@@ -1,0 +1,201 @@
+﻿//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// See LICENSE file in the project root for full license information.
+//
+#pragma once
+
+#include <armnn/TensorFwd.hpp>
+#include <boost/test/unit_test.hpp>
+#include <boost/multi_array.hpp>
+#include <vector>
+#include <array>
+
+#include <boost/assert.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/numeric/conversion/cast.hpp>
+
+#include "armnn/Tensor.hpp"
+
+#include "backends/test/QuantizeHelper.hpp"
+
+#include <cmath>
+
+constexpr float g_FloatCloseToZeroTolerance = 1.0e-7f;
+
+template<typename T, bool isQuantized = true>
+struct SelectiveComparer
+{
+    static bool Compare(T a, T b)
+    {
+        return (std::max(a, b) - std::min(a, b)) <= 1;
+    }
+
+};
+
+template<typename T>
+struct SelectiveComparer<T, false>
+{
+    static bool Compare(T a, T b)
+    {
+        // if a or b is zero, percent_tolerance does an exact match, so compare to a small, constant tolerance instead
+        if (a == 0.0f || b == 0.0f)
+        {
+            return std::abs(a - b) <= g_FloatCloseToZeroTolerance;
+        }
+        // For unquantized floats we use a tolerance of 1%.
+        boost::math::fpc::close_at_tolerance<float> comparer(boost::math::fpc::percent_tolerance(1.0f));
+        return comparer(a, b);
+    }
+};
+
+template<typename T>
+bool SelectiveCompare(T a, T b)
+{
+    return SelectiveComparer<T, armnn::IsQuantizedType<T>()>::Compare(a, b);
+};
+
+
+
+template <typename T, std::size_t n>
+boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n>& a,
+                                                   const boost::multi_array<T, n>& b)
+{
+    // check they are same shape
+    for (unsigned int i=0; i<n; i++)
+    {
+        if (a.shape()[i] != b.shape()[i])
+        {
+            boost::test_tools::predicate_result res(false);
+            res.message() << "Different shapes ["
+                        << a.shape()[i]
+                        << "!="
+                        << b.shape()[i]
+                        << "]";
+            return res;
+        }
+    }
+
+    // now compare element-wise
+
+    // fun iteration over n dimensions
+    std::array<unsigned int, n> indices;
+    for (unsigned int i = 0; i < n; i++)
+    {
+        indices[i] = 0;
+    }
+
+    std::stringstream errorString;
+    int numFailedElements = 0;
+    constexpr int maxReportedDifferences = 3;
+
+    while (true)
+    {
+        bool comparison = SelectiveCompare(a(indices), b(indices));
+        if (!comparison)
+        {
+            ++numFailedElements;
+
+            if (numFailedElements <= maxReportedDifferences)
+            {
+                if (numFailedElements >= 2)
+                {
+                    errorString << ", ";
+                }
+                errorString << "[";
+                for (unsigned int i = 0; i < n; ++i)
+                {
+                    errorString << indices[i];
+                    if (i != n - 1)
+                    {
+                        errorString << ",";
+                    }
+                }
+                errorString << "]";
+
+                errorString << " (" << +a(indices) << " != " << +b(indices) << ")";
+            }
+        }
+
+        ++indices[n - 1];
+        for (unsigned int i=n-1; i>0; i--)
+        {
+            if (indices[i] == a.shape()[i])
+            {
+                indices[i] = 0;
+                ++indices[i - 1];
+            }
+        }
+
+        if (indices[0] == a.shape()[0])
+        {
+            break;
+        }
+    }
+
+    boost::test_tools::predicate_result comparisonResult(true);
+    if (numFailedElements > 0)
+    {
+        comparisonResult = false;
+        comparisonResult.message() << numFailedElements << " different values at: ";
+        if (numFailedElements > maxReportedDifferences)
+        {
+            errorString << ", ... (and " << (numFailedElements - maxReportedDifferences) << " other differences)";
+        }
+        comparisonResult.message() << errorString.str();
+    }
+
+    return comparisonResult;
+}
+
+
+// Creates a boost::multi_array with shape defined by the given TensorInfo.
+template <typename T, std::size_t n>
+boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo)
+{
+    std::array<unsigned int, n> shape;
+
+    for (unsigned int i = 0; i < n; i++)
+    {
+        shape[i] = tensorInfo.GetShape()[i];
+    }
+
+    return boost::multi_array<T, n>(shape);
+}
+
+// Creates a boost::multi_array with shape defined by the given TensorInfo and contents defined by the given vector.
+template <typename T, std::size_t n>
+boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo, const std::vector<T>& flat)
+{
+    BOOST_ASSERT_MSG(flat.size() == tensorInfo.GetNumElements(), "Wrong number of components supplied to tensor");
+
+    std::array<unsigned int, n> shape;
+
+    for (unsigned int i = 0; i < n; i++)
+    {
+        shape[i] = tensorInfo.GetShape()[i];
+    }
+
+    boost::const_multi_array_ref<T, n> arrayRef(&flat[0], shape);
+    return boost::multi_array<T, n>(arrayRef);
+}
+
+template <typename T, std::size_t n>
+boost::multi_array<T, n> MakeRandomTensor(const armnn::TensorInfo& tensorInfo,
+                                          unsigned int seed,
+                                          float        min = -10.0f,
+                                          float        max = 10.0f)
+{
+    boost::random::mt19937                          gen(seed);
+    boost::random::uniform_real_distribution<float> dist(min, max);
+
+    std::vector<float> init(tensorInfo.GetNumElements());
+    for (unsigned int i = 0; i < init.size(); i++)
+    {
+        init[i] = dist(gen);
+    }
+    float qScale = tensorInfo.GetQuantizationScale();
+    int32_t qOffset = tensorInfo.GetQuantizationOffset();
+    return MakeTensor<T, n>(tensorInfo, QuantizedVector<T>(qScale, qOffset, init));
+}

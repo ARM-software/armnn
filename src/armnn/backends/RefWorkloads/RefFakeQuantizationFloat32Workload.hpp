@@ -1,0 +1,21 @@
+﻿//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// See LICENSE file in the project root for full license information.
+//
+
+#pragma once
+
+#include "backends/Workload.hpp"
+#include "backends/WorkloadData.hpp"
+
+namespace armnn
+{
+
+class RefFakeQuantizationFloat32Workload : public Float32Workload<FakeQuantizationQueueDescriptor>
+{
+public:
+    using Float32Workload<FakeQuantizationQueueDescriptor>::Float32Workload;
+    virtual void Execute() const override;
+};
+
+} //namespace armnn

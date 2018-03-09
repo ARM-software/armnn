@@ -1,0 +1,497 @@
+﻿//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// See LICENSE file in the project root for full license information.
+//
+#include <boost/test/unit_test.hpp>
+
+#include "armnn/ArmNN.hpp"
+#include "Graph.hpp"
+#include "Layer.hpp"
+#include "Layers.hpp"
+#include "armnn/TypesUtils.hpp"
+#include "armnn/Exceptions.hpp"
+
+#include "GraphUtils.hpp"
+#include "backends/CpuTensorHandle.hpp"
+
+#include <boost/cast.hpp>
+
+/// checks that first comes before second in the order
+bool CheckOrder(const armnn::Graph& graph, const armnn::Layer* first, const armnn::Layer* second)
+{
+    graph.Print();
+
+    const auto& order = graph.TopologicalSort();
+
+    auto firstPos = std::find(order.begin(), order.end(), first);
+    auto secondPos = std::find(firstPos, order.end(), second);
+
+    return (secondPos != order.end());
+}
+
+static armnn::Layer* GetFirstLayerWithName(armnn::Graph& graph, const std::string& name)
+{
+    for (auto&& layer : graph)
+    {
+        if (layer->GetNameStr() == name)
+        {
+            return layer;
+        }
+    }
+    return nullptr;
+}
+
+BOOST_AUTO_TEST_SUITE(Graph)
+
+BOOST_AUTO_TEST_CASE(ClassGraph)
+{
+    armnn::Graph graph;
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
+    BOOST_TEST(GraphHasNamedLayer(graph, "layerA"));
+}
+
+BOOST_AUTO_TEST_CASE(TopologicalSort)
+{
+    armnn::Graph graph;
+
+    armnn::ActivationDescriptor activationDefaults;
+
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::AdditionLayer>("layerC"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerD"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerE"));
+
+    armnn::Layer* const layerA = GetFirstLayerWithName(graph, "layerA");
+    armnn::Layer* const layerB = GetFirstLayerWithName(graph, "layerB");
+    armnn::Layer* const layerC = GetFirstLayerWithName(graph, "layerC");
+    armnn::Layer* const layerO = GetFirstLayerWithName(graph, "output");
+    armnn::Layer* const layerE = GetFirstLayerWithName(graph, "layerE");
+    armnn::Layer* const layerD = GetFirstLayerWithName(graph, "layerD");
+
+    // simple graph which branches and rejoins
+    //    A
+    //   / \'
+    //  D   E
+    //   \  |
+    //    \ B
+    //     \|
+    //      C
+    layerA->GetOutputSlot(0).Connect(layerD->GetInputSlot(0));
+    layerA->GetOutputSlot(0).Connect(layerE->GetInputSlot(0));
+    layerE->GetOutputSlot(0).Connect(layerB->GetInputSlot(0));
+    layerD->GetOutputSlot(0).Connect(layerC->GetInputSlot(0));
+    layerB->GetOutputSlot(0).Connect(layerC->GetInputSlot(1));
+    layerC->GetOutputSlot(0).Connect(layerO->GetInputSlot(0));
+
+    // check order is valid
+    BOOST_TEST(CheckOrder(graph, layerA, layerD));
+    BOOST_TEST(CheckOrder(graph, layerA, layerE));
+    BOOST_TEST(CheckOrder(graph, layerD, layerC));
+    BOOST_TEST(CheckOrder(graph, layerE, layerB));
+    BOOST_TEST(CheckOrder(graph, layerB, layerC));
+}
+
+BOOST_AUTO_TEST_CASE(InsertNewLayer)
+{
+    armnn::Graph graph;
+    armnn::TensorInfo tensorInfo({ 1, 1, 1, 1 }, armnn::DataType::Float32);
+
+    std::vector<armnn::Layer*> order;
+
+    armnn::ActivationDescriptor activationDefaults;
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerC"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::AdditionLayer>("layerD"));
+    BOOST_CHECK_NO_THROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
+
+    armnn::Layer* const layerA = GetFirstLayerWithName(graph, "layerA");
+    armnn::Layer* const layerB = GetFirstLayerWithName(graph, "layerB");
+    armnn::Layer* const layerC = GetFirstLayerWithName(graph, "layerC");
+    armnn::Layer* const layerD = GetFirstLayerWithName(graph, "layerD");
+    armnn::Layer* const layerO = GetFirstLayerWithName(graph, "output");
+
+    //    A
+    //   / \'
+    //  B   C
+    //   \ /
+    //    D
+    layerA->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    layerB->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    layerC->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    layerD->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    layerA->GetOutputSlot(0).Connect(layerB->GetInputSlot(0));
+    layerA->GetOutputSlot(0).Connect(layerC->GetInputSlot(0));
+    layerB->GetOutputSlot(0).Connect(layerD->GetInputSlot(0));
+    layerC->GetOutputSlot(0).Connect(layerD->GetInputSlot(1));
+    layerD->GetOutputSlot(0).Connect(layerO->GetInputSlot(0));
+
+    // check order is valid
+    BOOST_TEST(CheckOrder(graph, layerA, layerB));
+    BOOST_TEST(CheckOrder(graph, layerA, layerC));
+    BOOST_TEST(CheckOrder(graph, layerB, layerD));
+    BOOST_TEST(CheckOrder(graph, layerC, layerD));
+
+    //    A
+    //   / \'
+    //  B   C
+    //   \  |
+    //    \ E
+    //     \|
+    //      D
+    BOOST_CHECK_NO_THROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerD->GetInputSlot(1),
+                                                                      activationDefaults,
+                                                                      "layerE"));
+
+    armnn::Layer* const layerE = GetFirstLayerWithName(graph, "layerE");
+
+    // check order is valid
+    BOOST_TEST(CheckOrder(graph, layerA, layerB));
+    BOOST_TEST(CheckOrder(graph, layerA, layerC));
+    BOOST_TEST(CheckOrder(graph, layerB, layerD));
+    BOOST_TEST(CheckOrder(graph, layerC, layerE));
+    BOOST_TEST(CheckOrder(graph, layerE, layerD));
+
+    //      A
+    //     /|
+    //    / F
+    //   /  |
+    //  B   C
+    //   \  |
+    //    \ E
+    //     \|
+    //      D
+    BOOST_CHECK_NO_THROW(graph.InsertNewLayer<armnn::ActivationLayer>(layerC->GetInputSlot(0),
+                                                                      activationDefaults,
+                                                                      "layerF"));
+
+    armnn::Layer* const layerF = GetFirstLayerWithName(graph, "layerF");
+
+    // check order is valid
+    BOOST_TEST(CheckOrder(graph, layerA, layerB));
+    BOOST_TEST(CheckOrder(graph, layerA, layerF));
+    BOOST_TEST(CheckOrder(graph, layerF, layerC));
+    BOOST_TEST(CheckOrder(graph, layerB, layerD));
+    BOOST_TEST(CheckOrder(graph, layerC, layerE));
+    BOOST_TEST(CheckOrder(graph, layerE, layerD));
+}
+
+namespace
+{
+    using Edge = std::pair<const armnn::Layer*, const armnn::Layer*>;
+}
+
+static std::vector<Edge> GetEdgeList(const armnn::Graph& graph)
+{
+    std::vector<Edge> edges;
+
+    for (auto&& srcLayer: graph)
+    {
+        const unsigned int numOutputSlots = srcLayer->GetNumOutputSlots();
+        for (unsigned int s = 0; s < numOutputSlots; ++s)
+        {
+            const armnn::IOutputSlot& outputSlot = srcLayer->GetOutputSlot(s);
+            const unsigned int numConnections = outputSlot.GetNumConnections();
+            for (unsigned int c = 0; c < numConnections; ++c)
+            {
+                auto inputSlot = boost::polymorphic_downcast<const armnn::InputSlot*>(outputSlot.GetConnection(c));
+                edges.emplace_back(srcLayer, &inputSlot->GetOwningLayer());
+            }
+        }
+    }
+
+    return edges;
+}
+
+static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armnn::Graph& origGraph)
+{
+    std::vector<Edge> origEdges = GetEdgeList(origGraph);
+    std::vector<Edge> newEdges = GetEdgeList(graph);
+
+    // Adding copy layers should not produce any duplicate edges
+    {
+        std::vector<Edge> sortedNewEdges = newEdges;
+        std::sort(sortedNewEdges.begin(), sortedNewEdges.end());
+
+        auto last = std::unique(sortedNewEdges.begin(), sortedNewEdges.end());
+        BOOST_CHECK_MESSAGE(last == sortedNewEdges.end(), "New graph contains duplicate edges!");
+    }
+
+    // Each new edge must be tested
+    while (!newEdges.empty())
+    {
+        const Edge edge = std::move(newEdges.back());
+        newEdges.pop_back();
+
+        // Edge present in the original graph?
+        int originalEdge = -1;
+        for (unsigned int i = 0; i < origEdges.size(); i++)
+        {
+            const Edge& origEdge = origEdges[i];
+            if (origEdge.first->GetNameStr() == edge.first->GetNameStr() &&
+                origEdge.second->GetNameStr() == edge.second->GetNameStr())
+            {
+                originalEdge = boost::numeric_cast<int>(i);
+            }
+        }
+
+        if (originalEdge != -1)
+        {
+            // Each vertex should correspond to a layer.
+            const armnn::Layer* srcLayer = edge.first;
+            const armnn::Layer* dstLayer = edge.second;
+            BOOST_TEST(srcLayer);
+            BOOST_TEST(dstLayer);
+
+            // Both layers must have the same compute device.
+            if (srcLayer && dstLayer)
+            {
+                BOOST_TEST((srcLayer->GetComputeDevice() == dstLayer->GetComputeDevice()));
+            }
+
+            // Mark edge in original graph as observed (by deleting it)
+            origEdges.erase(origEdges.begin() + originalEdge);
+        }
+        else
+        {
+            // Edge did not exist in the original graph.
+            // It must then be an edge connecting a layer and a copy layer.
+            const armnn::Layer* srcLayer = edge.first;
+            const armnn::Layer* dstLayer = edge.second;
+
+            if (srcLayer == nullptr || dstLayer == nullptr)
+            {
+                BOOST_ERROR("At least one of the two ends of a new edge (" << edge.first << ", " << edge.second << ") "
+                            "introduced after adding copy layers to a graph correspond is not known to the graph");
+                continue;
+            }
+
+            // One and only one of the two layers referenced by the edge should be present in the original graph.
+            const bool srcLayerInOrigGraph = GraphHasNamedLayer(origGraph, edge.first->GetNameStr());
+            const bool dstLayerInOrigGraph = GraphHasNamedLayer(origGraph, edge.second->GetNameStr());
+
+            if (srcLayerInOrigGraph == dstLayerInOrigGraph)
+            {
+                BOOST_ERROR("A new edge ("
+                            << edge.first->GetName()
+                            << ", "
+                            << edge.second->GetName()
+                            << ") introduced after adding copy "
+                               "layers to a graph is invalid. One of the ends should be present in the original "
+                               "graph and the other should not, but "
+                            << (srcLayerInOrigGraph ? "both are" : "none are"));
+                continue;
+            }
+
+            const armnn::Layer* copyLayer = srcLayerInOrigGraph ? edge.second : edge.first;
+            const armnn::Layer* nonCopyLayer = srcLayerInOrigGraph ? srcLayer : dstLayer;
+
+            // Find all edges connecting the copy layer to other layers
+            std::vector<Edge> adjEdges;
+            auto it = newEdges.begin();
+            while (it != newEdges.end())
+            {
+                Edge& newEdge = *it;
+                if (copyLayer == (srcLayerInOrigGraph ? newEdge.first : newEdge.second))
+                {
+                    adjEdges.push_back(newEdge);
+
+                    // Since the adjacent edge is immediately tested below, no need to consider it afterwards
+                    it = newEdges.erase(it);
+                }
+                else
+                {
+                    it++;
+                }
+            }
+
+            if (adjEdges.empty())
+            {
+                BOOST_ERROR("An edge connecting a layer and a copy layer exists, (" << edge.first << ", " <<
+                            edge.second << "),  but no other edges connecting the copy layer '" << copyLayer->GetName()
+                            << "' to other layers could be found");
+                continue;
+            }
+
+            // Test adjacent edges now
+            for (const Edge& adjEdge : adjEdges)
+            {
+                // The adjacent edge must connect the copy layer to another layer
+                const armnn::Layer* adjLayer = srcLayerInOrigGraph ? adjEdge.second : adjEdge.first;
+
+                if (!adjLayer)
+                {
+                    BOOST_ERROR("An edge (" << adjEdge.first << ", " << adjEdge.second <<") is adjacent to an edge "
+                                "connecting a layer and a copy layer, (" << edge.first << ", " << edge.second << "), "
+                                "but the non-copy layer in the former, '" << adjLayer->GetName() << "' does not "
+                                "correspond to a layer");
+                    continue;
+                }
+
+                // Both layers must have different compute devices
+                BOOST_TEST((nonCopyLayer->GetComputeDevice() != adjLayer->GetComputeDevice()));
+
+                // There must exist an edge connecting both layers directly in the original graph
+                {
+                    const armnn::Layer* origEdgeN1 = srcLayerInOrigGraph ? nonCopyLayer : adjLayer;
+                    const armnn::Layer* origEdgeN2 = srcLayerInOrigGraph ? adjLayer : nonCopyLayer;
+                    auto origEdgeIter = std::find(origEdges.begin(), origEdges.end(),
+                        Edge(origEdgeN1, origEdgeN2));
+
+                    if (origEdgeIter != origEdges.end())
+                    {
+                        origEdges.erase(origEdgeIter);
+                    }
+                    else
+                    {
+                        BOOST_ERROR("An edge (" << adjEdge.first << ", " << adjEdge.second << ") is adjacent to an "
+                            "edge connecting a layer and a copy layer, (" << edge.first << ", " << edge.second <<
+                            "), but there is no edge connecting the layers in the original graph");
+                    }
+                }
+            }
+        }
+    }
+
+    BOOST_TEST(origEdges.empty(), "Not all of the edges in the original graph correspond to paths in the new graph");
+}
+
+struct CopyLayersFixture
+{
+    CopyLayersFixture()
+    {
+        using namespace armnn;
+        using namespace std;
+
+        Layer* const inputLayer = AddLayer<InputLayer>(0, "input");
+        inputLayer->SetComputeDevice(Compute::CpuRef);
+
+        Convolution2dDescriptor convolutionDefaults;
+        Layer* const convLayer1 = AddLayer<Convolution2dLayer>(convolutionDefaults, "conv1");
+        convLayer1->SetComputeDevice(Compute::CpuRef);
+
+        inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+
+        Layer* const convLayer2 = AddLayer<Convolution2dLayer>(convolutionDefaults, "conv2");
+        convLayer2->SetComputeDevice(Compute::CpuRef);
+
+        convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
+
+        armnn::OriginsDescriptor mergerDefaults(2);
+        Layer* const mergerLayer = AddLayer<MergerLayer>(mergerDefaults, "merger");
+        mergerLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+        convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
+        convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
+
+        armnn::ActivationDescriptor activationDefaults;
+        Layer* const actLayer = AddLayer<ActivationLayer>(activationDefaults, "act");
+        actLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+        mergerLayer->GetOutputSlot(0).Connect(actLayer->GetInputSlot(0));
+
+        armnn::SoftmaxDescriptor softmaxDefaults;
+        Layer* const softmaxLayer = AddLayer<SoftmaxLayer>(softmaxDefaults, "softmax");
+        softmaxLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+        actLayer->GetOutputSlot(0).Connect(softmaxLayer->GetInputSlot(0));
+
+        Layer* const outputLayer = AddLayer<OutputLayer>(0, "output");
+        outputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+        softmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    }
+
+    armnn::TensorInfo m_TensorDesc;
+    armnn::Graph m_Graph;
+
+private:
+
+    template <typename LayerType, typename... Args>
+    LayerType* AddLayer(Args&&... args)
+    {
+        LayerType* const layer = m_Graph.AddLayer<LayerType>(std::forward<Args>(args)...);
+
+        for (auto slot = layer->BeginOutputSlots(); slot != layer->EndOutputSlots(); ++slot)
+        {
+            slot->SetTensorInfo(m_TensorDesc);
+        }
+
+        return layer;
+    };
+};
+
+BOOST_FIXTURE_TEST_CASE(AddCopyLayers, CopyLayersFixture)
+{
+    const armnn::Graph origGraph(m_Graph);
+    m_Graph.AddCopyLayers();
+
+    TestGraphAfterAddingCopyLayers(m_Graph, origGraph);
+}
+
+BOOST_FIXTURE_TEST_CASE(AddCopyLayersSeveralTimes, CopyLayersFixture)
+{
+    m_Graph.AddCopyLayers();
+
+    // Calling AddCopyLayers() several times should not change the connections
+    const std::vector<Edge> edges = GetEdgeList(m_Graph);
+    for (int i = 0; i < 4; ++i)
+    {
+        m_Graph.AddCopyLayers();
+        const std::vector<Edge> otherEdges = GetEdgeList(m_Graph);
+        BOOST_TEST((edges == otherEdges));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames)
+{
+    armnn::Graph graph;
+
+    armnn::InputLayer* const inputLayer = graph.AddLayer<armnn::InputLayer>(0, "input");
+    inputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+    armnn::ViewsDescriptor splitterDesc(2);
+    armnn::SplitterLayer* const splitterLayer = graph.AddLayer<armnn::SplitterLayer>(splitterDesc, "splitter");
+    splitterLayer->SetComputeDevice(armnn::Compute::GpuAcc);
+
+    armnn::AdditionLayer* const additionLayer = graph.AddLayer<armnn::AdditionLayer>("addition");
+    additionLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+    armnn::OutputLayer* const outputLayer = graph.AddLayer<armnn::OutputLayer>(0, "output");
+    outputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+    inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(1).Connect(additionLayer->GetInputSlot(1));
+    additionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    graph.AddCopyLayers();
+
+    std::vector<Edge> edges = GetEdgeList(graph);
+    BOOST_CHECK(edges.size() == 7u);
+    std::sort(edges.begin(), edges.end());
+    auto last = std::unique(edges.begin(), edges.end());
+    BOOST_CHECK_MESSAGE(last == edges.end(), "Found duplicated edges after AddCopyLayers()");
+}
+
+BOOST_AUTO_TEST_CASE(DuplicateLayerNames)
+{
+    armnn::Graph graph;
+
+    armnn::InputLayer* const inputLayer = graph.AddLayer<armnn::InputLayer>(0, "layer");
+    inputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+    armnn::OutputLayer* const outputLayer = graph.AddLayer<armnn::OutputLayer>(0, "layer");
+    outputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+
+    inputLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    auto it = graph.TopologicalSort().begin();
+    BOOST_TEST(((*it)->GetType() == armnn::LayerType::Input));
+    BOOST_TEST(((*std::next(it))->GetType() == armnn::LayerType::Output));
+}
+
+BOOST_AUTO_TEST_SUITE_END()

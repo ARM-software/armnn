@@ -1,0 +1,20 @@
+//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// See LICENSE file in the project root for full license information.
+//
+
+#pragma once
+
+#include "NeonBaseConstantWorkload.hpp"
+
+namespace armnn
+{
+
+class NeonConstantFloat32Workload : public NeonBaseConstantWorkload<DataType::Float32>
+{
+public:
+    using NeonBaseConstantWorkload<DataType::Float32>::NeonBaseConstantWorkload;
+    virtual void Execute() const override;
+};
+
+} //namespace armnn

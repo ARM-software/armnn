@@ -34,6 +34,56 @@ constexpr char const* GetComputeDeviceAsCString(Compute compute)
     }
 }
 
+constexpr char const* GetActivationFunctionAsCString(ActivationFunction activation)
+{
+    switch (activation)
+    {
+        case ActivationFunction::Sigmoid:       return "Sigmoid";
+        case ActivationFunction::TanH:          return "TanH";
+        case ActivationFunction::Linear:        return "Linear";
+        case ActivationFunction::ReLu:          return "ReLu";
+        case ActivationFunction::BoundedReLu:   return "BoundedReLu";
+        case ActivationFunction::SoftReLu:      return "SoftReLu";
+        case ActivationFunction::LeakyReLu:     return "LeakyReLu";
+        case ActivationFunction::Abs:           return "Abs";
+        case ActivationFunction::Sqrt:          return "Sqrt";
+        case ActivationFunction::Square:        return "Square";
+        default:                                return "Unknown";
+    }
+}
+
+constexpr char const* GetPoolingAlgorithmAsCString(PoolingAlgorithm pooling)
+{
+    switch (pooling)
+    {
+        case PoolingAlgorithm::Average:  return "Average";
+        case PoolingAlgorithm::Max:      return "Max";
+        case PoolingAlgorithm::L2:       return "L2";
+        default:                         return "Unknown";
+    }
+}
+
+constexpr char const* GetOutputShapeRoundingAsCString(OutputShapeRounding rounding)
+{
+    switch (rounding)
+    {
+        case OutputShapeRounding::Ceiling:  return "Ceiling";
+        case OutputShapeRounding::Floor:    return "Floor";
+        default:                            return "Unknown";
+    }
+}
+
+
+constexpr char const* GetPaddingMethodAsCString(PaddingMethod method)
+{
+    switch (method)
+    {
+        case PaddingMethod::Exclude:       return "Exclude";
+        case PaddingMethod::IgnoreValue:   return "IgnoreValue";
+        default:                           return "Unknown";
+    }
+}
+
 constexpr unsigned int GetDataTypeSize(DataType dataType)
 {
     switch (dataType)

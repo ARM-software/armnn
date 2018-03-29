@@ -56,6 +56,8 @@ public:
     /// it cannot be setup for some reason.
     Runtime(const CreationOptions& options);
 
+    ~Runtime();
+
 private:
     friend void RuntimeLoadedNetworksReserve(armnn::Runtime* runtime); // see RuntimeTests.cpp
 

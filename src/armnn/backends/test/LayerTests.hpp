@@ -82,6 +82,8 @@ LayerTestResult<uint8_t, 4> IgnorePaddingMaxPooling2dSize3Uint8Test(armnn::IWork
 
 LayerTestResult<float,   4> SimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float,   4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(armnn::IWorkloadFactory& workloadFactory,
+                                                                              bool forceNoPadding);
 LayerTestResult<float,   4> IgnorePaddingSimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> IgnorePaddingSimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4>   IgnorePaddingSimpleAveragePooling2dNoPaddingTest(armnn::IWorkloadFactory& workloadFactory);
@@ -187,6 +189,8 @@ LayerTestResult<float, 4> CompareActivationTest(armnn::IWorkloadFactory&  worklo
                                                 unsigned int batchSize);
 
 LayerTestResult<float, 4> MultiplicationTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> CompareMultiplicationTest(armnn::IWorkloadFactory& workloadFactory,
                                              armnn::IWorkloadFactory& refWorkloadFactory);
@@ -260,6 +264,8 @@ LayerTestResult<uint8_t, 2> CompareSoftmaxUint8Test(armnn::IWorkloadFactory& wor
     float beta);
 
 LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(armnn::IWorkloadFactory& workloadFactory,
                                                             bool                     biasEnabled);
@@ -303,3 +309,6 @@ LayerTestResult<float, 2> FullyConnectedLargeTest(armnn::IWorkloadFactory& workl
 LayerTestResult<float, 4> SimplePermuteFloat32Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> SimplePermuteUint8Test(armnn::IWorkloadFactory& workloadFactory);
 
+LayerTestResult<float, 4> PermuteFloat32ValueSet1Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> PermuteFloat32ValueSet2Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> PermuteFloat32ValueSet3Test(armnn::IWorkloadFactory& workloadFactory);

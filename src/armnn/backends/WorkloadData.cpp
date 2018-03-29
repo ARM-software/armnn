@@ -502,16 +502,13 @@ void MultiplicationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
 {
     ValidateTwoInputs(workloadInfo, "MultiplicationQueueDescriptor");
     ValidateSingleOutput(workloadInfo, "MultiplicationQueueDescriptor");
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_InputTensorInfos[1],
-                              "MultiplicationQueueDescriptor",
-                              "first input",
-                              "second input");
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "MultiplicationQueueDescriptor",
-                              "input",
-                              "output");
+
+    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                                       workloadInfo.m_InputTensorInfos[1],
+                                       workloadInfo.m_OutputTensorInfos[0],
+                                       "MultiplicationQueueDescriptor",
+                                       "first input",
+                                       "second input");
 }
 
 void BatchNormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

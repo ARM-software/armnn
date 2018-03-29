@@ -135,6 +135,7 @@ public:
     ~OptimizedNetwork();
 
     Status PrintGraph() override;
+    Status SerializeToDot(std::ostream& stream) const override;
 
     Graph& GetGraph() { return *m_Graph; }
 

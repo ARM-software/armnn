@@ -41,6 +41,7 @@ void Splitter(const SplitterQueueDescriptor& data)
 
             //split view extents are defined by the size of (the corresponding) input tensor
             const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[viewIdx]);
+            BOOST_ASSERT(outputInfo.GetNumDimensions() == inputInfo0.GetNumDimensions());
 
             // check all dimensions to see if this element is inside the given input view
             bool insideView = true;

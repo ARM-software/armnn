@@ -63,6 +63,7 @@ public:
     virtual const IOutputSlot& GetOutputSlot(unsigned int index) const = 0;
     virtual IOutputSlot& GetOutputSlot(unsigned int index) = 0;
 
+    virtual LayerGuid GetGuid() const = 0;
 protected:
     ~IConnectableLayer() {} // Objects are not deletable via the handle
 };
@@ -265,6 +266,7 @@ public:
     static void Destroy(IOptimizedNetwork* network);
 
     virtual Status PrintGraph() = 0;
+    virtual Status SerializeToDot(std::ostream& stream) const = 0;
 
 protected:
     ~IOptimizedNetwork() {}

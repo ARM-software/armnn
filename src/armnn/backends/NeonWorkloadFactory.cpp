@@ -112,7 +112,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePooling2d(const Poo
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonConvolution2dFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonConvolution2dFloat32Workload, NeonConvolution2dUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(

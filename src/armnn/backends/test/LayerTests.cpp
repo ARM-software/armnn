@@ -1005,31 +1005,22 @@ LayerTestResult<float,4> CompareAdditionTest(armnn::IWorkloadFactory& workloadFa
     return ret;
 }
 
-LayerTestResult<float,4> MultiplicationTest(armnn::IWorkloadFactory& workloadFactory)
+namespace {
+LayerTestResult<float,4> MultiplicationTestHelper(armnn::IWorkloadFactory& workloadFactory,
+                                                  const unsigned int shape0[4],
+                                                  const std::vector<float> & values0,
+                                                  const unsigned int shape1[4],
+                                                  const std::vector<float> & values1,
+                                                  const unsigned int outShape[4],
+                                                  const std::vector<float> & outValues)
 {
-    const unsigned int width = 2;
-    const unsigned int height = 2;
-    const unsigned int channelCount = 2;
-    const unsigned int batchSize = 2;
+    const size_t dimensionCount = 4;
+    armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, armnn::DataType::Float32};
+    armnn::TensorInfo inputTensorInfo1{dimensionCount, shape1, armnn::DataType::Float32};
+    armnn::TensorInfo outputTensorInfo{dimensionCount, outShape, armnn::DataType::Float32};
 
-    armnn::TensorInfo inputTensorInfo0;
-    armnn::TensorInfo inputTensorInfo1;
-    armnn::TensorInfo outputTensorInfo;
-
-    constexpr unsigned int shape[] = { batchSize, channelCount, height, width };
-    constexpr std::size_t dimensionCount = std::extent<decltype(shape)>::value;
-
-    inputTensorInfo0 = armnn::TensorInfo(dimensionCount, shape, armnn::DataType::Float32);
-    inputTensorInfo1 = armnn::TensorInfo(dimensionCount, shape, armnn::DataType::Float32);
-    outputTensorInfo = armnn::TensorInfo(dimensionCount, shape, armnn::DataType::Float32);
-
-    auto input0 = MakeTensor<float, 4>(inputTensorInfo0, std::vector<float>({
-        1,  1,  1,  1,    2,  2,  2,  2,
-        3,  3,  3,  3,    4,  4,  4,  4 }));
-
-    auto input1 = MakeTensor<float, 4>(inputTensorInfo1, std::vector<float>({
-        2,  2,  2,  2,    3,  3,  3,  3,
-        4,  4,  4,  4,    5,  5,  5,  5 }));
+    auto input0 = MakeTensor<float, 4>(inputTensorInfo0, values0);
+    auto input1 = MakeTensor<float, 4>(inputTensorInfo1, values1);
 
     LayerTestResult<float,4> ret(outputTensorInfo);
 
@@ -1056,11 +1047,84 @@ LayerTestResult<float,4> MultiplicationTest(armnn::IWorkloadFactory& workloadFac
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
-    ret.outputExpected = MakeTensor<float, 4>(outputTensorInfo, std::vector<float>({
-        2,  2,  2,  2,    6,  6,  6,  6,
-        12, 12, 12, 12,  20, 20, 20, 20 }));
-
+    ret.outputExpected = MakeTensor<float, 4>(outputTensorInfo, outValues);
     return ret;
+}
+} // anonymous namespace
+
+
+LayerTestResult<float,4> MultiplicationTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int width = 2;
+    const unsigned int height = 2;
+    const unsigned int channelCount = 2;
+    const unsigned int batchSize = 2;
+
+    unsigned int shape[] = { batchSize, channelCount, height, width };
+
+    std::vector<float> input0({
+        1,  1,  1,  1,    2,  2,  2,  2,
+        3,  3,  3,  3,    4,  4,  4,  4 });
+
+    std::vector<float> input1({
+        2,  2,  2,  2,    3,  3,  3,  3,
+        4,  4,  4,  4,    5,  5,  5,  5 });
+
+    std::vector<float> output({
+        2,  2,  2,  2,    6,  6,  6,  6,
+        12, 12, 12, 12,  20, 20, 20, 20 });
+
+    return MultiplicationTestHelper(workloadFactory,
+                                    shape,
+                                    input0,
+                                    shape,
+                                    input1,
+                                    shape,
+                                    output);
+}
+
+LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    unsigned int shape0[] = { 1, 2, 2, 2 };
+    std::vector<float> input0({ 1, 2, 3, 4, 5, 6, 7, 8});
+
+    unsigned int shape1[] = { 1, 1, 1, 1 };
+    std::vector<float> input1({ 2 });
+
+    std::vector<float> output({ 2, 4, 6, 8, 10, 12, 14, 16});
+
+    return MultiplicationTestHelper(workloadFactory,
+                                    shape0,
+                                    input0,
+                                    shape1,
+                                    input1,
+                                    shape0,
+                                    output);
+}
+
+LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    unsigned int shape0[] = { 1, 3, 3, 2 };
+    std::vector<float> input0({
+        1,   2,      3,  4,      5,  6,
+        7,   8,      9, 10,     11, 12,
+        13, 14,     15, 16,     17, 18});
+
+    unsigned int shape1[] = { 1, 1, 1, 2 };
+    std::vector<float> input1({ 1, 2 });
+
+    std::vector<float> output({
+        1,   4,       3,  8,      5, 12,
+        7,   16,      9, 20,     11, 24,
+        13,  28,     15, 32,     17, 36});
+
+    return MultiplicationTestHelper(workloadFactory,
+                                    shape0,
+                                    input0,
+                                    shape1,
+                                    input1,
+                                    shape0,
+                                    output);
 }
 
 LayerTestResult<float,4> CompareMultiplicationTest(armnn::IWorkloadFactory& workloadFactory,
@@ -3253,75 +3317,172 @@ LayerTestResult<uint8_t, 4> AdditionUint8Test(armnn::IWorkloadFactory& workloadF
     return result;
 }
 
-LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& workloadFactory)
+namespace
 {
-    unsigned int batchSize = 1;
-    unsigned int channels = 2;
-    unsigned int height = 2;
-    unsigned int width = 3;
+LayerTestResult<uint8_t, 4> MultiplicationUint8TestHelper(armnn::IWorkloadFactory& workloadFactory,
+                                                          const unsigned int shape0[4],
+                                                          const std::vector<uint8_t> & values0,
+                                                          float scale0,
+                                                          int32_t offset0,
+                                                          const unsigned int shape1[4],
+                                                          const std::vector<uint8_t> & values1,
+                                                          float scale1,
+                                                          int32_t offset1,
+                                                          const unsigned int outShape[4],
+                                                          const std::vector<uint8_t> & outValues,
+                                                          float outScale,
+                                                          int32_t outOffset)
+{
+    armnn::TensorInfo inputTensorInfo0(4, shape0, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo inputTensorInfo1(4, shape1, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo outputTensorInfo(4, outShape, armnn::DataType::QuantisedAsymm8);
 
-    armnn::TensorInfo inputTensorInfo1, inputTensorInfo2;
-    armnn::TensorInfo outputTensorInfo;
+    inputTensorInfo0.SetQuantizationScale(scale0);
+    inputTensorInfo0.SetQuantizationOffset(offset0);
 
-    const unsigned int shape[] = { batchSize, channels, height, width };
-    inputTensorInfo1 = armnn::TensorInfo(4, shape, armnn::DataType::QuantisedAsymm8);
-    inputTensorInfo1.SetQuantizationScale(4.0f);
-    inputTensorInfo1.SetQuantizationOffset(1);
+    inputTensorInfo1.SetQuantizationScale(scale1);
+    inputTensorInfo1.SetQuantizationOffset(offset1);
 
-    inputTensorInfo2 = armnn::TensorInfo(4, shape, armnn::DataType::QuantisedAsymm8);
-    inputTensorInfo2.SetQuantizationScale(3.0f);
-    inputTensorInfo2.SetQuantizationOffset(-2);
+    outputTensorInfo.SetQuantizationScale(outScale);
+    outputTensorInfo.SetQuantizationOffset(outOffset);
 
-    outputTensorInfo = armnn::TensorInfo(4, shape, armnn::DataType::QuantisedAsymm8);
-    outputTensorInfo.SetQuantizationScale(1366.255f); // Scale/offset chosen to have output values out of range
-    outputTensorInfo.SetQuantizationOffset(-5);
+    auto input0 = MakeTensor<uint8_t, 4>(inputTensorInfo0, values0);
+    auto input1 = MakeTensor<uint8_t, 4>(inputTensorInfo1, values1);
 
-    // See dequantized values to the right
-    auto input1 = MakeTensor<uint8_t, 4>(inputTensorInfo1, std::vector<uint8_t>(
-    {
-         62,  37,   3, 172,  13, 111, // 244, 144,   8, 684,  48, 440,
-        188,  20,  73,  31,  23,  31  // 748,  76, 288, 120,  88, 120
-    }));
-
-    // See dequantized values to the right
-    auto input2 = MakeTensor<uint8_t, 4>(inputTensorInfo1, std::vector<uint8_t>(
-    {
-        126, 240, 252, 183, 121, 247, // 384, 726, 762, 555, 369, 747,
-         48, 115, 151,  79,  78,  97  // 150, 351, 459, 243, 240, 297
-    }));
-
-    // See dequantized values to the right
     LayerTestResult<uint8_t, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<uint8_t, 4>(outputTensorInfo, std::vector<uint8_t>(
-    {
-         64,  72,   0, 255,   8, 236, //  93696, 104544, 6096(clamped), 379620(clamped), 17712, 328680,
-         77,  15,  92,  16,  10,  21, // 112200,  26676,        132192,           29160, 21120,  35640
-    }));
+    result.outputExpected = MakeTensor<uint8_t, 4>(outputTensorInfo, outValues);
 
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::MultiplicationQueueDescriptor data;
     armnn::WorkloadInfo info;
-    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
-    AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
+    AddInputToWorkload(data,  info, inputTensorInfo0, inputHandle0.get());
+    AddInputToWorkload(data,  info, inputTensorInfo1, inputHandle1.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMultiplication(data, info);
 
+    inputHandle0->Allocate();
     inputHandle1->Allocate();
-    inputHandle2->Allocate();
     outputHandle->Allocate();
 
+    CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
-    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
 
     return result;
+}
+} // anonymous namespace
+
+LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    unsigned int batchSize = 1;
+    unsigned int channels = 2;
+    unsigned int height = 2;
+    unsigned int width = 3;
+    const unsigned int shape[] = { batchSize, channels, height, width };
+
+    // See dequantized values to the right
+    std::vector<uint8_t> input0({
+         62,  37,   3, 172,  13, 111, // 244, 144,   8, 684,  48, 440,
+        188,  20,  73,  31,  23,  31  // 748,  76, 288, 120,  88, 120
+    });
+
+    // See dequantized values to the right
+    std::vector<uint8_t> input1({
+        126, 240, 252, 183, 121, 247, // 384, 726, 762, 555, 369, 747,
+         48, 115, 151,  79,  78,  97  // 150, 351, 459, 243, 240, 297
+    });
+
+    // See dequantized values to the right
+    std::vector<uint8_t> output(
+    {
+         64,  72,   0, 255,   8, 236, //  93696, 104544, 6096(clamped), 379620(clamped), 17712, 328680,
+         77,  15,  92,  16,  10,  21, // 112200,  26676,        132192,           29160, 21120,  35640
+    });
+
+    return MultiplicationUint8TestHelper(workloadFactory,
+                                         shape,
+                                         input0,
+                                         4.0f,
+                                         1,
+                                         shape,
+                                         input1,
+                                         3.0f,
+                                         -2,
+                                         shape,
+                                         output,
+                                         1366.255f, // Scale/offset chosen to have output values out of range
+                                         -5);
+}
+
+LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<uint8_t> input0({
+        1, 2, 3,    4,  5,  6,
+        7, 8, 9,   10, 11, 12
+    });
+
+    std::vector<uint8_t> input1({2});
+
+    std::vector<uint8_t> output({
+        2,  4,   6,     8, 10, 12,
+        14, 16, 18,    20, 22, 24
+    });
+
+    return MultiplicationUint8TestHelper(workloadFactory,
+                                         shape0,
+                                         input0,
+                                         1.0f,
+                                         0,
+                                         shape1,
+                                         input1,
+                                         1.0f,
+                                         0,
+                                         shape0,
+                                         output,
+                                         1.0f,
+                                         0);
+}
+
+LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<uint8_t> input0({
+        1, 2, 3,    4,  5,  6,
+        7, 8, 9,   10, 11, 12
+    });
+
+    std::vector<uint8_t> input1({1, 2, 3});
+
+    std::vector<uint8_t> output({
+        1,  4,   9,     4, 10, 18,
+        7, 16,  27,    10, 22, 36
+    });
+
+    return MultiplicationUint8TestHelper(workloadFactory,
+                                         shape0,
+                                         input0,
+                                         1.0f,
+                                         0,
+                                         shape1,
+                                         input1,
+                                         1.0f,
+                                         0,
+                                         shape0,
+                                         output,
+                                         1.0f,
+                                         0);
 }
 
 LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(armnn::IWorkloadFactory& workloadFactory)
@@ -3702,6 +3863,12 @@ LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(armnn::IWorkloadFact
     return SimpleAveragePooling2dTestCommon<uint8_t>(workloadFactory, 0.5, -1);
 }
 
+LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(armnn::IWorkloadFactory& workloadFactory,
+                                                                            bool forceNoPadding)
+{
+    return IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon<float>(workloadFactory, forceNoPadding);
+}
+
 LayerTestResult<float, 4> LargeTensorsAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory)
 {
     return LargeTensorsAveragePooling2dTestCommon<float>(workloadFactory);
@@ -3881,4 +4048,19 @@ LayerTestResult<float, 4> SimplePermuteFloat32Test(armnn::IWorkloadFactory& work
 LayerTestResult<uint8_t, 4> SimplePermuteUint8Test(armnn::IWorkloadFactory& workloadFactory)
 {
     return SimplePermuteUint8TestCommon(workloadFactory);
+};
+
+LayerTestResult<float, 4> PermuteFloat32ValueSet1Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return PermuteFloat32ValueSet1TestCommon(workloadFactory);
+};
+
+LayerTestResult<float, 4> PermuteFloat32ValueSet2Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return PermuteFloat32ValueSet2TestCommon(workloadFactory);
+};
+
+LayerTestResult<float, 4> PermuteFloat32ValueSet3Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return PermuteFloat32ValueSet3TestCommon(workloadFactory);
 };

@@ -4,18 +4,48 @@
 //
 
 #include "Multiplication.hpp"
+#include "Broadcast.hpp"
+
+#include <functional>
+
+namespace
+{
+
+void ElementwiseMultiplication(unsigned int numElements,
+                               const float* inData0,
+                               const float* inData1,
+                               float* outData)
+{
+    for (unsigned int i = 0; i < numElements; ++i)
+    {
+        outData[i] = inData0[i] * inData1[i];
+    }
+}
+
+} // namespace
 
 namespace armnn
 {
 
-void Multiplication(const float* in0,
-                    const float* in1,
-                    unsigned int numElements,
-                    float* out)
+void Multiplication(const TensorShape& inShape0,
+                    const TensorShape& inShape1,
+                    const TensorShape& outShape,
+                    const float* inData0,
+                    const float* inData1,
+                    float* outData)
 {
-    for (unsigned int i = 0; i < numElements; ++i)
+    if (inShape0 == inShape1)
     {
-        out[i] = in0[i] * in1[i];
+        ElementwiseMultiplication(inShape0.GetNumElements(), inData0, inData1, outData);
+    }
+    else
+    {
+        BroadcastLoop(inShape0, inShape1, outShape).Unroll(
+            std::multiplies<float>(),
+            0,
+            inData0,
+            inData1,
+            outData);
     }
 }
 

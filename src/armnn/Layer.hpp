@@ -10,6 +10,7 @@
 #include "backends/WorkloadDataCollector.hpp"
 #include "backends/WorkloadInfo.hpp"
 #include "InternalTypes.hpp"
+#include "SerializeLayerParameters.hpp"
 
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
@@ -218,6 +219,10 @@ public:
 
     virtual void ValidateTensorShapesFromInputs() = 0;
 
+    /// Helper to serialize the layer parameters to string
+    /// (currently used in DotSerializer and company)
+    virtual void SerializeLayerParameters(ParameterStringifyFunction & fn) const {}
+
     // IConnectableLayer
 
     const char* GetName() const override { return m_LayerName.c_str(); }
@@ -229,6 +234,9 @@ public:
     InputSlot& GetInputSlot(unsigned int index) override { return  m_InputSlots.at(index); }
     const OutputSlot& GetOutputSlot(unsigned int index = 0) const override { return m_OutputSlots.at(index); }
     OutputSlot& GetOutputSlot(unsigned int index = 0) override { return m_OutputSlots.at(index); }
+
+    void SetGuid(LayerGuid guid) { m_Guid = guid; }
+    LayerGuid GetGuid() const final { return m_Guid; }
 
 protected:
     // Graph needs access to the virtual destructor
@@ -281,6 +289,8 @@ private:
     /// Used for sorting
     mutable LayerPriority m_Priority = 0;
     mutable bool m_Visiting = false;
+
+    LayerGuid m_Guid;
 };
 
 // A layer user-provided data can be bound to (e.g. inputs, outputs)

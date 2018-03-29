@@ -18,8 +18,8 @@ public:
     /// Inserts an equivalent ReshapeLayer that bypasses both for that connection.
     void Run(Graph& graph, InputSlot& connection) const
     {
-        auto& base = connection.GetConnectedOutputSlot()->GetOwningLayer();
-        auto& child = connection.GetOwningLayer();
+        Layer& base = connection.GetConnectedOutputSlot()->GetOwningLayer();
+        Layer& child = connection.GetOwningLayer();
 
         BOOST_ASSERT(base.GetType() == LayerType::Reshape);
         BOOST_ASSERT(child.GetType() == LayerType::Reshape);

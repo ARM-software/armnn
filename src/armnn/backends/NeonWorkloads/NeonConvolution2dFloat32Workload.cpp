@@ -15,7 +15,12 @@ using namespace armcomputetensorutils;
 NeonConvolution2dFloat32Workload::NeonConvolution2dFloat32Workload(const Convolution2dQueueDescriptor& descriptor,
                                                                    const WorkloadInfo& info)
     : NeonConvolution2dBaseWorkload(descriptor, info)
-{}
+{
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        InitialiseArmComputeTensorData(m_BiasTensor, m_Data.m_Bias->template GetConstTensor<float>());
+    }
+}
 
 
 void NeonConvolution2dFloat32Workload::Execute() const

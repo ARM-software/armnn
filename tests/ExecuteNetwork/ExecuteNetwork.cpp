@@ -6,6 +6,9 @@
 #if defined(ARMNN_CAFFE_PARSER)
 #include "armnnCaffeParser/ICaffeParser.hpp"
 #endif
+#if defined(ARMNN_TF_PARSER)
+#include "armnnTfParser/ITfParser.hpp"
+#endif
 #include "Logging.hpp"
 #include "../InferenceTest.hpp"
 
@@ -232,8 +235,13 @@ int main(int argc, char* argv[])
     }
     else if (modelFormat.find("tensorflow") != std::string::npos)
     {
+#if defined(ARMNN_TF_PARSER)
+        return MainImpl<armnnTfParser::ITfParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
+            inputName.c_str(), inputTensorShape.get(), inputTensorDataFilePath.c_str(), outputName.c_str());
+#else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
         return 1;
+#endif
     }
     else
     {

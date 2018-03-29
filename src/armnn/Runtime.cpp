@@ -9,6 +9,7 @@
 #ifdef ARMCOMPUTECL_ENABLED
 #include <arm_compute/core/CL/OpenCL.h>
 #include <arm_compute/core/CL/CLKernelLibrary.h>
+#include <arm_compute/runtime/CL/CLScheduler.h>
 #endif
 
 #include <boost/log/trivial.hpp>
@@ -58,18 +59,26 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut, IOptimizedNetworkPtr inNetw
     m_LoadedNetworks[networkIdOut] = std::move(loadedNetwork);
 
     return Status::Success;
-
 }
 
 Status Runtime::UnloadNetwork(NetworkId networkId)
 {
+#ifdef ARMCOMPUTECL_ENABLED
+    if (arm_compute::CLScheduler::get().context()() != NULL)
+    {
+        arm_compute::CLScheduler::get().sync();
+    }
+#endif
     if (m_LoadedNetworks.erase(networkId) == 0)
     {
         BOOST_LOG_TRIVIAL(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";
         return Status::Failure;
     }
 #ifdef ARMCOMPUTECL_ENABLED
-    arm_compute::CLKernelLibrary::get().clear_programs_cache();
+    if (arm_compute::CLScheduler::get().context()() != NULL && m_LoadedNetworks.empty())
+    {
+        m_WorkloadFactories.m_GpuAcc.get()->LoadOpenClRuntime();
+    }
 #endif
     BOOST_LOG_TRIVIAL(debug) << "Runtime::UnloadNetwork(): Unloaded network with ID: " << networkId;
     return Status::Success;
@@ -87,11 +96,24 @@ Runtime::Runtime(const CreationOptions& options)
     m_WorkloadFactories.m_CpuRef = make_shared<RefWorkloadFactory>(
         options.m_DefaultComputeDevice == Compute::CpuRef ? true : options.m_UseCpuRefAsFallback);
     m_WorkloadFactories.m_CpuAcc = make_shared<NeonWorkloadFactory>();
-    m_WorkloadFactories.m_GpuAcc = make_shared<ClWorkloadFactory>();
+    m_WorkloadFactories.m_GpuAcc = make_shared<ClWorkloadFactory>(options.m_ClTunedParameters);
 
     if (options.m_DefaultComputeDevice == Compute::GpuAcc)
     {
-        m_WorkloadFactories.m_GpuAcc.get()->LoadOpenClRuntime(options.m_ClTunedParameters);
+        m_WorkloadFactories.m_GpuAcc.get()->LoadOpenClRuntime();
+    }
+}
+
+Runtime::~Runtime()
+{
+    std::vector<int> networkIDs;
+    std::transform(m_LoadedNetworks.begin(), m_LoadedNetworks.end(),
+                   std::back_inserter(networkIDs),
+                   [](const auto &pair) { return pair.first; });
+
+    for (auto networkID : networkIDs)
+    {
+        UnloadNetwork(networkID);
     }
 }
 

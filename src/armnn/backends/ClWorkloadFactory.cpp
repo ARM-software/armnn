@@ -35,24 +35,62 @@ bool ClWorkloadFactory::IsLayerSupported(const Layer& layer, DataType dataType, 
 
 #ifdef ARMCOMPUTECL_ENABLED
 
-void ClWorkloadFactory::LoadOpenClRuntime(IClTunedParameters* clTunedParameters)
+ClWorkloadFactory::ClWorkloadFactory(IClTunedParameters* clTunedParameters):
+    m_clTunedParameters(boost::polymorphic_downcast<ClTunedParameters*>(clTunedParameters))
 {
-    ClTunedParameters* clTunedParametersImpl = boost::polymorphic_downcast<ClTunedParameters*>(clTunedParameters);
+    try
+    {
+        std::vector<cl::Platform> platforms;
+        cl::Platform::get(&platforms);
 
-    cl::Device device;
+        // Select default platform as the first element
+        cl::Platform::setDefault(platforms[0]);
+
+        std::vector<cl::Device> devices;
+        platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+
+        // Select default device as the first element
+        cl::Device::setDefault(devices[0]);
+    }
+    catch (const cl::Error& clError)
+    {
+        throw ClRuntimeUnavailableException(boost::str(boost::format(
+            "Could not initialize the CL runtime. Error description: %1%. CL error code: %2%"
+        ) % clError.what() % clError.err()));
+    }
+
+    // Remove the use of global CL context
+    cl::Context::setDefault(cl::Context{});
+    BOOST_ASSERT(cl::Context::getDefault()() == NULL);
+
+    // Remove the use of global CL command queue
+    cl::CommandQueue::setDefault(cl::CommandQueue{});
+    BOOST_ASSERT(cl::CommandQueue::getDefault()() == NULL);
+}
+
+ClWorkloadFactory::~ClWorkloadFactory()
+{
+}
+
+void ClWorkloadFactory::LoadOpenClRuntime()
+{
+    cl::Device device = cl::Device::getDefault();
     cl::Context context;
     cl::CommandQueue commandQueue;
 
     try
     {
-        device = cl::Device::getDefault();
-        context = cl::Context::getDefault();
+        arm_compute::CLKernelLibrary::get().clear_programs_cache();
+        arm_compute::CLScheduler::get().init(context, commandQueue, device);
+        arm_compute::CLKernelLibrary::get().init(".", context, device);
+
+        context = cl::Context(device);
 
         bool enableProfiling = false;
 #if ARMNN_PROFILING_ENABLED
         enableProfiling = true;
 #endif
-        if (clTunedParametersImpl && clTunedParametersImpl->m_Mode == IClTunedParameters::Mode::UpdateTunedParameters)
+        if (m_clTunedParameters && m_clTunedParameters->m_Mode == IClTunedParameters::Mode::UpdateTunedParameters)
         {
             enableProfiling = true; // Needed for the CLTuner to work.
         }
@@ -65,7 +103,7 @@ void ClWorkloadFactory::LoadOpenClRuntime(IClTunedParameters* clTunedParameters)
         else
         {
             // Use default queue
-            commandQueue = cl::CommandQueue::getDefault();
+            commandQueue = cl::CommandQueue(context, device);
         }
     }
     catch (const cl::Error& clError)
@@ -79,9 +117,9 @@ void ClWorkloadFactory::LoadOpenClRuntime(IClTunedParameters* clTunedParameters)
     arm_compute::CLKernelLibrary::get().init(".", context, device);
 
     arm_compute::ICLTuner* tuner = nullptr;
-    if (clTunedParameters)
+    if (m_clTunedParameters)
     {
-        tuner = &clTunedParametersImpl->m_Tuner;
+        tuner = &m_clTunedParameters->m_Tuner;
     }
     arm_compute::CLScheduler::get().init(context, commandQueue, device, tuner);
 }
@@ -266,7 +304,16 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescri
 
 #else // #if ARMCOMPUTECL_ENABLED
 
-void ClWorkloadFactory::LoadOpenClRuntime(IClTunedParameters* clTunedParameters)
+ClWorkloadFactory::ClWorkloadFactory(IClTunedParameters* clTunedParameters)
+{
+    // No CL support
+}
+
+ClWorkloadFactory::~ClWorkloadFactory()
+{
+}
+
+void ClWorkloadFactory::LoadOpenClRuntime()
 {
     // No CL support
 }

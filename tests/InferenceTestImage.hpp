@@ -119,3 +119,9 @@ std::vector<float> GetImageDataInArmNnLayoutAsNormalizedFloats(ImageChannelLayou
 std::vector<float> GetImageDataInArmNnLayoutAsFloatsSubtractingMean(ImageChannelLayout layout,
     const InferenceTestImage& image,
     const std::array<float, 3>& mean);
+
+// Reads the contents of an inference test image as 3-channel pixels and returns the image data as normalized float
+// values. The returned image stay in the original order (HWC) order. The C order may be changed according to the
+// supplied layout value.
+std::vector<float> GetImageDataAsNormalizedFloats(ImageChannelLayout layout,
+                                                  const InferenceTestImage& image);

@@ -55,6 +55,26 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     auto& output = this->GetOutput();
     const auto testCaseId = this->GetTestCaseId();
 
+    std::map<float,int> resultMap;
+    {
+        int index = 0;
+        for (const auto & o : output)
+        {
+            resultMap[o] = index++;
+        }
+    }
+
+    {
+        BOOST_LOG_TRIVIAL(info) << "= Prediction values for test #" << testCaseId;
+        auto it = resultMap.rbegin();
+        for (int i=0; i<5 && it != resultMap.rend(); ++i)
+        {
+            BOOST_LOG_TRIVIAL(info) << "Top(" << (i+1) << ") prediction is " << it->second <<
+              " with confidence: " << 100.0*(it->first) << "%";
+            ++it;
+        }
+    }
+
     const unsigned int prediction = boost::numeric_cast<unsigned int>(
         std::distance(output.begin(), std::max_element(output.begin(), output.end())));
 

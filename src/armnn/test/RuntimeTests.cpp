@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryUsage)
     BOOST_TEST(leakedBefore == leakedAfter);
 
     // Add resonable threshold after and before running valgrind with the ACL clear cache function.
-    BOOST_TEST(reachableAfter - reachableBefore < 30000);
+    BOOST_TEST(static_cast<long>(reachableAfter) - static_cast<long>(reachableBefore) < 1024);
 
     // these are needed because VALGRIND_COUNT_LEAKS is a macro that assigns to the parameters
     // so they are assigned to, but still considered unused, causing a warning
@@ -178,7 +178,18 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
 
     // if we're not running under Valgrind, these vars will have been initialised to 0, so this will always pass
     BOOST_TEST(leakedBefore == leakedAfter);
-    BOOST_TEST(reachableBefore == reachableAfter);
+
+    #if defined(ARMCOMPUTECL_ENABLED)
+        // reachableBefore == reachableAfter should hold, but on OpenCL with Android we are still
+        // not entirely able to control the memory in the OpenCL driver. Testing is showing that
+        // after this test (which clears all OpenCL memory) we are clearing a little bit more than
+        // we expect, probably depending on the order in which other tests are run.
+        BOOST_TEST(reachableBefore - reachableAfter <= 24);
+    #else
+        BOOST_TEST(reachableBefore == reachableAfter);
+    #endif
+
+    BOOST_TEST(reachableBefore >= reachableAfter);
 
     // these are needed because VALGRIND_COUNT_LEAKS is a macro that assigns to the parameters
     // so they are assigned to, but still considered unused, causing a warning

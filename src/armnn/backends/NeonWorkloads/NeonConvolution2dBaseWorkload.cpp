@@ -73,10 +73,6 @@ NeonConvolution2dBaseWorkload<dataType>::NeonConvolution2dBaseWorkload(const Con
     using Type = ResolveType<dataType>;
 
     InitialiseArmComputeTensorData(m_KernelTensor, m_Data.m_Weight->template GetConstTensor<Type>());
-    if (m_Data.m_Parameters.m_BiasEnabled)
-    {
-        InitialiseArmComputeTensorData(m_BiasTensor, m_Data.m_Bias->template GetConstTensor<Type>());
-    }
 }
 
 // Generate known implementations for linker

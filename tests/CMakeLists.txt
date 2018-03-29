@@ -85,7 +85,51 @@ if(BUILD_CAFFE_PARSER)
     CaffeParserTest(CaffeYolo-Armnn "${CaffeYolo-Armnn_sources}")
 endif()
 
-if (BUILD_CAFFE_PARSER)
+if(BUILD_TF_PARSER)
+    macro(TfParserTest testName sources)
+        add_executable_ex(${testName} ${sources})
+        target_include_directories(${testName} PRIVATE ../src/armnnUtils)
+
+        target_link_libraries(${testName} inferenceTest)
+        target_link_libraries(${testName} armnnTfParser)
+        target_link_libraries(${testName} armnn)
+        target_link_libraries(${testName} ${CMAKE_THREAD_LIBS_INIT})
+        if(OPENCL_LIBRARIES)
+            target_link_libraries(${testName} ${OPENCL_LIBRARIES})
+        endif()
+        target_link_libraries(${testName}
+            ${Boost_SYSTEM_LIBRARY}
+            ${Boost_FILESYSTEM_LIBRARY}
+            ${Boost_PROGRAM_OPTIONS_LIBRARY})
+        addDllCopyCommands(${testName})
+    endmacro()
+
+    set(TfMnist-Armnn_sources
+        TfMnist-Armnn/TfMnist-Armnn.cpp
+        MnistDatabase.hpp
+        MnistDatabase.cpp)
+    TfParserTest(TfMnist-Armnn "${TfMnist-Armnn_sources}")
+
+    set(TfCifar10-Armnn_sources
+        TfCifar10-Armnn/TfCifar10-Armnn.cpp
+        Cifar10Database.hpp
+        Cifar10Database.cpp)
+    TfParserTest(TfCifar10-Armnn "${TfCifar10-Armnn_sources}")
+
+    set(TfMobileNet-Armnn_sources
+        TfMobileNet-Armnn/TfMobileNet-Armnn.cpp
+        MobileNetDatabase.hpp
+        MobileNetDatabase.cpp)
+    TfParserTest(TfMobileNet-Armnn "${TfMobileNet-Armnn_sources}")
+
+    set(TfInceptionV3-Armnn_sources
+        TfInceptionV3-Armnn/TfInceptionV3-Armnn.cpp
+        MobileNetDatabase.hpp
+        MobileNetDatabase.cpp)
+    TfParserTest(TfInceptionV3-Armnn "${TfInceptionV3-Armnn_sources}")
+endif()
+
+if (BUILD_CAFFE_PARSER OR BUILD_TF_PARSER)
     set(ExecuteNetwork_sources
         ExecuteNetwork/ExecuteNetwork.cpp)
 
@@ -94,6 +138,9 @@ if (BUILD_CAFFE_PARSER)
 
     if (BUILD_CAFFE_PARSER)
         target_link_libraries(ExecuteNetwork armnnCaffeParser)
+    endif()
+    if (BUILD_TF_PARSER)
+        target_link_libraries(ExecuteNetwork armnnTfParser)
     endif()
     target_link_libraries(ExecuteNetwork armnn)
     target_link_libraries(ExecuteNetwork ${CMAKE_THREAD_LIBS_INIT})

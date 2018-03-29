@@ -222,3 +222,34 @@ std::vector<float> GetImageDataInArmNnLayoutAsFloatsSubtractingMean(ImageChannel
             return value - mean[channelIndex];
         });
 }
+
+std::vector<float> GetImageDataAsNormalizedFloats(ImageChannelLayout layout,
+                                                  const InferenceTestImage& image)
+{
+    std::vector<float> imageData;
+    const unsigned int h = image.GetHeight();
+    const unsigned int w = image.GetWidth();
+
+    const unsigned int rDstIndex = GetImageChannelIndex(layout, ImageChannel::R);
+    const unsigned int gDstIndex = GetImageChannelIndex(layout, ImageChannel::G);
+    const unsigned int bDstIndex = GetImageChannelIndex(layout, ImageChannel::B);
+
+    imageData.resize(h * w * 3);
+    unsigned int offset = 0;
+
+    for (unsigned int j = 0; j < h; ++j)
+    {
+        for (unsigned int i = 0; i < w; ++i)
+        {
+            uint8_t r, g, b;
+            std::tie(r, g, b) = image.GetPixelAs3Channels(i, j);
+
+            imageData[offset+rDstIndex] = float(r) / 255.0f;
+            imageData[offset+gDstIndex] = float(g) / 255.0f;
+            imageData[offset+bDstIndex] = float(b) / 255.0f;
+            offset += 3;
+        }
+    }
+
+    return imageData;
+}

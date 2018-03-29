@@ -15,14 +15,13 @@ class Optimization;
 class Optimizer
 {
 public:
-    static const Optimizer& Get();
 
-    void Optimize(Graph& graph) const;
+    static void Optimize(Graph& graph);
 
 private:
     ~Optimizer() = default;
 
-    Optimizer(std::initializer_list<Optimization*> optimizations) : m_Optimizations(optimizations) {}
+    Optimizer();
 
     std::vector<Optimization*> m_Optimizations;
 };

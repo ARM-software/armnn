@@ -152,4 +152,7 @@ private:
     SizeType m_NumDimMappings;
 };
 
+// Define LayerGuid type.
+using LayerGuid = unsigned int;
+
 }

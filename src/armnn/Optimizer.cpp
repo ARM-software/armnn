@@ -8,7 +8,7 @@
 namespace armnn
 {
 
-const Optimizer& Optimizer::Get()
+Optimizer::Optimizer()
 {
     // Add optimizations here
     static optimizations::SquashEqualPermuteSiblings squashEqualPermuteSiblings;
@@ -19,28 +19,26 @@ const Optimizer& Optimizer::Get()
     static optimizations::OptimizeConsecutiveReshapes optimizeConsecutiveReshapes;
 
     // Set optimizations in desired order
-    static const Optimizer optimizer({
-                                         &squashEqualPermuteSiblings,
-                                         &squashEqualReshapeSiblings,
-                                         &optimizeInversePermutes,
-                                         &movePermuteUp,
-                                         &permuteAsReshape,
-                                         &optimizeConsecutiveReshapes,
-                                     });
-
-    return optimizer;
+    m_Optimizations = {&squashEqualPermuteSiblings,
+                       &squashEqualReshapeSiblings,
+                       &optimizeInversePermutes,
+                       &movePermuteUp,
+                       &permuteAsReshape,
+                       &optimizeConsecutiveReshapes,
+                      };
 }
 
-void Optimizer::Optimize(Graph& graph) const
+void Optimizer::Optimize(Graph& graph)
 {
+    Optimizer optimizer;
     auto it = graph.TopologicalSort().end();
     // Call TopologicalSort() in every iteration to re-order the list in case layers where added/removed.
     while (it != graph.TopologicalSort().begin())
     {
         --it;
-        for (auto&& optimization : m_Optimizations)
+        for (auto&& optimization : optimizer.m_Optimizations)
         {
-            optimization->Run(graph, it);
+            optimization->Run(graph, **it);
 
             if ((*it)->IsOutputUnconnected())
             {

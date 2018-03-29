@@ -23,18 +23,22 @@ namespace armnn
 {
 
 class IClTunedParameters;
+class ClTunedParameters;
 
 // ARM Compute OpenCL workload factory
 class ClWorkloadFactory : public IWorkloadFactory
 {
 public:
-    virtual ~ClWorkloadFactory(){};
+
+    ClWorkloadFactory(IClTunedParameters* clTunedParameters = nullptr);
+
+    virtual ~ClWorkloadFactory();
 
     virtual Compute GetCompute() const override { return Compute::GpuAcc; }
 
     static bool IsLayerSupported(const Layer& layer, DataType dataType, std::string& outReasonIfUnsupported);
 
-    void LoadOpenClRuntime(IClTunedParameters* clTunedParameters = nullptr);
+    void LoadOpenClRuntime();
 
     virtual bool SupportsSubTensors() const override { return true; }
 
@@ -109,6 +113,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
+
+private:
+    ClTunedParameters* m_clTunedParameters;
 };
 
 class ClTunedParameters : public IClTunedParameters

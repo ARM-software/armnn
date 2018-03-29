@@ -720,6 +720,83 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(armnn::IWorkl
     return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
 }
 
+//
+// Tests max pooling with the following parameters:
+//
+//   Pooling size: 3x2
+//   Stride:       (2,2)
+//   input size:   3x2
+//   channels:     1
+//   batch size:   1
+//
+template<typename T>
+LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        bool forceNoPadding,
+        float qScale = 1.0f,
+        int32_t qOffset = 0)
+{
+    armnn::Pooling2dDescriptor descriptor;
+    descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
+    descriptor.m_PoolWidth = 3;
+    descriptor.m_PoolHeight = 2;
+    descriptor.m_StrideX = 2;
+    descriptor.m_StrideY = 2;
+    descriptor.m_PadLeft = (forceNoPadding) ? 0 : 1;
+    descriptor.m_PadRight = descriptor.m_PadLeft;
+    descriptor.m_PadTop = 0;
+    descriptor.m_PadBottom = 0;
+    descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
+    descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
+
+    unsigned int inputWidth = 3;
+    unsigned int inputHeight = 2;
+    unsigned int outputWidth =
+        (inputWidth + descriptor.m_PadLeft + descriptor.m_PadRight + descriptor.m_StrideX - descriptor.m_PoolWidth) /
+        descriptor.m_StrideX;
+    unsigned int outputHeight =
+        (inputHeight + descriptor.m_PadTop + descriptor.m_PadBottom + descriptor.m_StrideY - descriptor.m_PoolHeight) /
+        descriptor.m_StrideY;
+    unsigned int channels = 1;
+    unsigned int batchSize = 1;
+
+    std::vector<float> inputData = {
+        3.0f, 6.0f, 9.0f,
+        12.0f, 15.0f, 18.0f,
+    };
+
+    std::vector<float> expectedOutputDataWithPadding = {
+        6.0f, 8.0f,
+    };
+
+    std::vector<float> expectedOutputDataNoPadding = {
+        10.5f,
+    };
+
+    armnn::TensorInfo inputTensorInfo({ batchSize, channels, inputHeight, inputWidth }, armnn::GetDataType<T>());
+
+    // Scale and offset should match input - we're just calculating average values.
+    armnn::TensorInfo outputTensorInfo({ batchSize, channels, outputHeight, outputWidth }, armnn::GetDataType<T>());
+
+    // Set quantization parameters if the requested type is a quantized type.
+    if(armnn::IsQuantizedType<T>())
+    {
+        inputTensorInfo.SetQuantizationScale(qScale);
+        inputTensorInfo.SetQuantizationOffset(qOffset);
+        outputTensorInfo.SetQuantizationScale(qScale);
+        outputTensorInfo.SetQuantizationOffset(qOffset);
+    }
+
+    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+
+    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
+        forceNoPadding ? QuantizedVector<T>(qScale, qOffset, expectedOutputDataNoPadding) :
+                         QuantizedVector<T>(qScale, qOffset, expectedOutputDataWithPadding));
+
+    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+}
+
+
 template<typename T>
 LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
                                                             float qScale = 1.0f,

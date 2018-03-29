@@ -3,6 +3,8 @@
 // See LICENSE file in the project root for full license information.
 //
 
+#pragma once
+
 #include <backends/Workload.hpp>
 #include <backends/NeonWorkloadUtils.hpp>
 

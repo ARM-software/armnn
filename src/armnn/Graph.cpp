@@ -14,6 +14,9 @@
 #include <boost/format.hpp>
 
 #include <unordered_map>
+#include <DotSerializer.hpp>
+#include <sstream>
+
 
 namespace armnn
 {
@@ -68,6 +71,80 @@ Status Graph::Print() const
     }
     BOOST_LOG_TRIVIAL(info) << "\n\n";
 
+    return Status::Success;
+}
+
+Status Graph::SerializeToDot(std::ostream& stream)
+{
+    {
+        DotGraph graph(stream, "Optimized");
+
+        {
+            // Default node attributes:
+            DotDefaults nodes(stream, "node");
+            nodes.GetAttributeSet()
+                .AddAttribute("shape", "record");
+        }
+
+        {
+            // Default edge attributes:
+            DotDefaults edges(stream, "edge");
+            edges.GetAttributeSet()
+                .AddAttribute("fontsize", 8)
+                .AddAttribute("fontcolor", "blue")
+                .AddAttribute("fontname", "arial-bold");
+        }
+
+        // First declare the nodes
+        for (auto&& layer : m_Layers)
+        {
+            DotNode node(stream, layer->GetGuid(), GetLayerTypeAsCString(layer->GetType()));
+            // Extract the layer parameters
+            ParameterStringifyFunction extractParams = [&node](const std::string & name, const std::string & value){
+                node.GetContents().AddContent(name + " : " + value);
+            };
+            layer->SerializeLayerParameters(extractParams);
+        }
+
+        // Second declare the edges
+        for (auto&& layer : m_Layers)
+        {
+            LayerGuid toId = layer->GetGuid();
+
+            for (unsigned int i=0;i<layer->GetNumInputSlots(); i++)
+            {
+                OutputSlot* outputSlot = static_cast<OutputSlot*>(layer->GetInputSlot(i).GetConnection());
+                LayerGuid fromId = outputSlot->GetOwningLayer().GetGuid();
+                DotEdge edge(stream, fromId, toId);
+
+                // Now Print the tensor shape on the edge
+                {
+                    // Construct the label attribute with HTML markup
+                    std::stringstream ss;
+                    {
+                        ss << "< [";
+                        const TensorShape& shape = outputSlot->GetTensorInfo().GetShape();
+                        for (unsigned int i = 0; i < shape.GetNumDimensions(); i++)
+                        {
+                            if (i != 0)
+                            {
+                                ss << ",";
+                            }
+                            ss << shape[i];
+                        }
+                        ss << "] >";
+                    }
+
+                    edge.GetAttributeSet().AddAttribute("label", ss);
+                }
+            }
+        }
+    }
+
+    if (stream.bad())
+    {
+        return Status::Failure;
+    }
     return Status::Success;
 }
 

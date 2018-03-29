@@ -33,13 +33,6 @@ std::unique_ptr<ImageNetDatabase::TTestCaseData> ImageNetDatabase::GetTestCaseDa
     testCaseId = testCaseId % boost::numeric_cast<unsigned int>(m_ImageSet.size());
     const ImageSet& imageSet = m_ImageSet[testCaseId];
     const std::string fullPath = m_BinaryDirectory + imageSet.first;
-    FILE* file = fopen(fullPath.c_str(), "rb");
-
-    if (file == nullptr)
-    {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to load " << fullPath;
-        return nullptr;
-    }
 
     InferenceTestImage image(fullPath.c_str());
     image.Resize(m_Width, m_Height);

@@ -8,9 +8,6 @@
 
 #include <functional>
 
-namespace armnn
-{
-
 namespace
 {
 
@@ -23,6 +20,9 @@ void ElementwiseAddition(unsigned int numElements, const float* inData0, const f
 }
 
 } // namespace
+
+namespace armnn
+{
 
 void Addition(const TensorShape& inShape0,
               const TensorShape& inShape1,

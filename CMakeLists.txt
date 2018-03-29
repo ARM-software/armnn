@@ -25,8 +25,10 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/Permute.hpp
     src/armnnUtils/Logging.cpp
     src/armnnUtils/Permute.cpp
+    src/armnnUtils/DotSerializer.cpp
+    src/armnnUtils/DotSerializer.hpp
     )
-if(BUILD_CAFFE_PARSER)
+if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER)
     list(APPEND armnnUtils_sources
     src/armnnUtils/ParserPrototxtFixture.hpp
     )
@@ -57,6 +59,29 @@ if(BUILD_CAFFE_PARSER)
 
     target_link_libraries(armnnCaffeParser armnn)
     target_link_libraries(armnnCaffeParser ${PROTOBUF_LIBRARIES})
+endif()
+
+if(BUILD_TF_PARSER)
+    set(armnn_tf_parser_sources)
+    list(APPEND armnn_tf_parser_sources
+        include/armnnTfParser/ITfParser.hpp
+        src/armnnTfParser/TfParser.hpp
+        src/armnnTfParser/TfParser.cpp
+        ${TF_PROTOBUFS}
+        )
+    # The generated tensorflow protobuf .cc files are not warning clean and we can't fix them.
+    if(COMPILER_IS_GNU_LIKE)
+        set_source_files_properties(${TF_PROTOBUFS} PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-sign-conversion")
+    endif()
+
+    add_library_ex(armnnTfParser SHARED ${armnn_tf_parser_sources})
+
+    target_include_directories(armnnTfParser PRIVATE src/armnnUtils)
+
+    target_link_libraries(armnnTfParser armnn)
+
+    # Protobuf (use the specific version tensorflow wants)
+    target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
 endif()
 
 # ArmNN source files required for all build options
@@ -199,6 +224,8 @@ list(APPEND armnn_sources
     src/armnn/Layers.cpp
     src/armnn/Runtime.hpp
     src/armnn/Runtime.cpp
+    src/armnn/SerializeLayerParameters.cpp
+    src/armnn/SerializeLayerParameters.hpp
     src/armnn/Descriptors.cpp
     src/armnn/LoadedNetwork.hpp
     src/armnn/LoadedNetwork.cpp
@@ -247,6 +274,8 @@ if(ARMCOMPUTENEON)
         src/armnn/backends/NeonWorkloads/NeonConvolution2dBaseWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dFloat32Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonConvolution2dUint8Workload.cpp
+        src/armnn/backends/NeonWorkloads/NeonConvolution2dUint8Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloat32Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionUint8Workload.cpp
@@ -380,6 +409,9 @@ install(TARGETS armnn DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 if(BUILD_CAFFE_PARSER)
     install(TARGETS armnnCaffeParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
+if(BUILD_TF_PARSER)
+    install(TARGETS armnnTfParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+endif()
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 target_link_libraries(armnn ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
@@ -404,6 +436,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/UtilsTests.cpp
         src/armnn/test/GraphTests.cpp
+        src/armnn/test/OptimizerTests.cpp
         src/armnn/test/RuntimeTests.cpp
         src/armnn/test/CreateWorkload.hpp
         src/armnn/test/TensorTest.cpp
@@ -451,6 +484,34 @@ if(BUILD_UNIT_TESTS)
             src/armnn/backends/test/MemCopyTests.cpp)
     endif()
 
+    if(BUILD_TF_PARSER)
+        list(APPEND unittest_sources
+            src/armnnTfParser/test/Activations.cpp
+            src/armnnTfParser/test/Addition.cpp
+            src/armnnTfParser/test/BiasAdd.cpp
+            src/armnnTfParser/test/BroadcastForAdd.cpp
+            src/armnnTfParser/test/Convolution2d.cpp
+            src/armnnTfParser/test/Concat.cpp
+            src/armnnTfParser/test/ConcatOfConcats.cpp
+            src/armnnTfParser/test/DepthwiseConvolution2d.cpp
+            src/armnnTfParser/test/FusedBatchNorm.cpp
+            src/armnnTfParser/test/Identity.cpp
+            src/armnnTfParser/test/LocalResponseNormalization.cpp
+            src/armnnTfParser/test/Multiplication.cpp
+            src/armnnTfParser/test/MultiOutput.cpp
+            src/armnnTfParser/test/PassThru.cpp
+            src/armnnTfParser/test/Pooling.cpp
+            src/armnnTfParser/test/Reshape.cpp
+            src/armnnTfParser/test/ResizeBilinear.cpp
+            src/armnnTfParser/test/Shape.cpp
+            src/armnnTfParser/test/Softmax.cpp
+            src/armnnTfParser/test/TestDependencies.cpp
+            src/armnnTfParser/test/FullyConnected.cpp
+            src/armnnTfParser/test/Constant.cpp
+            src/armnnTfParser/test/TestMultiInputsOutputs.cpp
+            src/armnnTfParser/test/Squeeze.cpp)
+    endif()
+
     if(BUILD_CAFFE_PARSER)
         list(APPEND unittest_sources
             src/armnnCaffeParser/test/TestAdd.cpp
@@ -478,6 +539,10 @@ if(BUILD_UNIT_TESTS)
     target_link_libraries(UnitTests armnn)
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
     target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
+    if(BUILD_TF_PARSER)
+        target_link_libraries(UnitTests armnnTfParser)
+    endif()
 
     if(BUILD_CAFFE_PARSER)
         target_link_libraries(UnitTests armnnCaffeParser)

@@ -5,12 +5,16 @@
 
 #pragma once
 
+#include <armnn/Tensor.hpp>
+
 namespace armnn
 {
 
-void Multiplication(const float* in0,
-                    const float* in1,
-                    unsigned int numElements,
-                    float* out);
+void Multiplication(const TensorShape& inShape0,
+                    const TensorShape& inShape1,
+                    const TensorShape& outShape,
+                    const float* inData0,
+                    const float* inData1,
+                    float* outData);
 
 } //namespace armnn

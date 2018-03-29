@@ -58,6 +58,11 @@ Status OptimizedNetwork::PrintGraph()
     return Status::Success;
 }
 
+Status OptimizedNetwork::SerializeToDot(std::ostream& stream) const
+{
+    return m_Graph->SerializeToDot(stream);
+}
+
 IOptimizedNetworkPtr Optimize(const INetwork& inNetwork, const DeviceSpec& deviceSpec)
 {
     const Network& network = *boost::polymorphic_downcast<const Network*>(&inNetwork);
@@ -65,7 +70,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork, const DeviceSpec& devic
 
     OptimizedNetwork* optNet = new OptimizedNetwork(std::move(graph));
 
-    Optimizer::Get().Optimize(optNet->GetGraph());
+    Optimizer::Optimize(optNet->GetGraph());
 
     // Infer the tensor infos for all output slots. Throws an exception on failure.
     optNet->GetGraph().InferTensorInfos();

@@ -186,8 +186,8 @@ void Pooling2d(const float* in,
 
                     // Clamp the pooling region inside the valid input area (which includes the padding).
                     // This is necessary because the final pooling in a row may overlap beyond the padding.
-                    hend = std::min(hend, heightInput + padRight);
-                    wend = std::min(wend, widthInput + padBottom);
+                    hend = std::min(hend, heightInput + padBottom);
+                    wend = std::min(wend, widthInput + padRight);
 
                     float result = defaultInitializer;
                     float poolAreaSize = boost::numeric_cast<float>((hend - hstart) * (wend - wstart));

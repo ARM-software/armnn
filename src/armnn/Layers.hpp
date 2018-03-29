@@ -22,9 +22,16 @@ template <typename Parameters>
 class LayerWithParameters : public Layer
 {
 public:
-    typedef Parameters DescriptorType;
+    using DescriptorType = Parameters;
 
     const Parameters& GetParameters() const { return m_Param; }
+
+    /// Helper to serialize the layer parameters to string
+    /// (currently used in DotSerializer and company)
+    void SerializeLayerParameters(ParameterStringifyFunction & fn) const
+    {
+        StringifyLayerParameters<Parameters>::Serialize(fn, m_Param);
+    }
 
 protected:
     LayerWithParameters(unsigned int numInputSlots,

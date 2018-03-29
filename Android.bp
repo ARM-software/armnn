@@ -16,6 +16,7 @@ cc_library_static {
     srcs: [
         "src/armnnUtils/Logging.cpp",
         "src/armnnUtils/Permute.cpp",
+        "src/armnnUtils/DotSerializer.cpp",
         "src/armnn/backends/ArmComputeTensorUtils.cpp",
         "src/armnn/backends/ClWorkloads/ClActivationFloat32Workload.cpp",
         "src/armnn/backends/ClWorkloads/ClActivationUint8Workload.cpp",
@@ -54,6 +55,7 @@ cc_library_static {
         "src/armnn/backends/NeonWorkloads/NeonConstantUint8Workload.cpp",
         "src/armnn/backends/NeonWorkloads/NeonConvolution2dBaseWorkload.cpp",
         "src/armnn/backends/NeonWorkloads/NeonConvolution2dFloat32Workload.cpp",
+        "src/armnn/backends/NeonWorkloads/NeonConvolution2dUint8Workload.cpp",
         "src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloat32Workload.cpp",
         "src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionUint8Workload.cpp",
         "src/armnn/backends/NeonWorkloads/NeonFloorFloat32Workload.cpp",
@@ -127,6 +129,7 @@ cc_library_static {
         "src/armnn/Graph.cpp",
         "src/armnn/Optimizer.cpp",
         "src/armnn/Runtime.cpp",
+        "src/armnn/SerializeLayerParameters.cpp",
         "src/armnn/InternalTypes.cpp",
         "src/armnn/Layer.cpp",
         "src/armnn/Layers.cpp",

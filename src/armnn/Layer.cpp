@@ -18,7 +18,6 @@ namespace armnn
 
 void InputSlot::Insert(Layer& layer)
 {
-    BOOST_ASSERT(layer.GetNumInputSlots() <= 1);
     BOOST_ASSERT(layer.GetNumOutputSlots() == 1);
 
     OutputSlot* const prevSlot = GetConnectedOutputSlot();
@@ -115,11 +114,21 @@ void OutputSlot::ValidateConnectionIndex(unsigned int index) const
     }
 }
 
+namespace {
+LayerGuid GenerateLayerGuid()
+{
+    //Note: Not thread safe.
+    static LayerGuid newGuid=0;
+    return newGuid++;
+}
+} //namespace
+
 Layer::Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType type, const char* name)
 : m_OutputHandlers(numOutputSlots)
 , m_LayerName(name ? name : "")
 , m_Type(type)
 , m_ComputeDevice(Compute::Undefined)
+, m_Guid(GenerateLayerGuid())
 {
     m_InputSlots.reserve(numInputSlots);
     for (unsigned int i = 0; i < numInputSlots; ++i)

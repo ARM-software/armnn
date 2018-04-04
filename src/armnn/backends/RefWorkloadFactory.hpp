@@ -113,6 +113,12 @@ public:
     virtual std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreateDetectionOutput(const DetectionOutputQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const override;
+
+    virtual std::unique_ptr<IWorkload> CreateReorg(const ReorgQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const override;
+
 private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>

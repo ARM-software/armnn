@@ -259,4 +259,28 @@ bool IsFloorSupportedRef(const TensorInfo& input,
                                      &FalseFuncU8<>);
 }
 
+    //
+bool IsDetectionOutputSupportedRef(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const DetectionOutputDescriptor& descriptor,
+                                    std::string* reasonIfUnsupported)
+{
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &FalseFuncU8<>);
+}
+
+bool IsReorgSupportedRef(const TensorInfo& input,
+                         const TensorInfo& output,
+                         const DetectionOutputDescriptor& descriptor,
+                         std::string* reasonIfUnsupported)
+{
+    ignore_unused(output);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &FalseFuncU8<>);
+}
+
 }

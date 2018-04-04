@@ -1408,6 +1408,93 @@ void CaffeParser::Cleanup()
     m_ArmnnOutputSlotForCaffeTop.clear();
 }
 
+void CaffeParser::ParseReorgLayer(const caffe::LayerParameter& layerParam)
+{
+    BOOST_ASSERT(layerParam.type() == "Reorg");
+    ValidateNumInputsOutputs(layerParam, 1, 1);
+    ReorgParameter reorgParameter = layerParam.ReorgParameter();
+    BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
+
+    int stride;
+    if ( convParam.has_stride() )
+    {
+        stride = convParam.stride();
+    }
+    else
+    {
+        throw ParseException("Loading Reorg Layer: stride defined Illegally");
+    }
+
+    if ( (inputShape.dim(2) % stride) != 0 || (inputShape.dim(2) % stride) != 0 )
+    {
+        throw ParseException("Loading Reorg Layer: stride can not devide inputshape dim 2 or 3");
+    }
+
+    armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
+
+    BlobShape outputShape;
+    outputShape.add_dim(0);
+    outputShape.set_dim(0, inputShape.dim(0));
+    outputShape.add_dim(1);
+    outputShape.set_dim(1, stride*stride*inputShape.dim(1));
+    outputShape.add_dim(2);
+    outputShape.set_dim( 2, inputShape.dim(2)/ stride );
+    outputShape.add_dim(3);
+    outputShape.set_dim( 3, inputShape.dim(3)/ stride );
+
+    ReorgDescriptor reorgDescriptor;
+    reorgDescriptor.m_Stride = stride;
+    //reorgDescriptor.m_StrideX = strideW;
+    //reorgDescriptor.m_StrideY  = strideH;
+
+    IConnectableLayer* reorgLayer = nullptr;
+    reorgLayer = m_Network->AddReorgLayer(reorgDescriptor,layerParam.name().c_str());
+    inputConnection->Connect( reorgLayer->GetInputSlot(0) );
+
+    BOOST_ASSERT(reorgLayer);
+    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), reorgLayer->GetOutputSlot(0));
+}
+
+void CaffeParser::ParseDetectionOutpurLayer(const caffe::LayerParameter& layerParam)
+{
+    BOOST_ASSERT(layerParam.type() == "DetectionOutput");
+    ValidateNumInputsOutputs(layerParam, 1, 1);
+    ReorgParameter detectionoutputParameter = layerParam.ReorgParameter();
+    BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
+
+    int classes;
+    if ( convParam.has_classes() )
+    {
+        stride = convParam.classes();
+    }
+    else
+    {
+        throw ParseException("Loading DetectionOutput Layer: stride defined Illegally");
+    }
+
+    armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
+
+    BlobShape outputShape;
+    outputShape.add_dim(0);
+    outputShape.set_dim(0, inputShape.dim(0));
+    outputShape.add_dim(1);
+    outputShape.set_dim(1, stride*stride*inputShape.dim(1));
+    outputShape.add_dim(2);
+    outputShape.set_dim( 2, inputShape.dim(2)/ stride );
+    outputShape.add_dim(3);
+    outputShape.set_dim( 3, inputShape.dim(3)/ stride );
+
+    DetectionOutputDescriptor detectionoutputDescriptor;
+    detectionoutputDescriptor.m_Classes = classes;
+
+    IConnectableLayer* detectionoutputLayer = nullptr;
+    detectionoutputLayer = m_Network->AddDetectionOutputLayer(detectionoutputDescriptor,layerParam.name().c_str());
+    inputConnection->Connect( detectionoutputLayer->GetInputSlot(0) );
+
+    BOOST_ASSERT(detectionoutputLayer);
+    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), detectionoutputLayer->GetOutputSlot(0));
+}
+
 }
 
 

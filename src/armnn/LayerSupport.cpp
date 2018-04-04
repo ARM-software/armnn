@@ -257,4 +257,23 @@ bool IsFloorSupported(Compute compute,
     FORWARD_LAYER_SUPPORT_FUNC(compute, IsFloorSupported, input, output);
 }
 
+//
+bool IsDetectionOutputSupported(Compute compute,
+                                const TensorInfo& input,
+                                const TensorInfo& output,
+                                char* reasonIfUnsupported,
+                                size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsFloorSupported, input, output);
+}
+
+bool IsReorgSupported(Compute compute,
+                      const TensorInfo& input,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsFloorSupported, input, output);
+}
+
 }

@@ -23,5 +23,8 @@ struct MultiplicationQueueDescriptor;
 struct BatchNormalizationQueueDescriptor;
 struct FakeQuantizationQueueDescriptor;
 struct ReshapeQueueDescriptor;
+//
+struct DetectionOutputQueueDescriptor;
+struct ReorgQueueDescriptor;
 
 } // namespace armnn

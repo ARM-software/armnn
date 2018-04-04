@@ -249,4 +249,33 @@ struct FloorQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+    //
+struct DetectionOutputQueueDescriptor : QueueDescriptorWithParameters<DetectionOutputDescriptor>
+{
+    DetectionOutputQueueDescriptor()
+            //: m_Weight(nullptr)
+            //, m_Bias(nullptr)
+    {
+    }
+
+    //const ConstCpuTensorHandle* m_Weight;
+    //const ConstCpuTensorHandle* m_Bias;
+
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
+struct ReorgQueueDescriptor : QueueDescriptorWithParameters<ReorgDescriptor>
+{
+    ReorgQueueDescriptor()
+            //: m_Weight(nullptr)
+            //, m_Bias(nullptr)
+    {
+    }
+
+    //const ConstCpuTensorHandle* m_Weight;
+    //const ConstCpuTensorHandle* m_Bias;
+
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

@@ -747,4 +747,19 @@ void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+    //
+void DetectionOutputQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "DetectionOutputQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "DetectionOutputQueueDescriptor");
+    //todo
+}
+
+void ReorgQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "ReorgQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "ReorgQueueDescriptor");
+    //todo
+}
+
 } //namespace armnn

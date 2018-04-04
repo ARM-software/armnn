@@ -194,6 +194,21 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, Dat
             result = IsSplitterSupported(compute, input, cLayer->GetParameters(), reason, reasonCapacity);
             break;
         }
+        //
+        case LayerType::OutputDetection:
+        {
+            auto cLayer = boost::polymorphic_downcast<const OutputDetectionLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            result = IsSplitterSupported(compute, input, cLayer->GetParameters(), reason, reasonCapacity);
+            break;
+        }
+        case LayerType::Reorg:
+        {
+            auto cLayer = boost::polymorphic_downcast<const ReorgLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            result = IsSplitterSupported(compute, input, cLayer->GetParameters(), reason, reasonCapacity);
+            break;
+        }
         default:
         {
             BOOST_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");

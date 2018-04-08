@@ -56,4 +56,7 @@ DECLARE_LAYER(ResizeBilinear)
 DECLARE_LAYER(Softmax)
 DECLARE_LAYER(Splitter)
 
+//
+DECLARE_LAYER(DetectionOutput)
+DECLARE_LAYER(Reorg)
 }

@@ -327,14 +327,14 @@ IConnectableLayer* Network::AddFloorLayer(const char* name)
     return m_Graph->AddLayer<FloorLayer>(name);
 }
 
-IConnectableLayer* AddDetectionOutputLayer(const DetectionOutputDescriptor& detectionoutputDescriptor,
-                                               const char* name = nullptr)
+IConnectableLayer* Network::AddDetectionOutputLayer(const DetectionOutputDescriptor& detectionoutputDescriptor,
+                                               const char* name)
 {
     return m_Graph->AddLayer<DetectionOutputLayer>(name);
 }
 
-IConnectableLayer* AddReorgLayer(const ReorgDescriptor& reorgDescriptor,
-                                     const char* name = nullptr)
+IConnectableLayer* Network::AddReorgLayer(const ReorgDescriptor& reorgDescriptor,
+                                     const char* name)
 {
     return m_Graph->AddLayer<ReorgLayer>(name);
 }

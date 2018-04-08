@@ -462,6 +462,18 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescri
     return nullptr;
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDetectionOutput(const DetectionOutputQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReorg(const ReorgQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
 #endif // #if ARMCOMPUTECL_ENABLED
 
 armnn::IClTunedParameters* IClTunedParameters::CreateRaw(armnn::IClTunedParameters::Mode mode)

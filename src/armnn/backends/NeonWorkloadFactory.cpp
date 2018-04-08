@@ -355,6 +355,18 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDesc
     return nullptr;
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDetectionOutput(const DetectionOutputQueueDescriptor& descriptor,
+                                                                    const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateReorg(const ReorgQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
 #endif
 
 } //namespace armnn

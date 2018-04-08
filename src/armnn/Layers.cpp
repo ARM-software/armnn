@@ -1030,7 +1030,7 @@ std::unique_ptr<IWorkload> DetectionOutputLayer::CreateWorkload(const Graph& gra
                                                   const IWorkloadFactory& factory) const
 {
     DetectionOutputQueueDescriptor descriptor;
-    return factory.CreateReshape(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateDetectionOutput(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
 DetectionOutputLayer* DetectionOutputLayer::Clone(Graph& graph) const
@@ -1040,7 +1040,7 @@ DetectionOutputLayer* DetectionOutputLayer::Clone(Graph& graph) const
 
 void DetectionOutputLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
+    /*ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
                                                "DetectionOutputLayer: InputSlot must be connected to an OutputSlot");
     ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
                                                "DetectionOutputLayer: TensorInfo must be set on connected OutputSlot.");
@@ -1055,14 +1055,14 @@ void DetectionOutputLayer::ValidateTensorShapesFromInputs()
     unsigned int inHeight = inputShape[2];
     unsigned int inBatchSize = inputShape[0];
 
-    /*unsigned int filterWidth = filterShape[3];
+    unsigned int filterWidth = filterShape[3];
     unsigned int readWidth = (inWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - (filterWidth);
     unsigned int outWidth =  1+(readWidth / m_Param.m_StrideX);
 
     unsigned int filterHeight = filterShape[2];
     unsigned int readHeight = (inHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - (filterHeight);
     unsigned int outHeight = 1+(readHeight / m_Param.m_StrideY);
-    unsigned int depthMultiplier = filterShape[0];*/
+    unsigned int depthMultiplier = filterShape[0];
 
     unsigned int outChannels = filterShape[1]*depthMultiplier;
     unsigned int outBatchSize = inBatchSize;
@@ -1070,14 +1070,20 @@ void DetectionOutputLayer::ValidateTensorShapesFromInputs()
     TensorShape outShape({outBatchSize, outChannels, outHeight, outWidth});
     ConditionalThrow<LayerValidationException>(GetOutputSlot(0).ValidateTensorShape(outShape),
                                                "DetectionOutputLayer: "
-                                                       "TensorShape set on OutputSlot[0] does not match the inferred shape.");
+                                                       "TensorShape set on OutputSlot[0] does not match the inferred shape.");*/
+}
+
+DetectionOutputLayer::DetectionOutputLayer(const DetectionOutputDescriptor& desc, const char* name)
+    : LayerWithParameters(1, 1, LayerType::DetectionOutput, desc, name)
+{
+
 }
 
 std::unique_ptr<IWorkload> ReorgLayer::CreateWorkload(const Graph& graph,
                                                   const IWorkloadFactory& factory) const
 {
     ReorgQueueDescriptor descriptor;
-    return factory.CreateReshape(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateReorg(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
 ReorgLayer* ReorgLayer::Clone(Graph& graph) const
@@ -1087,7 +1093,7 @@ ReorgLayer* ReorgLayer::Clone(Graph& graph) const
 
 void ReorgLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
+    /*ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
                                                "ReorgLayer: InputSlot must be connected to an OutputSlot");
     ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
                                                "ReorgLayer: TensorInfo must be set on connected OutputSlot.");
@@ -1102,14 +1108,14 @@ void ReorgLayer::ValidateTensorShapesFromInputs()
     unsigned int inHeight = inputShape[2];
     unsigned int inBatchSize = inputShape[0];
 
-    /*unsigned int filterWidth = filterShape[3];
+    unsigned int filterWidth = filterShape[3];
     unsigned int readWidth = (inWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - (filterWidth);
     unsigned int outWidth =  1+(readWidth / m_Param.m_StrideX);
 
     unsigned int filterHeight = filterShape[2];
     unsigned int readHeight = (inHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - (filterHeight);
     unsigned int outHeight = 1+(readHeight / m_Param.m_StrideY);
-    unsigned int depthMultiplier = filterShape[0];*/
+    unsigned int depthMultiplier = filterShape[0];
 
     unsigned int outChannels = filterShape[1]*depthMultiplier;
     unsigned int outBatchSize = inBatchSize;
@@ -1117,7 +1123,13 @@ void ReorgLayer::ValidateTensorShapesFromInputs()
     TensorShape outShape({outBatchSize, outChannels, outHeight, outWidth});
     ConditionalThrow<LayerValidationException>(GetOutputSlot(0).ValidateTensorShape(outShape),
                                                "ReorgLayer: "
-                                                       "TensorShape set on OutputSlot[0] does not match the inferred shape.");
+                                                       "TensorShape set on OutputSlot[0] does not match the inferred shape.");*/
+}
+
+ReorgLayer::ReorgLayer(const ReorgDescriptor& desc, const char* name)
+    : LayerWithParameters(1, 1, LayerType::Reorg, desc, name)
+{
+
 }
 
 }

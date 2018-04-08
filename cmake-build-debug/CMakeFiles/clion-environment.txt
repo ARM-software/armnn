@@ -1,0 +1,4 @@
+ToolSet: 15.0@C:\vs2017
+Options: msvc.arch=amd64
+
+Options:

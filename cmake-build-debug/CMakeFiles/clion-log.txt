@@ -1,0 +1,72 @@
+"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - NMake Makefiles" D:\temp\armnn
+CMake Warning at cmake/modules/FindBoost.cmake:765 (message):
+  Imported targets not available for Boost version 106600
+Call Stack (most recent call first):
+  cmake/modules/FindBoost.cmake:869 (_Boost_COMPONENT_DEPENDENCIES)
+  cmake/modules/FindBoost.cmake:1471 (_Boost_MISSING_DEPENDENCIES)
+  cmake/GlobalConfig.cmake:98 (find_package)
+  CMakeLists.txt:11 (include)
+
+
+CMake Warning at cmake/modules/FindBoost.cmake:765 (message):
+  Imported targets not available for Boost version 106600
+Call Stack (most recent call first):
+  cmake/modules/FindBoost.cmake:869 (_Boost_COMPONENT_DEPENDENCIES)
+  cmake/modules/FindBoost.cmake:1471 (_Boost_MISSING_DEPENDENCIES)
+  cmake/GlobalConfig.cmake:98 (find_package)
+  CMakeLists.txt:11 (include)
+
+
+CMake Warning at cmake/modules/FindBoost.cmake:765 (message):
+  Imported targets not available for Boost version 106600
+Call Stack (most recent call first):
+  cmake/modules/FindBoost.cmake:869 (_Boost_COMPONENT_DEPENDENCIES)
+  cmake/modules/FindBoost.cmake:1471 (_Boost_MISSING_DEPENDENCIES)
+  cmake/GlobalConfig.cmake:98 (find_package)
+  CMakeLists.txt:11 (include)
+
+
+CMake Warning at cmake/modules/FindBoost.cmake:765 (message):
+  Imported targets not available for Boost version 106600
+Call Stack (most recent call first):
+  cmake/modules/FindBoost.cmake:869 (_Boost_COMPONENT_DEPENDENCIES)
+  cmake/modules/FindBoost.cmake:1471 (_Boost_MISSING_DEPENDENCIES)
+  cmake/GlobalConfig.cmake:98 (find_package)
+  CMakeLists.txt:11 (include)
+
+
+CMake Warning at cmake/modules/FindBoost.cmake:765 (message):
+  Imported targets not available for Boost version 106600
+Call Stack (most recent call first):
+  cmake/modules/FindBoost.cmake:869 (_Boost_COMPONENT_DEPENDENCIES)
+  cmake/modules/FindBoost.cmake:1471 (_Boost_MISSING_DEPENDENCIES)
+  cmake/GlobalConfig.cmake:98 (find_package)
+  CMakeLists.txt:11 (include)
+
+
+CMake Error at cmake/modules/FindBoost.cmake:1841 (message):
+  Unable to find the requested Boost libraries.
+
+  Boost version: 1.66.0
+
+  Boost include path: D:/3rdParty/Boost/include
+
+  Could not find the following static Boost libraries:
+
+          boost_unit_test_framework
+          boost_system
+          boost_filesystem
+          boost_log
+          boost_program_options
+
+  No Boost libraries were found.  You may need to set BOOST_LIBRARYDIR to the
+  directory containing Boost libraries or BOOST_ROOT to the location of
+  Boost.
+Call Stack (most recent call first):
+  cmake/GlobalConfig.cmake:98 (find_package)
+  CMakeLists.txt:11 (include)
+
+
+-- Configuring incomplete, errors occurred!
+See also "D:/temp/armnn/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+See also "D:/temp/armnn/cmake-build-debug/CMakeFiles/CMakeError.log".

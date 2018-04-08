@@ -141,12 +141,14 @@ bool IsFloorSupported(Compute compute,
 bool IsDetectionOutputSupported(Compute compute,
                       const TensorInfo& input,
                       const TensorInfo& output,
+                      const DetectionOutputDescriptor& descriptor,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
 bool IsReorgSupported(Compute compute,
                       const TensorInfo& input,
                       const TensorInfo& output,
+                      const ReorgDescriptor& descriptor,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 

@@ -1,0 +1,30 @@
+Determining if the include file pthread.h exists failed with the following output:
+Change Dir: D:/temp/armnn/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command:"nmake" "/NOLOGO" "cmTC_b1d29\fast"
+	C:\vs2017\VC\Tools\MSVC\14.13.26128\bin\HostX64\x64\nmake.exe -f CMakeFiles\cmTC_b1d29.dir\build.make /nologo -L                  CMakeFiles\cmTC_b1d29.dir\build
+Building C object CMakeFiles/cmTC_b1d29.dir/CheckIncludeFile.c.obj
+	C:\vs2017\VC\Tools\MSVC\14.13.26128\bin\Hostx64\x64\cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\nm3B3C.tmp
+CheckIncludeFile.c
+D:\temp\armnn\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c(1): fatal error C1083: Cannot open include file: 'pthread.h': No such file or directory
+NMAKE : fatal error U1077: 'C:\vs2017\VC\Tools\MSVC\14.13.26128\bin\Hostx64\x64\cl.exe' : return code '0x2'
+Stop.
+NMAKE : fatal error U1077: 'C:\vs2017\VC\Tools\MSVC\14.13.26128\bin\HostX64\x64\nmake.exe' : return code '0x2'
+Stop.
+
+
+Determining if the include file valgrind/memcheck.h exists failed with the following output:
+Change Dir: D:/temp/armnn/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command:"nmake" "/NOLOGO" "cmTC_e937f\fast"
+	C:\vs2017\VC\Tools\MSVC\14.13.26128\bin\HostX64\x64\nmake.exe -f CMakeFiles\cmTC_e937f.dir\build.make /nologo -L                  CMakeFiles\cmTC_e937f.dir\build
+Building C object CMakeFiles/cmTC_e937f.dir/CheckIncludeFile.c.obj
+	C:\vs2017\VC\Tools\MSVC\14.13.26128\bin\Hostx64\x64\cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\nm3CA4.tmp
+CheckIncludeFile.c
+D:\temp\armnn\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c(1): fatal error C1083: Cannot open include file: 'valgrind/memcheck.h': No such file or directory
+NMAKE : fatal error U1077: 'C:\vs2017\VC\Tools\MSVC\14.13.26128\bin\Hostx64\x64\cl.exe' : return code '0x2'
+Stop.
+NMAKE : fatal error U1077: 'C:\vs2017\VC\Tools\MSVC\14.13.26128\bin\HostX64\x64\nmake.exe' : return code '0x2'
+Stop.
+
+

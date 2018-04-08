@@ -195,9 +195,9 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, Dat
             break;
         }
         //
-        case LayerType::OutputDetection:
+        case LayerType::DetectionOutput:
         {
-            auto cLayer = boost::polymorphic_downcast<const OutputDetectionLayer*>(&layer);
+            auto cLayer = boost::polymorphic_downcast<const DetectionOutputLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             result = IsSplitterSupported(compute, input, cLayer->GetParameters(), reason, reasonCapacity);
             break;

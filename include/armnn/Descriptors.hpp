@@ -304,4 +304,22 @@ struct ReshapeDescriptor
     TensorShape m_TargetShape;
 };
 
+struct DetectionOutputDescriptor
+{
+    DetectionOutputDescriptor()
+    :m_classes(0)
+    {}
+
+    uint32_t m_classes;
+};
+
+struct ReorgDescriptor
+{
+    ReorgDescriptor()
+    :m_dim(0)
+    {}
+
+    uint32_t m_dim;
+};
+
 }

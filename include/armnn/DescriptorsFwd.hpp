@@ -21,7 +21,7 @@ struct SoftmaxDescriptor;
 struct OriginsDescriptor;
 struct ViewsDescriptor;
 //
-struct DetecttionOutputDescriptor;
+struct DetectionOutputDescriptor;
 struct ReorgDescriptor;
 
 using MergerDescriptor = OriginsDescriptor;

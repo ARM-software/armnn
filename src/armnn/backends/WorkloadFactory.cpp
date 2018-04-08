@@ -199,14 +199,14 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, Dat
         {
             auto cLayer = boost::polymorphic_downcast<const DetectionOutputLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = IsSplitterSupported(compute, input, cLayer->GetParameters(), reason, reasonCapacity);
+            result = IsDetectionOutputSupported(compute, input, cLayer->GetParameters(), reason, reasonCapacity);
             break;
         }
         case LayerType::Reorg:
         {
             auto cLayer = boost::polymorphic_downcast<const ReorgLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = IsSplitterSupported(compute, input, cLayer->GetParameters(), reason, reasonCapacity);
+            result = IsReorgSupported(compute, input, cLayer->GetParameters(), reason, reasonCapacity);
             break;
         }
         default:

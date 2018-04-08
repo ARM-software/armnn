@@ -199,7 +199,7 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, Dat
         {
             auto cLayer = boost::polymorphic_downcast<const DetectionOutputLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& output = layer.GetOutputSlot(0).GetConnection(0)->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = IsDetectionOutputSupported(compute, input, output, cLayer->GetParameters(), reason, reasonCapacity);
             break;
         }
@@ -207,7 +207,7 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, Dat
         {
             auto cLayer = boost::polymorphic_downcast<const ReorgLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& output = layer.GetOutputSlot(0).GetConnection(0)->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = IsReorgSupported(compute, input, output, cLayer->GetParameters(), reason, reasonCapacity);
             break;
         }

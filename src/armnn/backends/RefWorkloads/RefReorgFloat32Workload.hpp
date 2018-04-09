@@ -10,6 +10,7 @@ namespace armnn
     {
     public:
         using Float32Workload<ReorgQueueDescriptor>::Float32Workload;
+
         virtual void Execute() const override;
     };
 

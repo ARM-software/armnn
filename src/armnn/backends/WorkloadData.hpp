@@ -13,6 +13,7 @@
 #include "InternalTypes.hpp"
 #include "OutputHandler.hpp"
 #include "CpuTensorHandleFwd.hpp"
+#include "armnn/TensorFwd.hpp"
 
 namespace armnn
 {
@@ -267,15 +268,12 @@ struct DetectionOutputQueueDescriptor : QueueDescriptorWithParameters<DetectionO
 struct ReorgQueueDescriptor : QueueDescriptorWithParameters<ReorgDescriptor>
 {
     ReorgQueueDescriptor()
-            //: m_Weight(nullptr)
-            //, m_Bias(nullptr)
+            : m_Shape()
     {
     }
 
-    //const ConstCpuTensorHandle* m_Weight;
-    //const ConstCpuTensorHandle* m_Bias;
-
     void Validate(const WorkloadInfo& workloadInfo) const;
+    TensorShape m_Shape;
 };
 
 } //namespace armnn

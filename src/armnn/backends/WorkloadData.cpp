@@ -759,7 +759,12 @@ void ReorgQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     ValidateSingleInput(workloadInfo, "ReorgQueueDescriptor");
     ValidateSingleOutput(workloadInfo, "ReorgQueueDescriptor");
-    //todo
+
+    TensorShape shape = workloadInfo.m_InputTensorInfos[0].GetShape();
+    if(shape.GetNumDimensions()<4 || shape[0]<=0 || shape[1]<=0 || shape[2]<=0 || shape[3]<=0 )
+    {
+        throw InvalidArgumentException("ReorgQueueDescriptor: Input tensor shape unvalidate.");
+    }
 }
 
 } //namespace armnn

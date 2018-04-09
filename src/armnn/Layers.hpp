@@ -470,8 +470,7 @@ public:
     bool IsEqual(const Layer& other) const
     {
         return (other.GetType() == LayerType::Reorg) &&
-               m_Param.m_dim == boost::polymorphic_downcast<const ReorgLayer*>(&other)->m_Param.m_dim;
-               //m_Param.m_TargetShape == boost::polymorphic_downcast<const ReorgLayer*>(&other)->m_Param.m_TargetShape;
+               m_Param.m_Stride == boost::polymorphic_downcast<const ReorgLayer*>(&other)->m_Param.m_Stride;
     }
 
 protected:

@@ -316,10 +316,10 @@ struct DetectionOutputDescriptor
 struct ReorgDescriptor
 {
     ReorgDescriptor()
-    :m_dim(0)
+    :m_Stride(1)
     {}
 
-    uint32_t m_dim;
+    uint32_t m_Stride;
 };
 
 }

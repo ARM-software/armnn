@@ -72,6 +72,8 @@ const std::map<std::string, CaffeParser::OperationParsingFunction> CaffeParser::
     { "Scale",        &CaffeParser::ParseScaleLayer },
     { "Split",        &CaffeParser::ParseSplitLayer },
     { "Dropout",      &CaffeParser::ParseDropoutLayer},
+    { "Reorg",        &CaffeParser::ParseReorgLayer },
+    { "DetectionOutput", &CaffeParser::ParseDetectionOutputLayer},
 };
 
 ICaffeParser* ICaffeParser::CreateRaw()
@@ -944,6 +946,7 @@ void CaffeParser::ParseConcatLayer(const LayerParameter& layerParam)
     {
         const TensorInfo& inputInfo = GetArmnnOutputSlotForCaffeTop(
             layerParam.bottom(boost::numeric_cast<int>(viewIndex))).GetTensorInfo();
+        
         // Check whether the dimensions of the input tensors are actually 4
         if (inputInfo.GetNumDimensions()!=4)
         {
@@ -1384,6 +1387,8 @@ INetworkPtr CaffeParser::CreateNetworkFromNetParameter(NetParameter& netParam,
     }
     m_RequestedOutputs = requestedOutputs;
 
+    std::cout << "in caffeParser create network from net parameter." << std::endl;
+
     try
     {
         LoadNetParam(netParam);
@@ -1412,13 +1417,13 @@ void CaffeParser::ParseReorgLayer(const caffe::LayerParameter& layerParam)
 {
     BOOST_ASSERT(layerParam.type() == "Reorg");
     ValidateNumInputsOutputs(layerParam, 1, 1);
-    ReorgParameter reorgParameter = layerParam.ReorgParameter();
+    ReorgParameter reorgParameter = layerParam.reorg_param();
     BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
 
-    int stride;
-    if ( convParam.has_stride() )
+    unsigned int stride;
+    if ( reorgParameter.has_stride() )
     {
-        stride = convParam.stride();
+        stride = reorgParameter.stride();
     }
     else
     {
@@ -1449,28 +1454,69 @@ void CaffeParser::ParseReorgLayer(const caffe::LayerParameter& layerParam)
 
     IConnectableLayer* reorgLayer = nullptr;
     reorgLayer = m_Network->AddReorgLayer(reorgDescriptor,layerParam.name().c_str());
-    inputConnection->Connect( reorgLayer->GetInputSlot(0) );
+    inputConnection.Connect( reorgLayer->GetInputSlot(0) );
 
     BOOST_ASSERT(reorgLayer);
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), reorgLayer->GetOutputSlot(0));
 }
 
-void CaffeParser::ParseDetectionOutpurLayer(const caffe::LayerParameter& layerParam)
+void CaffeParser::ParseDetectionOutputLayer(const caffe::LayerParameter& layerParam)
 {
     BOOST_ASSERT(layerParam.type() == "DetectionOutput");
     ValidateNumInputsOutputs(layerParam, 1, 1);
-    ReorgParameter detectionoutputParameter = layerParam.ReorgParameter();
+    DetectionOutputParameter detectionoutputParameter = layerParam.detection_output_param();
     BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
 
-    int classes;
-    if ( convParam.has_classes() )
+    unsigned int coords;
+    if ( detectionoutputParameter.has_coords() )
+        coords = detectionoutputParameter.coords();
+    else
+        throw ParseException("Loading DetectionOutput Layer: coords defined Illegally");
+
+    unsigned int classes;
+    if ( detectionoutputParameter.has_num_classes() )
+        classes = detectionoutputParameter.num_classes();
+    else
+        throw ParseException("Loading DetectionOutput Layer: classes defined Illegally");
+
+    unsigned int side;
+    if( detectionoutputParameter.has_side() )
+        side = detectionoutputParameter.side();
+    else
+        throw ParseException("Loading DetectionOutput Layer: side defined Illegally");
+
+    unsigned int numBox;
+    if( detectionoutputParameter.has_num_box() )
+        numBox = detectionoutputParameter.num_box();
+    else
+        throw ParseException("Loading DetectionOutput Layer: numbox defined Illegally");
+
+    float confidenceThreshold;
+    if( detectionoutputParameter.has_confidence_threshold() )
+        confidenceThreshold = detectionoutputParameter.confidence_threshold();
+    else
+        throw ParseException("Loading DetectionOutput Layer: confidenceThreshold defined Illegally");
+
+    float nmsThreshold;
+    if( detectionoutputParameter.has_nms_threshold() )
+        nmsThreshold = detectionoutputParameter.nms_threshold();
+    else
+        throw ParseException("Loading DetectionOutput Layer: nmsThreshold defined Illegally");
+
+    std::vector<float> anchors;
+    int size;
+    size = detectionoutputParameter.anchor_size();
+    if( size > 1 )
     {
-        stride = convParam.classes();
+        anchors.resize(static_cast<long unsigned int>(size));
+        for(int i = 0; i < size ; ++i )
+        {
+            anchors.emplace_back(detectionoutputParameter.anchor(i));
+        }
     }
     else
-    {
-        throw ParseException("Loading DetectionOutput Layer: stride defined Illegally");
-    }
+        throw ParseException("Loading DetectionOutput Layer: anchors defined Illegally");
+
 
     armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
 
@@ -1478,18 +1524,24 @@ void CaffeParser::ParseDetectionOutpurLayer(const caffe::LayerParameter& layerPa
     outputShape.add_dim(0);
     outputShape.set_dim(0, inputShape.dim(0));
     outputShape.add_dim(1);
-    outputShape.set_dim(1, stride*stride*inputShape.dim(1));
+    outputShape.set_dim(1, side * side);
     outputShape.add_dim(2);
-    outputShape.set_dim( 2, inputShape.dim(2)/ stride );
-    outputShape.add_dim(3);
-    outputShape.set_dim( 3, inputShape.dim(3)/ stride );
+    outputShape.set_dim( 2, (classes + coords + 1)*numBox );
 
     DetectionOutputDescriptor detectionoutputDescriptor;
+    // uint32 param
     detectionoutputDescriptor.m_Classes = classes;
+    detectionoutputDescriptor.m_Side = side;
+    detectionoutputDescriptor.m_NumBox = numBox;
+    // float pram
+    detectionoutputDescriptor.m_ConfidenceThreshold = confidenceThreshold;
+    detectionoutputDescriptor.m_NmsThreshold = nmsThreshold;
+    // vector param
+    detectionoutputDescriptor.m_Biases = std::move(anchors);
 
     IConnectableLayer* detectionoutputLayer = nullptr;
     detectionoutputLayer = m_Network->AddDetectionOutputLayer(detectionoutputDescriptor,layerParam.name().c_str());
-    inputConnection->Connect( detectionoutputLayer->GetInputSlot(0) );
+    inputConnection.Connect( detectionoutputLayer->GetInputSlot(0) );
 
     BOOST_ASSERT(detectionoutputLayer);
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), detectionoutputLayer->GetOutputSlot(0));

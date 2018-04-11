@@ -448,8 +448,7 @@ public:
     bool IsEqual(const Layer& other) const
     {
         return (other.GetType() == LayerType::DetectionOutput) &&
-               m_Param.m_classes == boost::polymorphic_downcast<const DetectionOutputLayer*>(&other)->m_Param.m_classes;
-               //m_Param.m_TargetShape == boost::polymorphic_downcast<const DetectionOutputLayer*>(&other)->m_Param.m_TargetShape;
+               m_Param.m_Classes == boost::polymorphic_downcast<const DetectionOutputLayer*>(&other)->m_Param.m_Classes;
     }
 
 protected:

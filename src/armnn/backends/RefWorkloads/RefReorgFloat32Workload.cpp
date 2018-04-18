@@ -45,7 +45,7 @@ namespace armnn
         TensorShape shape = info.GetShape();
         unsigned int stride = m_Data.m_Parameters.m_Stride;
 
-        reorg_cpu<float>(inputData,shape[2],shape[3],shape[1],shape[0],stride,1,outputData);
+        reorg_cpu<float>(inputData,shape[2],shape[3],shape[1],shape[0],stride,0,outputData);
     }
 
 } //namespace armnn

@@ -307,16 +307,17 @@ struct ReshapeDescriptor
 struct DetectionOutputDescriptor
 {
     DetectionOutputDescriptor()
-            : m_Classes(0),m_Side(0),m_NumBox(0)
-              ,m_Biases({0.0f,}),m_ConfidenceThreshold(0.0f),m_NmsThreshold(0.0f)
+            : m_Classes(0),m_Side(0),m_NumBox(0),m_Coords(0)
+              ,m_ConfidenceThreshold(0.0f),m_NmsThreshold(0.0f),m_Biases()
     {}
 
     uint32_t m_Classes;
     uint32_t m_Side;
     uint32_t m_NumBox;
-    std::vector<float> m_Biases;
+    uint32_t m_Coords;
     float m_ConfidenceThreshold;
     float m_NmsThreshold;
+    std::vector<float> m_Biases;
 };
 
 struct ReorgDescriptor

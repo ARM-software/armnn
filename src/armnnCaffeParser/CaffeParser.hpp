@@ -95,6 +95,9 @@ private:
     void ParseScaleLayer(const caffe::LayerParameter& layerParam);
     void ParseSplitLayer(const caffe::LayerParameter& layerParam);
     void ParseDropoutLayer(const caffe::LayerParameter& layerParam);
+    // add layers that yolov2 need.
+    void ParseReorgLayer(const caffe::LayerParameter& layerParam);
+    void ParseDetectionOutputLayer(const caffe::LayerParameter& layerParam);
     /// @}
 
     void TrackInputBinding(armnn::IConnectableLayer* layer,

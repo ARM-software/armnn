@@ -108,6 +108,13 @@ public:
 
     IConnectableLayer* AddOutputLayer(LayerBindingId id, const char* name = nullptr) override;
 
+    // for yolov2
+    IConnectableLayer* AddDetectionOutputLayer(const DetectionOutputDescriptor& detectionoutputDescriptor,
+                                                       const char* name = nullptr) override;
+
+    IConnectableLayer* AddReorgLayer(const ReorgDescriptor& reorgDescriptor,
+                                             const char* name = nullptr) override;
+
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
         const ConstTensor& weights,

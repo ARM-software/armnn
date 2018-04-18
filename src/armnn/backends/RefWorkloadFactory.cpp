@@ -228,4 +228,17 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFloor(const FloorQueueDescr
     return MakeWorkload<RefFloorFloat32Workload, NullWorkload>(descriptor, info);
 }
 
+// for yolov2
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDetectionOutput(const DetectionOutputQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
+{
+    return MakeWorkload<RefDetectionOutputFloat32Workload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReorg(const ReorgQueueDescriptor& descriptor,
+                                               const WorkloadInfo& info) const
+{
+    return MakeWorkload<RefReorgFloat32Workload, NullWorkload>(descriptor, info);
+}
+
 } // namespace armnn

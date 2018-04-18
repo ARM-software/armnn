@@ -434,4 +434,47 @@ protected:
     ~ReshapeLayer() = default;
 };
 
+// for yolov2
+class DetectionOutputLayer : public LayerWithParameters<DetectionOutputDescriptor>
+{
+public:
+    virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,
+                                                      const IWorkloadFactory& factory) const override;
+
+    DetectionOutputLayer* Clone(Graph& graph) const override;
+
+    void ValidateTensorShapesFromInputs() override;
+
+    bool IsEqual(const Layer& other) const
+    {
+        return (other.GetType() == LayerType::DetectionOutput) &&
+               m_Param.m_Classes == boost::polymorphic_downcast<const DetectionOutputLayer*>(&other)->m_Param.m_Classes;
+    }
+
+protected:
+    DetectionOutputLayer(const DetectionOutputDescriptor& desc, const char* name);
+    ~DetectionOutputLayer() = default;
+};
+
+class ReorgLayer : public LayerWithParameters<ReorgDescriptor>
+{
+public:
+    virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,
+                                                      const IWorkloadFactory& factory) const override;
+
+    ReorgLayer* Clone(Graph& graph) const override;
+
+    void ValidateTensorShapesFromInputs() override;
+
+    bool IsEqual(const Layer& other) const
+    {
+        return (other.GetType() == LayerType::Reorg) &&
+               m_Param.m_Stride == boost::polymorphic_downcast<const ReorgLayer*>(&other)->m_Param.m_Stride;
+    }
+
+protected:
+    ReorgLayer(const ReorgDescriptor& desc, const char* name);
+    ~ReorgLayer() = default;
+};
+
 }

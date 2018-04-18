@@ -20,6 +20,9 @@ struct ResizeBilinearDescriptor;
 struct SoftmaxDescriptor;
 struct OriginsDescriptor;
 struct ViewsDescriptor;
+//
+struct DetectionOutputDescriptor;
+struct ReorgDescriptor;
 
 using MergerDescriptor = OriginsDescriptor;
 using SplitterDescriptor = ViewsDescriptor;

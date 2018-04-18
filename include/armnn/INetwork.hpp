@@ -254,6 +254,14 @@ public:
     /// @return Interface for configuring the layer.
     virtual IConnectableLayer* AddOutputLayer(LayerBindingId id, const char* name = nullptr) = 0;
 
+    // add an yolov2 detection layer to the network
+    virtual IConnectableLayer* AddDetectionOutputLayer(const DetectionOutputDescriptor& detectionoutputDescriptor,
+                                               const char* name = nullptr) = 0;
+
+    // add an yolov2 reorg layer to the network
+    virtual IConnectableLayer* AddReorgLayer(const ReorgDescriptor& reorgDescriptor,
+                                               const char* name = nullptr) = 0;
+
 protected:
     ~INetwork() {}
 };

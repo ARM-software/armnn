@@ -38,6 +38,8 @@ enum class LayerType
     // Last layer goes here
     LastLayer,
     Splitter = LastLayer,
+    DetectionOutput,
+    Reorg,
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

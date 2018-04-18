@@ -327,6 +327,18 @@ IConnectableLayer* Network::AddFloorLayer(const char* name)
     return m_Graph->AddLayer<FloorLayer>(name);
 }
 
+IConnectableLayer* Network::AddDetectionOutputLayer(const DetectionOutputDescriptor& detectionoutputDescriptor,
+                                               const char* name)
+{
+    return m_Graph->AddLayer<DetectionOutputLayer>(detectionoutputDescriptor,name);
+}
+
+IConnectableLayer* Network::AddReorgLayer(const ReorgDescriptor& reorgDescriptor,
+                                     const char* name)
+{
+    return m_Graph->AddLayer<ReorgLayer>(reorgDescriptor,name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

@@ -95,4 +95,14 @@ bool IsFloorSupportedRef(const TensorInfo& input,
                          const TensorInfo& output,
                          std::string* reasonIfUnsupported = nullptr);
 
+//
+bool IsDetectionOutputSupportedRef(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const DetectionOutputDescriptor& descriptor,
+                                   std::string* reasonIfUnsupported = nullptr);
+
+bool IsReorgSupportedRef(const TensorInfo& input,
+                         const TensorInfo& output,
+                         const DetectionOutputDescriptor& descriptor,
+                         std::string* reasonIfUnsupported = nullptr);
 }

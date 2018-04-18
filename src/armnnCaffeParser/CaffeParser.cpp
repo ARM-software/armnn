@@ -72,6 +72,8 @@ const std::map<std::string, CaffeParser::OperationParsingFunction> CaffeParser::
     { "Scale",        &CaffeParser::ParseScaleLayer },
     { "Split",        &CaffeParser::ParseSplitLayer },
     { "Dropout",      &CaffeParser::ParseDropoutLayer},
+    { "Reorg",        &CaffeParser::ParseReorgLayer },
+    { "DetectionOutput", &CaffeParser::ParseDetectionOutputLayer},
 };
 
 ICaffeParser* ICaffeParser::CreateRaw()
@@ -944,6 +946,7 @@ void CaffeParser::ParseConcatLayer(const LayerParameter& layerParam)
     {
         const TensorInfo& inputInfo = GetArmnnOutputSlotForCaffeTop(
             layerParam.bottom(boost::numeric_cast<int>(viewIndex))).GetTensorInfo();
+
         // Check whether the dimensions of the input tensors are actually 4
         if (inputInfo.GetNumDimensions()!=4)
         {
@@ -1086,6 +1089,20 @@ void CaffeParser::ParseSplitLayer(const caffe::LayerParameter& layerParam)
     for (int i = 0; i < layerParam.top_size(); i++)
     {
         SetArmnnOutputSlotForCaffeTop(layerParam.top(i), outputSlot);
+    }
+
+    const TensorInfo& inputInfo = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo();
+
+    //ViewsDescriptor splitDescriptor(1, 4);// we only consider 4-D tensor here
+    std::vector<unsigned int> cpDimSizes(4, 0u);
+    cpDimSizes[0] = inputInfo.GetShape()[0];
+    cpDimSizes[1] = inputInfo.GetShape()[1];
+    cpDimSizes[2] = inputInfo.GetShape()[2];
+    cpDimSizes[3] = inputInfo.GetShape()[3];
+
+    for (int i = 0; i < layerParam.top_size(); i++)
+    {
+        GetArmnnOutputSlotForCaffeTop(layerParam.top(i)).SetTensorInfo(armnn::TensorInfo(4, cpDimSizes.data(), DataType::Float32));
     }
 }
 
@@ -1277,7 +1294,11 @@ void CaffeParser::LoadNetParam(NetParameter& netParameter)
     // Add ArmNN output layers connected to each requested output
     for (const std::string& requestedOutput : m_RequestedOutputs)
     {
+        std::cout << "requestedOutput "  << requestedOutput << std::endl;
+
         armnn::IOutputSlot& outputSlot = GetArmnnOutputSlotForCaffeTop(requestedOutput);
+
+        //std::cout << "requestedOutput "  << requestedOutput << std::endl;
 
         const armnn::LayerBindingId outputId = boost::numeric_cast<armnn::LayerBindingId>(
             m_NetworkOutputsBindingInfo.size());
@@ -1406,6 +1427,151 @@ void CaffeParser::Cleanup()
     m_InputShapes.clear();
     m_RequestedOutputs.clear();
     m_ArmnnOutputSlotForCaffeTop.clear();
+}
+
+void CaffeParser::ParseReorgLayer(const caffe::LayerParameter& layerParam)
+{
+    BOOST_ASSERT(layerParam.type() == "Reorg");
+    ValidateNumInputsOutputs(layerParam, 1, 1);
+    ReorgParameter reorgParameter = layerParam.reorg_param();
+    //BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
+
+    unsigned int stride;
+    if ( reorgParameter.has_stride() )
+    {
+        stride = reorgParameter.stride();
+    }
+    else
+    {
+        throw ParseException("Loading Reorg Layer: stride defined Illegally");
+    }
+
+    armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
+
+    const TensorInfo& inputInfo = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo();
+    std::vector<unsigned int> orgDimSizes(4, 0u);
+    orgDimSizes[0] = inputInfo.GetShape()[0];
+    orgDimSizes[1] = stride*stride*inputInfo.GetShape()[1];
+    orgDimSizes[2] = inputInfo.GetShape()[2]/ stride;
+    orgDimSizes[3] = inputInfo.GetShape()[3]/ stride;
+
+    ReorgDescriptor reorgDescriptor;
+    reorgDescriptor.m_Stride = stride;
+    //reorgDescriptor.m_StrideX = strideW;
+    //reorgDescriptor.m_StrideY  = strideH;
+
+    IConnectableLayer* reorgLayer = nullptr;
+    reorgLayer = m_Network->AddReorgLayer(reorgDescriptor,layerParam.name().c_str());
+    inputConnection.Connect( reorgLayer->GetInputSlot(0) );
+
+    reorgLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(4, orgDimSizes.data(), DataType::Float32));
+    BOOST_ASSERT(reorgLayer);
+    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), reorgLayer->GetOutputSlot(0));
+}
+
+void CaffeParser::ParseDetectionOutputLayer(const caffe::LayerParameter& layerParam)
+{
+    BOOST_ASSERT(layerParam.type() == "DetectionOutput");
+    ValidateNumInputsOutputs(layerParam, 1, 1);
+    DetectionOutputParameter detectionoutputParameter = layerParam.detection_output_param();
+    BlobShape inputShape = TensorDescToBlobShape(GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo());
+
+    unsigned int coords;
+    if ( detectionoutputParameter.has_coords() )
+        coords = detectionoutputParameter.coords();
+    else
+        throw ParseException("Loading DetectionOutput Layer: coords defined Illegally");
+
+    unsigned int classes;
+    if ( detectionoutputParameter.has_num_classes() )
+        classes = detectionoutputParameter.num_classes();
+    else
+        throw ParseException("Loading DetectionOutput Layer: classes defined Illegally");
+
+    unsigned int numBox;
+    if( detectionoutputParameter.has_num_box() )
+        numBox = detectionoutputParameter.num_box();
+    else
+        throw ParseException("Loading DetectionOutput Layer: numbox defined Illegally");
+
+    float confidenceThreshold;
+    if( detectionoutputParameter.has_confidence_threshold() )
+        confidenceThreshold = detectionoutputParameter.confidence_threshold();
+    else
+        throw ParseException("Loading DetectionOutput Layer: confidenceThreshold defined Illegally");
+
+    float nmsThreshold;
+    if( detectionoutputParameter.has_nms_threshold() )
+    {
+        nmsThreshold = detectionoutputParameter.nms_threshold();
+    }
+    else
+    {
+        nmsThreshold = 0.5f;
+        //throw ParseException("Loading DetectionOutput Layer: nmsThreshold defined Illegally");
+    }
+
+    std::vector<float> anchors;
+    int size = detectionoutputParameter.anchor_size();
+    if( size > 1 )
+    {
+        anchors.reserve(static_cast<long unsigned int>(size));
+        for(int i = 0; i < size ; ++i )
+        {
+            anchors.emplace_back(detectionoutputParameter.anchor(i));
+        }
+    }
+    else
+        throw ParseException("Loading DetectionOutput Layer: anchors defined Illegally");
+
+    unsigned int side;
+    if( detectionoutputParameter.has_side() )
+    {
+        side = detectionoutputParameter.side();
+    }
+    else
+    {
+        const TensorInfo& inputInfo = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0)).GetTensorInfo();
+        side = inputInfo.GetShape().GetNumElements() / ((classes + coords + 1)*numBox);
+        side = static_cast<unsigned int>( sqrt(side) );
+        //throw ParseException("Loading DetectionOutput Layer: side value Illegally");
+    }
+
+    armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
+
+    BlobShape outputShape;
+    outputShape.add_dim(0);
+    outputShape.set_dim(0, inputShape.dim(0));
+    outputShape.add_dim(1);
+    outputShape.set_dim(1, side * side);
+    outputShape.add_dim(2);
+    outputShape.set_dim( 2, (classes + coords + 1)*numBox );
+
+    DetectionOutputDescriptor detectionoutputDescriptor;
+    // uint32 param
+    detectionoutputDescriptor.m_Classes = classes;
+    detectionoutputDescriptor.m_Side = side;
+    detectionoutputDescriptor.m_NumBox = numBox;
+    detectionoutputDescriptor.m_Coords = coords;
+    // float pram
+    detectionoutputDescriptor.m_ConfidenceThreshold = confidenceThreshold;
+    detectionoutputDescriptor.m_NmsThreshold = nmsThreshold;
+    // vector param
+    detectionoutputDescriptor.m_Biases.clear();
+    detectionoutputDescriptor.m_Biases.swap(anchors);
+
+    IConnectableLayer* detectionoutputLayer = nullptr;
+    detectionoutputLayer = m_Network->AddDetectionOutputLayer(detectionoutputDescriptor,layerParam.name().c_str());
+    inputConnection.Connect( detectionoutputLayer->GetInputSlot(0) );
+
+    std::vector<unsigned int> orgDimSizes(3, 0u);
+    orgDimSizes[0] = 1;
+    orgDimSizes[1] = 169;
+    orgDimSizes[2] = 7;
+    detectionoutputLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(3, orgDimSizes.data(), DataType::Float32));
+
+    BOOST_ASSERT(detectionoutputLayer);
+    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), detectionoutputLayer->GetOutputSlot(0));
 }
 
 }

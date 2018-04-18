@@ -214,6 +214,12 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefFakeQuantizationFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefPermuteWorkload.hpp
     src/armnn/backends/RefWorkloads/RefPermuteWorkload.cpp
+    # append for yolov2
+    src/armnn/backends/RefWorkloads/RefDetectionOutputFloat32Workload.hpp
+    src/armnn/backends/RefWorkloads/RefDetectionOutputFloat32Workload.cpp
+    src/armnn/backends/RefWorkloads/RefReorgFloat32Workload.hpp
+    src/armnn/backends/RefWorkloads/RefReorgFloat32Workload.cpp
+    #
     src/armnn/InternalTypes.hpp
     src/armnn/InternalTypes.cpp
     src/armnn/LayerFwd.hpp

@@ -747,4 +747,24 @@ void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+    //
+void DetectionOutputQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "DetectionOutputQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "DetectionOutputQueueDescriptor");
+    //todo
+}
+
+void ReorgQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "ReorgQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "ReorgQueueDescriptor");
+
+    TensorShape shape = workloadInfo.m_InputTensorInfos[0].GetShape();
+    if(shape.GetNumDimensions()<4 || shape[0]<=0 || shape[1]<=0 || shape[2]<=0 || shape[3]<=0 )
+    {
+        throw InvalidArgumentException("ReorgQueueDescriptor: Input tensor shape unvalidate.");
+    }
+}
+
 } //namespace armnn

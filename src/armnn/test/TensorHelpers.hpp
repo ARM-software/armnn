@@ -22,7 +22,7 @@
 
 #include <cmath>
 
-constexpr float g_FloatCloseToZeroTolerance = 1.0e-7f;
+constexpr float g_FloatCloseToZeroTolerance = 1.0e-6f;
 
 template<typename T, bool isQuantized = true>
 struct SelectiveComparer

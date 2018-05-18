@@ -7,14 +7,14 @@
 #include "backends/CpuTensorHandle.hpp"
 #include "backends/ArmComputeTensorUtils.hpp"
 
-
 namespace armnn
 {
 using namespace armcomputetensorutils;
 
 NeonFullyConnectedFloat32Workload::NeonFullyConnectedFloat32Workload(const FullyConnectedQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo& info)
+    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Float32Workload<FullyConnectedQueueDescriptor>(descriptor, info)
+    , m_FullyConnectedLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonFullyConnectedFloat32Workload", 1, 1);
 
@@ -50,5 +50,4 @@ void NeonFullyConnectedFloat32Workload::Execute() const
 }
 
 } //namespace armnn
-
 

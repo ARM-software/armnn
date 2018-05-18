@@ -23,7 +23,7 @@ void Splitter(const SplitterQueueDescriptor& data)
 
     for (unsigned int index = 0; index < inputInfo0.GetNumElements(); ++index)
     {
-        unsigned int indices[MaxNumOfTensorDimensions];
+        unsigned int indices[MaxNumOfTensorDimensions] = { 0 };
 
         unsigned int indexRemainder = index;
         unsigned int dimensionStride = inputInfo0.GetNumElements();

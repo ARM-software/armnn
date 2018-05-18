@@ -16,6 +16,7 @@
 
 #ifdef ARMCOMPUTECL_ENABLED
 #include "ClWorkloads/ClAdditionFloat32Workload.hpp"
+#include "ClWorkloads/ClConvolution2dBaseWorkload.hpp"
 #include "ClWorkloads/ClPooling2dBaseWorkload.hpp"
 #include "ClWorkloads/ClPermuteWorkload.hpp"
 #include "ClWorkloads/ClNormalizationFloat32Workload.hpp"
@@ -110,7 +111,7 @@ bool IsClDepthwiseConvolution2dDescParamsSupported(std::string* reasonIfUnsuppor
     {
         if (reasonIfUnsupported)
         {
-            *reasonIfUnsupported = "Depwthwise convolution Weight tensor needs to be 4d";
+            *reasonIfUnsupported = "Depthwise convolution Weight tensor needs to be 4d";
         }
         return false;
     }
@@ -233,16 +234,19 @@ bool IsDirectConvolution2dParamsSupportedCl(std::string* reasonIfUnsupported,
 }
 
 bool IsConvolution2dSupportedCl(const TensorInfo& input,
+                                const TensorInfo& output,
                                 const Convolution2dDescriptor& descriptor,
                                 const TensorInfo& weights,
+                                const TensorInfo& biases,
                                 std::string* reasonIfUnsupported)
 {
-    return IsSupportedForDataTypeCl(reasonIfUnsupported,
-                                    input.GetDataType(),
-                                    &TrueFunc<decltype(descriptor), decltype(weights)>,
-                                    &IsDirectConvolution2dParamsSupportedCl,
-                                    descriptor,
-                                    weights);
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClConvolution2dWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor,
+                                   weights,
+                                   biases);
 }
 
 bool IsDepthwiseConvolutionSupportedCl(const TensorInfo& input,

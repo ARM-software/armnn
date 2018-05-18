@@ -67,6 +67,9 @@ LayerTestResult<float, 4> DepthwiseConvolution2dTest(armnn::IWorkloadFactory& wo
 LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(armnn::IWorkloadFactory& workloadFactory,
                                                               bool biasEnabled);
 
+LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(armnn::IWorkloadFactory& workloadFactory,
+                                                               bool biasEnabled);
+
 LayerTestResult<float,   4> SimpleMaxPooling2dSize2x2Stride2x2Test(armnn::IWorkloadFactory& workloadFactory,
                                                                    bool forceNoPadding);
 LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize2x2Stride2x2Uint8Test(armnn::IWorkloadFactory& workloadFactory,

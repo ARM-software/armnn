@@ -13,27 +13,42 @@ int main(int argc, char* argv[])
     using YoloInferenceModel = InferenceModel<armnnCaffeParser::ICaffeParser,
         float>;
 
-    return InferenceTestMain(argc, argv, { 0 },
-        [&inputTensorShape]()
-        {
-            return make_unique<YoloTestCaseProvider<YoloInferenceModel>>(
-                [&]
-                (typename YoloInferenceModel::CommandLineOptions modelOptions)
-                {
-                    if (!ValidateDirectory(modelOptions.m_ModelDir))
+    int retVal = EXIT_FAILURE;
+    try
+    {
+        // Coverity fix: InferenceTestMain() may throw uncaught exceptions.
+        retVal = InferenceTestMain(argc, argv, { 0 },
+            [&inputTensorShape]()
+            {
+                return make_unique<YoloTestCaseProvider<YoloInferenceModel>>(
+                    [&]
+                    (typename YoloInferenceModel::CommandLineOptions modelOptions)
                     {
-                        return std::unique_ptr<YoloInferenceModel>();
-                    }
+                        if (!ValidateDirectory(modelOptions.m_ModelDir))
+                        {
+                            return std::unique_ptr<YoloInferenceModel>();
+                        }
 
-                    typename YoloInferenceModel::Params modelParams;
-                    modelParams.m_ModelPath = modelOptions.m_ModelDir + "yolov1_tiny_voc2007_model.caffemodel";
-                    modelParams.m_InputBinding = "data";
-                    modelParams.m_OutputBinding = "fc12";
-                    modelParams.m_InputTensorShape = &inputTensorShape;
-                    modelParams.m_IsModelBinary = true;
-                    modelParams.m_ComputeDevice = modelOptions.m_ComputeDevice;
+                        typename YoloInferenceModel::Params modelParams;
+                        modelParams.m_ModelPath = modelOptions.m_ModelDir + "yolov1_tiny_voc2007_model.caffemodel";
+                        modelParams.m_InputBinding = "data";
+                        modelParams.m_OutputBinding = "fc12";
+                        modelParams.m_InputTensorShape = &inputTensorShape;
+                        modelParams.m_IsModelBinary = true;
+                        modelParams.m_ComputeDevice = modelOptions.m_ComputeDevice;
+                        modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
 
-                    return std::make_unique<YoloInferenceModel>(modelParams);
+                        return std::make_unique<YoloInferenceModel>(modelParams);
+                });
             });
-        });
+    }
+    catch (const std::exception& e)
+    {
+        // Coverity fix: BOOST_LOG_TRIVIAL (typically used to report errors) may throw an
+        // exception of type std::length_error.
+        // Using stderr instead in this context as there is no point in nesting try-catch blocks here.
+        std::cerr << "WARNING: CaffeYolo-Armnn: An error has occurred when running "
+                     "the classifier inference tests: " << e.what() << std::endl;
+    }
+    return retVal;
 }

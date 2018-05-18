@@ -62,6 +62,9 @@ ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1, DepthwiseConvoluti
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, true)
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, false)
 
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, true)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, false)
+
 // Splitter
 BOOST_AUTO_TEST_CASE(SimpleSplitter)
 {

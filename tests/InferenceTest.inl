@@ -307,6 +307,7 @@ int ClassifierInferenceTestMain(int argc, char* argv[], const char* modelFilenam
                     modelParams.m_InputTensorShape = inputTensorShape;
                     modelParams.m_IsModelBinary = isModelBinary;
                     modelParams.m_ComputeDevice = modelOptions.m_ComputeDevice;
+                    modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
 
                     return std::make_unique<InferenceModel>(modelParams);
             });

@@ -7,13 +7,18 @@
 
 #include <backends/NeonWorkloadUtils.hpp>
 
+#include "arm_compute/runtime/MemoryManagerOnDemand.h"
+
+#include <memory>
+
 namespace armnn
 {
 
 class NeonFullyConnectedFloat32Workload : public Float32Workload<FullyConnectedQueueDescriptor>
 {
 public:
-    NeonFullyConnectedFloat32Workload(const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonFullyConnectedFloat32Workload(const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info,
+                                      std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
     virtual void Execute() const override;
 
 private:
@@ -23,8 +28,4 @@ private:
 };
 
 } //namespace armnn
-
-
-
-
 

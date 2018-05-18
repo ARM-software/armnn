@@ -62,6 +62,7 @@ LayerTestResult<T, 2> SimpleSoftmaxTestImpl(armnn::IWorkloadFactory& workloadFac
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
@@ -140,7 +141,9 @@ LayerTestResult<T, 2> CompareSoftmaxTestImpl(armnn::IWorkloadFactory& workloadFa
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
+    refWorkloadFactory.Finalize();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());

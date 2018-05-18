@@ -529,7 +529,11 @@ void CaffeParser::ParseConvLayer(const LayerParameter& layerParam)
         returnLayer = layer;
     }
 
-    BOOST_ASSERT(returnLayer);
+    if (!returnLayer)
+    {
+        throw ParseException("Loading Convolution Layer: invalid return layer");
+    }
+
     SetArmnnOutputSlotForCaffeTop(layerParam.top(0), returnLayer->GetOutputSlot(0));
 }
 
@@ -1013,6 +1017,18 @@ void CaffeParser::ParseBatchNormLayer(const LayerParameter& layerParam)
 
     vector<float> varianceData(channels);
     GetDataFromBlob(layerParam, varianceData, 1);
+
+    // read moving average factor and apply scaling (if required)
+    const BlobProto& blob = layerParam.blobs(boost::numeric_cast<int>(2));
+    const float movingAverageFactor = blob.data(boost::numeric_cast<int>(0));
+    if(movingAverageFactor != 0.0f)
+    {
+        const float scaleFactor = 1.0f / movingAverageFactor;
+        auto scaleFunction = [scaleFactor](float f) -> float { return f * scaleFactor; };
+
+        std::transform(varianceData.begin(), varianceData.end(), varianceData.begin(), scaleFunction);
+        std::transform(meanData.begin(), meanData.end(), meanData.begin(), scaleFunction);
+    }
 
     // identity scale operation
     vector<float> betaData(channels, 0.0f);

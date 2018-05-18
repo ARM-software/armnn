@@ -3,7 +3,7 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "Graph.hpp"
-#include "Layers.hpp"
+#include "LayersFwd.hpp"
 
 #include <armnn/Utils.hpp>
 #include <armnn/TypesUtils.hpp>
@@ -121,20 +121,7 @@ Status Graph::SerializeToDot(std::ostream& stream)
                 {
                     // Construct the label attribute with HTML markup
                     std::stringstream ss;
-                    {
-                        ss << "< [";
-                        const TensorShape& shape = outputSlot->GetTensorInfo().GetShape();
-                        for (unsigned int i = 0; i < shape.GetNumDimensions(); i++)
-                        {
-                            if (i != 0)
-                            {
-                                ss << ",";
-                            }
-                            ss << shape[i];
-                        }
-                        ss << "] >";
-                    }
-
+                    ss << "< " << outputSlot->GetTensorInfo().GetShape() << " >";
                     edge.GetAttributeSet().AddAttribute("label", ss);
                 }
             }

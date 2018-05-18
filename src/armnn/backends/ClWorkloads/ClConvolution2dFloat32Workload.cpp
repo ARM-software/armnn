@@ -14,8 +14,9 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 ClConvolution2dFloat32Workload::ClConvolution2dFloat32Workload(const Convolution2dQueueDescriptor& descriptor,
-                                                               const WorkloadInfo& info)
+    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Float32Workload<Convolution2dQueueDescriptor>(descriptor, info)
+    , m_ConvolutionLayer(memoryManager)
 {
 
     // todo: check tensor shapes match
@@ -42,14 +43,11 @@ ClConvolution2dFloat32Workload::ClConvolution2dFloat32Workload(const Convolution
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_pConvolutionLayer = std::make_unique<arm_compute::CLConvolutionLayer>();
-    static_cast<arm_compute::CLConvolutionLayer*>(m_pConvolutionLayer.get())->configure(&input,
-                                                                                        &m_KernelTensor,
-                                                                                        optionalBias,
-                                                                                        &output,
-                                                                                        padStrideInfo);
-
-    BOOST_ASSERT(m_pConvolutionLayer);
+    m_ConvolutionLayer.configure(&input,
+                                 &m_KernelTensor,
+                                 optionalBias,
+                                 &output,
+                                 padStrideInfo);
 
     InitialiseArmComputeClTensorData(m_KernelTensor, m_Data.m_Weight->GetConstTensor<float>());
 
@@ -62,9 +60,8 @@ ClConvolution2dFloat32Workload::ClConvolution2dFloat32Workload(const Convolution
 void ClConvolution2dFloat32Workload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClConvolution2dFloat32Workload_Execute");
-    BOOST_ASSERT(m_pConvolutionLayer);
 
-    m_pConvolutionLayer->run();
+    m_ConvolutionLayer.run();
 }
 
 } //namespace armnn

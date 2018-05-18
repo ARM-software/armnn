@@ -6,6 +6,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <sstream>
 
 namespace armnn
 {
@@ -69,6 +70,24 @@ void ConditionalThrow(bool condition, const std::string& message)
     if (!condition)
     {
         throw ExceptionType(message);
+    }
+}
+
+///
+/// ComparedType must support:
+///   operator==(const ComparedType&)
+///   operator<<(ostream&, const ComparedType&)
+///
+template <typename ExceptionType, typename ComparedType>
+void ConditionalThrowIfNotEqual(const std::string& message,
+                                const ComparedType& leftHandSide,
+                                const ComparedType& rightHandSide)
+{
+    if (!(leftHandSide == rightHandSide))
+    {
+        std::stringstream ss;
+        ss << message << " : " << leftHandSide << " != " << rightHandSide;
+        throw ExceptionType(ss.str());
     }
 }
 

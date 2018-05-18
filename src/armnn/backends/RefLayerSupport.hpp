@@ -28,8 +28,10 @@ bool IsConstantSupportedRef(const TensorInfo& output,
                             std::string* reasonIfUnsupported = nullptr);
 
 bool IsConvolution2dSupportedRef(const TensorInfo& input,
+                                 const TensorInfo& output,
                                  const Convolution2dDescriptor& descriptor,
                                  const TensorInfo& weights,
+                                 const TensorInfo& biases,
                                  std::string* reasonIfUnsupported = nullptr);
 
 bool IsDepthwiseConvolutionSupportedRef(const TensorInfo& input,

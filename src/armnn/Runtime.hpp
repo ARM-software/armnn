@@ -8,21 +8,13 @@
 #include "armnn/INetwork.hpp"
 #include "armnn/IRuntime.hpp"
 #include "armnn/Tensor.hpp"
-#include "backends/RefWorkloadFactory.hpp"
-#include "backends/NeonWorkloadFactory.hpp"
-#include "backends/ClWorkloadFactory.hpp"
+#include "backends/ClContextControl.hpp"
 
+#include <mutex>
 #include <unordered_map>
 
 namespace armnn
 {
-
-struct WorkloadFactories
-{
-    std::shared_ptr<RefWorkloadFactory> m_CpuRef;
-    std::shared_ptr<NeonWorkloadFactory> m_CpuAcc;
-    std::shared_ptr<ClWorkloadFactory> m_GpuAcc;
-};
 
 class Runtime final : public IRuntime
 {
@@ -63,11 +55,17 @@ private:
 
     int GenerateNetworkId();
 
+    LoadedNetwork* GetLoadedNetworkPtr(NetworkId networkId) const;
+
+    mutable std::mutex m_Mutex;
+
     std::unordered_map<NetworkId, std::unique_ptr<LoadedNetwork>> m_LoadedNetworks;
 
-    WorkloadFactories m_WorkloadFactories;
+    ClContextControl m_ClContextControl;
 
     int m_NetworkIdCounter;
+
+    bool m_UseCpuRefAsFallback;
 
     DeviceSpec m_DeviceSpec;
 };

@@ -12,9 +12,38 @@
 namespace armnn
 {
 
+using namespace armcomputetensorutils;
+
+arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
+    const TensorInfo& output,
+    const Convolution2dDescriptor& descriptor,
+    const TensorInfo& weights,
+    const TensorInfo& biases)
+{
+    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
+    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
+    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights);
+    arm_compute::TensorInfo aclBiasesInfo;
+    arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
+
+    if (descriptor.m_BiasEnabled)
+    {
+        aclBiasesInfo = BuildArmComputeTensorInfo(biases);
+        optionalAclBiasesInfo = &aclBiasesInfo;
+    }
+
+    arm_compute::PadStrideInfo layerInfo = BuildArmComputePadStrideInfo(descriptor);
+
+    return arm_compute::NEConvolutionLayer::validate(&aclInputInfo,
+                                                     &aclWeightsInfo,
+                                                     optionalAclBiasesInfo,
+                                                     &aclOutputInfo,
+                                                     layerInfo);
+}
+
 template<armnn::DataType dataType>
 NeonConvolution2dBaseWorkload<dataType>::NeonConvolution2dBaseWorkload(const Convolution2dQueueDescriptor& descriptor,
-                                                                       const WorkloadInfo& info)
+    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : TypedWorkload<Convolution2dQueueDescriptor, dataType>(descriptor, info)
 {
     using arm_compute::NEDirectConvolutionLayer;
@@ -50,7 +79,7 @@ NeonConvolution2dBaseWorkload<dataType>::NeonConvolution2dBaseWorkload(const Con
 
     if (preferDirectConvolution)
     {
-        auto directConvolutionLayer = std::make_unique<arm_compute::NEDirectConvolutionLayer>();
+        auto directConvolutionLayer = std::make_unique<arm_compute::NEDirectConvolutionLayer>(memoryManager);
         directConvolutionLayer->configure(&input,
                                           &m_KernelTensor,
                                           optionalBiasTensor,
@@ -60,7 +89,7 @@ NeonConvolution2dBaseWorkload<dataType>::NeonConvolution2dBaseWorkload(const Con
     }
     else
     {
-        auto convolutionLayer = std::make_unique<arm_compute::NEConvolutionLayer>();
+        auto convolutionLayer = std::make_unique<arm_compute::NEConvolutionLayer>(memoryManager);
         convolutionLayer->configure(&input,
                                     &m_KernelTensor,
                                     optionalBiasTensor,
@@ -80,5 +109,4 @@ template class NeonConvolution2dBaseWorkload<DataType::Float32>;
 template class NeonConvolution2dBaseWorkload<DataType::QuantisedAsymm8>;
 
 } //namespace armnn
-
 

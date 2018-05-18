@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "Layers.hpp"
+#include "LayersFwd.hpp"
 
 #include <armnn/Types.hpp>
 #include <armnn/TensorFwd.hpp>
@@ -254,8 +254,8 @@ public:
         }
     }
     template <typename... Args>
-    LayerInGraph(Graph& graph, Iterator insertBefore, Args&&... args)
-        // Ignore insertBefore. Always add to the back of the inputs.
+    LayerInGraph(Graph& graph, Iterator, Args&&... args)
+        // Ignore Iterator argument. Always add to the back of the inputs.
         : LayerInGraph(graph, std::forward<Args>(args)...)
     {
     }

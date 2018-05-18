@@ -37,19 +37,7 @@ StringifyLayerParameters<ReshapeDescriptor>::Serialize(ParameterStringifyFunctio
                                                        const ReshapeDescriptor & desc)
 {
     std::stringstream ss;
-    ss <<  "[";
-    bool addComma = false;
-    for (unsigned int i=0; i<desc.m_TargetShape.GetNumDimensions(); ++i)
-    {
-        if (addComma)
-        {
-            ss << ",";
-        }
-        ss << desc.m_TargetShape[i];
-        addComma = true;
-    }
-    ss << "]";
-
+    ss << desc.m_TargetShape;
     fn("TargetShape",ss.str());
 }
 
@@ -152,5 +140,32 @@ StringifyLayerParameters<FullyConnectedDescriptor>::Serialize(ParameterStringify
     fn("TransposeWeightMatrix", (desc.m_TransposeWeightMatrix?"true":"false"));
 }
 
+void
+StringifyLayerParameters<OriginsDescriptor>::Serialize(ParameterStringifyFunction & fn,
+                                                       const OriginsDescriptor & desc)
+{
+    uint32_t numViews = desc.GetNumViews();
+    uint32_t numDims  = desc.GetNumDimensions();
+
+    for (uint32_t view=0; view<numViews; ++view)
+    {
+        std::stringstream key;
+        key << "MergeTo#" << view;
+        std::stringstream value;
+        value << "[";
+        auto viewData = desc.GetViewOrigin(view);
+
+        for (uint32_t dim=0; dim<numDims; ++dim)
+        {
+            if(dim > 0)
+            {
+                value << ",";
+            }
+            value << viewData[dim];
+        }
+        value << "]";
+        fn(key.str(), value.str());
+    }
+}
 
 }

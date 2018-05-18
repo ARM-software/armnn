@@ -11,8 +11,6 @@
 #include "armnn/Utils.hpp"
 #include "armnn/Exceptions.hpp"
 
-#include "Layers.hpp"
-
 #include <cstring>
 #include <boost/assert.hpp>
 #include <boost/cast.hpp>

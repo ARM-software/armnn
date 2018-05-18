@@ -32,7 +32,7 @@ inline void ConfigureLoggingTest()
 /// If support is added for a feature, the test case will fail because the name incorrectly contains UNSUPPORTED.
 /// If support is removed for a feature, the test case will fail because the name doesn't contain UNSUPPORTED.
 template <typename T, std::size_t n>
-void CompareTestResultIfSupported(const std::string& testName, LayerTestResult<T, n> testResult)
+void CompareTestResultIfSupported(const std::string& testName, const LayerTestResult<T, n>& testResult)
 {
     bool testNameIndicatesUnsupported = testName.find("UNSUPPORTED") != std::string::npos;
     BOOST_CHECK_MESSAGE(testNameIndicatesUnsupported != testResult.supported,

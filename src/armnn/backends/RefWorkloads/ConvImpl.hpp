@@ -57,6 +57,11 @@ static void ConvImpl(ConvData data,
                      int32_t outputOffset,
                      bool depthwise = false)
 {
+    if (data.m_Parameters.m_BiasEnabled && !biasData)
+    {
+        throw InvalidArgumentException("Bias is enabled but the bias data is invalid");
+    }
+
     const TensorInfo& inputInfo0 = GetTensorInfo(data.m_Inputs[0]);
     const TensorInfo& outputInfo0 = GetTensorInfo(data.m_Outputs[0]);
     const TensorInfo& filterInfo = data.m_Weight->GetTensorInfo();
@@ -64,8 +69,6 @@ static void ConvImpl(ConvData data,
     unsigned int depthMult      = depthwise ? filterInfo.GetShape()[0] : 1;
     unsigned int channelsInput  = filterInfo.GetShape()[1];
     unsigned int channelsOutput = depthwise ? channelsInput * depthMult : filterInfo.GetShape()[0];
-
-    BOOST_ASSERT(data.m_Parameters.m_BiasEnabled == false || biasData != nullptr);
 
     unsigned int batchSize    = outputInfo0.GetShape()[0];
     unsigned int heightOutput = outputInfo0.GetShape()[2];

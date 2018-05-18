@@ -5,12 +5,14 @@
 
 #include "NeonSoftmaxUint8Workload.hpp"
 
-
-
 namespace armnn
 {
-NeonSoftmaxUint8Workload::NeonSoftmaxUint8Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info)
+
+NeonSoftmaxUint8Workload::NeonSoftmaxUint8Workload(const SoftmaxQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info,
+                                                   std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Uint8Workload<SoftmaxQueueDescriptor>(descriptor, info)
+    , m_SoftmaxLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonSoftmaxUint8Workload", 1, 1);
 
@@ -34,5 +36,6 @@ void NeonSoftmaxUint8Workload::Execute() const
 
     m_SoftmaxLayer.run();
 }
+
 } //namespace armnn
 

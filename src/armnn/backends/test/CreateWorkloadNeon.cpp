@@ -214,13 +214,16 @@ BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
     // check that outputs are as we expect them (see definition of CreateSplitterWorkloadTest)
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({1, 7}, DataType::Float32)));
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({5, 7, 7}, DataType::Float32)));
+
     auto outputHandle0 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle0, TensorInfo({1, 4}, DataType::Float32)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle0, TensorInfo({1, 7, 7}, DataType::Float32)));
+
     auto outputHandle1 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[1]);
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle1, TensorInfo({1, 1}, DataType::Float32)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle1, TensorInfo({2, 7, 7}, DataType::Float32)));
+
     auto outputHandle2 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[2]);
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle2, TensorInfo({1, 2}, DataType::Float32)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle2, TensorInfo({2, 7, 7}, DataType::Float32)));
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMerger)

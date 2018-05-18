@@ -6,7 +6,6 @@
 #include "RefWorkloadFactory.hpp"
 #include "RefWorkloads.hpp"
 #include "Layer.hpp"
-#include "Layers.hpp"
 #include "MemCopyWorkload.hpp"
 #include "MakeWorkloadHelper.hpp"
 
@@ -187,7 +186,6 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMemCopy(const MemCop
 #endif
     default:
         throw InvalidArgumentException("RefWorkloadFactory: Destination type not supported for MemCopy Workload.");
-        return nullptr;
     }
 }
 

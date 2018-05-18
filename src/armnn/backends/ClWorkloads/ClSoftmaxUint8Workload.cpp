@@ -10,8 +10,10 @@
 namespace armnn
 {
 
-ClSoftmaxUint8Workload::ClSoftmaxUint8Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClSoftmaxUint8Workload::ClSoftmaxUint8Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,
+                                               std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Uint8Workload<SoftmaxQueueDescriptor>(descriptor, info)
+    , m_SoftmaxLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("ClSoftmaxUint8Workload", 1, 1);
 

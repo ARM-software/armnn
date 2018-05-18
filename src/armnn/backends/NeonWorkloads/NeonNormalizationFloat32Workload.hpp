@@ -7,13 +7,16 @@
 
 #include <backends/NeonWorkloadUtils.hpp>
 
+#include "arm_compute/runtime/MemoryManagerOnDemand.h"
+
 namespace armnn
 {
 
 class NeonNormalizationFloat32Workload : public Float32Workload<NormalizationQueueDescriptor>
 {
 public:
-    NeonNormalizationFloat32Workload(const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonNormalizationFloat32Workload(const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info,
+                                     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
     virtual void Execute() const override;
 
 private:

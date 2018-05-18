@@ -241,13 +241,16 @@ static void RefCreateSplitterWorkloadTest()
     // check that outputs are as we expect them (see definition of CreateSplitterWorkloadTest)
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<ConstCpuTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    BOOST_TEST((inputHandle->GetTensorInfo() == TensorInfo({ 1, 7 }, SplitterWorkloadType::ms_DataType)));
+    BOOST_TEST((inputHandle->GetTensorInfo() == TensorInfo({ 5, 7, 7 }, SplitterWorkloadType::ms_DataType)));
+
     auto outputHandle0 = boost::polymorphic_downcast<CpuTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST((outputHandle0->GetTensorInfo() == TensorInfo({ 1, 4 }, SplitterWorkloadType::ms_DataType)));
+    BOOST_TEST((outputHandle0->GetTensorInfo() == TensorInfo({ 1, 7, 7 }, SplitterWorkloadType::ms_DataType)));
+
     auto outputHandle1 = boost::polymorphic_downcast<CpuTensorHandle*>(queueDescriptor.m_Outputs[1]);
-    BOOST_TEST((outputHandle1->GetTensorInfo() == TensorInfo({ 1, 1 }, SplitterWorkloadType::ms_DataType)));
+    BOOST_TEST((outputHandle1->GetTensorInfo() == TensorInfo({ 2, 7, 7 }, SplitterWorkloadType::ms_DataType)));
+
     auto outputHandle2 = boost::polymorphic_downcast<CpuTensorHandle*>(queueDescriptor.m_Outputs[2]);
-    BOOST_TEST((outputHandle2->GetTensorInfo() == TensorInfo({ 1, 2 }, SplitterWorkloadType::ms_DataType)));
+    BOOST_TEST((outputHandle2->GetTensorInfo() == TensorInfo({ 2, 7, 7 }, SplitterWorkloadType::ms_DataType)));
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterFloat32Workload)

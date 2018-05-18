@@ -4,41 +4,22 @@
 //
 #pragma once
 
-#include "WorkloadFactory.hpp"
+#include "AclBaseMemoryManager.hpp"
 #include "OutputHandler.hpp"
 #include "armnn/IRuntime.hpp"
 
-#ifdef ARMCOMPUTECL_ENABLED
-#include <arm_compute/runtime/CL/CLTuner.h>
-#endif
-
-namespace cl
-{
-class Context;
-class CommandQueue;
-class Device;
-}
-
 namespace armnn
 {
-
-class IClTunedParameters;
-class ClTunedParameters;
 
 // ARM Compute OpenCL workload factory
 class ClWorkloadFactory : public IWorkloadFactory
 {
 public:
-
-    ClWorkloadFactory(IClTunedParameters* clTunedParameters = nullptr);
-
-    virtual ~ClWorkloadFactory();
+    ClWorkloadFactory();
 
     virtual Compute GetCompute() const override { return Compute::GpuAcc; }
 
     static bool IsLayerSupported(const Layer& layer, DataType dataType, std::string& outReasonIfUnsupported);
-
-    void LoadOpenClRuntime();
 
     virtual bool SupportsSubTensors() const override { return true; }
 
@@ -114,23 +95,11 @@ public:
     virtual std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 
+    void Finalize() override;
+
 private:
-    ClTunedParameters* m_clTunedParameters;
-};
 
-class ClTunedParameters : public IClTunedParameters
-{
-public:
-    ClTunedParameters(armnn::IClTunedParameters::Mode mode);
-
-    virtual void Load(const char* filename);
-    virtual void Save(const char* filename) const;
-
-    Mode m_Mode;
-
-#ifdef ARMCOMPUTECL_ENABLED
-    arm_compute::CLTuner m_Tuner;
-#endif
+    mutable AclBaseMemoryManager m_MemoryManager;
 };
 
 } // namespace armnn

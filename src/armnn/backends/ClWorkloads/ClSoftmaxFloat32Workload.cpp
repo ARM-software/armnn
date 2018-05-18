@@ -10,8 +10,10 @@
 namespace armnn
 {
 
-ClSoftmaxFloat32Workload::ClSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClSoftmaxFloat32Workload::ClSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,
+                                                   std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Float32Workload<SoftmaxQueueDescriptor>(descriptor, info)
+    , m_SoftmaxLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("ClSoftmaxFloat32Workload", 1, 1);
 

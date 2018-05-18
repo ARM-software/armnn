@@ -31,7 +31,16 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
     while (std::getline(stream, line))
     {
         std::vector<std::string> tokens;
-        boost::split(tokens, line, boost::algorithm::is_any_of("\t ,;:"), boost::token_compress_on);
+        try
+        {
+            // Coverity fix: boost::split() may throw an exception of type boost::bad_function_call.
+            boost::split(tokens, line, boost::algorithm::is_any_of("\t ,;:"), boost::token_compress_on);
+        }
+        catch (const std::exception& e)
+        {
+            BOOST_LOG_TRIVIAL(error) << "An error occurred when splitting tokens: " << e.what();
+            continue;
+        }
         for (const std::string& token : tokens)
         {
             if (!token.empty()) // See https://stackoverflow.com/questions/10437406/
@@ -219,7 +228,17 @@ int main(int argc, char* argv[])
     {
         std::stringstream ss(inputTensorShapeStr);
         std::vector<unsigned int> dims = ParseArray<unsigned int>(ss);
-        inputTensorShape = std::make_unique<armnn::TensorShape>(dims.size(), dims.data());
+
+        try
+        {
+            // Coverity fix: An exception of type armnn::InvalidArgumentException is thrown and never caught.
+            inputTensorShape = std::make_unique<armnn::TensorShape>(dims.size(), dims.data());
+        }
+        catch (const armnn::InvalidArgumentException& e)
+        {
+            BOOST_LOG_TRIVIAL(fatal) << "Cannot create tensor shape: " << e.what();
+            return 1;
+        }
     }
 
     // Forward to implementation based on the parser type

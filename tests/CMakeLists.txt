@@ -127,6 +127,12 @@ if(BUILD_TF_PARSER)
         MobileNetDatabase.hpp
         MobileNetDatabase.cpp)
     TfParserTest(TfInceptionV3-Armnn "${TfInceptionV3-Armnn_sources}")
+
+    set(TfResNext-Armnn_sources
+        TfResNext_Quantized-Armnn/TfResNext_Quantized-Armnn.cpp
+        ImageNetDatabase.hpp
+        ImageNetDatabase.cpp)
+    TfParserTest(TfResNext-Armnn "${TfResNext-Armnn_sources}")
 endif()
 
 if (BUILD_CAFFE_PARSER OR BUILD_TF_PARSER)

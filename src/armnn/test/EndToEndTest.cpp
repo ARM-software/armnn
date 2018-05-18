@@ -75,7 +75,8 @@ BOOST_AUTO_TEST_CASE(Unsigned8)
 
     // load it into the runtime
     NetworkId netId;
-    runtime->LoadNetwork(netId, std::move(optNet));
+    auto error = runtime->LoadNetwork(netId, std::move(optNet));
+    BOOST_TEST(error == Status::Success);
 
     // create structures for input & output
     std::vector<uint8_t> inputData

@@ -9,6 +9,7 @@
 
 #include <arm_compute/core/ITensor.h>
 #include <arm_compute/core/TensorInfo.h>
+#include <arm_compute/core/Types.h>
 
 #include <boost/cast.hpp>
 
@@ -37,6 +38,19 @@ arm_compute::NormalizationLayerInfo BuildArmComputeNormalizationLayerInfo(const 
 
 /// Utility function used to setup an arm_compute::PermutationVector object from an armnn::PermutationVector
 arm_compute::PermutationVector BuildArmComputePermutationVector(const armnn::PermutationVector& vector);
+
+/// Utility function used to setup an arm_compute::PadStrideInfo object from an armnn layer descriptor
+template <typename Descriptor>
+arm_compute::PadStrideInfo BuildArmComputePadStrideInfo(const Descriptor &descriptor)
+{
+    return arm_compute::PadStrideInfo(descriptor.m_StrideX,
+                                      descriptor.m_StrideY,
+                                      descriptor.m_PadLeft,
+                                      descriptor.m_PadRight,
+                                      descriptor.m_PadTop,
+                                      descriptor.m_PadBottom,
+                                      arm_compute::DimensionRoundingType::FLOOR);
+}
 
 /// Sets up the given ArmCompute tensor's dimensions based on the given ArmNN tensor.
 template <typename Tensor>

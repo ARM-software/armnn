@@ -177,22 +177,30 @@ ViewsDescriptor::ViewsDescriptor()
 
 ViewsDescriptor::ViewsDescriptor(uint32_t numViews, uint32_t numDimensions /*= 4*/)
     : m_Origins(numViews, numDimensions)
-    , m_ViewSizes(numViews && numDimensions > 0 ? new uint32_t *[numViews]() : nullptr)
+    , m_ViewSizes(numViews > 0 && numDimensions > 0 ?
+                      new uint32_t *[numViews]() : nullptr)
 {
-    for (uint32_t i = 0; GetNumDimensions() > 0 && i < GetNumViews(); ++i)
+    if (m_ViewSizes)
     {
-        m_ViewSizes[i] = new uint32_t[GetNumDimensions()]();
+        for (uint32_t i = 0; GetNumDimensions() > 0 && i < GetNumViews(); ++i)
+        {
+            m_ViewSizes[i] = new uint32_t[GetNumDimensions()]();
+        }
     }
 }
 
 ViewsDescriptor::ViewsDescriptor(const ViewsDescriptor& other)
     : m_Origins(other.m_Origins)
-    , m_ViewSizes(other.GetNumViews() && other.GetNumDimensions() > 0 ? new uint32_t *[other.GetNumViews()]() : nullptr)
+    , m_ViewSizes(other.GetNumViews() > 0 && other.GetNumDimensions() > 0 ?
+                      new uint32_t *[other.GetNumViews()]() : nullptr)
 {
-    for (uint32_t i = 0; GetNumDimensions() > 0 && i < GetNumViews(); ++i)
+    if (m_ViewSizes)
     {
-        m_ViewSizes[i] = new uint32_t[GetNumDimensions()]();
-        memcpy(m_ViewSizes[i], other.m_ViewSizes[i], GetNumDimensions() * sizeof(uint32_t));
+        for (uint32_t i = 0; GetNumDimensions() > 0 && i < GetNumViews(); ++i)
+        {
+            m_ViewSizes[i] = new uint32_t[GetNumDimensions()]();
+            memcpy(m_ViewSizes[i], other.m_ViewSizes[i], GetNumDimensions() * sizeof(uint32_t));
+        }
     }
 }
 
@@ -204,11 +212,14 @@ ViewsDescriptor::ViewsDescriptor(ViewsDescriptor&& other)
 
 ViewsDescriptor::~ViewsDescriptor()
 {
-    for (uint32_t i = 0; GetNumDimensions() > 0 && i < GetNumViews(); ++i)
+    if (m_ViewSizes)
     {
-        delete[] m_ViewSizes[i];
+        for (uint32_t i = 0; GetNumDimensions() > 0 && i < GetNumViews(); ++i)
+        {
+            delete[] m_ViewSizes[i];
+        }
+        delete[] m_ViewSizes;
     }
-    delete[] m_ViewSizes;
 }
 
 ViewsDescriptor& ViewsDescriptor::operator=(ViewsDescriptor rhs)
@@ -239,6 +250,12 @@ Status ViewsDescriptor::SetViewOriginCoord(uint32_t view, uint32_t coord, uint32
 
 Status ViewsDescriptor::SetViewSize(uint32_t view, uint32_t coord, uint32_t value)
 {
+    if (!m_ViewSizes)
+    {
+        BOOST_LOG_TRIVIAL(error) << "ViewsDescriptor::SetViewSize: invalid view sizes";
+        return Status::Failure;
+    }
+
     if (view >= GetNumViews())
     {
         BOOST_LOG_TRIVIAL(error) << "ViewsDescriptor::SetViewSize: view argument:" << view <<

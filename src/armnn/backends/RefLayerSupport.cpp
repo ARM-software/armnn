@@ -77,11 +77,16 @@ bool IsConstantSupportedRef(const TensorInfo& output,
 }
 
 bool IsConvolution2dSupportedRef(const TensorInfo& input,
+                                 const TensorInfo& output,
                                  const Convolution2dDescriptor& descriptor,
                                  const TensorInfo& weights,
+                                 const TensorInfo& biases,
                                  std::string* reasonIfUnsupported)
 {
     ignore_unused(descriptor);
+    ignore_unused(output);
+    ignore_unused(weights);
+    ignore_unused(biases);
     return IsSupportedForDataTypeRef(reasonIfUnsupported,
                                      input.GetDataType(),
                                      &TrueFunc<>,

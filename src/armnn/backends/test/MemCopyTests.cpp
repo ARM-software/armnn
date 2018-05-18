@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(MemCopyTestSuite)
 void MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactory, armnn::IWorkloadFactory& dstWorkloadFactory,
                  bool withSubtensors)
 {
-    const std::array<unsigned int, 4> shapeData = { 1u, 1u, 6u, 5u };
+    const std::array<unsigned int, 4> shapeData = { { 1u, 1u, 6u, 5u } };
     const armnn::TensorShape tensorShape(4, shapeData.data());
     const armnn::TensorInfo tensorInfo(tensorShape, armnn::DataType::Float32);
     boost::multi_array<float, 4> inputData = MakeTensor<float, 4>(tensorInfo, std::vector<float>(

@@ -15,6 +15,7 @@
 #include <boost/core/ignore_unused.hpp>
 
 #ifdef ARMCOMPUTENEON_ENABLED
+#include "NeonWorkloads/NeonConvolution2dBaseWorkload.hpp"
 #include "NeonWorkloads/NeonPooling2dBaseWorkload.hpp"
 #include "NeonWorkloads/NeonPermuteWorkload.hpp"
 #endif
@@ -53,9 +54,10 @@ bool IsNeonDirectConvolutionPreferred(const TensorInfo& weightInfo, const Convol
     const bool strideSupported = (desc.m_StrideX == 1 || desc.m_StrideX == 2 || desc.m_StrideX == 3) &&
                                  (desc.m_StrideY == 1 || desc.m_StrideY == 2 || desc.m_StrideY == 3);
 
-    auto paddingLargerThan = [](const Convolution2dDescriptor& desc, unsigned int value)
+    auto paddingLargerThan = [](const Convolution2dDescriptor& conv2ddesc, unsigned int value)
     {
-        return desc.m_PadLeft > value || desc.m_PadRight > value || desc.m_PadTop > value || desc.m_PadBottom > value;
+        return conv2ddesc.m_PadLeft > value || conv2ddesc.m_PadRight > value ||
+               conv2ddesc.m_PadTop > value || conv2ddesc.m_PadBottom > value;
     };
 
     // Supported sizes and padding
@@ -69,22 +71,6 @@ bool IsNeonDirectConvolutionPreferred(const TensorInfo& weightInfo, const Convol
                                          // NEDirectConvolutionLayerKernel doesn't support NULL bias
                                          desc.m_BiasEnabled;
     return preferDirectConvolution;
-}
-
-bool IsNeonMultiplicationParamsSupported(std::string* reasonIfUnsupported,
-                                         const TensorInfo& info0,
-                                         const TensorInfo& info1)
-{
-    if (info0.GetShape() == info1.GetShape())
-    {
-        return true;
-    }
-
-    if (reasonIfUnsupported)
-    {
-        *reasonIfUnsupported = "Multiplication on Neon does not support implicit broadcast.";
-    }
-    return false;
 }
 
 bool IsNeonNormalizationDescParamsSupported(std::string* reasonIfUnsupported, const NormalizationDescriptor& parameters)
@@ -194,16 +180,6 @@ bool IsNeonDepthwiseConvolution2dDescParamsSupported(std::string* reasonIfUnsupp
         return false;
     }
 
-    if (parameters.m_PadLeft != parameters.m_PadRight || parameters.m_PadTop != parameters.m_PadBottom)
-    {
-        if (reasonIfUnsupported)
-        {
-            *reasonIfUnsupported = "Asymmetric padding for depthwise convolution currently not supported "
-                "in Neon backend";
-        }
-        return false;
-    }
-
     return true;
 }
 
@@ -241,15 +217,19 @@ bool IsConstantSupportedNeon(const TensorInfo& output,
 }
 
 bool IsConvolution2dSupportedNeon(const TensorInfo& input,
+                                  const TensorInfo& output,
                                   const Convolution2dDescriptor& descriptor,
                                   const TensorInfo& weights,
+                                  const TensorInfo& biases,
                                   std::string* reasonIfUnsupported)
 {
-    ignore_unused(descriptor);
-    return IsSupportedForDataTypeNeon(reasonIfUnsupported,
-                                      input.GetDataType(),
-                                      &TrueFunc<>,
-                                      &TrueFunc<>);
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConvolution2dWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor,
+                                   weights,
+                                   biases);
 }
 
 bool IsDepthwiseConvolutionSupportedNeon(const TensorInfo& input,
@@ -309,13 +289,11 @@ bool IsMultiplicationSupportedNeon(const TensorInfo& input0,
                                    const TensorInfo& input1,
                                    std::string* reasonIfUnsupported)
 {
+    ignore_unused(input1);
     return IsSupportedForDataTypeNeon(reasonIfUnsupported,
                                       input0.GetDataType(),
-                                      &IsNeonMultiplicationParamsSupported,
-                                      &FalseFuncU8<const TensorInfo&, const TensorInfo&>,
-                                      input0,
-                                      input1
-                            );
+                                      &TrueFunc<>,
+                                      &FalseFuncU8<>);
 }
 
 bool IsNormalizationSupportedNeon(const TensorInfo& input,

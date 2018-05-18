@@ -70,4 +70,9 @@ template <> struct StringifyLayerParameters<FullyConnectedDescriptor>
     static void Serialize(ParameterStringifyFunction & fn, const FullyConnectedDescriptor & desc);
 };
 
+template <> struct StringifyLayerParameters<OriginsDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction & fn, const OriginsDescriptor & desc);
+};
+
 }

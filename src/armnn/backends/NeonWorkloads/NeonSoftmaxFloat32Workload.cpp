@@ -7,9 +7,11 @@
 
 namespace armnn
 {
+
 NeonSoftmaxFloat32Workload::NeonSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor,
-                                                       const WorkloadInfo& info)
+    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Float32Workload<SoftmaxQueueDescriptor>(descriptor, info)
+    , m_SoftmaxLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonSoftmaxFloat32Workload", 1, 1);
 
@@ -25,7 +27,6 @@ void NeonSoftmaxFloat32Workload::Execute() const
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonSoftmaxFloat32Workload_Execute");
     m_SoftmaxLayer.run();
 }
+
 } //namespace armnn
-
-
 

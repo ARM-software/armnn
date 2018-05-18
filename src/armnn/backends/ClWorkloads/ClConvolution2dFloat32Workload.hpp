@@ -7,16 +7,22 @@
 
 #include "backends/ClWorkloadUtils.hpp"
 
+#include "arm_compute/runtime/MemoryManagerOnDemand.h"
+
+#include <memory>
+
 namespace armnn
 {
+
 class ClConvolution2dFloat32Workload : public Float32Workload<Convolution2dQueueDescriptor>
 {
 public:
-    ClConvolution2dFloat32Workload(const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClConvolution2dFloat32Workload(const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,
+                                   std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
     void Execute() const override;
 
 private:
-    mutable std::unique_ptr<arm_compute::IFunction>         m_pConvolutionLayer;
+    mutable arm_compute::CLConvolutionLayer         m_ConvolutionLayer;
 
     arm_compute::CLTensor m_KernelTensor;
     arm_compute::CLTensor m_BiasTensor;

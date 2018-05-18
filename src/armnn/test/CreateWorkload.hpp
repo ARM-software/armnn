@@ -9,7 +9,6 @@
 #include <boost/cast.hpp>
 
 #include "backends/WorkloadData.hpp"
-#include "Layers.hpp"
 #include "Graph.hpp"
 
 #include <utility>
@@ -541,10 +540,16 @@ std::unique_ptr<SplitterWorkload>
     CreateSplitterWorkloadTest(armnn::IWorkloadFactory& factory, armnn::Graph& graph)
 {
     // create the layer we're testing
-    ViewsDescriptor layerDesc(3, 2);
-    layerDesc.SetViewOriginCoord(0, 1, 2); // deliberately add these in a weird order
-    layerDesc.SetViewOriginCoord(2, 1, 0);
-    layerDesc.SetViewOriginCoord(1, 1, 3);
+    // NOTE: need three dimensions channels, height/y, width/x because the Compute
+    //       library restricts subtensors to have the same x and y dimensions as
+    //       their parent tensors, and therefore the origin on the x and y dimension
+    //       has to be zero for any view. So we need a third dimension to split...
+    // NOTE: arguments are: number of views, number of dimensions
+    ViewsDescriptor layerDesc(3, 3);
+    // NOTE: arguments are: view, dimension, value
+    layerDesc.SetViewOriginCoord(0, 0, 0);
+    layerDesc.SetViewOriginCoord(1, 0, 1);
+    layerDesc.SetViewOriginCoord(2, 0, 3);
 
     Layer* const layer = graph.AddLayer<SplitterLayer>(layerDesc, "layer");
 
@@ -555,15 +560,16 @@ std::unique_ptr<SplitterWorkload>
     Layer* const output2 = graph.AddLayer<OutputLayer>(2, "output2");
 
     // connect up
-    armnn::TensorInfo tensorInfo({1, 7}, SplitterWorkload::ms_DataType);
+    armnn::TensorInfo tensorInfo({5, 7, 7}, SplitterWorkload::ms_DataType);
     Connect(input, layer, tensorInfo);
 
-    armnn::TensorInfo output0Info({1, 2}, SplitterWorkload::ms_DataType);
-    armnn::TensorInfo output1Info({1, 1}, SplitterWorkload::ms_DataType);
-    armnn::TensorInfo output2Info({1, 4}, SplitterWorkload::ms_DataType);
-    Connect(layer, output1, output1Info, 1, 0); // deliberately connect these up in a weird order
-    Connect(layer, output0, output0Info, 2, 0);
-    Connect(layer, output2, output2Info, 0, 0);
+    armnn::TensorInfo output0Info({1, 7, 7}, SplitterWorkload::ms_DataType);
+    armnn::TensorInfo output1Info({2, 7, 7}, SplitterWorkload::ms_DataType);
+    armnn::TensorInfo output2Info({2, 7, 7}, SplitterWorkload::ms_DataType);
+
+    Connect(layer, output0, output0Info, 0, 0);
+    Connect(layer, output1, output1Info, 1, 0);
+    Connect(layer, output2, output2Info, 2, 0);
 
     CreateTensorHandles(graph, factory);
 
@@ -576,11 +582,14 @@ std::unique_ptr<SplitterWorkload>
     BOOST_TEST(queueDescriptor.m_ViewOrigins.size() == 3);
 
     BOOST_TEST(queueDescriptor.m_ViewOrigins[0].m_Origin[0] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[1].m_Origin[0] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[2].m_Origin[0] == 0);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[0].m_Origin[1] == 2);
-    BOOST_TEST(queueDescriptor.m_ViewOrigins[1].m_Origin[1] == 3);
+    BOOST_TEST(queueDescriptor.m_ViewOrigins[1].m_Origin[0] == 1);
+    BOOST_TEST(queueDescriptor.m_ViewOrigins[2].m_Origin[0] == 3);
+    BOOST_TEST(queueDescriptor.m_ViewOrigins[0].m_Origin[1] == 0);
+    BOOST_TEST(queueDescriptor.m_ViewOrigins[1].m_Origin[1] == 0);
     BOOST_TEST(queueDescriptor.m_ViewOrigins[2].m_Origin[1] == 0);
+    BOOST_TEST(queueDescriptor.m_ViewOrigins[0].m_Origin[2] == 0);
+    BOOST_TEST(queueDescriptor.m_ViewOrigins[1].m_Origin[2] == 0);
+    BOOST_TEST(queueDescriptor.m_ViewOrigins[2].m_Origin[2] == 0);
 
     // return so we can do extra, backend-specific tests
     return workload;
@@ -594,9 +603,10 @@ std::pair<std::unique_ptr<SplitterWorkload>, std::unique_ptr<MergerWorkload>>
     static_assert(SplitterWorkload::ms_DataType == MergerWorkload::ms_DataType,
         "Splitter and merger workloads must have the same data type");
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 100, 10 }, SplitterWorkload::ms_DataType);
-    armnn::TensorInfo splitTensorInfo1({ 1, 1, 60, 10 }, SplitterWorkload::ms_DataType);
-    armnn::TensorInfo splitTensorInfo2({ 1, 1, 40, 10 }, SplitterWorkload::ms_DataType);
+    armnn::TensorInfo inputTensorInfo({ 1, 2, 100, 10 }, SplitterWorkload::ms_DataType);
+
+    armnn::TensorInfo splitTensorInfo1({ 1, 1, 100, 10 }, SplitterWorkload::ms_DataType);
+    armnn::TensorInfo splitTensorInfo2({ 1, 1, 100, 10 }, SplitterWorkload::ms_DataType);
 
     //construct the  graph
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
@@ -608,37 +618,46 @@ std::pair<std::unique_ptr<SplitterWorkload>, std::unique_ptr<MergerWorkload>>
     splitterViews.SetViewOriginCoord(0, 3, 0);
 
     splitterViews.SetViewOriginCoord(1, 0, 0);
-    splitterViews.SetViewOriginCoord(1, 1, 0);
-    splitterViews.SetViewOriginCoord(1, 2, 60);
+    splitterViews.SetViewOriginCoord(1, 1, 1);
+    splitterViews.SetViewOriginCoord(1, 2, 0);
     splitterViews.SetViewOriginCoord(1, 3, 0);
 
     Layer* const splitter = graph.AddLayer<SplitterLayer>(splitterViews, "splitter");
+    BOOST_TEST_CHECKPOINT("created splitter layer");
 
     armnn::OriginsDescriptor mergerViews(2);
     mergerViews.SetViewOriginCoord(0, 0, 0);
-    mergerViews.SetViewOriginCoord(0, 1, 0);
+    mergerViews.SetViewOriginCoord(0, 1, 1);
     mergerViews.SetViewOriginCoord(0, 2, 0);
     mergerViews.SetViewOriginCoord(0, 3, 0);
 
     mergerViews.SetViewOriginCoord(1, 0, 0);
     mergerViews.SetViewOriginCoord(1, 1, 0);
-    mergerViews.SetViewOriginCoord(1, 2, 40);
+    mergerViews.SetViewOriginCoord(1, 2, 0);
     mergerViews.SetViewOriginCoord(1, 3, 0);
 
     Layer* const merger = graph.AddLayer<MergerLayer>(mergerViews, "merger");
+    BOOST_TEST_CHECKPOINT("created merger layer");
 
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
     // add connections
     Connect(input, splitter, inputTensorInfo, 0, 0);
+    BOOST_TEST_CHECKPOINT("connect input to splitter");
     Connect(splitter, merger, splitTensorInfo1, 0, 1); // The splitter & merger are connected up
+    BOOST_TEST_CHECKPOINT("connect splitter[0] to merger[1]");
     Connect(splitter, merger, splitTensorInfo2, 1, 0); // so that the outputs are flipped round
+    BOOST_TEST_CHECKPOINT("connect splitter[1] to merger[0]");
     Connect(merger, output, inputTensorInfo, 0, 0);
+    BOOST_TEST_CHECKPOINT("connect merger to output");
 
     CreateTensorHandles(graph, factory);
+    BOOST_TEST_CHECKPOINT("created tensor handles");
 
     auto workloadSplitter = MakeAndCheckWorkload<SplitterWorkload>(*splitter, graph, factory);
+    BOOST_TEST_CHECKPOINT("created splitter workload");
     auto workloadMerger = MakeAndCheckWorkload<MergerWorkload>(*merger, graph, factory);
+    BOOST_TEST_CHECKPOINT("created merger workload");
 
     return {std::move(workloadSplitter), std::move(workloadMerger)};
 }
@@ -657,22 +676,23 @@ void CreateSplitterMultipleInputsOneOutputWorkloadTest(armnn::IWorkloadFactory& 
     static_assert(SplitterWorkload::ms_DataType == ActivationWorkload::ms_DataType,
         "Splitter and activation workloads must have the same data type");
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 100, 10 }, SplitterWorkload::ms_DataType);
-    armnn::TensorInfo splitTensorInfo1({ 1, 1, 60, 10 }, SplitterWorkload::ms_DataType);
-    armnn::TensorInfo splitTensorInfo2({ 1, 1, 40, 10 }, SplitterWorkload::ms_DataType);
+    armnn::TensorInfo inputTensorInfo ({ 1, 3, 100, 50 }, SplitterWorkload::ms_DataType);
+    armnn::TensorInfo splitTensorInfo1({ 1, 1, 100, 50 }, SplitterWorkload::ms_DataType);
+    armnn::TensorInfo splitTensorInfo2({ 1, 2, 100, 50 }, SplitterWorkload::ms_DataType);
 
     //construct the  graph
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
 
     armnn::ViewsDescriptor splitterViews(2);
+
     splitterViews.SetViewOriginCoord(0, 0, 0);
     splitterViews.SetViewOriginCoord(0, 1, 0);
     splitterViews.SetViewOriginCoord(0, 2, 0);
     splitterViews.SetViewOriginCoord(0, 3, 0);
 
     splitterViews.SetViewOriginCoord(1, 0, 0);
-    splitterViews.SetViewOriginCoord(1, 1, 0);
-    splitterViews.SetViewOriginCoord(1, 2, 60);
+    splitterViews.SetViewOriginCoord(1, 1, 1);
+    splitterViews.SetViewOriginCoord(1, 2, 0);
     splitterViews.SetViewOriginCoord(1, 3, 0);
 
     Layer* const splitter = graph.AddLayer<SplitterLayer>(splitterViews, "splitter");

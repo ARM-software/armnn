@@ -5,11 +5,11 @@
 
 #include "LoadedNetwork.hpp"
 #include "Layer.hpp"
-#include "Layers.hpp"
 #include "Graph.hpp"
 #include "Network.hpp"
 #include "Runtime.hpp"
 #include "Profiling.hpp"
+#include "HeapProfiling.hpp"
 
 #ifdef ARMCOMPUTECL_ENABLED
 #include <arm_compute/core/CL/OpenCL.h>
@@ -28,13 +28,13 @@ namespace armnn
 using namespace std;
 
 std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
-    const WorkloadFactories& workloadFactories)
+                                                                bool useCpuRefAsFallback)
 {
     std::unique_ptr<LoadedNetwork> loadedNetwork;
 
     try
     {
-        loadedNetwork.reset(new LoadedNetwork(std::move(net), workloadFactories));
+        loadedNetwork.reset(new LoadedNetwork(std::move(net), useCpuRefAsFallback));
     }
     catch (const std::runtime_error& error)
     {
@@ -58,8 +58,9 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
     return loadedNetwork;
 }
 
-LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, const WorkloadFactories& workloadFactories)
-:   m_OptimizedNetwork(std::move(net))
+LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, bool useCpuRefAsFallback)
+    : m_CpuRef(useCpuRefAsFallback)
+    , m_OptimizedNetwork(std::move(net))
 {
     Graph& order = m_OptimizedNetwork->GetGraph().TopologicalSort();
     //first create tensor handlers
@@ -68,13 +69,13 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, const Worklo
     //(for example the splitter and merger layers)
     for (auto&& layer : order)
     {
-        layer->CreateTensorHandles(m_OptimizedNetwork->GetGraph(), *GetWorkloadFactory(*layer, workloadFactories));
+        layer->CreateTensorHandles(m_OptimizedNetwork->GetGraph(), GetWorkloadFactory(*layer));
     }
 
     //then create workloads
     for (auto&& layer : order)
     {
-        const shared_ptr<IWorkloadFactory> workloadFactory = GetWorkloadFactory(*layer, workloadFactories);
+        const IWorkloadFactory& workloadFactory = GetWorkloadFactory(*layer);
 
         switch (layer->GetType())
         {
@@ -86,7 +87,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, const Worklo
             }
         default:
             {
-                auto workload = layer->CreateWorkload(m_OptimizedNetwork->GetGraph(), *workloadFactory);
+                auto workload = layer->CreateWorkload(m_OptimizedNetwork->GetGraph(), workloadFactory);
 
                 if (!workload)
                 {
@@ -105,6 +106,11 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, const Worklo
 
     // set up memory
     m_OptimizedNetwork->GetGraph().AllocateDynamicBuffers();
+
+    // finalize the workload factories before execution
+    m_CpuRef.Finalize();
+    m_CpuAcc.Finalize();
+    m_GpuAcc.Finalize();
 }
 
 TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const
@@ -136,27 +142,26 @@ TensorInfo LoadedNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
     throw InvalidArgumentException(boost::str(boost::format("No output layer is associated with id %1%") % layerId));
 }
 
-const shared_ptr<IWorkloadFactory> LoadedNetwork::GetWorkloadFactory(const Layer& layer,
-    const WorkloadFactories& workloadFactories) const
+const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) const
 {
-    shared_ptr<IWorkloadFactory> workloadFactory;
+    const IWorkloadFactory* workloadFactory = nullptr;
 
     switch (layer.GetComputeDevice())
     {
         case Compute::CpuAcc:
         {
-            workloadFactory = workloadFactories.m_CpuAcc;
+            workloadFactory = &m_CpuAcc;
             break;
         }
         case Compute::GpuAcc:
         {
-            workloadFactory = workloadFactories.m_GpuAcc;
+            workloadFactory = &m_GpuAcc;
             break;
         }
         case Compute::CpuRef:
         default:
         {
-            workloadFactory = workloadFactories.m_CpuRef;
+            workloadFactory = &m_CpuRef;
             break;
         }
     }
@@ -168,7 +173,7 @@ const shared_ptr<IWorkloadFactory> LoadedNetwork::GetWorkloadFactory(const Layer
                      "Factory does not support layer");
     boost::ignore_unused(reasonIfUnsupported);
 
-    return workloadFactory;
+    return *workloadFactory;
 }
 
 namespace {
@@ -266,8 +271,7 @@ private:
 }
 
 Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
-                                      const OutputTensors& outputTensors,
-                                      const WorkloadFactories& workloadFactories)
+                                      const OutputTensors& outputTensors)
 {
     ARMNN_UPDATE_PROFILING_EVENT_TAG();
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "EnqueueWorkload");
@@ -293,20 +297,21 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     for (const BindableLayer* inputLayer : graph.GetInputLayers())
     {
         const TensorPin& pin = workloadData.GetInputTensorPin(inputLayer->GetBindingId());
-        EnqueueInput(*inputLayer, pin.GetTensorHandle(), pin.GetTensorInfo(), workloadFactories);
+        EnqueueInput(*inputLayer, pin.GetTensorHandle(), pin.GetTensorInfo());
     }
 
     // for each output to the network, call EnqueueOutput with the data passed by the user
     for (const BindableLayer* outputLayer : graph.GetOutputLayers())
     {
         const TensorPin& pin = workloadData.GetOutputTensorPin(outputLayer->GetBindingId());
-        EnqueueOutput(*outputLayer, pin.GetTensorHandle(), pin.GetTensorInfo(), workloadFactories);
+        EnqueueOutput(*outputLayer, pin.GetTensorHandle(), pin.GetTensorInfo());
     }
 
     bool executionSucceeded = true;
 
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
+        ARMNN_SCOPED_HEAP_PROFILING("Executing");
         executionSucceeded = Execute();
     }
 
@@ -316,8 +321,7 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     return executionSucceeded ? Status::Success : Status::Failure;
 }
 
-void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo,
-    const WorkloadFactories& workloadFactories)
+void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo)
 {
     if (layer.GetType() != LayerType::Input)
     {
@@ -344,14 +348,13 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     inputQueueDescriptor.m_Outputs.push_back(outputTensorHandle);
     info.m_OutputTensorInfos.push_back(outputTensorInfo);
 
-    shared_ptr<IWorkloadFactory> workloadFactory = GetWorkloadFactory(layer, workloadFactories);
-    auto inputWorkload = workloadFactory->CreateInput(inputQueueDescriptor, info);
+    const IWorkloadFactory& workloadFactory = GetWorkloadFactory(layer);
+    auto inputWorkload = workloadFactory.CreateInput(inputQueueDescriptor, info);
     BOOST_ASSERT_MSG(inputWorkload, "No input workload created");
     m_WorkloadQueue.insert(m_WorkloadQueue.begin(), move(inputWorkload));
 }
 
-void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* tensorHandle,
-    const TensorInfo& tensorInfo, const WorkloadFactories& workloadFactories)
+void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo)
 {
     if (layer.GetType() != LayerType::Output)
     {
@@ -381,8 +384,8 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     outputQueueDescriptor.m_Inputs.push_back(inputTensorHandle);
     info.m_InputTensorInfos.push_back(inputTensorInfo);
 
-    shared_ptr<IWorkloadFactory> workloadFactory = GetWorkloadFactory(layer, workloadFactories);
-    auto                         outputWorkload  = workloadFactory->CreateOutput(outputQueueDescriptor, info);
+    const IWorkloadFactory& workloadFactory = GetWorkloadFactory(layer);
+    auto outputWorkload = workloadFactory.CreateOutput(outputQueueDescriptor, info);
     BOOST_ASSERT_MSG(outputWorkload, "No output workload created");
     m_WorkloadQueue.push_back(move(outputWorkload));
 }

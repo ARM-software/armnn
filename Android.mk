@@ -7,7 +7,7 @@ LOCAL_PATH := $(call my-dir)
 
 # Configure these paths if you move the source or Khronos headers
 #
-OPENCL_HEADER_PATH := $(LOCAL_PATH)/../../mali/product/khronos/original
+OPENCL_HEADER_PATH := $(LOCAL_PATH)/../clframework/include
 NN_HEADER_PATH := $(LOCAL_PATH)/../../../../frameworks/ml/nn/runtime/include
 ARMNN_HEADER_PATH := $(LOCAL_PATH)/include
 ARMNN_SOURCE_HEADER_PATH := $(LOCAL_PATH)/src/armnn
@@ -30,18 +30,18 @@ LOCAL_CFLAGS := \
 
 LOCAL_SRC_FILES :=  \
 	src/armnn/test/UnitTests.cpp \
-    src/armnn/test/EndToEndTest.cpp \
-    src/armnn/test/UtilsTests.cpp \
-    src/armnn/test/GraphTests.cpp \
-    src/armnn/test/RuntimeTests.cpp \
-    src/armnn/test/TensorTest.cpp \
-    src/armnn/test/Network_test.cpp \
-    src/armnn/backends/test/IsLayerSupportedTest.cpp \
-    src/armnn/backends/test/Reference.cpp \
-    src/armnn/backends/test/WorkloadDataValidation.cpp \
-    src/armnn/backends/test/TensorCopyUtils.cpp \
-    src/armnn/backends/test/LayerTests.cpp \
-    src/armnn/backends/test/CreateWorkloadRef.cpp \
+	src/armnn/test/EndToEndTest.cpp \
+	src/armnn/test/UtilsTests.cpp \
+	src/armnn/test/GraphTests.cpp \
+	src/armnn/test/RuntimeTests.cpp \
+	src/armnn/test/TensorTest.cpp \
+	src/armnn/test/Network_test.cpp \
+	src/armnn/backends/test/IsLayerSupportedTest.cpp \
+	src/armnn/backends/test/Reference.cpp \
+	src/armnn/backends/test/WorkloadDataValidation.cpp \
+	src/armnn/backends/test/TensorCopyUtils.cpp \
+	src/armnn/backends/test/LayerTests.cpp \
+	src/armnn/backends/test/CreateWorkloadRef.cpp \
 	src/armnn/backends/test/ArmComputeCl.cpp \
 	src/armnn/backends/test/ArmComputeNeon.cpp \
 	src/armnn/backends/test/CreateWorkloadCl.cpp \
@@ -77,6 +77,8 @@ LOCAL_ARM_MODE := arm
 
 # Mark source files as dependent on Android.mk
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+
+LOCAL_PROPRIETARY_MODULE := true
 
 include $(BUILD_EXECUTABLE)
 

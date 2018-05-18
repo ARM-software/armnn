@@ -1,5 +1,5 @@
 #Caffe layers supported by the Arm NN SDK
-This reference guide provides a list of Caffe layers the Arm NN SDK currently supports. 
+This reference guide provides a list of Caffe layers the Arm NN SDK currently supports.
 
 Although some other neural networks might work, Arm tests the Arm NN SDK with Caffe implementations of the following neural networks: 
 
@@ -12,11 +12,13 @@ Although some other neural networks might work, Arm tests the Arm NN SDK with Ca
 - Lenet.
 - MobileNetv1.
 
-The Arm NN SDK supports the following machine learning layers for Caffe networks: 
+The Arm NN SDK supports the following machine learning layers for Caffe networks:
 
 
-- BatchNorm, in inference mode. 
+- BatchNorm, in inference mode.
 - Convolution, excluding the Dilation Size, Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
+- Concat, along the channel dimension only.
+- Dropout, in inference mode.
 - Eltwise, excluding the coeff parameter.
 - Inner Product, excluding the Weight Filler, Bias Filler, Engine, and Axis parameters.
 - Input.
@@ -26,6 +28,5 @@ The Arm NN SDK supports the following machine learning layers for Caffe networks
 - Scale.
 - Softmax, excluding the Axis and Engine parameters.
 - Split.
-- Dropout, in inference mode.
 
-More machine learning layers will be supported in future releases. 
+More machine learning layers will be supported in future releases.

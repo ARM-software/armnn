@@ -6,8 +6,10 @@
 
 #include "test/TensorHelpers.hpp"
 #include "TensorCopyUtils.hpp"
+#include "Permute.hpp"
 
 #include <boost/test/unit_test.hpp>
+#include <boost/assert.hpp>
 
 #include "armnn/LayerSupport.hpp"
 
@@ -342,11 +344,11 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
     std::vector<T> myVec(outputDesc.GetNumElements(), 0);
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
-            -4723,  -7044,  -9324,  -6253, -3542,
             -7140, -10580, -13940,  -9300, -5230,
             -9590, -14120, -18520, -12290, -6860,
             -9980, -14560, -18960, -12560, -7000,
             -7518, -10904, -14144,  -9318, -5152,
+            -5032,  -7256,  -9376,  -6142, -3368,
         })));
 
     return SimpleConvolution2dTestImpl<T>(workloadFactory,
@@ -357,9 +359,79 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
         qScale,
         qOffset,
         1,  // padding left
-        2,  // padding top
+        1,  // padding top
         2,  // padding right
-        1); // padding bottom
+        2); // padding bottom
+}
+
+template<typename T>
+LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloadFactory& workloadFactory,
+                                                                 float qScale,
+                                                                 int32_t qOffset,
+                                                                 bool biasEnabled)
+{
+    // Use a single-batch 2-channel 5x5 image as input
+    armnn::TensorInfo inputTensorInfo({ 1, 2, 5, 5 }, armnn::GetDataType<T>());
+    auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
+        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
+             0,  1,  2,  3,  4,
+             5,  6,  7,  8,  9,
+            10, 11, 12, 13, 14,
+            15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24,
+
+            25, 26, 27, 28, 29,
+            30, 31, 32, 33, 34,
+            35, 36, 37, 38, 39,
+            40, 41, 42, 43, 44,
+            45, 46, 47, 48, 49
+        })));
+
+    // Use a depth multiplier of 1 on a 2-channel 4x4 kernel
+    armnn::TensorInfo kernelTensorInfo({ 1, 2, 4, 4 }, armnn::GetDataType<T>());
+    auto kernel = MakeTensor<T, 4>(kernelTensorInfo, std::vector<T>(
+        QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(), {
+            32, 31, 30, 29,
+            28, 27, 26, 25,
+            24, 23, 22, 21,
+            20, 19, 18, 17,
+
+            16, 15, 14, 13,
+            12, 11, 10,  9,
+             8,  7,  6,  5,
+             4,  3,  2,  1
+        })));
+
+    // Expected output is 1 batch of a 2-channel 5x5 image
+    // calculated using the python tensorflow library with strideX=1, strideY=1
+    armnn::TensorInfo outputTensorInfo({ 1, 2, 5, 5 }, armnn::GetDataType<T>());
+    boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputTensorInfo, std::vector<T>(
+        QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(), {
+            1062, 1580, 1850, 1530, 1117,
+            2140, 3108, 3500, 2842, 2042,
+            3580, 5068, 5460, 4342, 3062,
+            3618, 5072, 5390, 4248, 2971,
+            3074, 4282, 4510, 3533, 2457,
+            1550, 2284, 2362, 1955, 1428,
+            2910, 4206, 4342, 3528, 2536,
+            3390, 4886, 5022, 4068, 2916,
+            3566, 5056, 5182, 4133, 2922,
+            3100, 4352, 4452, 3517, 2465
+        })));
+
+    return DepthwiseConvolution2dAsymmetricTestImpl<T>(workloadFactory,
+        input,
+        kernel,
+        GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(biasEnabled, qScale, qOffset),
+        expectedOutput,
+        qScale,
+        qOffset,
+        1,  // padding left
+        1,  // padding top
+        2,  // padding right
+        2,  // padding bottom
+        1,  // strideX
+        1); // strideY
 }
 
 LayerTestResult<float, 4>
@@ -383,6 +455,12 @@ LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(armnn::IWorkloadFa
                                                               bool biasEnabled)
 {
     return DepthwiseConvolution2dDepthMul1TestImpl<float, float>(workloadFactory, 0.0f, 0, biasEnabled);
+}
+
+LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(armnn::IWorkloadFactory& workloadFactory,
+                                                               bool                     biasEnabled)
+{
+    return DepthwiseConvolution2dAsymmetricTestCommon<float>(workloadFactory, 0.0f, 0, biasEnabled);
 }
 
 LayerTestResult<uint8_t, 4> DepthwiseConvolution2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
@@ -493,137 +571,84 @@ LayerTestResult<uint8_t, 3> CopyViaSplitterUint8Test(armnn::IWorkloadFactory& wo
 
 LayerTestResult<float,3> MergerTest(armnn::IWorkloadFactory& workloadFactory)
 {
-    unsigned int outputWidth = 5;
+    unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
     unsigned int outputChannels = 3;
 
-    unsigned int inputWidth1 = 2;
-    unsigned int inputHeight1 = 2;
-    unsigned int inputChannels1 = 3;
+    unsigned int inputWidth1 = 3;
+    unsigned int inputHeight1 = 6;
+    unsigned int inputChannels1 = 2;
 
-    unsigned int inputWidth2 = 2;
-    unsigned int inputHeight2 = 4;
-    unsigned int inputChannels2 = 3;
-
-    unsigned int inputWidth3 = 3;
-    unsigned int inputHeight3 = 6;
-    unsigned int inputChannels3 = 2;
-
-    unsigned int inputWidth4 = 3;
-    unsigned int inputHeight4 = 6;
-    unsigned int inputChannels4 = 1;
+    unsigned int inputWidth2 = 3;
+    unsigned int inputHeight2 = 6;
+    unsigned int inputChannels2 = 1;
 
     // Define the tensor descriptors
     armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::Float32);
     armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::Float32);
     armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::Float32);
-    armnn::TensorInfo inputTensorInfo3({ inputChannels3, inputHeight3, inputWidth3 }, armnn::DataType::Float32);
-    armnn::TensorInfo inputTensorInfo4({ inputChannels4, inputHeight4, inputWidth4 }, armnn::DataType::Float32);
 
     LayerTestResult<float,3> ret(outputTensorInfo);
 
-
     ret.outputExpected = MakeTensor<float, 3>(outputTensorInfo, std::vector<float>(
-        {
-            1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
-            6.0f, 7.0f, 8.0f, 9.0f, 10.0f,
-            11.0f, 12.0f, 13.0f, 14.0f, 15.0f,
-            16.0f, 17.0f, 18.0f, 19.0f, 20.0f,
-            21.0f, 22.0f, 23.0f, 24.0f, 25.0f,
-            26.0f, 27.0f, 28.0f, 29.0f, 30.0f,
+    {
+            1.0f, 2.0f, 3.0f,
+            4.0f, 5.0f, 6.0f,
+            7.0f, 8.0f, 9.0f,
+            10.0f, 11.0f, 12.0f,
+            13.0f, 14.0f, 15.0f,
+            16.0f, 17.0f, 18.0f,
 
-            31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
-            36.0f, 37.0f, 38.0f, 39.0f, 40.0f,
-            41.0f, 42.0f, 43.0f, 44.0f, 45.0f,
-            46.0f, 47.0f, 48.0f, 49.0f, 50.0f,
-            51.0f, 52.0f, 53.0f, 54.0f, 55.0f,
-            56.0f, 57.0f, 58.0f, 59.0f, 60.0f,
+            19.0f, 20.0f, 21.0f,
+            22.0f, 23.0f, 24.0f,
+            25.0f, 26.0f, 27.0f,
+            28.0f, 29.0f, 30.0f,
+            31.0f, 32.0f, 33.0f,
+            34.0f, 35.0f, 36.0f,
 
-            61.0f, 62.0f, 63.0f, 64.0f, 65.0f,
-            66.0f, 67.0f, 68.0f, 69.0f, 70.0f,
-            71.0f, 72.0f, 73.0f, 74.0f, 75.0f,
-            76.0f, 77.0f, 78.0f, 79.0f, 80.0f,
-            81.0f, 82.0f, 83.0f, 84.0f, 85.0f,
-            86.0f, 87.0f, 88.0f, 89.0f, 90.0f,
-
+            37.0f, 38.0f, 39.0f,
+            40.0f, 41.0f, 42.0f,
+            43.0f, 44.0f, 45.0f,
+            46.0f, 47.0f, 48.0f,
+            49.0f, 50.0f, 51.0f,
+            52.0f, 53.0f, 54.0f,
         })
     );
 
-
     auto input1 = MakeTensor<float, 3>(inputTensorInfo1, std::vector<float>(
         {
-            1.0f, 2.0f,
-            6.0f, 7.0f,
+            1.0f, 2.0f, 3.0f,
+            4.0f, 5.0f, 6.0f,
+            7.0f, 8.0f, 9.0f,
+            10.0f, 11.0f, 12.0f,
+            13.0f, 14.0f, 15.0f,
+            16.0f, 17.0f, 18.0f,
 
-            31.0f, 32.0f,
-            36.0f, 37.0f,
-
-            61.0f, 62.0f,
-            66.0f, 67.0f,
+            19.0f, 20.0f, 21.0f,
+            22.0f, 23.0f, 24.0f,
+            25.0f, 26.0f, 27.0f,
+            28.0f, 29.0f, 30.0f,
+            31.0f, 32.0f, 33.0f,
+            34.0f, 35.0f, 36.0f,
         })
     );
 
     auto input2 = MakeTensor<float, 3>(inputTensorInfo2, std::vector<float>(
         {
-            11.0f, 12.0f,
-            16.0f, 17.0f,
-            21.0f, 22.0f,
-            26.0f, 27.0f,
-
-            41.0f, 42.0f,
-            46.0f, 47.0f,
-            51.0f, 52.0f,
-            56.0f, 57.0f,
-
-            71.0f, 72.0f,
-            76.0f, 77.0f,
-            81.0f, 82.0f,
-            86.0f, 87.0f,
-        })
-    );
-
-    auto input3 = MakeTensor<float, 3>(inputTensorInfo3, std::vector<float>(
-        {
-            3.0f, 4.0f, 5.0f,
-            8.0f, 9.0f, 10.0f,
-            13.0f, 14.0f, 15.0f,
-            18.0f, 19.0f, 20.0f,
-            23.0f, 24.0f, 25.0f,
-            28.0f, 29.0f, 30.0f,
-
-            33.0f, 34.0f, 35.0f,
-            38.0f, 39.0f, 40.0f,
+            37.0f, 38.0f, 39.0f,
+            40.0f, 41.0f, 42.0f,
             43.0f, 44.0f, 45.0f,
-            48.0f, 49.0f, 50.0f,
-            53.0f, 54.0f, 55.0f,
-            58.0f, 59.0f, 60.0f,
-        })
-    );
-
-
-    auto input4 = MakeTensor<float, 3>(inputTensorInfo4, std::vector<float>(
-        {
-            63.0f, 64.0f, 65.0f,
-            68.0f, 69.0f, 70.0f,
-            73.0f, 74.0f, 75.0f,
-            78.0f, 79.0f, 80.0f,
-            83.0f, 84.0f, 85.0f,
-            88.0f, 89.0f, 90.0f,
+            46.0f, 47.0f, 48.0f,
+            49.0f, 50.0f, 51.0f,
+            52.0f, 53.0f, 54.0f,
         })
     );
 
     std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //extent of the window is defined by size of input[0]
     armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
 
-    std::vector<unsigned int> wOrigin2 = {0, 2, 0}; //extent of the window is defined by size of input[1]
+    std::vector<unsigned int> wOrigin2 = {2, 0, 0}; //extent of the window is defined by size of input[1]
     armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
-
-    std::vector<unsigned int> wOrigin3 = {0, 0, 2}; //extent of the window is defined by size of input[2]
-    armnn::MergerQueueDescriptor::ViewOrigin window3(wOrigin3);
-
-    std::vector<unsigned int> wOrigin4 = {2, 0, 2}; //extent of the window is defined by size of input[3]
-    armnn::MergerQueueDescriptor::ViewOrigin window4(wOrigin4);
-
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
@@ -639,43 +664,25 @@ LayerTestResult<float,3> MergerTest(armnn::IWorkloadFactory& workloadFactory)
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle3  =
-        subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo3.GetShape(), wOrigin3.data()) :
-            workloadFactory.CreateTensorHandle(inputTensorInfo3);
-
-    std::unique_ptr<armnn::ITensorHandle> inputHandle4  =
-        subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo4.GetShape(), wOrigin4.data()) :
-            workloadFactory.CreateTensorHandle(inputTensorInfo4);
-
-
     armnn::MergerQueueDescriptor data;
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
-    AddInputToWorkload(data, info, inputTensorInfo3, inputHandle3.get());
-    AddInputToWorkload(data, info, inputTensorInfo4, inputHandle4.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
-    data.m_ViewOrigins.push_back(window3);
-    data.m_ViewOrigins.push_back(window4);
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
-    inputHandle3->Allocate();
-    inputHandle4->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
-    CopyDataToITensorHandle(inputHandle3.get(), &input3[0][0][0]);
-    CopyDataToITensorHandle(inputHandle4.get(), &input4[0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
@@ -765,6 +772,7 @@ LayerTestResult<float,4> AdditionTest(armnn::IWorkloadFactory& workloadFactory)
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -841,6 +849,7 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(armnn::IWorkloadFactory& workloa
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -912,6 +921,7 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(armnn::IWorkloadFactory&
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -996,7 +1006,9 @@ LayerTestResult<float,4> CompareAdditionTest(armnn::IWorkloadFactory& workloadFa
     CopyDataToITensorHandle(inputHandle1Ref.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2Ref.get(), &input2[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
+    refWorkloadFactory.Finalize();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1043,6 +1055,7 @@ LayerTestResult<float,4> MultiplicationTestHelper(armnn::IWorkloadFactory& workl
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1185,7 +1198,9 @@ LayerTestResult<float,4> CompareMultiplicationTest(armnn::IWorkloadFactory& work
     CopyDataToITensorHandle(inputHandle0Ref.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1Ref.get(), &input1[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
+    refWorkloadFactory.Finalize();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&comparisonResult.output[0][0][0][0], outputHandle.get());
@@ -1264,7 +1279,9 @@ LayerTestResult<float,4> CompareBatchNormTest(armnn::IWorkloadFactory& workloadF
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
+    refWorkloadFactory.Finalize();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1273,23 +1290,299 @@ LayerTestResult<float,4> CompareBatchNormTest(armnn::IWorkloadFactory& workloadF
     return ret;
 }
 
-void Concatenate(armnn::IWorkloadFactory& workloadFactory,
-    std::initializer_list<const armnn::TensorInfo> inputTensorInfos,
-    std::initializer_list<void*> inputs,
-    const armnn::TensorInfo& outputTensorInfo,
-    void* output,
-    unsigned int concatDim)
+template<typename T>
+void PermuteTensorData(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::PermutationVector& mappings,
+        armnn::TensorInfo & inputTensorInfo,
+        const T * inputData,
+        std::vector<T>& outputData)
 {
-    armnn::MergerQueueDescriptor queueDescriptor;
+    BOOST_ASSERT_MSG(inputData != nullptr, "inputData must not be null");
+    if (inputData == nullptr)
+    {
+        // Nullptr is an error in the test. By returning without doing the concatenation
+        // I expect the caller to fail the test. It still makes sense to report this as
+        // an assert for Debug builds.
+        return;
+    }
 
+    armnn::TensorInfo outputTensorInfo = armnnUtils::Permuted(inputTensorInfo, mappings);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::PermuteQueueDescriptor queueDescriptor;
+    queueDescriptor.m_Parameters = armnn::PermuteDescriptor{mappings};
+    armnn::WorkloadInfo workloadInfo;
+    AddInputToWorkload(queueDescriptor, workloadInfo, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePermute(queueDescriptor, workloadInfo);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), inputData);
+
+    workload->Execute();
+
+    outputData.resize(outputTensorInfo.GetNumElements());
+    CopyDataFromITensorHandle(&outputData[0], outputHandle.get());
+    inputTensorInfo = outputTensorInfo;
+}
+
+armnn::OriginsDescriptor CreateMergerDescriptorForConcatenation(
+        const std::vector<armnn::TensorInfo> & inputTensorInfos,
+        unsigned int concatDim)
+{
     std::vector<armnn::TensorShape> shapes;
     shapes.reserve(inputTensorInfos.size());
     for (const armnn::TensorInfo& it: inputTensorInfos)
     {
         shapes.push_back(it.GetShape());
     }
-    armnn::OriginsDescriptor viewsDescriptor = armnn::CreateMergerDescriptorForConcatenation(shapes.begin(),
-        shapes.end(), concatDim);
+
+    return armnn::CreateMergerDescriptorForConcatenation(shapes.begin(),
+                                                         shapes.end(),
+                                                         concatDim);
+}
+
+//
+// Concatenation is only supported for N and C dimensions for NCHW. In case of
+// <4 dimensions we need to make sure that the concat dimensions is at least
+// the 3rd slowest iterating one.
+//
+
+bool NeedPermuteForConcat(
+        const std::vector<armnn::TensorInfo> & inputTensorInfos,
+        unsigned int concatDim)
+{
+    // See note above. Additionally we expect the input shapes to have the
+    // same number of dimensions.
+    unsigned int nDimensions = 0;
+
+    // determine the number of dimensions as well as sanity check them
+    // agains test implementation issues
+    for (auto && tensorInfo : inputTensorInfos)
+    {
+        if (!nDimensions)
+        {
+            nDimensions = tensorInfo.GetShape().GetNumDimensions();
+        }
+        else
+        {
+            BOOST_ASSERT_MSG(nDimensions == tensorInfo.GetShape().GetNumDimensions(),
+                "Input shapes must have the same number of dimensions");
+        }
+    }
+
+    return (nDimensions-concatDim) < 3;
+}
+
+armnn::TensorShape ExpandTensorShapeTo3dForPermute(const armnn::TensorShape & inputShape)
+{
+    unsigned int numDims = inputShape.GetNumDimensions();
+    if (numDims >= 3)
+    {
+        // Nothing to do if the inputShape has at least 3 dimensions.
+        return inputShape;
+    }
+
+    std::vector<unsigned int> newDims(size_t(3), 1u);
+    unsigned int expandedBy = 3 - numDims;
+    for (unsigned int i=0; i<numDims; ++i)
+    {
+        newDims[expandedBy+i] = inputShape[i];
+    }
+    return armnn::TensorShape(3u, &newDims[0]);
+}
+
+void Generate3dPermuteVectorForConcat(
+        unsigned int numDimensions,
+        unsigned int & concatDim,
+        std::pair<armnn::PermutationVector, armnn::PermutationVector> & permutations)
+{
+    BOOST_ASSERT_MSG(numDimensions <= 3,
+       "Only dimensions 1,2 and 3 are supported by this helper");
+
+    unsigned int expandedBy = 3 - numDimensions;
+    unsigned int expandedConcatAxis = concatDim + expandedBy;
+
+    if (expandedConcatAxis == 2)
+    {
+        concatDim = 0;
+        armnn::PermutationVector forwardPermutation({1, 2, 0});
+        armnn::PermutationVector reversePermutation({2, 0, 1});
+        permutations = std::make_pair(forwardPermutation, reversePermutation);
+    }
+    else if (expandedConcatAxis == 1)
+    {
+        concatDim = 0;
+        armnn::PermutationVector forwardPermutation({2, 0, 1});
+        armnn::PermutationVector reversePermutation({1, 2, 0});
+        permutations = std::make_pair(forwardPermutation, reversePermutation);
+    }
+    else
+    {
+        BOOST_ASSERT(expandedConcatAxis == 0);
+        concatDim = 0;
+    }
+}
+
+//
+// Permute the input tensors so we can do a supported concatenation.
+// Also treat lower than 3d tensors as 3d by adding dummy 1 dimensions
+// at the front. Finally this function tells what the output shape
+// of the permuted concatenated tensor is going to be.
+//
+template <typename T>
+void PermuteInputsForConcat(
+        armnn::IWorkloadFactory& workloadFactory,
+        std::vector<armnn::TensorInfo> & inputTensorInfos,
+        std::vector<T *> & inputData,
+        std::vector<std::vector<T>> & inputDataStorage,
+        armnn::PermutationVector & permuteVector,
+        unsigned int & concatDim,
+        armnn::TensorInfo & outputTensorInfo)
+{
+    BOOST_ASSERT_MSG(inputTensorInfos.size() > 1,
+        "Expecting more than one tensor to be concatenated here");
+
+    unsigned int numDims = 0;
+    unsigned int nthInput = 0;
+    const armnn::PermutationVector identity({0, 1, 2});
+
+    std::pair<armnn::PermutationVector, armnn::PermutationVector> permutations =
+        std::make_pair(identity, identity);
+
+    inputDataStorage.resize(inputData.size());
+
+    for (auto && tensorInfo : inputTensorInfos)
+    {
+        if (numDims == 0)
+        {
+            numDims = tensorInfo.GetShape().GetNumDimensions();
+            Generate3dPermuteVectorForConcat(numDims, concatDim, permutations);
+            // store the reverese permutation
+            permuteVector = permutations.second;
+            BOOST_ASSERT_MSG(!permuteVector.IsEqual(identity),
+                "Test logic error, we don't need permutation, so we shouldn't arrive here");
+        }
+        else
+        {
+            BOOST_ASSERT_MSG(numDims == tensorInfo.GetShape().GetNumDimensions(),
+                "All inputs must have the same number of dimensions");
+        }
+
+        armnn::TensorInfo newTensorInfo = tensorInfo;
+        newTensorInfo.SetShape(ExpandTensorShapeTo3dForPermute(tensorInfo.GetShape()));
+
+        PermuteTensorData<T>(workloadFactory,
+                             permutations.first,
+                             newTensorInfo,
+                             inputData[nthInput],
+                             inputDataStorage[nthInput]);
+
+        inputData[nthInput] = inputDataStorage[nthInput].data();
+        inputTensorInfos[nthInput] = newTensorInfo;
+
+        ++nthInput;
+    }
+
+    outputTensorInfo.SetShape(
+        armnnUtils::Permuted(
+            ExpandTensorShapeTo3dForPermute(outputTensorInfo.GetShape()),
+            permutations.first));
+}
+
+
+//
+// This is the pair of PermuteInputsForConcat(...) which permutes back
+// the output of the concatenation so we can check against an expected
+// output.
+//
+template <typename T>
+void PermuteOutputForConcat(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::TensorInfo & tensorInfo,
+        const armnn::PermutationVector & permuteVector,
+        std::unique_ptr<armnn::ITensorHandle> && inputDataHandle,
+        T * data)
+{
+    BOOST_ASSERT_MSG(data != nullptr, "data must not be null");
+    if (data == nullptr)
+    {
+        // Nullptr is an error in the test. By returning without doing the permutation
+        // I expect the caller to fail the test. It still makes sense to report this as
+        // an assert for Debug builds.
+        return;
+    }
+
+    armnn::TensorInfo resultTensorInfo = tensorInfo;
+    std::vector<T> inputData(tensorInfo.GetNumElements());
+    std::vector<T> outputData;
+
+    CopyDataFromITensorHandle(&inputData[0], inputDataHandle.get());
+
+    PermuteTensorData<T>(workloadFactory,
+                         permuteVector,
+                         resultTensorInfo,
+                         &inputData[0],
+                         outputData);
+
+    ::memcpy(data, &outputData[0], sizeof(T)*outputData.size());
+}
+
+template <typename T>
+void Concatenate(armnn::IWorkloadFactory& workloadFactory,
+                 std::initializer_list<const armnn::TensorInfo> inputTensorInfosOrig,
+                 std::initializer_list<T *> inputsOrig,
+                 const armnn::TensorInfo& outputTensorInfoOrig,
+                 T * output,
+                 unsigned int concatDim)
+{
+    BOOST_ASSERT_MSG(output != nullptr, "output must not be null");
+    if (output == nullptr)
+    {
+        // Nullptr is an error in the test. By returning without doing the permutation
+        // I expect the caller to fail the test. It still makes sense to report this as
+        // an assert for Debug builds.
+        return;
+    }
+
+    armnn::MergerQueueDescriptor queueDescriptor;
+
+    // save a copy of the parameters which we might need to change
+    std::vector<armnn::TensorInfo> inputTensorInfos(inputTensorInfosOrig.begin(), inputTensorInfosOrig.end());
+    std::vector<T *> inputs            = inputsOrig;
+    armnn::TensorInfo outputTensorInfo = outputTensorInfoOrig;
+
+    armnn::PermutationVector permuteVector{0, 1, 2};
+
+    // hold and automatically release memory for the reshaped input data
+    std::vector<std::vector<T>> tmpInputDataStorage;
+
+    const size_t inputCount = inputTensorInfos.size();
+
+    bool needPermuteForConcat = NeedPermuteForConcat(inputTensorInfos, concatDim);
+
+    if (needPermuteForConcat)
+    {
+        //
+        // We need to permute the inputs, because concatenation along
+        // the requested axis is not supported
+        //
+        PermuteInputsForConcat<T>(workloadFactory,
+                                  inputTensorInfos,
+                                  inputs,
+                                  tmpInputDataStorage,
+                                  permuteVector,
+                                  concatDim,
+                                  outputTensorInfo);
+    }
+
+    armnn::OriginsDescriptor viewsDescriptor = CreateMergerDescriptorForConcatenation(inputTensorInfos, concatDim);
 
     queueDescriptor.m_ViewOrigins.reserve(viewsDescriptor.GetNumViews());
     for (unsigned int i = 0; i < viewsDescriptor.GetNumViews(); ++i)
@@ -1297,8 +1590,6 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
         queueDescriptor.m_ViewOrigins.emplace_back(std::vector<unsigned int>(viewsDescriptor.GetViewOrigin(i),
             viewsDescriptor.GetViewOrigin(i) + viewsDescriptor.GetNumDimensions()));
     }
-
-    const size_t inputCount = inputTensorInfos.size();
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
@@ -1308,7 +1599,7 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
     const bool subTensorsSupported = workloadFactory.SupportsSubTensors();
     for (unsigned int i = 0; i < inputCount; ++i)
     {
-        const armnn::TensorInfo& inputTensorInfo = inputTensorInfos.begin()[i];
+        const armnn::TensorInfo& inputTensorInfo = inputTensorInfos[i];
 
         std::unique_ptr<armnn::ITensorHandle> inputHandle = subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo.GetShape(),
@@ -1322,7 +1613,7 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
 
     for (unsigned int i = 0; i < inputCount; ++i)
     {
-        AddInputToWorkload(queueDescriptor, workloadInfo, inputTensorInfos.begin()[i], inputHandles[i].get());
+        AddInputToWorkload(queueDescriptor, workloadInfo, inputTensorInfos[i], inputHandles[i].get());
     }
 
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
@@ -1339,12 +1630,25 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
     unsigned int nextInputId = 0;
     for (auto& inputHandle : inputHandles)
     {
-        CopyDataToITensorHandle(inputHandle.get(), *(inputs.begin() + nextInputId++));
+        CopyDataToITensorHandle(inputHandle.get(), inputs[nextInputId]);
+        ++nextInputId;
     }
 
+    workloadFactory.Finalize();
     workload->Execute();
 
-    CopyDataFromITensorHandle(output, outputHandle.get());
+    if (needPermuteForConcat)
+    {
+        PermuteOutputForConcat<T>(workloadFactory,
+                                  outputTensorInfo,
+                                  permuteVector,
+                                  std::move(outputHandle),
+                                  output);
+    }
+    else
+    {
+        CopyDataFromITensorHandle(output, outputHandle.get());
+    }
 }
 
 template <typename T>
@@ -1362,7 +1666,7 @@ LayerTestResult<T, 1> Concatenation1dTestImpl(armnn::IWorkloadFactory& workloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate(workloadFactory,
+    Concatenate<T>(workloadFactory,
         { inputTensorInfo, inputTensorInfo, inputTensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -1419,7 +1723,7 @@ LayerTestResult<T, 2> Concatenation2dTestImpl(armnn::IWorkloadFactory& workloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate(workloadFactory,
+    Concatenate<T>(workloadFactory,
         { inputTensorInfo, inputTensorInfo, inputTensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -1524,7 +1828,7 @@ LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate(workloadFactory,
+    Concatenate<T>(workloadFactory,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -1596,7 +1900,7 @@ LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate(workloadFactory,
+    Concatenate<T>(workloadFactory,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -1693,7 +1997,7 @@ LayerTestResult<T, 3> Concatenation3dTestImpl(armnn::IWorkloadFactory& workloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate(workloadFactory,
+    Concatenate<T>(workloadFactory,
         { inputTensorInfo, inputTensorInfo, inputTensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -1953,7 +2257,7 @@ LayerTestResult<T, 3> Concatenation3dDim0DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate(workloadFactory,
+    Concatenate<T>(workloadFactory,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2091,7 +2395,7 @@ LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate(workloadFactory,
+    Concatenate<T>(workloadFactory,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2229,7 +2533,7 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate(workloadFactory,
+    Concatenate<T>(workloadFactory,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2306,6 +2610,7 @@ LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -2358,6 +2663,7 @@ LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& work
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -2408,6 +2714,7 @@ LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workl
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -2457,6 +2764,7 @@ LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -2507,6 +2815,7 @@ LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -2555,6 +2864,7 @@ LayerTestResult<float, 2> FakeQuantizationTest(armnn::IWorkloadFactory& workload
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
@@ -2617,6 +2927,7 @@ LayerTestResult<float, 4> L2Normalization1dTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -2686,6 +2997,7 @@ LayerTestResult<float, 4> L2Normalization2dTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -2766,6 +3078,7 @@ LayerTestResult<float, 4> L2Normalization3dTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -2929,6 +3242,7 @@ LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3022,6 +3336,7 @@ LayerTestResult<T, 4> ConstantTestImpl(armnn::IWorkloadFactory& workloadFactory,
 
     outputHandle->Allocate();
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3040,32 +3355,22 @@ LayerTestResult<uint8_t, 4> ConstantTestUint8(armnn::IWorkloadFactory& workloadF
 
 LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFactory)
 {
-    unsigned int outputWidth = 5;
+    unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
     unsigned int outputChannels = 3;
 
-    unsigned int inputWidth1 = 2;
-    unsigned int inputHeight1 = 2;
-    unsigned int inputChannels1 = 3;
+    unsigned int inputWidth1 = 3;
+    unsigned int inputHeight1 = 6;
+    unsigned int inputChannels1 = 2;
 
-    unsigned int inputWidth2 = 2;
-    unsigned int inputHeight2 = 4;
-    unsigned int inputChannels2 = 3;
-
-    unsigned int inputWidth3 = 3;
-    unsigned int inputHeight3 = 6;
-    unsigned int inputChannels3 = 2;
-
-    unsigned int inputWidth4 = 3;
-    unsigned int inputHeight4 = 6;
-    unsigned int inputChannels4 = 1;
+    unsigned int inputWidth2 = 3;
+    unsigned int inputHeight2 = 6;
+    unsigned int inputChannels2 = 1;
 
     // Define the tensor descriptors
     armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::QuantisedAsymm8);
     armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedAsymm8);
     armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo inputTensorInfo3({ inputChannels3, inputHeight3, inputWidth3 }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo inputTensorInfo4({ inputChannels4, inputHeight4, inputWidth4 }, armnn::DataType::QuantisedAsymm8);
 
     // Arbitrary scale and offsets. They don't really matter as the merger operator doesn't dequantize/quantize
     const float scale = 0.13497836f;
@@ -3077,112 +3382,68 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFac
     inputTensorInfo1.SetQuantizationOffset(offset);
     inputTensorInfo2.SetQuantizationScale(scale);
     inputTensorInfo2.SetQuantizationOffset(offset);
-    inputTensorInfo3.SetQuantizationScale(scale);
-    inputTensorInfo3.SetQuantizationOffset(offset);
-    inputTensorInfo4.SetQuantizationScale(scale);
-    inputTensorInfo4.SetQuantizationOffset(offset);
 
     LayerTestResult<uint8_t, 3> ret(outputTensorInfo);
 
     ret.outputExpected = MakeTensor<uint8_t, 3>(outputTensorInfo, std::vector<uint8_t>(
-    {
-        1, 2, 3, 4, 5,
-        6, 7, 8, 9, 10,
-        11, 12, 13, 14, 15,
-        16, 17, 18, 19, 20,
-        21, 22, 23, 24, 25,
-        26, 27, 28, 29, 30,
+        {
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12,
+            13, 14, 15,
+            16, 17, 18,
 
-        31, 32, 33, 34, 35,
-        36, 37, 38, 39, 40,
-        41, 42, 43, 44, 45,
-        46, 47, 48, 49, 50,
-        51, 52, 53, 54, 55,
-        56, 57, 58, 59, 60,
+            19, 20, 21,
+            22, 23, 24,
+            25, 26, 27,
+            28, 29, 30,
+            31, 32, 33,
+            34, 35, 36,
 
-        61, 62, 63, 64, 65,
-        66, 67, 68, 69, 70,
-        71, 72, 73, 74, 75,
-        76, 77, 78, 79, 80,
-        81, 82, 83, 84, 85,
-        86, 87, 88, 89, 90,
-    })
+            37, 38, 39,
+            40, 41, 42,
+            43, 44, 45,
+            46, 47, 48,
+            49, 50, 51,
+            52, 53, 54,
+        })
     );
-
 
     auto input1 = MakeTensor<uint8_t, 3>(inputTensorInfo1, std::vector<uint8_t>(
     {
-        1, 2,
-        6, 7,
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12,
+        13, 14, 15,
+        16, 17, 18,
 
-        31, 32,
-        36, 37,
-
-        61, 62,
-        66, 67,
+        19, 20, 21,
+        22, 23, 24,
+        25, 26, 27,
+        28, 29, 30,
+        31, 32, 33,
+        34, 35, 36,
     })
     );
 
     auto input2 = MakeTensor<uint8_t, 3>(inputTensorInfo2, std::vector<uint8_t>(
     {
-        11, 12,
-        16, 17,
-        21, 22,
-        26, 27,
-
-        41, 42,
-        46, 47,
-        51, 52,
-        56, 57,
-
-        71, 72,
-        76, 77,
-        81, 82,
-        86, 87,
-    })
-    );
-
-    auto input3 = MakeTensor<uint8_t, 3>(inputTensorInfo3, std::vector<uint8_t>(
-    {
-        3, 4, 5,
-        8, 9, 10,
-        13, 14, 15,
-        18, 19, 20,
-        23, 24, 25,
-        28, 29, 30,
-
-        33, 34, 35,
-        38, 39, 40,
+        37, 38, 39,
+        40, 41, 42,
         43, 44, 45,
-        48, 49, 50,
-        53, 54, 55,
-        58, 59, 60,
-    })
-    );
-
-
-    auto input4 = MakeTensor<uint8_t, 3>(inputTensorInfo4, std::vector<uint8_t>(
-    {
-        63, 64, 65,
-        68, 69, 70,
-        73, 74, 75,
-        78, 79, 80,
-        83, 84, 85,
-        88, 89, 90,
+        46, 47, 48,
+        49, 50, 51,
+        52, 53, 54,
     })
     );
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //extent of the window is defined by size of input[0]
     armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
 
-    std::vector<unsigned int> wOrigin2 = { 0, 2, 0 }; //extent of the window is defined by size of input[1]
+    std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //extent of the window is defined by size of input[1]
     armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
-
-    std::vector<unsigned int> wOrigin3 = { 0, 0, 2 }; //extent of the window is defined by size of input[2]
-    armnn::MergerQueueDescriptor::ViewOrigin window3(wOrigin3);
-
-    std::vector<unsigned int> wOrigin4 = { 2, 0, 2 }; //extent of the window is defined by size of input[3]
-    armnn::MergerQueueDescriptor::ViewOrigin window4(wOrigin4);
 
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -3199,43 +3460,26 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFac
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle3 =
-        subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo3.GetShape(), wOrigin3.data()) :
-            workloadFactory.CreateTensorHandle(inputTensorInfo3);
-
-    std::unique_ptr<armnn::ITensorHandle> inputHandle4 =
-        subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo4.GetShape(), wOrigin4.data()) :
-            workloadFactory.CreateTensorHandle(inputTensorInfo4);
-
 
     armnn::MergerQueueDescriptor data;
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
-    AddInputToWorkload(data, info, inputTensorInfo3, inputHandle3.get());
-    AddInputToWorkload(data, info, inputTensorInfo4, inputHandle4.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
-    data.m_ViewOrigins.push_back(window3);
-    data.m_ViewOrigins.push_back(window4);
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
-    inputHandle3->Allocate();
-    inputHandle4->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
-    CopyDataToITensorHandle(inputHandle3.get(), &input3[0][0][0]);
-    CopyDataToITensorHandle(inputHandle4.get(), &input4[0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
@@ -3310,6 +3554,7 @@ LayerTestResult<uint8_t, 4> AdditionUint8Test(armnn::IWorkloadFactory& workloadF
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3371,6 +3616,7 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8TestHelper(armnn::IWorkloadFactor
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3531,6 +3777,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(armnn::IWorkloadFactory& 
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3588,6 +3835,7 @@ LayerTestResult<uint8_t, 4> SimpleResizeBilinearUint8Test(armnn::IWorkloadFactor
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3643,6 +3891,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearSqMinUint8Test(armnn::IWorkloadFactory
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3696,6 +3945,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMinUint8Test(armnn::IWorkloadFactory& 
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3751,6 +4001,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMagUint8Test(armnn::IWorkloadFactory& 
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());

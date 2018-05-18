@@ -9,7 +9,6 @@
 
 #include "backends/CpuTensorHandle.hpp"
 #include "backends/RefWorkloadFactory.hpp"
-#include <Layers.hpp>
 
 #include <string>
 #include <iostream>

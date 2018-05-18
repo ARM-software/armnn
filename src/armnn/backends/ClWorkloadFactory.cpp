@@ -10,10 +10,10 @@
 #include <string>
 #include "CpuTensorHandle.hpp"
 #include "Layer.hpp"
-#include "Layers.hpp"
 
 #ifdef ARMCOMPUTECL_ENABLED
 #include <arm_compute/core/CL/CLKernelLibrary.h>
+#include <arm_compute/runtime/CL/CLBufferAllocator.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 #include "backends/MemCopyWorkload.hpp"
 #include "backends/ClTensorHandle.hpp"
@@ -24,6 +24,7 @@
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/log/trivial.hpp>
 
 namespace armnn
 {
@@ -35,93 +36,9 @@ bool ClWorkloadFactory::IsLayerSupported(const Layer& layer, DataType dataType, 
 
 #ifdef ARMCOMPUTECL_ENABLED
 
-ClWorkloadFactory::ClWorkloadFactory(IClTunedParameters* clTunedParameters):
-    m_clTunedParameters(boost::polymorphic_downcast<ClTunedParameters*>(clTunedParameters))
+ClWorkloadFactory::ClWorkloadFactory()
+: m_MemoryManager(std::make_unique<arm_compute::CLBufferAllocator>())
 {
-    try
-    {
-        std::vector<cl::Platform> platforms;
-        cl::Platform::get(&platforms);
-
-        // Select default platform as the first element
-        cl::Platform::setDefault(platforms[0]);
-
-        std::vector<cl::Device> devices;
-        platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
-
-        // Select default device as the first element
-        cl::Device::setDefault(devices[0]);
-    }
-    catch (const cl::Error& clError)
-    {
-        throw ClRuntimeUnavailableException(boost::str(boost::format(
-            "Could not initialize the CL runtime. Error description: %1%. CL error code: %2%"
-        ) % clError.what() % clError.err()));
-    }
-
-    // Remove the use of global CL context
-    cl::Context::setDefault(cl::Context{});
-    BOOST_ASSERT(cl::Context::getDefault()() == NULL);
-
-    // Remove the use of global CL command queue
-    cl::CommandQueue::setDefault(cl::CommandQueue{});
-    BOOST_ASSERT(cl::CommandQueue::getDefault()() == NULL);
-}
-
-ClWorkloadFactory::~ClWorkloadFactory()
-{
-}
-
-void ClWorkloadFactory::LoadOpenClRuntime()
-{
-    cl::Device device = cl::Device::getDefault();
-    cl::Context context;
-    cl::CommandQueue commandQueue;
-
-    try
-    {
-        arm_compute::CLKernelLibrary::get().clear_programs_cache();
-        arm_compute::CLScheduler::get().init(context, commandQueue, device);
-        arm_compute::CLKernelLibrary::get().init(".", context, device);
-
-        context = cl::Context(device);
-
-        bool enableProfiling = false;
-#if ARMNN_PROFILING_ENABLED
-        enableProfiling = true;
-#endif
-        if (m_clTunedParameters && m_clTunedParameters->m_Mode == IClTunedParameters::Mode::UpdateTunedParameters)
-        {
-            enableProfiling = true; // Needed for the CLTuner to work.
-        }
-
-        if (enableProfiling)
-        {
-            // Create a new queue with profiling enabled
-            commandQueue = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE);
-        }
-        else
-        {
-            // Use default queue
-            commandQueue = cl::CommandQueue(context, device);
-        }
-    }
-    catch (const cl::Error& clError)
-    {
-        throw ClRuntimeUnavailableException(boost::str(boost::format(
-            "Could not initialize the CL runtime. Error description: %1%. CL error code: %2%"
-        ) % clError.what() % clError.err()));
-    }
-
-    // Note the first argument (path to cl source code) will be ignored as they should be embedded in the armcompute.
-    arm_compute::CLKernelLibrary::get().init(".", context, device);
-
-    arm_compute::ICLTuner* tuner = nullptr;
-    if (m_clTunedParameters)
-    {
-        tuner = &m_clTunedParameters->m_Tuner;
-    }
-    arm_compute::CLScheduler::get().init(context, commandQueue, device, tuner);
 }
 
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
@@ -170,7 +87,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQ
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                             const WorkloadInfo&           info) const
 {
-    return MakeWorkload<ClSoftmaxFloat32Workload, ClSoftmaxUint8Workload>(descriptor, info);
+    return MakeWorkload<ClSoftmaxFloat32Workload, ClSoftmaxUint8Workload>(descriptor, info, m_MemoryManager.Get());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
@@ -188,7 +105,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMerger(const MergerQu
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClFullyConnectedFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClFullyConnectedFloat32Workload, NullWorkload>(descriptor, info, m_MemoryManager.Get());
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
@@ -206,7 +123,8 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooli
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
                                                                          const WorkloadInfo&               info) const
 {
-    return MakeWorkload<ClConvolution2dFloat32Workload, ClConvolution2dUint8Workload>(descriptor, info);
+    return MakeWorkload<ClConvolution2dFloat32Workload, ClConvolution2dUint8Workload>(descriptor, info,
+                                                                                      m_MemoryManager.Get());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthwiseConvolution2d(
@@ -302,20 +220,15 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescri
     return MakeWorkload<ClFloorFloat32Workload, NullWorkload>(descriptor, info);
 }
 
+void ClWorkloadFactory::Finalize()
+{
+    m_MemoryManager.Finalize();
+}
+
 #else // #if ARMCOMPUTECL_ENABLED
 
-ClWorkloadFactory::ClWorkloadFactory(IClTunedParameters* clTunedParameters)
+ClWorkloadFactory::ClWorkloadFactory()
 {
-    // No CL support
-}
-
-ClWorkloadFactory::~ClWorkloadFactory()
-{
-}
-
-void ClWorkloadFactory::LoadOpenClRuntime()
-{
-    // No CL support
 }
 
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
@@ -462,59 +375,10 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescri
     return nullptr;
 }
 
+void ClWorkloadFactory::Finalize()
+{
+}
+
 #endif // #if ARMCOMPUTECL_ENABLED
-
-armnn::IClTunedParameters* IClTunedParameters::CreateRaw(armnn::IClTunedParameters::Mode mode)
-{
-    return new ClTunedParameters(mode);
-}
-
-armnn::IClTunedParametersPtr IClTunedParameters::Create(armnn::IClTunedParameters::Mode mode)
-{
-    return IClTunedParametersPtr(CreateRaw(mode), &IClTunedParameters::Destroy);
-}
-
-void IClTunedParameters::Destroy(IClTunedParameters* params)
-{
-    delete params;
-}
-
-ClTunedParameters::ClTunedParameters(armnn::IClTunedParameters::Mode mode)
-    : m_Mode(mode)
-#ifdef ARMCOMPUTECL_ENABLED
-    , m_Tuner(mode == ClTunedParameters::Mode::UpdateTunedParameters)
-#endif
-{
-}
-
-void ClTunedParameters::Load(const char* filename)
-{
-#ifdef ARMCOMPUTECL_ENABLED
-    try
-    {
-        m_Tuner.load_from_file(filename);
-    }
-    catch (const std::exception& e)
-    {
-        throw armnn::Exception(std::string("Failed to load tuned parameters file '") + filename + "': " +
-            e.what());
-    }
-#endif
-}
-
-void ClTunedParameters::Save(const char* filename) const
-{
-#ifdef ARMCOMPUTECL_ENABLED
-    try
-    {
-        m_Tuner.save_to_file(filename);
-    }
-    catch (const std::exception& e)
-    {
-        throw armnn::Exception(std::string("Failed to save tuned parameters file to '") + filename + "': " +
-            e.what());
-    }
-#endif
-}
 
 } // namespace armnn

@@ -10,9 +10,9 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
     armnn::TensorInfo outputTensorInfo,
     armnn::TensorInfo weightsDesc,
     armnn::TensorInfo biasesDesc,
-    boost::multi_array<T, 2> weights,
-    boost::multi_array<B, 1> bias,
-    boost::multi_array<T, 4> input,
+    boost::multi_array<T, 2>& weights,
+    boost::multi_array<B, 1>& bias,
+    boost::multi_array<T, 4>& input,
     bool biasEnabled,
     bool transposeWeights)
 {
@@ -41,6 +41,7 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());

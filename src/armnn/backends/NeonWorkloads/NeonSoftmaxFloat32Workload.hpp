@@ -7,13 +7,18 @@
 
 #include <backends/NeonWorkloadUtils.hpp>
 
+#include "arm_compute/runtime/MemoryManagerOnDemand.h"
+
+#include <memory>
+
 namespace armnn
 {
 
 class NeonSoftmaxFloat32Workload : public Float32Workload<SoftmaxQueueDescriptor>
 {
 public:
-    NeonSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,
+                               std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
     virtual void Execute() const override;
 
 private:
@@ -21,7 +26,4 @@ private:
 };
 
 } //namespace armnn
-
-
-
 

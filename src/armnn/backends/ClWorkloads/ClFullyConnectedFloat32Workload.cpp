@@ -13,8 +13,9 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 ClFullyConnectedFloat32Workload::ClFullyConnectedFloat32Workload(const FullyConnectedQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info)
+    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Float32Workload<FullyConnectedQueueDescriptor>(descriptor, info)
+    , m_FullyConnected(memoryManager)
 {
 
     BuildArmComputeTensor(m_WeightsTensor, m_Data.m_Weight->GetTensorInfo());

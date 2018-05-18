@@ -7,13 +7,18 @@
 
 #include "backends/ClWorkloadUtils.hpp"
 
+#include "arm_compute/runtime/MemoryManagerOnDemand.h"
+
+#include <memory>
+
 namespace armnn
 {
 
 class ClSoftmaxFloat32Workload : public Float32Workload<SoftmaxQueueDescriptor>
 {
 public:
-    ClSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,
+                             std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
     void Execute() const override;
 
 private:
@@ -21,6 +26,4 @@ private:
 };
 
 } //namespace armnn
-
-
 

@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "WorkloadFactory.hpp"
+#include "AclBaseMemoryManager.hpp"
 #include "OutputHandler.hpp"
 
 #include <boost/core/ignore_unused.hpp>
@@ -16,7 +16,7 @@ namespace armnn
 class NeonWorkloadFactory : public IWorkloadFactory
 {
 public:
-    virtual ~NeonWorkloadFactory() { };
+    NeonWorkloadFactory();
 
     virtual Compute GetCompute() const override { return Compute::CpuAcc; }
 
@@ -95,6 +95,12 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
+
+    void Finalize() override;
+
+private:
+
+    mutable AclBaseMemoryManager m_MemoryManager;
 };
 
 } //namespace armnn

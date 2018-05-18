@@ -475,10 +475,23 @@ TfParser::GetTfInputNodes(const tensorflow::NodeDef& nodeDef) const
 {
     std::vector<OutputOfConstNodeDef> ret;
 
+    if (nodeDef.op() == "Const")
+    {
+        // For some reason const node can have "Control Inputs". We ignore them for now.
+        return ret;
+    }
+
     ret.reserve(boost::numeric_cast<size_t>(nodeDef.input_size()));
     for (int j = 0; j < nodeDef.input_size(); ++j)
     {
         OutputId outputId = ParseOutputId(nodeDef.input(j));
+
+        if (nodeDef.input(j)[0] == '^') // I couldn't find a better test for control inputs.
+        {
+            throw ParseException(
+                "Node '" + nodeDef.name() + "' has Control Input '" + nodeDef.input(j) + "' which is unsupported.");
+        }
+
         auto inputIt = m_NodesByName.find(outputId.m_IndexedValue);
         if (inputIt == m_NodesByName.end())
         {

@@ -6,9 +6,9 @@
 #include "armnn/Utils.hpp"
 #include "CpuTensorHandle.hpp"
 #include "Layer.hpp"
-#include "Layers.hpp"
 
 #ifdef ARMCOMPUTENEON_ENABLED
+#include "arm_compute/runtime/Allocator.h"
 #include "MemCopyWorkload.hpp"
 #include "NeonTensorHandle.hpp"
 #include "NeonWorkloadUtils.hpp"
@@ -28,6 +28,11 @@ bool NeonWorkloadFactory::IsLayerSupported(const Layer& layer, DataType dataType
 }
 
 #ifdef ARMCOMPUTENEON_ENABLED
+
+NeonWorkloadFactory::NeonWorkloadFactory()
+: m_MemoryManager(std::make_unique<arm_compute::Allocator>())
+{
+}
 
 std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITensorHandle& parent,
     TensorShape const& subTensorShape,
@@ -76,7 +81,8 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateActivation(const Activatio
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                               const WorkloadInfo&           info) const
 {
-    return MakeWorkload<NeonSoftmaxFloat32Workload, NeonSoftmaxUint8Workload>(descriptor, info);
+    return MakeWorkload<NeonSoftmaxFloat32Workload, NeonSoftmaxUint8Workload>(descriptor, info,
+                                                                              m_MemoryManager.Get());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
@@ -94,7 +100,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMerger(const Merger
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonFullyConnectedFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonFullyConnectedFloat32Workload, NullWorkload>(descriptor, info, m_MemoryManager.Get());
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
@@ -112,7 +118,8 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePooling2d(const Poo
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonConvolution2dFloat32Workload, NeonConvolution2dUint8Workload>(descriptor, info);
+    return MakeWorkload<NeonConvolution2dFloat32Workload, NeonConvolution2dUint8Workload>(descriptor, info,
+                                                                                          m_MemoryManager.Get());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(
@@ -125,7 +132,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateNormalization(
     const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonNormalizationFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonNormalizationFloat32Workload, NullWorkload>(descriptor, info, m_MemoryManager.Get());
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
@@ -188,7 +195,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFakeQuantization(
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonL2NormalizationFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonL2NormalizationFloat32Workload, NullWorkload>(descriptor, info, m_MemoryManager.Get());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
@@ -209,7 +216,16 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDesc
     return MakeWorkload<NeonFloorFloat32Workload, NullWorkload>(descriptor, info);
 }
 
+void NeonWorkloadFactory::Finalize()
+{
+    m_MemoryManager.Finalize();
+}
+
 #else // Compiled without ArmCompute libs
+
+NeonWorkloadFactory::NeonWorkloadFactory()
+{
+}
 
 std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITensorHandle& parent,
     TensorShape const& subTensorShape,
@@ -354,6 +370,9 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDesc
 {
     return nullptr;
 }
+
+void NeonWorkloadFactory::Finalize()
+{}
 
 #endif
 

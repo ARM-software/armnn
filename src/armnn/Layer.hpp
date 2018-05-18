@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/core/ignore_unused.hpp>
@@ -85,7 +86,19 @@ public:
 
     ~OutputSlot()
     {
-        DisconnectAll();
+        try
+        {
+            // Coverity fix: DisconnectAll() may throw uncaught exceptions.
+            DisconnectAll();
+        }
+        catch (const std::exception& e)
+        {
+            // Coverity fix: BOOST_LOG_TRIVIAL (typically used to report errors) may throw an
+            // exception of type std::length_error.
+            // Using stderr instead in this context as there is no point in nesting try-catch blocks here.
+            std::cerr << "WARNING: An error has occurred when disconnecting all output slots: "
+                      << e.what() << std::endl;
+        }
     }
 
     Layer& GetOwningLayer() const { return m_OwningLayer; }
@@ -140,7 +153,19 @@ inline InputSlot::~InputSlot()
 {
     if (m_Connection != nullptr)
     {
-        m_Connection->Disconnect(*this);
+        try
+        {
+            // Coverity fix: Disconnect() may throw uncaught exceptions.
+            m_Connection->Disconnect(*this);
+        }
+        catch (const std::exception& e)
+        {
+            // Coverity fix: BOOST_LOG_TRIVIAL (typically used to report errors) may throw an
+            // exception of type std::length_error.
+            // Using stderr instead in this context as there is no point in nesting try-catch blocks here.
+            std::cerr << "WARNING: An error has occurred when disconnecting an input slot: "
+                      << e.what() << std::endl;
+        }
     }
 }
 
@@ -221,7 +246,7 @@ public:
 
     /// Helper to serialize the layer parameters to string
     /// (currently used in DotSerializer and company)
-    virtual void SerializeLayerParameters(ParameterStringifyFunction & fn) const {}
+    virtual void SerializeLayerParameters(ParameterStringifyFunction &) const {}
 
     // IConnectableLayer
 

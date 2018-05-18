@@ -1,0 +1,33 @@
+//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// See LICENSE file in the project root for full license information.
+//
+#pragma once
+
+#include "LayerWithParameters.hpp"
+
+namespace armnn
+{
+
+class ReshapeLayer : public LayerWithParameters<ReshapeDescriptor>
+{
+public:
+    virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,
+        const IWorkloadFactory& factory) const override;
+
+    ReshapeLayer* Clone(Graph& graph) const override;
+
+    void ValidateTensorShapesFromInputs() override;
+
+    bool IsEqual(const Layer& other) const
+    {
+        return (other.GetType() == LayerType::Reshape) &&
+               m_Param.m_TargetShape == boost::polymorphic_downcast<const ReshapeLayer*>(&other)->m_Param.m_TargetShape;
+    }
+
+protected:
+    ReshapeLayer(const ReshapeDescriptor& desc, const char* name);
+    ~ReshapeLayer() = default;
+};
+
+} // namespace

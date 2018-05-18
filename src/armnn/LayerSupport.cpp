@@ -99,12 +99,14 @@ bool IsConstantSupported(Compute compute,
 
 bool IsConvolution2dSupported(Compute compute,
                               const TensorInfo& input,
+                              const TensorInfo& output,
                               const Convolution2dDescriptor& descriptor,
                               const TensorInfo& weights,
+                              const TensorInfo& biases,
                               char* reasonIfUnsupported,
                               size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(compute, IsConvolution2dSupported, input, descriptor, weights);
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsConvolution2dSupported, input, output, descriptor, weights, biases);
 }
 
 bool IsDepthwiseConvolutionSupported(Compute compute,

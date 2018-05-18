@@ -69,7 +69,7 @@ DotAttributeSet::DotAttributeSet(std::ostream& stream)
 DotAttributeSet::~DotAttributeSet()
 {
     bool doSpace=false;
-    for (auto attrib : m_Attributes)
+    for (auto&& attrib : m_Attributes)
     {
         if (doSpace)
         {
@@ -155,7 +155,16 @@ NodeContent::~NodeContent()
         ss << "\\l";
     }
     ss << "}\"";
-    GetStream() << ss.str();
+
+    std::string s;
+    try
+    {
+        // Coverity fix: std::stringstream::str() may throw an exception of type std::length_error.
+        s = ss.str();
+    }
+    catch (const std::exception&) { } // Swallow any exception.
+
+    GetStream() << s;
 }
 
 DotNode::DotNode(std::ostream& stream, unsigned int nodeId, const char* label)

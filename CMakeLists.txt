@@ -27,6 +27,10 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/Permute.cpp
     src/armnnUtils/DotSerializer.cpp
     src/armnnUtils/DotSerializer.hpp
+    src/armnnUtils/HeapProfiling.cpp
+    src/armnnUtils/HeapProfiling.hpp
+    src/armnnUtils/LeakChecking.cpp
+    src/armnnUtils/LeakChecking.hpp
     )
 if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER)
     list(APPEND armnnUtils_sources
@@ -100,6 +104,8 @@ list(APPEND armnn_sources
     include/armnn/Version.hpp
     src/armnn/backends/ClWorkloadFactory.hpp
     src/armnn/backends/ClWorkloadFactory.cpp
+    src/armnn/backends/ClContextControl.hpp
+    src/armnn/backends/ClContextControl.cpp
     src/armnn/backends/ClLayerSupport.cpp
     src/armnn/backends/ClLayerSupport.hpp
     src/armnn/backends/CpuTensorHandleFwd.hpp
@@ -120,6 +126,8 @@ list(APPEND armnn_sources
     src/armnn/backends/WorkloadData.cpp
     src/armnn/backends/WorkloadFactory.hpp
     src/armnn/backends/WorkloadFactory.cpp
+    src/armnn/backends/AclBaseMemoryManager.hpp
+    src/armnn/backends/AclBaseMemoryManager.cpp
     src/armnn/backends/WorkloadInfo.hpp
     src/armnn/backends/MemCopyWorkload.cpp
     src/armnn/backends/MemCopyWorkload.hpp
@@ -214,14 +222,58 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefFakeQuantizationFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefPermuteWorkload.hpp
     src/armnn/backends/RefWorkloads/RefPermuteWorkload.cpp
+    src/armnn/layers/LayerCloneBase.hpp
+    src/armnn/layers/LayerWithParameters.hpp
+    src/armnn/layers/ActivationLayer.hpp
+    src/armnn/layers/ActivationLayer.cpp
+    src/armnn/layers/AdditionLayer.hpp
+    src/armnn/layers/AdditionLayer.cpp
+    src/armnn/layers/BatchNormalizationLayer.hpp
+    src/armnn/layers/BatchNormalizationLayer.cpp
+    src/armnn/layers/ConstantLayer.hpp
+    src/armnn/layers/ConstantLayer.cpp
+    src/armnn/layers/Convolution2dLayer.hpp
+    src/armnn/layers/Convolution2dLayer.cpp
+    src/armnn/layers/DepthwiseConvolution2dLayer.hpp
+    src/armnn/layers/DepthwiseConvolution2dLayer.cpp
+    src/armnn/layers/FakeQuantizationLayer.hpp
+    src/armnn/layers/FakeQuantizationLayer.cpp
+    src/armnn/layers/FloorLayer.hpp
+    src/armnn/layers/FloorLayer.cpp
+    src/armnn/layers/FullyConnectedLayer.hpp
+    src/armnn/layers/FullyConnectedLayer.cpp
+    src/armnn/layers/InputLayer.hpp
+    src/armnn/layers/InputLayer.cpp
+    src/armnn/layers/L2NormalizationLayer.hpp
+    src/armnn/layers/L2NormalizationLayer.cpp
+    src/armnn/layers/MemCopyLayer.hpp
+    src/armnn/layers/MemCopyLayer.cpp
+    src/armnn/layers/MergerLayer.hpp
+    src/armnn/layers/MergerLayer.cpp
+    src/armnn/layers/MultiplicationLayer.hpp
+    src/armnn/layers/MultiplicationLayer.cpp
+    src/armnn/layers/NormalizationLayer.hpp
+    src/armnn/layers/NormalizationLayer.cpp
+    src/armnn/layers/OutputLayer.hpp
+    src/armnn/layers/OutputLayer.cpp
+    src/armnn/layers/PermuteLayer.hpp
+    src/armnn/layers/PermuteLayer.cpp
+    src/armnn/layers/Pooling2dLayer.hpp
+    src/armnn/layers/Pooling2dLayer.cpp
+    src/armnn/layers/ReshapeLayer.hpp
+    src/armnn/layers/ReshapeLayer.cpp
+    src/armnn/layers/ResizeBilinearLayer.hpp
+    src/armnn/layers/ResizeBilinearLayer.cpp
+    src/armnn/layers/SoftmaxLayer.hpp
+    src/armnn/layers/SoftmaxLayer.cpp
+    src/armnn/layers/SplitterLayer.hpp
+    src/armnn/layers/SplitterLayer.cpp
     src/armnn/InternalTypes.hpp
     src/armnn/InternalTypes.cpp
     src/armnn/LayerFwd.hpp
     src/armnn/Layer.hpp
     src/armnn/Layer.cpp
     src/armnn/LayersFwd.hpp
-    src/armnn/Layers.hpp
-    src/armnn/Layers.cpp
     src/armnn/Runtime.hpp
     src/armnn/Runtime.cpp
     src/armnn/SerializeLayerParameters.cpp
@@ -336,6 +388,8 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClConstantFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClConstantUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClConstantUint8Workload.hpp
+        src/armnn/backends/ClWorkloads/ClConvolution2dBaseWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClConvolution2dBaseWorkload.hpp
         src/armnn/backends/ClWorkloads/ClConvolution2dFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClConvolution2dFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClConvolution2dUint8Workload.cpp
@@ -426,7 +480,6 @@ endif()
 if(PROFILING_BACKEND_STREAMLINE)
     target_link_libraries(armnn pthread)
 endif()
-
 
 if(BUILD_UNIT_TESTS)
     set(unittest_sources)
@@ -530,13 +583,13 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(UnitTests PRIVATE src/armnn)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
 
-    CHECK_INCLUDE_FILE(valgrind/memcheck.h VALGRIND_FOUND)
-
-    if(VALGRIND_FOUND)
+    if(NOT HEAP_PROFILING AND VALGRIND_FOUND)
+        # Valgrind works with gperftools version number <= 2.4
         target_compile_definitions(UnitTests PRIVATE "WITH_VALGRIND=1")
     endif()
 
     target_link_libraries(UnitTests armnn)
+    target_link_libraries(UnitTests armnnUtils)
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
     target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 

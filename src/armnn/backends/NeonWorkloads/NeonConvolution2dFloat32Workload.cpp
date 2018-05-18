@@ -13,15 +13,14 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 NeonConvolution2dFloat32Workload::NeonConvolution2dFloat32Workload(const Convolution2dQueueDescriptor& descriptor,
-                                                                   const WorkloadInfo& info)
-    : NeonConvolution2dBaseWorkload(descriptor, info)
+    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
+    : NeonConvolution2dBaseWorkload(descriptor, info, memoryManager)
 {
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         InitialiseArmComputeTensorData(m_BiasTensor, m_Data.m_Bias->template GetConstTensor<float>());
     }
 }
-
 
 void NeonConvolution2dFloat32Workload::Execute() const
 {
@@ -34,8 +33,5 @@ void NeonConvolution2dFloat32Workload::ValidateData() const
     m_Data.ValidateInputsOutputs("NeonConvolution2dFloat32Workload", 1, 1);
 }
 
-
-
 } //namespace armnn
-
 

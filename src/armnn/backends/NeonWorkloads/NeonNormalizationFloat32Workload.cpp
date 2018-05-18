@@ -11,8 +11,9 @@ namespace armnn
 {
 
 NeonNormalizationFloat32Workload::NeonNormalizationFloat32Workload(const NormalizationQueueDescriptor& descriptor,
-                                                                   const WorkloadInfo& info)
+    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Float32Workload<NormalizationQueueDescriptor>(descriptor, info)
+    , m_NormalizationLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonNormalizationFloat32Workload", 1, 1);
     std::string reasonIfUnsupported;

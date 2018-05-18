@@ -190,7 +190,17 @@ int main(int argc, char* argv[])
     }
     catch (armnn::Exception const& e)
     {
-        BOOST_LOG_TRIVIAL(fatal) <<"Armnn Error: "<< e.what();
+        // Coverity fix: BOOST_LOG_TRIVIAL (typically used to report errors) may throw an
+        // exception of type std::length_error.
+        // Using stderr instead in this context as there is no point in nesting try-catch blocks here.
+        std::cerr << "Armnn Error: " << e.what() << std::endl;
+        return 1;
+    }
+    catch (const std::exception& e)
+    {
+        // Coverity fix: various boost exceptions can be thrown by methods called by this test. 
+        std::cerr << "WARNING: MultipleNetworksCifar10: An error has occurred when running the "
+                     "multiple networks inference tests: " << e.what() << std::endl;
         return 1;
     }
 }

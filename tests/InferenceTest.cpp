@@ -154,7 +154,7 @@ bool InferenceTest(const InferenceTestOptions& params,
     }
 
     const unsigned int nbTotalToProcess = params.m_IterationCount > 0 ? params.m_IterationCount
-        : boost::numeric_cast<unsigned int>(defaultTestCaseIds.size());
+        : static_cast<unsigned int>(defaultTestCaseIds.size());
 
     for (; nbProcessed < nbTotalToProcess; nbProcessed++)
     {

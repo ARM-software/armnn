@@ -1,0 +1,44 @@
+//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// See LICENSE file in the project root for full license information.
+//
+#pragma once
+
+#include "LayerWithParameters.hpp"
+
+namespace armnn
+{
+
+class PermuteLayer : public LayerWithParameters<PermuteDescriptor>
+{
+public:
+    virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph&            graph,
+                                                      const IWorkloadFactory& factory) const override;
+
+    PermuteLayer* Clone(Graph& graph) const override;
+
+    void ValidateTensorShapesFromInputs() override;
+
+    const PermutationVector& GetPermutation() const
+    {
+        return m_Param.m_DimMappings;
+    }
+
+    bool IsInverse(const Layer& other) const
+    {
+        return (other.GetType() == LayerType::Permute) &&
+            GetPermutation().IsInverse(boost::polymorphic_downcast<const PermuteLayer*>(&other)->GetPermutation());
+    }
+
+    bool IsEqual(const Layer& other) const
+    {
+        return (other.GetType() == LayerType::Permute) &&
+               GetPermutation().IsEqual(boost::polymorphic_downcast<const PermuteLayer*>(&other)->GetPermutation());
+    }
+
+protected:
+    PermuteLayer(const PermuteDescriptor& param, const char* name);
+    ~PermuteLayer() = default;
+};
+
+} // namespace

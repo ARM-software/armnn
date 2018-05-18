@@ -9,14 +9,26 @@
 #include "test/TensorHelpers.hpp"
 #include <string>
 
+
+// TODO davbec01 (14/05/18) : put these into armnnUtils namespace
+
 template<typename TParser>
 struct ParserPrototxtFixture
 {
     ParserPrototxtFixture()
         : m_Parser(TParser::Create())
-        , m_Runtime(armnn::IRuntime::Create(armnn::Compute::CpuRef))
         , m_NetworkIdentifier(-1)
-    {}
+    {
+        m_Runtimes.push_back(armnn::IRuntime::Create(armnn::Compute::CpuRef));
+
+#if ARMCOMPUTENEON_ENABLED
+        m_Runtimes.push_back(armnn::IRuntime::Create(armnn::Compute::CpuAcc));
+#endif
+
+#if ARMCOMPUTECL_ENABLED
+        m_Runtimes.push_back(armnn::IRuntime::Create(armnn::Compute::GpuAcc));
+#endif
+    }
 
     /// Parses and loads the network defined by the m_Prototext string.
     /// @{
@@ -39,10 +51,10 @@ struct ParserPrototxtFixture
     void RunTest(const std::map<std::string, std::vector<float>>& inputData,
         const std::map<std::string, std::vector<float>>& expectedOutputData);
 
-    std::string                 m_Prototext;
-    std::unique_ptr<TParser, void(*)(TParser* parser)> m_Parser;
-    armnn::IRuntimePtr          m_Runtime;
-    armnn::NetworkId            m_NetworkIdentifier;
+    std::string                                         m_Prototext;
+    std::unique_ptr<TParser, void(*)(TParser* parser)>  m_Parser;
+    std::vector<armnn::IRuntimePtr>                     m_Runtimes;
+    armnn::NetworkId                                    m_NetworkIdentifier;
 
     /// If the single-input-single-output overload of Setup() is called, these will store the input and output name
     /// so they don't need to be passed to the single-input-single-output overload of RunTest().
@@ -77,14 +89,19 @@ template<typename TParser>
 void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
-    armnn::INetworkPtr network =
-        m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes, requestedOutputs);
-
-    auto optimized = Optimize(*network, m_Runtime->GetDeviceSpec());
-    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized));
-    if (ret != armnn::Status::Success)
+    for (auto&& runtime : m_Runtimes)
     {
-        throw armnn::Exception("LoadNetwork failed");
+        armnn::INetworkPtr network =
+            m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes, requestedOutputs);
+
+        auto optimized = Optimize(*network, runtime->GetDeviceSpec());
+
+        armnn::Status ret = runtime->LoadNetwork(m_NetworkIdentifier, move(optimized));
+
+        if (ret != armnn::Status::Success)
+        {
+            throw armnn::Exception("LoadNetwork failed");
+        }
     }
 }
 
@@ -101,34 +118,37 @@ template <std::size_t NumOutputDimensions>
 void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::vector<float>>& inputData,
     const std::map<std::string, std::vector<float>>& expectedOutputData)
 {
-    using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
-
-    // Setup the armnn input tensors from the given vectors.
-    armnn::InputTensors inputTensors;
-    for (auto&& it : inputData)
+    for (auto&& runtime : m_Runtimes)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(it.first);
-        inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
-    }
+        using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
 
-    // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
-    std::map<std::string, boost::multi_array<float, NumOutputDimensions>> outputStorage;
-    armnn::OutputTensors outputTensors;
-    for (auto&& it : expectedOutputData)
-    {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
-        outputStorage.emplace(it.first, MakeTensor<float, NumOutputDimensions>(bindingInfo.second));
-        outputTensors.push_back(
-            { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
-    }
+        // Setup the armnn input tensors from the given vectors.
+        armnn::InputTensors inputTensors;
+        for (auto&& it : inputData)
+        {
+            BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(it.first);
+            inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
+        }
 
-    m_Runtime->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
+        // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
+        std::map<std::string, boost::multi_array<float, NumOutputDimensions>> outputStorage;
+        armnn::OutputTensors outputTensors;
+        for (auto&& it : expectedOutputData)
+        {
+            BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
+            outputStorage.emplace(it.first, MakeTensor<float, NumOutputDimensions>(bindingInfo.second));
+            outputTensors.push_back(
+                { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
+        }
 
-    // Compare each output tensor to the expected values
-    for (auto&& it : expectedOutputData)
-    {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
-        auto outputExpected = MakeTensor<float, NumOutputDimensions>(bindingInfo.second, it.second);
-        BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
+        runtime->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
+
+        // Compare each output tensor to the expected values
+        for (auto&& it : expectedOutputData)
+        {
+            BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
+            auto outputExpected = MakeTensor<float, NumOutputDimensions>(bindingInfo.second, it.second);
+            BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
+        }
     }
 }

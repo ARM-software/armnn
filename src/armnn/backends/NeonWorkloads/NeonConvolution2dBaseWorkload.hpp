@@ -12,8 +12,18 @@
 #include "backends/ArmComputeTensorUtils.hpp"
 #include "backends/NeonLayerSupport.hpp"
 
+#include "arm_compute/runtime/MemoryManagerOnDemand.h"
+
+#include <memory>
+
 namespace armnn
 {
+
+arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
+    const TensorInfo& output,
+    const Convolution2dDescriptor& descriptor,
+    const TensorInfo& weights,
+    const TensorInfo& biases);
 
 template<armnn::DataType dataType>
 class NeonConvolution2dBaseWorkload : public TypedWorkload<Convolution2dQueueDescriptor, dataType>
@@ -21,7 +31,8 @@ class NeonConvolution2dBaseWorkload : public TypedWorkload<Convolution2dQueueDes
 public:
     using TypedWorkload<Convolution2dQueueDescriptor, dataType>::m_Data;
 
-    NeonConvolution2dBaseWorkload(const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonConvolution2dBaseWorkload(const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,
+                                  std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
 
     virtual void ValidateData() const {};
 
@@ -30,4 +41,5 @@ protected:
     arm_compute::Tensor m_KernelTensor;
     arm_compute::Tensor m_BiasTensor;
 };
+
 } //namespace armnn

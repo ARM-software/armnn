@@ -7,6 +7,9 @@ option(ARMCOMPUTENEON "Build with ARM Compute NEON support" OFF)
 option(ARMCOMPUTECL "Build with ARM Compute OpenCL support" OFF)
 option(PROFILING "Build with ArmNN built-in profiling support" OFF)
 option(PROFILING_BACKEND_STREAMLINE "Forward the armNN profiling events to DS-5/Streamline as annotations" OFF)
+# options used for heap profiling
+option(HEAP_PROFILING "Build with heap profiling enabled" OFF)
+option(GPERFTOOLS_ROOT "Location where the gperftools 'include' and 'lib' folders to be found" Off)
 
 include(SelectLibraryConfigurations)
 
@@ -146,7 +149,6 @@ if(BUILD_TF_PARSER)
     include_directories(SYSTEM "${TF_GENERATED_SOURCES}")
 endif()
 
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # ARM Compute
@@ -248,5 +250,36 @@ endif()
 if(PROFILING_BACKEND_STREAMLINE)
     include_directories("${GATOR_ROOT}/annotate")
     add_definitions(-DARMNN_STREAMLINE_ENABLED)
+endif()
+
+if(HEAP_PROFILING)
+    # enable heap profiling for everything except for referencetests
+    if(NOT ${PROJECT_NAME} STREQUAL "referencetests")
+        find_path(HEAP_PROFILER_INCLUDE gperftools/heap-profiler.h
+                PATHS ${GPERFTOOLS_ROOT}/include
+                NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+        include_directories(SYSTEM "${HEAP_PROFILER_INCLUDE}")
+        find_library(GPERF_TOOLS_LIBRARY
+                    NAMES tcmalloc_debug
+                    HINTS ${GPERFTOOLS_ROOT}/lib)
+        link_directories(${GPERFTOOLS_ROOT}/lib)
+
+        link_libraries(${GPERF_TOOLS_LIBRARY})
+        add_definitions("-DARMNN_HEAP_PROFILING_ENABLED=1")
+    else()
+        message("Heap profiling is disabled for referencetests")
+    endif()
+else()
+    # Valgrind only works with gperftools version number <= 2.4
+    CHECK_INCLUDE_FILE(valgrind/memcheck.h VALGRIND_FOUND)
+endif()
+
+
+if(NOT BUILD_CAFFE_PARSER)
+    message(STATUS "Caffe parser support is disabled")
+endif()
+
+if(NOT BUILD_TF_PARSER)
+    message(STATUS "Tensorflow parser support is disabled")
 endif()
 

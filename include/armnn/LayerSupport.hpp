@@ -37,8 +37,10 @@ bool IsConstantSupported(Compute compute,
 
 bool IsConvolution2dSupported(Compute compute,
                               const TensorInfo& input,
+                              const TensorInfo& output,
                               const Convolution2dDescriptor& descriptor,
                               const TensorInfo& weights,
+                              const TensorInfo& biases,
                               char* reasonIfUnsupported = nullptr,
                               size_t reasonIfUnsupportedMaxLength = 1024);
 

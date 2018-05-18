@@ -7,7 +7,6 @@
 #include "Layer.hpp"
 #include "backends/CpuTensorHandle.hpp"
 #include "backends/WorkloadFactory.hpp"
-#include "Layers.hpp"
 #include "Optimizer.hpp"
 
 #include <armnn/Utils.hpp>

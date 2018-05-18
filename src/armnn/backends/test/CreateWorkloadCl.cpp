@@ -23,7 +23,6 @@ BOOST_AUTO_TEST_CASE(CreateActivationWorkload)
 {
     Graph graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreateActivationWorkloadTest<ClActivationFloat32Workload>(factory, graph);
 
@@ -40,7 +39,6 @@ BOOST_AUTO_TEST_CASE(CreateAdditionWorkload)
 {
     Graph graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreateAdditionWorkloadTest<ClAdditionFloat32Workload>(factory, graph);
 
@@ -58,7 +56,6 @@ BOOST_AUTO_TEST_CASE(CreateBatchNormalizationWorkload)
 {
     Graph             graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloat32Workload>(factory, graph);
 
@@ -136,7 +133,6 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationWorkload)
 {
     Graph             graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload =
         CreateMultiplicationWorkloadTest<ClMultiplicationFloat32Workload>(factory, graph);
@@ -155,7 +151,6 @@ BOOST_AUTO_TEST_CASE(CreateNormalizationWorkload)
 {
     Graph             graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreateNormalizationWorkloadTest<ClNormalizationFloat32Workload>(factory, graph);
 
@@ -172,7 +167,6 @@ BOOST_AUTO_TEST_CASE(CreatePooling2dWorkload)
 {
     Graph             graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreatePooling2dWorkloadTest<ClPooling2dFloat32Workload>(factory, graph);
 
@@ -190,7 +184,6 @@ static void ClCreateReshapeWorkloadTest()
 {
     Graph             graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreateReshapeWorkloadTest<ReshapeWorkloadType>(factory, graph);
 
@@ -217,7 +210,6 @@ BOOST_AUTO_TEST_CASE(CreateSoftmaxWorkload)
 {
     Graph             graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreateSoftmaxWorkloadTest<ClSoftmaxFloat32Workload>(factory, graph);
 
@@ -234,20 +226,24 @@ BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
 {
     Graph graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreateSplitterWorkloadTest<ClSplitterFloat32Workload>(factory, graph);
 
     // check that outputs are as we expect them (see definition of CreateSplitterWorkloadTest)
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {7}));
-    auto outputHandle0 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle0, {4}));
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {5, 7, 7}));
+
     auto outputHandle1 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[1]);
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle1, {1}));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle1, {2, 7, 7}));
+
     auto outputHandle2 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[2]);
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle2, {2}));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle2, {2, 7, 7}));
+
+    auto outputHandle0 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    // NOTE: At the moment the CL collapses the tensor to a 2 dim when dimension zero = 1
+    //       we are raising this difference between the NEON and CL libs as an issue with the compute library team
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle0, {7, 7}));
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
@@ -260,7 +256,6 @@ BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
 
     Graph graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workloads =
         CreateSplitterMergerWorkloadTest<ClSplitterFloat32Workload, ClMergerFloat32Workload>(factory, graph);
@@ -332,7 +327,6 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
 BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsCl)
 {
     ClWorkloadFactory    factory;
-    factory.LoadOpenClRuntime();
     CreateMemCopyWorkloads<CopyFromCpuToClWorkload,CopyFromClToCpuWorkload,IClTensorHandle>(factory);
 }
 
@@ -340,7 +334,6 @@ BOOST_AUTO_TEST_CASE(CreateL2NormalizationWorkload)
 {
     Graph             graph;
     ClWorkloadFactory factory;
-    factory.LoadOpenClRuntime();
 
     auto workload = CreateL2NormalizationWorkloadTest<ClL2NormalizationFloat32Workload>(factory, graph);
 

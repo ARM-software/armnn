@@ -8,8 +8,22 @@
 
 int main(int argc, char* argv[])
 {
-    return armnn::test::ClassifierInferenceTestMain<MnistDatabase, armnnCaffeParser::ICaffeParser>(
-        argc, argv, "lenet_iter_9000.caffemodel", true, "data", "prob",
-        { 0, 1, 5, 8, 9 },
-        [](const char* dataDir) { return MnistDatabase(dataDir); });
+    int retVal = EXIT_FAILURE;
+    try
+    {
+        // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
+        retVal = armnn::test::ClassifierInferenceTestMain<MnistDatabase, armnnCaffeParser::ICaffeParser>(
+                    argc, argv, "lenet_iter_9000.caffemodel", true, "data", "prob",
+                    { 0, 1, 5, 8, 9 },
+                    [](const char* dataDir) { return MnistDatabase(dataDir); });
+    }
+    catch (const std::exception& e)
+    {
+        // Coverity fix: BOOST_LOG_TRIVIAL (typically used to report errors) may throw an
+        // exception of type std::length_error.
+        // Using stderr instead in this context as there is no point in nesting try-catch blocks here.
+        std::cerr << "WARNING: CaffeMnist-Armnn: An error has occurred when running "
+                     "the classifier inference tests: " << e.what() << std::endl;
+    }
+    return retVal;
 }

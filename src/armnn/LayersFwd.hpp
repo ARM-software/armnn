@@ -6,6 +6,29 @@
 
 #include "InternalTypes.hpp"
 
+#include "layers/ActivationLayer.hpp"
+#include "layers/AdditionLayer.hpp"
+#include "layers/BatchNormalizationLayer.hpp"
+#include "layers/ConstantLayer.hpp"
+#include "layers/Convolution2dLayer.hpp"
+#include "layers/DepthwiseConvolution2dLayer.hpp"
+#include "layers/FakeQuantizationLayer.hpp"
+#include "layers/FloorLayer.hpp"
+#include "layers/FullyConnectedLayer.hpp"
+#include "layers/InputLayer.hpp"
+#include "layers/L2NormalizationLayer.hpp"
+#include "layers/MemCopyLayer.hpp"
+#include "layers/MergerLayer.hpp"
+#include "layers/MultiplicationLayer.hpp"
+#include "layers/NormalizationLayer.hpp"
+#include "layers/OutputLayer.hpp"
+#include "layers/PermuteLayer.hpp"
+#include "layers/Pooling2dLayer.hpp"
+#include "layers/ReshapeLayer.hpp"
+#include "layers/ResizeBilinearLayer.hpp"
+#include "layers/SoftmaxLayer.hpp"
+#include "layers/SplitterLayer.hpp"
+
 namespace armnn
 {
 

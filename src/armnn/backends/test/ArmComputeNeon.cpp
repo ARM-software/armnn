@@ -88,6 +88,9 @@ ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1, DepthwiseConvoluti
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, true)
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, false)
 
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, true)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, false)
+
 namespace
 {
 
@@ -134,6 +137,10 @@ BOOST_AUTO_TEST_CASE(DepthwiseConv2dUtils)
     // Supported shape 2x2
     armnn::TensorInfo weightsInfo2x2({ 1, 1, 2, 2 }, armnn::DataType::Float32);
     BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(1, 1), weightsInfo2x2));
+
+    // Asymmetric padding
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(1, 1, 1, 1, 2, 1, 2),
+                                                          weightsInfo3x3));
 }
 
 // Pooling
@@ -235,6 +242,8 @@ ARMNN_AUTO_TEST_CASE(AddBroadcast1Element, AdditionBroadcast1ElementTest)
 
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)
+ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1Element, MultiplicationBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVector, MultiplicationBroadcast1DVectorTest)
 
 // Batch Norm
 ARMNN_AUTO_TEST_CASE(BatchNorm, BatchNormTest)

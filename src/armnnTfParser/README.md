@@ -1,4 +1,4 @@
-#The Arm NN TensorFlow parser
+# The Arm NN TensorFlow parser
 
 `armnnTfParser` is a library for loading Neural Networks defined by TensorFlow protobuf files into the Arm NN runtime.
 

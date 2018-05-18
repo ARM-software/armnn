@@ -22,8 +22,11 @@ public:
 
     virtual Compute GetCompute() const = 0;
 
+    /// Informs the memory manager that the network is finalized and ready for execution.
+    virtual void Finalize() { }
+
     static bool IsLayerSupported(Compute compute, const Layer& layer, DataType dataType,
-        std::string& outReasonIfUnsupported);
+                                 std::string& outReasonIfUnsupported);
     static bool IsLayerSupported(const Layer& layer, DataType dataType, std::string& outReasonIfUnsupported);
 
     virtual bool SupportsSubTensors() const = 0;

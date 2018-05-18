@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Types.hpp"
+#include "Tensor.hpp"
 #include <cmath>
 #include <ostream>
 #include <boost/assert.hpp>
@@ -196,6 +197,21 @@ inline std::ostream& operator<<(std::ostream& os, Compute compute)
     return os;
 }
 
+inline std::ostream & operator<<(std::ostream & os, const armnn::TensorShape & shape)
+{
+    os << "[";
+    for (uint32_t i=0; i<shape.GetNumDimensions(); ++i)
+    {
+        if (i!=0)
+        {
+            os << ",";
+        }
+        os << shape[i];
+    }
+    os << "]";
+    return os;
+}
+
 /// Quantize a floating point data type into an 8-bit data type
 /// @param value The value to quantize
 /// @param scale The scale (must be non-zero)
@@ -210,7 +226,11 @@ inline QuantizedType Quantize(float value, float scale, int32_t offset)
     constexpr QuantizedType min = std::numeric_limits<QuantizedType>::lowest();
     BOOST_ASSERT(scale != 0.f);
     int quantized = boost::numeric_cast<int>(round(value / scale)) + offset;
-    QuantizedType quantizedBits = quantized < min ? min : quantized > max ? max : static_cast<QuantizedType>(quantized);
+    QuantizedType quantizedBits = quantized <= min
+                                  ? min
+                                  : quantized >= max
+                                    ? max
+                                    : static_cast<QuantizedType>(quantized);
     return quantizedBits;
 }
 

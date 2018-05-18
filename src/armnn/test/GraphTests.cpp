@@ -7,7 +7,6 @@
 #include "armnn/ArmNN.hpp"
 #include "Graph.hpp"
 #include "Layer.hpp"
-#include "Layers.hpp"
 #include "armnn/TypesUtils.hpp"
 #include "armnn/Exceptions.hpp"
 
@@ -326,8 +325,7 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
                 {
                     BOOST_ERROR("An edge (" << adjEdge.first << ", " << adjEdge.second <<") is adjacent to an edge "
                                 "connecting a layer and a copy layer, (" << edge.first << ", " << edge.second << "), "
-                                "but the non-copy layer in the former, '" << adjLayer->GetName() << "' does not "
-                                "correspond to a layer");
+                                "but the non-copy layer in the former does not correspond to a layer");
                     continue;
                 }
 

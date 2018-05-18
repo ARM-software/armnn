@@ -6,13 +6,13 @@
 #include "NeonL2NormalizationFloat32Workload.hpp"
 #include "backends/ArmComputeUtils.hpp"
 
-
 namespace armnn
 {
 
 NeonL2NormalizationFloat32Workload::NeonL2NormalizationFloat32Workload(const L2NormalizationQueueDescriptor& descriptor,
-                                                                       const WorkloadInfo& info)
+    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : Float32Workload<L2NormalizationQueueDescriptor>(descriptor, info)
+    , m_Layer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonL2NormalizationFloat32Workload", 1, 1);
 

@@ -33,8 +33,10 @@ bool IsConstantSupportedCl(const TensorInfo& output,
                            std::string* reasonIfUnsupported = nullptr);
 
 bool IsConvolution2dSupportedCl(const TensorInfo& input,
+                                const TensorInfo& output,
                                 const Convolution2dDescriptor& descriptor,
                                 const TensorInfo& weights,
+                                const TensorInfo& biases,
                                 std::string* reasonIfUnsupported = nullptr);
 
 bool IsDepthwiseConvolutionSupportedCl(const TensorInfo& input,

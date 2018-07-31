@@ -165,7 +165,7 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	 CXX_FLAGS="-fPIE -fPIC" \
 	 cmake .. \
       -DCMAKE_SYSTEM_NAME=Linux \
-      -DCMAKE_EXE_LINKER_FLAGS=-pie \
+      -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
       -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary/ \
       -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \
       -DBOOST_ROOT=$HOME/armnn-devenv/boost/install/ \

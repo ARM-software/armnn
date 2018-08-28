@@ -266,8 +266,8 @@ TensorInfo PrepareReshape(const TensorInfo& input, const std::vector<int32_t>& t
 }
 
 // We need the input0Slot to guide the reshape for input1Slot.
-IOutputSlot* BroadcastForAddandMul(IOutputSlot* input0Slot, IOutputSlot* input1Slot, bool isNHWC, INetwork& m_Network,
-                                   const tensorflow::NodeDef& nodeDef)
+IOutputSlot* AddBroadcastReshapeLayer(IOutputSlot* input0Slot, IOutputSlot* input1Slot, bool isNHWC,
+                                         INetwork& m_Network, const tensorflow::NodeDef& nodeDef)
 {
     const TensorInfo& input1Info = input1Slot->GetTensorInfo();
     const TensorInfo inputTensorInfo = input0Slot->GetTensorInfo();
@@ -354,6 +354,7 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "MatMul",                &TfParser::ParseMatMul },
     { "Mul",                   &TfParser::ParseMul },
     { "Placeholder",           &TfParser::ParsePlaceholder },
+    { "RealDiv",               &TfParser::ParseRealDiv },
     { "Relu",                  &TfParser::ParseRelu },
     { "Relu6",                 &TfParser::ParseRelu6 },
     { "Reshape",               &TfParser::ParseReshape },
@@ -1893,6 +1894,12 @@ ParsedTfOperationPtr TfParser::ParsePlaceholder(const tensorflow::NodeDef& nodeD
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
+ParsedTfOperationPtr TfParser::ParseRealDiv(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+{
+    boost::ignore_unused(graphDef);
+    return AddRealDivLayer(nodeDef);
+}
+
 ParsedTfOperationPtr TfParser::ParseRelu(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
@@ -2135,20 +2142,20 @@ ParsedTfOperationPtr TfParser::AddAdditionLayer(const tensorflow::NodeDef& nodeD
         const std::string dataFormat = ReadMandatoryNodeStringAttribute(nodeDef, "data_format");
 
         CHECK_DATA_FORMAT(nodeDef, dataFormat, "BiasAdd");
-        input1Slot = BroadcastForAddandMul(input0Slot, input1Slot, dataFormat == "NHWC", *m_Network, nodeDef);
+        input1Slot = AddBroadcastReshapeLayer(input0Slot, input1Slot, dataFormat == "NHWC", *m_Network, nodeDef);
     }
     else
     {
         if (input0Info.GetNumDimensions() == 1)
         {
             const bool isNHWC = true;
-            input0Slot = BroadcastForAddandMul(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
+            input0Slot = AddBroadcastReshapeLayer(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
         }
 
         if (input1Info.GetNumDimensions() == 1)
         {
             const bool isNHWC = true;
-            input1Slot = BroadcastForAddandMul(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
+            input1Slot = AddBroadcastReshapeLayer(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
         }
     }
 
@@ -2169,6 +2176,44 @@ ParsedTfOperationPtr TfParser::AddAdditionLayer(const tensorflow::NodeDef& nodeD
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
+ParsedTfOperationPtr TfParser::AddRealDivLayer(const tensorflow::NodeDef& nodeDef)
+{
+    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+
+    IConnectableLayer* const layer = m_Network->AddDivisionLayer(nodeDef.name().c_str());
+    IOutputSlot* input0Slot = &inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
+    IOutputSlot* input1Slot = &inputs[1].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1].m_Index);
+
+    auto const input0NumDims = input0Slot->GetTensorInfo().GetNumDimensions();
+    auto const input1NumDims = input1Slot->GetTensorInfo().GetNumDimensions();
+
+
+    if (input0NumDims < input1NumDims)
+    {
+        const bool isNHWC = true;
+        input0Slot = AddBroadcastReshapeLayer(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
+    }
+    if (input1NumDims < input0NumDims)
+    {
+        const bool isNHWC = true;
+        input1Slot = AddBroadcastReshapeLayer(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
+    }
+
+    input0Slot->Connect(layer->GetInputSlot(0));
+    input1Slot->Connect(layer->GetInputSlot(1));
+
+    if (input0NumDims < input1NumDims)
+    {
+        layer->GetOutputSlot(0).SetTensorInfo(input1Slot->GetTensorInfo());
+    }
+    else
+    {
+        layer->GetOutputSlot(0).SetTensorInfo(input0Slot->GetTensorInfo());
+
+    }
+    return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+}
+
 IConnectableLayer* TfParser::AddMultiplicationLayer(const tensorflow::NodeDef& nodeDef)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
@@ -2183,12 +2228,12 @@ IConnectableLayer* TfParser::AddMultiplicationLayer(const tensorflow::NodeDef& n
     if (input0NumDims < input1NumDims)
     {
         const bool isNHWC = true;
-        input0Slot = BroadcastForAddandMul(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
+        input0Slot = AddBroadcastReshapeLayer(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
     }
     if (input1NumDims < input0NumDims)
     {
         const bool isNHWC = true;
-        input1Slot = BroadcastForAddandMul(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
+        input1Slot = AddBroadcastReshapeLayer(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
     }
 
     input0Slot->Connect(layer->GetInputSlot(0));
@@ -2204,7 +2249,6 @@ IConnectableLayer* TfParser::AddMultiplicationLayer(const tensorflow::NodeDef& n
     }
     return layer;
 }
-
 
 IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& matMulNodeDef,
     const tensorflow::NodeDef* addNodeDef, const char* armnnLayerName)

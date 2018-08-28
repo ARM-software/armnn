@@ -706,6 +706,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/MultiOutput.cpp
             src/armnnTfParser/test/PassThru.cpp
             src/armnnTfParser/test/Pooling.cpp
+            src/armnnTfParser/test/RealDiv.cpp
             src/armnnTfParser/test/Reshape.cpp
             src/armnnTfParser/test/ResizeBilinear.cpp
             src/armnnTfParser/test/Shape.cpp

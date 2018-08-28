@@ -21,7 +21,7 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
     const TensorInfo& output,
     const DepthwiseConvolution2dDescriptor& descriptor,
     const TensorInfo& weights,
-    const TensorInfo& biases)
+    const boost::optional<TensorInfo>& biases)
 {
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
@@ -29,9 +29,12 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
 
     arm_compute::TensorInfo aclBiasesInfo;
     arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
+
     if (descriptor.m_BiasEnabled)
     {
-        aclBiasesInfo  = BuildArmComputeTensorInfo(biases);
+        BOOST_ASSERT(biases.is_initialized());
+
+        aclBiasesInfo = BuildArmComputeTensorInfo(biases.get());
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 

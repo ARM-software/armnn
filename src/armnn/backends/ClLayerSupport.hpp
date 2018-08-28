@@ -9,6 +9,8 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/ArmNN.hpp>
 
+#include <boost/optional.hpp>
+
 namespace armnn
 {
 bool IsClDirectConvolution2dSupported(const TensorInfo& weightInfo, const Convolution2dDescriptor& desc);
@@ -42,14 +44,14 @@ bool IsConvolution2dSupportedCl(const TensorInfo& input,
                                 const TensorInfo& output,
                                 const Convolution2dDescriptor& descriptor,
                                 const TensorInfo& weights,
-                                const TensorInfo& biases,
+                                const boost::optional<TensorInfo>& biases,
                                 std::string* reasonIfUnsupported = nullptr);
 
 bool IsDepthwiseConvolutionSupportedCl(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const DepthwiseConvolution2dDescriptor& descriptor,
                                        const TensorInfo& weights,
-                                       const TensorInfo& biases,
+                                       const boost::optional<TensorInfo>& biases,
                                        std::string* reasonIfUnsupported = nullptr);
 
 bool IsFullyConnectedSupportedCl(const TensorInfo& input,

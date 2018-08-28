@@ -10,6 +10,8 @@
 #include <layers/LstmLayer.hpp>
 #include <boost/optional.hpp>
 
+#include <boost/optional.hpp>
+
 namespace armnn
 {
 
@@ -39,14 +41,14 @@ bool IsConvolution2dSupportedRef(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const Convolution2dDescriptor& descriptor,
                                  const TensorInfo& weights,
-                                 const TensorInfo& biases,
+                                 const boost::optional<TensorInfo>& biases,
                                  std::string* reasonIfUnsupported = nullptr);
 
 bool IsDepthwiseConvolutionSupportedRef(const TensorInfo& input,
                                         const TensorInfo& output,
                                         const DepthwiseConvolution2dDescriptor& descriptor,
                                         const TensorInfo& weights,
-                                        const TensorInfo& biases,
+                                        const boost::optional<TensorInfo>& biases,
                                         std::string* reasonIfUnsupported = nullptr);
 
 bool IsFullyConnectedSupportedRef(const TensorInfo& input,

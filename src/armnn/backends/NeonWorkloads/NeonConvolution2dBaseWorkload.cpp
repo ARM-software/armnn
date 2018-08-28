@@ -21,17 +21,20 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
     const TensorInfo& output,
     const Convolution2dDescriptor& descriptor,
     const TensorInfo& weights,
-    const TensorInfo& biases)
+    const boost::optional<TensorInfo>& biases)
 {
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
     const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights);
+
     arm_compute::TensorInfo aclBiasesInfo;
     arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
 
     if (descriptor.m_BiasEnabled)
     {
-        aclBiasesInfo = BuildArmComputeTensorInfo(biases);
+        BOOST_ASSERT(biases.is_initialized());
+
+        aclBiasesInfo = BuildArmComputeTensorInfo(biases.get());
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 

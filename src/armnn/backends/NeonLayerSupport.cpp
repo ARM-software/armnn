@@ -197,7 +197,7 @@ bool IsConvolution2dSupportedNeon(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const Convolution2dDescriptor& descriptor,
                                   const TensorInfo& weights,
-                                  const TensorInfo& biases,
+                                  const boost::optional<TensorInfo>& biases,
                                   std::string* reasonIfUnsupported)
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConvolution2dWorkloadValidate,
@@ -213,7 +213,7 @@ bool IsDepthwiseConvolutionSupportedNeon(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const DepthwiseConvolution2dDescriptor& descriptor,
                                          const TensorInfo& weights,
-                                         const TensorInfo& biases,
+                                         const boost::optional<TensorInfo>& biases,
                                          std::string* reasonIfUnsupported)
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDepthwiseConvolutionWorkloadValidate,

@@ -7,6 +7,8 @@
 
 #include "backends/ClWorkloadUtils.hpp"
 
+#include <boost/optional.hpp>
+
 namespace armnn
 {
 
@@ -14,7 +16,7 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
                                                            const TensorInfo& output,
                                                            const DepthwiseConvolution2dDescriptor& descriptor,
                                                            const TensorInfo& weights,
-                                                           const TensorInfo& biases);
+                                                           const boost::optional<TensorInfo>& biases);
 
 template<armnn::DataType... dataTypes>
 class ClDepthwiseConvolutionBaseWorkload : public TypedWorkload<DepthwiseConvolution2dQueueDescriptor, dataTypes...>

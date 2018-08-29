@@ -221,4 +221,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp32ToFp16(
     return std::make_unique<RefConvertFp32ToFp16Workload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDivision(
+    const DivisionQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    return MakeWorkload<RefDivisionFloat32Workload, RefDivisionUint8Workload>(descriptor, info);
+}
+
 } // namespace armnn

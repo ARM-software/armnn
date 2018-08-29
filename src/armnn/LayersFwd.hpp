@@ -14,6 +14,7 @@
 #include "layers/ConvertFp32ToFp16Layer.hpp"
 #include "layers/Convolution2dLayer.hpp"
 #include "layers/DepthwiseConvolution2dLayer.hpp"
+#include "layers/DivisionLayer.hpp"
 #include "layers/FakeQuantizationLayer.hpp"
 #include "layers/FloorLayer.hpp"
 #include "layers/FullyConnectedLayer.hpp"
@@ -67,6 +68,7 @@ DECLARE_LAYER(ConvertFp16ToFp32)
 DECLARE_LAYER(ConvertFp32ToFp16)
 DECLARE_LAYER(Convolution2d)
 DECLARE_LAYER(DepthwiseConvolution2d)
+DECLARE_LAYER(Division)
 DECLARE_LAYER(FakeQuantization)
 DECLARE_LAYER(Floor)
 DECLARE_LAYER(FullyConnected)

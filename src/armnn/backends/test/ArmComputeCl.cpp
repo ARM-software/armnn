@@ -140,6 +140,11 @@ ARMNN_AUTO_TEST_CASE(UNSUPPORTED_L2Pooling2dSize9Uint8, L2Pooling2dSize9Uint8Tes
 ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)
 ARMNN_AUTO_TEST_CASE(AddBroadcast1Element, AdditionBroadcast1ElementTest)
 
+// Div
+ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)
+ARMNN_AUTO_TEST_CASE(DivisionBroadcast1Element, DivisionBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(DivisionBroadcast1DVector, DivisionBroadcast1DVectorTest)
+
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)
 ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1Element, MultiplicationBroadcast1ElementTest)

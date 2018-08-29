@@ -17,11 +17,11 @@
 #include "ClWorkloads/ClAdditionFloat32Workload.hpp"
 #include "ClWorkloads/ClActivationFloat32Workload.hpp"
 #include "ClWorkloads/ClBatchNormalizationFloat32Workload.hpp"
-
 #include "ClWorkloads/ClConvertFp16ToFp32Workload.hpp"
 #include "ClWorkloads/ClConvertFp32ToFp16Workload.hpp"
 #include "ClWorkloads/ClConvolution2dBaseWorkload.hpp"
 #include "ClWorkloads/ClDepthwiseConvolutionBaseWorkload.hpp"
+#include "ClWorkloads/ClDivisionFloatWorkload.hpp"
 #include "ClWorkloads/ClL2NormalizationFloat32Workload.hpp"
 #include "ClWorkloads/ClMultiplicationFloat32Workload.hpp"
 #include "ClWorkloads/ClFullyConnectedFloat32Workload.hpp"
@@ -236,6 +236,18 @@ bool IsDepthwiseConvolutionSupportedCl(const TensorInfo& input,
                                    descriptor,
                                    weights,
                                    biases);
+}
+
+bool IsDivisionSupportedCl(const TensorInfo& input0,
+                           const TensorInfo& input1,
+                           const TensorInfo& output,
+                           std::string* reasonIfUnsupported)
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClDivisionWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool IsFullyConnectedSupportedCl(const TensorInfo& input,

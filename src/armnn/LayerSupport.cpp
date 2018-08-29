@@ -141,6 +141,16 @@ bool IsConvolution2dSupported(Compute compute,
     FORWARD_LAYER_SUPPORT_FUNC(compute, IsConvolution2dSupported, input, output, descriptor, weights, biases);
 }
 
+bool IsDivisionSupported(Compute compute,
+                         const TensorInfo& input0,
+                         const TensorInfo& input1,
+                         const TensorInfo& output,
+                         char* reasonIfUnsupported,
+                         size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsDivisionSupported, input0, input1, output);
+}
+
 bool IsDepthwiseConvolutionSupported(Compute compute,
                                      const TensorInfo& input,
                                      const TensorInfo& output,

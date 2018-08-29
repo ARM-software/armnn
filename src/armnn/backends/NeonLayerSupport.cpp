@@ -225,6 +225,15 @@ bool IsDepthwiseConvolutionSupportedNeon(const TensorInfo& input,
                                    biases);
 }
 
+bool IsDivisionSupportedNeon(const TensorInfo& input0,
+                             const TensorInfo& input1,
+                             const TensorInfo& output,
+                             std::string* reasonIfUnsupported)
+{
+    // At the moment division is not supported
+    return false;
+}
+
 bool IsFullyConnectedSupportedNeon(const TensorInfo& input,
                                    const TensorInfo& output,
                                    const TensorInfo& weights,

@@ -584,6 +584,11 @@ IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
     return layer;
 }
 
+IConnectableLayer* Network::AddDivisionLayer(const char* name)
+{
+    return m_Graph->AddLayer<DivisionLayer>(name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

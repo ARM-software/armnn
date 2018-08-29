@@ -798,4 +798,17 @@ void ConvertFp16ToFp32QueueDescriptor::Validate(const WorkloadInfo& workloadInfo
                               "output");
 }
 
+void DivisionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTwoInputs(workloadInfo, "DivisionQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "DivisionQueueDescriptor");
+
+    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                                       workloadInfo.m_InputTensorInfos[1],
+                                       workloadInfo.m_OutputTensorInfos[0],
+                                       "DivisionQueueDescriptor",
+                                       "first input",
+                                       "second input");
+}
+
 } //namespace armnn

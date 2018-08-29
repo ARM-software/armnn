@@ -482,6 +482,19 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, boo
                                           reasonCapacity);
             break;
         }
+        case LayerType::Division:
+        {
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = IsDivisionSupported(compute,
+                                         OverrideDataType(input0, dataType),
+                                         OverrideDataType(input1, dataType),
+                                         OverrideDataType(output, dataType),
+                                         reason,
+                                         reasonCapacity);
+            break;
+        }
         case LayerType::Reshape:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();

@@ -163,6 +163,12 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMultiplication(
     return MakeWorkload<ClMultiplicationFloat32Workload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateDivision(
+    const DivisionQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClDivisionFloatWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateBatchNormalization(
     const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
@@ -419,6 +425,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp16ToFp32(
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp32ToFp16(
     const ConvertFp32ToFp16QueueDescriptor& descriptor,
     const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
 {
     return nullptr;
 }

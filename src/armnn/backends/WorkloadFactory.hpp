@@ -120,6 +120,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateConvertFp32ToFp16(const ConvertFp32ToFp16QueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreateDivision(const DivisionQueueDescriptor& descriptor,
+                                                      const WorkloadInfo& info) const = 0;
 };
 
 } //namespace armnn

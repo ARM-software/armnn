@@ -60,6 +60,7 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionBaseWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClDivisionFloatWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClFloorFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClFullyConnectedFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClL2NormalizationFloat32Workload.cpp \
@@ -163,6 +164,9 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/RefWorkloads/RefPermuteWorkload.cpp \
         src/armnn/backends/RefWorkloads/RefConvertFp16ToFp32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.cpp \
+        src/armnn/backends/RefWorkloads/Division.cpp \
+        src/armnn/backends/RefWorkloads/RefDivisionFloat32Workload.cpp \
+        src/armnn/backends/RefWorkloads/RefDivisionUint8Workload.cpp \
         src/armnn/backends/MemCopyWorkload.cpp \
         src/armnn/backends/WorkloadData.cpp \
         src/armnn/backends/WorkloadFactory.cpp \
@@ -187,6 +191,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/OutputLayer.cpp \
         src/armnn/layers/PermuteLayer.cpp \
         src/armnn/layers/Pooling2dLayer.cpp \
+        src/armnn/layers/DivisionLayer.cpp \
         src/armnn/layers/ReshapeLayer.cpp \
         src/armnn/layers/ResizeBilinearLayer.cpp \
         src/armnn/layers/SoftmaxLayer.cpp \

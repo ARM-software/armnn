@@ -22,6 +22,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::ConvertFp32ToFp16: return "ConvertFp32ToFp16";
         case LayerType::Convolution2d: return "Convolution2d";
         case LayerType::DepthwiseConvolution2d: return "DepthwiseConvolution2d";
+        case LayerType::Division: return "Division";
         case LayerType::FakeQuantization: return "FakeQuantization";
         case LayerType::Floor: return "Floor";
         case LayerType::FullyConnected: return "FullyConnected";

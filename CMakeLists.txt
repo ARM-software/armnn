@@ -200,6 +200,8 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefBatchNormalizationUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearUint8Workload.hpp
     src/armnn/backends/RefWorkloads/Multiplication.cpp
+    src/armnn/backends/RefWorkloads/Division.cpp
+    src/armnn/backends/RefWorkloads/Division.hpp
     src/armnn/backends/RefWorkloads/RefMultiplicationUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefL2NormalizationFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/Multiplication.hpp
@@ -279,6 +281,10 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefConvertFp16ToFp32Workload.hpp
     src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.cpp
     src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.hpp
+    src/armnn/backends/RefWorkloads/RefDivisionFloat32Workload.cpp
+    src/armnn/backends/RefWorkloads/RefDivisionFloat32Workload.hpp
+    src/armnn/backends/RefWorkloads/RefDivisionUint8Workload.cpp
+    src/armnn/backends/RefWorkloads/RefDivisionUint8Workload.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp
@@ -323,6 +329,8 @@ list(APPEND armnn_sources
     src/armnn/layers/PermuteLayer.cpp
     src/armnn/layers/Pooling2dLayer.hpp
     src/armnn/layers/Pooling2dLayer.cpp
+    src/armnn/layers/DivisionLayer.cpp
+    src/armnn/layers/DivisionLayer.hpp
     src/armnn/layers/ReshapeLayer.hpp
     src/armnn/layers/ReshapeLayer.cpp
     src/armnn/layers/ResizeBilinearLayer.hpp
@@ -527,6 +535,8 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClPooling2dUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClPooling2dUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClReshapeFloat32Workload.cpp
+        src/armnn/backends/ClWorkloads/ClDivisionFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClDivisionFloatWorkload.cpp
         src/armnn/backends/ClWorkloads/ClReshapeFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClReshapeUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClReshapeUint8Workload.hpp

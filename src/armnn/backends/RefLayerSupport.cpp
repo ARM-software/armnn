@@ -117,6 +117,19 @@ bool IsDepthwiseConvolutionSupportedRef(const TensorInfo& input,
                                      &TrueFunc<>);
 }
 
+bool IsDivisionSupportedRef(const TensorInfo& input0,
+                            const TensorInfo& input1,
+                            const TensorInfo& output,
+                            std::string* reasonIfUnsupported)
+{
+    ignore_unused(input1);
+    ignore_unused(output);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input0.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool IsFullyConnectedSupportedRef(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const TensorInfo& weights,

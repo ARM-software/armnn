@@ -113,6 +113,8 @@ public:
                                     const LstmInputParams& params,
                                     const char* name = nullptr) override;
 
+    IConnectableLayer* AddDivisionLayer(const char* name = nullptr) override;
+
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
         const ConstTensor& weights,

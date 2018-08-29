@@ -22,6 +22,7 @@ enum class LayerType
     ConvertFp32ToFp16,
     Convolution2d,
     DepthwiseConvolution2d,
+    Division,
     FakeQuantization,
     Floor,
     FullyConnected,

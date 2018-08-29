@@ -55,3 +55,5 @@
 #include "backends/RefWorkloads/RefLstmFloat32Workload.hpp"
 #include "backends/RefWorkloads/RefConvertFp16ToFp32Workload.hpp"
 #include "backends/RefWorkloads/RefConvertFp32ToFp16Workload.hpp"
+#include "backends/RefWorkloads/RefDivisionFloat32Workload.hpp"
+#include "backends/RefWorkloads/RefDivisionUint8Workload.hpp"

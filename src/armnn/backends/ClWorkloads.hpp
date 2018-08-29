@@ -17,6 +17,7 @@
 #include "backends/ClWorkloads/ClConvolution2dUint8Workload.hpp"
 #include "backends/ClWorkloads/ClDepthwiseConvolutionFloat32Workload.hpp"
 #include "backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.hpp"
+#include "backends/ClWorkloads/ClDivisionFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClFloorFloat32Workload.hpp"
 #include "backends/ClWorkloads/ClFullyConnectedFloat32Workload.hpp"
 #include "backends/ClWorkloads/ClL2NormalizationFloat32Workload.hpp"

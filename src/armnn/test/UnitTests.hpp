@@ -8,6 +8,7 @@
 #include "armnn/Utils.hpp"
 #include "backends/RefWorkloadFactory.hpp"
 #include "backends/test/LayerTests.hpp"
+#include "TensorHelpers.hpp"
 #include <boost/test/unit_test.hpp>
 
 inline void ConfigureLoggingTest()

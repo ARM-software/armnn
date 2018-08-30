@@ -1117,6 +1117,36 @@ namespace {
     }
 } // anonymous namespace
 
+LayerTestResult<float,4> DivisionByZeroTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int width = 2;
+    const unsigned int height = 2;
+    const unsigned int channelCount = 2;
+    const unsigned int batchSize = 2;
+
+    unsigned int shape[] = { batchSize, channelCount, height, width };
+
+    std::vector<float> input0({
+                                1.f,  1.f,  1.f,  1.f,  0.f, 0.f, 0.f, 0.f,
+                               -1.f, -1.f, -1.f, -1.f,  5.f, 5.f, 5.f, 5.f });
+
+    std::vector<float> input1({
+                               0.f, 0.f, -0.f, -0.f,  0.f, 0.f, -0.f, -0.f,
+                               0.f, 0.f, -0.f, -0.f,  5.f, 5.f,  5.f,  5.f });
+
+    std::vector<float> output({
+                               INFINITY, INFINITY, -INFINITY, -INFINITY,  NAN, NAN, -NAN, -NAN,
+                               -INFINITY, -INFINITY, INFINITY, INFINITY,  1, 1, 1, 1 });
+
+    return DivisionTestHelper(workloadFactory,
+                              shape,
+                              input0,
+                              shape,
+                              input1,
+                              shape,
+                              output);
+}
+
 LayerTestResult<float,4> DivisionTest(armnn::IWorkloadFactory& workloadFactory)
 {
     const unsigned int width = 2;

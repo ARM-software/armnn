@@ -193,6 +193,7 @@ LayerTestResult<float, 4> CompareActivationTest(armnn::IWorkloadFactory&  worklo
                                                 unsigned int batchSize);
 
 LayerTestResult<float, 4> DivisionTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> DivisionByZeroTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4> DivisionBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(armnn::IWorkloadFactory& workloadFactory);
 

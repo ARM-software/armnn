@@ -148,6 +148,7 @@ ARMNN_AUTO_TEST_CASE(AddBroadcast1ElementUint8, AdditionBroadcast1ElementUint8Te
 
 // Div
 ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)
+ARMNN_AUTO_TEST_CASE(DivisionByZero, DivisionByZeroTest)
 ARMNN_AUTO_TEST_CASE(DivisionBroadcast1Element, DivisionBroadcast1ElementTest)
 ARMNN_AUTO_TEST_CASE(DivisionBroadcast1DVector, DivisionBroadcast1DVectorTest)
 

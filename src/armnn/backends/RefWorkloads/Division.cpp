@@ -8,6 +8,8 @@
 
 #include <functional>
 
+#include <cmath>
+
 namespace
 {
 
@@ -18,8 +20,43 @@ void ElementwiseDivision(unsigned int numElements,
 {
     for (unsigned int i = 0; i < numElements; ++i)
     {
-        //TODO How to handle divide by 0
-        outData[i] = inData0[i] / inData1[i];
+        if (inData1[i] != 0.0f)
+        {
+            outData[i] = inData0[i] / inData1[i];
+        }
+        else if (inData0[i] == 0.0f)
+        {
+            if (!std::signbit(inData1[i]))
+            {
+                outData[i]= NAN;
+            }
+            else
+            {
+                outData[i]= -NAN;
+            }
+        }
+        else if (inData0[i] < 0.0f)
+        {
+            if (!std::signbit(inData1[i]))
+            {
+                outData[i] = -INFINITY;
+            }
+            else
+            {
+                outData[i] = INFINITY;
+            }
+        }
+        else
+        {
+            if (!std::signbit(inData1[i]))
+            {
+                outData[i] = INFINITY;
+            }
+            else
+            {
+                outData[i] = -INFINITY;
+            }
+        }
     }
 }
 

@@ -44,6 +44,17 @@ struct SelectiveComparer<T, false>
         {
             return std::abs(a - b) <= g_FloatCloseToZeroTolerance;
         }
+
+        if (std::isinf(a) && a == b)
+        {
+            return true;
+        }
+
+        if (std::isnan(a) && std::isnan(b))
+        {
+            return true;
+        }
+
         // For unquantized floats we use a tolerance of 1%.
         boost::math::fpc::close_at_tolerance<float> comparer(boost::math::fpc::percent_tolerance(1.0f));
         return comparer(a, b);

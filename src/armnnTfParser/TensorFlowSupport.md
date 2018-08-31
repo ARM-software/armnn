@@ -92,6 +92,10 @@ The parser does not support all forms of [broadcast composition](https://www.ten
 
  The parser only supports the NHWC data format in the input layer. See the TensorFlow [placeholder documentation](https://www.tensorflow.org/api_docs/python/tf/placeholder) for more information.
 
+**realdiv**
+
+The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [realdiv documentation](https://www.tensorflow.org/api_docs/python/tf/realdiv) for more information. 
+
 **reshape**
 
 The parser does not support reshaping to or from 4D. See the TensorFlow [reshape documentation](https://www.tensorflow.org/api_docs/python/tf/reshape) for more information.

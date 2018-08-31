@@ -11,14 +11,14 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct Convolution2dFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct Convolution2dFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     explicit Convolution2dFixture(const char* paddingType)
     : Convolution2dFixture(paddingType, 1)
     {}
 
-    // dilation: 0 - dilations attribute is not included;
-    // dilation: >0 - dilations attribute set to [1,v,v,1], where v is the value of the dilation arg
+    // Dilation: 0 - dilations attribute is not included;
+    // Dilation: >0 - dilations attribute set to [1,v,v,1], where v is the value of the dilation arg
     explicit Convolution2dFixture(const char* paddingType, int stride, int dilation = 0)
     {
         std::string strideString = std::to_string(stride);
@@ -309,13 +309,8 @@ BOOST_AUTO_TEST_CASE(ParseConv2DDilation2)
     armnn::TensorShape tensorShape = { 1, 3, 3, 1 };
     inputShapes["graphInput"] = tensorShape;
     armnnTfParser::ITfParserPtr parser = armnnTfParser::ITfParser::Create();
-    BOOST_CHECK_EXCEPTION(parser->CreateNetworkFromString(prototext, inputShapes, { "potato" }),
-                          armnn::ParseException,
-                          [] (armnn::ParseException const& ex)->bool
-                          {
-                                return strcmp(ex.what(),
-                                              "ArmNN only supports Convolution layers with dilations [1,1,1,1]") == 0;
-                          });
+    BOOST_CHECK_THROW(parser->CreateNetworkFromString(prototext, inputShapes, { "potato" }),
+                          armnn::ParseException);
 }
 
 

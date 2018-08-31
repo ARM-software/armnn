@@ -14,8 +14,13 @@ namespace armnn
 class RefFullyConnectedUint8Workload : public Uint8Workload<FullyConnectedQueueDescriptor>
 {
 public:
-    using Uint8Workload<FullyConnectedQueueDescriptor>::Uint8Workload;
+    explicit RefFullyConnectedUint8Workload(const FullyConnectedQueueDescriptor& descriptor,
+                                             const WorkloadInfo& info);
     virtual void Execute() const override;
+
+private:
+    std::unique_ptr<ScopedCpuTensorHandle> m_Weight;
+    std::unique_ptr<ScopedCpuTensorHandle> m_Bias;
 };
 
 } //namespace armnn

@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct SoftmaxFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct SoftmaxFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     SoftmaxFixture()
     {

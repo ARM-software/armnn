@@ -4,14 +4,30 @@
 //
 
 #include "NeonAdditionFloat32Workload.hpp"
+#include "backends/ArmComputeTensorUtils.hpp"
 #include "backends/CpuTensorHandle.hpp"
 
 namespace armnn
 {
 
+arm_compute::Status NeonAdditionWorkloadValidate(const TensorInfo& input0,
+                                                 const TensorInfo& input1,
+                                                 const TensorInfo& output)
+{
+    const arm_compute::TensorInfo aclInput0 = armcomputetensorutils::BuildArmComputeTensorInfo(input0);
+    const arm_compute::TensorInfo aclInput1 = armcomputetensorutils::BuildArmComputeTensorInfo(input1);
+    const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+
+    return arm_compute::NEArithmeticAddition::validate(&aclInput0,
+                                                       &aclInput1,
+                                                       &aclOutput,
+                                                       arm_compute::ConvertPolicy::SATURATE);
+}
+
+
 NeonAdditionFloat32Workload::NeonAdditionFloat32Workload(const AdditionQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info)
-    : Float32Workload<AdditionQueueDescriptor>(descriptor, info)
+    : FloatWorkload<AdditionQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonAdditionFloat32Workload", 2, 1);
 
@@ -24,7 +40,7 @@ NeonAdditionFloat32Workload::NeonAdditionFloat32Workload(const AdditionQueueDesc
 
 void NeonAdditionFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonAdditionFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonAdditionFloat32Workload_Execute");
     m_AddLayer.run();
 }
 

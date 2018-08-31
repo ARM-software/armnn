@@ -180,7 +180,7 @@ BaseTensor<MemoryType>& BaseTensor<MemoryType>::operator =(const BaseTensor<Memo
     return *this;
 }
 
-// Explicit instantiations
+// Explicit instantiations.
 template class BaseTensor<const void*>;
 template class BaseTensor<void*>;
 

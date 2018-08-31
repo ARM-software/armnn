@@ -8,6 +8,9 @@
 #include "LeakChecking.hpp"
 #include "gperftools/heap-checker.h"
 
+namespace armnnUtils
+{
+
 struct ScopedLeakChecker::Impl
 {
     HeapLeakChecker m_LeakChecker;
@@ -58,5 +61,21 @@ ScopedDisableLeakChecking::ScopedDisableLeakChecking()
 ScopedDisableLeakChecking::~ScopedDisableLeakChecking()
 {
 }
+
+void LocalLeakCheckingOnly()
+{
+    auto * globalChecker = HeapLeakChecker::GlobalChecker();
+    if (globalChecker)
+    {
+        // Don't care about global leaks and make sure we won't report any.
+        // This is because leak checking supposed to run in well defined
+        // contexts through the ScopedLeakChecker, otherwise we risk false
+        // positives because of external factors.
+        globalChecker->NoGlobalLeaks();
+        globalChecker->CancelGlobalCheck();
+    }
+}
+
+} // namespace armnnUtils
 
 #endif // ARMNN_LEAK_CHECKING_ENABLED

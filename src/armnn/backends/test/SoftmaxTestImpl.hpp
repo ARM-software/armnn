@@ -39,7 +39,7 @@ LayerTestResult<T, 2> SimpleSoftmaxTestImpl(armnn::IWorkloadFactory& workloadFac
 
     LayerTestResult<T, 2> ret(outputTensorInfo);
 
-    // Each row is independently softmax'd
+    // Each row is independently softmax'd.
     auto input = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(
         QuantizedVector<T>(qScale, 0, {
             0.f, 1.f, 0.f, 0.f,

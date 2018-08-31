@@ -11,7 +11,7 @@
 namespace armnn
 {
 
-/// Computes the Pooling2d operation
+/// Computes the Pooling2d operation.
 void Pooling2d(const float* in,
                float* out,
                const TensorInfo& inputInfo,

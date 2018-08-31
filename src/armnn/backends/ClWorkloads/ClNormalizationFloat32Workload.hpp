@@ -14,7 +14,7 @@ arm_compute::Status ClNormalizationWorkloadValidate(const TensorInfo& input,
     const TensorInfo& output,
     const NormalizationDescriptor& descriptor);
 
-class ClNormalizationFloat32Workload : public Float32Workload<NormalizationQueueDescriptor>
+class ClNormalizationFloat32Workload : public FloatWorkload<NormalizationQueueDescriptor>
 {
 public:
     ClNormalizationFloat32Workload(const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info);

@@ -43,7 +43,7 @@ struct BroadcastLoop
     }
 
 private:
-    // Struct to hold the dimension data
+    // Struct to hold the dimension data.
     struct BroadcastDimensionData
     {
         unsigned int m_DimSize;

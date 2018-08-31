@@ -13,7 +13,7 @@
 namespace armnn
 {
 
-// Base class template providing an implementation of the Constant layer common to all data types
+// Base class template providing an implementation of the Constant layer common to all data types.
 template <armnn::DataType DataType>
 class RefBaseConstantWorkload : public TypedWorkload<ConstantQueueDescriptor, DataType>
 {

@@ -10,16 +10,16 @@
 namespace armnn
 {
 
-// Base class template providing an implementation of the Splitter layer common to all data types
-template <armnn::DataType DataType>
-class ClBaseSplitterWorkload : public TypedWorkload<SplitterQueueDescriptor, DataType>
+// Base class template providing an implementation of the Splitter layer common to all data types.
+template <armnn::DataType... DataTypes>
+class ClBaseSplitterWorkload : public TypedWorkload<SplitterQueueDescriptor, DataTypes...>
 {
 public:
-    using TypedWorkload<SplitterQueueDescriptor, DataType>::TypedWorkload;
+    using TypedWorkload<SplitterQueueDescriptor, DataTypes...>::TypedWorkload;
 
     void Execute() const override
     {
-        // With subtensors, merger is a no-op
+        // With subtensors, merger is a no-op.
     }
 };
 

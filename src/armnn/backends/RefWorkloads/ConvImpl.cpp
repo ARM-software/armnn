@@ -46,7 +46,7 @@ int32_t QuantizedMultiplierSmallerThanOne::operator*(int32_t rhs) const
 
 int32_t QuantizedMultiplierSmallerThanOne::SaturatingRoundingDoublingHighMul(int32_t a, int32_t b)
 {
-    // Check for overflow
+    // Check for overflow.
     if (a == b && a == std::numeric_limits<int32_t>::min())
     {
         return std::numeric_limits<int32_t>::max();

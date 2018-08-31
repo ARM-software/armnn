@@ -13,15 +13,16 @@
 namespace armnn
 {
 
-class IClTunedParameters;
+class IGpuAccTunedParameters;
 class ClTunedParameters;
 
-// ARM Compute OpenCL context control
+// ARM Compute OpenCL context control.
 class ClContextControl
 {
 public:
 
-    ClContextControl(IClTunedParameters* clTunedParameters = nullptr);
+    ClContextControl(IGpuAccTunedParameters* clTunedParameters = nullptr,
+                     bool profilingEnabled = false);
 
     virtual ~ClContextControl();
 
@@ -31,7 +32,7 @@ public:
     // to release the cached memory used by the compute library.
     void UnloadOpenClRuntime();
 
-    // Clear the CL cache, without losing the tuned parameter settings
+    // Clear the CL cache, without losing the tuned parameter settings.
     void ClearClCache();
 
 private:
@@ -40,12 +41,13 @@ private:
 
     ClTunedParameters* m_clTunedParameters;
 
+    bool m_ProfilingEnabled;
 };
 
-class ClTunedParameters : public IClTunedParameters
+class ClTunedParameters : public IGpuAccTunedParameters
 {
 public:
-    ClTunedParameters(armnn::IClTunedParameters::Mode mode);
+    ClTunedParameters(armnn::IGpuAccTunedParameters::Mode mode);
 
     virtual void Load(const char* filename);
     virtual void Save(const char* filename) const;

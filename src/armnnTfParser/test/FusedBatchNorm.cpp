@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct FusedBatchNormFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct FusedBatchNormFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     FusedBatchNormFixture()
     {
@@ -166,10 +166,10 @@ struct FusedBatchNormFixture : public ParserPrototxtFixture<armnnTfParser::ITfPa
 
 BOOST_FIXTURE_TEST_CASE(ParseFusedBatchNorm, FusedBatchNormFixture)
 {
-    RunTest<4>({1, 2, 3, 4, 5, 6, 7, 8, 9},             // input data
+    RunTest<4>({1, 2, 3, 4, 5, 6, 7, 8, 9},             // Input data.
                {-2.8277204f, -2.12079024f, -1.4138602f,
                 -0.7069301f, 0.0f, 0.7069301f,
-                1.4138602f, 2.12079024f, 2.8277204f});  // expected output data
+                1.4138602f, 2.12079024f, 2.8277204f});  // Expected output data.
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -10,7 +10,7 @@ namespace armnn
 
 void ClSplitterFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClSplitterFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClSplitterFloat32Workload_Execute");
     ClBaseSplitterWorkload::Execute();
 }
 

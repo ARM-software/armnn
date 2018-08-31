@@ -9,8 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-
-struct ReshapeFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ReshapeFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     ReshapeFixture()
     {

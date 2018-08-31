@@ -18,11 +18,11 @@ void FullyConnected(const float*      inputData,
                     const float*      biasData,
                     bool              transposeWeights)
 {
-    unsigned int N = outputTensorInfo.GetShape()[1]; // Output Vector Size
+    unsigned int N = outputTensorInfo.GetShape()[1]; // Outputs Vector Size.
 
-    BOOST_ASSERT(inputTensorInfo.GetNumDimensions() > 1); // Need some data
+    BOOST_ASSERT(inputTensorInfo.GetNumDimensions() > 1); // Needs some data.
 
-    unsigned int K = 1; // Total number of activations in the input
+    unsigned int K = 1; // Total number of activations in the input.
     for (unsigned int i = 1; i < inputTensorInfo.GetNumDimensions(); i++)
     {
         K *= inputTensorInfo.GetShape()[i];

@@ -10,7 +10,7 @@
 namespace armnn
 {
 
-/// Performs a matrix multiplication and optionally adds a bias
+/// Performs a matrix multiplication and optionally adds a bias.
 void FullyConnected(const float*      inputData,
                     float*            outputData,
                     const TensorInfo& inputTensorInfo,

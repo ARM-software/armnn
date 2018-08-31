@@ -78,12 +78,12 @@ std::unique_ptr<YoloDatabase::TTestCaseData> YoloDatabase::GetTestCaseData(unsig
     const auto& testCaseInputOutput = g_PerTestCaseInputOutput[testCaseId];
     const std::string imagePath = m_ImageDir + testCaseInputOutput.first;
 
-    // Load test case input image
+    // Loads test case input image.
     std::vector<float> imageData;
     try
     {
         InferenceTestImage image(imagePath.c_str());
-        image.Resize(YoloImageWidth, YoloImageHeight);
+        image.Resize(YoloImageWidth, YoloImageHeight, CHECK_LOCATION());
         imageData = GetImageDataInArmNnLayoutAsNormalizedFloats(ImageChannelLayout::Rgb, image);
     }
     catch (const InferenceTestImageException& e)
@@ -92,7 +92,7 @@ std::unique_ptr<YoloDatabase::TTestCaseData> YoloDatabase::GetTestCaseData(unsig
         return nullptr;
     }
 
-    // Prepare test case output
+    // Prepares test case output.
     std::vector<YoloDetectedObject> topObjectDetections;
     topObjectDetections.reserve(1);
     topObjectDetections.push_back(testCaseInputOutput.second);

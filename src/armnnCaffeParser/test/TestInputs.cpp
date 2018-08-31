@@ -35,16 +35,18 @@ BOOST_AUTO_TEST_CASE(InputShapes)
     std::string implicitInputNoShape = "name: \"Minimal\"\n"
                                        "input: \"data\" \n";
 
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(armnn::Compute::CpuRef));
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
     armnnCaffeParser::ICaffeParserPtr parser(armnnCaffeParser::ICaffeParser::Create());
     armnn::INetworkPtr network(nullptr, nullptr);
     armnn::NetworkId netId;
 
     // Check everything works normally
+    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
     {
         network = parser->CreateNetworkFromString(explicitInput.c_str(), {}, { "data" });
         BOOST_TEST(network.get());
-        runtime->LoadNetwork(netId, Optimize(*network, runtime->GetDeviceSpec()));
+        runtime->LoadNetwork(netId, Optimize(*network, backends, runtime->GetDeviceSpec()));
 
         armnnCaffeParser::BindingPointInfo inputBindingInfo = parser->GetNetworkInputBindingInfo("data");
         armnn::TensorInfo inputTensorInfo = inputBindingInfo.second;
@@ -56,11 +58,11 @@ BOOST_AUTO_TEST_CASE(InputShapes)
         BOOST_TEST(inputTensorInfo.GetShape()[3] == 4);
     }
 
-    // Check everything works with implicit input
+    // Checks everything works with implicit input.
     {
         network = parser->CreateNetworkFromString(implicitInput.c_str(), {}, { "data" });
         BOOST_TEST(network.get());
-        runtime->LoadNetwork(netId, Optimize(*network, runtime->GetDeviceSpec()));
+        runtime->LoadNetwork(netId, Optimize(*network, backends, runtime->GetDeviceSpec()));
 
         armnnCaffeParser::BindingPointInfo inputBindingInfo = parser->GetNetworkInputBindingInfo("data");
         armnn::TensorInfo inputTensorInfo = inputBindingInfo.second;
@@ -72,11 +74,11 @@ BOOST_AUTO_TEST_CASE(InputShapes)
         BOOST_TEST(inputTensorInfo.GetShape()[3] == 4);
     }
 
-    // Check everything works with implicit and passing shape
+    // Checks everything works with implicit and passing shape.
     {
         network = parser->CreateNetworkFromString(implicitInput.c_str(), { {"data", { 2, 2, 3, 4 } } }, { "data" });
         BOOST_TEST(network.get());
-        runtime->LoadNetwork(netId, Optimize(*network, runtime->GetDeviceSpec()));
+        runtime->LoadNetwork(netId, Optimize(*network, backends, runtime->GetDeviceSpec()));
 
         armnnCaffeParser::BindingPointInfo inputBindingInfo = parser->GetNetworkInputBindingInfo("data");
         armnn::TensorInfo inputTensorInfo = inputBindingInfo.second;
@@ -88,11 +90,11 @@ BOOST_AUTO_TEST_CASE(InputShapes)
         BOOST_TEST(inputTensorInfo.GetShape()[3] == 4);
     }
 
-    // Check everything works with implicit (no shape) and passing shape
+    // Checks everything works with implicit (no shape) and passing shape.
     {
         network = parser->CreateNetworkFromString(implicitInputNoShape.c_str(), {{"data", {2, 2, 3, 4} }}, { "data" });
         BOOST_TEST(network.get());
-        runtime->LoadNetwork(netId, Optimize(*network, runtime->GetDeviceSpec()));
+        runtime->LoadNetwork(netId, Optimize(*network, backends, runtime->GetDeviceSpec()));
 
         armnnCaffeParser::BindingPointInfo inputBindingInfo = parser->GetNetworkInputBindingInfo("data");
         armnn::TensorInfo inputTensorInfo = inputBindingInfo.second;
@@ -104,13 +106,13 @@ BOOST_AUTO_TEST_CASE(InputShapes)
         BOOST_TEST(inputTensorInfo.GetShape()[3] == 4);
     }
 
-    // Check exception on incompatible shapes
+    // Checks exception on incompatible shapes.
     {
         BOOST_CHECK_THROW(parser->CreateNetworkFromString(implicitInput.c_str(), {{"data",{ 2, 2, 3, 2 }}}, {"data"}),
             armnn::ParseException);
     }
 
-    // Check exception when no shape available
+    // Checks exception when no shape available.
     {
         BOOST_CHECK_THROW(parser->CreateNetworkFromString(implicitInputNoShape.c_str(), {}, { "data" }),
             armnn::ParseException);

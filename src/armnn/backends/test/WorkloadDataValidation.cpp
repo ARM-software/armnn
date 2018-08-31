@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(QueueDescriptor_Validate_WrongNumOfInputsOutputs)
 {
     InputQueueDescriptor invalidData;
     WorkloadInfo invalidInfo;
-    //invalid argument exception is expected, because no inputs and no outputs were defined
+    //Invalid argument exception is expected, because no inputs and no outputs were defined.
     BOOST_CHECK_THROW(RefWorkloadFactory().CreateInput(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(RefPooling2dFloat32Workload_Validate_WrongDimTensor)
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
 
-    unsigned int inputShape[]  = {2, 3, 4}; // <- invalid - input tensor has to be 4D
+    unsigned int inputShape[]  = {2, 3, 4}; // <- Invalid - input tensor has to be 4D.
     unsigned int outputShape[] = {2, 3, 4, 5};
 
     outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(RefPooling2dFloat32Workload_Validate_WrongDimTensor)
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
 
-    // invalid argument exception is expected, input tensor has to be 4D
+    // Invalid argument exception is expected, input tensor has to be 4D.
     BOOST_CHECK_THROW(RefPooling2dFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(SoftmaxQueueDescriptor_Validate_WrongInputHeight)
     unsigned int inputNum = 2;
 
     unsigned int outputChannels = inputChannels;
-    unsigned int outputHeight = inputHeight + 1;    //makes data invalid - Softmax expects height and width to be 1
+    unsigned int outputHeight = inputHeight + 1;    //Makes data invalid - Softmax expects height and width to be 1.
     unsigned int outputWidth = inputWidth;
     unsigned int outputNum = inputNum;
 
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(SoftmaxQueueDescriptor_Validate_WrongInputHeight)
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
 
-    //invalid argument exception is expected, because height != 1
+    //Invalid argument exception is expected, because height != 1.
     BOOST_CHECK_THROW(RefSoftmaxFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(FullyConnectedQueueDescriptor_Validate_RequiredDataMissing)
     unsigned int outputChannels = 3;
     unsigned int outputNum = 2;
 
-    // Define the tensor descriptors
+    // Define the tensor descriptors.
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
     armnn::TensorInfo weightsDesc;
@@ -120,8 +120,8 @@ BOOST_AUTO_TEST_CASE(FullyConnectedQueueDescriptor_Validate_RequiredDataMissing)
     invalidData.m_Parameters.m_TransposeWeightMatrix = false;
 
 
-    //invalid argument exception is expected, because not all required fields have been provided
-    //in particular inputsData[0], outputsData[0] and weightsData can not be null
+    //Invalid argument exception is expected, because not all required fields have been provided.
+    //In particular inputsData[0], outputsData[0] and weightsData can not be null.
     BOOST_CHECK_THROW(RefFullyConnectedFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
@@ -135,8 +135,8 @@ BOOST_AUTO_TEST_CASE(NormalizationQueueDescriptor_Validate_WrongInputHeight)
 
     constexpr unsigned int outputNum = inputNum;
     constexpr unsigned int outputChannels = inputChannels;
-    constexpr unsigned int outputHeight = inputHeight + 1; //makes data invalid - normalization requires
-                                                           //input and output to have the same dimensions
+    constexpr unsigned int outputHeight = inputHeight + 1; //Makes data invalid - normalization requires.
+                                                           //Input and output to have the same dimensions.
     constexpr unsigned int outputWidth  = inputWidth;
 
 
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(NormalizationQueueDescriptor_Validate_WrongInputHeight)
     invalidData.m_Parameters.m_Beta            = beta;
     invalidData.m_Parameters.m_K               = kappa;
 
-    //invalid argument exception is expected, because input height != output height
+    //Invalid argument exception is expected, because input height != output height.
     BOOST_CHECK_THROW(RefNormalizationFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(SplitterQueueDescriptor_Validate_WrongWindow)
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
 
-    // invalid since it has only 3 dimensions while the input tensor is 4d
+    // Invalid, since it has only 3 dimensions while the input tensor is 4d.
     std::vector<unsigned int> wOrigin = {0, 0, 0};
     armnn::SplitterQueueDescriptor::ViewOrigin window(wOrigin);
     invalidData.m_ViewOrigins.push_back(window);
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(SplitterQueueDescriptor_Validate_WrongWindow)
         "match input.");
     BOOST_CHECK_THROW(RefSplitterFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 
-    // invalid since window extends past the boundary of input tensor
+    // Invalid, since window extends past the boundary of input tensor.
     std::vector<unsigned int> wOrigin3 = {0, 0, 15, 0};
     armnn::SplitterQueueDescriptor::ViewOrigin window3(wOrigin3);
     invalidData.m_ViewOrigins[0] = window3;
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE(MergerQueueDescriptor_Validate_WrongWindow)
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
 
-    // invalid since it has only 3 dimensions while the input tensor is 4d
+    // Invalid, since it has only 3 dimensions while the input tensor is 4d.
     std::vector<unsigned int> wOrigin = {0, 0, 0};
     armnn::MergerQueueDescriptor::ViewOrigin window(wOrigin);
     invalidData.m_ViewOrigins.push_back(window);
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(MergerQueueDescriptor_Validate_WrongWindow)
         "match input.");
     BOOST_CHECK_THROW(RefMergerFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 
-    // invalid since window extends past the boundary of output tensor
+    // Invalid, since window extends past the boundary of output tensor.
     std::vector<unsigned int> wOrigin3 = {0, 0, 15, 0};
     armnn::MergerQueueDescriptor::ViewOrigin window3(wOrigin3);
     invalidData.m_ViewOrigins[0] = window3;
@@ -308,17 +308,17 @@ BOOST_AUTO_TEST_CASE(AdditionQueueDescriptor_Validate_InputNumbers)
     AddInputToWorkload(invalidData, invalidInfo, input1TensorInfo, nullptr);
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
 
-    // too few inputs
+    // Too few inputs.
     BOOST_CHECK_THROW(RefAdditionFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 
     AddInputToWorkload(invalidData, invalidInfo, input2TensorInfo, nullptr);
 
-    // correct
+    // Correct.
     BOOST_CHECK_NO_THROW(RefAdditionFloat32Workload(invalidData, invalidInfo));
 
     AddInputToWorkload(invalidData, invalidInfo, input3TensorInfo, nullptr);
 
-    // too many inputs
+    // Too many inputs.
     BOOST_CHECK_THROW(RefAdditionFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(AdditionQueueDescriptor_Validate_InputShapes)
     unsigned int shape1[] = {1, 1, 2, 1};
     unsigned int shape2[] = {1, 1, 3, 2};
 
-    // Incompatible shapes even with broadcasting
+    // Incompatible shapes even with broadcasting.
     {
         input1TensorInfo = armnn::TensorInfo(4, shape1, armnn::DataType::Float32);
         input2TensorInfo = armnn::TensorInfo(4, shape2, armnn::DataType::Float32);
@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_CASE(AdditionQueueDescriptor_Validate_InputShapes)
         BOOST_CHECK_THROW(RefAdditionFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
     }
 
-    // Output size not compatible with input sizes
+    // Output size not compatible with input sizes.
     {
         input1TensorInfo = armnn::TensorInfo(4, shape1, armnn::DataType::Float32);
         input2TensorInfo = armnn::TensorInfo(4, shape1, armnn::DataType::Float32);
@@ -360,7 +360,7 @@ BOOST_AUTO_TEST_CASE(AdditionQueueDescriptor_Validate_InputShapes)
         AddInputToWorkload(invalidData, invalidInfo, input2TensorInfo, nullptr);
         AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
 
-        // output differs
+        // Output differs.
         BOOST_CHECK_THROW(RefAdditionFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
     }
 }
@@ -374,7 +374,7 @@ BOOST_AUTO_TEST_CASE(MultiplicationQueueDescriptor_Validate_InputTensorDimension
     constexpr unsigned int input0Shape[] = { 2, 2, 4, 4 };
     constexpr std::size_t dimensionCount = std::extent<decltype(input0Shape)>::value;
 
-    // Check dimension consistency for input tensors
+    // Checks dimension consistency for input tensors.
     for (unsigned int dimIndex = 0; dimIndex < dimensionCount; ++dimIndex)
     {
         unsigned int input1Shape[dimensionCount];
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE(MultiplicationQueueDescriptor_Validate_InputTensorDimension
         BOOST_CHECK_THROW(RefMultiplicationFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
     }
 
-    // Check dimension consistency for input and output tensors
+    // Checks dimension consistency for input and output tensors.
     for (unsigned int dimIndex = 0; dimIndex < dimensionCount; ++dimIndex)
     {
         unsigned int outputShape[dimensionCount];
@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE(ReshapeQueueDescriptor_Validate_MismatchingNumElements)
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
 
-    // The input and output shapes should have the same number of elements, but these don't
+    // The input and output shapes should have the same number of elements, but these don't.
     unsigned int inputShape[] = { 1, 1, 2, 3 };
     unsigned int outputShape[] = { 1, 1, 1, 2 };
 
@@ -443,8 +443,29 @@ BOOST_AUTO_TEST_CASE(ReshapeQueueDescriptor_Validate_MismatchingNumElements)
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
 
-    // InvalidArgumentException is expected, because the number of elements don't match
+    // InvalidArgumentException is expected, because the number of elements don't match.
     BOOST_CHECK_THROW(RefReshapeFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+}
+
+
+BOOST_AUTO_TEST_CASE(LstmQueueDescriptor_Validate)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[] = { 1, 2 };
+    unsigned int outputShape[] = { 1 };
+
+    inputTensorInfo = armnn::TensorInfo(2, inputShape, armnn::DataType::Float32);
+    outputTensorInfo = armnn::TensorInfo(1, outputShape, armnn::DataType::Float32);
+
+    LstmQueueDescriptor invalidData;
+    WorkloadInfo        invalidInfo;
+
+    AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
+    AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
+
+    BOOST_CHECK_THROW(invalidData.Validate(invalidInfo), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

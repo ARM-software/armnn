@@ -14,8 +14,15 @@ namespace armnn
 class RefBatchNormalizationFloat32Workload : public Float32Workload<BatchNormalizationQueueDescriptor>
 {
 public:
-    using Float32Workload<BatchNormalizationQueueDescriptor>::Float32Workload;
+    explicit RefBatchNormalizationFloat32Workload(const BatchNormalizationQueueDescriptor& descriptor,
+                                          const WorkloadInfo& info);
     virtual void Execute() const override;
+
+private:
+    std::unique_ptr<ScopedCpuTensorHandle> m_Mean;
+    std::unique_ptr<ScopedCpuTensorHandle> m_Variance;
+    std::unique_ptr<ScopedCpuTensorHandle> m_Beta;
+    std::unique_ptr<ScopedCpuTensorHandle> m_Gamma;
 };
 
 } //namespace armnn

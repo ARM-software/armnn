@@ -9,10 +9,10 @@
 
 namespace armnn
 {
-class ClConstantFloat32Workload : public ClBaseConstantWorkload<DataType::Float32>
+class ClConstantFloat32Workload : public ClBaseConstantWorkload<DataType::Float16, DataType::Float32>
 {
 public:
-    using ClBaseConstantWorkload<DataType::Float32>::ClBaseConstantWorkload;
+    using ClBaseConstantWorkload<DataType::Float16, DataType::Float32>::ClBaseConstantWorkload;
     void Execute() const override;
 };
 

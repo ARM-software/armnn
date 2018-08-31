@@ -30,12 +30,4 @@ void OutputHandler::CollectWorkloadOutputs(WorkloadDataCollector& dataCollector)
     dataCollector.Push(m_TensorHandle.get(), m_TensorInfo);
 }
 
-void OutputHandler::AllocateTensors()
-{
-    if (m_TensorHandle)
-    {
-        m_TensorHandle->Allocate();
-    }
-}
-
 } // namespace armnn

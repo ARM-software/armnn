@@ -24,10 +24,10 @@ arm_compute::Status ClPermuteWorkloadValidate(const PermuteDescriptor& descripto
     return arm_compute::Status{};
 }
 
-template <armnn::DataType DataType>
-ClPermuteWorkload<DataType>::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
+template <armnn::DataType... DataTypes>
+ClPermuteWorkload<DataTypes...>::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
                                                const WorkloadInfo& info)
-    : TypedWorkload<PermuteQueueDescriptor, DataType>(descriptor, info)
+    : TypedWorkload<PermuteQueueDescriptor, DataTypes...>(descriptor, info)
 {
     using armcomputetensorutils::BuildArmComputePermutationVector;
 
@@ -37,18 +37,18 @@ ClPermuteWorkload<DataType>::ClPermuteWorkload(const PermuteQueueDescriptor& des
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     const armnn::PermutationVector& mappings = m_Data.m_Parameters.m_DimMappings;
 
-    // Run the layer
+    // Run the layer.
     m_PermuteFunction.configure(&input, &output, BuildArmComputePermutationVector(mappings));
 }
 
-template <armnn::DataType DataType>
-void ClPermuteWorkload<DataType>::Execute() const
+template <armnn::DataType... DataTypes>
+void ClPermuteWorkload<DataTypes...>::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, GetName() + "_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL( GetName() + "_Execute");
     m_PermuteFunction.run();
 }
 
-template class ClPermuteWorkload<DataType::Float32>;
+template class ClPermuteWorkload<DataType::Float16, DataType::Float32>;
 template class ClPermuteWorkload<DataType::QuantisedAsymm8>;
 
 } // namespace armnn

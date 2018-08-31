@@ -32,19 +32,16 @@ L2NormalizationLayer* L2NormalizationLayer::Clone(Graph& graph) const
 
 void L2NormalizationLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
-                     "L2NormalizationLayer: InputSlot must be connected to an OutputSlot");
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
-                     "L2NormalizationLayer: TensorInfo must be set on connected OutputSlot.");
+    VerifyLayerConnections(1, CHECK_LOCATION());
 
-    IOutputSlot* input = GetInputSlot(0).GetConnection();
+    auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    // input and output shapes are the same
-    TensorShape const& outShape = input->GetTensorInfo().GetShape();
+    BOOST_ASSERT(inferredShapes.size() == 1);
+
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "L2NormalizationLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        outShape);
+        inferredShapes[0]);
 }
 
 } // namespace armnn

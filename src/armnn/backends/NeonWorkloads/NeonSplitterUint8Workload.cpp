@@ -10,7 +10,7 @@ namespace armnn
 
 void NeonSplitterUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonSplitterUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSplitterUint8Workload_Execute");
     NeonBaseSplitterWorkload::Execute();
 }
 

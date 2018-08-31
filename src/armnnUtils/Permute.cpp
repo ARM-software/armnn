@@ -107,7 +107,7 @@ void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector&
     PermuteLoop(dstShape, mappings).Unroll(src, dst);
 }
 
-// Instantiate for types
+// Instantiates for types.
 template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
                       const float* src, float* dst);
 template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,

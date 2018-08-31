@@ -3,7 +3,7 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "../InferenceTest.hpp"
-#include "../MobileNetDatabase.hpp"
+#include "../ImagePreprocessor.hpp"
 #include "armnnTfParser/ITfParser.hpp"
 
 int main(int argc, char* argv[])
@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
         std::vector<ImageSet> imageSet =
         {
             {"Dog.jpg", 209},
-            // top five predictions in tensorflow:
+            // Top five predictions in tensorflow:
             // -----------------------------------
             // 209:Labrador retriever 0.949995
             // 160:Rhodesian ridgeback 0.0270182
@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
             // 853:tennis ball 0.000470382
             // 239:Greater Swiss Mountain dog 0.000464451
             {"Cat.jpg", 283},
-            // top five predictions in tensorflow:
+            // Top five predictions in tensorflow:
             // -----------------------------------
             // 283:tiger cat 0.579016
             // 286:Egyptian cat 0.319676
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
             // 288:lynx, catamount 0.011163
             // 289:leopard, Panthera pardus 0.000856755
             {"shark.jpg", 3},
-            // top five predictions in tensorflow:
+            // Top five predictions in tensorflow:
             // -----------------------------------
             // 3:great white shark, white shark, ... 0.996926
             // 4:tiger shark, Galeocerdo cuvieri 0.00270528
@@ -42,11 +42,21 @@ int main(int argc, char* argv[])
 
         armnn::TensorShape inputTensorShape({ 1, 224, 224, 3  });
 
+        using DataType = float;
+        using DatabaseType = ImagePreprocessor<float>;
+        using ParserType = armnnTfParser::ITfParser;
+        using ModelType = InferenceModel<ParserType, DataType>;
+
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
-        retVal = armnn::test::ClassifierInferenceTestMain<MobileNetDatabase, armnnTfParser::ITfParser>(
-                     argc, argv, "mobilenet_v1_1.0_224_fp32.pb", true, "input", "output", { 0, 1, 2 },
-                     [&imageSet](const char* dataDir) {
-                         return MobileNetDatabase(
+        retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
+                     argc, argv,
+                     "mobilenet_v1_1.0_224_fp32.pb", // model name
+                     true,                           // model is binary
+                     "input", "output",              // input and output tensor names
+                     { 0, 1, 2 },                    // test images to test with as above
+                     [&imageSet](const char* dataDir, const ModelType&) {
+                         // This creates a 224x224x3 NHWC float tensor to pass to Armnn
+                         return DatabaseType(
                              dataDir,
                              224,
                              224,

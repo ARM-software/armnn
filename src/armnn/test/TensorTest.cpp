@@ -8,7 +8,7 @@
 namespace armnn
 {
 
-// Add unit test framework for interpreting TensorInfo type
+// Adds unit test framework for interpreting TensorInfo type.
 std::ostream& boost_test_print_type(std::ostream& ostr, const TensorInfo& right)
 {
     ostr << "TensorInfo[ "
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(TensorVsConstTensor)
     armnn::Tensor t(TensorInfo(), &mutableDatum);
     armnn::ConstTensor ct(TensorInfo(), &immutableDatum);
 
-    // Check that both Tensor and ConstTensor can be passed as a ConstTensor
+    // Checks that both Tensor and ConstTensor can be passed as a ConstTensor.
     CheckTensor(t);
     CheckTensor(ct);
 }
@@ -136,9 +136,9 @@ BOOST_AUTO_TEST_CASE(ModifyTensorInfo)
 BOOST_AUTO_TEST_CASE(TensorShapeOperatorBrackets)
 {
     TensorShape shape({0,1,2,3});
-    // Check version of operator[] which returns an unsigned int
+    // Checks version of operator[] which returns an unsigned int.
     BOOST_TEST(shape[2] == 2);
-    // Check the version of operator[] which returns a reference
+    // Checks the version of operator[] which returns a reference.
     shape[2] = 20;
     BOOST_TEST(shape[2] == 20);
 }

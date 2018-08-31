@@ -10,7 +10,7 @@
 namespace armnn
 {
 
-class ClFloorFloat32Workload : public Float32Workload<FloorQueueDescriptor>
+class ClFloorFloat32Workload : public FloatWorkload<FloorQueueDescriptor>
 {
 public:
     ClFloorFloat32Workload(const FloorQueueDescriptor& descriptor, const WorkloadInfo& info);

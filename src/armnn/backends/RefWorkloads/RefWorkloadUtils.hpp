@@ -9,6 +9,7 @@
 
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
+#include <Half.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 
@@ -68,6 +69,18 @@ template <typename PayloadType>
 float* GetOutputTensorDataFloat(unsigned int idx, const PayloadType& data)
 {
     return GetOutputTensorData<float>(idx, data);
+}
+
+template <typename PayloadType>
+const Half* GetInputTensorDataHalf(unsigned int idx, const PayloadType& data)
+{
+    return GetInputTensorData<Half>(idx, data);
+}
+
+template <typename PayloadType>
+Half* GetOutputTensorDataHalf(unsigned int idx, const PayloadType& data)
+{
+    return GetOutputTensorData<Half>(idx, data);
 }
 
 ////////////////////////////////////////////

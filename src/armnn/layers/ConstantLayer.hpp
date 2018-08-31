@@ -21,12 +21,18 @@ public:
 
     void ValidateTensorShapesFromInputs() override;
 
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
+
+    // Free up the constant source data
+    void ReleaseConstantData() override {};
+
+    std::unique_ptr<ScopedCpuTensorHandle> m_LayerOutput;
 protected:
-    ConstantLayer(const std::shared_ptr<ScopedCpuTensorHandle>& input, const char* name);
+    ConstantLayer(const char* name);
     ~ConstantLayer() = default;
 
-private:
-    std::shared_ptr<ScopedCpuTensorHandle> m_LayerOutput;
+    ConstantTensors GetConstantTensorsByRef() override { return {m_LayerOutput}; }
+
 };
 
 } // namespace

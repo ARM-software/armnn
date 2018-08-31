@@ -105,10 +105,10 @@ public:
                 {
                     for (Boost3dArray::index c = 0; c < numClasses; ++c)
                     {
-                        // Resolved confidence: Class probabilities * scales
+                        // Resolved confidence: class probabilities * scales.
                         const float confidence = classProbabilities[y][x][c] * scales[y][x][s];
 
-                        // Resolve bounding box and store
+                        // Resolves bounding box and stores.
                         YoloBoundingBox box;
                         box.m_X = boxes[y][x][s][0];
                         box.m_Y = boxes[y][x][s][1];
@@ -121,16 +121,16 @@ public:
             }
         }
 
-        // Sort detected objects by confidence
+        // Sorts detected objects by confidence.
         std::sort(detectedObjects.begin(), detectedObjects.end(),
             [](const YoloDetectedObject& a, const YoloDetectedObject& b)
             {
-                // Sort by largest confidence first, then by class
+                // Sorts by largest confidence first, then by class.
                 return a.m_Confidence > b.m_Confidence
                     || (a.m_Confidence == b.m_Confidence && a.m_Class > b.m_Class);
             });
 
-        // Check the top N detections
+        // Checks the top N detections.
         auto outputIt  = detectedObjects.begin();
         auto outputEnd = detectedObjects.end();
 
@@ -138,7 +138,7 @@ public:
         {
             if (outputIt == outputEnd)
             {
-                // Somehow expected more things to check than detections found by the model
+                // Somehow expected more things to check than detections found by the model.
                 return TestCaseResult::Abort;
             }
 

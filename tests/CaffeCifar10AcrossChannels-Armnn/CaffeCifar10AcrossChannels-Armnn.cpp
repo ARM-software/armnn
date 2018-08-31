@@ -11,11 +11,18 @@ int main(int argc, char* argv[])
     int retVal = EXIT_FAILURE;
     try
     {
+        using DataType = float;
+        using DatabaseType = Cifar10Database;
+        using ParserType = armnnCaffeParser::ICaffeParser;
+        using ModelType = InferenceModel<ParserType, DataType>;
+
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
-        retVal = armnn::test::ClassifierInferenceTestMain<Cifar10Database, armnnCaffeParser::ICaffeParser>(
+        retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
                     argc, argv, "cifar10_full_iter_60000.caffemodel", true, "data", "prob",
                     { 0, 1, 2, 4, 7 },
-                    [](const char* dataDir) { return Cifar10Database(dataDir); });
+                    [](const char* dataDir, const ModelType&) {
+                        return DatabaseType(dataDir);
+                    });
     }
     catch (const std::exception& e)
     {

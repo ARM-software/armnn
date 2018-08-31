@@ -18,6 +18,7 @@ public:
     ReshapeLayer* Clone(Graph& graph) const override;
 
     void ValidateTensorShapesFromInputs() override;
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
     bool IsEqual(const Layer& other) const
     {

@@ -14,13 +14,13 @@ BOOST_AUTO_TEST_SUITE(TensorflowParser)
 // Tests that a Const node in Tensorflow can be converted to a ConstLayer in armnn (as opposed to most
 // Const nodes which are used as weight inputs for convolutions etc. and are therefore not converted to
 // armnn ConstLayers).
-struct ConstantFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ConstantFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     ConstantFixture()
     {
-        // input = tf.placeholder(tf.float32, name = "input")
-        // const = tf.constant([17], tf.float32, [1])
-        // output = tf.add(input, const, name = "output")
+        // Input = tf.placeholder(tf.float32, name = "input")
+        // Const = tf.constant([17], tf.float32, [1])
+        // Output = tf.add(input, const, name = "output")
         m_Prototext =
             R"(
 node {
@@ -90,12 +90,12 @@ BOOST_FIXTURE_TEST_CASE(Constant, ConstantFixture)
 
 // Tests that a single Const node in Tensorflow can be used twice by a dependant node. This should result in only
 // a single armnn ConstLayer being created.
-struct ConstantReusedFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ConstantReusedFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     ConstantReusedFixture()
     {
-        // const = tf.constant([17], tf.float32, [1])
-        // output = tf.add(const, const, name = "output")
+        // Const = tf.constant([17], tf.float32, [1])
+        // Output = tf.add(const, const, name = "output")
         m_Prototext =
             R"(
 node {
@@ -145,7 +145,7 @@ BOOST_FIXTURE_TEST_CASE(ConstantReused, ConstantReusedFixture)
 }
 
 template <int ListSize>
-struct ConstantValueListFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ConstantValueListFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     ConstantValueListFixture()
     {
@@ -180,7 +180,7 @@ node {
             m_Prototext += std::string("float_val : ") + std::to_string(value) + "\n";
         }
 
-        m_Prototext += 
+        m_Prototext +=
             R"(
       }
     }
@@ -209,7 +209,7 @@ BOOST_FIXTURE_TEST_CASE(ConstantMaxValueList, ConstantMaxValueListFixture)
 }
 
 template <bool WithShape, bool WithContent, bool WithValueList>
-struct ConstantCreateFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ConstantCreateFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     ConstantCreateFixture()
     {

@@ -4,8 +4,8 @@
 //
 
 #include "ClDepthwiseConvolutionFloat32Workload.hpp"
-#include "ClDepthwiseConvolutionHelper.hpp"
-#include "backends/ClTensorHandle.hpp"
+
+#include "backends/ClWorkloadUtils.hpp"
 #include "backends/CpuTensorHandle.hpp"
 
 namespace armnn
@@ -14,17 +14,25 @@ namespace armnn
 ClDepthwiseConvolutionFloat32Workload::ClDepthwiseConvolutionFloat32Workload(
     const DepthwiseConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : Float32Workload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
+    : ClDepthwiseConvolutionBaseWorkload(descriptor, info)
 {
-    InitClDepthwiseConvolutionWorkload(*this);
+    InitializeArmComputeClTensorDataForFloatTypes(*m_KernelTensor, m_Data.m_Weight);
+
+    if (m_BiasTensor)
+    {
+        InitializeArmComputeClTensorDataForFloatTypes(*m_BiasTensor, m_Data.m_Bias);
+    }
+
+    m_DepthwiseConvolutionLayer->prepare();
+    FreeUnusedTensors();
 }
 
 void ClDepthwiseConvolutionFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClDepthwiseConvolutionFloat32Workload_Execute");
-    BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClDepthwiseConvolutionFloat32Workload_Execute");
+    BOOST_ASSERT(m_DepthwiseConvolutionLayer);
 
-    m_pDepthwiseConvolutionLayer->run();
+    m_DepthwiseConvolutionLayer->run();
 }
 
 } //namespace armnn

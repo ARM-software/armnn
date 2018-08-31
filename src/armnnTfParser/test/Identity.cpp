@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct IdentitySimpleFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct IdentitySimpleFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     IdentitySimpleFixture()
     {
@@ -51,7 +51,7 @@ BOOST_FIXTURE_TEST_CASE(IdentitySimple, IdentitySimpleFixture)
     RunTest<1>({ 1.0f, 2.0f, 3.0f, 4.0f }, { 1.0f, 2.0f, 3.0f, 4.0f });
 }
 
-struct IdentityFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct IdentityFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     IdentityFixture()
     {
@@ -105,7 +105,7 @@ BOOST_FIXTURE_TEST_CASE(ParseIdentity, IdentityFixture)
     RunTest<1>({ 1.0f, 2.0f, 3.0f, 4.0f }, { 2.0f, 4.0f, 6.0f, 8.0f });
 }
 
-struct IdentityChainFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct IdentityChainFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     IdentityChainFixture()
     {

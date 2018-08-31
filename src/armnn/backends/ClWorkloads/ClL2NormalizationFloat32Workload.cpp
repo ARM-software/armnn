@@ -12,9 +12,21 @@ namespace armnn
 {
 using namespace armcomputetensorutils;
 
+arm_compute::Status ClL2NormalizationWorkloadValidate(const TensorInfo& input,
+                                                      const TensorInfo& output)
+{
+    const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
+    const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
+
+    arm_compute::NormalizationLayerInfo normalizationInfo =
+            CreateAclNormalizationLayerInfoForL2Normalization(input);
+
+    return arm_compute::CLNormalizationLayer::validate(&aclInput, &aclOutput, normalizationInfo);
+}
+
 ClL2NormalizationFloat32Workload::ClL2NormalizationFloat32Workload(const L2NormalizationQueueDescriptor& descriptor,
                                                                    const WorkloadInfo& info)
-    : Float32Workload<L2NormalizationQueueDescriptor>(descriptor, info)
+    : FloatWorkload<L2NormalizationQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClL2NormalizationFloat32Workload", 1, 1);
 
@@ -25,7 +37,7 @@ ClL2NormalizationFloat32Workload::ClL2NormalizationFloat32Workload(const L2Norma
 
 void ClL2NormalizationFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClL2NormalizationFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClL2NormalizationFloat32Workload_Execute");
     m_Layer.run();
 }
 

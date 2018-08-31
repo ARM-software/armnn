@@ -22,9 +22,10 @@ enum class Status
 
 enum class DataType
 {
-    Float32   = 0,
-    QuantisedAsymm8 = 1,
-    Signed32  = 2
+    Float16 = 0,
+    Float32   = 1,
+    QuantisedAsymm8 = 2,
+    Signed32  = 3
 };
 
 enum class ActivationFunction
@@ -33,7 +34,7 @@ enum class ActivationFunction
     TanH        = 1,
     Linear      = 2,
     ReLu        = 3,
-    BoundedReLu = 4, //< min(a, max(b, input))
+    BoundedReLu = 4, ///< min(a, max(b, input))
     SoftReLu    = 5,
     LeakyReLu   = 6,
     Abs         = 7,
@@ -51,16 +52,18 @@ enum class PoolingAlgorithm
 ///
 /// The padding method modifies the output of pooling layers.
 /// In both supported methods, the values are ignored (they are
-/// not even zeros which would make a difference for max pooling
+/// not even zeroes, which would make a difference for max pooling
 /// a tensor with negative values). The difference between
-/// IgnoreValue and Exclude is that the former count the padding
+/// IgnoreValue and Exclude is that the former counts the padding
 /// fields in the divisor of Average and L2 pooling, while
 /// Exclude does not.
 ///
 enum class PaddingMethod
 {
-    IgnoreValue = 0, // The padding fields count, but ignored
-    Exclude     = 1  // The padding fields don't count and ignored
+    /// The padding fields count, but are ignored
+    IgnoreValue = 0, 
+    /// The padding fields don't count and are ignored
+    Exclude     = 1  
 };
 
 enum class NormalizationAlgorithmChannel
@@ -71,8 +74,10 @@ enum class NormalizationAlgorithmChannel
 
 enum class NormalizationAlgorithmMethod
 {
-    LocalBrightness = 0, /* Krichevsky 2012: Local Brightness Normalization */
-    LocalContrast = 1  /* Jarret 2009: Local Contrast Normalization       */
+    /// Krichevsky 2012: Local Brightness Normalization 
+    LocalBrightness = 0, 
+    /// Jarret 2009: Local Contrast Normalization       
+    LocalContrast = 1
 };
 
 enum class OutputShapeRounding
@@ -83,15 +88,20 @@ enum class OutputShapeRounding
 
 enum class Compute
 {
-    CpuRef      = 0,  // CPU Execution: Reference C++ kernels
-    CpuAcc      = 1,  // CPU Execution: NEON: ArmCompute
-    GpuAcc      = 2,  // GPU Execution: OpenCL: ArmCompute
+    /// CPU Execution: Reference C++ kernels
+    CpuRef      = 0,  
+    /// CPU Execution: NEON: ArmCompute
+    CpuAcc      = 1,  
+    /// GPU Execution: OpenCL: ArmCompute
+    GpuAcc      = 2, 
     Undefined   = 5
 };
 
-struct DeviceSpec
+class IDeviceSpec
 {
-    Compute DefaultComputeDevice;
+protected:
+    IDeviceSpec() {};
+    virtual ~IDeviceSpec() {};
 };
 
 /// Type of identifiers for bindable layers (inputs, outputs).
@@ -105,10 +115,10 @@ public:
     using ArrayType = std::array<ValueType, MaxNumOfTensorDimensions>;
     using ConstIterator = typename ArrayType::const_iterator;
 
-    /// @param dimMappings Indicates how to translate tensor elements from a given source into the target destination,
+    /// @param dimMappings - Indicates how to translate tensor elements from a given source into the target destination,
     /// when source and target potentially have different memory layouts.
     ///
-    /// E.g. For a 4-d tensor laid out in memory with format (Batch Element, Height, Width, Channels),
+    /// E.g. For a 4-d tensor laid out in a memory with the format (Batch Element, Height, Width, Channels),
     /// which is to be passed as an input to ArmNN, each source dimension is mapped to the corresponding
     /// ArmNN dimension. The Batch dimension remains the same (0 -> 0). The source Height dimension is mapped
     /// to the location of the ArmNN Height dimension (1 -> 2). Similar arguments are made for the Width and
@@ -152,7 +162,7 @@ private:
     SizeType m_NumDimMappings;
 };
 
-// Define LayerGuid type.
+/// Define LayerGuid type.
 using LayerGuid = unsigned int;
 
 }

@@ -19,7 +19,7 @@ public:
     ScopedLeakChecker(const std::string & name);
     ~ScopedLeakChecker();
 
-    // forwarding these to Google Performance Tools
+    // Forwarding these to Google Performance Tools.
     static bool IsActive();
     bool NoLeaks();
     // Note that the following two functions only work after
@@ -29,12 +29,12 @@ public:
     ssize_t ObjectsLeaked() const;
 
 private:
-    // hide imlementation so we don't litter other's namespaces
-    // with heap checker related stuff
+    // Hides imlementation so we don't litter other's namespaces
+    // with heap checker related stuff.
     struct Impl;
     std::unique_ptr<Impl> m_Impl;
 
-    // No default construction and copying
+    // No default construction and copying.
     ScopedLeakChecker() = delete;
     ScopedLeakChecker(const ScopedLeakChecker &) = delete;
     ScopedLeakChecker & operator=(const ScopedLeakChecker &) = delete;
@@ -47,15 +47,18 @@ public:
     ~ScopedDisableLeakChecking();
 
 private:
-    // hide imlementation so we don't litter other's namespaces
-    // with heap checker related stuff
+    // Hides imlementation so we don't litter other's namespaces
+    // with heap checker related stuff.
     struct Impl;
     std::unique_ptr<Impl> m_Impl;
 
-    // No copying
+    // No copying.
     ScopedDisableLeakChecking(const ScopedDisableLeakChecking &) = delete;
     ScopedDisableLeakChecking & operator=(const ScopedDisableLeakChecking &) = delete;
 };
+
+// disable global leak checks starting from 'main'
+void LocalLeakCheckingOnly();
 
 } // namespace armnnUtils
 
@@ -77,6 +80,9 @@ private:
 #define ARMNN_DISABLE_LEAK_CHECKING_IN_SCOPE() \
     armnnUtils::ScopedDisableLeakChecking __disable_leak_checking_in_scope__
 
+#define ARMNN_LOCAL_LEAK_CHECKING_ONLY() \
+    armnnUtils::LocalLeakCheckingOnly()
+
 #else // ARMNN_LEAK_CHECKING_ENABLED
 
 #define ARMNN_SCOPED_LEAK_CHECKER(TAG)
@@ -85,5 +91,6 @@ private:
 #define ARMNN_BYTES_LEAKED_IN_SCOPE() 0
 #define ARMNN_OBJECTS_LEAKED_IN_SCOPE() 0
 #define ARMNN_DISABLE_LEAK_CHECKING_IN_SCOPE()
+#define ARMNN_LOCAL_LEAK_CHECKING_ONLY()
 
 #endif // ARMNN_LEAK_CHECKING_ENABLED

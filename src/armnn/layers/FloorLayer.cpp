@@ -32,18 +32,16 @@ FloorLayer* FloorLayer::Clone(Graph& graph) const
 
 void FloorLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
-                     "FloorLayer: InputSlot must be connected to an OutputSlot");
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
-                     "FloorLayer: TensorInfo must be set on connected OutputSlot.");
+    VerifyLayerConnections(1, CHECK_LOCATION());
 
-    // input and output shapes are the same
-    IOutputSlot* input = GetInputSlot(0).GetConnection();
-    TensorShape const& outShape = input->GetTensorInfo().GetShape();
+    auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
+
+    BOOST_ASSERT(inferredShapes.size() == 1);
+
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "FloorLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        outShape);
+        inferredShapes[0]);
 }
 
 } // namespace armnn

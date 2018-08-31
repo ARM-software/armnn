@@ -16,20 +16,20 @@
 namespace armnn
 {
 
-// Helper function to copy a full string to a truncated version
+/// Helper function to copy a full string to a truncated version.
 void CopyErrorMessage(char* truncatedString, const char* fullString, size_t maxLength)
 {
     if(truncatedString != nullptr)
     {
         size_t copyLength = std::min(maxLength, strlen(fullString));
         std::strncpy(truncatedString, fullString, copyLength);
-        // Ensure null-terminated string
+        // Ensure null-terminated string.
         truncatedString[copyLength] = '\0';
     }
 }
 
 // Helper macro to avoid code duplication.
-// Forwards function func to funcRef, funcNeon or funcCl, depending on the value of compute
+// Forwards function func to funcRef, funcNeon or funcCl, depending on the value of compute.
 #define FORWARD_LAYER_SUPPORT_FUNC(compute, func, ...) \
     std::string reasonIfUnsupportedFull; \
     bool isSupported; \
@@ -58,11 +58,12 @@ bool CheckTensorDataTypesEqual(const TensorInfo& input0, const TensorInfo& input
 
 bool IsActivationSupported(Compute compute,
                            const TensorInfo& input,
+                           const TensorInfo& output,
                            const ActivationDescriptor& descriptor,
                            char* reasonIfUnsupported,
                            size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(compute, IsActivationSupported, input, descriptor);
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsActivationSupported, input, output, descriptor);
 }
 
 bool IsAdditionSupported(Compute compute,
@@ -82,11 +83,24 @@ bool IsAdditionSupported(Compute compute,
 
 bool IsBatchNormalizationSupported(Compute compute,
                                    const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const TensorInfo& mean,
+                                   const TensorInfo& var,
+                                   const TensorInfo& beta,
+                                   const TensorInfo& gamma,
                                    const BatchNormalizationDescriptor& descriptor,
                                    char* reasonIfUnsupported,
                                    size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(compute, IsBatchNormalizationSupported, input, descriptor);
+    FORWARD_LAYER_SUPPORT_FUNC(compute,
+                               IsBatchNormalizationSupported,
+                               input,
+                               output,
+                               mean,
+                               var,
+                               beta,
+                               gamma,
+                               descriptor);
 }
 
 bool IsConstantSupported(Compute compute,
@@ -95,6 +109,24 @@ bool IsConstantSupported(Compute compute,
                          size_t reasonIfUnsupportedMaxLength)
 {
     FORWARD_LAYER_SUPPORT_FUNC(compute, IsConstantSupported, output);
+}
+
+bool IsConvertFp16ToFp32Supported(Compute compute,
+                                  const TensorInfo& input,
+                                  const TensorInfo& output,
+                                  char* reasonIfUnsupported,
+                                  size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsConvertFp16ToFp32Supported, input, output);
+}
+
+bool IsConvertFp32ToFp16Supported(Compute compute,
+                                  const TensorInfo& input,
+                                  const TensorInfo& output,
+                                  char* reasonIfUnsupported,
+                                  size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsConvertFp32ToFp16Supported, input, output);
 }
 
 bool IsConvolution2dSupported(Compute compute,
@@ -111,12 +143,14 @@ bool IsConvolution2dSupported(Compute compute,
 
 bool IsDepthwiseConvolutionSupported(Compute compute,
                                      const TensorInfo& input,
+                                     const TensorInfo& output,
                                      const DepthwiseConvolution2dDescriptor& descriptor,
                                      const TensorInfo& weights,
+                                     const TensorInfo& biases,
                                      char* reasonIfUnsupported,
                                      size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(compute, IsDepthwiseConvolutionSupported, input, descriptor, weights);
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsDepthwiseConvolutionSupported, input, output, descriptor, weights, biases);
 }
 
 bool IsInputSupported(Compute compute,
@@ -129,21 +163,51 @@ bool IsInputSupported(Compute compute,
 
 bool IsFullyConnectedSupported(Compute compute,
                                const TensorInfo& input,
+                               const TensorInfo& output,
+                               const TensorInfo& weights,
+                               const TensorInfo& biases,
                                const FullyConnectedDescriptor& descriptor,
                                char* reasonIfUnsupported,
                                size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(compute, IsFullyConnectedSupported, input, descriptor);
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsFullyConnectedSupported, input, output, weights, biases, descriptor);
 }
 
 bool IsL2NormalizationSupported(Compute compute,
                                 const TensorInfo& input,
+                                const TensorInfo& output,
                                 char* reasonIfUnsupported,
                                 size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(compute, IsL2NormalizationSupported, input);
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsL2NormalizationSupported, input, output);
 }
 
+bool IsLstmSupported(Compute compute, const TensorInfo& input, const TensorInfo& outputStateIn,
+                     const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
+                     const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
+                     const TensorInfo& output, const LstmDescriptor& descriptor,
+                     const TensorInfo& inputToForgetWeights, const TensorInfo& inputToCellWeights,
+                     const TensorInfo& inputToOutputWeights, const TensorInfo& recurrentToForgetWeights,
+                     const TensorInfo& recurrentToCellWeights, const TensorInfo& recurrentToOutputWeights,
+                     const TensorInfo& forgetGateBias, const TensorInfo& cellBias,
+                     const TensorInfo& outputGateBias, const TensorInfo* inputToInputWeights,
+                     const TensorInfo* recurrentToInputWeights, const TensorInfo* cellToInputWeights,
+                     const TensorInfo* inputGateBias, const TensorInfo* projectionWeights,
+                     const TensorInfo* projectionBias, const TensorInfo* cellToForgetWeights,
+                     const TensorInfo* cellToOutputWeights, char* reasonIfUnsupported,
+                     size_t reasonIfUnsupportedMaxLength)
+
+{
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsLstmSupported, input, outputStateIn, cellStateIn,
+                               scratchBuffer, outputStateOut, cellStateOut,
+                               output, descriptor, inputToForgetWeights, inputToCellWeights,
+                               inputToOutputWeights, recurrentToForgetWeights,
+                               recurrentToCellWeights, recurrentToOutputWeights,
+                               forgetGateBias, cellBias, outputGateBias,
+                               inputToInputWeights, recurrentToInputWeights,
+                               cellToInputWeights, inputGateBias, projectionWeights,
+                               projectionBias, cellToForgetWeights, cellToOutputWeights);
+}
 bool IsMergerSupported(Compute compute,
                        std::vector<const TensorInfo*> inputs,
                        const OriginsDescriptor& descriptor,
@@ -157,10 +221,11 @@ bool IsMergerSupported(Compute compute,
 bool IsMultiplicationSupported(Compute compute,
                                const TensorInfo& input0,
                                const TensorInfo& input1,
+                               const TensorInfo& output,
                                char* reasonIfUnsupported,
                                size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(compute, IsMultiplicationSupported, input0, input1);
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsMultiplicationSupported, input0, input1, output);
 }
 
 bool IsNormalizationSupported(Compute compute,
@@ -211,11 +276,12 @@ bool IsResizeBilinearSupported(Compute compute,
 
 bool IsSoftmaxSupported(Compute compute,
                         const TensorInfo& input,
+                        const TensorInfo& output,
                         const SoftmaxDescriptor& descriptor,
                         char* reasonIfUnsupported,
                         size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(compute, IsSoftmaxSupported, input, descriptor);
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsSoftmaxSupported, input, output, descriptor);
 }
 
 bool IsSplitterSupported(Compute compute,
@@ -250,7 +316,7 @@ bool IsFloorSupported(Compute compute,
                       char* reasonIfUnsupported,
                       size_t reasonIfUnsupportedMaxLength)
 {
-    // By definition (that is, regardless of compute device), shapes and data type must match
+    // By definition (that is, regardless of compute device), shapes and data type must match.
     if (input.GetShape() != output.GetShape() || input.GetDataType() != output.GetDataType())
     {
         return false;

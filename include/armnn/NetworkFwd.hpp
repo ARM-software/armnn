@@ -6,6 +6,7 @@
 
 namespace armnn
 {
+struct LstmInputParams;
 class INetwork;
 class IOptimizedNetwork;
 class Graph;

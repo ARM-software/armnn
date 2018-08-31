@@ -12,6 +12,7 @@
 
 #include <GraphTopologicalSort.hpp>
 #include <Permute.hpp>
+#include <VerificationHelpers.hpp>
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
@@ -47,13 +48,13 @@ const PermutationVector ArmNNToNHWC = { 0, 3, 1, 2 };
 IConnectableLayer* AddSwizzleLayer(INetwork& network, IOutputSlot& input, const PermutationVector& mapping,
     const std::string& name)
 {
-    // Add swizzle layer
+    // Adds swizzle layer.
     IConnectableLayer* const layer = network.AddPermuteLayer(mapping, name.c_str());
 
-    // Connect intput to swizzle layer
+    // Connects intput to swizzle layer.
     input.Connect(layer->GetInputSlot(0));
 
-    // Setup swizzled output
+    // Sets up swizzled output.
     const TensorInfo outInfo = armnnUtils::Permuted(input.GetTensorInfo(), mapping);
     layer->GetOutputSlot(0).SetTensorInfo(outInfo);
 
@@ -63,13 +64,13 @@ IConnectableLayer* AddSwizzleLayer(INetwork& network, IOutputSlot& input, const 
 IConnectableLayer* SwizzleInDeswizzleOut(INetwork& network, IOutputSlot& input, IConnectableLayer& layer,
     const std::string& name)
 {
-    // Add swizzle layer
+    // Adds swizzle layer.
     IConnectableLayer* const swizzleLayer = AddSwizzleLayer(network, input, NHWCToArmNN, "swizzle_for-" + name);
 
-    // Connect swizzledInput to layer
+    // Connects swizzledInput to layer.
     swizzleLayer->GetOutputSlot(0).Connect(layer.GetInputSlot(0));
 
-    // Add deswizzle layer
+    // Adds deswizzle layer.
     IConnectableLayer* const deswizzleLayer = AddSwizzleLayer(network, layer.GetOutputSlot(0), ArmNNToNHWC,
         "deswizzle_for-" + name);
 
@@ -92,19 +93,27 @@ void ReadMandatoryNodeAttributeImpl(const tensorflow::NodeDef& nodeDef,
         }
         else
         {
-            throw ParseException(boost::str(boost::format(
-                "Attribute %1% of node %2% expected to have %3% as tensorflow::AttrValue::ValueCase, "
-                "but found %4% instead")
-                % attribName
-                % nodeDef.name()
-                % static_cast<int>(expectedValueCase)
-                % static_cast<int>(attrValue.value_case())));
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "Attribute %1% of node %2% expected to have %3% as tensorflow::AttrValue::ValueCase, "
+                        "but found %4% instead %5%")
+                        % attribName
+                        % nodeDef.name()
+                        % static_cast<int>(expectedValueCase)
+                        % static_cast<int>(attrValue.value_case())
+                        % CHECK_LOCATION().AsString()));
         }
     }
     else
     {
-        throw ParseException(boost::str(boost::format("Could not find required attribute %1% in node %2%")
-            % attribName % nodeDef.name()));
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Could not find required attribute %1% in node %2% %3%")
+                    % attribName
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 }
 
@@ -124,13 +133,16 @@ void ReadOptionalNodeAttributeImpl(const tensorflow::NodeDef& nodeDef,
         }
         else
         {
-            throw ParseException(boost::str(boost::format(
-                "Attribute %1% of node %2% expected to have %3% as tensorflow::AttrValue::ValueCase, "
-                "but found %4% instead")
-                % attribName
-                % nodeDef.name()
-                % static_cast<int>(expectedValueCase)
-                % static_cast<int>(attrValue.value_case())));
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "Attribute %1% of node %2% expected to have %3% as tensorflow::AttrValue::ValueCase, "
+                        "but found %4% instead %5%")
+                        % attribName
+                        % nodeDef.name()
+                        % static_cast<int>(expectedValueCase)
+                        % static_cast<int>(attrValue.value_case())
+                        % CHECK_LOCATION().AsString()));
         }
     }
 }
@@ -233,11 +245,16 @@ TensorInfo PrepareReshape(const TensorInfo& input, const std::vector<int32_t>& t
     {
         if (std::find(std::next(stretchDim), targetDims.end(), -1) != targetDims.end())
         {
-            throw ParseException("At most one component of shape can be -1");
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "At most one component of shape can be -1 %1%")
+                        % CHECK_LOCATION().AsString()));
         }
 
-        auto targetNumElements = boost::numeric_cast<unsigned int>(std::accumulate(targetDims.begin(), targetDims.end(),
-            -1, std::multiplies<int32_t>()));
+        auto targetNumElements =
+            boost::numeric_cast<unsigned int>(
+                std::accumulate(targetDims.begin(), targetDims.end(), -1, std::multiplies<int32_t>()));
         auto stretchIndex = static_cast<size_t>(std::distance(targetDims.begin(), stretchDim));
         outDims[stretchIndex] = input.GetNumElements() / targetNumElements;
     }
@@ -248,7 +265,7 @@ TensorInfo PrepareReshape(const TensorInfo& input, const std::vector<int32_t>& t
     return reshapeInfo;
 }
 
-// We need the input0Slot to guide the reshape for input1Slot
+// We need the input0Slot to guide the reshape for input1Slot.
 IOutputSlot* BroadcastForAddandMul(IOutputSlot* input0Slot, IOutputSlot* input1Slot, bool isNHWC, INetwork& m_Network,
                                    const tensorflow::NodeDef& nodeDef)
 {
@@ -284,12 +301,43 @@ OutputId ParseOutputId(const std::string & name)
         int n = std::stoi(name.substr(colonPos+1));
         if (n<0 || n>100)
         {
-            throw ParseException("Output tensor id is out of range for "+name);
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "Output tensor id is out of range for %1% %2%")
+                        % name
+                        % CHECK_LOCATION().AsString()));
         }
         outputNum = static_cast<unsigned int>(n);
     }
     return OutputId(name.substr(0,colonPos),outputNum);
 }
+
+#define CHECK_DATA_FORMAT(NODE_DEF, FORMAT, NODE_TYPE) \
+    if( FORMAT != "NHWC" && FORMAT != "NCHW" ) \
+    { \
+        throw ParseException( \
+            boost::str( \
+                boost::format( \
+                    "Unsupported data format %1% passed for %2% node %3%. " \
+                    "Only NHWC and NCHW supported %4%") \
+                    % FORMAT \
+                    % NODE_TYPE \
+                    % NODE_DEF.name() \
+                    % CHECK_LOCATION().AsString())); \
+    }
+
+#define CHECK_PADDING_TYPE(NODE_DEF, PADDING) \
+    if(PADDING != "SAME" && PADDING != "VALID" ) \
+    { \
+        throw ParseException( \
+            boost::str( \
+                boost::format( \
+                    "Only 'SAME' and 'VALID' padding supported. Got %1% for %2% %3%") \
+                    % PADDING \
+                    % NODE_DEF.name() \
+                    % CHECK_LOCATION().AsString())); \
+    } \
 
 } // namespace
 
@@ -318,6 +366,7 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "Tanh",                  &TfParser::ParseTanh },
     { "MaxPool",               &TfParser::ParseMaxPool },
     { "AvgPool",               &TfParser::ParseAvgPool },
+    { "Maximum",               &TfParser::ParseMaximum },
 };
 
 ITfParser* ITfParser::CreateRaw()
@@ -402,13 +451,18 @@ public:
     IOutputSlot& ResolveArmnnOutputSlot(unsigned int tfOutputIndex) override
     {
         BOOST_ASSERT(m_Layer);
-        // Assume one-to-one mapping between Tf and armnn output slots.
+        // Assumes one-to-one mapping between Tf and armnn output slots.
         unsigned int armnnOutputSlotIdx = tfOutputIndex;
         if (armnnOutputSlotIdx >= m_Layer->GetNumOutputSlots())
         {
             throw ParseException(
-                boost::str(boost::format("The requested output slot #%1% "
-                    "for %2% does not exist") % armnnOutputSlotIdx % m_Layer->GetName()));
+                boost::str(
+                    boost::format(
+                        "The requested output slot #%1% "
+                        "for %2% does not exist %3%")
+                        % armnnOutputSlotIdx
+                        % m_Layer->GetName()
+                        % CHECK_LOCATION().AsString()));
         }
         return m_Layer->GetOutputSlot(armnnOutputSlotIdx);
     }
@@ -417,7 +471,7 @@ protected:
     IConnectableLayer* m_Layer;
 };
 
-/// A SingleLayerParsedTfOperation for deferred layer creation
+/// A SingleLayerParsedTfOperation for deferred layer creation.
 class DeferredSingleLayerParsedTfOperation : public SingleLayerParsedTfOperation
 {
 public:
@@ -455,7 +509,13 @@ const tensorflow::NodeDef* TfParser::ResolveIdentityNode(const tensorflow::NodeD
 
     if (nodeDef->input_size() != 1)
     {
-        throw ParseException("Identity node does not have correct amount of inputs!");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Identity node should have a single input! %1% has %2% inputs %3%")
+                    % nodeDef->name()
+                    % nodeDef->input_size()
+                    % CHECK_LOCATION().AsString()));
     }
 
     auto it = m_NodesByName.find(nodeDef->input(0));
@@ -466,7 +526,12 @@ const tensorflow::NodeDef* TfParser::ResolveIdentityNode(const tensorflow::NodeD
     }
     else
     {
-        throw ParseException("Cannot find what the Identity node is linked to!");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Cannot find what the Identity node %1% is linked to! %2%")
+                    % nodeDef->name()
+                    % CHECK_LOCATION().AsString()));
     }
 }
 
@@ -489,15 +554,25 @@ TfParser::GetTfInputNodes(const tensorflow::NodeDef& nodeDef) const
         if (nodeDef.input(j)[0] == '^') // I couldn't find a better test for control inputs.
         {
             throw ParseException(
-                "Node '" + nodeDef.name() + "' has Control Input '" + nodeDef.input(j) + "' which is unsupported.");
+                boost::str(
+                    boost::format(
+                        "Node '%1%' has Control Input '%2%' for input #%3% which is unsupported. %4%")
+                        % nodeDef.name()
+                        % nodeDef.input(j)
+                        % j
+                        % CHECK_LOCATION().AsString()));
         }
 
         auto inputIt = m_NodesByName.find(outputId.m_IndexedValue);
         if (inputIt == m_NodesByName.end())
         {
             throw ParseException(
-                "Can't find node '" + nodeDef.input(j) +
-                "', which is listed as an input of '" + nodeDef.name() + "'");
+                boost::str(
+                    boost::format(
+                        "Can't find node '%1%', which is listed as an input of '%2%' %3%")
+                        % nodeDef.input(j)
+                        % nodeDef.name()
+                        % CHECK_LOCATION().AsString()));
         }
         ret.push_back(OutputOfConstNodeDef(inputIt->second,outputId.m_Index));
     }
@@ -509,22 +584,33 @@ std::vector<OutputOfParsedTfOperation>
 TfParser::GetInputParsedTfOperationsChecked(const tensorflow::NodeDef& nodeDef,
                                             std::size_t expectedNumInputs)
 {
-    // Fetch the tensorflow nodes connected as inputs and validate the size.
+    // Fetches the tensorflow nodes connected as inputs and validate the size.
     std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
     const std::size_t numInputs = nodes.size();
     if (numInputs != expectedNumInputs)
     {
-        throw ParseException(boost::str(boost::format("Unexpected number of inputs for node %1%. "
-            "Expected %2%, found %3%") % nodeDef.name() % expectedNumInputs % numInputs));
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Unexpected number of inputs for node %1%. Expected %2%, found %3% %4%")
+                    % nodeDef.name()
+                    % expectedNumInputs
+                    % numInputs
+                    % CHECK_LOCATION().AsString()));
     }
-    // Fetch the corresponding ParsedTfOperation operations
+    // Fetches the corresponding ParsedTfOperation operations
     std::vector<OutputOfParsedTfOperation> result;
     for (auto&& node : nodes)
     {
         auto it = m_ParsedTfOperations.find(node.m_IndexedValue->name());
         if (it == m_ParsedTfOperations.end())
         {
-            throw ParseException("Node with name '" + node.m_IndexedValue->name() + "' has not been parsed");
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "Node with name '%1%' has not been parsed %2%")
+                        % node.m_IndexedValue->name()
+                        % CHECK_LOCATION().AsString()));
         }
         ParsedTfOperation* parsedOp = it->second.get();
         // Transparently 'skip' any Identity operations. This simplifies the logic inside the ParseXXX() functions.
@@ -538,7 +624,8 @@ ParsedTfOperationPtr TfParser::ParseAdd(const tensorflow::NodeDef& nodeDef, cons
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
-    // If one of the inputs is a MatMul and the other is a const, then we handle both nodes together as FullyConnected
+    // If one of the inputs is a MatMul and the other is a const, then we handle both nodes
+    // together as FullyConnected.
     if (inputs[0].m_IndexedValue->GetNode().op() == "MatMul" &&
         HasParsedConstTensor<float>(inputs[1].m_IndexedValue->GetNode().name()))
     {
@@ -557,7 +644,7 @@ ParsedTfOperationPtr TfParser::ParseAdd(const tensorflow::NodeDef& nodeDef, cons
     }
     else
     {
-        // Otherwise it's just a regular addition
+        // Otherwise it's just a regular addition.
         return AddAdditionLayer(nodeDef);
     }
 }
@@ -625,8 +712,8 @@ public:
     ConstTensor GetConstTensor(bool swizzleForConvolutionWeights, std::vector<T>& outputTensorData) const
     {
         // Mappings from TensorFlow filter tensors to the ArmNN filter tensors.
-        // Tensorflow weights are [H, W, In, Out]
-        // ArmNN weights are [Out, In, H, W]
+        // Tensorflow weights are [H, W, In, Out].
+        // ArmNN weights are [Out, In, H, W].
         static const PermutationVector HWIOToOIHW = {2, 3, 1, 0};
 
         const TensorInfo outInfo = swizzleForConvolutionWeights
@@ -635,7 +722,7 @@ public:
 
         outputTensorData.resize(m_TensorInfo.GetNumElements());
 
-        // Copy or swizzle from the permanent storage into the storage the caller provided.
+        // Copies or swizzles from the permanent storage into the storage the caller provided.
         if (swizzleForConvolutionWeights)
         {
             armnnUtils::Permute(outInfo.GetShape(), HWIOToOIHW, m_Storage.data(), outputTensorData.data());
@@ -644,7 +731,7 @@ public:
         {
             memcpy(outputTensorData.data(), m_Storage.data(), m_TensorInfo.GetNumBytes());
         }
-        // Update the result to point to the user provided storage
+        // Updates the result to point to the user provided storage.
         ConstTensor constTensor(outInfo, outputTensorData);
         return constTensor;
     }
@@ -656,7 +743,8 @@ private:
     TensorInfo m_TensorInfo;
 };
 
-DataType ConvertTfTensorDataType(const tensorflow::DataType tfDataType)
+DataType ConvertTfTensorDataType(const tensorflow::DataType tfDataType,
+                                 const tensorflow::NodeDef& nodeDef)
 {
     switch (tfDataType)
     {
@@ -667,9 +755,13 @@ DataType ConvertTfTensorDataType(const tensorflow::DataType tfDataType)
         return DataType::Signed32;
         break;
     default:
-        throw ParseException(boost::str(
-            boost::format("Unknown DataType %1% for node")
-            % tensorflow::DataType_Name(tfDataType)));
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Unknown DataType %1% for node %2% %3%")
+                    % tensorflow::DataType_Name(tfDataType)
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 }
 
@@ -685,30 +777,30 @@ struct ParseTfTensorValueList
     static void ReadData(const void* srcData, unsigned int numSrcElements,
         std::vector<int8_t>& dstData, unsigned int numDstElements)
     {
-        // If there are no entries in the list, perform no action
+        // If there are no entries in the list, perform no action.
         if (numSrcElements == 0)
         {
             return;
         }
 
-        // If no size was provided, use the length of the value list
+        // If no size was provided, use the length of the value list.
         if (numDstElements == 0)
         {
             numDstElements = numSrcElements;
         }
 
-        // Allocate memory
+        // Allocates memory.
         dstData.resize(std::max(numSrcElements, numDstElements) * sizeof(DataType));
 
         const DataType* srcTensor = reinterpret_cast<const DataType*>(srcData);
         DataType* dstTensor = reinterpret_cast<DataType*>(dstData.data());
 
-        // Copy the value list entries into the destination
+        // Copies the value list entries into the destination.
         std::copy(srcTensor, srcTensor + numSrcElements, dstTensor);
 
         if (numDstElements > numSrcElements)
         {
-            // Use the last element in the list to fill the remaining entries
+            // Uses the last element in the list to fill the remaining entries.
             std::fill(dstTensor + numSrcElements, dstTensor + numDstElements, srcTensor[numSrcElements - 1]);
         }
     }
@@ -792,9 +884,12 @@ ParsedTfOperationPtr TfParser::ParseConst(const tensorflow::NodeDef& nodeDef, co
 
     if (nodeDef.attr().count("value") == 0)
     {
-        throw ParseException(boost::str(
-            boost::format("Value not found for Const node - %1%")
-            % nodeDef.name()));
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Value not found for Const node - %1% %2%")
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
     const tensorflow::TensorProto& tfTensor = nodeDef.attr().at("value").tensor();
@@ -807,8 +902,8 @@ ParsedTfOperationPtr TfParser::ParseConst(const tensorflow::NodeDef& nodeDef, co
     std::transform(tfTensorShape.dim().begin(), tfTensorShape.dim().end(),
         std::back_inserter(dimensionSizes), GetDimensionSize);
 
-    // Calculate number of elements
-    const DataType dataType = ConvertTfTensorDataType(tfDataType);
+    // Calculates number of elements.
+    const DataType dataType = ConvertTfTensorDataType(tfDataType, nodeDef);
     unsigned int numElements = 0U;
 
     if (!dimensionSizes.empty())
@@ -819,53 +914,65 @@ ParsedTfOperationPtr TfParser::ParseConst(const tensorflow::NodeDef& nodeDef, co
 
     std::vector<int8_t> tensorData;
 
-    // Get tensor data from the list of values attribute
+    // Get tensor data from the list of values attribute.
     if (tfTensor.tensor_content().empty())
     {
         InvokeParseFunction<ParseTfTensorValueList>::Result<void>(dataType, tfTensor, numElements, tensorData);
 
         // If the tensor shape is not defined, but there is a value list, then interpret the data as a 1D
-        // tensor of the provided number of elements
+        // tensor of the provided number of elements.
         if (numElements == 0)
         {
-            const unsigned int tfNumElements = static_cast<unsigned int>(tensorData.size()) / GetDataTypeSize(dataType);
+            const unsigned int tfNumElements =
+                static_cast<unsigned int>(tensorData.size()) / GetDataTypeSize(dataType);
             dimensionSizes.push_back(tfNumElements);
         }
     }
-    // Get tensor data from tensor content attribute
+    // Gets tensor data from tensor content attribute.
     else
     {
         tensorData.assign(tfTensor.tensor_content().begin(), tfTensor.tensor_content().end());
 
-        // Check if a tensor shape is defined for the tensor content
+        // Checks if a tensor shape is defined for the tensor content.
         if (numElements == 0)
         {
-            throw ParseException(boost::str(
-                boost::format("No tensor shape found for Const node - %1%")
-                % nodeDef.name()));
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "No tensor shape found for Const node - %1% %2%")
+                        % nodeDef.name()
+                        % CHECK_LOCATION().AsString()));
         }
     }
 
-    // Const node requires at least a list of values or a content attribute
+    // Const node requires at least a list of values or a content attribute.
     if (tensorData.empty())
     {
-        throw ParseException(boost::str(
-            boost::format("No tensor data found for Const node - %1%")
-            % nodeDef.name()));
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "No tensor data found for Const node - %1% %2%")
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
-    const TensorInfo tensorInfo(static_cast<unsigned int>(dimensionSizes.size()), dimensionSizes.data(), dataType);
+    const TensorInfo tensorInfo(static_cast<unsigned int>(dimensionSizes.size()),
+                                dimensionSizes.data(),
+                                dataType);
 
     // If we have a list of values, then the length of the list must be
-    // less than or equal to the number of elements implied by the shape argument
+    // less than or equal to the number of elements implied by the shape argument.
     if (tensorData.size() > tensorInfo.GetNumBytes())
     {
-        throw ParseException(boost::str(
-            boost::format("Number of elements (%1%) should be less than or equal \
-            to the number of elements implied by the shape argument (%2%) for Const node - %3%")
-            % (tensorData.size() / GetDataTypeSize(dataType))
-            % tensorInfo.GetNumElements()
-            % nodeDef.name()));
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Number of elements (%1%) should be less than or equal "
+                    "to the number of elements implied by the shape argument (%2%) for Const node - %3% %4%")
+                    % (tensorData.size() / GetDataTypeSize(dataType))
+                    % tensorInfo.GetNumElements()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
     return InvokeParseFunction<MakeTfOperation<ParsedConstTfOperation>>::Result<ParsedTfOperationPtr>(
@@ -896,7 +1003,13 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
 
     if (!HasParsedConstTensor<float>(inputs[1].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports Convolution layers with constant weights");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports Convolution layers with constant weights for %1%, input %2% %3%")
+                    % nodeDef.name()
+                    % inputs[1].m_IndexedValue->GetNode().name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* weightNode =
         boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
@@ -905,7 +1018,7 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
     std::string dataFormat = ReadMandatoryNodeStringAttribute(nodeDef, "data_format");
     std::vector<uint32_t> strides = ReadMandatoryNodeUint32ListAttribute(nodeDef, "strides");
 
-    // read the dilations, if present - only [1,1,1,1] (the default) is supported
+    // Read the dilations, if present - only [1,1,1,1] (the default) is supported.
     std::vector<uint32_t> dilations = ReadOptionalNodeUint32ListAttribute(nodeDef, "dilations");
     if (!dilations.empty())
     {
@@ -913,7 +1026,12 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
         {
             if (dilation != 1u)
             {
-                throw ParseException("ArmNN only supports Convolution layers with dilations [1,1,1,1]");
+                throw ParseException(
+                    boost::str(
+                        boost::format(
+                            "ArmNN only supports Convolution layers with dilations [1,1,1,1] for %1% %2%")
+                            % nodeDef.name()
+                            % CHECK_LOCATION().AsString()));
             }
         }
     }
@@ -921,21 +1039,19 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
     Convolution2dDescriptor desc;
     desc.m_BiasEnabled = false;
 
+    CHECK_DATA_FORMAT(nodeDef, dataFormat, "Conv2D");
+
     if (dataFormat == "NHWC")
     {
         desc.m_StrideX = strides[2];
         desc.m_StrideY = strides[1];
-        // Swizzle input to supported memory layout
+        // Swizzles input to supported memory layout.
         inputTensorInfo = armnnUtils::Permuted(inputSlot.GetTensorInfo(), NHWCToArmNN);
     }
     else if (dataFormat == "NCHW")
     {
         desc.m_StrideX = strides[3];
         desc.m_StrideY = strides[2];
-    }
-    else
-    {
-        throw ParseException("Unsupported data format passed for Conv2D. Only NHWC and NCHW supported");
     }
 
     uint32_t inputHeight = inputTensorInfo.GetShape()[2];
@@ -950,6 +1066,9 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
 
     bool padding = false;
     TensorInfo outputInfo;
+
+    CHECK_PADDING_TYPE(nodeDef, paddingString);
+
     if (paddingString == "SAME")
     {
         padding = true;
@@ -976,10 +1095,6 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
                                       static_cast<float>(desc.m_StrideX)))
                                 }, DataType::Float32);
     }
-    else
-    {
-        throw ParseException("Only 'SAME' and 'VALID' padding supported");
-    }
 
     CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, padding);
     CalcPadding(inputWidth, weightWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, padding);
@@ -1000,7 +1115,7 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
 }
 
 ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& nodeDef,
-                                                   const tensorflow::GraphDef& graphDef)
+                                                    const tensorflow::GraphDef& graphDef)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
     IOutputSlot& inputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
@@ -1008,7 +1123,14 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
 
     if (!HasParsedConstTensor<float>(inputs[1].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports Depthwise Convolution layers with constant weights");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports Depthwise Convolution layer with constant weights. "
+                    "Non const input found %1% for node %2% %3%")
+                    % inputs[1].m_IndexedValue->GetNode().name()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* weightNode =
         boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
@@ -1021,21 +1143,19 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
     DepthwiseConvolution2dDescriptor desc;
     desc.m_BiasEnabled = false;
 
+    CHECK_DATA_FORMAT(nodeDef, dataFormat, "DepthwiseConv2dNative");
+
     if (dataFormat == "NHWC")
     {
         desc.m_StrideX = strides[2];
         desc.m_StrideY = strides[1];
-        // Swizzle input to supported memory layout
+        // Swizzles input to supported memory layout.
         inputTensorInfo = armnnUtils::Permuted(inputSlot.GetTensorInfo(), NHWCToArmNN);
     }
     else if (dataFormat == "NCHW")
     {
         desc.m_StrideX = strides[3];
         desc.m_StrideY = strides[2];
-    }
-    else
-    {
-        throw ParseException("Unsupported data format passed for DepthwiseConv2dNative. Only NHWC and NCHW supported");
     }
 
     uint32_t inputHeight = inputTensorInfo.GetShape()[2];
@@ -1050,6 +1170,9 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
 
     bool padding = false;
     TensorInfo outputInfo;
+
+    CHECK_PADDING_TYPE(nodeDef, paddingString);
+
     if (paddingString == "SAME")
     {
         padding = true;
@@ -1075,10 +1198,6 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
                                     static_cast<float>(inputWidth - weightWidth + 1) /
                                     static_cast<float>(desc.m_StrideX)))
                                 }, DataType::Float32);
-    }
-    else
-    {
-        throw ParseException("Only 'SAME' and 'VALID' padding supported");
     }
 
     CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, padding);
@@ -1106,37 +1225,66 @@ ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& no
 
     if (!HasParsedConstTensor<float>(inputs[1].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports FusedBatchNormalization layers with constant scale");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports FusedBatchNormalization layers with constant scale. "
+                    "Input %1%. Node %2% %3%")
+                    % inputs[1].m_IndexedValue->GetNode().name()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* scaleNode =
         boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[1].m_IndexedValue);
 
     if (!HasParsedConstTensor<float>(inputs[2].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports FusedBatchNormalization layers with constant offset");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports FusedBatchNormalization layers with constant offset. "
+                    "Input %1%. Node %2% %3%")
+                    % inputs[2].m_IndexedValue->GetNode().name()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* offsetNode =
         boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[2].m_IndexedValue);
 
     if (!HasParsedConstTensor<float>(inputs[3].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports FusedBatchNormalization layers with constant mean");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports FusedBatchNormalization layers with constant mean. "
+                    "Input %1%. Node %2% %3%")
+                    % inputs[3].m_IndexedValue->GetNode().name()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* meanNode =
         boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[3].m_IndexedValue);
 
     if (!HasParsedConstTensor<float>(inputs[4].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports FusedBatchNormalization layers with constant variance");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports FusedBatchNormalization layers with constant variance. "
+                    "Input %1%. Node %2% %3%")
+                    % inputs[4].m_IndexedValue->GetNode().name()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<float>* varianceNode =
         boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(inputs[4].m_IndexedValue);
 
-    // The descriptor only has the epsilon attribute
+    // The descriptor only has the epsilon attribute.
     BatchNormalizationDescriptor desc;
     desc.m_Eps = ReadMandatoryNodeFloatAttribute(nodeDef, "epsilon");
 
-    // data for the parsed tensor args (scale, offset, mean, variance) must be stored locally until the layer is added
+    // Data for the parsed tensor args (scale, offset, mean, variance) must be stored
+    // locally until the layer is added.
     std::vector<float> scaleTensorData;
     ConstTensor scaleTensor = scaleNode->GetConstTensor(false, scaleTensorData);
 
@@ -1175,11 +1323,108 @@ ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& no
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
+bool TfParser::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef,
+                                           size_t alphaLayerIndex,
+                                           const OutputOfParsedTfOperation& otherOp,
+                                           armnn::IOutputSlot** outputOfLeakyRelu,
+                                           armnn::ActivationDescriptor & desc)
+{
+    const tensorflow::NodeDef& otherNodeDef = otherOp.m_IndexedValue->GetNode();
+
+    // Verifying all these assumptions hold:
+    //
+    // 1, the mulNodeDef is an elementwise multiplication node "Mul"
+    // 2, the alphaLayerIndex selects a constant node from the inputs of the "Mul" node
+    // 3, the inputLayerIndex selects a layer which has the same name as otherNodeDef
+    //
+
+    if (mulNodeDef.op() == "Mul")
+    {
+        size_t otherLayerIndex = (alphaLayerIndex == 0 ? 1 : 0);
+        std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(mulNodeDef, 2);
+
+        BOOST_ASSERT(inputs.size() == 2);
+        BOOST_ASSERT((otherLayerIndex == 0 || alphaLayerIndex == 0));
+        BOOST_ASSERT((otherLayerIndex == 1 || alphaLayerIndex == 1));
+        BOOST_ASSERT(((otherLayerIndex + alphaLayerIndex) == 1));
+
+        if (inputs[otherLayerIndex].m_IndexedValue->GetNode().name() == otherNodeDef.name())
+        {
+            if (HasParsedConstTensor<float>(inputs[alphaLayerIndex].m_IndexedValue->GetNode().name()))
+            {
+                ParsedConstTfOperation<float>* alpha =
+                    boost::polymorphic_downcast<ParsedConstTfOperation<float> *>(
+                        inputs[alphaLayerIndex].m_IndexedValue);
+
+                std::vector<float> const_data;
+                ConstTensor const_tensor = alpha->GetConstTensor(false, const_data);
+
+                if (const_data.size() == 1)
+                {
+                    desc.m_Function = ActivationFunction::LeakyReLu;
+                    desc.m_A = const_data[0];
+
+                    *outputOfLeakyRelu = &(otherOp.m_IndexedValue->ResolveArmnnOutputSlot(otherOp.m_Index));
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+// For max nodes, we only support those as part of a leaky relu, i.e.,
+// as part for a max(mul(a, x), x) expression. We thus need to
+// identify one input as a multiplication with a scalar constant,
+// extract the constant and the two inputs, verify that the two other
+// inputs are the same node, and then create a leaky relu node.
+
+ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
+                                            const tensorflow::GraphDef& graphDef)
+{
+    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+    auto inputNode0 = inputs[0].m_IndexedValue->GetNode();
+    auto inputNode1 = inputs[1].m_IndexedValue->GetNode();
+    IOutputSlot* outputOfLeakyRelu = nullptr;
+
+    ActivationDescriptor desc;
+
+    // There are four possible scenarios we need to support (respectively below):
+    // 1, max(mul(a, x), x)
+    // 2, max(mul(x, a), x)
+    // 3, max(x, mul(a, x))
+    // 4, max(x, mul(x, a))
+
+    if (IsSupportedLeakyReluPattern(inputNode0, 0, inputs[1], &outputOfLeakyRelu, desc) ||
+        IsSupportedLeakyReluPattern(inputNode0, 1, inputs[1], &outputOfLeakyRelu, desc) ||
+        IsSupportedLeakyReluPattern(inputNode1, 0, inputs[0], &outputOfLeakyRelu, desc) ||
+        IsSupportedLeakyReluPattern(inputNode1, 1, inputs[0], &outputOfLeakyRelu, desc))
+    {
+        BOOST_ASSERT(outputOfLeakyRelu != nullptr);
+
+        IConnectableLayer* const layer = m_Network->AddActivationLayer(desc, nodeDef.name().c_str());
+        outputOfLeakyRelu->Connect(layer->GetInputSlot(0));
+        layer->GetOutputSlot(0).SetTensorInfo(outputOfLeakyRelu->GetTensorInfo());
+        return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+    }
+    else
+    {
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN currenly offers limited support for Maximum node when it can be fused to "
+                    "form a LeakyRelu activation as leakyrelu=max(mul(alpha, X), X). "
+                    "Node: %1% %2%")
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
+    }
+}
+
 ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
                                            const tensorflow::GraphDef& graphDef)
 {
     std::vector<OutputOfConstNodeDef> nodes = GetTfInputNodes(nodeDef);
-    // In tensorflow, we have the last input of the Concat layer as the axis for concatenation
+    // In tensorflow, we have the last input of the Concat layer as the axis for concatenation.
     unsigned int numInputs = static_cast<unsigned int>(nodes.size());
     unsigned int numConcatView = numInputs - 1;
 
@@ -1189,10 +1434,17 @@ ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
     unsigned int mergeDim = 0;
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, numInputs);
 
-    // The last input is the axis for concatenation
+    // The last input is the axis for concatenation.
     if (!HasParsedConstTensor<int32_t>(inputs[numInputs - 1].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports Concat with constant axis");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports Concat with constant axis. "
+                    "Input %1%. Node %2% %3%")
+                    % inputs[numInputs - 1].m_IndexedValue->GetNode().name()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<int32_t>* shapeNode =
             boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[numInputs - 1].m_IndexedValue);
@@ -1200,27 +1452,42 @@ ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
     std::vector<int32_t> axisTensorData;
     ConstTensor axisTensor = shapeNode->GetConstTensor(false, axisTensorData);
 
-    // This concatDim indicates the data format: 3 is the NHWC, 1 is the NCHW
+    // This concatDim indicates the data format: 3 is the NHWC, 1 is the NCHW.
     const unsigned int concatDimInput = static_cast<unsigned int>(axisTensorData[0]);
 
-    // Armnn supports concatenation along the channel dimension for data format NHWC and NCHW
+    // Armnn supports concatenation along the channel dimension for data formats NHWC and NCHW.
     if (concatDimInput == 0 || concatDimInput == 2)
     {
-        throw ParseException("The dimension for concatenation is not supported by Armnn");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Dimension %1% for concatenation is not supported by Armnn. "
+                    "Node %2% %3%")
+                    % concatDimInput
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
-    // This is the only concatDim we support in Armnn
+    // This is the only concatDim we support in armnn.
     const unsigned int concatDim = 1;
     for (unsigned int viewIndex = 0; viewIndex < numConcatView; ++viewIndex)
     {
-        // need to double check whether it should be
+        // Need to double check whether it should be
         IOutputSlot& inputSlot =
             inputs[viewIndex].m_IndexedValue->ResolveArmnnOutputSlot(inputs[viewIndex].m_Index);
         TensorInfo inputTensorInfo = inputSlot.GetTensorInfo();
 
         if (inputTensorInfo.GetNumDimensions() != MaxNumOfTensorDimensions)
         {
-            throw ParseException("The number of dimensions for input tensors of the concatenation op should be 4");
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "The number of dimensions: %1% for input tensors of the "
+                        "concatenation op should be %2% for Node %3% %4%")
+                        % inputTensorInfo.GetNumDimensions()
+                        % MaxNumOfTensorDimensions
+                        % nodeDef.name()
+                        % CHECK_LOCATION().AsString()));
         }
 
         if (concatDimInput == 3)
@@ -1281,16 +1548,22 @@ ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
 ParsedTfOperationPtr TfParser::ParseShape(const tensorflow::NodeDef& nodeDef,
     const tensorflow::GraphDef& graphDef)
 {
-    // Note: The Shape layer is handled in a special way, because:
-    //        1. ARMNN doesn't support int32 tensors which it outputs
-    //        2. ARMNN works with statically shaped tensors which are known at parse time
+    // Note: the Shape layer is handled in a special way, because:
+    //        1. ARMNN doesn't support int32 tensors which it outputs.
+    //        2. ARMNN works with statically shaped tensors which are known at parse time.
     //        3. because of 1. and 2. we treat the output of Shape as a temporary const int32
-    //           tensor which may be used as an input to other ops, most likely a Reshape
+    //           tensor which may be used as an input to other ops, most likely a Reshape.
 
     const tensorflow::DataType tfDataType = ReadMandatoryNodeTypeAttribute(nodeDef, "out_type");
     if (tfDataType != tensorflow::DT_INT32)
     {
-        throw ParseException("Armnn only supports DT_INT32 as out_type");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Armnn only supports DT_INT32 as out_type. Got %1% for Node %2% %3%")
+                    % tensorflow::DataType_Name(tfDataType)
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
     const std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
@@ -1322,7 +1595,14 @@ ParsedTfOperationPtr TfParser::ParseReshape(const tensorflow::NodeDef& nodeDef,
 
     if (!HasParsedConstTensor<int32_t>(inputs[1].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports Reshape layers with constant shapes");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports Reshape layers with constant shapes. "
+                    "Input %1% Node %2% %3%")
+                    % inputs[1].m_IndexedValue->GetNode().name()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<int32_t>* shapeNode =
         boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
@@ -1352,22 +1632,35 @@ ParsedTfOperationPtr TfParser::ParseResizeBilinear(const tensorflow::NodeDef& no
 
     if (!HasParsedConstTensor<int32_t>(inputs[1].m_IndexedValue->GetNode().name()))
     {
-        throw ParseException("ArmNN only supports ResizeBilinear layers with constant sizes");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports ResizeBilinear layers with constant sizes. "
+                    "Input %1%. Node %2% %3%")
+                    % inputs[1].m_IndexedValue->GetNode().name()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     ParsedConstTfOperation<int32_t>* sizeNode =
         boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
 
-    // Check the align_corners attribute is not set
+    // Checks the align_corners attribute is not set.
     if (ReadOptionalNodeBoolAttribute(nodeDef, "align_corners", false))
     {
-        throw ParseException("ArmNN only supports ResizeBilinear layers with align_corners set to false");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports ResizeBilinear layers with align_corners set to false. "
+                    "Node %1% %2%")
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
-    // data for the parsed tensor args (size) must be stored locally
+    // Data for the parsed tensor args (size) must be stored locally.
     std::vector<int32_t> sizeTensorData;
     ConstTensor sizeTensor = sizeNode->GetConstTensor(false, sizeTensorData);
 
-    // The descriptor only has target height and width attributes, which we get from the size tensor
+    // The descriptor only has target height and width attributes, which we get from the size tensor.
     ResizeBilinearDescriptor desc;
     desc.m_TargetHeight = static_cast<uint32_t> (sizeTensorData[0]);
     desc.m_TargetWidth = static_cast<uint32_t> (sizeTensorData[1]);
@@ -1376,18 +1669,18 @@ ParsedTfOperationPtr TfParser::ParseResizeBilinear(const tensorflow::NodeDef& no
 
     IOutputSlot& inputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
     TensorInfo inputTensorInfo = inputSlot.GetTensorInfo();
-    // the input shape is always in BHWC format, this will be swizzled below; for now,
-    // get the batch and channels to make up the ArmNN output shape with the target size
+    // The input shape is always in BHWC format, this will be swizzled below; for now,
+    // get the batch and channels to make up the ArmNN output shape with the target size.
     unsigned int outBatch = inputTensorInfo.GetShape()[0];
     unsigned int outChannels = inputTensorInfo.GetShape()[3];
     unsigned int outHeight = desc.m_TargetHeight;
     unsigned int outWidth = desc.m_TargetWidth;
     TensorShape outShape({outBatch, outChannels, outHeight, outWidth});
-    // The output DataType is always Float32, regardless of the input DataType
+    // The output DataType is always Float32, regardless of the input DataType.
     const TensorInfo outputTensorInfo(outShape, armnn::DataType::Float32);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
-    // TensorFlow ResizeBilinear input is always in BHWC format, so add swizzle and deswizzle layers
+    // TensorFlow ResizeBilinear input is always in BHWC format, so add swizzle and deswizzle layers.
     layer = SwizzleInDeswizzleOut(*m_Network, inputSlot, *layer, nodeDef.name());
 
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
@@ -1409,41 +1702,63 @@ TensorInfo OutputShapeOfSqueeze(const tensorflow::NodeDef& nodeDef, TensorInfo i
     }
     else
     {
-        throw ParseException(boost::str(
-                boost::format("Unsupported DataType %1% for Squeeze operation")
-                % tensorflow::DataType_Name(tfDataType)));
+        throw ParseException(
+            boost::str(
+                boost::format("Unsupported DataType %1% for Squeeze operation %2% %3%")
+                % tensorflow::DataType_Name(tfDataType)
+                % nodeDef.name()
+                % CHECK_LOCATION().AsString()));
+    }
+
+
+    if (inputTensorInfo.GetNumDimensions() > 4)
+    {
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Unsupported number of dimensions: %1% for input shape for Squeeze %2% %3%")
+                    % inputTensorInfo.GetNumDimensions()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
     std::vector<uint32_t> squeezeDims = ReadOptionalNodeUint32ListAttribute(nodeDef, "squeeze_dims");
+    static const uint32_t dimensionSequence[] = { 0, 1, 2, 3 };
+
     if (squeezeDims.empty())
     {
-        for(unsigned int i = 0; i < inputTensorInfo.GetNumDimensions(); i++)
-        {
-            if (inputTensorInfo.GetShape()[i] == 1)
-            {
-                squeezeDims.push_back(i);
-            }
-        }
+        squeezeDims.assign(dimensionSequence,
+                           dimensionSequence+inputTensorInfo.GetNumDimensions());
     }
 
     std::vector<uint32_t> outputDims;
     for(unsigned int i = 0; i < inputTensorInfo.GetNumDimensions(); i++)
     {
-        bool includeDimension = (std::find(squeezeDims.begin(), squeezeDims.end(), i) == squeezeDims.end());
-        if (includeDimension)
+        bool skipSqueeze = (std::find(squeezeDims.begin(), squeezeDims.end(), i) == squeezeDims.end());
+        auto currentDimension = inputTensorInfo.GetShape()[i];
+        if (skipSqueeze || currentDimension != 1)
         {
-            outputDims.push_back(inputTensorInfo.GetShape()[i]);
+            outputDims.push_back(currentDimension);
         }
     }
 
     if (outputDims.size() > 4)
     {
-        throw ParseException("Unsupported shape for Squeeze");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Unsupported number of dimensions: %1% for output shape for Squeeze %2% %3%")
+                    % outputDims.size()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
-    TensorInfo outTensorInfo = TensorInfo(boost::numeric_cast<unsigned int>(outputDims.size()),
-                                          outputDims.data(),
-                                          type);
+    TensorShape outShape = TensorShape(static_cast<unsigned int>(outputDims.size()),
+                                       outputDims.data());
+
+    TensorInfo outTensorInfo = inputTensorInfo;
+    outTensorInfo.SetShape(outShape);
+    outTensorInfo.SetDataType(type);
 
     return outTensorInfo;
 }
@@ -1496,9 +1811,10 @@ ParsedTfOperationPtr TfParser::ParseLrn(const tensorflow::NodeDef& nodeDef, cons
 }
 
 /// An ParsedTfOperation for a MatMul node.
-/// Creation of the armnn FullyConnected layer is deferred until it is actually needed, because MatMul nodes are
-/// often used for the first part of a biased FullyConnected (MatMul followed by Add) and in these cases armnn doesn't
-/// need a separate layer for the MatMul.
+/// Creation of the armnn FullyConnected layer is deferred until it is actually needed, because
+/// MatMul nodes are often used for the first part of a biased FullyConnected (MatMul followed
+/// by Add) and in these cases armnn doesn't need a separate layer for the MatMul.
+///
 class ParsedMatMulTfOperation : public DeferredSingleLayerParsedTfOperation
 {
 public:
@@ -1516,46 +1832,35 @@ public:
 
 ParsedTfOperationPtr TfParser::ParseMatMul(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    // Defer the creation of the layer (see ParsedMatMulTfOperation).
+    // Defers the creation of the layer (see ParsedMatMulTfOperation).
     return std::make_unique<ParsedMatMulTfOperation>(this, nodeDef);
 }
+
+/// An ParsedTfOperation for a Mul node.
+/// Creation of the armnn Mul layer is deferred until it is actually needed, because Mul nodes
+/// are also used for the first part of a leaky relu activation function (Mul followed by Maximum)
+/// and in these cases armnn doesn't need a separate layer for the Mul.
+///
+class ParsedMulTfOperation : public DeferredSingleLayerParsedTfOperation
+{
+public:
+    ParsedMulTfOperation(TfParser* parser, const tensorflow::NodeDef& node)
+        : DeferredSingleLayerParsedTfOperation(parser, node)
+    {
+    }
+
+    void CreateLayerDeferred() override
+    {
+        BOOST_ASSERT(m_Layer == nullptr);
+        m_Layer = m_Parser->AddMultiplicationLayer(m_Node);
+    }
+};
 
 ParsedTfOperationPtr TfParser::ParseMul(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
     boost::ignore_unused(graphDef);
 
-    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
-
-    IConnectableLayer* const layer = m_Network->AddMultiplicationLayer(nodeDef.name().c_str());
-    IOutputSlot* input0Slot = &inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
-    IOutputSlot* input1Slot = &inputs[1].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1].m_Index);
-
-    auto const input0NumDims = input0Slot->GetTensorInfo().GetNumDimensions();
-    auto const input1NumDims = input1Slot->GetTensorInfo().GetNumDimensions();
-
-    if (input0NumDims < input1NumDims)
-    {
-        const bool isNHWC = true;
-        input0Slot = BroadcastForAddandMul(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
-    }
-    if (input1NumDims < input0NumDims)
-    {
-        const bool isNHWC = true;
-        input1Slot = BroadcastForAddandMul(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
-    }
-
-    input0Slot->Connect(layer->GetInputSlot(0));
-    input1Slot->Connect(layer->GetInputSlot(1));
-
-    if (input0NumDims < input1NumDims)
-    {
-        layer->GetOutputSlot(0).SetTensorInfo(input1Slot->GetTensorInfo());
-    }
-    else
-    {
-        layer->GetOutputSlot(0).SetTensorInfo(input0Slot->GetTensorInfo());
-    }
-    return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+    return std::make_unique<ParsedMulTfOperation>(this, nodeDef);
 }
 
 ParsedTfOperationPtr TfParser::ParsePlaceholder(const tensorflow::NodeDef& nodeDef,
@@ -1570,7 +1875,12 @@ ParsedTfOperationPtr TfParser::ParsePlaceholder(const tensorflow::NodeDef& nodeD
     auto it = m_InputShapes.find(nodeDef.name());
     if (it == m_InputShapes.end())
     {
-        throw ParseException("Missing input shape for Placeholder '" + nodeDef.name() + "'");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Missing input shape for Placeholder '%1%' %2%")
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
     TensorInfo tensorInfo(it->second, DataType::Float32);
 
@@ -1691,7 +2001,13 @@ ParsedTfOperationPtr TfParser::ParsePooling2d(const tensorflow::NodeDef& nodeDef
 
     if (inputs.size() != 1)
     {
-        throw ParseException("2D Pooling expects one input!");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "2D Pooling expects one input!. Got %1% for Node %2% %3%")
+                    % inputs.size()
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
     std::string paddingString = ReadMandatoryNodeStringAttribute(nodeDef, "padding");
@@ -1704,13 +2020,15 @@ ParsedTfOperationPtr TfParser::ParsePooling2d(const tensorflow::NodeDef& nodeDef
     pooling2dDescriptor.m_PaddingMethod = PaddingMethod::Exclude;
     pooling2dDescriptor.m_OutputShapeRounding = OutputShapeRounding::Floor;
 
+    CHECK_DATA_FORMAT(nodeDef, dataFormat, "Pooling2D");
+
     if (dataFormat == "NHWC")
     {
         pooling2dDescriptor.m_StrideX    = strides[2];
         pooling2dDescriptor.m_StrideY    = strides[1];
         pooling2dDescriptor.m_PoolWidth  = ksize[2];
         pooling2dDescriptor.m_PoolHeight = ksize[1];
-        // Swizzle input to supported memory layout
+        // Swizzles input to supported memory layout.
         inputTensorInfo = armnnUtils::Permuted(inputSlot.GetTensorInfo(), NHWCToArmNN);
     }
     else if (dataFormat == "NCHW")
@@ -1720,16 +2038,15 @@ ParsedTfOperationPtr TfParser::ParsePooling2d(const tensorflow::NodeDef& nodeDef
         pooling2dDescriptor.m_PoolWidth  = ksize[3];
         pooling2dDescriptor.m_PoolHeight = ksize[2];
     }
-    else
-    {
-        throw ParseException("Only NHWC or NCHW supported for Pooling2d");
-    }
 
     uint32_t inputHeight = inputTensorInfo.GetShape()[2];
     uint32_t inputWidth = inputTensorInfo.GetShape()[3];
 
     bool padding = false;
     TensorInfo outputInfo;
+
+    CHECK_PADDING_TYPE(nodeDef, paddingString);
+
     if (paddingString == "SAME")
     {
         padding = true;
@@ -1756,10 +2073,6 @@ ParsedTfOperationPtr TfParser::ParsePooling2d(const tensorflow::NodeDef& nodeDef
                                       static_cast<float>(pooling2dDescriptor.m_StrideX)))
                                 }, DataType::Float32);
     }
-    else
-    {
-        throw ParseException("Only 'SAME' and 'VALID' padding supported");
-    }
 
     CalcPadding(inputWidth, pooling2dDescriptor.m_PoolWidth, pooling2dDescriptor.m_StrideX,
                     pooling2dDescriptor.m_PadLeft, pooling2dDescriptor.m_PadRight, padding);
@@ -1770,7 +2083,12 @@ ParsedTfOperationPtr TfParser::ParsePooling2d(const tensorflow::NodeDef& nodeDef
     IConnectableLayer* layer = m_Network->AddPooling2dLayer(pooling2dDescriptor, nodeDef.name().c_str());
     if (layer == nullptr)
     {
-        throw ParseException("Failed to add pooling2d layer");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Failed to add pooling2d layer for %1% %2%")
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
@@ -1803,19 +2121,21 @@ ParsedTfOperationPtr TfParser::AddAdditionLayer(const tensorflow::NodeDef& nodeD
         // with the same data in the correct dimension for broadcast in addition.
         if(input1Info.GetNumDimensions() != 1)
         {
-            throw ParseException("Unsupported bias for BiasAdd. It should be a 1D vector.");
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "Unsupported bias for BiasAdd. It should be a 1D vector. "
+                        "Got %1% dimensions for input %2%. Node %3% %4%")
+                        % input1Info.GetNumDimensions()
+                        % inputs[1].m_IndexedValue->GetNode().name()
+                        % nodeDef.name()
+                        % CHECK_LOCATION().AsString()));
         }
 
         const std::string dataFormat = ReadMandatoryNodeStringAttribute(nodeDef, "data_format");
-        const bool isNHWC = (dataFormat == "NHWC");
-        const bool isNCHW = (dataFormat == "NCHW");
 
-        if (!isNHWC && ! isNCHW)
-        {
-            throw ParseException("Only NHWC or NCHW supported for BiasAdd");
-        }
-
-        input1Slot = BroadcastForAddandMul(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
+        CHECK_DATA_FORMAT(nodeDef, dataFormat, "BiasAdd");
+        input1Slot = BroadcastForAddandMul(input0Slot, input1Slot, dataFormat == "NHWC", *m_Network, nodeDef);
     }
     else
     {
@@ -1849,15 +2169,52 @@ ParsedTfOperationPtr TfParser::AddAdditionLayer(const tensorflow::NodeDef& nodeD
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
+IConnectableLayer* TfParser::AddMultiplicationLayer(const tensorflow::NodeDef& nodeDef)
+{
+    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+
+    IConnectableLayer* const layer = m_Network->AddMultiplicationLayer(nodeDef.name().c_str());
+    IOutputSlot* input0Slot = &inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
+    IOutputSlot* input1Slot = &inputs[1].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1].m_Index);
+
+    auto const input0NumDims = input0Slot->GetTensorInfo().GetNumDimensions();
+    auto const input1NumDims = input1Slot->GetTensorInfo().GetNumDimensions();
+
+    if (input0NumDims < input1NumDims)
+    {
+        const bool isNHWC = true;
+        input0Slot = BroadcastForAddandMul(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
+    }
+    if (input1NumDims < input0NumDims)
+    {
+        const bool isNHWC = true;
+        input1Slot = BroadcastForAddandMul(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
+    }
+
+    input0Slot->Connect(layer->GetInputSlot(0));
+    input1Slot->Connect(layer->GetInputSlot(1));
+
+    if (input0NumDims < input1NumDims)
+    {
+        layer->GetOutputSlot(0).SetTensorInfo(input1Slot->GetTensorInfo());
+    }
+    else
+    {
+        layer->GetOutputSlot(0).SetTensorInfo(input0Slot->GetTensorInfo());
+    }
+    return layer;
+}
+
+
 IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& matMulNodeDef,
     const tensorflow::NodeDef* addNodeDef, const char* armnnLayerName)
 {
-    // find bias const (if applicable)
+    // Finds bias const (if applicable).
     ParsedConstTfOperation<float>* biasNode = nullptr;
     if (addNodeDef != nullptr)
     {
         std::vector<OutputOfParsedTfOperation> addInputs = GetInputParsedTfOperationsChecked(*addNodeDef, 2);
-        // find our inputs
+        // Finds our inputs.
         if (HasParsedConstTensor<float>(addInputs[0].m_IndexedValue->GetNode().name()))
         {
             biasNode = boost::polymorphic_downcast<ParsedConstTfOperation<float>*>(addInputs[0].m_IndexedValue);
@@ -1868,11 +2225,20 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
         }
         else
         {
-            throw ParseException("ArmNN only supports fully connected layers with constant bias");
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "ArmNN only supports fully connected layers with constant bias. "
+                        "Inputs %1% and %2%. AddNode %3%. MatMulNode %4% %5%")
+                        % addInputs[0].m_IndexedValue->GetNode().name()
+                        % addInputs[1].m_IndexedValue->GetNode().name()
+                        % addNodeDef->name()
+                        % matMulNodeDef.name()
+                        % CHECK_LOCATION().AsString()));
         }
     }
 
-    // find matmul inputs
+    // Finds matmul inputs.
     ParsedConstTfOperation<float>* weightNode = nullptr;
     ParsedTfOperation* inputNode  = nullptr;
     unsigned int inputIdx = 0;
@@ -1891,18 +2257,26 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
     }
     else
     {
-        throw ParseException("ArmNN only supports fully connected layers with constant weights");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "ArmNN only supports fully connected layers with constant weights. "
+                    "Inputs %1% and %2%. MatMulNode %3% %4%")
+                    % mulInputs[0].m_IndexedValue->GetNode().name()
+                    % mulInputs[1].m_IndexedValue->GetNode().name()
+                    % matMulNodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
     std::vector<float> weightTensorData;
-    // handle weight
+    // Handles weight.
     ConstTensor weights = weightNode->GetConstTensor(false, weightTensorData);
 
     FullyConnectedDescriptor desc;
     desc.m_BiasEnabled = addNodeDef != nullptr;
 
     IConnectableLayer* layer = nullptr;
-    // make the layer
+    // Makes the layer.
     if (addNodeDef != nullptr)
     {
         std::vector<float> biasTensorData;
@@ -1910,7 +2284,14 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
 
         if (weights.GetShape()[1] != biases.GetShape()[0])
         {
-            throw ParseException("shape of matmul and bias do not match");
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "Shape of matmul weights and bias do not match. "
+                        "AddNode %1%. MatMulNode %2% %3%")
+                        % addNodeDef->name()
+                        % matMulNodeDef.name()
+                        % CHECK_LOCATION().AsString()));
         }
 
         layer = m_Network->AddFullyConnectedLayer(desc, weights, biases, armnnLayerName);
@@ -1925,7 +2306,7 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
     inputNode->ResolveArmnnOutputSlot(inputIdx).Connect(layer->GetInputSlot(0));
     unsigned int batches = inputNode->ResolveArmnnOutputSlot(inputIdx).GetTensorInfo().GetShape()[0];
 
-    // handle output
+    // Handles output.
     TensorInfo outputInfo({ batches, weights.GetShape()[1] }, DataType::Float32);
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     return layer;
@@ -1933,7 +2314,7 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
 
 void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
 {
-    // get the type of the node (assume float)
+    // Gets the type of the node (assume float).
     tensorflow::DataType type = tensorflow::DT_FLOAT;
     if (nodeDef.attr().count("T") != 0)
     {
@@ -1948,7 +2329,14 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
 
     if (type != tensorflow::DT_FLOAT && nodeDef.op() != "Const")
     {
-        throw ParseException("Currently only FLOAT is supported for tensorflow nodes (apart from Const)");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Currently only FLOAT is supported for tensorflow nodes (apart from Const). "
+                    "Got %1% for Node %2% %3%")
+                    % tensorflow::DataType_Name(type)
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
     }
 
     const std::string& operation = nodeDef.op();
@@ -1959,7 +2347,7 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
         ParsedTfOperationPtr parsedTfOperation = (this->*func)(nodeDef, graphDef);
         ParsedTfOperation* parsedTfOperationRaw = parsedTfOperation.get();
 
-        // Store the parsed operation so that dependent layers can connect to it
+        // Stores the parsed operation so that dependent layers can connect to it.
         auto it = m_ParsedTfOperations.find(nodeDef.name());
         if (it != m_ParsedTfOperations.end())
         {
@@ -1967,7 +2355,7 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
         }
         m_ParsedTfOperations[nodeDef.name()] = std::move(parsedTfOperation);
 
-        // If this node was requested as an output from the network then add an ArmNN output layer
+        // If this node was requested as an output from the network, then adds an ArmNN output layer.
         if (std::find(m_RequestedOutputs.begin(), m_RequestedOutputs.end(), nodeDef.name()) !=
             m_RequestedOutputs.end())
         {
@@ -1986,14 +2374,18 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
     }
     else
     {
-        throw ParseException(boost::str(
-            boost::format("Unsupported operation %1% in tensorflow::GraphDef") % operation));
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Unsupported operation %1% in tensorflow::GraphDef %2%")
+                    % operation
+                    % CHECK_LOCATION().AsString()));
     }
 }
 
 void TfParser::LoadGraphDef(const tensorflow::GraphDef& graphDef)
 {
-    // add all nodes to our map
+    // Adds all nodes to our map.
     m_NodesByName.clear();
     m_NetworkInputsBindingInfo.clear();
     m_NetworkOutputsBindingInfo.clear();
@@ -2004,19 +2396,24 @@ void TfParser::LoadGraphDef(const tensorflow::GraphDef& graphDef)
         m_NodesByName[node.name()]      = &node;
     }
 
-    // Find the output nodes the user requested
+    // Finds the output nodes the user requested.
     std::vector<const tensorflow::NodeDef*> targetNodes;
     for (const std::string& requestedOutputName : m_RequestedOutputs)
     {
         auto nodeIt = m_NodesByName.find(requestedOutputName);
         if (nodeIt == m_NodesByName.end())
         {
-            throw ParseException("Couldn't find requested output node '" + requestedOutputName + "' in graph");
+            throw ParseException(
+                boost::str(
+                    boost::format(
+                        "Couldn't find requested output node '%1%' in graph %2%")
+                        % requestedOutputName
+                        % CHECK_LOCATION().AsString()));
         }
         targetNodes.push_back(nodeIt->second);
     }
 
-    // Sort them into a linear ordering such that all inputs of a node are before the node itself
+    // Sorts them into a linear ordering such that all inputs of a node are before the node itself.
     std::vector<const tensorflow::NodeDef*> sortedNodes;
     if (!armnnUtils::GraphTopologicalSort<const tensorflow::NodeDef*>(
         targetNodes,
@@ -2031,10 +2428,14 @@ void TfParser::LoadGraphDef(const tensorflow::GraphDef& graphDef)
         },
         sortedNodes))
     {
-        throw ParseException("Cycle detected in graph");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Cycle detected in graph %1%")
+                    % CHECK_LOCATION().AsString()));
     }
 
-    // Parse each node in order, knowing that all inputs of a node will be processed before the node itself
+    // Parses each node in order, knowing that all inputs of a node will be processed before the node itself.
     for (const auto& it : sortedNodes)
     {
         const tensorflow::NodeDef& currentNode = *it;
@@ -2050,12 +2451,15 @@ INetworkPtr TfParser::CreateNetworkFromTextFile(const char* graphFile,
 
     if (fd == nullptr)
     {
-        std::stringstream error;
-        error << "Graph file " << graphFile << " failed to open";
-        throw FileNotFoundException(error.str());
+        throw FileNotFoundException(
+            boost::str(
+                boost::format(
+                    "Graph file %1% failed to open %2%")
+                    % graphFile
+                    % CHECK_LOCATION().AsString()));
     }
 
-    // Parse the file into a message
+    // Parses the file into a message.
     tensorflow::GraphDef graphDef;
     auto                 input   = new google::protobuf::io::FileInputStream(fileno(fd));
     bool                 success = google::protobuf::TextFormat::Parse(input, &graphDef);
@@ -2064,9 +2468,11 @@ INetworkPtr TfParser::CreateNetworkFromTextFile(const char* graphFile,
 
     if (!success)
     {
-        std::stringstream error;
-        error << "Failed to parse graph file";
-        throw ParseException(error.str());
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Failed to parse graph file %1%")
+                    % CHECK_LOCATION().AsString()));
     }
 
     return CreateNetworkFromGraphDef(graphDef, inputShapes, requestedOutputs);
@@ -2076,15 +2482,17 @@ INetworkPtr TfParser::CreateNetworkFromString(const char* protoText,
     const std::map<std::string, TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
-    // Parse the string into a message
+    // Parses the string into a message.
     tensorflow::GraphDef graphDef;
     bool success = google::protobuf::TextFormat::ParseFromString(protoText, &graphDef);
 
     if (!success)
     {
-        std::stringstream error;
-        error << "Failed to parse graph file";
-        throw ParseException(error.str());
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Failed to parse graph file %1%")
+                    % CHECK_LOCATION().AsString()));
     }
 
     return CreateNetworkFromGraphDef(graphDef, inputShapes, requestedOutputs);
@@ -2098,12 +2506,15 @@ INetworkPtr TfParser::CreateNetworkFromBinaryFile(const char* graphFile,
 
     if (fd == nullptr)
     {
-        std::stringstream error;
-        error << "Graph file " << graphFile << " failed to open";
-        throw FileNotFoundException(error.str());
+        throw FileNotFoundException(
+            boost::str(
+                boost::format(
+                    "Graph file %1% failed to open %2%")
+                    % graphFile
+                    % CHECK_LOCATION().AsString()));
     }
 
-    // Parse the file into a message
+    // Parses the file into a message.
     tensorflow::GraphDef graphDef;
 
     google::protobuf::io::FileInputStream  inStream(fileno(fd));
@@ -2114,9 +2525,12 @@ INetworkPtr TfParser::CreateNetworkFromBinaryFile(const char* graphFile,
 
     if (!success)
     {
-        std::stringstream error;
-        error << "Failed to parse protobuf file" << graphFile;
-        throw ParseException(error.str());
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Failed to parse protobuf file %1% %2%")
+                    % graphFile
+                    % CHECK_LOCATION().AsString()));
     }
 
     return CreateNetworkFromGraphDef(graphDef, inputShapes, requestedOutputs);
@@ -2131,7 +2545,11 @@ INetworkPtr TfParser::CreateNetworkFromGraphDef(const tensorflow::GraphDef& grap
     m_InputShapes = inputShapes;
     if (requestedOutputs.size() == 0)
     {
-        throw ParseException("requestedOutputs must have at least one entry");
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "requestedOutputs must have at least one entry %1%")
+                    % CHECK_LOCATION().AsString()));
     }
     m_RequestedOutputs = requestedOutputs;
 
@@ -2152,7 +2570,7 @@ INetworkPtr TfParser::CreateNetworkFromGraphDef(const tensorflow::GraphDef& grap
 
 void TfParser::Cleanup()
 {
-    // cleanup, in case we reuse this parser
+    // Cleanup, in case we reuse this parser.
     m_InputShapes.clear();
     m_RequestedOutputs.clear();
     m_NodesByName.clear();
@@ -2176,7 +2594,13 @@ std::pair<LayerBindingId, TensorInfo> TfParser::GetBindingInfo(const std::string
     auto it = nameToBindingInfo.find(layerName);
     if (it == nameToBindingInfo.end())
     {
-        throw InvalidArgumentException(boost::str(boost::format("Unknown %1% '%2%'") % bindingPointDesc % layerName));
+        throw InvalidArgumentException(
+            boost::str(
+                boost::format(
+                    "Unknown %1% '%2%' %3%")
+                    % bindingPointDesc
+                    % layerName
+                    % CHECK_LOCATION().AsString()));
     }
     return it->second;
 }
@@ -2205,8 +2629,13 @@ void TfParser::TrackBindingPoint(IConnectableLayer* layer,
     }
     else
     {
-        throw ParseException(boost::str(
-            boost::format("Id %1% used by more than one %2% layer") % id % bindingPointDesc));
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Id %1% used by more than one %2% layer %3%")
+                    % id
+                    % bindingPointDesc
+                    % CHECK_LOCATION().AsString()));
     }
 }
 

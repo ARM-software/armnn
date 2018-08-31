@@ -24,9 +24,13 @@ public:
 
     void ValidateTensorShapesFromInputs() override;
 
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
+
 protected:
     DepthwiseConvolution2dLayer(const DepthwiseConvolution2dDescriptor& param, const char* name);
     ~DepthwiseConvolution2dLayer() = default;
+
+    ConstantTensors GetConstantTensorsByRef() override;
 };
 
 } // namespace

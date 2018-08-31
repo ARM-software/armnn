@@ -9,7 +9,7 @@ namespace armnn
 
 void ClConstantUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClConstantUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClConstantUint8Workload_Execute");
     ClBaseConstantWorkload::Execute();
 }
 

@@ -4,9 +4,12 @@
 //
 #pragma once
 
-#if ARMNN_PROFILING_ENABLED
+#include "ProfilingEvent.hpp"
 
 #include "armnn/ArmNN.hpp"
+#include "armnn/IProfiler.hpp"
+
+#include "WallClockTimer.hpp"
 
 #include <chrono>
 #include <iosfwd>
@@ -15,82 +18,52 @@
 #include <stack>
 #include <map>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace armnn
 {
-
-// Clock class that uses the same timestamp function as the Mali DDK
-class monotonic_clock {
-public:
-    using duration = std::chrono::nanoseconds;
-    using time_point = std::chrono::time_point<monotonic_clock, duration>;
-
-    static std::chrono::time_point<monotonic_clock, std::chrono::nanoseconds> now() noexcept
-    {
-        timespec ts;
-#if defined(CLOCK_MONOTONIC_RAW)
-        clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-#else
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-#endif
-        return time_point(std::chrono::nanoseconds(ts.tv_sec*1000000000 + ts.tv_nsec));
-    }
-};
 
 // Simple single-threaded profiler.
 // Tracks events reported by BeginEvent()/EndEvent() and outputs detailed information and stats when
 // Profiler::AnalyzeEventsAndWriteResults() is called.
-class Profiler
+class Profiler final : public IProfiler
 {
 public:
+    Profiler();
+    ~Profiler();
+    using InstrumentPtr = std::unique_ptr<Instrument>;
+
     // Marks the beginning of a user-defined event.
-    // No attempt will be made to copy the name string: It must be known at compile time.
-    void BeginEvent(Compute compute, const std::string name);
+    // No attempt will be made to copy the name string: it must be known at compile time.
+    Event* BeginEvent(Compute compute, const std::string& name, std::vector<InstrumentPtr>&& instruments);
 
     // Marks the end of a user-defined event.
-    void EndEvent(Compute compute);
+    void EndEvent(Event* event);
+
+    // Enables/disables profiling.
+    void EnableProfiling(bool enableProfiling) override;
+
+    // Checks if profiling is enabled.
+    bool IsProfilingEnabled() override;
 
     // Increments the event tag, allowing grouping of events in a user-defined manner (e.g. per inference).
-    void UpdateEventTag() { ++m_EventTag; m_EventTagUpdated = true; }
+    void UpdateEventTag();
 
     // Analyzes the tracked events and writes the results to the given output stream.
     // Please refer to the configuration variables in Profiling.cpp to customize the information written.
-    void AnalyzeEventsAndWriteResults(std::ostream& outStream) const;
+    void AnalyzeEventsAndWriteResults(std::ostream& outStream) const override;
 
-    // Accesses the singleton
-    static Profiler& Get() { return s_Instance; }
+    // Print stats for events in JSON Format to the given output stream.
+    void Print(std::ostream& outStream) const override;
 
-    // Gets a string name for a given Compute device enum
-    const char* GetEventComputeDevice(Compute compute) const;
-
-    // Gets the color to render an event with, based on which device it denotes
-    std::uint32_t GetEventColor(Compute compute) const;
-
-    typedef monotonic_clock Clock;
-    typedef std::chrono::time_point<Clock> TimePoint;
+    // Gets the color to render an event with, based on which device it denotes.
+    uint32_t GetEventColor(Compute compute) const;
 
 private:
-
+    using EventPtr = std::unique_ptr<Event>;
     struct Marker
     {
         std::size_t m_Id;
-        const std::string m_EventName;
-        TimePoint m_TimeStamp;
-        Compute m_ComputeDevice;
-        std::uint32_t m_Tag;
-    };
-
-    struct ProfilingEvent
-    {
-        std::string m_Label;
-        TimePoint m_StartTime;
-        TimePoint m_StopTime;
-        Compute m_Device;
-        std::uint32_t m_Tag;
-
-        double DurationMs() const
-        {
-            return std::chrono::duration<double>(m_StopTime - m_StartTime).count()*1000.0;
-        }
     };
 
     struct ProfilingEventStats
@@ -98,62 +71,100 @@ private:
         double m_TotalMs;
         double m_MinMs;
         double m_MaxMs;
-        std::uint32_t m_Count;
+        uint32_t m_Count;
     };
-
-    Profiler();
-    ~Profiler();
 
     // Waits for a compute device to finish working to guarantee correct timings.
     // Currently used exclusively when emitting profiling events denoting GPU work.
     void WaitForDevice(Compute compute) const;
 
-    void AnalyzeEventSequenceAndWriteResults(std::vector<ProfilingEvent>::const_iterator first,
-                                             std::vector<ProfilingEvent>::const_iterator last,
-                                             std::ostream& outStream) const;
+    template<typename EventIterType>
+    void AnalyzeEventSequenceAndWriteResults(EventIterType first, EventIterType last, std::ostream& outStream) const;
 
     std::map<std::string, ProfilingEventStats> CalculateProfilingEventStats() const;
+    void PopulateInferences(std::vector<const Event*>& outInferences, int& outBaseLevel) const;
+    void PopulateDescendants(std::map<const Event*, std::vector<const Event*>>& outDescendantsMap) const;
 
-    std::stack<Marker> m_ObservedMarkers;
-    std::vector<ProfilingEvent> m_EventSequence;
-    std::uint32_t m_EventTag;
-    std::uint32_t m_NestingLevel;
-    bool m_EventTagUpdated;
+    std::stack<Event*> m_Parents;
+    std::vector<EventPtr> m_EventSequence;
+    bool m_ProfilingEnabled;
 
-    static Profiler s_Instance;
+private:
+    // Friend functions for unit testing, see ProfilerTests.cpp.
+    friend size_t GetProfilerEventSequenceSize(armnn::Profiler* profiler);
 };
 
-// Helper to easily add event markers to the codebase
+// Singleton profiler manager.
+// Keeps track of all the running profiler instances.
+class ProfilerManager
+{
+public:
+    // Register the given profiler as a thread local pointer.
+    void RegisterProfiler(Profiler* profiler);
+
+    // Gets the thread local pointer to the profiler.
+    Profiler* GetProfiler();
+
+    // Accesses the singleton.
+    static ProfilerManager& GetInstance();
+
+private:
+    // The constructor is kept private so that other instances of this class (other that the singleton's)
+    // can't be allocated.
+    ProfilerManager() {}
+};
+
+// Helper to easily add event markers to the codebase.
 class ScopedProfilingEvent
 {
 public:
-    ScopedProfilingEvent(Compute compute, const std::string name)
-        : m_Compute(compute)
+    using InstrumentPtr = std::unique_ptr<Instrument>;
+
+    template<typename... Args>
+    ScopedProfilingEvent(Compute compute, const std::string& name, Args... args)
+        : m_Event(nullptr)
+        , m_Profiler(ProfilerManager::GetInstance().GetProfiler())
     {
-        Profiler::Get().BeginEvent(compute, name);
+        if (m_Profiler && m_Profiler->IsProfilingEnabled())
+        {
+            std::vector<InstrumentPtr> instruments(0);
+            instruments.reserve(sizeof...(args)); //One allocation
+            ConstructNextInVector(instruments, args...);
+            m_Event = m_Profiler->BeginEvent(compute, name, std::move(instruments));
+        }
     }
 
     ~ScopedProfilingEvent()
     {
-        Profiler::Get().EndEvent(m_Compute);
+        if (m_Profiler && m_Event)
+        {
+            m_Profiler->EndEvent(m_Event);
+        }
     }
 
 private:
-    armnn::Compute m_Compute;
+
+    void ConstructNextInVector(std::vector<InstrumentPtr>& instruments)
+    {
+        boost::ignore_unused(instruments);
+    }
+
+    template<typename Arg, typename... Args>
+    void ConstructNextInVector(std::vector<InstrumentPtr>& instruments, Arg arg, Args... args)
+    {
+        instruments.emplace_back(std::make_unique<Arg>(arg));
+        ConstructNextInVector(instruments, args...);
+    }
+
+    Event* m_Event;                                 ///< Event to track
+    Profiler* m_Profiler;                           ///< Profiler used
 };
 
 } // namespace armnn
 
-// Allows grouping events in an user-defined manner (e.g. per inference)
-#define ARMNN_UPDATE_PROFILING_EVENT_TAG() armnn::Profiler::Get().UpdateEventTag();
-
 // The event name must be known at compile time
-#define ARMNN_SCOPED_PROFILING_EVENT(compute, name) armnn::ScopedProfilingEvent e_##__FILE__##__LINE__(compute, name);
+#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(compute, /*name,*/ ...) \
+    armnn::ScopedProfilingEvent e_##__FILE__##__LINE__(compute, /*name,*/ __VA_ARGS__);
 
-#else
-
-#define ARMNN_UPDATE_PROFILING_EVENT_TAG()
-#define ARMNN_SCOPED_PROFILING_EVENT(compute, name)
-
-#endif // ARMNN_PROFILING_ENABLED
-
+#define ARMNN_SCOPED_PROFILING_EVENT(compute, name) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(compute, name, armnn::WallClockTimer())

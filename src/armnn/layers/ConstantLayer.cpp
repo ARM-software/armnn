@@ -13,9 +13,8 @@
 namespace armnn
 {
 
-ConstantLayer::ConstantLayer(const std::shared_ptr<ScopedCpuTensorHandle>& input, const char* name)
+ConstantLayer::ConstantLayer(const char* name)
     : Layer(0, 1, LayerType::Constant, name)
-    , m_LayerOutput(input)
 {
 }
 
@@ -29,13 +28,22 @@ std::unique_ptr<IWorkload> ConstantLayer::CreateWorkload(const Graph& graph,
 
 ConstantLayer* ConstantLayer::Clone(Graph& graph) const
 {
-    // Cloned layers share the same layer output object
-    return CloneBase<ConstantLayer>(graph, m_LayerOutput, GetName());
+    // Cloned layers share the same layer output object.
+    auto layer = CloneBase<ConstantLayer>(graph, GetName());
+
+    layer->m_LayerOutput = m_LayerOutput ? std::make_unique<ScopedCpuTensorHandle>(*m_LayerOutput) : nullptr;
+
+    return std::move(layer);
+}
+
+std::vector<TensorShape> ConstantLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
+{
+    return std::vector<TensorShape>({  m_LayerOutput->GetTensorInfo().GetShape() });
 }
 
 void ConstantLayer::ValidateTensorShapesFromInputs()
 {
-    // get the output shape from the value of the constant layer
+    // Get the output shape from the value of the constant layer.
     TensorShape const& outShape = m_LayerOutput->GetTensorInfo().GetShape();
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "ConstantLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

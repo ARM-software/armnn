@@ -19,6 +19,7 @@ public:
     SplitterLayer* Clone(Graph& graph) const override;
 
     void ValidateTensorShapesFromInputs() override;
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
 protected:
     SplitterLayer(const ViewsDescriptor& param, const char* name);

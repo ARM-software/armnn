@@ -8,13 +8,14 @@
 #include <memory>
 #include "armnn/TensorFwd.hpp"
 #include "OutputHandler.hpp"
+#include <boost/optional.hpp>
 
 namespace armnn
 {
 
 class Layer;
 
-// Workload factory interface for compute backends
+// Workload factory interface for compute backends.
 class IWorkloadFactory
 {
 public:
@@ -25,9 +26,16 @@ public:
     /// Informs the memory manager that the network is finalized and ready for execution.
     virtual void Finalize() { }
 
-    static bool IsLayerSupported(Compute compute, const Layer& layer, DataType dataType,
+    /// Inform the memory manager to release the memory
+    virtual void Release() { }
+
+    /// Inform the memory manager to acquire memory
+    virtual void Acquire() { }
+
+    static bool IsLayerSupported(Compute compute, const Layer& layer, boost::optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);
-    static bool IsLayerSupported(const Layer& layer, DataType dataType, std::string& outReasonIfUnsupported);
+    static bool IsLayerSupported(const Layer& layer, boost::optional<DataType> dataType,
+                                 std::string& outReasonIfUnsupported);
 
     virtual bool SupportsSubTensors() const = 0;
 
@@ -103,6 +111,15 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreateLstm(const LstmQueueDescriptor& descriptor,
+                                                  const WorkloadInfo& info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreateConvertFp32ToFp16(const ConvertFp32ToFp16QueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const = 0;
 };
 
 } //namespace armnn

@@ -21,7 +21,7 @@ ClReshapeUint8Workload::ClReshapeUint8Workload(const ReshapeQueueDescriptor& des
 
 void ClReshapeUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClReshapeUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClReshapeUint8Workload_Execute");
 
     m_Layer.run();
 }

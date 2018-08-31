@@ -12,7 +12,8 @@
 class MnistDatabase
 {
 public:
-    using TTestCaseData = ClassifierTestCaseData<float>;
+    using DataType = float;
+    using TTestCaseData = ClassifierTestCaseData<DataType>;
 
     explicit MnistDatabase(const std::string& binaryFileDirectory, bool scaleValues = false);
     std::unique_ptr<TTestCaseData> GetTestCaseData(unsigned int testCaseId);

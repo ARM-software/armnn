@@ -27,35 +27,35 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
 
     // NOTE: Compute Library imposes a restriction that the x and y dimension (input height and width)
     //       cannot be split.
-    //       For the reasons for this see first comment on https://jira.arm.com/browse/IVGCVSW-1239
+    //       For the reasons for this, see first comment on https://jira.arm.com/browse/IVGCVSW-1239
     //
-    // this test has therefore been recast to split the channels, then split the resulting subtensor
+    // This test has therefore been recast to split the channels, then split the resulting subtensor.
 
-    // to take channel 0 of original output
-    // and channel 0 and channel 1 of the split subtensor
+    // To take channel 0 of original output
+    // and channel 0 and channel 1 of the split subtensor.
     unsigned int outputWidth1 = inputWidth;
     unsigned int outputHeight1 = inputHeight;
     unsigned int outputChannels1 = 1;
 
-    // to take channel 1 and 2 of the original output
+    // To take channel 1 and 2 of the original output.
     unsigned int outputWidth2 = inputWidth;
     unsigned int outputHeight2 = inputHeight;
     unsigned int outputChannels2 = 2;
 
 
-    // Define the tensor descriptors
+    // Define the tensor descriptors.
     armnn::TensorInfo inputTensorInfo({ inputChannels, inputHeight, inputWidth }, armnn::GetDataType<T>());
 
-    // outputs of the original split
+    // Outputs of the original split.
     armnn::TensorInfo outputTensorInfo1({ outputChannels1, outputHeight1, outputWidth1 }, armnn::GetDataType<T>());
     armnn::TensorInfo outputTensorInfo2({ outputChannels2, outputHeight2, outputWidth2 }, armnn::GetDataType<T>());
 
-    // outputs of the subsequent subtensor split
+    // Outputs of the subsequent subtensor split.
     armnn::TensorInfo outputTensorInfo3({ outputChannels1, outputHeight1, outputWidth1 }, armnn::GetDataType<T>());
     armnn::TensorInfo outputTensorInfo4({ outputChannels1, outputHeight1, outputWidth1 }, armnn::GetDataType<T>());
 
     // Set quantization parameters if the requested type is a quantized type.
-    // The quantization doesn't really matter as the splitter operator doesn't dequantize/quantize
+    // The quantization doesn't really matter as the splitter operator doesn't dequantize/quantize.
     if(armnn::IsQuantizedType<T>())
     {
         inputTensorInfo.SetQuantizationScale(qScale);
@@ -100,7 +100,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
         })
     ));
 
-    // channel 0 of the original input
+    // Channel 0 of the original input.
     ret1.outputExpected = MakeTensor<T, 3>(outputTensorInfo1, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
             1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
@@ -112,7 +112,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
         })
     ));
 
-    // channel 1 & 2 of the original input
+    // Channel 1 & 2 of the original input.
     ret2.outputExpected = MakeTensor<T, 3>(outputTensorInfo2, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
             31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
@@ -131,7 +131,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
         })
     ));
 
-    // channel 0 of return 2 (i.e. channels 1 and 2 of the original input)
+    // Channel 0 of return 2 (i.e. channels 1 and 2 of the original input).
     ret3.outputExpected = MakeTensor<T, 3>(outputTensorInfo3, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
             31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
@@ -143,7 +143,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
         })
     ));
 
-    // channel 1 of return 2
+    // Channel 1 of return 2.
     ret4.outputExpected = MakeTensor<T, 3>(outputTensorInfo4, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
             61.0f, 62.0f, 63.0f, 64.0f, 65.0f,
@@ -155,19 +155,19 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
         })
     ));
 
-    // NOTE: as a corollary of the no splitting of x and y restriction the x and y values of the view origins
+    // NOTE: as a corollary of the splitting of x and y restriction the x and y values of the view origins
     //       have to be zero, the co-ordinates are as per the tensor info above channels, height/y, width/x
-    //       note that under the hood the compute engine reverses these i.e. its coordinate system is x, y, channels
-    std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //extent of the window is defined by size of output[0]
+    //       note that under the hood the compute engine reverses these i.e. its coordinate system is x, y, channels.
+    std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //Extent of the window is defined by size of output[0].
     armnn::SplitterQueueDescriptor::ViewOrigin window1(wOrigin1);
 
-    std::vector<unsigned int> wOrigin2 = {1, 0, 0}; //extent of the window is defined by size of output[1]
+    std::vector<unsigned int> wOrigin2 = {1, 0, 0}; //Extent of the window is defined by size of output[1].
     armnn::SplitterQueueDescriptor::ViewOrigin window2(wOrigin2);
 
-    std::vector<unsigned int> wOrigin3 = {0, 0, 0}; //extent of the window is defined by size of output[2]
+    std::vector<unsigned int> wOrigin3 = {0, 0, 0}; //Extent of the window is defined by size of output[2].
     armnn::SplitterQueueDescriptor::ViewOrigin window3(wOrigin3);
 
-    std::vector<unsigned int> wOrigin4 = {1, 0, 0}; //extent of the window is defined by size of output[3]
+    std::vector<unsigned int> wOrigin4 = {1, 0, 0}; //Extent of the window is defined by size of output[3].
     armnn::SplitterQueueDescriptor::ViewOrigin window4(wOrigin4);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
@@ -217,7 +217,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
     CopyDataFromITensorHandle(&ret1.output[0][0][0], outputHandle1.get());
     CopyDataFromITensorHandle(&ret2.output[0][0][0], outputHandle2.get());
 
-//    // Do the second split
+//    // Do the second split.
     armnn::SplitterQueueDescriptor data2;
     armnn::WorkloadInfo info2;
     AddInputToWorkload(data2, info2, outputTensorInfo2, outputHandle2.get());

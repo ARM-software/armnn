@@ -45,6 +45,12 @@ ScopedCpuTensorHandle::ScopedCpuTensorHandle(const ConstTensor& tensor)
     CopyFrom(tensor.GetMemoryArea(), tensor.GetNumBytes());
 }
 
+ScopedCpuTensorHandle::ScopedCpuTensorHandle(const ConstCpuTensorHandle& tensorHandle)
+: ScopedCpuTensorHandle(tensorHandle.GetTensorInfo())
+{
+    CopyFrom(tensorHandle.GetConstTensor<void>(), tensorHandle.GetTensorInfo().GetNumBytes());
+}
+
 ScopedCpuTensorHandle::ScopedCpuTensorHandle(const ScopedCpuTensorHandle& other)
 : CpuTensorHandle(other.GetTensorInfo())
 {

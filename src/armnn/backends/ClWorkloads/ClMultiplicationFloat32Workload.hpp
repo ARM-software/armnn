@@ -9,12 +9,17 @@
 
 namespace armnn
 {
-class ClMultiplicationFloat32Workload : public Float32Workload<MultiplicationQueueDescriptor>
+
+arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
+                                                     const TensorInfo& input1,
+                                                     const TensorInfo& output);
+
+class ClMultiplicationFloat32Workload : public FloatWorkload<MultiplicationQueueDescriptor>
 {
 public:
     ClMultiplicationFloat32Workload(const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info);
 
-    using Float32Workload<MultiplicationQueueDescriptor>::Float32Workload;
+    using FloatWorkload<MultiplicationQueueDescriptor>::FloatWorkload;
     void Execute() const override;
 
 private:

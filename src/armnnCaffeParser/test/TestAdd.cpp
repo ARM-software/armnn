@@ -8,7 +8,7 @@
 
 BOOST_AUTO_TEST_SUITE(CaffeParser)
 
-struct AddFixture : public ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
+struct AddFixture : public armnnUtils::ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
 {
     AddFixture()
     {

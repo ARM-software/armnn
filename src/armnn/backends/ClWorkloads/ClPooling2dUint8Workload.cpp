@@ -16,7 +16,7 @@ ClPooling2dUint8Workload::ClPooling2dUint8Workload(const Pooling2dQueueDescripto
 
 void ClPooling2dUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClPooling2dUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClPooling2dUint8Workload_Execute");
     m_PoolingLayer.run();
 }
 

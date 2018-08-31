@@ -18,7 +18,7 @@ NeonPooling2dUint8Workload::NeonPooling2dUint8Workload(const Pooling2dQueueDescr
 
 void NeonPooling2dUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonPooling2dUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonPooling2dUint8Workload_Execute");
     m_PoolingLayer.run();
 }
 

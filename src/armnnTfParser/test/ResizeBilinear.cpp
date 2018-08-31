@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct ResizeBilinearFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ResizeBilinearFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     ResizeBilinearFixture()
     {
@@ -98,11 +98,11 @@ node {
 
 BOOST_FIXTURE_TEST_CASE(ParseResizeBilinear, ResizeBilinearFixture)
 {
-    RunTest<4>(// input data
+    RunTest<4>(// Input data.
                { 0.0f, 1.0f, 2.0f,
                  3.0f, 4.0f, 5.0f,
                  6.0f, 7.0f, 8.0f },
-               // expected output data
+               // Expected output data.
                { 0.0f, 0.6f, 1.2f, 1.8f, 2.0f,
                  1.8f, 2.4f, 3.0f, 3.6f, 3.8f,
                  3.6f, 4.2f, 4.8f, 5.4f, 5.6f,

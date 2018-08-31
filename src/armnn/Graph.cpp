@@ -32,7 +32,7 @@ Graph::Graph(const Graph& other)
         otherToClonedMap.emplace(otherLayer, layer);
     }
 
-    // Copy slot connections
+    // Copies slot connections.
     for (auto&& otherLayer : other.m_Layers)
     {
         Layer* const thisLayer = otherToClonedMap[otherLayer];
@@ -95,18 +95,18 @@ Status Graph::SerializeToDot(std::ostream& stream)
                 .AddAttribute("fontname", "arial-bold");
         }
 
-        // First declare the nodes
+        // First declares the nodes.
         for (auto&& layer : m_Layers)
         {
             DotNode node(stream, layer->GetGuid(), GetLayerTypeAsCString(layer->GetType()));
-            // Extract the layer parameters
+            // Extracts the layer parameters.
             ParameterStringifyFunction extractParams = [&node](const std::string & name, const std::string & value){
                 node.GetContents().AddContent(name + " : " + value);
             };
             layer->SerializeLayerParameters(extractParams);
         }
 
-        // Second declare the edges
+        // Second declares the edges.
         for (auto&& layer : m_Layers)
         {
             LayerGuid toId = layer->GetGuid();
@@ -117,9 +117,9 @@ Status Graph::SerializeToDot(std::ostream& stream)
                 LayerGuid fromId = outputSlot->GetOwningLayer().GetGuid();
                 DotEdge edge(stream, fromId, toId);
 
-                // Now Print the tensor shape on the edge
+                // Now print the tensor shape on the edge.
                 {
-                    // Construct the label attribute with HTML markup
+                    // Constructs the label attribute with HTML markup.
                     std::stringstream ss;
                     ss << "< " << outputSlot->GetTensorInfo().GetShape() << " >";
                     edge.GetAttributeSet().AddAttribute("label", ss);
@@ -137,13 +137,94 @@ Status Graph::SerializeToDot(std::ostream& stream)
 
 Status Graph::AllocateDynamicBuffers()
 {
+    // Layers must be sorted in topological order
+    BOOST_ASSERT(m_LayersInOrder);
+
+    std::unordered_set<const ITensorHandle*> preallocatedTensors;
+    std::unordered_map<const ITensorHandle*, unsigned int> handleReferenceCounts;
+
+    // Finds the first TensorHandle ancestor of a SubTensorHandle. If the ITensorHandle provided
+    // is a TensorHandle, the function just returns it
+    auto TraceSubTensorHandleAncestry = [](ITensorHandle* const subTensorHandle)
+    {
+        ITensorHandle* ancestor = subTensorHandle;
+        while (ancestor && ancestor->GetParent())
+        {
+            ancestor = ancestor->GetParent();
+        }
+        return ancestor;
+    };
+
+    // Checks whether a TensorHandle has been pre-allocated
+    auto IsPreallocated = [&](ITensorHandle* const tensorHandle)
+    {
+        return tensorHandle && preallocatedTensors.find(tensorHandle) != preallocatedTensors.end();
+    };
+
+    // Constant tensor handles need to last from the beginning of execution till the end,
+    // therefore we pre-allocate them upfront
     for (auto&& layer : m_Layers)
     {
-        for (auto slot = layer->BeginOutputSlots(); slot != layer->EndOutputSlots(); ++slot)
+        if (layer->GetType() == LayerType::Constant)
         {
-            slot->GetOutputHandler().AllocateTensors();
+            for (auto&& slot = layer->BeginOutputSlots(); slot != layer->EndOutputSlots(); ++slot)
+            {
+                ITensorHandle *tensorHandle = TraceSubTensorHandleAncestry(slot->GetOutputHandler().GetData());
+
+                if (tensorHandle && !IsPreallocated(tensorHandle))
+                {
+                    tensorHandle->Allocate();
+                    preallocatedTensors.insert(tensorHandle);
+                }
+            }
         }
     }
+
+    // Iterate over the network in topological order
+    for (auto&& layer : m_Layers)
+    {
+        // Count the amount of times each output slot references a certain buffer (ITensorHandle).
+        // The first time we encounter a new tensor handle, we start managing its lifetime.
+        for (auto&& slot = layer->BeginOutputSlots(); slot != layer->EndOutputSlots(); ++slot)
+        {
+            ITensorHandle *tensorHandle = TraceSubTensorHandleAncestry(slot->GetOutputHandler().GetData());
+
+            if (tensorHandle && !IsPreallocated(tensorHandle))
+            {
+                unsigned int numConnections = slot->GetNumConnections();
+                if (handleReferenceCounts.find(tensorHandle) == handleReferenceCounts.end())
+                {
+                    handleReferenceCounts[tensorHandle] = numConnections;
+                    tensorHandle->Manage();
+                }
+                else
+                {
+                    handleReferenceCounts[tensorHandle] += numConnections;
+                }
+            }
+        }
+
+        // Loop through the input slots in the same layer and decrement the reference counter associated
+        // to each tensor handle we encounter. Once it reaches zero, we end the lifetime of the tensor handle
+        for (auto&& slot = layer->BeginInputSlots(); slot != layer->EndInputSlots(); ++slot)
+        {
+            ITensorHandle *tensorHandle = TraceSubTensorHandleAncestry(
+                slot->GetConnectedOutputSlot()->GetOutputHandler().GetData());
+
+            if (tensorHandle && !IsPreallocated(tensorHandle))
+            {
+                --handleReferenceCounts[tensorHandle];
+
+                if (handleReferenceCounts[tensorHandle] == 0u)
+                {
+                    // Stop managing lifetime of tensor handle
+                    tensorHandle->Allocate();
+                    handleReferenceCounts.erase(tensorHandle);
+                }
+            }
+        }
+    }
+
     return Status::Success;
 }
 
@@ -151,7 +232,7 @@ const Graph& Graph::TopologicalSort() const
 {
     if (!m_LayersInOrder)
     {
-        //Reset layer order
+        // Resets layer order.
         for (auto&& it : m_Layers)
         {
             it->ResetPriority();
@@ -178,9 +259,9 @@ void Graph::AddCopyLayers()
     // CPU -> Neon (and viceversa)
     auto MayNeedCopyLayer = [](const Layer& layer)
         {
-            // All layers should have been associated with a valid compute device at this point
+            // All layers should have been associated with a valid compute device at this point.
             BOOST_ASSERT(layer.GetComputeDevice() != Compute::Undefined);
-            // Do not need another copy layer if copy layer is already present
+            // Does not need another copy layer if a copy layer is already present.
             return layer.GetType() != LayerType::MemCopy;
         };
 
@@ -191,14 +272,14 @@ void Graph::AddCopyLayers()
             unsigned int srcOutputIndex = 0;
             for (auto&& srcOutput : srcLayer->GetOutputSlots())
             {
-                for (auto&& dstInput : srcOutput.GetConnections())
+                std::vector<InputSlot*> connectionCopy = srcOutput.GetConnections();
+                for (auto&& dstInput : connectionCopy)
                 {
                     Layer& dstLayer = dstInput->GetOwningLayer();
-
                     if (MayNeedCopyLayer(dstLayer) && (dstLayer.GetComputeDevice() != srcLayer->GetComputeDevice()))
                     {
-                        // A copy layer is needed in between the source and destination layers
-                        // Record the operation rather than attempting to modify the graph as we go
+                        // A copy layer is needed in between the source and destination layers.
+                        // Record the operation rather than attempting to modify the graph as we go.
                         // (invalidating iterators)
                         const std::string copyLayerName = boost::str(boost::format("[ %1% (%2%) -> %3% (%4%) ]")
                                                                      % srcLayer->GetName()

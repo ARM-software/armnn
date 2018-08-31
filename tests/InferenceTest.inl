@@ -4,8 +4,6 @@
 //
 #include "InferenceTest.hpp"
 
-#include "InferenceModel.hpp"
-
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/log/trivial.hpp>
@@ -30,6 +28,7 @@ namespace armnn
 namespace test
 {
 
+
 template <typename TTestCaseDatabase, typename TModel>
 ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
     int& numInferencesRef,
@@ -42,6 +41,7 @@ ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
     std::vector<typename TModel::DataType> modelInput)
     : InferenceModelTestCase<TModel>(model, testCaseId, std::move(modelInput), model.GetOutputSize())
     , m_Label(label)
+    , m_QuantizationParams(model.GetQuantizationParams())
     , m_NumInferencesRef(numInferencesRef)
     , m_NumCorrectInferencesRef(numCorrectInferencesRef)
     , m_ValidationPredictions(validationPredictions)
@@ -60,7 +60,7 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
         int index = 0;
         for (const auto & o : output)
         {
-            resultMap[o] = index++;
+            resultMap[ToFloat<typename TModel::DataType>::Convert(o, m_QuantizationParams)] = index++;
         }
     }
 
@@ -78,7 +78,7 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     const unsigned int prediction = boost::numeric_cast<unsigned int>(
         std::distance(output.begin(), std::max_element(output.begin(), output.end())));
 
-    // If we're just running the defaultTestCaseIds, each one must be classified correctly
+    // If we're just running the defaultTestCaseIds, each one must be classified correctly.
     if (params.m_IterationCount == 0 && prediction != m_Label)
     {
         BOOST_LOG_TRIVIAL(error) << "Prediction for test case " << testCaseId << " (" << prediction << ")" <<
@@ -86,7 +86,7 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
         return TestCaseResult::Failed;
     }
 
-    // If a validation file was provided as input, check that the prediction matches
+    // If a validation file was provided as input, it checks that the prediction matches.
     if (!m_ValidationPredictions.empty() && prediction != m_ValidationPredictions[testCaseId])
     {
         BOOST_LOG_TRIVIAL(error) << "Prediction for test case " << testCaseId << " (" << prediction << ")" <<
@@ -94,13 +94,13 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
         return TestCaseResult::Failed;
     }
 
-    // If a validation file was requested as output, store the predictions
+    // If a validation file was requested as output, it stores the predictions.
     if (m_ValidationPredictionsOut)
     {
         m_ValidationPredictionsOut->push_back(prediction);
     }
 
-    // Update accuracy stats
+    // Updates accuracy stats.
     m_NumInferencesRef++;
     if (prediction == m_Label)
     {
@@ -154,7 +154,7 @@ bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::ProcessCommandLineOp
         return false;
     }
 
-    m_Database = std::make_unique<TDatabase>(m_ConstructDatabase(m_DataDir.c_str()));
+    m_Database = std::make_unique<TDatabase>(m_ConstructDatabase(m_DataDir.c_str(), *m_Model));
     if (!m_Database)
     {
         return false;
@@ -191,7 +191,7 @@ bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::OnInferenceTestFinis
         boost::numeric_cast<double>(m_NumInferences);
     BOOST_LOG_TRIVIAL(info) << std::fixed << std::setprecision(3) << "Overall accuracy: " << accuracy;
 
-    // If a validation file was requested as output, save the predictions to it
+    // If a validation file was requested as output, the predictions are saved to it.
     if (!m_ValidationFileOut.empty())
     {
         std::ofstream validationFileOut(m_ValidationFileOut.c_str(), std::ios_base::trunc | std::ios_base::out);
@@ -215,7 +215,7 @@ bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::OnInferenceTestFinis
 template <typename TDatabase, typename InferenceModel>
 void ClassifierTestCaseProvider<TDatabase, InferenceModel>::ReadPredictions()
 {
-    // Read expected predictions from the input validation file (if provided)
+    // Reads the expected predictions from the input validation file (if provided).
     if (!m_ValidationFileIn.empty())
     {
         std::ifstream validationFileIn(m_ValidationFileIn.c_str(), std::ios_base::in);
@@ -242,7 +242,7 @@ int InferenceTestMain(int argc,
     const std::vector<unsigned int>& defaultTestCaseIds,
     TConstructTestCaseProvider constructTestCaseProvider)
 {
-    // Configure logging for both the ARMNN library and this test program
+    // Configures logging for both the ARMNN library and this test program.
 #ifdef NDEBUG
     armnn::LogSeverity level = armnn::LogSeverity::Info;
 #else
@@ -275,20 +275,35 @@ int InferenceTestMain(int argc,
     }
 }
 
+//
+// This function allows us to create a classifier inference test based on:
+//  - a model file name
+//  - which can be a binary or a text file for protobuf formats
+//  - an input tensor name
+//  - an output tensor name
+//  - a set of test case ids
+//  - a callback method which creates an object that can return images
+//    called 'Database' in these tests
+//  - and an input tensor shape
+//
 template<typename TDatabase,
-    typename TParser,
-    typename TConstructDatabaseCallable>
-int ClassifierInferenceTestMain(int argc, char* argv[], const char* modelFilename, bool isModelBinary,
-    const char* inputBindingName, const char* outputBindingName,
-    const std::vector<unsigned int>& defaultTestCaseIds,
-    TConstructDatabaseCallable constructDatabase,
-    const armnn::TensorShape* inputTensorShape)
+         typename TParser,
+         typename TConstructDatabaseCallable>
+int ClassifierInferenceTestMain(int argc,
+                                char* argv[],
+                                const char* modelFilename,
+                                bool isModelBinary,
+                                const char* inputBindingName,
+                                const char* outputBindingName,
+                                const std::vector<unsigned int>& defaultTestCaseIds,
+                                TConstructDatabaseCallable constructDatabase,
+                                const armnn::TensorShape* inputTensorShape)
 {
     return InferenceTestMain(argc, argv, defaultTestCaseIds,
         [=]
         ()
         {
-            using InferenceModel = InferenceModel<TParser, float>;
+            using InferenceModel = InferenceModel<TParser, typename TDatabase::DataType>;
             using TestCaseProvider = ClassifierTestCaseProvider<TDatabase, InferenceModel>;
 
             return make_unique<TestCaseProvider>(constructDatabase,
@@ -308,6 +323,7 @@ int ClassifierInferenceTestMain(int argc, char* argv[], const char* modelFilenam
                     modelParams.m_IsModelBinary = isModelBinary;
                     modelParams.m_ComputeDevice = modelOptions.m_ComputeDevice;
                     modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
+                    modelParams.m_EnableFp16TurboMode = modelOptions.m_EnableFp16TurboMode;
 
                     return std::make_unique<InferenceModel>(modelParams);
             });

@@ -23,10 +23,13 @@ public:
     FullyConnectedLayer* Clone(Graph& graph) const override;
 
     void ValidateTensorShapesFromInputs() override;
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
 protected:
     FullyConnectedLayer(const FullyConnectedDescriptor& param, const char* name);
     ~FullyConnectedLayer() = default;
+
+    ConstantTensors GetConstantTensorsByRef() override;
 };
 
 } // namespace

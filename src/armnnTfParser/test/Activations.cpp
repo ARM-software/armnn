@@ -9,8 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-
-struct ActivationFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ActivationFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     explicit ActivationFixture(const char* activationFunction)
     {
@@ -106,8 +105,5 @@ BOOST_FIXTURE_TEST_CASE(ParseTanh, TanhFixture)
     RunTest<2>({ -0.1f, -0.2f, -0.3f, -0.4f, 0.1f, 0.2f, 0.3f },
                { -0.09966799f, -0.19737528f, -0.29131261f, -0.379949f, 0.09966799f, 0.19737528f, 0.29131261f });
 }
-
-
-
 
 BOOST_AUTO_TEST_SUITE_END()

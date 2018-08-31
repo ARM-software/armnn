@@ -10,7 +10,7 @@
 
 namespace armnn
 {
-class ClPooling2dFloat32Workload : public ClPooling2dBaseWorkload<DataType::Float32>
+class ClPooling2dFloat32Workload : public ClPooling2dBaseWorkload<DataType::Float16, DataType::Float32>
 {
 public:
     ClPooling2dFloat32Workload(const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info);

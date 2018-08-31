@@ -35,8 +35,11 @@
 #include "SoftmaxTestImpl.hpp"
 #include "NormTestImpl.hpp"
 #include "PermuteTestImpl.hpp"
+#include "LstmTestImpl.hpp"
+#include "ConvertFp16ToFp32TestImpl.hpp"
+#include "ConvertFp32ToFp16TestImpl.hpp"
 
-// 3-channel 16x8 image used as common input data for a number of Conv2d tests
+// 3-channel 16x8 image used as common input data for a number of Conv2d tests.
 static std::vector<float> ConvInput3x8x16({
     0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
     0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
@@ -64,10 +67,10 @@ static std::vector<float> ConvInput3x8x16({
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 });
 
-// 2-channel bias used by a number of Conv2d tests
+// 2-channel bias used by a number of Conv2d tests.
 static std::vector<float> Bias2({0, 2});
 
-// Helper function that returns either Bias2 or an empty vector depending on whether bias is enabled
+// Helper function that returns either Bias2 or an empty vector depending on whether bias is enabled.
 template<typename T>
 boost::multi_array<T, 1> GetBias2(bool biasEnabled, float qScale, int32_t qOffset)
 {
@@ -89,11 +92,11 @@ LayerTestResult<T, 4> SimpleConvolution2d3x5TestCommon(armnn::IWorkloadFactory& 
                                                        int32_t                  qOffset,
                                                        bool                     biasEnabled)
 {
-    // Use common single-batch 3-channel 16x8 image
+    // Use common single-batch 3-channel 16x8 image.
     armnn::TensorInfo inputDesc({1, 3, 8, 16}, armnn::GetDataType<T>());
     boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputDesc, QuantizedVector<T>(qScale, qOffset, ConvInput3x8x16));
 
-    // Use a 2-element batch with 3-channel 3x5 kernels
+    // Use a 2-element batch with 3-channel 3x5 kernels.
     armnn::TensorInfo kernelDesc({2, 3, 5, 3}, armnn::GetDataType<T>());
     boost::multi_array<T, 4> kernel = MakeTensor<T, 4>(kernelDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
@@ -135,7 +138,7 @@ LayerTestResult<T, 4> SimpleConvolution2d3x5TestCommon(armnn::IWorkloadFactory& 
             0, 0, 0
         })));
 
-    // Expected output is 2 batch elements of a 1-channel 14x4 image
+    // Expected output is 2 batch elements of a 1-channel 14x4 image.
     armnn::TensorInfo outputDesc({1, 2, 4, 14}, armnn::GetDataType<T>());
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
@@ -167,13 +170,13 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(armnn::IWorkloadFactory& 
                                                        int32_t                  qOffset,
                                                        bool                     biasEnabled)
 {
-    // Use a 3x3 kernel, which exercises ArmCompute's direct convolution path
+    // Use a 3x3 kernel, which exercises ArmCompute's direct convolution path.
 
-    // Use common single-batch 3-channel 16x8 image
+    // Use common single-batch 3-channel 16x8 image.
     armnn::TensorInfo inputDesc({1, 3, 8, 16}, armnn::GetDataType<T>());
     boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputDesc, QuantizedVector<T>(qScale, qOffset, ConvInput3x8x16));
 
-    // Use a 2-element batch of 3-channel 3x3 kernels
+    // Use a 2-element batch of 3-channel 3x3 kernels.
     armnn::TensorInfo kernelDesc({2, 3, 3, 3}, armnn::GetDataType<T>());
     boost::multi_array<T, 4> kernel = MakeTensor<T, 4>(kernelDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
@@ -203,7 +206,7 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(armnn::IWorkloadFactory& 
             0, 0, 0
         })));
 
-    // Expected output is 1 batch of a 2-channel 14x6 image
+    // Expected output is 1 batch of a 2-channel 14x6 image.
     armnn::TensorInfo outputDesc({1, 2, 6, 14}, armnn::GetDataType<T>());
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
@@ -261,7 +264,7 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
     float                    qScale,
     int32_t                  qOffset)
 {
-    // Use a single-batch 1-channel 3x3 image as input
+    // Use a single-batch 1-channel 3x3 image as input.
     armnn::TensorInfo inputDesc({1, 1, 3, 3}, armnn::GetDataType<T>());
     boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
@@ -270,7 +273,7 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
             13,23,33
         })));
 
-    // Use 1 batch of a 1-channel 2x2 kernel
+    // Use 1 batch of a 1-channel 2x2 kernel.
     armnn::TensorInfo kernelDesc({1, 1, 2, 2}, armnn::GetDataType<T>());
     boost::multi_array<T, 4> kernel = MakeTensor<T, 4>(kernelDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
@@ -278,7 +281,7 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
             -12,-22,
         })));
 
-// Expected output is 1 batch of a 1-channel 6x8 image
+// Expected output is 1 batch of a 1-channel 6x8 image.
 // Manually calculated like this:
 //[-11*0 -21*0  -12*0 -22*0  ; -11*0  -21*0  -12*0  -22*0  ; -11*0  -21*0  -12*0  -22*0  ; -11*0  -21*0 -12*0  -22*0 ..]
 //[-11*0 -21*0  -12*0 -22*11 ; -11*0  -21*0  -12*11 -22*21 ; -11*0  -21*0  -12*21 -22*31 ; -11*0  -21*0 -12*31 -22*0 ..]
@@ -307,10 +310,10 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
       expectedOutput,
       qScale,
       qOffset,
-      1,  // padding left
-      2,  // padding top
-      3,  // padding right
-      4); // padding bottom
+      1,  // Padding left.
+      2,  // Padding top.
+      3,  // Padding right.
+      4); // Padding bottom.
 }
 
 template<typename T>
@@ -318,7 +321,7 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
     float                    qScale,
     int32_t                  qOffset)
 {
-    // Use a single-batch 1-channel 5x5 image as input
+    // Use a single-batch 1-channel 5x5 image as input.
     armnn::TensorInfo inputDesc({ 1, 1, 5, 5 }, armnn::GetDataType<T>());
     boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
@@ -329,7 +332,7 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
             15,25,35,45,55,
         })));
 
-    // Use 1 batch of a 1-channel 4x4 kernel
+    // Use 1 batch of a 1-channel 4x4 kernel.
     armnn::TensorInfo kernelDesc({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
     boost::multi_array<T, 4> kernel = MakeTensor<T, 4>(kernelDesc, std::vector<T>(
         QuantizedVector<T>(qScale, qOffset, {
@@ -339,7 +342,7 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
             -14,-24,-34,-44,
         })));
 
-    // Expected output is 1 batch of a 1-channel 5x5 image
+    // Expected output is 1 batch of a 1-channel 5x5 image.
     armnn::TensorInfo outputDesc({ 1, 1, 5, 5 }, armnn::GetDataType<T>());
     std::vector<T> myVec(outputDesc.GetNumElements(), 0);
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputDesc, std::vector<T>(
@@ -358,10 +361,10 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
         expectedOutput,
         qScale,
         qOffset,
-        1,  // padding left
-        1,  // padding top
-        2,  // padding right
-        2); // padding bottom
+        1,  // Padding left.
+        1,  // Padding top.
+        2,  // Padding right.
+        2); // Padding bottom.
 }
 
 template<typename T>
@@ -370,7 +373,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloa
                                                                  int32_t qOffset,
                                                                  bool biasEnabled)
 {
-    // Use a single-batch 2-channel 5x5 image as input
+    // Use a single-batch 2-channel 5x5 image as input.
     armnn::TensorInfo inputTensorInfo({ 1, 2, 5, 5 }, armnn::GetDataType<T>());
     auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
         QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
@@ -387,7 +390,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloa
             45, 46, 47, 48, 49
         })));
 
-    // Use a depth multiplier of 1 on a 2-channel 4x4 kernel
+    // Use a depth multiplier of 1 on a 2-channel 4x4 kernel.
     armnn::TensorInfo kernelTensorInfo({ 1, 2, 4, 4 }, armnn::GetDataType<T>());
     auto kernel = MakeTensor<T, 4>(kernelTensorInfo, std::vector<T>(
         QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(), {
@@ -402,8 +405,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloa
              4,  3,  2,  1
         })));
 
-    // Expected output is 1 batch of a 2-channel 5x5 image
-    // calculated using the python tensorflow library with strideX=1, strideY=1
+    // Expected output is 1 batch of a 2-channel 5x5 image.
+    // Calculated using the python tensorflow library with strideX=1, strideY=1.
     armnn::TensorInfo outputTensorInfo({ 1, 2, 5, 5 }, armnn::GetDataType<T>());
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputTensorInfo, std::vector<T>(
         QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(), {
@@ -426,10 +429,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloa
         expectedOutput,
         qScale,
         qOffset,
-        1,  // padding left
-        1,  // padding top
-        2,  // padding right
-        2,  // padding bottom
+        1,  // Padding left.
+        1,  // Padding top.
+        2,  // Padding right.
+        2,  // Padding bottom.
         1,  // strideX
         1); // strideY
 }
@@ -569,6 +572,55 @@ LayerTestResult<uint8_t, 3> CopyViaSplitterUint8Test(armnn::IWorkloadFactory& wo
     return CopyViaSplitterTestImpl<uint8_t>(workloadFactory, 1.0f, 0);
 }
 
+LayerTestResult<float, 2> LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest(
+        armnn::IWorkloadFactory& workloadFactory)
+{
+    armnn::TensorInfo inputDesc({ 2, 2 }, armnn::GetDataType<float>());
+    boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            { 2., 3., 3., 4. }));
+
+    armnn::TensorInfo outputDesc({ 2, 4 }, armnn::GetDataType<float>());
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(outputDesc, std::vector<float>(
+            {-0.36444446f, -0.00352185f, 0.12886585f, -0.05163646f,
+             -0.42734814f, -0.00478661f,  0.13455015f, -0.03560682f}));
+    return LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(workloadFactory, input, expectedOutput);
+}
+
+LayerTestResult<float, 2> LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest(
+        armnn::IWorkloadFactory& workloadFactory)
+{
+    armnn::TensorInfo inputDesc({ 2, 5 }, armnn::GetDataType<float>());
+    boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            {0.787926f, 0.151646f, 0.071352f, 0.118426f, 0.458058f,
+             0.295743f, 0.544053f, 0.690064f, 0.858138f, 0.497181f}));
+
+    armnn::TensorInfo outputDesc({ 2, 16 }, armnn::GetDataType<float>());
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(outputDesc, std::vector<float>(
+            {-0.00396806f, 0.029352f,     -0.00279226f, 0.0159977f,   -0.00835576f,
+             -0.0211779f,  0.0283512f,    -0.0114597f,  0.00907307f,  -0.0244004f,
+             -0.0152191f,  -0.0259063f,   0.00914318f,  0.00415118f,  0.017147f,
+             0.0134203f, -0.013869f,    0.0287268f,   -0.00334693f, 0.00733398f,  -0.0287926f,
+             -0.0186926f,   0.0193662f,   -0.0115437f,  0.00422612f,  -0.0345232f,
+             0.00223253f,   -0.00957321f, 0.0210624f,   0.013331f,    0.0150954f,
+             0.02168f}));
+    return LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(workloadFactory, input, expectedOutput);
+}
+
+LayerTestResult<float, 2> LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    armnn::TensorInfo inputDesc({2, 2}, armnn::GetDataType<float>());
+    boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            {2., 3., 3., 4.}));
+
+
+    armnn::TensorInfo outputDesc({2, 4}, armnn::GetDataType<float>());
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(outputDesc, std::vector<float>(
+            {{-0.02973187f, 0.1229473f,   0.20885126f, -0.15358765f,
+              -0.0185422f,   0.11281417f,  0.24466537f, -0.1826292f}}));
+
+    return LstmNoCifgNoPeepholeNoProjectionTestImpl(workloadFactory, input, expectedOutput);
+}
+
 LayerTestResult<float,3> MergerTest(armnn::IWorkloadFactory& workloadFactory)
 {
     unsigned int outputWidth = 3;
@@ -583,7 +635,7 @@ LayerTestResult<float,3> MergerTest(armnn::IWorkloadFactory& workloadFactory)
     unsigned int inputHeight2 = 6;
     unsigned int inputChannels2 = 1;
 
-    // Define the tensor descriptors
+    // Define the tensor descriptors.
     armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::Float32);
     armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::Float32);
     armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::Float32);
@@ -644,10 +696,10 @@ LayerTestResult<float,3> MergerTest(armnn::IWorkloadFactory& workloadFactory)
         })
     );
 
-    std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //extent of the window is defined by size of input[0]
+    std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //Extent of the window is defined by size of input[0].
     armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
 
-    std::vector<unsigned int> wOrigin2 = {2, 0, 0}; //extent of the window is defined by size of input[1]
+    std::vector<unsigned int> wOrigin2 = {2, 0, 0}; //Extent of the window is defined by size of input[1].
     armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -1350,7 +1402,7 @@ armnn::OriginsDescriptor CreateMergerDescriptorForConcatenation(
 
 //
 // Concatenation is only supported for N and C dimensions for NCHW. In case of
-// <4 dimensions we need to make sure that the concat dimensions is at least
+// <4 dimensions we need to make sure that the concat dimensions are at least
 // the 3rd slowest iterating one.
 //
 
@@ -1362,8 +1414,8 @@ bool NeedPermuteForConcat(
     // same number of dimensions.
     unsigned int nDimensions = 0;
 
-    // determine the number of dimensions as well as sanity check them
-    // agains test implementation issues
+    // Determine the number of dimensions as well as sanity check them
+    // agains test implementation issues.
     for (auto && tensorInfo : inputTensorInfos)
     {
         if (!nDimensions)
@@ -1464,7 +1516,7 @@ void PermuteInputsForConcat(
         {
             numDims = tensorInfo.GetShape().GetNumDimensions();
             Generate3dPermuteVectorForConcat(numDims, concatDim, permutations);
-            // store the reverese permutation
+            // Store the reverese permutation.
             permuteVector = permutations.second;
             BOOST_ASSERT_MSG(!permuteVector.IsEqual(identity),
                 "Test logic error, we don't need permutation, so we shouldn't arrive here");
@@ -1499,7 +1551,7 @@ void PermuteInputsForConcat(
 
 //
 // This is the pair of PermuteInputsForConcat(...) which permutes back
-// the output of the concatenation so we can check against an expected
+// the output of the concatenation so we can check it against an expected
 // output.
 //
 template <typename T>
@@ -1553,14 +1605,14 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
 
     armnn::MergerQueueDescriptor queueDescriptor;
 
-    // save a copy of the parameters which we might need to change
+    // Saves a copy of the parameters which we might need to change.
     std::vector<armnn::TensorInfo> inputTensorInfos(inputTensorInfosOrig.begin(), inputTensorInfosOrig.end());
     std::vector<T *> inputs            = inputsOrig;
     armnn::TensorInfo outputTensorInfo = outputTensorInfoOrig;
 
     armnn::PermutationVector permuteVector{0, 1, 2};
 
-    // hold and automatically release memory for the reshaped input data
+    // Holds and automatically releases memory for the reshaped input data.
     std::vector<std::vector<T>> tmpInputDataStorage;
 
     const size_t inputCount = inputTensorInfos.size();
@@ -1571,7 +1623,7 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
     {
         //
         // We need to permute the inputs, because concatenation along
-        // the requested axis is not supported
+        // the requested axis is not supported.
         //
         PermuteInputsForConcat<T>(workloadFactory,
                                   inputTensorInfos,
@@ -2641,7 +2693,7 @@ LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& work
 
     // The 'resize bilinear' operation projects the top-left corner of output texels into the input image,
     // then figures out the interpolants and weights. Note this is different to projecting the centre of the
-    // output texel - and thus we'll expect the output 1x1 matrix to contain as its single element the value
+    // output texel - and thus we'll expect the output 1x1 matrix to contain, as its single element, the value
     // that was at position (0,0) of the input matrix (rather than an average, which we would expect if projecting
     // the centre).
     LayerTestResult<float, 4> result(outputTensorInfo);
@@ -3367,12 +3419,12 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFac
     unsigned int inputHeight2 = 6;
     unsigned int inputChannels2 = 1;
 
-    // Define the tensor descriptors
+    // Defines the tensor descriptors.
     armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::QuantisedAsymm8);
     armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedAsymm8);
     armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedAsymm8);
 
-    // Arbitrary scale and offsets. They don't really matter as the merger operator doesn't dequantize/quantize
+    // Arbitrary scale and offsets. They don't really matter as the merger operator doesn't dequantize/quantize them.
     const float scale = 0.13497836f;
     const int32_t offset = -7;
 
@@ -3439,10 +3491,10 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFac
     })
     );
 
-    std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //extent of the window is defined by size of input[0]
+    std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
     armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
 
-    std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //extent of the window is defined by size of input[1]
+    std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
     armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
 
 
@@ -3513,21 +3565,21 @@ LayerTestResult<uint8_t, 4> AdditionUint8Test(armnn::IWorkloadFactory& workloadF
     outputTensorInfo.SetQuantizationScale(scale);
     outputTensorInfo.SetQuantizationOffset(offset);
 
-    // See dequantized values to the right
+    // See dequantized values to the right.
     auto input1 = MakeTensor<uint8_t, 4>(inputTensorInfo1, std::vector<uint8_t>(
     {
          63,  35,  77,  70,  56, 112, //  420, 224,  518,  469,  371, 763
         203,  28, 252, 168, 245,  91  // 1400, 175, 1743, 1155, 1694, 616
     }));
 
-    // See dequantized values to the right
+    // See dequantized values to the right.
     auto input2 = MakeTensor<uint8_t, 4>(inputTensorInfo1, std::vector<uint8_t>(
     {
          21,   7, 175, 231, 175, 210, // 126,   28, 1204, 1596, 1204, 1449
         126, 161,  63,  21, 105, 126  // 861, 1106,  420,  126,  714,  861
     }));
 
-    // See dequantized values to the right
+    // See dequantized values to the right.
     LayerTestResult<uint8_t, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<uint8_t, 4>(outputTensorInfo, std::vector<uint8_t>(
     {
@@ -3633,19 +3685,19 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& wor
     unsigned int width = 3;
     const unsigned int shape[] = { batchSize, channels, height, width };
 
-    // See dequantized values to the right
+    // See dequantized values to the right.
     std::vector<uint8_t> input0({
          62,  37,   3, 172,  13, 111, // 244, 144,   8, 684,  48, 440,
         188,  20,  73,  31,  23,  31  // 748,  76, 288, 120,  88, 120
     });
 
-    // See dequantized values to the right
+    // See dequantized values to the right.
     std::vector<uint8_t> input1({
         126, 240, 252, 183, 121, 247, // 384, 726, 762, 555, 369, 747,
          48, 115, 151,  79,  78,  97  // 150, 351, 459, 243, 240, 297
     });
 
-    // See dequantized values to the right
+    // See dequantized values to the right.
     std::vector<uint8_t> output(
     {
          64,  72,   0, 255,   8, 236, //  93696, 104544, 6096(clamped), 379620(clamped), 17712, 328680,
@@ -3663,7 +3715,7 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& wor
                                          -2,
                                          shape,
                                          output,
-                                         1366.255f, // Scale/offset chosen to have output values out of range
+                                         1366.255f, // Scale/offset chosen to have output values out of range.
                                          -5);
 }
 
@@ -3813,7 +3865,7 @@ LayerTestResult<uint8_t, 4> SimpleResizeBilinearUint8Test(armnn::IWorkloadFactor
 
     // The 'resize bilinear' operation projects the top-left corner of output texels into the input image,
     // then figures out the interpolants and weights. Note this is different to projecting the centre of the
-    // output texel - and thus we'll expect the output 1x1 matrix to contain as its single element the value
+    // output texel - and thus we'll expect the output 1x1 matrix to contain, as its single element, the value
     // that was at position (0,0) of the input matrix (rather than an average, which we would expect if projecting
     // the centre).
     LayerTestResult<uint8_t, 4> result(outputTensorInfo);

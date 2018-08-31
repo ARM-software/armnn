@@ -5,20 +5,21 @@
 
 #pragma once
 
+#include <backends/NeonWorkloadUtils.hpp>
 #include <backends/Workload.hpp>
 
 namespace armnn
 {
-// Base class template providing an implementation of the Merger layer common to all data types
-template <armnn::DataType DataType>
-class NeonBaseMergerWorkload : public TypedWorkload<MergerQueueDescriptor, DataType>
+// Base class template providing an implementation of the Merger layer common to all data types.
+template <armnn::DataType... DataTypes>
+class NeonBaseMergerWorkload : public TypedWorkload<MergerQueueDescriptor, DataTypes...>
 {
 public:
-    using TypedWorkload<MergerQueueDescriptor, DataType>::TypedWorkload;
+    using TypedWorkload<MergerQueueDescriptor, DataTypes...>::TypedWorkload;
 
     virtual void Execute() const override
     {
-        // With subtensors, merger is a no-op
+        // With subtensors, merger is a no-op.
     }
 };
 

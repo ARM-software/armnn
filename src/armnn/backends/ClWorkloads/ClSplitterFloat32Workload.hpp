@@ -10,10 +10,10 @@
 namespace armnn
 {
 
-class ClSplitterFloat32Workload : public ClBaseSplitterWorkload<DataType::Float32>
+class ClSplitterFloat32Workload : public ClBaseSplitterWorkload<DataType::Float16, DataType::Float32>
 {
 public:
-    using ClBaseSplitterWorkload<DataType::Float32>::ClBaseSplitterWorkload;
+    using ClBaseSplitterWorkload<DataType::Float16, DataType::Float32>::ClBaseSplitterWorkload;
     virtual void Execute() const override;
 };
 

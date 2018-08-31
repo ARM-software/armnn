@@ -3,7 +3,6 @@
 // See LICENSE file in the project root for full license information.
 //
 #include <boost/test/unit_test.hpp>
-
 #include "test/TensorHelpers.hpp"
 #include "LayerTests.hpp"
 
@@ -13,6 +12,7 @@
 #include "backends/RefWorkloadFactory.hpp"
 #include "backends/ClLayerSupport.hpp"
 #include "ActivationFixture.hpp"
+#include "ClContextControlFixture.hpp"
 
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
@@ -21,7 +21,7 @@
 
 #include "test/UnitTests.hpp"
 
-BOOST_AUTO_TEST_SUITE(Compute_ArmComputeCl)
+BOOST_FIXTURE_TEST_SUITE(Compute_ArmComputeCl, ClContextControlFixture)
 using FactoryType = armnn::ClWorkloadFactory;
 
 // ============================================================================
@@ -65,26 +65,23 @@ ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8, DepthwiseConv
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, true)
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, false)
 
-// Splitter
-BOOST_AUTO_TEST_CASE(SimpleSplitter)
+// Softmax
+BOOST_AUTO_TEST_CASE(Softmax4dSupport)
 {
-    armnn::ClWorkloadFactory workloadFactory;
-    auto testResult = SplitterTest(workloadFactory);
-    for (unsigned int i = 0; i < testResult.size(); ++i)
-    {
-        BOOST_TEST(CompareTensors(testResult[i].output, testResult[i].outputExpected));
-    }
+    const unsigned int numDimensions = 4u;
+    std::array<unsigned int, numDimensions> dimensionSizes;
+    dimensionSizes.fill(1u);
+
+    const armnn::TensorInfo inputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
+
+    // 4D Softmax should be reported as unsupported on the CL backend
+    BOOST_TEST(!armnn::IsSoftmaxSupportedCl(inputInfo, outputInfo, armnn::SoftmaxDescriptor()));
 }
 
-BOOST_AUTO_TEST_CASE(SimpleSplitterUint8)
-{
-    armnn::ClWorkloadFactory workloadFactory;
-    auto testResult = SplitterUint8Test(workloadFactory);
-    for (unsigned int i = 0; i < testResult.size(); ++i)
-    {
-        BOOST_TEST(CompareTensors(testResult[i].output, testResult[i].outputExpected));
-    }
-}
+// Splitter
+ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)
+ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)
 
 ARMNN_AUTO_TEST_CASE(CopyViaSplitter, CopyViaSplitterTest)
 ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
@@ -208,6 +205,19 @@ ARMNN_AUTO_TEST_CASE(SimplePermuteUint8, SimplePermuteUint8Test)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1, PermuteFloat32ValueSet1Test)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2, PermuteFloat32ValueSet2Test)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3, PermuteFloat32ValueSet3Test)
+
+// Lstm
+ARMNN_AUTO_TEST_CASE(LstmLayerFloat32WithCifgWithPeepholeNoProjection,
+        LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest)
+ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgNoPeepholeNoProjection,
+                     LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest)
+ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjection,
+                         LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest)
+
+// Convert from Float16 to Float32
+ARMNN_AUTO_TEST_CASE(SimpleConvertFp16ToFp32, SimpleConvertFp16ToFp32Test)
+// Convert from Float32 to Float16
+ARMNN_AUTO_TEST_CASE(SimpleConvertFp32ToFp16, SimpleConvertFp32ToFp16Test)
 
 // ============================================================================
 // COMPARE tests

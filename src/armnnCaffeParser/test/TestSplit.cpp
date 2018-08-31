@@ -8,7 +8,7 @@
 
 BOOST_AUTO_TEST_SUITE(CaffeParser)
 
-struct SplitFixture : public ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
+struct SplitFixture : public armnnUtils::ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
 {
     SplitFixture()
     {

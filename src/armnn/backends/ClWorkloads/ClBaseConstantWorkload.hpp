@@ -9,12 +9,12 @@
 
 namespace armnn
 {
-template <armnn::DataType DataType>
-class ClBaseConstantWorkload : public TypedWorkload<ConstantQueueDescriptor, DataType>
+template <armnn::DataType... DataTypes>
+class ClBaseConstantWorkload : public TypedWorkload<ConstantQueueDescriptor, DataTypes...>
 {
 public:
     ClBaseConstantWorkload(const ConstantQueueDescriptor& descriptor, const WorkloadInfo& info)
-        : TypedWorkload<ConstantQueueDescriptor, DataType>(descriptor, info)
+        : TypedWorkload<ConstantQueueDescriptor, DataTypes...>(descriptor, info)
         , m_RanOnce(false)
     {
     }

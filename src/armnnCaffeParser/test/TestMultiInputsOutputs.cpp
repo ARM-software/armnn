@@ -8,7 +8,7 @@
 
 BOOST_AUTO_TEST_SUITE(CaffeParser)
 
-struct MultiInputsOutputsFixture : public ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
+struct MultiInputsOutputsFixture : public armnnUtils::ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
 {
     MultiInputsOutputsFixture()
     {

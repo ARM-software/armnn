@@ -3,7 +3,7 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "../InferenceTest.hpp"
-#include "../ImageNetDatabase.hpp"
+#include "../CaffePreprocessor.hpp"
 #include "armnnCaffeParser/ICaffeParser.hpp"
 
 int main(int argc, char* argv[])
@@ -11,10 +11,17 @@ int main(int argc, char* argv[])
     int retVal = EXIT_FAILURE;
     try
     {
+        using DataType = float;
+        using DatabaseType = CaffePreprocessor;
+        using ParserType = armnnCaffeParser::ICaffeParser;
+        using ModelType = InferenceModel<ParserType, DataType>;
+
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
-        retVal = armnn::test::ClassifierInferenceTestMain<ImageNetDatabase, armnnCaffeParser::ICaffeParser>(
+        retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
                      argc, argv, "bvlc_alexnet_1.caffemodel", true, "data", "prob", { 0 },
-                     [](const char* dataDir) { return ImageNetDatabase(dataDir); });
+                     [](const char* dataDir, const ModelType &) {
+                         return DatabaseType(dataDir);
+                     });
     }
     catch (const std::exception& e)
     {

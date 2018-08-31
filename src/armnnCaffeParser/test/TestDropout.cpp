@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(CaffeParser)
 
-struct DropoutFixture : public ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
+struct DropoutFixture : public armnnUtils::ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
 {
     DropoutFixture()
     {

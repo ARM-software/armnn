@@ -11,14 +11,13 @@
 namespace armnn
 {
 
-bool IsNeonActivationUint8Supported(std::string* reasonIfUnsupported, const ActivationDescriptor& parameters);
-
 bool IsNeonDirectConvolutionPreferred(const TensorInfo& weightInfo, const Convolution2dDescriptor& desc);
 
 bool IsNeonNormalizationDescParamsSupported(std::string* reasonIfUnsupported,
                                             const NormalizationDescriptor& parameters);
 
 bool IsActivationSupportedNeon(const TensorInfo& input,
+                               const TensorInfo& output,
                                const ActivationDescriptor& descriptor,
                                std::string* reasonIfUnsupported);
 
@@ -32,6 +31,11 @@ bool IsAdditionSupportedNeon(const TensorInfo& input0,
                              std::string* reasonIfUnsupported);
 
 bool IsBatchNormalizationSupportedNeon(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const TensorInfo& mean,
+                                       const TensorInfo& var,
+                                       const TensorInfo& beta,
+                                       const TensorInfo& gamma,
                                        const BatchNormalizationDescriptor& descriptor,
                                        std::string* reasonIfUnsupported = nullptr);
 
@@ -45,12 +49,18 @@ bool IsConvolution2dSupportedNeon(const TensorInfo& input,
                                   const TensorInfo& biases,
                                   std::string* reasonIfUnsupported = nullptr);
 
+
 bool IsDepthwiseConvolutionSupportedNeon(const TensorInfo& input,
+                                         const TensorInfo& output,
                                          const DepthwiseConvolution2dDescriptor& descriptor,
                                          const TensorInfo& weights,
+                                         const TensorInfo& biases,
                                          std::string* reasonIfUnsupported = nullptr);
 
 bool IsFullyConnectedSupportedNeon(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const TensorInfo& weights,
+                                   const TensorInfo& biases,
                                    const FullyConnectedDescriptor& descriptor,
                                    std::string* reasonIfUnsupported = nullptr);
 
@@ -58,6 +68,7 @@ bool IsInputSupportedNeon(const TensorInfo& input,
                           std::string* reasonIfUnsupported = nullptr);
 
 bool IsL2NormalizationSupportedNeon(const TensorInfo& input,
+                                    const TensorInfo& output,
                                     std::string* reasonIfUnsupported = nullptr);
 
 bool IsMergerSupportedNeon(const std::vector<const TensorInfo*> inputs,
@@ -66,6 +77,7 @@ bool IsMergerSupportedNeon(const std::vector<const TensorInfo*> inputs,
 
 bool IsMultiplicationSupportedNeon(const TensorInfo& input0,
                                    const TensorInfo& input1,
+                                   const TensorInfo& output,
                                    std::string* reasonIfUnsupported = nullptr);
 
 bool IsNormalizationSupportedNeon(const TensorInfo& input,
@@ -90,6 +102,7 @@ bool IsResizeBilinearSupportedNeon(const TensorInfo& input,
                                    std::string* reasonIfUnsupported = nullptr);
 
 bool IsSoftmaxSupportedNeon(const TensorInfo& input,
+                            const TensorInfo& output,
                             const SoftmaxDescriptor& descriptor,
                             std::string* reasonIfUnsupported = nullptr);
 
@@ -107,5 +120,27 @@ bool IsReshapeSupportedNeon(const TensorInfo& input,
 bool IsFloorSupportedNeon(const TensorInfo& input,
                           const TensorInfo& output,
                           std::string* reasonIfUnsupported = nullptr);
+
+bool IsLstmSupportedNeon(const TensorInfo& input, const TensorInfo& outputStateIn,
+                         const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
+                         const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
+                         const TensorInfo& output, const LstmDescriptor& descriptor,
+                         const TensorInfo& inputToForgetWeights, const TensorInfo& inputToCellWeights,
+                         const TensorInfo& inputToOutputWeights, const TensorInfo& recurrentToForgetWeights,
+                         const TensorInfo& recurrentToCellWeights, const TensorInfo& recurrentToOutputWeights,
+                         const TensorInfo& forgetGateBias, const TensorInfo& cellBias,
+                         const TensorInfo& outputGateBias, const TensorInfo* inputToInputWeights,
+                         const TensorInfo* recurrentToInputWeights, const TensorInfo* cellToInputWeights,
+                         const TensorInfo* inputGateBias, const TensorInfo* projectionWeights,
+                         const TensorInfo* projectionBias, const TensorInfo* cellToForgetWeights,
+                         const TensorInfo* cellToOutputWeights, std::string* reasonIfUnsupported = nullptr);
+
+bool IsConvertFp16ToFp32SupportedNeon(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      std::string* reasonIfUnsupported = nullptr);
+
+bool IsConvertFp32ToFp16SupportedNeon(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      std::string* reasonIfUnsupported = nullptr);
 
 }

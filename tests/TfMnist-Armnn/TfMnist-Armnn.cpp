@@ -13,11 +13,18 @@ int main(int argc, char* argv[])
     int retVal = EXIT_FAILURE;
     try
     {
+        using DataType = float;
+        using DatabaseType = MnistDatabase;
+        using ParserType = armnnTfParser::ITfParser;
+        using ModelType = InferenceModel<ParserType, DataType>;
+
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
-        retVal = armnn::test::ClassifierInferenceTestMain<MnistDatabase, armnnTfParser::ITfParser>(
+        retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
                      argc, argv, "simple_mnist_tf.prototxt", false,
                      "Placeholder", "Softmax", { 0, 1, 2, 3, 4 },
-                     [](const char* dataDir) { return MnistDatabase(dataDir, true); },
+                     [](const char* dataDir, const ModelType&) {
+                         return DatabaseType(dataDir, true);
+                     },
                      &inputTensorShape);
     }
     catch (const std::exception& e)

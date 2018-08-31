@@ -10,7 +10,7 @@
 namespace armnn
 {
 
-/// Computes the softmax function on some inputs, into outputs, with a shape given by tensorInfo
+/// Computes the softmax function on some inputs, into outputs, with a shape given by tensorInfo.
 void Softmax(const float* in, float* out, const TensorInfo& tensorInfo, float beta);
 
 } //namespace armnn

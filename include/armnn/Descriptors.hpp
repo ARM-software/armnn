@@ -95,8 +95,8 @@ private:
     uint32_t** m_ViewSizes;
 };
 
-// Convenience template to create a OriginsDescriptor to use when creating a Merger layer for performing concatenation
-// of a number of input tensors
+/// Convenience template to create an OriginsDescriptor to use when creating a Merger layer for performing concatenation
+/// of a number of input tensors
 template <typename TensorShapeIt>
 OriginsDescriptor CreateMergerDescriptorForConcatenation(TensorShapeIt first, TensorShapeIt last,
     unsigned int concatenationDimension)
@@ -301,7 +301,35 @@ struct ResizeBilinearDescriptor
 
 struct ReshapeDescriptor
 {
+    ReshapeDescriptor()
+    : m_TargetShape()
+    {}
+
+    ReshapeDescriptor(const TensorShape& shape)
+    : m_TargetShape(shape)
+    {}
+
     TensorShape m_TargetShape;
+};
+
+// temporary descriptor for Lstm
+struct LstmDescriptor
+{
+    LstmDescriptor()
+    : m_ActivationFunc(1) // 0: None, 1: Relu, 3: Relu6, 4: Tanh, 6: Sigmoid
+    , m_ClippingThresCell(0.0)
+    , m_ClippingThresProj(0.0)
+    , m_CifgEnabled(true)
+    , m_PeepholeEnabled(false)
+    , m_ProjectionEnabled(false)
+    {}
+
+    uint32_t m_ActivationFunc;
+    float m_ClippingThresCell;
+    float m_ClippingThresProj;
+    bool m_CifgEnabled;
+    bool m_PeepholeEnabled;
+    bool m_ProjectionEnabled;
 };
 
 }

@@ -157,7 +157,7 @@ const uint32_t* OriginsDescriptor::GetViewOrigin(uint32_t idx) const
 }
 
 
-// Reorder the viewOrigins in accordance with the indices presented in newOrdering array
+// Reorders the viewOrigins in accordance with the indices presented in newOrdering array.
 void OriginsDescriptor::ReorderOrigins(unsigned int*  newOrdering, unsigned int numNewOrdering)
 {
     BOOST_ASSERT_MSG(m_NumViews == numNewOrdering, "number of views must match number of "

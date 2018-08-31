@@ -18,6 +18,8 @@ enum class LayerType
     Addition,
     BatchNormalization,
     Constant,
+    ConvertFp16ToFp32,
+    ConvertFp32ToFp16,
     Convolution2d,
     DepthwiseConvolution2d,
     FakeQuantization,
@@ -25,6 +27,7 @@ enum class LayerType
     FullyConnected,
     Input,
     L2Normalization,
+    Lstm,
     MemCopy,
     Merger,
     Multiplication,
@@ -35,7 +38,7 @@ enum class LayerType
     Reshape,
     ResizeBilinear,
     Softmax,
-    // Last layer goes here
+    // Last layer goes here.
     LastLayer,
     Splitter = LastLayer,
 };

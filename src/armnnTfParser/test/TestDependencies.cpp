@@ -22,16 +22,16 @@ BOOST_AUTO_TEST_SUITE(TensorflowParser)
 //    \ R3
 //     \|
 //      O
-struct RediscoveredDependenciesFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct RediscoveredDependenciesFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     RediscoveredDependenciesFixture()
     {
-        // input = tf.placeholder(tf.float32, 1, "input")
-        // relu0 = tf.nn.relu(input, "relu0")
-        // relu1 = tf.nn.relu(relu0, "relu1")
-        // relu2 = tf.nn.relu(relu0, "relu2")
-        // relu3 = tf.nn.relu(relu2, "relu3")
-        // output = tf.add(relu1, relu3, "output")
+        // Input = tf.placeholder(tf.float32, 1, "input")
+        // Relu0 = tf.nn.relu(input, "relu0")
+        // Relu1 = tf.nn.relu(relu0, "relu1")
+        // Relu2 = tf.nn.relu(relu0, "relu2")
+        // Relu3 = tf.nn.relu(relu2, "relu3")
+        // Output = tf.add(relu1, relu3, "output")
         m_Prototext = R"(
             node {
               name: "input"
@@ -184,12 +184,12 @@ node {
 //
 BOOST_AUTO_TEST_CASE(ComplexCycle)
 {
-    // input = tf.placeholder(tf.float32, 1, "input")
-    // add2 = tf.nn.relu(input, add1, "add2") // This line won't actually run in TF, because add1 is not yet defined
-    // relu1 = tf.nn.relu(relu0, "relu1")
-    // relu2 = tf.nn.relu(relu0, "relu2")
-    // relu3 = tf.nn.relu(relu2, "relu3")
-    // add1 = tf.add(relu1, relu3, "add1")
+    // Input = tf.placeholder(tf.float32, 1, "input")
+    // Add2 = tf.nn.relu(input, add1, "add2") // This line won't actually run in TF, because add1 is not yet defined
+    // Relu1 = tf.nn.relu(relu0, "relu1")
+    // Relu2 = tf.nn.relu(relu0, "relu2")
+    // Relu3 = tf.nn.relu(relu2, "relu3")
+    // Add1 = tf.add(relu1, relu3, "add1")
     const char* prototext = R"(
         node {
             name: "input"

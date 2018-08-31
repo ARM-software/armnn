@@ -24,9 +24,13 @@ public:
 
     void ValidateTensorShapesFromInputs() override;
 
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
+
 protected:
     Convolution2dLayer(const Convolution2dDescriptor& param, const char* name);
     ~Convolution2dLayer() = default;
+
+    ConstantTensors GetConstantTensorsByRef() override;
 };
 
 } // namespace

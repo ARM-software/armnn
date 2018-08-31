@@ -9,7 +9,12 @@
 
 namespace armnn
 {
-class NeonActivationFloat32Workload : public Float32Workload<ActivationQueueDescriptor>
+
+arm_compute::Status NeonActivationWorkloadValidate(const TensorInfo& input,
+                                                   const TensorInfo& output,
+                                                   const ActivationDescriptor& descriptor);
+
+class NeonActivationFloat32Workload : public FloatWorkload<ActivationQueueDescriptor>
 {
 public:
     NeonActivationFloat32Workload(const ActivationQueueDescriptor& descriptor, const WorkloadInfo& info);

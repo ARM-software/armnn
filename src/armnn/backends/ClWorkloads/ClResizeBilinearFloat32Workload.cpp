@@ -14,7 +14,7 @@ namespace armnn
 
 ClResizeBilinearFloat32Workload::ClResizeBilinearFloat32Workload(const ResizeBilinearQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info)
-    : Float32Workload<ResizeBilinearQueueDescriptor>(descriptor, info)
+    : FloatWorkload<ResizeBilinearQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClResizeBilinearFloat32Workload", 1, 1);
 
@@ -28,7 +28,7 @@ ClResizeBilinearFloat32Workload::ClResizeBilinearFloat32Workload(const ResizeBil
 
 void ClResizeBilinearFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClResizeBilinearFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClResizeBilinearFloat32Workload_Execute");
     m_ResizeBilinearLayer.run();
 }
 

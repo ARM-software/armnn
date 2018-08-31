@@ -4,6 +4,9 @@
 //
 #pragma once
 
+#include <vector>
+#include "armnn/TypesUtils.hpp"
+
 namespace armnn
 {
 
@@ -24,4 +27,4 @@ enum class LogSeverity
 ///     severity: All log messages that are at this severity level or higher will be printed, others will be ignored.
 void ConfigureLogging(bool printToStandardOutput, bool printToDebugOutput, LogSeverity severity);
 
-}
+} // namespace armnn

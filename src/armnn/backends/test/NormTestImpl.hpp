@@ -87,7 +87,7 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(armnn::IWorkloadFactory& wo
                     // When normalising within channels, the 3x3 kernel covers the entire 2x2 input at every index.
                     // Therefore, all output values should equal the inputs, but divided by:
                     // pow((kappa + (accumulatedScale * alpha)), beta)
-                    // ...where accumulatedScale is the sum of every element squared
+                    // ...where accumulatedScale is the sum of every element squared.
                     float divisor[inputNum];
                     for(int i = 0; i < boost::numeric_cast<int>(inputNum); i++)
                     {
@@ -139,7 +139,7 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(armnn::IWorkloadFactory& wo
             }
             break;
         }
-        case armnn::NormalizationAlgorithmMethod::LocalContrast: // NOTE: intentional fallthrough
+        case armnn::NormalizationAlgorithmMethod::LocalContrast: // NOTE: intentional fallthrough.
         default:
         {
             throw armnn::UnimplementedException("Unsupported normalisation method type, "

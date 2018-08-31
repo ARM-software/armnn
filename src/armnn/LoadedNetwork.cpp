@@ -27,30 +27,54 @@ namespace armnn
 
 using namespace std;
 
+namespace
+{
+
+template <typename ExceptionType>
+std::string ToErrorMessage(const char * prefix, const ExceptionType & error)
+{
+    std::stringstream ss;
+    ss << prefix << " " << error.what();
+    return ss.str();
+}
+
+#if ARMCOMPUTECL_ENABLED
+std::string ToErrorMessage(const char * prefix, const cl::Error& error)
+{
+    std::stringstream ss;
+    ss << prefix << " " << error.what() << ".  CL error code is: " << error.err();
+    return ss.str();
+}
+#endif
+
+} // anonymous
+
 std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
-                                                                bool useCpuRefAsFallback)
+                                                                std::string & errorMessage)
 {
     std::unique_ptr<LoadedNetwork> loadedNetwork;
 
     try
     {
-        loadedNetwork.reset(new LoadedNetwork(std::move(net), useCpuRefAsFallback));
+        loadedNetwork.reset(new LoadedNetwork(std::move(net)));
     }
     catch (const std::runtime_error& error)
     {
-        BOOST_LOG_TRIVIAL(error) << "An error occurred when preparing the network workloads: " << error.what();
+        errorMessage = ToErrorMessage("An error occurred when preparing the network workloads: ", error);
+        BOOST_LOG_TRIVIAL(error) << errorMessage;
         return std::unique_ptr<LoadedNetwork>();
     }
     catch (const armnn::Exception& error)
     {
-        BOOST_LOG_TRIVIAL(error) << "An error occurred when preparing the network workloads: " << error.what();
+        errorMessage = ToErrorMessage("An error occurred when preparing the network workloads: ", error);
+        BOOST_LOG_TRIVIAL(error) << errorMessage;
         return std::unique_ptr<LoadedNetwork>();
     }
 #if ARMCOMPUTECL_ENABLED
     catch (const cl::Error& error)
     {
-        BOOST_LOG_TRIVIAL(error) << "A CL error occurred attempting to prepare a network workload: "
-            << error.what() << ". CL error code is: " << error.err();
+        errorMessage = ToErrorMessage("A CL error occurred attempting to prepare a network workload: ", error);
+        BOOST_LOG_TRIVIAL(error) << errorMessage;
         return std::unique_ptr<LoadedNetwork>();
     }
 #endif
@@ -58,21 +82,25 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
     return loadedNetwork;
 }
 
-LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, bool useCpuRefAsFallback)
-    : m_CpuRef(useCpuRefAsFallback)
+LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
+    : m_CpuRef()
     , m_OptimizedNetwork(std::move(net))
 {
+    // Create a profiler and register it for the current thread.
+    m_Profiler = std::make_shared<Profiler>();
+    ProfilerManager::GetInstance().RegisterProfiler(m_Profiler.get());
+
     Graph& order = m_OptimizedNetwork->GetGraph().TopologicalSort();
-    //first create tensor handlers
-    //handlers are created before workloads are
-    //because workload creation can modify some of the handlers
-    //(for example the splitter and merger layers)
+    //First create tensor handlers.
+    //Handlers are created before workloads are.
+    //Because workload creation can modify some of the handlers,
+    //(for example the splitter and merger layers).
     for (auto&& layer : order)
     {
         layer->CreateTensorHandles(m_OptimizedNetwork->GetGraph(), GetWorkloadFactory(*layer));
     }
 
-    //then create workloads
+    //Then create workloads.
     for (auto&& layer : order)
     {
         const IWorkloadFactory& workloadFactory = GetWorkloadFactory(*layer);
@@ -82,7 +110,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, bool useCpuR
         case LayerType::Input:
         case LayerType::Output:
             {
-                // Inputs and outputs are treated in a special way - see EnqueueInput() and EnqueueOutput()
+                // Inputs and outputs are treated in a special way - see EnqueueInput() and EnqueueOutput().
                 break;
             }
         default:
@@ -99,15 +127,17 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, bool useCpuR
                 }
 
                 m_WorkloadQueue.push_back(move(workload));
+                // release the constant data in the layer..
+                layer->ReleaseConstantData();
                 break;
             }
         }
     }
 
-    // set up memory
+    // Set up memory.
     m_OptimizedNetwork->GetGraph().AllocateDynamicBuffers();
 
-    // finalize the workload factories before execution
+    // Finalize the workload factories before execution.
     m_CpuRef.Finalize();
     m_CpuAcc.Finalize();
     m_GpuAcc.Finalize();
@@ -159,9 +189,12 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
             break;
         }
         case Compute::CpuRef:
-        default:
         {
             workloadFactory = &m_CpuRef;
+            break;
+        }
+        default:
+        {
             break;
         }
     }
@@ -169,7 +202,7 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
     BOOST_ASSERT_MSG(workloadFactory, "No workload factory");
 
     std::string reasonIfUnsupported;
-    BOOST_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer, layer.GetDataType(), reasonIfUnsupported),
+    BOOST_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer, {}, reasonIfUnsupported),
                      "Factory does not support layer");
     boost::ignore_unused(reasonIfUnsupported);
 
@@ -273,19 +306,18 @@ private:
 Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
                                       const OutputTensors& outputTensors)
 {
-    ARMNN_UPDATE_PROFILING_EVENT_TAG();
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "EnqueueWorkload");
 
     const Graph& graph = m_OptimizedNetwork->GetGraph();
 
-    // Walk graph to determine the order of execution
+    // Walk graph to determine the order of execution.
     if (graph.GetNumLayers() < 2)
     {
         BOOST_LOG_TRIVIAL(warning) << "IRuntime::EnqueueWorkload()::Less than two nodes in graph";
         return Status::Failure;
     }
 
-    // Data that must be kept alive for the entire execution of the workload
+    // Data that must be kept alive for the entire execution of the workload.
     WorkloadData workloadData(inputTensors, outputTensors);
 
     if (graph.GetNumInputs() != inputTensors.size())
@@ -293,14 +325,14 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         throw InvalidArgumentException("Number of inputs provided does not match network.");
     }
 
-    // for each input to the network, call EnqueueInput with the data passed by the user
+    // For each input to the network, call EnqueueInput with the data passed by the user.
     for (const BindableLayer* inputLayer : graph.GetInputLayers())
     {
         const TensorPin& pin = workloadData.GetInputTensorPin(inputLayer->GetBindingId());
         EnqueueInput(*inputLayer, pin.GetTensorHandle(), pin.GetTensorInfo());
     }
 
-    // for each output to the network, call EnqueueOutput with the data passed by the user
+    // For each output to the network, call EnqueueOutput with the data passed by the user.
     for (const BindableLayer* outputLayer : graph.GetOutputLayers())
     {
         const TensorPin& pin = workloadData.GetOutputTensorPin(outputLayer->GetBindingId());
@@ -315,7 +347,7 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         executionSucceeded = Execute();
     }
 
-    // Hack: get rid of inputs and outputs we added
+    // Hack: get rid of inputs and outputs we added.
     TidyWorkloadQueue(graph.GetNumInputs(), graph.GetNumOutputs());
 
     return executionSucceeded ? Status::Success : Status::Failure;
@@ -374,7 +406,7 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
 
     BOOST_ASSERT_MSG(layer.GetNumInputSlots() == 1, "Output Layer should have exactly one input.");
 
-    // Get the output handler from the previous node
+    // Gets the output handler from the previous node.
     const OutputHandler& outputHandler = layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOutputHandler();
 
     const TensorInfo& inputTensorInfo = outputHandler.GetTensorInfo();
@@ -393,6 +425,10 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
 bool LoadedNetwork::Execute()
 {
     bool success = true;
+
+    m_CpuRef.Acquire();
+    m_CpuAcc.Acquire();
+    m_GpuAcc.Acquire();
 
     try
     {
@@ -414,6 +450,11 @@ bool LoadedNetwork::Execute()
         BOOST_LOG_TRIVIAL(error) << "An error occurred attempting to execute a workload: " << error.what();
         success = false;
     }
+
+    // Informs the memory managers to release memory in it's respective memory group
+    m_CpuRef.Release();
+    m_CpuAcc.Release();
+    m_GpuAcc.Release();
 
     return success;
 }

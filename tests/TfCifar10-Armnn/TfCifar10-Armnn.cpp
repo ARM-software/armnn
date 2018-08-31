@@ -13,12 +13,18 @@ int main(int argc, char* argv[])
     int retVal = EXIT_FAILURE;
     try
     {
+        using DataType = float;
+        using DatabaseType = Cifar10Database;
+        using ParserType = armnnTfParser::ITfParser;
+        using ModelType = InferenceModel<ParserType, DataType>;
+
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
-        retVal = armnn::test::ClassifierInferenceTestMain<Cifar10Database, armnnTfParser::ITfParser>(
+        retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
                      argc, argv, "cifar10_tf.prototxt", false,
                      "data", "prob", { 0, 1, 2, 4, 7 },
-                     [](const char* dataDir) { return Cifar10Database(dataDir, true); },
-                     &inputTensorShape);
+                     [](const char* dataDir, const ModelType&) {
+                         return DatabaseType(dataDir, true);
+                     }, &inputTensorShape);
     }
     catch (const std::exception& e)
     {

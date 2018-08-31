@@ -12,7 +12,7 @@ namespace armnn
 
 NeonReshapeFloat32Workload::NeonReshapeFloat32Workload(const ReshapeQueueDescriptor& descriptor,
                                                        const WorkloadInfo& info)
-    : Float32Workload<ReshapeQueueDescriptor>(descriptor, info)
+    : FloatWorkload<ReshapeQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonReshapeFloat32Workload", 1, 1);
 
@@ -24,7 +24,7 @@ NeonReshapeFloat32Workload::NeonReshapeFloat32Workload(const ReshapeQueueDescrip
 
 void NeonReshapeFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonReshapeFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonReshapeFloat32Workload_Execute");
     m_Layer.run();
 }
 

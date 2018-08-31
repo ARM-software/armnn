@@ -7,6 +7,7 @@
 #include "RefWorkloadUtils.hpp"
 
 #include <Permute.hpp>
+#include "TypeUtils.hpp"
 
 namespace armnn
 {

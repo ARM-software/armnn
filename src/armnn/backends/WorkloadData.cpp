@@ -22,6 +22,8 @@ DataType GetBiasDataType(DataType inputDataType)
 {
     switch (inputDataType)
     {
+        case DataType::Float16:
+            return DataType::Float16;
         case DataType::Float32:
             return DataType::Float32;
         case DataType::QuantisedAsymm8:
@@ -148,7 +150,7 @@ void ValidateBiasTensorQuantization(const TensorInfo& biasTensor, const TensorIn
             to_string(biasTensor.GetQuantizationOffset()));
     }
     const float expectedScale = inputTensorInfo.GetQuantizationScale() * weightsTensorInfo.GetQuantizationScale();
-    if (biasTensor.GetQuantizationScale() != expectedScale)
+    if (std::abs(biasTensor.GetQuantizationScale() - expectedScale) > 0.000000001f)
     {
         // Print the float values with extra precision to see very small differences
         std::stringstream msg;
@@ -338,11 +340,11 @@ void SplitterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             ". Number of workloadInfo.m_OutputTensorInfos: " + to_string(workloadInfo.m_OutputTensorInfos.size()));
     }
 
-    //the dimensionality of all the windows has to match the dimensionality (not shape) of the input
+    //The dimensionality of all the windows has to match the dimensionality (not shape) of the input.
     std::size_t inputDims = workloadInfo.m_InputTensorInfos[0].GetNumDimensions();
     for(unsigned int w = 0; w < m_ViewOrigins.size(); ++w )
     {
-        //check that the dimensionality of input is same as the split windows
+        //Checks that the dimensionality of input is same as the split windows.
         ViewOrigin const& e = m_ViewOrigins[w];
         if (e.m_Origin.size() != inputDims)
         {
@@ -399,11 +401,11 @@ void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             ". Number of workloadInfo.m_InputTensorInfos: " + to_string(workloadInfo.m_InputTensorInfos.size()));
     }
 
-    //the dimensionality of all the windows has to match the dimensionality (not shape) of the output
+    //The dimensionality of all the windows has to match the dimensionality (not shape) of the output.
     std::size_t outputDims = workloadInfo.m_OutputTensorInfos[0].GetNumDimensions();
     for(unsigned int w = 0; w < m_ViewOrigins.size(); ++w )
     {
-        //check that the dimensionality of output is same as the split windows
+        //Checks that the dimensionality of output is same as the split windows.
         ViewOrigin const& e = m_ViewOrigins[w];
         if (e.m_Origin.size() != outputDims)
         {
@@ -415,7 +417,7 @@ void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                            "tensor has " +
                                            to_string(outputDims) + " dimensions.");
         }
-        //check that the merge windows are within the output tensor
+        //Checks that the merge windows are within the output tensor.
         for (unsigned int i = 0; i < e.m_Origin.size(); ++i)
         {
             if (e.m_Origin[i] + workloadInfo.m_InputTensorInfos[w].GetShape()[i]
@@ -456,7 +458,7 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
                                            "bias value tensor descriptor is missing.");
         }
 
-        // validate type and quantization values
+        // Validates type and quantization values.
         ValidateBiasTensorQuantization(m_Bias->GetTensorInfo(),
             workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(), "FullyConnectedQueueDescriptor");
 
@@ -578,7 +580,7 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
     ValidatePointer(m_Weight, "DepthwiseConvolution2dQueueDescriptor", "weight");
     ValidateTensorNumDimensions(m_Weight->GetTensorInfo(), "DepthwiseConvolution2dQueueDescriptor", 4, "weight");
 
-    //inputChannels * channelMultiplier should be equal to outputChannels
+    //inputChannels * channelMultiplier should be equal to outputChannels.
     const unsigned int numWeightChannelMultiplier = m_Weight->GetTensorInfo().GetShape()[0];
     const unsigned int numWeightInputChannels = m_Weight->GetTensorInfo().GetShape()[1];
     const unsigned int numWeightOutputChannels = workloadInfo.m_OutputTensorInfos[0].GetShape()[1];
@@ -649,7 +651,7 @@ void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "ResizeBilinearQueueDescriptor", 4, "input");
     ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "ResizeBilinearQueueDescriptor", 4, "output");
 
-    // Resize bilinear only changes width and height: batch and channel count must match
+    // Resizes bilinear only changes width and height: batch and channel count must match.
     {
         const unsigned int inputBatchSize = workloadInfo.m_InputTensorInfos[0].GetShape()[0];
         const unsigned int outputBatchSize = workloadInfo.m_OutputTensorInfos[0].GetShape()[0];
@@ -745,6 +747,55 @@ void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         throw InvalidArgumentException("FloorQueueDescriptor: Input and output tensor infos do not match.");
     }
+}
+
+void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "LstmQueueDescriptor", 2, "input");
+    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "LstmQueueDescriptor", 2, "output");
+}
+
+void ConvertFp32ToFp16QueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "ConvertFp32ToFp16QueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "ConvertFp32ToFp16QueueDescriptor");
+
+    if (workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::Float32)
+    {
+        throw InvalidArgumentException("ConvertFp32ToFp16QueueDescriptor: Input tensor type must be Float32.");
+    }
+
+    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Float16)
+    {
+        throw InvalidArgumentException("ConvertFp32ToFp16QueueDescriptor: Output tensor type must be Float16.");
+    }
+
+    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                              workloadInfo.m_OutputTensorInfos[0],
+                              "ConvertFp32ToFp16QueueDescriptor",
+                              "input",
+                              "output");
+}
+
+void ConvertFp16ToFp32QueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "ConvertFp16ToFp32QueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "ConvertFp16ToFp32QueueDescriptor");
+
+    if (workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::Float16)
+    {
+        throw InvalidArgumentException("ConvertFp16ToFp32QueueDescriptor: Input tensor type must be Float16.");
+    }
+    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Float32)
+    {
+        throw InvalidArgumentException("ConvertFp16ToFp32QueueDescriptor: Output tensor type must be Float32.");
+    }
+
+    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                              workloadInfo.m_OutputTensorInfos[0],
+                              "ConvertFp16ToFp32QueueDescriptor",
+                              "input",
+                              "output");
 }
 
 } //namespace armnn

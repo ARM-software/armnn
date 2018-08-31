@@ -17,6 +17,11 @@ The Arm NN SDK supports the following machine learning layers for Caffe networks
 
 - BatchNorm, in inference mode.
 - Convolution, excluding the Dilation Size, Weight Filler, Bias Filler, Engine, Force nd_im2col, and Axis parameters.
+
+  Caffe doesn't support depthwise convolution, the equivalent layer is implemented through the notion of groups. ArmNN supports groups this way:
+  - when group=1, it is a normal conv2d
+  - when group=#input_channels, we can replace it by a depthwise convolution
+  - when group>1 && group<#input_channels, we need to split the input into the given number of groups, apply a separate convolution and then merge the results
 - Concat, along the channel dimension only.
 - Dropout, in inference mode.
 - Eltwise, excluding the coeff parameter.

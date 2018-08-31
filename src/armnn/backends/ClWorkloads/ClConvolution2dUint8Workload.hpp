@@ -22,10 +22,12 @@ public:
     void Execute() const override;
 
 private:
-    mutable arm_compute::CLConvolutionLayer         m_ConvolutionLayer;
+    mutable arm_compute::CLConvolutionLayer m_ConvolutionLayer;
 
-    arm_compute::CLTensor m_KernelTensor;
-    arm_compute::CLTensor m_BiasTensor;
+    std::unique_ptr<arm_compute::CLTensor> m_KernelTensor;
+    std::unique_ptr<arm_compute::CLTensor> m_BiasTensor;
+
+    void FreeUnusedTensors();
 };
 
 } //namespace armnn

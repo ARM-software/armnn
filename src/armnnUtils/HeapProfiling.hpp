@@ -9,8 +9,8 @@
 #include <string>
 #include <cstddef>
 
-// this is conditional so we can change the environment variable
-// at build time
+// This is conditional so we can change the environment variable
+// at build time.
 #ifndef ARMNN_HEAP_PROFILE_DUMP_DIR
 #define ARMNN_HEAP_PROFILE_DUMP_DIR "ARMNN_HEAP_PROFILE_DUMP_DIR"
 #endif // ARMNN_HEAP_PROFILE_DUMP_DIR
@@ -24,12 +24,12 @@ public:
     ~ScopedHeapProfiler();
 
 private:
-    // Location comes from the ARMNN_HEAP_PROFILE_DUMP_DIR
-    // if not available then it dumps to /tmp
+    // Location comes from the ARMNN_HEAP_PROFILE_DUMP_DIR.
+    // If it is not available then it dumps to /tmp.
     std::string m_Location;
     std::string m_Tag;
 
-    // No default construction and copying
+    // No default construction and copying.
     ScopedHeapProfiler() = delete;
     ScopedHeapProfiler(const ScopedHeapProfiler &) = delete;
     ScopedHeapProfiler & operator=(const ScopedHeapProfiler &) = delete;

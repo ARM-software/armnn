@@ -12,6 +12,7 @@ struct Convolution2dDescriptor;
 struct DepthwiseConvolution2dDescriptor;
 struct FakeQuantizationDescriptor;
 struct FullyConnectedDescriptor;
+struct LstmDescriptor;
 struct PermuteDescriptor;
 struct NormalizationDescriptor;
 struct Pooling2dDescriptor;

@@ -15,7 +15,7 @@ void ConfigureLogging(bool printToStandardOutput, bool printToDebugOutput, LogSe
     ConfigureLogging(boost::log::core::get().get(), printToStandardOutput, printToDebugOutput, severity);
 }
 
-// Default to logging completely disabled.
+// Defaults to logging completely disabled.
 // The user of the library must enable it if they want by calling armnn::ConfigureLogging().
 struct DefaultLoggingConfiguration
 {
@@ -27,4 +27,4 @@ struct DefaultLoggingConfiguration
 
 static DefaultLoggingConfiguration g_DefaultLoggingConfiguration;
 
-}
+} // namespace armnn

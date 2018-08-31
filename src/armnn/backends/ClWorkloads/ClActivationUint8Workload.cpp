@@ -6,6 +6,7 @@
 #include "ClActivationUint8Workload.hpp"
 #include "backends/ClLayerSupport.hpp"
 
+#include "backends/ArmComputeUtils.hpp"
 #include "backends/ClTensorHandle.hpp"
 #include "backends/CpuTensorHandle.hpp"
 namespace armnn
@@ -15,15 +16,8 @@ ClActivationUint8Workload::ClActivationUint8Workload(const ActivationQueueDescri
                                                      const WorkloadInfo& info)
     : Uint8Workload<ActivationQueueDescriptor>(descriptor, info)
 {
-
-    std::string reasonIfUnsupported;
-    if (!IsClActivationUint8Supported(&reasonIfUnsupported, m_Data.m_Parameters))
-    {
-        throw InvalidArgumentException(reasonIfUnsupported);
-    }
-
-    // Only BoundedReLu is supported (see IsClActivationUint8Supported)
-    arm_compute::ActivationLayerInfo layerInfo(arm_compute::ActivationLayerInfo::ActivationFunction::LU_BOUNDED_RELU,
+    auto activation = ConvertActivationFunctionToAclActivationFunction(m_Data.m_Parameters.m_Function);
+    arm_compute::ActivationLayerInfo layerInfo(activation,
                                                m_Data.m_Parameters.m_A,
                                                m_Data.m_Parameters.m_B);
 
@@ -37,7 +31,7 @@ ClActivationUint8Workload::ClActivationUint8Workload(const ActivationQueueDescri
 
 void ClActivationUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClActivationUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClActivationUint8Workload_Execute");
 
     m_ActivationLayer.run();
 }

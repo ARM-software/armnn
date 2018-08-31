@@ -5,6 +5,7 @@
 #pragma once
 
 #include <armnn/Exceptions.hpp>
+#include <VerificationHelpers.hpp>
 
 #include <array>
 #include <cstdint>
@@ -57,6 +58,13 @@ public:
         Tga
     };
 
+    // Common names used to identify a channel in a pixel.
+    enum class ResizingMethods
+    {
+        STB,
+        BilinearAndNormalized,
+    };
+
     explicit InferenceTestImage(const char* filePath);
 
     InferenceTestImage(InferenceTestImage&&) = delete;
@@ -76,7 +84,16 @@ public:
     // of the tuple corresponds to the Red channel, whereas the last element is the Blue channel).
     std::tuple<uint8_t, uint8_t, uint8_t> GetPixelAs3Channels(unsigned int x, unsigned int y) const;
 
-    void Resize(unsigned int newWidth, unsigned int newHeight);
+    void StbResize(InferenceTestImage& im, const unsigned int newWidth, const unsigned int newHeight);
+
+
+    std::vector<float> Resize(unsigned int newWidth,
+                              unsigned int newHeight,
+                              const armnn::CheckLocation& location,
+                              const ResizingMethods meth = ResizingMethods::STB,
+                              const std::array<float, 3>& mean = {{0.0, 0.0, 0.0}},
+                              const std::array<float, 3>& stddev = {{1.0, 1.0, 1.0}});
+
     void Write(WriteFormat format, const char* filePath) const;
 
 private:
@@ -91,7 +108,7 @@ private:
     unsigned int m_NumChannels;
 };
 
-// Common names used to identify a channel in a pixel
+// Common names used to identify a channel in a pixel.
 enum class ImageChannel
 {
     R,
@@ -99,7 +116,7 @@ enum class ImageChannel
     B
 };
 
-// Channel layouts handled by the test framework
+// Channel layouts handled by the test framework.
 enum class ImageChannelLayout
 {
     Rgb,
@@ -112,7 +129,7 @@ enum class ImageChannelLayout
 std::vector<float> GetImageDataInArmNnLayoutAsNormalizedFloats(ImageChannelLayout layout,
     const InferenceTestImage& image);
 
-// Reads the contents of an inference test image as 3-channel pixels whose value is the result of subtracting the mean
+// Reads the contents of an inference test image as 3-channel pixels, whose value is the result of subtracting the mean
 // from the values in the original image. Channel data is stored according to the ArmNN layout (CHW). The order in
 // which channels appear in the resulting vector is defined by the provided layout. The order of the channels of the
 // provided mean should also match the given layout.

@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct AdditionFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct AdditionFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     AdditionFixture()
     {

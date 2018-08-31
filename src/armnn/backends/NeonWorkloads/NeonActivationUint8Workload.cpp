@@ -13,15 +13,8 @@ NeonActivationUint8Workload::NeonActivationUint8Workload(const ActivationQueueDe
                                                          const WorkloadInfo& info)
     : Uint8Workload<ActivationQueueDescriptor>(descriptor, info)
 {
-
-    std::string reasonIfUnsupported;
-    if (!IsNeonActivationUint8Supported(&reasonIfUnsupported, m_Data.m_Parameters))
-    {
-        throw InvalidArgumentException(reasonIfUnsupported);
-    }
-
-    // Only BoundedReLu is supported (see IsNeonActivationUint8Supported)
-    arm_compute::ActivationLayerInfo layerInfo(arm_compute::ActivationLayerInfo::ActivationFunction::LU_BOUNDED_RELU,
+    auto activation = ConvertActivationFunctionToAclActivationFunction(m_Data.m_Parameters.m_Function);
+    arm_compute::ActivationLayerInfo layerInfo(activation,
                                                m_Data.m_Parameters.m_A,
                                                m_Data.m_Parameters.m_B);
 
@@ -35,7 +28,7 @@ NeonActivationUint8Workload::NeonActivationUint8Workload(const ActivationQueueDe
 
 void NeonActivationUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonActivationUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonActivationUint8Workload_Execute");
 
     m_ActivationLayer.run();
 }

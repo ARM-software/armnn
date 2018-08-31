@@ -8,7 +8,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct PassThruFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct PassThruFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     PassThruFixture()
     {
@@ -46,7 +46,7 @@ BOOST_FIXTURE_TEST_CASE(RunGraph, PassThruFixture)
     auto input = MakeRandomTensor<float, 2>(inputTensorInfo, 378346);
     std::vector<float> inputVec;
     inputVec.assign(input.data(), input.data() + input.num_elements());
-    RunTest<2>(inputVec, inputVec); // The passthru network should output the same as the input
+    RunTest<2>(inputVec, inputVec); // The passthru network should output the same as the input.
 }
 
 BOOST_AUTO_TEST_SUITE_END()

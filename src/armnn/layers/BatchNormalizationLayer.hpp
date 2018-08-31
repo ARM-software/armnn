@@ -29,6 +29,8 @@ public:
 protected:
     BatchNormalizationLayer(const BatchNormalizationDescriptor& param, const char* name);
     ~BatchNormalizationLayer() = default;
+
+    ConstantTensors GetConstantTensorsByRef() override;
 };
 
 } // namespace

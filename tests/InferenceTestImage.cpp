@@ -37,6 +37,90 @@ unsigned int GetImageChannelIndex(ImageChannelLayout channelLayout, ImageChannel
     }
 }
 
+inline float Lerp(float a, float b, float w)
+{
+    return w * b + (1.f - w) * a;
+}
+
+inline void PutData(std::vector<float> & data,
+                    const unsigned int width,
+                    const unsigned int x,
+                    const unsigned int y,
+                    const unsigned int c,
+                    float value)
+{
+    data[(3*((y*width)+x)) + c] = value;
+}
+
+std::vector<float> ResizeBilinearAndNormalize(const InferenceTestImage & image,
+                                              const unsigned int outputWidth,
+                                              const unsigned int outputHeight,
+                                              const std::array<float, 3>& mean,
+                                              const std::array<float, 3>& stddev)
+{
+    std::vector<float> out;
+    out.resize(outputWidth * outputHeight * 3);
+
+    // We follow the definition of TensorFlow and AndroidNN: the top-left corner of a texel in the output
+    // image is projected into the input image to figure out the interpolants and weights. Note that this
+    // will yield different results than if projecting the centre of output texels.
+
+    const unsigned int inputWidth = image.GetWidth();
+    const unsigned int inputHeight = image.GetHeight();
+
+    // How much to scale pixel coordinates in the output image to get the corresponding pixel coordinates
+    // in the input image.
+    const float scaleY = boost::numeric_cast<float>(inputHeight) / boost::numeric_cast<float>(outputHeight);
+    const float scaleX = boost::numeric_cast<float>(inputWidth) / boost::numeric_cast<float>(outputWidth);
+
+    uint8_t rgb_x0y0[3];
+    uint8_t rgb_x1y0[3];
+    uint8_t rgb_x0y1[3];
+    uint8_t rgb_x1y1[3];
+
+    for (unsigned int y = 0; y < outputHeight; ++y)
+    {
+        // Corresponding real-valued height coordinate in input image.
+        const float iy = boost::numeric_cast<float>(y) * scaleY;
+
+        // Discrete height coordinate of top-left texel (in the 2x2 texel area used for interpolation).
+        const float fiy = floorf(iy);
+        const unsigned int y0 = boost::numeric_cast<unsigned int>(fiy);
+
+        // Interpolation weight (range [0,1])
+        const float yw = iy - fiy;
+
+        for (unsigned int x = 0; x < outputWidth; ++x)
+        {
+            // Real-valued and discrete width coordinates in input image.
+            const float ix = boost::numeric_cast<float>(x) * scaleX;
+            const float fix = floorf(ix);
+            const unsigned int x0 = boost::numeric_cast<unsigned int>(fix);
+
+            // Interpolation weight (range [0,1]).
+            const float xw = ix - fix;
+
+            // Discrete width/height coordinates of texels below and to the right of (x0, y0).
+            const unsigned int x1 = std::min(x0 + 1, inputWidth - 1u);
+            const unsigned int y1 = std::min(y0 + 1, inputHeight - 1u);
+
+            std::tie(rgb_x0y0[0], rgb_x0y0[1], rgb_x0y0[2]) = image.GetPixelAs3Channels(x0, y0);
+            std::tie(rgb_x1y0[0], rgb_x1y0[1], rgb_x1y0[2]) = image.GetPixelAs3Channels(x1, y0);
+            std::tie(rgb_x0y1[0], rgb_x0y1[1], rgb_x0y1[2]) = image.GetPixelAs3Channels(x0, y1);
+            std::tie(rgb_x1y1[0], rgb_x1y1[1], rgb_x1y1[2]) = image.GetPixelAs3Channels(x1, y1);
+
+            for (unsigned c=0; c<3; ++c)
+            {
+                const float ly0 = Lerp(float(rgb_x0y0[c]), float(rgb_x1y0[c]), xw);
+                const float ly1 = Lerp(float(rgb_x0y1[c]), float(rgb_x1y1[c]), xw);
+                const float l = Lerp(ly0, ly1, yw);
+                PutData(out, outputWidth, x, y, c, ((l/255.0f) - mean[c])/stddev[c]);
+            }
+        }
+    }
+    return out;
+}
+
 } // namespace
 
 InferenceTestImage::InferenceTestImage(char const* filePath)
@@ -94,8 +178,41 @@ std::tuple<uint8_t, uint8_t, uint8_t> InferenceTestImage::GetPixelAs3Channels(un
     return std::make_tuple(outPixelData[0], outPixelData[1], outPixelData[2]);
 }
 
-void InferenceTestImage::Resize(unsigned int newWidth, unsigned int newHeight)
+
+void InferenceTestImage::StbResize(InferenceTestImage& im, const unsigned int newWidth, const unsigned int newHeight)
 {
+    std::vector<uint8_t> newData;
+    newData.resize(newWidth * newHeight * im.GetNumChannels() * im.GetSingleElementSizeInBytes());
+
+    // boost::numeric_cast<>() is used for user-provided data (protecting about overflows).
+    // static_cast<> is ok for internal data (assumes that, when internal data was originally provided by a user,
+    // a boost::numeric_cast<>() handled the conversion).
+    const int nW = boost::numeric_cast<int>(newWidth);
+    const int nH = boost::numeric_cast<int>(newHeight);
+
+    const int w = static_cast<int>(im.GetWidth());
+    const int h = static_cast<int>(im.GetHeight());
+    const int numChannels = static_cast<int>(im.GetNumChannels());
+
+    const int res = stbir_resize_uint8(im.m_Data.data(), w, h, 0, newData.data(), nW, nH, 0, numChannels);
+    if (res == 0)
+    {
+        throw InferenceTestImageResizeFailed("The resizing operation failed");
+    }
+
+    im.m_Data.swap(newData);
+    im.m_Width = newWidth;
+    im.m_Height = newHeight;
+}
+
+std::vector<float> InferenceTestImage::Resize(unsigned int newWidth,
+                                              unsigned int newHeight,
+                                              const armnn::CheckLocation& location,
+                                              const ResizingMethods meth,
+                                              const std::array<float, 3>& mean,
+                                              const std::array<float, 3>& stddev)
+{
+    std::vector<float> out;
     if (newWidth == 0 || newHeight == 0)
     {
         throw InferenceTestImageResizeFailed(boost::str(boost::format("None of the dimensions passed to a resize "
@@ -104,32 +221,27 @@ void InferenceTestImage::Resize(unsigned int newWidth, unsigned int newHeight)
 
     if (newWidth == m_Width && newHeight == m_Height)
     {
-        // nothing to do
-        return;
+        // Nothing to do.
+        return out;
     }
 
-    std::vector<uint8_t> newData;
-    newData.resize(newWidth * newHeight * GetNumChannels() * GetSingleElementSizeInBytes());
-
-    // boost::numeric_cast<>() is used for user-provided data (protecting about overflows).
-    // static_cast<> ok for internal data (assumes that, when internal data was originally provided by a user,
-    // a boost::numeric_cast<>() handled the conversion).
-    const int nW = boost::numeric_cast<int>(newWidth);
-    const int nH = boost::numeric_cast<int>(newHeight);
-
-    const int w = static_cast<int>(GetWidth());
-    const int h = static_cast<int>(GetHeight());
-    const int numChannels = static_cast<int>(GetNumChannels());
-
-    const int res = stbir_resize_uint8(m_Data.data(), w, h, 0, newData.data(), nW, nH, 0, numChannels);
-    if (res == 0)
-    {
-        throw InferenceTestImageResizeFailed("The resizing operation failed");
+    switch (meth) {
+        case ResizingMethods::STB:
+        {
+            StbResize(*this, newWidth, newHeight);
+            break;
+        }
+        case ResizingMethods::BilinearAndNormalized:
+        {
+            out = ResizeBilinearAndNormalize(*this, newWidth, newHeight, mean, stddev);
+            break;
+        }
+        default:
+            throw InferenceTestImageResizeFailed(boost::str(
+                boost::format("Unknown resizing method asked ArmNN only supports {STB, BilinearAndNormalized} %1%")
+                              % location.AsString()));
     }
-
-    m_Data.swap(newData);
-    m_Width = newWidth;
-    m_Height = newHeight;
+    return out;
 }
 
 void InferenceTestImage::Write(WriteFormat format, const char* filePath) const

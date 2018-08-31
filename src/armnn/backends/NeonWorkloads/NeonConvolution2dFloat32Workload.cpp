@@ -18,13 +18,16 @@ NeonConvolution2dFloat32Workload::NeonConvolution2dFloat32Workload(const Convolu
 {
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        InitialiseArmComputeTensorData(m_BiasTensor, m_Data.m_Bias->template GetConstTensor<float>());
+        InitializeArmComputeTensorDataForFloatTypes(*m_BiasTensor, m_Data.m_Bias);
     }
+
+    m_ConvolutionLayer->prepare();
+    FreeUnusedTensors();
 }
 
 void NeonConvolution2dFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonConvolution2dFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConvolution2dFloat32Workload_Execute");
     m_ConvolutionLayer->run();
 }
 

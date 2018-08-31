@@ -10,6 +10,7 @@
 #include <boost/cast.hpp>
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
+#include "backends/CpuTensorHandle.hpp"
 
 #include <numeric>
 
@@ -24,19 +25,19 @@ void InputSlot::Insert(Layer& layer)
 
     if (prevSlot != nullptr)
     {
-        // Disconnect parent from this
+        // Disconnects parent from this.
         prevSlot->Disconnect(*this);
 
-        // Connect inserted layer to parent
+        // Connects inserted layer to parent.
         BOOST_ASSERT(layer.GetNumInputSlots() == 1);
         prevSlot->Connect(layer.GetInputSlot(0));
 
-        // Set tensor info for inserted layer
+        // Sets tensor info for inserted layer.
         const TensorInfo& tensorInfo = prevSlot->GetTensorInfo();
         layer.GetOutputHandler().SetTensorInfo(tensorInfo);
     }
 
-    // Connect inserted layer to this
+    // Connects inserted layer to this.
     layer.GetOutputSlot(0).Connect(*this);
 }
 
@@ -117,11 +118,11 @@ void OutputSlot::ValidateConnectionIndex(unsigned int index) const
 namespace {
 LayerGuid GenerateLayerGuid()
 {
-    //Note: Not thread safe.
+    // Note: Not thread safe.
     static LayerGuid newGuid=0;
     return newGuid++;
 }
-} //namespace
+} // namespace
 
 Layer::Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType type, const char* name)
 : m_OutputHandlers(numOutputSlots)
@@ -147,7 +148,7 @@ void Layer::CollectWorkloadInputs(WorkloadDataCollector& dataCollector, const Gr
 {
     for (auto&& inputSlot : GetInputSlots())
     {
-        // The graph must be well-formed at this point
+        // The graph must be well-formed at this point.
         BOOST_ASSERT(inputSlot.GetConnection());
         const OutputHandler& outputHandler = inputSlot.GetConnectedOutputSlot()->GetOutputHandler();
         dataCollector.Push(outputHandler.GetData(), outputHandler.GetTensorInfo());
@@ -170,13 +171,22 @@ void Layer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory)
     }
 }
 
+void Layer::ReleaseConstantData()
+{
+    // Now free up the static data.
+    OperateOnConstantTensors([](std::unique_ptr<ScopedCpuTensorHandle>& handle)
+                                 {
+                                     handle.reset(nullptr);
+                                 });
+}
+
 DataType Layer::GetDataType() const
 {
-    if (GetNumInputSlots() > 0) // Ignore the input layer
+    if (GetNumInputSlots() > 0) // Ignore the input layer.
     {
         return GetInputSlot(0).GetConnection()->GetTensorInfo().GetDataType();
     }
-    return DataType::Float32;
+    return GetOutputSlot(0).GetTensorInfo().GetDataType();
 }
 
 void Layer::ResetPriority() const
@@ -224,6 +234,66 @@ LayerPriority Layer::GetPriority() const
     }
 
     return m_Priority;
+}
+
+void Layer::VerifyLayerConnections(unsigned int expectedConnections, const CheckLocation& location) const
+{
+    BOOST_ASSERT(GetNumInputSlots() == expectedConnections);
+
+    for (unsigned int i=0; i<expectedConnections; ++i)
+    {
+        if (GetInputSlot(i).GetConnection() == nullptr)
+        {
+            throw LayerValidationException(
+                boost::str(
+                    boost::format(
+                        "Input connection #%1% must be connected "
+                        "for %2% layer %3% %4%")
+                        % i
+                        % GetLayerTypeAsCString(this->GetType())
+                        % GetNameStr()
+                        % location.AsString()));
+        }
+        if(! GetInputSlot(i).GetConnection()->IsTensorInfoSet())
+        {
+            throw LayerValidationException(
+                boost::str(
+                    boost::format(
+                        "TensorInfo of Input connection #%1% must be set on connected OutputSlot for "
+                        "%2% layer %3% %4%")
+                        % i
+                        % GetLayerTypeAsCString(this->GetType())
+                        % GetNameStr()
+                        % location.AsString()));
+        }
+    }
+}
+
+std::vector<TensorShape> Layer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
+{
+    BOOST_ASSERT(GetNumInputSlots() != 0);
+    BOOST_ASSERT(GetNumOutputSlots() != 0);
+
+    // By default we return what we got, meaning the output shape(s) are the same as the input(s).
+    // This only works if the number of inputs and outputs are the same. Since we are in the Layer
+    // base class, this means the implementation needs to be overridden in the specific layers for
+    // the other cases. So the missing implementation justifies the UnimplementedException.
+
+    if (GetNumInputSlots() != GetNumOutputSlots())
+    {
+        throw UnimplementedException(
+            boost::str(
+                boost::format(
+                    "Default implementation for InferOutputShapes can only be used for "
+                    "layers with the same number of input and output slots. This doesn't "
+                    "hold for %1% layer %2% (#inputs=%3% #outputs=%4%) %5%")
+                    % GetLayerTypeAsCString(this->GetType())
+                    % GetNameStr()
+                    % GetNumInputSlots()
+                    % GetNumOutputSlots()
+                    % CHECK_LOCATION().AsString()));
+    }
+    return inputShapes;
 }
 
 } // namespace armnn

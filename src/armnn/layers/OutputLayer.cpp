@@ -29,7 +29,7 @@ OutputLayer* OutputLayer::Clone(Graph& graph) const
 
 void OutputLayer::ValidateTensorShapesFromInputs()
 {
-    // Just validate the input is connected
+    // Just validates that the input is connected.
     ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
                                                "OutputLayer: Input slot must be connected.");
 }

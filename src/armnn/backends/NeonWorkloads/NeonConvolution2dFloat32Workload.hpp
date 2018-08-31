@@ -15,7 +15,7 @@
 namespace armnn
 {
 
-class NeonConvolution2dFloat32Workload : public NeonConvolution2dBaseWorkload<DataType::Float32>
+class NeonConvolution2dFloat32Workload : public NeonConvolution2dBaseWorkload<DataType::Float16, DataType::Float32>
 {
 public:
     NeonConvolution2dFloat32Workload(const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,

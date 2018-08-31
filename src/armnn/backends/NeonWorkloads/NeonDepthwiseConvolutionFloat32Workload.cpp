@@ -16,23 +16,17 @@ using namespace armcomputetensorutils;
 NeonDepthwiseConvolutionFloat32Workload::NeonDepthwiseConvolutionFloat32Workload(
     const DepthwiseConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : Float32Workload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
+    : FloatWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
-    std::string reasonIfUnsupported;
-    if (!IsNeonDepthwiseConvolution2dDescParamsSupported(&reasonIfUnsupported, m_Data.m_Parameters, weightInfo))
-    {
-        throw UnimplementedException(reasonIfUnsupported);
-    }
+    m_KernelTensor = std::make_unique<arm_compute::Tensor>();
+    BuildArmComputeTensor(*m_KernelTensor, weightInfo);
 
-    BuildArmComputeTensor(m_KernelTensor, weightInfo);
-
-    arm_compute::Tensor* optionalBias = nullptr;
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        BuildArmComputeTensor(m_BiasTensor, m_Data.m_Bias->GetTensorInfo());
-        optionalBias = &m_BiasTensor;
+        m_BiasTensor = std::make_unique<arm_compute::Tensor>();
+        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo());
     }
 
     arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
@@ -54,8 +48,8 @@ NeonDepthwiseConvolutionFloat32Workload::NeonDepthwiseConvolutionFloat32Workload
         m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer3x3>();
         static_cast<arm_compute::NEDepthwiseConvolutionLayer3x3*>(
             m_pDepthwiseConvolutionLayer.get())->configure(&input,
-                                                           &m_KernelTensor,
-                                                           optionalBias,
+                                                           m_KernelTensor.get(),
+                                                           m_BiasTensor.get(),
                                                            &output,
                                                            padStrideInfo);
     }
@@ -64,28 +58,37 @@ NeonDepthwiseConvolutionFloat32Workload::NeonDepthwiseConvolutionFloat32Workload
         m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer>();
         static_cast<arm_compute::NEDepthwiseConvolutionLayer*>(
             m_pDepthwiseConvolutionLayer.get())->configure(&input,
-                                                           &m_KernelTensor,
-                                                           optionalBias,
+                                                           m_KernelTensor.get(),
+                                                           m_BiasTensor.get(),
                                                            &output,
                                                            padStrideInfo);
     }
 
     BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
 
-    InitialiseArmComputeTensorData(m_KernelTensor, m_Data.m_Weight->GetConstTensor<float>());
+    InitializeArmComputeTensorDataForFloatTypes(*m_KernelTensor, m_Data.m_Weight);
 
-    if (optionalBias)
+    if (m_BiasTensor)
     {
-        InitialiseArmComputeTensorData(*optionalBias, m_Data.m_Bias->GetConstTensor<float>());
+        InitializeArmComputeTensorDataForFloatTypes(*m_BiasTensor, m_Data.m_Bias);
     }
+
+    m_pDepthwiseConvolutionLayer->prepare();
+    FreeUnusedTensors();
 }
 
 void NeonDepthwiseConvolutionFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "NeonDepthwiseConvolutionFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonDepthwiseConvolutionFloat32Workload_Execute");
     BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
 
     m_pDepthwiseConvolutionLayer->run();
+}
+
+void NeonDepthwiseConvolutionFloat32Workload::FreeUnusedTensors()
+{
+    FreeTensorIfUnused(m_KernelTensor);
+    FreeTensorIfUnused(m_BiasTensor);
 }
 
 } //namespace armnn

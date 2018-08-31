@@ -31,24 +31,24 @@ public:
                 auto permute = boost::polymorphic_downcast<PermuteLayer*>(&connection.GetOwningLayer());
                 const PermutationVector& perm = permute->GetPermutation();
 
-                // Insert an equivalent permute before every input of the base layer.
+                // Inserts an equivalent permute before every input of the base layer.
                 for (auto baseInput = base.BeginInputSlots(); baseInput != base.EndInputSlots(); ++baseInput)
                 {
-                    // Insert new permute layer.
+                    // Inserts a new permute layer.
                     const std::string name = std::string("moved_up-") + permute->GetName();
                     PermuteLayer& permLayer = *graph.InsertNewLayer<PermuteLayer>(*baseInput, perm, name.c_str());
 
-                    // Set output tensor info for the new layer.
+                    // Sets output tensor info for the new layer.
                     OutputSlot& parentOutput = *permLayer.GetInputSlot(0).GetConnectedOutputSlot();
                     const TensorInfo permOutInfo = armnnUtils::Permuted(parentOutput.GetTensorInfo(), perm);
                     permLayer.GetOutputHandler().SetTensorInfo(permOutInfo);
                 }
 
-                // Set permuted output tensor info
+                // Sets permuted output tensor info
                 const TensorInfo& childOutInfo = permute->GetOutputHandler().GetTensorInfo();
                 base.GetOutputHandler().SetTensorInfo(childOutInfo);
 
-                // Bypass permute. It will be removed as it's left unconnected.
+                // Bypasses permute. It will be removed as it's left unconnected.
                 permute->GetOutputSlot().MoveAllConnections(base.GetOutputSlot());
             }
         }

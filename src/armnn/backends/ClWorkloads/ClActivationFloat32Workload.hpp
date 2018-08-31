@@ -9,9 +9,12 @@
 
 namespace armnn
 {
+arm_compute::Status ClActivationWorkloadValidate(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 const ActivationDescriptor& descriptor);
 
-// Activation layer execution
-class ClActivationFloat32Workload : public Float32Workload<ActivationQueueDescriptor>
+// Activation layer execution.
+class ClActivationFloat32Workload : public FloatWorkload<ActivationQueueDescriptor>
 {
 public:
     ClActivationFloat32Workload(const ActivationQueueDescriptor& descriptor, const WorkloadInfo& info);

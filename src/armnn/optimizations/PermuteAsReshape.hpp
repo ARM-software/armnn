@@ -23,7 +23,7 @@ public:
 
             const std::string name = std::string("as_reshape-") + permute.GetName();
             const ReshapeDescriptor descriptor{outInfo.GetShape()};
-            // Insert so layers don't need to be re-sorted
+            // Inserts NewLayer so layers don't need to be re-sorted.
             auto reshape = graph.InsertNewLayer<ReshapeLayer>(permute.GetInputSlot(0), descriptor, name.c_str());
             reshape->GetOutputHandler().SetTensorInfo(outInfo);
 

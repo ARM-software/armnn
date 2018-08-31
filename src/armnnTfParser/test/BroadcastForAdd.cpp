@@ -6,10 +6,10 @@
 #include <boost/test/unit_test.hpp>
 #include "armnnTfParser/ITfParser.hpp"
 #include "ParserPrototxtFixture.hpp"
-// This is a special case for add, which supports broadcasting
+// This is a special case for add, which supports broadcasting.
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct BroadcastForAddFixtureSlot1 : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct BroadcastForAddFixtureSlot1 : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     BroadcastForAddFixtureSlot1()
     {
@@ -71,7 +71,7 @@ struct BroadcastForAddFixtureSlot1 : public ParserPrototxtFixture<armnnTfParser:
     }
 };
 
-struct BroadcastForAddFixtureSlot0 : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct BroadcastForAddFixtureSlot0 : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     BroadcastForAddFixtureSlot0()
     {

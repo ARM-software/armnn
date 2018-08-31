@@ -30,17 +30,23 @@ ReshapeLayer* ReshapeLayer::Clone(Graph& graph) const
     return CloneBase<ReshapeLayer>(graph, m_Param, GetName());
 }
 
+std::vector<TensorShape> ReshapeLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
+{
+    return std::vector<TensorShape>({ m_Param.m_TargetShape });
+}
+
 void ReshapeLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
-                     "ReshapeLayer: InputSlot must be connected to an OutputSlot");
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
-                     "ReshapeLayer: TensorInfo must be set on connected OutputSlot.");
+    VerifyLayerConnections(1, CHECK_LOCATION());
+
+    auto inferredShapes = InferOutputShapes({  });
+
+    BOOST_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "ReshapeLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        m_Param.m_TargetShape);
+        inferredShapes[0]);
 }
 
 } // namespace armnn

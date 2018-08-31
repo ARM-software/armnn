@@ -10,10 +10,10 @@
 namespace armnn
 {
 
-class NeonSplitterFloat32Workload : public NeonBaseSplitterWorkload<DataType::Float32>
+class NeonSplitterFloat32Workload : public NeonBaseSplitterWorkload<DataType::Float16, DataType::Float32>
 {
 public:
-    using NeonBaseSplitterWorkload<DataType::Float32>::NeonBaseSplitterWorkload;
+    using NeonBaseSplitterWorkload<DataType::Float16, DataType::Float32>::NeonBaseSplitterWorkload;
     virtual void Execute() const override;
 };
 

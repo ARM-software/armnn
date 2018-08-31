@@ -17,7 +17,7 @@
 namespace armnn
 {
 
-// Helper function to compute "Within" normalization using Krichevsky 2012: Local Brightness Normalization
+// Helper function to compute "Within" normalization using Krichevsky 2012: Local Brightness Normalization.
 static void NormalizeWithinUingLbr(const float*       inputData,
                                    float*             outputData,
                                    const TensorShape& tensorShape,
@@ -80,7 +80,7 @@ static void NormalizeWithinUingLbr(const float*       inputData,
     }
 }
 
-// Helper function to compute "Across" normalization using Krichevsky 2012: Local Brightness Normalization
+// Helper function to compute "Across" normalization using Krichevsky 2012: Local Brightness Normalization.
 void NormalizeAcrossUingLbr(const float*       inputData,
                             float*             outputData,
                             const TensorShape& tensorShape,

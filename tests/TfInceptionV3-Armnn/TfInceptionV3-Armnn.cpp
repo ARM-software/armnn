@@ -3,7 +3,7 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "../InferenceTest.hpp"
-#include "../MobileNetDatabase.hpp"
+#include "../ImagePreprocessor.hpp"
 #include "armnnTfParser/ITfParser.hpp"
 
 int main(int argc, char* argv[])
@@ -21,11 +21,18 @@ int main(int argc, char* argv[])
 
         armnn::TensorShape inputTensorShape({ 1, 299, 299, 3 });
 
+        using DataType = float;
+        using DatabaseType = ImagePreprocessor<float>;
+        using ParserType = armnnTfParser::ITfParser;
+        using ModelType = InferenceModel<ParserType, DataType>;
+
         // Coverity fix: InferenceTestMain() may throw uncaught exceptions.
-        retVal = armnn::test::ClassifierInferenceTestMain<MobileNetDatabase, armnnTfParser::ITfParser>(
+        retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
                     argc, argv, "inception_v3_2016_08_28_frozen_transformed.pb", true,
                     "input", "InceptionV3/Predictions/Reshape_1", { 0, 1, 2, },
-                    [&imageSet](const char* dataDir) { return MobileNetDatabase(dataDir, 299, 299, imageSet); },
+                    [&imageSet](const char* dataDir, const ModelType&) {
+                        return DatabaseType(dataDir, 299, 299, imageSet);
+                    },
                     &inputTensorShape);
     }
     catch (const std::exception& e)

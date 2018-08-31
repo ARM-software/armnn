@@ -15,6 +15,8 @@ if (BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
+add_subdirectory(samples)
+
 # Include the additional cmake files in their own target so that they will appear nicely in IDEs
 add_custom_target(AdditionalCMakeFiles SOURCES ${additional_cmake_files})
 
@@ -31,6 +33,12 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/HeapProfiling.hpp
     src/armnnUtils/LeakChecking.cpp
     src/armnnUtils/LeakChecking.hpp
+    src/armnnUtils/CsvReader.cpp
+    src/armnnUtils/CsvReader.hpp
+    src/armnnUtils/FloatingPointConverter.cpp
+    src/armnnUtils/FloatingPointConverter.hpp
+    src/armnnUtils/VerificationHelpers.hpp
+    src/armnnUtils/VerificationHelpers.cpp
     )
 if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER)
     list(APPEND armnnUtils_sources
@@ -45,6 +53,8 @@ if(BUILD_CAFFE_PARSER)
     set(armnn_caffe_parser_sources)
     list(APPEND armnn_caffe_parser_sources
         include/armnnCaffeParser/ICaffeParser.hpp
+        src/armnnCaffeParser/RecordByRecordCaffeParser.hpp
+        src/armnnCaffeParser/RecordByRecordCaffeParser.cpp
         src/armnnCaffeParser/CaffeParser.hpp
         src/armnnCaffeParser/CaffeParser.cpp
         ${CAFFE_GENERATED_SOURCES}/caffe/proto/caffe.pb.cc
@@ -63,6 +73,30 @@ if(BUILD_CAFFE_PARSER)
 
     target_link_libraries(armnnCaffeParser armnn)
     target_link_libraries(armnnCaffeParser ${PROTOBUF_LIBRARIES})
+
+endif()
+
+if(BUILD_ONNX_PARSER)
+    set(armnn_onnx_parser_sources)
+    list(APPEND armnn_onnx_parser_sources
+        include/armnnOnnxParser/IOnnxParser.hpp
+        src/armnnOnnxParser/OnnxParser.hpp
+        src/armnnOnnxParser/OnnxParser.cpp
+        ${ONNX_GENERATED_SOURCES}/onnx/onnx.pb.cc
+        )
+    # The generated onnx protobuf .cc files are not warning clean and we can't fix them.
+    if(COMPILER_IS_GNU_LIKE)
+        set_source_files_properties(${ONNX_GENERATED_SOURCES}/onnx/onnx.pb.cc PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-sign-conversion")
+    endif()
+
+    add_library_ex(armnnOnnxParser SHARED ${armnn_onnx_parser_sources})
+
+    target_include_directories(armnnOnnxParser PRIVATE src/armnnUtils)
+
+    target_link_libraries(armnnOnnxParser armnn)
+
+    # Protobuf
+    target_link_libraries(armnnOnnxParser ${PROTOBUF_LIBRARIES})
 endif()
 
 if(BUILD_TF_PARSER)
@@ -88,7 +122,25 @@ if(BUILD_TF_PARSER)
     target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
 endif()
 
+if(BUILD_TF_LITE_PARSER)
+    set(armnn_tf_lite_parser_sources)
+    list(APPEND armnn_tf_lite_parser_sources
+        include/armnnTfLiteParser/ITfLiteParser.hpp
+        src/armnnTfLiteParser/TfLiteParser.hpp
+        src/armnnTfLiteParser/TfLiteParser.cpp
+     )
+
+     add_library_ex(armnnTfLiteParser SHARED ${armnn_tf_lite_parser_sources})
+
+     target_include_directories(armnnTfLiteParser PRIVATE src/armnnUtils)
+
+     target_link_libraries(armnnTfLiteParser ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
+     target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
+endif()
+
 # ArmNN source files required for all build options
+include_directories(SYSTEM third-party)
+
 list(APPEND armnn_sources
     include/armnn/ArmNN.hpp
     include/armnn/Descriptors.hpp
@@ -126,9 +178,8 @@ list(APPEND armnn_sources
     src/armnn/backends/WorkloadData.cpp
     src/armnn/backends/WorkloadFactory.hpp
     src/armnn/backends/WorkloadFactory.cpp
-    src/armnn/backends/AclBaseMemoryManager.hpp
-    src/armnn/backends/AclBaseMemoryManager.cpp
     src/armnn/backends/WorkloadInfo.hpp
+    src/armnn/backends/WorkloadUtils.hpp
     src/armnn/backends/MemCopyWorkload.cpp
     src/armnn/backends/MemCopyWorkload.hpp
     src/armnn/backends/RefWorkloads/Broadcast.hpp
@@ -222,6 +273,12 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefFakeQuantizationFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefPermuteWorkload.hpp
     src/armnn/backends/RefWorkloads/RefPermuteWorkload.cpp
+    src/armnn/backends/RefWorkloads/RefLstmFloat32Workload.cpp
+    src/armnn/backends/RefWorkloads/RefLstmFloat32Workload.hpp
+    src/armnn/backends/RefWorkloads/RefConvertFp16ToFp32Workload.cpp
+    src/armnn/backends/RefWorkloads/RefConvertFp16ToFp32Workload.hpp
+    src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.cpp
+    src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp
@@ -234,6 +291,10 @@ list(APPEND armnn_sources
     src/armnn/layers/ConstantLayer.cpp
     src/armnn/layers/Convolution2dLayer.hpp
     src/armnn/layers/Convolution2dLayer.cpp
+    src/armnn/layers/ConvertFp16ToFp32Layer.hpp
+    src/armnn/layers/ConvertFp16ToFp32Layer.cpp
+    src/armnn/layers/ConvertFp32ToFp16Layer.hpp
+    src/armnn/layers/ConvertFp32ToFp16Layer.cpp
     src/armnn/layers/DepthwiseConvolution2dLayer.hpp
     src/armnn/layers/DepthwiseConvolution2dLayer.cpp
     src/armnn/layers/FakeQuantizationLayer.hpp
@@ -246,6 +307,8 @@ list(APPEND armnn_sources
     src/armnn/layers/InputLayer.cpp
     src/armnn/layers/L2NormalizationLayer.hpp
     src/armnn/layers/L2NormalizationLayer.cpp
+    src/armnn/layers/LstmLayer.cpp
+    src/armnn/layers/LstmLayer.hpp
     src/armnn/layers/MemCopyLayer.hpp
     src/armnn/layers/MemCopyLayer.cpp
     src/armnn/layers/MergerLayer.hpp
@@ -268,8 +331,11 @@ list(APPEND armnn_sources
     src/armnn/layers/SoftmaxLayer.cpp
     src/armnn/layers/SplitterLayer.hpp
     src/armnn/layers/SplitterLayer.cpp
+    src/armnn/Half.hpp
     src/armnn/InternalTypes.hpp
     src/armnn/InternalTypes.cpp
+    src/armnn/JsonPrinter.hpp
+    src/armnn/JsonPrinter.cpp
     src/armnn/LayerFwd.hpp
     src/armnn/Layer.hpp
     src/armnn/Layer.cpp
@@ -279,6 +345,7 @@ list(APPEND armnn_sources
     src/armnn/SerializeLayerParameters.cpp
     src/armnn/SerializeLayerParameters.hpp
     src/armnn/Descriptors.cpp
+    src/armnn/DeviceSpec.hpp
     src/armnn/LoadedNetwork.hpp
     src/armnn/LoadedNetwork.cpp
     src/armnn/Exceptions.cpp
@@ -286,22 +353,35 @@ list(APPEND armnn_sources
     src/armnn/Graph.cpp
     src/armnn/Network.hpp
     src/armnn/Network.cpp
+    src/armnn/NetworkUtils.hpp
     src/armnn/backends/OutputHandler.hpp
     src/armnn/backends/OutputHandler.cpp
+    src/armnn/ProfilingEvent.cpp
+    src/armnn/ProfilingEvent.hpp
     src/armnn/Profiling.cpp
+    src/armnn/Instrument.hpp
+    src/armnn/WallClockTimer.hpp
+    src/armnn/WallClockTimer.cpp
     src/armnn/Tensor.cpp
     src/armnn/Utils.cpp
     src/armnn/LayerSupport.cpp
     src/armnn/LayerSupportCommon.hpp
     src/armnn/optimizations/All.hpp
+    src/armnn/optimizations/ConvertConstants.hpp
     src/armnn/optimizations/MovePermuteUp.hpp
     src/armnn/optimizations/Optimization.hpp
     src/armnn/optimizations/OptimizeConsecutiveReshapes.hpp
     src/armnn/optimizations/OptimizeInversePermutes.hpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
+    src/armnn/optimizations/OptimizeInverseConversions.hpp
+    src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
     src/armnn/Optimizer.hpp
     src/armnn/Optimizer.cpp
+    third-party/half/half.hpp
+    src/armnn/IGraphObservable.hpp
+    src/armnn/Observable.hpp
+    src/armnn/Observable.cpp
     )
 
 if(ARMCOMPUTENEON)
@@ -322,12 +402,18 @@ if(ARMCOMPUTENEON)
         src/armnn/backends/NeonWorkloads/NeonConstantFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonConstantUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonConstantUint8Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonConvertFp16ToFp32Workload.cpp
+        src/armnn/backends/NeonWorkloads/NeonConvertFp16ToFp32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonConvertFp32ToFp16Workload.cpp
+        src/armnn/backends/NeonWorkloads/NeonConvertFp32ToFp16Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dBaseWorkload.cpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dBaseWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dFloat32Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dUint8Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionBaseWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionBaseWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloat32Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionUint8Workload.cpp
@@ -338,6 +424,8 @@ if(ARMCOMPUTENEON)
         src/armnn/backends/NeonWorkloads/NeonFullyConnectedFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonL2NormalizationFloat32Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonL2NormalizationFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonLstmFloat32Workload.cpp
+        src/armnn/backends/NeonWorkloads/NeonLstmFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonMergerFloat32Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonMergerFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonMergerUint8Workload.cpp
@@ -358,6 +446,8 @@ if(ARMCOMPUTENEON)
         src/armnn/backends/NeonWorkloads/NeonReshapeFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonReshapeUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonReshapeUint8Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonSoftmaxBaseWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonSoftmaxBaseWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonSoftmaxFloat32Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonSoftmaxFloat32Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonSoftmaxUint8Workload.cpp
@@ -368,7 +458,11 @@ if(ARMCOMPUTENEON)
         src/armnn/backends/NeonWorkloads/NeonSplitterUint8Workload.hpp
         src/armnn/backends/NeonWorkloadUtils.cpp
         src/armnn/backends/NeonWorkloadUtils.hpp
-        src/armnn/backends/NeonTensorHandle.hpp)
+        src/armnn/backends/NeonTensorHandle.hpp
+        src/armnn/NeonInterceptorScheduler.hpp
+        src/armnn/NeonInterceptorScheduler.cpp
+        src/armnn/NeonTimer.hpp
+        src/armnn/NeonTimer.cpp)
 endif()
 if(ARMCOMPUTECL)
     # Additionally include source files for ARM Compute OpenCL backend
@@ -377,8 +471,16 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClActivationFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClActivationUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClActivationUint8Workload.hpp
+        src/armnn/backends/ClWorkloads/ClAdditionBaseWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClAdditionBaseWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClConvertFp16ToFp32Workload.cpp
+        src/armnn/backends/ClWorkloads/ClConvertFp16ToFp32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.cpp
+        src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.hpp
         src/armnn/backends/ClWorkloads/ClAdditionFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClAdditionFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClAdditionUint8Workload.cpp
+        src/armnn/backends/ClWorkloads/ClAdditionUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClBaseConstantWorkload.cpp
         src/armnn/backends/ClWorkloads/ClBaseConstantWorkload.hpp
         src/armnn/backends/ClWorkloads/ClBaseMergerWorkload.hpp
@@ -394,17 +496,20 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClConvolution2dFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClConvolution2dUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClConvolution2dUint8Workload.hpp
+        src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionBaseWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionBaseWorkload.hpp
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.hpp
-        src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionHelper.hpp
         src/armnn/backends/ClWorkloads/ClFloorFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClFloorFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClFullyConnectedFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClFullyConnectedFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClL2NormalizationFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClL2NormalizationFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClLstmFloat32Workload.cpp
+        src/armnn/backends/ClWorkloads/ClLstmFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClMergerFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClMergerFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClMergerUint8Workload.cpp
@@ -427,6 +532,8 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClReshapeUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClResizeBilinearFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClResizeBilinearFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClSoftmaxBaseWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClSoftmaxBaseWorkload.hpp
         src/armnn/backends/ClWorkloads/ClSoftmaxFloat32Workload.cpp
         src/armnn/backends/ClWorkloads/ClSoftmaxFloat32Workload.hpp
         src/armnn/backends/ClWorkloads/ClSoftmaxUint8Workload.cpp
@@ -436,14 +543,29 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClSplitterUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClSplitterUint8Workload.hpp
         src/armnn/backends/ClWorkloadUtils.hpp
-        src/armnn/backends/ClTensorHandle.hpp)
+        src/armnn/backends/ClTensorHandle.hpp
+        src/armnn/OpenClTimer.cpp
+        src/armnn/OpenClTimer.hpp)
 endif()
 # Files shared by all ARM Compute backends
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     list(APPEND armnn_sources
         src/armnn/backends/ArmComputeTensorUtils.hpp
         src/armnn/backends/ArmComputeTensorUtils.cpp
-        src/armnn/backends/ArmComputeUtils.hpp)
+        src/armnn/backends/ArmComputeUtils.hpp
+        src/armnn/memory/IMemoryPool.hpp
+        src/armnn/memory/BlobMemoryPool.cpp
+        src/armnn/memory/BlobMemoryPool.hpp
+        src/armnn/memory/BlobLifetimeManager.cpp
+        src/armnn/memory/BlobLifetimeManager.hpp
+        src/armnn/memory/PoolManager.cpp
+        src/armnn/memory/PoolManager.hpp
+        src/armnn/memory/BaseMemoryManager.hpp
+        src/armnn/memory/BaseMemoryManager.cpp
+        src/armnn/memory/OffsetMemoryPool.cpp
+        src/armnn/memory/OffsetMemoryPool.hpp
+        src/armnn/memory/OffsetLifetimeManager.cpp
+        src/armnn/memory/OffsetLifetimeManager.hpp)
 endif()
 
 # Files used for Streamline-based profiling backend
@@ -459,12 +581,19 @@ target_include_directories(armnn PRIVATE src/armnnUtils)
 target_link_libraries(armnn armnnUtils)
 target_link_libraries(armnn ${CMAKE_DL_LIBS})
 
+
 install(TARGETS armnn DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 if(BUILD_CAFFE_PARSER)
     install(TARGETS armnnCaffeParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
+if(BUILD_ONNX_PARSER)
+    install(TARGETS armnnOnnxParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+endif()
 if(BUILD_TF_PARSER)
     install(TARGETS armnnTfParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+endif()
+if(BUILD_TF_LITE_PARSER)
+    install(TARGETS armnnTfLiteParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
@@ -488,14 +617,21 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/UnitTests.hpp
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/UtilsTests.cpp
+        src/armnn/test/JsonPrinterTests.cpp
         src/armnn/test/GraphTests.cpp
         src/armnn/test/OptimizerTests.cpp
+        src/armnn/test/ProfilerTests.cpp
         src/armnn/test/RuntimeTests.cpp
         src/armnn/test/CreateWorkload.hpp
         src/armnn/test/TensorTest.cpp
         src/armnn/test/TensorHelpers.hpp
-        src/armnn/test/Network_test.cpp
+        src/armnn/test/CsvReaderTest.cpp
+        src/armnn/test/NetworkTests.cpp
+        src/armnn/test/FloatingPointConverterTest.cpp
+        src/armnn/test/ProfilingEventTest.cpp
         src/armnn/test/GraphUtils.hpp
+        src/armnn/test/InstrumentTests.cpp
+        src/armnn/test/ObservableTest.cpp
         src/armnn/backends/test/IsLayerSupportedTest.cpp
         src/armnn/backends/test/IsLayerSupportedTestImpl.hpp
         src/armnn/backends/test/Reference.cpp
@@ -504,6 +640,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/backends/test/TensorCopyUtils.cpp
         src/armnn/backends/test/LayerTests.hpp
         src/armnn/backends/test/LayerTests.cpp
+        src/armnn/backends/test/LayerReleaseConstantDataTest.cpp
         src/armnn/backends/test/Conv2dTestImpl.hpp
         src/armnn/backends/test/ActivationTestImpl.hpp
         src/armnn/backends/test/ActivationFixture.hpp
@@ -522,14 +659,18 @@ if(BUILD_UNIT_TESTS)
         list(APPEND unittest_sources
             src/armnn/backends/test/ArmComputeNeon.cpp
             src/armnn/backends/test/CreateWorkloadNeon.cpp
-            src/armnn/test/CreateWorkloadClNeon.hpp)
+            src/armnn/test/CreateWorkloadClNeon.hpp
+            src/armnn/test/NeonTimerTest.cpp)
     endif()
 
     if(ARMCOMPUTECL)
         list(APPEND unittest_sources
             src/armnn/backends/test/ArmComputeCl.cpp
+            src/armnn/backends/test/ClContextControlFixture.hpp
             src/armnn/backends/test/CreateWorkloadCl.cpp
-            src/armnn/test/CreateWorkloadClNeon.hpp)
+            src/armnn/test/CreateWorkloadClNeon.hpp
+            src/armnn/test/OpenClTimerTest.cpp
+            src/armnn/test/FP16SupportTest.cpp)
     endif()
 
     if(ARMCOMPUTENEON OR ARMCOMPUTECL)
@@ -550,6 +691,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/FusedBatchNorm.cpp
             src/armnnTfParser/test/Identity.cpp
             src/armnnTfParser/test/LocalResponseNormalization.cpp
+            src/armnnTfParser/test/MaximumForLeakyRelu.cpp
             src/armnnTfParser/test/Multiplication.cpp
             src/armnnTfParser/test/MultiOutput.cpp
             src/armnnTfParser/test/PassThru.cpp
@@ -565,10 +707,29 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Squeeze.cpp)
     endif()
 
+    if(BUILD_TF_LITE_PARSER)
+        list(APPEND unittest_sources
+             src/armnnTfLiteParser/test/ParserFlatbuffersFixture.hpp
+             src/armnnTfLiteParser/test/AvgPool2D.cpp
+             src/armnnTfLiteParser/test/Conv2D.cpp
+             src/armnnTfLiteParser/test/DepthwiseConvolution2D.cpp
+             src/armnnTfLiteParser/test/Softmax.cpp
+             src/armnnTfLiteParser/test/Squeeze.cpp
+             src/armnnTfLiteParser/test/LoadModel.cpp
+             src/armnnTfLiteParser/test/GetBuffer.cpp
+             src/armnnTfLiteParser/test/OutputShapeOfSqueeze.cpp
+             src/armnnTfLiteParser/test/InputOutputTensorNames.cpp
+             src/armnnTfLiteParser/test/GetTensorIds.cpp
+             src/armnnTfLiteParser/test/GetSubgraphInputsOutputs.cpp
+             src/armnnTfLiteParser/test/GetInputsOutputs.cpp
+             )
+    endif()
+
     if(BUILD_CAFFE_PARSER)
         list(APPEND unittest_sources
             src/armnnCaffeParser/test/TestAdd.cpp
             src/armnnCaffeParser/test/TestConcat.cpp
+            src/armnnCaffeParser/test/TestConvolution.cpp
             src/armnnCaffeParser/test/TestDropout.cpp
             src/armnnCaffeParser/test/TestInputs.cpp
             src/armnnCaffeParser/test/TestMul.cpp
@@ -579,19 +740,41 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
+    if(BUILD_ONNX_PARSER)
+        list(APPEND unittest_sources
+            src/armnnOnnxParser/test/Constructor.cpp
+            src/armnnOnnxParser/test/CreateNetwork.cpp
+            src/armnnOnnxParser/test/ProtoxtFixture.cpp
+            src/armnnOnnxParser/test/Const.cpp
+            src/armnnOnnxParser/test/Pooling.cpp
+            src/armnnOnnxParser/test/Reshape.cpp
+            src/armnnOnnxParser/test/Relu.cpp
+            src/armnnOnnxParser/test/Conv2D.cpp
+            src/armnnOnnxParser/test/Addition.cpp
+            src/armnnOnnxParser/test/FullyConnected.cpp
+            src/armnnOnnxParser/test/GetInputsOutputs.cpp
+            src/armnnOnnxParser/test/BatchNorm.cpp
+            src/armnnOnnxParser/test/DepthConv.cpp
+            )
+    endif()
+
     add_executable_ex(UnitTests ${unittest_sources})
     target_include_directories(UnitTests PRIVATE src/armnn)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
 
-    if(NOT HEAP_PROFILING AND VALGRIND_FOUND)
-        # Valgrind works with gperftools version number <= 2.4
-        target_compile_definitions(UnitTests PRIVATE "WITH_VALGRIND=1")
+    if(VALGRIND_FOUND)
+        if(HEAP_PROFILING OR LEAK_CHECKING)
+            message("Valgrind is disabled for heap profiling and leak checking builds.")
+        else()
+            # Valgrind works with gperftools version number <= 2.4
+            target_compile_definitions(UnitTests PRIVATE "WITH_VALGRIND=1")
+        endif()
     endif()
 
     target_link_libraries(UnitTests armnn)
     target_link_libraries(UnitTests armnnUtils)
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
-    target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 
     if(BUILD_TF_PARSER)
         target_link_libraries(UnitTests armnnTfParser)
@@ -601,6 +784,13 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(UnitTests armnnCaffeParser)
     endif()
 
+    if(BUILD_TF_LITE_PARSER)
+        target_link_libraries(UnitTests armnnTfLiteParser)
+    endif()
+
+    if(BUILD_ONNX_PARSER)
+        target_link_libraries(UnitTests armnnOnnxParser)
+    endif()
+
     addDllCopyCommands(UnitTests)
 endif()
-

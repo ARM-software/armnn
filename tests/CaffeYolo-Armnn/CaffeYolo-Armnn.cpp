@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
                         modelParams.m_IsModelBinary = true;
                         modelParams.m_ComputeDevice = modelOptions.m_ComputeDevice;
                         modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
+                        modelParams.m_EnableFp16TurboMode = modelOptions.m_EnableFp16TurboMode;
 
                         return std::make_unique<YoloInferenceModel>(modelParams);
                 });

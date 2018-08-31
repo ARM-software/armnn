@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstring>
 #include <boost/cast.hpp>
+#include <Half.hpp>
 
 #include "TensorCopyUtils.hpp"
 
@@ -47,12 +48,15 @@ void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* mem
                 case arm_compute::DataType::QASYMM8:
                     CopyArmComputeITensorData(static_cast<const uint8_t*>(mem), handle->GetTensor());
                     break;
+                case arm_compute::DataType::F16:
+                    CopyArmComputeITensorData(static_cast<const armnn::Half*>(mem), handle->GetTensor());
+                    break;
                 default:
                 {
                     throw armnn::UnimplementedException();
                 }
             }
-            handle->UnMap();
+            handle->Unmap();
             break;
         }
 #endif
@@ -108,12 +112,15 @@ void CopyDataFromITensorHandle(void* mem, const armnn::ITensorHandle* tensorHand
                 case arm_compute::DataType::QASYMM8:
                     CopyArmComputeITensorData(handle->GetTensor(), static_cast<uint8_t*>(mem));
                     break;
+                case arm_compute::DataType::F16:
+                    CopyArmComputeITensorData(handle->GetTensor(), static_cast<armnn::Half*>(mem));
+                    break;
                 default:
                 {
                     throw armnn::UnimplementedException();
                 }
             }
-            const_cast<armnn::IClTensorHandle*>(handle)->UnMap();
+            const_cast<armnn::IClTensorHandle*>(handle)->Unmap();
             break;
         }
 #endif

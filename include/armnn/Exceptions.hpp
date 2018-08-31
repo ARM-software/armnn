@@ -11,7 +11,38 @@
 namespace armnn
 {
 
-// base class for all ArmNN exceptions so that users can filter to just those
+struct CheckLocation
+{
+    const char* m_Function;
+    const char* m_File;
+    unsigned int m_Line;
+
+    CheckLocation(const char* func,
+                  const char* file,
+                  unsigned int line)
+    : m_Function{func}
+    , m_File{file}
+    , m_Line{line}
+    {
+    }
+
+    std::string AsString() const
+    {
+        std::stringstream ss;
+        ss << " at function " << m_Function
+           << " [" << m_File << ':' << m_Line << "]";
+        return ss.str();
+    }
+
+    std::string FileLine() const
+    {
+        std::stringstream ss;
+        ss << " [" << m_File << ':' << m_Line << "]";
+        return ss.str();
+    }
+};
+
+/// Base class for all ArmNN exceptions so that users can filter to just those.
 class Exception : public std::exception
 {
 public:
@@ -91,4 +122,6 @@ void ConditionalThrowIfNotEqual(const std::string& message,
     }
 }
 
-}
+} // namespace armnn
+
+#define CHECK_LOCATION() armnn::CheckLocation(__func__, __FILE__, __LINE__)

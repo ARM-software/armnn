@@ -5,29 +5,20 @@
 
 #pragma once
 
+#include "ClDepthwiseConvolutionBaseWorkload.hpp"
+
 #include "backends/ClWorkloadUtils.hpp"
 
 namespace armnn
 {
 
-class ClDepthwiseConvolutionFloat32Workload : public Float32Workload<DepthwiseConvolution2dQueueDescriptor>
+class ClDepthwiseConvolutionFloat32Workload : public ClDepthwiseConvolutionBaseWorkload<DataType::Float16,
+                                                                                        DataType::Float32>
 {
 public:
     ClDepthwiseConvolutionFloat32Workload(const DepthwiseConvolution2dQueueDescriptor& descriptor,
                                           const WorkloadInfo& info);
     void Execute() const override;
-
-private:
-    typedef float KernelDataType;
-    typedef float BiasDataType;
-
-    mutable std::unique_ptr<arm_compute::IFunction> m_pDepthwiseConvolutionLayer;
-
-    arm_compute::CLTensor m_KernelTensor;
-    arm_compute::CLTensor m_BiasTensor;
-
-    template <typename WorkloadType>
-    friend void InitClDepthwiseConvolutionWorkload(WorkloadType& workload);
 };
 
 } //namespace armnn

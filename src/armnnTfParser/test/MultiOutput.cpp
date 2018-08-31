@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct MultiOutMatchFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct MultiOutMatchFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     MultiOutMatchFixture()
     {
@@ -54,7 +54,7 @@ BOOST_FIXTURE_TEST_CASE(MultiOutMatch, MultiOutMatchFixture)
     RunTest<2>({ 0, 0, 10000, 0, 0, 0, 0 }, { 0, 0, 1, 0, 0, 0, 0 });
 }
 
-struct MultiOutFailFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct MultiOutFailFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     MultiOutFailFixture()
     {
@@ -97,7 +97,7 @@ BOOST_FIXTURE_TEST_CASE(MultiOutFail, MultiOutFailFixture)
     // Not running the graph because this is expected to throw an exception during parsing.
 }
 
-struct MultiOutInvalidFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct MultiOutInvalidFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     MultiOutInvalidFixture()
     {

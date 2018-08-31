@@ -19,6 +19,10 @@
 #include "TensorCopyUtils.hpp"
 #include "WorkloadTestUtils.hpp"
 
+#if ARMCOMPUTECL_ENABLED || ARMCOMPUTENEON_ENABLED
+#include "../ArmComputeTensorUtils.hpp"
+#endif
+
 BOOST_AUTO_TEST_SUITE(MemCopyTestSuite)
 
 void MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactory, armnn::IWorkloadFactory& dstWorkloadFactory,
@@ -80,6 +84,26 @@ void MemCopyTest(bool withSubtensors)
     DstWorkloadFactory dstWorkloadFactory;
     MemCopyTest(srcWorkloadFactory, dstWorkloadFactory, withSubtensors);
 }
+
+#if ARMCOMPUTECL_ENABLED || ARMCOMPUTENEON_ENABLED
+
+BOOST_AUTO_TEST_CASE(AclTypeConversions)
+{
+    arm_compute::Strides strides(1,2,3,4);
+    armnn::TensorShape convertedStrides = armnn::armcomputetensorutils::GetStrides(strides);
+    BOOST_TEST(convertedStrides[0] == 4);
+    BOOST_TEST(convertedStrides[1] == 3);
+    BOOST_TEST(convertedStrides[2] == 2);
+    BOOST_TEST(convertedStrides[3] == 1);
+
+    arm_compute::TensorShape shape(5,6,7,8);
+    armnn::TensorShape convertedshape = armnn::armcomputetensorutils::GetShape(shape);
+    BOOST_TEST(convertedshape[0] == 8);
+    BOOST_TEST(convertedshape[1] == 7);
+    BOOST_TEST(convertedshape[2] == 6);
+    BOOST_TEST(convertedshape[3] == 5);
+}
+#endif
 
 #if ARMCOMPUTECL_ENABLED
 

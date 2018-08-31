@@ -10,7 +10,7 @@
 namespace armnn
 {
 
-class ClReshapeFloat32Workload : public Float32Workload<ReshapeQueueDescriptor>
+class ClReshapeFloat32Workload : public FloatWorkload<ReshapeQueueDescriptor>
 {
 public:
     ClReshapeFloat32Workload(const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info);

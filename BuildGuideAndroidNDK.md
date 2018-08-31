@@ -164,8 +164,8 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	 CC=aarch64-linux-android-clang \
 	 CXX_FLAGS="-fPIE -fPIC" \
 	 cmake .. \
-      -DCMAKE_SYSTEM_NAME=Linux \
-      -DCMAKE_EXE_LINKER_FLAGS=-pie \
+      -DCMAKE_SYSTEM_NAME=Android \
+      -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
       -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary/ \
       -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \
       -DBOOST_ROOT=$HOME/armnn-devenv/boost/install/ \
@@ -181,11 +181,11 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 * Push the build results to an Android device and make symbolic links for shared libraries:
 
 	```bash
-	adb push libarmnnTfParser.so libarmnn.so UnitTests \
-         $NDK/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so \
-         /data/local/tmp/
-	adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so \
-         /data/local/tmp/libprotobuf.so.15.0.1
+	adb push libarmnnTfParser.so /data/local/tmp/
+	adb push libarmnn.so /data/local/tmp/
+	adb push UnitTests /data/local/tmp/
+	adb push $NDK/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so /data/local/tmp/
+	adb push $HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so /data/local/tmp/libprotobuf.so.15.0.1
 	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so.15'
 	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so'
 	```

@@ -18,7 +18,7 @@ namespace armnn
 class TensorShape
 {
 public:
-    /// Empty (invalid) constructor
+    /// Empty (invalid) constructor.
     TensorShape();
 
     TensorShape(unsigned int numDimensions, const unsigned int* dimensionSizes);
@@ -53,7 +53,7 @@ private:
 class TensorInfo
 {
 public:
-    /// Empty (invalid) constructor
+    /// Empty (invalid) constructor.
     TensorInfo();
 
     TensorInfo(const TensorShape& shape, DataType dataType,
@@ -88,7 +88,7 @@ public:
 private:
     TensorShape m_Shape;
     DataType m_DataType;
-    /// Scale and offset values used for quantization
+    /// Scale and offset values are used for quantization.
     struct Quantization
     {
         Quantization() : m_Scale(0.f), m_Offset(0) {}
@@ -102,11 +102,11 @@ template<typename MemoryType>
 class BaseTensor
 {
 public:
-    /// Empty (invalid) constructor
+    /// Empty (invalid) constructor.
     BaseTensor();
 
     /// Constructor from a raw memory pointer.
-    /// @param memoryArea Region of CPU-addressable memory where tensor data will be stored. Must be valid while
+    /// @param memoryArea - Region of CPU-addressable memory where tensor data will be stored. Must be valid while
     /// workloads are on the fly. Tensor instances do not claim ownership of referenced memory regions, that is,
     /// no attempt will be made by ArmNN to free these memory regions automatically.
     BaseTensor(const TensorInfo& info, MemoryType memoryArea);
@@ -130,7 +130,7 @@ public:
     MemoryType GetMemoryArea() const { return m_MemoryArea; }
 
 protected:
-    // protected destructor to stop users from making these
+    // Protected destructor to stop users from making these
     // (could still new one on the heap and then leak it...)
     ~BaseTensor() {}
 
@@ -144,21 +144,23 @@ private:
 class Tensor : public BaseTensor<void*>
 {
 public:
-    using BaseTensor<void*>::BaseTensor; // Bring in the constructors and assignment operator
+    /// Brings in the constructors and assignment operator.
+    using BaseTensor<void*>::BaseTensor; 
 };
 
 /// A tensor defined by a TensorInfo (shape and data type) and an immutable backing store.
 class ConstTensor : public BaseTensor<const void*>
 {
 public:
-    using BaseTensor<const void*>::BaseTensor; // Bring in the constructors and assignment operator
+    /// Brings in the constructors and assignment operator.
+    using BaseTensor<const void*>::BaseTensor; 
     ConstTensor() : BaseTensor<const void*>() {} // This needs to be redefined explicitly??
 
-    // Can be implicitly constructed from non-const Tensor
+    /// Can be implicitly constructed from non-const Tensor.
     ConstTensor(const Tensor& other) : BaseTensor<const void*>(other.GetInfo(), other.GetMemoryArea()) {}
 
     /// Constructor from a backing container.
-    /// @param container An stl-like container type which implements data() and size() methods.
+    /// @param container - An stl-like container type which implements data() and size() methods.
     /// Presence of data() and size() is a strong indicator of the continuous memory layout of the container,
     /// which is a requirement for Tensor data. Tensor instances do not claim ownership of referenced memory regions,
     /// that is, no attempt will be made by ArmNN to free these memory regions automatically.

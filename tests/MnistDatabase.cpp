@@ -47,7 +47,7 @@ std::unique_ptr<MnistDatabase::TTestCaseData> MnistDatabase::GetTestCaseData(uns
 
     unsigned int magic, num, row, col;
 
-    // check the files have the correct header
+    // Checks the files have the correct header.
     imageStream.read(reinterpret_cast<char*>(&magic), sizeof(magic));
     if (magic != 0x03080000)
     {
@@ -61,8 +61,8 @@ std::unique_ptr<MnistDatabase::TTestCaseData> MnistDatabase::GetTestCaseData(uns
         return nullptr;
     }
 
-    // Endian swap image and label file - All the integers in the files are stored in MSB first(high endian) format,
-    // hence need to flip the bytes of the header if using it on Intel processors or low-endian machines
+    // Endian swaps the image and label file - all the integers in the files are stored in MSB first(high endian)
+    // format, hence it needs to flip the bytes of the header if using it on Intel processors or low-endian machines
     labelStream.read(reinterpret_cast<char*>(&num), sizeof(num));
     imageStream.read(reinterpret_cast<char*>(&num), sizeof(num));
     EndianSwap(num);
@@ -71,7 +71,7 @@ std::unique_ptr<MnistDatabase::TTestCaseData> MnistDatabase::GetTestCaseData(uns
     imageStream.read(reinterpret_cast<char*>(&col), sizeof(col));
     EndianSwap(col);
 
-    // read image and label into memory
+    // Reads image and label into memory.
     imageStream.seekg(testCaseId * g_kMnistImageByteSize, std::ios_base::cur);
     imageStream.read(reinterpret_cast<char*>(&I[0]), g_kMnistImageByteSize);
     labelStream.seekg(testCaseId, std::ios_base::cur);

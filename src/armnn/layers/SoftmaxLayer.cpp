@@ -31,14 +31,16 @@ SoftmaxLayer* SoftmaxLayer::Clone(Graph& graph) const
 
 void SoftmaxLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
-                                               "SoftmaxLayer: Input slot must be connected.");
+    VerifyLayerConnections(1, CHECK_LOCATION());
 
-    const TensorShape& outShape = GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape();
+    auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
+
+    BOOST_ASSERT(inferredShapes.size() == 1);
+
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "SoftmaxLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        outShape);
+        inferredShapes[0]);
 }
 
 } // namespace armnn

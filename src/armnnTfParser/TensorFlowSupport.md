@@ -104,7 +104,16 @@ The parser only supports `ResizeMethod.BILINEAR` with `align_corners=False`. See
 
 The parser only supports 2D inputs and does not support selecting the `softmax` dimension. See the TensorFlow [softmax documentation](https://www.tensorflow.org/api_docs/python/tf/nn/softmax) for more information.
 
+**maximum**
 
+where maximum is used in one of the following ways
+
+* max(mul(a, x), x)
+* max(mul(x, a), x)
+* max(x, mul(a, x))
+* max(x, mul(x, a)
+
+This is interpreted as a ActivationLayer with a LeakyRelu activation function. Any other usage of max will currently cause an unsupported error. See the TensorFlow [maximum documentation](https://www.tensorflow.org/api_docs/python/tf/maximum) for more information.
 
 ## Tested networks
 

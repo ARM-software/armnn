@@ -27,7 +27,7 @@ arm_compute::Status ClNormalizationWorkloadValidate(const TensorInfo& input, con
 
 ClNormalizationFloat32Workload::ClNormalizationFloat32Workload(const NormalizationQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info)
-    : Float32Workload<NormalizationQueueDescriptor>(descriptor, info)
+    : FloatWorkload<NormalizationQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClNormalizationFloat32Workload", 1, 1);
 
@@ -42,7 +42,7 @@ ClNormalizationFloat32Workload::ClNormalizationFloat32Workload(const Normalizati
 
 void ClNormalizationFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClNormalizationFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClNormalizationFloat32Workload_Execute");
     m_NormalizationLayer.run();
 }
 

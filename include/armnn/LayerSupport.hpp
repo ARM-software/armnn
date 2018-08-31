@@ -13,6 +13,7 @@ namespace armnn
 
 bool IsActivationSupported(Compute compute,
                            const TensorInfo& input,
+                           const TensorInfo& output,
                            const ActivationDescriptor& descriptor,
                            char* reasonIfUnsupported = nullptr,
                            size_t reasonIfUnsupportedMaxLength = 1024);
@@ -26,6 +27,11 @@ bool IsAdditionSupported(Compute compute,
 
 bool IsBatchNormalizationSupported(Compute compute,
                                    const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const TensorInfo& mean,
+                                   const TensorInfo& var,
+                                   const TensorInfo& beta,
+                                   const TensorInfo& gamma,
                                    const BatchNormalizationDescriptor& descriptor,
                                    char* reasonIfUnsupported = nullptr,
                                    size_t reasonIfUnsupportedMaxLength = 1024);
@@ -34,6 +40,18 @@ bool IsConstantSupported(Compute compute,
                          const TensorInfo& output,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
+
+bool IsConvertFp16ToFp32Supported(Compute compute,
+                                  const TensorInfo& input,
+                                  const TensorInfo& output,
+                                  char* reasonIfUnsupported = nullptr,
+                                  size_t reasonIfUnsupportedMaxLength = 1024);
+
+bool IsConvertFp32ToFp16Supported(Compute compute,
+                                  const TensorInfo& input,
+                                  const TensorInfo& output,
+                                  char* reasonIfUnsupported = nullptr,
+                                  size_t reasonIfUnsupportedMaxLength = 1024);
 
 bool IsConvolution2dSupported(Compute compute,
                               const TensorInfo& input,
@@ -46,8 +64,10 @@ bool IsConvolution2dSupported(Compute compute,
 
 bool IsDepthwiseConvolutionSupported(Compute compute,
                                      const TensorInfo& input,
+                                     const TensorInfo& output,
                                      const DepthwiseConvolution2dDescriptor& descriptor,
                                      const TensorInfo& weights,
+                                     const TensorInfo& biases,
                                      char* reasonIfUnsupported = nullptr,
                                      size_t reasonIfUnsupportedMaxLength = 1024);
 
@@ -57,15 +77,34 @@ bool IsInputSupported(Compute compute,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
 bool IsFullyConnectedSupported(Compute compute,
-                               const TensorInfo& input,const
-                               FullyConnectedDescriptor& descriptor,
+                               const TensorInfo& input,
+                               const TensorInfo& output,
+                               const TensorInfo& weights,
+                               const TensorInfo& biases,
+                               const FullyConnectedDescriptor& descriptor,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
 bool IsL2NormalizationSupported(Compute compute,
                                 const TensorInfo& input,
+                                const TensorInfo& output,
                                 char* reasonIfUnsupported = nullptr,
                                 size_t reasonIfUnsupportedMaxLength = 1024);
+
+bool IsLstmSupported(Compute compute, const TensorInfo& input, const TensorInfo& outputStateIn,
+                     const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
+                     const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
+                     const TensorInfo& output, const LstmDescriptor& descriptor,
+                     const TensorInfo& inputToForgetWeights, const TensorInfo& inputToCellWeights,
+                     const TensorInfo& inputToOutputWeights, const TensorInfo& recurrentToForgetWeights,
+                     const TensorInfo& recurrentToCellWeights, const TensorInfo& recurrentToOutputWeights,
+                     const TensorInfo& forgetGateBias, const TensorInfo& cellBias,
+                     const TensorInfo& outputGateBias, const TensorInfo* inputToInputWeights,
+                     const TensorInfo* recurrentToInputWeights, const TensorInfo* cellToInputWeights,
+                     const TensorInfo* inputGateBias, const TensorInfo* projectionWeights,
+                     const TensorInfo* projectionBias, const TensorInfo* cellToForgetWeights,
+                     const TensorInfo* cellToOutputWeights, char* reasonIfUnsupported = nullptr,
+                     size_t reasonIfUnsupportedMaxLength = 1024);
 
 bool IsMergerSupported(Compute compute,
                        const std::vector<const TensorInfo*> inputs,
@@ -76,6 +115,7 @@ bool IsMergerSupported(Compute compute,
 bool IsMultiplicationSupported(Compute compute,
                                const TensorInfo& input0,
                                const TensorInfo& input1,
+                               const TensorInfo& output,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
@@ -112,6 +152,7 @@ bool IsResizeBilinearSupported(Compute compute,
 
 bool IsSoftmaxSupported(Compute compute,
                         const TensorInfo& input,
+                        const TensorInfo& output,
                         const SoftmaxDescriptor& descriptor,
                         char* reasonIfUnsupported = nullptr,
                         size_t reasonIfUnsupportedMaxLength = 1024);

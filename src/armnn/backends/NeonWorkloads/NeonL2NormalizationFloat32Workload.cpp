@@ -9,9 +9,21 @@
 namespace armnn
 {
 
+arm_compute::Status NeonL2NormalizationWorkloadValidate(const TensorInfo& input,
+                                                        const TensorInfo& output)
+{
+    const arm_compute::TensorInfo aclInput = armcomputetensorutils::BuildArmComputeTensorInfo(input);
+    const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+
+    arm_compute::NormalizationLayerInfo normalizationInfo =
+            CreateAclNormalizationLayerInfoForL2Normalization(input);
+
+    return arm_compute::NENormalizationLayer::validate(&aclInput, &aclOutput, normalizationInfo);
+}
+
 NeonL2NormalizationFloat32Workload::NeonL2NormalizationFloat32Workload(const L2NormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : Float32Workload<L2NormalizationQueueDescriptor>(descriptor, info)
+    : FloatWorkload<L2NormalizationQueueDescriptor>(descriptor, info)
     , m_Layer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonL2NormalizationFloat32Workload", 1, 1);
@@ -23,7 +35,7 @@ NeonL2NormalizationFloat32Workload::NeonL2NormalizationFloat32Workload(const L2N
 
 void NeonL2NormalizationFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonL2NormalizationFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonL2NormalizationFloat32Workload_Execute");
     m_Layer.run();
 }
 

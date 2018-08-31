@@ -4,15 +4,17 @@
 //
 #pragma once
 
-#include "AclBaseMemoryManager.hpp"
 #include "OutputHandler.hpp"
 
+#include "memory/BaseMemoryManager.hpp"
+
 #include <boost/core/ignore_unused.hpp>
+#include <boost/optional.hpp>
 
 namespace armnn
 {
 
-// Neon workload factory
+// Neon workload factory.
 class NeonWorkloadFactory : public IWorkloadFactory
 {
 public:
@@ -20,7 +22,8 @@ public:
 
     virtual Compute GetCompute() const override { return Compute::CpuAcc; }
 
-    static bool IsLayerSupported(const Layer& layer, DataType dataType, std::string& outReasonIfUnsupported);
+    static bool IsLayerSupported(const Layer& layer, boost::optional<DataType> dataType,
+                                 std::string& outReasonIfUnsupported);
 
     virtual bool SupportsSubTensors() const override { return true; }
 
@@ -96,11 +99,25 @@ public:
     virtual std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 
-    void Finalize() override;
+    virtual std::unique_ptr<IWorkload> CreateLstm(const LstmQueueDescriptor& descriptor,
+                                                  const WorkloadInfo& info) const override;
+
+    virtual std::unique_ptr<IWorkload> CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const override;
+
+    virtual std::unique_ptr<IWorkload> CreateConvertFp32ToFp16(const ConvertFp32ToFp16QueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const override;
+
+    virtual void Finalize() override;
+
+    virtual void Release() override;
+
+    virtual void Acquire() override;
 
 private:
-
-    mutable AclBaseMemoryManager m_MemoryManager;
+#ifdef ARMCOMPUTENEON_ENABLED
+    mutable NeonMemoryManager m_MemoryManager;
+#endif
 };
 
 } //namespace armnn

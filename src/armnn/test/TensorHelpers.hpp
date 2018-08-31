@@ -39,7 +39,7 @@ struct SelectiveComparer<T, false>
 {
     static bool Compare(T a, T b)
     {
-        // if a or b is zero, percent_tolerance does an exact match, so compare to a small, constant tolerance instead
+        // If a or b is zero, percent_tolerance does an exact match, so compare to a small, constant tolerance instead.
         if (a == 0.0f || b == 0.0f)
         {
             return std::abs(a - b) <= g_FloatCloseToZeroTolerance;
@@ -62,7 +62,7 @@ template <typename T, std::size_t n>
 boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n>& a,
                                                    const boost::multi_array<T, n>& b)
 {
-    // check they are same shape
+    // Checks they are same shape.
     for (unsigned int i=0; i<n; i++)
     {
         if (a.shape()[i] != b.shape()[i])
@@ -77,9 +77,9 @@ boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n
         }
     }
 
-    // now compare element-wise
+    // Now compares element-wise.
 
-    // fun iteration over n dimensions
+    // Fun iteration over n dimensions.
     std::array<unsigned int, n> indices;
     for (unsigned int i = 0; i < n; i++)
     {
@@ -150,7 +150,7 @@ boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n
 }
 
 
-// Creates a boost::multi_array with shape defined by the given TensorInfo.
+// Creates a boost::multi_array with the shape defined by the given TensorInfo.
 template <typename T, std::size_t n>
 boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo)
 {
@@ -164,7 +164,7 @@ boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo)
     return boost::multi_array<T, n>(shape);
 }
 
-// Creates a boost::multi_array with shape defined by the given TensorInfo and contents defined by the given vector.
+// Creates a boost::multi_array with the shape defined by the given TensorInfo and contents defined by the given vector.
 template <typename T, std::size_t n>
 boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo, const std::vector<T>& flat)
 {

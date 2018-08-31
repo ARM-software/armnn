@@ -31,32 +31,39 @@ LOCAL_EXPORT_C_INCLUDES := \
         $(ARMNN_SOURCE_UTILS_HEADER_PATH)
 
 LOCAL_C_INCLUDES := \
-        $(OPENCL_HEADER_PATH) \
-        $(NN_HEADER_PATH) \
-        $(ARMNN_HEADER_PATH) \
-        $(ARMNN_SOURCE_HEADER_PATH) \
-        $(ARMNN_SOURCE_UTILS_HEADER_PATH)
+	$(OPENCL_HEADER_PATH) \
+	$(NN_HEADER_PATH) \
+	$(ARMNN_HEADER_PATH) \
+	$(ARMNN_SOURCE_HEADER_PATH) \
+	$(ARMNN_SOURCE_UTILS_HEADER_PATH)
 
 LOCAL_SRC_FILES := \
+        src/armnnUtils/DotSerializer.cpp \
+        src/armnnUtils/FloatingPointConverter.cpp \
         src/armnnUtils/Logging.cpp \
         src/armnnUtils/Permute.cpp \
-        src/armnnUtils/DotSerializer.cpp \
         src/armnn/backends/ArmComputeTensorUtils.cpp \
         src/armnn/backends/ClWorkloads/ClActivationFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClActivationUint8Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClAdditionBaseWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClAdditionFloat32Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClAdditionUint8Workload.cpp \
         src/armnn/backends/ClWorkloads/ClBaseConstantWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClBatchNormalizationFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClConstantFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClConstantUint8Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClConvertFp16ToFp32Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.cpp \
         src/armnn/backends/ClWorkloads/ClConvolution2dBaseWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClConvolution2dFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClConvolution2dUint8Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionBaseWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.cpp \
         src/armnn/backends/ClWorkloads/ClFloorFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClFullyConnectedFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClL2NormalizationFloat32Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClLstmFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClMergerFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClMergerUint8Workload.cpp \
         src/armnn/backends/ClWorkloads/ClMultiplicationFloat32Workload.cpp \
@@ -68,6 +75,7 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/ClWorkloads/ClReshapeFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClReshapeUint8Workload.cpp \
         src/armnn/backends/ClWorkloads/ClResizeBilinearFloat32Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClSoftmaxBaseWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClSoftmaxFloat32Workload.cpp \
         src/armnn/backends/ClWorkloads/ClSoftmaxUint8Workload.cpp \
         src/armnn/backends/ClWorkloads/ClSplitterFloat32Workload.cpp \
@@ -78,14 +86,18 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/NeonWorkloads/NeonBatchNormalizationFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonConstantFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonConstantUint8Workload.cpp \
+        src/armnn/backends/NeonWorkloads/NeonConvertFp16ToFp32Workload.cpp \
+        src/armnn/backends/NeonWorkloads/NeonConvertFp32ToFp16Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonConvolution2dBaseWorkload.cpp \
         src/armnn/backends/NeonWorkloads/NeonConvolution2dFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonConvolution2dUint8Workload.cpp \
+        src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionBaseWorkload.cpp \
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionUint8Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonFloorFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonFullyConnectedFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonL2NormalizationFloat32Workload.cpp \
+        src/armnn/backends/NeonWorkloads/NeonLstmFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonMergerFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonMergerUint8Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonMultiplicationFloat32Workload.cpp \
@@ -96,6 +108,7 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/NeonWorkloads/NeonPooling2dUint8Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonReshapeFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonReshapeUint8Workload.cpp \
+        src/armnn/backends/NeonWorkloads/NeonSoftmaxBaseWorkload.cpp \
         src/armnn/backends/NeonWorkloads/NeonSoftmaxFloat32Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonSoftmaxUint8Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonSplitterFloat32Workload.cpp \
@@ -129,6 +142,7 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/RefWorkloads/Activation.cpp \
         src/armnn/backends/RefWorkloads/RefReshapeUint8Workload.cpp \
         src/armnn/backends/RefWorkloads/RefL2NormalizationFloat32Workload.cpp \
+        src/armnn/backends/RefWorkloads/RefLstmFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefConvolution2dFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefConvolution2dUint8Workload.cpp \
         src/armnn/backends/RefWorkloads/RefSplitterFloat32Workload.cpp \
@@ -147,21 +161,25 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/RefWorkloads/RefMergerFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefFullyConnectedUint8Workload.cpp \
         src/armnn/backends/RefWorkloads/RefPermuteWorkload.cpp \
+        src/armnn/backends/RefWorkloads/RefConvertFp16ToFp32Workload.cpp \
+        src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.cpp \
         src/armnn/backends/MemCopyWorkload.cpp \
         src/armnn/backends/WorkloadData.cpp \
         src/armnn/backends/WorkloadFactory.cpp \
-        src/armnn/backends/AclBaseMemoryManager.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/BatchNormalizationLayer.cpp \
         src/armnn/layers/ConstantLayer.cpp \
         src/armnn/layers/Convolution2dLayer.cpp \
+        src/armnn/layers/ConvertFp16ToFp32Layer.cpp \
+        src/armnn/layers/ConvertFp32ToFp16Layer.cpp \
         src/armnn/layers/DepthwiseConvolution2dLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
         src/armnn/layers/FloorLayer.cpp \
         src/armnn/layers/FullyConnectedLayer.cpp \
         src/armnn/layers/InputLayer.cpp \
         src/armnn/layers/L2NormalizationLayer.cpp \
+        src/armnn/layers/LstmLayer.cpp \
         src/armnn/layers/MemCopyLayer.cpp \
         src/armnn/layers/MergerLayer.cpp \
         src/armnn/layers/MultiplicationLayer.cpp \
@@ -182,20 +200,33 @@ LOCAL_SRC_FILES := \
         src/armnn/InternalTypes.cpp \
         src/armnn/Layer.cpp \
         src/armnn/LoadedNetwork.cpp \
+        src/armnn/NeonInterceptorScheduler.cpp \
+        src/armnn/NeonTimer.cpp \
         src/armnn/Network.cpp \
         src/armnn/backends/OutputHandler.cpp \
+        src/armnn/OpenClTimer.cpp \
+        src/armnn/WallClockTimer.cpp \
+        src/armnn/ProfilingEvent.cpp \
         src/armnn/Profiling.cpp \
+        src/armnn/JsonPrinter.cpp \
         src/armnn/Tensor.cpp \
         src/armnn/Utils.cpp \
         src/armnn/LayerSupport.cpp \
+        src/armnn/Observable.cpp \
         src/armnn/backends/RefLayerSupport.cpp \
         src/armnn/backends/ClLayerSupport.cpp \
         src/armnn/backends/NeonLayerSupport.cpp \
         src/armnn/backends/NeonWorkloadUtils.cpp \
-        src/armnn/backends/NeonWorkloadFactory.cpp
+        src/armnn/backends/NeonWorkloadFactory.cpp \
+        src/armnn/memory/BaseMemoryManager.cpp \
+        src/armnn/memory/BlobLifetimeManager.cpp \
+        src/armnn/memory/BlobMemoryPool.cpp \
+        src/armnn/memory/OffsetLifetimeManager.cpp \
+        src/armnn/memory/OffsetMemoryPool.cpp \
+        src/armnn/memory/PoolManager.cpp
 
 LOCAL_STATIC_LIBRARIES := \
-        armnn-arm_compute \
+	armnn-arm_compute \
         libboost_log \
         libboost_system \
         libboost_thread
@@ -213,9 +244,20 @@ LOCAL_CFLAGS := \
 
 include $(BUILD_STATIC_LIBRARY)
 
+###############
+# armnn-tests #
+###############
 include $(CLEAR_VARS)
 
-LOCAL_C_INCLUDES :=  \
+LOCAL_MODULE := armnn-tests
+LOCAL_MODULE_TAGS := eng optional
+LOCAL_ARM_MODE := arm
+LOCAL_PROPRIETARY_MODULE := true
+
+# Mark source files as dependent on Android.mk
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+
+LOCAL_C_INCLUDES := \
 	$(OPENCL_HEADER_PATH) \
 	$(NN_HEADER_PATH) \
 	$(ARMNN_HEADER_PATH) \
@@ -230,14 +272,19 @@ LOCAL_CFLAGS := \
 	-DARMCOMPUTECL_ENABLED \
 	-DARMCOMPUTENEON_ENABLED
 
-LOCAL_SRC_FILES :=  \
+LOCAL_SRC_FILES := \
 	src/armnn/test/UnitTests.cpp \
 	src/armnn/test/EndToEndTest.cpp \
 	src/armnn/test/UtilsTests.cpp \
 	src/armnn/test/GraphTests.cpp \
 	src/armnn/test/RuntimeTests.cpp \
 	src/armnn/test/TensorTest.cpp \
-	src/armnn/test/Network_test.cpp \
+	src/armnn/test/NeonTimerTest.cpp \
+	src/armnn/test/NetworkTests.cpp \
+	src/armnn/test/InstrumentTests.cpp \
+	src/armnn/test/OpenClTimerTest.cpp \
+	src/armnn/test/ProfilingEventTest.cpp \
+	src/armnn/test/ObservableTest.cpp \
 	src/armnn/backends/test/IsLayerSupportedTest.cpp \
 	src/armnn/backends/test/Reference.cpp \
 	src/armnn/backends/test/WorkloadDataValidation.cpp \
@@ -259,7 +306,7 @@ LOCAL_STATIC_LIBRARIES := \
 	libboost_thread \
 	armnn-arm_compute
 
-LOCAL_SHARED_LIBRARIES :=  \
+LOCAL_SHARED_LIBRARIES := \
 	libbase \
 	libhidlbase \
 	libhidltransport \
@@ -271,18 +318,5 @@ LOCAL_SHARED_LIBRARIES :=  \
 	android.hidl.memory@1.0 \
 	libOpenCL
 
-LOCAL_MODULE := armnn-tests
-
-LOCAL_MODULE_TAGS := eng optional
-
-LOCAL_ARM_MODE := arm
-
-# Mark source files as dependent on Android.mk
-LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
-
-LOCAL_PROPRIETARY_MODULE := true
-
 include $(BUILD_EXECUTABLE)
-
-
 

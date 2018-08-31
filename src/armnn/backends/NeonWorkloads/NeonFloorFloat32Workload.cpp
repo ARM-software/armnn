@@ -9,7 +9,7 @@ namespace armnn
 {
 NeonFloorFloat32Workload::NeonFloorFloat32Workload(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info)
-    : Float32Workload<FloorQueueDescriptor>(descriptor, info)
+    : FloatWorkload<FloorQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonFloorFloat32Workload", 1, 1);
 
@@ -21,7 +21,7 @@ NeonFloorFloat32Workload::NeonFloorFloat32Workload(const FloorQueueDescriptor& d
 
 void NeonFloorFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonFloorFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonFloorFloat32Workload_Execute");
     m_Layer.run();
 }
 } //namespace armnn

@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> MergerLayer::CreateWorkload(const Graph& graph, const
 {
     MergerQueueDescriptor descriptor;
 
-    // copy the view origins to the descriptor
+    // Copies the view origins to the descriptor.
     descriptor.m_ViewOrigins.reserve(m_Param.GetNumViews());
     for (unsigned int i = 0; i < m_Param.GetNumViews(); ++i)
     {
@@ -36,9 +36,9 @@ std::unique_ptr<IWorkload> MergerLayer::CreateWorkload(const Graph& graph, const
 
 void MergerLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory)
 {
-    //if sub tensors are supported than the merger
+    //If sub tensors are supported than the merger
     //just needs to make sure that the outputs of the prev layer
-    //are made subtensors of the output of the merger layer
+    //are made subtensors of the output of the merger layer.
     m_OutputHandlers[0].CreateTensorHandles(factory);
     if (factory.SupportsSubTensors())
     {
@@ -76,33 +76,28 @@ MergerLayer* MergerLayer::Clone(Graph& graph) const
     return CloneBase<MergerLayer>(graph, m_Param, GetName());
 }
 
-void MergerLayer::ValidateTensorShapesFromInputs()
+std::vector<TensorShape> MergerLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    // Validate Merger layer
-    ConditionalThrowIfNotEqual<LayerValidationException>(
-        "MergerLayer: Num Inputs must match num views.",
-        m_Param.GetNumViews(),
-        GetNumInputSlots());
+    BOOST_ASSERT(inputShapes.size() == m_Param.GetNumViews());
 
     unsigned int numDims = m_Param.GetNumDimensions();
-    for (unsigned int i=0; i<GetNumInputSlots(); i++)
+    for (unsigned int i=0; i< inputShapes.size(); i++)
     {
-        auto& inputInfo = GetInputSlot(i).GetConnection()->GetTensorInfo();
+        auto& inputShape = inputShapes[i];
 
-        boost::ignore_unused(inputInfo);
         ConditionalThrowIfNotEqual<LayerValidationException>(
             "MergerLayer: Num Dimensions must match all inputs.",
             numDims,
-            inputInfo.GetNumDimensions());
+            inputShape.GetNumDimensions());
     }
 
-    // Find the bounding box (extents) of all the views
+    // Finds the bounding box (extents) of all the views.
     std::vector<unsigned int> extentMin(numDims);
     std::vector<unsigned int> extentMax(numDims);
-    for (unsigned int i = 0; i < GetNumInputSlots(); i++)
+    for (unsigned int i = 0; i < inputShapes.size(); i++)
     {
         const uint32_t* origin = m_Param.GetViewOrigin(i);
-        const armnn::TensorShape& shape = GetInputSlot(i).GetConnection()->GetTensorInfo().GetShape();
+        const armnn::TensorShape& shape = inputShapes[i];
         for (unsigned int d = 0; d < numDims; d++)
         {
             extentMin[d] = std::min(extentMin[d], origin[d]);
@@ -110,23 +105,23 @@ void MergerLayer::ValidateTensorShapesFromInputs()
         }
     }
 
-    // Check that the bounding box starts at the origin
+    // Checks that the bounding box starts at the origin.
     if (!std::all_of(extentMin.begin(), extentMin.end(), [](unsigned int s) { return s == 0; }))
     {
         throw LayerValidationException("MergerLayer: there is no view that starts at the origin");
     }
 
-    // Check that there are no overlaps of views (this would lead to undefined output at those locations).
-    // Check each pair of views against each other
-    // (and don't bother to check against self, or check the same pair both ways round)
-    for (unsigned int a = 0; a < GetNumInputSlots(); a++)
+    // Checks that there are no overlaps of views (this would lead to undefined output at those locations).
+    // Checks each pair of views against each other
+    // (and doesn't bother to check against self, or check the same pair both ways round).
+    for (unsigned int a = 0; a < inputShapes.size(); a++)
     {
         const uint32_t* aOrigin = m_Param.GetViewOrigin(a);
-        const armnn::TensorShape& aShape = GetInputSlot(a).GetConnection()->GetTensorInfo().GetShape();
+        const armnn::TensorShape& aShape = inputShapes[a];
         for (unsigned int b = 0; b < a; b++)
         {
             const uint32_t* bOrigin = m_Param.GetViewOrigin(b);
-            const armnn::TensorShape& bShape = GetInputSlot(b).GetConnection()->GetTensorInfo().GetShape();
+            const armnn::TensorShape& bShape = inputShapes[b];
 
             bool allAxesOverlap = true;
             for (unsigned int d = 0; d < numDims && allAxesOverlap; d++)
@@ -149,13 +144,13 @@ void MergerLayer::ValidateTensorShapesFromInputs()
         }
     }
 
-    // Check that there are no "holes", i.e. regions of the output which is not covered by a view.
+    // Checks that there are no "holes", i.e. regions of the output which is not covered by a view.
     // Because we already checked that there are no overlaps, this can be done simply by checking that
     // the total 'volume' of the views is the same as the output.
     unsigned int totalViewsVolume = 0;
-    for (unsigned int i = 0; i < GetNumInputSlots(); i++)
+    for (unsigned int i = 0; i < inputShapes.size(); i++)
     {
-        totalViewsVolume += GetInputSlot(i).GetConnection()->GetTensorInfo().GetNumElements();
+        totalViewsVolume += inputShapes[i].GetNumElements();
     }
     unsigned int outputVolume = 1;
     for (unsigned int d = 0; d < numDims; d++)
@@ -168,11 +163,33 @@ void MergerLayer::ValidateTensorShapesFromInputs()
         totalViewsVolume,
         outputVolume);
 
-    TensorShape outShape(numDims, extentMax.data());
+    return std::vector<TensorShape>({ TensorShape({numDims, extentMax.data()}) });
+}
+
+void MergerLayer::ValidateTensorShapesFromInputs()
+{
+    // Validates Merger layer.
+    ConditionalThrowIfNotEqual<LayerValidationException>(
+        "MergerLayer: Num Inputs must match num views.",
+        m_Param.GetNumViews(),
+        GetNumInputSlots());
+
+    VerifyLayerConnections(m_Param.GetNumViews(), CHECK_LOCATION());
+
+    std::vector<TensorShape> inputShapes;
+    for (uint i = 0; i < GetNumInputSlots(); ++i)
+    {
+        inputShapes.push_back(GetInputSlot(i).GetConnection()->GetTensorInfo().GetShape());
+    }
+
+    auto inferredShapes = InferOutputShapes(inputShapes);
+
+    BOOST_ASSERT(inferredShapes.size() == 1);
+
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "MergerLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        outShape);
+        inferredShapes[0]);
 }
 
 } // namespace armnn armnn

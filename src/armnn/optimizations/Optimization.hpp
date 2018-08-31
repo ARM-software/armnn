@@ -13,9 +13,10 @@ namespace armnn
 class Optimization
 {
 public:
+    Optimization() = default;
+    virtual ~Optimization() = default;
     virtual void Run(Graph& graph, Layer& base) const = 0;
 protected:
-    ~Optimization() = default;
 };
 
 // Wrappers
@@ -44,7 +45,7 @@ protected:
     ~OptimizeForTypeImpl() = default;
 };
 
-/// Specialization that calls Wrapped::Run() for any layer type
+/// Specialization that calls Wrapped::Run() for any layer type.
 template <typename Wrapped>
 class OptimizeForTypeImpl<Layer, Wrapped> : public armnn::Optimization, public Wrapped
 {
@@ -90,7 +91,7 @@ public:
                 }
             }
 
-            // Remove unconnected children
+            // Removes unconnected children.
             for (unsigned int i = 0; i < output->GetNumConnections();)
             {
                 Layer* child = &output->GetConnection(i)->GetOwningLayer();

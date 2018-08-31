@@ -4,8 +4,11 @@
 //
 #pragma once
 
+#include "ConvertConstants.hpp"
 #include "OptimizeInversePermutes.hpp"
 #include "PermuteAsReshape.hpp"
 #include "OptimizeConsecutiveReshapes.hpp"
 #include "SquashEqualSiblings.hpp"
 #include "MovePermuteUp.hpp"
+#include "OptimizeInverseConversions.hpp"
+#include "ConvertFp32NetworkToFp16.hpp"

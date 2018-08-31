@@ -8,6 +8,7 @@
 #include "armnn/Types.hpp"
 #include "Network.hpp"
 #include "LayerFwd.hpp"
+#include "Profiling.hpp"
 #include "backends/RefWorkloadFactory.hpp"
 #include "backends/NeonWorkloadFactory.hpp"
 #include "backends/ClWorkloadFactory.hpp"
@@ -33,10 +34,15 @@ public:
     Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors);
 
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
-                                                            bool useCpuRefAsFallback);
+                                                            std::string & errorMessage);
+
+    // NOTE we return by reference as the purpose of this method is only to provide
+    // access to the private m_Profiler and in theory we should not need to increment
+    // the shared_ptr's reference counter
+    const std::shared_ptr<Profiler>& GetProfiler() const { return m_Profiler; }
 
 private:
-    LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, bool useCpuRefAsFallback);
+    LoadedNetwork(std::unique_ptr<OptimizedNetwork> net);
 
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
@@ -54,6 +60,7 @@ private:
 
     std::unique_ptr<OptimizedNetwork> m_OptimizedNetwork;
     std::vector< std::unique_ptr<IWorkload> > m_WorkloadQueue;
+    std::shared_ptr<Profiler> m_Profiler;
 };
 
 }

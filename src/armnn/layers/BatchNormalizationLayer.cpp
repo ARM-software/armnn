@@ -21,12 +21,19 @@ BatchNormalizationLayer::BatchNormalizationLayer(const armnn::BatchNormalization
 std::unique_ptr<IWorkload> BatchNormalizationLayer::CreateWorkload(const Graph& graph,
                                                                    const IWorkloadFactory& factory) const
 {
+    // on this level constant data should not be released..
+    BOOST_ASSERT_MSG(m_Mean != nullptr, "BatchNormalizationLayer: Mean data should not be null.");
+    BOOST_ASSERT_MSG(m_Variance != nullptr, "BatchNormalizationLayer: Variance data should not be null.");
+    BOOST_ASSERT_MSG(m_Beta != nullptr, "BatchNormalizationLayer: Beta data should not be null.");
+    BOOST_ASSERT_MSG(m_Gamma != nullptr, "BatchNormalizationLayer: Gamma data should not be null.");
+
     BatchNormalizationQueueDescriptor descriptor;
 
     descriptor.m_Mean = m_Mean.get();
     descriptor.m_Variance = m_Variance.get();
     descriptor.m_Beta = m_Beta.get();
     descriptor.m_Gamma = m_Gamma.get();
+
     return factory.CreateBatchNormalization(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
@@ -44,17 +51,22 @@ BatchNormalizationLayer* BatchNormalizationLayer::Clone(Graph& graph) const
 
 void BatchNormalizationLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
-                     "BatchNormalizationLayer: InputSlot must be connected to an OutputSlot");
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
-                     "BatchNormalizationLayer: TensorInfo must be set on connected OutputSlot.");
+    VerifyLayerConnections(1, CHECK_LOCATION());
 
-    auto& info = GetInputSlot(0).GetConnection()->GetTensorInfo();
+    auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
+
+    BOOST_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "BatchNormalizationLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        info.GetShape());
+        inferredShapes[0]);
+
+}
+
+Layer::ConstantTensors BatchNormalizationLayer::GetConstantTensorsByRef()
+{
+    return {m_Mean, m_Variance, m_Beta, m_Gamma};
 }
 
 } // namespace armnn

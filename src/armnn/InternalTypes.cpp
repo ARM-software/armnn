@@ -18,6 +18,8 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Addition: return "Addition";
         case LayerType::BatchNormalization: return "BatchNormalization";
         case LayerType::Constant: return "Constant";
+        case LayerType::ConvertFp16ToFp32: return "ConvertFp16ToFp32";
+        case LayerType::ConvertFp32ToFp16: return "ConvertFp32ToFp16";
         case LayerType::Convolution2d: return "Convolution2d";
         case LayerType::DepthwiseConvolution2d: return "DepthwiseConvolution2d";
         case LayerType::FakeQuantization: return "FakeQuantization";
@@ -25,6 +27,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::FullyConnected: return "FullyConnected";
         case LayerType::Input: return "Input";
         case LayerType::L2Normalization: return "L2Normalization";
+        case LayerType::Lstm: return "Lstm";
         case LayerType::MemCopy: return "MemCopy";
         case LayerType::Merger: return "Merger";
         case LayerType::Multiplication: return "Multiplication";

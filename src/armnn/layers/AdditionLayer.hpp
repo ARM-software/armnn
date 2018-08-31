@@ -19,6 +19,8 @@ public:
 
     void ValidateTensorShapesFromInputs() override;
 
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
+
 protected:
     AdditionLayer(const char* name);
     ~AdditionLayer() = default;

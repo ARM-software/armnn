@@ -32,20 +32,16 @@ FakeQuantizationLayer* FakeQuantizationLayer::Clone(Graph& graph) const
 
 void FakeQuantizationLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
-                     "FakeQuantizationLayer: InputSlot must be connected to an OutputSlot");
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
-                     "FakeQuantizationLayer: TensorInfo must be set on connected OutputSlot.");
+    VerifyLayerConnections(1, CHECK_LOCATION());
 
+    auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    IOutputSlot* input = GetInputSlot(0).GetConnection();
+    BOOST_ASSERT(inferredShapes.size() == 1);
 
-    // input and output shapes are the same
-    TensorShape const& outShape = input->GetTensorInfo().GetShape();
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "FakeQuantizationLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        outShape);
+        inferredShapes[0]);
 }
 
 } // namespace armnn

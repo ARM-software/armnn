@@ -9,6 +9,7 @@
 #include "IRuntime.hpp"
 #include "INetwork.hpp"
 #include "LayerSupport.hpp"
+#include "LstmParams.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
 #include "TypesUtils.hpp"

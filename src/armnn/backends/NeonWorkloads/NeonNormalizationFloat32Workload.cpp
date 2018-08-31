@@ -6,13 +6,28 @@
 #include "NeonNormalizationFloat32Workload.hpp"
 #include "backends/NeonLayerSupport.hpp"
 #include "backends/ArmComputeUtils.hpp"
+#include "backends/ArmComputeTensorUtils.hpp"
 
 namespace armnn
 {
 
+arm_compute::Status NeonNormalizationWorkloadValidate(const TensorInfo& input,
+                                                      const TensorInfo& output,
+                                                      const NormalizationDescriptor& descriptor)
+{
+    const arm_compute::TensorInfo aclInput = armcomputetensorutils::BuildArmComputeTensorInfo(input);
+    const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+
+    arm_compute::NormalizationLayerInfo normalizationInfo =
+            armcomputetensorutils::BuildArmComputeNormalizationLayerInfo(descriptor);
+
+    return arm_compute::NENormalizationLayer::validate(&aclInput, &aclOutput, normalizationInfo);
+}
+
 NeonNormalizationFloat32Workload::NeonNormalizationFloat32Workload(const NormalizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : Float32Workload<NormalizationQueueDescriptor>(descriptor, info)
+                                                   const WorkloadInfo& info,
+                                                   std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
+    : FloatWorkload<NormalizationQueueDescriptor>(descriptor, info)
     , m_NormalizationLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonNormalizationFloat32Workload", 1, 1);
@@ -22,7 +37,7 @@ NeonNormalizationFloat32Workload::NeonNormalizationFloat32Workload(const Normali
         throw UnimplementedException(reasonIfUnsupported);
     }
 
-    // input and output tensors have to have the same dimensionality
+    // Input and output tensors have to have the same dimensionality.
     if (info.m_InputTensorInfos[0].GetShape()[1] != info.m_OutputTensorInfos[0].GetShape()[1]
         || info.m_InputTensorInfos[0].GetShape()[0] != info.m_OutputTensorInfos[0].GetShape()[0]
         || info.m_InputTensorInfos[0].GetShape()[3] != info.m_OutputTensorInfos[0].GetShape()[3]
@@ -48,7 +63,7 @@ NeonNormalizationFloat32Workload::NeonNormalizationFloat32Workload(const Normali
 
 void NeonNormalizationFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonNormalizationFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonNormalizationFloat32Workload_Execute");
     m_NormalizationLayer.run();
 }
 

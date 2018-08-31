@@ -10,7 +10,7 @@
 namespace armnn
 {
 
-// Activation layer execution
+// Activation layer execution.
 class ClActivationUint8Workload : public Uint8Workload<ActivationQueueDescriptor>
 {
 public:

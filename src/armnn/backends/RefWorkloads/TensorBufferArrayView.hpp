@@ -10,7 +10,7 @@
 namespace armnn
 {
 
-// Utility class providing access to raw tensor memory based on indices along each dimension
+// Utility class providing access to raw tensor memory based on indices along each dimension.
 template <typename DataType>
 class TensorBufferArrayView
 {

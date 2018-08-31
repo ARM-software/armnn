@@ -10,7 +10,7 @@
 namespace armnn
 {
 
-class ClResizeBilinearFloat32Workload : public Float32Workload<ResizeBilinearQueueDescriptor>
+class ClResizeBilinearFloat32Workload : public FloatWorkload<ResizeBilinearQueueDescriptor>
 {
 public:
     ClResizeBilinearFloat32Workload(const ResizeBilinearQueueDescriptor& descriptor, const WorkloadInfo& info);

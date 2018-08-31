@@ -8,7 +8,7 @@
 
 BOOST_AUTO_TEST_SUITE(CaffeParser)
 
-struct ConcatFixture : public ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
+struct ConcatFixture : public armnnUtils::ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
 {
     ConcatFixture()
     {

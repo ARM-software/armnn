@@ -14,7 +14,10 @@
 namespace armnn
 {
 
-class NeonL2NormalizationFloat32Workload : public Float32Workload<L2NormalizationQueueDescriptor>
+arm_compute::Status NeonL2NormalizationWorkloadValidate(const TensorInfo& input,
+                                                        const TensorInfo& output);
+
+class NeonL2NormalizationFloat32Workload : public FloatWorkload<L2NormalizationQueueDescriptor>
 {
 public:
     NeonL2NormalizationFloat32Workload(const L2NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info,

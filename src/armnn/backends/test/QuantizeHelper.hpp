@@ -61,7 +61,7 @@ struct IsFloatingPointIterator
 };
 
 template <typename T, typename FloatIt,
-typename std::enable_if<IsFloatingPointIterator<FloatIt>::value, int>::type=0 // Make sure valid fp iterator
+typename std::enable_if<IsFloatingPointIterator<FloatIt>::value, int>::type=0 // Makes sure fp iterator is valid.
 >
 std::vector<T> QuantizedVector(float qScale, int32_t qOffset, FloatIt first, FloatIt last)
 {

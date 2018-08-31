@@ -10,6 +10,7 @@
 #include <ostream>
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <set>
 
 namespace armnn
 {
@@ -89,8 +90,9 @@ constexpr unsigned int GetDataTypeSize(DataType dataType)
 {
     switch (dataType)
     {
-        case DataType::Signed32:
-        case DataType::Float32:   return 4U;
+        case DataType::Float16:     return 2U;
+        case DataType::Float32:
+        case DataType::Signed32:   return 4U;
         case DataType::QuantisedAsymm8: return 1U;
         default:                  return 0U;
     }
@@ -107,17 +109,17 @@ constexpr bool StrEqual(const char* strA, const char (&strB)[N])
     return isEqual;
 }
 
-constexpr Compute ParseComputeDevice(const char* str)
+constexpr armnn::Compute ParseComputeDevice(const char* str)
 {
-    if (StrEqual(str, "CpuAcc"))
+    if (armnn::StrEqual(str, "CpuAcc"))
     {
         return armnn::Compute::CpuAcc;
     }
-    else if (StrEqual(str, "CpuRef"))
+    else if (armnn::StrEqual(str, "CpuRef"))
     {
         return armnn::Compute::CpuRef;
     }
-    else if (StrEqual(str, "GpuAcc"))
+    else if (armnn::StrEqual(str, "GpuAcc"))
     {
         return armnn::Compute::GpuAcc;
     }
@@ -131,32 +133,53 @@ constexpr const char* GetDataTypeName(DataType dataType)
 {
     switch (dataType)
     {
-        case DataType::Float32:   return "Float32";
+        case DataType::Float16:         return "Float16";
+        case DataType::Float32:         return "Float32";
         case DataType::QuantisedAsymm8: return "Unsigned8";
-        case DataType::Signed32:  return "Signed32";
-        default:                  return "Unknown";
+        case DataType::Signed32:        return "Signed32";
+
+        default:
+            return "Unknown";
     }
 }
 
+
+template<typename T>
+struct IsHalfType
+    : std::integral_constant<bool, std::is_floating_point<T>::value && sizeof(T) == 2>
+{};
+
+template<typename T, typename U=T>
+struct GetDataTypeImpl;
+
+template<typename T>
+struct GetDataTypeImpl<T, typename std::enable_if_t<IsHalfType<T>::value, T>>
+{
+    static constexpr DataType Value = DataType::Float16;
+};
+
+template<>
+struct GetDataTypeImpl<float>
+{
+    static constexpr DataType Value = DataType::Float32;
+};
+
+template<>
+struct GetDataTypeImpl<uint8_t>
+{
+    static constexpr DataType Value = DataType::QuantisedAsymm8;
+};
+
+template<>
+struct GetDataTypeImpl<int32_t>
+{
+    static constexpr DataType Value = DataType::Signed32;
+};
+
 template <typename T>
-constexpr DataType GetDataType();
-
-template <>
-constexpr DataType GetDataType<float>()
+constexpr DataType GetDataType()
 {
-    return DataType::Float32;
-}
-
-template <>
-constexpr DataType GetDataType<uint8_t>()
-{
-    return DataType::QuantisedAsymm8;
-}
-
-template <>
-constexpr DataType GetDataType<int32_t>()
-{
-    return DataType::Signed32;
+    return GetDataTypeImpl<T>::Value;
 }
 
 template<typename T>
@@ -165,33 +188,29 @@ constexpr bool IsQuantizedType()
     return std::is_integral<T>::value;
 }
 
-
-template<DataType DT>
-struct ResolveTypeImpl;
-
-template<>
-struct ResolveTypeImpl<DataType::QuantisedAsymm8>
-{
-    using Type = uint8_t;
-};
-
-template<>
-struct ResolveTypeImpl<DataType::Float32>
-{
-    using Type = float;
-};
-
-template<DataType DT>
-using ResolveType = typename ResolveTypeImpl<DT>::Type;
-
-
 inline std::ostream& operator<<(std::ostream& os, Status stat)
 {
     os << GetStatusAsCString(stat);
     return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, Compute compute)
+inline std::ostream& operator<<(std::ostream& os, const std::vector<Compute>& compute)
+{
+    for (const Compute& comp : compute) {
+        os << GetComputeDeviceAsCString(comp) << " ";
+    }
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const std::set<Compute>& compute)
+{
+    for (const Compute& comp : compute) {
+        os << GetComputeDeviceAsCString(comp) << " ";
+    }
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Compute& compute)
 {
     os << GetComputeDeviceAsCString(compute);
     return os;
@@ -212,11 +231,11 @@ inline std::ostream & operator<<(std::ostream & os, const armnn::TensorShape & s
     return os;
 }
 
-/// Quantize a floating point data type into an 8-bit data type
-/// @param value The value to quantize
-/// @param scale The scale (must be non-zero)
-/// @param offset The offset
-/// @return The quantized value calculated as round(value/scale)+offset
+/// Quantize a floating point data type into an 8-bit data type.
+/// @param value - The value to quantize.
+/// @param scale - The scale (must be non-zero).
+/// @param offset - The offset.
+/// @return - The quantized value calculated as round(value/scale)+offset.
 ///
 template<typename QuantizedType>
 inline QuantizedType Quantize(float value, float scale, int32_t offset)
@@ -234,11 +253,11 @@ inline QuantizedType Quantize(float value, float scale, int32_t offset)
     return quantizedBits;
 }
 
-/// Dequantize an 8-bit data type into a floating point data type
-/// @param value The value to dequantize
-/// @param scale The scale (must be non-zero)
-/// @param offset The offset
-/// @return The dequantized value calculated as (value-offset)*scale
+/// Dequantize an 8-bit data type into a floating point data type.
+/// @param value - The value to dequantize.
+/// @param scale - The scale (must be non-zero).
+/// @param offset - The offset.
+/// @return - The dequantized value calculated as (value-offset)*scale.
 ///
 template <typename QuantizedType>
 inline float Dequantize(QuantizedType value, float scale, int32_t offset)
@@ -247,6 +266,20 @@ inline float Dequantize(QuantizedType value, float scale, int32_t offset)
     BOOST_ASSERT(scale != 0.f);
     float dequantized = boost::numeric_cast<float>(value - offset) * scale;
     return dequantized;
+}
+
+template <typename DataType>
+void VerifyTensorInfoDataType(const armnn::TensorInfo & info)
+{
+    auto expectedType = armnn::GetDataType<DataType>();
+    if (info.GetDataType() != expectedType)
+    {
+        std::stringstream ss;
+        ss << "Unexpected datatype:" << armnn::GetDataTypeName(info.GetDataType())
+            << " for tensor:" << info.GetShape()
+            << ". The type expected to be: " << armnn::GetDataTypeName(expectedType);
+        throw armnn::Exception(ss.str());
+    }
 }
 
 } //namespace armnn

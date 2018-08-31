@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct MultiplicationFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct MultiplicationFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     MultiplicationFixture()
     {
@@ -74,7 +74,7 @@ BOOST_FIXTURE_TEST_CASE(ParseMultiplication, MultiplicationFixture)
     RunTest<2>({ 0, 0, 10000, 0, 0, 0, 0 }, { 0, 0, 1, 0, 0, 0, 0 });
 }
 
-struct MultiplicationBroadcastFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct MultiplicationBroadcastFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     MultiplicationBroadcastFixture(const armnn::TensorShape& inputShape0, const armnn::TensorShape& inputShape1)
     {

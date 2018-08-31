@@ -164,7 +164,7 @@ void Pooling2d(const float* in,
     Executor execute       = GetExecutor(params.m_PoolType);
 
     // Check supported padding methods outside the loop to simplify
-    // the inner loop
+    // the inner loop.
     if (params.m_PaddingMethod != PaddingMethod::Exclude &&
         params.m_PaddingMethod != PaddingMethod::IgnoreValue)
     {
@@ -192,7 +192,7 @@ void Pooling2d(const float* in,
                     float result = defaultInitializer;
                     float poolAreaSize = boost::numeric_cast<float>((hend - hstart) * (wend - wstart));
 
-                    // special case: when the pooling kernel is over a padding region and the padding
+                    // Special case: when the pooling kernel is over a padding region and the padding
                     //               size is larger or equal to the kernel and the kernel only covers
                     //               padding and no real values, then we initialize the result as zero
                     //               by convention. This is because we need to choose a value here and
@@ -208,8 +208,8 @@ void Pooling2d(const float* in,
 
                     if (clamped && params.m_PaddingMethod == PaddingMethod::Exclude)
                     {
-                        // when we exclude the padding, it means we calculate with a smaller
-                        // kernel size, so I change the divisor here
+                        // When we exclude the padding, it means we calculate with a smaller
+                        // kernel size, so I changed the divisor here.
                         poolAreaSize = boost::numeric_cast<float>((hend - hstart) * (wend - wstart));
                     }
 

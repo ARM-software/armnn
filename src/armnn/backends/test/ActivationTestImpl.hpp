@@ -53,7 +53,7 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(armnn::IWorkloadFactory& workloadFac
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    // Setup bounded ReLu
+    // Setup bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
     armnn::WorkloadInfo workloadInfo;
     AddInputToWorkload(descriptor, workloadInfo, inputTensorInfo, inputHandle.get());
@@ -94,7 +94,7 @@ LayerTestResult<float, 4> BoundedReLuUpperAndLowerBoundTest(armnn::IWorkloadFact
      0.999f,       1.2f,    0.89f,      6.1f,
     };
 
-    // Calculated manually
+    // Calculated manually.
     std::vector<float> output = std::vector<float>{
       -1.0f,       0.1f,     0.5f,      1.0f,
      0.786f,    0.9875f,    -1.0f,    0.384f,
@@ -122,7 +122,7 @@ LayerTestResult<float, 4> BoundedReLuUpperBoundOnlyTest(armnn::IWorkloadFactory&
      0.999f,       1.2f,    0.89f,       6.1f,
     };
 
-    // Calculated manually
+    // Calculated manually. 
     std::vector<float> output = std::vector<float>{
        0.0f,       0.1f,     0.5f,       6.0f,
      0.786f,    5.9875f,     0.0f,     0.384f,
@@ -147,7 +147,7 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperBoundOnlyTest(armnn::IWorkloadF
         251,   8, 92
     };
 
-    // Calculated manually
+    // Calculated manually. 
     std::vector<uint8_t> output = std::vector<uint8_t>{
           0, 122,  0,
         255,   0, 58
@@ -176,7 +176,7 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperAndLowerBoundTest(armnn::IWorkl
         251,   8, 92
     };
 
-    // Calculated manually
+    // Calculated manually.
     std::vector<uint8_t> output = std::vector<uint8_t>{
          51, 192, 32,
         192,  32, 92
@@ -186,7 +186,7 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperAndLowerBoundTest(armnn::IWorkl
     float inputScale    = 0.0125f;
 
     return BoundedReLuTestCommon(workloadFactory, 1.0f, -1.0f,
-                                 inputScale, inputOffset, inputScale, inputOffset, // input/output scale & offset same
+                                 inputScale, inputOffset, inputScale, inputOffset, // Input/output scale & offset same.
                                  input, output,
                                  inputWidth, inputHeight, inputChannels, inputBatchSize);
 }
@@ -229,13 +229,14 @@ boost::multi_array<float, 4> BoundedReLuRandomInputTest(armnn::IWorkloadFactory&
 
     boost::multi_array<float, 4> output(GetTensorShapeAsArray<4>(outputTensorInfo));
 
-    // min/max random values passed to MakeRandomTensor are purposely outside of the ReLu range [lowerBound, upperBound]
+    // Min/max random values passed to MakeRandomTensor are purposely outside of the ReLu
+    // range [lowerBound, upperBound].
     auto input = MakeRandomTensor<float, 4>(inputTensorInfo, 4605828, lowerBound - 5.0f, upperBound * 2.0f);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    // Setup bounded ReLu
+    // Set up bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
     armnn::WorkloadInfo workloadInfo;
     AddInputToWorkload(descriptor, workloadInfo, inputTensorInfo, inputHandle.get());
@@ -308,7 +309,7 @@ LayerTestResult<T,4> ConstantLinearActivationTestCommon(armnn::IWorkloadFactory&
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    // Do linear activation that should leave tensor unchanged
+    // Do linear activation that should leave the tensor unchanged.
     armnn::ActivationQueueDescriptor data;
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
@@ -329,7 +330,7 @@ LayerTestResult<T,4> ConstantLinearActivationTestCommon(armnn::IWorkloadFactory&
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
-    // Ensure output equals input
+    // Ensure output equals input.
     ret.outputExpected = input;
 
     return ret;
@@ -386,7 +387,7 @@ LayerTestResult<T, 4> SimpleActivationTest(armnn::IWorkloadFactory& workloadFact
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    // Setup bounded ReLu
+    // Setup bounded ReLu.
     armnn::ActivationQueueDescriptor descriptor;
     armnn::WorkloadInfo workloadInfo;
     AddInputToWorkload(descriptor, workloadInfo, inputTensorInfo, inputHandle.get());
@@ -407,7 +408,7 @@ LayerTestResult<T, 4> SimpleActivationTest(armnn::IWorkloadFactory& workloadFact
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
 
-    // Calculated manually
+    // Calculated manually.
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, outputExpectedData));
 
     return result;
@@ -423,7 +424,7 @@ LayerTestResult<T, 4> SimpleSigmoidTestCommon(armnn::IWorkloadFactory& workloadF
         1.0f,  2.0f,  3.0f,  4.0f
     };
 
-    // Calculate output values for input
+    // Calculate output values for input.
     auto f = [](float value)
     {
         return 1.0f / (1.0f + std::exp(-value));

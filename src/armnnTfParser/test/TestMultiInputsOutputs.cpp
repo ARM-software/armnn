@@ -9,14 +9,14 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct MultiInputsOutputsFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct MultiInputsOutputsFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     MultiInputsOutputsFixture()
     {
-        // input1 = tf.placeholder(tf.float32, shape=[], name = "input1")
-        // input2 = tf.placeholder(tf.float32, shape = [], name = "input2")
-        // add1 = tf.add(input1, input2, name = "add1")
-        // add2 = tf.add(input1, input2, name = "add2")
+        // Input1 = tf.placeholder(tf.float32, shape=[], name = "input1")
+        // Input2 = tf.placeholder(tf.float32, shape = [], name = "input2")
+        // Add1 = tf.add(input1, input2, name = "add1")
+        // Add2 = tf.add(input1, input2, name = "add2")
         m_Prototext = R"(
 node {
   name: "input1"

@@ -47,7 +47,7 @@ void ConfigureLogging(boost::log::core* core, bool printToStandardOutput, bool p
     // stdout, so we have to explicitly disable logging in this case.
     core->set_logging_enabled(printToStandardOutput || printToDebugOutput);
 
-    // Setup severity filter
+    // Sets up severity filter.
     boost::log::trivial::severity_level boostSeverity;
     switch (severity)
     {

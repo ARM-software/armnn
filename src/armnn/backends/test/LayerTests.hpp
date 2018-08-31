@@ -6,12 +6,13 @@
 
 #include "armnn/ArmNN.hpp"
 #include "armnn/Tensor.hpp"
+#include "Half.hpp"
 
 #include <boost/multi_array.hpp>
 #include <boost/assert.hpp>
 #include <array>
 
-// Layer callables
+// Layer callables.
 
 namespace armnn
 {
@@ -213,20 +214,20 @@ LayerTestResult<float, 4> CompareBoundedReLuTest(armnn::IWorkloadFactory& worklo
                                                  float upperBound,
                                                  float lowerBound);
 
-// Tests that the output should be identical to the input when the output dimensions match the input ones
+// Tests that the output should be identical to the input when the output dimensions match the input ones.
 LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloadFactory);
 
-// Tests the behaviour of the resize bilinear operation when rescaling a 2x2 image into a 1x1 image
+// Tests the behaviour of the resize bilinear operation when rescaling a 2x2 image into a 1x1 image.
 LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& workloadFactory);
 
-// Tests resize bilinear for minification of a square input matrix (also: input dimensions are a
-// multiple of output dimensions)
+// Tests the resize bilinear for minification of a square input matrix (also: input dimensions are a
+// multiple of output dimensions).
 LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workloadFactory);
 
-// Tests resize bilinear for minification (output dimensions smaller than input dimensions)
+// Tests the resize bilinear for minification (output dimensions smaller than input dimensions).
 LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloadFactory);
 
-// Tests resize bilinear for magnification (output dimensions bigger than input dimensions)
+// Tests the resize bilinear for magnification (output dimensions bigger than input dimensions).
 LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> BatchNormTest(armnn::IWorkloadFactory& workloadFactory);
@@ -315,3 +316,13 @@ LayerTestResult<uint8_t, 4> SimplePermuteUint8Test(armnn::IWorkloadFactory& work
 LayerTestResult<float, 4> PermuteFloat32ValueSet1Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4> PermuteFloat32ValueSet2Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4> PermuteFloat32ValueSet3Test(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<float, 2> LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest
+        (armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 2>
+        LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 2>
+LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<float, 4> SimpleConvertFp16ToFp32Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<armnn::Half, 4> SimpleConvertFp32ToFp16Test(armnn::IWorkloadFactory& workloadFactory);

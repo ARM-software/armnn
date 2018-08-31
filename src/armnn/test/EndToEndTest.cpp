@@ -11,6 +11,8 @@
 #include "backends/test/QuantizeHelper.hpp"
 #include <boost/core/ignore_unused.hpp>
 
+#include <set>
+
 BOOST_AUTO_TEST_SUITE(EndToEnd)
 
 namespace
@@ -47,9 +49,10 @@ BOOST_AUTO_TEST_CASE(Unsigned8)
     using namespace armnn;
 
     // Create runtime in which test will run
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(armnn::Compute::CpuRef));
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    // build up the structure of the network
+    // Builds up the structure of the network.
     armnn::INetworkPtr net(INetwork::Create());
 
     IConnectableLayer* input = net->AddInputLayer(0, "input");
@@ -59,7 +62,7 @@ BOOST_AUTO_TEST_CASE(Unsigned8)
     input->GetOutputSlot(0).Connect(softmax->GetInputSlot(0));
     softmax->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    // set the tensors in the network
+    // Sets the tensors in the network.
     TensorInfo inputTensorInfo(TensorShape({1, 5}), DataType::QuantisedAsymm8);
     inputTensorInfo.SetQuantizationOffset(100);
     inputTensorInfo.SetQuantizationScale(10000.0f);
@@ -71,17 +74,18 @@ BOOST_AUTO_TEST_CASE(Unsigned8)
     softmax->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, runtime->GetDeviceSpec());
+    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    // load it into the runtime
+    // Loads it into the runtime.
     NetworkId netId;
     auto error = runtime->LoadNetwork(netId, std::move(optNet));
     BOOST_TEST(error == Status::Success);
 
-    // create structures for input & output
+    // Creates structures for input & output.
     std::vector<uint8_t> inputData
     {
-        1, 10, 3, 200, 5 // some inputs - one of which is sufficiently larger than the others to saturate softmax
+        1, 10, 3, 200, 5 // Some inputs - one of which is sufficiently larger than the others to saturate softmax.
     };
     std::vector<uint8_t> outputData(5);
 
@@ -94,19 +98,19 @@ BOOST_AUTO_TEST_CASE(Unsigned8)
         {0, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
     };
 
-    // do the inference
+    // Does the inference.
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
-    // check the results
+    // Checks the results.
     BOOST_TEST(outputData[0] == 0);
     BOOST_TEST(outputData[1] == 0);
     BOOST_TEST(outputData[2] == 0);
-    BOOST_TEST(outputData[3] == 255); // softmax has been saturated
+    BOOST_TEST(outputData[3] == 255); // softmax has been saturated.
     BOOST_TEST(outputData[4] == 0);
 }
 
 template <typename T>
-void ConstantUsageTest(armnn::Compute computeDevice,
+void ConstantUsageTest(const std::vector<armnn::Compute>& computeDevice,
     const armnn::TensorInfo& commonTensorInfo,
     const std::vector<T>& inputData,
     const std::vector<T>& constantData,
@@ -115,9 +119,10 @@ void ConstantUsageTest(armnn::Compute computeDevice,
     using namespace armnn;
 
     // Create runtime in which test will run
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(computeDevice));
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    // build up the structure of the network
+    // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
     IConnectableLayer* input = net->AddInputLayer(0);
@@ -129,19 +134,19 @@ void ConstantUsageTest(armnn::Compute computeDevice,
     constant->GetOutputSlot(0).Connect(add->GetInputSlot(1));
     add->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    // set the tensors in the network
+    // Sets the tensors in the network.
     input->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
     constant->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
     add->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
 
     // optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, runtime->GetDeviceSpec());
+    IOptimizedNetworkPtr optNet = Optimize(*net, computeDevice, runtime->GetDeviceSpec());
 
-    // load it into the runtime
+    // Loads it into the runtime.
     NetworkId netId;
     runtime->LoadNetwork(netId, std::move(optNet));
 
-    // create structures for input & output
+    // Creates structures for input & output.
     std::vector<T> outputData(inputData.size());
 
     InputTensors inputTensors
@@ -153,26 +158,26 @@ void ConstantUsageTest(armnn::Compute computeDevice,
         {0, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
     };
 
-    // do the inference
+    // Does the inference.
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
-    // check the results
+    // Checks the results.
     BOOST_TEST(outputData == expectedOutputData);
 }
 
-static void ConstantUsageFloat32Test(armnn::Compute computeDevice)
+static void ConstantUsageFloat32Test(const std::vector<armnn::Compute>& computeDevice)
 {
     const armnn::TensorInfo commonTensorInfo({ 2, 3 }, armnn::DataType::Float32);
 
     ConstantUsageTest(computeDevice,
         commonTensorInfo,
-        std::vector<float>{ 1.f, 2.f, 3.f, 4.f, 5.f, 6.f }, // input
-        std::vector<float>{ 6.f, 5.f, 4.f, 3.f, 2.f, 1.f }, // const input
-        std::vector<float>{ 7.f, 7.f, 7.f, 7.f, 7.f, 7.f }  // expected output
+        std::vector<float>{ 1.f, 2.f, 3.f, 4.f, 5.f, 6.f }, // Input.
+        std::vector<float>{ 6.f, 5.f, 4.f, 3.f, 2.f, 1.f }, // Const input.
+        std::vector<float>{ 7.f, 7.f, 7.f, 7.f, 7.f, 7.f }  // Expected output.
     );
 }
 
-static void ConstantUsageUint8Test(armnn::Compute computeDevice)
+static void ConstantUsageUint8Test(const std::vector<armnn::Compute>& computeDevice)
 {
     armnn::TensorInfo commonTensorInfo({ 2, 3 }, armnn::DataType::QuantisedAsymm8);
 
@@ -184,46 +189,49 @@ static void ConstantUsageUint8Test(armnn::Compute computeDevice)
 
     ConstantUsageTest(computeDevice,
         commonTensorInfo,
-        QuantizedVector<uint8_t>(scale, offset, { 1.f, 2.f, 3.f, 4.f, 5.f, 6.f }), // input
-        QuantizedVector<uint8_t>(scale, offset, { 6.f, 5.f, 4.f, 3.f, 2.f, 1.f }), // const input
-        QuantizedVector<uint8_t>(scale, offset, { 7.f, 7.f, 7.f, 7.f, 7.f, 7.f })  // expected output
+        QuantizedVector<uint8_t>(scale, offset, { 1.f, 2.f, 3.f, 4.f, 5.f, 6.f }), // Input.
+        QuantizedVector<uint8_t>(scale, offset, { 6.f, 5.f, 4.f, 3.f, 2.f, 1.f }), // Const input.
+        QuantizedVector<uint8_t>(scale, offset, { 7.f, 7.f, 7.f, 7.f, 7.f, 7.f })  // Expected output.
     );
 }
 
 BOOST_AUTO_TEST_CASE(ConstantUsage_Ref_Float32)
 {
-    ConstantUsageFloat32Test(armnn::Compute::CpuRef);
+    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    ConstantUsageFloat32Test(backends);
 }
 
 #if ARMCOMPUTENEON_ENABLED
 BOOST_AUTO_TEST_CASE(ConstantUsage_Neon_Float32)
 {
-    ConstantUsageFloat32Test(armnn::Compute::CpuAcc);
+    ConstantUsageFloat32Test({armnn::Compute::CpuAcc});
 }
 #endif
 
 #if ARMCOMPUTECL_ENABLED
 BOOST_AUTO_TEST_CASE(ConstantUsage_Cl_Float32)
 {
-    ConstantUsageFloat32Test(armnn::Compute::GpuAcc);
+    ConstantUsageFloat32Test({armnn::Compute::GpuAcc});
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(ConstantUsage_Ref_Uint8)
 {
-    ConstantUsageUint8Test(armnn::Compute::CpuRef);
+    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    ConstantUsageUint8Test(backends);
 }
 
 BOOST_AUTO_TEST_CASE(TrivialAdd)
 {
-    // This test was designed to match "AddTwo" in android nn/runtime/test/TestTrivialModel.cpp
+    // This test was designed to match "AddTwo" in android nn/runtime/test/TestTrivialModel.cpp.
 
     using namespace armnn;
 
     // Create runtime in which test will run
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(armnn::Compute::CpuRef));
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    // build up the structure of the network
+    // Builds up the structure of the network.
     armnn::INetworkPtr net(INetwork::Create());
 
     IConnectableLayer* input1 = net->AddInputLayer(0);
@@ -235,20 +243,21 @@ BOOST_AUTO_TEST_CASE(TrivialAdd)
     input2->GetOutputSlot(0).Connect(add->GetInputSlot(1));
     add->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    // set the tensors in the network
+    // Sets the tensors in the network.
     TensorInfo tensorInfo(TensorShape({3, 4}), DataType::Float32);
     input1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
     input2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
     add->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     // optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, runtime->GetDeviceSpec());
+    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    // load it into the runtime
+    // Loads it into the runtime.
     NetworkId netId;
     runtime->LoadNetwork(netId, std::move(optNet));
 
-    // create structures for input & output - matching android nn test
+    // Creates structures for input & output - matching android nn test.
     std::vector<float> input1Data
     {
         1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f
@@ -269,10 +278,10 @@ BOOST_AUTO_TEST_CASE(TrivialAdd)
         {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
     };
 
-    // do the inference
+    // Does the inference.
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
-    // check the results
+    // Checks the results
     BOOST_TEST(outputData[0] == 101);
     BOOST_TEST(outputData[1] == 202);
     BOOST_TEST(outputData[2] == 303);
@@ -292,9 +301,10 @@ BOOST_AUTO_TEST_CASE(MultipleOutputs)
     using namespace armnn;
 
     // Create runtime in which test will run
-    armnn::IRuntimePtr  runtime(armnn::IRuntime::Create(armnn::Compute::CpuRef));
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr  runtime(armnn::IRuntime::Create(options));
 
-    // build up the structure of the network
+    // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
     IConnectableLayer* input = net->AddInputLayer(0);
@@ -331,7 +341,7 @@ BOOST_AUTO_TEST_CASE(MultipleOutputs)
     activation2->GetOutputSlot(0).Connect(output2->GetInputSlot(0));
     activation3->GetOutputSlot(0).Connect(output3->GetInputSlot(0));
 
-    // set the tensors in the network
+    // Sets the tensors in the network.
     TensorInfo tensorInfo(TensorShape({ 10 }), DataType::Float32);
     input->GetOutputSlot(0).SetTensorInfo(tensorInfo);
     activation1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
@@ -339,13 +349,14 @@ BOOST_AUTO_TEST_CASE(MultipleOutputs)
     activation3->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     // optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, runtime->GetDeviceSpec());
+    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    // load it into the runtime
+    // Loads it into the runtime.
     NetworkId netId;
     runtime->LoadNetwork(netId, std::move(optNet));
 
-    // create structures for input & output
+    // Creates structures for input & output.
     const std::vector<float> inputData{ 3.f, 5.f, 2.f, 3.f, 7.f, 0.f, -2.f, -1.f, 3.f, 3.f };
 
     std::vector<float> output1Data(inputData.size());
@@ -363,32 +374,30 @@ BOOST_AUTO_TEST_CASE(MultipleOutputs)
         {2,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 2), output3Data.data())}
     };
 
-    // do the inference
+    // Does the inference.
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
-    // check the results
+    // Checks the results.
     BOOST_TEST(output1Data == std::vector<float>({ 1.f, 1.f, 1.f, 1.f, 1.f, 0.f, -1.f, -1.f, 1.f, 1.f })); // ReLu1
     BOOST_TEST(output2Data == std::vector<float>({ 3.f, 5.f, 2.f, 3.f, 6.f, 0.f, 0.f, 0.f, 3.f, 3.f })); // ReLu6
     BOOST_TEST(output3Data == std::vector<float>({ 3.f, 5.f, 2.f, 3.f, 5.f, 2.f, 2.f, 2.f, 3.f, 3.f })); // [2, 5]
 }
 
 #if ARMCOMPUTENEON_ENABLED
-BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
+BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
 {
     using namespace armnn;
 
-    // Create runtime in which test will run
-    // Note we don't allow falling back to CpuRef if an operation (excluding inputs, outputs, etc.) isn't supported
-    armnn::IRuntime::CreationOptions options(armnn::Compute::CpuAcc);
-    options.m_UseCpuRefAsFallback = false;
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    // Create runtime in which test will run and allow fallback to CpuRef.
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
 
-    // build up the structure of the network
+    // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
     IConnectableLayer* input = net->AddInputLayer(0);
 
-    // This layer configuration isn't supported by CpuAcc and isn't allowed to fall back, so LoadNetwork will fail.
+    // This layer configuration isn't supported by CpuAcc but we allow fallback to CpuRef so it shoud pass.
     NormalizationDescriptor descriptor;
     IConnectableLayer* pooling = net->AddNormalizationLayer(descriptor);
 
@@ -401,12 +410,45 @@ BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
 
     // optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, runtime->GetDeviceSpec());
+    std::vector<Compute> backends = {Compute::CpuAcc, Compute::CpuRef};
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
-    // Load it into the runtime. It should fail.
+    // Load it into the runtime. It should pass.
     NetworkId netId;
-    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Failure);
+    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
 }
 #endif // ARMCOMPUTENEON_ENABLED
+
+BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
+{
+    using namespace armnn;
+
+    // Create runtime in which test will run
+    // Note we don't allow falling back to CpuRef if an operation (excluding inputs, outputs, etc.) isn't supported
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0);
+
+    // This layer configuration isn't supported by CpuAcc and isn't allowed to fall back, so Optimize will return null.
+    NormalizationDescriptor descriptor;
+    IConnectableLayer* pooling = net->AddNormalizationLayer(descriptor);
+
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
+    pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+    pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+
+    // optimize the network
+    std::vector<Compute> backends = {Compute::CpuAcc};
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    BOOST_CHECK(!optNet);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

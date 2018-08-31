@@ -10,7 +10,7 @@ namespace armnn
 {
 
 ClFloorFloat32Workload::ClFloorFloat32Workload(const FloorQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : Float32Workload<FloorQueueDescriptor>(descriptor, info)
+    : FloatWorkload<FloorQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClFloorFloat32Workload", 1, 1);
 
@@ -22,7 +22,7 @@ ClFloorFloat32Workload::ClFloorFloat32Workload(const FloorQueueDescriptor& descr
 
 void ClFloorFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClFloorFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClFloorFloat32Workload_Execute");
     m_Layer.run();
 }
 

@@ -10,6 +10,8 @@
 #include "layers/AdditionLayer.hpp"
 #include "layers/BatchNormalizationLayer.hpp"
 #include "layers/ConstantLayer.hpp"
+#include "layers/ConvertFp16ToFp32Layer.hpp"
+#include "layers/ConvertFp32ToFp16Layer.hpp"
 #include "layers/Convolution2dLayer.hpp"
 #include "layers/DepthwiseConvolution2dLayer.hpp"
 #include "layers/FakeQuantizationLayer.hpp"
@@ -17,6 +19,7 @@
 #include "layers/FullyConnectedLayer.hpp"
 #include "layers/InputLayer.hpp"
 #include "layers/L2NormalizationLayer.hpp"
+#include "layers/LstmLayer.hpp"
 #include "layers/MemCopyLayer.hpp"
 #include "layers/MergerLayer.hpp"
 #include "layers/MultiplicationLayer.hpp"
@@ -60,6 +63,8 @@ DECLARE_LAYER(Activation)
 DECLARE_LAYER(Addition)
 DECLARE_LAYER(BatchNormalization)
 DECLARE_LAYER(Constant)
+DECLARE_LAYER(ConvertFp16ToFp32)
+DECLARE_LAYER(ConvertFp32ToFp16)
 DECLARE_LAYER(Convolution2d)
 DECLARE_LAYER(DepthwiseConvolution2d)
 DECLARE_LAYER(FakeQuantization)
@@ -67,6 +72,7 @@ DECLARE_LAYER(Floor)
 DECLARE_LAYER(FullyConnected)
 DECLARE_LAYER(Input)
 DECLARE_LAYER(L2Normalization)
+DECLARE_LAYER(Lstm)
 DECLARE_LAYER(MemCopy)
 DECLARE_LAYER(Merger)
 DECLARE_LAYER(Multiplication)

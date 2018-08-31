@@ -54,7 +54,7 @@ armnn::Convolution2dDescriptor MakeConv2dDesc(uint32_t strideX, uint32_t strideY
 
 BOOST_AUTO_TEST_CASE(Conv2dUtils)
 {
-    // the only preferred Neon convolution is 1x1 with padding=0 and stride size {1,2,3}
+    // The only preferred Neon convolution is 1x1 with padding=0 and stride size {1,2,3}.
     armnn::TensorShape shape1x1({ 1,1,1,1 });
     armnn::TensorInfo info1x1(shape1x1, armnn::DataType::Float32);
     BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(1, 1)));
@@ -98,49 +98,133 @@ armnn::DepthwiseConvolution2dDescriptor MakeDepthwiseConv2dDesc(uint32_t strideX
     uint32_t depthMultiplier = 1, uint32_t padLeft = 0, uint32_t padRight = 0,
     uint32_t padTop = 0, uint32_t padBottom = 0)
 {
+    boost::ignore_unused(depthMultiplier);
+
     armnn::DepthwiseConvolution2dDescriptor desc;
+
     desc.m_PadLeft = padLeft;
     desc.m_PadRight = padRight;
+
     desc.m_PadTop = padTop;
     desc.m_PadBottom = padBottom;
     desc.m_StrideX = strideX;
     desc.m_StrideY = strideY;
-    desc.m_BiasEnabled = true;
+    desc.m_BiasEnabled = false;
+
     return desc;
 }
 
+armnn::TensorInfo CreateOutputTensorInfo(const armnn::TensorInfo& inputInfo,
+                                         const armnn::TensorInfo& weightsInfo,
+                                         const armnn::DepthwiseConvolution2dDescriptor& descriptor,
+                                         armnn::DataType dataType)
+{
+    const armnn::TensorShape& inputShape  = inputInfo.GetShape();
+    const armnn::TensorShape& filterShape = weightsInfo.GetShape();
+
+    unsigned int inWidth = inputShape[3];
+    unsigned int inHeight = inputShape[2];
+    unsigned int inBatchSize = inputShape[0];
+
+    unsigned int filterWidth = filterShape[3];
+    unsigned int readWidth = (inWidth + descriptor.m_PadLeft + descriptor.m_PadRight) - (filterWidth);
+    unsigned int outWidth =  1u + (readWidth / descriptor.m_StrideX);
+
+    unsigned int filterHeight = filterShape[2];
+    unsigned int readHeight = (inHeight + descriptor.m_PadTop + descriptor.m_PadBottom) - (filterHeight);
+    unsigned int outHeight = 1u + (readHeight / descriptor.m_StrideY);
+    unsigned int depthMultiplier = filterShape[0];
+
+    unsigned int outChannels = filterShape[1] * depthMultiplier;
+    unsigned int outBatchSize = inBatchSize;
+
+    armnn::TensorShape outputShape({outBatchSize, outChannels, outHeight, outWidth});
+    return armnn::TensorInfo(outputShape, dataType);
+}
 }
 
 BOOST_AUTO_TEST_CASE(DepthwiseConv2dUtils)
 {
-    armnn::TensorInfo inputInfo({ 1, 1, 10, 10 }, armnn::DataType::Float32);
-    armnn::TensorInfo weightsInfo3x3({ 1, 1, 3, 3 }, armnn::DataType::Float32);
+    const armnn::DataType dataType = armnn::DataType::Float32;
+
+    armnn::TensorInfo inputInfo({1, 1, 10, 10 }, dataType);
+    armnn::TensorInfo outputInfo;
+    armnn::TensorInfo weightsInfo3x3({ 1, 1, 3, 3 }, dataType);
+    armnn::TensorInfo biasesInfo;
+
+    armnn::DepthwiseConvolution2dDescriptor descriptor;
 
     // Strides supported: 1,2,3
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(1, 1), weightsInfo3x3));
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(1, 2), weightsInfo3x3));
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(1, 3), weightsInfo3x3));
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(2, 1), weightsInfo3x3));
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(2, 2), weightsInfo3x3));
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(2, 3), weightsInfo3x3));
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(3, 1), weightsInfo3x3));
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(3, 2), weightsInfo3x3));
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(3, 3), weightsInfo3x3));
+    descriptor = MakeDepthwiseConv2dDesc(1, 1);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
 
-    // Unsupported stride
-    BOOST_TEST(!armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(4, 1), weightsInfo3x3));
+    descriptor = MakeDepthwiseConv2dDesc(1, 2);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
+
+    descriptor = MakeDepthwiseConv2dDesc(1, 3);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
+
+    descriptor = MakeDepthwiseConv2dDesc(2, 1);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
+
+    descriptor = MakeDepthwiseConv2dDesc(2, 2);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
+
+    descriptor = MakeDepthwiseConv2dDesc(2, 3);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
+
+    descriptor = MakeDepthwiseConv2dDesc(3, 1);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
+
+    descriptor = MakeDepthwiseConv2dDesc(3, 2);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
+
+    descriptor = MakeDepthwiseConv2dDesc(3, 3);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
+
+    // Supported stride 4
+    descriptor = MakeDepthwiseConv2dDesc(4, 1);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
 
     // Supported weights shape 1x1
     armnn::TensorInfo weightsInfo1x1({ 1, 1, 1, 1 }, armnn::DataType::Float32);
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(1, 1), weightsInfo1x1));
+    descriptor = MakeDepthwiseConv2dDesc(1, 1);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo1x1, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo1x1, biasesInfo));
 
     // Supported shape 2x2
     armnn::TensorInfo weightsInfo2x2({ 1, 1, 2, 2 }, armnn::DataType::Float32);
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(1, 1), weightsInfo2x2));
+    descriptor = MakeDepthwiseConv2dDesc(1, 1);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo2x2, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo2x2, biasesInfo));
 
     // Asymmetric padding
-    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, MakeDepthwiseConv2dDesc(1, 1, 1, 1, 2, 1, 2),
-                                                          weightsInfo3x3));
+    descriptor = MakeDepthwiseConv2dDesc(1, 1, 1, 1, 2, 1, 2);
+    outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo3x3, descriptor, dataType);
+    BOOST_TEST(armnn::IsDepthwiseConvolutionSupportedNeon(inputInfo, outputInfo, descriptor,
+                                                          weightsInfo3x3, biasesInfo));
 }
 
 // Pooling
@@ -201,26 +285,23 @@ ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta2Uint8, SimpleSoftmaxUint8Test, 2.0f)
 ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
 ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 
-// Splitter
-BOOST_AUTO_TEST_CASE(SimpleSplitter)
+// Softmax
+BOOST_AUTO_TEST_CASE(Softmax4dSupport)
 {
-    armnn::NeonWorkloadFactory workloadFactory;
-    auto testResult = SplitterTest(workloadFactory);
-    for (unsigned int i = 0; i < testResult.size(); ++i)
-    {
-        BOOST_TEST(CompareTensors(testResult[i].output, testResult[i].outputExpected));
-    }
+    const unsigned int numDimensions = 4u;
+    std::array<unsigned int, numDimensions> dimensionSizes;
+    dimensionSizes.fill(1u);
+
+    const armnn::TensorInfo inputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
+
+    // 4D Softmax should be reported as unsupported on the NEON backend
+    BOOST_TEST(!armnn::IsSoftmaxSupportedNeon(inputInfo, outputInfo, armnn::SoftmaxDescriptor()));
 }
 
-BOOST_AUTO_TEST_CASE(SimpleSplitterUint8)
-{
-    armnn::NeonWorkloadFactory workloadFactory;
-    auto testResult = SplitterUint8Test(workloadFactory);
-    for (unsigned int i = 0; i < testResult.size(); ++i)
-    {
-        BOOST_TEST(CompareTensors(testResult[i].output, testResult[i].outputExpected));
-    }
-}
+// Splitter
+ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)
+ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)
 
 ARMNN_AUTO_TEST_CASE(CopyViaSplitter, CopyViaSplitterTest)
 ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
@@ -375,5 +456,4 @@ ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSqrtActivationWithReference, Positive
 
 ARMNN_COMPARE_REF_FIXTURE_TEST_CASE(CompareSquareActivationWithReference, ActivationFixture,
                                     CompareActivationTest, armnn::ActivationFunction::Square, 5u)
-
 BOOST_AUTO_TEST_SUITE_END()

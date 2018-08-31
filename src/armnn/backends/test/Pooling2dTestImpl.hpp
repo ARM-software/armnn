@@ -155,21 +155,21 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(armnn::IWorkl
         3.0f, 5.0f, 4.0f, 0.0f, 1.0f, 5.0f, 9.0f, 7.0f,
     });
 
-    // Construct input data
+    // Constructs input data.
     std::vector<float> inputData;
     auto negator = [](float f) { return -f; };
 
-    // First image (two channels where the second channel is the negative of the first one)
+    // First image (two channels where the second channel is the negative of the first one).
     inputData.insert(inputData.end(), singleChannelData.begin(), singleChannelData.end());
     std::transform(singleChannelData.begin(), singleChannelData.end(), std::back_inserter(inputData), negator);
 
-    // Second image (same as first image)
+    // Second image (same as first image).
     inputData.insert(inputData.end(), singleChannelData.begin(), singleChannelData.end());
     std::transform(singleChannelData.begin(), singleChannelData.end(), std::back_inserter(inputData), negator);
 
     auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
 
-    // these were calculated manually
+    // These were calculated manually.
     auto shape(GetTensorShapeAsArray<4>(outputTensorInfo));
     boost::multi_array<T, 4> outputExpected(shape);
     if (forceNoPadding)
@@ -527,13 +527,13 @@ LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(armnn::IWorkloadFac
     descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
-    // Construct input data
+    // Construct input data.
     auto input = MakeTensor<T, 4>(inputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             1.0f, 3.0f, 4.0f,
         }));
 
-    // these were calculated manually
+    // These were calculated manually.
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             0.0f, 3.0f, 0.0f, 3.0f,
@@ -686,7 +686,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(armnn::IWorkl
         438.0f, 564.0f, 573.0f, 402.0f
     };
 
-    // Note that left and right edges will be 0.f, due to the 2x2 max pooling only accessing zeros here
+    // Note that left and right edges will be 0.f, due to the 2x2 max pooling only accessing zeros here.
     std::vector<float> expectedOutputDataWithPadding = {
         0.0f, 510.0f, 780.0f, 654.0f, 0.0f,
         0.0f, 438.0f, 618.0f, 402.0f, 0.0f

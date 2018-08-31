@@ -24,7 +24,7 @@ void Activation(const float* in,
         float input = in[i];
         float output;
 
-        // compute the result of the activation function
+        // Compute the result of the activation function.
         switch (function)
         {
             case ActivationFunction::Linear:

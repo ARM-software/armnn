@@ -8,7 +8,7 @@
 
 BOOST_AUTO_TEST_SUITE(CaffeParser)
 
-struct GlobalPoolingFixture : public ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
+struct GlobalPoolingFixture : public armnnUtils::ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
 {
     GlobalPoolingFixture()
     {

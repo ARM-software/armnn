@@ -14,7 +14,7 @@
 namespace armnn
 {
 
-class NeonSoftmaxFloat32Workload : public Float32Workload<SoftmaxQueueDescriptor>
+class NeonSoftmaxFloat32Workload : public FloatWorkload<SoftmaxQueueDescriptor>
 {
 public:
     NeonSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,

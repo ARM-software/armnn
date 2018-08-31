@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct ShapeFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ShapeFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     ShapeFixture()
     {
@@ -85,9 +85,8 @@ struct ShapeFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
 
 BOOST_FIXTURE_TEST_CASE(ParseShape, ShapeFixture)
 {
-    // Note: the test's output cannot be an int32 const layer, because that cannot exist in the
-    //       as ARMNN only supports u8 and float layers. For that reason I added a reshape layer
-    //       which reshapes the input to its original dimensions, which is not changing it.
+    // Note: the test's output cannot be an int32 const layer, because ARMNN only supports u8 and float layers.
+    //       For that reason I added a reshape layer which reshapes the input to its original dimensions.
     RunTest<2>({ 0.0f, 1.0f, 2.0f, 3.0f }, { 0.0f, 1.0f, 2.0f, 3.0f });
 }
 

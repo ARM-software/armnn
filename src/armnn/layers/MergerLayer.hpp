@@ -19,6 +19,7 @@ public:
     MergerLayer* Clone(Graph& graph) const override;
 
     void ValidateTensorShapesFromInputs() override;
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
 protected:
     MergerLayer(const OriginsDescriptor& param, const char* name);

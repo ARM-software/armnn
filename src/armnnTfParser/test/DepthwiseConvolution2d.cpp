@@ -11,7 +11,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct DepthwiseConvolution2dFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct DepthwiseConvolution2dFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     explicit DepthwiseConvolution2dFixture(const char* paddingType)
     {

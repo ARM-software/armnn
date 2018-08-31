@@ -52,7 +52,7 @@ LayerTestResult<T,4> BatchNormTestImpl(armnn::IWorkloadFactory& workloadFactory,
             4.f, 1.f,
             -2.f, 4.f
         }));
-    // these values are per-channel of the input
+    // These values are per-channel of the input.
     auto mean     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {3, -2}));
     auto variance = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {4, 9}));
     auto beta     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {3, 2}));
@@ -82,8 +82,8 @@ LayerTestResult<T,4> BatchNormTestImpl(armnn::IWorkloadFactory& workloadFactory,
     data.m_Gamma            = &gammaTensor;
     data.m_Parameters.m_Eps = 0.0f;
 
-    // for each channel:
-    // substract mean, divide by standard deviation (with an epsilon to avoid div by 0)
+    // For each channel:
+    // substract mean, divide by standard deviation (with an epsilon to avoid div by 0),
     // multiply by gamma and add beta
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
         QuantizedVector<T>(qScale, qOffset,

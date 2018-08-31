@@ -7,6 +7,7 @@
 
 #include "backends/Workload.hpp"
 #include "backends/WorkloadData.hpp"
+#include "backends/ClWorkloadUtils.hpp"
 
 #include <armnn/TypesUtils.hpp>
 #include <arm_compute/runtime/CL/functions/CLPermute.h>
@@ -18,13 +19,13 @@ namespace armnn
 
 arm_compute::Status ClPermuteWorkloadValidate(const PermuteDescriptor& descriptor);
 
-template <armnn::DataType DataType>
-class ClPermuteWorkload : public TypedWorkload<PermuteQueueDescriptor, DataType>
+template<armnn::DataType... DataTypes>
+class ClPermuteWorkload : public TypedWorkload<PermuteQueueDescriptor, DataTypes...>
 {
 public:
     static const std::string& GetName()
     {
-        static const std::string name = std::string("ClPermute") + GetDataTypeName(DataType) + "Workload";
+        static const std::string name = std::string("ClPermuteWorkload");
         return name;
     }
 
@@ -32,11 +33,11 @@ public:
     void Execute() const override;
 
 private:
-    using TypedWorkload<PermuteQueueDescriptor, DataType>::m_Data;
+    using TypedWorkload<PermuteQueueDescriptor, DataTypes...>::m_Data;
     mutable arm_compute::CLPermute m_PermuteFunction;
 };
 
-using ClPermuteFloat32Workload = ClPermuteWorkload<DataType::Float32>;
+using ClPermuteFloatWorkload = ClPermuteWorkload<DataType::Float16, DataType::Float32>;
 using ClPermuteUint8Workload = ClPermuteWorkload<DataType::QuantisedAsymm8>;
 
-} //namespace armnn
+} // namespace armnn

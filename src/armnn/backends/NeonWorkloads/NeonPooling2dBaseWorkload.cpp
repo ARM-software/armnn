@@ -25,10 +25,10 @@ arm_compute::Status NeonPooling2dWorkloadValidate(const TensorInfo& input,
     return arm_compute::NEPoolingLayer::validate(&aclInputInfo, &aclOutputInfo, layerInfo);
 }
 
-template <armnn::DataType dataType>
-NeonPooling2dBaseWorkload<dataType>::NeonPooling2dBaseWorkload(
+template <armnn::DataType... dataTypes>
+NeonPooling2dBaseWorkload<dataTypes...>::NeonPooling2dBaseWorkload(
     const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info, const std::string& name)
-    : TypedWorkload<Pooling2dQueueDescriptor, dataType>(descriptor, info)
+    : TypedWorkload<Pooling2dQueueDescriptor, dataTypes...>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs(name, 1, 1);
 
@@ -40,7 +40,7 @@ NeonPooling2dBaseWorkload<dataType>::NeonPooling2dBaseWorkload(
     m_PoolingLayer.configure(&input, &output, layerInfo);
 }
 
-template class NeonPooling2dBaseWorkload<DataType::Float32>;
+template class NeonPooling2dBaseWorkload<DataType::Float16, DataType::Float32>;
 template class NeonPooling2dBaseWorkload<DataType::QuantisedAsymm8>;
 
 } //namespace armnn

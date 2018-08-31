@@ -44,7 +44,7 @@ class SetupDebugOutput
 public:
     SetupDebugOutput()
     {
-        // Send the output to both cout (as standard) and the debug output.
+        // Sends the output to both cout (as standard) and the debug output.
         m_OutputStream.push(tee(std::cout));
         m_OutputStream.push(m_DebugOutputSink);
 

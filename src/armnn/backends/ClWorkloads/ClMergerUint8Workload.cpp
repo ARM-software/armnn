@@ -11,7 +11,7 @@ namespace armnn
 
 void ClMergerUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClMergerUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMergerUint8Workload_Execute");
     ClBaseMergerWorkload<DataType::QuantisedAsymm8>::Execute();
 }
 

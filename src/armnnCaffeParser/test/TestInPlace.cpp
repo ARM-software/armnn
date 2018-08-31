@@ -9,7 +9,7 @@
 BOOST_AUTO_TEST_SUITE(CaffeParser)
 
 // The pooling layer should take its input from the relu, not the add directly.
-struct InPlaceFixture : public ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
+struct InPlaceFixture : public armnnUtils::ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
 {
     InPlaceFixture()
     {
@@ -59,7 +59,7 @@ BOOST_FIXTURE_TEST_CASE(ParseInPlace, InPlaceFixture)
 
 // The requested output of the network is a layer which has an activation attached.
 // The output of the network should therefore actually be the activation layer.
-struct InPlaceOutputFixture : public ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
+struct InPlaceOutputFixture : public armnnUtils::ParserPrototxtFixture<armnnCaffeParser::ICaffeParser>
 {
     InPlaceOutputFixture()
     {

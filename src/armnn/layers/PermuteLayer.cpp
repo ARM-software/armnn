@@ -31,19 +31,25 @@ PermuteLayer* PermuteLayer::Clone(Graph& graph) const
     return CloneBase<PermuteLayer>(graph, m_Param, GetName());
 }
 
+std::vector<TensorShape> PermuteLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
+{
+    BOOST_ASSERT(inputShapes.size() == 1);
+    const TensorShape& inShape = inputShapes[0];
+    return std::vector<TensorShape> ({armnnUtils::Permuted(inShape, m_Param.m_DimMappings)});
+}
+
 void PermuteLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
-                     "PermuteLayer: InputSlot must be connected to an OutputSlot");
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
-                     "PermuteLayer: TensorInfo must be set on connected InputSlot.");
+    VerifyLayerConnections(1, CHECK_LOCATION());
 
-    const TensorInfo& infoIn = GetInputSlot(0).GetConnection()->GetTensorInfo();
-    TensorShape shapeOut = armnnUtils::Permuted(infoIn.GetShape(), m_Param.m_DimMappings);
+    auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
+
+    BOOST_ASSERT(inferredShapes.size() == 1);
+
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "PermuteLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        shapeOut);
+        inferredShapes[0]);
 }
 
 } // namespace armnn

@@ -10,7 +10,7 @@ namespace armnn
 
 void NeonMergerUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "ClMergerUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMergerUint8Workload_Execute");
     NeonBaseMergerWorkload::Execute();
 }
 

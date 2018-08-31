@@ -9,7 +9,12 @@
 
 namespace armnn
 {
-class NeonAdditionFloat32Workload : public Float32Workload<AdditionQueueDescriptor>
+
+arm_compute::Status NeonAdditionWorkloadValidate(const TensorInfo& input0,
+                                                 const TensorInfo& input1,
+                                                 const TensorInfo& output);
+
+class NeonAdditionFloat32Workload : public FloatWorkload<AdditionQueueDescriptor>
 {
 public:
     NeonAdditionFloat32Workload(const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info);

@@ -39,71 +39,95 @@ void CheckInputsOutput(std::unique_ptr<Workload> workload,
 
 BOOST_AUTO_TEST_SUITE(CreateWorkloadRef)
 
-template <typename ActivationWorkloadType>
+template <typename ActivationWorkloadType, armnn::DataType DataType>
 static void RefCreateActivationWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateActivationWorkloadTest<ActivationWorkloadType>(factory, graph);
+    auto workload = CreateActivationWorkloadTest<ActivationWorkloadType, DataType>(factory, graph);
 
-    // check that outputs are as we expect them (see definition of CreateActivationWorkloadTest)
+    // Checks that outputs are as we expect them (see definition of CreateActivationWorkloadTest).
     CheckInputOutput(std::move(workload),
-        TensorInfo({ 1, 1 }, ActivationWorkloadType::ms_DataType),
-        TensorInfo({ 1, 1 }, ActivationWorkloadType::ms_DataType));
+        TensorInfo({ 1, 1 }, DataType),
+        TensorInfo({ 1, 1 }, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateActivationFloat32Workload)
 {
-    RefCreateActivationWorkloadTest<RefActivationFloat32Workload>();
+    RefCreateActivationWorkloadTest<RefActivationFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateActivationUint8Workload)
 {
-    RefCreateActivationWorkloadTest<RefActivationUint8Workload>();
+    RefCreateActivationWorkloadTest<RefActivationUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-template <typename AdditionWorkloadType>
+template <typename AdditionWorkloadType, armnn::DataType DataType>
 static void RefCreateAdditionWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateAdditionWorkloadTest<AdditionWorkloadType>(factory, graph);
+    auto workload = CreateAdditionWorkloadTest<AdditionWorkloadType, DataType>(factory, graph);
 
-    // check that outputs are as we expect them (see definition of CreateAdditionWorkloadTest)
+    // Checks that outputs are as we expect them (see definition of CreateAdditionWorkloadTest).
     CheckInputsOutput(std::move(workload),
-        TensorInfo({ 2, 3 }, AdditionWorkloadType::ms_DataType),
-        TensorInfo({ 2, 3 }, AdditionWorkloadType::ms_DataType),
-        TensorInfo({ 2, 3 }, AdditionWorkloadType::ms_DataType));
+        TensorInfo({ 2, 3 }, DataType),
+        TensorInfo({ 2, 3 }, DataType),
+        TensorInfo({ 2, 3 }, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    RefCreateAdditionWorkloadTest<RefAdditionFloat32Workload>();
+    RefCreateAdditionWorkloadTest<RefAdditionFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateAdditionUint8Workload)
 {
-    RefCreateAdditionWorkloadTest<RefAdditionUint8Workload>();
+    RefCreateAdditionWorkloadTest<RefAdditionUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationWorkload)
 {
     Graph                graph;
     RefWorkloadFactory factory;
-    auto workload = CreateBatchNormalizationWorkloadTest<RefBatchNormalizationFloat32Workload>(factory, graph);
+    auto workload = CreateBatchNormalizationWorkloadTest<RefBatchNormalizationFloat32Workload, armnn::DataType::Float32>
+                    (factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateBatchNormalizationWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateBatchNormalizationWorkloadTest).
     CheckInputOutput(
         std::move(workload), TensorInfo({2, 3, 1, 1}, DataType::Float32), TensorInfo({2, 3, 1, 1}, DataType::Float32));
+}
+
+BOOST_AUTO_TEST_CASE(CreateConvertFp16ToFp32Float32Workload)
+{
+    Graph                graph;
+    RefWorkloadFactory factory;
+    auto workload = CreateConvertFp16ToFp32WorkloadTest<RefConvertFp16ToFp32Workload>(factory, graph);
+
+    // Checks that outputs and inputs are as we expect them
+    CheckInputOutput(
+        std::move(workload), TensorInfo({1, 3, 2, 3}, DataType::Float16), TensorInfo({1, 3, 2, 3}, DataType::Float32));
+}
+
+BOOST_AUTO_TEST_CASE(CreateConvertFp32ToFp16Float16Workload)
+{
+    Graph                graph;
+    RefWorkloadFactory factory;
+    auto workload = CreateConvertFp32ToFp16WorkloadTest<RefConvertFp32ToFp16Workload>(factory, graph);
+
+    // Checks that outputs and inputs are as we expect them
+    CheckInputOutput(
+        std::move(workload), TensorInfo({1, 3, 2, 3}, DataType::Float32), TensorInfo({1, 3, 2, 3}, DataType::Float16));
 }
 
 BOOST_AUTO_TEST_CASE(CreateConvolution2dWorkload)
 {
     Graph                graph;
     RefWorkloadFactory factory;
-    auto                 workload = CreateConvolution2dWorkloadTest<RefConvolution2dFloat32Workload>(factory, graph);
+    auto                 workload = CreateConvolution2dWorkloadTest<RefConvolution2dFloat32Workload,
+                         DataType::Float32>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
     CheckInputOutput(std::move(workload),
                      TensorInfo({2, 3, 8, 16}, DataType::Float32),
                      TensorInfo({2, 2, 2, 10}, DataType::Float32));
@@ -116,170 +140,172 @@ BOOST_AUTO_TEST_CASE(CreateDepthwiseConvolution2dWorkload)
     auto                 workload =
         CreateDepthwiseConvolution2dWorkloadTest<RefDepthwiseConvolution2dFloat32Workload>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
     CheckInputOutput(std::move(workload),
                      TensorInfo({2, 3, 8, 16}, DataType::Float32),
                      TensorInfo({2, 9, 2, 10}, DataType::Float32));
 }
 
-template <typename FullyConnectedWorkloadType>
+template <typename FullyConnectedWorkloadType, armnn::DataType DataType>
 static void RefCreateFullyConnectedWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateFullyConnectedWorkloadTest<FullyConnectedWorkloadType>(factory, graph);
+    auto workload = CreateFullyConnectedWorkloadTest<FullyConnectedWorkloadType, DataType>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest)
-    float inputsQScale = FullyConnectedWorkloadType::ms_DataType == DataType::QuantisedAsymm8 ? 1.0f : 0.0;
-    float outputQScale = FullyConnectedWorkloadType::ms_DataType == DataType::QuantisedAsymm8 ? 2.0f : 0.0;
+    // Checks that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest).
+    float inputsQScale = DataType == armnn::DataType::QuantisedAsymm8 ? 1.0f : 0.0;
+    float outputQScale = DataType == armnn::DataType::QuantisedAsymm8 ? 2.0f : 0.0;
     CheckInputOutput(std::move(workload),
-        TensorInfo({ 3, 1, 4, 5 }, FullyConnectedWorkloadType::ms_DataType, inputsQScale),
-        TensorInfo({ 3, 7 }, FullyConnectedWorkloadType::ms_DataType, outputQScale));
+        TensorInfo({ 3, 1, 4, 5 }, DataType, inputsQScale),
+        TensorInfo({ 3, 7 }, DataType, outputQScale));
 }
 
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat32Workload)
 {
-    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedFloat32Workload>();
+    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedUint8Workload)
 {
-    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedUint8Workload>();
+    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-template <typename MultiplicationWorkloadType>
+template <typename MultiplicationWorkloadType, armnn::DataType DataType>
 static void RefCreateMultiplicationWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateMultiplicationWorkloadTest<MultiplicationWorkloadType>(factory, graph);
+    auto workload = CreateMultiplicationWorkloadTest<MultiplicationWorkloadType, DataType>(factory, graph);
 
-    // check that outputs are as we expect them (see definition of CreateMultiplicationWorkloadTest)
+    // Checks that outputs are as we expect them (see definition of CreateMultiplicationWorkloadTest).
     CheckInputsOutput(std::move(workload),
-        TensorInfo({ 2, 3 }, MultiplicationWorkloadType::ms_DataType),
-        TensorInfo({ 2, 3 }, MultiplicationWorkloadType::ms_DataType),
-        TensorInfo({ 2, 3 }, MultiplicationWorkloadType::ms_DataType));
+        TensorInfo({ 2, 3 }, DataType),
+        TensorInfo({ 2, 3 }, DataType),
+        TensorInfo({ 2, 3 }, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
 {
-    RefCreateMultiplicationWorkloadTest<RefMultiplicationFloat32Workload>();
+    RefCreateMultiplicationWorkloadTest<RefMultiplicationFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
 {
-    RefCreateMultiplicationWorkloadTest<RefMultiplicationUint8Workload>();
+    RefCreateMultiplicationWorkloadTest<RefMultiplicationUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateNormalizationWorkload)
 {
     Graph                graph;
     RefWorkloadFactory factory;
-    auto                 workload = CreateNormalizationWorkloadTest<RefNormalizationFloat32Workload>(factory, graph);
+    auto                 workload = CreateNormalizationWorkloadTest<RefNormalizationFloat32Workload,
+                                    armnn::DataType::Float32>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateNormalizationWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     CheckInputOutput(std::move(workload),
                      TensorInfo({3, 5, 5, 1}, DataType::Float32),
                      TensorInfo({3, 5, 5, 1}, DataType::Float32));
 }
 
-template <typename Pooling2dWorkloadType>
+template <typename Pooling2dWorkloadType, armnn::DataType DataType>
 static void RefCreatePooling2dWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreatePooling2dWorkloadTest<Pooling2dWorkloadType>(factory, graph);
+    auto workload = CreatePooling2dWorkloadTest<Pooling2dWorkloadType, DataType>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreatePooling2dWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreatePooling2dWorkloadTest).
     CheckInputOutput(
         std::move(workload),
-        TensorInfo({3, 2, 5, 5}, Pooling2dWorkloadType::ms_DataType),
-        TensorInfo({3, 2, 2, 4}, Pooling2dWorkloadType::ms_DataType));
+        TensorInfo({3, 2, 5, 5}, DataType),
+        TensorInfo({3, 2, 2, 4}, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat32Workload)
 {
-    RefCreatePooling2dWorkloadTest<RefPooling2dFloat32Workload>();
+    RefCreatePooling2dWorkloadTest<RefPooling2dFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8Workload)
 {
-    RefCreatePooling2dWorkloadTest<RefPooling2dUint8Workload>();
+    RefCreatePooling2dWorkloadTest<RefPooling2dUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-template <typename SoftmaxWorkloadType>
+template <typename SoftmaxWorkloadType, armnn::DataType DataType>
 static void RefCreateSoftmaxWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateSoftmaxWorkloadTest<SoftmaxWorkloadType>(factory, graph);
+    auto workload = CreateSoftmaxWorkloadTest<SoftmaxWorkloadType, DataType>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateSoftmaxWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateSoftmaxWorkloadTest).
     CheckInputOutput(
         std::move(workload),
-        TensorInfo({4, 1}, SoftmaxWorkloadType::ms_DataType),
-        TensorInfo({4, 1}, SoftmaxWorkloadType::ms_DataType));
+        TensorInfo({4, 1}, DataType),
+        TensorInfo({4, 1}, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat32Workload)
 {
-    RefCreateSoftmaxWorkloadTest<RefSoftmaxFloat32Workload>();
+    RefCreateSoftmaxWorkloadTest<RefSoftmaxFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSoftmaxUint8Workload)
 {
-    RefCreateSoftmaxWorkloadTest<RefSoftmaxUint8Workload>();
+    RefCreateSoftmaxWorkloadTest<RefSoftmaxUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-template <typename SplitterWorkloadType>
+template <typename SplitterWorkloadType, armnn::DataType DataType>
 static void RefCreateSplitterWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateSplitterWorkloadTest<SplitterWorkloadType>(factory, graph);
+    auto workload = CreateSplitterWorkloadTest<SplitterWorkloadType, DataType>(factory, graph);
 
-    // check that outputs are as we expect them (see definition of CreateSplitterWorkloadTest)
+    // Checks that outputs are as we expect them (see definition of CreateSplitterWorkloadTest).
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<ConstCpuTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    BOOST_TEST((inputHandle->GetTensorInfo() == TensorInfo({ 5, 7, 7 }, SplitterWorkloadType::ms_DataType)));
+    BOOST_TEST((inputHandle->GetTensorInfo() == TensorInfo({ 5, 7, 7 }, DataType)));
 
     auto outputHandle0 = boost::polymorphic_downcast<CpuTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST((outputHandle0->GetTensorInfo() == TensorInfo({ 1, 7, 7 }, SplitterWorkloadType::ms_DataType)));
+    BOOST_TEST((outputHandle0->GetTensorInfo() == TensorInfo({ 1, 7, 7 }, DataType)));
 
     auto outputHandle1 = boost::polymorphic_downcast<CpuTensorHandle*>(queueDescriptor.m_Outputs[1]);
-    BOOST_TEST((outputHandle1->GetTensorInfo() == TensorInfo({ 2, 7, 7 }, SplitterWorkloadType::ms_DataType)));
+    BOOST_TEST((outputHandle1->GetTensorInfo() == TensorInfo({ 2, 7, 7 }, DataType)));
 
     auto outputHandle2 = boost::polymorphic_downcast<CpuTensorHandle*>(queueDescriptor.m_Outputs[2]);
-    BOOST_TEST((outputHandle2->GetTensorInfo() == TensorInfo({ 2, 7, 7 }, SplitterWorkloadType::ms_DataType)));
+    BOOST_TEST((outputHandle2->GetTensorInfo() == TensorInfo({ 2, 7, 7 }, DataType)));
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterFloat32Workload)
 {
-    RefCreateSplitterWorkloadTest<RefSplitterFloat32Workload>();
+    RefCreateSplitterWorkloadTest<RefSplitterFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterUint8Workload)
 {
-    RefCreateSplitterWorkloadTest<RefSplitterUint8Workload>();
+    RefCreateSplitterWorkloadTest<RefSplitterUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-template <typename SplitterWorkloadType, typename MergerWorkloadType>
+template <typename SplitterWorkloadType, typename MergerWorkloadType, armnn::DataType DataType>
 static void RefCreateSplitterMergerWorkloadTest()
 {
-    // Test that it is possible to decide which output of the splitter layer
-    // should be lined to which input of the merger layer
-    // We test that is is possible to specify 0th output
-    // of the splitter to be the 1st input to the merger and the 1st output of the splitter  to be 0th input
+    // Tests that it is possible to decide which output of the splitter layer
+    // should be lined to which input of the merger layer.
+    // We tested that is is possible to specify 0th output
+    // of the splitter to be the 1st input to the merger and the 1st output of the splitter to be 0th input
     // of the merger.
 
     Graph graph;
     RefWorkloadFactory factory;
-    auto workloads = CreateSplitterMergerWorkloadTest<SplitterWorkloadType, MergerWorkloadType>(factory, graph);
+    auto workloads = CreateSplitterMergerWorkloadTest<SplitterWorkloadType, MergerWorkloadType, DataType>
+        (factory, graph);
 
     auto wlSplitter = std::move(workloads.first);
     auto wlMerger = std::move(workloads.second);
 
-    //check that the index of inputs/outputs matches what we declared on InputDescriptor construction.
+    //Checks that the index of inputs/outputs matches what we declared on InputDescriptor construction.
     armnn::CpuTensorHandle* sOut0 = dynamic_cast<armnn::CpuTensorHandle*>(wlSplitter->GetData().m_Outputs[0]);
     armnn::CpuTensorHandle* sOut1 = dynamic_cast<armnn::CpuTensorHandle*>(wlSplitter->GetData().m_Outputs[1]);
     armnn::CpuTensorHandle* mIn0 = dynamic_cast<armnn::CpuTensorHandle*>(wlMerger->GetData().m_Inputs[0]);
@@ -297,19 +323,19 @@ static void RefCreateSplitterMergerWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloat32)
 {
-    RefCreateSplitterMergerWorkloadTest<RefSplitterFloat32Workload, RefMergerFloat32Workload>();
+    RefCreateSplitterMergerWorkloadTest<RefSplitterFloat32Workload, RefMergerFloat32Workload, DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMergerUint8)
 {
-    RefCreateSplitterMergerWorkloadTest<RefSplitterUint8Workload, RefMergerUint8Workload>();
+    RefCreateSplitterMergerWorkloadTest<RefSplitterUint8Workload, RefMergerUint8Workload, DataType::QuantisedAsymm8>();
 }
 
-template <typename SplitterWorkloadType, typename ActivationWorkloadType>
+template <typename SplitterWorkloadType, typename ActivationWorkloadType, armnn::DataType DataType>
 static void RefCreateSingleOutputMultipleInputsTest()
 {
-    // Test that it is possible to assign multiple (two) different layers to each of the outputs of a splitter layer.
-    // We create a splitter with two outputs. That each of those outputs is used by two different activation layers
+    // Tests that it is possible to assign multiple (two) different layers to each of the outputs of a splitter layer.
+    // We created a splitter with two outputs. That each of those outputs is used by two different activation layers.
 
     Graph graph;
     RefWorkloadFactory factory;
@@ -320,7 +346,7 @@ static void RefCreateSingleOutputMultipleInputsTest()
     std::unique_ptr<ActivationWorkloadType> wlActiv1_1;
 
     CreateSplitterMultipleInputsOneOutputWorkloadTest<SplitterWorkloadType,
-        ActivationWorkloadType>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1, wlActiv1_0, wlActiv1_1);
+        ActivationWorkloadType, DataType>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1, wlActiv1_0, wlActiv1_1);
 
     armnn::CpuTensorHandle* sOut0 = dynamic_cast<armnn::CpuTensorHandle*>(wlSplitter->GetData().m_Outputs[0]);
     armnn::CpuTensorHandle* sOut1 = dynamic_cast<armnn::CpuTensorHandle*>(wlSplitter->GetData().m_Outputs[1]);
@@ -345,73 +371,76 @@ static void RefCreateSingleOutputMultipleInputsTest()
 
 BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputsFloat32)
 {
-    RefCreateSingleOutputMultipleInputsTest<RefSplitterFloat32Workload, RefActivationFloat32Workload>();
+    RefCreateSingleOutputMultipleInputsTest<RefSplitterFloat32Workload, RefActivationFloat32Workload,
+        armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputsUint8)
 {
-    RefCreateSingleOutputMultipleInputsTest<RefSplitterUint8Workload, RefActivationUint8Workload>();
+    RefCreateSingleOutputMultipleInputsTest<RefSplitterUint8Workload, RefActivationUint8Workload,
+        armnn::DataType::QuantisedAsymm8>();
 }
 
-template <typename ResizeBilinearWorkloadType>
+template <typename ResizeBilinearWorkloadType, armnn::DataType DataType>
 static void RefCreateResizeBilinearTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateResizeBilinearWorkloadTest<ResizeBilinearWorkloadType>(factory, graph);
+    auto workload = CreateResizeBilinearWorkloadTest<ResizeBilinearWorkloadType, DataType>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateResizeBilinearWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateResizeBilinearWorkloadTest).
     CheckInputOutput(
         std::move(workload),
-        TensorInfo({ 2, 3, 4, 4 }, ResizeBilinearWorkloadType::ms_DataType),
-        TensorInfo({ 2, 3, 2, 2 }, ResizeBilinearWorkloadType::ms_DataType));
+        TensorInfo({ 2, 3, 4, 4 }, DataType),
+        TensorInfo({ 2, 3, 2, 2 }, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32)
 {
-    RefCreateResizeBilinearTest<RefResizeBilinearFloat32Workload>();
+    RefCreateResizeBilinearTest<RefResizeBilinearFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearUint8)
 {
-    RefCreateResizeBilinearTest<RefResizeBilinearUint8Workload>();
+    RefCreateResizeBilinearTest<RefResizeBilinearUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloat32)
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateL2NormalizationWorkloadTest<RefL2NormalizationFloat32Workload>(factory, graph);
+    auto workload = CreateL2NormalizationWorkloadTest<RefL2NormalizationFloat32Workload, armnn::DataType::Float32>
+            (factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateL2NormalizationWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateL2NormalizationWorkloadTest).
     CheckInputOutput(
         std::move(workload),
-        TensorInfo({ 5, 20, 50, 67 }, RefL2NormalizationFloat32Workload::ms_DataType),
-        TensorInfo({ 5, 20, 50, 67 }, RefL2NormalizationFloat32Workload::ms_DataType));
+        TensorInfo({ 5, 20, 50, 67 }, armnn::DataType::Float32),
+        TensorInfo({ 5, 20, 50, 67 }, armnn::DataType::Float32));
 }
 
-template <typename ReshapeWorkloadType>
+template <typename ReshapeWorkloadType, armnn::DataType DataType>
 static void RefCreateReshapeWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateReshapeWorkloadTest<ReshapeWorkloadType>(factory, graph);
+    auto workload = CreateReshapeWorkloadTest<ReshapeWorkloadType, DataType>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateReshapeWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateReshapeWorkloadTest).
     CheckInputOutput(
         std::move(workload),
-        TensorInfo({ 4, 1 }, ReshapeWorkloadType::ms_DataType),
-        TensorInfo({ 1, 4 }, ReshapeWorkloadType::ms_DataType));
+        TensorInfo({ 4, 1 }, DataType),
+        TensorInfo({ 1, 4 }, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeFloat32Workload)
 {
-    RefCreateReshapeWorkloadTest<RefReshapeFloat32Workload>();
+    RefCreateReshapeWorkloadTest<RefReshapeFloat32Workload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
 {
-    RefCreateReshapeWorkloadTest<RefReshapeUint8Workload>();
+    RefCreateReshapeWorkloadTest<RefReshapeUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

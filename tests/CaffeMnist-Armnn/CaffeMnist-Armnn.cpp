@@ -11,11 +11,18 @@ int main(int argc, char* argv[])
     int retVal = EXIT_FAILURE;
     try
     {
+        using DataType = float;
+        using DatabaseType = MnistDatabase;
+        using ParserType = armnnCaffeParser::ICaffeParser;
+        using ModelType = InferenceModel<ParserType, DataType>;
+
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
-        retVal = armnn::test::ClassifierInferenceTestMain<MnistDatabase, armnnCaffeParser::ICaffeParser>(
+        retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
                     argc, argv, "lenet_iter_9000.caffemodel", true, "data", "prob",
                     { 0, 1, 5, 8, 9 },
-                    [](const char* dataDir) { return MnistDatabase(dataDir); });
+                    [](const char* dataDir, const ModelType&) {
+                        return DatabaseType(dataDir);
+                    });
     }
     catch (const std::exception& e)
     {

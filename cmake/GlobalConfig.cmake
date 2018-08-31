@@ -1,15 +1,20 @@
 option(BUILD_CAFFE_PARSER "Build Caffe parser" OFF)
 option(BUILD_TF_PARSER "Build Tensorflow parser" OFF)
+option(BUILD_ONNX_PARSER "Build Onnx parser" OFF)
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
 option(BUILD_TESTS "Build test applications" OFF)
 option(BUILD_FOR_COVERAGE "Use no optimization and output .gcno and .gcda files" OFF)
 option(ARMCOMPUTENEON "Build with ARM Compute NEON support" OFF)
 option(ARMCOMPUTECL "Build with ARM Compute OpenCL support" OFF)
-option(PROFILING "Build with ArmNN built-in profiling support" OFF)
 option(PROFILING_BACKEND_STREAMLINE "Forward the armNN profiling events to DS-5/Streamline as annotations" OFF)
-# options used for heap profiling
+# options used for heap profiling and leak checking
 option(HEAP_PROFILING "Build with heap profiling enabled" OFF)
+option(LEAK_CHECKING "Build with leak checking enabled" OFF)
 option(GPERFTOOLS_ROOT "Location where the gperftools 'include' and 'lib' folders to be found" Off)
+# options used for tensorflow lite support
+option(BUILD_TF_LITE_PARSER "Build Tensorflow Lite parser" OFF)
+option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OFF)
+option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
 
 include(SelectLibraryConfigurations)
 
@@ -106,7 +111,7 @@ link_directories(${Boost_LIBRARY_DIR})
 find_package (Threads)
 
 # Favour the protobuf passed on command line
-if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER)
+if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER OR BUILD_ONNX_PARSER)
     find_library(PROTOBUF_LIBRARY_DEBUG NAMES "protobufd"
         PATHS ${PROTOBUF_ROOT}/lib
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -147,6 +152,63 @@ if(BUILD_TF_PARSER)
 
     # C++ headers generated for tf protobufs
     include_directories(SYSTEM "${TF_GENERATED_SOURCES}")
+endif()
+
+if(BUILD_ONNX_PARSER)
+    add_definitions(-DARMNN_ONNX_PARSER)
+
+    find_path(ONNX_GENERATED_SOURCES "onnx/onnx.pb.cc")
+
+    # C++ headers generated for onnx protobufs
+    include_directories(SYSTEM "${ONNX_GENERATED_SOURCES}")
+endif()
+
+
+# Flatbuffers support for TF Lite
+if(BUILD_TF_LITE_PARSER)
+    find_path(TF_LITE_SCHEMA_INCLUDE_PATH
+              schema_generated.h
+              HINTS ${TF_LITE_GENERATED_PATH})
+
+    if(NOT TF_LITE_SCHEMA_INCLUDE_PATH)
+        message(WARNING
+          "Couldn't find 'schema_generated.h' at ${TF_LITE_GENERATED_PATH}. Disabling Tf Lite support")
+        set(BUILD_TF_LITE_PARSER Off)
+    else()
+        message(STATUS "Tf Lite generated header found at: ${TF_LITE_SCHEMA_INCLUDE_PATH}")
+    endif()
+
+    # verify we have a valid flatbuffers include path
+    find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
+              HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
+
+    if(NOT FLATBUFFERS_INCLUDE_PATH)
+        message(WARNING
+          "Couldn't find 'flatbuffers/flatbuffers.h' at ${FLATBUFFERS_ROOT}/include. Disabling Tf Lite support")
+        set(BUILD_TF_LITE_PARSER Off)
+    else()
+        message(STATUS "Flatbuffers headers are located at: ${FLATBUFFERS_INCLUDE_PATH}")
+    endif()
+
+    find_library(FLATBUFFERS_LIBRARY
+                 NAMES libflatbuffers.a flatbuffers
+                 HINTS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib)
+
+    if(NOT FLATBUFFERS_LIBRARY)
+        message(WARNING
+          "Couldn't find flatbuffers library. Disabling Tf Lite support")
+        set(BUILD_TF_LITE_PARSER Off)
+    else()
+        message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
+    endif()
+
+    # Setup includes and libs only if we still want Tf Lite
+    if(BUILD_TF_LITE_PARSER)
+        include_directories(SYSTEM "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
+        add_definitions(-DARMNN_TF_LITE_PARSER)
+        add_definitions(-DARMNN_TF_LITE_SCHEMA_PATH="${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs")
+    endif()
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -238,12 +300,7 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     find_path(HALF_INCLUDE half/half.hpp
               PATHS ${ARMCOMPUTE_ROOT}/include
               NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-    include_directories(${HALF_INCLUDE})
-endif()
-
-# Built-in profiler
-if(PROFILING)
-    add_definitions(-DARMNN_PROFILING_ENABLED)
+    include_directories(SYSTEM ${HALF_INCLUDE})
 endif()
 
 # Streamline annotate
@@ -252,7 +309,7 @@ if(PROFILING_BACKEND_STREAMLINE)
     add_definitions(-DARMNN_STREAMLINE_ENABLED)
 endif()
 
-if(HEAP_PROFILING)
+if(HEAP_PROFILING OR LEAK_CHECKING)
     # enable heap profiling for everything except for referencetests
     if(NOT ${PROJECT_NAME} STREQUAL "referencetests")
         find_path(HEAP_PROFILER_INCLUDE gperftools/heap-profiler.h
@@ -265,9 +322,14 @@ if(HEAP_PROFILING)
         link_directories(${GPERFTOOLS_ROOT}/lib)
 
         link_libraries(${GPERF_TOOLS_LIBRARY})
-        add_definitions("-DARMNN_HEAP_PROFILING_ENABLED=1")
+        if (HEAP_PROFILING)
+            add_definitions("-DARMNN_HEAP_PROFILING_ENABLED=1")
+        endif()
+        if (LEAK_CHECKING)
+            add_definitions("-DARMNN_LEAK_CHECKING_ENABLED=1")
+        endif()
     else()
-        message("Heap profiling is disabled for referencetests")
+        message("Heap profiling and leak checking are disabled for referencetests")
     endif()
 else()
     # Valgrind only works with gperftools version number <= 2.4
@@ -283,3 +345,6 @@ if(NOT BUILD_TF_PARSER)
     message(STATUS "Tensorflow parser support is disabled")
 endif()
 
+if(NOT BUILD_TF_LITE_PARSER)
+    message(STATUS "Tensorflow Lite parser support is disabled")
+endif()

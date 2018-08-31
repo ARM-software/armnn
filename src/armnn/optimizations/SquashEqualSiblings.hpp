@@ -41,7 +41,7 @@ public:
                         {
                             std::swap(sibling, lowestPriorityChild);
                         }
-                        // Bypass sibling. It will be removed as it's left unconnected.
+                        // Bypasses sibling. It will be removed as it's left unconnected.
                         auto siblingOut = sibling->BeginOutputSlots();
                         for (auto lowestPriorityChildOut = lowestPriorityChild->BeginOutputSlots();
                              lowestPriorityChildOut != lowestPriorityChild->EndOutputSlots(); ++lowestPriorityChildOut)

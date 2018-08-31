@@ -29,7 +29,7 @@ void Merger(const MergerQueueDescriptor& data)
         for (unsigned int i=0; i<outputInfo0.GetNumDimensions(); i++)
         {
             dimensionStride /= outputInfo0.GetShape()[i];
-            indices[i] = indexRemainder / dimensionStride; // use integer division to round down
+            indices[i] = indexRemainder / dimensionStride; // Use integer division to round down.
             indexRemainder -= indices[i] * dimensionStride;
         }
 
@@ -37,11 +37,11 @@ void Merger(const MergerQueueDescriptor& data)
         {
             MergerQueueDescriptor::ViewOrigin const& view = data.m_ViewOrigins[viewIdx];
 
-            //split view extents are defined by the size of (the corresponding) input tensor
+            //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& inputInfo = GetTensorInfo(data.m_Inputs[viewIdx]);
             BOOST_ASSERT(inputInfo.GetNumDimensions() == outputInfo0.GetNumDimensions());
 
-            // check all dimensions to see if this element is inside the given input view
+            // Check all dimensions to see if this element is inside the given input view.
             bool insideView = true;
             for (unsigned int i=0; i<inputInfo.GetNumDimensions(); i++)
             {
@@ -66,13 +66,13 @@ void Merger(const MergerQueueDescriptor& data)
                     dimensionStride *= inputInfo.GetShape()[i];
                 }
 
-                //we are within the view, copy input data to the output corresponding to this view
+                //We are within the view, copy input data to the output corresponding to this view.
                 (GetOutputTensorData<DataType>(0, data))[index] =
                     (GetInputTensorData<DataType>(viewIdx, data))[inIndex];
 
-                //what should we do if input views overlap on the output tensor?
-                //we could error, take the average, or shm else...
-                //for now just stop after finding first view (input) that matches.
+                //What should we do if input views overlap on the output tensor?
+                //We could error, take the average, or shm else...
+                //For now just stop after finding first view (input) that matches.
                 break;
             }
         }

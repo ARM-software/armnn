@@ -36,7 +36,7 @@ CreateAclNormalizationLayerInfoForL2Normalization(const armnn::TensorInfo& tenso
     // For the reference implementation, to make alpha_ become 1, we'd have to use alpha = normSize instead.
     const float alpha = 1.0f;
 
-    // Don't offset the reduction
+    // Don't offset the reduction.
     const float kappa = 0.0f;
 
     // pow(reduction, -0.5) = 1 / sqrt(reduction)
@@ -53,7 +53,7 @@ ConvertActivationFunctionToAclActivationFunction(ActivationFunction armnnFunctio
     switch (armnnFunction)
     {
         case ActivationFunction::Linear:        return AclActivationFunction::LINEAR;
-        // Arm compute's 'logistic' function is non-parameterized, so it is exactly a sigmoid function
+        // Arm compute's 'logistic' function is non-parameterized, so it is exactly a sigmoid function.
         case ActivationFunction::Sigmoid:       return AclActivationFunction::LOGISTIC;
         case ActivationFunction::ReLu:          return AclActivationFunction::RELU;
         case ActivationFunction::BoundedReLu:   return AclActivationFunction::LU_BOUNDED_RELU;
@@ -110,6 +110,14 @@ ConvertNormalizationAlgorithmChannelToAclNormType(NormalizationAlgorithmChannel 
         case NormalizationAlgorithmChannel::Within: return NormType::IN_MAP_2D;
         default:    throw InvalidArgumentException("Unsupported normalization algorithm channel type");
     }
+}
+
+inline arm_compute::FullyConnectedLayerInfo
+ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(const FullyConnectedDescriptor& fullyConnectedDesc)
+{
+    arm_compute::FullyConnectedLayerInfo fc_info;
+    fc_info.transpose_weights = fullyConnectedDesc.m_TransposeWeightMatrix;
+    return fc_info;
 }
 
 }

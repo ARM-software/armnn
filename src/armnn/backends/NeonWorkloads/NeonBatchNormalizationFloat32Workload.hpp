@@ -10,7 +10,15 @@
 namespace armnn
 {
 
-class NeonBatchNormalizationFloat32Workload : public Float32Workload<BatchNormalizationQueueDescriptor>
+arm_compute::Status NeonBatchNormalizationValidate(const TensorInfo& input,
+                                                   const TensorInfo& output,
+                                                   const TensorInfo& mean,
+                                                   const TensorInfo& var,
+                                                   const TensorInfo& beta,
+                                                   const TensorInfo& gamma,
+                                                   const BatchNormalizationDescriptor& descriptor);
+
+class NeonBatchNormalizationFloat32Workload : public FloatWorkload<BatchNormalizationQueueDescriptor>
 {
 public:
     NeonBatchNormalizationFloat32Workload(const BatchNormalizationQueueDescriptor& descriptor,
@@ -20,10 +28,12 @@ public:
 private:
     mutable arm_compute::NEBatchNormalizationLayer m_Layer;
 
-    arm_compute::Tensor m_Mean;
-    arm_compute::Tensor m_Variance;
-    arm_compute::Tensor m_Gamma;
-    arm_compute::Tensor m_Beta;
+    std::unique_ptr<arm_compute::Tensor> m_Mean;
+    std::unique_ptr<arm_compute::Tensor> m_Variance;
+    std::unique_ptr<arm_compute::Tensor> m_Gamma;
+    std::unique_ptr<arm_compute::Tensor> m_Beta;
+
+    void FreeUnusedTensors();
 };
 
 } //namespace armnn

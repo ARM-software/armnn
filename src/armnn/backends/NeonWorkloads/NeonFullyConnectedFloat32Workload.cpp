@@ -4,16 +4,47 @@
 //
 
 #include "NeonFullyConnectedFloat32Workload.hpp"
-#include "backends/CpuTensorHandle.hpp"
+
 #include "backends/ArmComputeTensorUtils.hpp"
+#include "backends/ArmComputeUtils.hpp"
+#include "backends/CpuTensorHandle.hpp"
 
 namespace armnn
 {
 using namespace armcomputetensorutils;
 
+arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
+                                                       const TensorInfo& output,
+                                                       const TensorInfo& weights,
+                                                       const TensorInfo& biases,
+                                                       const FullyConnectedDescriptor& descriptor)
+{
+    const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
+    const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
+    const arm_compute::TensorInfo aclWeights = BuildArmComputeTensorInfo(weights);
+
+    arm_compute::TensorInfo aclBiases;
+    arm_compute::TensorInfo *optionalAclBiases = nullptr;
+    if (descriptor.m_BiasEnabled)
+    {
+        aclBiases  = BuildArmComputeTensorInfo(biases);
+        optionalAclBiases = &aclBiases;
+    }
+
+    const arm_compute::FullyConnectedLayerInfo fullyConnectedLayerInfo =
+        ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor);
+
+
+    return arm_compute::NEFullyConnectedLayer::validate(&aclInput,
+                                                        &aclWeights,
+                                                        optionalAclBiases,
+                                                        &aclOutput,
+                                                        fullyConnectedLayerInfo);
+}
+
 NeonFullyConnectedFloat32Workload::NeonFullyConnectedFloat32Workload(const FullyConnectedQueueDescriptor& descriptor,
     const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : Float32Workload<FullyConnectedQueueDescriptor>(descriptor, info)
+    : FloatWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
     , m_FullyConnectedLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonFullyConnectedFloat32Workload", 1, 1);
@@ -21,32 +52,44 @@ NeonFullyConnectedFloat32Workload::NeonFullyConnectedFloat32Workload(const Fully
     arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    BuildArmComputeTensor(m_WeightsTensor, m_Data.m_Weight->GetTensorInfo());
+    m_WeightsTensor = std::make_unique<arm_compute::Tensor>();
+    BuildArmComputeTensor(*m_WeightsTensor, m_Data.m_Weight->GetTensorInfo());
 
-    arm_compute::Tensor* optionalBiasTensor = nullptr;
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        BuildArmComputeTensor(m_BiasesTensor, m_Data.m_Bias->GetTensorInfo());
-        optionalBiasTensor = &m_BiasesTensor;
+        m_BiasesTensor = std::make_unique<arm_compute::Tensor>();
+        BuildArmComputeTensor(*m_BiasesTensor, m_Data.m_Bias->GetTensorInfo());
     }
 
     // Construct
-    m_FullyConnectedLayer.configure(
-        &input, &m_WeightsTensor, optionalBiasTensor, &output, m_Data.m_Parameters.m_TransposeWeightMatrix);
+    arm_compute::FullyConnectedLayerInfo fc_info;
+    fc_info.transpose_weights = m_Data.m_Parameters.m_TransposeWeightMatrix;
+    m_FullyConnectedLayer.configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
 
     // Allocate
-    InitialiseArmComputeTensorData(m_WeightsTensor, m_Data.m_Weight->GetConstTensor<float>());
+    InitializeArmComputeTensorDataForFloatTypes(*m_WeightsTensor, m_Data.m_Weight);
 
-    if (optionalBiasTensor)
+    if (m_BiasesTensor)
     {
-        InitialiseArmComputeTensorData(*optionalBiasTensor, m_Data.m_Bias->GetConstTensor<float>());
+        InitializeArmComputeTensorDataForFloatTypes(*m_BiasesTensor, m_Data.m_Bias);
     }
+
+    // Force Compute Library to perform the necessary copying and reshaping, after which
+    // delete all the input tensors that will no longer be needed
+    m_FullyConnectedLayer.prepare();
+    FreeUnusedTensors();
 }
 
 void NeonFullyConnectedFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonFullyConnectedFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonFullyConnectedFloat32Workload_Execute");
     m_FullyConnectedLayer.run();
+}
+
+void NeonFullyConnectedFloat32Workload::FreeUnusedTensors()
+{
+    FreeTensorIfUnused(m_WeightsTensor);
+    FreeTensorIfUnused(m_BiasesTensor);
 }
 
 } //namespace armnn

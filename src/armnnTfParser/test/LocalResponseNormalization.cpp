@@ -9,8 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-
-struct LocalResponseNormalizationBaseFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct LocalResponseNormalizationBaseFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     explicit LocalResponseNormalizationBaseFixture(float alpha, float beta, float bias)
     {

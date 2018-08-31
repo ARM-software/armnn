@@ -10,7 +10,7 @@
 namespace armnn
 {
 
-class NeonDepthwiseConvolutionFloat32Workload : public Float32Workload<DepthwiseConvolution2dQueueDescriptor>
+class NeonDepthwiseConvolutionFloat32Workload : public FloatWorkload<DepthwiseConvolution2dQueueDescriptor>
 {
 public:
     NeonDepthwiseConvolutionFloat32Workload(const DepthwiseConvolution2dQueueDescriptor& descriptor,
@@ -20,8 +20,10 @@ public:
 private:
     mutable std::unique_ptr<arm_compute::IFunction> m_pDepthwiseConvolutionLayer;
 
-    arm_compute::Tensor m_KernelTensor;
-    arm_compute::Tensor m_BiasTensor;
+    std::unique_ptr<arm_compute::Tensor> m_KernelTensor;
+    std::unique_ptr<arm_compute::Tensor> m_BiasTensor;
+
+    void FreeUnusedTensors();
 };
 
 } //namespace armnn

@@ -60,7 +60,7 @@ LayerTestResult<float, 2> FullyConnectedFloat32Test(armnn::IWorkloadFactory& wor
     unsigned int outputChannels = 3;
     unsigned int outputNum = 2;
 
-    // Define the tensor descriptors
+    // Define the tensor descriptors.
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
     armnn::TensorInfo weightsDesc;
@@ -186,8 +186,8 @@ LayerTestResult<uint8_t, 2> FullyConnectedUint8Test(armnn::IWorkloadFactory& wor
         biasEnabled, true
     );
 
-    // manually calculated
-    // note one of these values has been clamped to 0
+    // Manually calculated.
+    // Note one of these values has been clamped to 0.
     if (biasEnabled)
     {
         result.outputExpected = MakeTensor<uint8_t, 2>(outputTensorInfo, std::vector<uint8_t>{0, 242});
@@ -222,7 +222,7 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(armnn::IWorkloadFactory& wor
     unsigned int outputChannels = 1;
     unsigned int outputNum = 1;
 
-    // Define the tensor descriptors
+    // Define the tensor descriptors.
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
     armnn::TensorInfo weightsDesc;

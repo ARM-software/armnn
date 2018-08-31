@@ -9,8 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-
-struct Pooling2dFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct Pooling2dFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     explicit Pooling2dFixture(const char* poolingtype)
     {

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <armnn/DescriptorsFwd.hpp>
+#include <armnn/LstmParams.hpp>
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Types.hpp>
 
@@ -20,7 +21,7 @@ namespace armnn
 {
 class Graph;
 
-/// Private implementation of INetwork
+/// Private implementation of INetwork.
 class Network final : public INetwork
 {
 public:
@@ -107,6 +108,10 @@ public:
     IConnectableLayer* AddFloorLayer(const char* name = nullptr) override;
 
     IConnectableLayer* AddOutputLayer(LayerBindingId id, const char* name = nullptr) override;
+
+    IConnectableLayer* AddLstmLayer(const LstmDescriptor& descriptor,
+                                    const LstmInputParams& params,
+                                    const char* name = nullptr) override;
 
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,

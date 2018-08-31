@@ -1,0 +1,35 @@
+//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// See LICENSE file in the project root for full license information.
+//
+
+#include <iostream>
+#include <sstream>
+
+#include <armnn/Exceptions.hpp>
+
+namespace armnnUtils
+{
+
+void CheckValidSize(std::initializer_list<size_t> validInputCounts,
+                    size_t actualValue,
+                    const char* validExpr,
+                    const char* actualExpr,
+                    const armnn::CheckLocation& location);
+
+uint32_t NonNegative(const char* expr,
+                     int32_t value,
+                     const armnn::CheckLocation& location);
+
+int32_t VerifyInt32(const char* expr,
+                    int64_t value,
+                    const armnn::CheckLocation& location);
+
+}//armnnUtils
+
+#define CHECKED_INT32(VALUE) armnnUtils::VerifyInt32(#VALUE, VALUE, CHECK_LOCATION())
+
+#define CHECK_VALID_SIZE(ACTUAL, ...) \
+armnnUtils::CheckValidSize({__VA_ARGS__}, ACTUAL, #__VA_ARGS__, #ACTUAL, CHECK_LOCATION())
+
+#define CHECKED_NON_NEGATIVE(VALUE) armnnUtils::NonNegative(#VALUE, VALUE, CHECK_LOCATION())

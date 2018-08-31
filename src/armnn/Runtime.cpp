@@ -45,22 +45,32 @@ int Runtime::GenerateNetworkId()
 
 Status Runtime::LoadNetwork(NetworkId& networkIdOut, IOptimizedNetworkPtr inNetwork)
 {
+    std::string ignoredErrorMessage;
+    return LoadNetwork(networkIdOut, std::move(inNetwork), ignoredErrorMessage);
+}
+
+Status Runtime::LoadNetwork(NetworkId& networkIdOut,
+                            IOptimizedNetworkPtr inNetwork,
+                            std::string & errorMessage)
+{
     IOptimizedNetwork* rawNetwork = inNetwork.release();
     unique_ptr<LoadedNetwork> loadedNetwork = LoadedNetwork::MakeLoadedNetwork(
         std::unique_ptr<OptimizedNetwork>(boost::polymorphic_downcast<OptimizedNetwork*>(rawNetwork)),
-        m_UseCpuRefAsFallback);
+        errorMessage);
 
     if (!loadedNetwork)
     {
         return Status::Failure;
     }
 
-    std::lock_guard<std::mutex> lockGuard(m_Mutex);
-
     networkIdOut = GenerateNetworkId();
 
-    // store the network
-    m_LoadedNetworks[networkIdOut] = std::move(loadedNetwork);
+    {
+        std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+        // Stores the network
+        m_LoadedNetworks[networkIdOut] = std::move(loadedNetwork);
+    }
 
     return Status::Success;
 }
@@ -70,7 +80,7 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
 #ifdef ARMCOMPUTECL_ENABLED
     if (arm_compute::CLScheduler::get().context()() != NULL)
     {
-        // wait for all queued CL requests to finish before unloading the network they may be using
+        // Waits for all queued CL requests to finish before unloading the network they may be using.
         try
         {
             // Coverity fix: arm_compute::CLScheduler::sync() may throw an exception of type cl::Error.
@@ -84,36 +94,55 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
         }
     }
 #endif
-    std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-    if (m_LoadedNetworks.erase(networkId) == 0)
     {
-        BOOST_LOG_TRIVIAL(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";
-        return Status::Failure;
-    }
+        std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+        if (m_LoadedNetworks.erase(networkId) == 0)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";
+            return Status::Failure;
+        }
+
 #ifdef ARMCOMPUTECL_ENABLED
-    if (arm_compute::CLScheduler::get().context()() != NULL && m_LoadedNetworks.empty())
-    {
-        // There are no loaded networks left, so clear the CL cache to free up memory
-        m_ClContextControl.ClearClCache();
-    }
+        if (arm_compute::CLScheduler::get().context()() != NULL && m_LoadedNetworks.empty())
+        {
+            // There are no loaded networks left, so clear the CL cache to free up memory
+            m_ClContextControl.ClearClCache();
+        }
 #endif
+    }
+
     BOOST_LOG_TRIVIAL(debug) << "Runtime::UnloadNetwork(): Unloaded network with ID: " << networkId;
     return Status::Success;
 }
 
+const std::shared_ptr<IProfiler> Runtime::GetProfiler(NetworkId networkId) const
+{
+    auto it = m_LoadedNetworks.find(networkId);
+    if (it != m_LoadedNetworks.end())
+    {
+        auto& loadedNetwork = it->second;
+        return loadedNetwork->GetProfiler();
+    }
+
+    return nullptr;
+}
+
 Runtime::Runtime(const CreationOptions& options)
-    : m_ClContextControl(options.m_ClTunedParameters)
+    : m_ClContextControl(options.m_GpuAccTunedParameters.get(),
+                         options.m_EnableGpuProfiling)
     , m_NetworkIdCounter(0)
 {
     BOOST_LOG_TRIVIAL(info) << "ArmNN v" << ARMNN_VERSION << "\n";
-    BOOST_LOG_TRIVIAL(info) << "Using compute device: " << options.m_DefaultComputeDevice << "\n";
-    m_DeviceSpec.DefaultComputeDevice = options.m_DefaultComputeDevice;
 
-    // If useCpuRefAsFallback is false, the reference workload factory will be prevented from creating
-    // operation workloads, unless the default compute device is precisely the reference backend.
-    // This option is passed to the LoadedNetwork, which owns the workload factories.
-    m_UseCpuRefAsFallback = options.m_DefaultComputeDevice == Compute::CpuRef || options.m_UseCpuRefAsFallback;
+    m_DeviceSpec.m_SupportedComputeDevices.insert(armnn::Compute::CpuRef);
+    #if ARMCOMPUTECL_ENABLED
+        m_DeviceSpec.m_SupportedComputeDevices.insert(armnn::Compute::GpuAcc);
+    #endif
+    #if ARMCOMPUTENEON_ENABLED
+        m_DeviceSpec.m_SupportedComputeDevices.insert(armnn::Compute::CpuAcc);
+    #endif
 }
 
 Runtime::~Runtime()
@@ -173,8 +202,8 @@ TensorInfo Runtime::GetOutputTensorInfo(NetworkId networkId, LayerBindingId laye
 }
 
 Status Runtime::EnqueueWorkload(NetworkId networkId,
-                                     const InputTensors& inputTensors,
-                                     const OutputTensors& outputTensors)
+                                const InputTensors& inputTensors,
+                                const OutputTensors& outputTensors)
 {
     LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
     return loadedNetwork->EnqueueWorkload(inputTensors, outputTensors);

@@ -15,9 +15,13 @@
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
+
+#include "ClWorkloads.hpp"
+
 #include "backends/MemCopyWorkload.hpp"
 #include "backends/ClTensorHandle.hpp"
-#include "ClWorkloads.hpp"
+
+#include "memory/IPoolManager.hpp"
 #endif
 
 #include "MakeWorkloadHelper.hpp"
@@ -29,7 +33,9 @@
 namespace armnn
 {
 
-bool ClWorkloadFactory::IsLayerSupported(const Layer& layer, DataType dataType, std::string& outReasonIfUnsupported)
+bool ClWorkloadFactory::IsLayerSupported(const Layer& layer,
+                                         boost::optional<DataType> dataType,
+                                         std::string& outReasonIfUnsupported)
 {
     return IWorkloadFactory::IsLayerSupported(Compute::GpuAcc, layer, dataType, outReasonIfUnsupported);
 }
@@ -43,7 +49,10 @@ ClWorkloadFactory::ClWorkloadFactory()
 
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
 {
-    return std::make_unique<ClTensorHandle>(tensorInfo);
+    std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo);
+    tensorHandle->SetMemoryGroup(m_MemoryManager.GetInterLayerMemoryGroup());
+
+    return tensorHandle;
 }
 
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorHandle&      parent,
@@ -58,24 +67,25 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
     coords.set_num_dimensions(subTensorShape.GetNumDimensions());
     for (unsigned int i = 0; i < subTensorShape.GetNumDimensions(); i++)
     {
-        // arm compute indexes tensor coords in reverse order
+        // Arm compute indexes tensor coords in reverse order.
         unsigned int revertedIndex = subTensorShape.GetNumDimensions() - i - 1;
         coords.set(i, boost::numeric_cast<int>(subTensorOrigin[revertedIndex]));
     }
 
-    return std::make_unique<ClSubTensorHandle>(static_cast<ClTensorHandle&>(parent).GetTensor(), shape, coords);
+    return std::make_unique<ClSubTensorHandle>(
+        boost::polymorphic_downcast<IClTensorHandle*>(&parent), shape, coords);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return MakeWorkload<CopyFromCpuToClFloat32Workload, CopyFromCpuToClUint8Workload>(descriptor, info);
+    return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return MakeWorkload<CopyFromClToCpuFloat32Workload, CopyFromClToCpuUint8Workload>(descriptor, info);
+    return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
@@ -87,7 +97,8 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQ
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                             const WorkloadInfo&           info) const
 {
-    return MakeWorkload<ClSoftmaxFloat32Workload, ClSoftmaxUint8Workload>(descriptor, info, m_MemoryManager.Get());
+    return MakeWorkload<ClSoftmaxFloat32Workload, ClSoftmaxUint8Workload>(descriptor, info,
+                                                                          m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
@@ -105,13 +116,14 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMerger(const MergerQu
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClFullyConnectedFloat32Workload, NullWorkload>(descriptor, info, m_MemoryManager.Get());
+    return MakeWorkload<ClFullyConnectedFloat32Workload, NullWorkload>(descriptor, info,
+                                                                       m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                                    const WorkloadInfo&           info) const
 {
-    return MakeWorkload<ClPermuteFloat32Workload, ClPermuteUint8Workload>(descriptor, info);
+    return MakeWorkload<ClPermuteFloatWorkload, ClPermuteUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
@@ -124,7 +136,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConvolution2d(const C
                                                                          const WorkloadInfo&               info) const
 {
     return MakeWorkload<ClConvolution2dFloat32Workload, ClConvolution2dUint8Workload>(descriptor, info,
-                                                                                      m_MemoryManager.Get());
+                                                                              m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthwiseConvolution2d(
@@ -142,7 +154,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateNormalization(const N
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&            info) const
 {
-    return MakeWorkload<ClAdditionFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClAdditionFloat32Workload, ClAdditionUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMultiplication(
@@ -165,21 +177,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMemCopy(const MemCopy
         throw InvalidArgumentException("ClWorkloadFactory: Invalid null input for MemCopy workload");
     }
 
-    // Create a workload that will copy tensor data from the inputs, which can have a number of different formats,
-    // to CL tensors.
-    switch (descriptor.m_Inputs[0]->GetType())
-    {
-    case ITensorHandle::Cpu:
-        return MakeWorkload<CopyFromCpuToClFloat32Workload, CopyFromCpuToClUint8Workload>(descriptor, info);
-#if ARMCOMPUTENEON_ENABLED
-    case ITensorHandle::Neon:
-    {
-        return MakeWorkload<CopyFromNeonToClFloat32Workload, CopyFromNeonToClUint8Workload>(descriptor, info);
-    }
-#endif
-    default:
-        throw InvalidArgumentException("ClWorkloadFactory: Destination type not supported for MemCopy Workload.");
-    }
+    return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateResizeBilinear(
@@ -220,9 +218,39 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescri
     return MakeWorkload<ClFloorFloat32Workload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClLstmFloat32Workload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp16ToFp32(
+    const ConvertFp16ToFp32QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<ClConvertFp16ToFp32Workload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp32ToFp16(
+    const ConvertFp32ToFp16QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<ClConvertFp32ToFp16Workload>(descriptor, info);
+}
+
 void ClWorkloadFactory::Finalize()
 {
     m_MemoryManager.Finalize();
+}
+
+void ClWorkloadFactory::Release()
+{
+    m_MemoryManager.Release();
+}
+
+void ClWorkloadFactory::Acquire()
+{
+    m_MemoryManager.Acquire();
 }
 
 #else // #if ARMCOMPUTECL_ENABLED
@@ -375,7 +403,35 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescri
     return nullptr;
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp16ToFp32(
+    const ConvertFp16ToFp32QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp32ToFp16(
+    const ConvertFp32ToFp16QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
 void ClWorkloadFactory::Finalize()
+{
+}
+
+void ClWorkloadFactory::Release()
+{
+}
+
+void ClWorkloadFactory::Acquire()
 {
 }
 

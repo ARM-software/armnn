@@ -10,10 +10,10 @@
 namespace armnn
 {
 
-class NeonMergerFloat32Workload : public NeonBaseMergerWorkload<DataType::Float32>
+class NeonMergerFloat32Workload : public NeonBaseMergerWorkload<DataType::Float16, DataType::Float32>
 {
 public:
-    using NeonBaseMergerWorkload<DataType::Float32>::NeonBaseMergerWorkload;
+    using NeonBaseMergerWorkload<DataType::Float16, DataType::Float32>::NeonBaseMergerWorkload;
     virtual void Execute() const override;
 };
 

@@ -15,13 +15,15 @@ using namespace armcomputetensorutils;
 
 ClConvolution2dFloat32Workload::ClConvolution2dFloat32Workload(const Convolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : Float32Workload<Convolution2dQueueDescriptor>(descriptor, info)
+    : FloatWorkload<Convolution2dQueueDescriptor>(descriptor, info)
     , m_ConvolutionLayer(memoryManager)
 {
 
-    // todo: check tensor shapes match
+    // todo: check tensor shapes match.
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
-    BuildArmComputeTensor(m_KernelTensor, weightInfo);
+
+    m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
+    BuildArmComputeTensor(*m_KernelTensor, weightInfo);
 
     arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
                                              m_Data.m_Parameters.m_StrideY,
@@ -31,11 +33,10 @@ ClConvolution2dFloat32Workload::ClConvolution2dFloat32Workload(const Convolution
                                              m_Data.m_Parameters.m_PadBottom,
                                              arm_compute::DimensionRoundingType::FLOOR);
 
-    arm_compute::CLTensor* optionalBias = nullptr;
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        BuildArmComputeTensor(m_BiasTensor, m_Data.m_Bias->GetTensorInfo());
-        optionalBias = &m_BiasTensor;
+        m_BiasTensor = std::make_unique<arm_compute::CLTensor>();
+        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo());
     }
 
     m_Data.ValidateInputsOutputs("ClConvolution2dFloat32Workload", 1, 1);
@@ -44,24 +45,35 @@ ClConvolution2dFloat32Workload::ClConvolution2dFloat32Workload(const Convolution
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     m_ConvolutionLayer.configure(&input,
-                                 &m_KernelTensor,
-                                 optionalBias,
+                                 m_KernelTensor.get(),
+                                 m_BiasTensor.get(),
                                  &output,
                                  padStrideInfo);
 
-    InitialiseArmComputeClTensorData(m_KernelTensor, m_Data.m_Weight->GetConstTensor<float>());
+    InitializeArmComputeClTensorDataForFloatTypes(*m_KernelTensor, m_Data.m_Weight);
 
-    if (optionalBias)
+    if (m_BiasTensor)
     {
-        InitialiseArmComputeClTensorData(*optionalBias, m_Data.m_Bias->GetConstTensor<float>());
+        InitializeArmComputeClTensorDataForFloatTypes(*m_BiasTensor, m_Data.m_Bias);
     }
+
+    // Force Compute Library to perform the necessary copying and reshaping, after which
+    // delete all the input tensors that will no longer be needed
+    m_ConvolutionLayer.prepare();
+    FreeUnusedTensors();
 }
 
 void ClConvolution2dFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClConvolution2dFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClConvolution2dFloat32Workload_Execute");
 
     m_ConvolutionLayer.run();
+}
+
+void ClConvolution2dFloat32Workload::FreeUnusedTensors()
+{
+    FreeTensorIfUnused(m_KernelTensor);
+    FreeTensorIfUnused(m_BiasTensor);
 }
 
 } //namespace armnn

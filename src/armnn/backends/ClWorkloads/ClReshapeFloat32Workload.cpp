@@ -11,7 +11,7 @@ namespace armnn
 {
 
 ClReshapeFloat32Workload::ClReshapeFloat32Workload(const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : Float32Workload<ReshapeQueueDescriptor>(descriptor, info)
+    : FloatWorkload<ReshapeQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClReshapeFloat32Workload", 1, 1);
 
@@ -23,7 +23,7 @@ ClReshapeFloat32Workload::ClReshapeFloat32Workload(const ReshapeQueueDescriptor&
 
 void ClReshapeFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClReshapeFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClReshapeFloat32Workload_Execute");
     m_Layer.run();
 }
 

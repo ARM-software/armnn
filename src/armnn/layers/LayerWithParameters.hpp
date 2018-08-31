@@ -18,7 +18,7 @@ public:
     const Parameters& GetParameters() const { return m_Param; }
 
     /// Helper to serialize the layer parameters to string
-    /// (currently used in DotSerializer and company)
+    /// (currently used in DotSerializer and company).
     void SerializeLayerParameters(ParameterStringifyFunction & fn) const
     {
         StringifyLayerParameters<Parameters>::Serialize(fn, m_Param);
@@ -37,7 +37,7 @@ protected:
 
     ~LayerWithParameters() = default;
 
-    /// Helper function to reduce duplication in *Layer::CreateWorkload
+    /// Helper function to reduce duplication in *Layer::CreateWorkload.
     template <typename QueueDescriptor>
     WorkloadInfo PrepInfoAndDesc(QueueDescriptor& descriptor, const Graph& graph) const
     {
@@ -45,7 +45,7 @@ protected:
         return Layer::PrepInfoAndDesc(descriptor, graph);
     }
 
-    /// The parameters for the layer (not including tensor-valued weights etc.)
+    /// The parameters for the layer (not including tensor-valued weights etc.).
     Parameters m_Param;
 };
 

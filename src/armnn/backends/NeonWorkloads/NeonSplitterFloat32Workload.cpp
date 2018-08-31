@@ -10,7 +10,7 @@ namespace armnn
 
 void NeonSplitterFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonSplitterFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSplitterFloat32Workload_Execute");
     NeonBaseSplitterWorkload::Execute();
 }
 

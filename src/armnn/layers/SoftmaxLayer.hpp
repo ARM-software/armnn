@@ -9,19 +9,19 @@
 namespace armnn
 {
 
-class Pooling2dLayer : public LayerWithParameters<Pooling2dDescriptor>
+class SoftmaxLayer : public LayerWithParameters<SoftmaxDescriptor>
 {
 public:
     virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph&            graph,
                                                       const IWorkloadFactory& factory) const override;
 
-    Pooling2dLayer* Clone(Graph& graph) const override;
+    SoftmaxLayer* Clone(Graph& graph) const override;
 
     void ValidateTensorShapesFromInputs() override;
 
 protected:
-    Pooling2dLayer(const Pooling2dDescriptor& param, const char* name);
-    ~Pooling2dLayer() = default;
+    SoftmaxLayer(const SoftmaxDescriptor& param, const char* name);
+    ~SoftmaxLayer() = default;
 };
 
 } // namespace

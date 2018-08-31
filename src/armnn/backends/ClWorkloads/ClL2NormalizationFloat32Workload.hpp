@@ -10,7 +10,10 @@
 namespace armnn
 {
 
-class ClL2NormalizationFloat32Workload : public Float32Workload<L2NormalizationQueueDescriptor>
+arm_compute::Status ClL2NormalizationWorkloadValidate(const TensorInfo& input,
+                                                      const TensorInfo& output);
+
+class ClL2NormalizationFloat32Workload : public FloatWorkload<L2NormalizationQueueDescriptor>
 {
 public:
     ClL2NormalizationFloat32Workload(const L2NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info);

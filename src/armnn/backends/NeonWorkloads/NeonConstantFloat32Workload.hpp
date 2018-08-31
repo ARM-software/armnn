@@ -10,10 +10,10 @@
 namespace armnn
 {
 
-class NeonConstantFloat32Workload : public NeonBaseConstantWorkload<DataType::Float32>
+class NeonConstantFloat32Workload : public NeonBaseConstantWorkload<DataType::Float16, DataType::Float32>
 {
 public:
-    using NeonBaseConstantWorkload<DataType::Float32>::NeonBaseConstantWorkload;
+    using NeonBaseConstantWorkload<DataType::Float16, DataType::Float32>::NeonBaseConstantWorkload;
     virtual void Execute() const override;
 };
 

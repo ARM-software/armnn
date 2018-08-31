@@ -11,7 +11,7 @@ namespace armnn
 
 void ClMergerFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClMergerFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMergerFloat32Workload_Execute");
     ClBaseMergerWorkload::Execute();
 }
 

@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct ConcatOfConcatsFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct ConcatOfConcatsFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     explicit ConcatOfConcatsFixture(const armnn::TensorShape& inputShape0, const armnn::TensorShape& inputShape1,
                                     const armnn::TensorShape& inputShape2, const armnn::TensorShape& inputShape3,

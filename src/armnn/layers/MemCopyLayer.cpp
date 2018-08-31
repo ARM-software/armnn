@@ -9,6 +9,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <backends/WorkloadData.hpp>
 #include <backends/WorkloadFactory.hpp>
+#include <backends/MemCopyWorkload.hpp>
 
 namespace armnn
 {
@@ -26,23 +27,23 @@ MemCopyLayer* MemCopyLayer::Clone(Graph& graph) const
 std::unique_ptr<IWorkload> MemCopyLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
 {
     MemCopyQueueDescriptor descriptor;
-    return factory.CreateMemCopy(descriptor, PrepInfoAndDesc(descriptor, graph));
+
+    //This is different from other workloads. Does not get created by the workload factory.
+    return std::make_unique<CopyMemGenericWorkload>(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
 void MemCopyLayer::ValidateTensorShapesFromInputs()
 {
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection() != nullptr,
-                     "MemCopyLayer: InputSlot must be connected to an OutputSlot");
-    ConditionalThrow<LayerValidationException>(GetInputSlot(0).GetConnection()->IsTensorInfoSet(),
-                     "MemCopyLayer: TensorInfo must be set on connected OutputSlot.");
+    VerifyLayerConnections(1, CHECK_LOCATION());
 
+    auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
 
-    IOutputSlot* input = GetInputSlot(0).GetConnection();
+    BOOST_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "MemCopyLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
-        input->GetTensorInfo().GetShape());
+        inferredShapes[0]);
 }
 
 } // namespace armnn

@@ -41,7 +41,7 @@ struct ActivationFixture
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
 
-    // parameters used by some of the activation functions
+    // Parameters used by some of the activation functions.
     float a = 0.234f;
     float b = -12.345f;
 };

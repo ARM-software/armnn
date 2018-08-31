@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-struct BiasAddFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct BiasAddFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     explicit BiasAddFixture(const std::string& dataFormat)
     {

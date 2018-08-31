@@ -9,9 +9,8 @@
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
-
 template <bool withDimZero, bool withDimOne>
-struct SqueezeFixture : public ParserPrototxtFixture<armnnTfParser::ITfParser>
+struct SqueezeFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
     SqueezeFixture()
     {

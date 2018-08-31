@@ -11,7 +11,8 @@
 namespace armnn
 {
 
-class NeonPooling2dFloat32Workload : public NeonPooling2dBaseWorkload<armnn::DataType::Float32>
+class NeonPooling2dFloat32Workload : public NeonPooling2dBaseWorkload<armnn::DataType::Float16,
+                                                                      armnn::DataType::Float32>
 {
 public:
     NeonPooling2dFloat32Workload(const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info);

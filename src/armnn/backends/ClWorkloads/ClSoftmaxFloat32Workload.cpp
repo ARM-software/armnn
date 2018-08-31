@@ -12,7 +12,7 @@ namespace armnn
 
 ClSoftmaxFloat32Workload::ClSoftmaxFloat32Workload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,
                                                    std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : Float32Workload<SoftmaxQueueDescriptor>(descriptor, info)
+    : FloatWorkload<SoftmaxQueueDescriptor>(descriptor, info)
     , m_SoftmaxLayer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("ClSoftmaxFloat32Workload", 1, 1);
@@ -24,7 +24,7 @@ ClSoftmaxFloat32Workload::ClSoftmaxFloat32Workload(const SoftmaxQueueDescriptor&
 
 void ClSoftmaxFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClSoftmaxFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClSoftmaxFloat32Workload_Execute");
     m_SoftmaxLayer.run();
 }
 

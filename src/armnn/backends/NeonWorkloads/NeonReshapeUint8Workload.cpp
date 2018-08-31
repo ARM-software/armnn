@@ -24,7 +24,7 @@ NeonReshapeUint8Workload::NeonReshapeUint8Workload(const ReshapeQueueDescriptor&
 
 void NeonReshapeUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "NeonReshapeUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonReshapeUint8Workload_Execute");
     m_Layer.run();
 }
 } //namespace armnn

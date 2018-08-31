@@ -8,6 +8,7 @@
 #include "backends/ClWorkloadUtils.hpp"
 #include "backends/ClWorkloads.hpp"
 #include "backends/ClTensorHandle.hpp"
+#include "ClContextControlFixture.hpp"
 
 #include "test/CreateWorkloadClNeon.hpp"
 
@@ -17,16 +18,17 @@ boost::test_tools::predicate_result CompareIClTensorHandleShape(IClTensorHandle*
     return CompareTensorHandleShape<IClTensorHandle>(tensorHandle, expectedDimensions);
 }
 
-BOOST_AUTO_TEST_SUITE(CreateWorkloadCl)
+BOOST_FIXTURE_TEST_SUITE(CreateWorkloadCl, ClContextControlFixture)
 
-BOOST_AUTO_TEST_CASE(CreateActivationWorkload)
+template <typename ActivationWorkloadType, armnn::DataType DataType>
+static void ClCreateActivationWorkloadTest()
 {
     Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateActivationWorkloadTest<ClActivationFloat32Workload>(factory, graph);
+    auto workload = CreateActivationWorkloadTest<ActivationWorkloadType, DataType>(factory, graph);
 
-    // check that inputs/outputs are as we expect them (see definition of CreateActivationWorkloadTest)
+    // Checks that inputs/outputs are as we expect them (see definition of CreateActivationWorkloadTest).
     ActivationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -35,14 +37,24 @@ BOOST_AUTO_TEST_CASE(CreateActivationWorkload)
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {1}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateAdditionWorkload)
+BOOST_AUTO_TEST_CASE(CreateActivationFloat32Workload)
+{
+    ClCreateActivationWorkloadTest<ClActivationFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateActivationFloat16Workload)
+{
+    ClCreateActivationWorkloadTest<ClActivationFloat32Workload, armnn::DataType::Float16>();
+}
+
+template <typename AdditionWorkloadType, armnn::DataType DataType>
+static void ClCreateAdditionWorkloadTest()
 {
     Graph graph;
     ClWorkloadFactory factory;
+    auto workload = CreateAdditionWorkloadTest<AdditionWorkloadType, DataType>(factory, graph);
 
-    auto workload = CreateAdditionWorkloadTest<ClAdditionFloat32Workload>(factory, graph);
-
-    // check that inputs/outputs are as we expect them (see definition of CreateAdditionWorkloadTest)
+    // Checks that inputs/outputs are as we expect them (see definition of CreateAdditionWorkloadTest).
     AdditionQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle1 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto inputHandle2 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[1]);
@@ -52,14 +64,26 @@ BOOST_AUTO_TEST_CASE(CreateAdditionWorkload)
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 3}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationWorkload)
+BOOST_AUTO_TEST_CASE(CreateAdditionFloat32Workload)
 {
-    Graph             graph;
+    ClCreateAdditionWorkloadTest<ClAdditionFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
+{
+    ClCreateAdditionWorkloadTest<ClAdditionFloat32Workload, armnn::DataType::Float16>();
+}
+
+template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>
+static void ClCreateBatchNormalizationWorkloadTest()
+{
+    Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloat32Workload>(factory, graph);
+    auto workload = CreateBatchNormalizationWorkloadTest<BatchNormalizationWorkloadType, DataType>
+                    (factory, graph);
 
-    // check that inputs/outputs are as we expect them (see definition of CreateBatchNormalizationWorkloadTest)
+    // Checks that inputs/outputs are as we expect them (see definition of CreateBatchNormalizationWorkloadTest).
     BatchNormalizationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -68,14 +92,57 @@ BOOST_AUTO_TEST_CASE(CreateBatchNormalizationWorkload)
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 3, 1, 1}));
 }
 
-template <typename Convolution2dWorkloadType>
-static void Convolution2dWorkloadTest()
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat32Workload)
 {
-    Graph               graph;
-    ClWorkloadFactory   factory;
-    auto                workload = CreateConvolution2dWorkloadTest<Convolution2dWorkloadType>(factory, graph);
+    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloat32Workload, armnn::DataType::Float32>();
+}
 
-    // check that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest)
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16Workload)
+{
+    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloat32Workload, armnn::DataType::Float16>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateConvertFp16ToFp32Workload)
+{
+    Graph graph;
+    ClWorkloadFactory factory;
+    auto workload = CreateConvertFp16ToFp32WorkloadTest<ClConvertFp16ToFp32Workload>(factory, graph);
+
+    ConvertFp16ToFp32QueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {3, 2, 3}));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 2, 3}));
+    BOOST_TEST((inputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F16));
+    BOOST_TEST((outputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F32));
+}
+
+BOOST_AUTO_TEST_CASE(CreateConvertFp32ToFp16Workload)
+{
+    Graph graph;
+    ClWorkloadFactory factory;
+    auto workload = CreateConvertFp32ToFp16WorkloadTest<ClConvertFp32ToFp16Workload>(factory, graph);
+
+    ConvertFp32ToFp16QueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {3, 2, 3}));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 2, 3}));
+    BOOST_TEST((inputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F32));
+    BOOST_TEST((outputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F16));
+}
+
+template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
+static void ClConvolution2dWorkloadTest()
+{
+    Graph graph;
+    ClWorkloadFactory factory;
+    auto                workload = CreateConvolution2dWorkloadTest<Convolution2dWorkloadType, DataType>
+                                   (factory, graph);
+
+    // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -85,18 +152,24 @@ static void Convolution2dWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat32Workload)
 {
-    Convolution2dWorkloadTest<ClConvolution2dFloat32Workload>();
+    ClConvolution2dWorkloadTest<ClConvolution2dFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16Workload)
+{
+    ClConvolution2dWorkloadTest<ClConvolution2dFloat32Workload, armnn::DataType::Float16>();
 }
 
 
-template <typename Convolution2dWorkloadType>
-static void DirectConvolution2dWorkloadTest()
+template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
+static void ClDirectConvolution2dWorkloadTest()
 {
-    Graph               graph;
-    ClWorkloadFactory   factory;
-    auto                workload = CreateDirectConvolution2dWorkloadTest<Convolution2dWorkloadType>(factory, graph);
+    Graph graph;
+    ClWorkloadFactory factory;
+    auto workload = CreateDirectConvolution2dWorkloadTest<Convolution2dWorkloadType, DataType>(
+            factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateDirectConvolution2dWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateDirectConvolution2dWorkloadTest).
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -106,22 +179,28 @@ static void DirectConvolution2dWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dFloat32Workload)
 {
-    DirectConvolution2dWorkloadTest<ClConvolution2dFloat32Workload>();
+    ClDirectConvolution2dWorkloadTest<ClConvolution2dFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dFloat16Workload)
+{
+    ClDirectConvolution2dWorkloadTest<ClConvolution2dFloat32Workload, armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dUint8Workload)
 {
-    DirectConvolution2dWorkloadTest<ClConvolution2dUint8Workload>();
+    ClDirectConvolution2dWorkloadTest<ClConvolution2dUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkload)
+template <typename FullyConnectedWorkloadType, typename armnn::DataType DataType>
+static void ClCreateFullyConnectedWorkloadTest()
 {
-    Graph             graph;
+    Graph graph;
     ClWorkloadFactory factory;
-    auto              workload =
-        CreateFullyConnectedWorkloadTest<ClFullyConnectedFloat32Workload>(factory, graph);
+    auto workload =
+        CreateFullyConnectedWorkloadTest<FullyConnectedWorkloadType, DataType>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest).
     FullyConnectedQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -129,15 +208,28 @@ BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkload)
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 7}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateMultiplicationWorkload)
+
+BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat32WorkloadTest)
 {
-    Graph             graph;
+    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat16WorkloadTest)
+{
+    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedFloat32Workload, armnn::DataType::Float16>();
+}
+
+
+template <typename MultiplicationWorkloadType, typename armnn::DataType DataType>
+static void ClCreateMultiplicationWorkloadTest()
+{
+    Graph graph;
     ClWorkloadFactory factory;
 
     auto workload =
-        CreateMultiplicationWorkloadTest<ClMultiplicationFloat32Workload>(factory, graph);
+        CreateMultiplicationWorkloadTest<MultiplicationWorkloadType, DataType>(factory, graph);
 
-    // check that inputs/outputs are as we expect them (see definition of CreateMultiplicationWorkloadTest)
+    // Checks that inputs/outputs are as we expect them (see definition of CreateMultiplicationWorkloadTest).
     MultiplicationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle1 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto inputHandle2 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[1]);
@@ -147,14 +239,26 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationWorkload)
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 3}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationWorkload)
+BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat32WorkloadTest)
 {
-    Graph             graph;
+    ClCreateMultiplicationWorkloadTest<ClMultiplicationFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16WorkloadTest)
+{
+    ClCreateMultiplicationWorkloadTest<ClMultiplicationFloat32Workload, armnn::DataType::Float16>();
+}
+
+template <typename NormalizationWorkloadType, typename armnn::DataType DataType>
+static void ClNormalizationWorkloadTest()
+{
+    Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateNormalizationWorkloadTest<ClNormalizationFloat32Workload>(factory, graph);
+    auto workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>
+                    (factory, graph);
 
-    // check that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest)
+    // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     NormalizationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -163,14 +267,25 @@ BOOST_AUTO_TEST_CASE(CreateNormalizationWorkload)
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 5, 5, 1}));
 }
 
-BOOST_AUTO_TEST_CASE(CreatePooling2dWorkload)
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloat32Workload)
 {
-    Graph             graph;
+    ClNormalizationWorkloadTest<ClNormalizationFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16Workload)
+{
+    ClNormalizationWorkloadTest<ClNormalizationFloat32Workload, armnn::DataType::Float16>();
+}
+
+template <typename Pooling2dWorkloadType, typename armnn::DataType DataType>
+static void ClPooling2dWorkloadTest()
+{
+    Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreatePooling2dWorkloadTest<ClPooling2dFloat32Workload>(factory, graph);
+    auto workload = CreatePooling2dWorkloadTest<Pooling2dWorkloadType, DataType>(factory, graph);
 
-    // check that inputs/outputs are as we expect them (see definition of CreatePooling2dWorkloadTest)
+    // Check that inputs/outputs are as we expect them (see definition of CreatePooling2dWorkloadTest).
     Pooling2dQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -179,18 +294,28 @@ BOOST_AUTO_TEST_CASE(CreatePooling2dWorkload)
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 2, 2, 4}));
 }
 
-template <typename ReshapeWorkloadType>
+BOOST_AUTO_TEST_CASE(CreatePooling2dFloat32Workload)
+{
+    ClPooling2dWorkloadTest<ClPooling2dFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16Workload)
+{
+    ClPooling2dWorkloadTest<ClPooling2dFloat32Workload, armnn::DataType::Float16>();
+}
+
+template <typename ReshapeWorkloadType, typename armnn::DataType DataType>
 static void ClCreateReshapeWorkloadTest()
 {
-    Graph             graph;
+    Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateReshapeWorkloadTest<ReshapeWorkloadType>(factory, graph);
+    auto workload = CreateReshapeWorkloadTest<ReshapeWorkloadType, DataType>(factory, graph);
 
-    // check that outputs and inputs are as we expect them (see definition of CreateReshapeWorkloadTest)
+    // Checks that outputs and inputs are as we expect them (see definition of CreateReshapeWorkloadTest).
     ReshapeQueueDescriptor queueDescriptor = workload->GetData();
-    auto                   inputHandle     = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    auto                   outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
     BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {4, 1}));
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {4})); // Leading size 1 dimensions are collapsed by ACL.
@@ -198,38 +323,56 @@ static void ClCreateReshapeWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateReshapeFloat32Workload)
 {
-    ClCreateReshapeWorkloadTest<ClReshapeFloat32Workload>();
+    ClCreateReshapeWorkloadTest<ClReshapeFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateReshapeFloat16Workload)
+{
+    ClCreateReshapeWorkloadTest<ClReshapeFloat32Workload, armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
 {
-    ClCreateReshapeWorkloadTest<ClReshapeUint8Workload>();
+    ClCreateReshapeWorkloadTest<ClReshapeUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSoftmaxWorkload)
+template <typename SoftmaxWorkloadType, typename armnn::DataType DataType>
+static void ClSoftmaxWorkloadTest()
 {
-    Graph             graph;
+    Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateSoftmaxWorkloadTest<ClSoftmaxFloat32Workload>(factory, graph);
+    auto workload = CreateSoftmaxWorkloadTest<SoftmaxWorkloadType, DataType>(factory, graph);
 
-    // check that inputs/outputs are as we expect them (see definition of ClSoftmaxFloat32Workload)
+    // Checks that inputs/outputs are as we expect them (see definition of ClSoftmaxFloat32Workload).
     SoftmaxQueueDescriptor queueDescriptor = workload->GetData();
-    auto                   inputHandle     = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    auto                   outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
     BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {4, 1}));
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {4, 1}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
+
+BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat32WorkloadTest)
+{
+    ClSoftmaxWorkloadTest<ClSoftmaxFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat16WorkloadTest)
+{
+    ClSoftmaxWorkloadTest<ClSoftmaxFloat32Workload, armnn::DataType::Float16>();
+}
+
+template <typename SplitterWorkloadType, typename armnn::DataType DataType>
+static void ClSplitterWorkloadTest()
 {
     Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateSplitterWorkloadTest<ClSplitterFloat32Workload>(factory, graph);
+    auto workload = CreateSplitterWorkloadTest<SplitterWorkloadType, DataType>(factory, graph);
 
-    // check that outputs are as we expect them (see definition of CreateSplitterWorkloadTest)
+    // Checks that outputs are as we expect them (see definition of CreateSplitterWorkloadTest).
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {5, 7, 7}));
@@ -242,14 +385,25 @@ BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
 
     auto outputHandle0 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
     // NOTE: At the moment the CL collapses the tensor to a 2 dim when dimension zero = 1
-    //       we are raising this difference between the NEON and CL libs as an issue with the compute library team
+    //       we are raising this difference between the NEON and CL libs as an issue with the compute library team.
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle0, {7, 7}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
+BOOST_AUTO_TEST_CASE(CreateSplitterFloat32Workload)
 {
-    // Test that it is possible to decide which output of the splitter layer
-    // should be lined to which input of the merger layer
+    ClSplitterWorkloadTest<ClSplitterFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSplitterFloat16Workload)
+{
+    ClSplitterWorkloadTest<ClSplitterFloat32Workload, armnn::DataType::Float16>();
+}
+
+template <typename SplitterWorkloadType, typename MergerWorkloadType, typename armnn::DataType DataType>
+static void ClSplitterMergerTest()
+{
+    // Tests that it is possible to decide which output of the splitter layer
+    // should be lined to which input of the merger layer.
     // We test that is is possible to specify 0th output
     // of the splitter to be the 1st input to the merger and the 1st output of the splitter  to be 0th input
     // of the merger.
@@ -258,12 +412,13 @@ BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
     ClWorkloadFactory factory;
 
     auto workloads =
-        CreateSplitterMergerWorkloadTest<ClSplitterFloat32Workload, ClMergerFloat32Workload>(factory, graph);
+        CreateSplitterMergerWorkloadTest<SplitterWorkloadType, MergerWorkloadType, DataType>
+            (factory, graph);
 
     auto wlSplitter = std::move(workloads.first);
     auto wlMerger = std::move(workloads.second);
 
-    //check that the index of inputs/outputs matches what we declared on InputDescriptor construction.
+    //Checks that the index of inputs/outputs matches what we declared on InputDescriptor construction.
     armnn::ClSubTensorHandle* sOut0 = dynamic_cast<armnn::ClSubTensorHandle*>(wlSplitter->GetData().m_Outputs[0]);
     armnn::ClSubTensorHandle* sOut1 = dynamic_cast<armnn::ClSubTensorHandle*>(wlSplitter->GetData().m_Outputs[1]);
     armnn::ClSubTensorHandle* mIn0 = dynamic_cast<armnn::ClSubTensorHandle*>(wlMerger->GetData().m_Inputs[0]);
@@ -274,22 +429,33 @@ BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
     BOOST_TEST(mIn0);
     BOOST_TEST(mIn1);
 
-    //fliped order of inputs/outputs
+    //Fliped order of inputs/outputs.
     bool validDataPointers = (sOut0 == mIn1) && (sOut1 == mIn0);
     BOOST_TEST(validDataPointers);
 
 
-    //also make sure that the inputs are subtensors of one tensor and outputs are sub tensors of another tensor
+    //Also make sure that the inputs are subtensors of one tensor and outputs are sub tensors of another tensor.
     bool validSubTensorParents = (mIn0->GetTensor().parent() == mIn1->GetTensor().parent())
                                     && (sOut0->GetTensor().parent() == sOut1->GetTensor().parent());
 
     BOOST_TEST(validSubTensorParents);
 }
 
+BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloat32Workload)
+{
+    ClSplitterMergerTest<ClSplitterFloat32Workload, ClMergerFloat32Workload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloat16Workload)
+{
+    ClSplitterMergerTest<ClSplitterFloat32Workload, ClMergerFloat32Workload, armnn::DataType::Float16>();
+}
+
+
 BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
 {
     // Test that it is possible to assign multiple (two) different layers to each of the outputs of a splitter layer.
-    // We create a splitter with two outputs. That each of those outputs is used by two different activation layers
+    // We create a splitter with two outputs. That each of those outputs is used by two different activation layers.
 
     Graph graph;
     ClWorkloadFactory factory;
@@ -300,9 +466,10 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
     std::unique_ptr<ClActivationFloat32Workload> wlActiv1_1;
 
     CreateSplitterMultipleInputsOneOutputWorkloadTest<ClSplitterFloat32Workload,
-        ClActivationFloat32Workload>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1, wlActiv1_0, wlActiv1_1);
+        ClActivationFloat32Workload, armnn::DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
+                                                               wlActiv1_0, wlActiv1_1);
 
-    //check that the index of inputs/outputs matches what we declared on InputDescriptor construction.
+    //Checks that the index of inputs/outputs matches what we declared on InputDescriptor construction.
     armnn::ClSubTensorHandle* sOut0 = dynamic_cast<armnn::ClSubTensorHandle*>(wlSplitter->GetData().m_Outputs[0]);
     armnn::ClSubTensorHandle* sOut1 = dynamic_cast<armnn::ClSubTensorHandle*>(wlSplitter->GetData().m_Outputs[1]);
     armnn::ClSubTensorHandle* activ0_0Im = dynamic_cast<armnn::ClSubTensorHandle*>(wlActiv0_0->GetData().m_Inputs[0]);
@@ -327,17 +494,18 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
 BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsCl)
 {
     ClWorkloadFactory    factory;
-    CreateMemCopyWorkloads<CopyFromCpuToClWorkload,CopyFromClToCpuWorkload,IClTensorHandle>(factory);
+    CreateMemCopyWorkloads<IClTensorHandle>(factory);
 }
 
 BOOST_AUTO_TEST_CASE(CreateL2NormalizationWorkload)
 {
-    Graph             graph;
+    Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateL2NormalizationWorkloadTest<ClL2NormalizationFloat32Workload>(factory, graph);
+    auto workload = CreateL2NormalizationWorkloadTest<ClL2NormalizationFloat32Workload, armnn::DataType::Float32>
+        (factory, graph);
 
-    // check that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest)
+    // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     L2NormalizationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -345,5 +513,25 @@ BOOST_AUTO_TEST_CASE(CreateL2NormalizationWorkload)
     BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 5, 20, 50, 67 }));
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 5, 20, 50, 67 }));
 }
+
+template <typename LstmWorkloadType>
+static void ClCreateLstmWorkloadTest()
+{
+    Graph graph;
+    ClWorkloadFactory factory;
+    auto workload = CreateLstmWorkloadTest<LstmWorkloadType>(factory, graph);
+
+    LstmQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[1]);
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 2, 2 }));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 2, 4 }));
+}
+
+BOOST_AUTO_TEST_CASE(CreateLSTMWorkloadFloat32Workload)
+{
+    ClCreateLstmWorkloadTest<ClLstmFloat32Workload>();
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

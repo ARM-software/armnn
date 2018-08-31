@@ -10,10 +10,10 @@
 namespace armnn
 {
 
-class ClMergerFloat32Workload : public ClBaseMergerWorkload<armnn::DataType::Float32>
+class ClMergerFloat32Workload : public ClBaseMergerWorkload<DataType::Float16, DataType::Float32>
 {
 public:
-    using ClBaseMergerWorkload<armnn::DataType::Float32>::ClBaseMergerWorkload;
+    using ClBaseMergerWorkload<DataType::Float16, DataType::Float32>::ClBaseMergerWorkload;
     virtual void Execute() const override;
 };
 

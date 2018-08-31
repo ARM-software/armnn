@@ -8,6 +8,7 @@
 #include "OutputHandler.hpp"
 
 #include <boost/core/ignore_unused.hpp>
+#include <boost/optional.hpp>
 
 namespace armnn
 {
@@ -24,16 +25,17 @@ constexpr bool IsOperationQueueDescriptor(const ConstantQueueDescriptor&) { retu
 template <>
 constexpr bool IsOperationQueueDescriptor(const PermuteQueueDescriptor&) { return false; }
 
-// Reference workload factory
+// Reference workload factory.
 class RefWorkloadFactory : public IWorkloadFactory
 {
 public:
-    explicit RefWorkloadFactory(bool operationWorkloadsAllowed = true);
-    virtual ~RefWorkloadFactory() { };
+    explicit RefWorkloadFactory();
+    virtual ~RefWorkloadFactory() {}
 
     virtual Compute GetCompute() const override { return Compute::CpuRef; }
 
-    static bool IsLayerSupported(const Layer& layer, DataType dataType, std::string& outReasonIfUnsupported);
+    static bool IsLayerSupported(const Layer& layer, boost::optional<DataType> dataType,
+                                 std::string& outReasonIfUnsupported);
 
     virtual bool SupportsSubTensors() const override { return false; }
 
@@ -43,7 +45,7 @@ public:
     {
         boost::ignore_unused(parent, subTensorShape, subTensorOrigin);
         return nullptr;
-    };
+    }
 
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override;
 
@@ -113,12 +115,20 @@ public:
     virtual std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreateLstm(const LstmQueueDescriptor& descriptor,
+                                                  const WorkloadInfo& info) const override;
+
+    virtual std::unique_ptr<IWorkload> CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const override;
+
+    virtual std::unique_ptr<IWorkload> CreateConvertFp32ToFp16(const ConvertFp32ToFp16QueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const override;
+
 private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>
     std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor, const WorkloadInfo& info) const;
 
-    const bool m_OperationWorkloadsAllowed;
 };
 
 } // namespace armnn

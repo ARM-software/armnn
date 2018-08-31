@@ -6,11 +6,15 @@
 #pragma once
 
 #include "armnn/IRuntime.hpp"
+#include "armnnOnnxParser/IOnnxParser.hpp"
 #include "test/TensorHelpers.hpp"
+#include "VerificationHelpers.hpp"
+
+#include <boost/format.hpp>
 #include <string>
 
-
-// TODO davbec01 (14/05/18) : put these into armnnUtils namespace
+namespace armnnUtils
+{
 
 template<typename TParser>
 struct ParserPrototxtFixture
@@ -19,14 +23,15 @@ struct ParserPrototxtFixture
         : m_Parser(TParser::Create())
         , m_NetworkIdentifier(-1)
     {
-        m_Runtimes.push_back(armnn::IRuntime::Create(armnn::Compute::CpuRef));
+        armnn::IRuntime::CreationOptions options;
+        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::CpuRef));
 
 #if ARMCOMPUTENEON_ENABLED
-        m_Runtimes.push_back(armnn::IRuntime::Create(armnn::Compute::CpuAcc));
+        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::CpuAcc));
 #endif
 
 #if ARMCOMPUTECL_ENABLED
-        m_Runtimes.push_back(armnn::IRuntime::Create(armnn::Compute::GpuAcc));
+        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::GpuAcc));
 #endif
     }
 
@@ -38,10 +43,11 @@ struct ParserPrototxtFixture
         const std::string& outputName);
     void Setup(const std::map<std::string, armnn::TensorShape>& inputShapes,
         const std::vector<std::string>& requestedOutputs);
+    void Setup();
     /// @}
 
     /// Executes the network with the given input tensor and checks the result against the given output tensor.
-    /// This overload assumes the network has a single input and a single output.
+    /// This overload assumes that the network has a single input and a single output.
     template <std::size_t NumOutputDimensions>
     void RunTest(const std::vector<float>& inputData, const std::vector<float>& expectedOutputData);
 
@@ -53,7 +59,7 @@ struct ParserPrototxtFixture
 
     std::string                                         m_Prototext;
     std::unique_ptr<TParser, void(*)(TParser* parser)>  m_Parser;
-    std::vector<armnn::IRuntimePtr>                     m_Runtimes;
+    std::vector<std::pair<armnn::IRuntimePtr, armnn::Compute>> m_Runtimes;
     armnn::NetworkId                                    m_NetworkIdentifier;
 
     /// If the single-input-single-output overload of Setup() is called, these will store the input and output name
@@ -68,7 +74,7 @@ template<typename TParser>
 void ParserPrototxtFixture<TParser>::SetupSingleInputSingleOutput(const std::string& inputName,
     const std::string& outputName)
 {
-    // Store the input and output name so they don't need to be passed to the single-input-single-output RunTest().
+    // Stores the input and output name so they don't need to be passed to the single-input-single-output RunTest().
     m_SingleInputName = inputName;
     m_SingleOutputName = outputName;
     Setup({ }, { outputName });
@@ -79,7 +85,7 @@ void ParserPrototxtFixture<TParser>::SetupSingleInputSingleOutput(const armnn::T
     const std::string& inputName,
     const std::string& outputName)
 {
-    // Store the input and output name so they don't need to be passed to the single-input-single-output RunTest().
+    // Stores the input and output name so they don't need to be passed to the single-input-single-output RunTest().
     m_SingleInputName = inputName;
     m_SingleOutputName = outputName;
     Setup({ { inputName, inputTensorShape } }, { outputName });
@@ -91,16 +97,39 @@ void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::Te
 {
     for (auto&& runtime : m_Runtimes)
     {
+        std::string errorMessage;
+
         armnn::INetworkPtr network =
             m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes, requestedOutputs);
-
-        auto optimized = Optimize(*network, runtime->GetDeviceSpec());
-
-        armnn::Status ret = runtime->LoadNetwork(m_NetworkIdentifier, move(optimized));
-
+        auto optimized = Optimize(*network, { runtime.second, armnn::Compute::CpuRef }, runtime.first->GetDeviceSpec());
+        armnn::Status ret = runtime.first->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
         if (ret != armnn::Status::Success)
         {
-            throw armnn::Exception("LoadNetwork failed");
+            throw armnn::Exception(boost::str(
+                boost::format("LoadNetwork failed with error: '%1%' %2%")
+                              % errorMessage
+                              % CHECK_LOCATION().AsString()));
+        }
+    }
+}
+
+template<typename TParser>
+void ParserPrototxtFixture<TParser>::Setup()
+{
+    for (auto&& runtime : m_Runtimes)
+    {
+        std::string errorMessage;
+
+        armnn::INetworkPtr network =
+            m_Parser->CreateNetworkFromString(m_Prototext.c_str());
+        auto optimized = Optimize(*network, { runtime.second, armnn::Compute::CpuRef }, runtime.first->GetDeviceSpec());
+        armnn::Status ret = runtime.first->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
+        if (ret != armnn::Status::Success)
+        {
+            throw armnn::Exception(boost::str(
+                boost::format("LoadNetwork failed with error: '%1%' %2%")
+                              % errorMessage
+                              % CHECK_LOCATION().AsString()));
         }
     }
 }
@@ -122,7 +151,7 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
     {
         using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
 
-        // Setup the armnn input tensors from the given vectors.
+        // Sets up the armnn input tensors from the given vectors.
         armnn::InputTensors inputTensors;
         for (auto&& it : inputData)
         {
@@ -130,7 +159,7 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
             inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
         }
 
-        // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
+        // Allocates storage for the output tensors to be written to and sets up the armnn output tensors.
         std::map<std::string, boost::multi_array<float, NumOutputDimensions>> outputStorage;
         armnn::OutputTensors outputTensors;
         for (auto&& it : expectedOutputData)
@@ -141,14 +170,27 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
                 { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
         }
 
-        runtime->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
+        runtime.first->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
 
-        // Compare each output tensor to the expected values
+        // Compares each output tensor to the expected values.
         for (auto&& it : expectedOutputData)
         {
             BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
+            if (bindingInfo.second.GetNumElements() != it.second.size())
+            {
+                throw armnn::Exception(
+                    boost::str(
+                        boost::format("Output tensor %1% is expected to have %2% elements. "
+                                      "%3% elements supplied. %4%") %
+                                      it.first %
+                                      bindingInfo.second.GetNumElements() %
+                                      it.second.size() %
+                                      CHECK_LOCATION().AsString()));
+            }
             auto outputExpected = MakeTensor<float, NumOutputDimensions>(bindingInfo.second, it.second);
             BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
         }
     }
 }
+
+} // namespace armnnUtils

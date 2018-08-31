@@ -32,7 +32,7 @@ NeonSoftmaxUint8Workload::NeonSoftmaxUint8Workload(const SoftmaxQueueDescriptor&
 
 void NeonSoftmaxUint8Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuAcc, "ClSoftmaxUint8Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSoftmaxUint8Workload_Execute");
 
     m_SoftmaxLayer.run();
 }

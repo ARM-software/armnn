@@ -32,7 +32,7 @@ struct FullyConnectedBiasTypeForInputType<uint8_t>
     using Type = int32_t;
 };
 
-// Modifies a std::vector in-place using a specified bias
+// Modifies a std::vector in-place using a specified bias.
 template<typename T, typename B>
 void ApplyBias(std::vector<T>& v, float vScale, int32_t vOffset,
     const std::vector<B>& bias, float bScale, int32_t bOffset, uint32_t w, uint32_t h)
@@ -42,7 +42,7 @@ void ApplyBias(std::vector<T>& v, float vScale, int32_t vOffset,
     BOOST_ASSERT_MSG((armnn::IsQuantizedType<B>() && bScale != 0.0f) || (!armnn::IsQuantizedType<B>()),
                      "Invalid type and parameter combination.");
 
-    // Note we need to dequantize and re-quantize the image value and the bias
+    // Note we need to dequantize and re-quantize the image value and the bias.
     for (uint32_t i = 0; i < bias.size(); ++i)
     {
         float dBias = SelectiveDequantize(bias[i], bScale, bOffset);
@@ -90,15 +90,15 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 
     bool biasEnabled = bias.size() > 0;
 
-    // This function currently assumes 1 batch of input/output (and duplicates this into 2 batches)
+    // This function currently assumes 1 batch of input/output (and duplicates this into 2 batches).
     BOOST_ASSERT(inputNum == 1);
     BOOST_ASSERT(outputNum == 1);
 
-    // If a bias is used, its size must equal the number of output channels
+    // If a bias is used, its size must equal the number of output channels.
     BOOST_ASSERT(!biasEnabled || bias.size() == outputChannels);
 
 
-    // Note these tensors will use two (identical) batches
+    // Note these tensors will use two (identical) batches.
     armnn::TensorInfo inputTensorInfo({2*inputNum, inputChannels, inputHeight, inputWidth}, armnn::GetDataType<T>());
     armnn::TensorInfo outputTensorInfo({2*outputNum, outputChannels, outputHeight, outputWidth},
         armnn::GetDataType<T>());
@@ -120,7 +120,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
 
-    // Construct input data - Two batches of the same input image
+    // Construct input data - two batches of the same input image.
     std::vector<T> inputImage;
     inputImage.assign(input.data(), input.data() + 1*inputChannels*inputHeight*inputWidth);
     std::vector<T> inputData;
@@ -131,7 +131,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
     std::vector<T> outputImage;
     outputImage.assign(outputExpected.data(), outputExpected.data() + outputChannels*outputHeight*outputWidth);
 
-    // Apply bias to output image if enabled
+    // Apply bias to output image if it is enabled.
     if(biasEnabled)
     {
         std::vector<T> biasV;
@@ -141,14 +141,14 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
             outputWidth, outputHeight);
     }
 
-    // Construct expected output data - two identical images
+    // Construct expected output data - two identical images.
     std::vector<T> outputData;
     outputData.insert(outputData.end(), outputImage.begin(), outputImage.end());
     outputData.insert(outputData.end(), outputImage.begin(), outputImage.end());
 
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
-    // todo: nontrivial padding and strides
+    // Todo: nontrivial padding and strides.
     uint32_t                    strideX  = 1;
     uint32_t                    strideY  = 1;
 
@@ -171,7 +171,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // still set this whether or not bias is enabled - can be a source of bugs
+    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - can be a source of bugs.
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_PadLeft = padLeft;
@@ -222,11 +222,11 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
     unsigned int outputHeight   = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
     unsigned int outputWidth    = boost::numeric_cast<unsigned int>(outputExpected.shape()[3]);
 
-    // If a bias is used, its size must equal the number of output channels
+    // If a bias is used, its size must equal the number of output channels.
     bool biasEnabled = bias.size() > 0;
     BOOST_ASSERT(!biasEnabled || bias.size() == outputChannels);
 
-    // create the tensors
+    // Creates the tensors.
     armnn::TensorInfo inputTensorInfo({inputNum, inputChannels, inputHeight, inputWidth}, armnn::GetDataType<T>());
     armnn::TensorInfo outputTensorInfo({outputNum, outputChannels, outputHeight, outputWidth},
                                        armnn::GetDataType<T>());
@@ -246,12 +246,12 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
         biasDesc.SetQuantizationOffset(0);
     }
 
-    // Construct the input data
+    // Construct the input data.
     std::vector<T> inputData;
     inputData.assign(input.data(), input.data() + inputChannels*inputHeight*inputWidth);
     auto batchedInput = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
-    // Construct the output data, with bias applied, as appropriate
+    // Construct the output data, with bias applied, as appropriate.
     std::vector<T> outputData;
     outputData.assign(outputExpected.data(), outputExpected.data() + outputChannels*outputHeight*outputWidth);
     if (biasEnabled)
@@ -280,7 +280,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
 
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // still set this whether or not bias is enabled - can be a source of bugs
+    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - it can be a source of bugs.
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_PadLeft = padLeft;
@@ -372,14 +372,14 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFa
            -1.f, 0.f, -1.f,
         })));
 
-    // manually calculated
+    // Manually calculated.
     std::vector<T> outputImage(
         QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
                            outputTensorInfo.GetQuantizationOffset(),
                            {0.f, 0.f})
     );
 
-    // Optionally apply bias to output image
+    // Optionally apply bias to output image.
     if(biasEnabled)
     {
         ApplyBias(outputImage, outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(),
@@ -405,7 +405,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFa
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // still set this whether or not bias is enabled
+    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled.
     data.m_Parameters.m_StrideX = 1;
     data.m_Parameters.m_StrideY = 1;
     data.m_Parameters.m_PadLeft = 0;
@@ -520,7 +520,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
             0, 0, 0
         })));
 
-    // manually calculated
+    // Manually calculated.
     std::vector<T> outputImage = std::vector<T>(
         QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(), {
             3.5f,  3.5f,  3.5f,  3.5f,  3.5f,  3.5f,  3.5f,
@@ -552,7 +552,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
             0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f
         }));
 
-    // Optionally apply bias to output image
+    // Optionally apply bias to output image.
     if(biasEnabled)
     {
         ApplyBias(outputImage, outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(),
@@ -578,7 +578,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // still set this whether or not bias is enabled
+    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled.
     data.m_Parameters.m_StrideX = 2;
     data.m_Parameters.m_StrideY = 1;
     data.m_Parameters.m_PadLeft = 0;
@@ -609,7 +609,7 @@ LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFact
 {
     using B = typename FullyConnectedBiasTypeForInputType<T>::Type;
 
-    // until we have a specialist 1D convolution layer, we can fake one using
+    // Until we have a specialist 1D convolution layer, we can fake one using
     // 2D convolution with the final dimension set to 1.
     // I don't anticipate this being particularly slow, given that convolution is implemented
     // as a matrix multiplication, at which point dimension doesn't matter.
@@ -617,11 +617,11 @@ LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFact
     unsigned int batchSize      = 1;
     unsigned int inputChannels  = 2;
     unsigned int outputChannels = 3;
-    unsigned int inputSize      = 5; // the 1D size (could view as 'width' or 'height')
+    unsigned int inputSize      = 5; // The 1D size (could view as 'width' or 'height').
     unsigned int kernelSize     = 3;
     unsigned int padSize        = 2;
     unsigned int stride         = 1;
-    unsigned int outputSize     = 7; // (inputSize + 2 * padSize - kernelSize + 1) / stride
+    unsigned int outputSize     = 7; // (inputSize + 2 * padSize - kernelSize + 1) / stride.
 
     armnn::TensorInfo inputInfo({batchSize, inputChannels, inputSize, 1}, armnn::GetDataType<T>());
     armnn::TensorInfo outputInfo({batchSize, outputChannels, outputSize, 1}, armnn::GetDataType<T>());
@@ -671,7 +671,7 @@ LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFact
             2.5f, -1.0f + 3.0f, 1.25f - 3.2f + 2.5f, -1.0f - 5.0f, 1.25f + 0.5f - 2.0f, -3.0f, 0.5f
         }));
 
-    // Optionally apply bias to output image
+    // Optionally apply bias to output image.
     if(biasEnabled)
     {
         ApplyBias(outputData, outputInfo.GetQuantizationScale(), outputInfo.GetQuantizationOffset(),
@@ -712,7 +712,7 @@ LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFact
     workloadFactory.Finalize();
     workload->Execute();
 
-    // output
+    // Output
     LayerTestResult<T,4> ret(outputInfo);
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
     ret.outputExpected = MakeTensor<T, 4>(outputInfo, outputData);

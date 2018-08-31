@@ -10,9 +10,29 @@
 namespace armnn
 {
 
+arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
+                                                     const TensorInfo& input1,
+                                                     const TensorInfo& output)
+{
+    const arm_compute::TensorInfo aclInput1 = armcomputetensorutils::BuildArmComputeTensorInfo(input0);
+    const arm_compute::TensorInfo aclInput2 = armcomputetensorutils::BuildArmComputeTensorInfo(input1);
+    const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+
+    // At the time of writing, configure() will fail if a rounding policy other than TO_ZERO is supplied to it,
+    // when providing a scale of 1.0 for F32 tensors, even though the provided rounding policy appears to be
+    // ignored for F32 tensors.
+    return arm_compute::CLPixelWiseMultiplication::validate(&aclInput1,
+                                                            &aclInput2,
+                                                            &aclOutput,
+                                                            1.0f,
+                                                            arm_compute::ConvertPolicy::SATURATE,
+                                                            arm_compute::RoundingPolicy::TO_ZERO);
+}
+
+
 ClMultiplicationFloat32Workload::ClMultiplicationFloat32Workload(const MultiplicationQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info)
-    : Float32Workload<MultiplicationQueueDescriptor>(descriptor, info)
+    : FloatWorkload<MultiplicationQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClMultiplicationFloat32Workload", 2, 1);
 
@@ -30,9 +50,9 @@ ClMultiplicationFloat32Workload::ClMultiplicationFloat32Workload(const Multiplic
 
 void ClMultiplicationFloat32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::GpuAcc, "ClMultiplicationFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMultiplicationFloat32Workload_Execute");
 
-    // Execute the layer
+    // Executes the layer.
     m_PixelWiseMultiplication.run();
 }
 

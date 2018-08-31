@@ -9,7 +9,7 @@
 namespace armnn
 {
 
-/// Performs the ActivationFunction elementwise on the inputs to give the outputs
+/// Performs the ActivationFunction elementwise on the inputs to give the outputs.
 void Activation(const float* in,
                 float* out,
                 const TensorInfo& tensorInfo,

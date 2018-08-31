@@ -52,3 +52,6 @@
 #include "backends/RefWorkloads/Pooling2d.hpp"
 #include "backends/RefWorkloads/RefFakeQuantizationFloat32Workload.hpp"
 #include "backends/RefWorkloads/RefPermuteWorkload.hpp"
+#include "backends/RefWorkloads/RefLstmFloat32Workload.hpp"
+#include "backends/RefWorkloads/RefConvertFp16ToFp32Workload.hpp"
+#include "backends/RefWorkloads/RefConvertFp32ToFp16Workload.hpp"

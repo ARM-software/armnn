@@ -31,19 +31,19 @@ public:
 
         if (inInfo.GetShape() != outInfo.GetShape())
         {
-            // Insert equivalent reshape before base layer
+            // Inserts equivalent reshape before base layer.
             const std::string name = std::string("merged-") + base.GetName() + std::string("-with-") + child.GetName();
             const ReshapeDescriptor descriptor{outInfo.GetShape()};
             auto& newReshape = *graph.InsertNewLayer<ReshapeLayer>(base.GetInputSlot(0), descriptor, name.c_str());
-            // Set tensor info for new layer
+            // Sets tensor info for new layer.
             newReshape.GetOutputHandler().SetTensorInfo(outInfo);
-            // Reconnect base with original parent
+            // Reconnects base with original parent.
             newReshape.GetOutputSlot().MoveAllConnections(*parentOut);
-            // Parent is now the new layer
+            // Parent is now the new layer.
             parentOut = &newReshape.GetOutputSlot();
         }
 
-        // Move connections in child output to parent layer.
+        // Moves connections in child output to parent layer.
         // Child layer will be removed as it's left unconnected.
         // Base layer will be removed if left unconnected.
         child.GetOutputSlot().MoveAllConnections(*parentOut);

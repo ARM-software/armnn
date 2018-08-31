@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <functional>
+#include <list>
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/core/ignore_unused.hpp>
@@ -51,7 +53,7 @@ public:
     const OutputSlot* GetConnectedOutputSlot() const { return m_Connection; }
     OutputSlot* GetConnectedOutputSlot() { return m_Connection; }
 
-    /// Links the slot to an output slot or breaks an existing link if passing nullptr
+    /// Links the slot to an output slot or breaks an existing link if passing nullptr.
     void SetConnection(OutputSlot* source)
     {
         if (m_Connection != nullptr && source != nullptr)
@@ -62,7 +64,7 @@ public:
         m_Connection = source;
     }
 
-    // Insert single-output existing layer at this point in the graph.
+    // Inserts single-output existing layer at this point in the graph.
     void Insert(Layer& layer);
 
     // IInputSlot
@@ -113,10 +115,10 @@ public:
 
     bool ValidateTensorShape(const TensorShape& shape) const;
 
-    // Disconnect all conections
+    // Disconnect all conections.
     void DisconnectAll();
 
-    /// Move all connections to another OutputSlot
+    /// Moves all connections to another OutputSlot.
     void MoveAllConnections(OutputSlot& destination);
 
     // IOutputSlot
@@ -147,7 +149,7 @@ private:
     std::vector<InputSlot*> m_Connections;
 };
 
-// InputSlot inlines that need OutputSlot declaration
+// InputSlot inlines that need OutputSlot declaration.
 
 inline InputSlot::~InputSlot()
 {
@@ -172,6 +174,9 @@ inline InputSlot::~InputSlot()
 inline const IOutputSlot* InputSlot::GetConnection() const { return GetConnectedOutputSlot(); }
 inline IOutputSlot* InputSlot::GetConnection() { return GetConnectedOutputSlot(); }
 
+
+class ScopedCpuTensorHandle;
+
 // Base layer class
 
 using LayerPriority = unsigned int;
@@ -179,7 +184,7 @@ using LayerPriority = unsigned int;
 class Layer : public IConnectableLayer
 {
 public:
-    /// @param name Optional name for the layer (may be nullptr)
+    /// @param name - Optional name for the layer (may be nullptr).
     Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType type, const char* name);
 
     const std::string& GetNameStr() const
@@ -200,15 +205,15 @@ public:
     const std::vector<InputSlot>& GetInputSlots() const { return m_InputSlots; }
     const std::vector<OutputSlot>& GetOutputSlots() const { return m_OutputSlots; }
 
-    // Allow non-const access to input slots, but don't expose vector (vector size is fixed at layer construction).
+    // Allows non-const access to input slots, but don't expose vector (vector size is fixed at layer construction).
     std::vector<InputSlot>::iterator BeginInputSlots() { return m_InputSlots.begin(); }
     std::vector<InputSlot>::iterator EndInputSlots() { return m_InputSlots.end(); }
 
-    // Allow non-const access to output slots, but don't expose vector (vector size is fixed at layer construction).
+    // Allows non-const access to output slots, but don't expose vector (vector size is fixed at layer construction).
     std::vector<OutputSlot>::iterator BeginOutputSlots() { return m_OutputSlots.begin(); }
     std::vector<OutputSlot>::iterator EndOutputSlots() { return m_OutputSlots.end(); }
 
-    // Check whether the outputs of this layer don't have any connection
+    // Checks whether the outputs of this layer don't have any connection.
     bool IsOutputUnconnected()
     {
         unsigned int numConnections = 0;
@@ -221,7 +226,7 @@ public:
         return (GetNumOutputSlots() > 0) && (numConnections == 0);
     }
 
-    // Used for sorting
+    // Used for sorting.
     void ResetPriority() const;
     LayerPriority GetPriority() const;
 
@@ -238,15 +243,34 @@ public:
 
     virtual void CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory);
 
-    /// Creates a dynamically-allocated copy of this layer
-    /// @param graph The Graph into which this Layer is being cloned
+    /// Creates a dynamically-allocated copy of this layer.
+    /// @param graph - The Graph into which this Layer is being cloned.
     virtual Layer* Clone(Graph& graph) const = 0;
+
+    void VerifyLayerConnections(unsigned int expectedConnections, const CheckLocation& location) const;
 
     virtual void ValidateTensorShapesFromInputs() = 0;
 
-    /// Helper to serialize the layer parameters to string
-    /// (currently used in DotSerializer and company)
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
+
+    /// Helper to serialize the layer parameters to string.
+    /// (currently used in DotSerializer and company).
     virtual void SerializeLayerParameters(ParameterStringifyFunction &) const {}
+
+    // Free up the constant source data
+    virtual void ReleaseConstantData();
+
+    template<typename Op>
+    void OperateOnConstantTensors(Op op)
+    {
+        for (auto constant : GetConstantTensorsByRef())
+        {
+            if (constant.get())
+            {
+                op(constant);
+            }
+        }
+    };
 
     // IConnectableLayer
 
@@ -263,8 +287,12 @@ public:
     void SetGuid(LayerGuid guid) { m_Guid = guid; }
     LayerGuid GetGuid() const final { return m_Guid; }
 
+    void AddRelatedLayerName(const std::string layerName) { m_RelatedLayerNames.emplace_back(layerName); }
+
+    const std::list<std::string>& GetRelatedLayerNames() { return m_RelatedLayerNames; }
+
 protected:
-    // Graph needs access to the virtual destructor
+    // Graph needs access to the virtual destructor.
     friend class Graph;
     virtual ~Layer() = default;
 
@@ -282,7 +310,7 @@ protected:
         CollectWorkloadOutputs(dataCollector, graph);
     }
 
-    /// Helper function to reduce duplication in *Layer::CreateWorkload
+    /// Helper function to reduce duplication in *Layer::CreateWorkload.
     template <typename QueueDescriptor>
     WorkloadInfo PrepInfoAndDesc(QueueDescriptor& descriptor, const Graph& graph) const
     {
@@ -294,6 +322,10 @@ protected:
 
     template <typename LayerType, typename ... Params>
     LayerType* CloneBase(Graph& graph, Params&& ... params) const;
+
+    // Retrieve the Handles to the constants
+    using ConstantTensors = std::vector<std::reference_wrapper<std::unique_ptr<ScopedCpuTensorHandle>>>;
+    virtual ConstantTensors GetConstantTensorsByRef() {return ConstantTensors(); };
 
 private:
     void CollectWorkloadInputs(WorkloadDataCollector& dataCollector, const Graph& graph) const;
@@ -311,14 +343,16 @@ private:
     const LayerType m_Type;
     Compute m_ComputeDevice;
 
-    /// Used for sorting
+    /// Used for sorting.
     mutable LayerPriority m_Priority = 0;
     mutable bool m_Visiting = false;
 
     LayerGuid m_Guid;
+
+    std::list<std::string> m_RelatedLayerNames;
 };
 
-// A layer user-provided data can be bound to (e.g. inputs, outputs)
+// A layer user-provided data can be bound to (e.g. inputs, outputs).
 class BindableLayer : public Layer
 {
 public:

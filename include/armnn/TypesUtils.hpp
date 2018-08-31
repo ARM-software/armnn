@@ -96,11 +96,11 @@ constexpr unsigned int GetDataTypeSize(DataType dataType)
     }
 }
 
-template <int N>
+template <unsigned N>
 constexpr bool StrEqual(const char* strA, const char (&strB)[N])
 {
     bool isEqual = true;
-    for (int i = 0; isEqual && (i < N); ++i)
+    for (unsigned i = 0; isEqual && (i < N); ++i)
     {
         isEqual = (strA[i] == strB[i]);
     }

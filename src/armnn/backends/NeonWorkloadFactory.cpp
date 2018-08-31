@@ -82,32 +82,32 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateOutput(const OutputQueueDe
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                  const WorkloadInfo&              info) const
 {
-    return MakeWorkload<NeonActivationFloat32Workload, NeonActivationUint8Workload>(descriptor, info);
+    return MakeWorkload<NeonActivationFloatWorkload, NeonActivationUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                               const WorkloadInfo&           info) const
 {
-    return MakeWorkload<NeonSoftmaxFloat32Workload, NeonSoftmaxUint8Workload>(descriptor, info,
+    return MakeWorkload<NeonSoftmaxFloatWorkload, NeonSoftmaxUint8Workload>(descriptor, info,
                                                                               m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
                                                                const WorkloadInfo&            info) const
 {
-    return MakeWorkload<NeonSplitterFloat32Workload, NeonSplitterUint8Workload>(descriptor, info);
+    return MakeWorkload<NeonSplitterFloatWorkload, NeonSplitterUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&          info) const
 {
-    return MakeWorkload<NeonMergerFloat32Workload, NeonMergerUint8Workload>(descriptor, info);
+    return MakeWorkload<NeonMergerFloatWorkload, NeonMergerUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonFullyConnectedFloat32Workload, NullWorkload>(descriptor, info,
+    return MakeWorkload<NeonFullyConnectedFloatWorkload, NullWorkload>(descriptor, info,
                                                                          m_MemoryManager.GetIntraLayerManager());
 }
 
@@ -120,40 +120,40 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePermute(const Permu
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
                                                                        const WorkloadInfo&           info) const
 {
-    return MakeWorkload<NeonPooling2dFloat32Workload, NeonPooling2dUint8Workload>(descriptor, info);
+    return MakeWorkload<NeonPooling2dFloatWorkload, NeonPooling2dUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonConvolution2dFloat32Workload, NeonConvolution2dUint8Workload>(descriptor, info,
+    return MakeWorkload<NeonConvolution2dFloatWorkload, NeonConvolution2dUint8Workload>(descriptor, info,
                                                                               m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonDepthwiseConvolutionFloat32Workload, NeonDepthwiseConvolutionUint8Workload>(
+    return MakeWorkload<NeonDepthwiseConvolutionFloatWorkload, NeonDepthwiseConvolutionUint8Workload>(
         descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateNormalization(
     const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonNormalizationFloat32Workload, NullWorkload>(descriptor, info,
+    return MakeWorkload<NeonNormalizationFloatWorkload, NullWorkload>(descriptor, info,
                                                                         m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                                       const WorkloadInfo&            info) const
 {
-    return MakeWorkload<NeonAdditionFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonAdditionFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMultiplication(
     const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonMultiplicationFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonMultiplicationFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(
@@ -165,7 +165,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateBatchNormalization(
     const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonBatchNormalizationFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonBatchNormalizationFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
@@ -196,32 +196,32 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFakeQuantization(
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonL2NormalizationFloat32Workload, NullWorkload>(descriptor, info,
+    return MakeWorkload<NeonL2NormalizationFloatWorkload, NullWorkload>(descriptor, info,
                                                                           m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonConstantFloat32Workload, NeonConstantUint8Workload>(descriptor, info);
+    return MakeWorkload<NeonConstantFloatWorkload, NeonConstantUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonReshapeFloat32Workload, NeonReshapeUint8Workload>(descriptor, info);
+    return MakeWorkload<NeonReshapeFloatWorkload, NeonReshapeUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonFloorFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonFloorFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonLstmFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonLstmFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp16ToFp32(

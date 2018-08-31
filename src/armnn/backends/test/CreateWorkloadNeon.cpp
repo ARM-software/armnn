@@ -69,13 +69,13 @@ static void NeonCreateActivationWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateActivationFloat16Workload)
 {
-    NeonCreateActivationWorkloadTest<NeonActivationFloat32Workload, DataType::Float16>();
+    NeonCreateActivationWorkloadTest<NeonActivationFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateActivationFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateActivationFloatWorkload)
 {
-    NeonCreateActivationWorkloadTest<NeonActivationFloat32Workload, DataType::Float32>();
+    NeonCreateActivationWorkloadTest<NeonActivationFloatWorkload, DataType::Float32>();
 }
 
 template <typename AdditionWorkloadType, typename armnn::DataType DataType>
@@ -98,13 +98,13 @@ static void NeonCreateAdditionWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 {
-    NeonCreateAdditionWorkloadTest<NeonAdditionFloat32Workload, DataType::Float16>();
+    NeonCreateAdditionWorkloadTest<NeonAdditionFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateAdditionFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    NeonCreateAdditionWorkloadTest<NeonAdditionFloat32Workload, DataType::Float32>();
+    NeonCreateAdditionWorkloadTest<NeonAdditionFloatWorkload, DataType::Float32>();
 }
 
 template <typename BatchNormalizationWorkloadType, typename armnn::DataType DataType>
@@ -125,13 +125,13 @@ static void NeonCreateBatchNormalizationWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16Workload)
 {
-    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloat32Workload, DataType::Float16>();
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatWorkload)
 {
-    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloat32Workload, DataType::Float32>();
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float32>();
 }
 
 template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
@@ -153,13 +153,13 @@ static void NeonCreateConvolution2dWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16Workload)
 {
-    NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloat32Workload, DataType::Float16>();
+    NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatWorkload)
 {
-    NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloat32Workload, DataType::Float32>();
+    NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloatWorkload, DataType::Float32>();
 }
 
 template <typename FullyConnectedWorkloadType, typename armnn::DataType DataType>
@@ -181,13 +181,13 @@ static void NeonCreateFullyConnectedWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat16Workload)
 {
-    NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedFloat32Workload, DataType::Float16>();
+    NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloatWorkload)
 {
-    NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedFloat32Workload, DataType::Float32>();
+    NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedFloatWorkload, DataType::Float32>();
 }
 
 template <typename MultiplicationWorkloadType, typename armnn::DataType DataType>
@@ -211,13 +211,13 @@ static void NeonCreateMultiplicationWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
 {
-    NeonCreateMultiplicationWorkloadTest<NeonMultiplicationFloat32Workload, DataType::Float16>();
+    NeonCreateMultiplicationWorkloadTest<NeonMultiplicationFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
 {
-    NeonCreateMultiplicationWorkloadTest<NeonMultiplicationFloat32Workload, DataType::Float32>();
+    NeonCreateMultiplicationWorkloadTest<NeonMultiplicationFloatWorkload, DataType::Float32>();
 }
 
 template <typename NormalizationWorkloadType, typename armnn::DataType DataType>
@@ -238,13 +238,13 @@ static void NeonCreateNormalizationWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16Workload)
 {
-    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloat32Workload, DataType::Float16>();
+    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloatWorkload)
 {
-    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloat32Workload, DataType::Float32>();
+    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float32>();
 }
 
 template <typename Pooling2dWorkloadType, typename armnn::DataType DataType>
@@ -266,13 +266,13 @@ static void NeonCreatePooling2dWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16Workload)
 {
-    NeonCreatePooling2dWorkloadTest<NeonPooling2dFloat32Workload, DataType::Float16>();
+    NeonCreatePooling2dWorkloadTest<NeonPooling2dFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreatePooling2dFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreatePooling2dFloatWorkload)
 {
-    NeonCreatePooling2dWorkloadTest<NeonPooling2dFloat32Workload, DataType::Float32>();
+    NeonCreatePooling2dWorkloadTest<NeonPooling2dFloatWorkload, DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8Workload)
@@ -298,13 +298,13 @@ static void NeonCreateReshapeWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateReshapeFloat16Workload)
 {
-    NeonCreateReshapeWorkloadTest<NeonReshapeFloat32Workload, DataType::Float16>();
+    NeonCreateReshapeWorkloadTest<NeonReshapeFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateReshapeFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateReshapeFloatWorkload)
 {
-    NeonCreateReshapeWorkloadTest<NeonReshapeFloat32Workload, DataType::Float32>();
+    NeonCreateReshapeWorkloadTest<NeonReshapeFloatWorkload, DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
@@ -330,20 +330,20 @@ static void NeonCreateSoftmaxWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat16Workload)
 {
-    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxFloat32Workload, DataType::Float16>();
+    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxFloatWorkload, DataType::Float16>();
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateSoftmaxFloatWorkload)
 {
-    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxFloat32Workload, DataType::Float32>();
+    NeonCreateSoftmaxWorkloadTest<NeonSoftmaxFloatWorkload, DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
 {
     Graph graph;
     NeonWorkloadFactory factory;
-    auto workload = CreateSplitterWorkloadTest<NeonSplitterFloat32Workload, DataType::Float32>(factory, graph);
+    auto workload = CreateSplitterWorkloadTest<NeonSplitterFloatWorkload, DataType::Float32>(factory, graph);
 
     // Checks that outputs are as we expect them (see definition of CreateSplitterWorkloadTest).
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
     NeonWorkloadFactory factory;
 
     auto workloads =
-        CreateSplitterMergerWorkloadTest<NeonSplitterFloat32Workload, NeonMergerFloat32Workload,
+        CreateSplitterMergerWorkloadTest<NeonSplitterFloatWorkload, NeonMergerFloatWorkload,
             DataType::Float32>(factory, graph);
 
     auto wlSplitter = std::move(workloads.first);
@@ -401,14 +401,14 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
 
     Graph graph;
     NeonWorkloadFactory factory;
-    std::unique_ptr<NeonSplitterFloat32Workload> wlSplitter;
-    std::unique_ptr<NeonActivationFloat32Workload> wlActiv0_0;
-    std::unique_ptr<NeonActivationFloat32Workload> wlActiv0_1;
-    std::unique_ptr<NeonActivationFloat32Workload> wlActiv1_0;
-    std::unique_ptr<NeonActivationFloat32Workload> wlActiv1_1;
+    std::unique_ptr<NeonSplitterFloatWorkload> wlSplitter;
+    std::unique_ptr<NeonActivationFloatWorkload> wlActiv0_0;
+    std::unique_ptr<NeonActivationFloatWorkload> wlActiv0_1;
+    std::unique_ptr<NeonActivationFloatWorkload> wlActiv1_0;
+    std::unique_ptr<NeonActivationFloatWorkload> wlActiv1_1;
 
-    CreateSplitterMultipleInputsOneOutputWorkloadTest<NeonSplitterFloat32Workload,
-        NeonActivationFloat32Workload, DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
+    CreateSplitterMultipleInputsOneOutputWorkloadTest<NeonSplitterFloatWorkload,
+        NeonActivationFloatWorkload, DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
                                                                  wlActiv1_0, wlActiv1_1);
 
     armnn::INeonTensorHandle* sOut0 = dynamic_cast<armnn::INeonTensorHandle*>(wlSplitter->GetData().m_Outputs[0]);

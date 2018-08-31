@@ -37,14 +37,14 @@ static void ClCreateActivationWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {1}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateActivationFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateActivationFloatWorkload)
 {
-    ClCreateActivationWorkloadTest<ClActivationFloat32Workload, armnn::DataType::Float32>();
+    ClCreateActivationWorkloadTest<ClActivationFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateActivationFloat16Workload)
 {
-    ClCreateActivationWorkloadTest<ClActivationFloat32Workload, armnn::DataType::Float16>();
+    ClCreateActivationWorkloadTest<ClActivationFloatWorkload, armnn::DataType::Float16>();
 }
 
 template <typename AdditionWorkloadType, armnn::DataType DataType>
@@ -64,14 +64,14 @@ static void ClCreateAdditionWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 3}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateAdditionFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    ClCreateAdditionWorkloadTest<ClAdditionFloat32Workload, armnn::DataType::Float32>();
+    ClCreateAdditionWorkloadTest<ClAdditionFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 {
-    ClCreateAdditionWorkloadTest<ClAdditionFloat32Workload, armnn::DataType::Float16>();
+    ClCreateAdditionWorkloadTest<ClAdditionFloatWorkload, armnn::DataType::Float16>();
 }
 
 template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>
@@ -92,14 +92,14 @@ static void ClCreateBatchNormalizationWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 3, 1, 1}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatWorkload)
 {
-    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloat32Workload, armnn::DataType::Float32>();
+    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16Workload)
 {
-    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloat32Workload, armnn::DataType::Float16>();
+    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloatWorkload, armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateConvertFp16ToFp32Workload)
@@ -150,14 +150,14 @@ static void ClConvolution2dWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 2, 2, 10}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatWorkload)
 {
-    ClConvolution2dWorkloadTest<ClConvolution2dFloat32Workload, armnn::DataType::Float32>();
+    ClConvolution2dWorkloadTest<ClConvolution2dFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16Workload)
 {
-    ClConvolution2dWorkloadTest<ClConvolution2dFloat32Workload, armnn::DataType::Float16>();
+    ClConvolution2dWorkloadTest<ClConvolution2dFloatWorkload, armnn::DataType::Float16>();
 }
 
 
@@ -177,14 +177,14 @@ static void ClDirectConvolution2dWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 2, 6, 6}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dFloatWorkload)
 {
-    ClDirectConvolution2dWorkloadTest<ClConvolution2dFloat32Workload, armnn::DataType::Float32>();
+    ClDirectConvolution2dWorkloadTest<ClConvolution2dFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dFloat16Workload)
 {
-    ClDirectConvolution2dWorkloadTest<ClConvolution2dFloat32Workload, armnn::DataType::Float16>();
+    ClDirectConvolution2dWorkloadTest<ClConvolution2dFloatWorkload, armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dUint8Workload)
@@ -209,14 +209,14 @@ static void ClCreateFullyConnectedWorkloadTest()
 }
 
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat32WorkloadTest)
+BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloatWorkloadTest)
 {
-    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedFloat32Workload, armnn::DataType::Float32>();
+    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat16WorkloadTest)
 {
-    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedFloat32Workload, armnn::DataType::Float16>();
+    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedFloatWorkload, armnn::DataType::Float16>();
 }
 
 
@@ -239,14 +239,14 @@ static void ClCreateMultiplicationWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 3}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat32WorkloadTest)
+BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkloadTest)
 {
-    ClCreateMultiplicationWorkloadTest<ClMultiplicationFloat32Workload, armnn::DataType::Float32>();
+    ClCreateMultiplicationWorkloadTest<ClMultiplicationFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16WorkloadTest)
 {
-    ClCreateMultiplicationWorkloadTest<ClMultiplicationFloat32Workload, armnn::DataType::Float16>();
+    ClCreateMultiplicationWorkloadTest<ClMultiplicationFloatWorkload, armnn::DataType::Float16>();
 }
 
 template <typename NormalizationWorkloadType, typename armnn::DataType DataType>
@@ -267,14 +267,14 @@ static void ClNormalizationWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 5, 5, 1}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloatWorkload)
 {
-    ClNormalizationWorkloadTest<ClNormalizationFloat32Workload, armnn::DataType::Float32>();
+    ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16Workload)
 {
-    ClNormalizationWorkloadTest<ClNormalizationFloat32Workload, armnn::DataType::Float16>();
+    ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float16>();
 }
 
 template <typename Pooling2dWorkloadType, typename armnn::DataType DataType>
@@ -294,14 +294,14 @@ static void ClPooling2dWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 2, 2, 4}));
 }
 
-BOOST_AUTO_TEST_CASE(CreatePooling2dFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreatePooling2dFloatWorkload)
 {
-    ClPooling2dWorkloadTest<ClPooling2dFloat32Workload, armnn::DataType::Float32>();
+    ClPooling2dWorkloadTest<ClPooling2dFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16Workload)
 {
-    ClPooling2dWorkloadTest<ClPooling2dFloat32Workload, armnn::DataType::Float16>();
+    ClPooling2dWorkloadTest<ClPooling2dFloatWorkload, armnn::DataType::Float16>();
 }
 
 template <typename ReshapeWorkloadType, typename armnn::DataType DataType>
@@ -321,14 +321,14 @@ static void ClCreateReshapeWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {4})); // Leading size 1 dimensions are collapsed by ACL.
 }
 
-BOOST_AUTO_TEST_CASE(CreateReshapeFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateReshapeFloatWorkload)
 {
-    ClCreateReshapeWorkloadTest<ClReshapeFloat32Workload, armnn::DataType::Float32>();
+    ClCreateReshapeWorkloadTest<ClReshapeFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeFloat16Workload)
 {
-    ClCreateReshapeWorkloadTest<ClReshapeFloat32Workload, armnn::DataType::Float16>();
+    ClCreateReshapeWorkloadTest<ClReshapeFloatWorkload, armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
@@ -344,7 +344,7 @@ static void ClSoftmaxWorkloadTest()
 
     auto workload = CreateSoftmaxWorkloadTest<SoftmaxWorkloadType, DataType>(factory, graph);
 
-    // Checks that inputs/outputs are as we expect them (see definition of ClSoftmaxFloat32Workload).
+    // Checks that inputs/outputs are as we expect them (see definition of ClSoftmaxFloatWorkload).
     SoftmaxQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -354,14 +354,14 @@ static void ClSoftmaxWorkloadTest()
 }
 
 
-BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat32WorkloadTest)
+BOOST_AUTO_TEST_CASE(CreateSoftmaxFloatWorkloadTest)
 {
-    ClSoftmaxWorkloadTest<ClSoftmaxFloat32Workload, armnn::DataType::Float32>();
+    ClSoftmaxWorkloadTest<ClSoftmaxFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat16WorkloadTest)
 {
-    ClSoftmaxWorkloadTest<ClSoftmaxFloat32Workload, armnn::DataType::Float16>();
+    ClSoftmaxWorkloadTest<ClSoftmaxFloatWorkload, armnn::DataType::Float16>();
 }
 
 template <typename SplitterWorkloadType, typename armnn::DataType DataType>
@@ -389,14 +389,14 @@ static void ClSplitterWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle0, {7, 7}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateSplitterFloatWorkload)
 {
-    ClSplitterWorkloadTest<ClSplitterFloat32Workload, armnn::DataType::Float32>();
+    ClSplitterWorkloadTest<ClSplitterFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterFloat16Workload)
 {
-    ClSplitterWorkloadTest<ClSplitterFloat32Workload, armnn::DataType::Float16>();
+    ClSplitterWorkloadTest<ClSplitterFloatWorkload, armnn::DataType::Float16>();
 }
 
 template <typename SplitterWorkloadType, typename MergerWorkloadType, typename armnn::DataType DataType>
@@ -441,14 +441,14 @@ static void ClSplitterMergerTest()
     BOOST_TEST(validSubTensorParents);
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloatWorkload)
 {
-    ClSplitterMergerTest<ClSplitterFloat32Workload, ClMergerFloat32Workload, armnn::DataType::Float32>();
+    ClSplitterMergerTest<ClSplitterFloatWorkload, ClMergerFloatWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloat16Workload)
 {
-    ClSplitterMergerTest<ClSplitterFloat32Workload, ClMergerFloat32Workload, armnn::DataType::Float16>();
+    ClSplitterMergerTest<ClSplitterFloatWorkload, ClMergerFloatWorkload, armnn::DataType::Float16>();
 }
 
 
@@ -459,14 +459,14 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
 
     Graph graph;
     ClWorkloadFactory factory;
-    std::unique_ptr<ClSplitterFloat32Workload> wlSplitter;
-    std::unique_ptr<ClActivationFloat32Workload> wlActiv0_0;
-    std::unique_ptr<ClActivationFloat32Workload> wlActiv0_1;
-    std::unique_ptr<ClActivationFloat32Workload> wlActiv1_0;
-    std::unique_ptr<ClActivationFloat32Workload> wlActiv1_1;
+    std::unique_ptr<ClSplitterFloatWorkload> wlSplitter;
+    std::unique_ptr<ClActivationFloatWorkload> wlActiv0_0;
+    std::unique_ptr<ClActivationFloatWorkload> wlActiv0_1;
+    std::unique_ptr<ClActivationFloatWorkload> wlActiv1_0;
+    std::unique_ptr<ClActivationFloatWorkload> wlActiv1_1;
 
-    CreateSplitterMultipleInputsOneOutputWorkloadTest<ClSplitterFloat32Workload,
-        ClActivationFloat32Workload, armnn::DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
+    CreateSplitterMultipleInputsOneOutputWorkloadTest<ClSplitterFloatWorkload,
+        ClActivationFloatWorkload, armnn::DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
                                                                wlActiv1_0, wlActiv1_1);
 
     //Checks that the index of inputs/outputs matches what we declared on InputDescriptor construction.
@@ -502,7 +502,7 @@ BOOST_AUTO_TEST_CASE(CreateL2NormalizationWorkload)
     Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateL2NormalizationWorkloadTest<ClL2NormalizationFloat32Workload, armnn::DataType::Float32>
+    auto workload = CreateL2NormalizationWorkloadTest<ClL2NormalizationFloatWorkload, armnn::DataType::Float32>
         (factory, graph);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
@@ -528,9 +528,9 @@ static void ClCreateLstmWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 2, 4 }));
 }
 
-BOOST_AUTO_TEST_CASE(CreateLSTMWorkloadFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateLSTMWorkloadFloatWorkload)
 {
-    ClCreateLstmWorkloadTest<ClLstmFloat32Workload>();
+    ClCreateLstmWorkloadTest<ClLstmFloatWorkload>();
 }
 
 

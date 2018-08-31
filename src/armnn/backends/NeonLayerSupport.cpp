@@ -15,15 +15,15 @@
 #include <boost/core/ignore_unused.hpp>
 
 #ifdef ARMCOMPUTENEON_ENABLED
-#include "NeonWorkloads/NeonAdditionFloat32Workload.hpp"
-#include "NeonWorkloads/NeonActivationFloat32Workload.hpp"
-#include "NeonWorkloads/NeonBatchNormalizationFloat32Workload.hpp"
+#include "NeonWorkloads/NeonAdditionFloatWorkload.hpp"
+#include "NeonWorkloads/NeonActivationFloatWorkload.hpp"
+#include "NeonWorkloads/NeonBatchNormalizationFloatWorkload.hpp"
 #include "NeonWorkloads/NeonConvolution2dBaseWorkload.hpp"
 #include "NeonWorkloads/NeonDepthwiseConvolutionBaseWorkload.hpp"
-#include "NeonWorkloads/NeonL2NormalizationFloat32Workload.hpp"
-#include "NeonWorkloads/NeonMultiplicationFloat32Workload.hpp"
-#include "NeonWorkloads/NeonNormalizationFloat32Workload.hpp"
-#include "NeonWorkloads/NeonFullyConnectedFloat32Workload.hpp"
+#include "NeonWorkloads/NeonL2NormalizationFloatWorkload.hpp"
+#include "NeonWorkloads/NeonMultiplicationFloatWorkload.hpp"
+#include "NeonWorkloads/NeonNormalizationFloatWorkload.hpp"
+#include "NeonWorkloads/NeonFullyConnectedFloatWorkload.hpp"
 #include "NeonWorkloads/NeonPermuteWorkload.hpp"
 #include "NeonWorkloads/NeonPooling2dBaseWorkload.hpp"
 #include "NeonWorkloads/NeonSoftmaxBaseWorkload.hpp"

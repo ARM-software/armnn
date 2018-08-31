@@ -395,19 +395,19 @@ list(APPEND armnn_sources
 if(ARMCOMPUTENEON)
     # Additionally include source files for ARM Compute NEON backend
     list(APPEND armnn_sources
-        src/armnn/backends/NeonWorkloads/NeonActivationFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonActivationFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonActivationFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonActivationFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonActivationUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonActivationUint8Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonAdditionFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonAdditionFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonAdditionFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonAdditionFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonBaseConstantWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonBaseMergerWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonBaseSplitterWorkload.hpp
-        src/armnn/backends/NeonWorkloads/NeonBatchNormalizationFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonBatchNormalizationFloat32Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonConstantFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonConstantFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonBatchNormalizationFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonBatchNormalizationFloatWorkload.hpp
+        src/armnn/backends/NeonWorkloads/NeonConstantFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonConstantFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonConstantUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonConstantUint8Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonConvertFp16ToFp32Workload.cpp
@@ -416,52 +416,52 @@ if(ARMCOMPUTENEON)
         src/armnn/backends/NeonWorkloads/NeonConvertFp32ToFp16Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dBaseWorkload.cpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dBaseWorkload.hpp
-        src/armnn/backends/NeonWorkloads/NeonConvolution2dFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonConvolution2dFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonConvolution2dFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonConvolution2dFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonConvolution2dUint8Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionBaseWorkload.cpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionBaseWorkload.hpp
-        src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonDepthwiseConvolutionUint8Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonFloorFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonFloorFloat32Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonFullyConnectedFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonFullyConnectedFloat32Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonL2NormalizationFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonL2NormalizationFloat32Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonLstmFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonLstmFloat32Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonMergerFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonMergerFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonFloorFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonFloorFloatWorkload.hpp
+        src/armnn/backends/NeonWorkloads/NeonFullyConnectedFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonFullyConnectedFloatWorkload.hpp
+        src/armnn/backends/NeonWorkloads/NeonL2NormalizationFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonL2NormalizationFloatWorkload.hpp
+        src/armnn/backends/NeonWorkloads/NeonLstmFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonLstmFloatWorkload.hpp
+        src/armnn/backends/NeonWorkloads/NeonMergerFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonMergerFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonMergerUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonMergerUint8Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonMultiplicationFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonMultiplicationFloat32Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonNormalizationFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonNormalizationFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonMultiplicationFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonMultiplicationFloatWorkload.hpp
+        src/armnn/backends/NeonWorkloads/NeonNormalizationFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonNormalizationFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonPermuteWorkload.cpp
         src/armnn/backends/NeonWorkloads/NeonPermuteWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonPooling2dBaseWorkload.cpp
         src/armnn/backends/NeonWorkloads/NeonPooling2dBaseWorkload.hpp
-        src/armnn/backends/NeonWorkloads/NeonPooling2dFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonPooling2dFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonPooling2dFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonPooling2dFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonPooling2dUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonPooling2dUint8Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonReshapeFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonReshapeFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonReshapeFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonReshapeFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonReshapeUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonReshapeUint8Workload.hpp
         src/armnn/backends/NeonWorkloads/NeonSoftmaxBaseWorkload.cpp
         src/armnn/backends/NeonWorkloads/NeonSoftmaxBaseWorkload.hpp
-        src/armnn/backends/NeonWorkloads/NeonSoftmaxFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonSoftmaxFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonSoftmaxFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonSoftmaxFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonSoftmaxUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonSoftmaxUint8Workload.hpp
-        src/armnn/backends/NeonWorkloads/NeonSplitterFloat32Workload.cpp
-        src/armnn/backends/NeonWorkloads/NeonSplitterFloat32Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonSplitterFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonSplitterFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonSplitterUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonSplitterUint8Workload.hpp
         src/armnn/backends/NeonWorkloadUtils.cpp
@@ -475,8 +475,8 @@ endif()
 if(ARMCOMPUTECL)
     # Additionally include source files for ARM Compute OpenCL backend
     list(APPEND armnn_sources
-        src/armnn/backends/ClWorkloads/ClActivationFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClActivationFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClActivationFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClActivationFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClActivationUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClActivationUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClAdditionBaseWorkload.cpp
@@ -485,71 +485,71 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClConvertFp16ToFp32Workload.hpp
         src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.cpp
         src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.hpp
-        src/armnn/backends/ClWorkloads/ClAdditionFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClAdditionFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClAdditionFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClAdditionFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClAdditionUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClAdditionUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClBaseConstantWorkload.cpp
         src/armnn/backends/ClWorkloads/ClBaseConstantWorkload.hpp
         src/armnn/backends/ClWorkloads/ClBaseMergerWorkload.hpp
-        src/armnn/backends/ClWorkloads/ClBatchNormalizationFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClBatchNormalizationFloat32Workload.hpp
-        src/armnn/backends/ClWorkloads/ClConstantFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClConstantFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClBatchNormalizationFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClBatchNormalizationFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClConstantFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClConstantFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClConstantUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClConstantUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClConvolution2dBaseWorkload.cpp
         src/armnn/backends/ClWorkloads/ClConvolution2dBaseWorkload.hpp
-        src/armnn/backends/ClWorkloads/ClConvolution2dFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClConvolution2dFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClConvolution2dFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClConvolution2dFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClConvolution2dUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClConvolution2dUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionBaseWorkload.cpp
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionBaseWorkload.hpp
-        src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.hpp
-        src/armnn/backends/ClWorkloads/ClFloorFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClFloorFloat32Workload.hpp
-        src/armnn/backends/ClWorkloads/ClFullyConnectedFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClFullyConnectedFloat32Workload.hpp
-        src/armnn/backends/ClWorkloads/ClL2NormalizationFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClL2NormalizationFloat32Workload.hpp
-        src/armnn/backends/ClWorkloads/ClLstmFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClLstmFloat32Workload.hpp
-        src/armnn/backends/ClWorkloads/ClMergerFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClMergerFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClFloorFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClFloorFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClFullyConnectedFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClFullyConnectedFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClL2NormalizationFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClL2NormalizationFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClLstmFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClLstmFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClMergerFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClMergerFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClMergerUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClMergerUint8Workload.hpp
-        src/armnn/backends/ClWorkloads/ClMultiplicationFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClMultiplicationFloat32Workload.hpp
-        src/armnn/backends/ClWorkloads/ClNormalizationFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClNormalizationFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClMultiplicationFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClMultiplicationFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClNormalizationFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClNormalizationFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClPermuteWorkload.cpp
         src/armnn/backends/ClWorkloads/ClPermuteWorkload.hpp
         src/armnn/backends/ClWorkloads/ClPooling2dBaseWorkload.cpp
         src/armnn/backends/ClWorkloads/ClPooling2dBaseWorkload.hpp
-        src/armnn/backends/ClWorkloads/ClPooling2dFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClPooling2dFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClPooling2dFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClPooling2dFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClPooling2dUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClPooling2dUint8Workload.hpp
-        src/armnn/backends/ClWorkloads/ClReshapeFloat32Workload.cpp
+        src/armnn/backends/ClWorkloads/ClReshapeFloatWorkload.cpp
         src/armnn/backends/ClWorkloads/ClDivisionFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClDivisionFloatWorkload.cpp
-        src/armnn/backends/ClWorkloads/ClReshapeFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClReshapeFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClReshapeUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClReshapeUint8Workload.hpp
-        src/armnn/backends/ClWorkloads/ClResizeBilinearFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClResizeBilinearFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClResizeBilinearFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClResizeBilinearFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClSoftmaxBaseWorkload.cpp
         src/armnn/backends/ClWorkloads/ClSoftmaxBaseWorkload.hpp
-        src/armnn/backends/ClWorkloads/ClSoftmaxFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClSoftmaxFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClSoftmaxFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClSoftmaxFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClSoftmaxUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClSoftmaxUint8Workload.hpp
-        src/armnn/backends/ClWorkloads/ClSplitterFloat32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClSplitterFloat32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClSplitterFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClSplitterFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClSplitterUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClSplitterUint8Workload.hpp
         src/armnn/backends/ClWorkloadUtils.hpp

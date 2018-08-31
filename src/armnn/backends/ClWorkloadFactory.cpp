@@ -91,32 +91,32 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateOutput(const OutputQueueDesc
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                const WorkloadInfo&              info) const
 {
-    return MakeWorkload<ClActivationFloat32Workload, ClActivationUint8Workload>(descriptor, info);
+    return MakeWorkload<ClActivationFloatWorkload, ClActivationUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                             const WorkloadInfo&           info) const
 {
-    return MakeWorkload<ClSoftmaxFloat32Workload, ClSoftmaxUint8Workload>(descriptor, info,
+    return MakeWorkload<ClSoftmaxFloatWorkload, ClSoftmaxUint8Workload>(descriptor, info,
                                                                           m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
                                                              const WorkloadInfo&            info) const
 {
-    return MakeWorkload<ClSplitterFloat32Workload, ClSplitterUint8Workload>(descriptor, info);
+    return MakeWorkload<ClSplitterFloatWorkload, ClSplitterUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
                                                                   const WorkloadInfo&          info) const
 {
-    return MakeWorkload<ClMergerFloat32Workload, ClMergerUint8Workload>(descriptor, info);
+    return MakeWorkload<ClMergerFloatWorkload, ClMergerUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClFullyConnectedFloat32Workload, NullWorkload>(descriptor, info,
+    return MakeWorkload<ClFullyConnectedFloatWorkload, NullWorkload>(descriptor, info,
                                                                        m_MemoryManager.GetIntraLayerManager());
 }
 
@@ -129,38 +129,38 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePermute(const Permute
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
                                                                      const WorkloadInfo&           info) const
 {
-    return MakeWorkload<ClPooling2dFloat32Workload, ClPooling2dUint8Workload>(descriptor, info);
+    return MakeWorkload<ClPooling2dFloatWorkload, ClPooling2dUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
                                                                          const WorkloadInfo&               info) const
 {
-    return MakeWorkload<ClConvolution2dFloat32Workload, ClConvolution2dUint8Workload>(descriptor, info,
+    return MakeWorkload<ClConvolution2dFloatWorkload, ClConvolution2dUint8Workload>(descriptor, info,
                                                                               m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClDepthwiseConvolutionFloat32Workload, ClDepthwiseConvolutionUint8Workload>(descriptor, info);
+    return MakeWorkload<ClDepthwiseConvolutionFloatWorkload, ClDepthwiseConvolutionUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
                                                                          const WorkloadInfo&                 info) const
 {
-    return MakeWorkload<ClNormalizationFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClNormalizationFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&            info) const
 {
-    return MakeWorkload<ClAdditionFloat32Workload, ClAdditionUint8Workload>(descriptor, info);
+    return MakeWorkload<ClAdditionFloatWorkload, ClAdditionUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMultiplication(
     const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClMultiplicationFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClMultiplicationFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateDivision(
@@ -172,7 +172,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateDivision(
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateBatchNormalization(
     const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClBatchNormalizationFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClBatchNormalizationFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
@@ -190,7 +190,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateResizeBilinear(
     const ResizeBilinearQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClResizeBilinearFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClResizeBilinearFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFakeQuantization(
@@ -203,31 +203,31 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFakeQuantization(
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClL2NormalizationFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClL2NormalizationFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClConstantFloat32Workload, ClConstantUint8Workload>(descriptor, info);
+    return MakeWorkload<ClConstantFloatWorkload, ClConstantUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClReshapeFloat32Workload, ClReshapeUint8Workload>(descriptor, info);
+    return MakeWorkload<ClReshapeFloatWorkload, ClReshapeUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClFloorFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClFloorFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClLstmFloat32Workload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClLstmFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp16ToFp32(

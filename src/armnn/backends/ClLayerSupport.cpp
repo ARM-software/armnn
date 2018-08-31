@@ -14,22 +14,22 @@
 #include <boost/core/ignore_unused.hpp>
 
 #ifdef ARMCOMPUTECL_ENABLED
-#include "ClWorkloads/ClAdditionFloat32Workload.hpp"
-#include "ClWorkloads/ClActivationFloat32Workload.hpp"
-#include "ClWorkloads/ClBatchNormalizationFloat32Workload.hpp"
+#include "ClWorkloads/ClAdditionFloatWorkload.hpp"
+#include "ClWorkloads/ClActivationFloatWorkload.hpp"
+#include "ClWorkloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "ClWorkloads/ClConvertFp16ToFp32Workload.hpp"
 #include "ClWorkloads/ClConvertFp32ToFp16Workload.hpp"
 #include "ClWorkloads/ClConvolution2dBaseWorkload.hpp"
 #include "ClWorkloads/ClDepthwiseConvolutionBaseWorkload.hpp"
 #include "ClWorkloads/ClDivisionFloatWorkload.hpp"
-#include "ClWorkloads/ClL2NormalizationFloat32Workload.hpp"
-#include "ClWorkloads/ClMultiplicationFloat32Workload.hpp"
-#include "ClWorkloads/ClFullyConnectedFloat32Workload.hpp"
+#include "ClWorkloads/ClL2NormalizationFloatWorkload.hpp"
+#include "ClWorkloads/ClMultiplicationFloatWorkload.hpp"
+#include "ClWorkloads/ClFullyConnectedFloatWorkload.hpp"
 #include "ClWorkloads/ClPooling2dBaseWorkload.hpp"
 #include "ClWorkloads/ClPermuteWorkload.hpp"
-#include "ClWorkloads/ClNormalizationFloat32Workload.hpp"
+#include "ClWorkloads/ClNormalizationFloatWorkload.hpp"
 #include "ClWorkloads/ClSoftmaxBaseWorkload.hpp"
-#include "ClWorkloads/ClLstmFloat32Workload.hpp"
+#include "ClWorkloads/ClLstmFloatWorkload.hpp"
 #endif
 
 using namespace boost;
@@ -417,7 +417,7 @@ bool IsLstmSupportedCl(const TensorInfo& input, const TensorInfo& outputStateIn,
                        const TensorInfo* projectionBias, const TensorInfo* cellToForgetWeights,
                        const TensorInfo* cellToOutputWeights, std::string* reasonIfUnsupported)
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(ClLstmFloat32WorkloadValidate, reasonIfUnsupported,
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClLstmFloatWorkloadValidate, reasonIfUnsupported,
                                    input, outputStateIn, cellStateIn, scratchBuffer, outputStateOut, cellStateOut,
                                    output, descriptor, inputToForgetWeights, inputToCellWeights,
                                    inputToOutputWeights, recurrentToForgetWeights,

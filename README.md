@@ -25,3 +25,14 @@ The armnn/tests directory contains tests used during ArmNN development. Many of 
 The 'ExecuteNetwork' program, in armnn/tests/ExecuteNetwork, has no additional dependencies beyond those required by ArmNN and the model parsers. It takes any model and any input tensor, and simply prints out the output tensor. Run with no arguments to see command-line help.
 
 The 'armnn/samples' directory contains SimpleSample.cpp. A very basic example of the ArmNN SDK API in use.
+
+### License
+
+Arm NN is provided under the [MIT](https://spdx.org/licenses/MIT.html) license.
+See [LICENSE](LICENSE) for more information. Contributions to this project are accepted under the same license.
+
+Individual files contain the following tag instead of the full license text.
+
+    SPDX-License-Identifier: MIT
+
+This enables machine processing of license information based on the SPDX License Identifiers that are available here: http://spdx.org/licenses/

@@ -127,6 +127,8 @@ public:
     virtual std::unique_ptr<IWorkload> CreateDivision(const DivisionQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const override;
 private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>

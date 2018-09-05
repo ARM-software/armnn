@@ -123,6 +123,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateDivision(const DivisionQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const = 0;
 };
 
 } //namespace armnn

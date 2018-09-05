@@ -227,4 +227,10 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDivision(
     return MakeWorkload<RefDivisionFloat32Workload, RefDivisionUint8Workload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
+    const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 } // namespace armnn

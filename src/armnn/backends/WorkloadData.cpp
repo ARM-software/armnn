@@ -811,4 +811,17 @@ void DivisionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                        "second input");
 }
 
+void SubtractionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTwoInputs(workloadInfo, "SubtractionQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "SubtractionQueueDescriptor");
+
+    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                                       workloadInfo.m_InputTensorInfos[1],
+                                       workloadInfo.m_OutputTensorInfos[0],
+                                       "SubtractionQueueDescriptor",
+                                       "first input",
+                                       "second input");
+}
+
 } //namespace armnn

@@ -56,6 +56,11 @@ bool IsDivisionSupportedRef(const TensorInfo& input0,
                             const TensorInfo& output,
                             std::string* reasonIfUnsupported = nullptr);
 
+bool IsSubtractionSupportedRef(const TensorInfo& input0,
+                               const TensorInfo& input1,
+                               const TensorInfo& output,
+                               std::string* reasonIfUnsupported = nullptr);
+
 bool IsFullyConnectedSupportedRef(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const TensorInfo& weights,

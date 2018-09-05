@@ -341,6 +341,8 @@ list(APPEND armnn_sources
     src/armnn/layers/SoftmaxLayer.cpp
     src/armnn/layers/SplitterLayer.hpp
     src/armnn/layers/SplitterLayer.cpp
+    src/armnn/layers/SubtractionLayer.cpp
+    src/armnn/layers/SubtractionLayer.hpp
     src/armnn/Half.hpp
     src/armnn/InternalTypes.hpp
     src/armnn/InternalTypes.cpp

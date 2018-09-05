@@ -39,9 +39,10 @@ enum class LayerType
     Reshape,
     ResizeBilinear,
     Softmax,
+    Splitter,
     // Last layer goes here.
     LastLayer,
-    Splitter = LastLayer,
+    Subtraction = LastLayer,
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

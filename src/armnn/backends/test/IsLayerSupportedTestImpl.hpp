@@ -350,7 +350,7 @@ DECLARE_LAYER_POLICY_2_PARAM(Softmax)
 
 DECLARE_LAYER_POLICY_2_PARAM(Splitter)
 
-
+DECLARE_LAYER_POLICY_1_PARAM(Subtraction)
 
 
 // Generic implementation to get the number of input slots for a given layer type;

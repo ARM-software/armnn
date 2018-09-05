@@ -80,6 +80,13 @@ bool IsDivisionSupported(Compute compute,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
+bool IsSubtractionSupported(Compute compute,
+                            const TensorInfo& input0,
+                            const TensorInfo& input1,
+                            const TensorInfo& output,
+                            char* reasonIfUnsupported = nullptr,
+                            size_t reasonIfUnsupportedMaxLength = 1024);
+
 bool IsInputSupported(Compute compute,
                       const TensorInfo& input,
                       char* reasonIfUnsupported = nullptr,

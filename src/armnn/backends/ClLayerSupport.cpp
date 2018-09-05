@@ -250,6 +250,15 @@ bool IsDivisionSupportedCl(const TensorInfo& input0,
                                    output);
 }
 
+bool IsSubtractionSupportedCl(const TensorInfo& input0,
+                              const TensorInfo& input1,
+                              const TensorInfo& output,
+                              std::string* reasonIfUnsupported)
+{
+    // At the moment subtraction is not supported
+    return false;
+}
+
 bool IsFullyConnectedSupportedCl(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const TensorInfo& weights,

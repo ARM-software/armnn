@@ -234,6 +234,15 @@ bool IsDivisionSupportedNeon(const TensorInfo& input0,
     return false;
 }
 
+bool IsSubtractionSupportedNeon(const TensorInfo& input0,
+                                const TensorInfo& input1,
+                                const TensorInfo& output,
+                                std::string* reasonIfUnsupported)
+{
+    // At the moment subtraction is not supported
+    return false;
+}
+
 bool IsFullyConnectedSupportedNeon(const TensorInfo& input,
                                    const TensorInfo& output,
                                    const TensorInfo& weights,

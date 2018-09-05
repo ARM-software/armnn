@@ -111,6 +111,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateDivision(const DivisionQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const override;
+
     virtual void Finalize() override;
 
     virtual void Release() override;

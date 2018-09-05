@@ -524,6 +524,19 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, boo
                                          reasonCapacity);
             break;
         }
+        case LayerType::Subtraction:
+        {
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = IsSubtractionSupported(compute,
+                                            OverrideDataType(input0, dataType),
+                                            OverrideDataType(input1, dataType),
+                                            OverrideDataType(output, dataType),
+                                            reason,
+                                            reasonCapacity);
+            break;
+        }
         default:
         {
             BOOST_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");

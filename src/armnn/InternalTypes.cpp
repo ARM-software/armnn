@@ -40,6 +40,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::ResizeBilinear: return "ResizeBilinear";
         case LayerType::Softmax: return "Softmax";
         case LayerType::Splitter: return "Splitter";
+        case LayerType::Subtraction: return "Subtraction";
         default:
             BOOST_ASSERT_MSG(false, "Unknown layer type");
             return "Unknown";

@@ -162,6 +162,12 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(
     return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateSubtraction(
+    const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateBatchNormalization(
     const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
@@ -425,6 +431,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp32ToFp16(
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& data,
                                                                const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& data,
+                                                                  const WorkloadInfo& info) const
 {
     return nullptr;
 }

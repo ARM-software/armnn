@@ -32,6 +32,7 @@
 #include "layers/ResizeBilinearLayer.hpp"
 #include "layers/SoftmaxLayer.hpp"
 #include "layers/SplitterLayer.hpp"
+#include "layers/SubtractionLayer.hpp"
 
 namespace armnn
 {
@@ -86,5 +87,6 @@ DECLARE_LAYER(Reshape)
 DECLARE_LAYER(ResizeBilinear)
 DECLARE_LAYER(Softmax)
 DECLARE_LAYER(Splitter)
+DECLARE_LAYER(Subtraction)
 
 }

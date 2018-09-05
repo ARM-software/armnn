@@ -299,6 +299,13 @@ public:
         armnn::Status ret = m_Runtime->EnqueueWorkload(m_NetworkIdentifier,
                                                        MakeInputTensors(input),
                                                        MakeOutputTensors(output));
+
+        // if profiling is enabled print out the results
+        if (profiler && profiler->IsProfilingEnabled())
+        {
+            profiler->Print(std::cout);
+        }
+
         if (ret == armnn::Status::Failure)
         {
             throw armnn::Exception("IRuntime::EnqueueWorkload failed");

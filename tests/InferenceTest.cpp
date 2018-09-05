@@ -231,6 +231,12 @@ bool InferenceTest(const InferenceTestOptions& params,
     BOOST_LOG_TRIVIAL(info) << std::fixed << std::setprecision(3) <<
         "Average time per test case: " << averageTimePerTestCaseMs << " ms";
 
+    // if profiling is enabled print out the results
+    if (profiler && profiler->IsProfilingEnabled())
+    {
+        profiler->Print(std::cout);
+    }
+
     if (!success)
     {
         BOOST_LOG_TRIVIAL(error) << "One or more test cases failed";

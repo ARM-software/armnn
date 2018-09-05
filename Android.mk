@@ -1,6 +1,6 @@
 #
 # Copyright © 2017 ARM Ltd. All rights reserved.
-# See LICENSE file in the project root for full license information.
+# SPDX-License-Identifier: MIT
 #
 
 LOCAL_PATH := $(call my-dir)

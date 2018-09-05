@@ -1,6 +1,6 @@
 ﻿//
 // Copyright © 2017 Arm Ltd. All rights reserved.
-// See LICENSE file in the project root for full license information.
+// SPDX-License-Identifier: MIT
 //
 #define BOOST_TEST_MODULE UnitTests
 #include <boost/test/unit_test.hpp>

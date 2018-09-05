@@ -1,6 +1,6 @@
 //
 // Copyright © 2017 Arm Ltd. All rights reserved.
-// See LICENSE file in the project root for full license information.
+// SPDX-License-Identifier: MIT
 //
 
 #if (defined(__aarch64__)) || (defined(__x86_64__)) // disable test failing on FireFly/Armv7

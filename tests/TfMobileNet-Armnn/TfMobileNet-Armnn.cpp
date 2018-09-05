@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
         retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
                      argc, argv,
-                     "mobilenet_v1_1.0_224_fp32.pb", // model name
+                     "mobilenet_v1_1.0_224_frozen.pb", // model name
                      true,                           // model is binary
-                     "input", "output",              // input and output tensor names
+                     "input", "MobilenetV1/Predictions/Reshape_1",              // input and output tensor names
                      { 0, 1, 2 },                    // test images to test with as above
                      [&imageSet](const char* dataDir, const ModelType&) {
                          // This creates a 224x224x3 NHWC float tensor to pass to Armnn

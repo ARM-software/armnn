@@ -135,8 +135,12 @@ bool IsSubtractionSupportedRef(const TensorInfo& input0,
                                const TensorInfo& output,
                                std::string* reasonIfUnsupported)
 {
-    // At the moment subtraction is not supported
-    return false;
+    ignore_unused(input1);
+    ignore_unused(output);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input0.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
 }
 
 bool IsFullyConnectedSupportedRef(const TensorInfo& input,

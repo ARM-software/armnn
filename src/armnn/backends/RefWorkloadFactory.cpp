@@ -230,7 +230,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDivision(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
     const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<RefSubtractionFloat32Workload, RefSubtractionUint8Workload>(descriptor, info);
 }
 
 } // namespace armnn

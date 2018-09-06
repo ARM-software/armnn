@@ -57,3 +57,5 @@
 #include "backends/RefWorkloads/RefConvertFp32ToFp16Workload.hpp"
 #include "backends/RefWorkloads/RefDivisionFloat32Workload.hpp"
 #include "backends/RefWorkloads/RefDivisionUint8Workload.hpp"
+#include "backends/RefWorkloads/RefSubtractionFloat32Workload.hpp"
+#include "backends/RefWorkloads/RefSubtractionUint8Workload.hpp"

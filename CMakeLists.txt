@@ -186,7 +186,18 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/Broadcast.cpp
     src/armnn/backends/RefWorkloads/RefMergerUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefConstantUint8Workload.hpp
+    src/armnn/backends/RefWorkloads/Addition.cpp
     src/armnn/backends/RefWorkloads/Addition.hpp
+    src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.cpp
+    src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.hpp
+    src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.cpp
+    src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.hpp
+    src/armnn/backends/RefWorkloads/Subtraction.cpp
+    src/armnn/backends/RefWorkloads/Subtraction.hpp
+    src/armnn/backends/RefWorkloads/RefSubtractionUint8Workload.cpp
+    src/armnn/backends/RefWorkloads/RefSubtractionUint8Workload.hpp
+    src/armnn/backends/RefWorkloads/RefSubtractionFloat32Workload.cpp
+    src/armnn/backends/RefWorkloads/RefSubtractionFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/ConvImpl.hpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefMultiplicationUint8Workload.hpp
@@ -207,7 +218,6 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/Multiplication.hpp
     src/armnn/backends/RefWorkloads/RefActivationUint8Workload.hpp
     src/armnn/backends/RefWorkloads/RefBaseConstantWorkload.cpp
-    src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefBatchNormalizationFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefPooling2dFloat32Workload.hpp
@@ -216,7 +226,6 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefFullyConnectedFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/Softmax.hpp
     src/armnn/backends/RefWorkloads/RefMergerFloat32Workload.hpp
-    src/armnn/backends/RefWorkloads/Addition.cpp
     src/armnn/backends/RefWorkloads/RefFakeQuantizationFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/TensorBufferArrayView.hpp
     src/armnn/backends/RefWorkloads/ResizeBilinear.cpp
@@ -237,7 +246,6 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefReshapeUint8Workload.hpp
     src/armnn/backends/RefWorkloads/Activation.cpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearFloat32Workload.hpp
-    src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.hpp
     src/armnn/backends/RefWorkloads/RefReshapeUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefMultiplicationFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefL2NormalizationFloat32Workload.cpp
@@ -266,9 +274,7 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefConstantUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefConstantFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/Pooling2d.cpp
-    src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefConvolution2dFloat32Workload.hpp
-    src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefMergerFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/Pooling2d.hpp
     src/armnn/backends/RefWorkloads/RefFullyConnectedUint8Workload.cpp

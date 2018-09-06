@@ -185,7 +185,11 @@ LayerTestResult<float, 4> AdditionBroadcast1ElementTest(armnn::IWorkloadFactory&
 LayerTestResult<float, 4> AdditionBroadcastTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> CompareAdditionTest(armnn::IWorkloadFactory& workloadFactory,
-                                       armnn::IWorkloadFactory& refWorkloadFactory);
+                                              armnn::IWorkloadFactory& refWorkloadFactory);
+
+LayerTestResult<float, 4> SubtractionTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SubtractionBroadcastTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> CompareActivationTest(armnn::IWorkloadFactory&  workloadFactory,
                                                 armnn::IWorkloadFactory&  refWorkloadFactory,
@@ -263,6 +267,10 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFac
 LayerTestResult<uint8_t, 4> AdditionUint8Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> AdditionBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> AdditionBroadcastUint8Test(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<uint8_t, 4> SubtractionUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<uint8_t, 4> CompareActivationUint8Test(armnn::IWorkloadFactory&  workloadFactory,
                                                        armnn::IWorkloadFactory&  refWorkloadFactory,

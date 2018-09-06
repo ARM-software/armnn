@@ -1002,7 +1002,7 @@ LayerTestResult<uint8_t, 4> AdditionBroadcast1ElementUint8Test(armnn::IWorkloadF
 }
 
 LayerTestResult<float,4> CompareAdditionTest(armnn::IWorkloadFactory& workloadFactory,
-                                    armnn::IWorkloadFactory& refWorkloadFactory)
+                                             armnn::IWorkloadFactory& refWorkloadFactory)
 {
     unsigned int batchSize = 4;
     unsigned int channels  = 1;
@@ -3933,6 +3933,164 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(armnn::IWor
                                          output,
                                          1.0f,
                                          0);
+}
+
+namespace
+{
+template <typename T>
+LayerTestResult<T, 4> SubtractionTestHelper(armnn::IWorkloadFactory& workloadFactory,
+                                            const unsigned int shape0[4],
+                                            const std::vector<T>& values0,
+                                            float scale0,
+                                            int32_t offset0,
+                                            const unsigned int shape1[4],
+                                            const std::vector<T> & values1,
+                                            float scale1,
+                                            int32_t offset1,
+                                            const unsigned int outShape[4],
+                                            const std::vector<T> & outValues,
+                                            float outScale,
+                                            int32_t outOffset)
+{
+    auto dataType = (std::is_same<T, uint8_t>::value ?
+                     armnn::DataType::QuantisedAsymm8 :
+                     armnn::DataType::Float32);
+
+    armnn::TensorInfo inputTensorInfo0(4, shape0, dataType);
+    armnn::TensorInfo inputTensorInfo1(4, shape1, dataType);
+    armnn::TensorInfo outputTensorInfo(4, outShape, dataType);
+
+    inputTensorInfo0.SetQuantizationScale(scale0);
+    inputTensorInfo0.SetQuantizationOffset(offset0);
+
+    inputTensorInfo1.SetQuantizationScale(scale1);
+    inputTensorInfo1.SetQuantizationOffset(offset1);
+
+    outputTensorInfo.SetQuantizationScale(outScale);
+    outputTensorInfo.SetQuantizationOffset(outOffset);
+
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, values0);
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, values1);
+
+    LayerTestResult<T, 4> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outValues);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::SubtractionQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data,  info, inputTensorInfo0, inputHandle0.get());
+    AddInputToWorkload(data,  info, inputTensorInfo1, inputHandle1.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateSubtraction(data, info);
+
+    inputHandle0->Allocate();
+    inputHandle1->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
+
+    workloadFactory.Finalize();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+
+    return result;
+}
+} // anonymous namespace
+
+LayerTestResult<uint8_t, 4> SubtractionUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 2, 2 };
+
+    std::vector<uint8_t> input0({ 10, 12, 14, 16 });
+    std::vector<uint8_t> input1({ 1, 2, 1, 2 });
+    std::vector<uint8_t> output({ 3, 3, 5, 5 });
+
+    return SubtractionTestHelper(workloadFactory,
+                                 shape0, input0, 0.5f, 2,
+                                 shape1, input1, 1.0f, 0,
+                                 shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<uint8_t> input0({ 10, 12, 14, 16 });
+    std::vector<uint8_t> input1({ 2 });
+    std::vector<uint8_t> output({ 5, 6, 7, 8 });
+
+    return SubtractionTestHelper(workloadFactory,
+                                 shape0, input0, 0.5f, 2,
+                                 shape1, input1, 1.0f, 0,
+                                 shape0, output, 1.0f, 3);
+}
+
+LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 2, 1 };
+
+    std::vector<uint8_t> input0({ 10, 12, 14, 16 });
+    std::vector<uint8_t> input1({ 2, 1 });
+    std::vector<uint8_t> output({ 8, 11, 12, 15 });
+
+    return SubtractionTestHelper(workloadFactory,
+                                 shape0, input0, 1.0f, 0,
+                                 shape1, input1, 1.0f, 0,
+                                 shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<float, 4> SubtractionTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 2, 2 };
+
+    std::vector<float> input0({ 1,  2, 3, 4 });
+    std::vector<float> input1({ 1, -1, 0, 2 });
+    std::vector<float> output({ 0,  3, 3, 2 });
+
+    return SubtractionTestHelper(workloadFactory,
+                                 shape0, input0, 1.0f, 0,
+                                 shape1, input1, 1.0f, 0,
+                                 shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<float> input0({ 1,  2, 3, 4 });
+    std::vector<float> input1({ 10 });
+    std::vector<float> output({ -9,  -8, -7, -6 });
+
+    return SubtractionTestHelper(workloadFactory,
+                                 shape0, input0, 1.0f, 0,
+                                 shape1, input1, 1.0f, 0,
+                                 shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<float, 4> SubtractionBroadcastTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 1, 2 };
+
+    std::vector<float> input0({ 1,  2, 3, 4 });
+    std::vector<float> input1({ 10, -5 });
+    std::vector<float> output({ -9,  7, -7, 9 });
+
+    return SubtractionTestHelper(workloadFactory,
+                                 shape0, input0, 1.0f, 0,
+                                 shape1, input1, 1.0f, 0,
+                                 shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(armnn::IWorkloadFactory& workloadFactory)

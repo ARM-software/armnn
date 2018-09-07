@@ -151,7 +151,7 @@ ARMNN_AUTO_TEST_CASE(SimpleSub, SubtractionTest)
 ARMNN_AUTO_TEST_CASE(SubBroadcast1Element, SubtractionBroadcast1ElementTest)
 ARMNN_AUTO_TEST_CASE(SubBroadcast, SubtractionBroadcastTest)
 
-ARMNN_AUTO_TEST_CASE(SubitionUint8, SubtractionUint8Test)
+ARMNN_AUTO_TEST_CASE(SubtractionUint8, SubtractionUint8Test)
 ARMNN_AUTO_TEST_CASE(SubBroadcastUint8, SubtractionBroadcastUint8Test)
 ARMNN_AUTO_TEST_CASE(SubBroadcast1ElementUint8, SubtractionBroadcast1ElementUint8Test)
 

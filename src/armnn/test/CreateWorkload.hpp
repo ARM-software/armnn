@@ -126,6 +126,39 @@ std::unique_ptr<AdditionWorkload> CreateAdditionWorkloadTest(armnn::IWorkloadFac
     return workload;
 }
 
+template <typename WorkloadType,
+          typename DescriptorType,
+          typename LayerType,
+          armnn::DataType DataType>
+std::unique_ptr<WorkloadType> CreateArithmeticWorkloadTest(armnn::IWorkloadFactory& factory,
+                                                           armnn::Graph&            graph)
+{
+    // Creates the layer we're testing.
+    Layer* const layer = graph.AddLayer<LayerType>("layer");
+
+    // Creates extra layers.
+    Layer* const input1 = graph.AddLayer<InputLayer>(1, "input1");
+    Layer* const input2 = graph.AddLayer<InputLayer>(2, "input2");
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connects up.
+    armnn::TensorInfo tensorInfo({2, 3}, DataType);
+    Connect(input1, layer, tensorInfo, 0, 0);
+    Connect(input2, layer, tensorInfo, 0, 1);
+    Connect(layer, output, tensorInfo);
+    CreateTensorHandles(graph, factory);
+
+    // Makes the workload and checks it.
+    auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, graph, factory);
+
+    DescriptorType queueDescriptor = workload->GetData();
+    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+
+    // Returns so we can do extra, backend-specific tests.
+    return workload;
+}
+
 template <typename BatchNormalizationFloat32Workload, armnn::DataType DataType>
 std::unique_ptr<BatchNormalizationFloat32Workload> CreateBatchNormalizationWorkloadTest(
     armnn::IWorkloadFactory& factory, armnn::Graph& graph)

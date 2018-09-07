@@ -491,14 +491,20 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClActivationUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClAdditionBaseWorkload.cpp
         src/armnn/backends/ClWorkloads/ClAdditionBaseWorkload.hpp
-        src/armnn/backends/ClWorkloads/ClConvertFp16ToFp32Workload.cpp
-        src/armnn/backends/ClWorkloads/ClConvertFp16ToFp32Workload.hpp
-        src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.cpp
-        src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.hpp
         src/armnn/backends/ClWorkloads/ClAdditionFloatWorkload.cpp
         src/armnn/backends/ClWorkloads/ClAdditionFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClAdditionUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClAdditionUint8Workload.hpp
+        src/armnn/backends/ClWorkloads/ClSubtractionBaseWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClSubtractionBaseWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClSubtractionFloatWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClSubtractionFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClSubtractionUint8Workload.cpp
+        src/armnn/backends/ClWorkloads/ClSubtractionUint8Workload.hpp
+        src/armnn/backends/ClWorkloads/ClConvertFp16ToFp32Workload.cpp
+        src/armnn/backends/ClWorkloads/ClConvertFp16ToFp32Workload.hpp
+        src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.cpp
+        src/armnn/backends/ClWorkloads/ClConvertFp32ToFp16Workload.hpp
         src/armnn/backends/ClWorkloads/ClBaseConstantWorkload.cpp
         src/armnn/backends/ClWorkloads/ClBaseConstantWorkload.hpp
         src/armnn/backends/ClWorkloads/ClBaseMergerWorkload.hpp

@@ -48,6 +48,9 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/ClWorkloads/ClAdditionBaseWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClAdditionFloatWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClAdditionUint8Workload.cpp \
+        src/armnn/backends/ClWorkloads/ClSubtractionBaseWorkload.cpp \
+        src/armnn/backends/ClWorkloads/ClSubtractionFloatWorkload.cpp \
+        src/armnn/backends/ClWorkloads/ClSubtractionUint8Workload.cpp \
         src/armnn/backends/ClWorkloads/ClBaseConstantWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClBatchNormalizationFloatWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClConstantFloatWorkload.cpp \

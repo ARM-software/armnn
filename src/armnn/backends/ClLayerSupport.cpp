@@ -29,6 +29,7 @@
 #include "ClWorkloads/ClPermuteWorkload.hpp"
 #include "ClWorkloads/ClNormalizationFloatWorkload.hpp"
 #include "ClWorkloads/ClSoftmaxBaseWorkload.hpp"
+#include "ClWorkloads/ClSubtractionFloatWorkload.hpp"
 #include "ClWorkloads/ClLstmFloatWorkload.hpp"
 #endif
 
@@ -255,8 +256,10 @@ bool IsSubtractionSupportedCl(const TensorInfo& input0,
                               const TensorInfo& output,
                               std::string* reasonIfUnsupported)
 {
-    // At the moment subtraction is not supported
-    return false;
+    return FORWARD_CL_LAYER_SUPPORT_FUNC(ClSubtractionValidate(input0,
+                                         input1,
+                                         output,
+                                         reasonIfUnsupported));
 }
 
 bool IsFullyConnectedSupportedCl(const TensorInfo& input,

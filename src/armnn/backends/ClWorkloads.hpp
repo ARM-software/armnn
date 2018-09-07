@@ -36,5 +36,7 @@
 #include "backends/ClWorkloads/ClSoftmaxUint8Workload.hpp"
 #include "backends/ClWorkloads/ClSplitterFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClSplitterUint8Workload.hpp"
+#include "backends/ClWorkloads/ClSubtractionFloatWorkload.hpp"
+#include "backends/ClWorkloads/ClSubtractionUint8Workload.hpp"
 #include "backends/ClWorkloads/ClConvertFp16ToFp32Workload.hpp"
 #include "backends/ClWorkloads/ClConvertFp32ToFp16Workload.hpp"

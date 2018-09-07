@@ -139,6 +139,25 @@ ARMNN_AUTO_TEST_CASE(UNSUPPORTED_L2Pooling2dSize9Uint8, L2Pooling2dSize9Uint8Tes
 // Add
 ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)
 ARMNN_AUTO_TEST_CASE(AddBroadcast1Element, AdditionBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(AddBroadcast, AdditionBroadcastTest)
+
+ARMNN_AUTO_TEST_CASE(AdditionUint8, AdditionUint8Test)
+ARMNN_AUTO_TEST_CASE(AddBroadcastUint8, AdditionBroadcastUint8Test)
+ARMNN_AUTO_TEST_CASE(AddBroadcast1ElementUint8, AdditionBroadcast1ElementUint8Test)
+
+// Sub
+ARMNN_AUTO_TEST_CASE(SimpleSub, SubtractionTest)
+
+// TODO :
+//  1, enable broadcast tests for SUB when COMPMID-1566 is implemented (IVGCVSW-1837)
+//  2, enable quantized tests for SUB when COMPMID-1564 is implemented (IVGCVSW-1836)
+
+// ARMNN_AUTO_TEST_CASE(SubBroadcast1Element, SubtractionBroadcast1ElementTest)
+// ARMNN_AUTO_TEST_CASE(SubBroadcast, SubtractionBroadcastTest)
+
+// ARMNN_AUTO_TEST_CASE(SubtractionUint8, SubtractionUint8Test)
+// ARMNN_AUTO_TEST_CASE(SubBroadcastUint8, SubtractionBroadcastUint8Test)
+// ARMNN_AUTO_TEST_CASE(SubBroadcast1ElementUint8, SubtractionBroadcast1ElementUint8Test)
 
 // Div
 ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)

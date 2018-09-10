@@ -341,7 +341,7 @@ int RunTest(const std::string& modelFormat,
 }
 
 int RunCsvTest(const armnnUtils::CsvRow &csvRow,
-               const std::shared_ptr<armnn::IRuntime>& runtime)
+               const std::shared_ptr<armnn::IRuntime>& runtime, const bool enableProfiling)
 {
     std::string modelFormat;
     std::string modelPath;
@@ -370,9 +370,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
          "This parameter is optional, depending on the network.")
         ("input-tensor-data,d", po::value(&inputTensorDataFilePath),
          "Path to a file containing the input data as a flat array separated by whitespace.")
-        ("output-name,o", po::value(&outputName), "Identifier of the output tensor in the network.")
-        ("event-based-profiling,e", po::bool_switch()->default_value(false),
-         "Enables built in profiler. If unset, defaults to off.");
+        ("output-name,o", po::value(&outputName), "Identifier of the output tensor in the network.");
     }
     catch (const std::exception& e)
     {
@@ -414,9 +412,6 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
     boost::trim(inputTensorShapeStr);
     boost::trim(inputTensorDataFilePath);
     boost::trim(outputName);
-
-    // Get the value of the switch arguments.
-    bool enableProfiling = vm["event-based-profiling"].as<bool>();
 
     // Get the preferred order of compute devices.
     std::vector<armnn::Compute> computeDevices = vm["compute"].as<std::vector<armnn::Compute>>();
@@ -546,6 +541,8 @@ int main(int argc, const char* argv[])
 
         // Create runtime
         armnn::IRuntime::CreationOptions options;
+        options.m_EnableGpuProfiling = enableProfiling;
+
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
 
         const std::string executableName("ExecuteNetwork");
@@ -560,7 +557,8 @@ int main(int argc, const char* argv[])
             for (auto&  testCase : testCases)
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
-                results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime)));
+                results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime),
+                                             enableProfiling));
             }
 
             // Check results
@@ -578,7 +576,7 @@ int main(int argc, const char* argv[])
             for (auto&  testCase : testCases)
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
-                if (RunCsvTest(testCase, runtime) != EXIT_SUCCESS)
+                if (RunCsvTest(testCase, runtime, enableProfiling) != EXIT_SUCCESS)
                 {
                     return EXIT_FAILURE;
                 }

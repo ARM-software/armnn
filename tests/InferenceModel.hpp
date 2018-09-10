@@ -241,6 +241,7 @@ public:
         else
         {
             armnn::IRuntime::CreationOptions options;
+            options.m_EnableGpuProfiling = m_EnableProfiling;
             m_Runtime = std::move(armnn::IRuntime::Create(options));
         }
 

@@ -40,13 +40,6 @@ bool ClAdditionValidate(const TensorInfo& input0,
                         const TensorInfo& output,
                         std::string* reasonIfUnsupported)
 {
-    if (input0.GetDataType() == DataType::QuantisedAsymm8)
-    {
-        // Reject quantised addition for the moment (COMPMID-1385)
-        *reasonIfUnsupported = "Quantised Addition not yet supported";
-        return false;
-    }
-
     const arm_compute::TensorInfo aclInput0Info = BuildArmComputeTensorInfo(input0);
     const arm_compute::TensorInfo aclInput1Info = BuildArmComputeTensorInfo(input1);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);

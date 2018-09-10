@@ -199,6 +199,15 @@ struct SubtractionQueueDescriptor : QueueDescriptor
 // Mean layer workload data.
 struct MeanQueueDescriptor : QueueDescriptor
 {
+    MeanQueueDescriptor()
+        : m_Axis(nullptr)
+        , m_Keepdims(false)
+    {
+    }
+
+    const ConstCpuTensorHandle* m_Axis;
+    bool m_Keepdims;
+
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 

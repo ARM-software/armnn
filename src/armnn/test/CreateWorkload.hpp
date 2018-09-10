@@ -96,36 +96,6 @@ std::unique_ptr<ActivationWorkload> CreateActivationWorkloadTest(armnn::IWorkloa
     return workload;
 }
 
-template <typename AdditionWorkload, armnn::DataType DataType>
-std::unique_ptr<AdditionWorkload> CreateAdditionWorkloadTest(armnn::IWorkloadFactory& factory,
-                                                             armnn::Graph&            graph)
-{
-    // Creates the layer we're testing.
-    Layer* const layer = graph.AddLayer<AdditionLayer>("layer");
-
-    // Creates extra layers.
-    Layer* const input1 = graph.AddLayer<InputLayer>(1, "input1");
-    Layer* const input2 = graph.AddLayer<InputLayer>(2, "input2");
-    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
-
-    // Connects up.
-    armnn::TensorInfo tensorInfo({2, 3}, DataType);
-    Connect(input1, layer, tensorInfo, 0, 0);
-    Connect(input2, layer, tensorInfo, 0, 1);
-    Connect(layer, output, tensorInfo);
-    CreateTensorHandles(graph, factory);
-
-    // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<AdditionWorkload>(*layer, graph, factory);
-
-    AdditionQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-
-    // Returns so we can do extra, backend-specific tests.
-    return workload;
-}
-
 template <typename WorkloadType,
           typename DescriptorType,
           typename LayerType,
@@ -509,36 +479,6 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
     BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({7, 20}, DataType, inputsQScale)));
     BOOST_TEST((queueDescriptor.m_Bias->GetTensorInfo() == TensorInfo({7}, GetBiasDataType(DataType), inputsQScale)));
-
-    // Returns so we can do extra, backend-specific tests.
-    return workload;
-}
-
-template <typename MultiplicationWorkload, armnn::DataType DataType>
-std::unique_ptr<MultiplicationWorkload> CreateMultiplicationWorkloadTest(armnn::IWorkloadFactory& factory,
-                                                                         armnn::Graph&            graph)
-{
-    // Creates the layer we're testing.
-    Layer* const layer = graph.AddLayer<MultiplicationLayer>("layer");
-
-    // Creates extra layers.
-    Layer* const input1 = graph.AddLayer<InputLayer>(1, "input1");
-    Layer* const input2 = graph.AddLayer<InputLayer>(2, "input2");
-    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
-
-    // Connects up.
-    armnn::TensorInfo tensorInfo({2, 3}, DataType);
-    Connect(input1, layer, tensorInfo, 0, 0);
-    Connect(input2, layer, tensorInfo, 0, 1);
-    Connect(layer, output, tensorInfo);
-    CreateTensorHandles(graph, factory);
-
-    // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<MultiplicationWorkload>(*layer, graph, factory);
-
-    MultiplicationQueueDescriptor queueDescriptor = workload->GetData();
-    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
-    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

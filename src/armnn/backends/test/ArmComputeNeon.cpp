@@ -319,7 +319,11 @@ ARMNN_AUTO_TEST_CASE(FullyConnectedLargeTransposed, FullyConnectedLargeTest, tru
 
 // Add
 ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)
+ARMNN_AUTO_TEST_CASE(AddBroadcast, AdditionBroadcastTest)
 ARMNN_AUTO_TEST_CASE(AddBroadcast1Element, AdditionBroadcast1ElementTest)
+
+// Sub
+ARMNN_AUTO_TEST_CASE(SimpleSub, SubtractionTest)
 
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)

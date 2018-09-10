@@ -113,6 +113,7 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/NeonWorkloads/NeonSoftmaxUint8Workload.cpp \
         src/armnn/backends/NeonWorkloads/NeonSplitterFloatWorkload.cpp \
         src/armnn/backends/NeonWorkloads/NeonSplitterUint8Workload.cpp \
+        src/armnn/backends/NeonWorkloads/NeonSubtractionFloatWorkload.cpp \
         src/armnn/backends/ClWorkloadFactory.cpp \
         src/armnn/backends/ClContextControl.cpp \
         src/armnn/backends/CpuTensorHandle.cpp \

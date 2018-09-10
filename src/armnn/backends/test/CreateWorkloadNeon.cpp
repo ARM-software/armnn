@@ -78,15 +78,17 @@ BOOST_AUTO_TEST_CASE(CreateActivationFloatWorkload)
     NeonCreateActivationWorkloadTest<NeonActivationFloatWorkload, DataType::Float32>();
 }
 
-template <typename AdditionWorkloadType, typename armnn::DataType DataType>
-static void NeonCreateAdditionWorkloadTest()
+template <typename WorkloadType,
+          typename DescriptorType,
+          typename LayerType,
+          armnn::DataType DataType>
+static void NeonCreateArithmethicWorkloadTest()
 {
-    Graph               graph;
+    Graph graph;
     NeonWorkloadFactory factory;
-    auto workload = CreateAdditionWorkloadTest<AdditionWorkloadType, DataType>(factory, graph);
+    auto workload = CreateArithmeticWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
 
-    // Checks that inputs/outputs are as we expect them (see definition of CreateAdditionWorkloadTest).
-    AdditionQueueDescriptor queueDescriptor = workload->GetData();
+    DescriptorType queueDescriptor = workload->GetData();
     auto inputHandle1 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto inputHandle2 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[1]);
     auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -98,13 +100,55 @@ static void NeonCreateAdditionWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 {
-    NeonCreateAdditionWorkloadTest<NeonAdditionFloatWorkload, DataType::Float16>();
+    NeonCreateArithmethicWorkloadTest<NeonAdditionFloatWorkload,
+                                      AdditionQueueDescriptor,
+                                      AdditionLayer,
+                                      DataType::Float16>();
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    NeonCreateAdditionWorkloadTest<NeonAdditionFloatWorkload, DataType::Float32>();
+    NeonCreateArithmethicWorkloadTest<NeonAdditionFloatWorkload,
+                                      AdditionQueueDescriptor,
+                                      AdditionLayer,
+                                      DataType::Float32>();
+}
+
+#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
+{
+    NeonCreateArithmethicWorkloadTest<NeonSubtractionFloatWorkload,
+                                      SubtractionQueueDescriptor,
+                                      SubtractionLayer,
+                                      DataType::Float16>();
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
+{
+    NeonCreateArithmethicWorkloadTest<NeonSubtractionFloatWorkload,
+                                      SubtractionQueueDescriptor,
+                                      SubtractionLayer,
+                                      DataType::Float32>();
+}
+
+#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
+{
+    NeonCreateArithmethicWorkloadTest<NeonMultiplicationFloatWorkload,
+                                      MultiplicationQueueDescriptor,
+                                      MultiplicationLayer,
+                                      DataType::Float16>();
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
+{
+    NeonCreateArithmethicWorkloadTest<NeonMultiplicationFloatWorkload,
+                                      MultiplicationQueueDescriptor,
+                                      MultiplicationLayer,
+                                      DataType::Float32>();
 }
 
 template <typename BatchNormalizationWorkloadType, typename armnn::DataType DataType>
@@ -188,36 +232,6 @@ BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat16Workload)
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloatWorkload)
 {
     NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedFloatWorkload, DataType::Float32>();
-}
-
-template <typename MultiplicationWorkloadType, typename armnn::DataType DataType>
-static void NeonCreateMultiplicationWorkloadTest()
-{
-    Graph               graph;
-    NeonWorkloadFactory factory;
-    auto                workload = CreateMultiplicationWorkloadTest<MultiplicationWorkloadType,
-                                   DataType>(factory, graph);
-
-    // Checks that inputs/outputs are as we expect them (see definition of CreateMultiplicationWorkloadTest).
-    MultiplicationQueueDescriptor queueDescriptor = workload->GetData();
-    auto inputHandle1 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
-    auto inputHandle2 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[1]);
-    auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle1, TensorInfo({2, 3}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle2, TensorInfo({2, 3}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({2, 3}, DataType)));
-}
-
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
-{
-    NeonCreateMultiplicationWorkloadTest<NeonMultiplicationFloatWorkload, DataType::Float16>();
-}
-#endif
-
-BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
-{
-    NeonCreateMultiplicationWorkloadTest<NeonMultiplicationFloatWorkload, DataType::Float32>();
 }
 
 template <typename NormalizationWorkloadType, typename armnn::DataType DataType>

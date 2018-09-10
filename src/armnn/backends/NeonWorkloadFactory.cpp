@@ -165,7 +165,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateSubtraction(
     const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NeonSubtractionFloatWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateBatchNormalization(

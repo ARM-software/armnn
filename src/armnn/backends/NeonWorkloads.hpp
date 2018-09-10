@@ -38,3 +38,4 @@
 #include "backends/NeonWorkloads/NeonSoftmaxUint8Workload.hpp"
 #include "backends/NeonWorkloads/NeonSplitterFloatWorkload.hpp"
 #include "backends/NeonWorkloads/NeonSplitterUint8Workload.hpp"
+#include "backends/NeonWorkloads/NeonSubtractionFloatWorkload.hpp"

@@ -458,6 +458,8 @@ if(ARMCOMPUTENEON)
         src/armnn/backends/NeonWorkloads/NeonSplitterFloatWorkload.hpp
         src/armnn/backends/NeonWorkloads/NeonSplitterUint8Workload.cpp
         src/armnn/backends/NeonWorkloads/NeonSplitterUint8Workload.hpp
+        src/armnn/backends/NeonWorkloads/NeonSubtractionFloatWorkload.cpp
+        src/armnn/backends/NeonWorkloads/NeonSubtractionFloatWorkload.hpp
         src/armnn/backends/NeonWorkloadUtils.cpp
         src/armnn/backends/NeonWorkloadUtils.hpp
         src/armnn/backends/NeonTensorHandle.hpp

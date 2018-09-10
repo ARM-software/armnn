@@ -27,6 +27,7 @@
 #include "NeonWorkloads/NeonPermuteWorkload.hpp"
 #include "NeonWorkloads/NeonPooling2dBaseWorkload.hpp"
 #include "NeonWorkloads/NeonSoftmaxBaseWorkload.hpp"
+#include "NeonWorkloads/NeonSubtractionFloatWorkload.hpp"
 #endif
 
 using namespace boost;
@@ -239,8 +240,11 @@ bool IsSubtractionSupportedNeon(const TensorInfo& input0,
                                 const TensorInfo& output,
                                 std::string* reasonIfUnsupported)
 {
-    // At the moment subtraction is not supported
-    return false;
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSubtractionWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool IsFullyConnectedSupportedNeon(const TensorInfo& input,

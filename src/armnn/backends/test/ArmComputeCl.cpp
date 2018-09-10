@@ -148,19 +148,9 @@ ARMNN_AUTO_TEST_CASE(AddBroadcast1ElementUint8, AdditionBroadcast1ElementUint8Te
 // Sub
 ARMNN_AUTO_TEST_CASE(SimpleSub, SubtractionTest)
 
-// TODO :
-//  1, enable broadcast tests for SUB when COMPMID-1566 is implemented (IVGCVSW-1837)
-//  2, enable quantized tests for SUB when COMPMID-1564 is implemented (IVGCVSW-1836)
-
-// ARMNN_AUTO_TEST_CASE(SubBroadcast1Element, SubtractionBroadcast1ElementTest)
-// ARMNN_AUTO_TEST_CASE(SubBroadcast, SubtractionBroadcastTest)
-
-// ARMNN_AUTO_TEST_CASE(SubtractionUint8, SubtractionUint8Test)
-// ARMNN_AUTO_TEST_CASE(SubBroadcastUint8, SubtractionBroadcastUint8Test)
-// ARMNN_AUTO_TEST_CASE(SubBroadcast1ElementUint8, SubtractionBroadcast1ElementUint8Test)
-
 // Div
 ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)
+ARMNN_AUTO_TEST_CASE(DivisionByZero, DivisionByZeroTest)
 ARMNN_AUTO_TEST_CASE(DivisionBroadcast1Element, DivisionBroadcast1ElementTest)
 ARMNN_AUTO_TEST_CASE(DivisionBroadcast1DVector, DivisionBroadcast1DVectorTest)
 // NOTE: quantized division is not supported by CL and not required by the

@@ -250,6 +250,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvertFp32ToFp16(
     return std::make_unique<ClConvertFp32ToFp16Workload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 void ClWorkloadFactory::Finalize()
 {
     m_MemoryManager.Finalize();
@@ -443,6 +449,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDivision(const DivisionQueue
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
 {
     return nullptr;
 }

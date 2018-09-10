@@ -244,6 +244,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp32ToFp16(
     return std::make_unique<NeonConvertFp32ToFp16Workload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 void NeonWorkloadFactory::Finalize()
 {
     m_MemoryManager.Finalize();
@@ -437,6 +443,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDivision(const DivisionQue
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& data,
                                                                   const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
 {
     return nullptr;
 }

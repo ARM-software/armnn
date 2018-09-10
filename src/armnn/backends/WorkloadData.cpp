@@ -824,4 +824,10 @@ void SubtractionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) cons
                                        "second input");
 }
 
+void MeanQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "MeanQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "MeanQueueDescriptor");
+}
+
 } //namespace armnn

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClSubtractionBaseWorkload.hpp"
+#include "ClAdditionWorkload.hpp"
 
 #include "backends/ClTensorHandle.hpp"
 #include "backends/CpuTensorHandle.hpp"
@@ -16,11 +16,11 @@ using namespace armcomputetensorutils;
 static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::ConvertPolicy::SATURATE;
 
 template <armnn::DataType... T>
-ClSubtractionBaseWorkload<T...>::ClSubtractionBaseWorkload(const SubtractionQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info)
-    : TypedWorkload<SubtractionQueueDescriptor, T...>(descriptor, info)
+ClAdditionWorkload<T...>::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor,
+                                                  const WorkloadInfo& info)
+    : TypedWorkload<AdditionQueueDescriptor, T...>(descriptor, info)
 {
-    this->m_Data.ValidateInputsOutputs("ClSubtractionBaseWorkload", 2, 1);
+    this->m_Data.ValidateInputsOutputs("ClAdditionWorkload", 2, 1);
 
     arm_compute::ICLTensor& input0 = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& input1 = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[1])->GetTensor();
@@ -29,25 +29,25 @@ ClSubtractionBaseWorkload<T...>::ClSubtractionBaseWorkload(const SubtractionQueu
 }
 
 template <armnn::DataType... T>
-void ClSubtractionBaseWorkload<T...>::Execute() const
+void ClAdditionWorkload<T...>::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClSubtractionBaseWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClAdditionWorkload_Execute");
     m_Layer.run();
 }
 
-bool ClSubtractionValidate(const TensorInfo& input0,
-                           const TensorInfo& input1,
-                           const TensorInfo& output,
-                           std::string* reasonIfUnsupported)
+bool ClAdditionValidate(const TensorInfo& input0,
+                        const TensorInfo& input1,
+                        const TensorInfo& output,
+                        std::string* reasonIfUnsupported)
 {
     const arm_compute::TensorInfo aclInput0Info = BuildArmComputeTensorInfo(input0);
     const arm_compute::TensorInfo aclInput1Info = BuildArmComputeTensorInfo(input1);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
 
-    const arm_compute::Status aclStatus = arm_compute::CLArithmeticSubtraction::validate(&aclInput0Info,
-                                                                                         &aclInput1Info,
-                                                                                         &aclOutputInfo,
-                                                                                         g_AclConvertPolicy);
+    const arm_compute::Status aclStatus = arm_compute::CLArithmeticAddition::validate(&aclInput0Info,
+                                                                                      &aclInput1Info,
+                                                                                      &aclOutputInfo,
+                                                                                      g_AclConvertPolicy);
 
     const bool supported = (aclStatus.error_code() == arm_compute::ErrorCode::OK);
     if (!supported && reasonIfUnsupported)
@@ -60,5 +60,5 @@ bool ClSubtractionValidate(const TensorInfo& input0,
 
 } //namespace armnn
 
-template class armnn::ClSubtractionBaseWorkload<armnn::DataType::Float16, armnn::DataType::Float32>;
-template class armnn::ClSubtractionBaseWorkload<armnn::DataType::QuantisedAsymm8>;
+template class armnn::ClAdditionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>;
+template class armnn::ClAdditionWorkload<armnn::DataType::QuantisedAsymm8>;

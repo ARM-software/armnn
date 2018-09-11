@@ -11,10 +11,10 @@ namespace armnn
 {
 
 template <armnn::DataType... dataTypes>
-class ClAdditionBaseWorkload : public TypedWorkload<AdditionQueueDescriptor, dataTypes...>
+class ClAdditionWorkload : public TypedWorkload<AdditionQueueDescriptor, dataTypes...>
 {
 public:
-    ClAdditionBaseWorkload(const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClAdditionWorkload(const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info);
 
     void Execute() const override;
 

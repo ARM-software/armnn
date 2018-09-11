@@ -14,7 +14,7 @@
 #include <boost/core/ignore_unused.hpp>
 
 #ifdef ARMCOMPUTECL_ENABLED
-#include "ClWorkloads/ClAdditionFloatWorkload.hpp"
+#include "ClWorkloads/ClAdditionWorkload.hpp"
 #include "ClWorkloads/ClActivationFloatWorkload.hpp"
 #include "ClWorkloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "ClWorkloads/ClConvertFp16ToFp32Workload.hpp"
@@ -29,7 +29,7 @@
 #include "ClWorkloads/ClPermuteWorkload.hpp"
 #include "ClWorkloads/ClNormalizationFloatWorkload.hpp"
 #include "ClWorkloads/ClSoftmaxBaseWorkload.hpp"
-#include "ClWorkloads/ClSubtractionFloatWorkload.hpp"
+#include "ClWorkloads/ClSubtractionWorkload.hpp"
 #include "ClWorkloads/ClLstmFloatWorkload.hpp"
 #endif
 

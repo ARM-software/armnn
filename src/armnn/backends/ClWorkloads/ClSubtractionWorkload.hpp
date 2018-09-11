@@ -11,10 +11,10 @@ namespace armnn
 {
 
 template <armnn::DataType... dataTypes>
-class ClSubtractionBaseWorkload : public TypedWorkload<SubtractionQueueDescriptor, dataTypes...>
+class ClSubtractionWorkload : public TypedWorkload<SubtractionQueueDescriptor, dataTypes...>
 {
 public:
-    ClSubtractionBaseWorkload(const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClSubtractionWorkload(const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info);
 
     void Execute() const override;
 

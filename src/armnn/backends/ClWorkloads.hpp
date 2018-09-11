@@ -6,8 +6,7 @@
 #pragma once
 #include "backends/ClWorkloads/ClActivationFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClActivationUint8Workload.hpp"
-#include "backends/ClWorkloads/ClAdditionFloatWorkload.hpp"
-#include "backends/ClWorkloads/ClAdditionUint8Workload.hpp"
+#include "backends/ClWorkloads/ClAdditionWorkload.hpp"
 #include "backends/ClWorkloads/ClBaseConstantWorkload.hpp"
 #include "backends/ClWorkloads/ClBaseMergerWorkload.hpp"
 #include "backends/ClWorkloads/ClBatchNormalizationFloatWorkload.hpp"
@@ -36,7 +35,6 @@
 #include "backends/ClWorkloads/ClSoftmaxUint8Workload.hpp"
 #include "backends/ClWorkloads/ClSplitterFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClSplitterUint8Workload.hpp"
-#include "backends/ClWorkloads/ClSubtractionFloatWorkload.hpp"
-#include "backends/ClWorkloads/ClSubtractionUint8Workload.hpp"
+#include "backends/ClWorkloads/ClSubtractionWorkload.hpp"
 #include "backends/ClWorkloads/ClConvertFp16ToFp32Workload.hpp"
 #include "backends/ClWorkloads/ClConvertFp32ToFp16Workload.hpp"

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "backends/RefWorkloads/RefConstantUint8Workload.hpp"
-#include "backends/RefWorkloads/Addition.hpp"
+#include "backends/RefWorkloads/ArithmeticFunction.hpp"
 #include "backends/RefWorkloads/ConvImpl.hpp"
 #include "backends/RefWorkloads/RefMultiplicationUint8Workload.hpp"
 #include "backends/RefWorkloads/RefBaseConstantWorkload.hpp"
@@ -14,7 +14,6 @@
 #include "backends/RefWorkloads/RefSplitterUint8Workload.hpp"
 #include "backends/RefWorkloads/RefResizeBilinearUint8Workload.hpp"
 #include "backends/RefWorkloads/RefL2NormalizationFloat32Workload.hpp"
-#include "backends/RefWorkloads/Multiplication.hpp"
 #include "backends/RefWorkloads/RefActivationUint8Workload.hpp"
 #include "backends/RefWorkloads/RefPooling2dFloat32Workload.hpp"
 #include "backends/RefWorkloads/RefWorkloadUtils.hpp"

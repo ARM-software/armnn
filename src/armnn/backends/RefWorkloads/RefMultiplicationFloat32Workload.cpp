@@ -5,7 +5,7 @@
 
 #include "RefMultiplicationFloat32Workload.hpp"
 
-#include "Multiplication.hpp"
+#include "ArithmeticFunction.hpp"
 #include "RefWorkloadUtils.hpp"
 
 #include "Profiling.hpp"
@@ -25,7 +25,7 @@ void RefMultiplicationFloat32Workload::Execute() const
     const float* inputData0 = GetInputTensorDataFloat(0, m_Data);
     const float* inputData1 = GetInputTensorDataFloat(1, m_Data);
 
-    Multiplication(inShape0, inShape1, outShape, inputData0, inputData1, outputData);
+    ArithmeticFunction<std::multiplies<float>>(inShape0, inShape1, outShape, inputData0, inputData1, outputData);
 }
 
 } //namespace armnn

@@ -5,7 +5,7 @@
 
 #include "RefDivisionUint8Workload.hpp"
 
-#include "Division.hpp"
+#include "ArithmeticFunction.hpp"
 #include "RefWorkloadUtils.hpp"
 
 #include "Profiling.hpp"
@@ -27,9 +27,13 @@ void RefDivisionUint8Workload::Execute() const
     auto dequant1 = Dequantize(GetInputTensorDataU8(1, m_Data), inputInfo1);
 
     std::vector<float> results(outputInfo.GetNumElements());
-    Division(
-        inputInfo0.GetShape(), inputInfo1.GetShape(), outputInfo.GetShape(),
-        dequant0.data(), dequant1.data(),results.data());
+
+    ArithmeticFunction<std::divides<float>>(inputInfo0.GetShape(),
+                                            inputInfo1.GetShape(),
+                                            outputInfo.GetShape(),
+                                            dequant0.data(),
+                                            dequant1.data(),
+                                            results.data());
 
     Quantize(GetOutputTensorDataU8(0, m_Data), results.data(), outputInfo);
 }

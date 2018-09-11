@@ -186,14 +186,12 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/Broadcast.cpp
     src/armnn/backends/RefWorkloads/RefMergerUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefConstantUint8Workload.hpp
-    src/armnn/backends/RefWorkloads/Addition.cpp
-    src/armnn/backends/RefWorkloads/Addition.hpp
+    src/armnn/backends/RefWorkloads/ArithmeticFunction.cpp
+    src/armnn/backends/RefWorkloads/ArithmeticFunction.hpp
     src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.hpp
     src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.hpp
-    src/armnn/backends/RefWorkloads/Subtraction.cpp
-    src/armnn/backends/RefWorkloads/Subtraction.hpp
     src/armnn/backends/RefWorkloads/RefSubtractionUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefSubtractionUint8Workload.hpp
     src/armnn/backends/RefWorkloads/RefSubtractionFloat32Workload.cpp
@@ -210,12 +208,8 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefActivationFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefBatchNormalizationUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearUint8Workload.hpp
-    src/armnn/backends/RefWorkloads/Multiplication.cpp
-    src/armnn/backends/RefWorkloads/Division.cpp
-    src/armnn/backends/RefWorkloads/Division.hpp
     src/armnn/backends/RefWorkloads/RefMultiplicationUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefL2NormalizationFloat32Workload.hpp
-    src/armnn/backends/RefWorkloads/Multiplication.hpp
     src/armnn/backends/RefWorkloads/RefActivationUint8Workload.hpp
     src/armnn/backends/RefWorkloads/RefBaseConstantWorkload.cpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearFloat32Workload.cpp

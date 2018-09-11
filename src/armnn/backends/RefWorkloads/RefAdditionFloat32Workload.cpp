@@ -5,7 +5,7 @@
 
 #include "RefAdditionFloat32Workload.hpp"
 
-#include "Addition.hpp"
+#include "ArithmeticFunction.hpp"
 #include "RefWorkloadUtils.hpp"
 
 #include "Profiling.hpp"
@@ -25,7 +25,7 @@ void RefAdditionFloat32Workload::Execute() const
     const float* inData1 = GetInputTensorDataFloat(1, m_Data);
     float* outData = GetOutputTensorDataFloat(0, m_Data);
 
-    Addition(inShape0, inShape1, outShape, inData0, inData1, outData);
+    ArithmeticFunction<std::plus<float>>(inShape0, inShape1, outShape, inData0, inData1, outData);
 }
 
 } //namespace armnn

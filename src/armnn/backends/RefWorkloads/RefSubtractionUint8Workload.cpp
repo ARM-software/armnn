@@ -5,7 +5,7 @@
 
 #include "RefSubtractionUint8Workload.hpp"
 
-#include "Subtraction.hpp"
+#include "ArithmeticFunction.hpp"
 #include "RefWorkloadUtils.hpp"
 
 #include "Profiling.hpp"
@@ -28,12 +28,12 @@ void RefSubtractionUint8Workload::Execute() const
 
     std::vector<float> results(outputInfo.GetNumElements());
 
-    Subtraction(inputInfo0.GetShape(),
-                inputInfo1.GetShape(),
-                outputInfo.GetShape(),
-                dequant0.data(),
-                dequant1.data(),
-                results.data());
+    ArithmeticFunction<std::minus<float>>(inputInfo0.GetShape(),
+                                          inputInfo1.GetShape(),
+                                          outputInfo.GetShape(),
+                                          dequant0.data(),
+                                          dequant1.data(),
+                                          results.data());
 
     Quantize(GetOutputTensorDataU8(0, m_Data), results.data(), outputInfo);
 }

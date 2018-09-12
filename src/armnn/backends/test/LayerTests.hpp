@@ -284,6 +284,10 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& wor
 LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(armnn::IWorkloadFactory& workloadFactory);
 
+LayerTestResult<uint8_t, 4> DivisionUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(armnn::IWorkloadFactory& workloadFactory);
+
 LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(armnn::IWorkloadFactory& workloadFactory,
                                                             bool                     biasEnabled);
 

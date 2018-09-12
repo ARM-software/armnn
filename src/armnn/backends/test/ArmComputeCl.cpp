@@ -163,6 +163,8 @@ ARMNN_AUTO_TEST_CASE(SimpleSub, SubtractionTest)
 ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)
 ARMNN_AUTO_TEST_CASE(DivisionBroadcast1Element, DivisionBroadcast1ElementTest)
 ARMNN_AUTO_TEST_CASE(DivisionBroadcast1DVector, DivisionBroadcast1DVectorTest)
+// NOTE: quantized division is not supported by CL and not required by the
+//       android NN api
 
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)

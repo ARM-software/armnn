@@ -160,6 +160,11 @@ ARMNN_AUTO_TEST_CASE(SimpleDivision, DivisionTest)
 ARMNN_AUTO_TEST_CASE(DivisionByZero, DivisionByZeroTest)
 ARMNN_AUTO_TEST_CASE(DivisionBroadcast1Element, DivisionBroadcast1ElementTest)
 ARMNN_AUTO_TEST_CASE(DivisionBroadcast1DVector, DivisionBroadcast1DVectorTest)
+// NOTE: division by zero for quantized div needs more attention
+//       see IVGCVSW-1849
+ARMNN_AUTO_TEST_CASE(DivisionUint8, DivisionUint8Test)
+ARMNN_AUTO_TEST_CASE(DivisionUint8Broadcast1Element, DivisionBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE(DivisionUint8Broadcast1DVector, DivisionBroadcast1DVectorUint8Test)
 
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)

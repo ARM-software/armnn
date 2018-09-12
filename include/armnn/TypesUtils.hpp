@@ -240,6 +240,8 @@ inline std::ostream & operator<<(std::ostream & os, const armnn::TensorShape & s
 template<typename QuantizedType>
 inline QuantizedType Quantize(float value, float scale, int32_t offset)
 {
+    // TODO : check we act sensibly for Inf, NaN and -Inf
+    //        see IVGCVSW-1849
     static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
     constexpr QuantizedType max = std::numeric_limits<QuantizedType>::max();
     constexpr QuantizedType min = std::numeric_limits<QuantizedType>::lowest();

@@ -1070,51 +1070,70 @@ LayerTestResult<float,4> CompareAdditionTest(armnn::IWorkloadFactory& workloadFa
 }
 
 namespace {
-    LayerTestResult<float,4> DivisionTestHelper(armnn::IWorkloadFactory& workloadFactory,
-                                                      const unsigned int shape0[4],
-                                                      const std::vector<float> & values0,
-                                                      const unsigned int shape1[4],
-                                                      const std::vector<float> & values1,
-                                                      const unsigned int outShape[4],
-                                                      const std::vector<float> & outValues)
-    {
-        const size_t dimensionCount = 4;
-        armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, armnn::DataType::Float32};
-        armnn::TensorInfo inputTensorInfo1{dimensionCount, shape1, armnn::DataType::Float32};
-        armnn::TensorInfo outputTensorInfo{dimensionCount, outShape, armnn::DataType::Float32};
+template <typename T>
+LayerTestResult<T, 4> DivisionTestHelper(armnn::IWorkloadFactory& workloadFactory,
+                                         const unsigned int shape0[4],
+                                         const std::vector<T>& values0,
+                                         float scale0,
+                                         int32_t offset0,
+                                         const unsigned int shape1[4],
+                                         const std::vector<T> & values1,
+                                         float scale1,
+                                         int32_t offset1,
+                                         const unsigned int outShape[4],
+                                         const std::vector<T> & outValues,
+                                         float outScale,
+                                         int32_t outOffset)
+{
+    auto dataType = (std::is_same<T, uint8_t>::value ?
+                     armnn::DataType::QuantisedAsymm8 :
+                     armnn::DataType::Float32);
 
-        auto input0 = MakeTensor<float, 4>(inputTensorInfo0, values0);
-        auto input1 = MakeTensor<float, 4>(inputTensorInfo1, values1);
+    armnn::TensorInfo inputTensorInfo0(4, shape0, dataType);
+    armnn::TensorInfo inputTensorInfo1(4, shape1, dataType);
+    armnn::TensorInfo outputTensorInfo(4, outShape, dataType);
 
-        LayerTestResult<float,4> ret(outputTensorInfo);
+    inputTensorInfo0.SetQuantizationScale(scale0);
+    inputTensorInfo0.SetQuantizationOffset(offset0);
 
-        std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
-        std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-        std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    inputTensorInfo1.SetQuantizationScale(scale1);
+    inputTensorInfo1.SetQuantizationOffset(offset1);
 
-        armnn::DivisionQueueDescriptor data;
-        armnn::WorkloadInfo info;
-        AddInputToWorkload(data, info, inputTensorInfo0, inputHandle0.get());
-        AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
-        AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+    outputTensorInfo.SetQuantizationScale(outScale);
+    outputTensorInfo.SetQuantizationOffset(outOffset);
 
-        std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDivision(data, info);
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, values0);
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, values1);
 
-        inputHandle0->Allocate();
-        inputHandle1->Allocate();
-        outputHandle->Allocate();
+    LayerTestResult<T, 4> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outValues);
 
-        CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
-        CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-        workloadFactory.Finalize();
-        workload->Execute();
+    armnn::DivisionQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data,  info, inputTensorInfo0, inputHandle0.get());
+    AddInputToWorkload(data,  info, inputTensorInfo1, inputHandle1.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-        CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDivision(data, info);
 
-        ret.outputExpected = MakeTensor<float, 4>(outputTensorInfo, outValues);
-        return ret;
-    }
+    inputHandle0->Allocate();
+    inputHandle1->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
+
+    workloadFactory.Finalize();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+
+    return result;
+}
 } // anonymous namespace
 
 LayerTestResult<float,4> DivisionByZeroTest(armnn::IWorkloadFactory& workloadFactory)
@@ -1138,13 +1157,10 @@ LayerTestResult<float,4> DivisionByZeroTest(armnn::IWorkloadFactory& workloadFac
                                INFINITY, INFINITY, -INFINITY, -INFINITY,  NAN, NAN, -NAN, -NAN,
                                -INFINITY, -INFINITY, INFINITY, INFINITY,  1, 1, 1, 1 });
 
-    return DivisionTestHelper(workloadFactory,
-                              shape,
-                              input0,
-                              shape,
-                              input1,
-                              shape,
-                              output);
+    return DivisionTestHelper<float>(workloadFactory,
+                                     shape, input0, 1.0f, 0,
+                                     shape, input1, 1.0f, 0,
+                                     shape, output, 1.0f, 0);
 }
 
 LayerTestResult<float,4> DivisionTest(armnn::IWorkloadFactory& workloadFactory)
@@ -1168,13 +1184,11 @@ LayerTestResult<float,4> DivisionTest(armnn::IWorkloadFactory& workloadFactory)
                                       2,  2,  2,  2,    1.5,  1.5,  1.5,  1.5,
                                       1, 1, 1, 1,  1.25, 1.25, 1.25, 1.25 });
 
-    return DivisionTestHelper(workloadFactory,
-                                    shape,
-                                    input0,
-                                    shape,
-                                    input1,
-                                    shape,
-                                    output);
+
+    return DivisionTestHelper<float>(workloadFactory,
+                                     shape, input0, 1.0f, 0,
+                                     shape, input1, 1.0f, 0,
+                                     shape, output, 1.0f, 0);
 }
 
 LayerTestResult<float, 4> DivisionBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory)
@@ -1187,13 +1201,11 @@ LayerTestResult<float, 4> DivisionBroadcast1ElementTest(armnn::IWorkloadFactory&
 
     std::vector<float> output({ 1, 2, 3, 4, 5, 6, 7, 8});
 
-    return DivisionTestHelper(workloadFactory,
-                                    shape0,
-                                    input0,
-                                    shape1,
-                                    input1,
-                                    shape0,
-                                    output);
+
+    return DivisionTestHelper<float>(workloadFactory,
+                                     shape0, input0, 1.0f, 0,
+                                     shape1, input1, 1.0f, 0,
+                                     shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(armnn::IWorkloadFactory& workloadFactory)
@@ -1212,13 +1224,72 @@ LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(armnn::IWorkloadFactory&
                                       7,   8,      9, 10,     11, 12,
                                       13, 14,     15, 16,     17, 18});
 
-    return DivisionTestHelper(workloadFactory,
-                                    shape0,
-                                    input0,
-                                    shape1,
-                                    input1,
-                                    shape0,
-                                    output);
+    return DivisionTestHelper<float>(workloadFactory,
+                                     shape0, input0, 1.0f, 0,
+                                     shape1, input1, 1.0f, 0,
+                                     shape0, output, 1.0f, 0);
+}
+
+
+LayerTestResult<uint8_t,4> DivisionUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int width = 2;
+    const unsigned int height = 2;
+    const unsigned int channelCount = 2;
+    const unsigned int batchSize = 2;
+
+    unsigned int shape[] = { batchSize, channelCount, height, width };
+
+    std::vector<uint8_t> input0({2,  2,  2,  2,    3,  3,  3,  3,
+                                 4,  4,  4,  4,    5,  5,  5,  5 });
+
+    std::vector<uint8_t> input1({1,  1,  1,  1,    2,  2,  2,  2,
+                                 4,  4,  4,  4,    4,  4,  4,  4 });
+
+    std::vector<uint8_t> output({8,  8,  8,  8,    6,  6,  6,  6,
+                                 4,  4,  4,  4,    5,  5,  5,  5});
+
+
+    return DivisionTestHelper<uint8_t>(workloadFactory,
+                                     shape, input0, 1.0f,  0,
+                                     shape, input1, 1.0f,  0,
+                                     shape, output, 0.25f, 0);
+}
+
+LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    unsigned int shape0[] = { 1, 2, 2, 2 };
+    std::vector<uint8_t> input0({ 2, 4, 6, 8, 10, 12, 14, 16});
+
+    unsigned int shape1[] = { 1, 1, 1, 1 };
+    std::vector<uint8_t> input1({ 2 });
+
+    std::vector<uint8_t> output({ 1, 2, 3, 4, 5, 6, 7, 8});
+
+    return DivisionTestHelper<uint8_t>(workloadFactory,
+                                     shape0, input0, 1.0f, 0,
+                                     shape1, input1, 1.0f, 0,
+                                     shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    unsigned int shape0[] = { 1, 3, 3, 2 };
+    std::vector<uint8_t> input0({1,   4,     3,  8,      5,  12,
+                                 7,   16,    9,  20,     11, 24,
+                                 13,  28,    15, 32,     17, 36});
+
+    unsigned int shape1[] = { 1, 1, 1, 2 };
+    std::vector<uint8_t> input1({ 1, 2 });
+
+    std::vector<uint8_t> output({1,   2,      3,  4,      5,  6,
+                                 7,   8,      9, 10,     11, 12,
+                                 13, 14,     15, 16,     17, 18});
+
+    return DivisionTestHelper<uint8_t>(workloadFactory,
+                                     shape0, input0, 1.0f, 0,
+                                     shape1, input1, 1.0f, 0,
+                                     shape0, output, 1.0f, 0);
 }
 
 namespace {

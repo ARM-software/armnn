@@ -115,6 +115,8 @@ public:
 
     IConnectableLayer* AddDivisionLayer(const char* name = nullptr) override;
 
+    IConnectableLayer* AddSubtractionLayer(const char* name = nullptr) override;
+
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
         const ConstTensor& weights,

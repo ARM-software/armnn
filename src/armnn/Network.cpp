@@ -589,6 +589,11 @@ IConnectableLayer* Network::AddDivisionLayer(const char* name)
     return m_Graph->AddLayer<DivisionLayer>(name);
 }
 
+IConnectableLayer* Network::AddSubtractionLayer(const char* name)
+{
+    return m_Graph->AddLayer<SubtractionLayer>(name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

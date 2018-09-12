@@ -18,9 +18,6 @@ arm_compute::Status ClDivisionWorkloadValidate(const TensorInfo& input0,
     const arm_compute::TensorInfo aclInput2 = armcomputetensorutils::BuildArmComputeTensorInfo(input1);
     const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
-    // At the time of writing, configure() will fail if a rounding policy other than TO_ZERO is supplied to it,
-    // when providing a scale of 1.0 for F32 tensors, even though the provided rounding policy appears to be
-    // ignored for F32 tensors.
     return arm_compute::CLArithmeticDivision::validate(&aclInput1, &aclInput2, &aclOutput);
 }
 

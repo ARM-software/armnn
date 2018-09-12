@@ -182,23 +182,18 @@ list(APPEND armnn_sources
     src/armnn/backends/WorkloadUtils.hpp
     src/armnn/backends/MemCopyWorkload.cpp
     src/armnn/backends/MemCopyWorkload.hpp
+    src/armnn/backends/StringMapping.cpp
+    src/armnn/backends/StringMapping.hpp
     src/armnn/backends/RefWorkloads/Broadcast.hpp
     src/armnn/backends/RefWorkloads/Broadcast.cpp
     src/armnn/backends/RefWorkloads/RefMergerUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefConstantUint8Workload.hpp
     src/armnn/backends/RefWorkloads/ArithmeticFunction.cpp
     src/armnn/backends/RefWorkloads/ArithmeticFunction.hpp
-    src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.cpp
-    src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.hpp
-    src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.cpp
-    src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.hpp
-    src/armnn/backends/RefWorkloads/RefSubtractionUint8Workload.cpp
-    src/armnn/backends/RefWorkloads/RefSubtractionUint8Workload.hpp
-    src/armnn/backends/RefWorkloads/RefSubtractionFloat32Workload.cpp
-    src/armnn/backends/RefWorkloads/RefSubtractionFloat32Workload.hpp
+    src/armnn/backends/RefWorkloads/RefArithmeticWorkload.cpp
+    src/armnn/backends/RefWorkloads/RefArithmeticWorkload.hpp
     src/armnn/backends/RefWorkloads/ConvImpl.hpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearUint8Workload.cpp
-    src/armnn/backends/RefWorkloads/RefMultiplicationUint8Workload.hpp
     src/armnn/backends/RefWorkloads/FullyConnected.cpp
     src/armnn/backends/RefWorkloads/RefFullyConnectedFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefSoftmaxFloat32Workload.cpp
@@ -208,7 +203,6 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefActivationFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefBatchNormalizationUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearUint8Workload.hpp
-    src/armnn/backends/RefWorkloads/RefMultiplicationUint8Workload.cpp
     src/armnn/backends/RefWorkloads/RefL2NormalizationFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefActivationUint8Workload.hpp
     src/armnn/backends/RefWorkloads/RefBaseConstantWorkload.cpp
@@ -241,7 +235,6 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/Activation.cpp
     src/armnn/backends/RefWorkloads/RefResizeBilinearFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefReshapeUint8Workload.cpp
-    src/armnn/backends/RefWorkloads/RefMultiplicationFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefL2NormalizationFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefConvolution2dFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefBatchNormalizationUint8Workload.hpp
@@ -260,7 +253,6 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefSplitterFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefConstantFloat32Workload.hpp
     src/armnn/backends/RefWorkloads/RefActivationFloat32Workload.hpp
-    src/armnn/backends/RefWorkloads/RefMultiplicationFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefReshapeFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/RefNormalizationFloat32Workload.cpp
     src/armnn/backends/RefWorkloads/Softmax.cpp
@@ -281,10 +273,6 @@ list(APPEND armnn_sources
     src/armnn/backends/RefWorkloads/RefConvertFp16ToFp32Workload.hpp
     src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.cpp
     src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.hpp
-    src/armnn/backends/RefWorkloads/RefDivisionFloat32Workload.cpp
-    src/armnn/backends/RefWorkloads/RefDivisionFloat32Workload.hpp
-    src/armnn/backends/RefWorkloads/RefDivisionUint8Workload.cpp
-    src/armnn/backends/RefWorkloads/RefDivisionUint8Workload.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp

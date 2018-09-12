@@ -124,16 +124,12 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/RefWorkloads/RefSoftmaxFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefActivationFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefBatchNormalizationUint8Workload.cpp \
-        src/armnn/backends/RefWorkloads/RefMultiplicationUint8Workload.cpp \
         src/armnn/backends/RefWorkloads/RefBaseConstantWorkload.cpp \
         src/armnn/backends/RefWorkloads/RefResizeBilinearFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefBatchNormalizationFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/Broadcast.cpp \
         src/armnn/backends/RefWorkloads/ArithmeticFunction.cpp \
-        src/armnn/backends/RefWorkloads/RefAdditionUint8Workload.cpp \
-        src/armnn/backends/RefWorkloads/RefAdditionFloat32Workload.cpp \
-        src/armnn/backends/RefWorkloads/RefSubtractionUint8Workload.cpp \
-        src/armnn/backends/RefWorkloads/RefSubtractionFloat32Workload.cpp \
+        src/armnn/backends/RefWorkloads/RefArithmeticWorkload.cpp \
         src/armnn/backends/RefWorkloads/RefFakeQuantizationFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/ResizeBilinear.cpp \
         src/armnn/backends/RefWorkloads/RefSoftmaxUint8Workload.cpp \
@@ -151,7 +147,6 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/RefWorkloads/RefActivationUint8Workload.cpp \
         src/armnn/backends/RefWorkloads/RefSplitterUint8Workload.cpp \
         src/armnn/backends/RefWorkloads/RefPooling2dFloat32Workload.cpp \
-        src/armnn/backends/RefWorkloads/RefMultiplicationFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefReshapeFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefNormalizationFloat32Workload.cpp \
         src/armnn/backends/RefWorkloads/Softmax.cpp \
@@ -164,8 +159,6 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/RefWorkloads/RefPermuteWorkload.cpp \
         src/armnn/backends/RefWorkloads/RefConvertFp16ToFp32Workload.cpp \
         src/armnn/backends/RefWorkloads/RefConvertFp32ToFp16Workload.cpp \
-        src/armnn/backends/RefWorkloads/RefDivisionFloat32Workload.cpp \
-        src/armnn/backends/RefWorkloads/RefDivisionUint8Workload.cpp \
         src/armnn/backends/MemCopyWorkload.cpp \
         src/armnn/backends/WorkloadData.cpp \
         src/armnn/backends/WorkloadFactory.cpp \
@@ -219,6 +212,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Utils.cpp \
         src/armnn/LayerSupport.cpp \
         src/armnn/Observable.cpp \
+        src/armnn/backends/StringMapping.cpp \
         src/armnn/backends/RefLayerSupport.cpp \
         src/armnn/backends/ClLayerSupport.cpp \
         src/armnn/backends/NeonLayerSupport.cpp \

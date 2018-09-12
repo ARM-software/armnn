@@ -17,27 +17,29 @@ int main(int argc, char* argv[])
             {"Dog.jpg", 209},
             // Top five predictions in tensorflow:
             // -----------------------------------
-            // 209:Labrador retriever 0.949995
-            // 160:Rhodesian ridgeback 0.0270182
-            // 208:golden retriever 0.0192866
-            // 853:tennis ball 0.000470382
-            // 239:Greater Swiss Mountain dog 0.000464451
+            // 209:Labrador retriever 0.46392533
+            // 160:Rhodesian ridgeback 0.29911423
+            // 208:golden retriever 0.108059585
+            // 169:redbone 0.033753652
+            // 274:dingo, warrigal, warragal, ... 0.01232666
+
             {"Cat.jpg", 283},
             // Top five predictions in tensorflow:
             // -----------------------------------
-            // 283:tiger cat 0.579016
-            // 286:Egyptian cat 0.319676
-            // 282:tabby, tabby cat 0.0873346
-            // 288:lynx, catamount 0.011163
-            // 289:leopard, Panthera pardus 0.000856755
+            // 283:tiger cat 0.6508582
+            // 286:Egyptian cat 0.2604343
+            // 282:tabby, tabby cat 0.028786005
+            // 288:lynx, catamount 0.020673484
+            // 40:common iguana, iguana, ... 0.0080499435
+
             {"shark.jpg", 3},
             // Top five predictions in tensorflow:
             // -----------------------------------
-            // 3:great white shark, white shark, ... 0.996926
-            // 4:tiger shark, Galeocerdo cuvieri 0.00270528
-            // 149:killer whale, killer, orca, ... 0.000121848
-            // 395:sturgeon 7.78977e-05
-            // 5:hammerhead, hammerhead shark 6.44127e-055
+            // 3:great white shark, white shark, ... 0.96672016
+            // 4:tiger shark, Galeocerdo cuvieri 0.028302953
+            // 149:killer whale, killer, orca, ... 0.0020228163
+            // 5:hammerhead, hammerhead shark 0.0017547971
+            // 150:dugong, Dugong dugon 0.0003968083
         };
 
         armnn::TensorShape inputTensorShape({ 1, 224, 224, 3  });
@@ -50,10 +52,10 @@ int main(int argc, char* argv[])
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
         retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
                      argc, argv,
-                     "mobilenet_v1_1.0_224_frozen.pb", // model name
-                     true,                           // model is binary
-                     "input", "MobilenetV1/Predictions/Reshape_1",              // input and output tensor names
-                     { 0, 1, 2 },                    // test images to test with as above
+                     "mobilenet_v1_1.0_224_frozen.pb",              // model name
+                     true,                                          // model is binary
+                     "input", "MobilenetV1/Predictions/Reshape_1",  // input and output tensor names
+                     { 0, 1, 2 },                                   // test images to test with as above
                      [&imageSet](const char* dataDir, const ModelType&) {
                          // This creates a 224x224x3 NHWC float tensor to pass to Armnn
                          return DatabaseType(

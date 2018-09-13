@@ -345,4 +345,14 @@ bool IsFloorSupported(Compute compute,
     FORWARD_LAYER_SUPPORT_FUNC(compute, IsFloorSupported, input, output);
 }
 
+bool IsMeanSupported(Compute compute,
+                     const TensorInfo& input,
+                     const TensorInfo& output,
+                     const MeanDescriptor& descriptor,
+                     char* reasonIfUnsupported,
+                     size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsMeanSupported, input, output, descriptor);
+}
+
 }

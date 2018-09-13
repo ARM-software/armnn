@@ -453,4 +453,12 @@ bool IsConvertFp32ToFp16SupportedNeon(const TensorInfo& input,
     return true;
 }
 
+bool IsMeanSupportedNeon(const TensorInfo& input,
+                         const TensorInfo& output,
+                         const MeanDescriptor& descriptor,
+                         std::string* reasonIfUnsupported)
+{
+    return false;
+}
+
 }

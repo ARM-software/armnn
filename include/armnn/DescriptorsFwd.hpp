@@ -15,6 +15,7 @@ struct FullyConnectedDescriptor;
 struct LstmDescriptor;
 struct PermuteDescriptor;
 struct NormalizationDescriptor;
+struct MeanDescriptor;
 struct Pooling2dDescriptor;
 struct ReshapeDescriptor;
 struct ResizeBilinearDescriptor;

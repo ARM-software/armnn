@@ -142,6 +142,11 @@ bool IsFloorSupportedCl(const TensorInfo& input,
                         const TensorInfo& output,
                         std::string* reasonIfUnsupported = nullptr);
 
+bool IsMeanSupportedCl(const TensorInfo& input,
+                       const TensorInfo& output,
+                       const MeanDescriptor& descriptor,
+                       std::string* reasonIfUnsupported = nullptr);
+
 bool IsConvertFp16ToFp32SupportedCl(const TensorInfo& input,
                                     const TensorInfo& output,
                                     std::string* reasonIfUnsupported = nullptr);

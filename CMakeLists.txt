@@ -305,6 +305,8 @@ list(APPEND armnn_sources
     src/armnn/layers/L2NormalizationLayer.cpp
     src/armnn/layers/LstmLayer.cpp
     src/armnn/layers/LstmLayer.hpp
+    src/armnn/layers/MeanLayer.hpp
+    src/armnn/layers/MeanLayer.cpp
     src/armnn/layers/MemCopyLayer.hpp
     src/armnn/layers/MemCopyLayer.cpp
     src/armnn/layers/MergerLayer.hpp

@@ -117,6 +117,8 @@ public:
 
     IConnectableLayer* AddSubtractionLayer(const char* name = nullptr) override;
 
+    IConnectableLayer* AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name = nullptr) override;
+
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
         const ConstTensor& weights,

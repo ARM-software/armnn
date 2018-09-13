@@ -537,6 +537,19 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, boo
                                             reasonCapacity);
             break;
         }
+        case LayerType::Mean:
+        {
+            auto cLayer = boost::polymorphic_downcast<const MeanLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = IsMeanSupported(compute,
+                                     OverrideDataType(input, dataType),
+                                     OverrideDataType(output, dataType),
+                                     cLayer->GetParameters(),
+                                     reason,
+                                     reasonCapacity);
+            break;
+        }
         default:
         {
             BOOST_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");

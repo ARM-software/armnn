@@ -332,4 +332,19 @@ struct LstmDescriptor
     bool m_ProjectionEnabled;
 };
 
+struct MeanDescriptor
+{
+    MeanDescriptor()
+    : m_KeepDims(false)
+    {}
+
+    MeanDescriptor(const std::vector<unsigned int>& axis, bool keepDims)
+    : m_Axis(axis)
+    , m_KeepDims(keepDims)
+    {}
+
+    std::vector<unsigned int> m_Axis;
+    bool m_KeepDims;
+};
+
 }

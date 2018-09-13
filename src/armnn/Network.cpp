@@ -594,6 +594,11 @@ IConnectableLayer* Network::AddSubtractionLayer(const char* name)
     return m_Graph->AddLayer<SubtractionLayer>(name);
 }
 
+IConnectableLayer* Network::AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name)
+{
+    return m_Graph->AddLayer<MeanLayer>(meanDescriptor,name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

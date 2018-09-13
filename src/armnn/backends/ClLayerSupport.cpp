@@ -462,4 +462,12 @@ bool IsConvertFp32ToFp16SupportedCl(const TensorInfo& input,
                                    reasonIfUnsupported);
 }
 
+bool IsMeanSupportedCl(const TensorInfo& input,
+                       const TensorInfo& output,
+                       const MeanDescriptor& descriptor,
+                       std::string* reasonIfUnsupported)
+{
+    return false;
+}
+
 }

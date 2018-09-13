@@ -147,4 +147,9 @@ bool IsConvertFp32ToFp16SupportedRef(const TensorInfo& input,
                                      const TensorInfo& output,
                                      std::string* reasonIfUnsupported = nullptr);
 
+bool IsMeanSupportedRef(const TensorInfo& input,
+                        const TensorInfo& output,
+                        const MeanDescriptor& descriptor,
+                        std::string* reasonIfUnsupported = nullptr);
+
 }

@@ -196,4 +196,11 @@ bool IsFloorSupported(Compute compute,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
+bool IsMeanSupported(Compute compute,
+                     const TensorInfo& input,
+                     const TensorInfo& output,
+                     const MeanDescriptor& descriptor,
+                     char* reasonIfUnsupported = nullptr,
+                     size_t reasonIfUnsupportedMaxLength = 1024);
+
 }

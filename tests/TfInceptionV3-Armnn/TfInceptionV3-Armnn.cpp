@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
         // Coverity fix: InferenceTestMain() may throw uncaught exceptions.
         retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
-                    argc, argv, "inception_v3_2016_08_28_frozen_transformed.pb", true,
+                    argc, argv, "inception_v3_2016_08_28_frozen.pb", true,
                     "input", "InceptionV3/Predictions/Reshape_1", { 0, 1, 2, },
                     [&imageSet](const char* dataDir, const ModelType&) {
                         return DatabaseType(dataDir, 299, 299, imageSet);

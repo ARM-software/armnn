@@ -21,7 +21,7 @@ public:
     virtual void Execute() const override;
 
 private:
-    mutable arm_compute::NEArithmeticSubtraction m_AddLayer;
+    mutable arm_compute::NEArithmeticSubtraction m_SubLayer;
 };
 
 } //namespace armnn

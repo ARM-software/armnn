@@ -268,12 +268,12 @@ static void ClCreateFullyConnectedWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloatWorkloadTest)
 {
-    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedFloatWorkload, armnn::DataType::Float32>();
+    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat16WorkloadTest)
 {
-    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedFloatWorkload, armnn::DataType::Float16>();
+    ClCreateFullyConnectedWorkloadTest<ClFullyConnectedWorkload, armnn::DataType::Float16>();
 }
 
 template <typename NormalizationWorkloadType, typename armnn::DataType DataType>

@@ -18,7 +18,7 @@
 #include "backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.hpp"
 #include "backends/ClWorkloads/ClDivisionFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClFloorFloatWorkload.hpp"
-#include "backends/ClWorkloads/ClFullyConnectedFloatWorkload.hpp"
+#include "backends/ClWorkloads/ClFullyConnectedWorkload.hpp"
 #include "backends/ClWorkloads/ClL2NormalizationFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClLstmFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClMergerFloatWorkload.hpp"

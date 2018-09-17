@@ -61,7 +61,7 @@ LOCAL_SRC_FILES := \
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.cpp \
         src/armnn/backends/ClWorkloads/ClDivisionFloatWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClFloorFloatWorkload.cpp \
-        src/armnn/backends/ClWorkloads/ClFullyConnectedFloatWorkload.cpp \
+        src/armnn/backends/ClWorkloads/ClFullyConnectedWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClL2NormalizationFloatWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClLstmFloatWorkload.cpp \
         src/armnn/backends/ClWorkloads/ClMergerFloatWorkload.cpp \

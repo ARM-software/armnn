@@ -24,7 +24,7 @@
 #include "ClWorkloads/ClDivisionFloatWorkload.hpp"
 #include "ClWorkloads/ClL2NormalizationFloatWorkload.hpp"
 #include "ClWorkloads/ClMultiplicationFloatWorkload.hpp"
-#include "ClWorkloads/ClFullyConnectedFloatWorkload.hpp"
+#include "ClWorkloads/ClFullyConnectedWorkload.hpp"
 #include "ClWorkloads/ClPooling2dBaseWorkload.hpp"
 #include "ClWorkloads/ClPermuteWorkload.hpp"
 #include "ClWorkloads/ClNormalizationFloatWorkload.hpp"
@@ -269,11 +269,6 @@ bool IsFullyConnectedSupportedCl(const TensorInfo& input,
                                  const FullyConnectedDescriptor& descriptor,
                                  std::string* reasonIfUnsupported)
 {
-    // At the moment U8 is unsupported
-    if (input.GetDataType() == DataType::QuantisedAsymm8)
-    {
-        return false;
-    }
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClFullyConnectedWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,

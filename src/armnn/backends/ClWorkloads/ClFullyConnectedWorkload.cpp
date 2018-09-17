@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClFullyConnectedFloatWorkload.hpp"
+#include "ClFullyConnectedWorkload.hpp"
 #include "backends/ClTensorHandle.hpp"
 #include "backends/CpuTensorHandle.hpp"
 #include "backends/ArmComputeTensorUtils.hpp"
@@ -42,9 +42,9 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                         fullyConnectedLayerInfo);
 }
 
-ClFullyConnectedFloatWorkload::ClFullyConnectedFloatWorkload(const FullyConnectedQueueDescriptor& descriptor,
+ClFullyConnectedWorkload::ClFullyConnectedWorkload(const FullyConnectedQueueDescriptor& descriptor,
     const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : FloatWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
+    : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
     , m_FullyConnectedLayer(memoryManager)
 {
     m_WeightsTensor = std::make_unique<arm_compute::CLTensor>();
@@ -56,7 +56,7 @@ ClFullyConnectedFloatWorkload::ClFullyConnectedFloatWorkload(const FullyConnecte
         BuildArmComputeTensor(*m_BiasesTensor, m_Data.m_Bias->GetTensorInfo());
     }
 
-    m_Data.ValidateInputsOutputs("ClFullyConnectedFloatWorkload", 1, 1);
+    m_Data.ValidateInputsOutputs("ClFullyConnectedWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
@@ -67,11 +67,25 @@ ClFullyConnectedFloatWorkload::ClFullyConnectedFloatWorkload(const FullyConnecte
     m_FullyConnectedLayer.configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
 
     // Allocate
-    InitializeArmComputeClTensorDataForFloatTypes(*m_WeightsTensor, m_Data.m_Weight);
+    if (m_Data.m_Weight->GetTensorInfo().GetDataType() == DataType::QuantisedAsymm8)
+    {
+        InitialiseArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight->GetConstTensor<uint8_t>());
+    }
+    else
+    {
+        InitializeArmComputeClTensorDataForFloatTypes(*m_WeightsTensor, m_Data.m_Weight);
+    }
 
     if (m_BiasesTensor)
     {
-        InitializeArmComputeClTensorDataForFloatTypes(*m_BiasesTensor, m_Data.m_Bias);
+        if (m_Data.m_Bias->GetTensorInfo().GetDataType() == DataType::Signed32)
+        {
+            InitialiseArmComputeClTensorData(*m_BiasesTensor, m_Data.m_Bias->GetConstTensor<int32_t>());
+        }
+        else
+        {
+            InitializeArmComputeClTensorDataForFloatTypes(*m_BiasesTensor, m_Data.m_Bias);
+        }
     }
 
     // Force Compute Library to perform the necessary copying and reshaping, after which
@@ -80,13 +94,13 @@ ClFullyConnectedFloatWorkload::ClFullyConnectedFloatWorkload(const FullyConnecte
     FreeUnusedTensors();
 }
 
-void ClFullyConnectedFloatWorkload::Execute() const
+void ClFullyConnectedWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClFullyConnectedFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClFullyConnectedWorkload_Execute");
     m_FullyConnectedLayer.run();
 }
 
-void ClFullyConnectedFloatWorkload::FreeUnusedTensors()
+void ClFullyConnectedWorkload::FreeUnusedTensors()
 {
     FreeTensorIfUnused(m_WeightsTensor);
     FreeTensorIfUnused(m_BiasesTensor);

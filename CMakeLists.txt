@@ -506,8 +506,8 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.hpp
         src/armnn/backends/ClWorkloads/ClFloorFloatWorkload.cpp
         src/armnn/backends/ClWorkloads/ClFloorFloatWorkload.hpp
-        src/armnn/backends/ClWorkloads/ClFullyConnectedFloatWorkload.cpp
-        src/armnn/backends/ClWorkloads/ClFullyConnectedFloatWorkload.hpp
+        src/armnn/backends/ClWorkloads/ClFullyConnectedWorkload.cpp
+        src/armnn/backends/ClWorkloads/ClFullyConnectedWorkload.hpp
         src/armnn/backends/ClWorkloads/ClL2NormalizationFloatWorkload.cpp
         src/armnn/backends/ClWorkloads/ClL2NormalizationFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClLstmFloatWorkload.cpp

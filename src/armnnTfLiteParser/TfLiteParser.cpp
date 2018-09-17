@@ -455,6 +455,8 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D] =  &TfLiteParser::ParseDepthwiseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]           =  &TfLiteParser::ParseSoftmax;
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]           =  &TfLiteParser::ParseSqueeze;
+    m_ParserFunctions[tflite::BuiltinOperator_RELU]              =  &TfLiteParser::ParseRelu;
+    m_ParserFunctions[tflite::BuiltinOperator_RELU6]             =  &TfLiteParser::ParseRelu6;
 }
 
 void TfLiteParser::ResetParser()
@@ -692,7 +694,7 @@ void TfLiteParser::ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex
     // we need to add the activation layer and fortunately we don't need to care about the data layout
     // beause the activation function is element-wise, so it is OK to have the activation after the trailing
     // swizzle layer
-    layer = AddActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
+    layer = AddFusedActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -770,7 +772,7 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     // we need to add the activation layer and fortunately we don't need to care about the data layout
     // beause the activation function is element-wise, so it is OK to have the activation after the trailing
     // swizzle layer
-    layer = AddActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
+    layer = AddFusedActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -845,7 +847,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     // we need to add the activation layer and fortunately we don't need to care about the data layout
     // beause the activation function is element-wise, so it is OK to have the activation after the trailing
     // swizzle layer
-    layer = AddActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
+    layer = AddFusedActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -965,9 +967,75 @@ void TfLiteParser::ParseSqueeze(size_t subgraphIndex, size_t operatorIndex)
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
 
-armnn::IConnectableLayer* TfLiteParser::AddActivationLayer(armnn::IConnectableLayer* prevLayer,
-                                                           unsigned int outputSlot,
-                                                           tflite::ActivationFunctionType activationType)
+void TfLiteParser::ParseRelu(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    boost::ignore_unused(operatorPtr);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = str(boost::format("Activation:RELU:%1%:%2%") % subgraphIndex % operatorIndex);
+    ActivationDescriptor activationDesc;
+    activationDesc.m_Function = ActivationFunction::ReLu;
+    IConnectableLayer* const layer  =
+        m_Network->AddActivationLayer(activationDesc, layerName.c_str());
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    // register the input connection slots for the layer, connections are made after all layers have been created
+    // only the tensors for the inputs are relevant, exclude the const tensors
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseRelu6(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    boost::ignore_unused(operatorPtr);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = str(boost::format("Activation:RELU6:%1%:%2%") % subgraphIndex % operatorIndex);
+    ActivationDescriptor activationDesc;
+    activationDesc.m_Function = ActivationFunction::BoundedReLu;
+    activationDesc.m_A = 6.0f;
+    activationDesc.m_B = 0.0f;
+    IConnectableLayer* const layer  =
+        m_Network->AddActivationLayer(activationDesc, layerName.c_str());
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    // register the input connection slots for the layer, connections are made after all layers have been created
+    // only the tensors for the inputs are relevant, exclude the const tensors
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+armnn::IConnectableLayer* TfLiteParser::AddFusedActivationLayer(armnn::IConnectableLayer* prevLayer,
+                                                                unsigned int outputSlot,
+                                                                tflite::ActivationFunctionType activationType)
 {
     ActivationDescriptor activationDesc;
     std::string layerName = prevLayer->GetName();

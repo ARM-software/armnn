@@ -727,6 +727,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/GetTensorIds.cpp
              src/armnnTfLiteParser/test/GetSubgraphInputsOutputs.cpp
              src/armnnTfLiteParser/test/GetInputsOutputs.cpp
+             src/armnnTfLiteParser/test/Activations.cpp
              )
     endif()
 

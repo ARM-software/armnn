@@ -93,6 +93,8 @@ private:
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
+    void ParseRelu(size_t subgraphIndex, size_t operatorIndex);
+    void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);
 
     void RegisterProducerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IOutputSlot* slot);
     void RegisterConsumerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IInputSlot* slot);
@@ -111,9 +113,9 @@ private:
     void ResetParser();
 
     /// Attach an activation layer to the one passed as a parameter
-    armnn::IConnectableLayer* AddActivationLayer(armnn::IConnectableLayer* layer,
-                                                 unsigned int outputSlot,
-                                                 tflite::ActivationFunctionType activationType);
+    armnn::IConnectableLayer* AddFusedActivationLayer(armnn::IConnectableLayer* layer,
+                                                      unsigned int outputSlot,
+                                                      tflite::ActivationFunctionType activationType);
 
     // SupportedDataStorage's purpose is to hold data till we pass over to the network.
     // We don't care about the content, and we want a single datatype to simplify the code.

@@ -146,8 +146,8 @@ public:
             if (detectedObject.m_Class != expectedDetection.m_Class)
             {
                 BOOST_LOG_TRIVIAL(error) << "Prediction for test case " << this->GetTestCaseId() <<
-                    " (" << detectedObject.m_Class << ")" <<
-                    " is incorrect (should be " << expectedDetection.m_Class << ")";
+                    " is incorrect: Expected (" << expectedDetection.m_Class << ")" <<
+                    " but predicted (" << detectedObject.m_Class << ")";
                 return TestCaseResult::Failed;
             }
 

@@ -186,6 +186,7 @@ class Layer : public IConnectableLayer
 public:
     /// @param name - Optional name for the layer (may be nullptr).
     Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType type, const char* name);
+    Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType type, DataLayout layout, const char* name);
 
     const std::string& GetNameStr() const
     {
@@ -233,6 +234,8 @@ public:
     LayerType GetType() const { return m_Type; }
 
     DataType GetDataType() const;
+
+    DataLayout GetDataLayout() const { return m_DataLayout; }
 
     Compute GetComputeDevice() const { return m_ComputeDevice; }
     void SetComputeDevice(Compute device) { m_ComputeDevice = device; }
@@ -341,6 +344,7 @@ private:
     std::vector<OutputSlot> m_OutputSlots;
 
     const LayerType m_Type;
+    const DataLayout m_DataLayout;
     Compute m_ComputeDevice;
 
     /// Used for sorting.

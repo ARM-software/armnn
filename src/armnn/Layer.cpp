@@ -124,10 +124,15 @@ LayerGuid GenerateLayerGuid()
 }
 } // namespace
 
-Layer::Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType type, const char* name)
+Layer::Layer(unsigned int numInputSlots,
+             unsigned int numOutputSlots,
+             LayerType type,
+             DataLayout layout,
+             const char* name)
 : m_OutputHandlers(numOutputSlots)
 , m_LayerName(name ? name : "")
 , m_Type(type)
+, m_DataLayout(layout)
 , m_ComputeDevice(Compute::Undefined)
 , m_Guid(GenerateLayerGuid())
 {
@@ -142,6 +147,14 @@ Layer::Layer(unsigned int numInputSlots, unsigned int numOutputSlots, LayerType 
     {
         m_OutputSlots.emplace_back(*this, m_OutputHandlers[i]);
     }
+}
+
+Layer::Layer(unsigned int numInputSlots,
+             unsigned int numOutputSlots,
+             LayerType type,
+             const char* name)
+: Layer(numInputSlots, numOutputSlots, type, DataLayout::NCHW, name)
+{
 }
 
 void Layer::CollectWorkloadInputs(WorkloadDataCollector& dataCollector, const Graph& graph) const

@@ -28,6 +28,12 @@ enum class DataType
     Signed32  = 3
 };
 
+enum class DataLayout
+{
+    NCHW = 1,
+    NHWC = 2
+};
+
 enum class ActivationFunction
 {
     Sigmoid     = 0,

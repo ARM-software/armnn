@@ -19,7 +19,7 @@
 #include "Profiling.hpp"
 
 #include "NeonLayerSupport.hpp"
-#include "../../../include/armnn/Types.hpp"
+#include "armnn/Types.hpp"
 #include "Half.hpp"
 
 using namespace armnn::armcomputetensorutils;

@@ -6,7 +6,7 @@
 #include "NeonBatchNormalizationFloatWorkload.hpp"
 #include "backends/CpuTensorHandle.hpp"
 #include "backends/ArmComputeTensorUtils.hpp"
-#include "../../../../include/armnn/ArmNN.hpp"
+#include "armnn/ArmNN.hpp"
 
 namespace armnn
 {

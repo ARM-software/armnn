@@ -1,0 +1,101 @@
+#
+# Copyright © 2017 Arm Ltd. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+
+list(APPEND armnnRefBackend_sources
+    Activation.cpp
+    Activation.hpp
+    ArithmeticFunction.cpp
+    ArithmeticFunction.hpp
+    BatchNormImpl.hpp
+    Broadcast.cpp
+    Broadcast.hpp
+    ConvImpl.cpp
+    ConvImpl.hpp
+    FullyConnected.cpp
+    FullyConnected.hpp
+    Merger.hpp
+    Pooling2d.cpp
+    Pooling2d.hpp
+    RefActivationFloat32Workload.cpp
+    RefActivationFloat32Workload.hpp
+    RefActivationUint8Workload.cpp
+    RefActivationUint8Workload.hpp
+    RefArithmeticWorkload.cpp
+    RefArithmeticWorkload.hpp
+    RefBaseConstantWorkload.cpp
+    RefBaseConstantWorkload.hpp
+    RefBatchNormalizationFloat32Workload.cpp
+    RefBatchNormalizationFloat32Workload.hpp
+    RefBatchNormalizationUint8Workload.cpp
+    RefBatchNormalizationUint8Workload.hpp
+    RefConstantFloat32Workload.cpp
+    RefConstantFloat32Workload.hpp
+    RefConstantUint8Workload.cpp
+    RefConstantUint8Workload.hpp
+    RefConvertFp16ToFp32Workload.cpp
+    RefConvertFp16ToFp32Workload.hpp
+    RefConvertFp32ToFp16Workload.cpp
+    RefConvertFp32ToFp16Workload.hpp
+    RefConvolution2dFloat32Workload.cpp
+    RefConvolution2dFloat32Workload.hpp
+    RefConvolution2dUint8Workload.cpp
+    RefConvolution2dUint8Workload.hpp
+    RefDepthwiseConvolution2dFloat32Workload.cpp
+    RefDepthwiseConvolution2dFloat32Workload.hpp
+    RefDepthwiseConvolution2dUint8Workload.cpp
+    RefDepthwiseConvolution2dUint8Workload.hpp
+    RefFakeQuantizationFloat32Workload.cpp
+    RefFakeQuantizationFloat32Workload.hpp
+    RefFloorFloat32Workload.cpp
+    RefFloorFloat32Workload.hpp
+    RefFullyConnectedFloat32Workload.cpp
+    RefFullyConnectedFloat32Workload.hpp
+    RefFullyConnectedUint8Workload.cpp
+    RefFullyConnectedUint8Workload.hpp
+    RefL2NormalizationFloat32Workload.cpp
+    RefL2NormalizationFloat32Workload.hpp
+    RefLstmFloat32Workload.cpp
+    RefLstmFloat32Workload.hpp
+    RefMergerFloat32Workload.cpp
+    RefMergerFloat32Workload.hpp
+    RefMergerUint8Workload.cpp
+    RefMergerUint8Workload.hpp
+    RefNormalizationFloat32Workload.cpp
+    RefNormalizationFloat32Workload.hpp
+    RefPermuteWorkload.cpp
+    RefPermuteWorkload.hpp
+    RefPooling2dFloat32Workload.cpp
+    RefPooling2dFloat32Workload.hpp
+    RefPooling2dUint8Workload.cpp
+    RefPooling2dUint8Workload.hpp
+    RefReshapeFloat32Workload.cpp
+    RefReshapeFloat32Workload.hpp
+    RefReshapeUint8Workload.cpp
+    RefReshapeUint8Workload.hpp
+    RefResizeBilinearFloat32Workload.cpp
+    RefResizeBilinearFloat32Workload.hpp
+    RefResizeBilinearUint8Workload.cpp
+    RefResizeBilinearUint8Workload.hpp
+    RefSoftmaxFloat32Workload.cpp
+    RefSoftmaxFloat32Workload.hpp
+    RefSoftmaxUint8Workload.cpp
+    RefSoftmaxUint8Workload.hpp
+    RefSplitterFloat32Workload.cpp
+    RefSplitterFloat32Workload.hpp
+    RefSplitterUint8Workload.cpp
+    RefSplitterUint8Workload.hpp
+    RefWorkloadUtils.hpp
+    ResizeBilinear.cpp
+    ResizeBilinear.hpp
+    Softmax.cpp
+    Softmax.hpp
+    Splitter.hpp
+    TensorBufferArrayView.hpp
+)
+
+add_library(armnnRefBackend STATIC ${armnnRefBackend_sources})
+target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

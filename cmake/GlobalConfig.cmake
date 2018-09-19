@@ -348,3 +348,6 @@ endif()
 if(NOT BUILD_TF_LITE_PARSER)
     message(STATUS "Tensorflow Lite parser support is disabled")
 endif()
+
+# ArmNN source files required for all build options
+include_directories(SYSTEM third-party)

@@ -57,7 +57,7 @@ static void ClCreateArithmethicWorkloadTest()
     ClWorkloadFactory factory;
     auto workload = CreateArithmeticWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
 
-    // Checks that inputs/outputs are as we expect them (see definition of CreateSubtractionWorkloadTest).
+    // Checks that inputs/outputs are as we expect them (see definition of CreateArithmeticWorkloadTest).
     DescriptorType queueDescriptor = workload->GetData();
     auto inputHandle1 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto inputHandle2 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[1]);

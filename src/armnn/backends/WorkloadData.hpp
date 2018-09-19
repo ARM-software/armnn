@@ -202,6 +202,12 @@ struct MeanQueueDescriptor : QueueDescriptorWithParameters<MeanDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+// Pad layer workload data
+struct PadQueueDescriptor : QueueDescriptorWithParameters<PadDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Batch norm layer workload data.
 struct BatchNormalizationQueueDescriptor : QueueDescriptorWithParameters<BatchNormalizationDescriptor>
 {

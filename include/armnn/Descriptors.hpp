@@ -347,4 +347,14 @@ struct MeanDescriptor
     bool m_KeepDims;
 };
 
+struct PadDescriptor
+{
+    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList);
+
+    // first is number of values to add before the tensor in the dimension,
+    // second is the number of values to add after the tensor in the dimension
+    // the number of pairs should match the number of dimensions in the input tensor.
+    std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
+};
+
 }

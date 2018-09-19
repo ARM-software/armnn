@@ -850,4 +850,22 @@ void MeanQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+void PadQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "PadQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "PadQueueDescriptor");
+
+    const TensorInfo& input = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[1];
+    // input and output should have the same number of dimensions
+    ValidateTensorNumDimensions(output, "PadQueueDescriptor", input.GetNumDimensions(), "output");
+    // there should be entry in the pad list for each dimension in the input tensor
+    if (m_Parameters.m_PadList.size() != input.GetNumDimensions()) {
+        throw InvalidArgumentException("Pad List should contain the same number of entries as there"
+                                       " are dimensions in the input tensor that is " +
+                                       to_string(input.GetNumDimensions()) + " entries " +
+                                       " not " + to_string(m_Parameters.m_PadList.size()) + " entries.");
+    }
+}
+
 } //namespace armnn

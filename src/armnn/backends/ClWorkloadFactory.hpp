@@ -117,6 +117,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateMean(const MeanQueueDescriptor& descriptor,
                                                   const WorkloadInfo& Info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreatePad(const PadQueueDescriptor& descriptor,
+                                                 const WorkloadInfo& info) const override;
+
     virtual void Finalize() override;
 
     virtual void Release() override;

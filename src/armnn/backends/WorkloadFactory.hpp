@@ -129,6 +129,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateMean(const MeanQueueDescriptor& descriptor,
                                                   const WorkloadInfo& Info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreatePad(const PadQueueDescriptor& descriptor,
+                                                 const WorkloadInfo& Info) const = 0;
 };
 
 } //namespace armnn

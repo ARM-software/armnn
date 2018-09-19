@@ -24,6 +24,7 @@
 #include <fstream>
 #include <algorithm>
 #include <limits>
+#include <numeric>
 
 using namespace armnn;
 using armnn::CheckLocation;
@@ -457,6 +458,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]           =  &TfLiteParser::ParseSqueeze;
     m_ParserFunctions[tflite::BuiltinOperator_RELU]              =  &TfLiteParser::ParseRelu;
     m_ParserFunctions[tflite::BuiltinOperator_RELU6]             =  &TfLiteParser::ParseRelu6;
+    m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]           =  &TfLiteParser::ParseReshape;
 }
 
 void TfLiteParser::ResetParser()
@@ -1029,6 +1031,68 @@ void TfLiteParser::ParseRelu6(size_t subgraphIndex, size_t operatorIndex)
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
     // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+armnn::TensorInfo TfLiteParser::OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
+                                                     const std::vector<int32_t> & targetDimsIn)
+{
+    std::vector<unsigned int> outputDims(targetDimsIn.begin(), targetDimsIn.end());
+    const auto stretchDim = std::find(targetDimsIn.begin(), targetDimsIn.end(), -1);
+
+    if (stretchDim != targetDimsIn.end())
+    {
+        if (std::find(std::next(stretchDim), targetDimsIn.end(), -1) != targetDimsIn.end())
+        {
+            throw ParseException(
+                boost::str(
+                    boost::format("At most one component of shape can be -1 %1%") % CHECK_LOCATION().AsString()));
+        }
+
+        auto targetNumElements =
+            boost::numeric_cast<unsigned int>(
+                std::accumulate(targetDimsIn.begin(), targetDimsIn.end(), -1, std::multiplies<int32_t>()));
+
+        auto stretchIndex = static_cast<size_t>(std::distance(targetDimsIn.begin(), stretchDim));
+        outputDims[stretchIndex] = inputTensorInfo.GetNumElements() / targetNumElements;
+    }
+
+    TensorShape outputShape = TensorShape(static_cast<unsigned int>(outputDims.size()), outputDims.data());
+
+    TensorInfo reshapeInfo = inputTensorInfo;
+    reshapeInfo.SetShape(outputShape);
+
+    return reshapeInfo;
+}
+
+void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto * options = operatorPtr->builtin_options.AsReshapeOptions();
+
+    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo outputTensorInfo =
+        TfLiteParser::OutputShapeOfReshape(inputTensorInfo, options->new_shape);
+
+    ReshapeDescriptor reshapeDesc;
+    reshapeDesc.m_TargetShape = outputTensorInfo.GetShape();
+
+    auto layerName = boost::str(boost::format("Reshape:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }

@@ -74,7 +74,8 @@ public:
     static BufferRawPtr GetBuffer(const ModelPtr& model, size_t bufferIndex);
     static armnn::TensorInfo OutputShapeOfSqueeze(const std::vector<uint32_t> & squeezeDims,
                                                   const armnn::TensorInfo & inputTensorInfo);
-
+    static armnn::TensorInfo OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
+                                                  const std::vector<int32_t> & targetDimsIn);
 
 private:
     // No copying allowed until it is wanted and properly implemented
@@ -95,6 +96,7 @@ private:
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);
+    void ParseReshape(size_t subgraphIndex, size_t operatorIndex);
 
     void RegisterProducerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IOutputSlot* slot);
     void RegisterConsumerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IInputSlot* slot);

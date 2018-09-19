@@ -728,6 +728,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/GetSubgraphInputsOutputs.cpp
              src/armnnTfLiteParser/test/GetInputsOutputs.cpp
              src/armnnTfLiteParser/test/Activations.cpp
+             src/armnnTfLiteParser/test/Reshape.cpp
              )
     endif()
 

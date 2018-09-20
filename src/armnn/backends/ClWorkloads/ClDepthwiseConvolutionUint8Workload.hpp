@@ -7,8 +7,6 @@
 
 #include "ClDepthwiseConvolutionBaseWorkload.hpp"
 
-#include "backends/ClWorkloadUtils.hpp"
-
 namespace armnn
 {
 

@@ -9,6 +9,8 @@
 #include "backends/CpuTensorHandle.hpp"
 #include "Half.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 

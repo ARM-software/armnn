@@ -5,6 +5,7 @@
 
 #include "ClMergerFloatWorkload.hpp"
 
+#include "ClWorkloadUtils.hpp"
 
 namespace armnn
 {

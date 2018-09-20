@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include "backends/ClWorkloadUtils.hpp"
-#include "backends/ClWorkloads//ClPooling2dBaseWorkload.hpp"
+#include "backends/Workload.hpp"
+
+#include "ClPooling2dBaseWorkload.hpp"
 
 namespace armnn
 {

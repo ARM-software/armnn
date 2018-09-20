@@ -5,8 +5,9 @@
 
 #include "ClDepthwiseConvolutionFloatWorkload.hpp"
 
-#include "backends/ClWorkloadUtils.hpp"
 #include "backends/CpuTensorHandle.hpp"
+
+#include "ClWorkloadUtils.hpp"
 
 namespace armnn
 {

@@ -7,6 +7,8 @@
 #include "backends/ClTensorHandle.hpp"
 #include "backends/ArmComputeUtils.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 arm_compute::Status ClActivationWorkloadValidate(const TensorInfo& input,

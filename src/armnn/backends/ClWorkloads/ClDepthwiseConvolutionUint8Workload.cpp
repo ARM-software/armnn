@@ -7,6 +7,8 @@
 
 #include "backends/CpuTensorHandle.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 

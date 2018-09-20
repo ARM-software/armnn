@@ -5,6 +5,7 @@
 
 #include "ClMergerUint8Workload.hpp"
 
+#include "ClWorkloadUtils.hpp"
 
 namespace armnn
 {

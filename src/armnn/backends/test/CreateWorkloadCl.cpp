@@ -5,7 +5,7 @@
 #include "backends/ClWorkloadFactory.hpp"
 #include "backends/RefWorkloadFactory.hpp"
 #include "backends/MemCopyWorkload.hpp"
-#include "backends/ClWorkloadUtils.hpp"
+#include "backends/ClWorkloads/ClWorkloadUtils.hpp"
 #include "backends/ClWorkloads.hpp"
 #include "backends/ClTensorHandle.hpp"
 #include "ClContextControlFixture.hpp"

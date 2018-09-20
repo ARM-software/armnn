@@ -5,6 +5,8 @@
 
 #include "ClSplitterUint8Workload.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 

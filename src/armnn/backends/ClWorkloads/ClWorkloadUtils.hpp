@@ -4,14 +4,16 @@
 //
 #pragma once
 
-#include "Workload.hpp"
+#include "OpenClTimer.hpp"
+#include "backends/Workload.hpp"
+#include "backends/ArmComputeTensorUtils.hpp"
+#include "backends/CpuTensorHandle.hpp"
+
 #include <arm_compute/core/CL/OpenCL.h>
 #include <arm_compute/runtime/CL/CLFunctions.h>
 #include <arm_compute/runtime/SubTensor.h>
-#include "ArmComputeTensorUtils.hpp"
-#include "OpenClTimer.hpp"
-#include "CpuTensorHandle.hpp"
-#include "Half.hpp"
+
+#include <Half.hpp>
 
 #define ARMNN_SCOPED_PROFILING_EVENT_CL(name) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::GpuAcc, \

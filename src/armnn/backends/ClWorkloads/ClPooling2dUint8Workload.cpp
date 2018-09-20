@@ -5,6 +5,8 @@
 
 #include "ClPooling2dUint8Workload.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 

@@ -10,6 +10,8 @@
 #include "backends/ArmComputeUtils.hpp"
 #include "backends/ClLayerSupport.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 using namespace armcomputetensorutils;

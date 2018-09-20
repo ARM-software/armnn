@@ -4,6 +4,8 @@
 //
 
 #include "ClConstantFloatWorkload.hpp"
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 

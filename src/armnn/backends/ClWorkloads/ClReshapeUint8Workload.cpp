@@ -7,6 +7,8 @@
 #include "backends/ClTensorHandle.hpp"
 #include "backends/CpuTensorHandle.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 ClReshapeUint8Workload::ClReshapeUint8Workload(const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info)

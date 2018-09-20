@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include "backends/ClWorkloadUtils.hpp"
-
+#include "backends/Workload.hpp"
 #include <boost/optional.hpp>
+
+#include <arm_compute/runtime/CL/CLFunctions.h>
 
 namespace armnn
 {

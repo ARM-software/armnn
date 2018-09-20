@@ -9,6 +9,8 @@
 #include "backends/ArmComputeUtils.hpp"
 #include "backends/ArmComputeTensorUtils.hpp"
 
+#include <arm_compute/runtime/CL/functions/CLConvolutionLayer.h>
+
 namespace armnn
 {
 using namespace armcomputetensorutils;

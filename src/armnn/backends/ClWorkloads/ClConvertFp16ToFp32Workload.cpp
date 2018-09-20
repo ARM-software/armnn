@@ -6,6 +6,8 @@
 #include "ClConvertFp16ToFp32Workload.hpp"
 #include "backends/ClTensorHandle.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 using namespace armcomputetensorutils;

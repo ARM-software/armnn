@@ -546,7 +546,7 @@ if(ARMCOMPUTECL)
         src/armnn/backends/ClWorkloads/ClSplitterFloatWorkload.hpp
         src/armnn/backends/ClWorkloads/ClSplitterUint8Workload.cpp
         src/armnn/backends/ClWorkloads/ClSplitterUint8Workload.hpp
-        src/armnn/backends/ClWorkloadUtils.hpp
+        src/armnn/backends/ClWorkloads/ClWorkloadUtils.hpp
         src/armnn/backends/ClTensorHandle.hpp
         src/armnn/OpenClTimer.cpp
         src/armnn/OpenClTimer.hpp)

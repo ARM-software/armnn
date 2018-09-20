@@ -7,7 +7,6 @@
 
 #include "backends/Workload.hpp"
 #include "backends/WorkloadData.hpp"
-#include "backends/ClWorkloadUtils.hpp"
 
 #include <armnn/TypesUtils.hpp>
 #include <arm_compute/runtime/CL/functions/CLPermute.h>

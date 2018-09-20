@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "backends/ClWorkloadUtils.hpp"
+#include <armnn/Tensor.hpp>
+#include <arm_compute/core/Error.h>
 
 namespace armnn
 {

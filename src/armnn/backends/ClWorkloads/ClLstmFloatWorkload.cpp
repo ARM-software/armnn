@@ -8,7 +8,10 @@
 #include "backends/CpuTensorHandle.hpp"
 #include "backends/ArmComputeTensorUtils.hpp"
 #include "backends/ClLayerSupport.hpp"
-#include "arm_compute/runtime/CL/functions/CLLSTMLayer.h"
+
+#include <arm_compute/runtime/CL/functions/CLLSTMLayer.h>
+
+#include "ClWorkloadUtils.hpp"
 
 namespace armnn
 {

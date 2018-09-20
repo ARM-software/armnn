@@ -8,6 +8,8 @@
 #include "backends/CpuTensorHandle.hpp"
 #include "backends/ArmComputeUtils.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 using namespace armcomputetensorutils;

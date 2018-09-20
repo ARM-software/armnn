@@ -5,6 +5,8 @@
 
 #include "ClPooling2dFloatWorkload.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 

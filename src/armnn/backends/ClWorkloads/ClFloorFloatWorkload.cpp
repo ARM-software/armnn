@@ -6,6 +6,8 @@
 #include "ClFloorFloatWorkload.hpp"
 #include "backends/ClTensorHandle.hpp"
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 

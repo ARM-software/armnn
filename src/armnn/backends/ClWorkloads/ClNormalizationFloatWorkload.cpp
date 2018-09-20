@@ -9,6 +9,7 @@
 #include "backends/ClLayerSupport.hpp"
 #include "backends/ArmComputeUtils.hpp"
 #include "backends/ArmComputeTensorUtils.hpp"
+#include "ClWorkloadUtils.hpp"
 
 namespace armnn
 {

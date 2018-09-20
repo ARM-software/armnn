@@ -5,9 +5,12 @@
 
 #pragma once
 
-#include "backends/ClWorkloadUtils.hpp"
+#include <armnn/Tensor.hpp>
+#include <armnn/Descriptors.hpp>
 
 #include <boost/optional.hpp>
+
+#include <arm_compute/core/Error.h>
 
 namespace armnn
 {

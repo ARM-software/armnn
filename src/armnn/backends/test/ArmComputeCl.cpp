@@ -8,7 +8,7 @@
 
 #include "backends/CpuTensorHandle.hpp"
 #include "backends/ClWorkloadFactory.hpp"
-#include "backends/ClWorkloadUtils.hpp"
+#include "backends/ClWorkloads/ClWorkloadUtils.hpp"
 #include "backends/RefWorkloadFactory.hpp"
 #include "backends/ClLayerSupport.hpp"
 #include "ActivationFixture.hpp"

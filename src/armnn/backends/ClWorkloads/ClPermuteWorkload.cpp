@@ -9,6 +9,8 @@
 
 #include <arm_compute/core/Error.h>
 
+#include "ClWorkloadUtils.hpp"
+
 namespace armnn
 {
 

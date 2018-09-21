@@ -30,5 +30,5 @@ void InitializeArmComputeTensorDataForFloatTypes(arm_compute::Tensor& tensor, co
 #define     ARMNN_SCOPED_PROFILING_EVENT_NEON(name) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, \
                                                   name, \
-                                                  armnn::WallClockTimer(), \
-                                                  armnn::NeonTimer())
+                                                  armnn::NeonTimer(), \
+                                                  armnn::WallClockTimer())

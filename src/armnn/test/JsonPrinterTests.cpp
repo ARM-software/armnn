@@ -276,7 +276,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
             break;
         case armnn::Compute::CpuAcc: backend = "Neon";
             changeLine31 = ",\n\"NeonKernelTimer/: NEFillBorderKernel\": {";
-            changeLine39 = R"(ms"
+            changeLine39 = R"(us"
 },
 "NeonKernelTimer/: NELogitsDMaxKernel": {
 "raw": [
@@ -284,7 +284,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 ,
 
 ],
-"unit": "ms"
+"unit": "us"
 },
 "NeonKernelTimer/: NELogitsDSoftmaxKernel": {
 "raw": [
@@ -292,7 +292,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 ,
 
 ],
-"unit": "ms")";
+"unit": "us")";
             changeLine40 = R"(
 },
 "CopyMemGeneric_Execute": {

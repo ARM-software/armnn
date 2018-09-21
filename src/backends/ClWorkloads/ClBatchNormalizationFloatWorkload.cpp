@@ -68,10 +68,10 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
                       m_Gamma.get(),
                       m_Data.m_Parameters.m_Eps);
 
-    InitializeArmComputeClTensorDataForFloatTypes(*m_Mean, m_Data.m_Mean);
-    InitializeArmComputeClTensorDataForFloatTypes(*m_Variance, m_Data.m_Variance);
-    InitializeArmComputeClTensorDataForFloatTypes(*m_Beta, m_Data.m_Beta);
-    InitializeArmComputeClTensorDataForFloatTypes(*m_Gamma, m_Data.m_Gamma);
+    InitializeArmComputeClTensorData(*m_Mean, m_Data.m_Mean);
+    InitializeArmComputeClTensorData(*m_Variance, m_Data.m_Variance);
+    InitializeArmComputeClTensorData(*m_Beta, m_Data.m_Beta);
+    InitializeArmComputeClTensorData(*m_Gamma, m_Data.m_Gamma);
 
     // Force Compute Library to perform the necessary copying and reshaping, after which
     // delete all the input tensors that will no longer be needed

@@ -17,11 +17,11 @@ ClDepthwiseConvolutionFloatWorkload::ClDepthwiseConvolutionFloatWorkload(
     const WorkloadInfo& info)
     : ClDepthwiseConvolutionBaseWorkload(descriptor, info)
 {
-    InitializeArmComputeClTensorDataForFloatTypes(*m_KernelTensor, m_Data.m_Weight);
+    InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
 
     if (m_BiasTensor)
     {
-        InitializeArmComputeClTensorDataForFloatTypes(*m_BiasTensor, m_Data.m_Bias);
+        InitializeArmComputeClTensorData(*m_BiasTensor, m_Data.m_Bias);
     }
 
     m_DepthwiseConvolutionLayer->prepare();

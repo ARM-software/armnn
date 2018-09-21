@@ -42,8 +42,8 @@ void InitialiseArmComputeClTensorData(arm_compute::CLTensor& clTensor, const T* 
     CopyArmComputeClTensorData<T>(data, clTensor);
 }
 
-inline void InitializeArmComputeClTensorDataForFloatTypes(arm_compute::CLTensor& clTensor,
-                                                          const ConstCpuTensorHandle *handle)
+inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
+                                             const ConstCpuTensorHandle* handle)
 {
     BOOST_ASSERT(handle);
     switch(handle->GetTensorInfo().GetDataType())
@@ -54,8 +54,14 @@ inline void InitializeArmComputeClTensorDataForFloatTypes(arm_compute::CLTensor&
         case DataType::Float32:
             InitialiseArmComputeClTensorData(clTensor, handle->GetConstTensor<float>());
             break;
+        case DataType::QuantisedAsymm8:
+            InitialiseArmComputeClTensorData(clTensor, handle->GetConstTensor<uint8_t>());
+            break;
+        case DataType::Signed32:
+            InitialiseArmComputeClTensorData(clTensor, handle->GetConstTensor<int32_t>());
+            break;
         default:
-            BOOST_ASSERT_MSG(false, "Unexpected floating point type.");
+            BOOST_ASSERT_MSG(false, "Unexpected tensor type.");
     }
 };
 

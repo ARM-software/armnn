@@ -51,11 +51,11 @@ ClConvolution2dUint8Workload::ClConvolution2dUint8Workload(const Convolution2dQu
                                  &output,
                                  padStrideInfo);
 
-    InitialiseArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight->GetConstTensor<uint8_t>());
+    InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
 
     if (m_BiasTensor)
     {
-        InitialiseArmComputeClTensorData(*m_BiasTensor, m_Data.m_Bias->GetConstTensor<int32_t>());
+        InitializeArmComputeClTensorData(*m_BiasTensor, m_Data.m_Bias);
     }
 
     // Force Compute Library to perform the necessary copying and reshaping, after which

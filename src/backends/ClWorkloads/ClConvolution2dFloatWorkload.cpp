@@ -52,11 +52,11 @@ ClConvolution2dFloatWorkload::ClConvolution2dFloatWorkload(const Convolution2dQu
                                  &output,
                                  padStrideInfo);
 
-    InitializeArmComputeClTensorDataForFloatTypes(*m_KernelTensor, m_Data.m_Weight);
+    InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
 
     if (m_BiasTensor)
     {
-        InitializeArmComputeClTensorDataForFloatTypes(*m_BiasTensor, m_Data.m_Bias);
+        InitializeArmComputeClTensorData(*m_BiasTensor, m_Data.m_Bias);
     }
 
     // Force Compute Library to perform the necessary copying and reshaping, after which

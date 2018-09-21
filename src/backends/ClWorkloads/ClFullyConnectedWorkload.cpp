@@ -68,26 +68,11 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(const FullyConnectedQueueDesc
     fc_info.transpose_weights = m_Data.m_Parameters.m_TransposeWeightMatrix;
     m_FullyConnectedLayer.configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
 
-    // Allocate
-    if (m_Data.m_Weight->GetTensorInfo().GetDataType() == DataType::QuantisedAsymm8)
-    {
-        InitialiseArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight->GetConstTensor<uint8_t>());
-    }
-    else
-    {
-        InitializeArmComputeClTensorDataForFloatTypes(*m_WeightsTensor, m_Data.m_Weight);
-    }
+    InitializeArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight);
 
     if (m_BiasesTensor)
     {
-        if (m_Data.m_Bias->GetTensorInfo().GetDataType() == DataType::Signed32)
-        {
-            InitialiseArmComputeClTensorData(*m_BiasesTensor, m_Data.m_Bias->GetConstTensor<int32_t>());
-        }
-        else
-        {
-            InitializeArmComputeClTensorDataForFloatTypes(*m_BiasesTensor, m_Data.m_Bias);
-        }
+        InitializeArmComputeClTensorData(*m_BiasesTensor, m_Data.m_Bias);
     }
 
     // Force Compute Library to perform the necessary copying and reshaping, after which

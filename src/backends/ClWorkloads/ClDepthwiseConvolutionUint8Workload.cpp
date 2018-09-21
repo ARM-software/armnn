@@ -17,11 +17,11 @@ ClDepthwiseConvolutionUint8Workload::ClDepthwiseConvolutionUint8Workload(
     const WorkloadInfo& info)
     : ClDepthwiseConvolutionBaseWorkload(descriptor, info)
 {
-    InitialiseArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight->template GetConstTensor<uint8_t>());
+    InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
 
     if (m_BiasTensor)
     {
-        InitialiseArmComputeClTensorData(*m_BiasTensor, m_Data.m_Bias->template GetConstTensor<int32_t>());
+        InitializeArmComputeClTensorData(*m_BiasTensor, m_Data.m_Bias);
     }
 
     m_DepthwiseConvolutionLayer->prepare();

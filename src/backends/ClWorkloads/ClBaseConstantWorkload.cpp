@@ -36,17 +36,17 @@ void ClBaseConstantWorkload<dataTypes...>::Execute() const
         {
             case arm_compute::DataType::F16:
             {
-                CopyArmComputeClTensorData(data.m_LayerOutput->GetConstTensor<Half>(), output);
+                CopyArmComputeClTensorData(output, data.m_LayerOutput->GetConstTensor<Half>());
                 break;
             }
             case arm_compute::DataType::F32:
             {
-                CopyArmComputeClTensorData(data.m_LayerOutput->GetConstTensor<float>(), output);
+                CopyArmComputeClTensorData(output, data.m_LayerOutput->GetConstTensor<float>());
                 break;
             }
             case arm_compute::DataType::QASYMM8:
             {
-                CopyArmComputeClTensorData(data.m_LayerOutput->GetConstTensor<uint8_t>(), output);
+                CopyArmComputeClTensorData(output, data.m_LayerOutput->GetConstTensor<uint8_t>());
                 break;
             }
             default:

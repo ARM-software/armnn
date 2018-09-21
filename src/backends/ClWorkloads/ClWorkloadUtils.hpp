@@ -20,7 +20,7 @@ namespace armnn
 {
 
 template <typename T>
-void CopyArmComputeClTensorData(const T* srcData, arm_compute::CLTensor& dstTensor)
+void CopyArmComputeClTensorData(arm_compute::CLTensor& dstTensor, const T* srcData)
 {
     {
         ARMNN_SCOPED_PROFILING_EVENT_CL("MapClTensorForWriting");
@@ -35,30 +35,25 @@ void CopyArmComputeClTensorData(const T* srcData, arm_compute::CLTensor& dstTens
     dstTensor.unmap();
 }
 
-template <typename T>
-void InitialiseArmComputeClTensorData(arm_compute::CLTensor& clTensor, const T* data)
-{
-    armcomputetensorutils::InitialiseArmComputeTensorEmpty(clTensor);
-    CopyArmComputeClTensorData<T>(data, clTensor);
-}
-
 inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
                                              const ConstCpuTensorHandle* handle)
 {
     BOOST_ASSERT(handle);
+
+    armcomputetensorutils::InitialiseArmComputeTensorEmpty(clTensor);
     switch(handle->GetTensorInfo().GetDataType())
     {
         case DataType::Float16:
-            InitialiseArmComputeClTensorData(clTensor, handle->GetConstTensor<armnn::Half>());
+            CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<armnn::Half>());
             break;
         case DataType::Float32:
-            InitialiseArmComputeClTensorData(clTensor, handle->GetConstTensor<float>());
+            CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<float>());
             break;
         case DataType::QuantisedAsymm8:
-            InitialiseArmComputeClTensorData(clTensor, handle->GetConstTensor<uint8_t>());
+            CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<uint8_t>());
             break;
         case DataType::Signed32:
-            InitialiseArmComputeClTensorData(clTensor, handle->GetConstTensor<int32_t>());
+            CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<int32_t>());
             break;
         default:
             BOOST_ASSERT_MSG(false, "Unexpected tensor type.");

@@ -33,6 +33,7 @@ BACKEND_SOURCES := \
         ClMergerUint8Workload.cpp \
         ClMultiplicationFloatWorkload.cpp \
         ClNormalizationFloatWorkload.cpp \
+        ClPadWorkload.cpp \
         ClPermuteWorkload.cpp \
         ClPooling2dBaseWorkload.cpp \
         ClPooling2dFloatWorkload.cpp \

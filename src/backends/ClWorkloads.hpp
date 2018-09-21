@@ -25,6 +25,7 @@
 #include "backends/ClWorkloads/ClMergerUint8Workload.hpp"
 #include "backends/ClWorkloads/ClMultiplicationFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClNormalizationFloatWorkload.hpp"
+#include "backends/ClWorkloads/ClPadWorkload.hpp"
 #include "backends/ClWorkloads/ClPermuteWorkload.hpp"
 #include "backends/ClWorkloads/ClPooling2dFloatWorkload.hpp"
 #include "backends/ClWorkloads/ClPooling2dUint8Workload.hpp"

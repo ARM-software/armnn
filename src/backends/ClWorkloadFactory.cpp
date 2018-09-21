@@ -270,7 +270,8 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMean(const MeanQueueDescript
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
                                                         const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClPadWorkload<armnn::DataType::Float16, armnn::DataType::Float32>,
+                        ClPadWorkload<armnn::DataType::QuantisedAsymm8>>(descriptor, info);
 }
 
 void ClWorkloadFactory::Finalize()

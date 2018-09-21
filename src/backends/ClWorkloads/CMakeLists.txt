@@ -54,6 +54,8 @@ list(APPEND armnnClBackend_sources
     ClMultiplicationFloatWorkload.hpp
     ClNormalizationFloatWorkload.cpp
     ClNormalizationFloatWorkload.hpp
+    ClPadWorkload.cpp
+    ClPadWorkload.hpp
     ClPermuteWorkload.cpp
     ClPermuteWorkload.hpp
     ClPooling2dBaseWorkload.cpp

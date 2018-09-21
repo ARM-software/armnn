@@ -25,6 +25,7 @@
 #include "ClWorkloads/ClL2NormalizationFloatWorkload.hpp"
 #include "ClWorkloads/ClMultiplicationFloatWorkload.hpp"
 #include "ClWorkloads/ClFullyConnectedWorkload.hpp"
+#include "ClWorkloads/ClPadWorkload.hpp"
 #include "ClWorkloads/ClPooling2dBaseWorkload.hpp"
 #include "ClWorkloads/ClPermuteWorkload.hpp"
 #include "ClWorkloads/ClNormalizationFloatWorkload.hpp"
@@ -332,6 +333,14 @@ bool IsOutputSupportedCl(const TensorInfo& output,
                                     output.GetDataType(),
                                     &TrueFunc<>,
                                     &TrueFunc<>);
+}
+
+bool IsPadSupportedCl(const TensorInfo& input,
+                      const TensorInfo& output,
+                      const PadDescriptor& descriptor,
+                      std::string* reasonIfUnsupported)
+{
+    return FORWARD_CL_LAYER_SUPPORT_FUNC(ClPadValidate(input, output, descriptor, reasonIfUnsupported));
 }
 
 bool IsPermuteSupportedCl(const TensorInfo& input,

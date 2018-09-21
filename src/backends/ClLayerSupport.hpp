@@ -109,6 +109,11 @@ bool IsNormalizationSupportedCl(const TensorInfo& input,
 bool IsOutputSupportedCl(const TensorInfo& output,
                          std::string* reasonIfUnsupported = nullptr);
 
+bool IsPadSupportedCl(const TensorInfo& input,
+                      const TensorInfo& output,
+                      const PadDescriptor& descriptor,
+                      std::string* reasonIfUnsupported = nullptr);
+
 bool IsPermuteSupportedCl(const TensorInfo& input,
                           const TensorInfo& output,
                           const PermuteDescriptor& descriptor,

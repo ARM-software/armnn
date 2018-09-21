@@ -14,6 +14,11 @@ ARMNN_MAIN_HEADER_PATH := $(LOCAL_PATH)/src
 ARMNN_SOURCE_HEADER_PATH := $(LOCAL_PATH)/src/armnn
 ARMNN_SOURCE_UTILS_HEADER_PATH := $(LOCAL_PATH)/src/armnnUtils
 
+# find the backend.mk files in the backend source folders
+ARMNN_BACKEND_MAKEFILE_LOCAL_PATHS := $(wildcard $(LOCAL_PATH)/src/backends/*/backend.mk)
+ARMNN_BACKEND_MAKEFILE_PATHS := $(subst $(LOCAL_PATH),,$(ARMNN_BACKEND_MAKEFILE_LOCAL_PATHS))
+ARMNN_BACKEND_MAKEFILE_DIRS := $(subst /backend.mk,,$(ARMNN_BACKEND_MAKEFILE_PATHS))
+
 ##############
 # libarmnn.a #
 ##############
@@ -24,8 +29,20 @@ LOCAL_MODULE_TAGS := eng optional
 LOCAL_ARM_MODE := arm
 LOCAL_PROPRIETARY_MODULE := true
 
-# Mark source files as dependent on Android.mk
-LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+# placeholder to hold all backend source files
+ARMNN_BACKEND_SOURCES :=
+
+#
+# iterate through the backend include paths, include them into the current makefile
+# and append the sources held by the BACKEND_SOURCES variable to the ARMNN_BACKEND_SOURCES list
+#
+$(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
+   $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
+   $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(BACKEND_SOURCES))))
+
+# Mark source files as dependent on Android.mk and backend makefiles
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk \
+                                 $(ARMNN_BACKEND_MAKEFILE_LOCAL_PATHS)
 
 LOCAL_EXPORT_C_INCLUDES := \
         $(ARMNN_MAIN_HEADER_PATH) \
@@ -41,131 +58,26 @@ LOCAL_C_INCLUDES := \
 	$(ARMNN_SOURCE_UTILS_HEADER_PATH)
 
 LOCAL_SRC_FILES := \
+        $(ARMNN_BACKEND_SOURCES) \
         src/armnnUtils/DotSerializer.cpp \
         src/armnnUtils/FloatingPointConverter.cpp \
         src/armnnUtils/Logging.cpp \
         src/armnnUtils/Permute.cpp \
         src/backends/ArmComputeTensorUtils.cpp \
-        src/backends/ClWorkloads/ClActivationFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClActivationUint8Workload.cpp \
-        src/backends/ClWorkloads/ClAdditionWorkload.cpp \
-        src/backends/ClWorkloads/ClSubtractionWorkload.cpp \
-        src/backends/ClWorkloads/ClBaseConstantWorkload.cpp \
-        src/backends/ClWorkloads/ClBatchNormalizationFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClConstantFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClConstantUint8Workload.cpp \
-        src/backends/ClWorkloads/ClConvertFp16ToFp32Workload.cpp \
-        src/backends/ClWorkloads/ClConvertFp32ToFp16Workload.cpp \
-        src/backends/ClWorkloads/ClConvolution2dBaseWorkload.cpp \
-        src/backends/ClWorkloads/ClConvolution2dFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClConvolution2dUint8Workload.cpp \
-        src/backends/ClWorkloads/ClDepthwiseConvolutionBaseWorkload.cpp \
-        src/backends/ClWorkloads/ClDepthwiseConvolutionFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClDepthwiseConvolutionUint8Workload.cpp \
-        src/backends/ClWorkloads/ClDivisionFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClFloorFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClFullyConnectedWorkload.cpp \
-        src/backends/ClWorkloads/ClL2NormalizationFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClLstmFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClMergerFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClMergerUint8Workload.cpp \
-        src/backends/ClWorkloads/ClMultiplicationFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClNormalizationFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClPermuteWorkload.cpp \
-        src/backends/ClWorkloads/ClPooling2dBaseWorkload.cpp \
-        src/backends/ClWorkloads/ClPooling2dFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClPooling2dUint8Workload.cpp \
-        src/backends/ClWorkloads/ClReshapeFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClReshapeUint8Workload.cpp \
-        src/backends/ClWorkloads/ClResizeBilinearFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClSoftmaxBaseWorkload.cpp \
-        src/backends/ClWorkloads/ClSoftmaxFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClSoftmaxUint8Workload.cpp \
-        src/backends/ClWorkloads/ClSplitterFloatWorkload.cpp \
-        src/backends/ClWorkloads/ClSplitterUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonActivationFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonActivationUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonAdditionFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonBatchNormalizationFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonConstantFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonConstantUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonConvertFp16ToFp32Workload.cpp \
-        src/backends/NeonWorkloads/NeonConvertFp32ToFp16Workload.cpp \
-        src/backends/NeonWorkloads/NeonConvolution2dBaseWorkload.cpp \
-        src/backends/NeonWorkloads/NeonConvolution2dFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonConvolution2dUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonDepthwiseConvolutionBaseWorkload.cpp \
-        src/backends/NeonWorkloads/NeonDepthwiseConvolutionFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonDepthwiseConvolutionUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonFloorFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonFullyConnectedFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonL2NormalizationFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonLstmFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonMergerFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonMergerUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonMultiplicationFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonNormalizationFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonPermuteWorkload.cpp \
-        src/backends/NeonWorkloads/NeonPooling2dBaseWorkload.cpp \
-        src/backends/NeonWorkloads/NeonPooling2dFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonPooling2dUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonReshapeFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonReshapeUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonSoftmaxBaseWorkload.cpp \
-        src/backends/NeonWorkloads/NeonSoftmaxFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonSoftmaxUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonSplitterFloatWorkload.cpp \
-        src/backends/NeonWorkloads/NeonSplitterUint8Workload.cpp \
-        src/backends/NeonWorkloads/NeonSubtractionFloatWorkload.cpp \
         src/backends/ClWorkloadFactory.cpp \
         src/backends/ClContextControl.cpp \
         src/backends/CpuTensorHandle.cpp \
         src/backends/RefWorkloadFactory.cpp \
-        src/backends/RefWorkloads/RefMergerUint8Workload.cpp \
-        src/backends/RefWorkloads/RefResizeBilinearUint8Workload.cpp \
-        src/backends/RefWorkloads/FullyConnected.cpp \
-        src/backends/RefWorkloads/RefFullyConnectedFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefSoftmaxFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefActivationFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefBatchNormalizationUint8Workload.cpp \
-        src/backends/RefWorkloads/RefBaseConstantWorkload.cpp \
-        src/backends/RefWorkloads/RefResizeBilinearFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefBatchNormalizationFloat32Workload.cpp \
-        src/backends/RefWorkloads/Broadcast.cpp \
-        src/backends/RefWorkloads/ArithmeticFunction.cpp \
-        src/backends/RefWorkloads/RefArithmeticWorkload.cpp \
-        src/backends/RefWorkloads/RefFakeQuantizationFloat32Workload.cpp \
-        src/backends/RefWorkloads/ResizeBilinear.cpp \
-        src/backends/RefWorkloads/RefSoftmaxUint8Workload.cpp \
-        src/backends/RefWorkloads/RefDepthwiseConvolution2dFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefPooling2dUint8Workload.cpp \
-        src/backends/RefWorkloads/RefFloorFloat32Workload.cpp \
-        src/backends/RefWorkloads/ConvImpl.cpp \
-        src/backends/RefWorkloads/Activation.cpp \
-        src/backends/RefWorkloads/RefReshapeUint8Workload.cpp \
-        src/backends/RefWorkloads/RefL2NormalizationFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefLstmFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefConvolution2dFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefConvolution2dUint8Workload.cpp \
-        src/backends/RefWorkloads/RefSplitterFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefActivationUint8Workload.cpp \
-        src/backends/RefWorkloads/RefSplitterUint8Workload.cpp \
-        src/backends/RefWorkloads/RefPooling2dFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefReshapeFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefNormalizationFloat32Workload.cpp \
-        src/backends/RefWorkloads/Softmax.cpp \
-        src/backends/RefWorkloads/RefDepthwiseConvolution2dUint8Workload.cpp \
-        src/backends/RefWorkloads/RefConstantUint8Workload.cpp \
-        src/backends/RefWorkloads/RefConstantFloat32Workload.cpp \
-        src/backends/RefWorkloads/Pooling2d.cpp \
-        src/backends/RefWorkloads/RefMergerFloat32Workload.cpp \
-        src/backends/RefWorkloads/RefFullyConnectedUint8Workload.cpp \
-        src/backends/RefWorkloads/RefPermuteWorkload.cpp \
-        src/backends/RefWorkloads/RefConvertFp16ToFp32Workload.cpp \
-        src/backends/RefWorkloads/RefConvertFp32ToFp16Workload.cpp \
         src/backends/MemCopyWorkload.cpp \
         src/backends/WorkloadData.cpp \
         src/backends/WorkloadFactory.cpp \
+        src/backends/OutputHandler.cpp \
+        src/backends/StringMapping.cpp \
+        src/backends/RefLayerSupport.cpp \
+        src/backends/ClLayerSupport.cpp \
+        src/backends/NeonLayerSupport.cpp \
+        src/backends/NeonWorkloadUtils.cpp \
+        src/backends/NeonWorkloadFactory.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArithmeticBaseLayer.cpp \
@@ -207,7 +119,6 @@ LOCAL_SRC_FILES := \
         src/armnn/NeonInterceptorScheduler.cpp \
         src/armnn/NeonTimer.cpp \
         src/armnn/Network.cpp \
-        src/backends/OutputHandler.cpp \
         src/armnn/OpenClTimer.cpp \
         src/armnn/WallClockTimer.cpp \
         src/armnn/ProfilingEvent.cpp \
@@ -217,12 +128,6 @@ LOCAL_SRC_FILES := \
         src/armnn/Utils.cpp \
         src/armnn/LayerSupport.cpp \
         src/armnn/Observable.cpp \
-        src/backends/StringMapping.cpp \
-        src/backends/RefLayerSupport.cpp \
-        src/backends/ClLayerSupport.cpp \
-        src/backends/NeonLayerSupport.cpp \
-        src/backends/NeonWorkloadUtils.cpp \
-        src/backends/NeonWorkloadFactory.cpp \
         src/armnn/memory/BaseMemoryManager.cpp \
         src/armnn/memory/BlobLifetimeManager.cpp \
         src/armnn/memory/BlobMemoryPool.cpp \

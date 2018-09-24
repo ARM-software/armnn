@@ -8,11 +8,11 @@
 #include <backends/reference/RefWorkloadFactory.hpp>
 
 #if ARMCOMPUTECL_ENABLED
-#include "backends/ClTensorHandle.hpp"
+#include <backends/ClTensorHandle.hpp>
 #endif
 
 #if ARMCOMPUTENEON_ENABLED
-#include "backends/NeonTensorHandle.hpp"
+#include <backends/neon/NeonTensorHandle.hpp>
 #endif
 
 

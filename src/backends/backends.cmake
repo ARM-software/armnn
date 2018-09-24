@@ -12,6 +12,7 @@ FILE(GLOB commonIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/common.cmake)
 FILE(GLOB backendIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/backend.cmake)
 
 # prefer to include common code first so backends can depend on them
-foreach(backendInclude ${commonIncludes} ${backendIncludes})
-    include(${backendInclude})
+foreach(includeFile ${commonIncludes} ${backendIncludes})
+    message("Including backend into the build: ${includeFile}")
+    include(${includeFile})
 endforeach()

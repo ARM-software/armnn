@@ -4,9 +4,9 @@
 //
 #pragma once
 
-#include "OutputHandler.hpp"
+#include <backends/OutputHandler.hpp>
 
-#include "armnn/IRuntime.hpp"
+#include <armnn/IRuntime.hpp>
 #include <boost/optional.hpp>
 
 #include "memory/BaseMemoryManager.hpp"

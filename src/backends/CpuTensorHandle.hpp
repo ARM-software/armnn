@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
+
 #include "CpuTensorHandleFwd.hpp"
-
-#include "armnn/TypesUtils.hpp"
-
-#include "OutputHandler.hpp"
+#include <armnn/TypesUtils.hpp>
+#include <backends/OutputHandler.hpp>
 
 #include <algorithm>
 

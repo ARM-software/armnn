@@ -73,9 +73,6 @@ LOCAL_SRC_FILES := \
         src/backends/OutputHandler.cpp \
         src/backends/StringMapping.cpp \
         src/backends/ClLayerSupport.cpp \
-        src/backends/NeonLayerSupport.cpp \
-        src/backends/NeonWorkloadUtils.cpp \
-        src/backends/NeonWorkloadFactory.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArithmeticBaseLayer.cpp \

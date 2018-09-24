@@ -4,7 +4,7 @@
 //
 #include "WorkloadFactory.hpp"
 #include <backends/reference/RefWorkloadFactory.hpp>
-#include "NeonWorkloadFactory.hpp"
+#include <backends/neon/NeonWorkloadFactory.hpp>
 #include "ClWorkloadFactory.hpp"
 
 #include <armnn/Types.hpp>

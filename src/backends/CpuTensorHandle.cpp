@@ -2,8 +2,8 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "armnn/Exceptions.hpp"
-#include "CpuTensorHandle.hpp"
+#include <armnn/Exceptions.hpp>
+#include <backends/CpuTensorHandle.hpp>
 
 #include <cstring>
 

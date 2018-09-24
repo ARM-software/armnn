@@ -8,8 +8,8 @@
 #include "LayerTests.hpp"
 
 #include <backends/CpuTensorHandle.hpp>
-#include <backends/NeonLayerSupport.hpp>
-#include <backends/NeonWorkloadFactory.hpp>
+#include <backends/neon/NeonLayerSupport.hpp>
+#include <backends/neon/NeonWorkloadFactory.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
 #include <backends/test/TensorCopyUtils.hpp>
 #include "ActivationFixture.hpp"

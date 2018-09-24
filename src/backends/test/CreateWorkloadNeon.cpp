@@ -2,11 +2,11 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "backends/NeonWorkloadFactory.hpp"
-#include "backends/NeonWorkloadUtils.hpp"
-#include "backends/NeonWorkloads.hpp"
-#include "backends/MemCopyWorkload.hpp"
-#include "backends/NeonTensorHandle.hpp"
+#include <backends/neon/NeonWorkloadFactory.hpp>
+#include <backends/neon/NeonTensorHandle.hpp>
+#include <backends/neon/workloads/NeonWorkloadUtils.hpp>
+#include <backends/neon/workloads/NeonWorkloads.hpp>
+#include <backends/MemCopyWorkload.hpp>
 
 #include "test/CreateWorkloadClNeon.hpp"
 

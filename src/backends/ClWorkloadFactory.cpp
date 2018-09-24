@@ -4,12 +4,12 @@
 //
 #include "ClWorkloadFactory.hpp"
 
-#include "armnn/Exceptions.hpp"
-#include "armnn/Utils.hpp"
+#include <armnn/Exceptions.hpp>
+#include <armnn/Utils.hpp>
 
 #include <string>
-#include "CpuTensorHandle.hpp"
-#include "Layer.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <Layer.hpp>
 
 #ifdef ARMCOMPUTECL_ENABLED
 #include <arm_compute/core/CL/CLKernelLibrary.h>
@@ -18,10 +18,10 @@
 
 #include "ClWorkloads.hpp"
 
-#include "backends/MemCopyWorkload.hpp"
-#include "backends/ClTensorHandle.hpp"
+#include <backends/MemCopyWorkload.hpp>
+#include <backends/ClTensorHandle.hpp>
 
-#include "memory/IPoolManager.hpp"
+#include <memory/IPoolManager.hpp>
 #endif
 
 #include "MakeWorkloadHelper.hpp"

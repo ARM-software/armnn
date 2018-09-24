@@ -11,7 +11,7 @@
 #include <backends/ClWorkloadFactory.hpp>
 #endif
 #if ARMCOMPUTENEON_ENABLED
-#include <backends/NeonWorkloadFactory.hpp>
+#include <backends/neon/NeonWorkloadFactory.hpp>
 #endif
 #include <backends/CpuTensorHandle.hpp>
 #include "test/TensorHelpers.hpp"

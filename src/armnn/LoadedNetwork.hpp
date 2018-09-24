@@ -12,7 +12,7 @@
 #include "Profiling.hpp"
 
 #include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/NeonWorkloadFactory.hpp>
+#include <backends/neon/NeonWorkloadFactory.hpp>
 #include <backends/ClWorkloadFactory.hpp>
 #include <backends/Workload.hpp>
 #include <backends/WorkloadFactory.hpp>

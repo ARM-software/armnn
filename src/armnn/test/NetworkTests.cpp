@@ -8,8 +8,8 @@
 #include <Network.hpp>
 #include <Graph.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/neon/NeonWorkloadFactory.hpp>
 #include <backends/ClWorkloadFactory.hpp>
-#include <backends/NeonWorkloadFactory.hpp>
 
 #include "GraphUtils.hpp"
 

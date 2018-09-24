@@ -9,11 +9,11 @@
 
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/neon/NeonWorkloadFactory.hpp>
 
 #include <string>
 #include <iostream>
 #include <backends/ClWorkloadFactory.hpp>
-#include <backends/NeonWorkloadFactory.hpp>
 
 #include "IsLayerSupportedTestImpl.hpp"
 #include "ClContextControlFixture.hpp"

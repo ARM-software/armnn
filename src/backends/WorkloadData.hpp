@@ -6,12 +6,14 @@
 
 #include "WorkloadDataFwd.hpp"
 
-#include "armnn/Types.hpp"
-#include "armnn/Tensor.hpp"
-#include "armnn/Descriptors.hpp"
-#include "armnn/Exceptions.hpp"
-#include "InternalTypes.hpp"
-#include "OutputHandler.hpp"
+#include <armnn/Types.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Descriptors.hpp>
+#include <armnn/Exceptions.hpp>
+
+#include <InternalTypes.hpp>
+#include <backends/OutputHandler.hpp>
+
 #include "CpuTensorHandleFwd.hpp"
 
 namespace armnn

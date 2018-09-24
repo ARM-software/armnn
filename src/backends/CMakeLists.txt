@@ -18,11 +18,6 @@ list(APPEND armnnBackendsCommon_sources
     MakeWorkloadHelper.hpp
     MemCopyWorkload.cpp
     MemCopyWorkload.hpp
-    NeonLayerSupport.cpp
-    NeonLayerSupport.hpp
-    NeonWorkloadFactory.cpp
-    NeonWorkloadFactory.hpp
-    NeonWorkloads.hpp
     OutputHandler.cpp
     OutputHandler.hpp
     StringMapping.cpp
@@ -37,15 +32,6 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadInfo.hpp
     WorkloadUtils.hpp
 )
-
-if(ARMCOMPUTENEON)
-    # Additionally include source files for ARM Compute NEON backend
-    list(APPEND armnnBackendsCommon_sources
-        NeonWorkloadUtils.cpp
-        NeonWorkloadUtils.hpp
-        NeonTensorHandle.hpp
-    )
-endif()
 
 if(ARMCOMPUTECL)
     # Additionally include source files for ARM Compute OpenCL backend

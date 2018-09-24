@@ -5,7 +5,7 @@
 #include <armnn/LayerSupport.hpp>
 
 #include <backends/reference/RefLayerSupport.hpp>
-#include <backends/NeonLayerSupport.hpp>
+#include <backends/neon/NeonLayerSupport.hpp>
 #include <backends/ClLayerSupport.hpp>
 
 #include <boost/assert.hpp>

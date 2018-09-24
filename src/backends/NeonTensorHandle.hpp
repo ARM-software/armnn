@@ -36,6 +36,11 @@ public:
         armnn::armcomputetensorutils::BuildArmComputeTensor(m_Tensor, tensorInfo);
     }
 
+    NeonTensorHandle(const TensorInfo& tensorInfo, DataLayout dataLayout)
+    {
+        armnn::armcomputetensorutils::BuildArmComputeTensor(m_Tensor, tensorInfo, dataLayout);
+    }
+
     arm_compute::ITensor& GetTensor() override { return m_Tensor; }
     arm_compute::ITensor const& GetTensor() const override { return m_Tensor; }
 

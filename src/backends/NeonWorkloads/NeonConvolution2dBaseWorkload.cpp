@@ -23,9 +23,9 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
     const TensorInfo& weights,
     const boost::optional<TensorInfo>& biases)
 {
-    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
-    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
-    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights);
+    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
 
     arm_compute::TensorInfo aclBiasesInfo;
     arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
@@ -34,7 +34,7 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
     {
         BOOST_ASSERT(biases.is_initialized());
 
-        aclBiasesInfo = BuildArmComputeTensorInfo(biases.get());
+        aclBiasesInfo = BuildArmComputeTensorInfo(biases.get(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 
@@ -63,12 +63,12 @@ NeonConvolution2dBaseWorkload<dataTypes...>::NeonConvolution2dBaseWorkload(
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     m_KernelTensor = std::make_unique<arm_compute::Tensor>();
-    BuildArmComputeTensor(*m_KernelTensor, m_Data.m_Weight->GetTensorInfo());
+    BuildArmComputeTensor(*m_KernelTensor, m_Data.m_Weight->GetTensorInfo(), descriptor.m_DataLayout);
 
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
-        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo());
+        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), descriptor.m_DataLayout);
     }
 
     arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,

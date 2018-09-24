@@ -55,6 +55,15 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const Tenso
     return tensorHandle;
 }
 
+std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                     DataLayout dataLayout) const
+{
+    std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo, dataLayout);
+    tensorHandle->SetMemoryGroup(m_MemoryManager.GetInterLayerMemoryGroup());
+
+    return tensorHandle;
+}
+
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorHandle&      parent,
                                                                         TensorShape const&   subTensorShape,
                                                                         unsigned int const* subTensorOrigin) const
@@ -286,6 +295,12 @@ ClWorkloadFactory::ClWorkloadFactory()
 }
 
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                     DataLayout dataLayout) const
 {
     return nullptr;
 }

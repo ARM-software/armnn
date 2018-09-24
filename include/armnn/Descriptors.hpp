@@ -216,6 +216,7 @@ struct Convolution2dDescriptor
     , m_StrideX(0)
     , m_StrideY(0)
     , m_BiasEnabled(false)
+    , m_DataLayout(DataLayout::NCHW)
     {};
 
     uint32_t             m_PadLeft;
@@ -225,6 +226,7 @@ struct Convolution2dDescriptor
     uint32_t             m_StrideX;
     uint32_t             m_StrideY;
     bool                 m_BiasEnabled;
+    DataLayout           m_DataLayout;
 };
 
 struct DepthwiseConvolution2dDescriptor

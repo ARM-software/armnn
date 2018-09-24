@@ -5,6 +5,7 @@
 #include "ArmComputeTensorUtils.hpp"
 #include "ArmComputeUtils.hpp"
 
+#include "armnn/Exceptions.hpp"
 #include <armnn/Descriptors.hpp>
 
 namespace armnn
@@ -64,6 +65,33 @@ arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tenso
                                                             tensorInfo.GetQuantizationOffset());
 
     return arm_compute::TensorInfo(aclTensorShape, 1, aclDataType, aclQuantizationInfo);
+}
+
+arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout)
+{
+    switch(dataLayout)
+    {
+        case armnn::DataLayout::NHWC : return arm_compute::DataLayout::NHWC;
+
+        case armnn::DataLayout::NCHW : return arm_compute::DataLayout::NCHW;
+
+        default: throw InvalidArgumentException("Unknown armnn::DataLayout: [" +
+                                                std::to_string(static_cast<int>(dataLayout)) + "]");
+    }
+}
+
+arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo,
+                                                  armnn::DataLayout dataLayout)
+{
+    const arm_compute::TensorShape aclTensorShape = BuildArmComputeTensorShape(tensorInfo.GetShape());
+    const arm_compute::DataType aclDataType = GetArmComputeDataType(tensorInfo.GetDataType());
+    const arm_compute::QuantizationInfo aclQuantizationInfo(tensorInfo.GetQuantizationScale(),
+                                                            tensorInfo.GetQuantizationOffset());
+
+    arm_compute::TensorInfo clTensorInfo(aclTensorShape, 1, aclDataType, aclQuantizationInfo);
+    clTensorInfo.set_data_layout(ConvertDataLayout(dataLayout));
+
+    return clTensorInfo;
 }
 
 arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDescriptor& descriptor)

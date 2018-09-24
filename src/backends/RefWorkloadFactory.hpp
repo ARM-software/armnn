@@ -49,6 +49,9 @@ public:
 
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override;
 
+    virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                              DataLayout dataLayout) const override;
+
     virtual std::unique_ptr<IWorkload> CreateInput(const InputQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 

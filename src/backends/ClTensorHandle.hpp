@@ -37,6 +37,11 @@ public:
         armnn::armcomputetensorutils::BuildArmComputeTensor(m_Tensor, tensorInfo);
     }
 
+    ClTensorHandle(const TensorInfo& tensorInfo, DataLayout dataLayout)
+    {
+        armnn::armcomputetensorutils::BuildArmComputeTensor(m_Tensor, tensorInfo, dataLayout);
+    }
+
     arm_compute::CLTensor& GetTensor() override { return m_Tensor; }
     arm_compute::CLTensor const& GetTensor() const override { return m_Tensor; }
     virtual void Allocate() override {armnn::armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_Tensor);}

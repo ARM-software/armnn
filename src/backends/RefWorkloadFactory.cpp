@@ -36,6 +36,12 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
     return std::make_unique<ScopedCpuTensorHandle>(tensorInfo);
 }
 
+std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                      DataLayout dataLayout) const
+{
+    return std::make_unique<ScopedCpuTensorHandle>(tensorInfo);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {

@@ -39,6 +39,11 @@ public:
     /// @param factory - Factory to be used for handler creation.
     void CreateTensorHandles(const IWorkloadFactory& factory);
 
+    /// @brief - Creates tensor handlers used by the intermediate tensors. Does not allocate memory.
+    /// @param factory - Factory to be used for handler creation.
+    /// @param dataLayout - Data Layout to be used for handler creation.
+    void CreateTensorHandles(const IWorkloadFactory& factory, DataLayout dataLayout);
+
     /// @brief - Gets the matching TensorInfo for the output.
     /// @return - References to the output TensorInfo.
     const TensorInfo& GetTensorInfo() const { return m_TensorInfo; }

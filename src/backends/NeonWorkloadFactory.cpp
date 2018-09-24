@@ -67,6 +67,15 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const Ten
     return tensorHandle;
 }
 
+std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                       DataLayout dataLayout) const
+{
+    auto tensorHandle = std::make_unique<NeonTensorHandle>(tensorInfo, dataLayout);
+    tensorHandle->SetMemoryGroup(m_MemoryManager.GetInterLayerMemoryGroup());
+
+    return tensorHandle;
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
                                                             const WorkloadInfo&        info) const
 {
@@ -285,6 +294,12 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITenso
 }
 
 std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                       DataLayout dataLayout) const
 {
     return nullptr;
 }

@@ -49,6 +49,9 @@ public:
 
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const = 0;
 
+    virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                              DataLayout dataLayout) const = 0;
+
     virtual std::unique_ptr<IWorkload> CreateOutput(const OutputQueueDescriptor& descriptor,
                                                     const WorkloadInfo& info) const = 0;
 

@@ -24,7 +24,7 @@ ClConvolution2dUint8Workload::ClConvolution2dUint8Workload(const Convolution2dQu
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
     m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
-    BuildArmComputeTensor(*m_KernelTensor, weightInfo);
+    BuildArmComputeTensor(*m_KernelTensor, weightInfo, descriptor.m_DataLayout);
 
     arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
                                              m_Data.m_Parameters.m_StrideY,
@@ -37,7 +37,7 @@ ClConvolution2dUint8Workload::ClConvolution2dUint8Workload(const Convolution2dQu
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::CLTensor>();
-        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo());
+        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), descriptor.m_DataLayout);
     }
 
     m_Data.ValidateInputsOutputs("ClConvolution2dUint8Workload", 1, 1);

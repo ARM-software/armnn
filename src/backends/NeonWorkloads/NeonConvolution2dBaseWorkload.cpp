@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/ArmComputeTensorUtils.hpp"
-#include "backends/NeonLayerSupport.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backends/NeonLayerSupport.hpp>
 
 #include "NeonConvolution2dBaseWorkload.hpp"
 
-#include "armnn/Types.hpp"
-#include "Half.hpp"
+#include <armnn/Types.hpp>
+#include <Half.hpp>
 
 namespace armnn
 {

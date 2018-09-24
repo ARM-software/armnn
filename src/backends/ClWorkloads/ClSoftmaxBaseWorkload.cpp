@@ -5,7 +5,7 @@
 
 #include "ClSoftmaxBaseWorkload.hpp"
 
-#include "backends/ArmComputeTensorUtils.hpp"
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLSoftmaxLayer.h>
 

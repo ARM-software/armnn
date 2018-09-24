@@ -43,15 +43,6 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadUtils.hpp
 )
 
-if(ARMCOMPUTENEON OR ARMCOMPUTECL)
-    # Files shared by all ARM Compute backends
-    list(APPEND armnnBackendsCommon_sources
-        ArmComputeTensorUtils.hpp
-        ArmComputeTensorUtils.cpp
-        ArmComputeUtils.hpp
-    )
-endif()
-
 if(ARMCOMPUTENEON)
     # Additionally include source files for ARM Compute NEON backend
     list(APPEND armnnBackendsCommon_sources

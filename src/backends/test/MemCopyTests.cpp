@@ -5,22 +5,22 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/multi_array.hpp>
 
-#include "armnn/ArmNN.hpp"
-#include "backends/RefWorkloadFactory.hpp"
+#include <armnn/ArmNN.hpp>
+#include <backends/RefWorkloadFactory.hpp>
 #if ARMCOMPUTECL_ENABLED
-#include "backends/ClWorkloadFactory.hpp"
+#include <backends/ClWorkloadFactory.hpp>
 #endif
 #if ARMCOMPUTENEON_ENABLED
-#include "backends/NeonWorkloadFactory.hpp"
+#include <backends/NeonWorkloadFactory.hpp>
 #endif
-#include "backends/CpuTensorHandle.hpp"
+#include <backends/CpuTensorHandle.hpp>
 #include "test/TensorHelpers.hpp"
 
 #include "TensorCopyUtils.hpp"
 #include "WorkloadTestUtils.hpp"
 
 #if ARMCOMPUTECL_ENABLED || ARMCOMPUTENEON_ENABLED
-#include "../ArmComputeTensorUtils.hpp"
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #endif
 
 BOOST_AUTO_TEST_SUITE(MemCopyTestSuite)

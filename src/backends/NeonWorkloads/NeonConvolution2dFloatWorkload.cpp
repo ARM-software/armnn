@@ -4,9 +4,9 @@
 //
 
 #include "NeonConvolution2dFloatWorkload.hpp"
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/ArmComputeTensorUtils.hpp"
-#include "backends/NeonLayerSupport.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backends/NeonLayerSupport.hpp>
 
 namespace armnn
 {

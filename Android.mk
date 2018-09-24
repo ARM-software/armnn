@@ -63,7 +63,7 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/FloatingPointConverter.cpp \
         src/armnnUtils/Logging.cpp \
         src/armnnUtils/Permute.cpp \
-        src/backends/ArmComputeTensorUtils.cpp \
+        src/backends/aclCommon/ArmComputeTensorUtils.cpp \
         src/backends/ClWorkloadFactory.cpp \
         src/backends/ClContextControl.cpp \
         src/backends/CpuTensorHandle.cpp \

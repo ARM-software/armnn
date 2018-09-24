@@ -4,10 +4,10 @@
 //
 
 #include "ClBaseConstantWorkload.hpp"
-#include "backends/ArmComputeTensorUtils.hpp"
-#include "backends/ClTensorHandle.hpp"
-#include "backends/CpuTensorHandle.hpp"
-#include "Half.hpp"
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backends/ClTensorHandle.hpp>
+#include <backends/CpuTensorHandle.hpp>
+#include <Half.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

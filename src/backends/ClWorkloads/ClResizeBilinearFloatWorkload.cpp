@@ -4,10 +4,10 @@
 //
 
 #include "ClResizeBilinearFloatWorkload.hpp"
-#include "backends/ClTensorHandle.hpp"
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/ClLayerSupport.hpp"
-#include "backends/ArmComputeUtils.hpp"
+#include <backends/ClTensorHandle.hpp>
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/ClLayerSupport.hpp>
+#include <backends/aclCommon/ArmComputeUtils.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

@@ -4,8 +4,8 @@
 //
 
 #include "ClActivationFloatWorkload.hpp"
-#include "backends/ClTensorHandle.hpp"
-#include "backends/ArmComputeUtils.hpp"
+#include <backends/ClTensorHandle.hpp>
+#include <backends/aclCommon/ArmComputeUtils.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

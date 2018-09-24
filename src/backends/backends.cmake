@@ -7,9 +7,11 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/backends)
 list(APPEND armnnLibraries armnnBackendsCommon)
 
 # single place to use wildcards, so we can include
-# yet unknown backend modules
+# yet unknown backend modules and corresponding common libraries
+FILE(GLOB commonIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/common.cmake)
 FILE(GLOB backendIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/backend.cmake)
 
-foreach(backendInclude ${backendIncludes})
+# prefer to include common code first so backends can depend on them
+foreach(backendInclude ${commonIncludes} ${backendIncludes})
     include(${backendInclude})
 endforeach()

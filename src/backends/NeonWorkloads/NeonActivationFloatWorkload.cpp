@@ -4,7 +4,7 @@
 //
 
 #include "NeonActivationFloatWorkload.hpp"
-#include "backends/ArmComputeUtils.hpp"
+#include <backends/aclCommon/ArmComputeUtils.hpp>
 
 
 namespace armnn

@@ -4,8 +4,8 @@
 //
 
 #include "NeonPermuteWorkload.hpp"
-#include "backends/NeonTensorHandle.hpp"
-#include "backends/ArmComputeTensorUtils.hpp"
+#include <backends/NeonTensorHandle.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <arm_compute/core/Error.h>
 

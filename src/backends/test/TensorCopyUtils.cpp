@@ -19,7 +19,7 @@
 #endif
 
 #if ARMCOMPUTECLENABLED || ARMCOMPUTENEON_ENABLED
-#include "backends/ArmComputeTensorUtils.hpp"
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #endif
 
 #include "backends/CpuTensorHandle.hpp"

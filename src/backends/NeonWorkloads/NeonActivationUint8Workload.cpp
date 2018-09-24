@@ -4,8 +4,8 @@
 //
 
 #include "NeonActivationUint8Workload.hpp"
-#include "backends/ArmComputeUtils.hpp"
-#include "backends/NeonLayerSupport.hpp"
+#include <backends/aclCommon/ArmComputeUtils.hpp>
+#include <backends/NeonLayerSupport.hpp>
 
 namespace armnn
 {

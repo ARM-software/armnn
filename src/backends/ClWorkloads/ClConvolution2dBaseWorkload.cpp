@@ -4,10 +4,10 @@
 //
 
 #include "ClConvolution2dBaseWorkload.hpp"
-#include "backends/ClLayerSupport.hpp"
-#include "backends/ClTensorHandle.hpp"
-#include "backends/ArmComputeUtils.hpp"
-#include "backends/ArmComputeTensorUtils.hpp"
+#include <backends/ClLayerSupport.hpp>
+#include <backends/ClTensorHandle.hpp>
+#include <backends/aclCommon/ArmComputeUtils.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLConvolutionLayer.h>
 

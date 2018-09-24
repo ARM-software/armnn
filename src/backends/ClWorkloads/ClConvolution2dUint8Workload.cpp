@@ -4,10 +4,10 @@
 //
 
 #include "ClConvolution2dUint8Workload.hpp"
-#include "backends/ClTensorHandle.hpp"
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/ArmComputeTensorUtils.hpp"
-#include "backends/ClLayerSupport.hpp"
+#include <backends/ClTensorHandle.hpp>
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backends/ClLayerSupport.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

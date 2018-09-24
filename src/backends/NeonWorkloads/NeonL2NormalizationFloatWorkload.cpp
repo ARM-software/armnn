@@ -4,7 +4,7 @@
 //
 
 #include "NeonL2NormalizationFloatWorkload.hpp"
-#include "backends/ArmComputeUtils.hpp"
+#include <backends/aclCommon/ArmComputeUtils.hpp>
 
 namespace armnn
 {

@@ -5,8 +5,8 @@
 #pragma once
 
 #include "OpenClTimer.hpp"
-#include "backends/ArmComputeTensorUtils.hpp"
-#include "backends/CpuTensorHandle.hpp"
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backends/CpuTensorHandle.hpp>
 
 #include <Half.hpp>
 

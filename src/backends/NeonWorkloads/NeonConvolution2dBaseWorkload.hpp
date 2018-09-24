@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "backends/ArmComputeTensorUtils.hpp"
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/NeonLayerSupport.hpp"
-#include "backends/NeonWorkloadUtils.hpp"
-#include "backends/Workload.hpp"
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/NeonLayerSupport.hpp>
+#include <backends/NeonWorkloadUtils.hpp>
+#include <backends/Workload.hpp>
 
-#include "arm_compute/runtime/MemoryManagerOnDemand.h"
+#include <arm_compute/runtime/MemoryManagerOnDemand.h>
 
 #include <boost/optional.hpp>
 

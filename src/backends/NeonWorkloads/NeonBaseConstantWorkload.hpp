@@ -6,7 +6,7 @@
 #pragma once
 
 #include <arm_compute/core/Types.h>
-#include <backends/ArmComputeTensorUtils.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/NeonTensorHandle.hpp>
 #include <backends/NeonWorkloadUtils.hpp>
@@ -14,7 +14,6 @@
 #include <Half.hpp>
 
 #include <boost/cast.hpp>
-#include "Half.hpp"
 
 namespace armnn
 {

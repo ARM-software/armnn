@@ -11,14 +11,14 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/assert.hpp>
 
-#include "armnn/LayerSupport.hpp"
+#include <armnn/LayerSupport.hpp>
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/WorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadFactory.hpp>
 
 #ifdef ARMCOMPUTECL_ENABLED
-#include "backends/ClTensorHandle.hpp"
-#include "backends/ArmComputeTensorUtils.hpp"
+#include <backends/ClTensorHandle.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #endif
 
 #include <algorithm>

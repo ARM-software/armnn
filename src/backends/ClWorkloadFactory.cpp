@@ -170,7 +170,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateAddition(const Additi
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMultiplication(
     const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClMultiplicationFloatWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClMultiplicationFloatWorkload, ClMultiplicationFloatWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateDivision(

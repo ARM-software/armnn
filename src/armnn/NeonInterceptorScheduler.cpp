@@ -42,7 +42,8 @@ void NeonInterceptorScheduler::schedule(arm_compute::ICPPKernel* kernel, const H
 void NeonInterceptorScheduler::run_workloads(std::vector <Workload>& workloads)
 {
     m_Timer.Start();
-    m_RealScheduler.run_workloads(workloads);
+    // NOTE: we should think about utilising the tag to make profiling more understandable
+    m_RealScheduler.run_tagged_workloads(workloads, nullptr);
     m_Timer.Stop();
 
     std::vector<Measurement> measurements = m_Timer.GetMeasurements();

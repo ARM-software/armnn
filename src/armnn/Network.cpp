@@ -599,6 +599,11 @@ IConnectableLayer* Network::AddMeanLayer(const MeanDescriptor& meanDescriptor, c
     return m_Graph->AddLayer<MeanLayer>(meanDescriptor,name);
 }
 
+IConnectableLayer* Network::AddPadLayer(const PadDescriptor& padDescriptor, const char* name)
+{
+    return m_Graph->AddLayer<PadLayer>(padDescriptor,name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

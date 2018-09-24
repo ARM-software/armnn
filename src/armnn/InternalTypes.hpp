@@ -35,6 +35,7 @@ enum class LayerType
     Multiplication,
     Normalization,
     Output,
+    Pad,
     Permute,
     Pooling2d,
     Reshape,

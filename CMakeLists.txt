@@ -199,6 +199,8 @@ list(APPEND armnn_sources
     src/armnn/layers/NormalizationLayer.cpp
     src/armnn/layers/OutputLayer.hpp
     src/armnn/layers/OutputLayer.cpp
+    src/armnn/layers/PadLayer.hpp
+    src/armnn/layers/PadLayer.cpp
     src/armnn/layers/PermuteLayer.hpp
     src/armnn/layers/PermuteLayer.cpp
     src/armnn/layers/Pooling2dLayer.hpp

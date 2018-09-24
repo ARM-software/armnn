@@ -285,6 +285,15 @@ public:
     /// @ return - Interface for configuring the layer.
     virtual IConnectableLayer* AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name = nullptr) = 0;
 
+    /// Adds a fully pad layer to the network.
+    /// @param paddings - n by 2 tensor, where n is the rank of the input tensor,
+    ///                   such that paddings[i,0] indicates the amount of padding to add in front of dimonsion i, and
+    ///                   paddings[i,1] indicates the amount of padding to add after the end of dimension i
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddPadLayer(const PadDescriptor& padDescriptor,
+                                           const char* name = nullptr) = 0;
+
 protected:
     ~INetwork() {}
 };

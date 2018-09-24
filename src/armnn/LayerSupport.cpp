@@ -355,4 +355,15 @@ bool IsMeanSupported(Compute compute,
     FORWARD_LAYER_SUPPORT_FUNC(compute, IsMeanSupported, input, output, descriptor);
 }
 
+bool IsPadSupported(Compute compute,
+                    const TensorInfo& input,
+                    const TensorInfo& output,
+                    const PadDescriptor& descriptor,
+                    char* reasonIfUnsupported,
+                    size_t reasonIfUnsupportedMaxLength)
+{
+    CopyErrorMessage(reasonIfUnsupported, "Not implemented", reasonIfUnsupportedMaxLength);
+    return false;
+}
+
 }

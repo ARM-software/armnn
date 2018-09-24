@@ -203,4 +203,11 @@ bool IsMeanSupported(Compute compute,
                      char* reasonIfUnsupported = nullptr,
                      size_t reasonIfUnsupportedMaxLength = 1024);
 
+bool IsPadSupported(Compute compute,
+                     const TensorInfo& input,
+                     const TensorInfo& output,
+                     const PadDescriptor& descriptor,
+                     char* reasonIfUnsupported = nullptr,
+                     size_t reasonIfUnsupportedMaxLength = 1024);
+
 }

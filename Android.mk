@@ -99,6 +99,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/MultiplicationLayer.cpp \
         src/armnn/layers/NormalizationLayer.cpp \
         src/armnn/layers/OutputLayer.cpp \
+        src/armnn/layers/PadLayer.cpp \
         src/armnn/layers/PermuteLayer.cpp \
         src/armnn/layers/Pooling2dLayer.cpp \
         src/armnn/layers/DivisionLayer.cpp \

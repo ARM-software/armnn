@@ -27,6 +27,7 @@
 #include "layers/MultiplicationLayer.hpp"
 #include "layers/NormalizationLayer.hpp"
 #include "layers/OutputLayer.hpp"
+#include "layers/PadLayer.hpp"
 #include "layers/PermuteLayer.hpp"
 #include "layers/Pooling2dLayer.hpp"
 #include "layers/ReshapeLayer.hpp"
@@ -83,6 +84,7 @@ DECLARE_LAYER(Merger)
 DECLARE_LAYER(Multiplication)
 DECLARE_LAYER(Normalization)
 DECLARE_LAYER(Output)
+DECLARE_LAYER(Pad)
 DECLARE_LAYER(Permute)
 DECLARE_LAYER(Pooling2d)
 DECLARE_LAYER(Reshape)

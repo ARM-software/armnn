@@ -472,6 +472,19 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, boo
                                         cLayer->GetParameters(), reason, reasonCapacity);
             break;
         }
+        case LayerType::Pad:
+        {
+            auto cLayer = boost::polymorphic_downcast<const PadLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = IsPadSupported(compute,
+                                    OverrideDataType(input, dataType),
+                                    OverrideDataType(output, dataType),
+                                    cLayer->GetParameters(),
+                                    reason,
+                                    reasonCapacity);
+            break;
+        }
         case LayerType::Pooling2d:
         {
             auto cLayer = boost::polymorphic_downcast<const Pooling2dLayer*>(&layer);

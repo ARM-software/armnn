@@ -351,7 +351,12 @@ struct MeanDescriptor
 
 struct PadDescriptor
 {
-    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList);
+    PadDescriptor()
+    {}
+
+    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList)
+    : m_PadList(padList)
+    {}
 
     // first is number of values to add before the tensor in the dimension,
     // second is the number of values to add after the tensor in the dimension

@@ -3,6 +3,10 @@
 # SPDX-License-Identifier: MIT
 #
 
+# BACKEND_SOURCES contains the list of files to be included
+# in the Android build and it is picked up by the Android.mk
+# file in the root of ArmNN
+
 BACKEND_SOURCES := \
         NeonActivationFloatWorkload.cpp \
         NeonActivationUint8Workload.cpp \

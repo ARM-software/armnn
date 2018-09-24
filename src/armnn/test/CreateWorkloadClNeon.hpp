@@ -5,7 +5,7 @@
 #pragma once
 
 #include "CreateWorkload.hpp"
-#include "backends/RefWorkloadFactory.hpp"
+#include <backends/reference/RefWorkloadFactory.hpp>
 
 #if ARMCOMPUTECL_ENABLED
 #include "backends/ClTensorHandle.hpp"

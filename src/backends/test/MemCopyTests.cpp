@@ -6,7 +6,7 @@
 #include <boost/multi_array.hpp>
 
 #include <armnn/ArmNN.hpp>
-#include <backends/RefWorkloadFactory.hpp>
+#include <backends/reference/RefWorkloadFactory.hpp>
 #if ARMCOMPUTECL_ENABLED
 #include <backends/ClWorkloadFactory.hpp>
 #endif

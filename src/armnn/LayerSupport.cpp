@@ -2,11 +2,11 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "armnn/LayerSupport.hpp"
+#include <armnn/LayerSupport.hpp>
 
-#include "backends/RefLayerSupport.hpp"
-#include "backends/NeonLayerSupport.hpp"
-#include "backends/ClLayerSupport.hpp"
+#include <backends/reference/RefLayerSupport.hpp>
+#include <backends/NeonLayerSupport.hpp>
+#include <backends/ClLayerSupport.hpp>
 
 #include <boost/assert.hpp>
 

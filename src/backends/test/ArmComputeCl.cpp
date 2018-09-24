@@ -6,11 +6,11 @@
 #include "test/TensorHelpers.hpp"
 #include "LayerTests.hpp"
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/ClWorkloadFactory.hpp"
-#include "backends/ClWorkloads/ClWorkloadUtils.hpp"
-#include "backends/RefWorkloadFactory.hpp"
-#include "backends/ClLayerSupport.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/ClWorkloadFactory.hpp>
+#include <backends/ClWorkloads/ClWorkloadUtils.hpp>
+#include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/ClLayerSupport.hpp>
 #include "ActivationFixture.hpp"
 #include "ClContextControlFixture.hpp"
 

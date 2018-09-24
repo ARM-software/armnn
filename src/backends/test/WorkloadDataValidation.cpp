@@ -5,8 +5,8 @@
 #include <boost/test/unit_test.hpp>
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/Workload.hpp>
-#include <backends/RefWorkloads.hpp>
-#include <backends/RefWorkloadFactory.hpp>
+#include <backends/reference/workloads/RefWorkloads.hpp>
+#include <backends/reference/RefWorkloadFactory.hpp>
 
 #include <armnn/Exceptions.hpp>
 

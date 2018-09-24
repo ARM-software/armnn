@@ -25,11 +25,6 @@ list(APPEND armnnBackendsCommon_sources
     NeonWorkloads.hpp
     OutputHandler.cpp
     OutputHandler.hpp
-    RefLayerSupport.cpp
-    RefLayerSupport.hpp
-    RefWorkloadFactory.cpp
-    RefWorkloadFactory.hpp
-    RefWorkloads.hpp
     StringMapping.cpp
     StringMapping.hpp
     WorkloadDataCollector.hpp

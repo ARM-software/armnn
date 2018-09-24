@@ -7,11 +7,11 @@
 #include "test/TensorHelpers.hpp"
 #include "LayerTests.hpp"
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/NeonLayerSupport.hpp"
-#include "backends/NeonWorkloadFactory.hpp"
-#include "backends/RefWorkloadFactory.hpp"
-#include "backends/test/TensorCopyUtils.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/NeonLayerSupport.hpp>
+#include <backends/NeonWorkloadFactory.hpp>
+#include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/test/TensorCopyUtils.hpp>
 #include "ActivationFixture.hpp"
 
 #include "WorkloadTestUtils.hpp"

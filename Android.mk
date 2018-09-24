@@ -67,13 +67,11 @@ LOCAL_SRC_FILES := \
         src/backends/ClWorkloadFactory.cpp \
         src/backends/ClContextControl.cpp \
         src/backends/CpuTensorHandle.cpp \
-        src/backends/RefWorkloadFactory.cpp \
         src/backends/MemCopyWorkload.cpp \
         src/backends/WorkloadData.cpp \
         src/backends/WorkloadFactory.cpp \
         src/backends/OutputHandler.cpp \
         src/backends/StringMapping.cpp \
-        src/backends/RefLayerSupport.cpp \
         src/backends/ClLayerSupport.cpp \
         src/backends/NeonLayerSupport.cpp \
         src/backends/NeonWorkloadUtils.cpp \

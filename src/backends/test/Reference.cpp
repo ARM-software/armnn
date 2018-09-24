@@ -7,7 +7,7 @@
 #include "LayerTests.hpp"
 #include "test/TensorHelpers.hpp"
 
-#include "backends/RefWorkloadFactory.hpp"
+#include <backends/reference/RefWorkloadFactory.hpp>
 
 #include "test/UnitTests.hpp"
 

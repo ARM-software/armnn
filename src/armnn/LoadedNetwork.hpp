@@ -4,16 +4,18 @@
 //
 #pragma once
 
-#include "armnn/Tensor.hpp"
-#include "armnn/Types.hpp"
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+
 #include "Network.hpp"
 #include "LayerFwd.hpp"
 #include "Profiling.hpp"
-#include "backends/RefWorkloadFactory.hpp"
-#include "backends/NeonWorkloadFactory.hpp"
-#include "backends/ClWorkloadFactory.hpp"
-#include "backends/Workload.hpp"
-#include "backends/WorkloadFactory.hpp"
+
+#include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/NeonWorkloadFactory.hpp>
+#include <backends/ClWorkloadFactory.hpp>
+#include <backends/Workload.hpp>
+#include <backends/WorkloadFactory.hpp>
 
 namespace cl
 {

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-list(APPEND armnnRefBackend_sources
+list(APPEND armnnRefBackendWorkloads_sources
     Activation.cpp
     Activation.hpp
     ArithmeticFunction.cpp
@@ -86,6 +86,7 @@ list(APPEND armnnRefBackend_sources
     RefSplitterFloat32Workload.hpp
     RefSplitterUint8Workload.cpp
     RefSplitterUint8Workload.hpp
+    RefWorkloads.hpp
     RefWorkloadUtils.hpp
     ResizeBilinear.cpp
     ResizeBilinear.hpp
@@ -95,7 +96,7 @@ list(APPEND armnnRefBackend_sources
     TensorBufferArrayView.hpp
 )
 
-add_library(armnnRefBackend STATIC ${armnnRefBackend_sources})
-target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src)
-target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+add_library(armnnRefBackendWorkloads STATIC ${armnnRefBackendWorkloads_sources})
+target_include_directories(armnnRefBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(armnnRefBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(armnnRefBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

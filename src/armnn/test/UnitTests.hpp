@@ -4,10 +4,10 @@
 //
 #pragma once
 
-#include "Logging.hpp"
-#include "armnn/Utils.hpp"
-#include "backends/RefWorkloadFactory.hpp"
-#include "backends/test/LayerTests.hpp"
+#include <Logging.hpp>
+#include <armnn/Utils.hpp>
+#include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/test/LayerTests.hpp>
 #include "TensorHelpers.hpp"
 #include <boost/test/unit_test.hpp>
 

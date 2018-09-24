@@ -4,12 +4,12 @@
 //
 #include <boost/test/unit_test.hpp>
 
-#include "armnn/ArmNN.hpp"
-#include "Network.hpp"
-#include "Graph.hpp"
-#include "backends/RefWorkloadFactory.hpp"
-#include "backends/ClWorkloadFactory.hpp"
-#include "backends/NeonWorkloadFactory.hpp"
+#include <armnn/ArmNN.hpp>
+#include <Network.hpp>
+#include <Graph.hpp>
+#include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/ClWorkloadFactory.hpp>
+#include <backends/NeonWorkloadFactory.hpp>
 
 #include "GraphUtils.hpp"
 

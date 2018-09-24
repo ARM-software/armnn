@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 #include "WorkloadFactory.hpp"
-#include "RefWorkloadFactory.hpp"
+#include <backends/reference/RefWorkloadFactory.hpp>
 #include "NeonWorkloadFactory.hpp"
 #include "ClWorkloadFactory.hpp"
 
-#include "armnn/Types.hpp"
-#include "armnn/LayerSupport.hpp"
-#include "Layer.hpp"
-#include "LayersFwd.hpp"
+#include <armnn/Types.hpp>
+#include <armnn/LayerSupport.hpp>
+#include <Layer.hpp>
+#include <LayersFwd.hpp>
 #include "CpuTensorHandle.hpp"
 
 #include <boost/cast.hpp>

@@ -4,8 +4,8 @@
 //
 #pragma once
 
-#include "WorkloadFactory.hpp"
-#include "OutputHandler.hpp"
+#include <backends/WorkloadFactory.hpp>
+#include <backends/OutputHandler.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/optional.hpp>

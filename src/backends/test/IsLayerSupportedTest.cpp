@@ -7,8 +7,8 @@
 #include "test/TensorHelpers.hpp"
 #include "LayerTests.hpp"
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/RefWorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/reference/RefWorkloadFactory.hpp>
 
 #include <string>
 #include <iostream>

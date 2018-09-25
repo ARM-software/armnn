@@ -239,15 +239,17 @@ struct DepthwiseConvolution2dDescriptor
     ,   m_StrideX(0)
     ,   m_StrideY(0)
     ,   m_BiasEnabled(false)
+    ,   m_DataLayout(DataLayout::NCHW)
     {}
 
-    uint32_t m_PadLeft;
-    uint32_t m_PadRight;
-    uint32_t m_PadTop;
-    uint32_t m_PadBottom;
-    uint32_t m_StrideX;
-    uint32_t m_StrideY;
-    bool     m_BiasEnabled;
+    uint32_t   m_PadLeft;
+    uint32_t   m_PadRight;
+    uint32_t   m_PadTop;
+    uint32_t   m_PadBottom;
+    uint32_t   m_StrideX;
+    uint32_t   m_StrideY;
+    bool       m_BiasEnabled;
+    DataLayout m_DataLayout;
 };
 
 

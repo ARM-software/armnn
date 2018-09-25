@@ -20,12 +20,12 @@ NeonDepthwiseConvolutionFloatWorkload::NeonDepthwiseConvolutionFloatWorkload(
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
     m_KernelTensor = std::make_unique<arm_compute::Tensor>();
-    BuildArmComputeTensor(*m_KernelTensor, weightInfo);
+    BuildArmComputeTensor(*m_KernelTensor, weightInfo, descriptor.m_DataLayout);
 
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
-        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo());
+        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), descriptor.m_DataLayout);
     }
 
     arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,

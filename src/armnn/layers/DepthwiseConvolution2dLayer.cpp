@@ -28,6 +28,9 @@ std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const Gra
     DepthwiseConvolution2dQueueDescriptor descriptor;
 
     descriptor.m_Weight = m_Weight.get();
+
+    descriptor.m_DataLayout = GetParameters().m_DataLayout;
+
     if (m_Param.m_BiasEnabled)
     {
         BOOST_ASSERT_MSG(m_Bias != nullptr, "DepthwiseConvolution2dLayer: Bias data should not be null.");

@@ -21,7 +21,7 @@
 #include "backends/NeonWorkloads/NeonDepthwiseConvolutionFloatWorkload.hpp"
 #include "backends/NeonWorkloads/NeonDepthwiseConvolutionUint8Workload.hpp"
 #include "backends/NeonWorkloads/NeonFloorFloatWorkload.hpp"
-#include "backends/NeonWorkloads/NeonFullyConnectedFloatWorkload.hpp"
+#include "backends/NeonWorkloads/NeonFullyConnectedWorkload.hpp"
 #include "backends/NeonWorkloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "backends/NeonWorkloads/NeonLstmFloatWorkload.hpp"
 #include "backends/NeonWorkloads/NeonMergerFloatWorkload.hpp"

@@ -225,13 +225,13 @@ static void NeonCreateFullyConnectedWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat16Workload)
 {
-    NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedFloatWorkload, DataType::Float16>();
+    NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedWorkload, DataType::Float16>();
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloatWorkload)
 {
-    NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedFloatWorkload, DataType::Float32>();
+    NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedWorkload, DataType::Float32>();
 }
 
 template <typename NormalizationWorkloadType, typename armnn::DataType DataType>

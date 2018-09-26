@@ -20,11 +20,11 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                        const TensorInfo& biases,
                                                        const FullyConnectedDescriptor& descriptor);
 
-class NeonFullyConnectedFloatWorkload : public FloatWorkload<FullyConnectedQueueDescriptor>
+class NeonFullyConnectedWorkload : public BaseWorkload<FullyConnectedQueueDescriptor>
 {
 public:
-    NeonFullyConnectedFloatWorkload(const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info,
-                                    std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
+    NeonFullyConnectedWorkload(const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info,
+                               std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
     virtual void Execute() const override;
 
 private:

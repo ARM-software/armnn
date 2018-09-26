@@ -116,8 +116,8 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMerger(const Merger
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonFullyConnectedFloatWorkload, NullWorkload>(descriptor, info,
-                                                                         m_MemoryManager.GetIntraLayerManager());
+    return MakeWorkload<NeonFullyConnectedWorkload, NeonFullyConnectedWorkload>(descriptor, info,
+                                                                                m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,

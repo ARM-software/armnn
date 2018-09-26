@@ -37,8 +37,8 @@ list(APPEND armnnNeonBackend_sources
     NeonDepthwiseConvolutionUint8Workload.hpp
     NeonFloorFloatWorkload.cpp
     NeonFloorFloatWorkload.hpp
-    NeonFullyConnectedFloatWorkload.cpp
-    NeonFullyConnectedFloatWorkload.hpp
+    NeonFullyConnectedWorkload.cpp
+    NeonFullyConnectedWorkload.hpp
     NeonL2NormalizationFloatWorkload.cpp
     NeonL2NormalizationFloatWorkload.hpp
     NeonLstmFloatWorkload.cpp

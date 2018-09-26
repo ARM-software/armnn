@@ -19,7 +19,7 @@ BACKEND_SOURCES := \
         NeonDepthwiseConvolutionFloatWorkload.cpp \
         NeonDepthwiseConvolutionUint8Workload.cpp \
         NeonFloorFloatWorkload.cpp \
-        NeonFullyConnectedFloatWorkload.cpp \
+        NeonFullyConnectedWorkload.cpp \
         NeonL2NormalizationFloatWorkload.cpp \
         NeonLstmFloatWorkload.cpp \
         NeonMergerFloatWorkload.cpp \

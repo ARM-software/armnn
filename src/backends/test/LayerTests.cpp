@@ -17,7 +17,7 @@
 #include <backends/WorkloadFactory.hpp>
 
 #ifdef ARMCOMPUTECL_ENABLED
-#include <backends/ClTensorHandle.hpp>
+#include <backends/cl/ClTensorHandle.hpp>
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #endif
 

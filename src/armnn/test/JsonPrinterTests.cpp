@@ -10,12 +10,12 @@
 #include <vector>
 #include <sstream>
 
-#include "Profiling.hpp"
-#include "armnn/Descriptors.hpp"
-#include "armnn/IRuntime.hpp"
-#include "armnn/INetwork.hpp"
-#include "backends/test/ClContextControlFixture.hpp"
-#include "backends/ClWorkloadFactory.hpp"
+#include <Profiling.hpp>
+#include <armnn/Descriptors.hpp>
+#include <armnn/IRuntime.hpp>
+#include <armnn/INetwork.hpp>
+#include <backends/test/ClContextControlFixture.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
 
 BOOST_FIXTURE_TEST_SUITE(JsonPrinterTests, ClProfilingContextControlFixture)
 

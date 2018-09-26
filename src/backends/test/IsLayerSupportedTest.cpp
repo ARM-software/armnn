@@ -4,7 +4,7 @@
 //
 #include <boost/test/unit_test.hpp>
 
-#include "test/TensorHelpers.hpp"
+#include <test/TensorHelpers.hpp>
 #include "LayerTests.hpp"
 
 #include <backends/CpuTensorHandle.hpp>
@@ -13,13 +13,13 @@
 
 #include <string>
 #include <iostream>
-#include <backends/ClWorkloadFactory.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
 
 #include "IsLayerSupportedTestImpl.hpp"
-#include "ClContextControlFixture.hpp"
+#include <backends/test/ClContextControlFixture.hpp>
 
-#include "layers/ConvertFp16ToFp32Layer.hpp"
-#include "layers/ConvertFp32ToFp16Layer.hpp"
+#include <layers/ConvertFp16ToFp32Layer.hpp>
+#include <layers/ConvertFp32ToFp16Layer.hpp>
 
 BOOST_AUTO_TEST_SUITE(IsLayerSupported)
 

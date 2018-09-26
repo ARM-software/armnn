@@ -6,9 +6,9 @@
 
 #include "LayerFwd.hpp"
 
-#include "backends/OutputHandler.hpp"
-#include "backends/WorkloadDataCollector.hpp"
-#include "backends/WorkloadInfo.hpp"
+#include <backends/OutputHandler.hpp>
+#include <backends/WorkloadDataCollector.hpp>
+#include <backends/WorkloadInfo.hpp>
 #include "InternalTypes.hpp"
 #include "SerializeLayerParameters.hpp"
 

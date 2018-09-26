@@ -4,20 +4,20 @@
 //
 #pragma once
 
-#include "backends/WorkloadFactory.hpp"
+#include <backends/WorkloadFactory.hpp>
 
 #ifdef ARMCOMPUTENEON_ENABLED
-#include "arm_compute/runtime/MemoryGroup.h"
+#include <arm_compute/runtime/MemoryGroup.h>
 #endif
 
 #ifdef ARMCOMPUTECL_ENABLED
-#include "arm_compute/runtime/CL/CLMemoryGroup.h"
+#include <arm_compute/runtime/CL/CLMemoryGroup.h>
 #endif
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
-#include "arm_compute/runtime/IAllocator.h"
-#include "arm_compute/runtime/IMemoryGroup.h"
-#include "arm_compute/runtime/MemoryManagerOnDemand.h"
+#include <arm_compute/runtime/IAllocator.h>
+#include <arm_compute/runtime/IMemoryGroup.h>
+#include <arm_compute/runtime/MemoryManagerOnDemand.h>
 #endif
 
 namespace armnn

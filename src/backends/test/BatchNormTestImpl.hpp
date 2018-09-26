@@ -8,12 +8,12 @@
 #include <armnn/Tensor.hpp>
 #include <backends/WorkloadInfo.hpp>
 
-#include "test/TensorHelpers.hpp"
+#include <test/TensorHelpers.hpp>
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/WorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadFactory.hpp>
 
-#include "backends/test/QuantizeHelper.hpp"
+#include <backends/test/QuantizeHelper.hpp>
 
 
 template<typename T>

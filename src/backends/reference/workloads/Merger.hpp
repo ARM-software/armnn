@@ -7,8 +7,7 @@
 
 #include "RefWorkloadUtils.hpp"
 
-#include "backends/WorkloadData.hpp"
-
+#include <backends/WorkloadData.hpp>
 #include <armnn/Tensor.hpp>
 
 namespace armnn

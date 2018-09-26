@@ -9,7 +9,7 @@
 #include <Graph.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
 #include <backends/neon/NeonWorkloadFactory.hpp>
-#include <backends/ClWorkloadFactory.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
 
 #include "GraphUtils.hpp"
 

@@ -5,12 +5,12 @@
 #include "Layer.hpp"
 
 #include "Graph.hpp"
-#include "backends/WorkloadData.hpp"
+#include <backends/WorkloadData.hpp>
+#include <backends/CpuTensorHandle.hpp>
 
 #include <boost/cast.hpp>
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
-#include "backends/CpuTensorHandle.hpp"
 
 #include <numeric>
 

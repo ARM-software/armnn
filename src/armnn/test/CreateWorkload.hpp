@@ -8,12 +8,13 @@
 
 #include <boost/cast.hpp>
 
-#include "backends/WorkloadData.hpp"
-#include "Graph.hpp"
+#include <backends/WorkloadData.hpp>
+#include <backends/CpuTensorHandle.hpp>
+
+#include <Graph.hpp>
 
 #include <utility>
 
-#include "backends/CpuTensorHandle.hpp"
 
 using namespace armnn;
 

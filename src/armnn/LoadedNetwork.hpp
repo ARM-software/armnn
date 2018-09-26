@@ -13,7 +13,7 @@
 
 #include <backends/reference/RefWorkloadFactory.hpp>
 #include <backends/neon/NeonWorkloadFactory.hpp>
-#include <backends/ClWorkloadFactory.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
 #include <backends/Workload.hpp>
 #include <backends/WorkloadFactory.hpp>
 

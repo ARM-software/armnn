@@ -7,10 +7,10 @@
 #include "LayerTests.hpp"
 
 #include <backends/CpuTensorHandle.hpp>
-#include <backends/ClWorkloadFactory.hpp>
-#include <backends/ClWorkloads/ClWorkloadUtils.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
+#include <backends/cl/workloads/ClWorkloadUtils.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/ClLayerSupport.hpp>
+#include <backends/cl/ClLayerSupport.hpp>
 #include "ActivationFixture.hpp"
 #include "ClContextControlFixture.hpp"
 

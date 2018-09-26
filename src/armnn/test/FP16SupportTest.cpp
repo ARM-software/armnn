@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "armnn/ArmNN.hpp"
-#include "armnn/Descriptors.hpp"
-#include "Graph.hpp"
-#include "armnn/IRuntime.hpp"
-#include "armnn/INetwork.hpp"
-#include "Optimizer.hpp"
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/test/QuantizeHelper.hpp"
+#include <armnn/ArmNN.hpp>
+#include <armnn/Descriptors.hpp>
+#include <armnn/IRuntime.hpp>
+#include <armnn/INetwork.hpp>
+#include <Graph.hpp>
+#include <Optimizer.hpp>
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/test/QuantizeHelper.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>

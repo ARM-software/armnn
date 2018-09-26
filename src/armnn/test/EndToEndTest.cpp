@@ -4,11 +4,11 @@
 //
 #include <boost/test/unit_test.hpp>
 
-#include "armnn/Descriptors.hpp"
-#include "armnn/IRuntime.hpp"
-#include "armnn/INetwork.hpp"
+#include <armnn/Descriptors.hpp>
+#include <armnn/IRuntime.hpp>
+#include <armnn/INetwork.hpp>
 
-#include "backends/test/QuantizeHelper.hpp"
+#include <backends/test/QuantizeHelper.hpp>
 #include <boost/core/ignore_unused.hpp>
 
 #include <set>

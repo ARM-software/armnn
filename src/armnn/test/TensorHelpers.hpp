@@ -16,9 +16,9 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "armnn/Tensor.hpp"
+#include <armnn/Tensor.hpp>
 
-#include "backends/test/QuantizeHelper.hpp"
+#include <backends/test/QuantizeHelper.hpp>
 
 #include <cmath>
 

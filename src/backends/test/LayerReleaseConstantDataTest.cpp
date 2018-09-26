@@ -6,13 +6,13 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/cast.hpp>
 
-#include "backends/WorkloadData.hpp"
-#include "Graph.hpp"
+#include <backends/WorkloadData.hpp>
+#include <Graph.hpp>
 
 #include <utility>
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/ClWorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
 
 using namespace armnn;
 using namespace std;

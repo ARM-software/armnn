@@ -6,9 +6,9 @@
 #pragma once
 
 #include "Optimization.hpp"
-#include "backends/CpuTensorHandle.hpp"
-#include "Half.hpp"
-#include "FloatingPointConverter.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <Half.hpp>
+#include <FloatingPointConverter.hpp>
 
 namespace armnn
 {

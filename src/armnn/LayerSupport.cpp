@@ -6,7 +6,7 @@
 
 #include <backends/reference/RefLayerSupport.hpp>
 #include <backends/neon/NeonLayerSupport.hpp>
-#include <backends/ClLayerSupport.hpp>
+#include <backends/cl/ClLayerSupport.hpp>
 
 #include <boost/assert.hpp>
 

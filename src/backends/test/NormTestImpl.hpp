@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "armnn/Exceptions.hpp"
-#include "armnn/LayerSupport.hpp"
+#include <armnn/Exceptions.hpp>
+#include <armnn/LayerSupport.hpp>
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/WorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadFactory.hpp>
 
 LayerTestResult<float,4> SimpleNormalizationTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                                      armnn::NormalizationAlgorithmChannel normChannel,

@@ -6,9 +6,9 @@
 #include "PadLayer.hpp"
 #include "LayerCloneBase.hpp"
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/WorkloadData.hpp"
-#include "backends/WorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadData.hpp>
+#include <backends/WorkloadFactory.hpp>
 
 #include <cstring>
 

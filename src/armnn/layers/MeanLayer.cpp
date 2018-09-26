@@ -6,9 +6,9 @@
 #include "MeanLayer.hpp"
 #include "LayerCloneBase.hpp"
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/WorkloadData.hpp"
-#include "backends/WorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadData.hpp>
+#include <backends/WorkloadFactory.hpp>
 
 #include <cstring>
 
@@ -44,7 +44,7 @@ void MeanLayer::ValidateTensorShapesFromInputs()
     VerifyLayerConnections(1, CHECK_LOCATION());
 
     const TensorInfo& input = GetInputSlot(0).GetConnection()->GetTensorInfo();
-    
+
     BOOST_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= MaxNumOfTensorDimensions,
                      "MeanLayer: Mean supports up to 4D input.");
 

@@ -9,11 +9,11 @@
 #include <armnn/TypesUtils.hpp>
 #include <backends/WorkloadInfo.hpp>
 
-#include "test/TensorHelpers.hpp"
+#include <test/TensorHelpers.hpp>
 #include "QuantizeHelper.hpp"
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/WorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadFactory.hpp>
 #include "ActivationFixture.hpp"
 
 #include <algorithm>
@@ -122,7 +122,7 @@ LayerTestResult<float, 4> BoundedReLuUpperBoundOnlyTest(armnn::IWorkloadFactory&
      0.999f,       1.2f,    0.89f,       6.1f,
     };
 
-    // Calculated manually. 
+    // Calculated manually.
     std::vector<float> output = std::vector<float>{
        0.0f,       0.1f,     0.5f,       6.0f,
      0.786f,    5.9875f,     0.0f,     0.384f,
@@ -147,7 +147,7 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperBoundOnlyTest(armnn::IWorkloadF
         251,   8, 92
     };
 
-    // Calculated manually. 
+    // Calculated manually.
     std::vector<uint8_t> output = std::vector<uint8_t>{
           0, 122,  0,
         255,   0, 58

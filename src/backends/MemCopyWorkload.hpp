@@ -5,7 +5,7 @@
 #pragma once
 
 #include "CpuTensorHandleFwd.hpp"
-#include "backends/Workload.hpp"
+#include "Workload.hpp"
 #include "WorkloadUtils.hpp"
 #include <utility>
 

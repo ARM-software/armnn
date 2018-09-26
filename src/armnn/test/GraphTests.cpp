@@ -2,18 +2,19 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
-
-#include "armnn/ArmNN.hpp"
-#include "Graph.hpp"
-#include "Layer.hpp"
-#include "armnn/TypesUtils.hpp"
-#include "armnn/Exceptions.hpp"
-
 #include "GraphUtils.hpp"
-#include "backends/CpuTensorHandle.hpp"
 
+#include <boost/test/unit_test.hpp>
 #include <boost/cast.hpp>
+
+#include <armnn/ArmNN.hpp>
+#include <armnn/TypesUtils.hpp>
+#include <armnn/Exceptions.hpp>
+#include <Graph.hpp>
+#include <Layer.hpp>
+
+#include <backends/CpuTensorHandle.hpp>
+
 
 /// Checks that first comes before second in the order.
 bool CheckOrder(const armnn::Graph& graph, const armnn::Layer* first, const armnn::Layer* second)

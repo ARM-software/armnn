@@ -8,12 +8,12 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 
-#include "test/TensorHelpers.hpp"
+#include <test/TensorHelpers.hpp>
 #include "QuantizeHelper.hpp"
 
-#include "backends/CpuTensorHandle.hpp"
+#include <backends/CpuTensorHandle.hpp>
 #include <backends/WorkloadInfo.hpp>
-#include "backends/WorkloadFactory.hpp"
+#include <backends/WorkloadFactory.hpp>
 
 LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                                                    const boost::multi_array<float, 2>& input,
@@ -283,7 +283,7 @@ LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
-    
+
     AddOutputToWorkload(data, info, scratchBufferTensorInfo, scratchHandle.get());
     AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
     AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());

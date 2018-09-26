@@ -6,11 +6,13 @@
 #include "Graph.hpp"
 #include "Layer.hpp"
 #include "DeviceSpec.hpp"
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/WorkloadFactory.hpp"
 #include "Optimizer.hpp"
-#include "armnn/Exceptions.hpp"
+#include "optimizations/All.hpp"
 
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadFactory.hpp>
+
+#include <armnn/Exceptions.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/TypesUtils.hpp>
 
@@ -26,8 +28,6 @@
 #include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/converter_policies.hpp>
 #include <boost/cast.hpp>
-
-#include "optimizations/All.hpp"
 
 namespace armnn
 {

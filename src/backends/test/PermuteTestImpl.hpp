@@ -9,11 +9,11 @@
 #include <armnn/TypesUtils.hpp>
 #include <backends/WorkloadInfo.hpp>
 
-#include "test/TensorHelpers.hpp"
+#include <test/TensorHelpers.hpp>
 #include "QuantizeHelper.hpp"
 
-#include "backends/CpuTensorHandle.hpp"
-#include "backends/WorkloadFactory.hpp"
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadFactory.hpp>
 
 template<typename T>
 LayerTestResult<T, 4> SimplePermuteTestImpl(

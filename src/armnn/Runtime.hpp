@@ -6,10 +6,10 @@
 
 #include "LoadedNetwork.hpp"
 #include "DeviceSpec.hpp"
-#include "armnn/INetwork.hpp"
-#include "armnn/IRuntime.hpp"
-#include "armnn/Tensor.hpp"
-#include "backends/ClContextControl.hpp"
+#include <armnn/INetwork.hpp>
+#include <armnn/IRuntime.hpp>
+#include <armnn/Tensor.hpp>
+#include <backends/cl/ClContextControl.hpp>
 
 #include <mutex>
 #include <unordered_map>

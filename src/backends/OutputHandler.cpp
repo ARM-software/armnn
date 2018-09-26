@@ -7,9 +7,9 @@
 #include <boost/assert.hpp>
 #include <boost/log/trivial.hpp>
 
-#include "backends/WorkloadFactory.hpp"
-#include "backends/WorkloadDataCollector.hpp"
-#include "backends/ITensorHandle.hpp"
+#include "WorkloadFactory.hpp"
+#include "WorkloadDataCollector.hpp"
+#include "ITensorHandle.hpp"
 
 namespace armnn
 {

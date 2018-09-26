@@ -8,13 +8,13 @@
 #include <armnn/ArmNN.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
 #if ARMCOMPUTECL_ENABLED
-#include <backends/ClWorkloadFactory.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
 #endif
 #if ARMCOMPUTENEON_ENABLED
 #include <backends/neon/NeonWorkloadFactory.hpp>
 #endif
 #include <backends/CpuTensorHandle.hpp>
-#include "test/TensorHelpers.hpp"
+#include <test/TensorHelpers.hpp>
 
 #include "TensorCopyUtils.hpp"
 #include "WorkloadTestUtils.hpp"

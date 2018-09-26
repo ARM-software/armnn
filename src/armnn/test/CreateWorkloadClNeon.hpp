@@ -8,7 +8,7 @@
 #include <backends/reference/RefWorkloadFactory.hpp>
 
 #if ARMCOMPUTECL_ENABLED
-#include <backends/ClTensorHandle.hpp>
+#include <backends/cl/ClTensorHandle.hpp>
 #endif
 
 #if ARMCOMPUTENEON_ENABLED

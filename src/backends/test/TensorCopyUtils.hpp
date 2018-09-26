@@ -4,8 +4,8 @@
 //
 #pragma once
 
-#include "armnn/Tensor.hpp"
-#include "backends/ITensorHandle.hpp"
+#include <armnn/Tensor.hpp>
+#include <backends/ITensorHandle.hpp>
 
 void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* mem);
 

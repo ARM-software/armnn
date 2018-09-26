@@ -64,15 +64,12 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/Logging.cpp \
         src/armnnUtils/Permute.cpp \
         src/backends/aclCommon/ArmComputeTensorUtils.cpp \
-        src/backends/ClWorkloadFactory.cpp \
-        src/backends/ClContextControl.cpp \
         src/backends/CpuTensorHandle.cpp \
         src/backends/MemCopyWorkload.cpp \
         src/backends/WorkloadData.cpp \
         src/backends/WorkloadFactory.cpp \
         src/backends/OutputHandler.cpp \
         src/backends/StringMapping.cpp \
-        src/backends/ClLayerSupport.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArithmeticBaseLayer.cpp \

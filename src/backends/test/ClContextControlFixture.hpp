@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "backends/ClContextControl.hpp"
+#include <backends/cl/ClContextControl.hpp>
 
 template<bool ProfilingEnabled>
 struct ClContextControlFixtureBase

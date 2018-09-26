@@ -4,13 +4,6 @@
 #
 
 list(APPEND armnnBackendsCommon_sources
-    ClContextControl.cpp
-    ClContextControl.hpp
-    ClLayerSupport.cpp
-    ClLayerSupport.hpp
-    ClWorkloadFactory.cpp
-    ClWorkloadFactory.hpp
-    ClWorkloads.hpp
     CpuTensorHandle.cpp
     CpuTensorHandleFwd.hpp
     CpuTensorHandle.hpp
@@ -32,13 +25,6 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadInfo.hpp
     WorkloadUtils.hpp
 )
-
-if(ARMCOMPUTECL)
-    # Additionally include source files for ARM Compute OpenCL backend
-    list(APPEND armnnBackendsCommon_sources
-        ClTensorHandle.hpp
-    )
-endif()
 
 add_library(armnnBackendsCommon STATIC ${armnnBackendsCommon_sources})
 target_include_directories(armnnBackendsCommon PRIVATE ${PROJECT_SOURCE_DIR}/src)

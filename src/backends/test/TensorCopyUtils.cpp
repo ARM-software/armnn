@@ -11,7 +11,7 @@
 #include "TensorCopyUtils.hpp"
 
 #ifdef ARMCOMPUTECL_ENABLED
-#include <backends/ClTensorHandle.hpp>
+#include <backends/cl/ClTensorHandle.hpp>
 #endif
 
 #if ARMCOMPUTENEON_ENABLED
@@ -22,7 +22,7 @@
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #endif
 
-#include "backends/CpuTensorHandle.hpp"
+#include <backends/CpuTensorHandle.hpp>
 
 void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* mem)
 {

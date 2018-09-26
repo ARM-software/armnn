@@ -2,15 +2,15 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <backends/ClWorkloadFactory.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
 #include <backends/MemCopyWorkload.hpp>
-#include <backends/ClWorkloads/ClWorkloadUtils.hpp>
-#include <backends/ClWorkloads.hpp>
-#include <backends/ClTensorHandle.hpp>
+#include <backends/cl/workloads/ClWorkloadUtils.hpp>
+#include <backends/cl/workloads/ClWorkloads.hpp>
+#include <backends/cl/ClTensorHandle.hpp>
 #include "ClContextControlFixture.hpp"
 
-#include "test/CreateWorkloadClNeon.hpp"
+#include <test/CreateWorkloadClNeon.hpp>
 
 boost::test_tools::predicate_result CompareIClTensorHandleShape(IClTensorHandle*                    tensorHandle,
                                                                 std::initializer_list<unsigned int> expectedDimensions)

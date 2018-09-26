@@ -6,9 +6,9 @@
 #pragma once
 
 #include <armnn/Types.hpp>
-#include "backends/StringMapping.hpp"
-#include "backends/Workload.hpp"
-#include "backends/WorkloadData.hpp"
+#include <backends/StringMapping.hpp>
+#include <backends/Workload.hpp>
+#include <backends/WorkloadData.hpp>
 
 namespace armnn
 {

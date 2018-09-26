@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "backends/WorkloadDataFwd.hpp"
+#include <backends/WorkloadDataFwd.hpp>
 
 #include <string>
 #include <vector>
@@ -14,10 +14,10 @@
 
 #include <boost/assert.hpp>
 
-#include "armnn/INetwork.hpp"
-#include "armnn/Types.hpp"
-#include "armnn/Descriptors.hpp"
-#include "armnn/Tensor.hpp"
+#include <armnn/INetwork.hpp>
+#include <armnn/Types.hpp>
+#include <armnn/Descriptors.hpp>
+#include <armnn/Tensor.hpp>
 #include "ITensorHandle.hpp"
 
 namespace armnn

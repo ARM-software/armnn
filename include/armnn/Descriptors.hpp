@@ -262,6 +262,7 @@ struct NormalizationDescriptor
     , m_Alpha(0.f)
     , m_Beta(0.f)
     , m_K(0.f)
+    , m_DataLayout(DataLayout::NCHW)
     {}
 
     NormalizationAlgorithmChannel m_NormChannelType;
@@ -270,6 +271,7 @@ struct NormalizationDescriptor
     float                         m_Alpha;
     float                         m_Beta;
     float                         m_K;
+    DataLayout                    m_DataLayout;
 };
 
 struct BatchNormalizationDescriptor

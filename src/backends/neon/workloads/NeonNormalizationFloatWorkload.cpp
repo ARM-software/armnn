@@ -8,6 +8,8 @@
 #include <backends/aclCommon/ArmComputeUtils.hpp>
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 
+using namespace armnn::armcomputetensorutils;
+
 namespace armnn
 {
 
@@ -15,11 +17,10 @@ arm_compute::Status NeonNormalizationWorkloadValidate(const TensorInfo& input,
                                                       const TensorInfo& output,
                                                       const NormalizationDescriptor& descriptor)
 {
-    const arm_compute::TensorInfo aclInput = armcomputetensorutils::BuildArmComputeTensorInfo(input);
-    const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+    const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
-    arm_compute::NormalizationLayerInfo normalizationInfo =
-            armcomputetensorutils::BuildArmComputeNormalizationLayerInfo(descriptor);
+    arm_compute::NormalizationLayerInfo normalizationInfo = BuildArmComputeNormalizationLayerInfo(descriptor);
 
     return arm_compute::NENormalizationLayer::validate(&aclInput, &aclOutput, normalizationInfo);
 }

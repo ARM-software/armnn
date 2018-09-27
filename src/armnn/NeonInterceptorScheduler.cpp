@@ -31,7 +31,6 @@ void NeonInterceptorScheduler::schedule(arm_compute::ICPPKernel* kernel, const H
     m_RealScheduler.schedule(kernel, hints.split_dimension());
     m_Timer.Stop();
 
-    m_Timer.SetScaleFactor(Measurement::Unit::TIME_US);
     std::vector<Measurement> measurements = m_Timer.GetMeasurements();
     BOOST_ASSERT(!measurements.empty());
 
@@ -47,7 +46,6 @@ void NeonInterceptorScheduler::run_workloads(std::vector <Workload>& workloads)
     m_RealScheduler.run_tagged_workloads(workloads, nullptr);
     m_Timer.Stop();
 
-    m_Timer.SetScaleFactor(Measurement::Unit::TIME_US);
     std::vector<Measurement> measurements = m_Timer.GetMeasurements();
     BOOST_ASSERT_MSG(measurements.size() == 3, "WallClockTimer does not have correct amount of measurements.");
 

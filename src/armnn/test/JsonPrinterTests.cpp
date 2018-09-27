@@ -246,7 +246,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 
     std::string backend = "Ref";
     std::string changeLine31 = "\n},\n\"CopyMemGeneric_Execute\": {";
-    std::string changeLine39 = "ms\"";
+    std::string changeLine39 = "us\"";
     std::string changeLine40;
     std::string changeLine45;
 
@@ -271,7 +271,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 ,
 
 ],
-"unit": "ms")";
+"unit": "us")";
             changeLine45 = "}\n";
             break;
         case armnn::Compute::CpuAcc: backend = "Neon";
@@ -301,7 +301,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 ,
 
 ],
-"unit": "ms")";
+"unit": "us")";
             changeLine45 = "}\n";
             break;
         default:
@@ -315,21 +315,21 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 ,
 
 ],
-"unit": "ms",
+"unit": "us",
 "layer_measurements": {
 "raw": [
 ,
 ,
 
 ],
-"unit": "ms",
+"unit": "us",
 "CopyMemGeneric_Execute": {
 "raw": [
 ,
 ,
 
 ],
-"unit": "ms"
+"unit": "us"
 },
 ")" + backend + R"(SoftmaxUintWorkload_Execute": {
 "raw": [
@@ -337,7 +337,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 ,
 
 ],
-"unit": "ms")" + changeLine31 + R"(
+"unit": "us")" + changeLine31 + R"(
 "raw": [
 ,
 ,

@@ -25,7 +25,7 @@ public:
     }
 };
 
-// Implementation of an instrument to measure elapsed wall-clock time in milliseconds.
+// Implementation of an instrument to measure elapsed wall-clock time in microseconds.
 class WallClockTimer : public Instrument
 {
 public:
@@ -41,8 +41,6 @@ public:
 
     // Get the name of the timer
     const char* GetName() const override;
-
-    void SetScaleFactor(Measurement::Unit measurementUnit);
 
     // Get the recorded measurements
     std::vector<Measurement> GetMeasurements() const override;
@@ -60,8 +58,6 @@ public:
 private:
     clock::time_point m_Start;
     clock::time_point m_Stop;
-    float m_ScaleFactor = 1.f;
-    Measurement::Unit m_Unit = Measurement::Unit::TIME_MS;
 };
 
 } //namespace armnn

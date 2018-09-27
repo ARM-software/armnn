@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE(ProfilingEventTest)
     // start the timer - outer
     testEvent.Start();
 
-    // wait for 10 milliseconds
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    // wait for 10 microseconds
+    std::this_thread::sleep_for(std::chrono::microseconds(10));
 
     // stop the timer - outer
     testEvent.Stop();
@@ -74,8 +74,8 @@ BOOST_AUTO_TEST_CASE(ProfilingEventTestOnGpuAcc)
     // start the timer - outer
     testEvent.Start();
 
-    // wait for 10 milliseconds
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    // wait for 10 microseconds
+    std::this_thread::sleep_for(std::chrono::microseconds(10));
 
     // stop the timer - outer
     testEvent.Stop();

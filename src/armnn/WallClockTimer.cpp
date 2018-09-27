@@ -4,7 +4,6 @@
 //
 
 #include "WallClockTimer.hpp"
-#include "armnn/Exceptions.hpp"
 
 namespace armnn
 {
@@ -28,34 +27,15 @@ void WallClockTimer::Stop()
     m_Stop = clock::now();
 }
 
-void WallClockTimer::SetScaleFactor(Measurement::Unit measurementUnit)
-{
-    switch(measurementUnit)
-    {
-        case Measurement::TIME_MS:
-            m_ScaleFactor = 1.f;
-            break;
-        case Measurement::TIME_US:
-            m_ScaleFactor = 1000.f;
-            break;
-        case Measurement::TIME_NS:
-            m_ScaleFactor = 1000000.f;
-            break;
-        default:
-            throw InvalidArgumentException("Invalid scale used");
-    }
-    m_Unit = measurementUnit;
-}
-
 std::vector<Measurement> WallClockTimer::GetMeasurements() const
 {
-    const auto delta       = std::chrono::duration<double, std::milli>(m_Stop - m_Start);
-    const auto startTimeMs = std::chrono::duration<double, std::milli>(m_Start.time_since_epoch());
-    const auto stopTimeMs  = std::chrono::duration<double, std::milli>(m_Stop.time_since_epoch());
+    const auto delta       = std::chrono::duration<double, std::micro>(m_Stop - m_Start);
+    const auto startTimeMs = std::chrono::duration<double, std::micro>(m_Start.time_since_epoch());
+    const auto stopTimeMs  = std::chrono::duration<double, std::micro>(m_Stop.time_since_epoch());
 
-    return { { WALL_CLOCK_TIME,       delta.count() * m_ScaleFactor,       m_Unit },
-             { WALL_CLOCK_TIME_START, startTimeMs.count() * m_ScaleFactor, m_Unit },
-             { WALL_CLOCK_TIME_STOP,  stopTimeMs.count() * m_ScaleFactor,  m_Unit } };
+    return { { WALL_CLOCK_TIME,       delta.count(),       Measurement::Unit::TIME_US },
+             { WALL_CLOCK_TIME_START, startTimeMs.count(), Measurement::Unit::TIME_US },
+             { WALL_CLOCK_TIME_STOP,  stopTimeMs.count(),  Measurement::Unit::TIME_US } };
 }
 
 } //namespace armnn

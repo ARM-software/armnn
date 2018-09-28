@@ -14,7 +14,12 @@ ARMNN_MAIN_HEADER_PATH := $(LOCAL_PATH)/src
 ARMNN_SOURCE_HEADER_PATH := $(LOCAL_PATH)/src/armnn
 ARMNN_SOURCE_UTILS_HEADER_PATH := $(LOCAL_PATH)/src/armnnUtils
 
-# find the backend.mk files in the backend source folders
+# find the common.mk and backend.mk files in the backend source folders
+ARMNN_BACKEND_COMMON_MAKEFILE_LOCAL_PATHS := $(wildcard $(LOCAL_PATH)/src/backends/*/common.mk) \
+                                             $(LOCAL_PATH)/src/backends/common.mk
+ARMNN_BACKEND_COMMON_MAKEFILE_PATHS := $(subst $(LOCAL_PATH),,$(ARMNN_BACKEND_COMMON_MAKEFILE_LOCAL_PATHS))
+ARMNN_BACKEND_COMMON_MAKEFILE_DIRS := $(subst /common.mk,,$(ARMNN_BACKEND_COMMON_MAKEFILE_PATHS))
+
 ARMNN_BACKEND_MAKEFILE_LOCAL_PATHS := $(wildcard $(LOCAL_PATH)/src/backends/*/backend.mk)
 ARMNN_BACKEND_MAKEFILE_PATHS := $(subst $(LOCAL_PATH),,$(ARMNN_BACKEND_MAKEFILE_LOCAL_PATHS))
 ARMNN_BACKEND_MAKEFILE_DIRS := $(subst /backend.mk,,$(ARMNN_BACKEND_MAKEFILE_PATHS))
@@ -29,13 +34,18 @@ LOCAL_MODULE_TAGS := eng optional
 LOCAL_ARM_MODE := arm
 LOCAL_PROPRIETARY_MODULE := true
 
-# placeholder to hold all backend source files
+# placeholder to hold all backend source files, common and specific to the backends
 ARMNN_BACKEND_SOURCES :=
 
 #
-# iterate through the backend include paths, include them into the current makefile
-# and append the sources held by the BACKEND_SOURCES variable to the ARMNN_BACKEND_SOURCES list
+# iterate through the backend common and specific include paths, include them into the
+# current makefile and append the sources held by the COMMON_SOURCES and BACKEND_SOURCES variable
+# (included from the given makefile) to the ARMNN_BACKEND_SOURCES list
 #
+$(foreach mkPath,$(ARMNN_BACKEND_COMMON_MAKEFILE_DIRS),\
+   $(eval include $(LOCAL_PATH)/$(mkPath)/common.mk)\
+   $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(COMMON_SOURCES))))
+
 $(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
    $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
    $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(BACKEND_SOURCES))))
@@ -63,13 +73,6 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/FloatingPointConverter.cpp \
         src/armnnUtils/Logging.cpp \
         src/armnnUtils/Permute.cpp \
-        src/backends/aclCommon/ArmComputeTensorUtils.cpp \
-        src/backends/CpuTensorHandle.cpp \
-        src/backends/MemCopyWorkload.cpp \
-        src/backends/WorkloadData.cpp \
-        src/backends/WorkloadFactory.cpp \
-        src/backends/OutputHandler.cpp \
-        src/backends/StringMapping.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArithmeticBaseLayer.cpp \

@@ -343,3 +343,16 @@ LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest(armnn::IWorkloadFactory& wo
 
 LayerTestResult<float, 4> SimpleConvertFp16ToFp32Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<armnn::Half, 4> SimpleConvertFp32ToFp16Test(armnn::IWorkloadFactory& workloadFactory);
+
+
+LayerTestResult<uint8_t, 1> MeanUint8SimpleTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 3> MeanUint8SimpleAxisTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> MeanUint8KeepDimsTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> MeanUint8MultipleDimsTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 1> MeanVtsUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 1> MeanFloatSimpleTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 3> MeanFloatSimpleAxisTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> MeanFloatKeepDimsTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> MeanFloatMultipleDimsTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 1> MeanVtsFloat1Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 3> MeanVtsFloat2Test(armnn::IWorkloadFactory& workloadFactory);

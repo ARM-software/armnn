@@ -845,6 +845,39 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefPermuteLayer)
     }
 }
 
+BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefMeanLayer)
+{
+    // Create runtime in which test will run
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+
+    // build up the structure of the network
+    armnn::INetworkPtr net(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* input = net->AddInputLayer(0);
+
+    armnn::MeanDescriptor descriptor({ 0, 1 }, false);
+    armnn::IConnectableLayer* meanLayer = net->AddMeanLayer(descriptor);
+
+    armnn::IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(meanLayer->GetInputSlot(0));
+    meanLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({ 4, 3, 2 }, armnn::DataType::Float32));
+    meanLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({ 2 }, armnn::DataType::Float32));
+
+    // optimize the network
+    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
+
+    for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
+    {
+        BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+    }
+}
+
 BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnCpuRef)
 {
     // Test to check when FP16 Turbo mode set

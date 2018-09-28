@@ -60,7 +60,7 @@ void MeanLayer::ValidateTensorShapesFromInputs()
     {
         outputRank = 1;
     }
-    else if (m_Param.m_Axis.size() <= input.GetNumDimensions())
+    else if (m_Param.m_Axis.size() >= input.GetNumDimensions())
     {
         throw LayerValidationException("MeanLayer: Dimensions to reduce can not be bigger than input dimensions");
     }

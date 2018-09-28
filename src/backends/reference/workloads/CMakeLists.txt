@@ -94,6 +94,12 @@ list(APPEND armnnRefBackendWorkloads_sources
     Softmax.hpp
     Splitter.hpp
     TensorBufferArrayView.hpp
+    Mean.cpp
+    Mean.hpp
+    RefMeanFloat32Workload.cpp
+    RefMeanFloat32Workload.hpp
+    RefMeanUint8Workload.cpp
+    RefMeanUint8Workload.hpp
 )
 
 add_library(armnnRefBackendWorkloads STATIC ${armnnRefBackendWorkloads_sources})

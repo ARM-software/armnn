@@ -250,4 +250,18 @@ ARMNN_AUTO_TEST_CASE(SimpleConvertFp16ToFp32, SimpleConvertFp16ToFp32Test)
 // Convert from Float32 to Float16
 ARMNN_AUTO_TEST_CASE(SimpleConvertFp32ToFp16, SimpleConvertFp32ToFp16Test)
 
+// Mean
+ARMNN_AUTO_TEST_CASE(MeanUint8Simple, MeanUint8SimpleTest)
+ARMNN_AUTO_TEST_CASE(MeanUint8SimpleAxis, MeanUint8SimpleAxisTest)
+ARMNN_AUTO_TEST_CASE(MeanUint8KeepDims, MeanUint8KeepDimsTest)
+ARMNN_AUTO_TEST_CASE(MeanUint8MultipleDims, MeanUint8MultipleDimsTest)
+ARMNN_AUTO_TEST_CASE(MeanVtsUint8, MeanVtsUint8Test)
+
+ARMNN_AUTO_TEST_CASE(MeanFloatSimple, MeanFloatSimpleTest)
+ARMNN_AUTO_TEST_CASE(MeanFloatSimpleAxis, MeanFloatSimpleAxisTest)
+ARMNN_AUTO_TEST_CASE(MeanFloatKeepDims, MeanFloatKeepDimsTest)
+ARMNN_AUTO_TEST_CASE(MeanFloatMultipleDims, MeanFloatMultipleDimsTest)
+ARMNN_AUTO_TEST_CASE(MeanVtsFloat1, MeanVtsFloat1Test)
+ARMNN_AUTO_TEST_CASE(MeanVtsFloat2, MeanVtsFloat2Test)
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -392,7 +392,12 @@ bool IsMeanSupportedRef(const TensorInfo& input,
                         const MeanDescriptor& descriptor,
                         std::string* reasonIfUnsupported)
 {
-    return false;
+    ignore_unused(output);
+    ignore_unused(descriptor);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
 }
 
 }

@@ -51,3 +51,5 @@
 #include "RefLstmFloat32Workload.hpp"
 #include "RefConvertFp16ToFp32Workload.hpp"
 #include "RefConvertFp32ToFp16Workload.hpp"
+#include "RefMeanUint8Workload.hpp"
+#include "RefMeanFloat32Workload.hpp"

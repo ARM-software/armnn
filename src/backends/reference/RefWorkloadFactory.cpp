@@ -242,7 +242,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
     const MeanQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<RefMeanFloat32Workload, RefMeanUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,

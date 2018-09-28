@@ -13,8 +13,8 @@
 namespace armnn
 {
 
-L2NormalizationLayer::L2NormalizationLayer(const char* name)
-    : Layer(1, 1, LayerType::L2Normalization, name)
+L2NormalizationLayer::L2NormalizationLayer(const L2NormalizationDescriptor& param, const char* name)
+    : LayerWithParameters(1, 1, LayerType::L2Normalization, param, name)
 {
 }
 
@@ -27,7 +27,7 @@ std::unique_ptr<IWorkload> L2NormalizationLayer::CreateWorkload(const Graph& gra
 
 L2NormalizationLayer* L2NormalizationLayer::Clone(Graph& graph) const
 {
-    return CloneBase<L2NormalizationLayer>(graph, GetName());
+    return CloneBase<L2NormalizationLayer>(graph, m_Param, GetName());
 }
 
 void L2NormalizationLayer::ValidateTensorShapesFromInputs()

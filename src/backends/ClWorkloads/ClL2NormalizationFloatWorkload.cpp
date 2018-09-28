@@ -15,10 +15,11 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 arm_compute::Status ClL2NormalizationWorkloadValidate(const TensorInfo& input,
-                                                      const TensorInfo& output)
+                                                      const TensorInfo& output,
+                                                      const L2NormalizationDescriptor& descriptor)
 {
-    const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
-    const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
+    const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
     arm_compute::NormalizationLayerInfo normalizationInfo =
             CreateAclNormalizationLayerInfoForL2Normalization(input);

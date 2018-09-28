@@ -98,7 +98,8 @@ public:
     IConnectableLayer* AddResizeBilinearLayer(const ResizeBilinearDescriptor& resizeDesc,
                                               const char* name = nullptr) override;
 
-    IConnectableLayer* AddL2NormalizationLayer(const char* name = nullptr) override;
+    IConnectableLayer* AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
+                                               const char* name = nullptr) override;
 
     IConnectableLayer* AddConstantLayer(const ConstTensor& input, const char* name = nullptr) override;
 

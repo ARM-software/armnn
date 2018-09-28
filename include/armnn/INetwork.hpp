@@ -228,9 +228,11 @@ public:
 
     /// Adds an L2 normalization layer to the network.
     /// Normalization is performed along dimension 1, but requires a 4d input.
+    /// @param desc - Parameters for the L2 normalization operation.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddL2NormalizationLayer(const char* name = nullptr) = 0;
+    virtual IConnectableLayer* AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
+                                                       const char* name = nullptr) = 0;
 
     /// Adds a layer with no inputs and a single output, which always corresponds to
     /// the passed in constant tensor.

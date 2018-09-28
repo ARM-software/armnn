@@ -73,6 +73,7 @@ bool IsInputSupportedRef(const TensorInfo& input,
 
 bool IsL2NormalizationSupportedRef(const TensorInfo& input,
                                    const TensorInfo& output,
+                                   const L2NormalizationDescriptor& descriptor,
                                    std::string* reasonIfUnsupported = nullptr);
 
 bool IsLstmSupportedRef(const TensorInfo& input, const TensorInfo& outputStateIn,

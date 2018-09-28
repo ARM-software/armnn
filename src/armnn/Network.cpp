@@ -468,9 +468,10 @@ resizeDescriptor, const char* name)
     return m_Graph->AddLayer<ResizeBilinearLayer>(resizeDescriptor,name);
 }
 
-IConnectableLayer* Network::AddL2NormalizationLayer(const char* name)
+IConnectableLayer* Network::AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
+                                                    const char* name)
 {
-    return m_Graph->AddLayer<L2NormalizationLayer>(name);
+    return m_Graph->AddLayer<L2NormalizationLayer>(desc, name);
 }
 
 IConnectableLayer* Network::AddConstantLayer(const ConstTensor& input, const char* name)

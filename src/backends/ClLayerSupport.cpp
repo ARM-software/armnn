@@ -290,9 +290,10 @@ bool IsInputSupportedCl(const TensorInfo& input,
 
 bool IsL2NormalizationSupportedCl(const TensorInfo& input,
                                   const TensorInfo& output,
+                                  const L2NormalizationDescriptor& descriptor,
                                   std::string* reasonIfUnsupported)
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(ClL2NormalizationWorkloadValidate, reasonIfUnsupported, input, output);
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClL2NormalizationWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 bool IsMergerSupportedCl(const std::vector<const TensorInfo*> inputs,

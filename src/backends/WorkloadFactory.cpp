@@ -274,10 +274,18 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, boo
         }
         case LayerType::L2Normalization:
         {
+            auto cLayer = boost::polymorphic_downcast<const L2NormalizationLayer*>(&layer);
+            const L2NormalizationDescriptor& descriptor = cLayer->GetParameters();
+
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsL2NormalizationSupported(compute, OverrideDataType(input, dataType),
-                    OverrideDataType(output, dataType), reason, reasonCapacity);
+
+            result = IsL2NormalizationSupported(compute,
+                                                OverrideDataType(input, dataType),
+                                                OverrideDataType(output, dataType),
+                                                descriptor,
+                                                reason,
+                                                reasonCapacity);
             break;
         }
         case LayerType::Lstm:

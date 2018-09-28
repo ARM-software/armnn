@@ -76,6 +76,7 @@ bool IsInputSupportedCl(const TensorInfo& input,
 
 bool IsL2NormalizationSupportedCl(const TensorInfo& input,
                                   const TensorInfo& output,
+                                  const L2NormalizationDescriptor& descriptor,
                                   std::string* reasonIfUnsupported = nullptr);
 
 bool IsLstmSupportedCl(const TensorInfo& input, const TensorInfo& outputStateIn,

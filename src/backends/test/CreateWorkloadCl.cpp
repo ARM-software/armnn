@@ -524,13 +524,14 @@ BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsCl)
     CreateMemCopyWorkloads<IClTensorHandle>(factory);
 }
 
-BOOST_AUTO_TEST_CASE(CreateL2NormalizationWorkload)
+template <typename L2NormalizationWorkloadType, typename armnn::DataType DataType>
+static void ClL2NormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateL2NormalizationWorkloadTest<ClL2NormalizationFloatWorkload, armnn::DataType::Float32>
-        (factory, graph);
+    auto workload = CreateL2NormalizationWorkloadTest<L2NormalizationWorkloadType, DataType>
+        (factory, graph, dataLayout);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     L2NormalizationQueueDescriptor queueDescriptor = workload->GetData();
@@ -539,6 +540,26 @@ BOOST_AUTO_TEST_CASE(CreateL2NormalizationWorkload)
 
     BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 5, 20, 50, 67 }));
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 5, 20, 50, 67 }));
+}
+
+BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloatNchwWorkload)
+{
+    ClL2NormalizationWorkloadTest<ClL2NormalizationFloatWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloatNhwcWorkload)
+{
+    ClL2NormalizationWorkloadTest<ClL2NormalizationFloatWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloat16NchwWorkload)
+{
+    ClL2NormalizationWorkloadTest<ClL2NormalizationFloatWorkload, armnn::DataType::Float16>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloat16NhwcWorkload)
+{
+    ClL2NormalizationWorkloadTest<ClL2NormalizationFloatWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
 }
 
 template <typename LstmWorkloadType>

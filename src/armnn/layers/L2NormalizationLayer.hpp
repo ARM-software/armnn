@@ -4,12 +4,12 @@
 //
 #pragma once
 
-#include <Layer.hpp>
+#include "LayerWithParameters.hpp"
 
 namespace armnn
 {
 
-class L2NormalizationLayer : public Layer
+class L2NormalizationLayer : public LayerWithParameters<L2NormalizationDescriptor>
 {
 public:
     virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,
@@ -20,7 +20,7 @@ public:
     void ValidateTensorShapesFromInputs() override;
 
 protected:
-    L2NormalizationLayer(const char* name);
+    L2NormalizationLayer(const L2NormalizationDescriptor& param, const char* name);
     ~L2NormalizationLayer() = default;
 };
 

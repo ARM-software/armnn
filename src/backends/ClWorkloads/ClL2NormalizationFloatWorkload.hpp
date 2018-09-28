@@ -13,7 +13,8 @@ namespace armnn
 {
 
 arm_compute::Status ClL2NormalizationWorkloadValidate(const TensorInfo& input,
-                                                      const TensorInfo& output);
+                                                      const TensorInfo& output,
+                                                      const L2NormalizationDescriptor& descriptor);
 
 class ClL2NormalizationFloatWorkload : public FloatWorkload<L2NormalizationQueueDescriptor>
 {

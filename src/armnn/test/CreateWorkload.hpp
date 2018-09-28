@@ -836,10 +836,13 @@ std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::
 
 template <typename L2NormalizationWorkload, armnn::DataType DataType>
 std::unique_ptr<L2NormalizationWorkload> CreateL2NormalizationWorkloadTest(armnn::IWorkloadFactory& factory,
-    armnn::Graph& graph)
+    armnn::Graph& graph, DataLayout dataLayout = DataLayout::NCHW)
 {
     // Creates the layer we're testing.
-    Layer* const layer = graph.AddLayer<L2NormalizationLayer>("l2norm");
+    L2NormalizationDescriptor layerDesc;
+    layerDesc.m_DataLayout = dataLayout;
+
+    Layer* const layer = graph.AddLayer<L2NormalizationLayer>(layerDesc, "l2norm");
 
     // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
@@ -856,6 +859,7 @@ std::unique_ptr<L2NormalizationWorkload> CreateL2NormalizationWorkloadTest(armnn
     auto workload = MakeAndCheckWorkload<L2NormalizationWorkload>(*layer, graph, factory);
 
     L2NormalizationQueueDescriptor queueDescriptor = workload->GetData();
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
 

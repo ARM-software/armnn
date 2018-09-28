@@ -104,6 +104,7 @@ bool IsFullyConnectedSupported(Compute compute,
 bool IsL2NormalizationSupported(Compute compute,
                                 const TensorInfo& input,
                                 const TensorInfo& output,
+                                const L2NormalizationDescriptor& descriptor,
                                 char* reasonIfUnsupported = nullptr,
                                 size_t reasonIfUnsupportedMaxLength = 1024);
 

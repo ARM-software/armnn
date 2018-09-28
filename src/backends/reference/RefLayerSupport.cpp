@@ -171,9 +171,11 @@ bool IsInputSupportedRef(const TensorInfo& input,
 
 bool IsL2NormalizationSupportedRef(const TensorInfo& input,
                                    const TensorInfo& output,
+                                   const L2NormalizationDescriptor& descriptor,
                                    std::string* reasonIfUnsupported)
 {
     ignore_unused(output);
+    ignore_unused(descriptor);
     return IsSupportedForDataTypeRef(reasonIfUnsupported,
                                      input.GetDataType(),
                                      &TrueFunc<>,

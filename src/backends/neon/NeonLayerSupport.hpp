@@ -81,6 +81,7 @@ bool IsInputSupportedNeon(const TensorInfo& input,
 
 bool IsL2NormalizationSupportedNeon(const TensorInfo& input,
                                     const TensorInfo& output,
+                                    const L2NormalizationDescriptor& descriptor,
                                     std::string* reasonIfUnsupported = nullptr);
 
 bool IsMergerSupportedNeon(const std::vector<const TensorInfo*> inputs,

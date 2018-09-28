@@ -10,6 +10,8 @@ There is a getting started guide here using Caffe: <https://developer.arm.com/te
 
 There is a getting started guide here using ONNX: [ONNX Support](src/armnnOnnxParser/README.md)
 
+There is a guide for backend development: [Backend development guide](src/backends/README.md)
+
 ### Build Instructions
 
 Arm tests the build system of Arm NN with the following build environments:

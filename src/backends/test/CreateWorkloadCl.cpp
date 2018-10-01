@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 {
-    ClCreateArithmethicWorkloadTest<ClSubtractionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>,
+    ClCreateArithmethicWorkloadTest<ClSubtractionWorkload,
                                     SubtractionQueueDescriptor,
                                     SubtractionLayer,
                                     armnn::DataType::Float32>();
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 {
-    ClCreateArithmethicWorkloadTest<ClSubtractionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>,
+    ClCreateArithmethicWorkloadTest<ClSubtractionWorkload,
                                     SubtractionQueueDescriptor,
                                     SubtractionLayer,
                                     armnn::DataType::Float16>();

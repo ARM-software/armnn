@@ -12,8 +12,7 @@
 namespace armnn
 {
 
-template <armnn::DataType... dataTypes>
-class ClSubtractionWorkload : public TypedWorkload<SubtractionQueueDescriptor, dataTypes...>
+class ClSubtractionWorkload : public BaseWorkload<SubtractionQueueDescriptor>
 {
 public:
     ClSubtractionWorkload(const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info);

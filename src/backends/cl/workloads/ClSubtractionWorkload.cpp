@@ -17,10 +17,9 @@ using namespace armcomputetensorutils;
 
 static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::ConvertPolicy::SATURATE;
 
-template <armnn::DataType... T>
-ClSubtractionWorkload<T...>::ClSubtractionWorkload(const SubtractionQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info)
-    : TypedWorkload<SubtractionQueueDescriptor, T...>(descriptor, info)
+ClSubtractionWorkload::ClSubtractionWorkload(const SubtractionQueueDescriptor& descriptor,
+                                             const WorkloadInfo& info)
+    : BaseWorkload<SubtractionQueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClSubtractionWorkload", 2, 1);
 
@@ -30,8 +29,7 @@ ClSubtractionWorkload<T...>::ClSubtractionWorkload(const SubtractionQueueDescrip
     m_Layer.configure(&input0, &input1, &output, g_AclConvertPolicy);
 }
 
-template <armnn::DataType... T>
-void ClSubtractionWorkload<T...>::Execute() const
+void ClSubtractionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClSubtractionWorkload_Execute");
     m_Layer.run();
@@ -61,6 +59,3 @@ bool ClSubtractionValidate(const TensorInfo& input0,
 }
 
 } //namespace armnn
-
-template class armnn::ClSubtractionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>;
-template class armnn::ClSubtractionWorkload<armnn::DataType::QuantisedAsymm8>;

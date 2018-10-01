@@ -182,8 +182,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateDivision(
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
                                                                        const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClSubtractionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>,
-                        ClSubtractionWorkload<armnn::DataType::QuantisedAsymm8>>(descriptor, info);
+    return std::make_unique<ClSubtractionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateBatchNormalization(

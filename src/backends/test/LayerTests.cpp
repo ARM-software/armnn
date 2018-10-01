@@ -39,6 +39,8 @@
 #include "ConvertFp16ToFp32TestImpl.hpp"
 #include "ConvertFp32ToFp16TestImpl.hpp"
 
+#include "ClContextControlFixture.hpp"
+
 // 3-channel 16x8 image used as common input data for a number of Conv2d tests.
 static std::vector<float> ConvInput3x8x16({
     0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
@@ -3159,30 +3161,101 @@ LayerTestResult<float, 2> FakeQuantizationTest(armnn::IWorkloadFactory& workload
     return ret;
 }
 
+namespace
+{
+
+LayerTestResult<float, 4> L2NormalizationTestImpl(armnn::IWorkloadFactory& workloadFactory,
+                                                  const armnn::TensorShape& inputOutputTensorShape,
+                                                  const std::vector<float>& inputValues,
+                                                  const std::vector<float>& expectedOutputValues,
+                                                  armnn::DataLayout dataLayout)
+{
+    const armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, armnn::DataType::Float32);
+
+    auto inputTensor = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>(inputValues));
+
+    LayerTestResult<float, 4> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>(expectedOutputValues));
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::L2NormalizationQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_DataLayout = dataLayout;
+    armnn::WorkloadInfo info;
+
+    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateL2Normalization(descriptor, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
+
+    workloadFactory.Finalize();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+
+    return result;
+}
+
+float CalcInvL2Norm(std::initializer_list<float> elements)
+{
+    const float reduction = std::accumulate(elements.begin(), elements.end(), 0.0f,
+        [](float acc, float element) { return acc + element * element; });
+    return 1.0f / sqrtf(reduction);
+}
+
+} // anonymous namespace
+
 LayerTestResult<float, 4> L2Normalization1dTest(armnn::IWorkloadFactory& workloadFactory)
 {
-    constexpr unsigned int inputWidth = 1;
-    constexpr unsigned int inputHeight = 1;
-    constexpr unsigned int inputChannels = 10;
-    constexpr unsigned int inputBatchSize = 1;
+    // Width: 1
+    // Height: 1
+    // Channels: 10
+    // BatchSize: 1
 
-    constexpr unsigned int outputWidth = inputWidth;
-    constexpr unsigned int outputHeight = inputHeight;
-    constexpr unsigned int outputChannels = inputChannels;
-    constexpr unsigned int outputBatchSize = inputBatchSize;
+    const armnn::TensorShape inputOutputShape{ 1, 10, 1, 1 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Channel 0, Height (1) x Width (1)
+         1.0f,
 
-    const armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth },
-        armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth },
-        armnn::DataType::Float32);
+        // Batch 0, Channel 1, Height (1) x Width (1)
+         2.0f,
 
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
-        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f
-    }));
+        // Batch 0, Channel 2, Height (1) x Width (1)
+         3.0f,
 
+        // Batch 0, Channel 3, Height (1) x Width (1)
+         4.0f,
+
+        // Batch 0, Channel 4, Height (1) x Width (1)
+         5.0f,
+
+        // Batch 0, Channel 5, Height (1) x Width (1)
+         6.0f,
+
+        // Batch 0, Channel 6, Height (1) x Width (1)
+         7.0f,
+
+        // Batch 0, Channel 7, Height (1) x Width (1)
+         8.0f,
+
+        // Batch 0, Channel 8, Height (1) x Width (1)
+         9.0f,
+
+        // Batch 0, Channel 9, Height (1) x Width (1)
+        10.0f
+    };
     const float approxInvL2Norm = 0.050964719f;
-    LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Channel 0, Height (1) x Width (1)
          1.0f * approxInvL2Norm,
          2.0f * approxInvL2Norm,
          3.0f * approxInvL2Norm,
@@ -3193,132 +3266,151 @@ LayerTestResult<float, 4> L2Normalization1dTest(armnn::IWorkloadFactory& workloa
          8.0f * approxInvL2Norm,
          9.0f * approxInvL2Norm,
         10.0f * approxInvL2Norm
-    }));
+    };
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
-    armnn::L2NormalizationQueueDescriptor descriptor;
-    armnn::WorkloadInfo info;
-    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
-
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateL2Normalization(descriptor, info);
-
-    inputHandle->Allocate();
-    outputHandle->Allocate();
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
-
-    workloadFactory.Finalize();
-    workload->Execute();
-
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
-    return result;
+    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+                                   inputValues, expectedOutputValues, armnn::DataLayout::NCHW);
 }
 
-namespace
+LayerTestResult<float, 4> L2Normalization1dNhwcTest(armnn::IWorkloadFactory& workloadFactory)
 {
+#ifdef ARMCOMPUTECL_ENABLED
+    // Clear the CL cache before this test when using ACL
+    if (ClContextControlFixture::Instance())
+    {
+        ClContextControlFixture::Instance()->m_ClContextControl.ClearClCache();
+    }
+#endif
 
-float CalcInvL2Norm(std::initializer_list<float> elements)
-{
-    const float reduction = std::accumulate(elements.begin(), elements.end(), 0.0f,
-        [](float acc, float element) { return acc + element * element; });
-    return 1.0f / sqrtf(reduction);
-}
+    // Width: 1
+    // Height: 1
+    // Channels: 10
+    // BatchSize: 1
 
+    const armnn::TensorShape inputOutputShape{ 1, 1, 1, 10 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Height 0, Width (1) x Channel (10)
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f
+    };
+    const float approxInvL2Norm = 0.050964719f;
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Height 0, Width (1) x Channel (10)
+         1.0f * approxInvL2Norm,
+         2.0f * approxInvL2Norm,
+         3.0f * approxInvL2Norm,
+         4.0f * approxInvL2Norm,
+         5.0f * approxInvL2Norm,
+         6.0f * approxInvL2Norm,
+         7.0f * approxInvL2Norm,
+         8.0f * approxInvL2Norm,
+         9.0f * approxInvL2Norm,
+        10.0f * approxInvL2Norm
+    };
+
+    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+                                   inputValues, expectedOutputValues, armnn::DataLayout::NHWC);
 }
 
 LayerTestResult<float, 4> L2Normalization2dTest(armnn::IWorkloadFactory& workloadFactory)
 {
-    constexpr unsigned int inputWidth = 5;
-    constexpr unsigned int inputHeight = 1;
-    constexpr unsigned int inputChannels = 2;
-    constexpr unsigned int inputBatchSize = 1;
+    // Width: 5
+    // Height: 1
+    // Channels: 2
+    // BatchSize: 1
 
-    constexpr unsigned int outputWidth = inputWidth;
-    constexpr unsigned int outputHeight = inputHeight;
-    constexpr unsigned int outputChannels = inputChannels;
-    constexpr unsigned int outputBatchSize = inputBatchSize;
-
-    const armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth },
-        armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth },
-        armnn::DataType::Float32);
-
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+    const armnn::TensorShape inputOutputShape{ 1, 2, 1, 5 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Channel 0, Height (1) x Width (5)
         1.0f, 3.0f, 5.0f, 7.0f,  9.0f,
-        2.0f, 4.0f, 6.0f, 8.0f, 10.0f
-    }));
 
-    LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
-         1.0f * CalcInvL2Norm({ 1.0f, 2.0f }),
-         3.0f * CalcInvL2Norm({ 3.0f, 4.0f }),
-         5.0f * CalcInvL2Norm({ 5.0f, 6.0f }),
-         7.0f * CalcInvL2Norm({ 7.0f, 8.0f }),
+        // Batch 0, Channel 1, Height (1) x Width (5)
+        2.0f, 4.0f, 6.0f, 8.0f, 10.0f
+    };
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Channel 0, Height (1) x Width (5)
+         1.0f * CalcInvL2Norm({ 1.0f,  2.0f }),
+         3.0f * CalcInvL2Norm({ 3.0f,  4.0f }),
+         5.0f * CalcInvL2Norm({ 5.0f,  6.0f }),
+         7.0f * CalcInvL2Norm({ 7.0f,  8.0f }),
          9.0f * CalcInvL2Norm({ 9.0f, 10.0f }),
 
-         2.0f * CalcInvL2Norm({ 1.0f, 2.0f }),
-         4.0f * CalcInvL2Norm({ 3.0f, 4.0f }),
-         6.0f * CalcInvL2Norm({ 5.0f, 6.0f }),
-         8.0f * CalcInvL2Norm({ 7.0f, 8.0f }),
+        // Batch 0, Channel 1, Height (1) x Width (5)
+         2.0f * CalcInvL2Norm({ 1.0f,  2.0f }),
+         4.0f * CalcInvL2Norm({ 3.0f,  4.0f }),
+         6.0f * CalcInvL2Norm({ 5.0f,  6.0f }),
+         8.0f * CalcInvL2Norm({ 7.0f,  8.0f }),
         10.0f * CalcInvL2Norm({ 9.0f, 10.0f })
-    }));
+    };
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+                                   inputValues, expectedOutputValues, armnn::DataLayout::NCHW);
+}
 
-    armnn::L2NormalizationQueueDescriptor descriptor;
-    armnn::WorkloadInfo info;
-    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+LayerTestResult<float, 4> L2Normalization2dNhwcTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    // Width: 5
+    // Height: 1
+    // Channels: 2
+    // BatchSize: 1
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateL2Normalization(descriptor, info);
+    const armnn::TensorShape inputOutputShape{ 1, 1, 5, 2 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Height 0, Width (5) x Channel (2)
+        1.0f,  2.0f,
+        3.0f,  4.0f,
+        5.0f,  6.0f,
+        7.0f,  8.0f,
+        9.0f, 10.0f
+    };
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Height 0, Width (5) x Channel (2)
+        1.0f * CalcInvL2Norm({ 1.0f,  2.0f }),
+        2.0f * CalcInvL2Norm({ 1.0f,  2.0f }),
+        3.0f * CalcInvL2Norm({ 3.0f,  4.0f }),
+        4.0f * CalcInvL2Norm({ 3.0f,  4.0f }),
+        5.0f * CalcInvL2Norm({ 5.0f,  6.0f }),
+        6.0f * CalcInvL2Norm({ 5.0f,  6.0f }),
+        7.0f * CalcInvL2Norm({ 7.0f,  8.0f }),
+        8.0f * CalcInvL2Norm({ 7.0f,  8.0f }),
+        9.0f * CalcInvL2Norm({ 9.0f, 10.0f }),
+       10.0f * CalcInvL2Norm({ 9.0f, 10.0f })
+    };
 
-    inputHandle->Allocate();
-    outputHandle->Allocate();
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
-
-    workloadFactory.Finalize();
-    workload->Execute();
-
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
-    return result;
+    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+                                   inputValues, expectedOutputValues, armnn::DataLayout::NHWC);
 }
 
 LayerTestResult<float, 4> L2Normalization3dTest(armnn::IWorkloadFactory& workloadFactory)
 {
-    constexpr unsigned int inputWidth = 3;
-    constexpr unsigned int inputHeight = 4;
-    constexpr unsigned int inputChannels = 2;
-    constexpr unsigned int inputBatchSize = 1;
+    // Width: 3
+    // Height: 4
+    // Channels: 2
+    // BatchSize: 1
 
-    constexpr unsigned int outputWidth = inputWidth;
-    constexpr unsigned int outputHeight = inputHeight;
-    constexpr unsigned int outputChannels = inputChannels;
-    constexpr unsigned int outputBatchSize = inputBatchSize;
-
-    const armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth },
-        armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth },
-        armnn::DataType::Float32);
-
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
-        // Channel 0
+    const armnn::TensorShape inputOutputShape{ 1, 2, 4, 3 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Channel 0, Height (4) x Width (3)
         119.0f,  21.0f, 150.0f,
         149.0f,  32.0f, 179.0f,
          15.0f, 227.0f, 141.0f,
         147.0f, 199.0f, 220.0f,
 
-        // Channel 1
+        // Batch 0, Channel 1, Height (4) x Width (3)
         110.0f, 140.0f,  73.0f,
         211.0f, 212.0f,  89.0f,
          24.0f, 138.0f, 188.0f,
-        162.0f,  12.0f, 161.0f,
-    }));
-
-    LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+        162.0f,  12.0f, 161.0f
+    };
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Channel 0, Height (4) x Width (3)
         119.0f * CalcInvL2Norm({ 119.0f, 110.0f }),
          21.0f * CalcInvL2Norm({  21.0f, 140.0f }),
         150.0f * CalcInvL2Norm({ 150.0f,  73.0f }),
@@ -3332,6 +3424,7 @@ LayerTestResult<float, 4> L2Normalization3dTest(armnn::IWorkloadFactory& workloa
         199.0f * CalcInvL2Norm({ 199.0f,  12.0f }),
         220.0f * CalcInvL2Norm({ 220.0f, 161.0f }),
 
+        // Batch 0, Channel 1, Height (4) x Width (3)
         110.0f * CalcInvL2Norm({ 119.0f, 110.0f }),
         140.0f * CalcInvL2Norm({  21.0f, 140.0f }),
          73.0f * CalcInvL2Norm({ 150.0f,  73.0f }),
@@ -3343,89 +3436,131 @@ LayerTestResult<float, 4> L2Normalization3dTest(armnn::IWorkloadFactory& workloa
         188.0f * CalcInvL2Norm({ 141.0f, 188.0f }),
         162.0f * CalcInvL2Norm({ 147.0f, 162.0f }),
          12.0f * CalcInvL2Norm({ 199.0f,  12.0f }),
-        161.0f * CalcInvL2Norm({ 220.0f, 161.0f }),
-    }));
+        161.0f * CalcInvL2Norm({ 220.0f, 161.0f })
+    };
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+                                   inputValues, expectedOutputValues, armnn::DataLayout::NCHW);
+}
 
-    armnn::L2NormalizationQueueDescriptor descriptor;
-    armnn::WorkloadInfo info;
-    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+LayerTestResult<float, 4> L2Normalization3dNhwcTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    // Width: 3
+    // Height: 4
+    // Channels: 2
+    // BatchSize: 1
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateL2Normalization(descriptor, info);
+    const armnn::TensorShape inputOutputShape{ 1, 4, 3, 2 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Height 0, Width (3) x Channel (2)
+        119.0f, 110.0f,
+         21.0f, 140.0f,
+        150.0f,  73.0f,
 
-    inputHandle->Allocate();
-    outputHandle->Allocate();
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+        // Batch 0, Height 1, Width (3) x Channel (2)
+        149.0f, 211.0f,
+         32.0f, 212.0f,
+        179.0f,  89.0f,
 
-    workloadFactory.Finalize();
-    workload->Execute();
+        // Batch 0, Height 2, Width (3) x Channel (2)
+         15.0f,  24.0f,
+        227.0f, 138.0f,
+        141.0f, 188.0f,
 
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
-    return result;
+        // Batch 0, Height 3, Width (3) x Channel (2)
+        147.0f, 162.0f,
+        199.0f,  12.0f,
+        220.0f, 161.0f
+    };
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Height 0, Width (3) x Channel (2)
+        119.0f * CalcInvL2Norm({ 119.0f, 110.0f }),
+        110.0f * CalcInvL2Norm({ 119.0f, 110.0f }),
+         21.0f * CalcInvL2Norm({  21.0f, 140.0f }),
+        140.0f * CalcInvL2Norm({  21.0f, 140.0f }),
+        150.0f * CalcInvL2Norm({ 150.0f,  73.0f }),
+         73.0f * CalcInvL2Norm({ 150.0f,  73.0f }),
+
+        // Batch 0, Height 1, Width (3) x Channel (2)
+        149.0f * CalcInvL2Norm({ 149.0f, 211.0f }),
+        211.0f * CalcInvL2Norm({ 149.0f, 211.0f }),
+         32.0f * CalcInvL2Norm({  32.0f, 212.0f }),
+        212.0f * CalcInvL2Norm({  32.0f, 212.0f }),
+        179.0f * CalcInvL2Norm({ 179.0f,  89.0f }),
+         89.0f * CalcInvL2Norm({ 179.0f,  89.0f }),
+
+        // Batch 0, Height 2, Width (3) x Channel (2)
+         15.0f * CalcInvL2Norm({  15.0f,  24.0f }),
+         24.0f * CalcInvL2Norm({  15.0f,  24.0f }),
+        227.0f * CalcInvL2Norm({ 227.0f, 138.0f }),
+        138.0f * CalcInvL2Norm({ 227.0f, 138.0f }),
+        141.0f * CalcInvL2Norm({ 141.0f, 188.0f }),
+        188.0f * CalcInvL2Norm({ 141.0f, 188.0f }),
+
+        // Batch 0, Height 3, Width (3) x Channel (2)
+        147.0f * CalcInvL2Norm({ 147.0f, 162.0f }),
+        162.0f * CalcInvL2Norm({ 147.0f, 162.0f }),
+        199.0f * CalcInvL2Norm({ 199.0f,  12.0f }),
+         12.0f * CalcInvL2Norm({ 199.0f,  12.0f }),
+        220.0f * CalcInvL2Norm({ 220.0f, 161.0f }),
+        161.0f * CalcInvL2Norm({ 220.0f, 161.0f })
+    };
+
+    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+                                   inputValues, expectedOutputValues, armnn::DataLayout::NHWC);
 }
 
 LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloadFactory)
 {
-    constexpr unsigned int inputWidth = 3;
-    constexpr unsigned int inputHeight = 4;
-    constexpr unsigned int inputChannels = 3;
-    constexpr unsigned int inputBatchSize = 2;
+    // Width: 3
+    // Height: 4
+    // Channels: 3
+    // BatchSize: 2
 
-    constexpr unsigned int outputWidth = inputWidth;
-    constexpr unsigned int outputHeight = inputHeight;
-    constexpr unsigned int outputChannels = inputChannels;
-    constexpr unsigned int outputBatchSize = inputBatchSize;
-
-    const armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth },
-        armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth },
-        armnn::DataType::Float32);
-
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
-        // Batch 0, Channel 0
+    const armnn::TensorShape inputOutputShape{ 2, 3, 4, 3 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Channel 0, Height (4) x Width (3)
         235.0f,  46.0f, 178.0f,
         100.0f, 123.0f,  19.0f,
         172.0f,  74.0f, 250.0f,
           6.0f, 195.0f,  80.0f,
 
-        // Batch 0, Channel 1
+        // Batch 0, Channel 1, Height (4) x Width (3)
         113.0f,  95.0f, 202.0f,
          77.0f, 114.0f,  71.0f,
         122.0f, 246.0f, 166.0f,
          82.0f,  28.0f,  37.0f,
 
-        // Batch 0, Channel 2
+        // Batch 0, Channel 2, Height (4) x Width (3)
          56.0f, 170.0f, 162.0f,
         194.0f,  89.0f, 254.0f,
          12.0f, 209.0f, 200.0f,
           1.0f,  64.0f,  54.0f,
 
-        // Batch 1, Channel 0
+        // Batch 1, Channel 0, Height (4) x Width (3)
          67.0f,  90.0f,  49.0f,
           7.0f, 163.0f,  18.0f,
          25.0f, 117.0f, 103.0f,
         247.0f,  59.0f, 189.0f,
 
-        // Batch 1, Channel 1
+        // Batch 1, Channel 1, Height (4) x Width (3)
         239.0f, 104.0f, 199.0f,
          17.0f, 124.0f, 153.0f,
         222.0f, 217.0f, 75.0f,
          32.0f, 126.0f, 21.0f,
 
-        // Batch 1, Channel 2
+        // Batch 1, Channel 2, Height (4) x Width (3)
          97.0f, 145.0f, 215.0f,
         115.0f, 116.0f, 238.0f,
         226.0f,  16.0f, 132.0f,
-         92.0f, 125.0f,  88.0f,
-    }));
-
-    LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
-
-        // Batch 0, Channel 0
+         92.0f, 125.0f,  88.0f
+    };
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Channel 0, Height (4) x Width (3)
         235.0f * CalcInvL2Norm({ 235.0f, 113.0f,  56.0f }),
          46.0f * CalcInvL2Norm({  46.0f,  95.0f, 170.0f }),
         178.0f * CalcInvL2Norm({ 178.0f, 202.0F, 162.0f }),
@@ -3439,7 +3574,7 @@ LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloa
         195.0f * CalcInvL2Norm({ 195.0f,  28.0f,  64.0f }),
          80.0f * CalcInvL2Norm({  80.0f,  37.0f,  54.0f }),
 
-        // Batch 0, Channel 1
+        // Batch 0, Channel 1, Height (4) x Width (3)
         113.0f * CalcInvL2Norm({ 235.0f, 113.0f,  56.0f }),
          95.0f * CalcInvL2Norm({  46.0f,  95.0f, 170.0f }),
         202.0f * CalcInvL2Norm({ 178.0f, 202.0F, 162.0f }),
@@ -3453,7 +3588,7 @@ LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloa
          28.0f * CalcInvL2Norm({ 195.0f,  28.0f,  64.0f }),
          37.0f * CalcInvL2Norm({  80.0f,  37.0f,  54.0f }),
 
-        // Batch 0, Channel 2
+        // Batch 0, Channel 2, Height (4) x Width (3)
          56.0f * CalcInvL2Norm({ 235.0f, 113.0f,  56.0f }),
         170.0f * CalcInvL2Norm({  46.0f,  95.0f, 170.0f }),
         162.0f * CalcInvL2Norm({ 178.0f, 202.0F, 162.0f }),
@@ -3467,7 +3602,7 @@ LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloa
          64.0f * CalcInvL2Norm({ 195.0f,  28.0f,  64.0f }),
          54.0f * CalcInvL2Norm({  80.0f,  37.0f,  54.0f }),
 
-        // Batch 1, Channel 0
+        // Batch 1, Channel 0, Height (4) x Width (3)
          67.0f * CalcInvL2Norm({  67.0f, 239.0f,  97.0f }),
          90.0f * CalcInvL2Norm({  90.0f, 104.0f, 145.0f }),
          49.0f * CalcInvL2Norm({  49.0f, 199.0f, 215.0f }),
@@ -3481,7 +3616,7 @@ LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloa
          59.0f * CalcInvL2Norm({  59.0f, 126.0f, 125.0f }),
         189.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f }),
 
-        // Batch 1, Channel 1
+        // Batch 1, Channel 1, Height (4) x Width (3)
         239.0f * CalcInvL2Norm({  67.0f, 239.0f,  97.0f }),
         104.0f * CalcInvL2Norm({  90.0f, 104.0f, 145.0f }),
         199.0f * CalcInvL2Norm({  49.0f, 199.0f, 215.0f }),
@@ -3495,7 +3630,7 @@ LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloa
         126.0f * CalcInvL2Norm({  59.0f, 126.0f, 125.0f }),
          21.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f }),
 
-        // Batch 1, Channel 2
+        // Batch 1, Channel 2, Height (4) x Width (3)
          97.0f * CalcInvL2Norm({  67.0f, 239.0f,  97.0f }),
         145.0f * CalcInvL2Norm({  90.0f, 104.0f, 145.0f }),
         215.0f * CalcInvL2Norm({  49.0f, 199.0f, 215.0f }),
@@ -3507,28 +3642,156 @@ LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloa
         132.0f * CalcInvL2Norm({ 103.0f,  75.0f, 132.0f }),
          92.0f * CalcInvL2Norm({ 247.0f,  32.0f,  92.0f }),
         125.0f * CalcInvL2Norm({  59.0f, 126.0f, 125.0f }),
-         88.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f }),
-    }));
+         88.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f })
+    };
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+                                   inputValues, expectedOutputValues, armnn::DataLayout::NCHW);
+}
 
-    armnn::L2NormalizationQueueDescriptor descriptor;
-    armnn::WorkloadInfo info;
-    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+LayerTestResult<float, 4> L2Normalization4dNhwcTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    // Width: 3
+    // Height: 4
+    // Channels: 3
+    // BatchSize: 2
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateL2Normalization(descriptor, info);
+    const armnn::TensorShape inputOutputShape{ 2, 4, 3, 3 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Height 0, Width (3) x Channel (3)
+        235.0f, 113.0f,  56.0f,
+         46.0f,  95.0f, 170.0f,
+        178.0f, 202.0f, 162.0f,
 
-    inputHandle->Allocate();
-    outputHandle->Allocate();
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+        // Batch 0, Height 1, Width (3) x Channel (3)
+        100.0f,  77.0f, 194.0f,
+        123.0f, 114.0f,  89.0f,
+         19.0f,  71.0f, 254.0f,
 
-    workloadFactory.Finalize();
-    workload->Execute();
+        // Batch 0, Height 2, Width (3) x Channel (3)
+        172.0f, 122.0f,  12.0f,
+         74.0f, 246.0f, 209.0f,
+        250.0f, 166.0f, 200.0f,
 
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
-    return result;
+        // Batch 0, Height 3, Width (3) x Channel (3)
+          6.0f,  82.0f,   1.0f,
+        195.0f,  28.0f,  64.0f,
+         80.0f,  37.0f,  54.0f,
+
+        // Batch 1, Height 0, Width (3) x Channel (3)
+         67.0f, 239.0f,  97.0f,
+         90.0f, 104.0f, 145.0f,
+         49.0f, 199.0f, 215.0f,
+
+        // Batch 1, Height 1, Width (3) x Channel (3)
+          7.0f,  17.0f, 115.0f,
+        163.0f, 124.0f, 116.0f,
+         18.0f, 153.0f, 238.0f,
+
+        // Batch 1, Height 2, Width (3) x Channel (3)
+         25.0f, 222.0f, 226.0f,
+        117.0f, 217.0f,  16.0f,
+        103.0f,  75.0f, 132.0f,
+
+        // Batch 1, Height 3, Width (3) x Channel (3)
+        247.0f,  32.0f,  92.0f,
+         59.0f, 126.0f, 125.0f,
+        189.0f,  21.0f,  88.0f
+    };
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Height 0, Width (3) x Channel (3)
+        235.0f * CalcInvL2Norm({ 235.0f, 113.0f,  56.0f }),
+        113.0f * CalcInvL2Norm({ 235.0f, 113.0f,  56.0f }),
+         56.0f * CalcInvL2Norm({ 235.0f, 113.0f,  56.0f }),
+         46.0f * CalcInvL2Norm({  46.0f,  95.0f, 170.0f }),
+         95.0f * CalcInvL2Norm({  46.0f,  95.0f, 170.0f }),
+        170.0f * CalcInvL2Norm({  46.0f,  95.0f, 170.0f }),
+        178.0f * CalcInvL2Norm({ 178.0f, 202.0F, 162.0f }),
+        202.0f * CalcInvL2Norm({ 178.0f, 202.0F, 162.0f }),
+        162.0f * CalcInvL2Norm({ 178.0f, 202.0F, 162.0f }),
+
+        // Batch 0, Height 1, Width (3) x Channel (3)
+        100.0f * CalcInvL2Norm({ 100.0f,  77.0f, 194.0f }),
+         77.0f * CalcInvL2Norm({ 100.0f,  77.0f, 194.0f }),
+        194.0f * CalcInvL2Norm({ 100.0f,  77.0f, 194.0f }),
+        123.0f * CalcInvL2Norm({ 123.0f, 114.0f,  89.0f }),
+        114.0f * CalcInvL2Norm({ 123.0f, 114.0f,  89.0f }),
+         89.0f * CalcInvL2Norm({ 123.0f, 114.0f,  89.0f }),
+         19.0f * CalcInvL2Norm({  19.0f,  71.0f, 254.0f }),
+         71.0f * CalcInvL2Norm({  19.0f,  71.0f, 254.0f }),
+        254.0f * CalcInvL2Norm({  19.0f,  71.0f, 254.0f }),
+
+        // Batch 0, Height 2, Width (3) x Channel (3)
+        172.0f * CalcInvL2Norm({ 172.0f, 122.0f,  12.0f }),
+        122.0f * CalcInvL2Norm({ 172.0f, 122.0f,  12.0f }),
+         12.0f * CalcInvL2Norm({ 172.0f, 122.0f,  12.0f }),
+         74.0f * CalcInvL2Norm({  74.0f, 246.0f, 209.0f }),
+        246.0f * CalcInvL2Norm({  74.0f, 246.0f, 209.0f }),
+        209.0f * CalcInvL2Norm({  74.0f, 246.0f, 209.0f }),
+        250.0f * CalcInvL2Norm({ 250.0f, 166.0f, 200.0f }),
+        166.0f * CalcInvL2Norm({ 250.0f, 166.0f, 200.0f }),
+        200.0f * CalcInvL2Norm({ 250.0f, 166.0f, 200.0f }),
+
+        // Batch 0, Height 3, Width (3) x Channel (3)
+          6.0f * CalcInvL2Norm({   6.0f,  82.0f,   1.0f }),
+         82.0f * CalcInvL2Norm({   6.0f,  82.0f,   1.0f }),
+          1.0f * CalcInvL2Norm({   6.0f,  82.0f,   1.0f }),
+        195.0f * CalcInvL2Norm({ 195.0f,  28.0f,  64.0f }),
+         28.0f * CalcInvL2Norm({ 195.0f,  28.0f,  64.0f }),
+         64.0f * CalcInvL2Norm({ 195.0f,  28.0f,  64.0f }),
+         80.0f * CalcInvL2Norm({  80.0f,  37.0f,  54.0f }),
+         37.0f * CalcInvL2Norm({  80.0f,  37.0f,  54.0f }),
+         54.0f * CalcInvL2Norm({  80.0f,  37.0f,  54.0f }),
+
+        // Batch 1, Height 0, Width (3) x Channel (3)
+         67.0f * CalcInvL2Norm({  67.0f, 239.0f,  97.0f }),
+        239.0f * CalcInvL2Norm({  67.0f, 239.0f,  97.0f }),
+         97.0f * CalcInvL2Norm({  67.0f, 239.0f,  97.0f }),
+         90.0f * CalcInvL2Norm({  90.0f, 104.0f, 145.0f }),
+        104.0f * CalcInvL2Norm({  90.0f, 104.0f, 145.0f }),
+        145.0f * CalcInvL2Norm({  90.0f, 104.0f, 145.0f }),
+         49.0f * CalcInvL2Norm({  49.0f, 199.0f, 215.0f }),
+        199.0f * CalcInvL2Norm({  49.0f, 199.0f, 215.0f }),
+        215.0f * CalcInvL2Norm({  49.0f, 199.0f, 215.0f }),
+
+        // Batch 1, Height 1, Width (3) x Channel (3)
+          7.0f * CalcInvL2Norm({   7.0f,  17.0f, 115.0f }),
+         17.0f * CalcInvL2Norm({   7.0f,  17.0f, 115.0f }),
+        115.0f * CalcInvL2Norm({   7.0f,  17.0f, 115.0f }),
+        163.0f * CalcInvL2Norm({ 163.0f, 124.0f, 116.0f }),
+        124.0f * CalcInvL2Norm({ 163.0f, 124.0f, 116.0f }),
+        116.0f * CalcInvL2Norm({ 163.0f, 124.0f, 116.0f }),
+         18.0f * CalcInvL2Norm({  18.0f, 153.0f, 238.0f }),
+        153.0f * CalcInvL2Norm({  18.0f, 153.0f, 238.0f }),
+        238.0f * CalcInvL2Norm({  18.0f, 153.0f, 238.0f }),
+
+        // Batch 1, Height 2, Width (3) x Channel (3)
+         25.0f * CalcInvL2Norm({  25.0f, 222.0f, 226.0f }),
+        222.0f * CalcInvL2Norm({  25.0f, 222.0f, 226.0f }),
+        226.0f * CalcInvL2Norm({  25.0f, 222.0f, 226.0f }),
+        117.0f * CalcInvL2Norm({ 117.0f, 217.0f,  16.0f }),
+        217.0f * CalcInvL2Norm({ 117.0f, 217.0f,  16.0f }),
+         16.0f * CalcInvL2Norm({ 117.0f, 217.0f,  16.0f }),
+        103.0f * CalcInvL2Norm({ 103.0f,  75.0f, 132.0f }),
+         75.0f * CalcInvL2Norm({ 103.0f,  75.0f, 132.0f }),
+        132.0f * CalcInvL2Norm({ 103.0f,  75.0f, 132.0f }),
+
+        // Batch 1, Height 3, Width (3) x Channel (3)
+        247.0f * CalcInvL2Norm({ 247.0f,  32.0f,  92.0f }),
+         32.0f * CalcInvL2Norm({ 247.0f,  32.0f,  92.0f }),
+         92.0f * CalcInvL2Norm({ 247.0f,  32.0f,  92.0f }),
+         59.0f * CalcInvL2Norm({  59.0f, 126.0f, 125.0f }),
+        126.0f * CalcInvL2Norm({  59.0f, 126.0f, 125.0f }),
+        125.0f * CalcInvL2Norm({  59.0f, 126.0f, 125.0f }),
+        189.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f }),
+         21.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f }),
+         88.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f })
+    };
+
+    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+                                   inputValues, expectedOutputValues, armnn::DataLayout::NHWC);
 }
 
 template <typename T>

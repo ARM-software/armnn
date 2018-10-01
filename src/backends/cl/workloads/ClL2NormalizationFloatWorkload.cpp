@@ -22,7 +22,7 @@ arm_compute::Status ClL2NormalizationWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
     arm_compute::NormalizationLayerInfo normalizationInfo =
-            CreateAclNormalizationLayerInfoForL2Normalization(input);
+            CreateAclNormalizationLayerInfoForL2Normalization(input, descriptor.m_DataLayout);
 
     return arm_compute::CLNormalizationLayer::validate(&aclInput, &aclOutput, normalizationInfo);
 }
@@ -35,7 +35,14 @@ ClL2NormalizationFloatWorkload::ClL2NormalizationFloatWorkload(const L2Normaliza
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
-    m_Layer.configure(&input, &output, CreateAclNormalizationLayerInfoForL2Normalization(info.m_InputTensorInfos[0]));
+
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
+    input.info()->set_data_layout(aclDataLayout);
+    output.info()->set_data_layout(aclDataLayout);
+
+    m_Layer.configure(&input, &output,
+                      CreateAclNormalizationLayerInfoForL2Normalization(info.m_InputTensorInfos[0],
+                                                                        m_Data.m_Parameters.m_DataLayout));
 }
 
 void ClL2NormalizationFloatWorkload::Execute() const
@@ -45,6 +52,3 @@ void ClL2NormalizationFloatWorkload::Execute() const
 }
 
 } //namespace armnn
-
-
-

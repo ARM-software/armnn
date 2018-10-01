@@ -18,7 +18,7 @@ arm_compute::Status NeonL2NormalizationWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
     arm_compute::NormalizationLayerInfo normalizationInfo =
-            CreateAclNormalizationLayerInfoForL2Normalization(input);
+            CreateAclNormalizationLayerInfoForL2Normalization(input, descriptor.m_DataLayout);
 
     return arm_compute::NENormalizationLayer::validate(&aclInput, &aclOutput, normalizationInfo);
 }
@@ -32,7 +32,14 @@ NeonL2NormalizationFloatWorkload::NeonL2NormalizationFloatWorkload(const L2Norma
 
     arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
-    m_Layer.configure(&input, &output, CreateAclNormalizationLayerInfoForL2Normalization(info.m_InputTensorInfos[0]));
+
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
+    input.info()->set_data_layout(aclDataLayout);
+    output.info()->set_data_layout(aclDataLayout);
+
+    m_Layer.configure(&input, &output,
+                      CreateAclNormalizationLayerInfoForL2Normalization(info.m_InputTensorInfos[0],
+                                                                        m_Data.m_Parameters.m_DataLayout));
 }
 
 void NeonL2NormalizationFloatWorkload::Execute() const

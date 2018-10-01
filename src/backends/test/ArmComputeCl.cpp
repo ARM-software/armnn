@@ -174,10 +174,16 @@ ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadca
 // Batch Norm
 ARMNN_AUTO_TEST_CASE(BatchNorm, BatchNormTest)
 
+// L2 Normalization
 ARMNN_AUTO_TEST_CASE(L2Normalization1d, L2Normalization1dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization2d, L2Normalization2dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization3d, L2Normalization3dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization4d, L2Normalization4dTest)
+
+ARMNN_AUTO_TEST_CASE(L2Normalization1dNhwc, L2Normalization1dNhwcTest)
+ARMNN_AUTO_TEST_CASE(L2Normalization2dNhwc, L2Normalization2dNhwcTest)
+ARMNN_AUTO_TEST_CASE(L2Normalization3dNhwc, L2Normalization3dNhwcTest)
+ARMNN_AUTO_TEST_CASE(L2Normalization4dNhwc, L2Normalization4dNhwcTest)
 
 // Resize Bilinear
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear, SimpleResizeBilinearTest)

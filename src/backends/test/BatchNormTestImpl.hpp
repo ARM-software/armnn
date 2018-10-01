@@ -17,8 +17,8 @@
 
 template<typename T>
 LayerTestResult<T,4> BatchNormTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                   float qScale,
-                                   int32_t qOffset)
+                                       float qScale,
+                                       int32_t qOffset)
 {
     const unsigned int width    = 2;
     const unsigned int height   = 3;
@@ -103,6 +103,7 @@ LayerTestResult<T,4> BatchNormTestImpl(armnn::IWorkloadFactory& workloadFactory,
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());

@@ -249,6 +249,11 @@ LayerTestResult<float, 4> L2Normalization2dTest(armnn::IWorkloadFactory& workloa
 LayerTestResult<float, 4> L2Normalization3dTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloadFactory);
 
+LayerTestResult<float, 4> L2Normalization1dNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> L2Normalization2dNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> L2Normalization3dNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> L2Normalization4dNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+
 LayerTestResult<float, 4> ConstantTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<uint8_t, 4> ConstantTestUint8(armnn::IWorkloadFactory& workloadFactory);

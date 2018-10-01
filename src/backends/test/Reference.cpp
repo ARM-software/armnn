@@ -193,11 +193,17 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8, ResizeBilinearMagUint8Test)
 // Fake Quantization
 ARMNN_AUTO_TEST_CASE(FakeQuantization, FakeQuantizationTest)
 
-// L2 Noramlization
+// L2 Normalization
 ARMNN_AUTO_TEST_CASE(L2Normalization1d, L2Normalization1dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization2d, L2Normalization2dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization3d, L2Normalization3dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization4d, L2Normalization4dTest)
+
+// NOTE: These tests are disabled until NHWC is supported by the reference L2Normalization implementation.
+//ARMNN_AUTO_TEST_CASE(L2Normalization1dNhwc, L2Normalization1dNhwcTest);
+//ARMNN_AUTO_TEST_CASE(L2Normalization2dNhwc, L2Normalization2dNhwcTest);
+//ARMNN_AUTO_TEST_CASE(L2Normalization3dNhwc, L2Normalization3dNhwcTest);
+//ARMNN_AUTO_TEST_CASE(L2Normalization4dNhwc, L2Normalization4dNhwcTest);
 
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)

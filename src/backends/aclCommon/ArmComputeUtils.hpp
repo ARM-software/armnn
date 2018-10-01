@@ -15,9 +15,11 @@ namespace armnn
 {
 
 inline arm_compute::NormalizationLayerInfo
-CreateAclNormalizationLayerInfoForL2Normalization(const armnn::TensorInfo& tensorInfo)
+CreateAclNormalizationLayerInfoForL2Normalization(const armnn::TensorInfo& tensorInfo,
+                                                  armnn::DataLayout dataLayout)
 {
-    const unsigned int depth = tensorInfo.GetShape()[1];
+    unsigned int depthDimension = dataLayout == armnn::DataLayout::NCHW ? 1 : 3;
+    const unsigned int depth = tensorInfo.GetShape()[depthDimension];
 
     // At the time of writing, {CL|Neon}L2Normalization performs the reduction only along dimension 0. This version of
     // L2 Normalization always performs the reduction along the depth axis, though. Thus, we repurpose

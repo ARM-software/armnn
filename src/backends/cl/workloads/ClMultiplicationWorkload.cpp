@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClMultiplicationFloatWorkload.hpp"
+#include "ClMultiplicationWorkload.hpp"
 #include <backends/cl/ClTensorHandle.hpp>
 #include <backends/CpuTensorHandle.hpp>
 #include "ClWorkloadUtils.hpp"
@@ -31,11 +31,11 @@ arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
 }
 
 
-ClMultiplicationFloatWorkload::ClMultiplicationFloatWorkload(const MultiplicationQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info)
-    : FloatWorkload<MultiplicationQueueDescriptor>(descriptor, info)
+ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info)
+    : BaseWorkload<MultiplicationQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("ClMultiplicationFloatWorkload", 2, 1);
+    m_Data.ValidateInputsOutputs("ClMultiplicationWorkload", 2, 1);
 
     arm_compute::ICLTensor& input0 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& input1 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
@@ -49,9 +49,9 @@ ClMultiplicationFloatWorkload::ClMultiplicationFloatWorkload(const Multiplicatio
                                         arm_compute::RoundingPolicy::TO_NEAREST_EVEN);
 }
 
-void ClMultiplicationFloatWorkload::Execute() const
+void ClMultiplicationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMultiplicationFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMultiplicationWorkload_Execute");
 
     // Executes the layer.
     m_PixelWiseMultiplication.run();

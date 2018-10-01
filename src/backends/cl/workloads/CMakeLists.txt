@@ -50,8 +50,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClMergerFloatWorkload.hpp
     ClMergerUint8Workload.cpp
     ClMergerUint8Workload.hpp
-    ClMultiplicationFloatWorkload.cpp
-    ClMultiplicationFloatWorkload.hpp
+    ClMultiplicationWorkload.cpp
+    ClMultiplicationWorkload.hpp
     ClNormalizationFloatWorkload.cpp
     ClNormalizationFloatWorkload.hpp
     ClPadWorkload.cpp

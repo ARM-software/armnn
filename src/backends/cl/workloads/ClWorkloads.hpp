@@ -23,7 +23,7 @@
 #include "ClLstmFloatWorkload.hpp"
 #include "ClMergerFloatWorkload.hpp"
 #include "ClMergerUint8Workload.hpp"
-#include "ClMultiplicationFloatWorkload.hpp"
+#include "ClMultiplicationWorkload.hpp"
 #include "ClNormalizationFloatWorkload.hpp"
 #include "ClPermuteWorkload.hpp"
 #include "ClPadWorkload.hpp"

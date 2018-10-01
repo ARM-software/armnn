@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkloadTest)
 {
-    ClCreateArithmethicWorkloadTest<ClMultiplicationFloatWorkload,
+    ClCreateArithmethicWorkloadTest<ClMultiplicationWorkload,
                                     MultiplicationQueueDescriptor,
                                     MultiplicationLayer,
                                     armnn::DataType::Float32>();
@@ -109,10 +109,18 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkloadTest)
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16WorkloadTest)
 {
-    ClCreateArithmethicWorkloadTest<ClMultiplicationFloatWorkload,
+    ClCreateArithmethicWorkloadTest<ClMultiplicationWorkload,
                                     MultiplicationQueueDescriptor,
                                     MultiplicationLayer,
                                     armnn::DataType::Float16>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8WorkloadTest)
+{
+    ClCreateArithmethicWorkloadTest<ClMultiplicationWorkload,
+                                    MultiplicationQueueDescriptor,
+                                    MultiplicationLayer,
+                                    armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkloadTest)

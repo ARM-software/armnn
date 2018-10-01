@@ -16,12 +16,12 @@ arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
                                                      const TensorInfo& input1,
                                                      const TensorInfo& output);
 
-class ClMultiplicationFloatWorkload : public FloatWorkload<MultiplicationQueueDescriptor>
+class ClMultiplicationWorkload : public BaseWorkload<MultiplicationQueueDescriptor>
 {
 public:
-    ClMultiplicationFloatWorkload(const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClMultiplicationWorkload(const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info);
 
-    using FloatWorkload<MultiplicationQueueDescriptor>::FloatWorkload;
+    using BaseWorkload<MultiplicationQueueDescriptor>::BaseWorkload;
     void Execute() const override;
 
 private:

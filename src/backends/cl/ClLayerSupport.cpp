@@ -23,7 +23,7 @@
 #include "workloads/ClDepthwiseConvolutionBaseWorkload.hpp"
 #include "workloads/ClDivisionFloatWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
-#include "workloads/ClMultiplicationFloatWorkload.hpp"
+#include "workloads/ClMultiplicationWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClPadWorkload.hpp"
 #include "workloads/ClPooling2dBaseWorkload.hpp"

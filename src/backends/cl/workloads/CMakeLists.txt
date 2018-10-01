@@ -13,7 +13,6 @@ list(APPEND armnnClBackendWorkloads_sources
     ClBaseConstantWorkload.cpp
     ClBaseConstantWorkload.hpp
     ClBaseMergerWorkload.hpp
-    ClBaseSplitterWorkload.hpp
     ClBatchNormalizationFloatWorkload.cpp
     ClBatchNormalizationFloatWorkload.hpp
     ClConstantFloatWorkload.cpp
@@ -76,10 +75,7 @@ list(APPEND armnnClBackendWorkloads_sources
     ClSoftmaxFloatWorkload.hpp
     ClSoftmaxUint8Workload.cpp
     ClSoftmaxUint8Workload.hpp
-    ClSplitterFloatWorkload.cpp
-    ClSplitterFloatWorkload.hpp
-    ClSplitterUint8Workload.cpp
-    ClSplitterUint8Workload.hpp
+    ClSplitterWorkload.hpp
     ClSubtractionWorkload.cpp
     ClSubtractionWorkload.hpp
     ClWorkloads.hpp

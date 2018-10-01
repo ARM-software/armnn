@@ -7,21 +7,18 @@
 
 #include <backends/Workload.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
-
 namespace armnn
 {
 
 // Base class template providing an implementation of the Splitter layer common to all data types.
-template <armnn::DataType... DataTypes>
-class ClBaseSplitterWorkload : public TypedWorkload<SplitterQueueDescriptor, DataTypes...>
+class ClSplitterWorkload : public BaseWorkload<SplitterQueueDescriptor>
 {
 public:
-    using TypedWorkload<SplitterQueueDescriptor, DataTypes...>::TypedWorkload;
+    using BaseWorkload<SplitterQueueDescriptor>::BaseWorkload;
 
     void Execute() const override
     {
-        // With subtensors, merger is a no-op.
+        // With subtensors, splitter is a no-op.
     }
 };
 

@@ -46,6 +46,4 @@ BACKEND_SOURCES := \
         workloads/ClSoftmaxBaseWorkload.cpp \
         workloads/ClSoftmaxFloatWorkload.cpp \
         workloads/ClSoftmaxUint8Workload.cpp \
-        workloads/ClSplitterFloatWorkload.cpp \
-        workloads/ClSplitterUint8Workload.cpp \
         workloads/ClSubtractionWorkload.cpp

@@ -113,7 +113,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSoftmax(const SoftmaxQueueDe
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
                                                              const WorkloadInfo&            info) const
 {
-    return MakeWorkload<ClSplitterFloatWorkload, ClSplitterUint8Workload>(descriptor, info);
+    return std::make_unique<ClSplitterWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,

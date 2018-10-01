@@ -114,7 +114,8 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&           info) const
 {
-    return MakeWorkload<RefPermuteFloat32Workload, RefPermuteUint8Workload>(descriptor, info);
+    return armnn::MakeWorkload<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteUint8Workload>
+        (descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,

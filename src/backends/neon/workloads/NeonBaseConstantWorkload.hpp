@@ -6,12 +6,12 @@
 #pragma once
 
 #include <arm_compute/core/Types.h>
+#include <armnnUtils/Half.hpp>
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #include <backends/neon/NeonTensorHandle.hpp>
 #include <backends/neon/workloads/NeonWorkloadUtils.hpp>
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/Workload.hpp>
-#include <Half.hpp>
 
 #include <boost/cast.hpp>
 

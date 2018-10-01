@@ -4,9 +4,11 @@
 //
 
 #include "RefConvertFp16ToFp32Workload.hpp"
-#include "Half.hpp"
+
 #include "RefWorkloadUtils.hpp"
 #include "FloatingPointConverter.hpp"
+
+#include <armnnUtils/Half.hpp>
 
 namespace armnn
 {

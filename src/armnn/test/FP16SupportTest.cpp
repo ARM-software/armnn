@@ -7,6 +7,8 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
+#include <armnnUtils/Half.hpp>
+
 #include <Graph.hpp>
 #include <Optimizer.hpp>
 #include <backends/CpuTensorHandle.hpp>
@@ -15,7 +17,6 @@
 #include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <Half.hpp>
 #include <set>
 
 using namespace armnn;

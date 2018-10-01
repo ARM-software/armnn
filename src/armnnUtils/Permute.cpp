@@ -5,6 +5,7 @@
 
 #include "Permute.hpp"
 
+#include "Half.hpp"
 #include <armnn/Tensor.hpp>
 
 #include <cassert>
@@ -108,6 +109,8 @@ void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector&
 }
 
 // Instantiates for types.
+template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
+                      const armnn::Half* src, armnn::Half* dst);
 template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
                       const float* src, float* dst);
 template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,

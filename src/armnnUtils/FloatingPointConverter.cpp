@@ -4,7 +4,8 @@
 //
 
 #include "FloatingPointConverter.hpp"
-#include "../armnn/Half.hpp"
+
+#include "Half.hpp"
 
 #include <boost/assert.hpp>
 

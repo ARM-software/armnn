@@ -5,11 +5,11 @@
 
 #include "RefConvertFp32ToFp16Workload.hpp"
 
-#include "Half.hpp"
 #include "FloatingPointConverter.hpp"
 #include "RefWorkloadUtils.hpp"
-
 #include "Profiling.hpp"
+
+#include "armnnUtils/Half.hpp"
 
 namespace armnn
 {

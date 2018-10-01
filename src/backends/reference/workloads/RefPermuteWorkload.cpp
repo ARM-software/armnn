@@ -26,6 +26,7 @@ void RefPermuteWorkload<DataType>::Execute() const
     armnnUtils::Permute(GetTensorInfo(dst).GetShape(), mappings, GetConstCpuData<T>(src), GetCpuData<T>(dst));
 }
 
+template class RefPermuteWorkload<DataType::Float16>;
 template class RefPermuteWorkload<DataType::Float32>;
 template class RefPermuteWorkload<DataType::QuantisedAsymm8>;
 

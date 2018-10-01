@@ -27,6 +27,7 @@ add_custom_target(AdditionalCMakeFiles SOURCES ${additional_cmake_files})
 set(armnnUtils_sources)
 list(APPEND armnnUtils_sources
     src/armnnUtils/GraphTopologicalSort.hpp
+    src/armnnUtils/Half.hpp
     src/armnnUtils/Logging.hpp
     src/armnnUtils/Permute.hpp
     src/armnnUtils/Logging.cpp
@@ -219,7 +220,6 @@ list(APPEND armnn_sources
     src/armnn/layers/SplitterLayer.cpp
     src/armnn/layers/SubtractionLayer.cpp
     src/armnn/layers/SubtractionLayer.hpp
-    src/armnn/Half.hpp
     src/armnn/InternalTypes.hpp
     src/armnn/InternalTypes.cpp
     src/armnn/JsonPrinter.hpp

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "armnn/Types.hpp"
-#include "Half.hpp"
+#include "armnnUtils/Half.hpp"
 
 namespace armnn
 {

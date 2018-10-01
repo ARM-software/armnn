@@ -3,12 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <algorithm>
-#include <cstring>
-#include <boost/cast.hpp>
-#include <Half.hpp>
-
 #include "TensorCopyUtils.hpp"
+
+#include <armnnUtils/Half.hpp>
+
 
 #ifdef ARMCOMPUTECL_ENABLED
 #include <backends/cl/ClTensorHandle.hpp>
@@ -23,6 +21,10 @@
 #endif
 
 #include <backends/CpuTensorHandle.hpp>
+
+#include <boost/cast.hpp>
+#include <algorithm>
+#include <cstring>
 
 void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* mem)
 {

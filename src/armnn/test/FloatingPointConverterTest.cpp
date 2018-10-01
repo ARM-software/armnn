@@ -4,7 +4,7 @@
 //
 
 #include "FloatingPointConverter.hpp"
-#include "Half.hpp"
+#include <armnnUtils/Half.hpp>
 
 #include <malloc.h>
 #include <iostream>

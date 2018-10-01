@@ -8,13 +8,13 @@
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnnUtils/Half.hpp>
 
 #include <backends/WorkloadInfo.hpp>
 #include <backends/CpuTensorHandle.hpp>
 
 #include <test/TensorHelpers.hpp>
 
-#include <Half.hpp>
 
 LayerTestResult<float, 4> SimpleConvertFp16ToFp32Test(armnn::IWorkloadFactory& workloadFactory)
 {

@@ -6,7 +6,7 @@
 
 #include "armnn/ArmNN.hpp"
 #include "armnn/Tensor.hpp"
-#include "Half.hpp"
+#include "armnnUtils/Half.hpp"
 
 #include <boost/multi_array.hpp>
 #include <boost/assert.hpp>

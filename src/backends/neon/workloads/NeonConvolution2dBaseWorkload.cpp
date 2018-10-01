@@ -10,7 +10,7 @@
 #include "NeonConvolution2dBaseWorkload.hpp"
 
 #include <armnn/Types.hpp>
-#include <Half.hpp>
+#include <armnnUtils/Half.hpp>
 
 namespace armnn
 {

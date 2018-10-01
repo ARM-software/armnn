@@ -27,6 +27,7 @@ public:
     void Execute() const override;
 };
 
+using RefPermuteFloat16Workload = RefPermuteWorkload<DataType::Float16>;
 using RefPermuteFloat32Workload = RefPermuteWorkload<DataType::Float32>;
 using RefPermuteUint8Workload   = RefPermuteWorkload<DataType::QuantisedAsymm8>;
 

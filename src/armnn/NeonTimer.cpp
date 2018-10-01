@@ -13,24 +13,31 @@
 
 namespace armnn
 {
+namespace
+{
+static thread_local auto g_Interceptor = std::make_shared<NeonInterceptorScheduler>(arm_compute::Scheduler::get());
+}
 
 void NeonTimer::Start()
 {
     m_Kernels.clear();
+    BOOST_ASSERT(g_Interceptor->GetKernels() == nullptr);
+    g_Interceptor->SetKernels(&m_Kernels);
+
     m_RealSchedulerType = arm_compute::Scheduler::get_type();
     //Note: We can't currently replace a custom scheduler
     if(m_RealSchedulerType != arm_compute::Scheduler::Type::CUSTOM)
     {
         // Keep the real schedule and add NeonInterceptorScheduler as an interceptor
         m_RealScheduler  = &arm_compute::Scheduler::get();
-        auto interceptor = std::make_shared<NeonInterceptorScheduler>(m_Kernels, *m_RealScheduler);
-        arm_compute::Scheduler::set(std::static_pointer_cast<arm_compute::IScheduler>(interceptor));
+        arm_compute::Scheduler::set(std::static_pointer_cast<arm_compute::IScheduler>(g_Interceptor));
     }
 }
 
 void NeonTimer::Stop()
 {
     // Restore real scheduler
+    g_Interceptor->SetKernels(nullptr);
     arm_compute::Scheduler::set(m_RealSchedulerType);
     m_RealScheduler = nullptr;
 }

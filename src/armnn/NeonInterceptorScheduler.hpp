@@ -17,7 +17,7 @@ namespace armnn
 class NeonInterceptorScheduler : public arm_compute::IScheduler
 {
 public:
-    NeonInterceptorScheduler(NeonTimer::KernelMeasurements &kernels, arm_compute::IScheduler &realScheduler);
+    NeonInterceptorScheduler(arm_compute::IScheduler &realScheduler);
     ~NeonInterceptorScheduler() = default;
 
     void set_num_threads(unsigned int numThreads) override;
@@ -28,10 +28,11 @@ public:
 
     void run_workloads(std::vector<Workload> &workloads) override;
 
+    void SetKernels(NeonTimer::KernelMeasurements* kernels) { m_Kernels = kernels; }
+    NeonTimer::KernelMeasurements* GetKernels() { return m_Kernels; }
 private:
-    NeonTimer::KernelMeasurements& m_Kernels;
+    NeonTimer::KernelMeasurements* m_Kernels;
     arm_compute::IScheduler& m_RealScheduler;
-    WallClockTimer m_Timer;
 };
 
 } // namespace armnn

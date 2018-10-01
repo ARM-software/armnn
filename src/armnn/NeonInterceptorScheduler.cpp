@@ -10,7 +10,7 @@
 namespace armnn{
 
 NeonInterceptorScheduler::NeonInterceptorScheduler(arm_compute::IScheduler &realScheduler)
-        : m_RealScheduler(realScheduler)
+        : m_Kernels(nullptr), m_RealScheduler(realScheduler)
 {
 }
 

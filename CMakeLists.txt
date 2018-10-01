@@ -43,6 +43,8 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/FloatingPointConverter.hpp
     src/armnnUtils/VerificationHelpers.hpp
     src/armnnUtils/VerificationHelpers.cpp
+    src/armnnUtils/ParserHelper.hpp
+    src/armnnUtils/ParserHelper.cpp
     )
 if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER)
     list(APPEND armnnUtils_sources
@@ -452,9 +454,12 @@ if(BUILD_UNIT_TESTS)
     if(BUILD_TF_LITE_PARSER)
         list(APPEND unittest_sources
              src/armnnTfLiteParser/test/ParserFlatbuffersFixture.hpp
+             src/armnnTfLiteParser/test/Activations.cpp
              src/armnnTfLiteParser/test/AvgPool2D.cpp
+             src/armnnTfLiteParser/test/Concatenation.cpp
              src/armnnTfLiteParser/test/Conv2D.cpp
              src/armnnTfLiteParser/test/DepthwiseConvolution2D.cpp
+             src/armnnTfLiteParser/test/Reshape.cpp
              src/armnnTfLiteParser/test/Softmax.cpp
              src/armnnTfLiteParser/test/Squeeze.cpp
              src/armnnTfLiteParser/test/LoadModel.cpp
@@ -464,8 +469,6 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/GetTensorIds.cpp
              src/armnnTfLiteParser/test/GetSubgraphInputsOutputs.cpp
              src/armnnTfLiteParser/test/GetInputsOutputs.cpp
-             src/armnnTfLiteParser/test/Activations.cpp
-             src/armnnTfLiteParser/test/Reshape.cpp
              )
     endif()
 

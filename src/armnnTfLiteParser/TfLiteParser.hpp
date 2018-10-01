@@ -90,13 +90,14 @@ private:
 
     void ParseUnsupportedOperator(size_t subgraphIndex, size_t operatorIndex);
     void ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex);
+    void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
-    void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
-    void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);
     void ParseReshape(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
 
     void RegisterProducerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IOutputSlot* slot);
     void RegisterConsumerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IInputSlot* slot);

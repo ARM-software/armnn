@@ -8,20 +8,26 @@
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/cl/ClLayerSupport.hpp>
 #include <backends/aclCommon/ArmComputeUtils.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 
 #include "ClWorkloadUtils.hpp"
+
+using namespace armnn::armcomputetensorutils;
 
 namespace armnn
 {
 
 ClResizeBilinearFloatWorkload::ClResizeBilinearFloatWorkload(const ResizeBilinearQueueDescriptor& descriptor,
-                                                               const WorkloadInfo& info)
+                                                             const WorkloadInfo& info)
     : FloatWorkload<ResizeBilinearQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClResizeBilinearFloatWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+
+    (&input)->info()->set_data_layout(ConvertDataLayout(m_Data.m_Parameters.m_DataLayout));
+    (&output)->info()->set_data_layout(ConvertDataLayout(m_Data.m_Parameters.m_DataLayout));
 
     m_ResizeBilinearLayer.configure(&input, &output, arm_compute::InterpolationPolicy::BILINEAR,
                                     arm_compute::BorderMode::REPLICATE, arm_compute::PixelValue(0.f),

@@ -92,7 +92,7 @@ struct ViewsDescriptor
     friend void swap(ViewsDescriptor& first, ViewsDescriptor& second);
 private:
     OriginsDescriptor m_Origins;
-    uint32_t** m_ViewSizes;
+    uint32_t**        m_ViewSizes;
 };
 
 /// Convenience template to create an OriginsDescriptor to use when creating a Merger layer for performing concatenation
@@ -308,10 +308,12 @@ struct ResizeBilinearDescriptor
     ResizeBilinearDescriptor()
     : m_TargetWidth(0)
     , m_TargetHeight(0)
+    , m_DataLayout(DataLayout::NCHW)
     {}
 
-    uint32_t m_TargetWidth;
-    uint32_t m_TargetHeight;
+    uint32_t   m_TargetWidth;
+    uint32_t   m_TargetHeight;
+    DataLayout m_DataLayout;
 };
 
 struct ReshapeDescriptor

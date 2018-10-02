@@ -195,11 +195,23 @@ TensorInfo Runtime::GetOutputTensorInfo(NetworkId networkId, LayerBindingId laye
     return GetLoadedNetworkPtr(networkId)->GetOutputTensorInfo(layerId);
 }
 
+
 Status Runtime::EnqueueWorkload(NetworkId networkId,
                                 const InputTensors& inputTensors,
                                 const OutputTensors& outputTensors)
 {
     LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
+
+    static thread_local NetworkId lastId = networkId;
+    if (lastId != networkId)
+    {
+        LoadedNetworkFuncSafe(lastId, [](LoadedNetwork* network)
+            {
+                network->FreeWorkingMemory();
+            });
+    }
+    lastId=networkId;
+
     return loadedNetwork->EnqueueWorkload(inputTensors, outputTensors);
 }
 

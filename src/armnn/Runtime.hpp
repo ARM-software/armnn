@@ -73,6 +73,17 @@ private:
 
     LoadedNetwork* GetLoadedNetworkPtr(NetworkId networkId) const;
 
+    template<typename Func>
+    void LoadedNetworkFuncSafe(NetworkId networkId, Func f)
+    {
+        std::lock_guard<std::mutex> lockGuard(m_Mutex);
+        auto iter = m_LoadedNetworks.find(networkId);
+        if (iter != m_LoadedNetworks.end())
+        {
+            f(iter->second.get());
+        }
+    }
+
     mutable std::mutex m_Mutex;
 
     std::unordered_map<NetworkId, std::unique_ptr<LoadedNetwork>> m_LoadedNetworks;

@@ -72,6 +72,7 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
     : m_CpuRef()
     , m_OptimizedNetwork(std::move(net))
+    , m_WorkingMemLock(m_WorkingMemMutex, std::defer_lock)
 {
     // Create a profiler and register it for the current thread.
     m_Profiler = std::make_shared<Profiler>();
@@ -303,6 +304,8 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     }
 
     // For each input to the network, call EnqueueInput with the data passed by the user.
+    m_InputQueue.clear();
+    m_InputQueue.reserve(graph.GetNumInputs());
     for (const BindableLayer* inputLayer : graph.GetInputLayers())
     {
         const TensorPin& pin = workloadData.GetInputTensorPin(inputLayer->GetBindingId());
@@ -310,6 +313,8 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     }
 
     // For each output to the network, call EnqueueOutput with the data passed by the user.
+    m_OutputQueue.clear();
+    m_OutputQueue.reserve(graph.GetNumOutputs());
     for (const BindableLayer* outputLayer : graph.GetOutputLayers())
     {
         const TensorPin& pin = workloadData.GetOutputTensorPin(outputLayer->GetBindingId());
@@ -323,9 +328,6 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         ARMNN_SCOPED_HEAP_PROFILING("Executing");
         executionSucceeded = Execute();
     }
-
-    // Hack: get rid of inputs and outputs we added.
-    TidyWorkloadQueue(graph.GetNumInputs(), graph.GetNumOutputs());
 
     return executionSucceeded ? Status::Success : Status::Failure;
 }
@@ -360,7 +362,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     const IWorkloadFactory& workloadFactory = GetWorkloadFactory(layer);
     auto inputWorkload = workloadFactory.CreateInput(inputQueueDescriptor, info);
     BOOST_ASSERT_MSG(inputWorkload, "No input workload created");
-    m_WorkloadQueue.insert(m_WorkloadQueue.begin(), move(inputWorkload));
+    m_InputQueue.push_back(move(inputWorkload));
 }
 
 void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo)
@@ -396,16 +398,39 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     const IWorkloadFactory& workloadFactory = GetWorkloadFactory(layer);
     auto outputWorkload = workloadFactory.CreateOutput(outputQueueDescriptor, info);
     BOOST_ASSERT_MSG(outputWorkload, "No output workload created");
-    m_WorkloadQueue.push_back(move(outputWorkload));
+    m_OutputQueue.push_back(move(outputWorkload));
+}
+
+void LoadedNetwork::AllocateWorkingMemory()
+{
+    BOOST_ASSERT_MSG(m_WorkingMemLock.owns_lock(), "Cannot allocate working memory if mutex is not already locked.");
+    if (m_IsWorkingMemAllocated)
+    {
+        return;
+    }
+    m_CpuRef.Acquire();
+    m_CpuAcc.Acquire();
+    m_GpuAcc.Acquire();
+    m_IsWorkingMemAllocated = true;
+}
+
+void LoadedNetwork::FreeWorkingMemory()
+{
+    std::lock_guard<UniqueMutexLock> lockGuard(m_WorkingMemLock);
+    if (!m_IsWorkingMemAllocated)
+    {
+        return;
+    }
+    // Informs the memory managers to release memory in it's respective memory group
+    m_CpuRef.Release();
+    m_CpuAcc.Release();
+    m_GpuAcc.Release();
+    m_IsWorkingMemAllocated = false;
 }
 
 bool LoadedNetwork::Execute()
 {
     bool success = true;
-
-    m_CpuRef.Acquire();
-    m_CpuAcc.Acquire();
-    m_GpuAcc.Acquire();
 
     auto Fail = [&](const std::exception& error)
     {
@@ -415,9 +440,22 @@ bool LoadedNetwork::Execute()
 
     try
     {
-        for (size_t i = 0; i < m_WorkloadQueue.size(); ++i)
+        std::lock_guard<UniqueMutexLock> lockGuard(m_WorkingMemLock);
+        AllocateWorkingMemory();
+
+        for (auto& input : m_InputQueue)
         {
-            m_WorkloadQueue[i]->Execute();
+            input->Execute();
+        }
+
+        for (auto& workload : m_WorkloadQueue)
+        {
+            workload->Execute();
+        }
+
+        for (auto& output: m_OutputQueue)
+        {
+            output->Execute();
         }
     }
     catch (const RuntimeException& error)
@@ -429,18 +467,7 @@ bool LoadedNetwork::Execute()
         Fail(error);
     }
 
-    // Informs the memory managers to release memory in it's respective memory group
-    m_CpuRef.Release();
-    m_CpuAcc.Release();
-    m_GpuAcc.Release();
-
     return success;
-}
-
-void LoadedNetwork::TidyWorkloadQueue(size_t numInputs, size_t numOutputs)
-{
-    m_WorkloadQueue.erase(m_WorkloadQueue.begin(), m_WorkloadQueue.begin() + boost::numeric_cast<long>(numInputs));
-    m_WorkloadQueue.erase(m_WorkloadQueue.end() - boost::numeric_cast<long>(numOutputs), m_WorkloadQueue.end());
 }
 
 }

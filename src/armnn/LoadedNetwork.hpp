@@ -17,6 +17,8 @@
 #include <backends/Workload.hpp>
 #include <backends/WorkloadFactory.hpp>
 
+#include <mutex>
+
 namespace cl
 {
     class Context;
@@ -30,6 +32,9 @@ namespace armnn
 class LoadedNetwork
 {
 public:
+    using WorkloadQueue = std::vector< std::unique_ptr<IWorkload> >;
+    ~LoadedNetwork(){ FreeWorkingMemory(); }
+
     TensorInfo GetInputTensorInfo(LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const;
 
@@ -43,6 +48,9 @@ public:
     // the shared_ptr's reference counter
     const std::shared_ptr<Profiler>& GetProfiler() const { return m_Profiler; }
 
+    void AllocateWorkingMemory();
+    void FreeWorkingMemory();
+
 private:
     LoadedNetwork(std::unique_ptr<OptimizedNetwork> net);
 
@@ -52,8 +60,6 @@ private:
 
     bool Execute();
 
-    void TidyWorkloadQueue(size_t numInputs, size_t numOutputs);
-
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
 
     RefWorkloadFactory  m_CpuRef;
@@ -61,8 +67,16 @@ private:
     ClWorkloadFactory   m_GpuAcc;
 
     std::unique_ptr<OptimizedNetwork> m_OptimizedNetwork;
-    std::vector< std::unique_ptr<IWorkload> > m_WorkloadQueue;
+    WorkloadQueue m_InputQueue;
+    WorkloadQueue m_WorkloadQueue;
+    WorkloadQueue m_OutputQueue;
     std::shared_ptr<Profiler> m_Profiler;
+
+    using UniqueMutexLock = std::unique_lock<std::mutex>;
+    mutable std::mutex m_WorkingMemMutex;
+    UniqueMutexLock m_WorkingMemLock;
+
+    bool m_IsWorkingMemAllocated=false;
 };
 
 }

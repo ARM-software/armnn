@@ -158,4 +158,9 @@ bool IsMeanSupportedRef(const TensorInfo& input,
                         const MeanDescriptor& descriptor,
                         std::string* reasonIfUnsupported = nullptr);
 
+bool IsPadSupportedRef(const TensorInfo& input,
+                       const TensorInfo& output,
+                       const PadDescriptor& descriptor,
+                       std::string* reasonIfUnsupported = nullptr);
+
 }

@@ -466,4 +466,12 @@ bool IsMeanSupportedNeon(const TensorInfo& input,
     return false;
 }
 
+bool IsPadSupportedNeon(const TensorInfo& input,
+                        const TensorInfo& output,
+                        const PadDescriptor& descriptor,
+                        std::string* reasonIfUnsupported)
+{
+    return false;
+}
+
 }

@@ -363,8 +363,8 @@ bool IsPadSupported(Compute compute,
                     char* reasonIfUnsupported,
                     size_t reasonIfUnsupportedMaxLength)
 {
-    CopyErrorMessage(reasonIfUnsupported, "Not implemented", reasonIfUnsupportedMaxLength);
-    return false;
+
+    FORWARD_LAYER_SUPPORT_FUNC(compute, IsPadSupported, input, output, descriptor);
 }
 
 }

@@ -858,7 +858,8 @@ void PadQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateSingleOutput(workloadInfo, "PadQueueDescriptor");
 
     const TensorInfo& input = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[1];
+    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
+
     // input and output should have the same number of dimensions
     ValidateTensorNumDimensions(output, "PadQueueDescriptor", input.GetNumDimensions(), "output");
     // there should be entry in the pad list for each dimension in the input tensor

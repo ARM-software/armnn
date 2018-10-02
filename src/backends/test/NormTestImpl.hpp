@@ -5,6 +5,7 @@
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/LayerSupport.hpp>
+#include "armnn/Types.hpp"
 
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/WorkloadFactory.hpp>
@@ -58,6 +59,7 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(armnn::IWorkloadFactory& wo
     data.m_Parameters.m_Alpha = alpha;
     data.m_Parameters.m_Beta = beta;
     data.m_Parameters.m_K = kappa;
+    data.m_Parameters.m_DataLayout = armnn::DataLayout::NCHW;
 
     armnn::PassthroughCpuTensorHandle refHandle(outputTensorInfo, &ret.outputExpected[0][0][0][0]);
     armnn::NormalizationQueueDescriptor refData = data;
@@ -135,6 +137,108 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(armnn::IWorkloadFactory& wo
                 {
                     throw armnn::UnimplementedException("Unsupported normalisation channel type, "
                                                         "only Across and Within are supported");
+                }
+            }
+            break;
+        }
+        case armnn::NormalizationAlgorithmMethod::LocalContrast: // NOTE: intentional fallthrough.
+        default:
+        {
+            throw armnn::UnimplementedException("Unsupported normalisation method type, "
+                                                "only LocalBrightness is supported");
+        }
+    }
+
+    return ret;
+}
+
+// This is test implementation for CL and NEON,
+// as currently, only Across Normalization is supported on CL and NEON for NHWC.
+LayerTestResult<float,4> SimpleNormalizationNhwcClNeonTestImpl(armnn::IWorkloadFactory& workloadFactory,
+                                                               armnn::NormalizationAlgorithmChannel normChannel,
+                                                               armnn::NormalizationAlgorithmMethod normMethod)
+{
+    const unsigned int inputHeight = 2;
+    const unsigned int inputWidth = 2;
+    const unsigned int inputChannels = 1;
+    const unsigned int inputNum = 2;
+
+    unsigned int outputHeight = inputHeight;
+    unsigned int outputWidth = inputWidth;
+    unsigned int outputChannels = inputChannels;
+    unsigned int outputNum = inputNum;
+
+    unsigned int inputShape[] = { inputNum, inputHeight, inputWidth, inputChannels };
+    unsigned int outputShape[] = { outputNum, outputHeight, outputWidth, outputChannels };
+
+    auto inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    auto outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
+
+    LayerTestResult<float,4> ret(outputTensorInfo);
+
+    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+        // Batch #0
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        // Batch #1
+        5.0f, 6.0f,
+        7.0f, 8.0f
+    }));
+
+    float alpha = 1.f;
+    float beta = 1.f;
+    float kappa = 1.f;
+    uint32_t normSize = 3;
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::NormalizationQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+    data.m_Parameters.m_NormChannelType = normChannel;
+    data.m_Parameters.m_NormMethodType = normMethod;
+    data.m_Parameters.m_NormSize = normSize;
+    data.m_Parameters.m_Alpha = alpha;
+    data.m_Parameters.m_Beta = beta;
+    data.m_Parameters.m_K = kappa;
+    data.m_Parameters.m_DataLayout = armnn::DataLayout::NHWC;
+
+    armnn::PassthroughCpuTensorHandle refHandle(outputTensorInfo, &ret.outputExpected[0][0][0][0]);
+    armnn::NormalizationQueueDescriptor refData = data;
+    armnn::WorkloadInfo refInfo = info;
+    SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, &refHandle);
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateNormalization(data, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+
+    workloadFactory.Finalize();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+
+    switch (normMethod)
+    {
+        case armnn::NormalizationAlgorithmMethod::LocalBrightness:
+        {
+            switch (normChannel)
+            {
+                case armnn::NormalizationAlgorithmChannel::Across:
+                {
+                    std::vector<float> expectedOutput{ 0.5f, 0.400000006f, 0.300000012f, 0.235294119f,
+                                                       0.192307696f, 0.16216217f, 0.140000001f, 0.123076923f };
+                    ret.outputExpected = MakeTensor<float, 4>(outputTensorInfo, expectedOutput);
+                    break;
+                }
+                default:
+                {
+                    throw armnn::UnimplementedException("Unsupported normalisation channel type, "
+                                                        "Only Cross-map is supported for NHWC layout");
                 }
             }
             break;

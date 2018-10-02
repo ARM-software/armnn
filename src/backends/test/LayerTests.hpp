@@ -131,6 +131,7 @@ LayerTestResult<float, 4> ConstantLinearActivationTest(armnn::IWorkloadFactory& 
 
 LayerTestResult<float, 4> SimpleNormalizationAcrossTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4> SimpleNormalizationWithinTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float,4> SimpleNormalizationAcrossNhwcTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 2> SimpleSoftmaxTest(armnn::IWorkloadFactory& workloadFactory, float beta);
 LayerTestResult<uint8_t, 2> SimpleSoftmaxUint8Test(armnn::IWorkloadFactory& workloadFactory, float beta);

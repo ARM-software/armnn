@@ -37,6 +37,10 @@ ClNormalizationFloatWorkload::ClNormalizationFloatWorkload(const NormalizationQu
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
+    input.info()->set_data_layout(aclDataLayout);
+    output.info()->set_data_layout(aclDataLayout);
+
     arm_compute::NormalizationLayerInfo normalizationInfo = BuildArmComputeNormalizationLayerInfo(m_Data.m_Parameters);
 
     m_NormalizationLayer.configure(&input, &output, normalizationInfo);

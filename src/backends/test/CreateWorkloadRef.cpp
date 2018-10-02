@@ -227,17 +227,22 @@ BOOST_AUTO_TEST_CASE(CreateFullyConnectedUint8Workload)
     RefCreateFullyConnectedWorkloadTest<RefFullyConnectedUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationWorkload)
+template <typename NormalizationWorkloadType, armnn::DataType DataType>
+static void RefCreateNormalizationWorkloadTest()
 {
-    Graph                graph;
+    Graph graph;
     RefWorkloadFactory factory;
-    auto                 workload = CreateNormalizationWorkloadTest<RefNormalizationFloat32Workload,
-                                    armnn::DataType::Float32>(factory, graph);
+    auto workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     CheckInputOutput(std::move(workload),
-                     TensorInfo({3, 5, 5, 1}, DataType::Float32),
-                     TensorInfo({3, 5, 5, 1}, DataType::Float32));
+                     TensorInfo({3, 5, 5, 1}, DataType),
+                     TensorInfo({3, 5, 5, 1}, DataType));
+}
+
+BOOST_AUTO_TEST_CASE(CreateRefNormalizationNchwWorkload)
+{
+    RefCreateNormalizationWorkloadTest<RefNormalizationFloat32Workload, armnn::DataType::Float32>();
 }
 
 template <typename Pooling2dWorkloadType, armnn::DataType DataType>

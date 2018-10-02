@@ -235,11 +235,11 @@ BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloatWorkload)
 }
 
 template <typename NormalizationWorkloadType, typename armnn::DataType DataType>
-static void NeonCreateNormalizationWorkloadTest()
+static void NeonCreateNormalizationWorkloadTest(DataLayout dataLayout)
 {
-    Graph               graph;
+    Graph graph;
     NeonWorkloadFactory factory;
-    auto                workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>(factory, graph);
+    auto workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>(factory, graph, dataLayout);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     NormalizationQueueDescriptor queueDescriptor = workload->GetData();
@@ -250,16 +250,27 @@ static void NeonCreateNormalizationWorkloadTest()
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16Workload)
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16NchwWorkload)
 {
-    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float16>();
+    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float16>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16NhwcWorkload)
+{
+    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float16>(DataLayout::NHWC);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloatWorkload)
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloatNchwWorkload)
 {
-    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float32>();
+    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float32>(DataLayout::NCHW);
 }
+
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloatNhwcWorkload)
+{
+    NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float32>(DataLayout::NHWC);
+}
+
 
 template <typename Pooling2dWorkloadType, typename armnn::DataType DataType>
 static void NeonCreatePooling2dWorkloadTest()

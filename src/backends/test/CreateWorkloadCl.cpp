@@ -285,13 +285,13 @@ BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat16WorkloadTest)
 }
 
 template <typename NormalizationWorkloadType, typename armnn::DataType DataType>
-static void ClNormalizationWorkloadTest()
+static void ClNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     ClWorkloadFactory factory;
 
     auto workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>
-                    (factory, graph);
+                    (factory, graph, dataLayout);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     NormalizationQueueDescriptor queueDescriptor = workload->GetData();
@@ -302,14 +302,24 @@ static void ClNormalizationWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 5, 5, 1}));
 }
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloatWorkload)
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloat32NchwWorkload)
 {
-    ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float32>();
+    ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16Workload)
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16NchwWorkload)
 {
-    ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float16>();
+    ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float16>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloat32NhwcWorkload)
+{
+    ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16NhwcWorkload)
+{
+    ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
 }
 
 template <typename Pooling2dWorkloadType, typename armnn::DataType DataType>

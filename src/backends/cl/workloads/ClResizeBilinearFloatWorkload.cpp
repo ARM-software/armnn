@@ -26,8 +26,9 @@ ClResizeBilinearFloatWorkload::ClResizeBilinearFloatWorkload(const ResizeBilinea
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    (&input)->info()->set_data_layout(ConvertDataLayout(m_Data.m_Parameters.m_DataLayout));
-    (&output)->info()->set_data_layout(ConvertDataLayout(m_Data.m_Parameters.m_DataLayout));
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
+    input.info()->set_data_layout(aclDataLayout);
+    output.info()->set_data_layout(aclDataLayout);
 
     m_ResizeBilinearLayer.configure(&input, &output, arm_compute::InterpolationPolicy::BILINEAR,
                                     arm_compute::BorderMode::REPLICATE, arm_compute::PixelValue(0.f),

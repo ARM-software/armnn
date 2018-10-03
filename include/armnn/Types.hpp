@@ -5,6 +5,7 @@
 #pragma once
 
 #include <array>
+#include <memory>
 
 namespace armnn
 {
@@ -67,9 +68,9 @@ enum class PoolingAlgorithm
 enum class PaddingMethod
 {
     /// The padding fields count, but are ignored
-    IgnoreValue = 0, 
+    IgnoreValue = 0,
     /// The padding fields don't count and are ignored
-    Exclude     = 1  
+    Exclude     = 1
 };
 
 enum class NormalizationAlgorithmChannel
@@ -80,9 +81,9 @@ enum class NormalizationAlgorithmChannel
 
 enum class NormalizationAlgorithmMethod
 {
-    /// Krichevsky 2012: Local Brightness Normalization 
-    LocalBrightness = 0, 
-    /// Jarret 2009: Local Contrast Normalization       
+    /// Krichevsky 2012: Local Brightness Normalization
+    LocalBrightness = 0,
+    /// Jarret 2009: Local Contrast Normalization
     LocalContrast = 1
 };
 
@@ -95,14 +96,28 @@ enum class OutputShapeRounding
 enum class Compute
 {
     /// CPU Execution: Reference C++ kernels
-    CpuRef      = 0,  
+    CpuRef      = 0,
     /// CPU Execution: NEON: ArmCompute
-    CpuAcc      = 1,  
+    CpuAcc      = 1,
     /// GPU Execution: OpenCL: ArmCompute
-    GpuAcc      = 2, 
+    GpuAcc      = 2,
     Undefined   = 5
 };
 
+/// Each backend should implement an IBackend.
+class IBackend
+{
+protected:
+    IBackend() {}
+    virtual ~IBackend() {}
+
+public:
+    virtual const std::string& GetId() const = 0;
+};
+
+using IBackendPtr = std::shared_ptr<IBackend>;
+
+/// Device specific knowledge to be passed to the optimizer.
 class IDeviceSpec
 {
 protected:

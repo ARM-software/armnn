@@ -12,7 +12,6 @@
 #include "QuantizeHelper.hpp"
 
 #include <backends/CpuTensorHandle.hpp>
-#include <backends/WorkloadInfo.hpp>
 #include <backends/WorkloadFactory.hpp>
 
 LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(armnn::IWorkloadFactory& workloadFactory,

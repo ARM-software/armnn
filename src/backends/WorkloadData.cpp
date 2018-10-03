@@ -5,7 +5,6 @@
 #include "WorkloadData.hpp"
 
 #include "CpuTensorHandle.hpp"
-#include "WorkloadInfo.hpp"
 
 #include <algorithm>
 #include <string>

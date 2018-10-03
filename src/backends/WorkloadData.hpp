@@ -10,6 +10,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
+#include <backends/WorkloadInfo.hpp>
 
 #include <InternalTypes.hpp>
 #include <backends/OutputHandler.hpp>

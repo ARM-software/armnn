@@ -6,7 +6,6 @@
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
-#include <backends/WorkloadInfo.hpp>
 
 #include <test/TensorHelpers.hpp>
 

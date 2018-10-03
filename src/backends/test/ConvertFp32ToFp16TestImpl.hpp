@@ -10,7 +10,6 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnnUtils/Half.hpp>
 
-#include <backends/WorkloadInfo.hpp>
 #include <backends/CpuTensorHandle.hpp>
 
 #include <test/TensorHelpers.hpp>

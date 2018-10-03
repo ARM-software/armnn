@@ -11,7 +11,6 @@
 #include <armnn/TypesUtils.hpp>
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/neon/NeonWorkloadFactory.hpp>
-#include <backends/WorkloadInfo.hpp>
 #include <backends/WorkloadFactory.hpp>
 #include <backends/test/LayerTests.hpp>
 #include <backends/test/TensorCopyUtils.hpp>

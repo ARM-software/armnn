@@ -4,10 +4,10 @@
 //
 #pragma once
 
-#include "Workload.hpp"
 #include <memory>
-#include "armnn/TensorFwd.hpp"
-#include "OutputHandler.hpp"
+#include <armnn/TensorFwd.hpp>
+#include <backends/OutputHandler.hpp>
+#include <backends/Workload.hpp>
 #include <boost/optional.hpp>
 
 namespace armnn
@@ -32,9 +32,13 @@ public:
     /// Inform the memory manager to acquire memory
     virtual void Acquire() { }
 
-    static bool IsLayerSupported(Compute compute, const Layer& layer, boost::optional<DataType> dataType,
+    static bool IsLayerSupported(Compute compute,
+                                 const IConnectableLayer& layer,
+                                 boost::optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);
-    static bool IsLayerSupported(const Layer& layer, boost::optional<DataType> dataType,
+
+    static bool IsLayerSupported(const IConnectableLayer& layer,
+                                 boost::optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);
 
     virtual bool SupportsSubTensors() const = 0;

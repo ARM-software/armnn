@@ -2,7 +2,8 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "WorkloadFactory.hpp"
+#include <backends/WorkloadFactory.hpp>
+
 #include <backends/reference/RefWorkloadFactory.hpp>
 #include <backends/neon/NeonWorkloadFactory.hpp>
 #include <backends/cl/ClWorkloadFactory.hpp>
@@ -53,12 +54,16 @@ namespace
     }
 }
 
-bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, boost::optional<DataType> dataType,
-    std::string& outReasonIfUnsupported)
+bool IWorkloadFactory::IsLayerSupported(Compute compute,
+                                        const IConnectableLayer& connectableLayer,
+                                        boost::optional<DataType> dataType,
+                                        std::string& outReasonIfUnsupported)
 {
     constexpr size_t reasonCapacity = 1024;
     char reason[reasonCapacity];
     bool result;
+    const Layer& layer = *(boost::polymorphic_downcast<const Layer*>(&connectableLayer));
+
     switch(layer.GetType())
     {
         case LayerType::Activation:
@@ -583,10 +588,12 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute, const Layer& layer, boo
     return result;
 }
 
-bool IWorkloadFactory::IsLayerSupported(const Layer& layer, boost::optional<DataType> dataType,
+bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLayer,
+                                        boost::optional<DataType> dataType,
                                         std::string& outReasonIfUnsupported)
 {
-    return IsLayerSupported(layer.GetComputeDevice(), layer, dataType, outReasonIfUnsupported);
+    auto layer = boost::polymorphic_downcast<const Layer*>(&connectableLayer);
+    return IsLayerSupported(layer->GetComputeDevice(), connectableLayer, dataType, outReasonIfUnsupported);
 }
 
 }

@@ -7,7 +7,6 @@
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
-#include <backends/WorkloadInfo.hpp>
 
 #include <test/TensorHelpers.hpp>
 #include "QuantizeHelper.hpp"

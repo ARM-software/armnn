@@ -7,7 +7,7 @@
 #include <boost/assert.hpp>
 #include <boost/log/trivial.hpp>
 
-#include "WorkloadFactory.hpp"
+#include <backends/WorkloadFactory.hpp>
 #include "WorkloadDataCollector.hpp"
 #include "ITensorHandle.hpp"
 

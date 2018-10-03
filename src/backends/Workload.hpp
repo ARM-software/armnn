@@ -12,7 +12,7 @@
 namespace armnn
 {
 
-// Workload interface to enqueue a layer computation.
+/// Workload interface to enqueue a layer computation.
 class IWorkload
 {
 public:

@@ -243,6 +243,13 @@ LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloa
 // Tests the resize bilinear for magnification (output dimensions bigger than input dimensions).
 LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloadFactory);
 
+// Tests that execute Resize Bilinear with NHWC data layout
+LayerTestResult<float, 4> ResizeBilinearNopNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SimpleResizeBilinearNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> ResizeBilinearSqMinNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> ResizeBilinearMinNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> ResizeBilinearMagNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+
 LayerTestResult<float, 4> BatchNormTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 2> FakeQuantizationTest(armnn::IWorkloadFactory& workloadFactory);

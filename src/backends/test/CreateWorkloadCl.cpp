@@ -596,5 +596,49 @@ BOOST_AUTO_TEST_CASE(CreateLSTMWorkloadFloatWorkload)
     ClCreateLstmWorkloadTest<ClLstmFloatWorkload>();
 }
 
+template <typename ResizeBilinearWorkloadType, typename armnn::DataType DataType>
+static void ClResizeBilinearWorkloadTest(DataLayout dataLayout)
+{
+    Graph graph;
+    ClWorkloadFactory factory;
+
+    auto workload = CreateResizeBilinearWorkloadTest<ResizeBilinearWorkloadType, DataType>(factory, graph, dataLayout);
+
+    // Checks that inputs/outputs are as we expect them (see definition of CreateResizeBilinearWorkloadTest).
+    ResizeBilinearQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    switch (dataLayout)
+    {
+        case DataLayout::NHWC:
+            BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 2, 4, 4, 3 }));
+            BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 2, 2, 2, 3 }));
+            break;
+        default: // NCHW
+            BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 2, 3, 4, 4 }));
+            BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 2, 3, 2, 2 }));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32NchwWorkload)
+{
+    ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat16NchwWorkload)
+{
+    ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float16>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32NhwcWorkload)
+{
+    ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat16NhwcWorkload)
+{
+    ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

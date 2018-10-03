@@ -807,13 +807,33 @@ void CreateSplitterMultipleInputsOneOutputWorkloadTest(armnn::IWorkloadFactory& 
 
 template <typename ResizeBilinearWorkload, armnn::DataType DataType>
 std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::IWorkloadFactory& factory,
-    armnn::Graph& graph)
+                                                                         armnn::Graph& graph,
+                                                                         DataLayout dataLayout = DataLayout::NCHW)
 {
+    TensorShape inputShape;
+    TensorShape outputShape;
+    unsigned int heightIndex;
+    unsigned int widthIndex;
+
+    switch (dataLayout) {
+        case DataLayout::NHWC:
+            inputShape = { 2, 4, 4, 3 };
+            outputShape = { 2, 2, 2, 3 };
+            heightIndex = 1;
+            widthIndex = 2;
+            break;
+        default: // NCHW
+            inputShape = { 2, 3, 4, 4 };
+            outputShape = { 2, 3, 2, 2 };
+            heightIndex = 2;
+            widthIndex = 3;
+    }
+
     // Creates the layer we're testing.
-    TensorShape outputShape({ 2, 3, 2, 2 });
     ResizeBilinearDescriptor resizeDesc;
-    resizeDesc.m_TargetWidth = outputShape[3];
-    resizeDesc.m_TargetHeight = outputShape[2];
+    resizeDesc.m_TargetWidth = outputShape[widthIndex];
+    resizeDesc.m_TargetHeight = outputShape[heightIndex];
+    resizeDesc.m_DataLayout = dataLayout;
     Layer* const layer = graph.AddLayer<ResizeBilinearLayer>(resizeDesc, "layer");
 
     // Creates extra layers.
@@ -821,7 +841,7 @@ std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
     // Connects up.
-    armnn::TensorInfo inputTensorInfo({ 2, 3, 4, 4 }, DataType);
+    armnn::TensorInfo inputTensorInfo(inputShape, DataType);
     armnn::TensorInfo outputTensorInfo(outputShape, DataType);
     Connect(input, layer, inputTensorInfo);
     Connect(layer, output, outputTensorInfo);
@@ -833,6 +853,7 @@ std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::
     ResizeBilinearQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

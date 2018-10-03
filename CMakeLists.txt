@@ -150,6 +150,7 @@ list(APPEND armnn_sources
     include/armnn/Descriptors.hpp
     include/armnn/DescriptorsFwd.hpp
     include/armnn/IRuntime.hpp
+    include/armnn/ILayerSupport.hpp
     include/armnn/INetwork.hpp
     include/armnn/Tensor.hpp
     include/armnn/TensorFwd.hpp

@@ -6,6 +6,7 @@
 
 #include <array>
 #include <memory>
+#include "ILayerSupport.hpp"
 
 namespace armnn
 {
@@ -113,6 +114,7 @@ protected:
 
 public:
     virtual const std::string& GetId() const = 0;
+    virtual const ILayerSupport& GetLayerSupport() const = 0;
 };
 
 using IBackendPtr = std::shared_ptr<IBackend>;

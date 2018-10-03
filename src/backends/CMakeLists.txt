@@ -7,6 +7,8 @@ list(APPEND armnnBackendsCommon_sources
     CpuTensorHandle.cpp
     CpuTensorHandleFwd.hpp
     CpuTensorHandle.hpp
+    IBackendInternal.hpp
+    ILayerSupport.cpp
     ITensorHandle.hpp
     MakeWorkloadHelper.hpp
     MemCopyWorkload.cpp

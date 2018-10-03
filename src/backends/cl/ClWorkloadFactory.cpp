@@ -144,8 +144,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooli
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
                                                                          const WorkloadInfo&               info) const
 {
-    return MakeWorkload<ClConvolution2dFloatWorkload, ClConvolution2dUint8Workload>(descriptor, info,
-                                                                              m_MemoryManager.GetIntraLayerManager());
+    return std::make_unique<ClConvolution2dWorkload>(descriptor, info, m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthwiseConvolution2d(

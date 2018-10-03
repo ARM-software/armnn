@@ -19,7 +19,7 @@
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
 #include "workloads/ClConvertFp32ToFp16Workload.hpp"
-#include "workloads/ClConvolution2dBaseWorkload.hpp"
+#include "workloads/ClConvolution2dWorkload.hpp"
 #include "workloads/ClDepthwiseConvolutionBaseWorkload.hpp"
 #include "workloads/ClDivisionFloatWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"

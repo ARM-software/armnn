@@ -199,13 +199,12 @@ BOOST_AUTO_TEST_CASE(CreateConvertFp32ToFp16Workload)
     BOOST_TEST((outputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F16));
 }
 
-template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void ClConvolution2dWorkloadTest()
 {
     Graph graph;
     ClWorkloadFactory factory;
-    auto                workload = CreateConvolution2dWorkloadTest<Convolution2dWorkloadType, DataType>
-                                   (factory, graph);
+    auto workload = CreateConvolution2dWorkloadTest<ClConvolution2dWorkload, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
@@ -217,22 +216,20 @@ static void ClConvolution2dWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatWorkload)
 {
-    ClConvolution2dWorkloadTest<ClConvolution2dFloatWorkload, armnn::DataType::Float32>();
+    ClConvolution2dWorkloadTest<armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16Workload)
 {
-    ClConvolution2dWorkloadTest<ClConvolution2dFloatWorkload, armnn::DataType::Float16>();
+    ClConvolution2dWorkloadTest<armnn::DataType::Float16>();
 }
 
-
-template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void ClDirectConvolution2dWorkloadTest()
 {
     Graph graph;
     ClWorkloadFactory factory;
-    auto workload = CreateDirectConvolution2dWorkloadTest<Convolution2dWorkloadType, DataType>(
-            factory, graph);
+    auto workload = CreateDirectConvolution2dWorkloadTest<ClConvolution2dWorkload, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateDirectConvolution2dWorkloadTest).
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
@@ -244,17 +241,17 @@ static void ClDirectConvolution2dWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dFloatWorkload)
 {
-    ClDirectConvolution2dWorkloadTest<ClConvolution2dFloatWorkload, armnn::DataType::Float32>();
+    ClDirectConvolution2dWorkloadTest<armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dFloat16Workload)
 {
-    ClDirectConvolution2dWorkloadTest<ClConvolution2dFloatWorkload, armnn::DataType::Float16>();
+    ClDirectConvolution2dWorkloadTest<armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDirectConvolution2dUint8Workload)
 {
-    ClDirectConvolution2dWorkloadTest<ClConvolution2dUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    ClDirectConvolution2dWorkloadTest<armnn::DataType::QuantisedAsymm8>();
 }
 
 template <typename FullyConnectedWorkloadType, typename armnn::DataType DataType>

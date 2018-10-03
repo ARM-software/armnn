@@ -21,9 +21,7 @@ BACKEND_SOURCES := \
         workloads/ClConstantUint8Workload.cpp \
         workloads/ClConvertFp16ToFp32Workload.cpp \
         workloads/ClConvertFp32ToFp16Workload.cpp \
-        workloads/ClConvolution2dBaseWorkload.cpp \
-        workloads/ClConvolution2dFloatWorkload.cpp \
-        workloads/ClConvolution2dUint8Workload.cpp \
+        workloads/ClConvolution2dWorkload.cpp \
         workloads/ClDepthwiseConvolutionBaseWorkload.cpp \
         workloads/ClDepthwiseConvolutionFloatWorkload.cpp \
         workloads/ClDepthwiseConvolutionUint8Workload.cpp \

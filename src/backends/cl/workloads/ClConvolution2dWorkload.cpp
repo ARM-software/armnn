@@ -3,24 +3,58 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClConvolution2dFloatWorkload.hpp"
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/cl/ClLayerSupport.hpp>
+#include "ClConvolution2dWorkload.hpp"
 
 #include "ClWorkloadUtils.hpp"
+
+#include <backends/cl/ClLayerSupport.hpp>
+#include <backends/cl/ClTensorHandle.hpp>
+#include <backends/cl/ClLayerSupport.hpp>
+#include <backends/aclCommon/ArmComputeUtils.hpp>
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backends/CpuTensorHandle.hpp>
+
+#include <arm_compute/runtime/CL/functions/CLConvolutionLayer.h>
 
 namespace armnn
 {
 using namespace armcomputetensorutils;
 
-ClConvolution2dFloatWorkload::ClConvolution2dFloatWorkload(const Convolution2dQueueDescriptor& descriptor,
+arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
+                                                    const TensorInfo& output,
+                                                    const Convolution2dDescriptor& descriptor,
+                                                    const TensorInfo& weights,
+                                                    const boost::optional<TensorInfo>& biases)
+{
+    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
+
+    arm_compute::TensorInfo aclBiasesInfo;
+    arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
+
+    if (descriptor.m_BiasEnabled)
+    {
+        BOOST_ASSERT(biases.is_initialized());
+
+        aclBiasesInfo = BuildArmComputeTensorInfo(biases.get(), descriptor.m_DataLayout);
+        optionalAclBiasesInfo = &aclBiasesInfo;
+    }
+
+    arm_compute::PadStrideInfo layerInfo = BuildArmComputePadStrideInfo(descriptor);
+
+    return arm_compute::CLConvolutionLayer::validate(&aclInputInfo,
+                                                     &aclWeightsInfo,
+                                                     optionalAclBiasesInfo,
+                                                     &aclOutputInfo,
+                                                     layerInfo);
+}
+
+ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : FloatWorkload<Convolution2dQueueDescriptor>(descriptor, info)
+    : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
     , m_ConvolutionLayer(memoryManager)
 {
-
     // todo: check tensor shapes match.
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
@@ -41,7 +75,7 @@ ClConvolution2dFloatWorkload::ClConvolution2dFloatWorkload(const Convolution2dQu
         BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
     }
 
-    m_Data.ValidateInputsOutputs("ClConvolution2dFloat32Workload", 1, 1);
+    m_Data.ValidateInputsOutputs("ClConvolution2dWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
@@ -69,14 +103,14 @@ ClConvolution2dFloatWorkload::ClConvolution2dFloatWorkload(const Convolution2dQu
     FreeUnusedTensors();
 }
 
-void ClConvolution2dFloatWorkload::Execute() const
+void ClConvolution2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClConvolution2dFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClConvolution2dWorkload_Execute");
 
     m_ConvolutionLayer.run();
 }
 
-void ClConvolution2dFloatWorkload::FreeUnusedTensors()
+void ClConvolution2dWorkload::FreeUnusedTensors()
 {
     FreeTensorIfUnused(m_KernelTensor);
     FreeTensorIfUnused(m_BiasTensor);

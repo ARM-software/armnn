@@ -218,6 +218,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                 }
                 BOOST_LOG_TRIVIAL(warning) << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
                                            << " is not supported on requested backend " << layer->GetComputeDevice()
+                                           << " for data type " << GetDataTypeName(dataType)
                                            << " (reason: " << reasonIfUnsupported
                                            << "), falling back to the next backend.";
             }

@@ -8,6 +8,7 @@
 # file in the root of ArmNN
 
 BACKEND_SOURCES := \
+        ClBackend.cpp \
         ClContextControl.cpp \
         ClLayerSupport.cpp \
         ClWorkloadFactory.cpp \

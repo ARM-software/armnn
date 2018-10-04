@@ -13,6 +13,11 @@
 namespace armnn
 {
 
+class NeonLayerSupport : public ILayerSupport
+{
+    // TODO implement
+};
+
 bool IsNeonDirectConvolutionPreferred(const TensorInfo& weightInfo, const Convolution2dDescriptor& desc);
 
 bool IsNeonNormalizationDescParamsSupported(std::string* reasonIfUnsupported,

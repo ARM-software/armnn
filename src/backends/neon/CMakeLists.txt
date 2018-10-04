@@ -5,6 +5,8 @@
 
 if(ARMCOMPUTENEON)
     list(APPEND armnnNeonBackend_sources
+        NeonBackend.cpp
+        NeonBackend.hpp
         NeonLayerSupport.cpp
         NeonLayerSupport.hpp
         NeonWorkloadFactory.cpp

@@ -13,6 +13,12 @@
 
 namespace armnn
 {
+
+class ClLayerSupport : public ILayerSupport
+{
+    // TODO implement
+};
+
 bool IsClDirectConvolution2dSupported(const TensorInfo& weightInfo, const Convolution2dDescriptor& desc);
 bool IsClDepthwiseConvolution2dDescParamsSupported(std::string* reasonIfUnsupported,
                                                    const DepthwiseConvolution2dDescriptor& parameters,

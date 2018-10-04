@@ -8,6 +8,7 @@
 # file in the root of ArmNN
 
 BACKEND_SOURCES := \
+        RefBackend.cpp \
         RefLayerSupport.cpp \
         RefWorkloadFactory.cpp \
         workloads/Activation.cpp \

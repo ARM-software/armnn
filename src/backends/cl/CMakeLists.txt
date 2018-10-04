@@ -4,6 +4,8 @@
 #
 
 list(APPEND armnnClBackend_sources
+    ClBackend.cpp
+    ClBackend.hpp
     ClContextControl.cpp
     ClContextControl.hpp
     ClLayerSupport.cpp

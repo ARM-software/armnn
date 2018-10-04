@@ -8,6 +8,7 @@
 # file in the root of ArmNN
 
 BACKEND_SOURCES := \
+        NeonBackend.cpp \
         NeonLayerSupport.cpp \
         NeonWorkloadFactory.cpp \
         workloads/NeonActivationFloatWorkload.cpp \

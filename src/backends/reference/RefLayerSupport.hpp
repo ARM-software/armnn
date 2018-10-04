@@ -15,6 +15,11 @@
 namespace armnn
 {
 
+class RefLayerSupport : public ILayerSupport
+{
+    // TODO implement
+};
+
 bool IsActivationSupportedRef(const TensorInfo& input,
                               const TensorInfo& output,
                               const ActivationDescriptor& descriptor,

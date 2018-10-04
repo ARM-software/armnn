@@ -4,6 +4,8 @@
 #
 
 list(APPEND armnnRefBackend_sources
+    RefBackend.cpp
+    RefBackend.hpp
     RefLayerSupport.cpp
     RefLayerSupport.hpp
     RefWorkloadFactory.cpp

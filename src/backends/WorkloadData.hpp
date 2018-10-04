@@ -145,13 +145,11 @@ struct Convolution2dQueueDescriptor : QueueDescriptorWithParameters<Convolution2
     Convolution2dQueueDescriptor()
         : m_Weight(nullptr)
         , m_Bias(nullptr)
-        , m_DataLayout(DataLayout::NCHW)
     {
     }
 
     const ConstCpuTensorHandle* m_Weight;
     const ConstCpuTensorHandle* m_Bias;
-    DataLayout m_DataLayout;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

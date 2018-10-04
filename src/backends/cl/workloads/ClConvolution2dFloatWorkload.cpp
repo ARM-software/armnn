@@ -25,7 +25,7 @@ ClConvolution2dFloatWorkload::ClConvolution2dFloatWorkload(const Convolution2dQu
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
     m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
-    BuildArmComputeTensor(*m_KernelTensor, weightInfo, descriptor.m_DataLayout);
+    BuildArmComputeTensor(*m_KernelTensor, weightInfo, m_Data.m_Parameters.m_DataLayout);
 
     arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
                                              m_Data.m_Parameters.m_StrideY,
@@ -38,13 +38,17 @@ ClConvolution2dFloatWorkload::ClConvolution2dFloatWorkload(const Convolution2dQu
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::CLTensor>();
-        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), descriptor.m_DataLayout);
+        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
     }
 
     m_Data.ValidateInputsOutputs("ClConvolution2dFloat32Workload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
+    input.info()->set_data_layout(aclDataLayout);
+    output.info()->set_data_layout(aclDataLayout);
 
     m_ConvolutionLayer.configure(&input,
                                  m_KernelTensor.get(),

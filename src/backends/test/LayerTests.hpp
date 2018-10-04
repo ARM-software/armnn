@@ -50,10 +50,13 @@ struct LayerTestResult
 };
 
 LayerTestResult<float, 4> SimpleConvolution2d3x5Test(armnn::IWorkloadFactory& workloadFactory,
-                                                     bool                     biasEnabled);
+                                                     bool biasEnabled);
 
 LayerTestResult<float, 4> SimpleConvolution2d3x3Test(armnn::IWorkloadFactory& workloadFactory,
-                                                     bool                     biasEnabled);
+                                                     bool biasEnabled);
+
+LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(armnn::IWorkloadFactory& workloadFactory,
+                                                         bool biasEnabled);
 
 LayerTestResult<float, 4>
 Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(armnn::IWorkloadFactory& workloadFactory);

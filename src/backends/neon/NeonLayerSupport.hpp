@@ -8,8 +8,6 @@
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
 
-#include <boost/optional.hpp>
-
 namespace armnn
 {
 
@@ -53,7 +51,7 @@ bool IsConvolution2dSupportedNeon(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const Convolution2dDescriptor& descriptor,
                                   const TensorInfo& weights,
-                                  const boost::optional<TensorInfo>& biases,
+                                  const Optional<TensorInfo>& biases,
                                   std::string* reasonIfUnsupported = nullptr);
 
 
@@ -61,7 +59,7 @@ bool IsDepthwiseConvolutionSupportedNeon(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const DepthwiseConvolution2dDescriptor& descriptor,
                                          const TensorInfo& weights,
-                                         const boost::optional<TensorInfo>& biases,
+                                         const Optional<TensorInfo>& biases,
                                          std::string* reasonIfUnsupported = nullptr);
 
 bool IsDivisionSupportedNeon(const TensorInfo& input0,

@@ -87,7 +87,7 @@ bool IsConvolution2dSupportedRef(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const Convolution2dDescriptor& descriptor,
                                  const TensorInfo& weights,
-                                 const boost::optional<TensorInfo>& biases,
+                                 const Optional<TensorInfo>& biases,
                                  std::string* reasonIfUnsupported)
 {
     ignore_unused(descriptor);
@@ -104,7 +104,7 @@ bool IsDepthwiseConvolutionSupportedRef(const TensorInfo& input,
                                         const TensorInfo& output,
                                         const DepthwiseConvolution2dDescriptor& descriptor,
                                         const TensorInfo& weights,
-                                        const boost::optional<TensorInfo>& biases,
+                                        const Optional<TensorInfo>& biases,
                                         std::string* reasonIfUnsupported)
 {
     ignore_unused(output);

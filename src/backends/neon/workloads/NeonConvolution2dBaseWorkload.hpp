@@ -13,8 +13,6 @@
 
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
 
-#include <boost/optional.hpp>
-
 #include <memory>
 
 namespace armnn
@@ -24,7 +22,7 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
     const TensorInfo& output,
     const Convolution2dDescriptor& descriptor,
     const TensorInfo& weights,
-    const boost::optional<TensorInfo>& biases);
+    const Optional<TensorInfo>& biases);
 
 template<armnn::DataType... dataTypes>
 class NeonConvolution2dBaseWorkload : public TypedWorkload<Convolution2dQueueDescriptor, dataTypes...>

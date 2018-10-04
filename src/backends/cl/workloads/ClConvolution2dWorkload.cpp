@@ -24,7 +24,7 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     const Convolution2dDescriptor& descriptor,
                                                     const TensorInfo& weights,
-                                                    const boost::optional<TensorInfo>& biases)
+                                                    const Optional<TensorInfo>& biases)
 {
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
@@ -35,9 +35,9 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
 
     if (descriptor.m_BiasEnabled)
     {
-        BOOST_ASSERT(biases.is_initialized());
+        BOOST_ASSERT(biases.has_value());
 
-        aclBiasesInfo = BuildArmComputeTensorInfo(biases.get(), descriptor.m_DataLayout);
+        aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 

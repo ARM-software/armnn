@@ -144,11 +144,11 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             const Convolution2dDescriptor& descriptor  = cLayer->GetParameters();
 
             // Construct optional biases object based on the value of m_BiasEnabled
-            boost::optional<TensorInfo> biases(boost::none);
+            Optional<TensorInfo> biases;
             if (descriptor.m_BiasEnabled)
             {
-                biases = boost::make_optional(
-                    OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType)));
+                biases =
+                    OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
             }
 
             result = IsConvolution2dSupported(compute,
@@ -181,11 +181,11 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             const DepthwiseConvolution2dDescriptor& descriptor = cLayer->GetParameters();
 
             // Construct optional biases object based on the value of m_BiasEnabled
-            boost::optional<TensorInfo> biases(boost::none);
+            Optional<TensorInfo> biases;
             if (descriptor.m_BiasEnabled)
             {
-                biases = boost::make_optional(
-                    OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType)));
+                biases =
+                    OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
             }
 
             result = IsDepthwiseConvolutionSupported(compute,

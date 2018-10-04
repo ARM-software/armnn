@@ -152,6 +152,7 @@ list(APPEND armnn_sources
     include/armnn/IRuntime.hpp
     include/armnn/ILayerSupport.hpp
     include/armnn/INetwork.hpp
+    include/armnn/Optional.hpp
     include/armnn/Tensor.hpp
     include/armnn/TensorFwd.hpp
     include/armnn/Types.hpp
@@ -376,6 +377,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/ObservableTest.cpp
+        src/armnn/test/OptionalTest.cpp
         src/backends/test/IsLayerSupportedTest.cpp
         src/backends/test/IsLayerSupportedTestImpl.hpp
         src/backends/test/Reference.cpp

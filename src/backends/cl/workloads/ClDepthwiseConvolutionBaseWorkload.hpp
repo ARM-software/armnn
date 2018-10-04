@@ -6,7 +6,6 @@
 #pragma once
 
 #include <backends/Workload.hpp>
-#include <boost/optional.hpp>
 
 #include <arm_compute/runtime/CL/CLFunctions.h>
 
@@ -17,7 +16,7 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
                                                            const TensorInfo& output,
                                                            const DepthwiseConvolution2dDescriptor& descriptor,
                                                            const TensorInfo& weights,
-                                                           const boost::optional<TensorInfo>& biases);
+                                                           const Optional<TensorInfo>& biases);
 
 template<armnn::DataType... dataTypes>
 class ClDepthwiseConvolutionBaseWorkload : public TypedWorkload<DepthwiseConvolution2dQueueDescriptor, dataTypes...>

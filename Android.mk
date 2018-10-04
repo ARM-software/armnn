@@ -193,6 +193,7 @@ LOCAL_SRC_FILES := \
 	src/armnn/test/OpenClTimerTest.cpp \
 	src/armnn/test/ProfilingEventTest.cpp \
 	src/armnn/test/ObservableTest.cpp \
+	src/armnn/test/OptionalTest.cpp \
 	src/backends/test/IsLayerSupportedTest.cpp \
 	src/backends/test/Reference.cpp \
 	src/backends/test/WorkloadDataValidation.cpp \

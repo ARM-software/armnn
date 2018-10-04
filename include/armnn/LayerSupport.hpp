@@ -7,8 +7,7 @@
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
-
-#include <boost/optional.hpp>
+#include <armnn/Optional.hpp>
 
 namespace armnn
 {
@@ -60,7 +59,7 @@ bool IsConvolution2dSupported(Compute compute,
                               const TensorInfo& output,
                               const Convolution2dDescriptor& descriptor,
                               const TensorInfo& weights,
-                              const boost::optional<TensorInfo>& biases,
+                              const Optional<TensorInfo>& biases,
                               char* reasonIfUnsupported = nullptr,
                               size_t reasonIfUnsupportedMaxLength = 1024);
 
@@ -69,7 +68,7 @@ bool IsDepthwiseConvolutionSupported(Compute compute,
                                      const TensorInfo& output,
                                      const DepthwiseConvolution2dDescriptor& descriptor,
                                      const TensorInfo& weights,
-                                     const boost::optional<TensorInfo>& biases,
+                                     const Optional<TensorInfo>& biases,
                                      char* reasonIfUnsupported = nullptr,
                                      size_t reasonIfUnsupportedMaxLength = 1024);
 

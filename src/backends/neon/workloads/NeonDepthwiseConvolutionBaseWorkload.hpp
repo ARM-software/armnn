@@ -7,8 +7,6 @@
 
 #include <backends/neon/workloads/NeonWorkloadUtils.hpp>
 
-#include <boost/optional.hpp>
-
 namespace armnn
 {
 
@@ -16,6 +14,6 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
                                                              const TensorInfo& output,
                                                              const DepthwiseConvolution2dDescriptor& descriptor,
                                                              const TensorInfo& weights,
-                                                             const boost::optional<TensorInfo>& biases);
+                                                             const Optional<TensorInfo>& biases);
 
 } // namespace armnn

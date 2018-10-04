@@ -14,7 +14,7 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
     const TensorInfo& output,
     const DepthwiseConvolution2dDescriptor& descriptor,
     const TensorInfo& weights,
-    const boost::optional<TensorInfo>& biases)
+    const Optional<TensorInfo>& biases)
 {
     const arm_compute::TensorInfo aclInputInfo =
         armcomputetensorutils::BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
@@ -28,9 +28,9 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
 
     if (descriptor.m_BiasEnabled)
     {
-        BOOST_ASSERT(biases.is_initialized());
+        BOOST_ASSERT(biases.has_value());
 
-        aclBiasesInfo = armcomputetensorutils::BuildArmComputeTensorInfo(biases.get(), descriptor.m_DataLayout);
+        aclBiasesInfo = armcomputetensorutils::BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 

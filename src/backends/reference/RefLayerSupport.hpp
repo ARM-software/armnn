@@ -8,9 +8,6 @@
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
 #include <layers/LstmLayer.hpp>
-#include <boost/optional.hpp>
-
-#include <boost/optional.hpp>
 
 namespace armnn
 {
@@ -46,14 +43,14 @@ bool IsConvolution2dSupportedRef(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const Convolution2dDescriptor& descriptor,
                                  const TensorInfo& weights,
-                                 const boost::optional<TensorInfo>& biases,
+                                 const Optional<TensorInfo>& biases,
                                  std::string* reasonIfUnsupported = nullptr);
 
 bool IsDepthwiseConvolutionSupportedRef(const TensorInfo& input,
                                         const TensorInfo& output,
                                         const DepthwiseConvolution2dDescriptor& descriptor,
                                         const TensorInfo& weights,
-                                        const boost::optional<TensorInfo>& biases,
+                                        const Optional<TensorInfo>& biases,
                                         std::string* reasonIfUnsupported = nullptr);
 
 bool IsDivisionSupportedRef(const TensorInfo& input0,

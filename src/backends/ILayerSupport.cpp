@@ -89,7 +89,7 @@ bool ILayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                              const TensorInfo& output,
                                              const Convolution2dDescriptor& descriptor,
                                              const TensorInfo& weights,
-                                             const boost::optional<TensorInfo>& biases,
+                                             const Optional<TensorInfo>& biases,
                                              char* reasonIfUnsupported,
                                              size_t reasonIfUnsupportedMaxLength) const
 {
@@ -100,7 +100,7 @@ bool ILayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     const DepthwiseConvolution2dDescriptor& descriptor,
                                                     const TensorInfo& weights,
-                                                    const boost::optional<TensorInfo>& biases,
+                                                    const Optional<TensorInfo>& biases,
                                                     char* reasonIfUnsupported,
                                                     size_t reasonIfUnsupportedMaxLength) const
 {

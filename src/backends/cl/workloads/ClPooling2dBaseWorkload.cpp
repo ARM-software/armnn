@@ -17,8 +17,8 @@ arm_compute::Status ClPooling2dWorkloadValidate(const TensorInfo& input,
     const TensorInfo& output,
     const Pooling2dDescriptor& descriptor)
 {
-    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
-    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
+    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
     arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(descriptor);
 
@@ -34,6 +34,10 @@ ClPooling2dBaseWorkload<dataTypes...>::ClPooling2dBaseWorkload(
 
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
+    input.info()->set_data_layout(aclDataLayout);
+    output.info()->set_data_layout(aclDataLayout);
 
     arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(m_Data.m_Parameters);
 

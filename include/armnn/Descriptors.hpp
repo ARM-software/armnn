@@ -180,6 +180,7 @@ struct Pooling2dDescriptor
     , m_StrideY(0)
     , m_OutputShapeRounding(OutputShapeRounding::Floor)
     , m_PaddingMethod(PaddingMethod::Exclude)
+    , m_DataLayout(DataLayout::NCHW)
     {};
 
     PoolingAlgorithm    m_PoolType;
@@ -193,6 +194,7 @@ struct Pooling2dDescriptor
     uint32_t            m_StrideY;
     OutputShapeRounding m_OutputShapeRounding;
     PaddingMethod       m_PaddingMethod;
+    DataLayout          m_DataLayout;
 };
 
 struct FullyConnectedDescriptor

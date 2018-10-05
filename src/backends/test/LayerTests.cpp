@@ -4929,6 +4929,11 @@ LayerTestResult<float, 4> SimpleAveragePooling2dTest(armnn::IWorkloadFactory& wo
     return SimpleAveragePooling2dTestCommon<float>(workloadFactory);
 }
 
+LayerTestResult<float, 4> SimpleAveragePooling2dNhwcTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SimpleAveragePooling2dNhwcTestCommon<float>(workloadFactory);
+}
+
 LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
 {
     return SimpleAveragePooling2dTestCommon<uint8_t>(workloadFactory, 0.5, -1);

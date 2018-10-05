@@ -88,6 +88,7 @@ LayerTestResult<float,   4> IgnorePaddingMaxPooling2dSize3Test(armnn::IWorkloadF
 LayerTestResult<uint8_t, 4> IgnorePaddingMaxPooling2dSize3Uint8Test(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float,   4> SimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float,   4> SimpleAveragePooling2dNhwcTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float,   4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(armnn::IWorkloadFactory& workloadFactory,
                                                                               bool forceNoPadding);

@@ -24,14 +24,12 @@ public:
     virtual bool IsActivationSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const ActivationDescriptor& descriptor,
-                                       char* reasonIfUnsupported = nullptr,
-                                       size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsAdditionSupported(const TensorInfo& input0,
                                      const TensorInfo& input1,
                                      const TensorInfo& output,
-                                     char* reasonIfUnsupported = nullptr,
-                                     size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsBatchNormalizationSupported(const TensorInfo& input,
                                                const TensorInfo& output,
@@ -40,68 +38,57 @@ public:
                                                const TensorInfo& beta,
                                                const TensorInfo& gamma,
                                                const BatchNormalizationDescriptor& descriptor,
-                                               char* reasonIfUnsupported = nullptr,
-                                               size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsConstantSupported(const TensorInfo& output,
-                                     char* reasonIfUnsupported = nullptr,
-                                     size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                               const TensorInfo& output,
-                                              char* reasonIfUnsupported = nullptr,
-                                              size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsConvertFp32ToFp16Supported(const TensorInfo& input,
                                               const TensorInfo& output,
-                                              char* reasonIfUnsupported = nullptr,
-                                              size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsConvolution2dSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           const Convolution2dDescriptor& descriptor,
                                           const TensorInfo& weights,
                                           const Optional<TensorInfo>& biases,
-                                          char* reasonIfUnsupported = nullptr,
-                                          size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                  const TensorInfo& output,
                                                  const DepthwiseConvolution2dDescriptor& descriptor,
                                                  const TensorInfo& weights,
                                                  const Optional<TensorInfo>& biases,
-                                                 char* reasonIfUnsupported = nullptr,
-                                                 size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsDivisionSupported(const TensorInfo& input0,
                                      const TensorInfo& input1,
                                      const TensorInfo& output,
-                                     char* reasonIfUnsupported = nullptr,
-                                     size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsSubtractionSupported(const TensorInfo& input0,
                                         const TensorInfo& input1,
                                         const TensorInfo& output,
-                                        char* reasonIfUnsupported = nullptr,
-                                        size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsInputSupported(const TensorInfo& input,
-                                  char* reasonIfUnsupported = nullptr,
-                                  size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsFullyConnectedSupported(const TensorInfo& input,
                                            const TensorInfo& output,
                                            const TensorInfo& weights,
                                            const TensorInfo& biases,
                                            const FullyConnectedDescriptor& descriptor,
-                                           char* reasonIfUnsupported = nullptr,
-                                           size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsL2NormalizationSupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             const L2NormalizationDescriptor& descriptor,
-                                            char* reasonIfUnsupported = nullptr,
-                                            size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsLstmSupported(const TensorInfo& input,
                                  const TensorInfo& outputStateIn,
@@ -128,82 +115,67 @@ public:
                                  const TensorInfo* projectionBias,
                                  const TensorInfo* cellToForgetWeights,
                                  const TensorInfo* cellToOutputWeights,
-                                 char* reasonIfUnsupported = nullptr,
-                                 size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                    const OriginsDescriptor& descriptor,
-                                   char* reasonIfUnsupported = nullptr,
-                                   size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsMultiplicationSupported(const TensorInfo& input0,
                                            const TensorInfo& input1,
                                            const TensorInfo& output,
-                                           char* reasonIfUnsupported = nullptr,
-                                           size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsNormalizationSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           const NormalizationDescriptor& descriptor,
-                                          char* reasonIfUnsupported = nullptr,
-                                          size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsOutputSupported(const TensorInfo& output,
-                                   char* reasonIfUnsupported = nullptr,
-                                   size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsPermuteSupported(const TensorInfo& input,
                                     const TensorInfo& output,
                                     const PermuteDescriptor& descriptor,
-                                    char* reasonIfUnsupported = nullptr,
-                                    size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsPooling2dSupported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       const Pooling2dDescriptor& descriptor,
-                                      char* reasonIfUnsupported = nullptr,
-                                      size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsResizeBilinearSupported(const TensorInfo& input,
-                                           char* reasonIfUnsupported = nullptr,
-                                           size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsSoftmaxSupported(const TensorInfo& input,
                                     const TensorInfo& output,
                                     const SoftmaxDescriptor& descriptor,
-                                    char* reasonIfUnsupported = nullptr,
-                                    size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsSplitterSupported(const TensorInfo& input,
                                      const ViewsDescriptor& descriptor,
-                                     char* reasonIfUnsupported = nullptr,
-                                     size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsFakeQuantizationSupported(const TensorInfo& input,
                                              const FakeQuantizationDescriptor& descriptor,
-                                             char* reasonIfUnsupported = nullptr,
-                                             size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsReshapeSupported(const TensorInfo& input,
-                                    char* reasonIfUnsupported = nullptr,
-                                    size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsFloorSupported(const TensorInfo& input,
                                   const TensorInfo& output,
-                                  char* reasonIfUnsupported = nullptr,
-                                  size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsMeanSupported(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const MeanDescriptor& descriptor,
-                                 char* reasonIfUnsupported = nullptr,
-                                 size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsPadSupported(const TensorInfo& input,
                                 const TensorInfo& output,
                                 const PadDescriptor& descriptor,
-                                char* reasonIfUnsupported = nullptr,
-                                size_t reasonIfUnsupportedMaxLength = 1024) const;
+                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
 }; // class ILayerSupport
 

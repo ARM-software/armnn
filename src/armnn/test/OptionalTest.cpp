@@ -5,7 +5,33 @@
 #include <boost/test/unit_test.hpp>
 
 #include <armnn/Optional.hpp>
+#include <boost/optional.hpp>
 #include <string>
+
+namespace
+{
+
+void PassStringRef(armnn::Optional<std::string&> value)
+{
+}
+
+void PassStringRefWithDefault(armnn::Optional<std::string&> value = armnn::EmptyOptional())
+{
+}
+
+void BoostCompatibilityTester(const armnn::Optional<std::string>& optionalString,
+                              bool hasValue,
+                              const std::string& expectedValue)
+{
+    BOOST_TEST(optionalString.has_value() == hasValue);
+    if (hasValue)
+    {
+        BOOST_TEST(optionalString.value() == expectedValue);
+    }
+}
+
+}
+
 
 BOOST_AUTO_TEST_SUITE(OptionalTests)
 
@@ -39,6 +65,62 @@ BOOST_AUTO_TEST_CASE(SimpleStringTests)
     BOOST_TEST(optionalString3 == true);
     BOOST_TEST(optionalString3.has_value() == true);
     BOOST_TEST(optionalString3.value() == "Hello World");
+}
+
+
+BOOST_AUTO_TEST_CASE(StringRefTests)
+{
+    armnn::Optional<std::string&> optionalStringRef{armnn::EmptyOptional()};
+    BOOST_TEST(optionalStringRef.has_value() == false);
+
+    PassStringRef(optionalStringRef);
+    PassStringRefWithDefault();
+
+    armnn::Optional<std::string&> optionalStringRef2 = optionalStringRef;
+
+    std::string helloWorld("Hello World");
+
+    std::string& helloWorldRef = helloWorld;
+    armnn::Optional<std::string&> optionalHelloRef = helloWorldRef;
+    BOOST_TEST(optionalHelloRef.has_value() == true);
+    BOOST_TEST(optionalHelloRef.value() == "Hello World");
+
+    armnn::Optional<std::string&> optionalHelloRef2 = helloWorld;
+    BOOST_TEST(optionalHelloRef2.has_value() == true);
+    BOOST_TEST(optionalHelloRef2.value() == "Hello World");
+
+    armnn::Optional<std::string&> optionalHelloRef3{helloWorldRef};
+    BOOST_TEST(optionalHelloRef3.has_value() == true);
+    BOOST_TEST(optionalHelloRef3.value() == "Hello World");
+
+    armnn::Optional<std::string&> optionalHelloRef4{helloWorld};
+    BOOST_TEST(optionalHelloRef4.has_value() == true);
+    BOOST_TEST(optionalHelloRef4.value() == "Hello World");
+
+    // modify through the optional reference
+    optionalHelloRef4.value().assign("Long Other String");
+    BOOST_TEST(helloWorld == "Long Other String");
+    BOOST_TEST(optionalHelloRef.value() == "Long Other String");
+    BOOST_TEST(optionalHelloRef2.value() == "Long Other String");
+    BOOST_TEST(optionalHelloRef3.value() == "Long Other String");
+}
+
+BOOST_AUTO_TEST_CASE(BoostCompatibilityTests)
+{
+    // sanity checks
+    BoostCompatibilityTester(armnn::Optional<std::string>(), false, "");
+    BoostCompatibilityTester(armnn::Optional<std::string>("Hello World"), true, "Hello World");
+
+    // the real thing is to see that we can pass a boost::optional in place
+    // of an ArmNN Optional
+    boost::optional<std::string> empty;
+    boost::optional<std::string> helloWorld("Hello World");
+
+    BoostCompatibilityTester(empty, false, "");
+    BoostCompatibilityTester(helloWorld, true, "Hello World");
+
+    BoostCompatibilityTester(boost::optional<std::string>(), false, "");
+    BoostCompatibilityTester(boost::optional<std::string>("Hello World"), true, "Hello World");
 }
 
 BOOST_AUTO_TEST_CASE(SimpleIntTests)

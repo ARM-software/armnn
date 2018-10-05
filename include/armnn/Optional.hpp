@@ -5,45 +5,50 @@
 #pragma once
 
 #include "Exceptions.hpp"
+#include <type_traits>
+#include <cstring>
+
+#include <boost/optional.hpp>
+
+// Optional is a drop in replacement for std::optional until we migrate
+// to c++-17. Only a subset of the optional features are implemented that
+// we intend to use in ArmNN.
+
+// There are two distinct implementations here:
+//
+//   1, for normal constructable/destructable types and reference types
+//   2, for reference types
+
+// The std::optional features we support are:
+//
+// - has_value() and operator bool() to tell if the optional has a value
+// - value() returns a reference to the held object
+//
+
+// There is a deprecated and limited support for boost::optional in this class,
+// which will be removed in the 19.02 release.
 
 namespace armnn
 {
 
-// NOTE: the members of the Optional class don't follow the ArmNN
-//       coding convention because the interface to be close to
-//       the C++-17 interface so we can easily migrate to std::optional
-//       later.
+// EmptyOptional is used to initialize the Optional class in case we want
+// to have default value for an Optional in a function declaration.
+struct EmptyOptional {};
 
-template <typename T>
-class Optional final
+
+// OptionalBase is the common functionality between reference and non-reference
+// optional types.
+class OptionalBase
 {
 public:
-    Optional(T&& value)
-        : m_HasValue{true}
-    {
-        new (m_Storage) T(value);
-    }
-
-    Optional(const T& value)
-        : m_HasValue{true}
-    {
-        new (m_Storage) T(value);
-    }
-
-    Optional(const Optional& other)
-        : m_HasValue{false}
-    {
-        *this = other;
-    }
-
-    Optional() noexcept
+    OptionalBase() noexcept
         : m_HasValue{false}
     {
     }
 
-    ~Optional()
+    bool has_value() const noexcept
     {
-        reset();
+        return m_HasValue;
     }
 
     operator bool() const noexcept
@@ -51,37 +56,101 @@ public:
         return has_value();
     }
 
-    Optional& operator=(T&& value)
+protected:
+    OptionalBase(bool hasValue) noexcept
+        : m_HasValue{hasValue}
+    {
+    }
+
+    bool m_HasValue;
+};
+
+//
+// The default implementation is the non-reference case. This
+// has an unsigned char array for storing the optional value which
+// is in-place constructed there.
+//
+template <bool IsReference, typename T>
+class OptionalReferenceSwitch : public OptionalBase
+{
+public:
+    using Base = OptionalBase;
+
+    OptionalReferenceSwitch() noexcept : Base{} {}
+    OptionalReferenceSwitch(EmptyOptional) noexcept : Base{} {}
+
+    OptionalReferenceSwitch(const T& value)
+        : Base{}
+    {
+        Construct(value);
+    }
+
+    OptionalReferenceSwitch(const OptionalReferenceSwitch& other)
+        : Base{}
+    {
+        *this = other;
+    }
+
+    // temporary support for limited conversion from boost
+    OptionalReferenceSwitch(const boost::optional<T>& other)
+        : Base{}
+    {
+        *this = other;
+    }
+
+    OptionalReferenceSwitch& operator=(const T& value)
     {
         reset();
-        new (m_Storage) T(value);
-        m_HasValue = true;
+        Construct(value);
         return *this;
     }
 
-    Optional& operator=(const T& value)
-    {
-        reset();
-        new(m_Storage) T(value);
-        m_HasValue = true;
-        return *this;
-    }
-
-    Optional& operator=(const Optional& other)
+    OptionalReferenceSwitch& operator=(const OptionalReferenceSwitch& other)
     {
         reset();
         if (other.has_value())
         {
-            new (m_Storage) T(other.value());
-            m_HasValue = true;
+            Construct(other.value());
         }
 
         return *this;
     }
 
+    // temporary support for limited conversion from boost
+    OptionalReferenceSwitch& operator=(const boost::optional<T>& other)
+    {
+        reset();
+        if (other.is_initialized())
+        {
+            Construct(other.get());
+        }
+
+        return *this;
+    }
+
+    OptionalReferenceSwitch& operator=(EmptyOptional)
+    {
+        reset();
+        return *this;
+    }
+
+    ~OptionalReferenceSwitch()
+    {
+        reset();
+    }
+
+    void reset()
+    {
+        if (Base::has_value())
+        {
+            value().T::~T();
+            Base::m_HasValue = false;
+        }
+    }
+
     const T& value() const
     {
-        if (!has_value())
+        if (!Base::has_value())
         {
             throw BadOptionalAccessException("Optional has no value");
         }
@@ -92,7 +161,7 @@ public:
 
     T& value()
     {
-        if (!has_value())
+        if (!Base::has_value())
         {
             throw BadOptionalAccessException("Optional has no value");
         }
@@ -101,23 +170,110 @@ public:
         return *valuePtr;
     }
 
-    bool has_value() const noexcept
+private:
+    void Construct(const T& value)
     {
-        return m_HasValue;
+        new (m_Storage) T(value);
+        m_HasValue = true;
+    }
+
+    alignas(alignof(T)) unsigned char m_Storage[sizeof(T)];
+};
+
+//
+// This is the special case for reference types. This holds a pointer
+// to the referenced type. This doesn't own the referenced memory and
+// it never calls delete on the pointer.
+//
+template <typename T>
+class OptionalReferenceSwitch<true, T> : public OptionalBase
+{
+public:
+    using Base = OptionalBase;
+    using NonRefT = typename std::remove_reference<T>::type;
+
+    OptionalReferenceSwitch() noexcept : Base{}, m_Storage{nullptr} {}
+    OptionalReferenceSwitch(EmptyOptional) noexcept : Base{}, m_Storage{nullptr} {}
+
+    OptionalReferenceSwitch(const OptionalReferenceSwitch& other) : Base{}
+    {
+        *this = other;
+    }
+
+    OptionalReferenceSwitch(T value)
+        : Base{true}
+        , m_Storage{&value}
+    {
+    }
+
+    OptionalReferenceSwitch& operator=(const T value)
+    {
+        m_Storage = &value;
+        Base::m_HasValue = true;
+        return *this;
+    }
+
+    OptionalReferenceSwitch& operator=(const OptionalReferenceSwitch& other)
+    {
+        m_Storage = other.m_Storage;
+        Base::m_HasValue = other.has_value();
+        return *this;
+    }
+
+    OptionalReferenceSwitch& operator=(EmptyOptional)
+    {
+        reset();
+        return *this;
+    }
+
+    ~OptionalReferenceSwitch()
+    {
+        reset();
     }
 
     void reset()
     {
-        if (has_value())
+        Base::m_HasValue = false;
+        m_Storage = nullptr;
+    }
+
+    const T value() const
+    {
+        if (!Base::has_value())
         {
-            value().T::~T();
-            m_HasValue = false;
+            throw BadOptionalAccessException("Optional has no value");
         }
+
+        return *m_Storage;
+    }
+
+    T value()
+    {
+        if (!Base::has_value())
+        {
+            throw BadOptionalAccessException("Optional has no value");
+        }
+
+        return *m_Storage;
     }
 
 private:
-    alignas(alignof(T)) unsigned char m_Storage[sizeof(T)];
-    bool m_HasValue;
+    NonRefT* m_Storage;
+};
+
+template <typename T>
+class Optional final : public OptionalReferenceSwitch<std::is_reference<T>::value, T>
+{
+public:
+    using BaseSwitch = OptionalReferenceSwitch<std::is_reference<T>::value, T>;
+
+    Optional(const T& value) : BaseSwitch{value} {}
+    Optional() noexcept : BaseSwitch{} {}
+    Optional(EmptyOptional empty) : BaseSwitch{empty} {}
+    Optional(const Optional& other) : BaseSwitch{other} {}
+
+    // temporary support for limited conversion from boost
+    Optional(const boost::optional<T>& other) : BaseSwitch{other} {}
 };
 
 }

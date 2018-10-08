@@ -22,9 +22,7 @@ BACKEND_SOURCES := \
         workloads/ClConvertFp16ToFp32Workload.cpp \
         workloads/ClConvertFp32ToFp16Workload.cpp \
         workloads/ClConvolution2dWorkload.cpp \
-        workloads/ClDepthwiseConvolutionBaseWorkload.cpp \
-        workloads/ClDepthwiseConvolutionFloatWorkload.cpp \
-        workloads/ClDepthwiseConvolutionUint8Workload.cpp \
+        workloads/ClDepthwiseConvolutionWorkload.cpp \
         workloads/ClDivisionFloatWorkload.cpp \
         workloads/ClFloorFloatWorkload.cpp \
         workloads/ClFullyConnectedWorkload.cpp \

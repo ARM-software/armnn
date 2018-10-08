@@ -7,7 +7,9 @@
 
 #include <backends/Workload.hpp>
 
-#include <arm_compute/runtime/CL/CLFunctions.h>
+#include <arm_compute/runtime/IFunction.h>
+#include <arm_compute/core/Error.h>
+#include <arm_compute/runtime/CL/CLTensor.h>
 
 namespace armnn
 {
@@ -18,14 +20,15 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
                                                            const TensorInfo& weights,
                                                            const Optional<TensorInfo>& biases);
 
-template<armnn::DataType... dataTypes>
-class ClDepthwiseConvolutionBaseWorkload : public TypedWorkload<DepthwiseConvolution2dQueueDescriptor, dataTypes...>
+class ClDepthwiseConvolutionWorkload : public BaseWorkload<DepthwiseConvolution2dQueueDescriptor>
 {
 public:
-    using TypedWorkload<DepthwiseConvolution2dQueueDescriptor, dataTypes...>::m_Data;
+    using BaseWorkload<DepthwiseConvolution2dQueueDescriptor>::m_Data;
 
-    ClDepthwiseConvolutionBaseWorkload(const DepthwiseConvolution2dQueueDescriptor& descriptor,
-                                       const WorkloadInfo& info);
+    ClDepthwiseConvolutionWorkload(const DepthwiseConvolution2dQueueDescriptor& descriptor,
+                                   const WorkloadInfo& info);
+
+    void Execute() const override;
 
 protected:
     std::unique_ptr<arm_compute::IFunction> m_DepthwiseConvolutionLayer;

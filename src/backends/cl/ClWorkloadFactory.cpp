@@ -150,7 +150,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConvolution2d(const C
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClDepthwiseConvolutionFloatWorkload, ClDepthwiseConvolutionUint8Workload>(descriptor, info);
+    return std::make_unique<ClDepthwiseConvolutionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,

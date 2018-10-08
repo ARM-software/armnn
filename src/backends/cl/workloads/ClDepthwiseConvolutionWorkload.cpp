@@ -3,14 +3,17 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClDepthwiseConvolutionBaseWorkload.hpp"
+#include "ClDepthwiseConvolutionWorkload.hpp"
 
 #include "TypeUtils.hpp"
+#include "ClWorkloadUtils.hpp"
 
 #include <backends/aclCommon/ArmComputeUtils.hpp>
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #include <backends/cl/ClTensorHandle.hpp>
 #include <backends/CpuTensorHandle.hpp>
+
+#include <arm_compute/runtime/CL/functions/CLDepthwiseConvolutionLayer.h>
 
 namespace armnn
 {
@@ -49,11 +52,10 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
                                                               aclDepthMultiplier);
 }
 
-template<armnn::DataType... dataTypes>
-ClDepthwiseConvolutionBaseWorkload<dataTypes...>::ClDepthwiseConvolutionBaseWorkload(
+ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     const DepthwiseConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : TypedWorkload<DepthwiseConvolution2dQueueDescriptor, dataTypes...>(descriptor, info)
+    : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
     auto& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
@@ -74,8 +76,7 @@ ClDepthwiseConvolutionBaseWorkload<dataTypes...>::ClDepthwiseConvolutionBaseWork
                                              m_Data.m_Parameters.m_PadBottom,
                                              arm_compute::DimensionRoundingType::FLOOR);
 
-    std::string name = std::string("ClDepthwiseConvolution") +
-            GetDataTypeName(m_Data.m_Weight->GetTensorInfo().GetDataType()) + "Workload";
+    std::string name = std::string("ClDepthwiseConvolutionWorkload");
     m_Data.ValidateInputsOutputs(name, 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
@@ -109,17 +110,30 @@ ClDepthwiseConvolutionBaseWorkload<dataTypes...>::ClDepthwiseConvolutionBaseWork
     }
 
     BOOST_ASSERT(m_DepthwiseConvolutionLayer);
+
+    InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
+
+    if (m_BiasTensor)
+    {
+        InitializeArmComputeClTensorData(*m_BiasTensor, m_Data.m_Bias);
+    }
+
+    m_DepthwiseConvolutionLayer->prepare();
+    FreeUnusedTensors();
 }
 
-template<armnn::DataType... dataTypes>
-void ClDepthwiseConvolutionBaseWorkload<dataTypes...>::FreeUnusedTensors()
+void ClDepthwiseConvolutionWorkload::FreeUnusedTensors()
 {
     FreeTensorIfUnused(m_KernelTensor);
     FreeTensorIfUnused(m_BiasTensor);
 }
 
-// Generate known implementations for linker
-template class ClDepthwiseConvolutionBaseWorkload<DataType::Float16, DataType::Float32>;
-template class ClDepthwiseConvolutionBaseWorkload<DataType::QuantisedAsymm8>;
+void ClDepthwiseConvolutionWorkload::Execute() const
+{
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClDepthwiseConvolutionWorkload_Execute");
+    BOOST_ASSERT(m_DepthwiseConvolutionLayer);
+
+    m_DepthwiseConvolutionLayer->run();
+}
 
 } // namespace armnn

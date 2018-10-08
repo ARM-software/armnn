@@ -35,10 +35,9 @@ void ClPadWorkload<T...>::Execute() const
     m_Layer.run();
 }
 
-bool ClPadValidate(const TensorInfo& input,
-                   const TensorInfo& output,
-                   const PadDescriptor& descriptor,
-                   std::string* reasonIfUnsupported)
+arm_compute::Status ClPadValidate(const TensorInfo& input,
+                                  const TensorInfo& output,
+                                  const PadDescriptor& descriptor)
 {
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
@@ -48,13 +47,7 @@ bool ClPadValidate(const TensorInfo& input,
                                                                             &aclOutputInfo,
                                                                             padList);
 
-    const bool supported = (aclStatus.error_code() == arm_compute::ErrorCode::OK);
-    if (!supported && reasonIfUnsupported)
-    {
-        *reasonIfUnsupported = aclStatus.error_description();
-    }
-
-    return supported;
+    return aclStatus;
 }
 
 } // namespace armnn

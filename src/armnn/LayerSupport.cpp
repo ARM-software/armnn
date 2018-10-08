@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <armnn/LayerSupport.hpp>
+#include <armnn/Optional.hpp>
 
 #include <backends/reference/RefLayerSupport.hpp>
 #include <backends/neon/NeonLayerSupport.hpp>
@@ -36,16 +37,16 @@ void CopyErrorMessage(char* truncatedString, const char* fullString, size_t maxL
     switch(compute) \
     { \
         case Compute::CpuRef: \
-            isSupported = func##Ref(__VA_ARGS__, &reasonIfUnsupportedFull); \
+            isSupported = func##Ref(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
             break; \
         case Compute::CpuAcc: \
-            isSupported = func##Neon(__VA_ARGS__, &reasonIfUnsupportedFull); \
+            isSupported = func##Neon(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
             break; \
         case Compute::GpuAcc: \
-            isSupported = func##Cl(__VA_ARGS__, &reasonIfUnsupportedFull); \
+            isSupported = func##Cl(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
             break; \
         default: \
-            isSupported = func##Ref(__VA_ARGS__, &reasonIfUnsupportedFull); \
+            isSupported = func##Ref(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
             break; \
     } \
     CopyErrorMessage(reasonIfUnsupported, reasonIfUnsupportedFull.c_str(), reasonIfUnsupportedMaxLength); \

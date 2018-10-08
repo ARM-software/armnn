@@ -23,8 +23,7 @@ private:
     mutable arm_compute::CLArithmeticSubtraction m_Layer;
 };
 
-bool ClSubtractionValidate(const TensorInfo& input0,
-                           const TensorInfo& input1,
-                           const TensorInfo& output,
-                           std::string* reasonIfUnsupported);
+arm_compute::Status ClSubtractionValidate(const TensorInfo& input0,
+                                          const TensorInfo& input1,
+                                          const TensorInfo& output);
 } //namespace armnn

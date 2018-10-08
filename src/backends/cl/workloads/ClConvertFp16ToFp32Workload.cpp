@@ -32,19 +32,15 @@ void ClConvertFp16ToFp32Workload::Execute() const
     m_Layer.run();
 }
 
-arm_compute::Status ClConvertFp16ToFp32WorkloadValidate(const TensorInfo& input,
-                                                        const TensorInfo& output,
-                                                        std::string* reasonIfUnsupported)
+arm_compute::Status ClConvertFp16ToFp32WorkloadValidate(const TensorInfo& input, const TensorInfo& output)
 {
     if (input.GetDataType() != DataType::Float16)
     {
-        *reasonIfUnsupported = "Input should be Float16";
-        return arm_compute::Status(arm_compute::ErrorCode::RUNTIME_ERROR, *reasonIfUnsupported);
+        return arm_compute::Status(arm_compute::ErrorCode::RUNTIME_ERROR, "Input should be Float16");
     }
     if (output.GetDataType() != DataType::Float32)
     {
-        *reasonIfUnsupported = "Output should be Float32";
-        return arm_compute::Status(arm_compute::ErrorCode::RUNTIME_ERROR, *reasonIfUnsupported);
+        return arm_compute::Status(arm_compute::ErrorCode::RUNTIME_ERROR, "Output should be Float32");
     }
 
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
@@ -52,12 +48,6 @@ arm_compute::Status ClConvertFp16ToFp32WorkloadValidate(const TensorInfo& input,
 
     const arm_compute::Status aclStatus = arm_compute::CLDepthConvertLayer::validate(
         &aclInputInfo, &aclOutputInfo, g_AclConvertPolicy, 0);
-
-    const bool supported = (aclStatus.error_code() == arm_compute::ErrorCode::OK);
-    if (!supported && reasonIfUnsupported)
-    {
-        *reasonIfUnsupported = aclStatus.error_description();
-    }
 
     return aclStatus;
 }

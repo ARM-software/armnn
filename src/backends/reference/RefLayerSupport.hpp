@@ -175,12 +175,12 @@ public:
 bool IsActivationSupportedRef(const TensorInfo& input,
                               const TensorInfo& output,
                               const ActivationDescriptor& descriptor,
-                              std::string* reasonIfUnsupported = nullptr);
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsAdditionSupportedRef(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
-                            std::string* reasonIfUnsupported = nullptr);
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsBatchNormalizationSupportedRef(const TensorInfo& input,
                                       const TensorInfo& output,
@@ -189,130 +189,143 @@ bool IsBatchNormalizationSupportedRef(const TensorInfo& input,
                                       const TensorInfo& beta,
                                       const TensorInfo& gamma,
                                       const BatchNormalizationDescriptor& descriptor,
-                                      std::string* reasonIfUnsupported = nullptr);
+                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsConstantSupportedRef(const TensorInfo& output,
-                            std::string* reasonIfUnsupported = nullptr);
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsConvolution2dSupportedRef(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const Convolution2dDescriptor& descriptor,
                                  const TensorInfo& weights,
                                  const Optional<TensorInfo>& biases,
-                                 std::string* reasonIfUnsupported = nullptr);
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsDepthwiseConvolutionSupportedRef(const TensorInfo& input,
                                         const TensorInfo& output,
                                         const DepthwiseConvolution2dDescriptor& descriptor,
                                         const TensorInfo& weights,
                                         const Optional<TensorInfo>& biases,
-                                        std::string* reasonIfUnsupported = nullptr);
+                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsDivisionSupportedRef(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
-                            std::string* reasonIfUnsupported = nullptr);
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsSubtractionSupportedRef(const TensorInfo& input0,
                                const TensorInfo& input1,
                                const TensorInfo& output,
-                               std::string* reasonIfUnsupported = nullptr);
+                               Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsFullyConnectedSupportedRef(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const TensorInfo& weights,
                                   const TensorInfo& biases,
                                   const FullyConnectedDescriptor& descriptor,
-                                  std::string* reasonIfUnsupported = nullptr);
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsInputSupportedRef(const TensorInfo& input,
-                         std::string* reasonIfUnsupported = nullptr);
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsL2NormalizationSupportedRef(const TensorInfo& input,
                                    const TensorInfo& output,
                                    const L2NormalizationDescriptor& descriptor,
-                                   std::string* reasonIfUnsupported = nullptr);
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-bool IsLstmSupportedRef(const TensorInfo& input, const TensorInfo& outputStateIn,
-                        const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
-                        const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
-                        const TensorInfo& output, const LstmDescriptor& descriptor,
-                        const TensorInfo& inputToForgetWeights, const TensorInfo& inputToCellWeights,
-                        const TensorInfo& inputToOutputWeights, const TensorInfo& recurrentToForgetWeights,
-                        const TensorInfo& recurrentToCellWeights, const TensorInfo& recurrentToOutputWeights,
-                        const TensorInfo& forgetGateBias, const TensorInfo& cellBias,
-                        const TensorInfo& outputGateBias, const TensorInfo* inputToInputWeights,
-                        const TensorInfo* recurrentToInputWeights, const TensorInfo* cellToInputWeights,
-                        const TensorInfo* inputGateBias, const TensorInfo* projectionWeights,
-                        const TensorInfo* projectionBias, const TensorInfo* cellToForgetWeights,
-                        const TensorInfo* cellToOutputWeights, std::string* reasonIfUnsupported = nullptr);
+bool IsLstmSupportedRef(const TensorInfo& input,
+                        const TensorInfo& outputStateIn,
+                        const TensorInfo& cellStateIn,
+                        const TensorInfo& scratchBuffer,
+                        const TensorInfo& outputStateOut,
+                        const TensorInfo& cellStateOut,
+                        const TensorInfo& output,
+                        const LstmDescriptor& descriptor,
+                        const TensorInfo& inputToForgetWeights,
+                        const TensorInfo& inputToCellWeights,
+                        const TensorInfo& inputToOutputWeights,
+                        const TensorInfo& recurrentToForgetWeights,
+                        const TensorInfo& recurrentToCellWeights,
+                        const TensorInfo& recurrentToOutputWeights,
+                        const TensorInfo& forgetGateBias,
+                        const TensorInfo& cellBias,
+                        const TensorInfo& outputGateBias,
+                        const TensorInfo* inputToInputWeights,
+                        const TensorInfo* recurrentToInputWeights,
+                        const TensorInfo* cellToInputWeights,
+                        const TensorInfo* inputGateBias,
+                        const TensorInfo* projectionWeights,
+                        const TensorInfo* projectionBias,
+                        const TensorInfo* cellToForgetWeights,
+                        const TensorInfo* cellToOutputWeights,
+                        Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsMergerSupportedRef(const std::vector<const TensorInfo*> inputs,
                           const OriginsDescriptor& descriptor,
-                          std::string* reasonIfUnsupported = nullptr);
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsMultiplicationSupportedRef(const TensorInfo& input0,
                                   const TensorInfo& input1,
                                   const TensorInfo& output,
-                                  std::string* reasonIfUnsupported = nullptr);
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsNormalizationSupportedRef(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const NormalizationDescriptor& descriptor,
-                                 std::string* reasonIfUnsupported = nullptr);
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsOutputSupportedRef(const TensorInfo& output,
-                          std::string* reasonIfUnsupported = nullptr);
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsPermuteSupportedRef(const TensorInfo& input,
                            const TensorInfo& output,
                            const PermuteDescriptor& descriptor,
-                           std::string* reasonIfUnsupported = nullptr);
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsPooling2dSupportedRef(const TensorInfo& input,
                              const TensorInfo& output,
                              const Pooling2dDescriptor& descriptor,
-                             std::string* reasonIfUnsupported = nullptr);
+                             Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsResizeBilinearSupportedRef(const TensorInfo& input,
-                                  std::string* reasonIfUnsupported = nullptr);
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsSoftmaxSupportedRef(const TensorInfo& input,
                            const TensorInfo& output,
                            const SoftmaxDescriptor& descriptor,
-                           std::string* reasonIfUnsupported = nullptr);
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsSplitterSupportedRef(const TensorInfo& input,
                             const ViewsDescriptor& descriptor,
-                            std::string* reasonIfUnsupported = nullptr);
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsFakeQuantizationSupportedRef(const TensorInfo& input,
                                     const FakeQuantizationDescriptor& descriptor,
-                                    std::string* reasonIfUnsupported = nullptr);
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsReshapeSupportedRef(const TensorInfo& input,
-                           std::string* reasonIfUnsupported = nullptr);
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsFloorSupportedRef(const TensorInfo& input,
                          const TensorInfo& output,
-                         std::string* reasonIfUnsupported = nullptr);
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsConvertFp16ToFp32SupportedRef(const TensorInfo& input,
                                      const TensorInfo& output,
-                                     std::string* reasonIfUnsupported = nullptr);
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsConvertFp32ToFp16SupportedRef(const TensorInfo& input,
                                      const TensorInfo& output,
-                                     std::string* reasonIfUnsupported = nullptr);
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsMeanSupportedRef(const TensorInfo& input,
                         const TensorInfo& output,
                         const MeanDescriptor& descriptor,
-                        std::string* reasonIfUnsupported = nullptr);
+                        Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsPadSupportedRef(const TensorInfo& input,
                        const TensorInfo& output,
                        const PadDescriptor& descriptor,
-                       std::string* reasonIfUnsupported = nullptr);
+                       Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 }

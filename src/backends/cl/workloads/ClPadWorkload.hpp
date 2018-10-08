@@ -23,10 +23,9 @@ private:
     mutable arm_compute::CLPadLayer m_Layer;
 };
 
-bool ClPadValidate(const TensorInfo& input,
-                   const TensorInfo& output,
-                   const PadDescriptor& descriptor,
-                   std::string* reasonIfUnsupported);
+arm_compute::Status ClPadValidate(const TensorInfo& input,
+                                  const TensorInfo& output,
+                                  const PadDescriptor& descriptor);
 
 } //namespace armnn
 

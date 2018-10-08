@@ -33,7 +33,7 @@ NeonNormalizationFloatWorkload::NeonNormalizationFloatWorkload(const Normalizati
 {
     m_Data.ValidateInputsOutputs("NeonNormalizationFloatWorkload", 1, 1);
     std::string reasonIfUnsupported;
-    if (!IsNeonNormalizationDescParamsSupported(&reasonIfUnsupported, m_Data.m_Parameters))
+    if (!IsNeonNormalizationDescParamsSupported(Optional<std::string&>(reasonIfUnsupported), m_Data.m_Parameters))
     {
         throw UnimplementedException(reasonIfUnsupported);
     }

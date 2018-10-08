@@ -37,10 +37,9 @@ void ClAdditionWorkload<T...>::Execute() const
     m_Layer.run();
 }
 
-bool ClAdditionValidate(const TensorInfo& input0,
-                        const TensorInfo& input1,
-                        const TensorInfo& output,
-                        std::string* reasonIfUnsupported)
+arm_compute::Status ClAdditionValidate(const TensorInfo& input0,
+                                       const TensorInfo& input1,
+                                       const TensorInfo& output)
 {
     const arm_compute::TensorInfo aclInput0Info = BuildArmComputeTensorInfo(input0);
     const arm_compute::TensorInfo aclInput1Info = BuildArmComputeTensorInfo(input1);
@@ -51,13 +50,7 @@ bool ClAdditionValidate(const TensorInfo& input0,
                                                                                       &aclOutputInfo,
                                                                                       g_AclConvertPolicy);
 
-    const bool supported = (aclStatus.error_code() == arm_compute::ErrorCode::OK);
-    if (!supported && reasonIfUnsupported)
-    {
-        *reasonIfUnsupported = aclStatus.error_description();
-    }
-
-    return supported;
+    return aclStatus;
 }
 
 } //namespace armnn

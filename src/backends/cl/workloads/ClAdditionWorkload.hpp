@@ -24,8 +24,7 @@ private:
     mutable arm_compute::CLArithmeticAddition m_Layer;
 };
 
-bool ClAdditionValidate(const TensorInfo& input0,
-                        const TensorInfo& input1,
-                        const TensorInfo& output,
-                        std::string* reasonIfUnsupported);
+arm_compute::Status ClAdditionValidate(const TensorInfo& input0,
+                                       const TensorInfo& input1,
+                                       const TensorInfo& output);
 } //namespace armnn

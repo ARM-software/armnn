@@ -5,6 +5,7 @@
 #pragma once
 
 #include <armnn/DescriptorsFwd.hpp>
+#include <armnn/Optional.hpp>
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/ArmNN.hpp>
@@ -18,19 +19,19 @@ class ClLayerSupport : public ILayerSupport
 };
 
 bool IsClDirectConvolution2dSupported(const TensorInfo& weightInfo, const Convolution2dDescriptor& desc);
-bool IsClDepthwiseConvolution2dDescParamsSupported(std::string* reasonIfUnsupported,
+bool IsClDepthwiseConvolution2dDescParamsSupported(Optional<std::string&> reasonIfUnsupported,
                                                    const DepthwiseConvolution2dDescriptor& parameters,
                                                    const TensorInfo& weights);
 
 bool IsActivationSupportedCl(const TensorInfo& input,
                              const TensorInfo& output,
                              const ActivationDescriptor& descriptor,
-                             std::string* reasonIfUnsupported = nullptr);
+                             Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsAdditionSupportedCl(const TensorInfo& input0,
                            const TensorInfo& input1,
                            const TensorInfo& output,
-                           std::string* reasonIfUnsupported = nullptr);
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsBatchNormalizationSupportedCl(const TensorInfo& input,
                                      const TensorInfo& output,
@@ -39,130 +40,143 @@ bool IsBatchNormalizationSupportedCl(const TensorInfo& input,
                                      const TensorInfo& beta,
                                      const TensorInfo& gamma,
                                      const BatchNormalizationDescriptor& descriptor,
-                                     std::string* reasonIfUnsupported = nullptr);
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsConstantSupportedCl(const TensorInfo& output,
-                           std::string* reasonIfUnsupported = nullptr);
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsConvolution2dSupportedCl(const TensorInfo& input,
                                 const TensorInfo& output,
                                 const Convolution2dDescriptor& descriptor,
                                 const TensorInfo& weights,
                                 const Optional<TensorInfo>& biases,
-                                std::string* reasonIfUnsupported = nullptr);
+                                Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsDepthwiseConvolutionSupportedCl(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const DepthwiseConvolution2dDescriptor& descriptor,
                                        const TensorInfo& weights,
                                        const Optional<TensorInfo>& biases,
-                                       std::string* reasonIfUnsupported = nullptr);
+                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsDivisionSupportedCl(const TensorInfo& input0,
                            const TensorInfo& input1,
                            const TensorInfo& output,
-                           std::string* reasonIfUnsupported = nullptr);
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsSubtractionSupportedCl(const TensorInfo& input0,
                               const TensorInfo& input1,
                               const TensorInfo& output,
-                              std::string* reasonIfUnsupported = nullptr);
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsFullyConnectedSupportedCl(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const TensorInfo& weights,
                                  const TensorInfo& biases,
                                  const FullyConnectedDescriptor& descriptor,
-                                 std::string* reasonIfUnsupported = nullptr);
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsInputSupportedCl(const TensorInfo& input,
-                        std::string* reasonIfUnsupported = nullptr);
+                        Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsL2NormalizationSupportedCl(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const L2NormalizationDescriptor& descriptor,
-                                  std::string* reasonIfUnsupported = nullptr);
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-bool IsLstmSupportedCl(const TensorInfo& input, const TensorInfo& outputStateIn,
-                       const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
-                       const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
-                       const TensorInfo& output, const LstmDescriptor& descriptor,
-                       const TensorInfo& inputToForgetWeights, const TensorInfo& inputToCellWeights,
-                       const TensorInfo& inputToOutputWeights, const TensorInfo& recurrentToForgetWeights,
-                       const TensorInfo& recurrentToCellWeights, const TensorInfo& recurrentToOutputWeights,
-                       const TensorInfo& forgetGateBias, const TensorInfo& cellBias,
-                       const TensorInfo& outputGateBias, const TensorInfo* inputToInputWeights,
-                       const TensorInfo* recurrentToInputWeights, const TensorInfo* cellToInputWeights,
-                       const TensorInfo* inputGateBias, const TensorInfo* projectionWeights,
-                       const TensorInfo* projectionBias, const TensorInfo* cellToForgetWeights,
-                       const TensorInfo* cellToOutputWeights, std::string* reasonIfUnsupported = nullptr);
+bool IsLstmSupportedCl(const TensorInfo& input,
+                       const TensorInfo& outputStateIn,
+                       const TensorInfo& cellStateIn,
+                       const TensorInfo& scratchBuffer,
+                       const TensorInfo& outputStateOut,
+                       const TensorInfo& cellStateOut,
+                       const TensorInfo& output,
+                       const LstmDescriptor& descriptor,
+                       const TensorInfo& inputToForgetWeights,
+                       const TensorInfo& inputToCellWeights,
+                       const TensorInfo& inputToOutputWeights,
+                       const TensorInfo& recurrentToForgetWeights,
+                       const TensorInfo& recurrentToCellWeights,
+                       const TensorInfo& recurrentToOutputWeights,
+                       const TensorInfo& forgetGateBias,
+                       const TensorInfo& cellBias,
+                       const TensorInfo& outputGateBias,
+                       const TensorInfo* inputToInputWeights,
+                       const TensorInfo* recurrentToInputWeights,
+                       const TensorInfo* cellToInputWeights,
+                       const TensorInfo* inputGateBias,
+                       const TensorInfo* projectionWeights,
+                       const TensorInfo* projectionBias,
+                       const TensorInfo* cellToForgetWeights,
+                       const TensorInfo* cellToOutputWeights,
+                       Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsMergerSupportedCl(const std::vector<const TensorInfo*> inputs,
                          const OriginsDescriptor& descriptor,
-                         std::string* reasonIfUnsupported = nullptr);
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsMultiplicationSupportedCl(const TensorInfo& input0,
                                  const TensorInfo& input1,
                                  const TensorInfo& output,
-                                 std::string* reasonIfUnsupported = nullptr);
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsNormalizationSupportedCl(const TensorInfo& input,
                                 const TensorInfo& output,
                                 const NormalizationDescriptor& descriptor,
-                                std::string* reasonIfUnsupported = nullptr);
+                                Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsOutputSupportedCl(const TensorInfo& output,
-                         std::string* reasonIfUnsupported = nullptr);
-
-bool IsPadSupportedCl(const TensorInfo& input,
-                      const TensorInfo& output,
-                      const PadDescriptor& descriptor,
-                      std::string* reasonIfUnsupported = nullptr);
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsPermuteSupportedCl(const TensorInfo& input,
                           const TensorInfo& output,
                           const PermuteDescriptor& descriptor,
-                          std::string* reasonIfUnsupported = nullptr);
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsPooling2dSupportedCl(const TensorInfo& input,
                             const TensorInfo& output,
                             const Pooling2dDescriptor& descriptor,
-                            std::string* reasonIfUnsupported = nullptr);
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsResizeBilinearSupportedCl(const TensorInfo& input,
-                                 std::string* reasonIfUnsupported = nullptr);
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsSoftmaxSupportedCl(const TensorInfo& input,
                           const TensorInfo& output,
                           const SoftmaxDescriptor& descriptor,
-                          std::string* reasonIfUnsupported = nullptr);
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsSplitterSupportedCl(const TensorInfo& input,
                            const ViewsDescriptor& descriptor,
-                           std::string* reasonIfUnsupported = nullptr);
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsFakeQuantizationSupportedCl(const TensorInfo& input,
                                    const FakeQuantizationDescriptor& descriptor,
-                                   std::string* reasonIfUnsupported = nullptr);
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsReshapeSupportedCl(const TensorInfo& input,
-                          std::string* reasonIfUnsupported = nullptr);
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsFloorSupportedCl(const TensorInfo& input,
                         const TensorInfo& output,
-                        std::string* reasonIfUnsupported = nullptr);
+                        Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
+bool IsConvertFp16ToFp32SupportedCl(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
+bool IsConvertFp32ToFp16SupportedCl(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 bool IsMeanSupportedCl(const TensorInfo& input,
                        const TensorInfo& output,
                        const MeanDescriptor& descriptor,
-                       std::string* reasonIfUnsupported = nullptr);
+                       Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-bool IsConvertFp16ToFp32SupportedCl(const TensorInfo& input,
-                                    const TensorInfo& output,
-                                    std::string* reasonIfUnsupported = nullptr);
-
-bool IsConvertFp32ToFp16SupportedCl(const TensorInfo& input,
-                                    const TensorInfo& output,
-                                    std::string* reasonIfUnsupported = nullptr);
+bool IsPadSupportedCl(const TensorInfo& input,
+                      const TensorInfo& output,
+                      const PadDescriptor& descriptor,
+                      Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
 }

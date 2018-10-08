@@ -7,6 +7,7 @@
 #include "armnn/NetworkFwd.hpp"
 #include "armnn/DescriptorsFwd.hpp"
 #include "armnn/TensorFwd.hpp"
+#include "armnn/Optional.hpp"
 
 #include "armnn/Types.hpp"
 
@@ -332,6 +333,7 @@ struct OptimizerOptions
 /// @param network INetwork description of the network to be optimized.
 /// @param backendPreferences The choice of the backend ordered by user preferences.
 /// @param deviceSpec DeviceSpec object as queried from the runtime. See IRuntime::GetDeviceSpec()
+/// @param errMessages if there are failures or warnings a string describing same will be added to the vector
 /// @param options OptimizerOptions object with optimizer configuration options
 /// @return An IOptimizedNetworkPtr interface to the optimized network, throws an exception derived from
 /// armnn::Exception if process fails.
@@ -339,5 +341,6 @@ struct OptimizerOptions
 IOptimizedNetworkPtr Optimize(const INetwork& network,
                               const std::vector<armnn::Compute>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
-                              const OptimizerOptions& options = OptimizerOptions());
+                              const OptimizerOptions& options = OptimizerOptions(),
+                              Optional<std::vector<std::string>&> errMessages = EmptyOptional());
 } //namespace armnn

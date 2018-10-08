@@ -69,10 +69,35 @@ Status OptimizedNetwork::SerializeToDot(std::ostream& stream) const
     return m_Graph->SerializeToDot(stream);
 }
 
+bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string>&> errMessages)
+{
+    bool noErrors = true;
+    unsigned int numOutputs = layer->GetNumOutputSlots();
+    for (unsigned int i = 0; i < numOutputs; i++) {
+        const OutputSlot &outputSlot = layer->GetOutputSlot(i);
+        const TensorInfo &info = outputSlot.GetTensorInfo();
+        if (DataType::QuantisedAsymm8 == info.GetDataType()) {
+            if (0.f == info.GetQuantizationScale()) {
+                noErrors = false;
+                std::stringstream ss;
+                ss << "ERROR: output " << i << " of layer " << GetLayerTypeAsCString(layer->GetType())
+                   << " (" << layer->GetNameStr() << ") is of type"
+                   << " Quantized 8 bit but its scale parameter has not been set";
+                BOOST_LOG_TRIVIAL(warning) << ss.str() ;
+                if (errMessages) {
+                    errMessages.value().push_back(ss.str());
+                }
+            }
+        }
+    }
+    return noErrors;
+}
+
 IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                               const std::vector<armnn::Compute>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
-                              const OptimizerOptions& options)
+                              const OptimizerOptions& options,
+                              Optional<std::vector<std::string>&> errMessages)
 {
     if (backendPreferences.empty()) {
         throw armnn::InvalidArgumentException("Invoked Optimize with no backends specified");
@@ -123,24 +148,41 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         }
     }
     if (availablePreferredBackends.empty()) {
-        BOOST_LOG_TRIVIAL(warning) << "None of the preferred backends " << backendPreferences
-                                   << " are supported. Current platform provides " << spec.m_SupportedComputeDevices;
-        return {nullptr, &IOptimizedNetwork::Destroy};
+        std::stringstream failureMsg;
+        failureMsg << "ERROR: None of the preferred backends " << backendPreferences
+                   << " are supported. Current platform provides " << spec.m_SupportedComputeDevices;
+        BOOST_LOG_TRIVIAL(warning) << failureMsg.str();
+        if (errMessages) {
+            errMessages.value().push_back(failureMsg.str());
+        }
+        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
     }
 
     auto ReturnWithError = [&](Layer* layer)
     {
-        BOOST_LOG_TRIVIAL(warning) << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
-                    << " is not supported on any preferred backend " << backendPreferences;
+        std::stringstream failureMsg;
+        failureMsg << "ERROR: Layer of type " << GetLayerTypeAsCString(layer->GetType())
+                   << " is not supported on any preferred backend " << backendPreferences;
+        BOOST_LOG_TRIVIAL(warning) << failureMsg.str();
+        if (errMessages) {
+            errMessages.value().push_back(failureMsg.str());
+        }
         return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
     };
 
     // Assign a compute device for all nodes
+    bool bErrorFound = false;
     for (auto&& layer : optNetObjPtr->GetGraph())
     {
         DataType dataType = layer->GetDataType();
         std::string reasonIfUnsupported;
         bool found = false;
+        if (!CheckScaleSetOnQuantizedType(layer, errMessages))
+        {
+            // don't bomb immediately, find all the quantized outputs
+            // which haven't had a scale set and report them all back.
+            bErrorFound = true;
+        }
         for (const armnn::Compute& backend : availablePreferredBackends)
         {
             // need to set the compute device on the layer
@@ -216,11 +258,16 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                         break;
                     }
                 }
-                BOOST_LOG_TRIVIAL(warning) << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
-                                           << " is not supported on requested backend " << layer->GetComputeDevice()
-                                           << " for data type " << GetDataTypeName(dataType)
-                                           << " (reason: " << reasonIfUnsupported
-                                           << "), falling back to the next backend.";
+                std::stringstream warningMsg;
+                warningMsg << "WARNING: Layer of type " << GetLayerTypeAsCString(layer->GetType())
+                           << " is not supported on requested backend " << layer->GetComputeDevice()
+                           << " for data type " << GetDataTypeName(dataType)
+                           << " (reason: " << reasonIfUnsupported
+                           << "), falling back to the next backend.";
+                BOOST_LOG_TRIVIAL(warning) << warningMsg.str();
+                if (errMessages) {
+                    errMessages.value().push_back(warningMsg.str());
+                }
             }
             else
             {
@@ -248,6 +295,10 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
             }
         }
     }
+    if (bErrorFound)
+    {
+        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
+    }
 
     Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(OptimizeInverseConversionsFp16(),
                                                                 OptimizeInverseConversionsFp32()));
@@ -260,6 +311,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
 
     return optNet;
 }
+
 
 Network::Network()
 : m_Graph(std::make_unique<Graph>())

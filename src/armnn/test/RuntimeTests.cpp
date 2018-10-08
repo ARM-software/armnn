@@ -485,4 +485,60 @@ BOOST_AUTO_TEST_CASE(RuntimeFallbackToCpuRef)
     BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
 }
 
+BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
+{
+    // Test for issue reported by Chris Nix in https://jira.arm.com/browse/IVGCVSW-1929
+    using namespace armnn;
+
+    // Create runtime in which test will run
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+    armnn::IConnectableLayer* input = net->AddInputLayer(
+            0,
+            "input"
+    );
+    armnn::IConnectableLayer* softmax = net->AddSoftmaxLayer(
+            armnn::SoftmaxDescriptor(),
+            "softmax"
+    );
+    armnn::IConnectableLayer* output = net->AddOutputLayer(
+            0,
+            "output"
+    );
+
+    input->GetOutputSlot(0).Connect(softmax->GetInputSlot(0));
+    softmax->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(
+            armnn::TensorShape({ 1, 5 }),
+            armnn::DataType::QuantisedAsymm8,
+            1.0f/255,
+            0
+    ));
+
+    softmax->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(
+            armnn::TensorShape({ 1, 5 }),
+            armnn::DataType::QuantisedAsymm8
+    ));
+
+    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<std::string> errMessages;
+    armnn::IOptimizedNetworkPtr optNet = Optimize(
+            *net,
+            backends,
+            runtime->GetDeviceSpec(),
+            OptimizerOptions(),
+            errMessages
+    );
+    
+    BOOST_TEST(errMessages.size() == 1);
+    BOOST_TEST(errMessages[0] ==
+        "ERROR: output 0 of layer Softmax (softmax) is of type "
+        "Quantized 8 bit but its scale parameter has not been set");
+    BOOST_TEST(!optNet);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

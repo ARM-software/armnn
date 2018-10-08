@@ -981,8 +981,8 @@ BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnGpuAcc)
     armnn::OptimizerOptions optimizerOptions;
     optimizerOptions.m_ReduceFp32ToFp16 = true;
 
-    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec(),
-                                                               optimizerOptions);
+    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
+            net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 
     const armnn::Graph& graph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
 

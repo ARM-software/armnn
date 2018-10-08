@@ -101,7 +101,8 @@ void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::Te
 
         armnn::INetworkPtr network =
             m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes, requestedOutputs);
-        auto optimized = Optimize(*network, { runtime.second, armnn::Compute::CpuRef }, runtime.first->GetDeviceSpec());
+        auto optimized = Optimize(*network,
+                { runtime.second, armnn::Compute::CpuRef }, runtime.first->GetDeviceSpec());
         armnn::Status ret = runtime.first->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
         if (ret != armnn::Status::Success)
         {
@@ -122,7 +123,8 @@ void ParserPrototxtFixture<TParser>::Setup()
 
         armnn::INetworkPtr network =
             m_Parser->CreateNetworkFromString(m_Prototext.c_str());
-        auto optimized = Optimize(*network, { runtime.second, armnn::Compute::CpuRef }, runtime.first->GetDeviceSpec());
+        auto optimized = Optimize(*network,
+                { runtime.second, armnn::Compute::CpuRef }, runtime.first->GetDeviceSpec());
         armnn::Status ret = runtime.first->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
         if (ret != armnn::Status::Success)
         {

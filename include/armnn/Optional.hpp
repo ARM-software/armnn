@@ -8,8 +8,6 @@
 #include <type_traits>
 #include <cstring>
 
-#include <boost/optional.hpp>
-
 // Optional is a drop in replacement for std::optional until we migrate
 // to c++-17. Only a subset of the optional features are implemented that
 // we intend to use in ArmNN.
@@ -25,16 +23,12 @@
 // - value() returns a reference to the held object
 //
 
-// There is a deprecated and limited support for boost::optional in this class,
-// which will be removed in the 19.02 release.
-
 namespace armnn
 {
 
 // EmptyOptional is used to initialize the Optional class in case we want
 // to have default value for an Optional in a function declaration.
 struct EmptyOptional {};
-
 
 // OptionalBase is the common functionality between reference and non-reference
 // optional types.
@@ -65,6 +59,28 @@ protected:
     bool m_HasValue;
 };
 
+struct HasGetMemberFunction
+{
+    template <class T>
+    static auto Check(T* p) ->  decltype(p->get(), std::true_type());
+
+    template <class T>
+    static auto Check(...) -> std::false_type;
+};
+
+//
+// Predicate checking for boost::optional compatibility
+//
+template <typename T>
+struct CheckBoostOptionalSignature
+{
+    using ResultType = decltype(HasGetMemberFunction::Check<T>(0));
+
+    static constexpr bool Result() {
+        return std::is_same<std::true_type, ResultType>::value;
+    }
+};
+
 //
 // The default implementation is the non-reference case. This
 // has an unsigned char array for storing the optional value which
@@ -91,8 +107,11 @@ public:
         *this = other;
     }
 
-    // temporary support for limited conversion from boost
-    OptionalReferenceSwitch(const boost::optional<T>& other)
+    // enable construction from types that matches the CheckBoostOptionalSignature
+    // predicate
+    template <typename O,
+              typename = std::enable_if_t<CheckBoostOptionalSignature<O>::Result()>>
+    OptionalReferenceSwitch(const O& other)
         : Base{}
     {
         *this = other;
@@ -116,21 +135,24 @@ public:
         return *this;
     }
 
-    // temporary support for limited conversion from boost
-    OptionalReferenceSwitch& operator=(const boost::optional<T>& other)
+    OptionalReferenceSwitch& operator=(EmptyOptional)
     {
         reset();
-        if (other.is_initialized())
+        return *this;
+    }
+
+    // enable copying from types that matches the CheckBoostOptionalSignature
+    // predicate
+    template <typename O,
+              typename = std::enable_if_t<CheckBoostOptionalSignature<O>::Result()>>
+    OptionalReferenceSwitch& operator=(const O& other)
+    {
+        reset();
+        if (other)
         {
             Construct(other.get());
         }
 
-        return *this;
-    }
-
-    OptionalReferenceSwitch& operator=(EmptyOptional)
-    {
-        reset();
         return *this;
     }
 
@@ -267,13 +289,15 @@ class Optional final : public OptionalReferenceSwitch<std::is_reference<T>::valu
 public:
     using BaseSwitch = OptionalReferenceSwitch<std::is_reference<T>::value, T>;
 
-    Optional(const T& value) : BaseSwitch{value} {}
     Optional() noexcept : BaseSwitch{} {}
+    Optional(const T& value) : BaseSwitch{value} {}
     Optional(EmptyOptional empty) : BaseSwitch{empty} {}
     Optional(const Optional& other) : BaseSwitch{other} {}
+    Optional(const BaseSwitch& other) : BaseSwitch{other} {}
 
-    // temporary support for limited conversion from boost
-    Optional(const boost::optional<T>& other) : BaseSwitch{other} {}
+    template <typename O,
+              typename = std::enable_if_t<CheckBoostOptionalSignature<O>::Result()>>
+    Optional(const O& other) : BaseSwitch{other} {}
 };
 
 }

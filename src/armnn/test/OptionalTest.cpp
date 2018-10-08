@@ -111,6 +111,10 @@ BOOST_AUTO_TEST_CASE(BoostCompatibilityTests)
     BoostCompatibilityTester(armnn::Optional<std::string>(), false, "");
     BoostCompatibilityTester(armnn::Optional<std::string>("Hello World"), true, "Hello World");
 
+    // verify boost signature selector
+    BOOST_TEST(armnn::CheckBoostOptionalSignature<boost::optional<std::string>>::Result() == true);
+    BOOST_TEST(armnn::CheckBoostOptionalSignature<armnn::Optional<std::string>>::Result() == false);
+
     // the real thing is to see that we can pass a boost::optional in place
     // of an ArmNN Optional
     boost::optional<std::string> empty;

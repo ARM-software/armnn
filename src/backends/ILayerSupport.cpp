@@ -28,7 +28,7 @@ bool DefaultLayerSupport(const char* func,
     return false;
 }
 
-}
+} // anonymous namespace
 
 bool ILayerSupport::IsActivationSupported(const TensorInfo& input,
                                           const TensorInfo& output,
@@ -106,15 +106,15 @@ bool ILayerSupport::IsDivisionSupported(const TensorInfo& input0,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool ILayerSupport::IsSubtractionSupported(const TensorInfo& input0,
-                                           const TensorInfo& input1,
-                                           const TensorInfo& output,
-                                           Optional<std::string&> reasonIfUnsupported) const
+bool ILayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
+                                                const FakeQuantizationDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool ILayerSupport::IsInputSupported(const TensorInfo& input,
+bool ILayerSupport::IsFloorSupported(const TensorInfo& input,
+                                     const TensorInfo& output,
                                      Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
@@ -126,6 +126,12 @@ bool ILayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                               const TensorInfo& biases,
                                               const FullyConnectedDescriptor& descriptor,
                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
+bool ILayerSupport::IsInputSupported(const TensorInfo& input,
+                                     Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
@@ -168,6 +174,14 @@ bool ILayerSupport::IsLstmSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool ILayerSupport::IsMeanSupported(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    const MeanDescriptor& descriptor,
+                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool ILayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                       const OriginsDescriptor& descriptor,
                                       Optional<std::string&> reasonIfUnsupported) const
@@ -197,6 +211,14 @@ bool ILayerSupport::IsOutputSupported(const TensorInfo& output,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool ILayerSupport::IsPadSupported(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const PadDescriptor& descriptor,
+                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool ILayerSupport::IsPermuteSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const PermuteDescriptor& descriptor,
@@ -209,6 +231,12 @@ bool ILayerSupport::IsPooling2dSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const Pooling2dDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
+bool ILayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                       Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
@@ -234,40 +262,12 @@ bool ILayerSupport::IsSplitterSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool ILayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
-                                                const FakeQuantizationDescriptor& descriptor,
-                                                Optional<std::string&> reasonIfUnsupported) const
+bool ILayerSupport::IsSubtractionSupported(const TensorInfo& input0,
+                                           const TensorInfo& input1,
+                                           const TensorInfo& output,
+                                           Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
-bool ILayerSupport::IsReshapeSupported(const TensorInfo& input,
-                                       Optional<std::string&> reasonIfUnsupported) const
-{
-    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
-}
-
-bool ILayerSupport::IsFloorSupported(const TensorInfo& input,
-                                     const TensorInfo& output,
-                                     Optional<std::string&> reasonIfUnsupported) const
-{
-    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
-}
-
-bool ILayerSupport::IsMeanSupported(const TensorInfo& input,
-                                    const TensorInfo& output,
-                                    const MeanDescriptor& descriptor,
-                                    Optional<std::string&> reasonIfUnsupported) const
-{
-    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
-}
-
-bool ILayerSupport::IsPadSupported(const TensorInfo& input,
-                                   const TensorInfo& output,
-                                   const PadDescriptor& descriptor,
-                                   Optional<std::string&> reasonIfUnsupported) const
-{
-    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
-}
-
-}
+} // namespace armnn

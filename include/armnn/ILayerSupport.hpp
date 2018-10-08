@@ -70,12 +70,12 @@ public:
                                      const TensorInfo& output,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
-    virtual bool IsSubtractionSupported(const TensorInfo& input0,
-                                        const TensorInfo& input1,
-                                        const TensorInfo& output,
-                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+    virtual bool IsFakeQuantizationSupported(const TensorInfo& input,
+                                             const FakeQuantizationDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
-    virtual bool IsInputSupported(const TensorInfo& input,
+    virtual bool IsFloorSupported(const TensorInfo& input,
+                                  const TensorInfo& output,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsFullyConnectedSupported(const TensorInfo& input,
@@ -84,6 +84,9 @@ public:
                                            const TensorInfo& biases,
                                            const FullyConnectedDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
+    virtual bool IsInputSupported(const TensorInfo& input,
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsL2NormalizationSupported(const TensorInfo& input,
                                             const TensorInfo& output,
@@ -117,6 +120,11 @@ public:
                                  const TensorInfo* cellToOutputWeights,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
+    virtual bool IsMeanSupported(const TensorInfo& input,
+                                 const TensorInfo& output,
+                                 const MeanDescriptor& descriptor,
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     virtual bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                    const OriginsDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
@@ -134,6 +142,11 @@ public:
     virtual bool IsOutputSupported(const TensorInfo& output,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
+    virtual bool IsPadSupported(const TensorInfo& input,
+                                const TensorInfo& output,
+                                const PadDescriptor& descriptor,
+                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     virtual bool IsPermuteSupported(const TensorInfo& input,
                                     const TensorInfo& output,
                                     const PermuteDescriptor& descriptor,
@@ -143,6 +156,9 @@ public:
                                       const TensorInfo& output,
                                       const Pooling2dDescriptor& descriptor,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
+    virtual bool IsReshapeSupported(const TensorInfo& input,
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsResizeBilinearSupported(const TensorInfo& input,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
@@ -156,27 +172,10 @@ public:
                                      const ViewsDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
-    virtual bool IsFakeQuantizationSupported(const TensorInfo& input,
-                                             const FakeQuantizationDescriptor& descriptor,
-                                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
-
-    virtual bool IsReshapeSupported(const TensorInfo& input,
-                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
-
-    virtual bool IsFloorSupported(const TensorInfo& input,
-                                  const TensorInfo& output,
-                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
-
-    virtual bool IsMeanSupported(const TensorInfo& input,
-                                 const TensorInfo& output,
-                                 const MeanDescriptor& descriptor,
-                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
-
-    virtual bool IsPadSupported(const TensorInfo& input,
-                                const TensorInfo& output,
-                                const PadDescriptor& descriptor,
-                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
-
+    virtual bool IsSubtractionSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 }; // class ILayerSupport
 
 } // namespace armnn

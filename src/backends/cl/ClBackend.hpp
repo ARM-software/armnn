@@ -4,8 +4,7 @@
 //
 #pragma once
 
-#include "backends/IBackendInternal.hpp"
-
+#include <backends/IBackendInternal.hpp>
 #include "ClLayerSupport.hpp"
 
 namespace armnn
@@ -23,10 +22,9 @@ public:
 
     std::unique_ptr<IWorkloadFactory> CreateWorkloadFactory() const override;
 
-private:
-    static const std::string s_Id;
+    static void Destroy(IBackend* backend);
 
-    // TODO initialize
+private:
     ClLayerSupport m_LayerSupport;
 };
 

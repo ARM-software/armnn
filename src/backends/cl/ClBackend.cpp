@@ -4,11 +4,25 @@
 //
 
 #include "ClBackend.hpp"
+#include <backends/BackendRegistry.hpp>
+#include <boost/cast.hpp>
 
 namespace armnn
 {
 
-const std::string ClBackend::s_Id = "arm_compute_cl";
+namespace
+{
+static const std::string s_Id = "GpuAcc";
+
+static BackendRegistry::Helper g_RegisterHelper{
+    s_Id,
+    []()
+    {
+        return IBackendUniquePtr(new ClBackend, &ClBackend::Destroy);
+    }
+};
+
+}
 
 const std::string& ClBackend::GetId() const
 {
@@ -22,8 +36,12 @@ const ILayerSupport& ClBackend::GetLayerSupport() const
 
 std::unique_ptr<IWorkloadFactory> ClBackend::CreateWorkloadFactory() const
 {
-    // TODO implement
     return nullptr;
+}
+
+void ClBackend::Destroy(IBackend* backend)
+{
+    delete boost::polymorphic_downcast<ClBackend*>(backend);
 }
 
 } // namespace armnn

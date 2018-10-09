@@ -4,11 +4,25 @@
 //
 
 #include "RefBackend.hpp"
+#include <backends/BackendRegistry.hpp>
+#include <boost/cast.hpp>
 
 namespace armnn
 {
 
-const std::string RefBackend::s_Id = "arm_reference";
+namespace
+{
+const std::string s_Id = "CpuRef";
+
+static BackendRegistry::Helper s_RegisterHelper{
+    s_Id,
+    []()
+    {
+        return IBackendUniquePtr(new RefBackend, &RefBackend::Destroy);
+    }
+};
+
+}
 
 const std::string& RefBackend::GetId() const
 {
@@ -22,8 +36,12 @@ const ILayerSupport& RefBackend::GetLayerSupport() const
 
 std::unique_ptr<IWorkloadFactory> RefBackend::CreateWorkloadFactory() const
 {
-    // TODO implement
     return nullptr;
+}
+
+void RefBackend::Destroy(IBackend* backend)
+{
+    delete boost::polymorphic_downcast<RefBackend*>(backend);
 }
 
 } // namespace armnn

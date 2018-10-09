@@ -13,8 +13,8 @@ namespace armnn
 class IBackendInternal : public IBackend
 {
 protected:
-    IBackendInternal() {}
-    virtual ~IBackendInternal() {}
+    IBackendInternal() = default;
+    ~IBackendInternal() override = default;
 
 public:
     virtual std::unique_ptr<IWorkloadFactory> CreateWorkloadFactory() const = 0;

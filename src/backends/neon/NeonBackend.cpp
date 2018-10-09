@@ -4,11 +4,26 @@
 //
 
 #include "NeonBackend.hpp"
+#include <backends/BackendRegistry.hpp>
+#include <boost/cast.hpp>
 
 namespace armnn
 {
 
-const std::string NeonBackend::s_Id = "arm_compute_neon";
+namespace
+{
+
+static const std::string s_Id = "CpuAcc";
+
+static BackendRegistry::Helper g_RegisterHelper{
+    s_Id,
+    []()
+    {
+        return IBackendUniquePtr(new NeonBackend, &NeonBackend::Destroy);
+    }
+};
+
+}
 
 const std::string& NeonBackend::GetId() const
 {
@@ -22,8 +37,12 @@ const ILayerSupport& NeonBackend::GetLayerSupport() const
 
 std::unique_ptr<IWorkloadFactory> NeonBackend::CreateWorkloadFactory() const
 {
-    // TODO implement
     return nullptr;
+}
+
+void NeonBackend::Destroy(IBackend* backend)
+{
+    delete boost::polymorphic_downcast<NeonBackend*>(backend);
 }
 
 } // namespace armnn

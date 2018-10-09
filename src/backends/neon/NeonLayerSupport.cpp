@@ -5,8 +5,8 @@
 
 #include "NeonLayerSupport.hpp"
 
-#include <LayerSupportCommon.hpp>
 #include <InternalTypes.hpp>
+#include <LayerSupportCommon.hpp>
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/Types.hpp>
@@ -34,6 +34,301 @@ using namespace boost;
 
 namespace armnn
 {
+
+bool NeonLayerSupport::IsActivationSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const ActivationDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsActivationSupportedNeon(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsAdditionSupported(const TensorInfo& input0,
+                                           const TensorInfo& input1,
+                                           const TensorInfo& output,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsAdditionSupportedNeon(input0, input1, output, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
+                                                     const TensorInfo& output,
+                                                     const TensorInfo& mean,
+                                                     const TensorInfo& var,
+                                                     const TensorInfo& beta,
+                                                     const TensorInfo& gamma,
+                                                     const BatchNormalizationDescriptor& descriptor,
+                                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsBatchNormalizationSupportedNeon(input,
+                                                    output,
+                                                    mean,
+                                                    var,
+                                                    beta,
+                                                    gamma,
+                                                    descriptor,
+                                                    reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsConstantSupported(const TensorInfo& output,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsConstantSupportedNeon(output, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
+                                                    const TensorInfo& output,
+                                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsConvertFp16ToFp32SupportedNeon(input, output, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsConvertFp32ToFp16Supported(const TensorInfo& input,
+                                                    const TensorInfo& output,
+                                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsConvertFp32ToFp16SupportedNeon(input, output, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const Convolution2dDescriptor& descriptor,
+                                                const TensorInfo& weights,
+                                                const Optional<TensorInfo>& biases,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsConvolution2dSupportedNeon(input,
+                                               output,
+                                               descriptor,
+                                               weights,
+                                               biases,
+                                               reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
+                                                       const TensorInfo& output,
+                                                       const DepthwiseConvolution2dDescriptor& descriptor,
+                                                       const TensorInfo& weights,
+                                                       const Optional<TensorInfo>& biases,
+                                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsDepthwiseConvolutionSupportedNeon(input,
+                                                      output,
+                                                      descriptor,
+                                                      weights,
+                                                      biases,
+                                                      reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsDivisionSupported(const TensorInfo& input0,
+                                           const TensorInfo& input1,
+                                           const TensorInfo& output,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsDivisionSupportedNeon(input0, input1, output, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
+                                                   const FakeQuantizationDescriptor& descriptor,
+                                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsFakeQuantizationSupportedNeon(input, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsFloorSupportedNeon(input, output, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 const TensorInfo& weights,
+                                                 const TensorInfo& biases,
+                                                 const FullyConnectedDescriptor& descriptor,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsFullyConnectedSupportedNeon(input,
+                                                output,
+                                                weights,
+                                                biases,
+                                                descriptor,
+                                                reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsInputSupported(const TensorInfo& input,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsInputSupportedNeon(input, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
+                                                  const TensorInfo& output,
+                                                  const L2NormalizationDescriptor& descriptor,
+                                                  Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsL2NormalizationSupportedNeon(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsLstmSupported(const TensorInfo& input,
+                                       const TensorInfo& outputStateIn,
+                                       const TensorInfo& cellStateIn,
+                                       const TensorInfo& scratchBuffer,
+                                       const TensorInfo& outputStateOut,
+                                       const TensorInfo& cellStateOut,
+                                       const TensorInfo& output,
+                                       const LstmDescriptor& descriptor,
+                                       const TensorInfo& inputToForgetWeights,
+                                       const TensorInfo& inputToCellWeights,
+                                       const TensorInfo& inputToOutputWeights,
+                                       const TensorInfo& recurrentToForgetWeights,
+                                       const TensorInfo& recurrentToCellWeights,
+                                       const TensorInfo& recurrentToOutputWeights,
+                                       const TensorInfo& forgetGateBias,
+                                       const TensorInfo& cellBias,
+                                       const TensorInfo& outputGateBias,
+                                       const TensorInfo* inputToInputWeights,
+                                       const TensorInfo* recurrentToInputWeights,
+                                       const TensorInfo* cellToInputWeights,
+                                       const TensorInfo* inputGateBias,
+                                       const TensorInfo* projectionWeights,
+                                       const TensorInfo* projectionBias,
+                                       const TensorInfo* cellToForgetWeights,
+                                       const TensorInfo* cellToOutputWeights,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsLstmSupportedNeon(input,
+                                      outputStateIn,
+                                      cellStateIn,
+                                      scratchBuffer,
+                                      outputStateOut,
+                                      cellStateOut,
+                                      output,
+                                      descriptor,
+                                      inputToForgetWeights,
+                                      inputToCellWeights,
+                                      inputToOutputWeights,
+                                      recurrentToForgetWeights,
+                                      recurrentToCellWeights,
+                                      recurrentToOutputWeights,
+                                      forgetGateBias,
+                                      cellBias,
+                                      outputGateBias,
+                                      inputToInputWeights,
+                                      recurrentToInputWeights,
+                                      cellToInputWeights,
+                                      inputGateBias,
+                                      projectionWeights,
+                                      projectionBias,
+                                      cellToForgetWeights,
+                                      cellToOutputWeights,
+                                      reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsMeanSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const MeanDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsMeanSupportedNeon(input, output, descriptor,reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
+                                         const OriginsDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsMergerSupportedNeon(inputs, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
+                                                 const TensorInfo& input1,
+                                                 const TensorInfo& output,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsMultiplicationSupportedNeon(input0, input1, output, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsNormalizationSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const NormalizationDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsNormalizationSupportedNeon(input,
+                                               output,
+                                               descriptor,
+                                               reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsOutputSupported(const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsOutputSupportedNeon(output, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsPadSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const PadDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsPadSupportedNeon(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsPermuteSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const PermuteDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsPermuteSupportedNeon(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsPooling2dSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const Pooling2dDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsPooling2dSupportedNeon(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsReshapeSupportedNeon(input, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsResizeBilinearSupportedNeon(input, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const SoftmaxDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsSoftmaxSupportedNeon(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsSplitterSupported(const TensorInfo& input,
+                                           const ViewsDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsSplitterSupportedNeon(input, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
+                                              const TensorInfo& input1,
+                                              const TensorInfo& output,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsSubtractionSupportedNeon(input0, input1, output, reasonIfUnsupported);
+}
+
+//
+// Implementation functions
+//
+// TODO: Functions kept for backward compatibility. Remove once transition to plugable backends is complete!
 
 bool IsNeonDirectConvolutionPreferred(const TensorInfo& weightInfo, const Convolution2dDescriptor& desc)
 {

@@ -2,21 +2,20 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
 
-#include "test/TensorHelpers.hpp"
-#include "LayerTests.hpp"
+#include <armnn/test/TensorHelpers.hpp>
+#include <armnn/test/UnitTests.hpp>
 
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/neon/NeonLayerSupport.hpp>
 #include <backends/neon/NeonWorkloadFactory.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/test/ActivationFixture.hpp>
+#include <backends/test/LayerTests.hpp>
 #include <backends/test/TensorCopyUtils.hpp>
-#include "ActivationFixture.hpp"
+#include <backends/test/WorkloadTestUtils.hpp>
 
-#include "WorkloadTestUtils.hpp"
-
-#include "test/UnitTests.hpp"
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(Compute_ArmComputeNeon)
 using FactoryType = armnn::NeonWorkloadFactory;

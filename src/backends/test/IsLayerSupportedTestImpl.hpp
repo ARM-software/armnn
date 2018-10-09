@@ -537,11 +537,6 @@ bool LayerTypeMatchesTestImpl(Tag<Type>)
         LayerTypeMatchesTestImpl<NextType(Type)>(Tag<NextType(Type)>());
 };
 
-bool LayerTypeMatchesTest()
-{
-    return LayerTypeMatchesTestImpl<armnn::LayerType::FirstLayer>(Tag<armnn::LayerType::FirstLayer>());
-};
-
 template<typename FactoryType, typename LayerType, armnn::DataType InputDataType , armnn::DataType OutputDataType>
 bool IsConvertLayerSupportedTests(std::string& reasonIfUnsupported)
 {

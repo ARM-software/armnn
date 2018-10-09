@@ -6,6 +6,7 @@
 if(ARMCOMPUTECL)
     add_subdirectory(${PROJECT_SOURCE_DIR}/src/backends/cl)
     list(APPEND armnnLibraries armnnClBackend armnnClBackendWorkloads)
+    list(APPEND armnnUnitTestLibraries armnnClBackendUnitTests)
 else()
     message("CL backend is disabled")
     add_subdirectory(${PROJECT_SOURCE_DIR}/src/backends/cl)

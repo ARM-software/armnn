@@ -2,24 +2,27 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
+
+#include "ClContextControlFixture.hpp"
+
 #include "test/TensorHelpers.hpp"
-#include "LayerTests.hpp"
+#include "test/UnitTests.hpp"
 
 #include <backends/CpuTensorHandle.hpp>
+#include <backends/cl/ClLayerSupport.hpp>
 #include <backends/cl/ClWorkloadFactory.hpp>
 #include <backends/cl/workloads/ClWorkloadUtils.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/cl/ClLayerSupport.hpp>
-#include "ActivationFixture.hpp"
-#include "ClContextControlFixture.hpp"
+#include <backends/test/ActivationFixture.hpp>
+#include <backends/test/LayerTests.hpp>
 
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
-#include <string>
-#include <iostream>
 
-#include "test/UnitTests.hpp"
+#include <boost/test/unit_test.hpp>
+
+#include <iostream>
+#include <string>
 
 BOOST_FIXTURE_TEST_SUITE(Compute_ArmComputeCl, ClContextControlFixture)
 using FactoryType = armnn::ClWorkloadFactory;

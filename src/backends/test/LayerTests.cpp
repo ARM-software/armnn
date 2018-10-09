@@ -39,7 +39,7 @@
 #include "ConvertFp16ToFp32TestImpl.hpp"
 #include "ConvertFp32ToFp16TestImpl.hpp"
 
-#include "ClContextControlFixture.hpp"
+#include <backends/cl/test/ClContextControlFixture.hpp>
 
 // 3-channel 16x8 image used as common input data for a number of Conv2d tests.
 static std::vector<float> ConvInput3x8x16({

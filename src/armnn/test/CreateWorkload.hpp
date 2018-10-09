@@ -9,6 +9,7 @@
 #include <boost/cast.hpp>
 
 #include <backends/WorkloadData.hpp>
+#include <backends/WorkloadFactory.hpp>
 #include <backends/CpuTensorHandle.hpp>
 
 #include <Graph.hpp>

@@ -15,7 +15,8 @@ list(APPEND armnnClBackend_sources
 )
 
 if(ARMCOMPUTECL)
-    add_subdirectory(workloads test)
+    add_subdirectory(workloads)
+    add_subdirectory(test)
 endif()
 
 add_library(armnnClBackend STATIC ${armnnClBackend_sources})

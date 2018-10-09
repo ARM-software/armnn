@@ -2,13 +2,15 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <backends/cl/ClWorkloadFactory.hpp>
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/MemCopyWorkload.hpp>
-#include <backends/cl/workloads/ClWorkloadUtils.hpp>
-#include <backends/cl/workloads/ClWorkloads.hpp>
-#include <backends/cl/ClTensorHandle.hpp>
+
 #include "ClContextControlFixture.hpp"
+
+#include <backends/MemCopyWorkload.hpp>
+#include <backends/cl/ClTensorHandle.hpp>
+#include <backends/cl/ClWorkloadFactory.hpp>
+#include <backends/cl/workloads/ClWorkloads.hpp>
+#include <backends/cl/workloads/ClWorkloadUtils.hpp>
+#include <backends/reference/RefWorkloadFactory.hpp>
 
 #include <test/CreateWorkloadClNeon.hpp>
 

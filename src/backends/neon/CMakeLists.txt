@@ -14,7 +14,8 @@ if(ARMCOMPUTENEON)
         NeonTensorHandle.hpp
     )
 
-    add_subdirectory(workloads test)
+    add_subdirectory(workloads)
+    add_subdirectory(test)
 else()
     list(APPEND armnnNeonBackend_sources
         NeonLayerSupport.cpp

@@ -194,17 +194,19 @@ LOCAL_SRC_FILES := \
 	src/armnn/test/ProfilingEventTest.cpp \
 	src/armnn/test/ObservableTest.cpp \
 	src/armnn/test/OptionalTest.cpp \
-	src/backends/test/IsLayerSupportedTest.cpp \
-	src/backends/test/Reference.cpp \
 	src/backends/test/WorkloadDataValidation.cpp \
 	src/backends/test/TensorCopyUtils.cpp \
 	src/backends/test/LayerTests.cpp \
-	src/backends/test/CreateWorkloadRef.cpp \
-	src/backends/test/ArmComputeCl.cpp \
-	src/backends/test/ArmComputeNeon.cpp \
-	src/backends/test/CreateWorkloadCl.cpp \
-	src/backends/test/CreateWorkloadNeon.cpp \
-	src/backends/test/MemCopyTests.cpp
+	src/backends/test/MemCopyTests.cpp \
+        src/backends/cl/test/ClCreateWorkloadTests.cpp \
+        src/backends/cl/test/ClLayerSupportTests.cpp \
+	src/backends/cl/test/ClLayerTests.cpp \
+        src/backends/neon/test/NeonCreateWorkloadTests.cpp \
+        src/backends/neon/test/NeonLayerSupportTests.cpp \
+	src/backends/neon/test/NeonLayerTests.cpp \
+        src/backends/reference/test/RefCreateWorkloadTests.cpp \
+        src/backends/reference/test/RefLayerSupportTests.cpp \
+	src/backends/reference/test/RefLayerTests.cpp
 
 LOCAL_STATIC_LIBRARIES := \
 	libneuralnetworks_common \

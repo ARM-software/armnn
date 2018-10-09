@@ -5,6 +5,8 @@
 #pragma once
 
 #include "CreateWorkload.hpp"
+
+#include <backends/MemCopyWorkload.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
 
 #if ARMCOMPUTECL_ENABLED

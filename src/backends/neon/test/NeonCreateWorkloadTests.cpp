@@ -2,13 +2,14 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
+#include <armnn/test/CreateWorkloadClNeon.hpp>
+
+#include <backends/MemCopyWorkload.hpp>
 #include <backends/neon/NeonWorkloadFactory.hpp>
 #include <backends/neon/NeonTensorHandle.hpp>
 #include <backends/neon/workloads/NeonWorkloadUtils.hpp>
 #include <backends/neon/workloads/NeonWorkloads.hpp>
-#include <backends/MemCopyWorkload.hpp>
-
-#include "test/CreateWorkloadClNeon.hpp"
 
 BOOST_AUTO_TEST_SUITE(CreateWorkloadNeon)
 

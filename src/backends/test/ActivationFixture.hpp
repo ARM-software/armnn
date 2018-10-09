@@ -7,6 +7,11 @@
 #include "TensorCopyUtils.hpp"
 #include "WorkloadTestUtils.hpp"
 
+#include <armnn/test/TensorHelpers.hpp>
+
+#include <boost/numeric/conversion/cast.hpp>
+#include <boost/multi_array.hpp>
+
 struct ActivationFixture
 {
     ActivationFixture()

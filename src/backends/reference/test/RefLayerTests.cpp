@@ -2,14 +2,14 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
 
-#include "LayerTests.hpp"
 #include "test/TensorHelpers.hpp"
+#include "test/UnitTests.hpp"
 
 #include <backends/reference/RefWorkloadFactory.hpp>
+#include <backends/test/LayerTests.hpp>
 
-#include "test/UnitTests.hpp"
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(Compute_Reference)
 using FactoryType = armnn::RefWorkloadFactory;

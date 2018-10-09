@@ -378,9 +378,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptionalTest.cpp
-        src/backends/test/IsLayerSupportedTest.cpp
         src/backends/test/IsLayerSupportedTestImpl.hpp
-        src/backends/test/Reference.cpp
         src/backends/test/WorkloadDataValidation.cpp
         src/backends/test/TensorCopyUtils.hpp
         src/backends/test/TensorCopyUtils.cpp
@@ -398,22 +396,16 @@ if(BUILD_UNIT_TESTS)
         src/backends/test/NormTestImpl.hpp
         src/backends/test/BatchNormTestImpl.hpp
         src/backends/test/WorkloadTestUtils.hpp
-        src/backends/test/CreateWorkloadRef.cpp
         src/backends/test/QuantizeHelper.hpp)
 
     if(ARMCOMPUTENEON)
         list(APPEND unittest_sources
-            src/backends/test/ArmComputeNeon.cpp
-            src/backends/test/CreateWorkloadNeon.cpp
             src/armnn/test/CreateWorkloadClNeon.hpp
             src/armnn/test/NeonTimerTest.cpp)
     endif()
 
     if(ARMCOMPUTECL)
         list(APPEND unittest_sources
-            src/backends/test/ArmComputeCl.cpp
-            src/backends/test/ClContextControlFixture.hpp
-            src/backends/test/CreateWorkloadCl.cpp
             src/armnn/test/CreateWorkloadClNeon.hpp
             src/armnn/test/OpenClTimerTest.cpp
             src/armnn/test/FP16SupportTest.cpp)
@@ -522,8 +514,15 @@ if(BUILD_UNIT_TESTS)
         endif()
     endif()
 
-    target_link_libraries(UnitTests armnn)
-    target_link_libraries(UnitTests armnnUtils)
+    # the backends under src/backends extend the list of
+    # static libs UnitTests to link against
+    list(APPEND armnnUnitTestLibraries armnn armnnUtils)
+
+    foreach(lib ${armnnUnitTestLibraries})
+        target_link_libraries(UnitTests ${lib})
+        message("Adding library dependency to UnitTests: ${lib}")
+    endforeach()
+
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
     target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 

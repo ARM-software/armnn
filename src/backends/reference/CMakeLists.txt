@@ -17,5 +17,5 @@ target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 
-add_subdirectory(workloads test)
-
+add_subdirectory(workloads)
+add_subdirectory(test)

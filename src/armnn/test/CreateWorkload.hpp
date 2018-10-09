@@ -177,7 +177,8 @@ std::unique_ptr<BatchNormalizationFloat32Workload> CreateBatchNormalizationWorkl
 
 template <typename Convolution2dWorkload, armnn::DataType DataType>
 std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IWorkloadFactory& factory,
-                                                                              armnn::Graph&            graph)
+                                                                       armnn::Graph&            graph,
+                                                                       DataLayout dataLayout = DataLayout::NCHW)
 {
     // Creates the layer we're testing.
     Convolution2dDescriptor layerDesc;
@@ -188,10 +189,15 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     layerDesc.m_StrideX = 2;
     layerDesc.m_StrideY = 4;
     layerDesc.m_BiasEnabled = true;
+    layerDesc.m_DataLayout = dataLayout;
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({2, 3, 5, 3}, DataType));
+    TensorShape weightShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 5, 3} : TensorShape{2, 5, 3, 3};
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 8, 16} : TensorShape{2, 8, 16, 3};
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 2, 2, 10} : TensorShape{2, 2, 10, 2};
+
+    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo(weightShape, DataType));
     layer->m_Bias   = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
 
     layer->m_Weight->Allocate();
@@ -201,9 +207,9 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
-    // Connecst up.
-    Connect(input, layer, TensorInfo({2, 3, 8, 16}, DataType));
-    Connect(layer, output, TensorInfo({2, 2, 2, 10}, DataType));
+    // Connects up.
+    Connect(input, layer, TensorInfo(inputShape, DataType));
+    Connect(layer, output, TensorInfo(outputShape, DataType));
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
@@ -216,11 +222,12 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 3);
     BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 1);
     BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 1);
-    BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled == true);
+    BOOST_TEST(queueDescriptor.m_Parameters.m_BiasEnabled);
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({2, 3, 5, 3}, DataType)));
+    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
     BOOST_TEST((queueDescriptor.m_Bias->GetTensorInfo() ==
         TensorInfo({2}, GetBiasDataType(DataType))));
 
@@ -501,7 +508,7 @@ std::unique_ptr<NormalizationWorkload> CreateNormalizationWorkloadTest(armnn::IW
 
     NormalizationLayer* layer = graph.AddLayer<NormalizationLayer>(layerDesc, "layer");
 
-    // Creatse extra layers.
+    // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 

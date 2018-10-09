@@ -11,8 +11,7 @@
 
 namespace armnn {
 
-template <armnn::DataType... dataTypes>
-class ClPadWorkload : public TypedWorkload<PadQueueDescriptor, dataTypes...>
+class ClPadWorkload : public BaseWorkload<PadQueueDescriptor>
 {
 public:
     ClPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info);
@@ -28,4 +27,3 @@ arm_compute::Status ClPadValidate(const TensorInfo& input,
                                   const PadDescriptor& descriptor);
 
 } //namespace armnn
-

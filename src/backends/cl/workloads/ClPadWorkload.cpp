@@ -15,9 +15,8 @@ namespace armnn
 {
 using namespace armcomputetensorutils;
 
-template <armnn::DataType... T>
-ClPadWorkload<T...>::ClPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info)
-: TypedWorkload<PadQueueDescriptor, T...>(descriptor, info)
+ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info)
+    : BaseWorkload<PadQueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClPadWorkload", 1, 1);
 
@@ -28,8 +27,7 @@ ClPadWorkload<T...>::ClPadWorkload(const PadQueueDescriptor& descriptor, const W
     m_Layer.configure(&input, &output, padList);
 }
 
-template <armnn::DataType... T>
-void ClPadWorkload<T...>::Execute() const
+void ClPadWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClPadWorkload_Execute");
     m_Layer.run();
@@ -51,6 +49,3 @@ arm_compute::Status ClPadValidate(const TensorInfo& input,
 }
 
 } // namespace armnn
-
-template class armnn::ClPadWorkload<armnn::DataType::Float16, armnn::DataType::Float32>;
-template class armnn::ClPadWorkload<armnn::DataType::QuantisedAsymm8>;

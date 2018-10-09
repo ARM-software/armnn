@@ -378,6 +378,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptionalTest.cpp
+        src/backends/test/BackendRegistryTests.cpp
         src/backends/test/IsLayerSupportedTestImpl.hpp
         src/backends/test/WorkloadDataValidation.cpp
         src/backends/test/TensorCopyUtils.hpp

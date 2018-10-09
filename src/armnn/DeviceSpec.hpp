@@ -17,9 +17,9 @@ public:
     DeviceSpec() {}
     virtual ~DeviceSpec() {}
 
-    virtual std::vector<IBackendPtr> GetBackends() const
+    virtual std::vector<IBackendSharedPtr> GetBackends() const
     {
-        return std::vector<IBackendPtr>();
+        return std::vector<IBackendSharedPtr>();
     }
 
     std::set<Compute> m_SupportedComputeDevices;

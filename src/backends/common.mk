@@ -8,6 +8,7 @@
 # file in the root of ArmNN
 
 COMMON_SOURCES := \
+    BackendRegistry.cpp \
     CpuTensorHandle.cpp \
     MemCopyWorkload.cpp \
     OutputHandler.cpp \

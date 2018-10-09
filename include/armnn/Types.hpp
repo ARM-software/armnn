@@ -117,7 +117,8 @@ public:
     virtual const ILayerSupport& GetLayerSupport() const = 0;
 };
 
-using IBackendPtr = std::shared_ptr<IBackend>;
+using IBackendSharedPtr = std::shared_ptr<IBackend>;
+using IBackendUniquePtr = std::unique_ptr<IBackend, void(*)(IBackend* backend)>;
 
 /// Device specific knowledge to be passed to the optimizer.
 class IDeviceSpec

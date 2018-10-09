@@ -3,13 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "LayerSupportCommon.hpp"
-
 #include "ClLayerSupport.hpp"
+
 #include "InternalTypes.hpp"
-#include <armnn/Descriptors.hpp>
-#include <armnn/Types.hpp>
-#include <armnn/Tensor.hpp>
+#include "LayerSupportCommon.hpp"
 
 #include <boost/core/ignore_unused.hpp>
 
@@ -38,6 +35,303 @@ using namespace boost;
 
 namespace armnn
 {
+
+bool ClLayerSupport::IsActivationSupported(const TensorInfo& input,
+                                           const TensorInfo& output,
+                                           const ActivationDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsActivationSupportedCl(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsAdditionSupported(const TensorInfo& input0,
+                                         const TensorInfo& input1,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsAdditionSupportedCl(input0, input1, output, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
+                                                   const TensorInfo& output,
+                                                   const TensorInfo& mean,
+                                                   const TensorInfo& var,
+                                                   const TensorInfo& beta,
+                                                   const TensorInfo& gamma,
+                                                   const BatchNormalizationDescriptor& descriptor,
+                                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsBatchNormalizationSupportedCl(input,
+                                                  output,
+                                                  mean,
+                                                  var,
+                                                  beta,
+                                                  gamma,
+                                                  descriptor,
+                                                  reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsConstantSupported(const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsConstantSupportedCl(output, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
+                                                  const TensorInfo& output,
+                                                  Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsConvertFp16ToFp32SupportedCl(input, output, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsConvertFp32ToFp16Supported(const TensorInfo& input,
+                                                  const TensorInfo& output,
+                                                  Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsConvertFp32ToFp16SupportedCl(input, output, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const Convolution2dDescriptor& descriptor,
+                                              const TensorInfo& weights,
+                                              const Optional<TensorInfo>& biases,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsConvolution2dSupportedCl(input,
+                                             output,
+                                             descriptor,
+                                             weights,
+                                             biases,
+                                             reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
+                                                     const TensorInfo& output,
+                                                     const DepthwiseConvolution2dDescriptor& descriptor,
+                                                     const TensorInfo& weights,
+                                                     const Optional<TensorInfo>& biases,
+                                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsDepthwiseConvolutionSupportedCl(input,
+                                                    output,
+                                                    descriptor,
+                                                    weights,
+                                                    biases,
+                                                    reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsDivisionSupported(const TensorInfo& input0,
+                                         const TensorInfo& input1,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsDivisionSupportedCl(input0, input1, output, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
+                                                 const FakeQuantizationDescriptor& descriptor,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsFakeQuantizationSupportedCl(input, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsFloorSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsFloorSupportedCl(input, output, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const TensorInfo& weights,
+                                               const TensorInfo& biases,
+                                               const FullyConnectedDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsFullyConnectedSupportedCl(input,
+                                              output,
+                                              weights,
+                                              biases,
+                                              descriptor,
+                                              reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsInputSupported(const TensorInfo& input,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsInputSupportedCl(input, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const L2NormalizationDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsL2NormalizationSupportedCl(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsLstmSupported(const TensorInfo& input,
+                                     const TensorInfo& outputStateIn,
+                                     const TensorInfo& cellStateIn,
+                                     const TensorInfo& scratchBuffer,
+                                     const TensorInfo& outputStateOut,
+                                     const TensorInfo& cellStateOut,
+                                     const TensorInfo& output,
+                                     const LstmDescriptor& descriptor,
+                                     const TensorInfo& inputToForgetWeights,
+                                     const TensorInfo& inputToCellWeights,
+                                     const TensorInfo& inputToOutputWeights,
+                                     const TensorInfo& recurrentToForgetWeights,
+                                     const TensorInfo& recurrentToCellWeights,
+                                     const TensorInfo& recurrentToOutputWeights,
+                                     const TensorInfo& forgetGateBias,
+                                     const TensorInfo& cellBias,
+                                     const TensorInfo& outputGateBias,
+                                     const TensorInfo* inputToInputWeights,
+                                     const TensorInfo* recurrentToInputWeights,
+                                     const TensorInfo* cellToInputWeights,
+                                     const TensorInfo* inputGateBias,
+                                     const TensorInfo* projectionWeights,
+                                     const TensorInfo* projectionBias,
+                                     const TensorInfo* cellToForgetWeights,
+                                     const TensorInfo* cellToOutputWeights,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsLstmSupportedCl(input,
+                                    outputStateIn,
+                                    cellStateIn,
+                                    scratchBuffer,
+                                    outputStateOut,
+                                    cellStateOut,
+                                    output,
+                                    descriptor,
+                                    inputToForgetWeights,
+                                    inputToCellWeights,
+                                    inputToOutputWeights,
+                                    recurrentToForgetWeights,
+                                    recurrentToCellWeights,
+                                    recurrentToOutputWeights,
+                                    forgetGateBias,
+                                    cellBias,
+                                    outputGateBias,
+                                    inputToInputWeights,
+                                    recurrentToInputWeights,
+                                    cellToInputWeights,
+                                    inputGateBias,
+                                    projectionWeights,
+                                    projectionBias,
+                                    cellToForgetWeights,
+                                    cellToOutputWeights,
+                                    reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsMeanSupported(const TensorInfo& input,
+                                     const TensorInfo& output,
+                                     const MeanDescriptor& descriptor,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsMeanSupportedCl(input, output, descriptor,reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
+                                       const OriginsDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsMergerSupportedCl(inputs, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
+                                               const TensorInfo& input1,
+                                               const TensorInfo& output,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsMultiplicationSupportedCl(input0, input1, output, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsNormalizationSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const NormalizationDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsNormalizationSupportedCl(input,
+                                             output,
+                                             descriptor,
+                                             reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsOutputSupported(const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsOutputSupportedCl(output, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsPadSupported(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    const PadDescriptor& descriptor,
+                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsPadSupportedCl(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsPermuteSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        const PermuteDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsPermuteSupportedCl(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsPooling2dSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const Pooling2dDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsPooling2dSupportedCl(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsReshapeSupportedCl(input, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsResizeBilinearSupportedCl(input, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        const SoftmaxDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsSoftmaxSupportedCl(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
+                                         const ViewsDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsSplitterSupportedCl(input, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
+                                            const TensorInfo& input1,
+                                            const TensorInfo& output,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    return armnn::IsSubtractionSupportedCl(input0, input1, output, reasonIfUnsupported);
+}
+
+//
+// Implementation functions
+//
+// TODO: Functions kept for backward compatibility. Remove redundant functions
+// once transition to plugable backends is complete.
+
 namespace
 {
 template<unsigned int FilterSize>

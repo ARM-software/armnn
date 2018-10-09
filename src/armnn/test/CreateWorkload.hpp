@@ -885,9 +885,14 @@ std::unique_ptr<L2NormalizationWorkload> CreateL2NormalizationWorkloadTest(armnn
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
+    TensorShape inputShape = (dataLayout == DataLayout::NCHW) ?
+                TensorShape{ 5, 20, 50, 67 } : TensorShape{ 5, 50, 67, 20 };
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ?
+                TensorShape{ 5, 20, 50, 67 } : TensorShape{ 5, 50, 67, 20 };
+
     // Connects up.
-    armnn::TensorInfo inputTensorInfo({ 5, 20, 50, 67 }, DataType);
-    armnn::TensorInfo outputTensorInfo({ 5, 20, 50, 67 }, DataType);
+    armnn::TensorInfo inputTensorInfo(inputShape, DataType);
+    armnn::TensorInfo outputTensorInfo(outputShape, DataType);
     Connect(input, layer, inputTensorInfo);
     Connect(layer, output, outputTensorInfo);
     CreateTensorHandles(graph, factory);

@@ -493,17 +493,23 @@ BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsNeon)
 template <typename L2NormalizationWorkloadType, typename armnn::DataType DataType>
 static void NeonCreateL2NormalizationWorkloadTest(DataLayout dataLayout)
 {
-    Graph                graph;
-    NeonWorkloadFactory  factory;
-    auto                 workload = CreateL2NormalizationWorkloadTest<L2NormalizationWorkloadType,
-                                    DataType>(factory, graph, dataLayout);
+    Graph graph;
+    NeonWorkloadFactory factory;
+    auto workload =
+            CreateL2NormalizationWorkloadTest<L2NormalizationWorkloadType, DataType>(factory, graph, dataLayout);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     L2NormalizationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({ 5, 20, 50, 67 }, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({ 5, 20, 50, 67 }, DataType)));
+
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ?
+                TensorShape{ 5, 20, 50, 67 } : TensorShape{ 5, 50, 67, 20 };
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ?
+                TensorShape{ 5, 20, 50, 67 } : TensorShape{ 5, 50, 67, 20 };
+
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC

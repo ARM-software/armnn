@@ -10,15 +10,11 @@ list(APPEND armnnClBackendWorkloads_sources
     ClActivationUint8Workload.hpp
     ClAdditionWorkload.cpp
     ClAdditionWorkload.hpp
-    ClBaseConstantWorkload.cpp
-    ClBaseConstantWorkload.hpp
     ClBaseMergerWorkload.hpp
     ClBatchNormalizationFloatWorkload.cpp
     ClBatchNormalizationFloatWorkload.hpp
-    ClConstantFloatWorkload.cpp
-    ClConstantFloatWorkload.hpp
-    ClConstantUint8Workload.cpp
-    ClConstantUint8Workload.hpp
+    ClConstantWorkload.cpp
+    ClConstantWorkload.hpp
     ClConvertFp16ToFp32Workload.cpp
     ClConvertFp16ToFp32Workload.hpp
     ClConvertFp32ToFp16Workload.cpp

@@ -15,10 +15,8 @@ BACKEND_SOURCES := \
         workloads/ClActivationFloatWorkload.cpp \
         workloads/ClActivationUint8Workload.cpp \
         workloads/ClAdditionWorkload.cpp \
-        workloads/ClBaseConstantWorkload.cpp \
         workloads/ClBatchNormalizationFloatWorkload.cpp \
-        workloads/ClConstantFloatWorkload.cpp \
-        workloads/ClConstantUint8Workload.cpp \
+        workloads/ClConstantWorkload.cpp \
         workloads/ClConvertFp16ToFp32Workload.cpp \
         workloads/ClConvertFp32ToFp16Workload.cpp \
         workloads/ClConvolution2dWorkload.cpp \

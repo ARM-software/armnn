@@ -223,7 +223,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateL2Normalization(const L2Norm
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClConstantFloatWorkload, ClConstantUint8Workload>(descriptor, info);
+    return std::make_unique<ClConstantWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,

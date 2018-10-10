@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClBaseConstantWorkload.hpp"
+#include "ClConstantWorkload.hpp"
 
 #include <armnnUtils/Half.hpp>
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
@@ -15,12 +15,16 @@
 namespace armnn
 {
 
-template class ClBaseConstantWorkload<DataType::Float16, DataType::Float32>;
-template class ClBaseConstantWorkload<DataType::QuantisedAsymm8>;
-
-template<armnn::DataType... dataTypes>
-void ClBaseConstantWorkload<dataTypes...>::Execute() const
+ClConstantWorkload::ClConstantWorkload(const ConstantQueueDescriptor& descriptor, const WorkloadInfo& info)
+    : BaseWorkload<ConstantQueueDescriptor>(descriptor, info)
+    , m_RanOnce(false)
 {
+}
+
+void ClConstantWorkload::Execute() const
+{
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClConstantWorkload_Execute");
+
     // The intermediate tensor held by the corresponding layer output handler can be initialised with the given data
     // on the first inference, then reused for subsequent inferences.
     // The initialisation cannot happen at workload construction time since the ACL kernel for the next layer may not
@@ -60,6 +64,5 @@ void ClBaseConstantWorkload<dataTypes...>::Execute() const
         m_RanOnce = true;
     }
 }
-
 
 } //namespace armnn

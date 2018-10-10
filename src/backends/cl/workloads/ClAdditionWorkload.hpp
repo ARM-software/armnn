@@ -12,8 +12,7 @@
 namespace armnn
 {
 
-template <armnn::DataType... dataTypes>
-class ClAdditionWorkload : public TypedWorkload<AdditionQueueDescriptor, dataTypes...>
+class ClAdditionWorkload : public BaseWorkload<AdditionQueueDescriptor>
 {
 public:
     ClAdditionWorkload(const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info);

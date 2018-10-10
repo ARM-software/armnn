@@ -69,7 +69,7 @@ static void ClCreateArithmethicWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    ClCreateArithmethicWorkloadTest<ClAdditionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>,
+    ClCreateArithmethicWorkloadTest<ClAdditionWorkload,
                                     AdditionQueueDescriptor,
                                     AdditionLayer,
                                     armnn::DataType::Float32>();
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 {
-    ClCreateArithmethicWorkloadTest<ClAdditionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>,
+    ClCreateArithmethicWorkloadTest<ClAdditionWorkload,
                                     AdditionQueueDescriptor,
                                     AdditionLayer,
                                     armnn::DataType::Float16>();

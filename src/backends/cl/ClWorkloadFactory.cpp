@@ -162,8 +162,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateNormalization(const N
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&            info) const
 {
-    return MakeWorkload<ClAdditionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>,
-                        ClAdditionWorkload<armnn::DataType::QuantisedAsymm8>>(descriptor, info);
+    return std::make_unique<ClAdditionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMultiplication(

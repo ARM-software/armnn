@@ -17,10 +17,9 @@ using namespace armcomputetensorutils;
 
 static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::ConvertPolicy::SATURATE;
 
-template <armnn::DataType... T>
-ClAdditionWorkload<T...>::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor,
-                                                  const WorkloadInfo& info)
-    : TypedWorkload<AdditionQueueDescriptor, T...>(descriptor, info)
+ClAdditionWorkload::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor,
+                                       const WorkloadInfo& info)
+    : BaseWorkload<AdditionQueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClAdditionWorkload", 2, 1);
 
@@ -30,8 +29,7 @@ ClAdditionWorkload<T...>::ClAdditionWorkload(const AdditionQueueDescriptor& desc
     m_Layer.configure(&input0, &input1, &output, g_AclConvertPolicy);
 }
 
-template <armnn::DataType... T>
-void ClAdditionWorkload<T...>::Execute() const
+void ClAdditionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClAdditionWorkload_Execute");
     m_Layer.run();
@@ -54,6 +52,3 @@ arm_compute::Status ClAdditionValidate(const TensorInfo& input0,
 }
 
 } //namespace armnn
-
-template class armnn::ClAdditionWorkload<armnn::DataType::Float16, armnn::DataType::Float32>;
-template class armnn::ClAdditionWorkload<armnn::DataType::QuantisedAsymm8>;

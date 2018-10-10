@@ -338,13 +338,13 @@ BOOST_AUTO_TEST_CASE(CreateNormalizationFloat16NhwcWorkload)
     ClNormalizationWorkloadTest<ClNormalizationFloatWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
 }
 
-template <typename Pooling2dWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void ClPooling2dWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreatePooling2dWorkloadTest<Pooling2dWorkloadType, DataType>(factory, graph, dataLayout);
+    auto workload = CreatePooling2dWorkloadTest<ClPooling2dWorkload, DataType>(factory, graph, dataLayout);
 
     std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW) ?
             std::initializer_list<unsigned int>({3, 2, 5, 5}) : std::initializer_list<unsigned int>({3, 5, 5, 2});
@@ -362,22 +362,22 @@ static void ClPooling2dWorkloadTest(DataLayout dataLayout)
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloatNchwWorkload)
 {
-    ClPooling2dWorkloadTest<ClPooling2dFloatWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
+    ClPooling2dWorkloadTest<armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloatNhwcWorkload)
 {
-    ClPooling2dWorkloadTest<ClPooling2dFloatWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+    ClPooling2dWorkloadTest<armnn::DataType::Float32>(DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16NchwWorkload)
 {
-    ClPooling2dWorkloadTest<ClPooling2dFloatWorkload, armnn::DataType::Float16>(DataLayout::NCHW);
+    ClPooling2dWorkloadTest<armnn::DataType::Float16>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16NhwcWorkload)
 {
-    ClPooling2dWorkloadTest<ClPooling2dFloatWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
+    ClPooling2dWorkloadTest<armnn::DataType::Float16>(DataLayout::NHWC);
 }
 
 template <typename ReshapeWorkloadType, typename armnn::DataType DataType>

@@ -39,12 +39,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClPadWorkload.hpp
     ClPermuteWorkload.cpp
     ClPermuteWorkload.hpp
-    ClPooling2dBaseWorkload.cpp
-    ClPooling2dBaseWorkload.hpp
-    ClPooling2dFloatWorkload.cpp
-    ClPooling2dFloatWorkload.hpp
-    ClPooling2dUint8Workload.cpp
-    ClPooling2dUint8Workload.hpp
+    ClPooling2dWorkload.cpp
+    ClPooling2dWorkload.hpp
     ClReshapeFloatWorkload.cpp
     ClReshapeFloatWorkload.hpp
     ClReshapeUint8Workload.cpp

@@ -29,9 +29,7 @@ BACKEND_SOURCES := \
         workloads/ClNormalizationFloatWorkload.cpp \
         workloads/ClPadWorkload.cpp \
         workloads/ClPermuteWorkload.cpp \
-        workloads/ClPooling2dBaseWorkload.cpp \
-        workloads/ClPooling2dFloatWorkload.cpp \
-        workloads/ClPooling2dUint8Workload.cpp \
+        workloads/ClPooling2dWorkload.cpp \
         workloads/ClReshapeFloatWorkload.cpp \
         workloads/ClReshapeUint8Workload.cpp \
         workloads/ClResizeBilinearFloatWorkload.cpp \

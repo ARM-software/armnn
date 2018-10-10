@@ -138,7 +138,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePermute(const Permute
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
                                                                      const WorkloadInfo&           info) const
 {
-    return MakeWorkload<ClPooling2dFloatWorkload, ClPooling2dUint8Workload>(descriptor, info);
+    return std::make_unique<ClPooling2dWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,

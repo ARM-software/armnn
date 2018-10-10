@@ -26,7 +26,7 @@
 #include "workloads/ClNormalizationFloatWorkload.hpp"
 #include "workloads/ClPadWorkload.hpp"
 #include "workloads/ClPermuteWorkload.hpp"
-#include "workloads/ClPooling2dBaseWorkload.hpp"
+#include "workloads/ClPooling2dWorkload.hpp"
 #include "workloads/ClSoftmaxBaseWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"
 #endif

@@ -3,11 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClPooling2dBaseWorkload.hpp"
+#include "ClPooling2dWorkload.hpp"
 #include <backends/cl/ClLayerSupport.hpp>
 #include <backends/cl/ClTensorHandle.hpp>
 #include <backends/aclCommon/ArmComputeUtils.hpp>
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+
+#include "ClWorkloadUtils.hpp"
 
 namespace armnn
 {
@@ -25,12 +27,11 @@ arm_compute::Status ClPooling2dWorkloadValidate(const TensorInfo& input,
     return arm_compute::CLPoolingLayer::validate(&aclInputInfo, &aclOutputInfo, layerInfo);
 }
 
-template <armnn::DataType... dataTypes>
-ClPooling2dBaseWorkload<dataTypes...>::ClPooling2dBaseWorkload(
-    const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info, const std::string& name)
-    : TypedWorkload<Pooling2dQueueDescriptor, dataTypes...>(descriptor, info)
+ClPooling2dWorkload::ClPooling2dWorkload(
+    const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info)
+    : BaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs(name, 1, 1);
+    m_Data.ValidateInputsOutputs("ClPooling2dWorkload", 1, 1);
 
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
@@ -45,7 +46,10 @@ ClPooling2dBaseWorkload<dataTypes...>::ClPooling2dBaseWorkload(
     m_PoolingLayer.configure(&input, &output, layerInfo);
 }
 
-template class ClPooling2dBaseWorkload<DataType::Float16, DataType::Float32>;
-template class ClPooling2dBaseWorkload<DataType::QuantisedAsymm8>;
+void ClPooling2dWorkload::Execute() const
+{
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClPooling2dWorkload_Execute");
+    m_PoolingLayer.run();
+}
 
 }

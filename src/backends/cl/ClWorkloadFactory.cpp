@@ -132,7 +132,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateFullyConnected(
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                                    const WorkloadInfo&           info) const
 {
-    return MakeWorkload<ClPermuteFloatWorkload, ClPermuteUint8Workload>(descriptor, info);
+    return std::make_unique<ClPermuteWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,

@@ -26,10 +26,9 @@ arm_compute::Status ClPermuteWorkloadValidate(const PermuteDescriptor& descripto
     return arm_compute::Status{};
 }
 
-template <armnn::DataType... DataTypes>
-ClPermuteWorkload<DataTypes...>::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
-                                               const WorkloadInfo& info)
-    : TypedWorkload<PermuteQueueDescriptor, DataTypes...>(descriptor, info)
+ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
+                                     const WorkloadInfo& info)
+    : BaseWorkload<PermuteQueueDescriptor>(descriptor, info)
 {
     using armcomputetensorutils::BuildArmComputePermutationVector;
 
@@ -43,14 +42,10 @@ ClPermuteWorkload<DataTypes...>::ClPermuteWorkload(const PermuteQueueDescriptor&
     m_PermuteFunction.configure(&input, &output, BuildArmComputePermutationVector(mappings));
 }
 
-template <armnn::DataType... DataTypes>
-void ClPermuteWorkload<DataTypes...>::Execute() const
+void ClPermuteWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL( GetName() + "_Execute");
     m_PermuteFunction.run();
 }
-
-template class ClPermuteWorkload<DataType::Float16, DataType::Float32>;
-template class ClPermuteWorkload<DataType::QuantisedAsymm8>;
 
 } // namespace armnn

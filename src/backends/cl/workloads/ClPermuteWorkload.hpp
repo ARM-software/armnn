@@ -18,8 +18,7 @@ namespace armnn
 
 arm_compute::Status ClPermuteWorkloadValidate(const PermuteDescriptor& descriptor);
 
-template<armnn::DataType... DataTypes>
-class ClPermuteWorkload : public TypedWorkload<PermuteQueueDescriptor, DataTypes...>
+class ClPermuteWorkload : public BaseWorkload<PermuteQueueDescriptor>
 {
 public:
     static const std::string& GetName()
@@ -32,11 +31,8 @@ public:
     void Execute() const override;
 
 private:
-    using TypedWorkload<PermuteQueueDescriptor, DataTypes...>::m_Data;
+    using BaseWorkload<PermuteQueueDescriptor>::m_Data;
     mutable arm_compute::CLPermute m_PermuteFunction;
 };
-
-using ClPermuteFloatWorkload = ClPermuteWorkload<DataType::Float16, DataType::Float32>;
-using ClPermuteUint8Workload = ClPermuteWorkload<DataType::QuantisedAsymm8>;
 
 } // namespace armnn

@@ -15,22 +15,22 @@ BackendRegistry& BackendRegistry::Instance()
     return instance;
 }
 
-void BackendRegistry::Register(const std::string& name, FactoryFunction factory)
+void BackendRegistry::Register(const BackendId& id, FactoryFunction factory)
 {
-    if (m_BackendFactories.count(name) > 0)
+    if (m_BackendFactories.count(id) > 0)
     {
-        throw InvalidArgumentException(name + " already registered as backend");
+        throw InvalidArgumentException(std::string(id) + " already registered as backend");
     }
 
-    m_BackendFactories[name] = factory;
+    m_BackendFactories[id] = factory;
 }
 
-BackendRegistry::FactoryFunction BackendRegistry::GetFactory(const std::string& name) const
+BackendRegistry::FactoryFunction BackendRegistry::GetFactory(const BackendId& id) const
 {
-    auto it = m_BackendFactories.find(name);
+    auto it = m_BackendFactories.find(id);
     if (it == m_BackendFactories.end())
     {
-        throw InvalidArgumentException(name + " has no backend factory registered");
+        throw InvalidArgumentException(std::string(id) + " has no backend factory registered");
     }
 
     return it->second;
@@ -42,4 +42,14 @@ void BackendRegistry::Swap(BackendRegistry::FactoryStorage& other)
     std::swap(instance.m_BackendFactories, other);
 }
 
+BackendIdSet BackendRegistry::GetBackendIds() const
+{
+    BackendIdSet result;
+    for (const auto& it : m_BackendFactories)
+    {
+        result.insert(it.first);
+    }
+    return result;
 }
+
+} // namespace armnn

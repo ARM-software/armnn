@@ -147,18 +147,23 @@ endif()
 
 list(APPEND armnn_sources
     include/armnn/ArmNN.hpp
+    include/armnn/BackendId.hpp
     include/armnn/Descriptors.hpp
     include/armnn/DescriptorsFwd.hpp
-    include/armnn/IRuntime.hpp
+    include/armnn/Exceptions.hpp
     include/armnn/ILayerSupport.hpp
     include/armnn/INetwork.hpp
+    include/armnn/IProfiler.hpp
+    include/armnn/IRuntime.hpp
+    include/armnn/LayerSupport.hpp
+    include/armnn/LstmParams.hpp
+    include/armnn/NetworkFwd.hpp
     include/armnn/Optional.hpp
     include/armnn/Tensor.hpp
     include/armnn/TensorFwd.hpp
     include/armnn/Types.hpp
     include/armnn/TypesUtils.hpp
     include/armnn/Utils.hpp
-    include/armnn/LayerSupport.hpp
     include/armnn/Version.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
@@ -378,6 +383,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptionalTest.cpp
+        src/backends/test/BackendIdTests.cpp
         src/backends/test/BackendRegistryTests.cpp
         src/backends/test/IsLayerSupportedTestImpl.hpp
         src/backends/test/WorkloadDataValidation.cpp

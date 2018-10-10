@@ -7,6 +7,7 @@
 #include <array>
 #include <memory>
 #include "ILayerSupport.hpp"
+#include "BackendId.hpp"
 
 namespace armnn
 {
@@ -94,17 +95,6 @@ enum class OutputShapeRounding
     Ceiling     = 1
 };
 
-enum class Compute
-{
-    /// CPU Execution: Reference C++ kernels
-    CpuRef      = 0,
-    /// CPU Execution: NEON: ArmCompute
-    CpuAcc      = 1,
-    /// GPU Execution: OpenCL: ArmCompute
-    GpuAcc      = 2,
-    Undefined   = 5
-};
-
 /// Each backend should implement an IBackend.
 class IBackend
 {
@@ -113,7 +103,7 @@ protected:
     virtual ~IBackend() {}
 
 public:
-    virtual const std::string& GetId() const = 0;
+    virtual const BackendId& GetId() const = 0;
     virtual const ILayerSupport& GetLayerSupport() const = 0;
 };
 
@@ -189,4 +179,4 @@ private:
 /// Define LayerGuid type.
 using LayerGuid = unsigned int;
 
-}
+} // namespace armnn

@@ -16,7 +16,7 @@ public:
     NeonBackend()  = default;
     ~NeonBackend() = default;
 
-    const std::string& GetId() const override;
+    const BackendId& GetId() const override;
 
     const ILayerSupport& GetLayerSupport() const override;
 

@@ -12,7 +12,7 @@ namespace armnn
 
 namespace
 {
-const std::string s_Id = "CpuRef";
+const BackendId s_Id{"CpuRef"};
 
 static BackendRegistry::Helper s_RegisterHelper{
     s_Id,
@@ -24,7 +24,7 @@ static BackendRegistry::Helper s_RegisterHelper{
 
 }
 
-const std::string& RefBackend::GetId() const
+const BackendId& RefBackend::GetId() const
 {
     return s_Id;
 }

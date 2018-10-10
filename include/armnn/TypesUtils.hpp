@@ -15,23 +15,12 @@
 namespace armnn
 {
 
-constexpr char const* GetStatusAsCString(Status compute)
+constexpr char const* GetStatusAsCString(Status status)
 {
-    switch (compute)
+    switch (status)
     {
         case armnn::Status::Success: return "Status::Success";
         case armnn::Status::Failure: return "Status::Failure";
-        default:                     return "Unknown";
-    }
-}
-
-constexpr char const* GetComputeDeviceAsCString(Compute compute)
-{
-    switch (compute)
-    {
-        case armnn::Compute::CpuRef: return "CpuRef";
-        case armnn::Compute::CpuAcc: return "CpuAcc";
-        case armnn::Compute::GpuAcc: return "GpuAcc";
         default:                     return "Unknown";
     }
 }
@@ -194,27 +183,6 @@ inline std::ostream& operator<<(std::ostream& os, Status stat)
     return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const std::vector<Compute>& compute)
-{
-    for (const Compute& comp : compute) {
-        os << GetComputeDeviceAsCString(comp) << " ";
-    }
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, const std::set<Compute>& compute)
-{
-    for (const Compute& comp : compute) {
-        os << GetComputeDeviceAsCString(comp) << " ";
-    }
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, const Compute& compute)
-{
-    os << GetComputeDeviceAsCString(compute);
-    return os;
-}
 
 inline std::ostream & operator<<(std::ostream & os, const armnn::TensorShape & shape)
 {

@@ -278,12 +278,9 @@ if(ARMCOMPUTECL)
               PATHS ${ARMCOMPUTE_ROOT}/include
               NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
-    find_library(OPENCL_LIBRARIES OpenCL)
-    if (NOT OPENCL_LIBRARIES)
-        # Link against libOpenCL in opencl-1.2-stubs, but don't search there at runtime
-        link_libraries(-L${ARMCOMPUTE_BUILD_DIR}/opencl-1.2-stubs)
-        set(OPENCL_LIBRARIES OpenCL)
-    endif()
+    # Link against libOpenCL in opencl-1.2-stubs, but don't search there at runtime
+    link_libraries(-L${ARMCOMPUTE_BUILD_DIR}/opencl-1.2-stubs)
+    set(OPENCL_LIBRARIES OpenCL)
 
     include_directories(${OPENCL_INCLUDE})
 

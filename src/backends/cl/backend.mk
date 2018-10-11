@@ -30,8 +30,7 @@ BACKEND_SOURCES := \
         workloads/ClPadWorkload.cpp \
         workloads/ClPermuteWorkload.cpp \
         workloads/ClPooling2dWorkload.cpp \
-        workloads/ClReshapeFloatWorkload.cpp \
-        workloads/ClReshapeUint8Workload.cpp \
+        workloads/ClReshapeWorkload.cpp \
         workloads/ClResizeBilinearFloatWorkload.cpp \
         workloads/ClSoftmaxBaseWorkload.cpp \
         workloads/ClSoftmaxFloatWorkload.cpp \

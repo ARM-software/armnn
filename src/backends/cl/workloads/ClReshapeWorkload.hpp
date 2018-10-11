@@ -12,11 +12,10 @@
 namespace armnn
 {
 
-// Reshape
-class ClReshapeUint8Workload : public Uint8Workload<ReshapeQueueDescriptor>
+class ClReshapeWorkload : public BaseWorkload<ReshapeQueueDescriptor>
 {
 public:
-    ClReshapeUint8Workload( const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClReshapeWorkload(const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info);
 
     void Execute() const override;
 
@@ -25,5 +24,3 @@ private:
 };
 
 } //namespace armnn
-
-

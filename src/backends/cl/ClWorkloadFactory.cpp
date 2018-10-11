@@ -229,7 +229,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConstant(const ConstantQueue
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClReshapeFloatWorkload, ClReshapeUint8Workload>(descriptor, info);
+    return std::make_unique<ClReshapeWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,

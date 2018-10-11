@@ -380,13 +380,13 @@ BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16NhwcWorkload)
     ClPooling2dWorkloadTest<armnn::DataType::Float16>(DataLayout::NHWC);
 }
 
-template <typename ReshapeWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void ClCreateReshapeWorkloadTest()
 {
     Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateReshapeWorkloadTest<ReshapeWorkloadType, DataType>(factory, graph);
+    auto workload = CreateReshapeWorkloadTest<ClReshapeWorkload, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateReshapeWorkloadTest).
     ReshapeQueueDescriptor queueDescriptor = workload->GetData();
@@ -399,17 +399,17 @@ static void ClCreateReshapeWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateReshapeFloatWorkload)
 {
-    ClCreateReshapeWorkloadTest<ClReshapeFloatWorkload, armnn::DataType::Float32>();
+    ClCreateReshapeWorkloadTest<armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeFloat16Workload)
 {
-    ClCreateReshapeWorkloadTest<ClReshapeFloatWorkload, armnn::DataType::Float16>();
+    ClCreateReshapeWorkloadTest<armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
 {
-    ClCreateReshapeWorkloadTest<ClReshapeUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    ClCreateReshapeWorkloadTest<armnn::DataType::QuantisedAsymm8>();
 }
 
 template <typename SoftmaxWorkloadType, typename armnn::DataType DataType>

@@ -313,9 +313,9 @@ struct ResizeBilinearDescriptor
     , m_DataLayout(DataLayout::NCHW)
     {}
 
-    uint32_t   m_TargetWidth;
-    uint32_t   m_TargetHeight;
-    DataLayout m_DataLayout;
+    uint32_t          m_TargetWidth;
+    uint32_t          m_TargetHeight;
+    DataLayoutIndexed m_DataLayout;
 };
 
 struct ReshapeDescriptor

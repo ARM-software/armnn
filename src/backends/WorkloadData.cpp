@@ -663,11 +663,10 @@ void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     }
 
     {
-        // DataLayout is NCHW by default (channelsIndex = 1)
-        const unsigned int channelsIndex = this->m_Parameters.m_DataLayout == armnn::DataLayout::NHWC ? 3 : 1;
-
-        const unsigned int inputChannelCount = workloadInfo.m_InputTensorInfos[0].GetShape()[channelsIndex];
-        const unsigned int outputChannelCount = workloadInfo.m_OutputTensorInfos[0].GetShape()[channelsIndex];
+        const unsigned int inputChannelCount =
+            workloadInfo.m_InputTensorInfos[0].GetShape()[this->m_Parameters.m_DataLayout.GetChannelsIndex()];
+        const unsigned int outputChannelCount =
+            workloadInfo.m_OutputTensorInfos[0].GetShape()[this->m_Parameters.m_DataLayout.GetChannelsIndex()];
         if (inputChannelCount != outputChannelCount)
         {
             throw InvalidArgumentException(

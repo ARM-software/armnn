@@ -420,27 +420,46 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputsUint8)
 }
 
 template <typename ResizeBilinearWorkloadType, armnn::DataType DataType>
-static void RefCreateResizeBilinearTest()
+static void RefCreateResizeBilinearTest(DataLayout dataLayout)
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateResizeBilinearWorkloadTest<ResizeBilinearWorkloadType, DataType>(factory, graph);
+    auto workload = CreateResizeBilinearWorkloadTest<ResizeBilinearWorkloadType, DataType>(factory, graph, dataLayout);
+
+    TensorShape inputShape;
+    TensorShape outputShape;
+
+    switch (dataLayout)
+    {
+        case DataLayout::NHWC:
+            inputShape  = { 2, 4, 4, 3 };
+            outputShape = { 2, 2, 2, 3 };
+            break;
+        default: // NCHW
+            inputShape  = { 2, 3, 4, 4 };
+            outputShape = { 2, 3, 2, 2 };
+    }
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateResizeBilinearWorkloadTest).
     CheckInputOutput(
-        std::move(workload),
-        TensorInfo({ 2, 3, 4, 4 }, DataType),
-        TensorInfo({ 2, 3, 2, 2 }, DataType));
+            std::move(workload),
+            TensorInfo(inputShape, DataType),
+            TensorInfo(outputShape, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32)
 {
-    RefCreateResizeBilinearTest<RefResizeBilinearFloat32Workload, armnn::DataType::Float32>();
+    RefCreateResizeBilinearTest<RefResizeBilinearFloat32Workload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearUint8)
 {
-    RefCreateResizeBilinearTest<RefResizeBilinearUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    RefCreateResizeBilinearTest<RefResizeBilinearUint8Workload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32Nhwc)
+{
+    RefCreateResizeBilinearTest<RefResizeBilinearFloat32Workload, armnn::DataType::Float32>(DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloat32)

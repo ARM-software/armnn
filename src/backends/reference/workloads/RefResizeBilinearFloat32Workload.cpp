@@ -23,7 +23,8 @@ void RefResizeBilinearFloat32Workload::Execute() const
     ResizeBilinear(GetInputTensorDataFloat(0, m_Data),
         inputInfo,
         GetOutputTensorDataFloat(0, m_Data),
-        outputInfo);
+        outputInfo,
+        m_Data.m_Parameters.m_DataLayout);
 }
 
 } //namespace armnn

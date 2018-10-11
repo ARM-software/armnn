@@ -10,6 +10,10 @@
 namespace armnn
 {
 
-void ResizeBilinear(const float* in, const TensorInfo& inputInfo, float* out, const TensorInfo& outputInfo);
+void ResizeBilinear(const float*      in,
+                    const TensorInfo& inputInfo,
+                    float*            out,
+                    const TensorInfo& outputInfo,
+                    DataLayoutIndexed dataLayout = DataLayout::NCHW);
 
 } //namespace armnn

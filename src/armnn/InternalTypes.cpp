@@ -48,4 +48,16 @@ char const* GetLayerTypeAsCString(LayerType type)
     }
 }
 
+// Definition in include/armnn/Types.hpp
+bool operator==(const DataLayout& dataLayout, const DataLayoutIndexed& indexed)
+{
+    return dataLayout == indexed.GetDataLayout();
+}
+
+// Definition in include/armnn/Types.hpp
+bool operator==(const DataLayoutIndexed& indexed, const DataLayout& dataLayout)
+{
+    return indexed.GetDataLayout() == dataLayout;
+}
+
 }

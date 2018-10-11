@@ -820,31 +820,26 @@ void CreateSplitterMultipleInputsOneOutputWorkloadTest(armnn::IWorkloadFactory& 
 template <typename ResizeBilinearWorkload, armnn::DataType DataType>
 std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::IWorkloadFactory& factory,
                                                                          armnn::Graph& graph,
-                                                                         DataLayout dataLayout = DataLayout::NCHW)
+                                                                         DataLayoutIndexed dataLayout =
+                                                                             DataLayout::NCHW)
 {
     TensorShape inputShape;
     TensorShape outputShape;
-    unsigned int heightIndex;
-    unsigned int widthIndex;
 
-    switch (dataLayout) {
+    switch (dataLayout.GetDataLayout()) {
         case DataLayout::NHWC:
-            inputShape = { 2, 4, 4, 3 };
+            inputShape =  { 2, 4, 4, 3 };
             outputShape = { 2, 2, 2, 3 };
-            heightIndex = 1;
-            widthIndex = 2;
             break;
         default: // NCHW
-            inputShape = { 2, 3, 4, 4 };
+            inputShape =  { 2, 3, 4, 4 };
             outputShape = { 2, 3, 2, 2 };
-            heightIndex = 2;
-            widthIndex = 3;
     }
 
     // Creates the layer we're testing.
     ResizeBilinearDescriptor resizeDesc;
-    resizeDesc.m_TargetWidth = outputShape[widthIndex];
-    resizeDesc.m_TargetHeight = outputShape[heightIndex];
+    resizeDesc.m_TargetWidth = outputShape[dataLayout.GetWidthIndex()];
+    resizeDesc.m_TargetHeight = outputShape[dataLayout.GetHeightIndex()];
     resizeDesc.m_DataLayout = dataLayout;
     Layer* const layer = graph.AddLayer<ResizeBilinearLayer>(resizeDesc, "layer");
 
@@ -865,7 +860,7 @@ std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::
     ResizeBilinearQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout.GetDataLayout() == dataLayout));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

@@ -178,7 +178,7 @@ ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadca
 ARMNN_AUTO_TEST_CASE(BatchNorm, BatchNormTest)
 ARMNN_AUTO_TEST_CASE(BatchNormUint8, BatchNormUint8Test)
 
-// Resize Bilinear
+// Resize Bilinear - NCHW
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear, SimpleResizeBilinearTest)
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint8, SimpleResizeBilinearUint8Test)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearNop, ResizeBilinearNopTest)
@@ -189,6 +189,13 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMin, ResizeBilinearMinTest)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint8, ResizeBilinearMinUint8Test)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMag, ResizeBilinearMagTest)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8, ResizeBilinearMagUint8Test)
+
+// Resize Bilinear - NHWC
+ARMNN_AUTO_TEST_CASE(ResizeBilinearNopNhwc, ResizeBilinearNopNhwcTest)
+ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearNhwc, SimpleResizeBilinearNhwcTest)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinNhwc, ResizeBilinearSqMinNhwcTest)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMinNhwc, ResizeBilinearMinNhwcTest)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwc, ResizeBilinearMagNhwcTest)
 
 // Fake Quantization
 ARMNN_AUTO_TEST_CASE(FakeQuantization, FakeQuantizationTest)

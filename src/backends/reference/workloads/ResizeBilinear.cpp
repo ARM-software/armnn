@@ -25,27 +25,31 @@ inline float Lerp(float a, float b, float w)
 
 }
 
-void ResizeBilinear(const float* in, const TensorInfo& inputInfo, float* out, const TensorInfo& outputInfo)
+void ResizeBilinear(const float*      in,
+                    const TensorInfo& inputInfo,
+                    float*            out,
+                    const TensorInfo& outputInfo,
+                    DataLayoutIndexed dataLayout)
 {
     // We follow the definition of TensorFlow and AndroidNN: the top-left corner of a texel in the output
     // image is projected into the input image to figure out the interpolants and weights. Note that this
     // will yield different results than if projecting the centre of output texels.
 
     const unsigned int batchSize = inputInfo.GetShape()[0];
-    const unsigned int channelCount = inputInfo.GetShape()[1];
+    const unsigned int channelCount = inputInfo.GetShape()[dataLayout.GetChannelsIndex()];
 
-    const unsigned int inputHeight = inputInfo.GetShape()[2];
-    const unsigned int inputWidth = inputInfo.GetShape()[3];
-    const unsigned int outputHeight = outputInfo.GetShape()[2];
-    const unsigned int outputWidth = outputInfo.GetShape()[3];
+    const unsigned int inputHeight = inputInfo.GetShape()[dataLayout.GetHeightIndex()];
+    const unsigned int inputWidth = inputInfo.GetShape()[dataLayout.GetWidthIndex()];
+    const unsigned int outputHeight = outputInfo.GetShape()[dataLayout.GetHeightIndex()];
+    const unsigned int outputWidth = outputInfo.GetShape()[dataLayout.GetWidthIndex()];
 
     // How much to scale pixel coordinates in the output image, to get the corresponding pixel coordinates
     // in the input image.
     const float scaleY = boost::numeric_cast<float>(inputHeight) / boost::numeric_cast<float>(outputHeight);
     const float scaleX = boost::numeric_cast<float>(inputWidth) / boost::numeric_cast<float>(outputWidth);
 
-    TensorBufferArrayView<const float> input(inputInfo.GetShape(), in);
-    TensorBufferArrayView<float> output(outputInfo.GetShape(), out);
+    TensorBufferArrayView<const float> input(inputInfo.GetShape(), in, dataLayout);
+    TensorBufferArrayView<float> output(outputInfo.GetShape(), out, dataLayout);
 
     for (unsigned int n = 0; n < batchSize; ++n)
     {

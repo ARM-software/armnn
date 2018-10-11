@@ -4,7 +4,10 @@
 //
 
 #include "NeonBackend.hpp"
+#include "NeonWorkloadFactory.hpp"
+
 #include <backends/BackendRegistry.hpp>
+
 #include <boost/cast.hpp>
 
 namespace armnn
@@ -37,7 +40,7 @@ const ILayerSupport& NeonBackend::GetLayerSupport() const
 
 std::unique_ptr<IWorkloadFactory> NeonBackend::CreateWorkloadFactory() const
 {
-    return nullptr;
+    return std::make_unique<NeonWorkloadFactory>();
 }
 
 void NeonBackend::Destroy(IBackend* backend)

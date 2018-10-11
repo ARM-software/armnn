@@ -4,7 +4,10 @@
 //
 
 #include "ClBackend.hpp"
+#include "ClWorkloadFactory.hpp"
+
 #include <backends/BackendRegistry.hpp>
+
 #include <boost/cast.hpp>
 
 namespace armnn
@@ -36,7 +39,7 @@ const ILayerSupport& ClBackend::GetLayerSupport() const
 
 std::unique_ptr<IWorkloadFactory> ClBackend::CreateWorkloadFactory() const
 {
-    return nullptr;
+    return std::make_unique<ClWorkloadFactory>();
 }
 
 void ClBackend::Destroy(IBackend* backend)

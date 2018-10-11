@@ -4,7 +4,10 @@
 //
 
 #include "RefBackend.hpp"
+#include "RefWorkloadFactory.hpp"
+
 #include <backends/BackendRegistry.hpp>
+
 #include <boost/cast.hpp>
 
 namespace armnn
@@ -36,7 +39,7 @@ const ILayerSupport& RefBackend::GetLayerSupport() const
 
 std::unique_ptr<IWorkloadFactory> RefBackend::CreateWorkloadFactory() const
 {
-    return nullptr;
+    return std::make_unique<RefWorkloadFactory>();
 }
 
 void RefBackend::Destroy(IBackend* backend)

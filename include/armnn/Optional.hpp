@@ -59,28 +59,6 @@ protected:
     bool m_HasValue;
 };
 
-struct HasGetMemberFunction
-{
-    template <class T>
-    static auto Check(T* p) ->  decltype(p->get(), std::true_type());
-
-    template <class T>
-    static auto Check(...) -> std::false_type;
-};
-
-//
-// Predicate checking for boost::optional compatibility
-//
-template <typename T>
-struct CheckBoostOptionalSignature
-{
-    using ResultType = decltype(HasGetMemberFunction::Check<T>(0));
-
-    static constexpr bool Result() {
-        return std::is_same<std::true_type, ResultType>::value;
-    }
-};
-
 //
 // The default implementation is the non-reference case. This
 // has an unsigned char array for storing the optional value which
@@ -107,16 +85,6 @@ public:
         *this = other;
     }
 
-    // enable construction from types that matches the CheckBoostOptionalSignature
-    // predicate
-    template <typename O,
-              typename = std::enable_if_t<CheckBoostOptionalSignature<O>::Result()>>
-    OptionalReferenceSwitch(const O& other)
-        : Base{}
-    {
-        *this = other;
-    }
-
     OptionalReferenceSwitch& operator=(const T& value)
     {
         reset();
@@ -138,21 +106,6 @@ public:
     OptionalReferenceSwitch& operator=(EmptyOptional)
     {
         reset();
-        return *this;
-    }
-
-    // enable copying from types that matches the CheckBoostOptionalSignature
-    // predicate
-    template <typename O,
-              typename = std::enable_if_t<CheckBoostOptionalSignature<O>::Result()>>
-    OptionalReferenceSwitch& operator=(const O& other)
-    {
-        reset();
-        if (other)
-        {
-            Construct(other.get());
-        }
-
         return *this;
     }
 
@@ -294,10 +247,6 @@ public:
     Optional(EmptyOptional empty) : BaseSwitch{empty} {}
     Optional(const Optional& other) : BaseSwitch{other} {}
     Optional(const BaseSwitch& other) : BaseSwitch{other} {}
-
-    template <typename O,
-              typename = std::enable_if_t<CheckBoostOptionalSignature<O>::Result()>>
-    Optional(const O& other) : BaseSwitch{other} {}
 };
 
 }

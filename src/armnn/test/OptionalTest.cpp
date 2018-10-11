@@ -5,7 +5,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <armnn/Optional.hpp>
-#include <boost/optional.hpp>
 #include <string>
 
 namespace
@@ -19,19 +18,7 @@ void PassStringRefWithDefault(armnn::Optional<std::string&> value = armnn::Empty
 {
 }
 
-void BoostCompatibilityTester(const armnn::Optional<std::string>& optionalString,
-                              bool hasValue,
-                              const std::string& expectedValue)
-{
-    BOOST_TEST(optionalString.has_value() == hasValue);
-    if (hasValue)
-    {
-        BOOST_TEST(optionalString.value() == expectedValue);
-    }
-}
-
-}
-
+} // namespace <anonymous>
 
 BOOST_AUTO_TEST_SUITE(OptionalTests)
 
@@ -103,28 +90,6 @@ BOOST_AUTO_TEST_CASE(StringRefTests)
     BOOST_TEST(optionalHelloRef.value() == "Long Other String");
     BOOST_TEST(optionalHelloRef2.value() == "Long Other String");
     BOOST_TEST(optionalHelloRef3.value() == "Long Other String");
-}
-
-BOOST_AUTO_TEST_CASE(BoostCompatibilityTests)
-{
-    // sanity checks
-    BoostCompatibilityTester(armnn::Optional<std::string>(), false, "");
-    BoostCompatibilityTester(armnn::Optional<std::string>("Hello World"), true, "Hello World");
-
-    // verify boost signature selector
-    BOOST_TEST(armnn::CheckBoostOptionalSignature<boost::optional<std::string>>::Result() == true);
-    BOOST_TEST(armnn::CheckBoostOptionalSignature<armnn::Optional<std::string>>::Result() == false);
-
-    // the real thing is to see that we can pass a boost::optional in place
-    // of an ArmNN Optional
-    boost::optional<std::string> empty;
-    boost::optional<std::string> helloWorld("Hello World");
-
-    BoostCompatibilityTester(empty, false, "");
-    BoostCompatibilityTester(helloWorld, true, "Hello World");
-
-    BoostCompatibilityTester(boost::optional<std::string>(), false, "");
-    BoostCompatibilityTester(boost::optional<std::string>("Hello World"), true, "Hello World");
 }
 
 BOOST_AUTO_TEST_CASE(SimpleIntTests)

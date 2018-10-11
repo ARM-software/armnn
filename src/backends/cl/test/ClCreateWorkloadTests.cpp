@@ -475,7 +475,7 @@ BOOST_AUTO_TEST_CASE(CreateSplitterFloat16Workload)
     ClSplitterWorkloadTest<armnn::DataType::Float16>();
 }
 
-template <typename MergerWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void ClSplitterMergerTest()
 {
     // Tests that it is possible to decide which output of the splitter layer
@@ -488,7 +488,7 @@ static void ClSplitterMergerTest()
     ClWorkloadFactory factory;
 
     auto workloads =
-        CreateSplitterMergerWorkloadTest<ClSplitterWorkload, MergerWorkloadType, DataType>
+        CreateSplitterMergerWorkloadTest<ClSplitterWorkload, ClMergerWorkload, DataType>
             (factory, graph);
 
     auto wlSplitter = std::move(workloads.first);
@@ -519,12 +519,12 @@ static void ClSplitterMergerTest()
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloatWorkload)
 {
-    ClSplitterMergerTest<ClMergerFloatWorkload, armnn::DataType::Float32>();
+    ClSplitterMergerTest<armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloat16Workload)
 {
-    ClSplitterMergerTest<ClMergerFloatWorkload, armnn::DataType::Float16>();
+    ClSplitterMergerTest<armnn::DataType::Float16>();
 }
 
 

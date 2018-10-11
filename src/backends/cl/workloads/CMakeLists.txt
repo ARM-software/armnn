@@ -8,7 +8,6 @@ list(APPEND armnnClBackendWorkloads_sources
     ClActivationWorkload.hpp
     ClAdditionWorkload.cpp
     ClAdditionWorkload.hpp
-    ClBaseMergerWorkload.hpp
     ClBatchNormalizationFloatWorkload.cpp
     ClBatchNormalizationFloatWorkload.hpp
     ClConstantWorkload.cpp
@@ -31,10 +30,7 @@ list(APPEND armnnClBackendWorkloads_sources
     ClL2NormalizationFloatWorkload.hpp
     ClLstmFloatWorkload.cpp
     ClLstmFloatWorkload.hpp
-    ClMergerFloatWorkload.cpp
-    ClMergerFloatWorkload.hpp
-    ClMergerUint8Workload.cpp
-    ClMergerUint8Workload.hpp
+    ClMergerWorkload.hpp
     ClMultiplicationWorkload.cpp
     ClMultiplicationWorkload.hpp
     ClNormalizationFloatWorkload.cpp

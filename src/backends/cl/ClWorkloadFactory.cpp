@@ -119,7 +119,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSplitter(const SplitterQueue
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
                                                                   const WorkloadInfo&          info) const
 {
-    return MakeWorkload<ClMergerFloatWorkload, ClMergerUint8Workload>(descriptor, info);
+    return std::make_unique<ClMergerWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateFullyConnected(

@@ -10,7 +10,7 @@ list(APPEND armnnClBackendUnitTests_sources
     ClLayerTests.cpp
 )
 
-add_library(armnnClBackendUnitTests STATIC ${armnnClBackendUnitTests_sources})
+add_library(armnnClBackendUnitTests OBJECT ${armnnClBackendUnitTests_sources})
 target_include_directories(armnnClBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnClBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnClBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

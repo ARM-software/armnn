@@ -507,7 +507,12 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
-    add_executable_ex(UnitTests ${unittest_sources})
+    foreach(lib ${armnnUnitTestLibraries})
+        message("Adding library dependency to UnitTests: ${lib}")
+        list(APPEND unittest_sources $<TARGET_OBJECTS:${lib}>)
+    endforeach()
+
+    add_executable(UnitTests ${unittest_sources})
     target_include_directories(UnitTests PRIVATE src)
     target_include_directories(UnitTests PRIVATE src/armnn)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
@@ -521,17 +526,11 @@ if(BUILD_UNIT_TESTS)
         endif()
     endif()
 
-    # the backends under src/backends extend the list of
-    # static libs UnitTests to link against
-    list(APPEND armnnUnitTestLibraries armnn armnnUtils)
-
-    foreach(lib ${armnnUnitTestLibraries})
-        target_link_libraries(UnitTests ${lib})
-        message("Adding library dependency to UnitTests: ${lib}")
-    endforeach()
-
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
     target_link_libraries(UnitTests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
+
+    target_link_libraries(UnitTests armnn)
+    target_link_libraries(UnitTests armnnUtils)
 
     if(BUILD_TF_PARSER)
         target_link_libraries(UnitTests armnnTfParser)

@@ -3391,14 +3391,6 @@ LayerTestResult<float, 4> L2Normalization1dTest(armnn::IWorkloadFactory& workloa
 
 LayerTestResult<float, 4> L2Normalization1dNhwcTest(armnn::IWorkloadFactory& workloadFactory)
 {
-#ifdef ARMCOMPUTECL_ENABLED
-    // Clear the CL cache before this test when using ACL
-    if (ClContextControlFixture::Instance())
-    {
-        ClContextControlFixture::Instance()->m_ClContextControl.ClearClCache();
-    }
-#endif
-
     // Width: 1
     // Height: 1
     // Channels: 10

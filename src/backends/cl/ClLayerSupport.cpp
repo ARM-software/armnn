@@ -12,7 +12,7 @@
 
 #ifdef ARMCOMPUTECL_ENABLED
 #include "workloads/ClAdditionWorkload.hpp"
-#include "workloads/ClActivationFloatWorkload.hpp"
+#include "workloads/ClActivationWorkload.hpp"
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
 #include "workloads/ClConvertFp32ToFp16Workload.hpp"

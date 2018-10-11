@@ -4,10 +4,8 @@
 #
 
 list(APPEND armnnClBackendWorkloads_sources
-    ClActivationFloatWorkload.cpp
-    ClActivationFloatWorkload.hpp
-    ClActivationUint8Workload.cpp
-    ClActivationUint8Workload.hpp
+    ClActivationWorkload.cpp
+    ClActivationWorkload.hpp
     ClAdditionWorkload.cpp
     ClAdditionWorkload.hpp
     ClBaseMergerWorkload.hpp

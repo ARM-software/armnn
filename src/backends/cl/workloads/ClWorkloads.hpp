@@ -4,8 +4,7 @@
 //
 
 #pragma once
-#include "ClActivationFloatWorkload.hpp"
-#include "ClActivationUint8Workload.hpp"
+#include "ClActivationWorkload.hpp"
 #include "ClAdditionWorkload.hpp"
 #include "ClConstantWorkload.hpp"
 #include "ClBaseMergerWorkload.hpp"

@@ -100,7 +100,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateOutput(const OutputQueueDesc
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                const WorkloadInfo&              info) const
 {
-    return MakeWorkload<ClActivationFloatWorkload, ClActivationUint8Workload>(descriptor, info);
+    return std::make_unique<ClActivationWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,

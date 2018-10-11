@@ -3,11 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClActivationFloatWorkload.hpp"
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
+#include "ClActivationWorkload.hpp"
 
 #include "ClWorkloadUtils.hpp"
+
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/cl/ClLayerSupport.hpp>
+#include <backends/cl/ClTensorHandle.hpp>
+#include <backends/aclCommon/ArmComputeUtils.hpp>
 
 namespace armnn
 {
@@ -33,11 +36,11 @@ arm_compute::Status ClActivationWorkloadValidate(const TensorInfo& input,
                                                     activationLayerInfo);
 }
 
-ClActivationFloatWorkload::ClActivationFloatWorkload(const ActivationQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info)
-    : FloatWorkload<ActivationQueueDescriptor>(descriptor, info)
+ClActivationWorkload::ClActivationWorkload(const ActivationQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info)
+    : BaseWorkload<ActivationQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("ClActivationFloatWorkload", 1, 1);
+    m_Data.ValidateInputsOutputs("ClActivationWorkload", 1, 1);
 
     const arm_compute::ActivationLayerInfo activationLayerInfo =
         ConvertActivationDescriptorToAclActivationLayerInfo(m_Data.m_Parameters);
@@ -47,9 +50,9 @@ ClActivationFloatWorkload::ClActivationFloatWorkload(const ActivationQueueDescri
     m_ActivationLayer.configure(&input, &output, activationLayerInfo);
 }
 
-void ClActivationFloatWorkload::Execute() const
+void ClActivationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClActivationFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_CL("ClActivationWorkload_Execute");
     m_ActivationLayer.run();
 }
 

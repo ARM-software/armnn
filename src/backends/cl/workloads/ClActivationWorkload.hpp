@@ -15,11 +15,10 @@ arm_compute::Status ClActivationWorkloadValidate(const TensorInfo& input,
                                                  const TensorInfo& output,
                                                  const ActivationDescriptor& descriptor);
 
-// Activation layer execution.
-class ClActivationFloatWorkload : public FloatWorkload<ActivationQueueDescriptor>
+class ClActivationWorkload : public BaseWorkload<ActivationQueueDescriptor>
 {
 public:
-    ClActivationFloatWorkload(const ActivationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClActivationWorkload(const ActivationQueueDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;
 
 private:

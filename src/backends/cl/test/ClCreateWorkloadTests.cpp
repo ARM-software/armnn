@@ -22,13 +22,13 @@ boost::test_tools::predicate_result CompareIClTensorHandleShape(IClTensorHandle*
 
 BOOST_FIXTURE_TEST_SUITE(CreateWorkloadCl, ClContextControlFixture)
 
-template <typename ActivationWorkloadType, armnn::DataType DataType>
+template <armnn::DataType DataType>
 static void ClCreateActivationWorkloadTest()
 {
     Graph graph;
     ClWorkloadFactory factory;
 
-    auto workload = CreateActivationWorkloadTest<ActivationWorkloadType, DataType>(factory, graph);
+    auto workload = CreateActivationWorkloadTest<ClActivationWorkload, DataType>(factory, graph);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateActivationWorkloadTest).
     ActivationQueueDescriptor queueDescriptor = workload->GetData();
@@ -41,12 +41,12 @@ static void ClCreateActivationWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateActivationFloatWorkload)
 {
-    ClCreateActivationWorkloadTest<ClActivationFloatWorkload, armnn::DataType::Float32>();
+    ClCreateActivationWorkloadTest<armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateActivationFloat16Workload)
 {
-    ClCreateActivationWorkloadTest<ClActivationFloatWorkload, armnn::DataType::Float16>();
+    ClCreateActivationWorkloadTest<armnn::DataType::Float16>();
 }
 
 template <typename WorkloadType,
@@ -536,13 +536,13 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
     Graph graph;
     ClWorkloadFactory factory;
     std::unique_ptr<ClSplitterWorkload> wlSplitter;
-    std::unique_ptr<ClActivationFloatWorkload> wlActiv0_0;
-    std::unique_ptr<ClActivationFloatWorkload> wlActiv0_1;
-    std::unique_ptr<ClActivationFloatWorkload> wlActiv1_0;
-    std::unique_ptr<ClActivationFloatWorkload> wlActiv1_1;
+    std::unique_ptr<ClActivationWorkload> wlActiv0_0;
+    std::unique_ptr<ClActivationWorkload> wlActiv0_1;
+    std::unique_ptr<ClActivationWorkload> wlActiv1_0;
+    std::unique_ptr<ClActivationWorkload> wlActiv1_1;
 
     CreateSplitterMultipleInputsOneOutputWorkloadTest<ClSplitterWorkload,
-        ClActivationFloatWorkload, armnn::DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
+        ClActivationWorkload, armnn::DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
                                                                wlActiv1_0, wlActiv1_1);
 
     //Checks that the index of inputs/outputs matches what we declared on InputDescriptor construction.

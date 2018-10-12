@@ -123,7 +123,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateFullyConnected(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                                      const WorkloadInfo&           info) const
 {
-    return MakeWorkload<NeonPermuteFloatWorkload, NeonPermuteUint8Workload>(descriptor, info);
+    return std::make_unique<NeonPermuteWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,

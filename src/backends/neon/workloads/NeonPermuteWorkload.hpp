@@ -19,8 +19,7 @@ namespace armnn
 arm_compute::Status NeonPermuteWorkloadValidate(const TensorInfo& input, const TensorInfo& output,
                                                 const PermuteDescriptor& descriptor);
 
-template <armnn::DataType... DataTypes>
-class NeonPermuteWorkload : public TypedWorkload<PermuteQueueDescriptor, DataTypes...>
+class NeonPermuteWorkload : public BaseWorkload<PermuteQueueDescriptor>
 {
 public:
     static const std::string& GetName()
@@ -33,11 +32,8 @@ public:
     void Execute() const override;
 
 private:
-    using TypedWorkload<PermuteQueueDescriptor, DataTypes...>::m_Data;
+    using BaseWorkload<PermuteQueueDescriptor>::m_Data;
     mutable arm_compute::NEPermute m_PermuteFunction;
 };
-
-using NeonPermuteFloatWorkload = NeonPermuteWorkload<DataType::Float16, DataType::Float32>;
-using NeonPermuteUint8Workload = NeonPermuteWorkload<DataType::QuantisedAsymm8>;
 
 } // namespace armnn

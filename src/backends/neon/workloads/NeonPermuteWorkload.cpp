@@ -24,10 +24,9 @@ arm_compute::Status NeonPermuteWorkloadValidate(const TensorInfo& input,
                                       armcomputetensorutils::BuildArmComputePermutationVector(mappings));
 }
 
-template <armnn::DataType... DataTypes>
-NeonPermuteWorkload<DataTypes...>::NeonPermuteWorkload(const PermuteQueueDescriptor& descriptor,
-                                               const WorkloadInfo& info)
-        : TypedWorkload<PermuteQueueDescriptor, DataTypes...>(descriptor, info)
+NeonPermuteWorkload::NeonPermuteWorkload(const PermuteQueueDescriptor& descriptor,
+                                         const WorkloadInfo& info)
+        : BaseWorkload<PermuteQueueDescriptor>(descriptor, info)
 {
     using armcomputetensorutils::BuildArmComputePermutationVector;
 
@@ -41,14 +40,10 @@ NeonPermuteWorkload<DataTypes...>::NeonPermuteWorkload(const PermuteQueueDescrip
     m_PermuteFunction.configure(&input, &output, BuildArmComputePermutationVector(mappings));
 }
 
-template <armnn::DataType... DataTypes>
-void NeonPermuteWorkload<DataTypes...>::Execute() const
+void NeonPermuteWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON(GetName() + "_Execute");
     m_PermuteFunction.run();
 }
-
-template class NeonPermuteWorkload<DataType::Float16, DataType::Float32>;
-template class NeonPermuteWorkload<DataType::QuantisedAsymm8>;
 
 } // namespace armnn

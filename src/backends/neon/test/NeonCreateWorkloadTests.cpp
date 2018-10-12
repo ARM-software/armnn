@@ -370,12 +370,12 @@ BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NhwcWorkload)
     NeonCreatePooling2dWorkloadTest<NeonPooling2dUint8Workload, DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
-template <typename ReshapeWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void NeonCreateReshapeWorkloadTest()
 {
     Graph               graph;
     NeonWorkloadFactory factory;
-    auto                workload = CreateReshapeWorkloadTest<ReshapeWorkloadType, DataType>(factory, graph);
+    auto                workload = CreateReshapeWorkloadTest<NeonReshapeWorkload, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateReshapeWorkloadTest).
     ReshapeQueueDescriptor queueDescriptor = workload->GetData();
@@ -388,18 +388,18 @@ static void NeonCreateReshapeWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateReshapeFloat16Workload)
 {
-    NeonCreateReshapeWorkloadTest<NeonReshapeFloatWorkload, DataType::Float16>();
+    NeonCreateReshapeWorkloadTest<DataType::Float16>();
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(CreateReshapeFloatWorkload)
 {
-    NeonCreateReshapeWorkloadTest<NeonReshapeFloatWorkload, DataType::Float32>();
+    NeonCreateReshapeWorkloadTest<DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
 {
-    NeonCreateReshapeWorkloadTest<NeonReshapeUint8Workload, DataType::QuantisedAsymm8>();
+    NeonCreateReshapeWorkloadTest<DataType::QuantisedAsymm8>();
 }
 
 template <typename SoftmaxWorkloadType, typename armnn::DataType DataType>

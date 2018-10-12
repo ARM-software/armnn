@@ -224,7 +224,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQue
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonReshapeFloatWorkload, NeonReshapeUint8Workload>(descriptor, info);
+    return std::make_unique<NeonReshapeWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,

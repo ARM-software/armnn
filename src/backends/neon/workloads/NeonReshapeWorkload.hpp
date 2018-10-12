@@ -10,10 +10,11 @@
 namespace armnn
 {
 
-class NeonReshapeUint8Workload : public Uint8Workload<ReshapeQueueDescriptor>
+class NeonReshapeWorkload : public BaseWorkload<ReshapeQueueDescriptor>
 {
 public:
-    NeonReshapeUint8Workload(const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonReshapeWorkload(const ReshapeQueueDescriptor& descriptor, const WorkloadInfo& info);
+
     virtual void Execute() const override;
 
 private:
@@ -21,7 +22,3 @@ private:
 };
 
 } //namespace armnn
-
-
-
-

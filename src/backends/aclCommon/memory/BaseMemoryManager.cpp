@@ -5,9 +5,9 @@
 #include "BaseMemoryManager.hpp"
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
-#include "memory/BlobLifetimeManager.hpp"
-#include "memory/PoolManager.hpp"
-#include "memory/OffsetLifetimeManager.hpp"
+#include "BlobLifetimeManager.hpp"
+#include "PoolManager.hpp"
+#include "OffsetLifetimeManager.hpp"
 #endif
 
 #include <boost/polymorphic_cast.hpp>

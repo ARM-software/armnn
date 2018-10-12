@@ -21,7 +21,7 @@
 #include <backends/MemCopyWorkload.hpp>
 #include <backends/cl/ClTensorHandle.hpp>
 
-#include <memory/IPoolManager.hpp>
+#include <backends/aclCommon/memory/IPoolManager.hpp>
 #endif
 
 #include <backends/MakeWorkloadHelper.hpp>

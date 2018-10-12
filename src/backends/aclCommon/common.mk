@@ -7,4 +7,11 @@
 # in the Android build and it is picked up by the Android.mk
 # file in the root of ArmNN
 
-COMMON_SOURCES := ArmComputeTensorUtils.cpp
+COMMON_SOURCES := \
+    ArmComputeTensorUtils.cpp \
+    memory/BaseMemoryManager.cpp \
+    memory/BlobLifetimeManager.cpp \
+    memory/BlobMemoryPool.cpp \
+    memory/OffsetLifetimeManager.cpp \
+    memory/OffsetMemoryPool.cpp \
+    memory/PoolManager.cpp

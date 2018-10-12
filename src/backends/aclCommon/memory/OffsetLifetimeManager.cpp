@@ -5,11 +5,11 @@
 #include "OffsetLifetimeManager.hpp"
 #include "OffsetMemoryPool.hpp"
 
-#include "arm_compute/runtime/IMemoryGroup.h"
+#include <arm_compute/runtime/IMemoryGroup.h>
 
 #include <numeric>
 
-#include "boost/assert.hpp"
+#include <boost/assert.hpp>
 
 namespace armnn
 {

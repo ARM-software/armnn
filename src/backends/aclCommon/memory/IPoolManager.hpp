@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "arm_compute/runtime/IPoolManager.h"
+#include <arm_compute/runtime/IPoolManager.h>
 
 namespace armnn
 {

@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "arm_compute/runtime/IMemoryPool.h"
+#include <arm_compute/runtime/IMemoryPool.h>
 
 namespace armnn
 {

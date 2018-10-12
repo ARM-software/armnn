@@ -121,13 +121,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Tensor.cpp \
         src/armnn/Utils.cpp \
         src/armnn/LayerSupport.cpp \
-        src/armnn/Observable.cpp \
-        src/armnn/memory/BaseMemoryManager.cpp \
-        src/armnn/memory/BlobLifetimeManager.cpp \
-        src/armnn/memory/BlobMemoryPool.cpp \
-        src/armnn/memory/OffsetLifetimeManager.cpp \
-        src/armnn/memory/OffsetMemoryPool.cpp \
-        src/armnn/memory/PoolManager.cpp
+        src/armnn/Observable.cpp
 
 LOCAL_STATIC_LIBRARIES := \
 	armnn-arm_compute \

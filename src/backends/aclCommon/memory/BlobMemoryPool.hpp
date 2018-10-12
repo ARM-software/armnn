@@ -6,8 +6,8 @@
 
 #include "IMemoryPool.hpp"
 
-#include "arm_compute/runtime/IAllocator.h"
-#include "arm_compute/runtime/Types.h"
+#include <arm_compute/runtime/IAllocator.h>
+#include <arm_compute/runtime/Types.h>
 
 namespace armnn
 {

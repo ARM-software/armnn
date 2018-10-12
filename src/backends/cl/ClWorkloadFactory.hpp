@@ -4,12 +4,12 @@
 //
 #pragma once
 
-#include <backends/OutputHandler.hpp>
-
 #include <armnn/IRuntime.hpp>
-#include <boost/optional.hpp>
 
-#include "memory/BaseMemoryManager.hpp"
+#include <backends/OutputHandler.hpp>
+#include <backends/aclCommon/memory/BaseMemoryManager.hpp>
+
+#include <boost/optional.hpp>
 
 namespace armnn
 {

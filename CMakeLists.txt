@@ -277,23 +277,6 @@ list(APPEND armnn_sources
     src/armnn/Observable.cpp
     )
 
-if(ARMCOMPUTENEON OR ARMCOMPUTECL)
-    list(APPEND armnn_sources
-        src/armnn/memory/IMemoryPool.hpp
-        src/armnn/memory/BlobMemoryPool.cpp
-        src/armnn/memory/BlobMemoryPool.hpp
-        src/armnn/memory/BlobLifetimeManager.cpp
-        src/armnn/memory/BlobLifetimeManager.hpp
-        src/armnn/memory/PoolManager.cpp
-        src/armnn/memory/PoolManager.hpp
-        src/armnn/memory/BaseMemoryManager.hpp
-        src/armnn/memory/BaseMemoryManager.cpp
-        src/armnn/memory/OffsetMemoryPool.cpp
-        src/armnn/memory/OffsetMemoryPool.hpp
-        src/armnn/memory/OffsetLifetimeManager.cpp
-        src/armnn/memory/OffsetLifetimeManager.hpp)
-endif()
-
 # Files used for Streamline-based profiling backend
 if(PROFILING_BACKEND_STREAMLINE)
     list(APPEND armnn_sources

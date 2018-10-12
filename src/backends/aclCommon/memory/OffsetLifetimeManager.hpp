@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "arm_compute/runtime/ISimpleLifetimeManager.h"
+#include <arm_compute/runtime/ISimpleLifetimeManager.h>
 
 namespace armnn
 {

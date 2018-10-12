@@ -7,6 +7,20 @@ list(APPEND armnnAclCommon_sources
     ArmComputeTensorUtils.hpp
     ArmComputeTensorUtils.cpp
     ArmComputeUtils.hpp
+    memory/BaseMemoryManager.cpp
+    memory/BaseMemoryManager.hpp
+    memory/BlobLifetimeManager.cpp
+    memory/BlobLifetimeManager.hpp
+    memory/BlobMemoryPool.cpp
+    memory/BlobMemoryPool.hpp
+    memory/IMemoryPool.hpp
+    memory/IPoolManager.hpp
+    memory/OffsetLifetimeManager.cpp
+    memory/OffsetLifetimeManager.hpp
+    memory/OffsetMemoryPool.cpp
+    memory/OffsetMemoryPool.hpp
+    memory/PoolManager.cpp
+    memory/PoolManager.hpp
 )
 
 add_subdirectory(test)

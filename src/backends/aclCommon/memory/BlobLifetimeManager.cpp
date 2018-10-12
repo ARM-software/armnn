@@ -5,7 +5,7 @@
 #include "BlobLifetimeManager.hpp"
 #include "BlobMemoryPool.hpp"
 
-#include "arm_compute/runtime/IMemoryGroup.h"
+#include <arm_compute/runtime/IMemoryGroup.h>
 
 #include "boost/assert.hpp"
 

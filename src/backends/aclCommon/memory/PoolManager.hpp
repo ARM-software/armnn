@@ -6,10 +6,11 @@
 
 #include "IPoolManager.hpp"
 
-#include "arm_compute/runtime/IMemoryPool.h"
-#include "arm_compute/core/Error.h"
-#include "support/Mutex.h"
-#include "support/Semaphore.h"
+#include <arm_compute/runtime/IMemoryPool.h>
+#include <arm_compute/core/Error.h>
+
+#include <support/Mutex.h>
+#include <support/Semaphore.h>
 
 #include <cstddef>
 #include <list>

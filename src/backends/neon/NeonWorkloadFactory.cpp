@@ -15,7 +15,7 @@
 #include "workloads/NeonWorkloadUtils.hpp"
 #include "workloads/NeonWorkloads.hpp"
 
-#include <memory/IPoolManager.hpp>
+#include <backends/aclCommon/memory/IPoolManager.hpp>
 #endif
 
 #include <backends/MakeWorkloadHelper.hpp>

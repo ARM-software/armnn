@@ -5,8 +5,7 @@
 #pragma once
 
 #include <backends/OutputHandler.hpp>
-
-#include <memory/BaseMemoryManager.hpp>
+#include <backends/aclCommon/memory/BaseMemoryManager.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/optional.hpp>

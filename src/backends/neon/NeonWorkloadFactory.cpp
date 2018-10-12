@@ -91,7 +91,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateOutput(const OutputQueueDe
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                  const WorkloadInfo&              info) const
 {
-    return MakeWorkload<NeonActivationFloatWorkload, NeonActivationUint8Workload>(descriptor, info);
+    return std::make_unique<NeonActivationWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,

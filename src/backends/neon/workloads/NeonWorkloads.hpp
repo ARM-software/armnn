@@ -4,8 +4,7 @@
 //
 
 #pragma once
-#include "NeonActivationFloatWorkload.hpp"
-#include "NeonActivationUint8Workload.hpp"
+#include "NeonActivationWorkload.hpp"
 #include "NeonAdditionFloatWorkload.hpp"
 #include "NeonBaseConstantWorkload.hpp"
 #include "NeonBaseMergerWorkload.hpp"

@@ -14,16 +14,14 @@ arm_compute::Status NeonActivationWorkloadValidate(const TensorInfo& input,
                                                    const TensorInfo& output,
                                                    const ActivationDescriptor& descriptor);
 
-class NeonActivationFloatWorkload : public FloatWorkload<ActivationQueueDescriptor>
+class NeonActivationWorkload : public BaseWorkload<ActivationQueueDescriptor>
 {
 public:
-    NeonActivationFloatWorkload(const ActivationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonActivationWorkload(const ActivationQueueDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;
 
 private:
     mutable arm_compute::NEActivationLayer m_ActivationLayer;
 };
+
 } //namespace armnn
-
-
-

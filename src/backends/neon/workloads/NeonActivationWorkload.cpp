@@ -3,9 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NeonActivationFloatWorkload.hpp"
+#include "NeonActivationWorkload.hpp"
 #include <backends/aclCommon/ArmComputeUtils.hpp>
-
 
 namespace armnn
 {
@@ -32,11 +31,11 @@ arm_compute::Status NeonActivationWorkloadValidate(const TensorInfo& input,
                                                     activationLayerInfo);
 }
 
-NeonActivationFloatWorkload::NeonActivationFloatWorkload(const ActivationQueueDescriptor& descriptor,
-                                                         const WorkloadInfo&              info)
-    : FloatWorkload<ActivationQueueDescriptor>(descriptor, info)
+NeonActivationWorkload::NeonActivationWorkload(const ActivationQueueDescriptor& descriptor,
+                                               const WorkloadInfo& info)
+    : BaseWorkload<ActivationQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("NeonActivationFloatWorkload", 1, 1);
+    m_Data.ValidateInputsOutputs("NeonActivationWorkload", 1, 1);
 
     const arm_compute::ActivationLayerInfo activationLayerInfo =
         ConvertActivationDescriptorToAclActivationLayerInfo(m_Data.m_Parameters);
@@ -47,11 +46,10 @@ NeonActivationFloatWorkload::NeonActivationFloatWorkload(const ActivationQueueDe
     m_ActivationLayer.configure(&input, &output, activationLayerInfo);
 }
 
-void NeonActivationFloatWorkload::Execute() const
+void NeonActivationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonActivationFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonActivationWorkload_Execute");
     m_ActivationLayer.run();
 }
 
 } //namespace armnn
-

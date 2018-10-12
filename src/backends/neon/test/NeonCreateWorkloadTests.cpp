@@ -51,13 +51,12 @@ bool TestNeonTensorHandleInfo(armnn::INeonTensorHandle* handle, const armnn::Ten
 
 } // namespace
 
-template <typename ActivationWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void NeonCreateActivationWorkloadTest()
 {
     Graph graph;
     NeonWorkloadFactory factory;
-    auto workload = CreateActivationWorkloadTest<ActivationWorkloadType, DataType>
-            (factory, graph);
+    auto workload = CreateActivationWorkloadTest<NeonActivationWorkload, DataType>(factory, graph);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateActivationWorkloadTest).
     ActivationQueueDescriptor queueDescriptor = workload->GetData();
@@ -70,13 +69,13 @@ static void NeonCreateActivationWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateActivationFloat16Workload)
 {
-    NeonCreateActivationWorkloadTest<NeonActivationFloatWorkload, DataType::Float16>();
+    NeonCreateActivationWorkloadTest<DataType::Float16>();
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(CreateActivationFloatWorkload)
 {
-    NeonCreateActivationWorkloadTest<NeonActivationFloatWorkload, DataType::Float32>();
+    NeonCreateActivationWorkloadTest<DataType::Float32>();
 }
 
 template <typename WorkloadType,
@@ -454,14 +453,14 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
     Graph graph;
     NeonWorkloadFactory factory;
     std::unique_ptr<NeonSplitterFloatWorkload> wlSplitter;
-    std::unique_ptr<NeonActivationFloatWorkload> wlActiv0_0;
-    std::unique_ptr<NeonActivationFloatWorkload> wlActiv0_1;
-    std::unique_ptr<NeonActivationFloatWorkload> wlActiv1_0;
-    std::unique_ptr<NeonActivationFloatWorkload> wlActiv1_1;
+    std::unique_ptr<NeonActivationWorkload> wlActiv0_0;
+    std::unique_ptr<NeonActivationWorkload> wlActiv0_1;
+    std::unique_ptr<NeonActivationWorkload> wlActiv1_0;
+    std::unique_ptr<NeonActivationWorkload> wlActiv1_1;
 
     CreateSplitterMultipleInputsOneOutputWorkloadTest<NeonSplitterFloatWorkload,
-        NeonActivationFloatWorkload, DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
-                                                                 wlActiv1_0, wlActiv1_1);
+        NeonActivationWorkload, DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
+                                                   wlActiv1_0, wlActiv1_1);
 
     armnn::INeonTensorHandle* sOut0 = dynamic_cast<armnn::INeonTensorHandle*>(wlSplitter->GetData().m_Outputs[0]);
     armnn::INeonTensorHandle* sOut1 = dynamic_cast<armnn::INeonTensorHandle*>(wlSplitter->GetData().m_Outputs[1]);

@@ -16,7 +16,7 @@
 
 #ifdef ARMCOMPUTENEON_ENABLED
 #include "workloads/NeonAdditionFloatWorkload.hpp"
-#include "workloads/NeonActivationFloatWorkload.hpp"
+#include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonBatchNormalizationFloatWorkload.hpp"
 #include "workloads/NeonConvolution2dBaseWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionBaseWorkload.hpp"

@@ -11,8 +11,7 @@ BACKEND_SOURCES := \
         NeonBackend.cpp \
         NeonLayerSupport.cpp \
         NeonWorkloadFactory.cpp \
-        workloads/NeonActivationFloatWorkload.cpp \
-        workloads/NeonActivationUint8Workload.cpp \
+        workloads/NeonActivationWorkload.cpp \
         workloads/NeonAdditionFloatWorkload.cpp \
         workloads/NeonBatchNormalizationFloatWorkload.cpp \
         workloads/NeonConstantFloatWorkload.cpp \

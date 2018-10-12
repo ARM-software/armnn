@@ -433,7 +433,7 @@ BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
 {
     Graph graph;
     NeonWorkloadFactory factory;
-    auto workload = CreateSplitterWorkloadTest<NeonSplitterFloatWorkload, DataType::Float32>(factory, graph);
+    auto workload = CreateSplitterWorkloadTest<NeonSplitterWorkload, DataType::Float32>(factory, graph);
 
     // Checks that outputs are as we expect them (see definition of CreateSplitterWorkloadTest).
     SplitterQueueDescriptor queueDescriptor = workload->GetData();
@@ -462,7 +462,7 @@ BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
     NeonWorkloadFactory factory;
 
     auto workloads =
-        CreateSplitterMergerWorkloadTest<NeonSplitterFloatWorkload, NeonMergerWorkload,
+        CreateSplitterMergerWorkloadTest<NeonSplitterWorkload, NeonMergerWorkload,
             DataType::Float32>(factory, graph);
 
     auto wlSplitter = std::move(workloads.first);
@@ -491,13 +491,13 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
 
     Graph graph;
     NeonWorkloadFactory factory;
-    std::unique_ptr<NeonSplitterFloatWorkload> wlSplitter;
+    std::unique_ptr<NeonSplitterWorkload> wlSplitter;
     std::unique_ptr<NeonActivationWorkload> wlActiv0_0;
     std::unique_ptr<NeonActivationWorkload> wlActiv0_1;
     std::unique_ptr<NeonActivationWorkload> wlActiv1_0;
     std::unique_ptr<NeonActivationWorkload> wlActiv1_1;
 
-    CreateSplitterMultipleInputsOneOutputWorkloadTest<NeonSplitterFloatWorkload,
+    CreateSplitterMultipleInputsOneOutputWorkloadTest<NeonSplitterWorkload,
         NeonActivationWorkload, DataType::Float32>(factory, graph, wlSplitter, wlActiv0_0, wlActiv0_1,
                                                    wlActiv1_0, wlActiv1_1);
 

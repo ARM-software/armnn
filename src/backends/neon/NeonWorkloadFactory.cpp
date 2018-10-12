@@ -104,7 +104,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueue
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
                                                                const WorkloadInfo&            info) const
 {
-    return MakeWorkload<NeonSplitterFloatWorkload, NeonSplitterUint8Workload>(descriptor, info);
+    return std::make_unique<NeonSplitterWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,

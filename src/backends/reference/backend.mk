@@ -17,6 +17,7 @@ BACKEND_SOURCES := \
         workloads/ConvImpl.cpp \
         workloads/FullyConnected.cpp \
         workloads/Mean.cpp \
+        workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
         workloads/RefActivationFloat32Workload.cpp \
         workloads/RefActivationUint8Workload.cpp \
@@ -43,6 +44,7 @@ BACKEND_SOURCES := \
         workloads/RefMergerFloat32Workload.cpp \
         workloads/RefMergerUint8Workload.cpp \
         workloads/RefNormalizationFloat32Workload.cpp \
+        workloads/RefPadWorkload.cpp \
         workloads/RefPermuteWorkload.cpp \
         workloads/RefPooling2dFloat32Workload.cpp \
         workloads/RefPooling2dUint8Workload.cpp \

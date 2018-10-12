@@ -246,6 +246,11 @@ ARMNN_AUTO_TEST_CASE(SimpleFloor, SimpleFloorTest)
 ARMNN_AUTO_TEST_CASE(SimpleReshapeFloat32, SimpleReshapeFloat32Test)
 ARMNN_AUTO_TEST_CASE(SimpleReshapeUint8, SimpleReshapeUint8Test)
 
+// Pad
+ARMNN_AUTO_TEST_CASE(Pad2d, Pad2dTest)
+ARMNN_AUTO_TEST_CASE(Pad3d, Pad3dTest)
+ARMNN_AUTO_TEST_CASE(Pad4d, Pad4dTest)
+
 // Permute
 ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteFloat32Test)
 ARMNN_AUTO_TEST_CASE(SimplePermuteUint8, SimplePermuteUint8Test)

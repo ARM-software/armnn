@@ -22,7 +22,14 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor, const Workloa
 
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(this->m_Data.m_Outputs[0])->GetTensor();
-    arm_compute::PaddingList padList = static_cast<arm_compute::PaddingList>(descriptor.m_Parameters.m_PadList);
+
+    std::vector<std::pair<unsigned int, unsigned int>> reversed_PadList(descriptor.m_Parameters.m_PadList.size());
+
+    std::reverse_copy(std::begin(descriptor.m_Parameters.m_PadList),
+            std::end(descriptor.m_Parameters.m_PadList),
+            std::begin(reversed_PadList));
+
+    arm_compute::PaddingList padList = static_cast<arm_compute::PaddingList>(reversed_PadList);
 
     m_Layer.configure(&input, &output, padList);
 }

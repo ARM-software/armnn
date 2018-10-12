@@ -206,6 +206,11 @@ ARMNN_AUTO_TEST_CASE(L2Normalization2d, L2Normalization2dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization3d, L2Normalization3dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization4d, L2Normalization4dTest)
 
+// Pad
+ARMNN_AUTO_TEST_CASE(Pad2d, Pad2dTest)
+ARMNN_AUTO_TEST_CASE(Pad3d, Pad3dTest)
+ARMNN_AUTO_TEST_CASE(Pad4d, Pad4dTest)
+
 // NOTE: These tests are disabled until NHWC is supported by the reference L2Normalization implementation.
 //ARMNN_AUTO_TEST_CASE(L2Normalization1dNhwc, L2Normalization1dNhwcTest);
 //ARMNN_AUTO_TEST_CASE(L2Normalization2dNhwc, L2Normalization2dNhwcTest);

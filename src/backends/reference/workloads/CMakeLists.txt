@@ -16,6 +16,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     FullyConnected.cpp
     FullyConnected.hpp
     Merger.hpp
+    Pad.cpp
+    Pad.hpp
     Pooling2d.cpp
     Pooling2d.hpp
     RefActivationFloat32Workload.cpp
@@ -64,6 +66,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefMergerUint8Workload.hpp
     RefNormalizationFloat32Workload.cpp
     RefNormalizationFloat32Workload.hpp
+    RefPadWorkload.cpp
+    RefPadWorkload.hpp
     RefPermuteWorkload.cpp
     RefPermuteWorkload.hpp
     RefPooling2dFloat32Workload.cpp

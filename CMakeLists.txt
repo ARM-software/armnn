@@ -277,21 +277,6 @@ list(APPEND armnn_sources
     src/armnn/Observable.cpp
     )
 
-if(ARMCOMPUTENEON)
-    # Additionally include source files for ARM Compute NEON backend
-    list(APPEND armnn_sources
-        src/armnn/NeonInterceptorScheduler.hpp
-        src/armnn/NeonInterceptorScheduler.cpp
-        src/armnn/NeonTimer.hpp
-        src/armnn/NeonTimer.cpp)
-endif()
-if(ARMCOMPUTECL)
-    # Additionally include source files for ARM Compute OpenCL backend
-    list(APPEND armnn_sources
-        src/armnn/OpenClTimer.cpp
-        src/armnn/OpenClTimer.hpp)
-endif()
-# Files shared by all ARM Compute backends
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     list(APPEND armnn_sources
         src/armnn/memory/IMemoryPool.hpp
@@ -404,24 +389,6 @@ if(BUILD_UNIT_TESTS)
         src/backends/test/BatchNormTestImpl.hpp
         src/backends/test/WorkloadTestUtils.hpp
         src/backends/test/QuantizeHelper.hpp)
-
-    if(ARMCOMPUTENEON)
-        list(APPEND unittest_sources
-            src/armnn/test/CreateWorkloadClNeon.hpp
-            src/armnn/test/NeonTimerTest.cpp)
-    endif()
-
-    if(ARMCOMPUTECL)
-        list(APPEND unittest_sources
-            src/armnn/test/CreateWorkloadClNeon.hpp
-            src/armnn/test/OpenClTimerTest.cpp
-            src/armnn/test/FP16SupportTest.cpp)
-    endif()
-
-    if(ARMCOMPUTENEON OR ARMCOMPUTECL)
-        list(APPEND unittest_sources
-            src/backends/test/MemCopyTests.cpp)
-    endif()
 
     if(BUILD_TF_PARSER)
         list(APPEND unittest_sources

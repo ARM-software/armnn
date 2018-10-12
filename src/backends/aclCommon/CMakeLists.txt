@@ -9,6 +9,8 @@ list(APPEND armnnAclCommon_sources
     ArmComputeUtils.hpp
 )
 
+add_subdirectory(test)
+
 add_library(armnnAclCommon STATIC ${armnnAclCommon_sources})
 target_include_directories(armnnAclCommon PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnAclCommon PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)

@@ -15,6 +15,11 @@ list(APPEND armnnClBackend_sources
 )
 
 if(ARMCOMPUTECL)
+    list(APPEND armnnClBackend_sources
+        OpenClTimer.cpp
+        OpenClTimer.hpp
+    )
+
     add_subdirectory(workloads)
     add_subdirectory(test)
 endif()

@@ -113,10 +113,7 @@ LOCAL_SRC_FILES := \
         src/armnn/InternalTypes.cpp \
         src/armnn/Layer.cpp \
         src/armnn/LoadedNetwork.cpp \
-        src/armnn/NeonInterceptorScheduler.cpp \
-        src/armnn/NeonTimer.cpp \
         src/armnn/Network.cpp \
-        src/armnn/OpenClTimer.cpp \
         src/armnn/WallClockTimer.cpp \
         src/armnn/ProfilingEvent.cpp \
         src/armnn/Profiling.cpp \
@@ -187,23 +184,26 @@ LOCAL_SRC_FILES := \
 	src/armnn/test/GraphTests.cpp \
 	src/armnn/test/RuntimeTests.cpp \
 	src/armnn/test/TensorTest.cpp \
-	src/armnn/test/NeonTimerTest.cpp \
 	src/armnn/test/NetworkTests.cpp \
 	src/armnn/test/InstrumentTests.cpp \
-	src/armnn/test/OpenClTimerTest.cpp \
 	src/armnn/test/ProfilingEventTest.cpp \
 	src/armnn/test/ObservableTest.cpp \
 	src/armnn/test/OptionalTest.cpp \
 	src/backends/test/WorkloadDataValidation.cpp \
 	src/backends/test/TensorCopyUtils.cpp \
 	src/backends/test/LayerTests.cpp \
-	src/backends/test/MemCopyTests.cpp \
+	src/backends/aclCommon/test/MemCopyTests.cpp \
         src/backends/cl/test/ClCreateWorkloadTests.cpp \
         src/backends/cl/test/ClLayerSupportTests.cpp \
 	src/backends/cl/test/ClLayerTests.cpp \
+        src/backends/cl/test/ClMemCopyTests.cpp \
+        src/backends/cl/test/Fp16SupportTest.cpp \
+        src/backends/cl/test/OpenClTimerTest.cpp \
         src/backends/neon/test/NeonCreateWorkloadTests.cpp \
         src/backends/neon/test/NeonLayerSupportTests.cpp \
 	src/backends/neon/test/NeonLayerTests.cpp \
+        src/backends/neon/test/NeonMemCopyTests.cpp \
+        src/backends/neon/test/NeonTimerTest.cpp \
         src/backends/reference/test/RefCreateWorkloadTests.cpp \
         src/backends/reference/test/RefLayerSupportTests.cpp \
 	src/backends/reference/test/RefLayerTests.cpp

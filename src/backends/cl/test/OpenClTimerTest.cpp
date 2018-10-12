@@ -5,18 +5,24 @@
 
 #if (defined(__aarch64__)) || (defined(__x86_64__)) // disable test failing on FireFly/Armv7
 
-#include <arm_compute/runtime/CL/CLScheduler.h>
+#include <armnn/test/TensorHelpers.hpp>
+
+#include <backends/CpuTensorHandle.hpp>
+#include <backends/WorkloadFactory.hpp>
+
 #include <backends/cl/ClContextControl.hpp>
 #include <backends/cl/ClWorkloadFactory.hpp>
-#include <backends/CpuTensorHandle.hpp>
-#include <boost/format.hpp>
-#include <iostream>
-#include <OpenClTimer.hpp>
+#include <backends/cl/OpenClTimer.hpp>
+
 #include <backends/test/TensorCopyUtils.hpp>
-#include "TensorHelpers.hpp"
-#include <boost/test/unit_test.hpp>
-#include <backends/WorkloadFactory.hpp>
 #include <backends/test/WorkloadTestUtils.hpp>
+
+#include <arm_compute/runtime/CL/CLScheduler.h>
+
+#include <boost/format.hpp>
+#include <boost/test/unit_test.hpp>
+
+#include <iostream>
 
 using namespace armnn;
 

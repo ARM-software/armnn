@@ -1,0 +1,14 @@
+#
+# Copyright © 2017 Arm Ltd. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+
+list(APPEND armnnAclCommonUnitTests_sources
+    CreateWorkloadClNeon.hpp
+    MemCopyTests.cpp
+)
+
+add_library(armnnAclCommonUnitTests OBJECT ${armnnAclCommonUnitTests_sources})
+target_include_directories(armnnAclCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(armnnAclCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(armnnAclCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

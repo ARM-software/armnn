@@ -3,20 +3,22 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <NeonTimer.hpp>
-#include "TensorHelpers.hpp"
-
 #include <armnn/ArmNN.hpp>
-#include <armnn/Tensor.hpp>
-#include <armnn/TypesUtils.hpp>
+
+#include <armnn/test/TensorHelpers.hpp>
+
 #include <backends/CpuTensorHandle.hpp>
-#include <backends/neon/NeonWorkloadFactory.hpp>
 #include <backends/WorkloadFactory.hpp>
+
+#include <backends/neon/NeonTimer.hpp>
+#include <backends/neon/NeonWorkloadFactory.hpp>
+
 #include <backends/test/LayerTests.hpp>
 #include <backends/test/TensorCopyUtils.hpp>
 #include <backends/test/WorkloadTestUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
+
 #include <cstdlib>
 #include <algorithm>
 

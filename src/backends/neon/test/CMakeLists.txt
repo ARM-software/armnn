@@ -7,6 +7,8 @@ list(APPEND armnnNeonBackendUnitTests_sources
     NeonCreateWorkloadTests.cpp
     NeonLayerSupportTests.cpp
     NeonLayerTests.cpp
+    NeonMemCopyTests.cpp
+    NeonTimerTest.cpp
 )
 
 add_library(armnnNeonBackendUnitTests OBJECT ${armnnNeonBackendUnitTests_sources})

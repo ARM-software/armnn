@@ -9,7 +9,9 @@
 
 BACKEND_SOURCES := \
         NeonBackend.cpp \
+        NeonInterceptorScheduler.cpp \
         NeonLayerSupport.cpp \
+        NeonTimer.cpp \
         NeonWorkloadFactory.cpp \
         workloads/NeonActivationWorkload.cpp \
         workloads/NeonAdditionFloatWorkload.cpp \

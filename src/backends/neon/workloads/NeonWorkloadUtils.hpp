@@ -5,9 +5,9 @@
 #pragma once
 
 #include <backends/Workload.hpp>
-#include <backends/neon/NeonTensorHandle.hpp>
 
-#include "NeonTimer.hpp"
+#include <backends/neon/NeonTensorHandle.hpp>
+#include <backends/neon/NeonTimer.hpp>
 
 #include <arm_compute/core/Types.h>
 #include <arm_compute/core/Helpers.h>

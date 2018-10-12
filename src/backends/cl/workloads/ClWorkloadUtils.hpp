@@ -5,10 +5,10 @@
 #pragma once
 
 #include <armnnUtils/Half.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/CpuTensorHandle.hpp>
 
-#include "OpenClTimer.hpp"
+#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backends/cl/OpenClTimer.hpp>
+#include <backends/CpuTensorHandle.hpp>
 
 #define ARMNN_SCOPED_PROFILING_EVENT_CL(name) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::GpuAcc, \

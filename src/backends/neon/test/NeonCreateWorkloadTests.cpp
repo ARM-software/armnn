@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/test/CreateWorkloadClNeon.hpp>
-
 #include <backends/MemCopyWorkload.hpp>
+
+#include <backends/aclCommon/test/CreateWorkloadClNeon.hpp>
+
 #include <backends/neon/NeonWorkloadFactory.hpp>
 #include <backends/neon/NeonTensorHandle.hpp>
 #include <backends/neon/workloads/NeonWorkloadUtils.hpp>

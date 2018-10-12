@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "CreateWorkload.hpp"
+#include <armnn/test/CreateWorkload.hpp>
 
 #include <backends/MemCopyWorkload.hpp>
 #include <backends/reference/RefWorkloadFactory.hpp>
@@ -16,7 +16,6 @@
 #if ARMCOMPUTENEON_ENABLED
 #include <backends/neon/NeonTensorHandle.hpp>
 #endif
-
 
 using namespace armnn;
 

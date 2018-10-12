@@ -7,11 +7,15 @@ if(ARMCOMPUTENEON)
     list(APPEND armnnNeonBackend_sources
         NeonBackend.cpp
         NeonBackend.hpp
+        NeonInterceptorScheduler.hpp
+        NeonInterceptorScheduler.cpp
         NeonLayerSupport.cpp
         NeonLayerSupport.hpp
         NeonWorkloadFactory.cpp
         NeonWorkloadFactory.hpp
         NeonTensorHandle.hpp
+        NeonTimer.hpp
+        NeonTimer.cpp
     )
 
     add_subdirectory(workloads)

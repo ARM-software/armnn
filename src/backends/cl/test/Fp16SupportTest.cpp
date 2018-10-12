@@ -45,7 +45,6 @@ BOOST_AUTO_TEST_CASE(Fp16DataTypeSupport)
     BOOST_CHECK(inputLayer1->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
     BOOST_CHECK(inputLayer2->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
     BOOST_CHECK(additionLayer->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
-
 }
 
 BOOST_AUTO_TEST_CASE(Fp16AdditionTest)
@@ -53,11 +52,10 @@ BOOST_AUTO_TEST_CASE(Fp16AdditionTest)
    using namespace half_float::literal;
    // Create runtime in which test will run
    IRuntime::CreationOptions options;
-   IRuntimePtr  runtime(IRuntime::Create(options));
+   IRuntimePtr runtime(IRuntime::Create(options));
 
    // Builds up the structure of the network.
    INetworkPtr net(INetwork::Create());
-
 
    IConnectableLayer* inputLayer1 = net->AddInputLayer(0);
    IConnectableLayer* inputLayer2 = net->AddInputLayer(1);
@@ -79,7 +77,6 @@ BOOST_AUTO_TEST_CASE(Fp16AdditionTest)
    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
    // Loads it into the runtime.
-
    NetworkId netId;
    runtime->LoadNetwork(netId, std::move(optNet));
 

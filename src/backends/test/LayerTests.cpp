@@ -16,11 +16,6 @@
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/WorkloadFactory.hpp>
 
-#ifdef ARMCOMPUTECL_ENABLED
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#endif
-
 #include <algorithm>
 #include <boost/cast.hpp>
 

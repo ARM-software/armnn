@@ -8,6 +8,8 @@ list(APPEND armnnClBackendUnitTests_sources
     ClCreateWorkloadTests.cpp
     ClLayerSupportTests.cpp
     ClLayerTests.cpp
+    ClMemCopyTests.cpp
+    OpenClTimerTest.cpp
 )
 
 add_library(armnnClBackendUnitTests OBJECT ${armnnClBackendUnitTests_sources})

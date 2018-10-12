@@ -12,6 +12,7 @@ BACKEND_SOURCES := \
         ClContextControl.cpp \
         ClLayerSupport.cpp \
         ClWorkloadFactory.cpp \
+        OpenClTimer.cpp \
         workloads/ClActivationWorkload.cpp \
         workloads/ClAdditionWorkload.cpp \
         workloads/ClBatchNormalizationFloatWorkload.cpp \

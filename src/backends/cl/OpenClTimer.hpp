@@ -7,8 +7,8 @@
 
 #include "Instrument.hpp"
 
-#include "arm_compute/runtime/CL/CLScheduler.h"
-#include "arm_compute/core/CL/OpenCL.h"
+#include <arm_compute/runtime/CL/CLScheduler.h>
+#include <arm_compute/core/CL/OpenCL.h>
 
 #include <vector>
 #include <list>

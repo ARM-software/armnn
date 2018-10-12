@@ -25,7 +25,7 @@
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
 #include "workloads/NeonPermuteWorkload.hpp"
-#include "workloads/NeonPooling2dBaseWorkload.hpp"
+#include "workloads/NeonPooling2dWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
 #include "workloads/NeonSubtractionFloatWorkload.hpp"
 #endif

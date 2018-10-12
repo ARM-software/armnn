@@ -129,7 +129,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePermute(const Permu
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
                                                                        const WorkloadInfo&           info) const
 {
-    return MakeWorkload<NeonPooling2dFloatWorkload, NeonPooling2dUint8Workload>(descriptor, info);
+    return std::make_unique<NeonPooling2dWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(

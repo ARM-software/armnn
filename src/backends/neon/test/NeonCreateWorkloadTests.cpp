@@ -324,12 +324,12 @@ BOOST_AUTO_TEST_CASE(CreateNormalizationFloatNhwcWorkload)
 }
 
 
-template <typename Pooling2dWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void NeonCreatePooling2dWorkloadTest(DataLayout dataLayout = DataLayout::NCHW)
 {
     Graph               graph;
     NeonWorkloadFactory factory;
-    auto                workload = CreatePooling2dWorkloadTest<Pooling2dWorkloadType, DataType>
+    auto                workload = CreatePooling2dWorkloadTest<NeonPooling2dWorkload, DataType>
                                    (factory, graph, dataLayout);
 
     TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{3, 2, 5, 5} : TensorShape{3, 5, 5, 2};
@@ -346,28 +346,28 @@ static void NeonCreatePooling2dWorkloadTest(DataLayout dataLayout = DataLayout::
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16Workload)
 {
-    NeonCreatePooling2dWorkloadTest<NeonPooling2dFloatWorkload, DataType::Float16>();
+    NeonCreatePooling2dWorkloadTest<DataType::Float16>();
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloatNchwWorkload)
 {
-    NeonCreatePooling2dWorkloadTest<NeonPooling2dFloatWorkload, DataType::Float32>(DataLayout::NCHW);
+    NeonCreatePooling2dWorkloadTest<DataType::Float32>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloatNhwcWorkload)
 {
-    NeonCreatePooling2dWorkloadTest<NeonPooling2dFloatWorkload, DataType::Float32>(DataLayout::NHWC);
+    NeonCreatePooling2dWorkloadTest<DataType::Float32>(DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NchwWorkload)
 {
-    NeonCreatePooling2dWorkloadTest<NeonPooling2dUint8Workload, DataType::QuantisedAsymm8>(DataLayout::NCHW);
+    NeonCreatePooling2dWorkloadTest<DataType::QuantisedAsymm8>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NhwcWorkload)
 {
-    NeonCreatePooling2dWorkloadTest<NeonPooling2dUint8Workload, DataType::QuantisedAsymm8>(DataLayout::NHWC);
+    NeonCreatePooling2dWorkloadTest<DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
 template <typename armnn::DataType DataType>

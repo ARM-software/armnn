@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NeonPooling2dBaseWorkload.hpp"
+#include "NeonPooling2dWorkload.hpp"
 #include <backends/neon/NeonLayerSupport.hpp>
 #include <backends/neon/NeonTensorHandle.hpp>
 #include <backends/aclCommon/ArmComputeUtils.hpp>
@@ -25,12 +25,11 @@ arm_compute::Status NeonPooling2dWorkloadValidate(const TensorInfo& input,
     return arm_compute::NEPoolingLayer::validate(&aclInputInfo, &aclOutputInfo, layerInfo);
 }
 
-template <armnn::DataType... dataTypes>
-NeonPooling2dBaseWorkload<dataTypes...>::NeonPooling2dBaseWorkload(
-    const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info, const std::string& name)
-    : TypedWorkload<Pooling2dQueueDescriptor, dataTypes...>(descriptor, info)
+NeonPooling2dWorkload::NeonPooling2dWorkload(
+    const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info)
+    : BaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs(name, 1, 1);
+    m_Data.ValidateInputsOutputs("NeonPooling2dWorkload", 1, 1);
 
     arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
@@ -44,8 +43,10 @@ NeonPooling2dBaseWorkload<dataTypes...>::NeonPooling2dBaseWorkload(
     m_PoolingLayer.configure(&input, &output, layerInfo);
 }
 
-template class NeonPooling2dBaseWorkload<DataType::Float16, DataType::Float32>;
-template class NeonPooling2dBaseWorkload<DataType::QuantisedAsymm8>;
+void NeonPooling2dWorkload::Execute() const
+{
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonPooling2dWorkload_Execute");
+    m_PoolingLayer.run();
+}
 
 } //namespace armnn
-

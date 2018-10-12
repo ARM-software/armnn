@@ -9,7 +9,6 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonAdditionFloatWorkload.cpp
     NeonAdditionFloatWorkload.hpp
     NeonBaseConstantWorkload.hpp
-    NeonBaseMergerWorkload.hpp
     NeonBaseSplitterWorkload.hpp
     NeonBatchNormalizationFloatWorkload.cpp
     NeonBatchNormalizationFloatWorkload.hpp
@@ -41,10 +40,7 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonL2NormalizationFloatWorkload.hpp
     NeonLstmFloatWorkload.cpp
     NeonLstmFloatWorkload.hpp
-    NeonMergerFloatWorkload.cpp
-    NeonMergerFloatWorkload.hpp
-    NeonMergerUint8Workload.cpp
-    NeonMergerUint8Workload.hpp
+    NeonMergerWorkload.hpp
     NeonMultiplicationFloatWorkload.cpp
     NeonMultiplicationFloatWorkload.hpp
     NeonNormalizationFloatWorkload.cpp

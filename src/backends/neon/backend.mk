@@ -28,8 +28,6 @@ BACKEND_SOURCES := \
         workloads/NeonFullyConnectedWorkload.cpp \
         workloads/NeonL2NormalizationFloatWorkload.cpp \
         workloads/NeonLstmFloatWorkload.cpp \
-        workloads/NeonMergerFloatWorkload.cpp \
-        workloads/NeonMergerUint8Workload.cpp \
         workloads/NeonMultiplicationFloatWorkload.cpp \
         workloads/NeonNormalizationFloatWorkload.cpp \
         workloads/NeonPermuteWorkload.cpp \

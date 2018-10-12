@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
     NeonWorkloadFactory factory;
 
     auto workloads =
-        CreateSplitterMergerWorkloadTest<NeonSplitterFloatWorkload, NeonMergerFloatWorkload,
+        CreateSplitterMergerWorkloadTest<NeonSplitterFloatWorkload, NeonMergerWorkload,
             DataType::Float32>(factory, graph);
 
     auto wlSplitter = std::move(workloads.first);

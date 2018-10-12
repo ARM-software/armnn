@@ -16,8 +16,7 @@ BACKEND_SOURCES := \
         workloads/NeonActivationWorkload.cpp \
         workloads/NeonAdditionFloatWorkload.cpp \
         workloads/NeonBatchNormalizationFloatWorkload.cpp \
-        workloads/NeonConstantFloatWorkload.cpp \
-        workloads/NeonConstantUint8Workload.cpp \
+        workloads/NeonConstantWorkload.cpp \
         workloads/NeonConvertFp16ToFp32Workload.cpp \
         workloads/NeonConvertFp32ToFp16Workload.cpp \
         workloads/NeonConvolution2dBaseWorkload.cpp \

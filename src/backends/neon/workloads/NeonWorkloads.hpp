@@ -6,10 +6,8 @@
 #pragma once
 #include "NeonActivationWorkload.hpp"
 #include "NeonAdditionFloatWorkload.hpp"
-#include "NeonBaseConstantWorkload.hpp"
 #include "NeonBatchNormalizationFloatWorkload.hpp"
-#include "NeonConstantFloatWorkload.hpp"
-#include "NeonConstantUint8Workload.hpp"
+#include "NeonConstantWorkload.hpp"
 #include "NeonConvertFp16ToFp32Workload.hpp"
 #include "NeonConvertFp32ToFp16Workload.hpp"
 #include "NeonConvolution2dBaseWorkload.hpp"

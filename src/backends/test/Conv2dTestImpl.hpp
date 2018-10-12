@@ -691,6 +691,106 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
     return ret;
 }
 
+template<typename T, typename B>
+LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(armnn::IWorkloadFactory& workloadFactory,
+                                                         const boost::multi_array<T, 4>& input,
+                                                         const boost::multi_array<T, 4>& kernel,
+                                                         const boost::multi_array<B, 1>& bias,
+                                                         const boost::multi_array<T, 4>& outputExpected,
+                                                         float qScale,
+                                                         int32_t qOffset,
+                                                         uint32_t padLeft = 0,
+                                                         uint32_t padTop = 0,
+                                                         uint32_t padRight = 0,
+                                                         uint32_t padBottom = 0,
+                                                         uint32_t strideX = 1,
+                                                         uint32_t strideY = 1)
+{
+    unsigned int inputNum       = boost::numeric_cast<unsigned int>(input.shape()[0]);
+    unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[3]);
+    unsigned int inputHeight    = boost::numeric_cast<unsigned int>(input.shape()[1]);
+    unsigned int inputWidth     = boost::numeric_cast<unsigned int>(input.shape()[2]);
+
+    unsigned int kernelChanMul  = boost::numeric_cast<unsigned int>(kernel.shape()[0]);
+    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(kernel.shape()[3]);
+    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(kernel.shape()[1]);
+    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(kernel.shape()[2]);
+
+    unsigned int outputNum      = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
+    unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[3]);
+    unsigned int outputHeight   = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
+    unsigned int outputWidth    = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
+
+    // Creates the tensors.
+    armnn::TensorInfo inputTensorInfo({inputNum, inputHeight, inputWidth, inputChannels}, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo({outputNum, outputHeight, outputWidth, outputChannels},
+                                       armnn::GetDataType<T>());
+    armnn::TensorInfo kernelDesc({kernelChanMul, kernelHeight, kernelWidth, kernelChannels}, armnn::GetDataType<T>());
+    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
+
+    // Set quantization parameters if the requested type is a quantized type.
+    if (armnn::IsQuantizedType<T>())
+    {
+        inputTensorInfo.SetQuantizationScale(qScale);
+        inputTensorInfo.SetQuantizationOffset(qOffset);
+        outputTensorInfo.SetQuantizationScale(qScale);
+        outputTensorInfo.SetQuantizationOffset(qOffset);
+        kernelDesc.SetQuantizationScale(qScale);
+        kernelDesc.SetQuantizationOffset(qOffset);
+        biasDesc.SetQuantizationScale(qScale*qScale);
+        biasDesc.SetQuantizationOffset(0);
+    }
+
+    // Construct the input data.
+    std::vector<T> inputData;
+    inputData.assign(input.data(), input.data() + inputHeight*inputWidth*inputChannels);
+    auto batchedInput = MakeTensor<T, 4>(inputTensorInfo, inputData);
+
+    // Construct the output data, with bias applied, as appropriate.
+    std::vector<T> outputData;
+    outputData.assign(outputExpected.data(), outputExpected.data() + outputHeight*outputWidth*outputChannels);
+
+    LayerTestResult<T, 4> ret(outputTensorInfo);
+    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
+    AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
+
+    armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
+
+    armnn::DepthwiseConvolution2dQueueDescriptor data;
+    data.m_Weight = &weightsTensor;
+    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - it can be a source of bugs.
+    data.m_Parameters.m_StrideX = strideX;
+    data.m_Parameters.m_StrideY = strideY;
+    data.m_Parameters.m_PadLeft = padLeft;
+    data.m_Parameters.m_PadRight = padRight;
+    data.m_Parameters.m_PadTop = padTop;
+    data.m_Parameters.m_PadBottom = padBottom;
+    data.m_Parameters.m_DataLayout = armnn::DataLayout::NHWC;
+
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
+
+    workloadFactory.Finalize();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+
+    return ret;
+}
+
 template<typename T>
 LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                            float qScale,

@@ -579,10 +579,12 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
     ValidatePointer(m_Weight, "DepthwiseConvolution2dQueueDescriptor", "weight");
     ValidateTensorNumDimensions(m_Weight->GetTensorInfo(), "DepthwiseConvolution2dQueueDescriptor", 4, "weight");
 
+    const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;
+
     //inputChannels * channelMultiplier should be equal to outputChannels.
     const unsigned int numWeightChannelMultiplier = m_Weight->GetTensorInfo().GetShape()[0];
-    const unsigned int numWeightInputChannels = m_Weight->GetTensorInfo().GetShape()[1];
-    const unsigned int numWeightOutputChannels = workloadInfo.m_OutputTensorInfos[0].GetShape()[1];
+    const unsigned int numWeightInputChannels = m_Weight->GetTensorInfo().GetShape()[channelIndex];
+    const unsigned int numWeightOutputChannels = workloadInfo.m_OutputTensorInfos[0].GetShape()[channelIndex];
     if (numWeightChannelMultiplier * numWeightInputChannels != numWeightOutputChannels)
     {
         throw InvalidArgumentException(

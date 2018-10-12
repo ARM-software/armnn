@@ -68,6 +68,9 @@ LayerTestResult<uint8_t, 4> Convolution1dUint8Test(armnn::IWorkloadFactory& work
 
 LayerTestResult<float, 4> DepthwiseConvolution2dTest(armnn::IWorkloadFactory& workloadFactory, bool biasEnabled);
 
+LayerTestResult<float, 4> DepthwiseConvolution2dDepthNhwcTest(armnn::IWorkloadFactory& workloadFactory,
+                                                              bool biasEnabled);
+
 LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(armnn::IWorkloadFactory& workloadFactory,
                                                               bool biasEnabled);
 

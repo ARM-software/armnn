@@ -190,19 +190,6 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dWorkload)
                      TensorInfo({2, 2, 2, 10}, DataType::Float32));
 }
 
-BOOST_AUTO_TEST_CASE(CreateDepthwiseConvolution2dWorkload)
-{
-    Graph                graph;
-    RefWorkloadFactory factory;
-    auto                 workload =
-        CreateDepthwiseConvolution2dWorkloadTest<RefDepthwiseConvolution2dFloat32Workload>(factory, graph);
-
-    // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
-    CheckInputOutput(std::move(workload),
-                     TensorInfo({2, 3, 8, 16}, DataType::Float32),
-                     TensorInfo({2, 9, 2, 10}, DataType::Float32));
-}
-
 template <typename FullyConnectedWorkloadType, armnn::DataType DataType>
 static void RefCreateFullyConnectedWorkloadTest()
 {

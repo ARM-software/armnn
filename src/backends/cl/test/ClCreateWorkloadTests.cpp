@@ -243,6 +243,36 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16NhwcWorkload)
     ClConvolution2dWorkloadTest<ClConvolution2dWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
 }
 
+template <typename DepthwiseConvolutionWorkloadType, typename armnn::DataType DataType>
+static void ClDepthwiseConvolutionWorkloadTest(DataLayout dataLayout)
+{
+    Graph graph;
+    ClWorkloadFactory factory;
+
+    auto workload = CreateDepthwiseConvolution2dWorkloadTest<DepthwiseConvolutionWorkloadType, DataType>
+                    (factory, graph, dataLayout);
+
+    // Checks that inputs/outputs are as we expect them (see definition of CreateDepthwiseConvolution2dWorkloadTest).
+    DepthwiseConvolution2dQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW)
+            ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+            : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW)
+            ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+            : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, inputShape));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, outputShape));
+}
+
+BOOST_AUTO_TEST_CASE(CreateDepthwiseConvolutionFloat32NhwcWorkload)
+{
+    ClDepthwiseConvolutionWorkloadTest<ClDepthwiseConvolutionWorkload, DataType::Float32>(DataLayout::NHWC);
+}
+
 template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
 static void ClDirectConvolution2dWorkloadTest()
 {

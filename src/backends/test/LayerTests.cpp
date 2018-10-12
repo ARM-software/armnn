@@ -493,6 +493,119 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloa
         1); // strideY
 }
 
+template<typename T>
+LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(armnn::IWorkloadFactory& workloadFactory,
+                                                           float qScale,
+                                                           int32_t qOffset,
+                                                           bool biasEnabled)
+{
+    armnn::TensorInfo inputTensorInfo({ 1, 5, 5, 2}, armnn::GetDataType<T>());
+    auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
+        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
+            0, 25,
+            1, 26,
+            2, 27,
+            3, 28,
+            4, 29,
+
+            5, 30,
+            6, 31,
+            7, 32,
+            8, 33,
+            9, 34,
+
+            10, 35,
+            11, 36,
+            12, 37,
+            13, 38,
+            14, 39,
+
+            15, 40,
+            16, 41,
+            17, 42,
+            18, 43,
+            19, 44,
+
+            20, 45,
+            21, 46,
+            22, 47,
+            23, 48,
+            24, 49
+        })));
+
+    armnn::TensorInfo kernelTensorInfo({ 1, 4, 4, 2}, armnn::GetDataType<T>());
+    auto kernel = MakeTensor<T, 4>(kernelTensorInfo, std::vector<T>(
+        QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(), {
+             32, 16,
+             31, 15,
+             30, 14,
+             29, 13,
+
+             28, 12,
+             27, 11,
+             26, 10,
+             25,  9,
+
+             24,  8,
+             23,  7,
+             22,  6,
+             21,  5,
+
+             20,  4,
+             19,  3,
+             18,  2,
+             17,  1
+        })));
+
+    armnn::TensorInfo outputTensorInfo({ 1, 5, 5, 2}, armnn::GetDataType<T>());
+    boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputTensorInfo, std::vector<T>(
+        QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(), {
+        1062, 1550,
+        1580, 2284,
+        1850, 2362,
+        1530, 1955,
+        1117, 1428,
+
+        2140, 2910,
+        3108, 4206,
+        3500, 4342,
+        2842, 3528,
+        2042, 2536,
+
+        3580, 3390,
+        5068, 4886,
+        5460, 5022,
+        4342, 4068,
+        3062, 2916,
+
+        3618, 3566,
+        5072, 5056,
+        5390, 5182,
+        4248, 4133,
+        2971, 2922,
+
+        3074, 3100,
+        4282, 4352,
+        4510, 4452,
+        3533, 3517,
+        2457, 2465
+        })));
+
+    return DepthwiseConvolution2dNhwcTestImpl<T>(workloadFactory,
+        input,
+        kernel,
+        GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(biasEnabled, qScale, qOffset),
+        expectedOutput,
+        qScale,
+        qOffset,
+        1,  // Padding left.
+        1,  // Padding top.
+        2,  // Padding right.
+        2,  // Padding bottom.
+        1,  // strideX
+        1);  // strideY
+}
+
 LayerTestResult<float, 4>
 Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(armnn::IWorkloadFactory& workloadFactory)
 {
@@ -508,6 +621,12 @@ LayerTestResult<float, 4> DepthwiseConvolution2dTest(armnn::IWorkloadFactory& wo
                                                      bool                     biasEnabled)
 {
     return DepthwiseConvolution2dTestImpl<float, float>(workloadFactory, 0.0f, 0, biasEnabled);
+}
+
+LayerTestResult<float, 4> DepthwiseConvolution2dDepthNhwcTest(armnn::IWorkloadFactory& workloadFactory,
+                                                              bool biasEnabled)
+{
+    return DepthwiseConvolution2dNhwcTestCommon<float>(workloadFactory, 0.0f, 0, biasEnabled);
 }
 
 LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(armnn::IWorkloadFactory& workloadFactory,

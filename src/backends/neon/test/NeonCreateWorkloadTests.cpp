@@ -219,6 +219,45 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNhwcWorkload)
     NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloatWorkload, DataType::Float32>(DataLayout::NHWC);
 }
 
+template <typename DepthwiseConvolution2dFloat32WorkloadType, typename armnn::DataType DataType>
+static void NeonCreateDepthWiseConvolutionWorkloadTest(DataLayout dataLayout)
+{
+    Graph graph;
+    NeonWorkloadFactory factory;
+
+    auto workload = CreateDepthwiseConvolution2dWorkloadTest<DepthwiseConvolution2dFloat32WorkloadType,
+                                                             DataType>(factory, graph, dataLayout);
+
+    // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
+    DepthwiseConvolution2dQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW)
+            ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+            : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW)
+            ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+            : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+}
+
+BOOST_AUTO_TEST_CASE(CreateDepthWiseConvolution2dFloat32NhwcWorkload)
+{
+    NeonCreateDepthWiseConvolutionWorkloadTest<NeonDepthwiseConvolutionFloatWorkload,
+                                               DataType::Float32>(DataLayout::NHWC);
+}
+
+#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+BOOST_AUTO_TEST_CASE(CreateDepthWiseConvolution2dFloat16NhwcWorkload)
+{
+    NeonCreateDepthWiseConvolutionWorkloadTest<NeonDepthwiseConvolutionFloatWorkload,
+                                               DataType::Float16>(DataLayout::NHWC);
+}
+#endif
+
 template <typename FullyConnectedWorkloadType, typename armnn::DataType DataType>
 static void NeonCreateFullyConnectedWorkloadTest()
 {

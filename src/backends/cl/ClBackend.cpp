@@ -15,10 +15,9 @@ namespace armnn
 
 namespace
 {
-static const BackendId s_Id{"GpuAcc"};
 
 static BackendRegistry::Helper g_RegisterHelper{
-    s_Id,
+    ClBackend::GetIdStatic(),
     []()
     {
         return IBackendUniquePtr(new ClBackend, &ClBackend::Destroy);
@@ -27,8 +26,9 @@ static BackendRegistry::Helper g_RegisterHelper{
 
 }
 
-const BackendId& ClBackend::GetId() const
+const BackendId& ClBackend::GetIdStatic()
 {
+    static const BackendId s_Id{"GpuAcc"};
     return s_Id;
 }
 

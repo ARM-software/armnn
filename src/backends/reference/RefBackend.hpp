@@ -16,7 +16,8 @@ public:
     RefBackend()  = default;
     ~RefBackend() = default;
 
-    const BackendId& GetId() const override;
+    static const BackendId& GetIdStatic();
+    const BackendId& GetId() const override { return GetIdStatic(); }
 
     const ILayerSupport& GetLayerSupport() const override;
 

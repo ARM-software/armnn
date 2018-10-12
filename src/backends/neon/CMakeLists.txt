@@ -29,7 +29,7 @@ else()
     )
 endif()
 
-add_library(armnnNeonBackend STATIC ${armnnNeonBackend_sources})
+add_library(armnnNeonBackend OBJECT ${armnnNeonBackend_sources})
 target_include_directories(armnnNeonBackend PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnNeonBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnNeonBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

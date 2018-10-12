@@ -16,7 +16,8 @@ public:
     NeonBackend()  = default;
     ~NeonBackend() = default;
 
-    const BackendId& GetId() const override;
+    static const BackendId& GetIdStatic();
+    const BackendId& GetId() const override { return GetIdStatic(); }
 
     const ILayerSupport& GetLayerSupport() const override;
 

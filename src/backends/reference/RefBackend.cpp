@@ -15,10 +15,9 @@ namespace armnn
 
 namespace
 {
-const BackendId s_Id{"CpuRef"};
 
 static BackendRegistry::Helper s_RegisterHelper{
-    s_Id,
+    RefBackend::GetIdStatic(),
     []()
     {
         return IBackendUniquePtr(new RefBackend, &RefBackend::Destroy);
@@ -27,8 +26,9 @@ static BackendRegistry::Helper s_RegisterHelper{
 
 }
 
-const BackendId& RefBackend::GetId() const
+const BackendId& RefBackend::GetIdStatic()
 {
+    static const BackendId s_Id{"CpuRef"};
     return s_Id;
 }
 

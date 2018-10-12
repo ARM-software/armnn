@@ -284,20 +284,22 @@ if(PROFILING_BACKEND_STREAMLINE)
         ${GATOR_ROOT}/annotate/streamline_annotate.c)
 endif()
 
-add_library_ex(armnn SHARED ${armnn_sources})
-
 # the backends under src/backends extend the list of
-# static libs armnn to link against
-list(APPEND armnnLibraries armnnUtils)
+# object libs armnn to include in the build
 include(src/backends/backends.cmake)
+foreach(lib ${armnnLibraries})
+    message("Adding object library dependency to armnn: ${lib}")
+    list(APPEND armnn_sources $<TARGET_OBJECTS:${lib}>)
+endforeach()
+
+add_library_ex(armnn SHARED ${armnn_sources})
 
 target_include_directories(armnn PRIVATE src)
 target_include_directories(armnn PRIVATE src/armnn)
 target_include_directories(armnn PRIVATE src/armnnUtils)
-foreach(lib ${armnnLibraries})
-    target_link_libraries(armnn ${lib})
-    message("Adding library dependency to armnn: ${lib}")
-endforeach()
+
+target_link_libraries(armnn armnnUtils)
+
 target_link_libraries(armnn ${CMAKE_DL_LIBS})
 
 install(TARGETS armnn DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
@@ -458,7 +460,7 @@ if(BUILD_UNIT_TESTS)
     endif()
 
     foreach(lib ${armnnUnitTestLibraries})
-        message("Adding library dependency to UnitTests: ${lib}")
+        message("Adding object library dependency to UnitTests: ${lib}")
         list(APPEND unittest_sources $<TARGET_OBJECTS:${lib}>)
     endforeach()
 

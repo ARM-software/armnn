@@ -102,7 +102,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefMeanUint8Workload.hpp
 )
 
-add_library(armnnRefBackendWorkloads STATIC ${armnnRefBackendWorkloads_sources})
+add_library(armnnRefBackendWorkloads OBJECT ${armnnRefBackendWorkloads_sources})
 target_include_directories(armnnRefBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnRefBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnRefBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

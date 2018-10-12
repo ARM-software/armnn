@@ -4,10 +4,7 @@
 //
 #pragma once
 
-#include <armnn/DescriptorsFwd.hpp>
-#include <armnn/Types.hpp>
-#include <armnn/Tensor.hpp>
-#include <layers/LstmLayer.hpp>
+#include <armnn/ILayerSupport.hpp>
 
 namespace armnn
 {

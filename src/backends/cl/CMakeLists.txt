@@ -24,7 +24,7 @@ if(ARMCOMPUTECL)
     add_subdirectory(test)
 endif()
 
-add_library(armnnClBackend STATIC ${armnnClBackend_sources})
+add_library(armnnClBackend OBJECT ${armnnClBackend_sources})
 target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

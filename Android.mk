@@ -204,12 +204,13 @@ LOCAL_SRC_FILES := \
 
 LOCAL_STATIC_LIBRARIES := \
 	libneuralnetworks_common \
-	libarmnn \
 	libboost_log \
 	libboost_system \
 	libboost_unit_test_framework \
 	libboost_thread \
 	armnn-arm_compute
+
+LOCAL_WHOLE_STATIC_LIBRARIES := libarmnn
 
 LOCAL_SHARED_LIBRARIES := \
 	libbase \

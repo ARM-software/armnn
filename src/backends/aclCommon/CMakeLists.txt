@@ -25,7 +25,7 @@ list(APPEND armnnAclCommon_sources
 
 add_subdirectory(test)
 
-add_library(armnnAclCommon STATIC ${armnnAclCommon_sources})
+add_library(armnnAclCommon OBJECT ${armnnAclCommon_sources})
 target_include_directories(armnnAclCommon PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnAclCommon PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnAclCommon PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

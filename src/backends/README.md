@@ -13,7 +13,7 @@ ArmNN source tree.
 
 The ```backend.cmake``` has two main purposes:
 
-1. It makes sure the artifact (typically a static library) is linked into the ArmNN shared library.
+1. It makes sure the artifact (a cmake OBJECT library) is linked into the ArmNN shared library.
 2. It makes sure that the subdirectory where backend sources reside gets included in the build.
 
 To achieve this there are two requirements for the ```backend.cmake``` file
@@ -28,7 +28,7 @@ To achieve this there are two requirements for the ```backend.cmake``` file
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/backends/reference)
 
 #
-# Add the static libraries built by the reference backend to the
+# Add the cmake OBJECT libraries built by the reference backend to the
 # list of libraries linked against the ArmNN shared library.
 #
 list(APPEND armnnLibraries armnnRefBackend armnnRefBackendWorkloads)

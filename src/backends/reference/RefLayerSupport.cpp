@@ -3,8 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "LayerSupportCommon.hpp"
 #include "RefLayerSupport.hpp"
+
+#include <LayerSupportCommon.hpp>
+
 #include <armnn/Descriptors.hpp>
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>

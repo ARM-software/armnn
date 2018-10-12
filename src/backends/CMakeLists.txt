@@ -30,7 +30,7 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadUtils.hpp
 )
 
-add_library(armnnBackendsCommon STATIC ${armnnBackendsCommon_sources})
+add_library(armnnBackendsCommon OBJECT ${armnnBackendsCommon_sources})
 target_include_directories(armnnBackendsCommon PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnBackendsCommon PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnBackendsCommon PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

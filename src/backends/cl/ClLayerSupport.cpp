@@ -5,8 +5,10 @@
 
 #include "ClLayerSupport.hpp"
 
-#include "InternalTypes.hpp"
-#include "LayerSupportCommon.hpp"
+#include <InternalTypes.hpp>
+#include <LayerSupportCommon.hpp>
+
+#include <armnn/Descriptors.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 

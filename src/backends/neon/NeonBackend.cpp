@@ -16,10 +16,8 @@ namespace armnn
 namespace
 {
 
-static const BackendId s_Id{"CpuAcc"};
-
 static BackendRegistry::Helper g_RegisterHelper{
-    s_Id,
+    NeonBackend::GetIdStatic(),
     []()
     {
         return IBackendUniquePtr(new NeonBackend, &NeonBackend::Destroy);
@@ -28,8 +26,9 @@ static BackendRegistry::Helper g_RegisterHelper{
 
 }
 
-const BackendId& NeonBackend::GetId() const
+const BackendId& NeonBackend::GetIdStatic()
 {
+    static const BackendId s_Id{"CpuAcc"};
     return s_Id;
 }
 

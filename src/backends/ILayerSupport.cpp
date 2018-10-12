@@ -4,6 +4,7 @@
 //
 
 #include <armnn/ILayerSupport.hpp>
+#include <armnn/Exceptions.hpp>
 
 namespace armnn
 {

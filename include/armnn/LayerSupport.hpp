@@ -12,21 +12,21 @@
 namespace armnn
 {
 
-bool IsActivationSupported(Compute compute,
+bool IsActivationSupported(const BackendId& backend,
                            const TensorInfo& input,
                            const TensorInfo& output,
                            const ActivationDescriptor& descriptor,
                            char* reasonIfUnsupported = nullptr,
                            size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsAdditionSupported(Compute compute,
+bool IsAdditionSupported(const BackendId& backend,
                          const TensorInfo& input0,
                          const TensorInfo& input1,
                          const TensorInfo& output,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsBatchNormalizationSupported(Compute compute,
+bool IsBatchNormalizationSupported(const BackendId& backend,
                                    const TensorInfo& input,
                                    const TensorInfo& output,
                                    const TensorInfo& mean,
@@ -37,24 +37,24 @@ bool IsBatchNormalizationSupported(Compute compute,
                                    char* reasonIfUnsupported = nullptr,
                                    size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsConstantSupported(Compute compute,
+bool IsConstantSupported(const BackendId& backend,
                          const TensorInfo& output,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsConvertFp16ToFp32Supported(Compute compute,
+bool IsConvertFp16ToFp32Supported(const BackendId& backend,
                                   const TensorInfo& input,
                                   const TensorInfo& output,
                                   char* reasonIfUnsupported = nullptr,
                                   size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsConvertFp32ToFp16Supported(Compute compute,
+bool IsConvertFp32ToFp16Supported(const BackendId& backend,
                                   const TensorInfo& input,
                                   const TensorInfo& output,
                                   char* reasonIfUnsupported = nullptr,
                                   size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsConvolution2dSupported(Compute compute,
+bool IsConvolution2dSupported(const BackendId& backend,
                               const TensorInfo& input,
                               const TensorInfo& output,
                               const Convolution2dDescriptor& descriptor,
@@ -63,7 +63,7 @@ bool IsConvolution2dSupported(Compute compute,
                               char* reasonIfUnsupported = nullptr,
                               size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsDepthwiseConvolutionSupported(Compute compute,
+bool IsDepthwiseConvolutionSupported(const BackendId& backend,
                                      const TensorInfo& input,
                                      const TensorInfo& output,
                                      const DepthwiseConvolution2dDescriptor& descriptor,
@@ -72,26 +72,26 @@ bool IsDepthwiseConvolutionSupported(Compute compute,
                                      char* reasonIfUnsupported = nullptr,
                                      size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsDivisionSupported(Compute compute,
+bool IsDivisionSupported(const BackendId& backend,
                          const TensorInfo& input0,
                          const TensorInfo& input1,
                          const TensorInfo& output,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsSubtractionSupported(Compute compute,
+bool IsSubtractionSupported(const BackendId& backend,
                             const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
                             char* reasonIfUnsupported = nullptr,
                             size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsInputSupported(Compute compute,
+bool IsInputSupported(const BackendId& backend,
                       const TensorInfo& input,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsFullyConnectedSupported(Compute compute,
+bool IsFullyConnectedSupported(const BackendId& backend,
                                const TensorInfo& input,
                                const TensorInfo& output,
                                const TensorInfo& weights,
@@ -100,14 +100,14 @@ bool IsFullyConnectedSupported(Compute compute,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsL2NormalizationSupported(Compute compute,
+bool IsL2NormalizationSupported(const BackendId& backend,
                                 const TensorInfo& input,
                                 const TensorInfo& output,
                                 const L2NormalizationDescriptor& descriptor,
                                 char* reasonIfUnsupported = nullptr,
                                 size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsLstmSupported(Compute compute, const TensorInfo& input, const TensorInfo& outputStateIn,
+bool IsLstmSupported(const BackendId& backend, const TensorInfo& input, const TensorInfo& outputStateIn,
                      const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
                      const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
                      const TensorInfo& output, const LstmDescriptor& descriptor,
@@ -122,88 +122,88 @@ bool IsLstmSupported(Compute compute, const TensorInfo& input, const TensorInfo&
                      const TensorInfo* cellToOutputWeights, char* reasonIfUnsupported = nullptr,
                      size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsMergerSupported(Compute compute,
+bool IsMergerSupported(const BackendId& backend,
                        const std::vector<const TensorInfo*> inputs,
                        const OriginsDescriptor& descriptor,
                        char* reasonIfUnsupported = nullptr,
                        size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsMultiplicationSupported(Compute compute,
+bool IsMultiplicationSupported(const BackendId& backend,
                                const TensorInfo& input0,
                                const TensorInfo& input1,
                                const TensorInfo& output,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsNormalizationSupported(Compute compute,
+bool IsNormalizationSupported(const BackendId& backend,
                               const TensorInfo& input,
                               const TensorInfo& output,
                               const NormalizationDescriptor& descriptor,
                               char* reasonIfUnsupported = nullptr,
                               size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsOutputSupported(Compute compute,
+bool IsOutputSupported(const BackendId& backend,
                        const TensorInfo& output,
                        char* reasonIfUnsupported = nullptr,
                        size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsPermuteSupported(Compute compute,
+bool IsPermuteSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,
                         const PermuteDescriptor& descriptor,
                         char* reasonIfUnsupported = nullptr,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsPooling2dSupported(Compute compute,
+bool IsPooling2dSupported(const BackendId& backend,
                           const TensorInfo& input,
                           const TensorInfo& output,
                           const Pooling2dDescriptor& descriptor,
                           char* reasonIfUnsupported = nullptr,
                           size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsResizeBilinearSupported(Compute compute,
+bool IsResizeBilinearSupported(const BackendId& backend,
                                const TensorInfo& input,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsSoftmaxSupported(Compute compute,
+bool IsSoftmaxSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,
                         const SoftmaxDescriptor& descriptor,
                         char* reasonIfUnsupported = nullptr,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsSplitterSupported(Compute compute,
+bool IsSplitterSupported(const BackendId& backend,
                          const TensorInfo& input,
                          const ViewsDescriptor& descriptor,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsFakeQuantizationSupported(Compute compute,
+bool IsFakeQuantizationSupported(const BackendId& backend,
                                  const TensorInfo& input,
                                  const FakeQuantizationDescriptor& descriptor,
                                  char* reasonIfUnsupported = nullptr,
                                  size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsReshapeSupported(Compute compute,
+bool IsReshapeSupported(const BackendId& backend,
                         const TensorInfo& input,
                         char* reasonIfUnsupported = nullptr,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsFloorSupported(Compute compute,
+bool IsFloorSupported(const BackendId& backend,
                       const TensorInfo& input,
                       const TensorInfo& output,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsMeanSupported(Compute compute,
+bool IsMeanSupported(const BackendId& backend,
                      const TensorInfo& input,
                      const TensorInfo& output,
                      const MeanDescriptor& descriptor,
                      char* reasonIfUnsupported = nullptr,
                      size_t reasonIfUnsupportedMaxLength = 1024);
 
-bool IsPadSupported(Compute compute,
+bool IsPadSupported(const BackendId& backend,
                      const TensorInfo& input,
                      const TensorInfo& output,
                      const PadDescriptor& descriptor,

@@ -376,3 +376,4 @@ LayerTestResult<float, 4> MeanFloatKeepDimsTest(armnn::IWorkloadFactory& workloa
 LayerTestResult<float, 4> MeanFloatMultipleDimsTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 1> MeanVtsFloat1Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 3> MeanVtsFloat2Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> AdditionAfterMaxPoolTest(armnn::IWorkloadFactory& workloadFactory);

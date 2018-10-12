@@ -5432,3 +5432,106 @@ LayerTestResult<float, 3> MeanVtsFloat2Test(armnn::IWorkloadFactory& workloadFac
 
     return MeanTestHelper<float, 3, 3>(workloadFactory, inputShape, input, {0, 2}, true, outputShape, output);
 }
+
+LayerTestResult<float, 4> AdditionAfterMaxPoolTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    // Create Initial Tensor
+    // 1, 2, 3
+    // 4, 5, 6
+    // 7, 8, 9
+
+    armnn::TensorInfo poolingInputTensorInfo({ 1, 1, 3, 3}, armnn::GetDataType<float>());
+    armnn::TensorInfo poolingOutputTensorInfo({ 1, 1, 2, 2}, armnn::GetDataType<float>());
+
+    boost::multi_array<float, 4> poolingInput = MakeTensor<float,4>(poolingInputTensorInfo,
+                                                            {1, 2, 3,
+                                                             4, 5, 6,
+                                                             7, 8, 9
+                                                            });
+
+    std::unique_ptr<armnn::ITensorHandle> poolingInputHandle =
+            workloadFactory.CreateTensorHandle(poolingInputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> poolingOutputHandle =
+            workloadFactory.CreateTensorHandle(poolingOutputTensorInfo);
+
+    // Apply MaxPool poolSize = 1x1, stride=2x2
+    // Result =
+    // 1, 3
+    // 7, 9
+    armnn::Pooling2dDescriptor descriptor;
+    descriptor.m_PoolHeight = 1;
+    descriptor.m_PoolWidth = 1;
+    descriptor.m_StrideX = 2;
+    descriptor.m_StrideY = 2;
+    descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
+
+    armnn::Pooling2dQueueDescriptor queueDescriptor;
+    queueDescriptor.m_Parameters = descriptor;
+    armnn::WorkloadInfo workloadInfo;
+    AddInputToWorkload(queueDescriptor, workloadInfo, poolingInputTensorInfo, poolingInputHandle.get());
+    AddOutputToWorkload(queueDescriptor, workloadInfo, poolingOutputTensorInfo, poolingOutputHandle.get());
+
+    // Create the MaxPool
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePooling2d(queueDescriptor, workloadInfo);
+
+    //LayerTestResult<float, 4> result(poolingOutputTensorInfo);
+    auto shape( GetTensorShapeAsArray<4>(poolingOutputTensorInfo));
+    boost::multi_array<float, 4> resultMaxPool;
+    resultMaxPool.resize(shape);
+
+
+    // Create addition with another tensor the same size
+    // This would be the result to apply a Conv2d with kernel ones(2) and stride 1x1
+    // with the initial tensor.
+    // 12, 16
+    // 24, 28
+
+    armnn::TensorInfo addInputTensorInfo({ 1,1,2,2}, armnn::GetDataType<float>());
+    armnn::TensorInfo addOutputTensorInfo({ 1,1,2,2}, armnn::GetDataType<float>());
+
+    boost::multi_array<float, 4> addInput = MakeTensor<float,4>(addInputTensorInfo,
+                                                                    {12, 16,
+                                                                     24, 28,
+                                                                    });
+
+    // Expected output tensor after MaxPool and Addition.
+    LayerTestResult<float,4> addRet(addOutputTensorInfo);
+    addRet.outputExpected = MakeTensor<float, 4>(addOutputTensorInfo, std::vector<float>(
+            {
+                    13, 19,
+                    31, 37
+            }));
+
+    std::unique_ptr<armnn::ITensorHandle> addInputHandle = workloadFactory.CreateTensorHandle(addInputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> addOutputHandle = workloadFactory.CreateTensorHandle(addOutputTensorInfo);
+
+    armnn::AdditionQueueDescriptor data;
+    armnn::WorkloadInfo info;
+
+    // Add the output of the MaxPool and the new tensor
+    AddInputToWorkload(data, info, poolingOutputTensorInfo, poolingOutputHandle.get());
+    AddInputToWorkload(data, info, addInputTensorInfo, addInputHandle.get());
+    AddOutputToWorkload(data, info, addOutputTensorInfo, addOutputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> addWorkload = workloadFactory.CreateAddition(data, info);
+
+    poolingInputHandle->Allocate();
+    poolingOutputHandle->Allocate();
+    addInputHandle->Allocate();
+    addOutputHandle->Allocate();
+
+    CopyDataToITensorHandle(poolingInputHandle.get(), &poolingInput[0][0][0][0]);
+    CopyDataFromITensorHandle(&resultMaxPool[0][0][0][0], poolingOutputHandle.get());
+
+    CopyDataToITensorHandle(poolingOutputHandle.get(), &resultMaxPool[0][0][0][0]);
+    CopyDataToITensorHandle(addInputHandle.get(), &addInput[0][0][0][0]);
+
+    workload->Execute();
+    addWorkload->Execute();
+
+    CopyDataFromITensorHandle(&addRet.output[0][0][0][0], addOutputHandle.get());
+
+    workloadFactory.Finalize();
+
+    return addRet;
+}

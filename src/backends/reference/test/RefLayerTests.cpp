@@ -277,4 +277,6 @@ ARMNN_AUTO_TEST_CASE(MeanFloatMultipleDims, MeanFloatMultipleDimsTest)
 ARMNN_AUTO_TEST_CASE(MeanVtsFloat1, MeanVtsFloat1Test)
 ARMNN_AUTO_TEST_CASE(MeanVtsFloat2, MeanVtsFloat2Test)
 
+ARMNN_AUTO_TEST_CASE(AdditionAfterMaxPool, AdditionAfterMaxPoolTest)
+
 BOOST_AUTO_TEST_SUITE_END()

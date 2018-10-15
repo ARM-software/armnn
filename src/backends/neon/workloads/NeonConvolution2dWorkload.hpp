@@ -24,24 +24,24 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
     const TensorInfo& weights,
     const Optional<TensorInfo>& biases);
 
-template<armnn::DataType... dataTypes>
-class NeonConvolution2dBaseWorkload : public TypedWorkload<Convolution2dQueueDescriptor, dataTypes...>
+class NeonConvolution2dWorkload : public BaseWorkload<Convolution2dQueueDescriptor>
 {
 public:
-    using TypedWorkload<Convolution2dQueueDescriptor, dataTypes...>::m_Data;
+    using BaseWorkload<Convolution2dQueueDescriptor>::m_Data;
 
-    NeonConvolution2dBaseWorkload(const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,
-                                  std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
+    NeonConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,
+                              std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
 
-    virtual void ValidateData() const {};
+    void Execute() const override;
 
-protected:
+private:
     std::unique_ptr<arm_compute::IFunction> m_ConvolutionLayer;
 
     std::unique_ptr<arm_compute::Tensor> m_KernelTensor;
     std::unique_ptr<arm_compute::Tensor> m_BiasTensor;
 
     void FreeUnusedTensors();
+
 };
 
 } //namespace armnn

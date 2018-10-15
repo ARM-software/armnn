@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "NeonConvolution2dWorkload.hpp"
+
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #include <backends/neon/NeonLayerSupport.hpp>
-
-#include "NeonConvolution2dBaseWorkload.hpp"
 
 #include <armnn/Types.hpp>
 #include <armnnUtils/Half.hpp>
@@ -47,15 +47,14 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
                                                      layerInfo);
 }
 
-template<armnn::DataType... dataTypes>
-NeonConvolution2dBaseWorkload<dataTypes...>::NeonConvolution2dBaseWorkload(
+NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : TypedWorkload<Convolution2dQueueDescriptor, dataTypes...>(descriptor, info)
+    : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
 {
     using arm_compute::NEDirectConvolutionLayer;
 
-    ValidateData();
+    m_Data.ValidateInputsOutputs("NeonConvolution2dWorkload", 1, 1);
 
     // todo: check tensor shapes match.
 
@@ -111,17 +110,25 @@ NeonConvolution2dBaseWorkload<dataTypes...>::NeonConvolution2dBaseWorkload(
 
     InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
 
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
+    }
+
+    m_ConvolutionLayer->prepare();
+    FreeUnusedTensors();
 }
 
-template<armnn::DataType... dataTypes>
-void NeonConvolution2dBaseWorkload<dataTypes...>::FreeUnusedTensors()
+void NeonConvolution2dWorkload::Execute() const
+{
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConvolution2dWorkload_Execute");
+    m_ConvolutionLayer->run();
+}
+
+void NeonConvolution2dWorkload::FreeUnusedTensors()
 {
     FreeTensorIfUnused(m_KernelTensor);
     FreeTensorIfUnused(m_BiasTensor);
 }
-
-// Generates known implementations for linker.
-template class NeonConvolution2dBaseWorkload<armnn::DataType::Float16, armnn::DataType::Float32>;
-template class NeonConvolution2dBaseWorkload<armnn::DataType::QuantisedAsymm8>;
 
 } //namespace armnn

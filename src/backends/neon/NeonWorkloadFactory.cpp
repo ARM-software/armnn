@@ -135,8 +135,8 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePooling2d(const Poo
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonConvolution2dFloatWorkload, NeonConvolution2dUint8Workload>(descriptor, info,
-                                                                              m_MemoryManager.GetIntraLayerManager());
+    return std::make_unique<NeonConvolution2dWorkload>(descriptor, info,
+                                                       m_MemoryManager.GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(

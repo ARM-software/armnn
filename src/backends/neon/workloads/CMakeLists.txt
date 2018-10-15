@@ -16,12 +16,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonConvertFp16ToFp32Workload.hpp
     NeonConvertFp32ToFp16Workload.cpp
     NeonConvertFp32ToFp16Workload.hpp
-    NeonConvolution2dBaseWorkload.cpp
-    NeonConvolution2dBaseWorkload.hpp
-    NeonConvolution2dFloatWorkload.cpp
-    NeonConvolution2dFloatWorkload.hpp
-    NeonConvolution2dUint8Workload.cpp
-    NeonConvolution2dUint8Workload.hpp
+    NeonConvolution2dWorkload.cpp
+    NeonConvolution2dWorkload.hpp
     NeonDepthwiseConvolutionBaseWorkload.cpp
     NeonDepthwiseConvolutionBaseWorkload.hpp
     NeonDepthwiseConvolutionFloatWorkload.cpp

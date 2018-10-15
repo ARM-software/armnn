@@ -179,12 +179,12 @@ BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatWorkload)
     NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float32>();
 }
 
-template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void NeonCreateConvolution2dWorkloadTest(DataLayout dataLayout = DataLayout::NCHW)
 {
     Graph                graph;
     NeonWorkloadFactory  factory;
-    auto                 workload = CreateConvolution2dWorkloadTest<Convolution2dWorkloadType,
+    auto                 workload = CreateConvolution2dWorkloadTest<NeonConvolution2dWorkload,
                                     DataType>(factory, graph, dataLayout);
 
     TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 8, 16} : TensorShape{2, 8, 16, 3};
@@ -201,23 +201,23 @@ static void NeonCreateConvolution2dWorkloadTest(DataLayout dataLayout = DataLayo
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16NchwWorkload)
 {
-    NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloatWorkload, DataType::Float16>();
+    NeonCreateConvolution2dWorkloadTest<DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloat16NhwcWorkload)
 {
-    NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloatWorkload, DataType::Float16>(DataLayout::NHWC);
+    NeonCreateConvolution2dWorkloadTest<DataType::Float16>(DataLayout::NHWC);
 }
 
 #endif
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNchwWorkload)
 {
-    NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloatWorkload, DataType::Float32>();
+    NeonCreateConvolution2dWorkloadTest<DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNhwcWorkload)
 {
-    NeonCreateConvolution2dWorkloadTest<NeonConvolution2dFloatWorkload, DataType::Float32>(DataLayout::NHWC);
+    NeonCreateConvolution2dWorkloadTest<DataType::Float32>(DataLayout::NHWC);
 }
 
 template <typename DepthwiseConvolution2dFloat32WorkloadType, typename armnn::DataType DataType>

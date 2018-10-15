@@ -236,11 +236,6 @@ bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                                  const FullyConnectedDescriptor& descriptor,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
-    // At the moment U8 is unsupported
-    if (input.GetDataType() == DataType::QuantisedAsymm8)
-    {
-        return false;
-    }
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonFullyConnectedWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,

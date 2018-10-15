@@ -84,7 +84,8 @@ BOOST_AUTO_TEST_CASE(Softmax4dSupport)
     const armnn::TensorInfo outputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
 
     // 4D Softmax should be reported as unsupported on the CL backend
-    BOOST_TEST(!armnn::IsSoftmaxSupportedCl(inputInfo, outputInfo, armnn::SoftmaxDescriptor()));
+    armnn::ClLayerSupport layerSupport;
+    BOOST_TEST(!layerSupport.IsSoftmaxSupported(inputInfo, outputInfo, armnn::SoftmaxDescriptor()));
 }
 
 // Splitter

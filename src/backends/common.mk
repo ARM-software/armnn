@@ -10,6 +10,7 @@
 COMMON_SOURCES := \
     BackendRegistry.cpp \
     CpuTensorHandle.cpp \
+    ILayerSupport.cpp \
     MemCopyWorkload.cpp \
     OutputHandler.cpp \
     StringMapping.cpp \

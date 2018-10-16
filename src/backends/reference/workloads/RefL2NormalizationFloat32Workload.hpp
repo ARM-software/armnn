@@ -15,7 +15,8 @@ class RefL2NormalizationFloat32Workload : public Float32Workload<L2Normalization
 {
 public:
     using Float32Workload<L2NormalizationQueueDescriptor>::Float32Workload;
-    virtual void Execute() const override;
+
+    void Execute() const override;
 };
 
 } //namespace armnn

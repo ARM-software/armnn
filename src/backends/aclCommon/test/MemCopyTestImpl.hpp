@@ -4,9 +4,9 @@
 //
 #pragma once
 
-#include "LayerTests.hpp"
-#include "TensorCopyUtils.hpp"
-#include "WorkloadTestUtils.hpp"
+#include <backends/test/LayerTests.hpp>
+#include <backends/test/TensorCopyUtils.hpp>
+#include <backends/test/WorkloadTestUtils.hpp>
 
 #include <armnn/test/TensorHelpers.hpp>
 

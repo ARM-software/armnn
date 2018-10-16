@@ -18,4 +18,7 @@ target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/arm
 target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 
 add_subdirectory(workloads)
-add_subdirectory(test)
+
+if(BUILD_UNIT_TESTS)
+    add_subdirectory(test)
+endif()

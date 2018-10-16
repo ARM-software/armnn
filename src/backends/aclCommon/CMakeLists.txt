@@ -23,7 +23,9 @@ list(APPEND armnnAclCommon_sources
     memory/PoolManager.hpp
 )
 
-add_subdirectory(test)
+if(BUILD_UNIT_TESTS)
+    add_subdirectory(test)
+endif()
 
 add_library(armnnAclCommon OBJECT ${armnnAclCommon_sources})
 target_include_directories(armnnAclCommon PRIVATE ${PROJECT_SOURCE_DIR}/src)

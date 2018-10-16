@@ -6,7 +6,10 @@
 #include <backends/aclCommon/ArmComputeTensorUtils.hpp>
 #include <backends/cl/ClWorkloadFactory.hpp>
 #include <backends/neon/NeonWorkloadFactory.hpp>
-#include <backends/test/MemCopyTestImpl.hpp>
+
+#if ARMCOMPUTECL_ENABLED && ARMCOMPUTENEON_ENABLED
+#include <backends/aclCommon/test/MemCopyTestImpl.hpp>
+#endif
 
 #include <boost/test/unit_test.hpp>
 

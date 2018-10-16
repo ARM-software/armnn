@@ -6,6 +6,7 @@
 list(APPEND armnnAclCommonUnitTests_sources
     CreateWorkloadClNeon.hpp
     MemCopyTests.cpp
+    MemCopyTestImpl.hpp
 )
 
 add_library(armnnAclCommonUnitTests OBJECT ${armnnAclCommonUnitTests_sources})

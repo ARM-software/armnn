@@ -21,7 +21,10 @@ if(ARMCOMPUTECL)
     )
 
     add_subdirectory(workloads)
-    add_subdirectory(test)
+
+    if(BUILD_UNIT_TESTS)
+        add_subdirectory(test)
+    endif()
 endif()
 
 add_library(armnnClBackend OBJECT ${armnnClBackend_sources})

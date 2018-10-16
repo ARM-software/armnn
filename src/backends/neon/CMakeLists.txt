@@ -19,7 +19,11 @@ if(ARMCOMPUTENEON)
     )
 
     add_subdirectory(workloads)
-    add_subdirectory(test)
+
+    if(BUILD_UNIT_TESTS)
+        add_subdirectory(test)
+    endif()
+
 else()
     list(APPEND armnnNeonBackend_sources
         NeonLayerSupport.cpp

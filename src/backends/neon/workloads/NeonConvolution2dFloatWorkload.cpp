@@ -18,7 +18,7 @@ NeonConvolution2dFloatWorkload::NeonConvolution2dFloatWorkload(const Convolution
 {
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        InitializeArmComputeTensorDataForFloatTypes(*m_BiasTensor, m_Data.m_Bias);
+        InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
     }
 
     m_ConvolutionLayer->prepare();
@@ -37,4 +37,3 @@ void NeonConvolution2dFloatWorkload::ValidateData() const
 }
 
 } //namespace armnn
-

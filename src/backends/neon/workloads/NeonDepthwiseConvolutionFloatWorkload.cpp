@@ -69,11 +69,11 @@ NeonDepthwiseConvolutionFloatWorkload::NeonDepthwiseConvolutionFloatWorkload(
 
     BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
 
-    InitializeArmComputeTensorDataForFloatTypes(*m_KernelTensor, m_Data.m_Weight);
+    InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
 
     if (m_BiasTensor)
     {
-        InitializeArmComputeTensorDataForFloatTypes(*m_BiasTensor, m_Data.m_Bias);
+        InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
     }
 
     m_pDepthwiseConvolutionLayer->prepare();

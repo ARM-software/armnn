@@ -169,57 +169,57 @@ NeonLstmFloatWorkload::NeonLstmFloatWorkload(const LstmQueueDescriptor &descript
 
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(*m_ScratchBuffer);
 
-    InitialiseArmComputeTensorData(*m_InputToForgetWeightsTensor,
-                                   m_Data.m_InputToForgetWeights->GetConstTensor<float>());
-    InitialiseArmComputeTensorData(*m_InputToCellWeightsTensor,
-                                   m_Data.m_InputToCellWeights->GetConstTensor<float>());
-    InitialiseArmComputeTensorData(*m_InputToOutputWeightsTensor,
-                                   m_Data.m_InputToOutputWeights->GetConstTensor<float>());
-    InitialiseArmComputeTensorData(*m_RecurrentToForgetWeightsTensor,
-                                   m_Data.m_RecurrentToForgetWeights->GetConstTensor<float>());
-    InitialiseArmComputeTensorData(*m_RecurrentToCellWeightsTensor,
-                                   m_Data.m_RecurrentToCellWeights->GetConstTensor<float>());
-    InitialiseArmComputeTensorData(*m_RecurrentToOutputWeightsTensor,
-                                   m_Data.m_RecurrentToOutputWeights->GetConstTensor<float>());
-    InitialiseArmComputeTensorData(*m_ForgetGateBiasTensor,
-                                   m_Data.m_ForgetGateBias->GetConstTensor<float>());
-    InitialiseArmComputeTensorData(*m_CellBiasTensor,
-                                   m_Data.m_CellBias->GetConstTensor<float>());
-    InitialiseArmComputeTensorData(*m_OutputGateBiasTensor,
-                                   m_Data.m_OutputGateBias->GetConstTensor<float>());
+    InitializeArmComputeTensorData(*m_InputToForgetWeightsTensor,
+                                   m_Data.m_InputToForgetWeights);
+    InitializeArmComputeTensorData(*m_InputToCellWeightsTensor,
+                                   m_Data.m_InputToCellWeights);
+    InitializeArmComputeTensorData(*m_InputToOutputWeightsTensor,
+                                   m_Data.m_InputToOutputWeights);
+    InitializeArmComputeTensorData(*m_RecurrentToForgetWeightsTensor,
+                                   m_Data.m_RecurrentToForgetWeights);
+    InitializeArmComputeTensorData(*m_RecurrentToCellWeightsTensor,
+                                   m_Data.m_RecurrentToCellWeights);
+    InitializeArmComputeTensorData(*m_RecurrentToOutputWeightsTensor,
+                                   m_Data.m_RecurrentToOutputWeights);
+    InitializeArmComputeTensorData(*m_ForgetGateBiasTensor,
+                                   m_Data.m_ForgetGateBias);
+    InitializeArmComputeTensorData(*m_CellBiasTensor,
+                                   m_Data.m_CellBias);
+    InitializeArmComputeTensorData(*m_OutputGateBiasTensor,
+                                   m_Data.m_OutputGateBias);
 
     if (!m_Data.m_Parameters.m_CifgEnabled)
     {
-        InitialiseArmComputeTensorData(*m_InputToInputWeightsTensor,
-                                       m_Data.m_InputToInputWeights->GetConstTensor<float>());
-        InitialiseArmComputeTensorData(*m_RecurrentToInputWeightsTensor,
-                                       m_Data.m_RecurrentToInputWeights->GetConstTensor<float>());
+        InitializeArmComputeTensorData(*m_InputToInputWeightsTensor,
+                                       m_Data.m_InputToInputWeights);
+        InitializeArmComputeTensorData(*m_RecurrentToInputWeightsTensor,
+                                       m_Data.m_RecurrentToInputWeights);
         if (m_Data.m_CellToInputWeights != nullptr)
         {
-            InitialiseArmComputeTensorData(*m_CellToInputWeightsTensor,
-                                           m_Data.m_CellToInputWeights->GetConstTensor<float>());
+            InitializeArmComputeTensorData(*m_CellToInputWeightsTensor,
+                                           m_Data.m_CellToInputWeights);
         }
-        InitialiseArmComputeTensorData(*m_InputGateBiasTensor,
-                                       m_Data.m_InputGateBias->GetConstTensor<float>());
+        InitializeArmComputeTensorData(*m_InputGateBiasTensor,
+                                       m_Data.m_InputGateBias);
     }
 
     if (m_Data.m_Parameters.m_ProjectionEnabled)
     {
-        InitialiseArmComputeTensorData(*m_ProjectionWeightsTensor,
-                                       m_Data.m_ProjectionWeights->GetConstTensor<float>());
+        InitializeArmComputeTensorData(*m_ProjectionWeightsTensor,
+                                       m_Data.m_ProjectionWeights);
         if (m_Data.m_ProjectionBias != nullptr)
         {
-            InitialiseArmComputeTensorData(*m_ProjectionBiasTensor,
-                                           m_Data.m_ProjectionBias->GetConstTensor<float>());
+            InitializeArmComputeTensorData(*m_ProjectionBiasTensor,
+                                           m_Data.m_ProjectionBias);
         }
     }
 
     if (m_Data.m_Parameters.m_PeepholeEnabled)
     {
-        InitialiseArmComputeTensorData(*m_CellToForgetWeightsTensor,
-                                       m_Data.m_CellToForgetWeights->GetConstTensor<float>());
-        InitialiseArmComputeTensorData(*m_CellToOutputWeightsTensor,
-                                       m_Data.m_CellToOutputWeights->GetConstTensor<float>());
+        InitializeArmComputeTensorData(*m_CellToForgetWeightsTensor,
+                                       m_Data.m_CellToForgetWeights);
+        InitializeArmComputeTensorData(*m_CellToOutputWeightsTensor,
+                                       m_Data.m_CellToOutputWeights);
     }
 
     // Force Compute Library to perform the necessary copying and reshaping, after which

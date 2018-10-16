@@ -57,7 +57,6 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonSubtractionFloatWorkload.cpp
     NeonSubtractionFloatWorkload.hpp
     NeonWorkloads.hpp
-    NeonWorkloadUtils.cpp
     NeonWorkloadUtils.hpp
 )
 

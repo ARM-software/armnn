@@ -69,22 +69,22 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
     // Allocate
     if (m_Data.m_Weight->GetTensorInfo().GetDataType() == DataType::QuantisedAsymm8)
     {
-        InitialiseArmComputeTensorData(*m_WeightsTensor, m_Data.m_Weight->GetConstTensor<uint8_t>());
+        InitializeArmComputeTensorData(*m_WeightsTensor, m_Data.m_Weight);
     }
     else
     {
-        InitializeArmComputeTensorDataForFloatTypes(*m_WeightsTensor, m_Data.m_Weight);
+        InitializeArmComputeTensorData(*m_WeightsTensor, m_Data.m_Weight);
     }
 
     if (m_BiasesTensor)
     {
         if (m_Data.m_Bias->GetTensorInfo().GetDataType() == DataType::Signed32)
         {
-            InitialiseArmComputeTensorData(*m_BiasesTensor, m_Data.m_Bias->GetConstTensor<int32_t>());
+            InitializeArmComputeTensorData(*m_BiasesTensor, m_Data.m_Bias);
         }
         else
         {
-            InitializeArmComputeTensorDataForFloatTypes(*m_BiasesTensor, m_Data.m_Bias);
+            InitializeArmComputeTensorData(*m_BiasesTensor, m_Data.m_Bias);
         }
     }
 
@@ -107,4 +107,3 @@ void NeonFullyConnectedWorkload::FreeUnusedTensors()
 }
 
 } //namespace armnn
-

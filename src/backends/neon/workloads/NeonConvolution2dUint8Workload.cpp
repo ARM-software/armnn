@@ -14,7 +14,7 @@ NeonConvolution2dUint8Workload::NeonConvolution2dUint8Workload(const Convolution
 {
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        InitialiseArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias->template GetConstTensor<int32_t>());
+        InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
     }
 
     m_ConvolutionLayer->prepare();

@@ -66,10 +66,10 @@ NeonBatchNormalizationFloatWorkload::NeonBatchNormalizationFloatWorkload(
                       m_Gamma.get(),
                       m_Data.m_Parameters.m_Eps);
 
-    InitializeArmComputeTensorDataForFloatTypes(*m_Mean, m_Data.m_Mean);
-    InitializeArmComputeTensorDataForFloatTypes(*m_Variance, m_Data.m_Variance);
-    InitializeArmComputeTensorDataForFloatTypes(*m_Gamma, m_Data.m_Gamma);
-    InitializeArmComputeTensorDataForFloatTypes(*m_Beta, m_Data.m_Beta);
+    InitializeArmComputeTensorData(*m_Mean, m_Data.m_Mean);
+    InitializeArmComputeTensorData(*m_Variance, m_Data.m_Variance);
+    InitializeArmComputeTensorData(*m_Gamma, m_Data.m_Gamma);
+    InitializeArmComputeTensorData(*m_Beta, m_Data.m_Beta);
 
     // Force Compute Library to perform the necessary copying and reshaping, after which
     // delete all the input tensors that will no longer be needed
@@ -92,5 +92,3 @@ void NeonBatchNormalizationFloatWorkload::FreeUnusedTensors()
 }
 
 } //namespace armnn
-
-

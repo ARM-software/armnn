@@ -37,5 +37,4 @@ BACKEND_SOURCES := \
         workloads/NeonSoftmaxBaseWorkload.cpp \
         workloads/NeonSoftmaxFloatWorkload.cpp \
         workloads/NeonSoftmaxUint8Workload.cpp \
-        workloads/NeonSubtractionFloatWorkload.cpp \
-        workloads/NeonWorkloadUtils.cpp
+        workloads/NeonSubtractionFloatWorkload.cpp

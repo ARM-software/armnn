@@ -69,11 +69,11 @@ NeonDepthwiseConvolutionUint8Workload::NeonDepthwiseConvolutionUint8Workload(
 
     BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
 
-    InitialiseArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight->GetConstTensor<uint8_t>());
+    InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
 
     if (m_BiasTensor)
     {
-        InitialiseArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias->GetConstTensor<int32_t>());
+        InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
     }
 
     m_pDepthwiseConvolutionLayer->prepare();

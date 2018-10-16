@@ -14,7 +14,7 @@ namespace armnn
 
 //
 // The Compute enum is now deprecated and it is now
-// replaced by BackendId
+// being replaced by BackendId
 //
 enum class Compute
 {
@@ -27,6 +27,8 @@ enum class Compute
     Undefined   = 5
 };
 
+/// Deprecated function that will be removed together with
+/// the Compute enum
 constexpr char const* GetComputeDeviceAsCString(Compute compute)
 {
     switch (compute)
@@ -38,6 +40,8 @@ constexpr char const* GetComputeDeviceAsCString(Compute compute)
     }
 }
 
+/// Deprecated function that will be removed together with
+/// the Compute enum
 inline std::ostream& operator<<(std::ostream& os, const std::vector<Compute>& compute)
 {
     for (const Compute& comp : compute) {
@@ -46,6 +50,8 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<Compute>& co
     return os;
 }
 
+/// Deprecated function that will be removed together with
+/// the Compute enum
 inline std::ostream& operator<<(std::ostream& os, const std::set<Compute>& compute)
 {
     for (const Compute& comp : compute) {
@@ -54,6 +60,8 @@ inline std::ostream& operator<<(std::ostream& os, const std::set<Compute>& compu
     return os;
 }
 
+/// Deprecated function that will be removed together with
+/// the Compute enum
 inline std::ostream& operator<<(std::ostream& os, const Compute& compute)
 {
     os << GetComputeDeviceAsCString(compute);
@@ -65,6 +73,9 @@ class BackendId final
 public:
     BackendId(const std::string& id) : m_Id{id} {}
     BackendId(const char* id) : m_Id{id} {}
+
+    /// Deprecated function that will be removed together with
+    /// the Compute enum
     BackendId(Compute compute) : m_Id{GetComputeDeviceAsCString(compute)} {}
 
     operator std::string() const { return m_Id; }
@@ -75,6 +86,8 @@ public:
         return *this;
     }
 
+    /// Deprecated function that will be removed together with
+    /// the Compute enum
     BackendId& operator=(Compute compute)
     {
         BackendId temp{compute};

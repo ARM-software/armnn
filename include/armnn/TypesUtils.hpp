@@ -98,6 +98,8 @@ constexpr bool StrEqual(const char* strA, const char (&strB)[N])
     return isEqual;
 }
 
+/// Deprecated function that will be removed together with
+/// the Compute enum
 constexpr armnn::Compute ParseComputeDevice(const char* str)
 {
     if (armnn::StrEqual(str, "CpuAcc"))

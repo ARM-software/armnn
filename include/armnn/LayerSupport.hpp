@@ -12,6 +12,7 @@
 namespace armnn
 {
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsActivationSupported(const BackendId& backend,
                            const TensorInfo& input,
                            const TensorInfo& output,
@@ -19,6 +20,7 @@ bool IsActivationSupported(const BackendId& backend,
                            char* reasonIfUnsupported = nullptr,
                            size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsAdditionSupported(const BackendId& backend,
                          const TensorInfo& input0,
                          const TensorInfo& input1,
@@ -26,6 +28,7 @@ bool IsAdditionSupported(const BackendId& backend,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsBatchNormalizationSupported(const BackendId& backend,
                                    const TensorInfo& input,
                                    const TensorInfo& output,
@@ -37,23 +40,27 @@ bool IsBatchNormalizationSupported(const BackendId& backend,
                                    char* reasonIfUnsupported = nullptr,
                                    size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsConstantSupported(const BackendId& backend,
                          const TensorInfo& output,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsConvertFp16ToFp32Supported(const BackendId& backend,
                                   const TensorInfo& input,
                                   const TensorInfo& output,
                                   char* reasonIfUnsupported = nullptr,
                                   size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsConvertFp32ToFp16Supported(const BackendId& backend,
                                   const TensorInfo& input,
                                   const TensorInfo& output,
                                   char* reasonIfUnsupported = nullptr,
                                   size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsConvolution2dSupported(const BackendId& backend,
                               const TensorInfo& input,
                               const TensorInfo& output,
@@ -63,6 +70,7 @@ bool IsConvolution2dSupported(const BackendId& backend,
                               char* reasonIfUnsupported = nullptr,
                               size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsDepthwiseConvolutionSupported(const BackendId& backend,
                                      const TensorInfo& input,
                                      const TensorInfo& output,
@@ -72,6 +80,7 @@ bool IsDepthwiseConvolutionSupported(const BackendId& backend,
                                      char* reasonIfUnsupported = nullptr,
                                      size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsDivisionSupported(const BackendId& backend,
                          const TensorInfo& input0,
                          const TensorInfo& input1,
@@ -79,6 +88,7 @@ bool IsDivisionSupported(const BackendId& backend,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsSubtractionSupported(const BackendId& backend,
                             const TensorInfo& input0,
                             const TensorInfo& input1,
@@ -86,11 +96,13 @@ bool IsSubtractionSupported(const BackendId& backend,
                             char* reasonIfUnsupported = nullptr,
                             size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsInputSupported(const BackendId& backend,
                       const TensorInfo& input,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsFullyConnectedSupported(const BackendId& backend,
                                const TensorInfo& input,
                                const TensorInfo& output,
@@ -100,6 +112,7 @@ bool IsFullyConnectedSupported(const BackendId& backend,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsL2NormalizationSupported(const BackendId& backend,
                                 const TensorInfo& input,
                                 const TensorInfo& output,
@@ -107,6 +120,7 @@ bool IsL2NormalizationSupported(const BackendId& backend,
                                 char* reasonIfUnsupported = nullptr,
                                 size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsLstmSupported(const BackendId& backend, const TensorInfo& input, const TensorInfo& outputStateIn,
                      const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
                      const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
@@ -122,12 +136,14 @@ bool IsLstmSupported(const BackendId& backend, const TensorInfo& input, const Te
                      const TensorInfo* cellToOutputWeights, char* reasonIfUnsupported = nullptr,
                      size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsMergerSupported(const BackendId& backend,
                        const std::vector<const TensorInfo*> inputs,
                        const OriginsDescriptor& descriptor,
                        char* reasonIfUnsupported = nullptr,
                        size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsMultiplicationSupported(const BackendId& backend,
                                const TensorInfo& input0,
                                const TensorInfo& input1,
@@ -135,6 +151,7 @@ bool IsMultiplicationSupported(const BackendId& backend,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsNormalizationSupported(const BackendId& backend,
                               const TensorInfo& input,
                               const TensorInfo& output,
@@ -142,11 +159,13 @@ bool IsNormalizationSupported(const BackendId& backend,
                               char* reasonIfUnsupported = nullptr,
                               size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsOutputSupported(const BackendId& backend,
                        const TensorInfo& output,
                        char* reasonIfUnsupported = nullptr,
                        size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsPermuteSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,
@@ -154,6 +173,7 @@ bool IsPermuteSupported(const BackendId& backend,
                         char* reasonIfUnsupported = nullptr,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsPooling2dSupported(const BackendId& backend,
                           const TensorInfo& input,
                           const TensorInfo& output,
@@ -161,11 +181,13 @@ bool IsPooling2dSupported(const BackendId& backend,
                           char* reasonIfUnsupported = nullptr,
                           size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsResizeBilinearSupported(const BackendId& backend,
                                const TensorInfo& input,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsSoftmaxSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,
@@ -173,29 +195,34 @@ bool IsSoftmaxSupported(const BackendId& backend,
                         char* reasonIfUnsupported = nullptr,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsSplitterSupported(const BackendId& backend,
                          const TensorInfo& input,
                          const ViewsDescriptor& descriptor,
                          char* reasonIfUnsupported = nullptr,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsFakeQuantizationSupported(const BackendId& backend,
                                  const TensorInfo& input,
                                  const FakeQuantizationDescriptor& descriptor,
                                  char* reasonIfUnsupported = nullptr,
                                  size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsReshapeSupported(const BackendId& backend,
                         const TensorInfo& input,
                         char* reasonIfUnsupported = nullptr,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsFloorSupported(const BackendId& backend,
                       const TensorInfo& input,
                       const TensorInfo& output,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsMeanSupported(const BackendId& backend,
                      const TensorInfo& input,
                      const TensorInfo& output,
@@ -203,6 +230,7 @@ bool IsMeanSupported(const BackendId& backend,
                      char* reasonIfUnsupported = nullptr,
                      size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsPadSupported(const BackendId& backend,
                      const TensorInfo& input,
                      const TensorInfo& output,

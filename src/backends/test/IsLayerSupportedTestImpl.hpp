@@ -418,8 +418,7 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
         try
         {
             bool retVal = LayerPolicy::MakeDummyWorkload(factory, numIn, numOut).get() != nullptr;
-            // hacky way (it has to be replaced): for Lstm, we only support F32 right now
-//            BOOST_CHECK_MESSAGE(retVal, layerName << errorMsg);
+            BOOST_CHECK_MESSAGE(retVal, layerName << errorMsg);
             return retVal;
         }
         catch(const armnn::InvalidArgumentException& e)

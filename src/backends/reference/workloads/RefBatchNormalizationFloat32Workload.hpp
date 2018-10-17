@@ -15,7 +15,7 @@ class RefBatchNormalizationFloat32Workload : public Float32Workload<BatchNormali
 {
 public:
     explicit RefBatchNormalizationFloat32Workload(const BatchNormalizationQueueDescriptor& descriptor,
-                                          const WorkloadInfo& info);
+                                                  const WorkloadInfo& info);
     virtual void Execute() const override;
 
 private:

@@ -217,6 +217,7 @@ LayerTestResult<float, 4> CompareMultiplicationTest(armnn::IWorkloadFactory& wor
                                              armnn::IWorkloadFactory& refWorkloadFactory);
 
 LayerTestResult<float, 4> BatchNormTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> BatchNormNhwcTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> CompareBatchNormTest(armnn::IWorkloadFactory& workloadFactory,
                                         armnn::IWorkloadFactory& refWorkloadFactory);
@@ -329,6 +330,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMinUint8Test(armnn::IWorkloadFactory& 
 LayerTestResult<uint8_t, 4> ResizeBilinearMagUint8Test(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<uint8_t, 4> BatchNormUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> BatchNormUint8NhwcTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<uint8_t, 4> ConstantUint8Test(armnn::IWorkloadFactory& workloadFactory);
 

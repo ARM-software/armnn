@@ -176,7 +176,9 @@ ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadca
 
 // Batch Norm
 ARMNN_AUTO_TEST_CASE(BatchNorm, BatchNormTest)
+ARMNN_AUTO_TEST_CASE(BatchNormNhwc, BatchNormNhwcTest)
 ARMNN_AUTO_TEST_CASE(BatchNormUint8, BatchNormUint8Test)
+ARMNN_AUTO_TEST_CASE(BatchNormUint8Nhwc, BatchNormUint8NhwcTest)
 
 // Resize Bilinear - NCHW
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear, SimpleResizeBilinearTest)

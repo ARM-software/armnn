@@ -289,9 +289,11 @@ struct BatchNormalizationDescriptor
 {
     BatchNormalizationDescriptor()
     : m_Eps(0.0001f)
+    , m_DataLayout(DataLayout::NCHW)
     {}
 
     float m_Eps;
+    DataLayout m_DataLayout;
 };
 
 struct FakeQuantizationDescriptor

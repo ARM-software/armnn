@@ -18,7 +18,7 @@
 #include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonBatchNormalizationFloatWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
-#include "workloads/NeonDepthwiseConvolutionBaseWorkload.hpp"
+#include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonMultiplicationFloatWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"

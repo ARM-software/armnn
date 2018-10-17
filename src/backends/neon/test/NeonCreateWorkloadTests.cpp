@@ -220,13 +220,13 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNhwcWorkload)
     NeonCreateConvolution2dWorkloadTest<DataType::Float32>(DataLayout::NHWC);
 }
 
-template <typename DepthwiseConvolution2dFloat32WorkloadType, typename armnn::DataType DataType>
+template <typename armnn::DataType DataType>
 static void NeonCreateDepthWiseConvolutionWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     NeonWorkloadFactory factory;
 
-    auto workload = CreateDepthwiseConvolution2dWorkloadTest<DepthwiseConvolution2dFloat32WorkloadType,
+    auto workload = CreateDepthwiseConvolution2dWorkloadTest<NeonDepthwiseConvolutionWorkload,
                                                              DataType>(factory, graph, dataLayout);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
@@ -247,15 +247,13 @@ static void NeonCreateDepthWiseConvolutionWorkloadTest(DataLayout dataLayout)
 
 BOOST_AUTO_TEST_CASE(CreateDepthWiseConvolution2dFloat32NhwcWorkload)
 {
-    NeonCreateDepthWiseConvolutionWorkloadTest<NeonDepthwiseConvolutionFloatWorkload,
-                                               DataType::Float32>(DataLayout::NHWC);
+    NeonCreateDepthWiseConvolutionWorkloadTest<DataType::Float32>(DataLayout::NHWC);
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateDepthWiseConvolution2dFloat16NhwcWorkload)
 {
-    NeonCreateDepthWiseConvolutionWorkloadTest<NeonDepthwiseConvolutionFloatWorkload,
-                                               DataType::Float16>(DataLayout::NHWC);
+    NeonCreateDepthWiseConvolutionWorkloadTest<DataType::Float16>(DataLayout::NHWC);
 }
 #endif
 

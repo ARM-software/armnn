@@ -142,8 +142,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<NeonDepthwiseConvolutionFloatWorkload, NeonDepthwiseConvolutionUint8Workload>(
-        descriptor, info);
+    return std::make_unique<NeonDepthwiseConvolutionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateNormalization(

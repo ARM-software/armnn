@@ -20,9 +20,7 @@ BACKEND_SOURCES := \
         workloads/NeonConvertFp16ToFp32Workload.cpp \
         workloads/NeonConvertFp32ToFp16Workload.cpp \
         workloads/NeonConvolution2dWorkload.cpp \
-        workloads/NeonDepthwiseConvolutionBaseWorkload.cpp \
-        workloads/NeonDepthwiseConvolutionFloatWorkload.cpp \
-        workloads/NeonDepthwiseConvolutionUint8Workload.cpp \
+        workloads/NeonDepthwiseConvolutionWorkload.cpp \
         workloads/NeonFloorFloatWorkload.cpp \
         workloads/NeonFullyConnectedWorkload.cpp \
         workloads/NeonL2NormalizationFloatWorkload.cpp \

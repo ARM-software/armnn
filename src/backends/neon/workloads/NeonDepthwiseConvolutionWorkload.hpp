@@ -16,4 +16,21 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
                                                              const TensorInfo& weights,
                                                              const Optional<TensorInfo>& biases);
 
+class NeonDepthwiseConvolutionWorkload : public BaseWorkload<DepthwiseConvolution2dQueueDescriptor>
+{
+public:
+    NeonDepthwiseConvolutionWorkload(const DepthwiseConvolution2dQueueDescriptor& descriptor,
+                                     const WorkloadInfo& info);
+
+    virtual void Execute() const override;
+
+private:
+    mutable std::unique_ptr<arm_compute::IFunction> m_pDepthwiseConvolutionLayer;
+
+    std::unique_ptr<arm_compute::Tensor> m_KernelTensor;
+    std::unique_ptr<arm_compute::Tensor> m_BiasTensor;
+
+    void FreeUnusedTensors();
+};
+
 } // namespace armnn

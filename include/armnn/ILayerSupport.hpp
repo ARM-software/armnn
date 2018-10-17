@@ -8,6 +8,7 @@
 #include <armnn/Optional.hpp>
 #include <vector>
 #include <cctype>
+#include <memory>
 
 namespace armnn
 {
@@ -177,5 +178,7 @@ public:
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 }; // class ILayerSupport
+
+using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;
 
 } // namespace armnn

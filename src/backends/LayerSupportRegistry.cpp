@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "BackendRegistry.hpp"
+#include "LayerSupportRegistry.hpp"
 
 namespace armnn
 {
 
-BackendRegistry& BackendRegistryInstance()
+LayerSupportRegistry& LayerSupportRegistryInstance()
 {
-    static BackendRegistry instance;
+    static LayerSupportRegistry instance;
     return instance;
 }
 

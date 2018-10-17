@@ -6,6 +6,7 @@
 list(APPEND armnnClBackend_sources
     ClBackend.cpp
     ClBackend.hpp
+    ClBackendId.hpp
     ClContextControl.cpp
     ClContextControl.hpp
     ClLayerSupport.cpp
@@ -16,6 +17,7 @@ list(APPEND armnnClBackend_sources
 
 if(ARMCOMPUTECL)
     list(APPEND armnnClBackend_sources
+        ClBackendId.hpp
         OpenClTimer.cpp
         OpenClTimer.hpp
     )

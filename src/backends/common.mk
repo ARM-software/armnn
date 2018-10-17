@@ -12,6 +12,7 @@ COMMON_SOURCES := \
     CpuTensorHandle.cpp \
     ILayerSupport.cpp \
     MemCopyWorkload.cpp \
+    LayerSupportRegistry.cpp \
     OutputHandler.cpp \
     StringMapping.cpp \
     WorkloadData.cpp \

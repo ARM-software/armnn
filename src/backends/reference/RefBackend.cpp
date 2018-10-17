@@ -4,6 +4,7 @@
 //
 
 #include "RefBackend.hpp"
+#include "RefBackendId.hpp"
 #include "RefWorkloadFactory.hpp"
 
 #include <backends/BackendRegistry.hpp>
@@ -16,7 +17,9 @@ namespace armnn
 namespace
 {
 
-static BackendRegistry::Helper s_RegisterHelper{
+static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
+{
+    BackendRegistryInstance(),
     RefBackend::GetIdStatic(),
     []()
     {
@@ -28,13 +31,8 @@ static BackendRegistry::Helper s_RegisterHelper{
 
 const BackendId& RefBackend::GetIdStatic()
 {
-    static const BackendId s_Id{"CpuRef"};
+    static const BackendId s_Id{RefBackendId()};
     return s_Id;
-}
-
-const ILayerSupport& RefBackend::GetLayerSupport() const
-{
-    return m_LayerSupport;
 }
 
 std::unique_ptr<IWorkloadFactory> RefBackend::CreateWorkloadFactory() const

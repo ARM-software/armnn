@@ -6,8 +6,8 @@
 
 #include <array>
 #include <memory>
-#include "ILayerSupport.hpp"
 #include "BackendId.hpp"
+#include "Exceptions.hpp"
 
 namespace armnn
 {
@@ -148,7 +148,6 @@ protected:
 
 public:
     virtual const BackendId& GetId() const = 0;
-    virtual const ILayerSupport& GetLayerSupport() const = 0;
 };
 
 using IBackendSharedPtr = std::shared_ptr<IBackend>;

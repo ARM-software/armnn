@@ -4,12 +4,15 @@
 //
 
 #include "NeonLayerSupport.hpp"
+#include "NeonBackendId.hpp"
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/InternalTypes.hpp>
 #include <armnn/LayerSupportCommon.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
+
+#include <backends/LayerSupportRegistry.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 
@@ -36,6 +39,21 @@ namespace armnn
 
 namespace
 {
+
+ILayerSupportSharedPtr GetLayerSupportPointer()
+{
+    static ILayerSupportSharedPtr instance{new NeonLayerSupport};
+    return instance;
+}
+
+static StaticRegistryInitializer<LayerSupportRegistry> g_RegisterHelper{
+    LayerSupportRegistryInstance(),
+    NeonBackendId(),
+    []()
+    {
+        return GetLayerSupportPointer();
+    }
+};
 
 bool IsNeonBackendSupported(Optional<std::string&> reasonIfUnsupported)
 {

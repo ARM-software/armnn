@@ -4,6 +4,7 @@
 //
 
 #include "NeonBackend.hpp"
+#include "NeonBackendId.hpp"
 #include "NeonWorkloadFactory.hpp"
 
 #include <backends/BackendRegistry.hpp>
@@ -16,7 +17,9 @@ namespace armnn
 namespace
 {
 
-static BackendRegistry::Helper g_RegisterHelper{
+static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
+{
+    BackendRegistryInstance(),
     NeonBackend::GetIdStatic(),
     []()
     {
@@ -28,13 +31,8 @@ static BackendRegistry::Helper g_RegisterHelper{
 
 const BackendId& NeonBackend::GetIdStatic()
 {
-    static const BackendId s_Id{"CpuAcc"};
+    static const BackendId s_Id{NeonBackendId()};
     return s_Id;
-}
-
-const ILayerSupport& NeonBackend::GetLayerSupport() const
-{
-    return m_LayerSupport;
 }
 
 std::unique_ptr<IWorkloadFactory> NeonBackend::CreateWorkloadFactory() const

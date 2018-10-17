@@ -5,7 +5,6 @@
 #pragma once
 
 #include <backends/IBackendInternal.hpp>
-#include "RefLayerSupport.hpp"
 
 namespace armnn
 {
@@ -19,14 +18,9 @@ public:
     static const BackendId& GetIdStatic();
     const BackendId& GetId() const override { return GetIdStatic(); }
 
-    const ILayerSupport& GetLayerSupport() const override;
-
     std::unique_ptr<IWorkloadFactory> CreateWorkloadFactory() const override;
 
     static void Destroy(IBackend* backend);
-
-private:
-    RefLayerSupport m_LayerSupport;
 };
 
 } // namespace armnn

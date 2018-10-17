@@ -7,6 +7,7 @@ if(ARMCOMPUTENEON)
     list(APPEND armnnNeonBackend_sources
         NeonBackend.cpp
         NeonBackend.hpp
+        NeonBackendId.hpp
         NeonInterceptorScheduler.hpp
         NeonInterceptorScheduler.cpp
         NeonLayerSupport.cpp
@@ -26,6 +27,7 @@ if(ARMCOMPUTENEON)
 
 else()
     list(APPEND armnnNeonBackend_sources
+        NeonBackendId.hpp
         NeonLayerSupport.cpp
         NeonLayerSupport.hpp
         NeonWorkloadFactory.cpp

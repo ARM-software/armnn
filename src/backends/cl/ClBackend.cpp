@@ -4,6 +4,7 @@
 //
 
 #include "ClBackend.hpp"
+#include "ClBackendId.hpp"
 #include "ClWorkloadFactory.hpp"
 
 #include <backends/BackendRegistry.hpp>
@@ -16,7 +17,9 @@ namespace armnn
 namespace
 {
 
-static BackendRegistry::Helper g_RegisterHelper{
+static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
+{
+    BackendRegistryInstance(),
     ClBackend::GetIdStatic(),
     []()
     {
@@ -28,13 +31,8 @@ static BackendRegistry::Helper g_RegisterHelper{
 
 const BackendId& ClBackend::GetIdStatic()
 {
-    static const BackendId s_Id{"GpuAcc"};
+    static const BackendId s_Id{ClBackendId()};
     return s_Id;
-}
-
-const ILayerSupport& ClBackend::GetLayerSupport() const
-{
-    return m_LayerSupport;
 }
 
 std::unique_ptr<IWorkloadFactory> ClBackend::CreateWorkloadFactory() const

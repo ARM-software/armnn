@@ -6,6 +6,7 @@
 list(APPEND armnnRefBackend_sources
     RefBackend.cpp
     RefBackend.hpp
+    RefBackendId.hpp
     RefLayerSupport.cpp
     RefLayerSupport.hpp
     RefWorkloadFactory.cpp

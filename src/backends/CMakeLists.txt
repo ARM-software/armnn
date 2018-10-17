@@ -12,11 +12,14 @@ list(APPEND armnnBackendsCommon_sources
     IBackendInternal.hpp
     ILayerSupport.cpp
     ITensorHandle.hpp
+    LayerSupportRegistry.cpp
+    LayerSupportRegistry.hpp
     MakeWorkloadHelper.hpp
     MemCopyWorkload.cpp
     MemCopyWorkload.hpp
     OutputHandler.cpp
     OutputHandler.hpp
+    RegistryCommon.hpp
     StringMapping.cpp
     StringMapping.hpp
     WorkloadDataCollector.hpp

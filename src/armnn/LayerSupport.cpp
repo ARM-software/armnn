@@ -5,7 +5,7 @@
 #include <armnn/LayerSupport.hpp>
 #include <armnn/Optional.hpp>
 
-#include <backends/BackendRegistry.hpp>
+#include <backends/LayerSupportRegistry.hpp>
 
 #include <boost/assert.hpp>
 
@@ -30,34 +30,17 @@ void CopyErrorMessage(char* truncatedString, const char* fullString, size_t maxL
     }
 }
 
-IBackend& GetBackend(const BackendId& id)
-{
-    static std::unordered_map<BackendId, IBackendUniquePtr> cachedBackends;
-    auto it = cachedBackends.find(id);
-    if (it == cachedBackends.end())
-    {
-        auto factoryFunc = BackendRegistry::Instance().GetFactory(id);
-        auto emplaceResult =
-            cachedBackends.emplace(
-                std::make_pair(id, factoryFunc())
-            );
-        BOOST_ASSERT(emplaceResult.second);
-        it = emplaceResult.first;
-    }
-
-    return *(it->second.get());
-}
-
 }
 
 // Helper macro to avoid code duplication.
 // Forwards function func to funcRef, funcNeon or funcCl, depending on the value of compute.
-#define FORWARD_LAYER_SUPPORT_FUNC(backend, func, ...) \
+#define FORWARD_LAYER_SUPPORT_FUNC(backendId, func, ...) \
     std::string reasonIfUnsupportedFull; \
     bool isSupported; \
     try { \
-        auto const& layerSupportObject = GetBackend(backend).GetLayerSupport(); \
-        isSupported = layerSupportObject.func(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
+        auto factoryFunc = LayerSupportRegistryInstance().GetFactory(backendId); \
+        auto layerSupportObject = factoryFunc(); \
+        isSupported = layerSupportObject->func(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
         CopyErrorMessage(reasonIfUnsupported, reasonIfUnsupportedFull.c_str(), reasonIfUnsupportedMaxLength); \
     } catch (InvalidArgumentException e) { \
         /* re-throwing with more context information */ \

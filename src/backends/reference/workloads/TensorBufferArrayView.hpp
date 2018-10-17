@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#pragma once
+
 #include <armnn/Tensor.hpp>
 
 #include <boost/assert.hpp>

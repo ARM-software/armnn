@@ -456,6 +456,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]     =  &TfLiteParser::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]           =  &TfLiteParser::ParseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D] =  &TfLiteParser::ParseDepthwiseConv2D;
+    m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]       =  &TfLiteParser::ParseMaxPool2D;
     m_ParserFunctions[tflite::BuiltinOperator_RELU]              =  &TfLiteParser::ParseRelu;
     m_ParserFunctions[tflite::BuiltinOperator_RELU6]             =  &TfLiteParser::ParseRelu6;
     m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]           =  &TfLiteParser::ParseReshape;
@@ -647,63 +648,6 @@ void TfLiteParser::ParseUnsupportedOperator(size_t subgraphIndex, size_t operato
                           CHECK_LOCATION().AsString()));
 }
 
-void TfLiteParser::ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex)
-{
-    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsPool2DOptions();
-
-    CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
-
-    Pooling2dDescriptor desc;
-
-    desc.m_PoolType = PoolingAlgorithm::Average;
-    desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
-    desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
-    desc.m_PoolWidth = CHECKED_NON_NEGATIVE(options->filter_width);
-    desc.m_PoolHeight = CHECKED_NON_NEGATIVE(options->filter_height);
-    desc.m_PaddingMethod = PaddingMethod::Exclude;
-    desc.m_OutputShapeRounding = OutputShapeRounding::Floor;
-
-    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(inputs.size(), 1);
-    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
-
-    // assuming input is NHWC
-    unsigned int inputHeight = inputTensorInfo.GetShape()[1];
-    unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
-
-    CalcPadding(inputHeight, desc.m_PoolHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
-    CalcPadding(inputWidth, desc.m_PoolWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
-
-    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(outputs.size(), 1);
-    armnn::TensorInfo outputTensorInfo  = ToTensorInfo(outputs[0]);
-
-    auto layerName = boost::str(boost::format("AveragePool2D:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, layerName.c_str());
-
-    BOOST_ASSERT(layer != nullptr);
-
-    // add permute layers to swizzle the input and deswizzle the output
-    std::pair<IConnectableLayer*, IConnectableLayer*> permuteLayers =
-            SwizzleInDeswizzleOut(*m_Network, layer, 0, inputTensorInfo, 0, outputTensorInfo);
-
-    // register the input connection slots for the layer, connections are made after all layers have been created
-    // only the tensors for the inputs are relevant, exclude the const tensors
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, permuteLayers.first, {inputTensorIndexes[0]});
-
-    // we need to add the activation layer and fortunately we don't need to care about the data layout
-    // beause the activation function is element-wise, so it is OK to have the activation after the trailing
-    // swizzle layer
-    layer = AddFusedActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
-    // register the output connection slots for the layer, connections are made after all layers have been created
-    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
-}
-
 void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
@@ -842,6 +786,90 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     std::pair<IConnectableLayer*, IConnectableLayer*> permuteLayers =
         SwizzleInDeswizzleOut(*m_Network, layer, 0, inputTensorInfo, 0, outputTensorInfo);
+
+    // register the input connection slots for the layer, connections are made after all layers have been created
+    // only the tensors for the inputs are relevant, exclude the const tensors
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, permuteLayers.first, {inputTensorIndexes[0]});
+
+    // we need to add the activation layer and fortunately we don't need to care about the data layout
+    // beause the activation function is element-wise, so it is OK to have the activation after the trailing
+    // swizzle layer
+    layer = AddFusedActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
+    // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParsePool(subgraphIndex, operatorIndex, PoolingAlgorithm::Average);
+}
+
+void TfLiteParser::ParseMaxPool2D(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParsePool(subgraphIndex, operatorIndex, PoolingAlgorithm::Max);
+}
+
+void TfLiteParser::ParsePool(size_t subgraphIndex,
+                             size_t operatorIndex,
+                             PoolingAlgorithm algorithm)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto * options = operatorPtr->builtin_options.AsPool2DOptions();
+
+    CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
+
+    std::string layerName;
+
+    switch (algorithm)
+    {
+        case PoolingAlgorithm::Average:
+            layerName =
+                boost::str(boost::format("AveragePool2D:%1%:%2%") % subgraphIndex % operatorIndex);
+            break;
+        case PoolingAlgorithm::Max:
+            layerName =
+                boost::str(boost::format("MaxPool2D:%1%:%2%") % subgraphIndex % operatorIndex);
+            break;
+        default:
+            BOOST_ASSERT_MSG(false, "Unsupported Pooling Algorithm");
+    }
+
+    Pooling2dDescriptor desc;
+
+    desc.m_PoolType = algorithm;
+    desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
+    desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
+    desc.m_PoolWidth = CHECKED_NON_NEGATIVE(options->filter_width);
+    desc.m_PoolHeight = CHECKED_NON_NEGATIVE(options->filter_height);
+    desc.m_PaddingMethod = PaddingMethod::Exclude;
+    desc.m_OutputShapeRounding = OutputShapeRounding::Floor;
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+
+    // assuming input is NHWC
+    unsigned int inputHeight = inputTensorInfo.GetShape()[1];
+    unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
+
+    CalcPadding(inputHeight, desc.m_PoolHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
+    CalcPadding(inputWidth, desc.m_PoolWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+    armnn::TensorInfo outputTensorInfo  = ToTensorInfo(outputs[0]);
+
+    IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, layerName.c_str());
+
+    BOOST_ASSERT(layer != nullptr);
+
+    // add permute layers to swizzle the input and deswizzle the output
+    std::pair<IConnectableLayer*, IConnectableLayer*> permuteLayers =
+            SwizzleInDeswizzleOut(*m_Network, layer, 0, inputTensorInfo, 0, outputTensorInfo);
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors

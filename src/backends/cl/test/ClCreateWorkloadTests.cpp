@@ -337,17 +337,20 @@ static void ClNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     ClWorkloadFactory factory;
-
-    auto workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>
-                    (factory, graph, dataLayout);
+    auto workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>(factory, graph, dataLayout);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
     NormalizationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {3, 5, 5, 1}));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 5, 5, 1}));
+    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW) ?
+            std::initializer_list<unsigned int>({3, 5, 5, 1}) : std::initializer_list<unsigned int>({3, 1, 5, 5});
+    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW) ?
+            std::initializer_list<unsigned int>({3, 5, 5, 1}) : std::initializer_list<unsigned int>({3, 1, 5, 5});
+
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, inputShape));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, outputShape));
 }
 
 BOOST_AUTO_TEST_CASE(CreateNormalizationFloat32NchwWorkload)

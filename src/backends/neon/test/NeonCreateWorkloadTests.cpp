@@ -296,8 +296,12 @@ static void NeonCreateNormalizationWorkloadTest(DataLayout dataLayout)
     NormalizationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({3, 5, 5, 1}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({3, 5, 5, 1}, DataType)));
+
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{3, 5, 5, 1} : TensorShape{3, 1, 5, 5};
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{3, 5, 5, 1} : TensorShape{3, 1, 5, 5};
+
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC

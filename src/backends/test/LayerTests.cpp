@@ -3441,123 +3441,120 @@ float CalcInvL2Norm(std::initializer_list<float> elements)
 
 } // anonymous namespace
 
-LayerTestResult<float, 2> Pad2dTest(armnn::IWorkloadFactory& workloadFactory)
+template<typename T>
+LayerTestResult<T, 2> Pad2dTestCommon(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
 {
-    const armnn::TensorShape inputShape{ 3, 3 };
-    const armnn::TensorShape outputShape{ 7, 7 };
+  const armnn::TensorShape inputShape{ 3, 3 };
+  const armnn::TensorShape outputShape{ 7, 7 };
 
-    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+  const armnn::TensorInfo inputTensorInfo(inputShape, armnn::GetDataType<T>());
+  const armnn::TensorInfo outputTensorInfo(outputShape, armnn::GetDataType<T>());
 
-
-    std::vector<float> inputValues
+  std::vector<T> inputValues(
+    QuantizedVector<T>(qScale, qOffset,
     {
+      // Height (3) x Width (3)
+      4, 8, 6,
+      7, 4, 4,
+      3, 2, 4
+    }));
 
-        // Height (3) x Width (3)
-        4.0f, 8.0f, 6.0f,
-        7.0f, 4.0f, 4.0f,
-        3.0f, 2.0f, 4.0f
-
-    };
-
-    std::vector<float> expectedOutputValues
+ std::vector<T> expectedOutputValues(
+  QuantizedVector<T>(qScale, qOffset,
     {
+      0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0,
+      0, 0, 4, 8, 6, 0, 0,
+      0, 0, 7, 4, 4, 0, 0,
+      0, 0, 3, 2, 4, 0, 0,
+      0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0
+    }));
 
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 4.0f, 8.0f, 6.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 7.0f, 4.0f, 4.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 3.0f, 2.0f, 4.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+  auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
 
-    };
+  LayerTestResult<T, 2> result(outputTensorInfo);
+  result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, std::vector<T>(expectedOutputValues));
 
-    auto inputTensor = MakeTensor<float, 2>(inputTensorInfo, std::vector<float>(inputValues));
+  std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+  std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    LayerTestResult<float, 2> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 2>(outputTensorInfo, std::vector<float>(expectedOutputValues));
+  armnn::PadQueueDescriptor descriptor;
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+  std::vector<std::pair<unsigned int, unsigned int>> PadList;
+  PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
+  PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
 
-    armnn::PadQueueDescriptor descriptor;
+  descriptor.m_Parameters.m_PadList = PadList;
+  armnn::WorkloadInfo info;
 
-    std::vector<std::pair<unsigned int, unsigned int>> PadList;
-    PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
-    PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
+  AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
+  AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    descriptor.m_Parameters.m_PadList = PadList;
-    armnn::WorkloadInfo info;
+  std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePad(descriptor, info);
 
-    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+  inputHandle->Allocate();
+  outputHandle->Allocate();
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePad(descriptor, info);
+  CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
 
-    inputHandle->Allocate();
-    outputHandle->Allocate();
+  workloadFactory.Finalize();
+  workload->Execute();
 
-    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
+  CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
 
-    workloadFactory.Finalize();
-    workload->Execute();
+  return result;
+}
 
-    CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
-
-    return result;
-};
-
-LayerTestResult<float, 3> Pad3dTest(armnn::IWorkloadFactory& workloadFactory)
+template <typename T>
+LayerTestResult<T, 3> Pad3dTestCommon(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
 {
     const armnn::TensorShape inputShape{ 2, 2, 2 };
     const armnn::TensorShape outputShape{ 3, 5, 6 };
 
-    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::GetDataType<T>());
+    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::GetDataType<T>());
 
-
-    std::vector<float> inputValues
+    std::vector<T> inputValues(
+      QuantizedVector<T>(qScale,qOffset,
     {
-
         // Channel 0, Height (2) x Width (2)
-        0.0f, 4.0f,
-        2.0f, 5.0f,
+        0, 4,
+        2, 5,
 
         // Channel 1, Height (2) x Width (2)
-        6.0f, 1.0f,
-        5.0f, 2.0f
-    };
+        6, 1,
+        5, 2
+    }));
 
-    std::vector<float> expectedOutputValues
+    std::vector<T> expectedOutputValues(
+      QuantizedVector<T>(qScale,qOffset,
     {
 
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 4.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 2.0f, 5.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 4, 0, 0,
+        0, 0, 2, 5, 0, 0,
+        0, 0, 0, 0, 0, 0,
 
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 6, 1, 0, 0,
+        0, 0, 5, 2, 0, 0,
+        0, 0, 0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 5.0f, 2.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0
 
+    }));
 
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+    auto inputTensor = MakeTensor<T, 3>(inputTensorInfo, std::vector<T>(inputValues));
 
-    };
-
-    auto inputTensor = MakeTensor<float, 3>(inputTensorInfo, std::vector<float>(inputValues));
-
-    LayerTestResult<float, 3> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 3>(outputTensorInfo, std::vector<float>(expectedOutputValues));
+    LayerTestResult<T, 3> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, std::vector<T>(expectedOutputValues));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -3588,227 +3585,209 @@ LayerTestResult<float, 3> Pad3dTest(armnn::IWorkloadFactory& workloadFactory)
     CopyDataFromITensorHandle(&result.output[0][0][0], outputHandle.get());
 
     return result;
-};
+}
 
-LayerTestResult<float, 4> Pad4dTest(armnn::IWorkloadFactory& workloadFactory)
+template <typename T>
+LayerTestResult<T, 4> Pad4dTestCommon(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
 {
     const armnn::TensorShape inputShape{ 2, 2, 3, 2 };
     const armnn::TensorShape outputShape{ 4, 5, 7, 4 };
 
-    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::GetDataType<T>());
+    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::GetDataType<T>());
 
-    std::vector<float> inputValues
+    std::vector<T> inputValues(
+      QuantizedVector<T>(qScale,qOffset,
     {
         // Batch 0, Channel 0, Height (3) x Width (2)
-        0.0f, 1.0f,
-        2.0f, 3.0f,
-        4.0f, 5.0f,
+        0, 1,
+        2, 3,
+        4, 5,
 
         // Batch 0, Channel 1, Height (3) x Width (2)
-        6.0f, 7.0f,
-        8.0f, 9.0f,
-        10.0f, 11.0f,
+        6, 7,
+        8, 9,
+        10, 11,
 
         // Batch 1, Channel 0, Height (3) x Width (2)
-        12.0f, 13.0f,
-        14.0f, 15.0f,
-        16.0f, 17.0f,
+        12, 13,
+        14, 15,
+        16, 17,
 
         // Batch 1, Channel 1, Height (3) x Width (2)
-        18.0f, 19.0f,
-        20.0f, 21.0f,
-        22.0f, 23.0f
+        18, 19,
+        20, 21,
+        22, 23
+    }));
 
-    };
-
-    std::vector<float> expectedOutputValues
+    std::vector<T> expectedOutputValues(
+      QuantizedVector<T>(qScale,qOffset,
     {
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 1, 0,
+        0, 2, 3, 0,
+        0, 4, 5, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 6, 7, 0,
+        0, 8, 9, 0,
+        0, 10, 11, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 12, 13, 0,
+        0, 14, 15, 0,
+        0, 16, 17, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 18, 19, 0,
+        0, 20, 21, 0,
+        0, 22, 23, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 2.0f, 3.0f, 0.0f,
-        0.0f, 4.0f, 5.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 6.0f, 7.0f, 0.0f,
-        0.0f, 8.0f, 9.0f, 0.0f,
-        0.0f, 10.0f, 11.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
 
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0
+    }));
 
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(inputValues));
 
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 12.0f, 13.0f, 0.0f,
-        0.0f, 14.0f, 15.0f, 0.0f,
-        0.0f, 16.0f, 17.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 18.0f, 19.0f, 0.0f,
-        0.0f, 20.0f, 21.0f, 0.0f,
-        0.0f, 22.0f, 23.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f
-
-    };
-
-    auto inputTensor = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>(inputValues));
-
-    LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, std::vector<float>(expectedOutputValues));
+    LayerTestResult<T, 4> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, std::vector<T>(expectedOutputValues));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -3841,7 +3820,37 @@ LayerTestResult<float, 4> Pad4dTest(armnn::IWorkloadFactory& workloadFactory)
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
 
     return result;
-};
+}
+
+LayerTestResult<uint8_t, 2> PadUint82dTest(armnn::IWorkloadFactory& workloadFactory)
+{
+  return Pad2dTestCommon<uint8_t>(workloadFactory, 1.0f, 0);
+}
+
+LayerTestResult<uint8_t, 3> PadUint83dTest(armnn::IWorkloadFactory& workloadFactory)
+{
+  return Pad3dTestCommon<uint8_t>(workloadFactory, 1.0f, 0);
+}
+
+LayerTestResult<uint8_t, 4> PadUint84dTest(armnn::IWorkloadFactory& workloadFactory)
+{
+  return Pad4dTestCommon<uint8_t>(workloadFactory, 1.0f, 0);
+}
+
+LayerTestResult<float, 2> PadFloat322dTest(armnn::IWorkloadFactory& workloadFactory)
+{
+  return Pad2dTestCommon<float>(workloadFactory, 0.0f, 0);
+}
+
+LayerTestResult<float, 3> PadFloat323dTest(armnn::IWorkloadFactory& workloadFactory)
+{
+  return Pad3dTestCommon<float>(workloadFactory, 0.0f, 0);
+}
+
+LayerTestResult<float, 4> PadFloat324dTest(armnn::IWorkloadFactory& workloadFactory)
+{
+  return Pad4dTestCommon<float>(workloadFactory, 0.0f, 0);
+}
 
 LayerTestResult<float, 4> L2Normalization1dTest(armnn::IWorkloadFactory& workloadFactory)
 {

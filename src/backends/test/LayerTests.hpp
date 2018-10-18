@@ -353,10 +353,13 @@ LayerTestResult<float, 2> FullyConnectedLargeTest(armnn::IWorkloadFactory& workl
 LayerTestResult<float, 4> SimplePermuteFloat32Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> SimplePermuteUint8Test(armnn::IWorkloadFactory& workloadFactory);
 
-LayerTestResult<float, 2> Pad2dTest(armnn::IWorkloadFactory& workloadFactory);
-LayerTestResult<float, 3> Pad3dTest(armnn::IWorkloadFactory& workloadFactory);
-LayerTestResult<float, 4> Pad4dTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 2> PadUint82dTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 3> PadUint83dTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> PadUint84dTest(armnn::IWorkloadFactory& workloadFactory);
 
+LayerTestResult<float, 2> PadFloat322dTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 3> PadFloat323dTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> PadFloat324dTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> PermuteFloat32ValueSet1Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4> PermuteFloat32ValueSet2Test(armnn::IWorkloadFactory& workloadFactory);

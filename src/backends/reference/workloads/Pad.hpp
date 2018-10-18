@@ -12,9 +12,10 @@
 
 namespace armnn
 {
+template <typename T>
 void Pad(const TensorInfo& inputInfo,
-        const TensorInfo& outputInfo,
-        std::vector<std::pair<unsigned int, unsigned int>> m_PadList,
-        const float* inputData,
-        float* outData);
+         const TensorInfo& outputInfo,
+         std::vector<std::pair<unsigned int, unsigned int>> m_PadList,
+         const T* inputData,
+         T* outData);
 } //namespace armnn

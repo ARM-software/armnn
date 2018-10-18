@@ -10,28 +10,31 @@
 
 #include "Profiling.hpp"
 
+#include "TypeUtils.hpp"
+
 #include <vector>
 
 namespace armnn
 {
 
-RefPadWorkload::RefPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info)
-  :BaseWorkload<PadQueueDescriptor>(descriptor, info) {}
-
-
-void RefPadWorkload::Execute() const
+template <armnn::DataType DataType>
+void RefPadWorkload<DataType>::Execute() const
 {
+    using T = ResolveType<DataType>;
 
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefPadWorkload_Execute");
 
     const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
     const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
 
-    const float* inputData = GetInputTensorDataFloat(0, m_Data);
-    float* outputData = GetOutputTensorDataFloat(0, m_Data);
+    const T* inputData = GetInputTensorData<T>(0, m_Data);
+    T* outputData = GetOutputTensorData<T>(0, m_Data);
 
 
     Pad(inputInfo, outputInfo, m_Data.m_Parameters.m_PadList, inputData, outputData);
 }
+
+template class RefPadWorkload<DataType::Float32>;
+template class RefPadWorkload<DataType::QuantisedAsymm8>;
 
 } //namespace armnn

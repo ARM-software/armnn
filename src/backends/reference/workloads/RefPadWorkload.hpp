@@ -5,17 +5,32 @@
 
 #pragma once
 
-#include "backends/Workload.hpp"
-#include "backends/WorkloadData.hpp"
+#include <backends/Workload.hpp>
+#include <backends/WorkloadData.hpp>
+
+#include <armnn/TypesUtils.hpp>
 
 namespace armnn
 {
 
-class RefPadWorkload : public BaseWorkload<PadQueueDescriptor>
+template <armnn::DataType DataType>
+class RefPadWorkload : public TypedWorkload<PadQueueDescriptor, DataType>
 {
 public:
-    explicit RefPadWorkload (const PadQueueDescriptor& descriptor, const WorkloadInfo& info);
-    virtual void Execute() const override;
+
+    static const std::string& GetName()
+    {
+        static const std::string name = std::string("RefPad") + GetDataTypeName(DataType) + "Workload";
+        return name;
+    }
+
+    using TypedWorkload<PadQueueDescriptor, DataType>::m_Data;
+    using TypedWorkload<PadQueueDescriptor, DataType>::TypedWorkload;
+
+    void Execute() const override;
 };
+
+using RefPadFloat32Workload = RefPadWorkload<DataType::Float32>;
+using RefPadUint8Workload   = RefPadWorkload<DataType::QuantisedAsymm8>;
 
 } //namespace armnn

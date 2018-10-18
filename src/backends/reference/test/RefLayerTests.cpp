@@ -213,9 +213,13 @@ ARMNN_AUTO_TEST_CASE(L2Normalization3d, L2Normalization3dTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization4d, L2Normalization4dTest)
 
 // Pad
-ARMNN_AUTO_TEST_CASE(Pad2d, Pad2dTest)
-ARMNN_AUTO_TEST_CASE(Pad3d, Pad3dTest)
-ARMNN_AUTO_TEST_CASE(Pad4d, Pad4dTest)
+ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
+ARMNN_AUTO_TEST_CASE(PadFloat323d, PadFloat323dTest)
+ARMNN_AUTO_TEST_CASE(PadFloat324d, PadFloat324dTest)
+
+ARMNN_AUTO_TEST_CASE(PadUint82d, PadUint82dTest)
+ARMNN_AUTO_TEST_CASE(PadUint83d, PadUint83dTest)
+ARMNN_AUTO_TEST_CASE(PadUint84d, PadUint84dTest)
 
 ARMNN_AUTO_TEST_CASE(L2Normalization1dNhwc, L2Normalization1dNhwcTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization2dNhwc, L2Normalization2dNhwcTest)

@@ -133,7 +133,7 @@ Layer::Layer(unsigned int numInputSlots,
 , m_LayerName(name ? name : "")
 , m_Type(type)
 , m_DataLayout(layout)
-, m_ComputeDevice(Compute::Undefined)
+, m_BackendId(UninitializedBackendId())
 , m_Guid(GenerateLayerGuid())
 {
     m_InputSlots.reserve(numInputSlots);

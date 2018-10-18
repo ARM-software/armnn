@@ -237,8 +237,8 @@ public:
 
     DataLayout GetDataLayout() const { return m_DataLayout; }
 
-    Compute GetComputeDevice() const { return m_ComputeDevice; }
-    void SetComputeDevice(Compute device) { m_ComputeDevice = device; }
+    const BackendId& GetBackendId() const { return m_BackendId; }
+    void SetBackendId(const BackendId& id) { m_BackendId = id; }
 
     // Virtuals
 
@@ -345,7 +345,7 @@ private:
 
     const LayerType m_Type;
     const DataLayout m_DataLayout;
-    Compute m_ComputeDevice;
+    BackendId m_BackendId;
 
     /// Used for sorting.
     mutable LayerPriority m_Priority = 0;

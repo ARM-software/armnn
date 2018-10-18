@@ -15,7 +15,7 @@ LayerType* Layer::CloneBase(Graph& graph, Params&& ... params) const
 {
     LayerType* const layer = graph.AddLayer<LayerType>(std::forward<Params>(params)...);
 
-    layer->SetComputeDevice(m_ComputeDevice);
+    layer->SetBackendId(GetBackendId());
     layer->SetGuid(GetGuid());
 
     return layer;

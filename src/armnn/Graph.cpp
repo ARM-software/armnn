@@ -67,7 +67,7 @@ Status Graph::Print() const
     for (auto&& it : TopologicalSort())
     {
         BOOST_LOG_TRIVIAL(info) << it->GetName() << ":" << GetLayerTypeAsCString(it->GetType())
-                                << ":" << GetComputeDeviceAsCString(it->GetComputeDevice());
+                                << ":" << it->GetBackendId().Get();
     }
     BOOST_LOG_TRIVIAL(info) << "\n\n";
 
@@ -260,7 +260,7 @@ void Graph::AddCopyLayers()
     auto MayNeedCopyLayer = [](const Layer& layer)
         {
             // All layers should have been associated with a valid compute device at this point.
-            BOOST_ASSERT(layer.GetComputeDevice() != Compute::Undefined);
+            BOOST_ASSERT(layer.GetBackendId() != Compute::Undefined);
             // Does not need another copy layer if a copy layer is already present.
             return layer.GetType() != LayerType::MemCopy;
         };
@@ -276,7 +276,7 @@ void Graph::AddCopyLayers()
                 for (auto&& dstInput : connectionCopy)
                 {
                     Layer& dstLayer = dstInput->GetOwningLayer();
-                    if (MayNeedCopyLayer(dstLayer) && (dstLayer.GetComputeDevice() != srcLayer->GetComputeDevice()))
+                    if (MayNeedCopyLayer(dstLayer) && (dstLayer.GetBackendId() != srcLayer->GetBackendId()))
                     {
                         // A copy layer is needed in between the source and destination layers.
                         // Record the operation rather than attempting to modify the graph as we go.
@@ -288,7 +288,7 @@ void Graph::AddCopyLayers()
                                                                      % dstInput->GetSlotIndex());
 
                         MemCopyLayer* const copyLayer = InsertNewLayer<MemCopyLayer>(*dstInput, copyLayerName.c_str());
-                        copyLayer->SetComputeDevice(dstLayer.GetComputeDevice());
+                        copyLayer->SetBackendId(dstLayer.GetBackendId());
                     }
                 }
                 ++srcOutputIndex;

@@ -336,7 +336,7 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
             // Both layers must have the same compute device.
             if (srcLayer && dstLayer)
             {
-                BOOST_TEST((srcLayer->GetComputeDevice() == dstLayer->GetComputeDevice()));
+                BOOST_TEST((srcLayer->GetBackendId() == dstLayer->GetBackendId()));
             }
 
             // Marks edge in original graph as observed (by deleting it).
@@ -418,7 +418,7 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
                 }
 
                 // Both layers must have different compute devices.
-                BOOST_TEST((nonCopyLayer->GetComputeDevice() != adjLayer->GetComputeDevice()));
+                BOOST_TEST((nonCopyLayer->GetBackendId() != adjLayer->GetBackendId()));
 
                 // There must exist an edge connecting both layers directly in the original graph.
                 {
@@ -453,40 +453,40 @@ struct CopyLayersFixture
         using namespace std;
 
         Layer* const inputLayer = AddLayer<InputLayer>(0, "input");
-        inputLayer->SetComputeDevice(Compute::CpuRef);
+        inputLayer->SetBackendId(Compute::CpuRef);
 
         Convolution2dDescriptor convolutionDefaults;
         Layer* const convLayer1 = AddLayer<Convolution2dLayer>(convolutionDefaults, "conv1");
-        convLayer1->SetComputeDevice(Compute::CpuRef);
+        convLayer1->SetBackendId(Compute::CpuRef);
 
         inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
 
         Layer* const convLayer2 = AddLayer<Convolution2dLayer>(convolutionDefaults, "conv2");
-        convLayer2->SetComputeDevice(Compute::CpuRef);
+        convLayer2->SetBackendId(Compute::CpuRef);
 
         convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
 
         armnn::OriginsDescriptor mergerDefaults(2);
         Layer* const mergerLayer = AddLayer<MergerLayer>(mergerDefaults, "merger");
-        mergerLayer->SetComputeDevice(armnn::Compute::CpuRef);
+        mergerLayer->SetBackendId(armnn::Compute::CpuRef);
 
         convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
         convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
 
         armnn::ActivationDescriptor activationDefaults;
         Layer* const actLayer = AddLayer<ActivationLayer>(activationDefaults, "act");
-        actLayer->SetComputeDevice(armnn::Compute::CpuRef);
+        actLayer->SetBackendId(armnn::Compute::CpuRef);
 
         mergerLayer->GetOutputSlot(0).Connect(actLayer->GetInputSlot(0));
 
         armnn::SoftmaxDescriptor softmaxDefaults;
         Layer* const softmaxLayer = AddLayer<SoftmaxLayer>(softmaxDefaults, "softmax");
-        softmaxLayer->SetComputeDevice(armnn::Compute::CpuRef);
+        softmaxLayer->SetBackendId(armnn::Compute::CpuRef);
 
         actLayer->GetOutputSlot(0).Connect(softmaxLayer->GetInputSlot(0));
 
         Layer* const outputLayer = AddLayer<OutputLayer>(0, "output");
-        outputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+        outputLayer->SetBackendId(armnn::Compute::CpuRef);
 
         softmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
     }
@@ -537,17 +537,17 @@ BOOST_AUTO_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames)
     armnn::Graph graph;
 
     armnn::InputLayer* const inputLayer = graph.AddLayer<armnn::InputLayer>(0, "input");
-    inputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+    inputLayer->SetBackendId(armnn::Compute::CpuRef);
 
     armnn::ViewsDescriptor splitterDesc(2);
     armnn::SplitterLayer* const splitterLayer = graph.AddLayer<armnn::SplitterLayer>(splitterDesc, "splitter");
-    splitterLayer->SetComputeDevice(armnn::Compute::GpuAcc);
+    splitterLayer->SetBackendId(armnn::Compute::GpuAcc);
 
     armnn::AdditionLayer* const additionLayer = graph.AddLayer<armnn::AdditionLayer>("addition");
-    additionLayer->SetComputeDevice(armnn::Compute::CpuRef);
+    additionLayer->SetBackendId(armnn::Compute::CpuRef);
 
     armnn::OutputLayer* const outputLayer = graph.AddLayer<armnn::OutputLayer>(0, "output");
-    outputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+    outputLayer->SetBackendId(armnn::Compute::CpuRef);
 
     inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
     splitterLayer->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(0));
@@ -568,10 +568,10 @@ BOOST_AUTO_TEST_CASE(DuplicateLayerNames)
     armnn::Graph graph;
 
     armnn::InputLayer* const inputLayer = graph.AddLayer<armnn::InputLayer>(0, "layer");
-    inputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+    inputLayer->SetBackendId(armnn::Compute::CpuRef);
 
     armnn::OutputLayer* const outputLayer = graph.AddLayer<armnn::OutputLayer>(0, "layer");
-    outputLayer->SetComputeDevice(armnn::Compute::CpuRef);
+    outputLayer->SetBackendId(armnn::Compute::CpuRef);
 
     inputLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 

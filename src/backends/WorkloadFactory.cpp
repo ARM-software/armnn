@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <backends/WorkloadFactory.hpp>
+#include <backends/LayerSupportRegistry.hpp>
 
 #include <backends/reference/RefWorkloadFactory.hpp>
 #include <backends/neon/NeonWorkloadFactory.hpp>
@@ -54,15 +55,18 @@ namespace
     }
 }
 
-bool IWorkloadFactory::IsLayerSupported(Compute compute,
+bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                         const IConnectableLayer& connectableLayer,
                                         boost::optional<DataType> dataType,
                                         std::string& outReasonIfUnsupported)
 {
-    constexpr size_t reasonCapacity = 1024;
-    char reason[reasonCapacity];
+    Optional<std::string&> reason = outReasonIfUnsupported;
     bool result;
     const Layer& layer = *(boost::polymorphic_downcast<const Layer*>(&connectableLayer));
+
+    auto const& layerSupportRegistry = LayerSupportRegistryInstance();
+    auto layerSupportFactory = layerSupportRegistry.GetFactory(backendId);
+    auto layerSupportObject = layerSupportFactory();
 
     switch(layer.GetType())
     {
@@ -71,12 +75,11 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             auto cLayer = boost::polymorphic_downcast<const ActivationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsActivationSupported(compute,
+            result = layerSupportObject->IsActivationSupported(
                                            OverrideDataType(input, dataType),
                                            OverrideDataType(output, dataType),
                                            cLayer->GetParameters(),
-                                           reason,
-                                           reasonCapacity);
+                                           reason);
             break;
         }
         case LayerType::Addition:
@@ -84,12 +87,11 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsAdditionSupported(compute,
+            result = layerSupportObject->IsAdditionSupported(
                                         OverrideDataType(input0, dataType),
                                         OverrideDataType(input1, dataType),
                                         OverrideDataType(output, dataType),
-                                        reason,
-                                        reasonCapacity);
+                                        reason);
             break;
         }
         case LayerType::BatchNormalization:
@@ -101,7 +103,7 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             const TensorInfo& var = cLayer->m_Variance->GetTensorInfo();
             const TensorInfo& beta = cLayer->m_Beta->GetTensorInfo();
             const TensorInfo& gamma = cLayer->m_Gamma->GetTensorInfo();
-            result = IsBatchNormalizationSupported(compute,
+            result = layerSupportObject->IsBatchNormalizationSupported(
                                                    OverrideDataType(input, dataType),
                                                    OverrideDataType(output, dataType),
                                                    OverrideDataType(mean, dataType),
@@ -109,27 +111,27 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
                                                    OverrideDataType(beta, dataType),
                                                    OverrideDataType(gamma, dataType),
                                                    cLayer->GetParameters(),
-                                                   reason, reasonCapacity);
+                                                   reason);
             break;
         }
         case LayerType::Constant:
         {
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsConstantSupported(compute, OverrideDataType(output, dataType), reason, reasonCapacity);
+            result = layerSupportObject->IsConstantSupported(OverrideDataType(output, dataType), reason);
             break;
         }
         case LayerType::ConvertFp16ToFp32:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsConvertFp16ToFp32Supported(compute, input, output, reason, reasonCapacity);
+            result = layerSupportObject->IsConvertFp16ToFp32Supported(input, output, reason);
             break;
         }
         case LayerType::ConvertFp32ToFp16:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsConvertFp32ToFp16Supported(compute, input, output, reason, reasonCapacity);
+            result = layerSupportObject->IsConvertFp32ToFp16Supported(input, output, reason);
             break;
         }
         case LayerType::Convolution2d:
@@ -151,23 +153,22 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
                     OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
             }
 
-            result = IsConvolution2dSupported(compute,
+            result = layerSupportObject->IsConvolution2dSupported(
                                               input,
                                               output,
                                               descriptor,
                                               OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType),
                                               biases,
-                                              reason,
-                                              reasonCapacity);
+                                              reason);
             break;
         }
         case LayerType::MemCopy:
         {
             // MemCopy supported for CpuRef, CpuAcc and GpuAcc backends,
             // (also treat Undefined as CpuRef to avoid breaking lots of Unit tests).
-            result = compute == Compute::CpuRef || compute == Compute::Undefined
-                || compute == Compute::CpuAcc || compute == Compute::GpuAcc;
-            strcpy(reason, "Unsupported backend type");
+            result = backendId == Compute::CpuRef || backendId == Compute::Undefined
+                || backendId == Compute::CpuAcc || backendId == Compute::GpuAcc;
+            reason.value() = "Unsupported backend type";
             break;
         }
         case LayerType::DepthwiseConvolution2d:
@@ -188,30 +189,31 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
                     OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
             }
 
-            result = IsDepthwiseConvolutionSupported(compute,
+            result = layerSupportObject->IsDepthwiseConvolutionSupported(
                                                      input,
                                                      output,
                                                      descriptor,
                                                      OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType),
                                                      biases,
-                                                     reason,
-                                                     reasonCapacity);
+                                                     reason);
             break;
         }
         case LayerType::FakeQuantization:
         {
             auto cLayer = boost::polymorphic_downcast<const FakeQuantizationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = IsFakeQuantizationSupported(compute, OverrideDataType(input, dataType), cLayer->GetParameters(),
-                                                 reason, reasonCapacity);
+            result = layerSupportObject->IsFakeQuantizationSupported(OverrideDataType(input, dataType),
+                                                                     cLayer->GetParameters(),
+                                                                     reason);
             break;
         }
         case LayerType::Floor:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsFloorSupported(compute, OverrideDataType(input, dataType), OverrideDataType(output, dataType),
-                                      reason, reasonCapacity);
+            result = layerSupportObject->IsFloorSupported(OverrideDataType(input, dataType),
+                                                          OverrideDataType(output, dataType),
+                                                          reason);
             break;
         }
         case LayerType::FullyConnected:
@@ -261,20 +263,19 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
                 }
             }
 
-            result = IsFullyConnectedSupported(compute,
+            result = layerSupportObject->IsFullyConnectedSupported(
                                                OverrideDataType(input, dataType),
                                                OverrideDataType(output, dataType),
                                                OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType),
                                                *biasInfoPtr,
                                                descriptor,
-                                               reason,
-                                               reasonCapacity);
+                                               reason);
             break;
         }
         case LayerType::Input:
         {
             const TensorInfo& input = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsInputSupported(compute, OverrideDataType(input, dataType), reason, reasonCapacity);
+            result = layerSupportObject->IsInputSupported(OverrideDataType(input, dataType), reason);
             break;
         }
         case LayerType::L2Normalization:
@@ -285,12 +286,11 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            result = IsL2NormalizationSupported(compute,
+            result = layerSupportObject->IsL2NormalizationSupported(
                                                 OverrideDataType(input, dataType),
                                                 OverrideDataType(output, dataType),
                                                 descriptor,
-                                                reason,
-                                                reasonCapacity);
+                                                reason);
             break;
         }
         case LayerType::Lstm:
@@ -393,7 +393,7 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
                 cellToOutputWeights = &optCellToOutputWeights;
             }
 
-            result = IsLstmSupported(compute,
+            result = layerSupportObject->IsLstmSupported(
                                      input,
                                      outputStateIn,
                                      cellStateIn,
@@ -419,8 +419,7 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
                                      projectionBias,
                                      cellToForgetWeights,
                                      cellToOutputWeights,
-                                     reason,
-                                     reasonCapacity);
+                                     reason);
             break;
         }
         case LayerType::Merger:
@@ -444,7 +443,7 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             auto endPtr = boost::make_transform_iterator(inputs.end(), getTensorInfoPtr);
             std::vector<const TensorInfo*> inputPtrs(beginPtr, endPtr);
 
-            result = IsMergerSupported(compute, inputPtrs, cLayer->GetParameters(), reason, reasonCapacity);
+            result = layerSupportObject->IsMergerSupported(inputPtrs, cLayer->GetParameters(), reason);
             break;
         }
         case LayerType::Multiplication:
@@ -452,12 +451,11 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsMultiplicationSupported(compute,
+            result = layerSupportObject->IsMultiplicationSupported(
                                                OverrideDataType(input0, dataType),
                                                OverrideDataType(input1, dataType),
                                                OverrideDataType(output, dataType),
-                                               reason,
-                                               reasonCapacity);
+                                               reason);
             break;
         }
         case LayerType::Normalization:
@@ -465,15 +463,16 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             auto cLayer = boost::polymorphic_downcast<const NormalizationLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsNormalizationSupported(compute, OverrideDataType(input, dataType),
-                                              OverrideDataType(output, dataType), cLayer->GetParameters(), reason,
-                                              reasonCapacity);
+            result = layerSupportObject->IsNormalizationSupported(OverrideDataType(input, dataType),
+                                                                  OverrideDataType(output, dataType),
+                                                                  cLayer->GetParameters(),
+                                                                  reason);
             break;
         }
         case LayerType::Output:
         {
             const TensorInfo& output = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = IsOutputSupported(compute, OverrideDataType(output, dataType), reason, reasonCapacity);
+            result = layerSupportObject->IsOutputSupported(OverrideDataType(output, dataType), reason);
             break;
         }
         case LayerType::Permute:
@@ -481,8 +480,10 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             auto cLayer = boost::polymorphic_downcast<const PermuteLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsPermuteSupported(compute, OverrideDataType(input, dataType), OverrideDataType(output, dataType),
-                                        cLayer->GetParameters(), reason, reasonCapacity);
+            result = layerSupportObject->IsPermuteSupported(OverrideDataType(input, dataType),
+                                                            OverrideDataType(output, dataType),
+                                                            cLayer->GetParameters(),
+                                                            reason);
             break;
         }
         case LayerType::Pad:
@@ -490,12 +491,11 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             auto cLayer = boost::polymorphic_downcast<const PadLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsPadSupported(compute,
+            result = layerSupportObject->IsPadSupported(
                                     OverrideDataType(input, dataType),
                                     OverrideDataType(output, dataType),
                                     cLayer->GetParameters(),
-                                    reason,
-                                    reasonCapacity);
+                                    reason);
             break;
         }
         case LayerType::Pooling2d:
@@ -503,9 +503,10 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             auto cLayer = boost::polymorphic_downcast<const Pooling2dLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsPooling2dSupported(compute, OverrideDataType(input, dataType),
-                                          OverrideDataType(output, dataType), cLayer->GetParameters(), reason,
-                                          reasonCapacity);
+            result = layerSupportObject->IsPooling2dSupported(OverrideDataType(input, dataType),
+                                                              OverrideDataType(output, dataType),
+                                                              cLayer->GetParameters(),
+                                                              reason);
             break;
         }
         case LayerType::Division:
@@ -513,24 +514,23 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsDivisionSupported(compute,
+            result = layerSupportObject->IsDivisionSupported(
                                          OverrideDataType(input0, dataType),
                                          OverrideDataType(input1, dataType),
                                          OverrideDataType(output, dataType),
-                                         reason,
-                                         reasonCapacity);
+                                         reason);
             break;
         }
         case LayerType::Reshape:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = IsReshapeSupported(compute, OverrideDataType(input, dataType), reason, reasonCapacity);
+            result = layerSupportObject->IsReshapeSupported(OverrideDataType(input, dataType), reason);
             break;
         }
         case LayerType::ResizeBilinear:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = IsResizeBilinearSupported(compute, OverrideDataType(input, dataType), reason, reasonCapacity);
+            result = layerSupportObject->IsResizeBilinearSupported(OverrideDataType(input, dataType), reason);
             break;
         }
         case LayerType::Softmax:
@@ -538,16 +538,19 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             auto cLayer = boost::polymorphic_downcast<const SoftmaxLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsSoftmaxSupported(compute, OverrideDataType(input, dataType), OverrideDataType(output, dataType),
-                                        cLayer->GetParameters(), reason, reasonCapacity);
+            result = layerSupportObject->IsSoftmaxSupported(OverrideDataType(input, dataType),
+                                                            OverrideDataType(output, dataType),
+                                                            cLayer->GetParameters(),
+                                                            reason);
             break;
         }
         case LayerType::Splitter:
         {
             auto cLayer = boost::polymorphic_downcast<const SplitterLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = IsSplitterSupported(compute, OverrideDataType(input, dataType), cLayer->GetParameters(), reason,
-                                         reasonCapacity);
+            result = layerSupportObject->IsSplitterSupported(OverrideDataType(input, dataType),
+                                                             cLayer->GetParameters(),
+                                                             reason);
             break;
         }
         case LayerType::Subtraction:
@@ -555,12 +558,11 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsSubtractionSupported(compute,
+            result = layerSupportObject->IsSubtractionSupported(
                                             OverrideDataType(input0, dataType),
                                             OverrideDataType(input1, dataType),
                                             OverrideDataType(output, dataType),
-                                            reason,
-                                            reasonCapacity);
+                                            reason);
             break;
         }
         case LayerType::Mean:
@@ -568,23 +570,21 @@ bool IWorkloadFactory::IsLayerSupported(Compute compute,
             auto cLayer = boost::polymorphic_downcast<const MeanLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = IsMeanSupported(compute,
+            result = layerSupportObject->IsMeanSupported(
                                      OverrideDataType(input, dataType),
                                      OverrideDataType(output, dataType),
                                      cLayer->GetParameters(),
-                                     reason,
-                                     reasonCapacity);
+                                     reason);
             break;
         }
         default:
         {
             BOOST_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");
-            strcpy(reason, "Unrecognised layer type");
+            reason.value() = "Unrecognised layer type";
             result = false;
             break;
         }
     }
-    outReasonIfUnsupported = reason;
     return result;
 }
 
@@ -593,7 +593,7 @@ bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLaye
                                         std::string& outReasonIfUnsupported)
 {
     auto layer = boost::polymorphic_downcast<const Layer*>(&connectableLayer);
-    return IsLayerSupported(layer->GetComputeDevice(), connectableLayer, dataType, outReasonIfUnsupported);
+    return IsLayerSupported(layer->GetBackendId(), connectableLayer, dataType, outReasonIfUnsupported);
 }
 
 }

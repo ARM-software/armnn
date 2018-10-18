@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuAccDeviceSupportLayerNoFallback)
     armnn::NeonWorkloadFactory fact;
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
-        BOOST_CHECK_EQUAL(armnn::Compute::CpuAcc, layer->GetComputeDevice());
+        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
         BOOST_CHECK_NO_THROW(
             layer->CreateWorkload(static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph(), fact));
     }
@@ -541,7 +541,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
     armnn::ClWorkloadFactory fact;
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
-        BOOST_CHECK_EQUAL(armnn::Compute::GpuAcc, layer->GetComputeDevice());
+        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);
         BOOST_CHECK_NO_THROW(
             layer->CreateWorkload(static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph(), fact));
     }
@@ -609,14 +609,14 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerWithFallback)
 #if ARMCOMPUTENEON_ENABLED
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
-            BOOST_CHECK_EQUAL(armnn::Compute::CpuAcc, layer->GetComputeDevice());
+            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
         }
         else if (layer->GetType() == armnn::LayerType::Normalization)
         {
-            BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         }
 #else
-        BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
 #endif
     }
 }
@@ -747,7 +747,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback
     armnn::RefWorkloadFactory fact;
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
-        BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         BOOST_CHECK_NO_THROW(
             layer->CreateWorkload(static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph(), fact));
     }
@@ -791,23 +791,23 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback
 #if ARMCOMPUTENEON_ENABLED
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
-            BOOST_CHECK_EQUAL(armnn::Compute::CpuAcc, layer->GetComputeDevice());
+            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
         }
         else if (layer->GetType() == armnn::LayerType::Normalization)
         {
-            BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         }
 #elif ARMCOMPUTECL_ENABLED
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
-            BOOST_CHECK_EQUAL(armnn::Compute::GpuAcc, layer->GetComputeDevice());
+            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);
         }
         else if (layer->GetType() == armnn::LayerType::Normalization)
         {
-            BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+            BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         }
 #else
-        BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
 #endif
     }
 }
@@ -841,7 +841,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefPermuteLayer)
 
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
-        BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
     }
 }
 
@@ -874,7 +874,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefMeanLayer)
 
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
-        BOOST_CHECK_EQUAL(armnn::Compute::CpuRef, layer->GetComputeDevice());
+        BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
     }
 }
 

@@ -187,7 +187,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         {
             // need to set the compute device on the layer
             // before we can check if it is supported
-            layer->SetComputeDevice(backend);
+            layer->SetBackendId(backend);
             if (!IWorkloadFactory::IsLayerSupported(*layer, dataType, reasonIfUnsupported))
             {
                 if (dataType == DataType::Float16)
@@ -211,7 +211,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                             std::string reasonIfUnsupported;
 
                             // Try preferred backend first
-                            layer->SetComputeDevice(preferredBackend);
+                            layer->SetBackendId(preferredBackend);
                             if (IWorkloadFactory::IsLayerSupported(*layer, boost::none, reasonIfUnsupported))
                             {
                                 supportedBackendFound = true;
@@ -226,7 +226,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                                         continue;
                                     }
 
-                                    layer->SetComputeDevice(backend);
+                                    layer->SetBackendId(backend);
                                     if (IWorkloadFactory::IsLayerSupported(*layer, boost::none, reasonIfUnsupported))
                                     {
                                         supportedBackendFound = true;
@@ -260,7 +260,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                 }
                 std::stringstream warningMsg;
                 warningMsg << "WARNING: Layer of type " << GetLayerTypeAsCString(layer->GetType())
-                           << " is not supported on requested backend " << layer->GetComputeDevice()
+                           << " is not supported on requested backend " << layer->GetBackendId().Get()
                            << " for data type " << GetDataTypeName(dataType)
                            << " (reason: " << reasonIfUnsupported
                            << "), falling back to the next backend.";
@@ -287,7 +287,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                                 layerType == armnn::LayerType::Constant ||
                                 layerType == armnn::LayerType::Permute))
             {
-                layer->SetComputeDevice(armnn::Compute::CpuRef);
+                layer->SetBackendId(armnn::Compute::CpuRef);
             }
             else
             {

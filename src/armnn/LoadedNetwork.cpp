@@ -122,7 +122,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
                     const char* const layerName = layer->GetNameStr().length() != 0 ? layer->GetName() : "<Unnamed>";
                     throw InvalidArgumentException(boost::str(
                         boost::format("No workload created for layer (name: '%1%' type: '%2%') (compute '%3%')")
-                        % layerName % static_cast<int>(layer->GetType()) % layer->GetComputeDevice()
+                        % layerName % static_cast<int>(layer->GetType()) % layer->GetBackendId().Get()
                     ));
                 }
 
@@ -176,27 +176,17 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
 {
     const IWorkloadFactory* workloadFactory = nullptr;
 
-    switch (layer.GetComputeDevice())
+    if (layer.GetBackendId() == Compute::CpuAcc)
     {
-        case Compute::CpuAcc:
-        {
-            workloadFactory = &m_CpuAcc;
-            break;
-        }
-        case Compute::GpuAcc:
-        {
-            workloadFactory = &m_GpuAcc;
-            break;
-        }
-        case Compute::CpuRef:
-        {
-            workloadFactory = &m_CpuRef;
-            break;
-        }
-        default:
-        {
-            break;
-        }
+        workloadFactory = &m_CpuAcc;
+    }
+    else if (layer.GetBackendId() == Compute::GpuAcc)
+    {
+        workloadFactory = &m_GpuAcc;
+    }
+    else if (layer.GetBackendId() == Compute::CpuRef)
+    {
+        workloadFactory = &m_CpuRef;
     }
 
     BOOST_ASSERT_MSG(workloadFactory, "No workload factory");

@@ -32,7 +32,7 @@ public:
     /// Inform the memory manager to acquire memory
     virtual void Acquire() { }
 
-    static bool IsLayerSupported(Compute compute,
+    static bool IsLayerSupported(const BackendId& backendId,
                                  const IConnectableLayer& layer,
                                  boost::optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);

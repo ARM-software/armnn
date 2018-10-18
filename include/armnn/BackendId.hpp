@@ -70,9 +70,12 @@ inline std::ostream& operator<<(std::ostream& os, const Compute& compute)
     return os;
 }
 
+struct UninitializedBackendId {};
+
 class BackendId final
 {
 public:
+    BackendId(UninitializedBackendId) { GetComputeDeviceAsCString(Compute::Undefined); }
     BackendId(const std::string& id) : m_Id{id} {}
     BackendId(const char* id) : m_Id{id} {}
 
@@ -100,6 +103,21 @@ public:
     bool operator==(const BackendId& other) const
     {
         return m_Id == other.m_Id;
+    }
+
+    // comparison against objects from which the
+    // BackendId can be constructed
+    template <typename O>
+    bool operator==(const O& other) const
+    {
+        BackendId temp{other};
+        return *this == temp;
+    }
+
+    template <typename O>
+    bool operator!=(const O& other) const
+    {
+        return !(*this == other);
     }
 
     bool operator<(const BackendId& other) const

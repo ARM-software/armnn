@@ -6,6 +6,7 @@
 #include "RefNormalizationFloat32Workload.hpp"
 
 #include "RefWorkloadUtils.hpp"
+#include "TensorBufferArrayView.hpp"
 
 #include "Profiling.hpp"
 
@@ -87,12 +88,22 @@ void NormalizeAcrossUingLbr(const float*       inputData,
                             uint32_t           norm_size,
                             float              alpha,
                             float              beta,
-                            float              kappa)
+                            float              kappa,
+                            DataLayout         dataLayout)
 {
+    TensorBufferArrayView<const float> input(tensorShape,
+                                             inputData,
+                                             dataLayout);
+    TensorBufferArrayView<float> output(tensorShape,
+                                        outputData,
+                                        dataLayout);
+
+    DataLayoutIndexed dataLayoutIndexed(dataLayout);
+
     const unsigned int batchSize = tensorShape[0];
-    const unsigned int depth     = tensorShape[1];
-    const unsigned int rows      = tensorShape[2];
-    const unsigned int cols      = tensorShape[3];
+    const unsigned int depth     = tensorShape[dataLayoutIndexed.GetChannelsIndex()];
+    const unsigned int rows      = tensorShape[dataLayoutIndexed.GetHeightIndex()];
+    const unsigned int cols      = tensorShape[dataLayoutIndexed.GetWidthIndex()];
 
     int radius = boost::numeric_cast<int>(norm_size / 2u); /* Strong Assumption on rounding Mode */
 
@@ -114,23 +125,15 @@ void NormalizeAcrossUingLbr(const float*       inputData,
                             continue;
                         }
 
-                        float inval = inputData[n * cols * rows * depth +
-                                                boost::numeric_cast<unsigned int>(k) * cols * rows +
-                                                h * cols +
-                                                w];
+                        float inval = input.Get(n, boost::numeric_cast<unsigned int>(k), h, w);
 
-                        accumulated_scale += inval*inval;
+                        accumulated_scale += inval * inval;
                     }
+
                     float scale = kappa + (accumulated_scale * alpha);
                     scale = powf(scale, -beta);
-                    outputData[n * cols * rows * depth +
-                               c * cols * rows +
-                               h * cols +
-                               w] = scale *
-                                   inputData[n * cols * rows * depth +
-                                             c * cols * rows +
-                                             h * cols +
-                                             w];
+
+                    output.Get(n, c, h, w) = scale * input.Get(n, c, h, w);
                 }
             }
         }
@@ -145,7 +148,6 @@ void RefNormalizationFloat32Workload::Execute() const
 
     float*       outputData = GetOutputTensorDataFloat(0, m_Data);
     const float* inputData = GetInputTensorDataFloat(0, m_Data);
-
 
     if (NormalizationAlgorithmMethod::LocalBrightness == m_Data.m_Parameters.m_NormMethodType)
     {
@@ -167,7 +169,8 @@ void RefNormalizationFloat32Workload::Execute() const
                                    m_Data.m_Parameters.m_NormSize,
                                    m_Data.m_Parameters.m_Alpha,
                                    m_Data.m_Parameters.m_Beta,
-                                   m_Data.m_Parameters.m_K);
+                                   m_Data.m_Parameters.m_K,
+                                   m_Data.m_Parameters.m_DataLayout);
         }
         else
         {

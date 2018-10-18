@@ -694,7 +694,7 @@ LayerTestResult<float,4> SimpleNormalizationAcrossNhwcTest(armnn::IWorkloadFacto
 {
     auto normMethod = armnn::NormalizationAlgorithmMethod::LocalBrightness;
     auto normChannel = armnn::NormalizationAlgorithmChannel::Across;
-    return SimpleNormalizationNhwcClNeonTestImpl(workloadFactory, normChannel, normMethod);
+    return SimpleNormalizationNhwcTestImpl(workloadFactory, normChannel, normMethod);
 }
 
 LayerTestResult<float,2> SimpleSoftmaxTest(armnn::IWorkloadFactory& workloadFactory, float beta)

@@ -152,11 +152,9 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(armnn::IWorkloadFactory& wo
     return ret;
 }
 
-// This is test implementation for CL and NEON,
-// as currently, only Across Normalization is supported on CL and NEON for NHWC.
-LayerTestResult<float,4> SimpleNormalizationNhwcClNeonTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                               armnn::NormalizationAlgorithmChannel normChannel,
-                                                               armnn::NormalizationAlgorithmMethod normMethod)
+LayerTestResult<float,4> SimpleNormalizationNhwcTestImpl(armnn::IWorkloadFactory& workloadFactory,
+                                                         armnn::NormalizationAlgorithmChannel normChannel,
+                                                         armnn::NormalizationAlgorithmMethod normMethod)
 {
     const unsigned int inputHeight = 2;
     const unsigned int inputWidth = 2;

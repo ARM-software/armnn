@@ -133,11 +133,12 @@ std::unique_ptr<WorkloadType> CreateArithmeticWorkloadTest(armnn::IWorkloadFacto
 
 template <typename BatchNormalizationFloat32Workload, armnn::DataType DataType>
 std::unique_ptr<BatchNormalizationFloat32Workload> CreateBatchNormalizationWorkloadTest(
-    armnn::IWorkloadFactory& factory, armnn::Graph& graph)
+    armnn::IWorkloadFactory& factory, armnn::Graph& graph, DataLayout dataLayout = DataLayout::NCHW)
 {
     // Creates the layer we're testing.
     BatchNormalizationDescriptor layerDesc;
     layerDesc.m_Eps = 0.05f;
+    layerDesc.m_DataLayout = dataLayout;
 
     BatchNormalizationLayer* const layer = graph.AddLayer<BatchNormalizationLayer>(layerDesc, "layer");
 
@@ -155,16 +156,19 @@ std::unique_ptr<BatchNormalizationFloat32Workload> CreateBatchNormalizationWorkl
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
+    TensorShape inputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{ 2, 3, 1, 1 } : TensorShape{ 2, 1, 1, 3 };
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{ 2, 3, 1, 1 } : TensorShape{ 2, 1, 1, 3 };
+
     // Connects up.
-    armnn::TensorInfo tensorInfo({2, 3, 1, 1}, DataType);
-    Connect(input, layer, tensorInfo);
-    Connect(layer, output, tensorInfo);
+    Connect(input, layer, TensorInfo(inputShape, DataType));
+    Connect(layer, output, TensorInfo(outputShape, DataType));
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
     auto workload = MakeAndCheckWorkload<BatchNormalizationFloat32Workload>(*layer, graph, factory);
     BatchNormalizationQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_Eps == 0.05f);
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
     BOOST_TEST((queueDescriptor.m_Mean->GetTensorInfo() == TensorInfo({3}, DataType)));

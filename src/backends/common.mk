@@ -17,3 +17,12 @@ COMMON_SOURCES := \
     StringMapping.cpp \
     WorkloadData.cpp \
     WorkloadFactory.cpp
+
+# COMMON_TEST_SOURCES contains the list of files to be included
+# in the Android unit test build (armnn-tests) and it is picked
+# up by the Android.mk file in the root of ArmNN
+
+COMMON_TEST_SOURCES := \
+    test/WorkloadDataValidation.cpp \
+    test/TensorCopyUtils.cpp \
+    test/LayerTests.cpp

@@ -152,6 +152,24 @@ LOCAL_MODULE_TAGS := eng optional
 LOCAL_ARM_MODE := arm
 LOCAL_PROPRIETARY_MODULE := true
 
+# placeholder to hold all backend unit test source files
+ARMNN_BACKEND_TEST_SOURCES :=
+
+#
+# iterate through the backend common and specific include paths, include them into the current
+# makefile and append the sources held by the COMMON_TEST_SOURCES and BACKEND_TEST_SOURCES
+# (included from the given makefile) to the ARMNN_BACKEND_TEST_SOURCES list
+#
+$(foreach mkPath,$(ARMNN_BACKEND_COMMON_MAKEFILE_DIRS), \
+   $(eval include $(LOCAL_PATH)/$(mkPath)/common.mk) \
+   $(eval ARMNN_BACKEND_TEST_SOURCES := $(ARMNN_BACKEND_TEST_SOURCES) \
+   $(patsubst %,$(mkPath)/%,$(COMMON_TEST_SOURCES))))
+
+$(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS), \
+   $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk) \
+   $(eval ARMNN_BACKEND_TEST_SOURCES := $(ARMNN_BACKEND_TEST_SOURCES) \
+   $(patsubst %,$(mkPath)/%,$(BACKEND_TEST_SOURCES))))
+
 # Mark source files as dependent on Android.mk
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
@@ -172,6 +190,7 @@ LOCAL_CFLAGS := \
 	-DARMCOMPUTENEON_ENABLED
 
 LOCAL_SRC_FILES := \
+        $(ARMNN_BACKEND_TEST_SOURCES) \
 	src/armnn/test/UnitTests.cpp \
 	src/armnn/test/EndToEndTest.cpp \
 	src/armnn/test/UtilsTests.cpp \
@@ -182,25 +201,7 @@ LOCAL_SRC_FILES := \
 	src/armnn/test/InstrumentTests.cpp \
 	src/armnn/test/ProfilingEventTest.cpp \
 	src/armnn/test/ObservableTest.cpp \
-	src/armnn/test/OptionalTest.cpp \
-	src/backends/test/WorkloadDataValidation.cpp \
-	src/backends/test/TensorCopyUtils.cpp \
-	src/backends/test/LayerTests.cpp \
-	src/backends/aclCommon/test/MemCopyTests.cpp \
-        src/backends/cl/test/ClCreateWorkloadTests.cpp \
-        src/backends/cl/test/ClLayerSupportTests.cpp \
-	src/backends/cl/test/ClLayerTests.cpp \
-        src/backends/cl/test/ClMemCopyTests.cpp \
-        src/backends/cl/test/Fp16SupportTest.cpp \
-        src/backends/cl/test/OpenClTimerTest.cpp \
-        src/backends/neon/test/NeonCreateWorkloadTests.cpp \
-        src/backends/neon/test/NeonLayerSupportTests.cpp \
-	src/backends/neon/test/NeonLayerTests.cpp \
-        src/backends/neon/test/NeonMemCopyTests.cpp \
-        src/backends/neon/test/NeonTimerTest.cpp \
-        src/backends/reference/test/RefCreateWorkloadTests.cpp \
-        src/backends/reference/test/RefLayerSupportTests.cpp \
-	src/backends/reference/test/RefLayerTests.cpp
+	src/armnn/test/OptionalTest.cpp
 
 LOCAL_STATIC_LIBRARIES := \
 	libneuralnetworks_common \

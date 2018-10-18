@@ -58,3 +58,12 @@ BACKEND_SOURCES := \
         workloads/RefSplitterUint8Workload.cpp \
         workloads/ResizeBilinear.cpp \
         workloads/Softmax.cpp
+
+# BACKEND_TEST_SOURCES contains the list of files to be included
+# in the Android unit test build (armnn-tests) and it is picked
+# up by the Android.mk file in the root of ArmNN
+
+BACKEND_TEST_SOURCES := \
+        test/RefCreateWorkloadTests.cpp \
+        test/RefLayerSupportTests.cpp \
+        test/RefLayerTests.cpp

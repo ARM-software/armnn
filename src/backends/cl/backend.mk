@@ -37,3 +37,15 @@ BACKEND_SOURCES := \
         workloads/ClSoftmaxFloatWorkload.cpp \
         workloads/ClSoftmaxUint8Workload.cpp \
         workloads/ClSubtractionWorkload.cpp
+
+# BACKEND_TEST_SOURCES contains the list of files to be included
+# in the Android unit test build (armnn-tests) and it is picked
+# up by the Android.mk file in the root of ArmNN
+
+BACKEND_TEST_SOURCES := \
+        test/ClCreateWorkloadTests.cpp \
+        test/ClLayerSupportTests.cpp \
+        test/ClLayerTests.cpp \
+        test/ClMemCopyTests.cpp \
+        test/Fp16SupportTest.cpp \
+        test/OpenClTimerTest.cpp

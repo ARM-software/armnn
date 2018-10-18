@@ -15,3 +15,10 @@ COMMON_SOURCES := \
     memory/OffsetLifetimeManager.cpp \
     memory/OffsetMemoryPool.cpp \
     memory/PoolManager.cpp
+
+# COMMON_TEST_SOURCES contains the list of files to be included
+# in the Android unit test build (armnn-tests) and it is picked
+# up by the Android.mk file in the root of ArmNN
+
+COMMON_TEST_SOURCES := \
+    test/MemCopyTests.cpp

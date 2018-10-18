@@ -34,3 +34,14 @@ BACKEND_SOURCES := \
         workloads/NeonSoftmaxFloatWorkload.cpp \
         workloads/NeonSoftmaxUint8Workload.cpp \
         workloads/NeonSubtractionFloatWorkload.cpp
+
+# BACKEND_TEST_SOURCES contains the list of files to be included
+# in the Android unit test build (armnn-tests) and it is picked
+# up by the Android.mk file in the root of ArmNN
+
+BACKEND_TEST_SOURCES := \
+        test/NeonCreateWorkloadTests.cpp \
+        test/NeonLayerSupportTests.cpp \
+        test/NeonLayerTests.cpp \
+        test/NeonMemCopyTests.cpp \
+        test/NeonTimerTest.cpp

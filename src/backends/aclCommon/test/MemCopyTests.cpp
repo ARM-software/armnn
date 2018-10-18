@@ -9,11 +9,12 @@
 
 #if ARMCOMPUTECL_ENABLED && ARMCOMPUTENEON_ENABLED
 #include <backends/aclCommon/test/MemCopyTestImpl.hpp>
+#include <backends/cl/test/ClContextControlFixture.hpp>
 #endif
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(MemCopyTestSuite)
+BOOST_AUTO_TEST_SUITE(MemCopyCommon)
 
 BOOST_AUTO_TEST_CASE(AclTypeConversions)
 {
@@ -34,7 +35,11 @@ BOOST_AUTO_TEST_CASE(AclTypeConversions)
     BOOST_TEST(convertedshape[3] == 5);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
 #if ARMCOMPUTECL_ENABLED && ARMCOMPUTENEON_ENABLED
+
+BOOST_FIXTURE_TEST_SUITE(MemCopyClNeon, ClContextControlFixture)
 
 BOOST_AUTO_TEST_CASE(CopyBetweenNeonAndGpu)
 {
@@ -60,6 +65,6 @@ BOOST_AUTO_TEST_CASE(CopyBetweenGpuAndNeonWithSubtensors)
     BOOST_TEST(CompareTensors(result.output, result.outputExpected));
 }
 
-#endif
-
 BOOST_AUTO_TEST_SUITE_END()
+
+#endif

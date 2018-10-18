@@ -23,12 +23,20 @@ arm_compute::Status ClBatchNormalizationValidate(const TensorInfo& input,
                                                  const TensorInfo& gamma,
                                                  const BatchNormalizationDescriptor &desc)
 {
-    const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
-    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
-    const arm_compute::TensorInfo aclMeanInfo = BuildArmComputeTensorInfo(mean);
-    const arm_compute::TensorInfo aclVarInfo = BuildArmComputeTensorInfo(var);
-    const arm_compute::TensorInfo aclBetaInfo = BuildArmComputeTensorInfo(beta);
-    const arm_compute::TensorInfo aclGammaInfo = BuildArmComputeTensorInfo(gamma);
+    const DataLayout dataLayout = desc.m_DataLayout.GetDataLayout();
+
+    const arm_compute::TensorInfo aclInputInfo =
+          armcomputetensorutils::BuildArmComputeTensorInfo(input, dataLayout);
+    const arm_compute::TensorInfo aclOutputInfo =
+          armcomputetensorutils::BuildArmComputeTensorInfo(output, dataLayout);
+    const arm_compute::TensorInfo aclMeanInfo =
+          armcomputetensorutils::BuildArmComputeTensorInfo(mean, dataLayout);
+    const arm_compute::TensorInfo aclVarInfo =
+          armcomputetensorutils::BuildArmComputeTensorInfo(var, dataLayout);
+    const arm_compute::TensorInfo aclBetaInfo =
+          armcomputetensorutils::BuildArmComputeTensorInfo(beta, dataLayout);
+    const arm_compute::TensorInfo aclGammaInfo =
+          armcomputetensorutils::BuildArmComputeTensorInfo(gamma, dataLayout);
 
     return arm_compute::CLBatchNormalizationLayer::validate(&aclInputInfo,
                                                             &aclOutputInfo,
@@ -59,6 +67,10 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout.GetDataLayout());
+    input.info()->set_data_layout(aclDataLayout);
+    output.info()->set_data_layout(aclDataLayout);
 
     m_Layer.configure(&input,
                       &output,

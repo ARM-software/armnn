@@ -256,6 +256,7 @@ LayerTestResult<float, 4> ResizeBilinearMinNhwcTest(armnn::IWorkloadFactory& wor
 LayerTestResult<float, 4> ResizeBilinearMagNhwcTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> BatchNormTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> BatchNormNhwcTest(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 2> FakeQuantizationTest(armnn::IWorkloadFactory& workloadFactory);
 

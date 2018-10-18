@@ -153,30 +153,45 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
 }
 
 template <typename BatchNormalizationWorkloadType, typename armnn::DataType DataType>
-static void NeonCreateBatchNormalizationWorkloadTest()
+static void NeonCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph                graph;
     NeonWorkloadFactory  factory;
-    auto workload = CreateBatchNormalizationWorkloadTest<BatchNormalizationWorkloadType, DataType>(factory, graph);
+    auto workload = CreateBatchNormalizationWorkloadTest<BatchNormalizationWorkloadType, DataType>
+                    (factory, graph, dataLayout);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateBatchNormalizationWorkloadTest).
     BatchNormalizationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({2, 3, 1, 1}, DataType)));
-    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({2, 3, 1, 1}, DataType)));
+
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 4, 4} : TensorShape{2, 4, 4, 3};
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 4, 4} : TensorShape{2, 4, 4, 3};
+
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16Workload)
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16NchwWorkload)
 {
-    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float16>();
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float16>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16NhwcWorkload)
+{
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float16>(DataLayout::NHWC);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatWorkload)
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatNchwWorkload)
 {
-    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float32>();
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float32>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatNhwcWorkload)
+{
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float32>(DataLayout::NHWC);
 }
 
 template <typename armnn::DataType DataType>

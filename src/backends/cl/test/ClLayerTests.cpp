@@ -181,6 +181,7 @@ ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadca
 
 // Batch Norm
 ARMNN_AUTO_TEST_CASE(BatchNorm, BatchNormTest)
+ARMNN_AUTO_TEST_CASE(BatchNormNhwc, BatchNormNhwcTest)
 
 // L2 Normalization
 ARMNN_AUTO_TEST_CASE(L2Normalization1d, L2Normalization1dTest)

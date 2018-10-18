@@ -338,6 +338,7 @@ ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVector, MultiplicationBroadcast1DV
 
 // Batch Norm
 ARMNN_AUTO_TEST_CASE(BatchNorm, BatchNormTest)
+ARMNN_AUTO_TEST_CASE(BatchNormNhwc, BatchNormNhwcTest)
 
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)

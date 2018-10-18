@@ -293,7 +293,7 @@ struct BatchNormalizationDescriptor
     {}
 
     float m_Eps;
-    DataLayout m_DataLayout;
+    DataLayoutIndexed m_DataLayout;
 };
 
 struct FakeQuantizationDescriptor

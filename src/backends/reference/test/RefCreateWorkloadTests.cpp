@@ -157,13 +157,13 @@ static void RefCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
     switch (dataLayout)
     {
         case DataLayout::NHWC:
-            inputShape  = { 2, 1, 1, 3 };
-            outputShape = { 2, 1, 1, 3 };
+            inputShape  = { 2, 4, 4, 3 };
+            outputShape = { 2, 4, 4, 3 };
             break;
         case DataLayout::NCHW:
         default:
-            inputShape  = { 2, 3, 1, 1 };
-            outputShape = { 2, 3, 1, 1 };
+            inputShape  = { 2, 3, 4, 4 };
+            outputShape = { 2, 3, 4, 4 };
             break;
     }
 

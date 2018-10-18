@@ -144,31 +144,53 @@ BOOST_AUTO_TEST_CASE(CreateDivisionFloat16WorkloadTest)
 }
 
 template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>
-static void ClCreateBatchNormalizationWorkloadTest()
+static void ClCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     ClWorkloadFactory factory;
 
     auto workload = CreateBatchNormalizationWorkloadTest<BatchNormalizationWorkloadType, DataType>
-                    (factory, graph);
+                    (factory, graph, dataLayout);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateBatchNormalizationWorkloadTest).
     BatchNormalizationQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {2, 3, 1, 1}));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {2, 3, 1, 1}));
+     switch (dataLayout)
+    {
+        case DataLayout::NHWC:
+            BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 2, 4, 4, 3 }));
+            BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 2, 4, 4, 3 }));
+            break;
+        default: // NCHW
+            BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 2, 3, 4, 4 }));
+            BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 2, 3, 4, 4 }));
+    }
 }
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatWorkload)
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatNchwWorkload)
 {
-    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloatWorkload, armnn::DataType::Float32>();
+    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloatWorkload,
+                                           armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16Workload)
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16NchwWorkload)
 {
-    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloatWorkload, armnn::DataType::Float16>();
+    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloatWorkload,
+                                           armnn::DataType::Float16>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatNhwcWorkload)
+{
+    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloatWorkload,
+                                           armnn::DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationNhwcFloat16NhwcWorkload)
+{
+    ClCreateBatchNormalizationWorkloadTest<ClBatchNormalizationFloatWorkload,
+                                           armnn::DataType::Float16>(DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_CASE(CreateConvertFp16ToFp32Workload)

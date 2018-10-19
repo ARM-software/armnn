@@ -40,9 +40,7 @@ ClDivisionFloatWorkload::ClDivisionFloatWorkload(const DivisionQueueDescriptor& 
 void ClDivisionFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClDivisionFloatWorkload_Execute");
-
-    // Executes the layer.
-    m_ArithmeticDivision.run();
+    RunClFunction(m_ArithmeticDivision, CHECK_LOCATION());
 }
 
 } //namespace armnn

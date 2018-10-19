@@ -32,7 +32,7 @@ ClAdditionWorkload::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor
 void ClAdditionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClAdditionWorkload_Execute");
-    m_Layer.run();
+    RunClFunction(m_Layer, CHECK_LOCATION());
 }
 
 arm_compute::Status ClAdditionValidate(const TensorInfo& input0,

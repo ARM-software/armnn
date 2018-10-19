@@ -106,8 +106,7 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
 void ClConvolution2dWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClConvolution2dWorkload_Execute");
-
-    m_ConvolutionLayer.run();
+    RunClFunction(m_ConvolutionLayer, CHECK_LOCATION());
 }
 
 void ClConvolution2dWorkload::FreeUnusedTensors()

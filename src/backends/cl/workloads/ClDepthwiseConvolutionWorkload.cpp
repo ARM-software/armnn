@@ -137,7 +137,7 @@ void ClDepthwiseConvolutionWorkload::Execute() const
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClDepthwiseConvolutionWorkload_Execute");
     BOOST_ASSERT(m_DepthwiseConvolutionLayer);
 
-    m_DepthwiseConvolutionLayer->run();
+    RunClFunction(*m_DepthwiseConvolutionLayer, CHECK_LOCATION());
 }
 
 } // namespace armnn

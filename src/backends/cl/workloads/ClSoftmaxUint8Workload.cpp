@@ -36,8 +36,7 @@ ClSoftmaxUint8Workload::ClSoftmaxUint8Workload(const SoftmaxQueueDescriptor& des
 void ClSoftmaxUint8Workload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClSoftmaxUint8Workload_Execute");
-
-    m_SoftmaxLayer.run();
+    RunClFunction(m_SoftmaxLayer, CHECK_LOCATION());
 }
 
 } //namespace armnn

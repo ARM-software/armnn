@@ -49,7 +49,7 @@ ClNormalizationFloatWorkload::ClNormalizationFloatWorkload(const NormalizationQu
 void ClNormalizationFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClNormalizationFloatWorkload_Execute");
-    m_NormalizationLayer.run();
+    RunClFunction(m_NormalizationLayer, CHECK_LOCATION());
 }
 
 } //namespace armnn

@@ -51,7 +51,7 @@ ClPooling2dWorkload::ClPooling2dWorkload(
 void ClPooling2dWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClPooling2dWorkload_Execute");
-    m_PoolingLayer.run();
+    RunClFunction(m_PoolingLayer, CHECK_LOCATION());
 }
 
 }

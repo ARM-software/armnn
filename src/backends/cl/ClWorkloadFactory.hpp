@@ -132,6 +132,16 @@ public:
 private:
 
 #ifdef ARMCOMPUTECL_ENABLED
+    template<typename FloatWorkload, typename Uint8Workload, typename QueueDescriptorType, typename... Args>
+    static std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor,
+                                                   const WorkloadInfo& info,
+                                                   Args&&... args);
+
+    template <typename Workload, typename QueueDescriptorType, typename... Args>
+    static std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor,
+                                                   const WorkloadInfo& info,
+                                                   Args&&... args);
+
     mutable ClMemoryManager m_MemoryManager;
 #endif
 };

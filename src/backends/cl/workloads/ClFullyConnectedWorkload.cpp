@@ -84,7 +84,7 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(const FullyConnectedQueueDesc
 void ClFullyConnectedWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClFullyConnectedWorkload_Execute");
-    m_FullyConnectedLayer.run();
+    RunClFunction(m_FullyConnectedLayer, CHECK_LOCATION());
 }
 
 void ClFullyConnectedWorkload::FreeUnusedTensors()

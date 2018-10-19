@@ -53,7 +53,7 @@ ClActivationWorkload::ClActivationWorkload(const ActivationQueueDescriptor& desc
 void ClActivationWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClActivationWorkload_Execute");
-    m_ActivationLayer.run();
+    RunClFunction(m_ActivationLayer, CHECK_LOCATION());
 }
 
 } //namespace armnn

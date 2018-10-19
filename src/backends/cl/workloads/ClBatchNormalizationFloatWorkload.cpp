@@ -94,7 +94,7 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
 void ClBatchNormalizationFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClBatchNormalizationFloatWorkload_Execute");
-    m_Layer.run();
+    RunClFunction(m_Layer, CHECK_LOCATION());
 }
 
 void ClBatchNormalizationFloatWorkload::FreeUnusedTensors()

@@ -27,7 +27,7 @@ ClSoftmaxFloatWorkload::ClSoftmaxFloatWorkload(const SoftmaxQueueDescriptor& des
 void ClSoftmaxFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClSoftmaxFloatWorkload_Execute");
-    m_SoftmaxLayer.run();
+    RunClFunction(m_SoftmaxLayer, CHECK_LOCATION());
 }
 
 } //namespace armnn

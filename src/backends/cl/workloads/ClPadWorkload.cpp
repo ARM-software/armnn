@@ -37,7 +37,7 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor, const Workloa
 void ClPadWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClPadWorkload_Execute");
-    m_Layer.run();
+    RunClFunction(m_Layer, CHECK_LOCATION());
 }
 
 arm_compute::Status ClPadValidate(const TensorInfo& input,

@@ -32,7 +32,7 @@ ClSubtractionWorkload::ClSubtractionWorkload(const SubtractionQueueDescriptor& d
 void ClSubtractionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClSubtractionWorkload_Execute");
-    m_Layer.run();
+    RunClFunction(m_Layer, CHECK_LOCATION());
 }
 
 arm_compute::Status ClSubtractionValidate(const TensorInfo& input0,

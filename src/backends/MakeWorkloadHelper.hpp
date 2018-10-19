@@ -39,7 +39,9 @@ struct MakeWorkloadForType<NullWorkload>
 // Specify type void as the WorkloadType for unsupported DataType/WorkloadType combos.
 template <typename Float16Workload, typename Float32Workload, typename Uint8Workload, typename QueueDescriptorType,
     typename... Args>
-std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor, const WorkloadInfo& info, Args&&... args)
+std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descriptor,
+                                              const WorkloadInfo& info,
+                                              Args&&... args)
 {
     const DataType dataType = !info.m_InputTensorInfos.empty() ?
         info.m_InputTensorInfos[0].GetDataType()
@@ -67,9 +69,11 @@ std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor, c
 // FloatWorkload, Uint8Workload>.
 // Specify type void as the WorkloadType for unsupported DataType/WorkloadType combos.
 template <typename FloatWorkload, typename Uint8Workload, typename QueueDescriptorType, typename... Args>
-std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor, const WorkloadInfo& info, Args&&... args)
+std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descriptor,
+                                              const WorkloadInfo& info,
+                                              Args&&... args)
 {
-    return MakeWorkload<FloatWorkload, FloatWorkload, Uint8Workload>(descriptor, info,
+    return MakeWorkloadHelper<FloatWorkload, FloatWorkload, Uint8Workload>(descriptor, info,
        std::forward<Args>(args)...);
 }
 

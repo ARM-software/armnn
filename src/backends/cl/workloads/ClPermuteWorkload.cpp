@@ -45,7 +45,7 @@ ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
 void ClPermuteWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL( GetName() + "_Execute");
-    m_PermuteFunction.run();
+    RunClFunction(m_PermuteFunction, CHECK_LOCATION());
 }
 
 } // namespace armnn

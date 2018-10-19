@@ -18,7 +18,7 @@ template <typename F32Workload, typename U8Workload, typename QueueDescriptorTyp
 std::unique_ptr<IWorkload> RefWorkloadFactory::MakeWorkload(const QueueDescriptorType& descriptor,
     const WorkloadInfo& info) const
 {
-    return armnn::MakeWorkload<NullWorkload, F32Workload, U8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload>(descriptor, info);
 }
 
 RefWorkloadFactory::RefWorkloadFactory()
@@ -114,7 +114,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&           info) const
 {
-    return armnn::MakeWorkload<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteUint8Workload>
+    return MakeWorkloadHelper<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteUint8Workload>
         (descriptor, info);
 }
 

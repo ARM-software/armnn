@@ -10,6 +10,10 @@
 #include <backends/cl/OpenClTimer.hpp>
 #include <backends/CpuTensorHandle.hpp>
 
+#include <arm_compute/runtime/CL/CLFunctions.h>
+
+#include <sstream>
+
 #define ARMNN_SCOPED_PROFILING_EVENT_CL(name) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::GpuAcc, \
                                                   name, \
@@ -59,5 +63,25 @@ inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
             BOOST_ASSERT_MSG(false, "Unexpected tensor type.");
     }
 };
+
+inline RuntimeException WrapClError(const cl::Error& clError, const CheckLocation& location)
+{
+    std::stringstream message;
+    message << "CL error: " << clError.what() << ". Error code: " << clError.err();
+
+    return RuntimeException(message.str(), location);
+}
+
+inline void RunClFunction(arm_compute::IFunction& function, const CheckLocation& location)
+{
+    try
+    {
+        function.run();
+    }
+    catch (cl::Error& error)
+    {
+        throw WrapClError(error, location);
+    }
+}
 
 } //namespace armnn

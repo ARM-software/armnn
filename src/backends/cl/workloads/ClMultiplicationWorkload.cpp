@@ -52,9 +52,7 @@ ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDesc
 void ClMultiplicationWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClMultiplicationWorkload_Execute");
-
-    // Executes the layer.
-    m_PixelWiseMultiplication.run();
+    RunClFunction(m_PixelWiseMultiplication, CHECK_LOCATION());
 }
 
 } //namespace armnn

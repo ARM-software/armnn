@@ -29,7 +29,7 @@ ClConvertFp32ToFp16Workload::ClConvertFp32ToFp16Workload(
 void ClConvertFp32ToFp16Workload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClConvertFp32ToFp16Workload_Execute");
-    m_Layer.run();
+    RunClFunction(m_Layer, CHECK_LOCATION());
 }
 
 arm_compute::Status ClConvertFp32ToFp16WorkloadValidate(const TensorInfo& input, const TensorInfo& output)

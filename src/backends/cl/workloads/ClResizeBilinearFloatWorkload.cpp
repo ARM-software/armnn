@@ -38,8 +38,7 @@ ClResizeBilinearFloatWorkload::ClResizeBilinearFloatWorkload(const ResizeBilinea
 void ClResizeBilinearFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClResizeBilinearFloatWorkload_Execute");
-    m_ResizeBilinearLayer.run();
+    RunClFunction(m_ResizeBilinearLayer, CHECK_LOCATION());
 }
-
 
 } //namespace armnn

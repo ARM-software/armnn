@@ -110,6 +110,11 @@ class BadOptionalAccessException : public Exception
     using Exception::Exception;
 };
 
+class RuntimeException : public Exception
+{
+    using Exception::Exception;
+};
+
 template <typename ExceptionType>
 void ConditionalThrow(bool condition, const std::string& message)
 {

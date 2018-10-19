@@ -11,10 +11,6 @@
 #include "Profiling.hpp"
 #include "HeapProfiling.hpp"
 
-#ifdef ARMCOMPUTECL_ENABLED
-#include <arm_compute/core/CL/OpenCL.h>
-#endif
-
 #include <backends/CpuTensorHandle.hpp>
 
 #include <boost/polymorphic_cast.hpp>
@@ -38,15 +34,6 @@ std::string ToErrorMessage(const char * prefix, const ExceptionType & error)
     return ss.str();
 }
 
-#if ARMCOMPUTECL_ENABLED
-std::string ToErrorMessage(const char * prefix, const cl::Error& error)
-{
-    std::stringstream ss;
-    ss << prefix << " " << error.what() << ".  CL error code is: " << error.err();
-    return ss.str();
-}
-#endif
-
 } // anonymous
 
 std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
@@ -54,30 +41,30 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 {
     std::unique_ptr<LoadedNetwork> loadedNetwork;
 
+    auto Fail = [&](const std::exception& error) -> std::unique_ptr<LoadedNetwork>
+    {
+        errorMessage = ToErrorMessage("An error occurred when preparing the network workloads: ", error);
+        BOOST_LOG_TRIVIAL(error) << errorMessage;
+
+        return std::unique_ptr<LoadedNetwork>();
+    };
+
     try
     {
         loadedNetwork.reset(new LoadedNetwork(std::move(net)));
     }
-    catch (const std::runtime_error& error)
+    catch (const armnn::RuntimeException& error)
     {
-        errorMessage = ToErrorMessage("An error occurred when preparing the network workloads: ", error);
-        BOOST_LOG_TRIVIAL(error) << errorMessage;
-        return std::unique_ptr<LoadedNetwork>();
+        return Fail(error);
     }
     catch (const armnn::Exception& error)
     {
-        errorMessage = ToErrorMessage("An error occurred when preparing the network workloads: ", error);
-        BOOST_LOG_TRIVIAL(error) << errorMessage;
-        return std::unique_ptr<LoadedNetwork>();
+        return Fail(error);
     }
-#if ARMCOMPUTECL_ENABLED
-    catch (const cl::Error& error)
+    catch (const std::runtime_error& error)
     {
-        errorMessage = ToErrorMessage("A CL error occurred attempting to prepare a network workload: ", error);
-        BOOST_LOG_TRIVIAL(error) << errorMessage;
-        return std::unique_ptr<LoadedNetwork>();
+        return Fail(error);
     }
-#endif
 
     return loadedNetwork;
 }
@@ -420,6 +407,12 @@ bool LoadedNetwork::Execute()
     m_CpuAcc.Acquire();
     m_GpuAcc.Acquire();
 
+    auto Fail = [&](const std::exception& error)
+    {
+        BOOST_LOG_TRIVIAL(error) << "An error occurred attempting to execute a workload: " << error.what();
+        success = false;
+    };
+
     try
     {
         for (size_t i = 0; i < m_WorkloadQueue.size(); ++i)
@@ -427,18 +420,13 @@ bool LoadedNetwork::Execute()
             m_WorkloadQueue[i]->Execute();
         }
     }
-#if ARMCOMPUTECL_ENABLED
-    catch (const cl::Error& error)
+    catch (const RuntimeException& error)
     {
-        BOOST_LOG_TRIVIAL(error) << "A CL error occurred attempting to execute a workload: "
-            << error.what() << ". CL error code is: " << error.err();
-        success = false;
+        Fail(error);
     }
-#endif
     catch (const std::runtime_error& error)
     {
-        BOOST_LOG_TRIVIAL(error) << "An error occurred attempting to execute a workload: " << error.what();
-        success = false;
+        Fail(error);
     }
 
     // Informs the memory managers to release memory in it's respective memory group

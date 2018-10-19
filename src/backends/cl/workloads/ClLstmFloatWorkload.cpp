@@ -217,7 +217,7 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor, 
 void ClLstmFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClLstmFloatWorkload_Execute");
-    m_LstmLayer.run();
+    RunClFunction(m_LstmLayer, CHECK_LOCATION());
 }
 
 arm_compute::Status ClLstmFloatWorkloadValidate(const TensorInfo& input, const TensorInfo& outputStateIn,

@@ -26,7 +26,7 @@ ClReshapeWorkload::ClReshapeWorkload(const ReshapeQueueDescriptor& descriptor, c
 void ClReshapeWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL("ClReshapeWorkload_Execute");
-    m_Layer.run();
+    RunClFunction(m_Layer, CHECK_LOCATION());
 }
 
 } //namespace armnn

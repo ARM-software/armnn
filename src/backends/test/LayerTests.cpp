@@ -5585,17 +5585,22 @@ LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize3x3Stride2x4Uint8Test(armnn::I
 
 LayerTestResult<float, 4> SimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory)
 {
-    return SimpleAveragePooling2dTestCommon<float>(workloadFactory);
+    return SimpleAveragePooling2dTest<float>(workloadFactory);
 }
 
 LayerTestResult<float, 4> SimpleAveragePooling2dNhwcTest(armnn::IWorkloadFactory& workloadFactory)
 {
-    return SimpleAveragePooling2dNhwcTestCommon<float>(workloadFactory);
+    return SimpleAveragePooling2dNhwcTest<float>(workloadFactory);
 }
 
 LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
 {
-    return SimpleAveragePooling2dTestCommon<uint8_t>(workloadFactory, 0.5, -1);
+    return SimpleAveragePooling2dTest<uint8_t>(workloadFactory, 0.5, -1);
+}
+
+LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8NhwcTest(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SimpleAveragePooling2dNhwcTest<uint8_t>(workloadFactory, 0.5, -1);
 }
 
 LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(armnn::IWorkloadFactory& workloadFactory,

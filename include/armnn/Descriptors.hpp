@@ -194,7 +194,7 @@ struct Pooling2dDescriptor
     uint32_t            m_StrideY;
     OutputShapeRounding m_OutputShapeRounding;
     PaddingMethod       m_PaddingMethod;
-    DataLayout          m_DataLayout;
+    DataLayoutIndexed   m_DataLayout;
 };
 
 struct FullyConnectedDescriptor

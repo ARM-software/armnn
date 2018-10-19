@@ -609,6 +609,7 @@ std::unique_ptr<Pooling2dWorkload> CreatePooling2dWorkloadTest(armnn::IWorkloadF
     BOOST_TEST(queueDescriptor.m_Parameters.m_PadRight == 2);
     BOOST_TEST(queueDescriptor.m_Parameters.m_PadTop == 1);
     BOOST_TEST(queueDescriptor.m_Parameters.m_PadBottom == 1);
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
@@ -856,7 +857,8 @@ std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::
             inputShape =  { 2, 4, 4, 3 };
             outputShape = { 2, 2, 2, 3 };
             break;
-        default: // NCHW
+        case DataLayout::NCHW:
+        default:
             inputShape =  { 2, 3, 4, 4 };
             outputShape = { 2, 3, 2, 2 };
     }

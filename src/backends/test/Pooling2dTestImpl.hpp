@@ -15,28 +15,44 @@
 #include <algorithm>
 
 template<typename T>
-LayerTestResult<T, 4> SimplePooling2dTestImpl(
-                                              armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<T, 4> SimplePooling2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                               armnn::Pooling2dDescriptor descriptor,
                                               float qScale,
                                               int32_t qOffset,
                                               const boost::multi_array<T, 4>& input,
                                               const boost::multi_array<T, 4>& outputExpected)
 {
-    unsigned int inputHeight = boost::numeric_cast<unsigned int>(input.shape()[2]);
-    unsigned int inputWidth = boost::numeric_cast<unsigned int>(input.shape()[3]);
-    unsigned int inputChannels = boost::numeric_cast<unsigned int>(input.shape()[1]);
-    unsigned int inputBatchSize = boost::numeric_cast<unsigned int>(input.shape()[0]);
+    const unsigned int channelsIndex = descriptor.m_DataLayout.GetChannelsIndex();
+    const unsigned int heightIndex   = descriptor.m_DataLayout.GetHeightIndex();
+    const unsigned int widthIndex    = descriptor.m_DataLayout.GetWidthIndex();
 
-    unsigned int outputHeight = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
-    unsigned int outputWidth = boost::numeric_cast<unsigned int>(outputExpected.shape()[3]);
-    unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
+    unsigned int inputHeight     = boost::numeric_cast<unsigned int>(input.shape()[heightIndex]);
+    unsigned int inputWidth      = boost::numeric_cast<unsigned int>(input.shape()[widthIndex]);
+    unsigned int inputChannels   = boost::numeric_cast<unsigned int>(input.shape()[channelsIndex]);
+    unsigned int inputBatchSize  = boost::numeric_cast<unsigned int>(input.shape()[0]);
+
+    unsigned int outputHeight    = boost::numeric_cast<unsigned int>(outputExpected.shape()[heightIndex]);
+    unsigned int outputWidth     = boost::numeric_cast<unsigned int>(outputExpected.shape()[widthIndex]);
+    unsigned int outputChannels  = boost::numeric_cast<unsigned int>(outputExpected.shape()[channelsIndex]);
     unsigned int outputBatchSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
 
-    armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth },
-        armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth },
-        armnn::GetDataType<T>());
+    armnn::TensorShape inputTensorShape;
+    armnn::TensorShape outputTensorShape;
+
+    switch (descriptor.m_DataLayout.GetDataLayout())
+    {
+        case armnn::DataLayout::NHWC:
+            inputTensorShape = { inputBatchSize, inputHeight, inputWidth, inputChannels };
+            outputTensorShape = { outputBatchSize, outputHeight, outputWidth, outputChannels };
+            break;
+        case armnn::DataLayout::NCHW:
+        default:
+            inputTensorShape = { inputBatchSize, inputChannels, inputHeight, inputWidth };
+            outputTensorShape = { outputBatchSize, outputChannels, outputHeight, outputWidth };
+    }
+
+    armnn::TensorInfo inputTensorInfo(inputTensorShape, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo(outputTensorShape, armnn::GetDataType<T>());
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -54,79 +70,7 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
 
     armnn::Pooling2dQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters = descriptor;
-    armnn::WorkloadInfo workloadInfo;
-    AddInputToWorkload(queueDescriptor, workloadInfo, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
-
-    // Don't execute if Pooling is not supported, as an exception will be raised.
-    armnn::Compute compute = workloadFactory.GetCompute();
-    const size_t reasonIfUnsupportedMaxLen = 255;
-    char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    result.supported = armnn::IsPooling2dSupported(compute, inputTensorInfo, outputTensorInfo,
-                                                   queueDescriptor.m_Parameters,
-                                                   reasonIfUnsupported, reasonIfUnsupportedMaxLen);
-    if (!result.supported)
-    {
-        return result;
-    }
-
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePooling2d(queueDescriptor, workloadInfo);
-
-    inputHandle->Allocate();
-    outputHandle->Allocate();
-
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
-
-    workload->Execute();
-
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
-
-    result.outputExpected = outputExpected;
-
-    return result;
-}
-
-template<typename T>
-LayerTestResult<T, 4> SimplePooling2dNhwcTestImpl(
-                                                  armnn::IWorkloadFactory& workloadFactory,
-                                                  armnn::Pooling2dDescriptor descriptor,
-                                                  float qScale,
-                                                  int32_t qOffset,
-                                                  const boost::multi_array<T, 4>& input,
-                                                  const boost::multi_array<T, 4>& outputExpected)
-{
-    unsigned int inputHeight = boost::numeric_cast<unsigned int>(input.shape()[1]);
-    unsigned int inputWidth = boost::numeric_cast<unsigned int>(input.shape()[2]);
-    unsigned int inputChannels = boost::numeric_cast<unsigned int>(input.shape()[3]);
-    unsigned int inputBatchSize = boost::numeric_cast<unsigned int>(input.shape()[0]);
-
-    unsigned int outputHeight = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
-    unsigned int outputWidth = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
-    unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[3]);
-    unsigned int outputBatchSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
-
-    armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputHeight, inputWidth, inputChannels },
-                                      armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputHeight, outputWidth, outputChannels },
-                                       armnn::GetDataType<T>());
-
-    // Set quantization parameters if the requested type is a quantized type.
-    if(armnn::IsQuantizedType<T>())
-    {
-        inputTensorInfo.SetQuantizationScale(qScale);
-        inputTensorInfo.SetQuantizationOffset(qOffset);
-        outputTensorInfo.SetQuantizationScale(qScale);
-        outputTensorInfo.SetQuantizationOffset(qOffset);
-    }
-
-    LayerTestResult<T, 4> result(outputTensorInfo);
-
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
-    armnn::Pooling2dQueueDescriptor queueDescriptor;
-    queueDescriptor.m_Parameters = descriptor;
-    queueDescriptor.m_Parameters.m_DataLayout = armnn::DataLayout::NHWC;
+    queueDescriptor.m_Parameters.m_DataLayout = descriptor.m_DataLayout;
 
     armnn::WorkloadInfo workloadInfo;
     AddInputToWorkload(queueDescriptor, workloadInfo, inputTensorInfo, inputHandle.get());
@@ -291,6 +235,9 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(armnn::IWorkl
 
 template<typename T>
 LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
+                                                       const armnn::TensorShape& inputTensorShape,
+                                                       const armnn::TensorShape& outputTensorShape,
+                                                       armnn::DataLayout dataLayout,
                                                        float qScale = 1.0f,
                                                        int32_t qOffset = 0)
 {
@@ -303,9 +250,10 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(armnn::IWorkloadFactory& 
     descriptor.m_PadTop = 1;
     descriptor.m_PadBottom = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo(inputTensorShape, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo(outputTensorShape, armnn::GetDataType<T>());
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -335,54 +283,33 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(armnn::IWorkloadFactory& 
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleAveragePooling2dNhwcTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                           float qScale = 1.0f,
-                                                           int32_t qOffset = 0)
+LayerTestResult<T, 4> SimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory,
+                                                 float qScale = 1.0f,
+                                                 int32_t qOffset = 0)
 {
-    armnn::Pooling2dDescriptor descriptor;
-    descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
-    descriptor.m_PoolWidth = descriptor.m_PoolHeight = 2;
-    descriptor.m_StrideX = descriptor.m_StrideY = 2;
-    descriptor.m_PadLeft = 1;
-    descriptor.m_PadRight = 1;
-    descriptor.m_PadTop = 1;
-    descriptor.m_PadBottom = 1;
-    descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    const armnn::TensorShape inputTensorShape  { 1, 1, 4, 4 };
+    const armnn::TensorShape outputTensorShape { 1, 1, 3, 3 };
 
-    armnn::TensorInfo inputTensorInfo({ 1, 4, 4, 1 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 3, 1 }, armnn::GetDataType<T>());
+    return SimpleAveragePooling2dTestCommon<T>(workloadFactory, inputTensorShape, outputTensorShape,
+                                               armnn::DataLayout::NCHW, qScale, qOffset);
+}
 
-    // Set quantization parameters if the requested type is a quantized type.
-    if(armnn::IsQuantizedType<T>())
-    {
-        inputTensorInfo.SetQuantizationScale(qScale);
-        inputTensorInfo.SetQuantizationOffset(qOffset);
-        outputTensorInfo.SetQuantizationScale(qScale);
-        outputTensorInfo.SetQuantizationOffset(qOffset);
-    }
+template<typename T>
+LayerTestResult<T, 4> SimpleAveragePooling2dNhwcTest(armnn::IWorkloadFactory& workloadFactory,
+                                                     float qScale = 1.0f,
+                                                     int32_t qOffset = 0)
+{
+    const armnn::TensorShape inputTensorShape  { 1, 4, 4, 1 };
+    const armnn::TensorShape outputTensorShape { 1, 3, 3, 1 };
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo,
-                                  QuantizedVector<T>(qScale, qOffset, {
-                                          1.0f, 2.0f, 3.0f, 4.0f,
-                                          1.0f, 2.0f, 3.0f, 4.0f,
-                                          1.0f, 2.0f, 3.0f, 4.0f,
-                                          1.0f, 2.0f, 3.0f, 4.0f,
-                                  }));
-
-    auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                           QuantizedVector<T>(qScale, qOffset, {
-                                                   1.0f, 2.5f, 4.0f,
-                                                   1.0f, 2.5f, 4.0f,
-                                                   1.0f, 2.5f, 4.0f,
-                                           }));
-
-    return SimplePooling2dNhwcTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimpleAveragePooling2dTestCommon<T>(workloadFactory, inputTensorShape, outputTensorShape,
+                                               armnn::DataLayout::NHWC, qScale, qOffset);
 }
 
 template<typename T>
 LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                       float qScale = 1.0f,
-                                                       int32_t qOffset = 0)
+                                                             float qScale = 1.0f,
+                                                             int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;

@@ -143,12 +143,16 @@ void Pooling2d(const float* in,
                const TensorInfo& outputInfo,
                const Pooling2dDescriptor& params)
 {
+    const unsigned int channelsIndex = params.m_DataLayout.GetChannelsIndex();
+    const unsigned int heightIndex   = params.m_DataLayout.GetHeightIndex();
+    const unsigned int widthIndex    = params.m_DataLayout.GetWidthIndex();
+
     const int batchSize    = boost::numeric_cast<int>(outputInfo.GetShape()[0]);
-    const int channels     = boost::numeric_cast<int>(outputInfo.GetShape()[1]);
-    const int heightOutput = boost::numeric_cast<int>(outputInfo.GetShape()[2]);
-    const int widthOutput  = boost::numeric_cast<int>(outputInfo.GetShape()[3]);
-    const int heightInput  = boost::numeric_cast<int>(inputInfo.GetShape()[2]);
-    const int widthInput   = boost::numeric_cast<int>(inputInfo.GetShape()[3]);
+    const int channels     = boost::numeric_cast<int>(outputInfo.GetShape()[channelsIndex]);
+    const int heightOutput = boost::numeric_cast<int>(outputInfo.GetShape()[heightIndex]);
+    const int widthOutput  = boost::numeric_cast<int>(outputInfo.GetShape()[widthIndex]);
+    const int heightInput  = boost::numeric_cast<int>(inputInfo.GetShape()[heightIndex]);
+    const int widthInput   = boost::numeric_cast<int>(inputInfo.GetShape()[widthIndex]);
     const int padLeft      = boost::numeric_cast<int>(params.m_PadLeft);
     const int padRight     = boost::numeric_cast<int>(params.m_PadRight);
     const int padTop       = boost::numeric_cast<int>(params.m_PadTop);

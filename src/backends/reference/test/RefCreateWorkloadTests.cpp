@@ -308,27 +308,51 @@ BOOST_AUTO_TEST_CASE(CreateRefNormalizationNhwcWorkload)
 }
 
 template <typename Pooling2dWorkloadType, armnn::DataType DataType>
-static void RefCreatePooling2dWorkloadTest()
+static void RefCreatePooling2dWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreatePooling2dWorkloadTest<Pooling2dWorkloadType, DataType>(factory, graph);
+    auto workload = CreatePooling2dWorkloadTest<Pooling2dWorkloadType, DataType>(factory, graph, dataLayout);
+
+    TensorShape inputShape;
+    TensorShape outputShape;
+
+    switch (dataLayout)
+    {
+        case DataLayout::NHWC:
+            inputShape  = { 3, 5, 5, 2 };
+            outputShape = { 3, 2, 4, 2 };
+            break;
+        case DataLayout::NCHW:
+        default:
+            inputShape =  { 3, 2, 5, 5 };
+            outputShape = { 3, 2, 2, 4 };
+    }
 
     // Checks that outputs and inputs are as we expect them (see definition of CreatePooling2dWorkloadTest).
-    CheckInputOutput(
-        std::move(workload),
-        TensorInfo({3, 2, 5, 5}, DataType),
-        TensorInfo({3, 2, 2, 4}, DataType));
+    CheckInputOutput(std::move(workload),
+                     TensorInfo(inputShape, DataType),
+                     TensorInfo(outputShape, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat32Workload)
 {
-    RefCreatePooling2dWorkloadTest<RefPooling2dFloat32Workload, armnn::DataType::Float32>();
+    RefCreatePooling2dWorkloadTest<RefPooling2dFloat32Workload, armnn::DataType::Float32>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreatePooling2dFloat32NhwcWorkload)
+{
+    RefCreatePooling2dWorkloadTest<RefPooling2dFloat32Workload, armnn::DataType::Float32>(DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8Workload)
 {
-    RefCreatePooling2dWorkloadTest<RefPooling2dUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    RefCreatePooling2dWorkloadTest<RefPooling2dUint8Workload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NhwcWorkload)
+{
+    RefCreatePooling2dWorkloadTest<RefPooling2dUint8Workload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
 template <typename SoftmaxWorkloadType, armnn::DataType DataType>
@@ -496,16 +520,16 @@ static void RefCreateResizeBilinearTest(DataLayout dataLayout)
             inputShape  = { 2, 4, 4, 3 };
             outputShape = { 2, 2, 2, 3 };
             break;
-        default: // NCHW
+        case DataLayout::NCHW:
+        default:
             inputShape  = { 2, 3, 4, 4 };
             outputShape = { 2, 3, 2, 2 };
     }
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateResizeBilinearWorkloadTest).
-    CheckInputOutput(
-            std::move(workload),
-            TensorInfo(inputShape, DataType),
-            TensorInfo(outputShape, DataType));
+    CheckInputOutput(std::move(workload),
+                     TensorInfo(inputShape, DataType),
+                     TensorInfo(outputShape, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32)

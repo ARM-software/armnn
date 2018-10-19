@@ -712,7 +712,8 @@ static void ClResizeBilinearWorkloadTest(DataLayout dataLayout)
             BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 2, 4, 4, 3 }));
             BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 2, 2, 2, 3 }));
             break;
-        default: // NCHW
+        case DataLayout::NCHW:
+        default:
             BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 2, 3, 4, 4 }));
             BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 2, 3, 2, 2 }));
     }

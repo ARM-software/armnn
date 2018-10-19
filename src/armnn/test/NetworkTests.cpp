@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(SerializeToDot)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec());
 
     std::ostringstream ss;
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuRefWorkloads)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec());
     static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph().AllocateDynamicBuffers();
     BOOST_CHECK(optNet);
@@ -503,7 +503,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuAccDeviceSupportLayerNoFallback)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuAcc };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
     // validate workloads
@@ -534,7 +534,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::GpuAcc };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
     // validate workloads
@@ -570,7 +570,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerNoFallback)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuAcc };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(!optNet);
 }
@@ -597,7 +597,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerWithFallback)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuAcc, armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc, armnn::Compute::CpuRef };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_REQUIRE(optNet);
 
@@ -676,7 +676,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDevice)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::Undefined };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::Undefined };
 
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(!optNet);
@@ -738,7 +738,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::Undefined, armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::Undefined, armnn::Compute::CpuRef };
 
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
@@ -774,7 +774,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuAcc,
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc,
                                              armnn::Compute::GpuAcc,
                                              armnn::Compute::CpuRef };
 
@@ -818,7 +818,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefPermuteLayer)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -851,7 +851,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefMeanLayer)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
     // build up the structure of the network
     armnn::INetworkPtr net(armnn::INetwork::Create());
@@ -909,7 +909,7 @@ BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnCpuRef)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
     armnn::OptimizerOptions optimizerOptions;
     optimizerOptions.m_ReduceFp32ToFp16 = true;
@@ -976,7 +976,7 @@ BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnGpuAcc)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::GpuAcc};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
 
     armnn::OptimizerOptions optimizerOptions;
     optimizerOptions.m_ReduceFp32ToFp16 = true;

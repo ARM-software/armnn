@@ -3,15 +3,15 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
-#include "armnn/ArmNN.hpp"
+#include <armnn/ArmNN.hpp>
 
 #if defined(ARMNN_TF_LITE_PARSER)
-#include "armnnTfLiteParser/ITfLiteParser.hpp"
+#include <armnnTfLiteParser/ITfLiteParser.hpp>
 #endif
 
 #include <HeapProfiling.hpp>
 #if defined(ARMNN_ONNX_PARSER)
-#include "armnnOnnxParser/IOnnxParser.hpp"
+#include <armnnOnnxParser/IOnnxParser.hpp>
 #endif
 
 #include <boost/exception/exception.hpp>
@@ -20,6 +20,7 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <map>
 #include <string>
@@ -40,7 +41,7 @@ struct Params
     std::string m_InputBinding;
     std::string m_OutputBinding;
     const armnn::TensorShape* m_InputTensorShape;
-    std::vector<armnn::Compute> m_ComputeDevice;
+    std::vector<armnn::BackendId> m_ComputeDevice;
     bool m_EnableProfiling;
     size_t m_SubgraphId;
     bool m_IsModelBinary;
@@ -195,8 +196,6 @@ inline armnn::OutputTensors MakeOutputTensors(const InferenceModelInternal::Bind
     return { { output.first, armnn::Tensor(output.second, outputTensorData.data()) } };
 }
 
-
-
 template <typename IParser, typename TDataType>
 class InferenceModel
 {
@@ -207,7 +206,7 @@ public:
     struct CommandLineOptions
     {
         std::string m_ModelDir;
-        std::vector<armnn::Compute> m_ComputeDevice;
+        std::vector<armnn::BackendId> m_ComputeDevice;
         bool m_VisualizePostOptimizationModel;
         bool m_EnableFp16TurboMode;
     };
@@ -216,11 +215,13 @@ public:
     {
         namespace po = boost::program_options;
 
+        std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuAcc, armnn::Compute::CpuRef};
+
         desc.add_options()
             ("model-dir,m", po::value<std::string>(&options.m_ModelDir)->required(),
                 "Path to directory containing model files (.caffemodel/.prototxt/.tflite)")
-            ("compute,c", po::value<std::vector<armnn::Compute>>(&options.m_ComputeDevice)->default_value
-                 ({armnn::Compute::CpuAcc, armnn::Compute::CpuRef}),
+            ("compute,c", po::value<std::vector<armnn::BackendId>>(&options.m_ComputeDevice)->default_value
+                (defaultBackends),
                 "Which device to run layers on by default. Possible choices: CpuAcc, CpuRef, GpuAcc")
             ("visualize-optimized-model,v",
                 po::value<bool>(&options.m_VisualizePostOptimizationModel)->default_value(false),

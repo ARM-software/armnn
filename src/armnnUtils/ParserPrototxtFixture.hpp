@@ -59,7 +59,7 @@ struct ParserPrototxtFixture
 
     std::string                                         m_Prototext;
     std::unique_ptr<TParser, void(*)(TParser* parser)>  m_Parser;
-    std::vector<std::pair<armnn::IRuntimePtr, armnn::Compute>> m_Runtimes;
+    std::vector<std::pair<armnn::IRuntimePtr, armnn::BackendId>> m_Runtimes;
     armnn::NetworkId                                    m_NetworkIdentifier;
 
     /// If the single-input-single-output overload of Setup() is called, these will store the input and output name

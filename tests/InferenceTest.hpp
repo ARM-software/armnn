@@ -4,8 +4,8 @@
 //
 #pragma once
 
-#include "armnn/ArmNN.hpp"
-#include "armnn/TypesUtils.hpp"
+#include <armnn/ArmNN.hpp>
+#include <armnn/TypesUtils.hpp>
 #include "InferenceModel.hpp"
 
 #include <Logging.hpp>
@@ -27,6 +27,20 @@ inline std::istream& operator>>(std::istream& in, armnn::Compute& compute)
         in.setstate(std::ios_base::failbit);
         throw boost::program_options::validation_error(boost::program_options::validation_error::invalid_option_value);
     }
+    return in;
+}
+
+inline std::istream& operator>>(std::istream& in, armnn::BackendId& backend)
+{
+    std::string token;
+    in >> token;
+    armnn::Compute compute = armnn::ParseComputeDevice(token.c_str());
+    if (compute == armnn::Compute::Undefined)
+    {
+        in.setstate(std::ios_base::failbit);
+        throw boost::program_options::validation_error(boost::program_options::validation_error::invalid_option_value);
+    }
+    backend = compute;
     return in;
 }
 

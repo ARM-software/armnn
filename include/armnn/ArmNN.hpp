@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include "BackendId.hpp"
 #include "Descriptors.hpp"
 #include "Exceptions.hpp"
 #include "IRuntime.hpp"

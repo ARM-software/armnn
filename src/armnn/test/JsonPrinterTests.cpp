@@ -117,7 +117,7 @@ std::vector<std::string> ExtractSections(const std::string& exp)
     return sections;
 }
 
-std::string SoftmaxProfilerTestSetupHelper(const std::vector<armnn::Compute>& backends)
+std::string SoftmaxProfilerTestSetupHelper(const std::vector<armnn::BackendId>& backends)
 {
     using namespace armnn;
 
@@ -239,7 +239,7 @@ void SoftmaxProfilerTestValidationHelper(std::string& result, const std::string&
 }
 
 void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
-        const std::vector<armnn::Compute>& backends)
+        const std::vector<armnn::BackendId>& backends)
 {
     // setup the test fixture and obtain JSON Printer result
     std::string result = SoftmaxProfilerTestSetupHelper(backends);
@@ -250,10 +250,10 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
     std::string changeLine40;
     std::string changeLine45;
 
-    switch(backends[0]) {
-        case armnn::Compute::GpuAcc: backend = "Cl";
-            changeLine31 = ",\n\"OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]\": {";
-            changeLine39 = R"(us"
+    if (backends[0] == armnn::Compute::GpuAcc) {
+        backend = "Cl";
+        changeLine31 = ",\n\"OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]\": {";
+        changeLine39 = R"(us"
 },
 "OpenClKernelTimer/: softmax_layer_norm_quantized GWS[,,]": {
 "raw": [
@@ -263,7 +263,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 ],
 "unit": "us")";
 
-            changeLine40 = R"(
+        changeLine40 = R"(
 },
 "CopyMemGeneric_Execute": {
 "raw": [
@@ -272,11 +272,13 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 
 ],
 "unit": "us")";
-            changeLine45 = "}\n";
-            break;
-        case armnn::Compute::CpuAcc: backend = "Neon";
-            changeLine31 = ",\n\"NeonKernelTimer/: NEFillBorderKernel\": {";
-            changeLine39 = R"(us"
+        changeLine45 = "}\n";
+    }
+    else if (backends[0] == armnn::Compute::CpuAcc)
+    {
+        backend = "Neon";
+        changeLine31 = ",\n\"NeonKernelTimer/: NEFillBorderKernel\": {";
+        changeLine39 = R"(us"
 },
 "NeonKernelTimer/: NELogitsDMaxKernel": {
 "raw": [
@@ -293,7 +295,7 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 
 ],
 "unit": "us")";
-            changeLine40 = R"(
+        changeLine40 = R"(
 },
 "CopyMemGeneric_Execute": {
 "raw": [
@@ -302,11 +304,9 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
 
 ],
 "unit": "us")";
-            changeLine45 = "}\n";
-            break;
-        default:
-            break;
+        changeLine45 = "}\n";
     }
+
     std::string testData = R"({
 "ArmNN": {
 "inference_measurements": {

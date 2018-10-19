@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(Unsigned8)
     softmax->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // optimize the network
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
     // Loads it into the runtime.
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(Unsigned8)
 }
 
 template <typename T>
-void ConstantUsageTest(const std::vector<armnn::Compute>& computeDevice,
+void ConstantUsageTest(const std::vector<armnn::BackendId>& computeDevice,
     const armnn::TensorInfo& commonTensorInfo,
     const std::vector<T>& inputData,
     const std::vector<T>& constantData,
@@ -165,7 +165,7 @@ void ConstantUsageTest(const std::vector<armnn::Compute>& computeDevice,
     BOOST_TEST(outputData == expectedOutputData);
 }
 
-static void ConstantUsageFloat32Test(const std::vector<armnn::Compute>& computeDevice)
+static void ConstantUsageFloat32Test(const std::vector<armnn::BackendId>& computeDevice)
 {
     const armnn::TensorInfo commonTensorInfo({ 2, 3 }, armnn::DataType::Float32);
 
@@ -177,7 +177,7 @@ static void ConstantUsageFloat32Test(const std::vector<armnn::Compute>& computeD
     );
 }
 
-static void ConstantUsageUint8Test(const std::vector<armnn::Compute>& computeDevice)
+static void ConstantUsageUint8Test(const std::vector<armnn::BackendId>& computeDevice)
 {
     armnn::TensorInfo commonTensorInfo({ 2, 3 }, armnn::DataType::QuantisedAsymm8);
 
@@ -197,7 +197,7 @@ static void ConstantUsageUint8Test(const std::vector<armnn::Compute>& computeDev
 
 BOOST_AUTO_TEST_CASE(ConstantUsage_Ref_Float32)
 {
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     ConstantUsageFloat32Test(backends);
 }
 
@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(ConstantUsage_Cl_Float32)
 
 BOOST_AUTO_TEST_CASE(ConstantUsage_Ref_Uint8)
 {
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     ConstantUsageUint8Test(backends);
 }
 
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(TrivialAdd)
     add->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     // optimize the network
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
     // Loads it into the runtime.
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE(MultipleOutputs)
     activation3->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     // optimize the network
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
     // Loads it into the runtime.
@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
 
     // optimize the network
-    std::vector<Compute> backends = {Compute::CpuAcc, Compute::CpuRef};
+    std::vector<BackendId> backends = {Compute::CpuAcc, Compute::CpuRef};
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
     // Load it into the runtime. It should pass.
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
 
     // optimize the network
-    std::vector<Compute> backends = {Compute::CpuAcc};
+    std::vector<BackendId> backends = {Compute::CpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(!optNet);
 }

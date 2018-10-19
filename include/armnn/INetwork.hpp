@@ -4,12 +4,12 @@
 //
 #pragma once
 
-#include "armnn/NetworkFwd.hpp"
-#include "armnn/DescriptorsFwd.hpp"
-#include "armnn/TensorFwd.hpp"
-#include "armnn/Optional.hpp"
+#include <armnn/NetworkFwd.hpp>
+#include <armnn/DescriptorsFwd.hpp>
+#include <armnn/TensorFwd.hpp>
+#include <armnn/Optional.hpp>
 
-#include "armnn/Types.hpp"
+#include <armnn/Types.hpp>
 
 #include <memory>
 #include <vector>
@@ -339,7 +339,7 @@ struct OptimizerOptions
 /// armnn::Exception if process fails.
 
 IOptimizedNetworkPtr Optimize(const INetwork& network,
-                              const std::vector<armnn::Compute>& backendPreferences,
+                              const std::vector<BackendId>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
                               const OptimizerOptions& options = OptimizerOptions(),
                               Optional<std::vector<std::string>&> errMessages = EmptyOptional());

@@ -44,7 +44,7 @@ struct ParserFlatbuffersFixture
     std::vector<uint8_t> m_GraphBinary;
     std::string m_JsonString;
     std::unique_ptr<ITfLiteParser, void (*)(ITfLiteParser *parser)> m_Parser;
-    std::vector<std::pair<armnn::IRuntimePtr, armnn::Compute>> m_Runtimes;
+    std::vector<std::pair<armnn::IRuntimePtr, armnn::BackendId>> m_Runtimes;
     armnn::NetworkId m_NetworkIdentifier;
 
     /// If the single-input-single-output overload of Setup() is called, these will store the input and output name

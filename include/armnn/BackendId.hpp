@@ -75,6 +75,7 @@ struct UninitializedBackendId {};
 class BackendId final
 {
 public:
+    BackendId() { GetComputeDeviceAsCString(Compute::Undefined); }
     BackendId(UninitializedBackendId) { GetComputeDeviceAsCString(Compute::Undefined); }
     BackendId(const std::string& id) : m_Id{id} {}
     BackendId(const char* id) : m_Id{id} {}
@@ -128,17 +129,21 @@ public:
     const std::string& Get() const { return m_Id; }
 
 private:
-    // backend Id mustn't be empty:
-    BackendId() = delete;
     std::string m_Id;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const BackendId& id)
+{
+    os << id.Get();
+    return os;
+}
 
 template <template <class...> class TContainer>
 inline std::ostream& operator<<(std::ostream& os,
                                 const TContainer<BackendId>& ids)
 {
     os << '[';
-    for (const auto& id : ids) { os << id.Get() << " "; }
+    for (const auto& id : ids) { os << id << " "; }
     os << ']';
     return os;
 }

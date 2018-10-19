@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(Fp16AdditionTest)
    additionLayer->GetOutputSlot(0).SetTensorInfo(fp16TensorInfo);
 
    // optimize the network
-   std::vector<Compute> backends = {Compute::GpuAcc};
+   std::vector<BackendId> backends = {Compute::GpuAcc};
    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
    // Loads it into the runtime.

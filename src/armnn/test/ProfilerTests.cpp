@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(RuntimeLoadNetwork)
     armnn::NetworkId networkIdentifier = 1;
     armnn::INetworkPtr mockNetwork(armnn::INetwork::Create());
     mockNetwork->AddInputLayer(0, "test layer");
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     runtime->LoadNetwork(networkIdentifier, armnn::Optimize(*mockNetwork, backends, runtime->GetDeviceSpec()));
 
     // Check that now there's a profiler registered for this thread (created and registered by the loading the network).

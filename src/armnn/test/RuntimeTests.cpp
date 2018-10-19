@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(RuntimeUnloadNetwork)
     armnn::NetworkId networkIdentifier1 = 1;
     armnn::INetworkPtr mockNetwork1(armnn::INetwork::Create());
     mockNetwork1->AddInputLayer(0, "test layer");
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     runtime->LoadNetwork(networkIdentifier1, Optimize(*mockNetwork1, backends, runtime->GetDeviceSpec()));
 
     // Mock network 2.
@@ -71,7 +71,7 @@ struct DisableGlobalLeakChecking
 
 BOOST_GLOBAL_FIXTURE(DisableGlobalLeakChecking);
 
-void CreateAndDropDummyNetwork(const std::vector<armnn::Compute>& backends, armnn::Runtime& runtime)
+void CreateAndDropDummyNetwork(const std::vector<armnn::BackendId>& backends, armnn::Runtime& runtime)
 {
     armnn::NetworkId networkIdentifier;
     {
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeaksGpuAcc)
     armnn::Runtime runtime(options);
     armnn::RuntimeLoadedNetworksReserve(&runtime);
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::GpuAcc};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     {
         // Do a warmup of this so we make sure that all one-time
         // initialization happens before we do the leak checking.
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeaksCpuAcc)
     armnn::Runtime runtime(options);
     armnn::RuntimeLoadedNetworksReserve(&runtime);
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuAcc};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
     {
         // Do a warmup of this so we make sure that all one-time
         // initialization happens before we do the leak checking.
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeaksCpuRef)
     armnn::Runtime runtime(options);
     armnn::RuntimeLoadedNetworksReserve(&runtime);
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     {
         // Do a warmup of this so we make sure that all one-time
         // initialization happens before we do the leak checking.
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryUsage)
     VALGRIND_COUNT_LEAKS(leakedBefore, dubious, reachableBefore, suppressed);
 
     // build a mock-network and load it into the runtime
-    std::vector<armnn::Compute> backends = {armnn::Compute::GpuAcc};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     {
         armnn::TensorInfo inputTensorInfo(armnn::TensorShape({ 7, 7 }), armnn::DataType::Float32);
         armnn::TensorInfo outputTensorInfo(armnn::TensorShape({ 7, 7 }), armnn::DataType::Float32);
@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
         mockNetwork1->AddInputLayer(0, "test layer");
 
 
-        std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+        std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
         runtime.LoadNetwork(networkIdentifier1, Optimize(*mockNetwork1, backends, runtime.GetDeviceSpec()));
     }
 
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE(RuntimeValidateCpuAccDeviceSupportLayerNoFallback)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuAcc };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
 
@@ -406,7 +406,7 @@ BOOST_AUTO_TEST_CASE(RuntimeValidateGpuDeviceSupportLayerNoFallback)
     armnn::IRuntime::CreationOptions options;
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-    std::vector<armnn::Compute> backends = { armnn::Compute::GpuAcc };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
 
@@ -442,7 +442,7 @@ BOOST_AUTO_TEST_CASE(RuntimeCpuRef)
     normalize->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
 
     // optimize the network
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
     // Load it into the runtime. It should success.
@@ -476,7 +476,7 @@ BOOST_AUTO_TEST_CASE(RuntimeFallbackToCpuRef)
     normalize->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
 
     // Allow fallback to CpuRef.
-    std::vector<armnn::Compute> backends = { armnn::Compute::CpuAcc, armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc, armnn::Compute::CpuRef };
     // optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
 
@@ -524,7 +524,7 @@ BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
             armnn::DataType::QuantisedAsymm8
     ));
 
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     std::vector<std::string> errMessages;
     armnn::IOptimizedNetworkPtr optNet = Optimize(
             *net,
@@ -533,7 +533,7 @@ BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
             OptimizerOptions(),
             errMessages
     );
-    
+
     BOOST_TEST(errMessages.size() == 1);
     BOOST_TEST(errMessages[0] ==
         "ERROR: output 0 of layer Softmax (softmax) is of type "

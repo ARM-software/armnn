@@ -36,7 +36,8 @@ int main(int argc, char* argv[])
 
         namespace po = boost::program_options;
 
-        std::vector<armnn::Compute> computeDevice;
+        std::vector<armnn::BackendId> computeDevice;
+        std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuAcc, armnn::Compute::CpuRef};
         std::string modelDir;
         std::string dataDir;
 
@@ -48,8 +49,7 @@ int main(int argc, char* argv[])
                 ("help", "Display help messages")
                 ("model-dir,m", po::value<std::string>(&modelDir)->required(),
                     "Path to directory containing the Cifar10 model file")
-                ("compute,c", po::value<std::vector<armnn::Compute>>(&computeDevice)->default_value
-                     ({armnn::Compute::CpuAcc, armnn::Compute::CpuRef}),
+                ("compute,c", po::value<std::vector<armnn::BackendId>>(&computeDevice)->default_value(defaultBackends),
                     "Which device to run layers on by default. Possible choices: CpuAcc, CpuRef, GpuAcc")
                 ("data-dir,d", po::value<std::string>(&dataDir)->required(),
                     "Path to directory containing the Cifar10 test data");
@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
     }
     catch (const std::exception& e)
     {
-        // Coverity fix: various boost exceptions can be thrown by methods called by this test. 
+        // Coverity fix: various boost exceptions can be thrown by methods called by this test.
         std::cerr << "WARNING: MultipleNetworksCifar10: An error has occurred when running the "
                      "multiple networks inference tests: " << e.what() << std::endl;
         return 1;

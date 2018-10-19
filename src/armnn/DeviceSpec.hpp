@@ -22,7 +22,7 @@ public:
         return std::vector<IBackendSharedPtr>();
     }
 
-    std::set<Compute> m_SupportedComputeDevices;
+    std::set<BackendId> m_SupportedComputeDevices;
 };
 
 }

@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(InputShapes)
     armnn::NetworkId netId;
 
     // Check everything works normally
-    std::vector<armnn::Compute> backends = {armnn::Compute::CpuRef};
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     {
         network = parser->CreateNetworkFromString(explicitInput.c_str(), {}, { "data" });
         BOOST_TEST(network.get());

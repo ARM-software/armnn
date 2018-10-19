@@ -147,7 +147,7 @@ void PrintArray(const std::vector<float>& v)
     printf("\n");
 }
 
-void RemoveDuplicateDevices(std::vector<armnn::Compute>& computeDevices)
+void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
 {
     // Mark the duplicate devices as 'Undefined'.
     for (auto i = computeDevices.begin(); i != computeDevices.end(); ++i)
@@ -166,11 +166,11 @@ void RemoveDuplicateDevices(std::vector<armnn::Compute>& computeDevices)
                          computeDevices.end());
 }
 
-bool CheckDevicesAreValid(const std::vector<armnn::Compute>& computeDevices)
+bool CheckDevicesAreValid(const std::vector<armnn::BackendId>& computeDevices)
 {
     return (!computeDevices.empty()
             && std::none_of(computeDevices.begin(), computeDevices.end(),
-                            [](armnn::Compute c){ return c == armnn::Compute::Undefined; }));
+                            [](armnn::BackendId c){ return c == armnn::Compute::Undefined; }));
 }
 
 } // namespace
@@ -178,7 +178,7 @@ bool CheckDevicesAreValid(const std::vector<armnn::Compute>& computeDevices)
 template<typename TParser, typename TDataType>
 int MainImpl(const char* modelPath,
              bool isModelBinary,
-             const std::vector<armnn::Compute>& computeDevice,
+             const std::vector<armnn::BackendId>& computeDevice,
              const char* inputName,
              const armnn::TensorShape* inputTensorShape,
              const char* inputTensorDataFilePath,
@@ -232,7 +232,7 @@ int MainImpl(const char* modelPath,
 // This will run a test
 int RunTest(const std::string& modelFormat,
             const std::string& inputTensorShapeStr,
-            const vector<armnn::Compute>& computeDevice,
+            const vector<armnn::BackendId>& computeDevice,
             const std::string& modelPath,
             const std::string& inputName,
             const std::string& inputTensorDataFilePath,
@@ -360,7 +360,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
          "caffe-binary, caffe-text, tflite-binary, onnx-binary, onnx-text, tensorflow-binary or tensorflow-text.")
         ("model-path,m", po::value(&modelPath), "Path to model file, e.g. .caffemodel, .prototxt, .tflite,"
          " .onnx")
-        ("compute,c", po::value<std::vector<armnn::Compute>>()->multitoken(),
+        ("compute,c", po::value<std::vector<armnn::BackendId>>()->multitoken(),
          "The preferred order of devices to run layers on by default. Possible choices: CpuAcc, CpuRef, GpuAcc")
         ("input-name,i", po::value(&inputName), "Identifier of the input tensor in the network.")
         ("subgraph-number,n", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be "
@@ -414,7 +414,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
     boost::trim(outputName);
 
     // Get the preferred order of compute devices.
-    std::vector<armnn::Compute> computeDevices = vm["compute"].as<std::vector<armnn::Compute>>();
+    std::vector<armnn::BackendId> computeDevices = vm["compute"].as<std::vector<armnn::BackendId>>();
 
     // Remove duplicates from the list of compute devices.
     RemoveDuplicateDevices(computeDevices);
@@ -466,7 +466,7 @@ int main(int argc, const char* argv[])
              "caffe-binary, caffe-text, onnx-binary, onnx-text, tflite-binary, tensorflow-binary or tensorflow-text.")
             ("model-path,m", po::value(&modelPath), "Path to model file, e.g. .caffemodel, .prototxt,"
              " .tflite, .onnx")
-            ("compute,c", po::value<std::vector<armnn::Compute>>()->multitoken(),
+            ("compute,c", po::value<std::vector<std::string>>()->multitoken(),
              "The preferred order of devices to run layers on by default. Possible choices: CpuAcc, CpuRef, GpuAcc")
             ("input-name,i", po::value(&inputName), "Identifier of the input tensor in the network.")
             ("subgraph-number,x", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be executed."
@@ -588,7 +588,7 @@ int main(int argc, const char* argv[])
     else // Run single test
     {
         // Get the preferred order of compute devices.
-        std::vector<armnn::Compute> computeDevices = vm["compute"].as<std::vector<armnn::Compute>>();
+        std::vector<armnn::BackendId> computeDevices = vm["compute"].as<std::vector<armnn::BackendId>>();
 
         // Remove duplicates from the list of compute devices.
         RemoveDuplicateDevices(computeDevices);

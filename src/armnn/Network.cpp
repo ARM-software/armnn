@@ -94,7 +94,7 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
 }
 
 IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
-                              const std::vector<armnn::Compute>& backendPreferences,
+                              const std::vector<BackendId>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
                               const OptimizerOptions& options,
                               Optional<std::vector<std::string>&> errMessages)
@@ -133,8 +133,8 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     // determine which of the preferred backends we have available for use
     // and whether we have specified CpuRef as one of those backends.
     bool cpuRefUsed = false;
-    std::vector<armnn::Compute> availablePreferredBackends;
-    for (const armnn::Compute& backend : backendPreferences)
+    std::vector<BackendId> availablePreferredBackends;
+    for (const auto& backend : backendPreferences)
     {
         // Check if the backend is in the available backend devices.
         if (std::find(spec.m_SupportedComputeDevices.begin(),
@@ -142,7 +142,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                       spec.m_SupportedComputeDevices.end())
         {
             availablePreferredBackends.push_back(backend);
-            if (armnn::Compute::CpuRef == backend) {
+            if (backend == armnn::Compute::CpuRef) {
                 cpuRefUsed = true;
             }
         }
@@ -183,7 +183,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
             // which haven't had a scale set and report them all back.
             bErrorFound = true;
         }
-        for (const armnn::Compute& backend : availablePreferredBackends)
+        for (const auto& backend : availablePreferredBackends)
         {
             // need to set the compute device on the layer
             // before we can check if it is supported
@@ -205,7 +205,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                             InsertConvertFp32ToFp16LayersAfter(optNetObjPtr->GetGraph(), *layer);
 
                         // Assign a supported backend to the newly introduced conversion layers
-                        auto AssignFirstSupportedBackend = [&](Layer* layer, Compute preferredBackend)
+                        auto AssignFirstSupportedBackend = [&](Layer* layer, BackendId preferredBackend)
                         {
                             bool supportedBackendFound = false;
                             std::string reasonIfUnsupported;
@@ -218,7 +218,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                             }
                             else
                             {
-                                for (const Compute& backend : availablePreferredBackends)
+                                for (const auto& backend : availablePreferredBackends)
                                 {
                                     // Skip preferred backend (we already determined that it is not supported)
                                     if (backend == preferredBackend)

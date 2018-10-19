@@ -14,8 +14,6 @@
 #include <backends/cl/workloads/ClWorkloads.hpp>
 #include <backends/cl/workloads/ClWorkloadUtils.hpp>
 
-#include <backends/reference/RefWorkloadFactory.hpp>
-
 boost::test_tools::predicate_result CompareIClTensorHandleShape(IClTensorHandle*                    tensorHandle,
                                                                 std::initializer_list<unsigned int> expectedDimensions)
 {
@@ -737,6 +735,38 @@ BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32NhwcWorkload)
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat16NhwcWorkload)
 {
     ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
+}
+
+template <typename MeanWorkloadType, typename armnn::DataType DataType>
+static void ClMeanWorkloadTest()
+{
+    Graph graph;
+    ClWorkloadFactory factory;
+    auto workload = CreateMeanWorkloadTest<MeanWorkloadType, DataType>(factory, graph);
+
+    // Checks that inputs/outputs are as we expect them (see definition of CreateMeanWorkloadTest).
+    MeanQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    // The first dimension (batch size) in both input and output is singular thus it has been reduced by ACL.
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 3, 7, 4 }));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 4 }));
+}
+
+BOOST_AUTO_TEST_CASE(CreateMeanFloat32Workload)
+{
+    ClMeanWorkloadTest<ClMeanWorkload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateMeanFloat16Workload)
+{
+    ClMeanWorkloadTest<ClMeanWorkload, armnn::DataType::Float16>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateMeanUint8Workload)
+{
+    ClMeanWorkloadTest<ClMeanWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

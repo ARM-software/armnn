@@ -356,7 +356,8 @@ struct LstmDescriptor
 struct MeanDescriptor
 {
     MeanDescriptor()
-    : m_KeepDims(false)
+    : m_Axis()
+    , m_KeepDims(false)
     {}
 
     MeanDescriptor(const std::vector<unsigned int>& axis, bool keepDims)

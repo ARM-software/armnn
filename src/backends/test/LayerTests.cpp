@@ -5807,20 +5807,19 @@ LayerTestResult<float, 4> PermuteFloat32ValueSet3Test(armnn::IWorkloadFactory& w
 
 namespace
 {
+
 template <typename T, std::size_t InputDim, std::size_t OutputDim>
 LayerTestResult<T, OutputDim> MeanTestHelper(armnn::IWorkloadFactory& workloadFactory,
-                                     const unsigned int* inputShape,
-                                     const std::vector<T>& inputData,
-                                     const std::vector<unsigned int>& axis,
-                                     bool keepDims,
-                                     const unsigned int* outputShape,
-                                     const std::vector<T>& outputData,
-                                     float scale = 1.0f,
-                                     int32_t offset = 0)
+                                             const unsigned int* inputShape,
+                                             const std::vector<T>& inputData,
+                                             const std::vector<unsigned int>& axis,
+                                             bool keepDims,
+                                             const unsigned int* outputShape,
+                                             const std::vector<T>& outputData,
+                                             float scale = 1.0f,
+                                             int32_t offset = 0)
 {
-    auto dataType = (std::is_same<T, uint8_t>::value ?
-                     armnn::DataType::QuantisedAsymm8 :
-                     armnn::DataType::Float32);
+    auto dataType = (std::is_same<T, uint8_t>::value ? armnn::DataType::QuantisedAsymm8 : armnn::DataType::Float32);
 
     armnn::TensorInfo inputTensorInfo(InputDim, inputShape, dataType);
     armnn::TensorInfo outputTensorInfo(OutputDim, outputShape, dataType);
@@ -5860,6 +5859,7 @@ LayerTestResult<T, OutputDim> MeanTestHelper(armnn::IWorkloadFactory& workloadFa
 
     return result;
 }
+
 } // anonymous namespace
 
 LayerTestResult<uint8_t, 1> MeanUint8SimpleTest(armnn::IWorkloadFactory& workloadFactory)
@@ -5881,7 +5881,7 @@ LayerTestResult<uint8_t, 3> MeanUint8SimpleAxisTest(armnn::IWorkloadFactory& wor
     std::vector<uint8_t> input({ 1, 1, 2, 2, 3, 3 });
     std::vector<uint8_t> output({ 2, 2 });
 
-    return MeanTestHelper<uint8_t, 4, 3>(workloadFactory, inputShape, input, {2}, false, outputShape, output);
+    return MeanTestHelper<uint8_t, 4, 3>(workloadFactory, inputShape, input, { 2 }, false, outputShape, output);
 }
 
 LayerTestResult<uint8_t, 4> MeanUint8KeepDimsTest(armnn::IWorkloadFactory& workloadFactory)
@@ -5892,7 +5892,7 @@ LayerTestResult<uint8_t, 4> MeanUint8KeepDimsTest(armnn::IWorkloadFactory& workl
     std::vector<uint8_t> input({ 1, 1, 2, 2, 3, 3 });
     std::vector<uint8_t> output({ 2, 2 });
 
-    return MeanTestHelper<uint8_t, 4, 4>(workloadFactory, inputShape, input, {2}, true, outputShape, output);
+    return MeanTestHelper<uint8_t, 4, 4>(workloadFactory, inputShape, input, { 2 }, true, outputShape, output);
 }
 
 LayerTestResult<uint8_t, 4> MeanUint8MultipleDimsTest(armnn::IWorkloadFactory& workloadFactory)
@@ -5900,22 +5900,23 @@ LayerTestResult<uint8_t, 4> MeanUint8MultipleDimsTest(armnn::IWorkloadFactory& w
     const unsigned int inputShape[] = { 2, 3, 1, 2 };
     const unsigned int outputShape[] = { 1, 3, 1, 1 };
 
-    std::vector<uint8_t> input({ 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6});
+    std::vector<uint8_t> input({ 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6 });
     std::vector<uint8_t> output({ 1, 3, 5 });
 
-    return MeanTestHelper<uint8_t, 4, 4>(workloadFactory, inputShape, input, {0, 3}, true, outputShape, output);
+    return MeanTestHelper<uint8_t, 4, 4>(workloadFactory, inputShape, input, { 0, 3 }, true, outputShape, output);
 }
 
 LayerTestResult<uint8_t, 1> MeanVtsUint8Test(armnn::IWorkloadFactory& workloadFactory)
 {
-    const unsigned int inputShape[] = {4, 3, 2};
+    const unsigned int inputShape[] = { 4, 3, 2 };
     const unsigned int outputShape[] = { 2 };
 
-    std::vector<uint8_t> input({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
-    std::vector<uint8_t> output({12, 13});
+    std::vector<uint8_t> input({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                                 24 });
+    std::vector<uint8_t> output({ 12, 13 });
 
-    return MeanTestHelper<uint8_t, 3, 1>(workloadFactory, inputShape, input, {0, 1}, false, outputShape,
-        output, 0.8f, 5);
+    return MeanTestHelper<uint8_t, 3, 1>(workloadFactory, inputShape, input, { 0, 1 }, false, outputShape,
+                                         output, 0.8f, 5);
 }
 
 LayerTestResult<float, 1> MeanFloatSimpleTest(armnn::IWorkloadFactory& workloadFactory)
@@ -5923,8 +5924,8 @@ LayerTestResult<float, 1> MeanFloatSimpleTest(armnn::IWorkloadFactory& workloadF
     const unsigned int inputShape[] = { 3, 2 };
     const unsigned int outputShape[] = { 1 };
 
-    std::vector<float> input({ 1., 1., 2., 2., 3., 3. });
-    std::vector<float> output({ 2. });
+    std::vector<float> input({ 1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f });
+    std::vector<float> output({ 2.0f });
 
     return MeanTestHelper<float, 2, 1>(workloadFactory, inputShape, input, {}, false, outputShape, output);
 }
@@ -5934,10 +5935,10 @@ LayerTestResult<float, 3> MeanFloatSimpleAxisTest(armnn::IWorkloadFactory& workl
     const unsigned int inputShape[] = { 2, 3, 1, 2 };
     const unsigned int outputShape[] = { 3, 1, 2 };
 
-    std::vector<float> input({ 1., 2., 3., 4., 5., 6., 1., 2., 3., 4., 5., 6.});
-    std::vector<float> output({ 1., 2., 3., 4., 5., 6. });
+    std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f });
+    std::vector<float> output({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f });
 
-    return MeanTestHelper<float, 4, 3>(workloadFactory, inputShape, input, {0}, false, outputShape, output);
+    return MeanTestHelper<float, 4, 3>(workloadFactory, inputShape, input, { 0 }, false, outputShape, output);
 }
 
 LayerTestResult<float, 4> MeanFloatKeepDimsTest(armnn::IWorkloadFactory& workloadFactory)
@@ -5945,10 +5946,10 @@ LayerTestResult<float, 4> MeanFloatKeepDimsTest(armnn::IWorkloadFactory& workloa
     const unsigned int inputShape[] = { 1, 1, 3, 2 };
     const unsigned int outputShape[] = { 1, 1, 1, 2 };
 
-    std::vector<float> input({ 1., 1., 2., 2., 3., 3. });
-    std::vector<float> output({ 2., 2. });
+    std::vector<float> input({ 1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f });
+    std::vector<float> output({ 2.0f, 2.0f });
 
-    return MeanTestHelper<float, 4, 4>(workloadFactory, inputShape, input, {2}, true, outputShape, output);
+    return MeanTestHelper<float, 4, 4>(workloadFactory, inputShape, input, { 2 }, true, outputShape, output);
 }
 
 LayerTestResult<float, 4> MeanFloatMultipleDimsTest(armnn::IWorkloadFactory& workloadFactory)
@@ -5956,34 +5957,45 @@ LayerTestResult<float, 4> MeanFloatMultipleDimsTest(armnn::IWorkloadFactory& wor
     const unsigned int inputShape[] = { 2, 3, 1, 2 };
     const unsigned int outputShape[] = { 1, 3, 1, 1 };
 
-    std::vector<float> input({ 1., 2., 3., 4., 5., 6., 1., 2., 3., 4., 5., 6.});
-    std::vector<float> output({ 1.5, 3.5, 5.5 });
+    std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f });
+    std::vector<float> output({ 1.5f, 3.5f, 5.5f });
 
-    return MeanTestHelper<float, 4, 4>(workloadFactory, inputShape, input, {0, 3}, true, outputShape, output);
+    return MeanTestHelper<float, 4, 4>(workloadFactory, inputShape, input, { 0, 3 }, true, outputShape, output);
 }
 
 LayerTestResult<float, 1> MeanVtsFloat1Test(armnn::IWorkloadFactory& workloadFactory)
 {
-    const unsigned int inputShape[] = {4, 3, 2};
+    const unsigned int inputShape[] = { 4, 3, 2 };
     const unsigned int outputShape[] = { 2 };
 
-    std::vector<float> input({1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f,
-                              15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f});
-    std::vector<float> output({12.0f, 13.0f});
+    std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f,
+                               15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f });
+    std::vector<float> output({ 12.0f, 13.0f });
 
-    return MeanTestHelper<float, 3, 1>(workloadFactory, inputShape, input, {0, 1}, false, outputShape, output);
+    return MeanTestHelper<float, 3, 1>(workloadFactory, inputShape, input, { 0, 1 }, false, outputShape, output);
 }
 
 LayerTestResult<float, 3> MeanVtsFloat2Test(armnn::IWorkloadFactory& workloadFactory)
 {
-    const unsigned int inputShape[] = {4, 3, 2};
-    const unsigned int outputShape[] = {1, 3, 1 };
+    const unsigned int inputShape[] = { 4, 3, 2 };
+    const unsigned int outputShape[] = { 1, 3, 1 };
 
-    std::vector<float> input({1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f,
-                              15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f});
-    std::vector<float> output({10.5f, 12.5f, 14.5f});
+    std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f,
+                               15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f });
+    std::vector<float> output({ 10.5f, 12.5f, 14.5f });
 
-    return MeanTestHelper<float, 3, 3>(workloadFactory, inputShape, input, {0, 2}, true, outputShape, output);
+    return MeanTestHelper<float, 3, 3>(workloadFactory, inputShape, input, { 0, 2 }, true, outputShape, output);
+}
+
+LayerTestResult<float, 3> MeanVtsFloat3Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int inputShape[] = { 1, 2, 2, 1 };
+    const unsigned int outputShape[] = { 1, 2, 1 };
+
+    std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f });
+    std::vector<float> output({ 1.5f, 3.5f });
+
+    return MeanTestHelper<float, 4, 3>(workloadFactory, inputShape, input, { 2 }, false, outputShape, output);
 }
 
 LayerTestResult<float, 4> AdditionAfterMaxPoolTest(armnn::IWorkloadFactory& workloadFactory)

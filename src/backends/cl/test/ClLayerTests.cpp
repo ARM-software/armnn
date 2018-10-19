@@ -274,6 +274,21 @@ ARMNN_AUTO_TEST_CASE(SimpleConvertFp32ToFp16, SimpleConvertFp32ToFp16Test)
 
 ARMNN_AUTO_TEST_CASE(AdditionAfterMaxPool, AdditionAfterMaxPoolTest)
 
+// Mean
+ARMNN_AUTO_TEST_CASE(MeanUint8Simple, MeanUint8SimpleTest)
+ARMNN_AUTO_TEST_CASE(MeanUint8SimpleAxis, MeanUint8SimpleAxisTest)
+ARMNN_AUTO_TEST_CASE(MeanUint8KeepDims, MeanUint8KeepDimsTest)
+ARMNN_AUTO_TEST_CASE(MeanUint8MultipleDims, MeanUint8MultipleDimsTest)
+ARMNN_AUTO_TEST_CASE(MeanVtsUint8, MeanVtsUint8Test)
+
+ARMNN_AUTO_TEST_CASE(MeanFloatSimple, MeanFloatSimpleTest)
+ARMNN_AUTO_TEST_CASE(MeanFloatSimpleAxis, MeanFloatSimpleAxisTest)
+ARMNN_AUTO_TEST_CASE(MeanFloatKeepDims, MeanFloatKeepDimsTest)
+ARMNN_AUTO_TEST_CASE(MeanFloatMultipleDims, MeanFloatMultipleDimsTest)
+ARMNN_AUTO_TEST_CASE(MeanVtsFloat1, MeanVtsFloat1Test)
+ARMNN_AUTO_TEST_CASE(MeanVtsFloat2, MeanVtsFloat2Test)
+ARMNN_AUTO_TEST_CASE(MeanVtsFloat3, MeanVtsFloat3Test)
+
 // ============================================================================
 // COMPARE tests
 

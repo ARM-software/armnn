@@ -1021,4 +1021,37 @@ std::unique_ptr<ConvertFp32ToFp16Float16Workload> CreateConvertFp32ToFp16Workloa
     return workload;
 }
 
+template <typename MeanWorkload, armnn::DataType DataType>
+std::unique_ptr<MeanWorkload> CreateMeanWorkloadTest(armnn::IWorkloadFactory& factory, armnn::Graph& graph)
+{
+    // Reduce along the first and second dimensions, and do not keep the reduced dimensions.
+    MeanDescriptor descriptor({ 1, 2 }, false);
+
+    // Creates the layer we're testing.
+    Layer* const layer = graph.AddLayer<MeanLayer>(descriptor, "mean");
+
+    // Creates extra layers.
+    Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connects up.
+    armnn::TensorInfo inputTensorInfo({ 1, 3, 7, 4 }, DataType);
+    armnn::TensorInfo outputTensorInfo({ 1, 4 }, DataType);
+    Connect(input, layer, inputTensorInfo);
+    Connect(layer, output, outputTensorInfo);
+    CreateTensorHandles(graph, factory);
+
+    // Makes the workload and checks it.
+    auto workload = MakeAndCheckWorkload<MeanWorkload>(*layer, graph, factory);
+
+    MeanQueueDescriptor queueDescriptor = workload->GetData();
+    BOOST_TEST(queueDescriptor.m_Parameters.m_Axis == descriptor.m_Axis);
+    BOOST_TEST(queueDescriptor.m_Parameters.m_KeepDims == descriptor.m_KeepDims);
+    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+
+    // Returns so we can do extra, backend-specific tests.
+    return workload;
+}
+
 }

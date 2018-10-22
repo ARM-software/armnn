@@ -129,6 +129,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
 
     // We know that DeviceSpec should be the only implementation of IDeviceSpec.
     const DeviceSpec& spec = *boost::polymorphic_downcast<const DeviceSpec*>(&deviceSpec);
+    auto const& supportedBackends = spec.GetSupportedBackends();
 
     // determine which of the preferred backends we have available for use
     // and whether we have specified CpuRef as one of those backends.
@@ -137,9 +138,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     for (const auto& backend : backendPreferences)
     {
         // Check if the backend is in the available backend devices.
-        if (std::find(spec.m_SupportedComputeDevices.begin(),
-                      spec.m_SupportedComputeDevices.end(), backend) !=
-                      spec.m_SupportedComputeDevices.end())
+        if (supportedBackends.count(backend) > 0)
         {
             availablePreferredBackends.push_back(backend);
             if (backend == armnn::Compute::CpuRef) {
@@ -150,7 +149,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     if (availablePreferredBackends.empty()) {
         std::stringstream failureMsg;
         failureMsg << "ERROR: None of the preferred backends " << backendPreferences
-                   << " are supported. Current platform provides " << spec.m_SupportedComputeDevices;
+                   << " are supported. Current platform provides " << supportedBackends;
         BOOST_LOG_TRIVIAL(warning) << failureMsg.str();
         if (errMessages) {
             errMessages.value().push_back(failureMsg.str());

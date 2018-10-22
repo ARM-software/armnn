@@ -4,7 +4,8 @@
 //
 #include "Runtime.hpp"
 
-#include "armnn/Version.hpp"
+#include <armnn/Version.hpp>
+#include <backends/BackendRegistry.hpp>
 
 #include <iostream>
 
@@ -133,16 +134,9 @@ Runtime::Runtime(const CreationOptions& options)
     : m_ClContextControl(options.m_GpuAccTunedParameters.get(),
                          options.m_EnableGpuProfiling)
     , m_NetworkIdCounter(0)
+    , m_DeviceSpec{BackendRegistryInstance().GetBackendIds()}
 {
     BOOST_LOG_TRIVIAL(info) << "ArmNN v" << ARMNN_VERSION << "\n";
-
-    m_DeviceSpec.m_SupportedComputeDevices.insert(armnn::Compute::CpuRef);
-    #if ARMCOMPUTECL_ENABLED
-        m_DeviceSpec.m_SupportedComputeDevices.insert(armnn::Compute::GpuAcc);
-    #endif
-    #if ARMCOMPUTENEON_ENABLED
-        m_DeviceSpec.m_SupportedComputeDevices.insert(armnn::Compute::CpuAcc);
-    #endif
 }
 
 Runtime::~Runtime()

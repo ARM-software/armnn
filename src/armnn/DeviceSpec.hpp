@@ -14,15 +14,19 @@ namespace armnn
 class DeviceSpec : public IDeviceSpec
 {
 public:
-    DeviceSpec() {}
+    DeviceSpec(const BackendIdSet& supportedBackends)
+        : m_SupportedBackends{supportedBackends} {}
+
     virtual ~DeviceSpec() {}
 
-    virtual std::vector<IBackendSharedPtr> GetBackends() const
+    virtual const BackendIdSet& GetSupportedBackends() const
     {
-        return std::vector<IBackendSharedPtr>();
+        return m_SupportedBackends;
     }
 
-    std::set<BackendId> m_SupportedComputeDevices;
+private:
+    DeviceSpec() = delete;
+    BackendIdSet m_SupportedBackends;
 };
 
 }

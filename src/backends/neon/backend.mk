@@ -44,4 +44,5 @@ BACKEND_TEST_SOURCES := \
         test/NeonLayerSupportTests.cpp \
         test/NeonLayerTests.cpp \
         test/NeonMemCopyTests.cpp \
+        test/NeonRuntimeTests.cpp \
         test/NeonTimerTest.cpp

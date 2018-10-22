@@ -9,6 +9,7 @@ list(APPEND armnnClBackendUnitTests_sources
     ClLayerSupportTests.cpp
     ClLayerTests.cpp
     ClMemCopyTests.cpp
+    ClRuntimeTests.cpp
     OpenClTimerTest.cpp
 )
 

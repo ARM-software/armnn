@@ -47,5 +47,6 @@ BACKEND_TEST_SOURCES := \
         test/ClLayerSupportTests.cpp \
         test/ClLayerTests.cpp \
         test/ClMemCopyTests.cpp \
+        test/ClRuntimeTests.cpp \
         test/Fp16SupportTest.cpp \
         test/OpenClTimerTest.cpp

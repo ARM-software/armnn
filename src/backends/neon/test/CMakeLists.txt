@@ -8,6 +8,7 @@ list(APPEND armnnNeonBackendUnitTests_sources
     NeonLayerSupportTests.cpp
     NeonLayerTests.cpp
     NeonMemCopyTests.cpp
+    NeonRuntimeTests.cpp
     NeonTimerTest.cpp
 )
 

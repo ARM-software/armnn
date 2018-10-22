@@ -66,4 +66,5 @@ BACKEND_SOURCES := \
 BACKEND_TEST_SOURCES := \
         test/RefCreateWorkloadTests.cpp \
         test/RefLayerSupportTests.cpp \
-        test/RefLayerTests.cpp
+        test/RefLayerTests.cpp \
+        test/RefRuntimeTests.cpp

@@ -342,6 +342,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/OptimizerTests.cpp
         src/armnn/test/ProfilerTests.cpp
         src/armnn/test/RuntimeTests.cpp
+        src/armnn/test/RuntimeTests.hpp
         src/armnn/test/CreateWorkload.hpp
         src/armnn/test/TensorTest.cpp
         src/armnn/test/TensorHelpers.hpp

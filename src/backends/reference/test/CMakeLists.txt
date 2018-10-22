@@ -7,6 +7,7 @@ list(APPEND armnnRefBackendUnitTests_sources
     RefCreateWorkloadTests.cpp
     RefLayerSupportTests.cpp
     RefLayerTests.cpp
+    RefRuntimeTests.cpp
 )
 
 add_library(armnnRefBackendUnitTests OBJECT ${armnnRefBackendUnitTests_sources})

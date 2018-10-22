@@ -456,6 +456,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]     =  &TfLiteParser::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]           =  &TfLiteParser::ParseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D] =  &TfLiteParser::ParseDepthwiseConv2D;
+    m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]   =  &TfLiteParser::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]       =  &TfLiteParser::ParseMaxPool2D;
     m_ParserFunctions[tflite::BuiltinOperator_RELU]              =  &TfLiteParser::ParseRelu;
     m_ParserFunctions[tflite::BuiltinOperator_RELU6]             =  &TfLiteParser::ParseRelu6;
@@ -1217,6 +1218,75 @@ void TfLiteParser::ParseConcatenation(size_t subgraphIndex, size_t operatorIndex
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto & operatorRfr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto options = operatorRfr->builtin_options.AsFullyConnectedOptions();
+
+    CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
+
+    FullyConnectedDescriptor desc;
+    desc.m_BiasEnabled = false;
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
+
+    // Fully Connected Layer accepts two dimensional weights input
+    int32_t weightsDimension = static_cast<int32_t>(filterTensorInfo.GetNumDimensions());
+    if (weightsDimension != 2)
+    {
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Dimension %1% for Fully Connected weights is not supported by Armnn. "
+                    "Node %2%")
+                % weightsDimension
+                % CHECK_LOCATION().AsString()));
+    }
+
+    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo, false);
+    armnn::IConnectableLayer* layer;
+    auto layerName = boost::str(boost::format("FullyConnected:%1%:%2%") % subgraphIndex % operatorIndex);
+
+    if (inputs.size() == 3)
+    {
+        desc.m_BiasEnabled = true;
+        TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
+        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo, false);
+        layer = m_Network->AddFullyConnectedLayer(desc,
+                                                  filterTensorAndData.first,
+                                                  biasTensorAndData.first,
+                                                  layerName.c_str());
+    }
+    else
+    {
+        layer = m_Network->AddFullyConnectedLayer(desc,
+                                                  filterTensorAndData.first,
+                                                  layerName.c_str());
+    }
+    BOOST_ASSERT(layer != nullptr);
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    // register the input connection slot for the layer
+    // only the tensors for the inputs are relevant, exclude the const tensors
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    // we need to add the activation layer and fortunately we don't need to care about the data layout
+    armnn::IConnectableLayer* fusedActivationLayer = AddFusedActivationLayer(layer, 0,
+                                                                             options->fused_activation_function);
+    // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, fusedActivationLayer, {outputTensorIndexes[0]});
 }
 
 armnn::IConnectableLayer* TfLiteParser::AddFusedActivationLayer(armnn::IConnectableLayer* prevLayer,

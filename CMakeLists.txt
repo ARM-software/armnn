@@ -414,6 +414,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Concatenation.cpp
              src/armnnTfLiteParser/test/Conv2D.cpp
              src/armnnTfLiteParser/test/DepthwiseConvolution2D.cpp
+             src/armnnTfLiteParser/test/FullyConnected.cpp
              src/armnnTfLiteParser/test/MaxPool2D.cpp
              src/armnnTfLiteParser/test/Reshape.cpp
              src/armnnTfLiteParser/test/Softmax.cpp

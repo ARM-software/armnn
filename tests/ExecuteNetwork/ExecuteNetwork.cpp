@@ -2,8 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "armnn/ArmNN.hpp"
-
+#include <armnn/ArmNN.hpp>
 #include <armnn/TypesUtils.hpp>
 
 #if defined(ARMNN_CAFFE_PARSER)
@@ -164,13 +163,6 @@ void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
     // Remove 'Undefined' devices.
     computeDevices.erase(std::remove(computeDevices.begin(), computeDevices.end(), armnn::Compute::Undefined),
                          computeDevices.end());
-}
-
-bool CheckDevicesAreValid(const std::vector<armnn::BackendId>& computeDevices)
-{
-    return (!computeDevices.empty()
-            && std::none_of(computeDevices.begin(), computeDevices.end(),
-                            [](armnn::BackendId c){ return c == armnn::Compute::Undefined; }));
 }
 
 } // namespace
@@ -352,6 +344,10 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
 
     size_t subgraphId = 0;
 
+    const std::string backendsMessage = std::string("The preferred order of devices to run layers on by default. ")
+                                      + std::string("Possible choices: ")
+                                      + armnn::BackendRegistryInstance().GetBackendIdsAsString();
+
     po::options_description desc("Options");
     try
     {
@@ -361,7 +357,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
         ("model-path,m", po::value(&modelPath), "Path to model file, e.g. .caffemodel, .prototxt, .tflite,"
          " .onnx")
         ("compute,c", po::value<std::vector<armnn::BackendId>>()->multitoken(),
-         "The preferred order of devices to run layers on by default. Possible choices: CpuAcc, CpuRef, GpuAcc")
+         backendsMessage.c_str())
         ("input-name,i", po::value(&inputName), "Identifier of the input tensor in the network.")
         ("subgraph-number,n", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be "
          "executed. Defaults to 0")
@@ -420,9 +416,11 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
     RemoveDuplicateDevices(computeDevices);
 
     // Check that the specified compute devices are valid.
-    if (!CheckDevicesAreValid(computeDevices))
+    std::string invalidBackends;
+    if (!CheckRequestedBackendsAreValid(computeDevices, armnn::Optional<std::string&>(invalidBackends)))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains an invalid compute";
+        BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains invalid backend IDs: "
+                                 << invalidBackends;
         return EXIT_FAILURE;
     }
 
@@ -452,6 +450,9 @@ int main(int argc, const char* argv[])
 
     size_t subgraphId = 0;
 
+    const std::string backendsMessage = "Which device to run layers on by default. Possible choices: "
+                                      + armnn::BackendRegistryInstance().GetBackendIdsAsString();
+
     po::options_description desc("Options");
     try
     {
@@ -467,7 +468,7 @@ int main(int argc, const char* argv[])
             ("model-path,m", po::value(&modelPath), "Path to model file, e.g. .caffemodel, .prototxt,"
              " .tflite, .onnx")
             ("compute,c", po::value<std::vector<std::string>>()->multitoken(),
-             "The preferred order of devices to run layers on by default. Possible choices: CpuAcc, CpuRef, GpuAcc")
+             backendsMessage.c_str())
             ("input-name,i", po::value(&inputName), "Identifier of the input tensor in the network.")
             ("subgraph-number,x", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be executed."
               "Defaults to 0")
@@ -594,9 +595,11 @@ int main(int argc, const char* argv[])
         RemoveDuplicateDevices(computeDevices);
 
         // Check that the specified compute devices are valid.
-        if (!CheckDevicesAreValid(computeDevices))
+        std::string invalidBackends;
+        if (!CheckRequestedBackendsAreValid(computeDevices, armnn::Optional<std::string&>(invalidBackends)))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains an invalid compute";
+            BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains invalid backend IDs: "
+                                     << invalidBackends;
             return EXIT_FAILURE;
         }
 

@@ -11,6 +11,7 @@
 #include "INetwork.hpp"
 #include "LayerSupport.hpp"
 #include "LstmParams.hpp"
+#include "Optional.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
 #include "TypesUtils.hpp"

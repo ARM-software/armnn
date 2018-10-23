@@ -8,6 +8,8 @@
 #include <armnn/Exceptions.hpp>
 #include <functional>
 #include <memory>
+#include <sstream>
+#include <string>
 #include <unordered_map>
 
 namespace armnn
@@ -63,6 +65,23 @@ public:
             result.insert(it.first);
         }
         return result;
+    }
+
+    std::string GetBackendIdsAsString() const
+    {
+        static const std::string delimitator = ", ";
+
+        std::stringstream output;
+        for (auto& backendId : GetBackendIds())
+        {
+            if (output.tellp() != std::streampos(0))
+            {
+                output << delimitator;
+            }
+            output << backendId;
+        }
+
+        return output.str();
     }
 
     RegistryCommon() {}

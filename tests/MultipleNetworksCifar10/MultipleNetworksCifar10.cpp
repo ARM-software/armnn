@@ -41,6 +41,9 @@ int main(int argc, char* argv[])
         std::string modelDir;
         std::string dataDir;
 
+        const std::string backendsMessage = "Which device to run layers on by default. Possible choices: "
+                                          + armnn::BackendRegistryInstance().GetBackendIdsAsString();
+
         po::options_description desc("Options");
         try
         {
@@ -50,7 +53,7 @@ int main(int argc, char* argv[])
                 ("model-dir,m", po::value<std::string>(&modelDir)->required(),
                     "Path to directory containing the Cifar10 model file")
                 ("compute,c", po::value<std::vector<armnn::BackendId>>(&computeDevice)->default_value(defaultBackends),
-                    "Which device to run layers on by default. Possible choices: CpuAcc, CpuRef, GpuAcc")
+                    backendsMessage.c_str())
                 ("data-dir,d", po::value<std::string>(&dataDir)->required(),
                     "Path to directory containing the Cifar10 test data");
         }
@@ -90,6 +93,15 @@ int main(int argc, char* argv[])
             return 1;
         }
         string modelPath = modelDir + "cifar10_full_iter_60000.caffemodel";
+
+        // Check if the requested backend are all valid
+        std::string invalidBackends;
+        if (!CheckRequestedBackendsAreValid(computeDevice, armnn::Optional<std::string&>(invalidBackends)))
+        {
+            BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains invalid backend IDs: "
+                                     << invalidBackends;
+            return EXIT_FAILURE;
+        }
 
         // Create runtime
         armnn::IRuntime::CreationOptions options;

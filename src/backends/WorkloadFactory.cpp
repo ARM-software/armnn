@@ -5,10 +5,6 @@
 #include <backends/WorkloadFactory.hpp>
 #include <backends/LayerSupportRegistry.hpp>
 
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/neon/NeonWorkloadFactory.hpp>
-#include <backends/cl/ClWorkloadFactory.hpp>
-
 #include <armnn/Types.hpp>
 #include <armnn/LayerSupport.hpp>
 #include <Layer.hpp>
@@ -24,40 +20,42 @@ namespace armnn
 
 namespace
 {
-    const TensorInfo OverrideDataType(const TensorInfo& info, boost::optional<DataType> type)
-    {
-        if (type == boost::none)
-        {
-            return info;
-        }
 
-        return TensorInfo(info.GetShape(), type.get(), info.GetQuantizationScale(), info.GetQuantizationOffset());
+const TensorInfo OverrideDataType(const TensorInfo& info, Optional<DataType> type)
+{
+    if (!type)
+    {
+        return info;
     }
 
-    boost::optional<DataType> GetBiasTypeFromWeightsType(boost::optional<DataType> weightsType)
-    {
-        if (weightsType == boost::none)
-        {
-            return weightsType;
-        }
-
-        switch(weightsType.get())
-        {
-            case DataType::Float16:
-            case DataType::Float32:
-                return weightsType;
-            case DataType::QuantisedAsymm8:
-                return DataType::Signed32;
-            default:
-                BOOST_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
-        }
-        return boost::none;
-    }
+    return TensorInfo(info.GetShape(), type.value(), info.GetQuantizationScale(), info.GetQuantizationOffset());
 }
+
+Optional<DataType> GetBiasTypeFromWeightsType(Optional<DataType> weightsType)
+{
+    if (!weightsType)
+    {
+        return weightsType;
+    }
+
+    switch(weightsType.value())
+    {
+        case DataType::Float16:
+        case DataType::Float32:
+            return weightsType;
+        case DataType::QuantisedAsymm8:
+            return DataType::Signed32;
+        default:
+            BOOST_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
+    }
+    return EmptyOptional();
+}
+
+} // anonymous namespace
 
 bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                         const IConnectableLayer& connectableLayer,
-                                        boost::optional<DataType> dataType,
+                                        Optional<DataType> dataType,
                                         std::string& outReasonIfUnsupported)
 {
     Optional<std::string&> reason = outReasonIfUnsupported;
@@ -589,7 +587,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 }
 
 bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLayer,
-                                        boost::optional<DataType> dataType,
+                                        Optional<DataType> dataType,
                                         std::string& outReasonIfUnsupported)
 {
     auto layer = boost::polymorphic_downcast<const Layer*>(&connectableLayer);

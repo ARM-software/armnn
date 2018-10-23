@@ -25,7 +25,8 @@
 namespace armnn
 {
 
-bool NeonWorkloadFactory::IsLayerSupported(const Layer& layer, boost::optional<DataType> dataType,
+bool NeonWorkloadFactory::IsLayerSupported(const Layer& layer,
+                                           Optional<DataType> dataType,
                                            std::string& outReasonIfUnsupported)
 {
     return IWorkloadFactory::IsLayerSupported(Compute::CpuAcc, layer, dataType, outReasonIfUnsupported);

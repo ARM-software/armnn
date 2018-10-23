@@ -25,7 +25,8 @@ RefWorkloadFactory::RefWorkloadFactory()
 {
 }
 
-bool RefWorkloadFactory::IsLayerSupported(const Layer& layer, boost::optional<DataType> dataType,
+bool RefWorkloadFactory::IsLayerSupported(const Layer& layer,
+                                          Optional<DataType> dataType,
                                           std::string& outReasonIfUnsupported)
 {
     return IWorkloadFactory::IsLayerSupported(Compute::CpuRef, layer, dataType, outReasonIfUnsupported);

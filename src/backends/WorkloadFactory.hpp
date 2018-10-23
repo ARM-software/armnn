@@ -6,9 +6,9 @@
 
 #include <memory>
 #include <armnn/TensorFwd.hpp>
+#include <armnn/Optional.hpp>
 #include <backends/OutputHandler.hpp>
 #include <backends/Workload.hpp>
-#include <boost/optional.hpp>
 
 namespace armnn
 {
@@ -34,11 +34,11 @@ public:
 
     static bool IsLayerSupported(const BackendId& backendId,
                                  const IConnectableLayer& layer,
-                                 boost::optional<DataType> dataType,
+                                 Optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);
 
     static bool IsLayerSupported(const IConnectableLayer& layer,
-                                 boost::optional<DataType> dataType,
+                                 Optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);
 
     virtual bool SupportsSubTensors() const = 0;

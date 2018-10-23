@@ -11,13 +11,12 @@
 #include "LayerFwd.hpp"
 #include "Profiling.hpp"
 
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/neon/NeonWorkloadFactory.hpp>
-#include <backends/cl/ClWorkloadFactory.hpp>
+#include <backends/IBackendInternal.hpp>
 #include <backends/Workload.hpp>
 #include <backends/WorkloadFactory.hpp>
 
 #include <mutex>
+#include <unordered_map>
 
 namespace cl
 {
@@ -62,9 +61,11 @@ private:
 
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
 
-    RefWorkloadFactory  m_CpuRef;
-    NeonWorkloadFactory m_CpuAcc;
-    ClWorkloadFactory   m_GpuAcc;
+    using BackendPtrMap = std::unordered_map<BackendId, IBackendInternalUniquePtr>;
+    using WorkloadFactoryMap = std::unordered_map<BackendId, IBackendInternal::IWorkloadFactoryPtr>;
+
+    BackendPtrMap       m_Backends;
+    WorkloadFactoryMap  m_WorkloadFactories;
 
     std::unique_ptr<OptimizedNetwork> m_OptimizedNetwork;
     WorkloadQueue m_InputQueue;

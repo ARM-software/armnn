@@ -211,7 +211,9 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
 
                             // Try preferred backend first
                             layer->SetBackendId(preferredBackend);
-                            if (IWorkloadFactory::IsLayerSupported(*layer, boost::none, reasonIfUnsupported))
+                            if (IWorkloadFactory::IsLayerSupported(*layer,
+                                                                   EmptyOptional(),
+                                                                   reasonIfUnsupported))
                             {
                                 supportedBackendFound = true;
                             }
@@ -226,7 +228,9 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                                     }
 
                                     layer->SetBackendId(backend);
-                                    if (IWorkloadFactory::IsLayerSupported(*layer, boost::none, reasonIfUnsupported))
+                                    if (IWorkloadFactory::IsLayerSupported(*layer,
+                                                                           EmptyOptional(),
+                                                                           reasonIfUnsupported))
                                     {
                                         supportedBackendFound = true;
                                         break;

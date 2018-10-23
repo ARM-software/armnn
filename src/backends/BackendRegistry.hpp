@@ -6,11 +6,12 @@
 
 #include <armnn/Types.hpp>
 #include "RegistryCommon.hpp"
+#include "IBackendInternal.hpp"
 
 namespace armnn
 {
 
-using BackendRegistry = RegistryCommon<IBackend, IBackendUniquePtr>;
+using BackendRegistry = RegistryCommon<IBackendInternal, IBackendInternalUniquePtr>;
 
 BackendRegistry& BackendRegistryInstance();
 

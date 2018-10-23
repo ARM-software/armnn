@@ -5,11 +5,10 @@
 #pragma once
 
 #include <armnn/IRuntime.hpp>
+#include <armnn/Optional.hpp>
 
 #include <backends/OutputHandler.hpp>
 #include <backends/aclCommon/memory/BaseMemoryManager.hpp>
-
-#include <boost/optional.hpp>
 
 namespace armnn
 {
@@ -22,7 +21,8 @@ public:
 
     virtual Compute GetCompute() const override { return Compute::GpuAcc; }
 
-    static bool IsLayerSupported(const Layer& layer, boost::optional<DataType> dataType,
+    static bool IsLayerSupported(const Layer& layer,
+                                 Optional<DataType> dataType,
                                  std::string& outReasonIfUnsupported);
 
     virtual bool SupportsSubTensors() const override { return true; }

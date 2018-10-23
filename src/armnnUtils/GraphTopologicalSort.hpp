@@ -4,8 +4,8 @@
 //
 #pragma once
 
+#include <armnn/Optional.hpp>
 #include <boost/assert.hpp>
-#include <boost/optional.hpp>
 
 #include <functional>
 #include <map>
@@ -27,7 +27,7 @@ enum class NodeState
 
 
 template <typename TNodeId>
-boost::optional<TNodeId> GetNextChild(TNodeId node,
+armnn::Optional<TNodeId> GetNextChild(TNodeId node,
                                       std::function<std::vector<TNodeId>(TNodeId)> getIncomingEdges,
                                       std::map<TNodeId, NodeState>& nodeStates)
 {
@@ -70,11 +70,11 @@ bool TopologicallySort(
 
         nodeStates[current] = NodeState::Visiting;
 
-        boost::optional<TNodeId> nextChildOfCurrent = GetNextChild(current, getIncomingEdges, nodeStates);
+        auto nextChildOfCurrent = GetNextChild(current, getIncomingEdges, nodeStates);
 
         if (nextChildOfCurrent)
         {
-            TNodeId nextChild = nextChildOfCurrent.get();
+            TNodeId nextChild = nextChildOfCurrent.value();
 
             // If the child has not been searched, add to the stack and iterate over this node
             if (nodeStates.find(nextChild) == nodeStates.end())

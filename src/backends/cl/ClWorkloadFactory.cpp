@@ -35,7 +35,7 @@ namespace armnn
 {
 
 bool ClWorkloadFactory::IsLayerSupported(const Layer& layer,
-                                         boost::optional<DataType> dataType,
+                                         Optional<DataType> dataType,
                                          std::string& outReasonIfUnsupported)
 {
     return IWorkloadFactory::IsLayerSupported(Compute::GpuAcc, layer, dataType, outReasonIfUnsupported);

@@ -23,7 +23,7 @@ static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
     RefBackend::GetIdStatic(),
     []()
     {
-        return IBackendUniquePtr(new RefBackend, &RefBackend::Destroy);
+        return IBackendInternalUniquePtr(new RefBackend);
     }
 };
 
@@ -35,14 +35,9 @@ const BackendId& RefBackend::GetIdStatic()
     return s_Id;
 }
 
-std::unique_ptr<IWorkloadFactory> RefBackend::CreateWorkloadFactory() const
+IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory() const
 {
     return std::make_unique<RefWorkloadFactory>();
-}
-
-void RefBackend::Destroy(IBackend* backend)
-{
-    delete boost::polymorphic_downcast<RefBackend*>(backend);
 }
 
 } // namespace armnn

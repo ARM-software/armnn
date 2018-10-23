@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(TestRegistryHelper)
         [&called]()
         {
             called = true;
-            return armnn::IBackendUniquePtr(nullptr, nullptr);
+            return armnn::IBackendInternalUniquePtr(nullptr);
         }
     );
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(TestDirectCallToRegistry)
         [&called]()
         {
             called = true;
-            return armnn::IBackendUniquePtr(nullptr, nullptr);
+            return armnn::IBackendInternalUniquePtr(nullptr);
         }
     );
 

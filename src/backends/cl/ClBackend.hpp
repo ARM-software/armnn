@@ -18,9 +18,7 @@ public:
     static const BackendId& GetIdStatic();
     const BackendId& GetId() const override { return GetIdStatic(); }
 
-    std::unique_ptr<IWorkloadFactory> CreateWorkloadFactory() const override;
-
-    static void Destroy(IBackend* backend);
+    IWorkloadFactoryPtr CreateWorkloadFactory() const override;
 };
 
 } // namespace armnn

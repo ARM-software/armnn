@@ -20,7 +20,7 @@ class NeonWorkloadFactory : public IWorkloadFactory
 public:
     NeonWorkloadFactory();
 
-    virtual Compute GetCompute() const override { return Compute::CpuAcc; }
+    const BackendId& GetBackendId() const override;
 
     static bool IsLayerSupported(const Layer& layer,
                                  Optional<DataType> dataType,

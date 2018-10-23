@@ -32,7 +32,7 @@ std::unique_ptr<Workload> MakeAndCheckWorkload(Layer& layer, Graph& graph, const
     BOOST_TEST(workload.get() == boost::polymorphic_downcast<Workload*>(workload.get()),
                "Cannot convert to derived class");
     std::string reasonIfUnsupported;
-    layer.SetBackendId(factory.GetCompute());
+    layer.SetBackendId(factory.GetBackendId());
     BOOST_TEST(factory.IsLayerSupported(layer, layer.GetDataType(), reasonIfUnsupported));
     return std::unique_ptr<Workload>(static_cast<Workload*>(workload.release()));
 }

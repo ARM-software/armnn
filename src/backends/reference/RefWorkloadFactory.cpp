@@ -6,6 +6,7 @@
 #include <backends/MemCopyWorkload.hpp>
 #include <backends/MakeWorkloadHelper.hpp>
 #include "RefWorkloadFactory.hpp"
+#include "RefBackendId.hpp"
 #include "workloads/RefWorkloads.hpp"
 #include "Layer.hpp"
 
@@ -13,6 +14,11 @@
 
 namespace armnn
 {
+
+namespace
+{
+static const BackendId s_Id{RefBackendId()};
+}
 
 template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>
 std::unique_ptr<IWorkload> RefWorkloadFactory::MakeWorkload(const QueueDescriptorType& descriptor,
@@ -25,11 +31,16 @@ RefWorkloadFactory::RefWorkloadFactory()
 {
 }
 
+const BackendId& RefWorkloadFactory::GetBackendId() const
+{
+    return s_Id;
+}
+
 bool RefWorkloadFactory::IsLayerSupported(const Layer& layer,
                                           Optional<DataType> dataType,
                                           std::string& outReasonIfUnsupported)
 {
-    return IWorkloadFactory::IsLayerSupported(Compute::CpuRef, layer, dataType, outReasonIfUnsupported);
+    return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported);
 }
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const

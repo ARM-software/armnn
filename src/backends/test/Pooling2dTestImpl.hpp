@@ -77,10 +77,10 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(armnn::IWorkloadFactory& workloadF
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
 
     // Don't execute if Pooling is not supported, as an exception will be raised.
-    armnn::Compute compute = workloadFactory.GetCompute();
+    armnn::BackendId backend = workloadFactory.GetBackendId();
     const size_t reasonIfUnsupportedMaxLen = 255;
     char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    result.supported = armnn::IsPooling2dSupported(compute, inputTensorInfo, outputTensorInfo,
+    result.supported = armnn::IsPooling2dSupported(backend, inputTensorInfo, outputTensorInfo,
                                                    queueDescriptor.m_Parameters,
                                                    reasonIfUnsupported, reasonIfUnsupportedMaxLen);
     if (!result.supported)
@@ -650,10 +650,10 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(armnn::IWorkloadFactory& worklo
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);
 
     // Don't execute if Pooling is not supported, as an exception will be raised.
-    armnn::Compute compute = workloadFactory.GetCompute();
+    armnn::BackendId backend = workloadFactory.GetBackendId();
     const size_t reasonIfUnsupportedMaxLen = 255;
     char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    comparisonResult.supported = armnn::IsPooling2dSupported(compute, inputTensorInfo, outputTensorInfo,
+    comparisonResult.supported = armnn::IsPooling2dSupported(backend, inputTensorInfo, outputTensorInfo,
                                                              data.m_Parameters,
                                                              reasonIfUnsupported, reasonIfUnsupportedMaxLen);
     if (!comparisonResult.supported)

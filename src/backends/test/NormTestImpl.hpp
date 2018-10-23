@@ -308,10 +308,10 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(armnn::IWorkloadFactory& w
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
     // Don't execute if Normalization is not supported for the method and channel types, as an exception will be raised.
-    armnn::Compute compute = workloadFactory.GetCompute();
+    armnn::BackendId backend = workloadFactory.GetBackendId();
     const size_t reasonIfUnsupportedMaxLen = 255;
     char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    ret.supported = armnn::IsNormalizationSupported(compute, inputTensorInfo, outputTensorInfo, data.m_Parameters,
+    ret.supported = armnn::IsNormalizationSupported(backend, inputTensorInfo, outputTensorInfo, data.m_Parameters,
                                                     reasonIfUnsupported, reasonIfUnsupportedMaxLen);
     if (!ret.supported)
     {

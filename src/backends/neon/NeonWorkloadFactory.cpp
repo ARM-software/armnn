@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include "NeonWorkloadFactory.hpp"
+#include "NeonBackendId.hpp"
 #include <armnn/Utils.hpp>
 #include <backends/CpuTensorHandle.hpp>
 #include <Layer.hpp>
@@ -25,11 +26,21 @@
 namespace armnn
 {
 
+namespace
+{
+static const BackendId s_Id{NeonBackendId()};
+}
+
 bool NeonWorkloadFactory::IsLayerSupported(const Layer& layer,
                                            Optional<DataType> dataType,
                                            std::string& outReasonIfUnsupported)
 {
-    return IWorkloadFactory::IsLayerSupported(Compute::CpuAcc, layer, dataType, outReasonIfUnsupported);
+    return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported);
+}
+
+const BackendId& NeonWorkloadFactory::GetBackendId() const
+{
+    return s_Id;
 }
 
 #ifdef ARMCOMPUTENEON_ENABLED

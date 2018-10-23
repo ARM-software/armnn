@@ -19,7 +19,7 @@ class ClWorkloadFactory : public IWorkloadFactory
 public:
     ClWorkloadFactory();
 
-    virtual Compute GetCompute() const override { return Compute::GpuAcc; }
+    const BackendId& GetBackendId() const override;
 
     static bool IsLayerSupported(const Layer& layer,
                                  Optional<DataType> dataType,

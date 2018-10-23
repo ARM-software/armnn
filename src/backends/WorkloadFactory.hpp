@@ -21,7 +21,7 @@ class IWorkloadFactory
 public:
     virtual ~IWorkloadFactory() { }
 
-    virtual Compute GetCompute() const = 0;
+    virtual const BackendId& GetBackendId() const = 0;
 
     /// Informs the memory manager that the network is finalized and ready for execution.
     virtual void Finalize() { }

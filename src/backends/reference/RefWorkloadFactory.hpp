@@ -33,7 +33,7 @@ public:
     explicit RefWorkloadFactory();
     virtual ~RefWorkloadFactory() {}
 
-    virtual Compute GetCompute() const override { return Compute::CpuRef; }
+    const BackendId& GetBackendId() const override;
 
     static bool IsLayerSupported(const Layer& layer,
                                  Optional<DataType> dataType,

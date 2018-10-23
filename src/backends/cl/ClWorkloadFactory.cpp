@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include "ClWorkloadFactory.hpp"
+#include "ClBackendId.hpp"
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Utils.hpp>
@@ -34,11 +35,21 @@
 namespace armnn
 {
 
+namespace
+{
+static const BackendId s_Id{ClBackendId()};
+}
+
 bool ClWorkloadFactory::IsLayerSupported(const Layer& layer,
                                          Optional<DataType> dataType,
                                          std::string& outReasonIfUnsupported)
 {
-    return IWorkloadFactory::IsLayerSupported(Compute::GpuAcc, layer, dataType, outReasonIfUnsupported);
+    return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported);
+}
+
+const BackendId& ClWorkloadFactory::GetBackendId() const
+{
+    return s_Id;
 }
 
 #ifdef ARMCOMPUTECL_ENABLED

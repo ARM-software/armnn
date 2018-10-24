@@ -3,17 +3,20 @@
 # SPDX-License-Identifier: MIT
 #
 
+list(APPEND armnnNeonBackend_sources
+    NeonBackendId.hpp
+    NeonLayerSupport.cpp
+    NeonLayerSupport.hpp
+    NeonWorkloadFactory.cpp
+    NeonWorkloadFactory.hpp
+)
+
 if(ARMCOMPUTENEON)
     list(APPEND armnnNeonBackend_sources
         NeonBackend.cpp
         NeonBackend.hpp
-        NeonBackendId.hpp
         NeonInterceptorScheduler.hpp
         NeonInterceptorScheduler.cpp
-        NeonLayerSupport.cpp
-        NeonLayerSupport.hpp
-        NeonWorkloadFactory.cpp
-        NeonWorkloadFactory.hpp
         NeonTensorHandle.hpp
         NeonTimer.hpp
         NeonTimer.cpp
@@ -24,18 +27,10 @@ if(ARMCOMPUTENEON)
     if(BUILD_UNIT_TESTS)
         add_subdirectory(test)
     endif()
-
-else()
-    list(APPEND armnnNeonBackend_sources
-        NeonBackendId.hpp
-        NeonLayerSupport.cpp
-        NeonLayerSupport.hpp
-        NeonWorkloadFactory.cpp
-        NeonWorkloadFactory.hpp
-    )
 endif()
 
 add_library(armnnNeonBackend OBJECT ${armnnNeonBackend_sources})
 target_include_directories(armnnNeonBackend PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnNeonBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnNeonBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+

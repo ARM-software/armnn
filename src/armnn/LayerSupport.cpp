@@ -39,7 +39,7 @@ void CopyErrorMessage(char* truncatedString, const char* fullString, size_t maxL
     bool isSupported; \
     try { \
         auto factoryFunc = LayerSupportRegistryInstance().GetFactory(backendId); \
-        auto layerSupportObject = factoryFunc(); \
+        auto layerSupportObject = factoryFunc(EmptyInitializer()); \
         isSupported = layerSupportObject->func(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
         CopyErrorMessage(reasonIfUnsupported, reasonIfUnsupportedFull.c_str(), reasonIfUnsupportedMaxLength); \
     } catch (InvalidArgumentException e) { \

@@ -38,6 +38,7 @@ std::string ToErrorMessage(const char * prefix, const ExceptionType & error)
 } // anonymous
 
 std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
+                                                                const IRuntime::CreationOptions& options,
                                                                 std::string & errorMessage)
 {
     std::unique_ptr<LoadedNetwork> loadedNetwork;
@@ -52,7 +53,7 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 
     try
     {
-        loadedNetwork.reset(new LoadedNetwork(std::move(net)));
+        loadedNetwork.reset(new LoadedNetwork(std::move(net), options));
     }
     catch (const armnn::RuntimeException& error)
     {
@@ -70,7 +71,8 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
     return loadedNetwork;
 }
 
-LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
+LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
+                             const IRuntime::CreationOptions& options)
     : m_OptimizedNetwork(std::move(net))
     , m_WorkingMemLock(m_WorkingMemMutex, std::defer_lock)
 {
@@ -89,7 +91,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
         if (m_Backends.count(backend) == 0)
         {
             auto createBackend = BackendRegistryInstance().GetFactory(backend);
-            auto it = m_Backends.emplace(std::make_pair(backend, createBackend()));
+            auto it = m_Backends.emplace(std::make_pair(backend, createBackend(EmptyInitializer())));
             m_WorkloadFactories.emplace(std::make_pair(backend,
                                                        it.first->second->CreateWorkloadFactory()));
         }

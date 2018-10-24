@@ -64,7 +64,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
     auto const& layerSupportRegistry = LayerSupportRegistryInstance();
     auto layerSupportFactory = layerSupportRegistry.GetFactory(backendId);
-    auto layerSupportObject = layerSupportFactory();
+    auto layerSupportObject = layerSupportFactory(EmptyInitializer());
 
     switch(layer.GetType())
     {

@@ -9,7 +9,8 @@
 #include <armnn/INetwork.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/Tensor.hpp>
-#include <backends/cl/ClContextControl.hpp>
+#include <armnn/BackendId.hpp>
+#include <backends/IBackendContext.hpp>
 
 #include <mutex>
 #include <unordered_map>
@@ -85,14 +86,13 @@ private:
     }
 
     mutable std::mutex m_Mutex;
-
     std::unordered_map<NetworkId, std::unique_ptr<LoadedNetwork>> m_LoadedNetworks;
-
-    ClContextControl m_ClContextControl;
-
+    CreationOptions m_Options;
     int m_NetworkIdCounter;
-
     DeviceSpec m_DeviceSpec;
+
+    using BackendContextMap = std::unordered_map<BackendId, IBackendContextUniquePtr>;
+    BackendContextMap m_BackendContexts;
 };
 
 }

@@ -49,7 +49,7 @@ ILayerSupportSharedPtr GetLayerSupportPointer()
 static StaticRegistryInitializer<LayerSupportRegistry> g_RegisterHelper{
     LayerSupportRegistryInstance(),
     NeonBackendId(),
-    []()
+    [](const EmptyInitializer&)
     {
         return GetLayerSupportPointer();
     }

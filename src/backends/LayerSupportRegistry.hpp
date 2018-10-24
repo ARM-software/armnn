@@ -6,11 +6,13 @@
 
 #include "RegistryCommon.hpp"
 #include <armnn/ILayerSupport.hpp>
+#include <armnn/Types.hpp>
 
 namespace armnn
 {
-
-using LayerSupportRegistry = RegistryCommon<ILayerSupport, ILayerSupportSharedPtr>;
+using LayerSupportRegistry = RegistryCommon<ILayerSupport,
+                                            ILayerSupportSharedPtr,
+                                            EmptyInitializer>;
 
 LayerSupportRegistry& LayerSupportRegistryInstance();
 

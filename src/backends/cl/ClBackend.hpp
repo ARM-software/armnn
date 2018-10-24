@@ -12,8 +12,8 @@ namespace armnn
 class ClBackend : public IBackendInternal
 {
 public:
-    ClBackend()  = default;
-    ~ClBackend() = default;
+    ClBackend() = default;
+    ~ClBackend() override = default;
 
     static const BackendId& GetIdStatic();
     const BackendId& GetId() const override { return GetIdStatic(); }

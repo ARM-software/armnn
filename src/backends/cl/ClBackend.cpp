@@ -8,8 +8,7 @@
 #include "ClWorkloadFactory.hpp"
 
 #include <backends/BackendRegistry.hpp>
-
-#include <boost/cast.hpp>
+#include <boost/log/trivial.hpp>
 
 namespace armnn
 {
@@ -21,13 +20,13 @@ static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
 {
     BackendRegistryInstance(),
     ClBackend::GetIdStatic(),
-    []()
+    [](const EmptyInitializer&)
     {
         return IBackendInternalUniquePtr(new ClBackend);
     }
 };
 
-}
+} // anonymous namespace
 
 const BackendId& ClBackend::GetIdStatic()
 {

@@ -7,6 +7,7 @@
 #include "BackendId.hpp"
 #include "Descriptors.hpp"
 #include "Exceptions.hpp"
+#include "IBackend.hpp"
 #include "IRuntime.hpp"
 #include "INetwork.hpp"
 #include "LayerSupport.hpp"

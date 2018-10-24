@@ -8,6 +8,7 @@
 # file in the root of ArmNN
 
 BACKEND_SOURCES := \
+        ClBackendContext.cpp \
         ClBackend.cpp \
         ClContextControl.cpp \
         ClLayerSupport.cpp \
@@ -54,3 +55,4 @@ BACKEND_TEST_SOURCES := \
         test/ClRuntimeTests.cpp \
         test/Fp16SupportTest.cpp \
         test/OpenClTimerTest.cpp
+

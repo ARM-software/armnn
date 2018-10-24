@@ -6,14 +6,9 @@
 
 #include <armnn/Version.hpp>
 #include <backends/BackendRegistry.hpp>
+#include <backends/BackendContextRegistry.hpp>
 
 #include <iostream>
-
-#ifdef ARMCOMPUTECL_ENABLED
-#include <arm_compute/core/CL/OpenCL.h>
-#include <arm_compute/core/CL/CLKernelLibrary.h>
-#include <arm_compute/runtime/CL/CLScheduler.h>
-#endif
 
 #include <boost/log/trivial.hpp>
 #include <boost/polymorphic_cast.hpp>
@@ -57,6 +52,7 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut,
     IOptimizedNetwork* rawNetwork = inNetwork.release();
     unique_ptr<LoadedNetwork> loadedNetwork = LoadedNetwork::MakeLoadedNetwork(
         std::unique_ptr<OptimizedNetwork>(boost::polymorphic_downcast<OptimizedNetwork*>(rawNetwork)),
+        m_Options,
         errorMessage);
 
     if (!loadedNetwork)
@@ -78,24 +74,6 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut,
 
 Status Runtime::UnloadNetwork(NetworkId networkId)
 {
-#ifdef ARMCOMPUTECL_ENABLED
-    if (arm_compute::CLScheduler::get().context()() != NULL)
-    {
-        // Waits for all queued CL requests to finish before unloading the network they may be using.
-        try
-        {
-            // Coverity fix: arm_compute::CLScheduler::sync() may throw an exception of type cl::Error.
-            arm_compute::CLScheduler::get().sync();
-        }
-        catch (const cl::Error&)
-        {
-            BOOST_LOG_TRIVIAL(warning) << "WARNING: Runtime::UnloadNetwork(): an error occurred while waiting for "
-                                          "the queued CL requests to finish";
-            return Status::Failure;
-        }
-    }
-#endif
-
     {
         std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
@@ -104,14 +82,6 @@ Status Runtime::UnloadNetwork(NetworkId networkId)
             BOOST_LOG_TRIVIAL(warning) << "WARNING: Runtime::UnloadNetwork(): " << networkId << " not found!";
             return Status::Failure;
         }
-
-#ifdef ARMCOMPUTECL_ENABLED
-        if (arm_compute::CLScheduler::get().context()() != NULL && m_LoadedNetworks.empty())
-        {
-            // There are no loaded networks left, so clear the CL cache to free up memory
-            m_ClContextControl.ClearClCache();
-        }
-#endif
     }
 
     BOOST_LOG_TRIVIAL(debug) << "Runtime::UnloadNetwork(): Unloaded network with ID: " << networkId;
@@ -131,12 +101,26 @@ const std::shared_ptr<IProfiler> Runtime::GetProfiler(NetworkId networkId) const
 }
 
 Runtime::Runtime(const CreationOptions& options)
-    : m_ClContextControl(options.m_GpuAccTunedParameters.get(),
-                         options.m_EnableGpuProfiling)
+    : m_Options{options}
     , m_NetworkIdCounter(0)
     , m_DeviceSpec{BackendRegistryInstance().GetBackendIds()}
 {
     BOOST_LOG_TRIVIAL(info) << "ArmNN v" << ARMNN_VERSION << "\n";
+
+    for (const auto& id : BackendContextRegistryInstance().GetBackendIds())
+    {
+        // Store backend contexts for the supported ones
+        if (m_DeviceSpec.GetSupportedBackends().count(id) > 0)
+        {
+            // Don't throw an exception, rather return a dummy factory if not
+            // found.
+            auto factoryFun = BackendContextRegistryInstance().GetFactory(
+                id, [](const CreationOptions&) { return IBackendContextUniquePtr(); }
+            );
+
+            m_BackendContexts.emplace(std::make_pair(id, factoryFun(options)));
+        }
+    }
 }
 
 Runtime::~Runtime()

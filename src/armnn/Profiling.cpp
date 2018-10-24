@@ -9,10 +9,6 @@
 #include <streamline_annotate.h>
 #endif
 
-#if ARMCOMPUTECL_ENABLED
-#include <arm_compute/runtime/CL/CLFunctions.h>
-#endif
-
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
@@ -41,12 +37,6 @@ constexpr bool g_AggregateProfilingEventsByInference = true;
 // Whether a call to Profiler::AnalyzeEventsAndWriteResults() will be made when the Profiler is destroyed.
 // It can be convenient for local tests.
 constexpr bool g_WriteReportToStdOutOnProfilerDestruction = false;
-
-// Whether events denoting operations running on the GPU should force a sync before/after the event.
-// This is hardcoded to true for now as the profiling timings are not very useful without it.
-#if ARMCOMPUTECL_ENABLED
-constexpr bool g_ProfilingForceGpuSync = true;
-#endif
 
 Measurement FindMeasurement(const std::string& name, const Event* event)
 {
@@ -206,9 +196,6 @@ void Profiler::EnableProfiling(bool enableProfiling)
 
 Event* Profiler::BeginEvent(Compute compute, const std::string& label, std::vector<InstrumentPtr>&& instruments)
 {
-    // We need to sync just before the begin event to not include time before the period we want to time.
-    WaitForDevice(compute);
-
     Event* parent = m_Parents.empty() ? nullptr : m_Parents.top();
     m_EventSequence.push_back(std::make_unique<Event>(label, this, parent, compute, std::move(instruments)));
     Event* event = m_EventSequence.back().get();
@@ -476,16 +463,6 @@ void Profiler::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
             inferenceIdx++;
         }
     }
-}
-
-void Profiler::WaitForDevice(Compute compute) const
-{
-#if ARMCOMPUTECL_ENABLED
-    if(compute == Compute::GpuAcc && g_ProfilingForceGpuSync)
-    {
-        arm_compute::CLScheduler::get().sync();
-    }
-#endif
 }
 
 std::uint32_t Profiler::GetEventColor(Compute compute) const

@@ -74,10 +74,6 @@ private:
         uint32_t m_Count;
     };
 
-    // Waits for a compute device to finish working to guarantee correct timings.
-    // Currently used exclusively when emitting profiling events denoting GPU work.
-    void WaitForDevice(Compute compute) const;
-
     template<typename EventIterType>
     void AnalyzeEventSequenceAndWriteResults(EventIterType first, EventIterType last, std::ostream& outStream) const;
 

@@ -6,9 +6,12 @@
 list(APPEND armnnClBackendUnitTests_sources
     ClContextControlFixture.hpp
     ClCreateWorkloadTests.cpp
+    ClEndToEndTests.cpp
+    ClJsonPrinterTests.cpp
     ClLayerSupportTests.cpp
     ClLayerTests.cpp
     ClMemCopyTests.cpp
+    ClOptimizedNetworkTests.cpp
     ClRuntimeTests.cpp
     OpenClTimerTest.cpp
 )

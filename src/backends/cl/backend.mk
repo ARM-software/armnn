@@ -44,9 +44,12 @@ BACKEND_SOURCES := \
 
 BACKEND_TEST_SOURCES := \
         test/ClCreateWorkloadTests.cpp \
+        test/ClEndToEndTests.cpp \
+        test/ClJsonPrinterTests.cpp \
         test/ClLayerSupportTests.cpp \
         test/ClLayerTests.cpp \
         test/ClMemCopyTests.cpp \
+        test/ClOptimizedNetworkTests.cpp \
         test/ClRuntimeTests.cpp \
         test/Fp16SupportTest.cpp \
         test/OpenClTimerTest.cpp

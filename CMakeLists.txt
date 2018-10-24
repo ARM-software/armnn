@@ -337,7 +337,6 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/UnitTests.hpp
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/UtilsTests.cpp
-        src/armnn/test/JsonPrinterTests.cpp
         src/armnn/test/GraphTests.cpp
         src/armnn/test/OptimizerTests.cpp
         src/armnn/test/ProfilerTests.cpp
@@ -366,6 +365,8 @@ if(BUILD_UNIT_TESTS)
         src/backends/test/Conv2dTestImpl.hpp
         src/backends/test/ActivationTestImpl.hpp
         src/backends/test/ActivationFixture.hpp
+        src/backends/test/EndToEndTestImpl.hpp
+        src/backends/test/JsonPrinterTestImpl.hpp
         src/backends/test/Pooling2dTestImpl.hpp
         src/backends/test/ReshapeTestImpl.hpp
         src/backends/test/PermuteTestImpl.hpp
@@ -373,6 +374,7 @@ if(BUILD_UNIT_TESTS)
         src/backends/test/SplitterTestImpl.hpp
         src/backends/test/NormTestImpl.hpp
         src/backends/test/BatchNormTestImpl.hpp
+        src/backends/test/OptimizedNetworkTests.cpp
         src/backends/test/WorkloadTestUtils.hpp
         src/backends/test/QuantizeHelper.hpp)
 

@@ -4,7 +4,8 @@
 //
 #pragma once
 
-#include "Graph.hpp"
+#include <armnn/Graph.hpp>
+
 #include <string>
 
 namespace

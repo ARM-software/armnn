@@ -41,8 +41,11 @@ BACKEND_SOURCES := \
 
 BACKEND_TEST_SOURCES := \
         test/NeonCreateWorkloadTests.cpp \
+        test/NeonEndToEndTests.cpp \
+        test/NeonJsonPrinterTests.cpp \
         test/NeonLayerSupportTests.cpp \
         test/NeonLayerTests.cpp \
         test/NeonMemCopyTests.cpp \
+        test/NeonOptimizedNetworkTests.cpp \
         test/NeonRuntimeTests.cpp \
         test/NeonTimerTest.cpp

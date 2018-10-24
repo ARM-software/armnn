@@ -2,29 +2,27 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <stack>
-#include <string>
-#include <vector>
-#include <sstream>
 
-#include <Profiling.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
-#include <backends/cl/test/ClContextControlFixture.hpp>
-#include <backends/cl/ClWorkloadFactory.hpp>
+#include <armnn/Profiling.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(JsonPrinterTests, ClProfilingContextControlFixture)
+#include <boost/test/unit_test.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
-bool AreMatchingPair(const char opening, const char closing)
+#include <sstream>
+#include <stack>
+#include <string>
+#include <vector>
+
+inline bool AreMatchingPair(const char opening, const char closing)
 {
     return (opening == '{' && closing == '}') || (opening == '[' && closing == ']');
 }
 
-bool AreParenthesesMatching(const std::string& exp)
+inline bool AreParenthesesMatching(const std::string& exp)
 {
     std::stack<char> expStack;
     for (size_t i = 0; i < exp.length(); ++i)
@@ -48,7 +46,7 @@ bool AreParenthesesMatching(const std::string& exp)
     return expStack.empty();
 }
 
-std::vector<double> ExtractMeasurements(const std::string& exp)
+inline std::vector<double> ExtractMeasurements(const std::string& exp)
 {
     std::vector<double> numbers;
     bool inArray = false;
@@ -95,7 +93,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
     return numbers;
 }
 
-std::vector<std::string> ExtractSections(const std::string& exp)
+inline std::vector<std::string> ExtractSections(const std::string& exp)
 {
     std::vector<std::string> sections;
 
@@ -117,7 +115,7 @@ std::vector<std::string> ExtractSections(const std::string& exp)
     return sections;
 }
 
-std::string SoftmaxProfilerTestSetupHelper(const std::vector<armnn::BackendId>& backends)
+inline std::string SoftmaxProfilerTestSetupHelper(const std::vector<armnn::BackendId>& backends)
 {
     using namespace armnn;
 
@@ -193,7 +191,7 @@ std::string SoftmaxProfilerTestSetupHelper(const std::vector<armnn::BackendId>& 
     return ss.str();
 }
 
-void SoftmaxProfilerTestValidationHelper(std::string& result, const std::string& testData)
+inline void SoftmaxProfilerTestValidationHelper(std::string& result, const std::string& testData)
 {
     // ensure all measurements are greater than zero
     std::vector<double> measurementsVector = ExtractMeasurements(result);
@@ -238,7 +236,7 @@ void SoftmaxProfilerTestValidationHelper(std::string& result, const std::string&
     BOOST_CHECK(AreParenthesesMatching(result));
 }
 
-void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
+inline void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJsonPrinterResult(
         const std::vector<armnn::BackendId>& backends)
 {
     // setup the test fixture and obtain JSON Printer result
@@ -354,25 +352,3 @@ void SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult(
     // validate the JSON Printer result
     SoftmaxProfilerTestValidationHelper(result, testData);
 }
-
-BOOST_AUTO_TEST_CASE(SoftmaxProfilerJSONPrinterCpuRefTest)
-{
-    SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult({armnn::Compute::CpuRef});
-}
-
-
-#if ARMCOMPUTENEON_ENABLED
-BOOST_AUTO_TEST_CASE(SoftmaxProfilerJSONPrinterCpuAccTest)
-{
-    SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult({armnn::Compute::CpuAcc});
-}
-#endif
-
-#if ARMCOMPUTECL_ENABLED
-BOOST_AUTO_TEST_CASE(SoftmaxProfilerJSONPrinterGpuAccTest)
-{
-    SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJSONPrinterResult({armnn::Compute::GpuAcc});
-}
-#endif
-
-BOOST_AUTO_TEST_SUITE_END()

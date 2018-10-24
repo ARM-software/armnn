@@ -5,9 +5,12 @@
 
 list(APPEND armnnNeonBackendUnitTests_sources
     NeonCreateWorkloadTests.cpp
+    NeonEndToEndTests.cpp
+    NeonJsonPrinterTests.cpp
     NeonLayerSupportTests.cpp
     NeonLayerTests.cpp
     NeonMemCopyTests.cpp
+    NeonOptimizedNetworkTests.cpp
     NeonRuntimeTests.cpp
     NeonTimerTest.cpp
 )

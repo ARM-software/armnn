@@ -65,6 +65,9 @@ BACKEND_SOURCES := \
 
 BACKEND_TEST_SOURCES := \
         test/RefCreateWorkloadTests.cpp \
+        test/RefEndToEndTests.cpp \
+        test/RefJsonPrinterTests.cpp \
         test/RefLayerSupportTests.cpp \
         test/RefLayerTests.cpp \
+        test/RefOptimizedNetworkTests.cpp \
         test/RefRuntimeTests.cpp

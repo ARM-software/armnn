@@ -5,8 +5,11 @@
 
 list(APPEND armnnRefBackendUnitTests_sources
     RefCreateWorkloadTests.cpp
+    RefEndToEndTests.cpp
+    RefJsonPrinterTests.cpp
     RefLayerSupportTests.cpp
     RefLayerTests.cpp
+    RefOptimizedNetworkTests.cpp
     RefRuntimeTests.cpp
 )
 

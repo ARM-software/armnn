@@ -774,10 +774,6 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
     unsigned int padW = GET_OPTIONAL_WITH_VECTOR_FALLBACK(convParam, ConvolutionParameter,
                                                           pad_w, pad, unsigned int, 0u);
 
-    VALIDATE_EQUAL_VALUES_IN_RANGE(kernelH, kernelW, 0, 11);
-    VALIDATE_EQUAL_VALUES_IN_RANGE(strideH, strideW, 0, 11);
-    VALIDATE_EQUAL_VALUES_IN_RANGE(padH, padW, 0, 11);
-
     Convolution2dDescriptor convolution2dDescriptor;
     convolution2dDescriptor.m_PadLeft     = padW;
     convolution2dDescriptor.m_PadRight    = padW;

@@ -50,7 +50,8 @@ struct LayerTestResult
 };
 
 LayerTestResult<float, 4> SimpleConvolution2d3x5Test(armnn::IWorkloadFactory& workloadFactory,
-                                                     bool biasEnabled);
+                                                     bool biasEnabled,
+                                                     const armnn::DataLayoutIndexed& layout);
 
 LayerTestResult<float, 4> SimpleConvolution2d3x3Test(armnn::IWorkloadFactory& workloadFactory,
                                                      bool biasEnabled);
@@ -312,7 +313,8 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(armnn::IWorkloadF
 LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                            bool                     biasEnabled);
+                                                            bool                     biasEnabled,
+                                                            const armnn::DataLayoutIndexed& layout);
 
 LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(armnn::IWorkloadFactory& workloadFactory,
                                                             bool                     biasEnabled);

@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <string>
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
@@ -13,6 +14,8 @@
 
 #include <backends/CpuTensorHandle.hpp>
 #include <backends/WorkloadFactory.hpp>
+#include "Permute.hpp"
+#include <boost/numeric/conversion/cast.hpp>
 
 // Mapping from input type to bias type for fully connected layers.
 // float => float, uint8_t => int32_t
@@ -59,33 +62,55 @@ void ApplyBias(std::vector<T>& v, float vScale, int32_t vOffset,
     }
 }
 
+template<typename T>
+armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
+                                unsigned int numberOfChannels,
+                                unsigned int height,
+                                unsigned int width,
+                                const armnn::DataLayoutIndexed& layout)
+{
+    switch (layout.GetDataLayout())
+    {
+        case armnn::DataLayout::NCHW:
+            return armnn::TensorInfo({numberOfBatches, numberOfChannels, height, width}, armnn::GetDataType<T>());
+        case armnn::DataLayout ::NHWC:
+            return armnn::TensorInfo({numberOfBatches, height, width, numberOfChannels}, armnn::GetDataType<T>());
+        default:
+            throw armnn::InvalidArgumentException("unknown data layout ["
+                + std::to_string(static_cast<int>(layout.GetDataLayout())) + "]");
+    }
+}
+
+
+
 template<typename T, typename B>
 LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                  const boost::multi_array<T, 4>& input,
-                                                  const boost::multi_array<T, 4>& kernel,
+                                                  const boost::multi_array<T, 4>& originalInput,
+                                                  const boost::multi_array<T, 4>& originalKernel,
                                                   const boost::multi_array<B, 1>& bias,
-                                                  const boost::multi_array<T, 4>& outputExpected,
+                                                  const boost::multi_array<T, 4>& originalOutputExpected,
                                                   float qScale,
                                                   int32_t qOffset,
+                                                  const armnn::DataLayoutIndexed& layout = armnn::DataLayout::NCHW,
                                                   uint32_t padLeft = 0,
                                                   uint32_t padTop = 0,
                                                   uint32_t padRight = 0,
                                                   uint32_t padBottom = 0)
 {
-    unsigned int inputHeight   = boost::numeric_cast<unsigned int>(input.shape()[2]);
-    unsigned int inputWidth    = boost::numeric_cast<unsigned int>(input.shape()[3]);
-    unsigned int inputChannels = boost::numeric_cast<unsigned int>(input.shape()[1]);
-    unsigned int inputNum      = boost::numeric_cast<unsigned int>(input.shape()[0]);
+    unsigned int inputHeight   = boost::numeric_cast<unsigned int>(originalInput.shape()[2]);
+    unsigned int inputWidth    = boost::numeric_cast<unsigned int>(originalInput.shape()[3]);
+    unsigned int inputChannels = boost::numeric_cast<unsigned int>(originalInput.shape()[1]);
+    unsigned int inputNum      = boost::numeric_cast<unsigned int>(originalInput.shape()[0]);
 
-    unsigned int outputHeight   = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
-    unsigned int outputWidth    = boost::numeric_cast<unsigned int>(outputExpected.shape()[3]);
-    unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
-    unsigned int outputNum      = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
+    unsigned int outputHeight   = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[2]);
+    unsigned int outputWidth    = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[3]);
+    unsigned int outputChannels = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[1]);
+    unsigned int outputNum      = boost::numeric_cast<unsigned int>(originalOutputExpected.shape()[0]);
 
-    unsigned int kernelHeight = boost::numeric_cast<unsigned int>(kernel.shape()[2]);
-    unsigned int kernelWidth = boost::numeric_cast<unsigned int>(kernel.shape()[3]);
-    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(kernel.shape()[1]);
-    unsigned int kernelDepthMul = boost::numeric_cast<unsigned int>(kernel.shape()[0]);
+    unsigned int kernelHeight = boost::numeric_cast<unsigned int>(originalKernel.shape()[2]);
+    unsigned int kernelWidth = boost::numeric_cast<unsigned int>(originalKernel.shape()[3]);
+    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(originalKernel.shape()[1]);
+    unsigned int kernelDepthMul = boost::numeric_cast<unsigned int>(originalKernel.shape()[0]);
 
     bool biasEnabled = bias.size() > 0;
 
@@ -98,10 +123,11 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 
 
     // Note these tensors will use two (identical) batches.
-    armnn::TensorInfo inputTensorInfo({2*inputNum, inputChannels, inputHeight, inputWidth}, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({2*outputNum, outputChannels, outputHeight, outputWidth},
-        armnn::GetDataType<T>());
-    armnn::TensorInfo kernelDesc({kernelDepthMul, kernelChannels, kernelHeight, kernelWidth}, armnn::GetDataType<T>());
+    // NOTE: if layout is unknown we will get an exception at this point.
+    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(2*inputNum, inputChannels, inputHeight, inputWidth, layout);
+    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(
+            2*outputNum, outputChannels, outputHeight, outputWidth, layout);
+    armnn::TensorInfo kernelDesc = GetTensorInfo<T>(kernelDepthMul, kernelChannels, kernelHeight, kernelWidth, layout);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -121,14 +147,25 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 
     // Construct input data - two batches of the same input image.
     std::vector<T> inputImage;
-    inputImage.assign(input.data(), input.data() + 1*inputChannels*inputHeight*inputWidth);
+    inputImage.assign(originalInput.data(), originalInput.data() + 1*inputChannels*inputHeight*inputWidth);
     std::vector<T> inputData;
     inputData.insert(inputData.end(), inputImage.begin(), inputImage.end());
     inputData.insert(inputData.end(), inputImage.begin(), inputImage.end());
+
+    // at this point if we require it permute the input data
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<T> tmp(inputData.size());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        inputData = tmp;
+    }
+
     auto batchedInput = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
     std::vector<T> outputImage;
-    outputImage.assign(outputExpected.data(), outputExpected.data() + outputChannels*outputHeight*outputWidth);
+    outputImage.assign(originalOutputExpected.data(),
+            originalOutputExpected.data() + outputChannels*outputHeight*outputWidth);
 
     // Apply bias to output image if it is enabled.
     if(biasEnabled)
@@ -145,6 +182,13 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
     outputData.insert(outputData.end(), outputImage.begin(), outputImage.end());
     outputData.insert(outputData.end(), outputImage.begin(), outputImage.end());
 
+    // at this point if we require it permute the expected output
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<T> tmp(outputData.size());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp.data());
+        outputData = tmp;
+    }
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
     // Todo: nontrivial padding and strides.
@@ -158,7 +202,12 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
     armnn::WorkloadInfo info;
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
     armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
-
+    // Permute the kernel if necessary
+    boost::multi_array<T, 4> kernel = boost::multi_array<T, 4>(originalKernel);
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernel.data(), kernel.data());
+    }
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
 
     if(biasEnabled)
@@ -178,6 +227,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
     data.m_Parameters.m_PadTop = padTop;
     data.m_Parameters.m_PadBottom = padBottom;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
+    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvolution2d(data, info);
     inputHandle->Allocate();

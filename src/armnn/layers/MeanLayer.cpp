@@ -73,9 +73,7 @@ void MeanLayer::ValidateTensorShapesFromInputs()
         }
     }
 
-    unsigned int dimSizes[outputRank];
-    memset(dimSizes, 1, outputRank * sizeof(unsigned int));
-
+    std::vector<unsigned int> dimSizes(outputRank, 1);
     if (!m_Param.m_Axis.empty())
     {
         // Skip the dimension that has been reduced unless keepDims is true.
@@ -94,7 +92,7 @@ void MeanLayer::ValidateTensorShapesFromInputs()
             }
         }
     }
-    const TensorShape& inferredShape = TensorShape(outputRank, dimSizes);
+    const TensorShape& inferredShape = TensorShape(outputRank, dimSizes.data());
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "MeanLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

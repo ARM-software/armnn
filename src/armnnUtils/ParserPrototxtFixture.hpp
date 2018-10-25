@@ -5,12 +5,17 @@
 
 #pragma once
 
-#include "armnn/IRuntime.hpp"
-#include "armnnOnnxParser/IOnnxParser.hpp"
-#include "test/TensorHelpers.hpp"
-#include "VerificationHelpers.hpp"
+#include <armnn/IRuntime.hpp>
+#include <armnn/test/TensorHelpers.hpp>
+
+#include <armnnOnnxParser/IOnnxParser.hpp>
+
+#include <armnnUtils/VerificationHelpers.hpp>
+
+#include <backends/BackendRegistry.hpp>
 
 #include <boost/format.hpp>
+
 #include <string>
 
 namespace armnnUtils
@@ -24,15 +29,13 @@ struct ParserPrototxtFixture
         , m_NetworkIdentifier(-1)
     {
         armnn::IRuntime::CreationOptions options;
-        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::CpuRef));
 
-#if ARMCOMPUTENEON_ENABLED
-        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::CpuAcc));
-#endif
-
-#if ARMCOMPUTECL_ENABLED
-        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::GpuAcc));
-#endif
+        // Create runtimes for each available backend
+        const armnn::BackendIdSet availableBackendIds = armnn::BackendRegistryInstance().GetBackendIds();
+        for (auto& backendId : availableBackendIds)
+        {
+            m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), backendId));
+        }
     }
 
     /// Parses and loads the network defined by the m_Prototext string.

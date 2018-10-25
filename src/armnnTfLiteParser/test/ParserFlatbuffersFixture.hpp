@@ -15,6 +15,8 @@
 
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 
+#include <backends/BackendRegistry.hpp>
+
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"
 
@@ -30,15 +32,12 @@ struct ParserFlatbuffersFixture
             : m_Parser(ITfLiteParser::Create()), m_NetworkIdentifier(-1)
     {
         armnn::IRuntime::CreationOptions options;
-        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::CpuRef));
 
-#if ARMCOMPUTENEON_ENABLED
-        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::CpuAcc));
-#endif
-
-#if ARMCOMPUTECL_ENABLED
-        m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), armnn::Compute::GpuAcc));
-#endif
+        const armnn::BackendIdSet availableBackendIds = armnn::BackendRegistryInstance().GetBackendIds();
+        for (auto& backendId : availableBackendIds)
+        {
+            m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), backendId));
+        }
     }
 
     std::vector<uint8_t> m_GraphBinary;

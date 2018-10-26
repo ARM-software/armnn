@@ -457,7 +457,8 @@ template<typename T, typename B>
 LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFactory& workloadFactory,
                                                               float qScale,
                                                               int32_t qOffset,
-                                                              bool biasEnabled)
+                                                              bool biasEnabled,
+                                                              const armnn::DataLayoutIndexed& layout)
 {
     unsigned int inputHeight = 3;
     unsigned int inputWidth = 3;
@@ -473,10 +474,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFa
     unsigned int outputChannels = kernelChannels;
     unsigned int outputNum = inputNum;
 
-    armnn::TensorInfo inputTensorInfo({ inputNum, inputChannels, inputHeight, inputWidth }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ outputNum, outputChannels, outputHeight, outputWidth },
-        armnn::GetDataType<T>());
-    armnn::TensorInfo kernelDesc({ 1, outputChannels, kernelHeight, kernelWidth }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
+    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
+    armnn::TensorInfo kernelDesc = GetTensorInfo<T>(1, outputChannels, kernelHeight, kernelWidth, layout);
     armnn::TensorInfo biasDesc({ outputChannels }, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -491,32 +491,47 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFa
         biasDesc.SetQuantizationScale(qScale*qScale);
         biasDesc.SetQuantizationOffset(0);
     }
+    std::vector<T> inputData = std::vector<T>(
+            QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
+                    1.f, 2.f, 1.f,
+                    2.f, 1.f, 2.f,
+                    1.f, 2.f, 1.f,
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
-            1.f, 2.f, 1.f,
-            2.f, 1.f, 2.f,
-            1.f, 2.f, 1.f,
-
-            1.f, 2.f, 1.f,
-            2.f, 1.f, 2.f,
-            1.f, 2.f, 1.f,
-        })));
+                    1.f, 2.f, 1.f,
+                    2.f, 1.f, 2.f,
+                    1.f, 2.f, 1.f,
+            }));
+    // at this point if we require it permute the input data
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<T> tmp(inputData.size());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        inputData = tmp;
+    }
+    auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
     std::vector<B> biasV(QuantizedVector<B>(biasDesc.GetQuantizationScale(), biasDesc.GetQuantizationOffset(),
                                             {0, 2}));
     auto bias = MakeTensor<B, 1>(biasDesc, biasV);
 
-    auto kernel = MakeTensor<T, 4>(kernelDesc, std::vector<T>(
-        QuantizedVector<T>(kernelDesc.GetQuantizationScale(), kernelDesc.GetQuantizationOffset(), {
-            1.f, 0.f,  1.f,
-            0.f, 0.f,  0.f,
-           -1.f, 0.f, -1.f,
+    std::vector<T> kernelData = std::vector<T>(
+            QuantizedVector<T>(kernelDesc.GetQuantizationScale(), kernelDesc.GetQuantizationOffset(), {
+                    1.f, 0.f,  1.f,
+                    0.f, 0.f,  0.f,
+                    -1.f, 0.f, -1.f,
 
-            1.f, 0.f,  1.f,
-            0.f, 0.f,  0.f,
-           -1.f, 0.f, -1.f,
-        })));
+                    1.f, 0.f,  1.f,
+                    0.f, 0.f,  0.f,
+                    -1.f, 0.f, -1.f,
+            }));
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<T> tmp(kernelData.size());
+        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, kernelData.data(), tmp.data());
+        kernelData = tmp;
+    }
+    auto kernel = MakeTensor<T, 4>(kernelDesc, kernelData);
 
     // Manually calculated.
     std::vector<T> outputImage(
@@ -534,6 +549,13 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFa
     }
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<T> tmp(outputImage.size());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputImage.data(), tmp.data());
+        outputImage = tmp;
+    }
+
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputImage);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
@@ -559,6 +581,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFa
     data.m_Parameters.m_PadTop = 0;
     data.m_Parameters.m_PadBottom = 0;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
+    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
     inputHandle->Allocate();

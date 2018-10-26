@@ -92,11 +92,27 @@ BOOST_AUTO_TEST_CASE(Conv2dUtils)
 }
 
 // Depthwise Convolution
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1, DepthwiseConvolution2dDepthMul1Test, true)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1,
+                     DepthwiseConvolution2dDepthMul1Test, true, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1,
+                     DepthwiseConvolution2dDepthMul1Test, false, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8,
+                     DepthwiseConvolution2dDepthMul1Uint8Test, true, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8,
+                     DepthwiseConvolution2dDepthMul1Uint8Test, false, armnn::DataLayout::NCHW)
+
+// NHWC Depthwise Convolution
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1NHhwc,
+                     DepthwiseConvolution2dDepthMul1Test, true, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Nhwc,
+                     DepthwiseConvolution2dDepthMul1Test, false, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8Nhwc,
+                     DepthwiseConvolution2dDepthMul1Uint8Test, true, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8Nhwc,
+                     DepthwiseConvolution2dDepthMul1Uint8Test, false, armnn::DataLayout::NHWC)
+
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthNhwc, DepthwiseConvolution2dDepthNhwcTest, false)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1, DepthwiseConvolution2dDepthMul1Test, false)
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, true)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, false)
+
 
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric,
                      DepthwiseConvolution2dAsymmetricTest, true, armnn::DataLayout::NCHW)

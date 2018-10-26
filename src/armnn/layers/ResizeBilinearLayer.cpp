@@ -37,10 +37,14 @@ std::vector<TensorShape> ResizeBilinearLayer::InferOutputShapes(const std::vecto
 
     unsigned int outWidth = m_Param.m_TargetWidth;
     unsigned int outHeight = m_Param.m_TargetHeight;
-    unsigned int outChannels = inputShape[1];
+    unsigned int outChannels = inputShape[m_Param.m_DataLayout.GetChannelsIndex()];
     unsigned int outBatch = inputShape[0];
 
-    return std::vector<TensorShape>({ TensorShape({outBatch, outChannels, outHeight, outWidth}) });
+    TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NHWC ?
+        TensorShape( { outBatch, outHeight, outWidth, outChannels } ) :
+        TensorShape( { outBatch, outChannels, outHeight, outWidth });
+
+    return std::vector<TensorShape>({ tensorShape });
 }
 
 void ResizeBilinearLayer::ValidateTensorShapesFromInputs()

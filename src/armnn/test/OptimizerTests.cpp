@@ -771,4 +771,194 @@ BOOST_AUTO_TEST_CASE(Fp32NetworkToFp16OptimizationTest)
                              &IsLayerOfType<armnn::OutputLayer>));
 }
 
+void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
+                              const unsigned int* weightsShape, const unsigned int* outputShape,
+                              DataLayout dataLayout = DataLayout::NCHW)
+{
+    armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+
+    std::vector<float> weightsVector(90);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32), weightsVector);
+
+    Convolution2dDescriptor desc;
+    desc.m_BiasEnabled = false;
+    desc.m_StrideX = 1;
+    desc.m_StrideY = 1;
+    desc.m_DataLayout = dataLayout;
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    Convolution2dLayer* layer = graph.AddLayer<Convolution2dLayer>(desc, "conv2d");
+    layer->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
+    layer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+    input->GetOutputSlot().Connect(layer->GetInputSlot(0));
+    layer->GetOutputSlot().Connect(output->GetInputSlot(0));
+}
+
+BOOST_AUTO_TEST_CASE(Conv2dValidateTensorShapesFromInputs)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 1, 3, 8, 16 };
+    const unsigned int weightsShape[] = { 2, 3, 5, 3 };
+    const unsigned int outputShape[] = { 1, 2, 4, 14 };
+    CreateConvolution2dGraph(graph, inputShape, weightsShape, outputShape);
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
+BOOST_AUTO_TEST_CASE(Conv2dValidateTensorShapesFromInputsNhwc)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 1, 8, 16, 3 };
+    const unsigned int weightsShape[] = { 2, 5, 3, 3 };
+    const unsigned int outputShape[] = { 1, 4, 14, 2 };
+    CreateConvolution2dGraph(graph, inputShape, weightsShape, outputShape, DataLayout::NHWC);
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
+void CreateDepthwiseConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
+                              const unsigned int* weightsShape, const unsigned int* outputShape,
+                              DataLayout dataLayout = DataLayout::NCHW)
+{
+    armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+
+    std::vector<float> weightsVector(18);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32), weightsVector);
+
+    DepthwiseConvolution2dDescriptor desc;
+    desc.m_BiasEnabled = false;
+    desc.m_StrideX = 1;
+    desc.m_StrideY = 1;
+    desc.m_DataLayout = dataLayout;
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    DepthwiseConvolution2dLayer* layer = graph.AddLayer<DepthwiseConvolution2dLayer>(desc, "depthwiseConv2d");
+    layer->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
+    layer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+    input->GetOutputSlot().Connect(layer->GetInputSlot(0));
+    layer->GetOutputSlot().Connect(output->GetInputSlot(0));
+}
+
+BOOST_AUTO_TEST_CASE(DepthwiseConv2dValidateTensorShapesFromInputs)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 1, 2, 3, 3 };
+    const unsigned int weightsShape[] = { 1, 2, 3, 3 };
+    const unsigned int outputShape[] = { 1, 2, 1, 1 };
+    CreateDepthwiseConvolution2dGraph(graph, inputShape, weightsShape, outputShape);
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
+BOOST_AUTO_TEST_CASE(DepthwiseConv2dValidateTensorShapesFromInputsNhwc)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 1, 3, 3, 2 };
+    const unsigned int weightsShape[] = { 1, 3, 3, 2 };
+    const unsigned int outputShape[] = { 1, 1, 1, 2 };
+    CreateDepthwiseConvolution2dGraph(graph, inputShape, weightsShape, outputShape, DataLayout::NHWC);
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
+void CreatePooling2dGraph(Graph &graph, const unsigned int* inputShape,  const unsigned int* outputShape,
+                          DataLayout dataLayout = DataLayout::NCHW)
+{
+    armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+
+    Pooling2dDescriptor desc;
+    desc.m_PoolType = armnn::PoolingAlgorithm::Average;
+    desc.m_PoolWidth = desc.m_PoolHeight = 100;
+    desc.m_StrideX = desc.m_StrideY = 5;
+    desc.m_PadLeft = 50;
+    desc.m_PadRight = 50;
+    desc.m_PadTop = 50;
+    desc.m_PadBottom = 50;
+    desc.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    desc.m_DataLayout = dataLayout;
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    Pooling2dLayer* layer = graph.AddLayer<Pooling2dLayer>(desc, "pooling2d");
+    layer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+    input->GetOutputSlot().Connect(layer->GetInputSlot(0));
+    layer->GetOutputSlot().Connect(output->GetInputSlot(0));
+}
+
+BOOST_AUTO_TEST_CASE(Pooling2dValidateTensorShapesFromInputs)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 5, 3, 52, 60 };
+    const unsigned int outputShape[] = { 5, 3, 11, 13 };
+    CreatePooling2dGraph(graph, inputShape, outputShape, DataLayout::NCHW);
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
+BOOST_AUTO_TEST_CASE(Pooling2dValidateTensorShapesFromInputsNhwc)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 5, 52, 60, 3 };
+    const unsigned int outputShape[] = { 5, 11, 13, 3 };
+    CreatePooling2dGraph(graph, inputShape, outputShape, DataLayout::NHWC);
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
+void CreateResizeBilinearGraph(Graph &graph, const unsigned int* inputShape,  const unsigned int* outputShape,
+                               DataLayout dataLayout = DataLayout::NCHW)
+{
+    armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+
+    ResizeBilinearDescriptor desc;
+    desc.m_TargetHeight = 3;
+    desc.m_TargetWidth = 4;
+    desc.m_DataLayout = dataLayout;
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    ResizeBilinearLayer* layer = graph.AddLayer<ResizeBilinearLayer>(desc, "resizeBilinear");
+    layer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+    input->GetOutputSlot().Connect(layer->GetInputSlot(0));
+    layer->GetOutputSlot().Connect(output->GetInputSlot(0));
+}
+
+BOOST_AUTO_TEST_CASE(ResizeBilinearValidateTensorShapesFromInputs)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 1, 2, 4, 5 };
+    const unsigned int outputShape[] = { 1, 2, 3, 4 };
+    CreateResizeBilinearGraph(graph, inputShape, outputShape);
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
+BOOST_AUTO_TEST_CASE(ResizeBilinearValidateTensorShapesFromInputsNhwc)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 1, 4, 5, 2 };
+    const unsigned int outputShape[] = { 1, 3, 4, 2 };
+    CreateResizeBilinearGraph(graph, inputShape, outputShape, DataLayout::NHWC);
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

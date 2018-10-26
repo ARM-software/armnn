@@ -163,6 +163,12 @@ if (BUILD_TF_LITE_PARSER)
         ImagePreprocessor.hpp
         ImagePreprocessor.cpp)
     TfLiteParserTest(TfLiteMobilenetQuantized-Armnn "${TfLiteMobilenetQuantized-Armnn_sources}")
+
+    set(TfLiteVGG16Quantized-Armnn_sources
+        TfLiteVGG16Quantized-Armnn/TfLiteVGG16Quantized-Armnn.cpp
+        ImagePreprocessor.hpp
+        ImagePreprocessor.cpp)
+    TfLiteParserTest(TfLiteVGG16Quantized-Armnn "${TfLiteVGG16Quantized-Armnn_sources}")
 endif()
 
 if (BUILD_ONNX_PARSER)

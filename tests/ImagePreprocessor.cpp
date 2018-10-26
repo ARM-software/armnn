@@ -33,10 +33,16 @@ unsigned int ImagePreprocessor<TDataType>::GetLabelAndResizedImageAsFloat(unsign
                           InferenceTestImage::ResizingMethods::BilinearAndNormalized,
                           m_Mean, m_Stddev);
 
+    // duplicate data across the batch
+    for (unsigned int i = 1; i < m_BatchSize; i++)
+    {
+        result.insert( result.end(), result.begin(), result.begin() + GetNumImageElements() );
+    }
+
     if (m_DataFormat == DataFormat::NCHW)
     {
         const armnn::PermutationVector NHWCToArmNN = { 0, 2, 3, 1 };
-        armnn::TensorShape dstShape({1, 3, m_Height, m_Width});
+        armnn::TensorShape dstShape({m_BatchSize, 3, m_Height, m_Width});
         std::vector<float> tempImage(result.size());
         armnnUtils::Permute<float>(dstShape, NHWCToArmNN, result.data(), tempImage.data());
         result.swap(tempImage);

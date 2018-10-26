@@ -37,10 +37,12 @@ public:
         int32_t offset=0,
         const std::array<float, 3> mean={{0, 0, 0}},
         const std::array<float, 3> stddev={{1, 1, 1}},
-        DataFormat dataFormat=DataFormat::NHWC)
+        DataFormat dataFormat=DataFormat::NHWC,
+        unsigned int batchSize=1)
     : m_BinaryDirectory(binaryFileDirectory)
     , m_Height(height)
     , m_Width(width)
+    , m_BatchSize(batchSize)
     , m_Scale(scale)
     , m_Offset(offset)
     , m_ImageSet(imageSet)
@@ -61,6 +63,7 @@ private:
     std::string m_BinaryDirectory;
     unsigned int m_Height;
     unsigned int m_Width;
+    unsigned int m_BatchSize;
     // Quantization parameters
     float m_Scale;
     int32_t m_Offset;

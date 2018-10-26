@@ -118,7 +118,7 @@ struct FullyConnectedWithNoBiasFixture : FullyConnectedFixture
     FullyConnectedWithNoBiasFixture()
         : FullyConnectedFixture("[ 1, 4, 1, 1 ]",     // inputShape
                                 "[ 1, 1 ]",           // outputShape
-                                "[ 4, 1 ]",           // filterShape
+                                "[ 1, 4 ]",           // filterShape
                                 "[ 2, 3, 4, 5 ]")     // filterData
     {}
 };
@@ -136,7 +136,7 @@ struct FullyConnectedWithBiasFixture : FullyConnectedFixture
     FullyConnectedWithBiasFixture()
         : FullyConnectedFixture("[ 1, 4, 1, 1 ]",     // inputShape
                                 "[ 1, 1 ]",           // outputShape
-                                "[ 4, 1 ]",           // filterShape
+                                "[ 1, 4 ]",           // filterShape
                                 "[ 2, 3, 4, 5 ]",     // filterData
                                 "[ 1 ]",              // biasShape
                                 "[ 10, 0, 0, 0 ]" )   // biasData

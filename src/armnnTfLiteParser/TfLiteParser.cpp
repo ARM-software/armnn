@@ -1231,6 +1231,7 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
 
     FullyConnectedDescriptor desc;
     desc.m_BiasEnabled = false;
+    desc.m_TransposeWeightMatrix = true;
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);

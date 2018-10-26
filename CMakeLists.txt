@@ -353,31 +353,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/ObservableTest.cpp
-        src/armnn/test/OptionalTest.cpp
-        src/backends/test/BackendIdTests.cpp
-        src/backends/test/BackendRegistryTests.cpp
-        src/backends/test/IsLayerSupportedTestImpl.hpp
-        src/backends/test/WorkloadDataValidation.cpp
-        src/backends/test/TensorCopyUtils.hpp
-        src/backends/test/TensorCopyUtils.cpp
-        src/backends/test/LayerTests.hpp
-        src/backends/test/LayerTests.cpp
-        src/backends/test/LayerReleaseConstantDataTest.cpp
-        src/backends/test/Conv2dTestImpl.hpp
-        src/backends/test/ActivationTestImpl.hpp
-        src/backends/test/ActivationFixture.hpp
-        src/backends/test/EndToEndTestImpl.hpp
-        src/backends/test/JsonPrinterTestImpl.hpp
-        src/backends/test/Pooling2dTestImpl.hpp
-        src/backends/test/ReshapeTestImpl.hpp
-        src/backends/test/PermuteTestImpl.hpp
-        src/backends/test/FullyConnectedTestImpl.hpp
-        src/backends/test/SplitterTestImpl.hpp
-        src/backends/test/NormTestImpl.hpp
-        src/backends/test/BatchNormTestImpl.hpp
-        src/backends/test/OptimizedNetworkTests.cpp
-        src/backends/test/WorkloadTestUtils.hpp
-        src/backends/test/QuantizeHelper.hpp)
+        src/armnn/test/OptionalTest.cpp)
 
     if(BUILD_TF_PARSER)
         list(APPEND unittest_sources

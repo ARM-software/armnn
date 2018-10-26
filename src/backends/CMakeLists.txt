@@ -36,6 +36,10 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadUtils.hpp
 )
 
+if(BUILD_UNIT_TESTS)
+    add_subdirectory(test)
+endif()
+
 add_library(armnnBackendsCommon OBJECT ${armnnBackendsCommon_sources})
 target_include_directories(armnnBackendsCommon PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnBackendsCommon PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)

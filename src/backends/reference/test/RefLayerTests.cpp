@@ -67,8 +67,14 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1, DepthwiseConvolution2dDepthMul1Test, false)
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, false)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, true)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, false)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric,
+                     DepthwiseConvolution2dAsymmetricTest, true, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetric,
+                     DepthwiseConvolution2dAsymmetricTest, false, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetricNhwc,
+                     DepthwiseConvolution2dAsymmetricTest, true, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetricNhwc,
+                     DepthwiseConvolution2dAsymmetricTest, false, armnn::DataLayout::NHWC)
 
 // Pooling
 ARMNN_AUTO_TEST_CASE(SimpleMaxPooling2dSize2x2Stride2x2, SimpleMaxPooling2dSize2x2Stride2x2Test, false)

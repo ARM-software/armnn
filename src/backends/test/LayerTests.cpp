@@ -432,7 +432,8 @@ template<typename T>
 LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloadFactory& workloadFactory,
                                                                  float qScale,
                                                                  int32_t qOffset,
-                                                                 bool biasEnabled)
+                                                                 bool biasEnabled,
+                                                                 const armnn::DataLayoutIndexed& layout)
 {
     // Use a single-batch 2-channel 5x5 image as input.
     armnn::TensorInfo inputTensorInfo({ 1, 2, 5, 5 }, armnn::GetDataType<T>());
@@ -490,6 +491,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloa
         expectedOutput,
         qScale,
         qOffset,
+        layout,
         1,  // Padding left.
         1,  // Padding top.
         2,  // Padding right.
@@ -643,13 +645,14 @@ LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(armnn::IWorkloadFa
 }
 
 LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(armnn::IWorkloadFactory& workloadFactory,
-                                                               bool                     biasEnabled)
+                                                               bool biasEnabled,
+                                                               const armnn::DataLayoutIndexed& layout)
 {
-    return DepthwiseConvolution2dAsymmetricTestCommon<float>(workloadFactory, 0.0f, 0, biasEnabled);
+    return DepthwiseConvolution2dAsymmetricTestCommon<float>(workloadFactory, 0.0f, 0, biasEnabled, layout);
 }
 
 LayerTestResult<uint8_t, 4> DepthwiseConvolution2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                            bool                     biasEnabled)
+                                                            bool biasEnabled)
 {
     return DepthwiseConvolution2dTestImpl<uint8_t, int32_t>(workloadFactory, 0.5f, 50, biasEnabled);
 }
@@ -671,7 +674,7 @@ LayerTestResult<uint8_t, 4> Convolution1dUint8Test(armnn::IWorkloadFactory& work
 }
 
 LayerTestResult<float,4> CompareConvolution2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                armnn::IWorkloadFactory& refWorkloadFactory)
+                                                  armnn::IWorkloadFactory& refWorkloadFactory)
 {
     return CompareConvolution2dTestImpl<float>(workloadFactory, refWorkloadFactory);
 }

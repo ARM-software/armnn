@@ -337,11 +337,12 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(armnn::IWorkloadFactory& w
 template<typename T, typename B>
 LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                                                const boost::multi_array<T, 4>& input,
-                                                               const boost::multi_array<T, 4>& kernel,
+                                                               const boost::multi_array<T, 4>& originalKernel,
                                                                const boost::multi_array<B, 1>& bias,
                                                                const boost::multi_array<T, 4>& outputExpected,
                                                                float qScale,
                                                                int32_t qOffset,
+                                                               const armnn::DataLayoutIndexed& layout,
                                                                uint32_t padLeft = 0,
                                                                uint32_t padTop = 0,
                                                                uint32_t padRight = 0,
@@ -353,10 +354,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
     unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[1]);
     unsigned int inputHeight    = boost::numeric_cast<unsigned int>(input.shape()[2]);
     unsigned int inputWidth     = boost::numeric_cast<unsigned int>(input.shape()[3]);
-    unsigned int kernelChanMul  = boost::numeric_cast<unsigned int>(kernel.shape()[0]);
-    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(kernel.shape()[1]);
-    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(kernel.shape()[2]);
-    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(kernel.shape()[3]);
+    unsigned int kernelChanMul  = boost::numeric_cast<unsigned int>(originalKernel.shape()[0]);
+    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(originalKernel.shape()[1]);
+    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(originalKernel.shape()[2]);
+    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(originalKernel.shape()[3]);
     unsigned int outputNum      = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
     unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
     unsigned int outputHeight   = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
@@ -367,10 +368,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
     BOOST_ASSERT(!biasEnabled || bias.size() == outputChannels);
 
     // Creates the tensors.
-    armnn::TensorInfo inputTensorInfo({inputNum, inputChannels, inputHeight, inputWidth}, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({outputNum, outputChannels, outputHeight, outputWidth},
-                                       armnn::GetDataType<T>());
-    armnn::TensorInfo kernelDesc({kernelChanMul, kernelChannels, kernelHeight, kernelWidth}, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
+    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
+    armnn::TensorInfo kernelDesc = GetTensorInfo<T>(kernelChanMul, kernelChannels, kernelHeight, kernelWidth, layout);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -389,6 +389,16 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
     // Construct the input data.
     std::vector<T> inputData;
     inputData.assign(input.data(), input.data() + inputChannels*inputHeight*inputWidth);
+
+    // At this point if we require it permute the input data
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<T> tmp(inputData.size());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        inputData = tmp;
+    }
+
     auto batchedInput = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
     // Construct the output data, with bias applied, as appropriate.
@@ -404,12 +414,29 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
     }
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
+
+    // At this point if we require it permute the expected output
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<T> tmp(outputData.size());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp.data());
+        outputData = tmp;
+    }
+
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
+
+    // Permute the kernel if necessary
+    boost::multi_array<T, 4> kernel = boost::multi_array<T, 4>(originalKernel);
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernel.data(), kernel.data());
+    }
+
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
 
     armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
@@ -428,6 +455,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
     data.m_Parameters.m_PadTop = padTop;
     data.m_Parameters.m_PadBottom = padBottom;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
+    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
 
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());

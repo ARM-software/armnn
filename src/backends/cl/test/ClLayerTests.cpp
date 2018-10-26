@@ -75,8 +75,14 @@ ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1, DepthwiseConvoluti
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, true)
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8, DepthwiseConvolution2dDepthMul1Uint8Test, false)
 
-ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, true)
-ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetric, DepthwiseConvolution2dAsymmetricTest, false)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetric,
+                     DepthwiseConvolution2dAsymmetricTest, true, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetric,
+                     DepthwiseConvolution2dAsymmetricTest, false, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetricNhwc,
+                     DepthwiseConvolution2dAsymmetricTest, true, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetricNhwc,
+                     DepthwiseConvolution2dAsymmetricTest, false, armnn::DataLayout::NHWC)
 
 // Softmax
 BOOST_AUTO_TEST_CASE(Softmax4dSupport)

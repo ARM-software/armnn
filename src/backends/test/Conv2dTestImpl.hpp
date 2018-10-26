@@ -123,7 +123,6 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 
 
     // Note these tensors will use two (identical) batches.
-    // NOTE: if layout is unknown we will get an exception at this point.
     armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(2*inputNum, inputChannels, inputHeight, inputWidth, layout);
     armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(
             2*outputNum, outputChannels, outputHeight, outputWidth, layout);
@@ -600,7 +599,8 @@ template<typename T, typename B>
 LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                                      float qScale,
                                                      int32_t qOffset,
-                                                     bool biasEnabled)
+                                                     bool biasEnabled,
+                                                     const armnn::DataLayoutIndexed& layout)
 {
     unsigned int depthMultiplier = 2;
 
@@ -617,11 +617,12 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
     unsigned int outputChannels  = inputChannels * depthMultiplier;
     unsigned int outputBatchSize = inputBatchSize;
 
-    armnn::TensorInfo inputTensorInfo({inputBatchSize, inputChannels, inputHeight, inputWidth},
-                                      armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({outputBatchSize, outputChannels, outputHeight, outputWidth},
-        armnn::GetDataType<T>());
-    armnn::TensorInfo kernelDesc({depthMultiplier, inputChannels, kernelHeight, kernelWidth}, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(
+            inputBatchSize, inputChannels, inputHeight, inputWidth, layout);
+    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(
+            outputBatchSize, outputChannels, outputHeight, outputWidth, layout);
+    armnn::TensorInfo kernelDesc = GetTensorInfo<T>(
+            depthMultiplier, inputChannels, kernelHeight, kernelWidth, layout);
     armnn::TensorInfo biasDesc({outputChannels}, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -637,59 +638,74 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
         biasDesc.SetQuantizationOffset(0);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
-            0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        })));
+    // NOTE: originalInputData is in NCHW format
+    std::vector<T> originalInputData = std::vector<T>(
+            QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
+                    0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+                    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                    0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+                    0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+                    0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+                    0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+                    0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+                    0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            }));
+    std::vector<T> inputData = originalInputData;
+    // at this point if we require it permute the input data
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, originalInputData.data(), inputData.data());
+    }
+    auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
     std::vector<B> biasV(QuantizedVector<B>(biasDesc.GetQuantizationScale(), biasDesc.GetQuantizationOffset(),
         {0, 2, 1, -1}));
     auto bias = MakeTensor<B, 1>(biasDesc, biasV);
 
-    auto kernel = MakeTensor<T, 4>(kernelDesc, std::vector<T>(
-        QuantizedVector<T>(kernelDesc.GetQuantizationScale(), kernelDesc.GetQuantizationOffset(), {
-            1, 1, 1,
-            1, -1, 1,
-            1, 1, 1,
-            1, 1, 1,
-            1, 1, 1,
+    std::vector<T> originalKernelData = std::vector<T>(
+            QuantizedVector<T>(kernelDesc.GetQuantizationScale(), kernelDesc.GetQuantizationOffset(), {
+                    1, 1, 1,
+                    1, -1, 1,
+                    1, 1, 1,
+                    1, 1, 1,
+                    1, 1, 1,
 
-            2, 2, 2,
-            2, 2, 2,
-            2, 2, 2,
-            2, 2, 2,
-            2, 2, 2,
+                    2, 2, 2,
+                    2, 2, 2,
+                    2, 2, 2,
+                    2, 2, 2,
+                    2, 2, 2,
 
-            0, 0, 0,
-            0, -1, 0,
-            0, 0, 0,
-            0, 0, 0,
-            0, 0, 0,
+                    0, 0, 0,
+                    0, -1, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
 
-            0, 0, 0,
-            0, 0, 0,
-            0, 1, 0,
-            0, 0, 0,
-            0, 0, 0
-        })));
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 1, 0,
+                    0, 0, 0,
+                    0, 0, 0
+            }));
+    std::vector<T> kernelData = originalKernelData;
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernelData.data(), kernelData.data());
+    }
+    auto kernel = MakeTensor<T, 4>(kernelDesc, kernelData);
 
     // Manually calculated.
-    std::vector<T> outputImage = std::vector<T>(
+    std::vector<T> originalOutputImage = std::vector<T>(
         QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(), {
             3.5f,  3.5f,  3.5f,  3.5f,  3.5f,  3.5f,  3.5f,
             6.0f,  6.0f,  6.0f,  6.0f,  6.0f,  6.0f,  6.0f,
@@ -723,12 +739,23 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
     // Optionally apply bias to output image.
     if(biasEnabled)
     {
-        ApplyBias(outputImage, outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(),
-            biasV, biasDesc.GetQuantizationScale(), biasDesc.GetQuantizationOffset(),
-            outputWidth, outputHeight);
+        ApplyBias(originalOutputImage,
+                  outputTensorInfo.GetQuantizationScale(),
+                  outputTensorInfo.GetQuantizationOffset(),
+                  biasV,
+                  biasDesc.GetQuantizationScale(),
+                  biasDesc.GetQuantizationOffset(),
+                  outputWidth,
+                  outputHeight);
     }
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
+    std::vector<T> outputImage = originalOutputImage;
+    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, originalOutputImage.data(), outputImage.data());
+    }
+
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputImage);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
@@ -754,6 +781,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
     data.m_Parameters.m_PadTop = 1;
     data.m_Parameters.m_PadBottom = 1;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
+    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
     inputHandle->Allocate();
@@ -1132,7 +1160,8 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(armnn::IWorkloadFact
 
     auto input = MakeRandomTensor<T, 4>(inputTensorInfo, 124908, 0.0f, 255.0f);
     auto kernel = MakeRandomTensor<T, 4>(kernelDesc, 891234, 0.0f, 255.0f);
-    auto bias = MakeRandomTensor<typename FullyConnectedBiasTypeForInputType<T>::Type, 1>(biasDesc, 1028, 0.0f, 255.0f);
+    auto bias = MakeRandomTensor<typename FullyConnectedBiasTypeForInputType<T>::Type, 1>(
+            biasDesc, 1028, 0.0f, 255.0f);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);

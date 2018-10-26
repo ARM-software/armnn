@@ -627,9 +627,10 @@ LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(armnn::IWorkloadFac
 }
 
 LayerTestResult<float, 4> DepthwiseConvolution2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                     bool                     biasEnabled)
+                                                     bool                     biasEnabled,
+                                                     const armnn::DataLayoutIndexed& layout)
 {
-    return DepthwiseConvolution2dTestImpl<float, float>(workloadFactory, 0.0f, 0, biasEnabled);
+    return DepthwiseConvolution2dTestImpl<float, float>(workloadFactory, 0.0f, 0, biasEnabled, layout);
 }
 
 LayerTestResult<float, 4> DepthwiseConvolution2dDepthNhwcTest(armnn::IWorkloadFactory& workloadFactory,
@@ -652,9 +653,10 @@ LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(armnn::IWorkloadF
 }
 
 LayerTestResult<uint8_t, 4> DepthwiseConvolution2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                            bool biasEnabled)
+                                                            bool                     biasEnabled,
+                                                            const armnn::DataLayoutIndexed& layout)
 {
-    return DepthwiseConvolution2dTestImpl<uint8_t, int32_t>(workloadFactory, 0.5f, 50, biasEnabled);
+    return DepthwiseConvolution2dTestImpl<uint8_t, int32_t>(workloadFactory, 0.5f, 50, biasEnabled, layout);
 }
 
 LayerTestResult<uint8_t, 4> DepthwiseConvolution2dDepthMul1Uint8Test(armnn::IWorkloadFactory& workloadFactory,

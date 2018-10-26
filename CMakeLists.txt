@@ -228,38 +228,49 @@ list(APPEND armnn_sources
     src/armnn/layers/SplitterLayer.cpp
     src/armnn/layers/SubtractionLayer.cpp
     src/armnn/layers/SubtractionLayer.hpp
-    src/armnn/InternalTypes.hpp
-    src/armnn/InternalTypes.cpp
-    src/armnn/JsonPrinter.hpp
-    src/armnn/JsonPrinter.cpp
-    src/armnn/LayerFwd.hpp
-    src/armnn/Layer.hpp
-    src/armnn/Layer.cpp
-    src/armnn/LayersFwd.hpp
-    src/armnn/Runtime.hpp
-    src/armnn/Runtime.cpp
-    src/armnn/SerializeLayerParameters.cpp
-    src/armnn/SerializeLayerParameters.hpp
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
-    src/armnn/LoadedNetwork.hpp
-    src/armnn/LoadedNetwork.cpp
     src/armnn/Exceptions.cpp
-    src/armnn/Graph.hpp
     src/armnn/Graph.cpp
-    src/armnn/Network.hpp
+    src/armnn/Graph.hpp
+    src/armnn/IGraphObservable.hpp
+    src/armnn/Instrument.hpp
+    src/armnn/InternalTypes.cpp
+    src/armnn/InternalTypes.hpp
+    src/armnn/JsonPrinter.cpp
+    src/armnn/JsonPrinter.hpp
+    src/armnn/Layer.cpp
+    src/armnn/LayerFwd.hpp
+    src/armnn/Layer.hpp
+    src/armnn/LayersFwd.hpp
+    src/armnn/LayerSupportCommon.hpp
+    src/armnn/LayerSupport.cpp
+    src/armnn/LoadedNetwork.cpp
+    src/armnn/LoadedNetwork.hpp
     src/armnn/Network.cpp
+    src/armnn/Network.hpp
     src/armnn/NetworkUtils.hpp
+    src/armnn/Observable.cpp
+    src/armnn/Observable.hpp
+    src/armnn/Optimizer.cpp
+    src/armnn/Optimizer.hpp
+    src/armnn/Profiling.cpp
     src/armnn/ProfilingEvent.cpp
     src/armnn/ProfilingEvent.hpp
-    src/armnn/Profiling.cpp
-    src/armnn/Instrument.hpp
-    src/armnn/WallClockTimer.hpp
-    src/armnn/WallClockTimer.cpp
+    src/armnn/Profiling.hpp
+    src/armnn/Runtime.cpp
+    src/armnn/Runtime.hpp
+    src/armnn/SerializeLayerParameters.cpp
+    src/armnn/SerializeLayerParameters.hpp
+    src/armnn/SubGraph.cpp
+    src/armnn/SubGraph.hpp
+    src/armnn/SubGraphSelector.cpp
+    src/armnn/SubGraphSelector.hpp
     src/armnn/Tensor.cpp
+    src/armnn/TypeUtils.hpp
     src/armnn/Utils.cpp
-    src/armnn/LayerSupport.cpp
-    src/armnn/LayerSupportCommon.hpp
+    src/armnn/WallClockTimer.cpp
+    src/armnn/WallClockTimer.hpp
     src/armnn/optimizations/All.hpp
     src/armnn/optimizations/ConvertConstants.hpp
     src/armnn/optimizations/MovePermuteUp.hpp
@@ -270,12 +281,7 @@ list(APPEND armnn_sources
     src/armnn/optimizations/SquashEqualSiblings.hpp
     src/armnn/optimizations/OptimizeInverseConversions.hpp
     src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
-    src/armnn/Optimizer.hpp
-    src/armnn/Optimizer.cpp
     third-party/half/half.hpp
-    src/armnn/IGraphObservable.hpp
-    src/armnn/Observable.hpp
-    src/armnn/Observable.cpp
     )
 
 # Files used for Streamline-based profiling backend
@@ -334,26 +340,27 @@ endif()
 if(BUILD_UNIT_TESTS)
     set(unittest_sources)
     list(APPEND unittest_sources
-        src/armnn/test/UnitTests.cpp
-        src/armnn/test/UnitTests.hpp
-        src/armnn/test/EndToEndTest.cpp
-        src/armnn/test/UtilsTests.cpp
-        src/armnn/test/GraphTests.cpp
-        src/armnn/test/OptimizerTests.cpp
-        src/armnn/test/ProfilerTests.cpp
-        src/armnn/test/RuntimeTests.cpp
-        src/armnn/test/RuntimeTests.hpp
         src/armnn/test/CreateWorkload.hpp
-        src/armnn/test/TensorTest.cpp
-        src/armnn/test/TensorHelpers.hpp
         src/armnn/test/CsvReaderTest.cpp
-        src/armnn/test/NetworkTests.cpp
+        src/armnn/test/EndToEndTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp
-        src/armnn/test/ProfilingEventTest.cpp
+        src/armnn/test/GraphTests.cpp
         src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
+        src/armnn/test/NetworkTests.cpp
         src/armnn/test/ObservableTest.cpp
-        src/armnn/test/OptionalTest.cpp)
+        src/armnn/test/OptimizerTests.cpp
+        src/armnn/test/OptionalTest.cpp
+        src/armnn/test/ProfilerTests.cpp
+        src/armnn/test/ProfilingEventTest.cpp
+        src/armnn/test/RuntimeTests.cpp
+        src/armnn/test/RuntimeTests.hpp
+        src/armnn/test/SubGraphTests.cpp
+        src/armnn/test/TensorHelpers.hpp
+        src/armnn/test/TensorTest.cpp
+        src/armnn/test/UnitTests.cpp
+        src/armnn/test/UnitTests.hpp
+        src/armnn/test/UtilsTests.cpp)
 
     if(BUILD_TF_PARSER)
         list(APPEND unittest_sources

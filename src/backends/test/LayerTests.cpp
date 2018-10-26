@@ -165,7 +165,8 @@ template<typename T>
 LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(armnn::IWorkloadFactory& workloadFactory,
                                                        float                    qScale,
                                                        int32_t                  qOffset,
-                                                       bool                     biasEnabled)
+                                                       bool                     biasEnabled,
+                                                       const armnn::DataLayoutIndexed& layout)
 {
     // Use a 3x3 kernel, which exercises ArmCompute's direct convolution path.
 
@@ -228,7 +229,8 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(armnn::IWorkloadFactory& 
       GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(biasEnabled, qScale, qOffset),
       expectedOutput,
       qScale,
-      qOffset);
+      qOffset,
+      layout);
 }
 
 template<typename T>
@@ -294,9 +296,10 @@ LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(armnn::IWorkloadFact
 }
 
 LayerTestResult<float, 4> SimpleConvolution2d3x3Test(armnn::IWorkloadFactory& workloadFactory,
-                                                     bool                     biasEnabled)
+                                                     bool                     biasEnabled,
+                                                     const armnn::DataLayoutIndexed& layout)
 {
-    return SimpleConvolution2d3x3TestCommon<float>(workloadFactory, 0.f, 0, biasEnabled);
+    return SimpleConvolution2d3x3TestCommon<float>(workloadFactory, 0.f, 0, biasEnabled, layout);
 }
 
 LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(armnn::IWorkloadFactory& workloadFactory,
@@ -306,14 +309,16 @@ LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(armnn::IWorkloadFactory
 }
 
 LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                            bool                     biasEnabled)
+                                                            bool                     biasEnabled,
+                                                            const armnn::DataLayoutIndexed& layout)
 {
-    return SimpleConvolution2d3x3TestCommon<uint8_t>(workloadFactory, 0.5f, 50, biasEnabled);
+    return SimpleConvolution2d3x3TestCommon<uint8_t>(workloadFactory, 0.5f, 50, biasEnabled, layout);
 }
 
 template<typename T>
 LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
+    const armnn::DataLayoutIndexed& layout,
     float                    qScale,
     int32_t                  qOffset)
 {
@@ -363,7 +368,7 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
       expectedOutput,
       qScale,
       qOffset,
-      armnn::DataLayout::NCHW,
+      layout,
       1,  // Padding left.
       2,  // Padding top.
       3,  // Padding right.
@@ -372,8 +377,9 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
 
 template<typename T>
 LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWorkloadFactory& workloadFactory,
-    float                    qScale,
-    int32_t                  qOffset)
+                                                                     const armnn::DataLayoutIndexed& layout,
+                                                                     float qScale,
+                                                                     int32_t qOffset)
 {
     // Use a single-batch 1-channel 5x5 image as input.
     armnn::TensorInfo inputDesc({ 1, 1, 5, 5 }, armnn::GetDataType<T>());
@@ -415,7 +421,7 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
         expectedOutput,
         qScale,
         qOffset,
-        armnn::DataLayout::NCHW,
+        layout,
         1,  // Padding left.
         1,  // Padding top.
         2,  // Padding right.
@@ -606,14 +612,16 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(armnn::IWorkloadFacto
 }
 
 LayerTestResult<float, 4>
-Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(armnn::IWorkloadFactory& workloadFactory)
+Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(armnn::IWorkloadFactory& workloadFactory,
+                                                           const armnn::DataLayoutIndexed& layout)
 {
-    return Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon<float>(workloadFactory, 0.0f, 0);
+    return Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon<float>(workloadFactory, layout, 0.0f, 0);
 }
 
-LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(armnn::IWorkloadFactory& workloadFactory,
+                                                             const armnn::DataLayoutIndexed& layout)
 {
-    return SimpleConvolution2dAsymmetricPaddingTestCommon<float>(workloadFactory, 0.0f, 0);
+    return SimpleConvolution2dAsymmetricPaddingTestCommon<float>(workloadFactory, layout, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> DepthwiseConvolution2dTest(armnn::IWorkloadFactory& workloadFactory,

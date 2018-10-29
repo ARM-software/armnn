@@ -36,7 +36,7 @@ unsigned int ImagePreprocessor<TDataType>::GetLabelAndResizedImageAsFloat(unsign
     // duplicate data across the batch
     for (unsigned int i = 1; i < m_BatchSize; i++)
     {
-        result.insert( result.end(), result.begin(), result.begin() + GetNumImageElements() );
+        result.insert(result.end(), result.begin(), result.begin() + boost::numeric_cast<int>(GetNumImageElements()));
     }
 
     if (m_DataFormat == DataFormat::NCHW)

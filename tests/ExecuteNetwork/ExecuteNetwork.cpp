@@ -589,7 +589,8 @@ int main(int argc, const char* argv[])
     else // Run single test
     {
         // Get the preferred order of compute devices.
-        std::vector<armnn::BackendId> computeDevices = vm["compute"].as<std::vector<armnn::BackendId>>();
+        std::vector<std::string> computeDevicesAsStrings = vm["compute"].as<std::vector<std::string>>();
+        std::vector<armnn::BackendId> computeDevices(computeDevicesAsStrings.begin(), computeDevicesAsStrings.end());
 
         // Remove duplicates from the list of compute devices.
         RemoveDuplicateDevices(computeDevices);

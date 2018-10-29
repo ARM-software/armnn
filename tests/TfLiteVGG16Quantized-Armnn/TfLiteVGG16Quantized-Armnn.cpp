@@ -16,7 +16,6 @@ int main(int argc, char* argv[])
         // Coverity fix: The following code may throw an exception of type std::length_error.
         std::vector<ImageSet> imageSet =
         {
-            // Class number in probability print out offset by 1000 due to batch size fix
             {"Dog.jpg", 669},
             {"Cat.jpg", 669},
             {"shark.jpg", 669},

@@ -110,8 +110,6 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
                                                                         TensorShape const&   subTensorShape,
                                                                         unsigned int const* subTensorOrigin) const
 {
-    BOOST_ASSERT(parent.GetType() == ITensorHandle::CL);
-
     arm_compute::Coordinates coords;
     arm_compute::TensorShape shape = armcomputetensorutils::BuildArmComputeTensorShape(subTensorShape);
 

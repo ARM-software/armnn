@@ -54,8 +54,6 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITenso
     TensorShape const& subTensorShape,
     unsigned int const* subTensorOrigin) const
 {
-    BOOST_ASSERT(parent.GetType() == ITensorHandle::Neon);
-
     const arm_compute::TensorShape shape = armcomputetensorutils::BuildArmComputeTensorShape(subTensorShape);
 
     arm_compute::Coordinates coords;

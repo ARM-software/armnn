@@ -84,6 +84,16 @@ void ScopedCpuTensorHandle::Allocate()
     }
 }
 
+void ScopedCpuTensorHandle::CopyOutTo(void* memory) const
+{
+    memcpy(memory, GetTensor<void>(), GetTensorInfo().GetNumBytes());
+}
+
+void ScopedCpuTensorHandle::CopyInFrom(const void* memory)
+{
+    memcpy(GetTensor<void>(), memory, GetTensorInfo().GetNumBytes());
+}
+
 void ScopedCpuTensorHandle::CopyFrom(const ScopedCpuTensorHandle& other)
 {
     CopyFrom(other.GetTensor<void>(), other.GetTensorInfo().GetNumBytes());

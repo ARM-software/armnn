@@ -31,11 +31,6 @@ public:
         return m_TensorInfo;
     }
 
-    virtual ITensorHandle::Type GetType() const override
-    {
-        return ITensorHandle::Cpu;
-    }
-
     virtual void Manage() override {}
 
     virtual ITensorHandle* GetParent() const override { return nullptr; }
@@ -66,6 +61,10 @@ protected:
     void SetConstMemory(const void* mem) { m_Memory = mem; }
 
 private:
+    // Only used for testing
+    void CopyOutTo(void *) const override {}
+    void CopyInFrom(const void*) override {}
+
     ConstCpuTensorHandle(const ConstCpuTensorHandle& other) = delete;
     ConstCpuTensorHandle& operator=(const ConstCpuTensorHandle& other) = delete;
 
@@ -119,6 +118,10 @@ public:
     virtual void Allocate() override;
 
 private:
+    // Only used for testing
+    void CopyOutTo(void* memory) const override;
+    void CopyInFrom(const void* memory) override;
+
     void CopyFrom(const ScopedCpuTensorHandle& other);
     void CopyFrom(const void* srcMemory, unsigned int numBytes);
 };

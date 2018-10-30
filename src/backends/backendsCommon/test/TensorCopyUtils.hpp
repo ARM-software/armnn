@@ -8,8 +8,8 @@
 
 #include <backendsCommon/ITensorHandle.hpp>
 
-void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* mem);
+void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* memory);
 
 void CopyDataFromITensorHandle(void* mem, const armnn::ITensorHandle* tensorHandle);
 
-void AllocateAndCopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* mem);
+void AllocateAndCopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* memory);

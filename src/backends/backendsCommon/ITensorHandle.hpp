@@ -12,13 +12,6 @@ class TensorShape;
 class ITensorHandle
 {
 public:
-    enum Type
-    {
-        Cpu,
-        CL,
-        Neon
-    };
-
     virtual ~ITensorHandle(){}
 
     /// Indicate to the memory manager that this resource is active.
@@ -28,10 +21,6 @@ public:
     /// Indicate to the memory manager that this resource is no longer active.
     /// This is used to compute overlapping lifetimes of resources.
     virtual void Allocate() = 0;
-
-    /// Get the type backend associated with the tensor handle.
-    /// \return Type enum
-    virtual ITensorHandle::Type GetType() const = 0;
 
     /// Get the parent tensor if this is a subtensor.
     /// \return a pointer to the parent tensor. Otherwise nullptr if not a subtensor.
@@ -64,10 +53,14 @@ public:
     /// \return a TensorShape filled with the strides for each dimension
     virtual TensorShape GetStrides() const = 0;
 
-    /// Get the number of elements for each dimension orderd from slowest iterating dimension
+    /// Get the number of elements for each dimension ordered from slowest iterating dimension
     /// to fastest iterating dimension.
     /// \return a TensorShape filled with the number of elements for each dimension.
     virtual TensorShape GetShape() const = 0;
+
+    // Testing support to be able to verify and set tensor data content
+    virtual void CopyOutTo(void* memory) const = 0;
+    virtual void CopyInFrom(const void* memory) = 0;
 };
 
 }

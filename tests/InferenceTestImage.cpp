@@ -219,12 +219,6 @@ std::vector<float> InferenceTestImage::Resize(unsigned int newWidth,
             "operation can be zero. Requested width: %1%. Requested height: %2%.") % newWidth % newHeight));
     }
 
-    if (newWidth == m_Width && newHeight == m_Height)
-    {
-        // Nothing to do.
-        return out;
-    }
-
     switch (meth) {
         case ResizingMethods::STB:
         {

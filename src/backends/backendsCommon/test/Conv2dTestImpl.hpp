@@ -213,8 +213,9 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 
     CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
+    workloadFactory.Release();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -304,8 +305,9 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(armnn::IWorkloadFactory& w
 
     CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
+    workloadFactory.Release();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -445,7 +447,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
 
     CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -589,7 +590,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFa
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -791,7 +791,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -891,7 +890,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(armnn::IWorkloadFactory
 
     CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1007,8 +1005,9 @@ LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFact
 
     CopyDataToITensorHandle(inputHandle.get(), inputData.data());
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
+    workloadFactory.Release();
 
     // Output
     LayerTestResult<T,4> ret(outputInfo);
@@ -1105,9 +1104,10 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(armnn::IWorkloadFactory& workl
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
-    refWorkloadFactory.Finalize();
+    workloadFactory.Release();
+
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1228,9 +1228,7 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(armnn::IWorkloadFact
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
-    refWorkloadFactory.Finalize();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());

@@ -132,12 +132,6 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
 
     // Set up memory.
     m_OptimizedNetwork->GetGraph().AllocateDynamicBuffers();
-
-    // Finalize the workload factories before execution.
-    for (auto&& workloadFactory : m_WorkloadFactories)
-    {
-        workloadFactory.second->Finalize();
-    }
 }
 
 TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const

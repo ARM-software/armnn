@@ -87,7 +87,6 @@ LayerTestResult<T, 4> BatchNormTestImpl(armnn::IWorkloadFactory& workloadFactory
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -177,7 +176,6 @@ LayerTestResult<T,4> BatchNormTestNhwcImpl(armnn::IWorkloadFactory& workloadFact
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());

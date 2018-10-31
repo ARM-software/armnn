@@ -5,9 +5,9 @@
 #include "BaseMemoryManager.hpp"
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
-#include "BlobLifetimeManager.hpp"
-#include "PoolManager.hpp"
-#include "OffsetLifetimeManager.hpp"
+#include "arm_compute/runtime/BlobLifetimeManager.h"
+#include "arm_compute/runtime/PoolManager.h"
+#include "arm_compute/runtime/OffsetLifetimeManager.h"
 #endif
 
 #include <boost/polymorphic_cast.hpp>
@@ -19,7 +19,7 @@ namespace armnn
 BaseMemoryManager::BaseMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc,
                                      MemoryAffinity memoryAffinity)
 {
-    // (Re)create the memory manager components.
+    BOOST_ASSERT(alloc);
     m_Allocator = std::move(alloc);
 
     m_IntraLayerMemoryMgr = CreateArmComputeMemoryManager(memoryAffinity);
@@ -33,53 +33,30 @@ BaseMemoryManager::CreateArmComputeMemoryManager(MemoryAffinity memoryAffinity)
 
     if (memoryAffinity == MemoryAffinity::Buffer)
     {
-        lifetimeManager = std::make_shared<BlobLifetimeManager>();
+        lifetimeManager = std::make_shared<arm_compute::BlobLifetimeManager>();
     }
     else
     {
-        lifetimeManager = std::make_shared<OffsetLifetimeManager>();
+        lifetimeManager = std::make_shared<arm_compute::OffsetLifetimeManager>();
     }
 
-    auto poolManager   = std::make_shared<PoolManager>();
+    auto poolManager   = std::make_shared<arm_compute::PoolManager>();
     auto memoryManager = std::make_shared<arm_compute::MemoryManagerOnDemand>(lifetimeManager, poolManager);
-
-    // Set allocator that the memory manager will use
-    memoryManager->set_allocator(m_Allocator.get());
 
     return memoryManager;
 }
 
-void BaseMemoryManager::FinalizeMemoryManager(arm_compute::MemoryManagerOnDemand& memoryManager)
-{
-    // Number of pools that the manager will create. This specifies how many layers you want to run in parallel
-    memoryManager.set_num_pools(1);
-
-    // Finalize the memory manager. (Validity checks, memory allocations, etc)
-    memoryManager.finalize();
-}
-
-void BaseMemoryManager::Finalize()
-{
-    BOOST_ASSERT(m_IntraLayerMemoryMgr);
-    FinalizeMemoryManager(*m_IntraLayerMemoryMgr.get());
-
-    BOOST_ASSERT(m_InterLayerMemoryMgr);
-    FinalizeMemoryManager(*m_InterLayerMemoryMgr.get());
-}
-
 void BaseMemoryManager::Acquire()
 {
+    static const size_t s_NumPools = 1;
+
     // Allocate memory pools for intra-layer memory manager
     BOOST_ASSERT(m_IntraLayerMemoryMgr);
-    IPoolManager* poolManager = boost::polymorphic_downcast<IPoolManager*>(m_IntraLayerMemoryMgr->pool_manager());
-    BOOST_ASSERT(poolManager);
-    poolManager->AllocatePools();
+    m_IntraLayerMemoryMgr->populate(*m_Allocator, s_NumPools);
 
     // Allocate memory pools for inter-layer memory manager
     BOOST_ASSERT(m_InterLayerMemoryMgr);
-    poolManager = boost::polymorphic_downcast<IPoolManager*>(m_InterLayerMemoryMgr->pool_manager());
-    BOOST_ASSERT(poolManager);
-    poolManager->AllocatePools();
+    m_InterLayerMemoryMgr->populate(*m_Allocator, s_NumPools);
 
     // Acquire inter-layer memory group. NOTE: This has to come after allocating the pools
     BOOST_ASSERT(m_InterLayerMemoryGroup);
@@ -94,15 +71,11 @@ void BaseMemoryManager::Release()
 
     // Release memory pools managed by intra-layer memory manager
     BOOST_ASSERT(m_IntraLayerMemoryMgr);
-    IPoolManager* poolManager = boost::polymorphic_downcast<IPoolManager*>(m_IntraLayerMemoryMgr->pool_manager());
-    BOOST_ASSERT(poolManager);
-    poolManager->ReleasePools();
+    m_IntraLayerMemoryMgr->clear();
 
     // Release memory pools managed by inter-layer memory manager
     BOOST_ASSERT(m_InterLayerMemoryMgr);
-    poolManager = boost::polymorphic_downcast<IPoolManager*>(m_InterLayerMemoryMgr->pool_manager());
-    BOOST_ASSERT(poolManager);
-    poolManager->ReleasePools();
+    m_InterLayerMemoryMgr->clear();
 }
 #endif
 

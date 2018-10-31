@@ -25,9 +25,6 @@ public:
 
     virtual const BackendId& GetBackendId() const = 0;
 
-    /// Informs the memory manager that the network is finalized and ready for execution.
-    virtual void Finalize() { }
-
     /// Inform the memory manager to release the memory
     virtual void Release() { }
 

@@ -73,8 +73,9 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(armnn::IWorkloadFactory& wo
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
+    workloadFactory.Release();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -215,8 +216,9 @@ LayerTestResult<float,4> SimpleNormalizationNhwcTestImpl(armnn::IWorkloadFactory
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
+    workloadFactory.Release();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -330,9 +332,10 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(armnn::IWorkloadFactory& w
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
-    refWorkloadFactory.Finalize();
+    workloadFactory.Release();
+
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());

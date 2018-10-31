@@ -931,7 +931,6 @@ LayerTestResult<float,3> MergerTest(armnn::IWorkloadFactory& workloadFactory)
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
@@ -1021,7 +1020,6 @@ LayerTestResult<float,4> AdditionTest(armnn::IWorkloadFactory& workloadFactory)
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1098,7 +1096,6 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(armnn::IWorkloadFactory& workloa
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1170,7 +1167,6 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(armnn::IWorkloadFactory&
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1255,9 +1251,7 @@ LayerTestResult<float,4> CompareAdditionTest(armnn::IWorkloadFactory& workloadFa
     CopyDataToITensorHandle(inputHandle1Ref.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2Ref.get(), &input2[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
-    refWorkloadFactory.Finalize();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1324,7 +1318,6 @@ LayerTestResult<T, 4> DivisionTestHelper(armnn::IWorkloadFactory& workloadFactor
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -1527,7 +1520,6 @@ LayerTestResult<float,4> MultiplicationTestHelper(armnn::IWorkloadFactory& workl
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1670,9 +1662,7 @@ LayerTestResult<float,4> CompareMultiplicationTest(armnn::IWorkloadFactory& work
     CopyDataToITensorHandle(inputHandle0Ref.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1Ref.get(), &input1[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
-    refWorkloadFactory.Finalize();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&comparisonResult.output[0][0][0][0], outputHandle.get());
@@ -1751,9 +1741,7 @@ LayerTestResult<float,4> CompareBatchNormTest(armnn::IWorkloadFactory& workloadF
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
-    refWorkloadFactory.Finalize();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -2106,7 +2094,6 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
         ++nextInputId;
     }
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     if (needPermuteForConcat)
@@ -3087,7 +3074,6 @@ LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3152,7 +3138,6 @@ LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& work
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3217,7 +3202,6 @@ LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workl
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3280,7 +3264,6 @@ LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3345,7 +3328,6 @@ LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloa
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -3394,7 +3376,6 @@ LayerTestResult<float, 2> FakeQuantizationTest(armnn::IWorkloadFactory& workload
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
@@ -3441,8 +3422,9 @@ LayerTestResult<float, 4> L2NormalizationTestImpl(armnn::IWorkloadFactory& workl
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
+    workloadFactory.Release();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
 
@@ -3515,7 +3497,6 @@ LayerTestResult<T, 2> Pad2dTestCommon(armnn::IWorkloadFactory& workloadFactory, 
 
   CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
 
-  workloadFactory.Finalize();
   workload->Execute();
 
   CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
@@ -3596,7 +3577,6 @@ LayerTestResult<T, 3> Pad3dTestCommon(armnn::IWorkloadFactory& workloadFactory, 
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0], outputHandle.get());
@@ -3829,8 +3809,6 @@ LayerTestResult<T, 4> Pad4dTestCommon(armnn::IWorkloadFactory& workloadFactory, 
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
-
-    workloadFactory.Finalize();
 
     workload->Execute();
 
@@ -4530,7 +4508,6 @@ LayerTestResult<T, 4> ConstantTestImpl(armnn::IWorkloadFactory& workloadFactory,
 
     outputHandle->Allocate();
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -4673,7 +4650,6 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFac
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
@@ -4748,7 +4724,6 @@ LayerTestResult<uint8_t, 4> AdditionUint8Test(armnn::IWorkloadFactory& workloadF
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -4810,7 +4785,6 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8TestHelper(armnn::IWorkloadFactor
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -4984,7 +4958,6 @@ LayerTestResult<T, 4> SubtractionTestHelper(armnn::IWorkloadFactory& workloadFac
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5129,7 +5102,6 @@ LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(armnn::IWorkloadFactory& 
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5187,7 +5159,6 @@ LayerTestResult<uint8_t, 4> SimpleResizeBilinearUint8Test(armnn::IWorkloadFactor
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5243,7 +5214,6 @@ LayerTestResult<uint8_t, 4> ResizeBilinearSqMinUint8Test(armnn::IWorkloadFactory
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5297,7 +5267,6 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMinUint8Test(armnn::IWorkloadFactory& 
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5353,7 +5322,6 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMagUint8Test(armnn::IWorkloadFactory& 
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5875,7 +5843,6 @@ LayerTestResult<T, OutputDim> MeanTestHelper(armnn::IWorkloadFactory& workloadFa
 
     CopyDataToITensorHandle(inputHandle.get(), input.origin());
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
@@ -6118,8 +6085,6 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(armnn::IWorkloadFactory& work
     addWorkload->Execute();
 
     CopyDataFromITensorHandle(&addRet.output[0][0][0][0], addOutputHandle.get());
-
-    workloadFactory.Finalize();
 
     return addRet;
 }

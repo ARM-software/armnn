@@ -16,7 +16,6 @@
 #include "workloads/NeonWorkloadUtils.hpp"
 #include "workloads/NeonWorkloads.hpp"
 
-#include <aclCommon/memory/IPoolManager.hpp>
 #endif
 
 #include <backendsCommon/MakeWorkloadHelper.hpp>
@@ -280,11 +279,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePad(const PadQueueDescript
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
-void NeonWorkloadFactory::Finalize()
-{
-    m_MemoryManager.Finalize();
-}
-
 void NeonWorkloadFactory::Release()
 {
     m_MemoryManager.Release();
@@ -500,9 +494,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePad(const PadQueueDescript
 {
     return nullptr;
 }
-
-void NeonWorkloadFactory::Finalize()
-{}
 
 void NeonWorkloadFactory::Release()
 {}

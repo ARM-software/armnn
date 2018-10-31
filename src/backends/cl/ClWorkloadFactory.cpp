@@ -19,8 +19,6 @@
 
 #include <backendsCommon/MemCopyWorkload.hpp>
 
-#include <aclCommon/memory/IPoolManager.hpp>
-
 #include <cl/ClTensorHandle.hpp>
 #include <cl/workloads/ClWorkloads.hpp>
 #include <cl/workloads/ClWorkloadUtils.hpp>
@@ -316,11 +314,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePad(const PadQueueDescriptor
     return MakeWorkload<ClPadWorkload>(descriptor, info);
 }
 
-void ClWorkloadFactory::Finalize()
-{
-    m_MemoryManager.Finalize();
-}
-
 void ClWorkloadFactory::Release()
 {
     m_MemoryManager.Release();
@@ -535,10 +528,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePad(const PadQueueDescriptor
                                                         const WorkloadInfo& info) const
 {
     return nullptr;
-}
-
-void ClWorkloadFactory::Finalize()
-{
 }
 
 void ClWorkloadFactory::Release()

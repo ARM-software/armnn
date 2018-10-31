@@ -9,12 +9,7 @@
 
 COMMON_SOURCES := \
     ArmComputeTensorUtils.cpp \
-    memory/BaseMemoryManager.cpp \
-    memory/BlobLifetimeManager.cpp \
-    memory/BlobMemoryPool.cpp \
-    memory/OffsetLifetimeManager.cpp \
-    memory/OffsetMemoryPool.cpp \
-    memory/PoolManager.cpp
+    BaseMemoryManager.cpp
 
 # COMMON_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked

@@ -41,8 +41,9 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Finalize();
+    workloadFactory.Acquire();
     workload->Execute();
+    workloadFactory.Release();
 
     CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
 

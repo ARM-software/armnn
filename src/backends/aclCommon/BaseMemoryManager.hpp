@@ -43,12 +43,10 @@ public:
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& GetInterLayerManager() { return m_InterLayerMemoryMgr; }
     std::shared_ptr<arm_compute::IMemoryGroup>& GetInterLayerMemoryGroup()      { return m_InterLayerMemoryGroup; }
 
-    void Finalize();
     void Acquire();
     void Release();
 
 protected:
-
     std::unique_ptr<arm_compute::IAllocator>            m_Allocator;
     std::shared_ptr<arm_compute::MemoryManagerOnDemand> m_IntraLayerMemoryMgr;
     std::shared_ptr<arm_compute::MemoryManagerOnDemand> m_InterLayerMemoryMgr;
@@ -59,7 +57,6 @@ protected:
     virtual std::shared_ptr<arm_compute::IMemoryGroup>
     CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager) = 0;
 
-    void FinalizeMemoryManager(arm_compute::MemoryManagerOnDemand& memoryManager);
 #endif
 };
 

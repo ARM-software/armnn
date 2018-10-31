@@ -6,26 +6,14 @@
 #pragma once
 
 #include <cl/ClContextControl.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
 
 template<bool ProfilingEnabled>
 struct ClContextControlFixtureBase
 {
-    static ClContextControlFixtureBase*& Instance()
-    {
-        static ClContextControlFixtureBase* s_Instance = nullptr;
-        return s_Instance;
-    }
-
     // Initialising ClContextControl to ensure OpenCL is loaded correctly for each test case
     ClContextControlFixtureBase()
-        : m_ClContextControl(nullptr, ProfilingEnabled)
-    {
-        Instance() = this;
-    }
-    ~ClContextControlFixtureBase()
-    {
-        Instance() = nullptr;
-    }
+        : m_ClContextControl(nullptr, ProfilingEnabled) {}
 
     armnn::ClContextControl m_ClContextControl;
 };

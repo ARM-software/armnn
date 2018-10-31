@@ -210,7 +210,6 @@ LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(armnn::IWorkl
     CopyDataToITensorHandle(outputStateInHandle.get(), &outputStateInTensor[0][0]);
     CopyDataToITensorHandle(cellStateInHandle.get(), &cellStateInTensor[0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
@@ -920,7 +919,6 @@ LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory
     CopyDataToITensorHandle(outputStateInHandle.get(), &outputStateInTensor[0][0]);
     CopyDataToITensorHandle(cellStateInHandle.get(), &cellStateInTensor[0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
@@ -1138,7 +1136,6 @@ LayerTestResult<float, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(armn
     CopyDataToITensorHandle(outputStateOutHandle.get(), &outputStateOutTensor[0][0]);
     CopyDataToITensorHandle(cellStateOutHandle.get(), &cellStateOutTensor[0][0]);
 
-    workloadFactory.Finalize();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret0.output[0][0], scratchBufferHandle.get());

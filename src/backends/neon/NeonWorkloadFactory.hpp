@@ -5,8 +5,9 @@
 #pragma once
 
 #include <armnn/Optional.hpp>
+
 #include <backendsCommon/OutputHandler.hpp>
-#include <aclCommon/memory/BaseMemoryManager.hpp>
+#include <aclCommon/BaseMemoryManager.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 
@@ -126,8 +127,6 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreatePad(const PadQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info) const override;
-
-    virtual void Finalize() override;
 
     virtual void Release() override;
 

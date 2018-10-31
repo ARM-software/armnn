@@ -4,6 +4,7 @@
 //
 
 #include "Pooling2d.hpp"
+#include "TensorBufferArrayView.hpp"
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Types.hpp>
@@ -143,9 +144,10 @@ void Pooling2d(const float* in,
                const TensorInfo& outputInfo,
                const Pooling2dDescriptor& params)
 {
-    const unsigned int channelsIndex = params.m_DataLayout.GetChannelsIndex();
-    const unsigned int heightIndex   = params.m_DataLayout.GetHeightIndex();
-    const unsigned int widthIndex    = params.m_DataLayout.GetWidthIndex();
+    const armnn::DataLayoutIndexed dataLayout = params.m_DataLayout;
+    auto channelsIndex = dataLayout.GetChannelsIndex();
+    auto heightIndex = dataLayout.GetHeightIndex();
+    auto widthIndex = dataLayout.GetWidthIndex();
 
     const int batchSize    = boost::numeric_cast<int>(outputInfo.GetShape()[0]);
     const int channels     = boost::numeric_cast<int>(outputInfo.GetShape()[channelsIndex]);
@@ -166,6 +168,9 @@ void Pooling2d(const float* in,
 
     Accumulator accumulate = GetAccumulator(params.m_PoolType);
     Executor execute       = GetExecutor(params.m_PoolType);
+
+    TensorBufferArrayView<const float> input(inputInfo.GetShape(), in, dataLayout);
+    TensorBufferArrayView<float> output(outputInfo.GetShape(), out, dataLayout);
 
     // Check supported padding methods outside the loop to simplify
     // the inner loop.
@@ -221,10 +226,10 @@ void Pooling2d(const float* in,
                     {
                         for (auto xInput = wstart; xInput < wend; xInput++)
                         {
-                            float inval = in[n * widthInput * heightInput * channels +
-                                             c * widthInput * heightInput +
-                                             yInput * widthInput +
-                                             xInput];
+                            float inval = input.Get(boost::numeric_cast<unsigned int>(n),
+                                                    boost::numeric_cast<unsigned int>(c),
+                                                    boost::numeric_cast<unsigned int>(yInput),
+                                                    boost::numeric_cast<unsigned int>(xInput));
 
                             accumulate(result, inval);
                         }
@@ -232,10 +237,10 @@ void Pooling2d(const float* in,
 
                     execute(result, poolAreaSize);
 
-                    out[n * widthOutput * heightOutput * channels +
-                        c * widthOutput * heightOutput +
-                        yOutput * widthOutput +
-                        xOutput] = result;
+                    output.Get(boost::numeric_cast<unsigned int>(n),
+                               boost::numeric_cast<unsigned int>(c),
+                               boost::numeric_cast<unsigned int>(yOutput),
+                               boost::numeric_cast<unsigned int>(xOutput)) = result;
                 }
             }
         }

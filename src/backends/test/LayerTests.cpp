@@ -5602,24 +5602,28 @@ LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize3x3Stride2x4Uint8Test(armnn::I
     return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<uint8_t>(workloadFactory, forceNoPadding, 0.1f, 128);
 }
 
-LayerTestResult<float, 4> SimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SimpleMaxPooling2dTest(armnn::IWorkloadFactory& workloadFactory,
+                                                 const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleAveragePooling2dTest<float>(workloadFactory);
+    return SimpleMaxPooling2dTestCommon<float>(workloadFactory, dataLayout);
 }
 
-LayerTestResult<float, 4> SimpleAveragePooling2dNhwcTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SimpleMaxPooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
+                                                        const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleAveragePooling2dNhwcTest<float>(workloadFactory);
+    return SimpleMaxPooling2dTestCommon<uint8_t>(workloadFactory, dataLayout);
 }
 
-LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory,
+                                                     const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleAveragePooling2dTest<uint8_t>(workloadFactory, 0.5, -1);
+    return SimpleAveragePooling2dTestCommon<float>(workloadFactory, dataLayout);
 }
 
-LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8NhwcTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
+                                                            const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleAveragePooling2dNhwcTest<uint8_t>(workloadFactory, 0.5, -1);
+    return SimpleAveragePooling2dTestCommon<uint8_t>(workloadFactory, dataLayout, 0.5, -1);
 }
 
 LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(armnn::IWorkloadFactory& workloadFactory,
@@ -5638,14 +5642,16 @@ LayerTestResult<uint8_t, 4> LargeTensorsAveragePooling2dUint8Test(armnn::IWorklo
     return LargeTensorsAveragePooling2dTestCommon<uint8_t>(workloadFactory, 0.5, -1);
 }
 
-LayerTestResult<float, 4> SimpleL2Pooling2dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SimpleL2Pooling2dTest(armnn::IWorkloadFactory& workloadFactory,
+                                                const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<float>(workloadFactory);
+    return SimpleL2Pooling2dTestCommon<float>(workloadFactory, dataLayout);
 }
 
-LayerTestResult<uint8_t, 4> SimpleL2Pooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SimpleL2Pooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
+                                                       const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<uint8_t>(workloadFactory);
+    return SimpleL2Pooling2dTestCommon<uint8_t>(workloadFactory, dataLayout);
 }
 
 LayerTestResult<float, 4> L2Pooling2dSize3Stride1Test(armnn::IWorkloadFactory& workloadFactory)

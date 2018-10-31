@@ -62,27 +62,6 @@ void ApplyBias(std::vector<T>& v, float vScale, int32_t vOffset,
     }
 }
 
-template<typename T>
-armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
-                                unsigned int numberOfChannels,
-                                unsigned int height,
-                                unsigned int width,
-                                const armnn::DataLayoutIndexed& layout)
-{
-    switch (layout.GetDataLayout())
-    {
-        case armnn::DataLayout::NCHW:
-            return armnn::TensorInfo({numberOfBatches, numberOfChannels, height, width}, armnn::GetDataType<T>());
-        case armnn::DataLayout ::NHWC:
-            return armnn::TensorInfo({numberOfBatches, height, width, numberOfChannels}, armnn::GetDataType<T>());
-        default:
-            throw armnn::InvalidArgumentException("unknown data layout ["
-                + std::to_string(static_cast<int>(layout.GetDataLayout())) + "]");
-    }
-}
-
-
-
 template<typename T, typename B>
 LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                                   const boost::multi_array<T, 4>& originalInput,

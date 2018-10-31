@@ -683,15 +683,16 @@ LayerTestResult<float,4> CompareConvolution2dTest(armnn::IWorkloadFactory& workl
 
 template<typename T>
 LayerTestResult<T,4> CompareDepthwiseConvolution2dTest(armnn::IWorkloadFactory& workloadFactory,
-    armnn::IWorkloadFactory& refWorkloadFactory)
+                                                       armnn::IWorkloadFactory& refWorkloadFactory,
+                                                       const armnn::DataLayoutIndexed& layout)
 {
-    return CompareDepthwiseConvolution2dTestImpl<T>(workloadFactory, refWorkloadFactory);
+    return CompareDepthwiseConvolution2dTestImpl<T>(workloadFactory, refWorkloadFactory, layout);
 }
 
 template LayerTestResult<float, 4> CompareDepthwiseConvolution2dTest<float>(
-    armnn::IWorkloadFactory&, armnn::IWorkloadFactory&);
+    armnn::IWorkloadFactory&, armnn::IWorkloadFactory&, const armnn::DataLayoutIndexed&);
 template LayerTestResult<uint8_t, 4> CompareDepthwiseConvolution2dTest<uint8_t>(
-    armnn::IWorkloadFactory&, armnn::IWorkloadFactory&);
+    armnn::IWorkloadFactory&, armnn::IWorkloadFactory&, const armnn::DataLayoutIndexed&);
 
 LayerTestResult<float,4> SimpleNormalizationAcrossTest(armnn::IWorkloadFactory& workloadFactory)
 {

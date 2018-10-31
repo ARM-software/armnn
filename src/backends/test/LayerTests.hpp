@@ -187,7 +187,8 @@ LayerTestResult<float, 4> CompareConvolution2dTest(armnn::IWorkloadFactory& work
 
 template<typename T>
 LayerTestResult<T, 4> CompareDepthwiseConvolution2dTest(armnn::IWorkloadFactory& workloadFactory,
-    armnn::IWorkloadFactory& refWorkloadFactory);
+                                                        armnn::IWorkloadFactory& refWorkloadFactory,
+                                                        const armnn::DataLayoutIndexed& layout);
 
 LayerTestResult<float, 4> CompareNormalizationTest(armnn::IWorkloadFactory& workloadFactory,
                                                    armnn::IWorkloadFactory& refWorkloadFactory,

@@ -439,8 +439,19 @@ ARMNN_AUTO_TEST_CASE(SimpleNormalizationAcrossNhwc, SimpleNormalizationAcrossNhw
 
 ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareConv2dWithReference, CompareConvolution2dTest)
 
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareDepthwiseConv2dWithReferenceFloat32, CompareDepthwiseConvolution2dTest<float>)
-ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareDepthwiseConv2dWithReferenceUint8, CompareDepthwiseConvolution2dTest<uint8_t>)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareDepthwiseConv2dWithReferenceFloat32,
+                                 CompareDepthwiseConvolution2dTest<float>,
+                                 armnn::DataLayout::NCHW)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareDepthwiseConv2dWithReferenceUint8,
+                                 CompareDepthwiseConvolution2dTest<uint8_t>,
+                                 armnn::DataLayout::NCHW)
+
+ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareDepthwiseConv2dWithReferenceFloat32Nhwc,
+                                 CompareDepthwiseConvolution2dTest<float>,
+                                 armnn::DataLayout::NHWC)
+ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareDepthwiseConv2dWithReferenceUint8Nhwc,
+                                 CompareDepthwiseConvolution2dTest<uint8_t>,
+                                 armnn::DataLayout::NHWC)
 
 ARMNN_COMPARE_REF_AUTO_TEST_CASE(CompareNormalizationWithinWithReference, CompareNormalizationTest,
                                  armnn::NormalizationAlgorithmChannel::Within,

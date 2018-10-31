@@ -1095,7 +1095,8 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 
 template<typename T>
 LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
-    armnn::IWorkloadFactory& refWorkloadFactory)
+                                                            armnn::IWorkloadFactory& refWorkloadFactory,
+                                                            const armnn::DataLayoutIndexed& layout)
 {
     unsigned int inputHeight = 8;
     unsigned int inputWidth = 16;
@@ -1121,19 +1122,37 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(armnn::IWorkloadFact
     armnn::TensorInfo kernelDesc;
     armnn::TensorInfo biasDesc;
 
-    unsigned int inputShape[] = { inputNum, inputChannels, inputHeight, inputWidth };
-    unsigned int outputShape[] = { outputNum, outputChannels, outputHeight, outputWidth };
-    unsigned int kernelShape[] = { channelMultiplier, inputChannels, kernelHeight, kernelWidth };
-    unsigned int biasShape[] = { outputChannels };
+
+    std::vector<unsigned int> inputShape;
+    std::vector<unsigned int> outputShape;
+    std::vector<unsigned int> kernelShape;
+    std::vector<unsigned int> biasShape= { outputChannels };
+    switch (layout.GetDataLayout())
+    {
+        case armnn::DataLayout::NCHW:
+            inputShape =  { inputNum, inputChannels, inputHeight, inputWidth };
+            outputShape = { outputNum, outputChannels, outputHeight, outputWidth };
+            kernelShape = { channelMultiplier, inputChannels, kernelHeight, kernelWidth };
+            break;
+        case armnn::DataLayout ::NHWC:
+            inputShape =  { inputNum, inputHeight, inputWidth, inputChannels };
+            outputShape = { outputNum, outputHeight, outputWidth, outputChannels };
+            kernelShape = { channelMultiplier, kernelHeight, kernelWidth, inputChannels };
+            break;
+        default:
+            throw armnn::InvalidArgumentException("unknown data layout ["
+                                                  + std::to_string(static_cast<int>(layout.GetDataLayout())) + "]");
+    }
 
     float inputsQScale = armnn::IsQuantizedType<T>() ? 1.0f : 0;
     float outputQScale = armnn::IsQuantizedType<T>() ? 2.0f : 0;
     int32_t qOffset = 0;
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>(), inputsQScale, qOffset);
-    outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>(), outputQScale, qOffset);
-    kernelDesc = armnn::TensorInfo(4, kernelShape, armnn::GetDataType<T>(), inputsQScale, qOffset);
-    biasDesc = armnn::TensorInfo(1, biasShape, armnn::GetBiasDataType(armnn::GetDataType<T>()), inputsQScale, qOffset);
+    inputTensorInfo = armnn::TensorInfo(4, inputShape.data(), armnn::GetDataType<T>(), inputsQScale, qOffset);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape.data(), armnn::GetDataType<T>(), outputQScale, qOffset);
+    kernelDesc = armnn::TensorInfo(4, kernelShape.data(), armnn::GetDataType<T>(), inputsQScale, qOffset);
+    biasDesc = armnn::TensorInfo(
+            1, biasShape.data(), armnn::GetBiasDataType(armnn::GetDataType<T>()), inputsQScale, qOffset);
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
 
@@ -1164,6 +1183,7 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(armnn::IWorkloadFact
     data.m_Parameters.m_PadTop = padY;
     data.m_Parameters.m_PadBottom = padY;
     data.m_Parameters.m_BiasEnabled = true;
+    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
 
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refWorkloadFactory.CreateTensorHandle(outputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refWorkloadFactory.CreateTensorHandle(inputTensorInfo);

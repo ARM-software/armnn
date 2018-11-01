@@ -231,18 +231,18 @@ ARMNN_AUTO_TEST_CASE(L2Normalization3dNhwc, L2Normalization3dNhwcTest)
 ARMNN_AUTO_TEST_CASE(L2Normalization4dNhwc, L2Normalization4dNhwcTest)
 
 // Resize Bilinear - NCHW data layout
-ARMNN_AUTO_TEST_CASE(ResizeBilinearNop, ResizeBilinearNopTest)
-ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear, SimpleResizeBilinearTest)
-ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMin, ResizeBilinearSqMinTest)
-ARMNN_AUTO_TEST_CASE(ResizeBilinearMin, ResizeBilinearMinTest)
-ARMNN_AUTO_TEST_CASE(ResizeBilinearMag, ResizeBilinearMagTest)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearNop, ResizeBilinearNopTest, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear, SimpleResizeBilinearTest, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMin, ResizeBilinearSqMinTest, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMin, ResizeBilinearMinTest, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMag, ResizeBilinearMagTest, armnn::DataLayout::NCHW)
 
 // Resize Bilinear - NHWC data layout
-ARMNN_AUTO_TEST_CASE(ResizeBilinearNopNhwc, ResizeBilinearNopNhwcTest)
-ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearNhwc, SimpleResizeBilinearNhwcTest)
-ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinNhwc, ResizeBilinearSqMinNhwcTest)
-ARMNN_AUTO_TEST_CASE(ResizeBilinearMinNhwc, ResizeBilinearMinNhwcTest)
-ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwc, ResizeBilinearMagNhwcTest)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearNopNhwc, ResizeBilinearNopTest, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearNhwc, SimpleResizeBilinearTest, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinNhwc, ResizeBilinearSqMinTest, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMinNhwc, ResizeBilinearMinTest, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwc, ResizeBilinearMagTest, armnn::DataLayout::NHWC)
 
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)

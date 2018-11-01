@@ -3041,19 +3041,33 @@ LayerTestResult<float, 3> Concatenation3dDim2DiffInputDimsTest(armnn::IWorkloadF
     return Concatenation3dDim2DiffInputDimsTestImpl<float>(workloadFactory, 0.0f, 0);
 }
 
-LayerTestResult<float, 4> ResizeBilinearNopTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                    const armnn::TensorShape& inputOutputTensorShape,
-                                                    armnn::DataLayout dataLayout)
+LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloadFactory,
+                                                const armnn::DataLayoutIndexed& dataLayout)
 {
-    const armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, armnn::DataType::Float32);
+    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
 
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+    std::vector<float> inputData({
+        1.0f, 2.0f, 3.0f, 4.0f,
+        2.0f, 3.0f, 4.0f, 5.0f,
+        3.0f, 4.0f, 5.0f, 6.0f,
+        4.0f, 5.0f, 6.0f, 7.0f,
+
         1.0f, 2.0f, 3.0f, 4.0f,
         2.0f, 3.0f, 4.0f, 5.0f,
         3.0f, 4.0f, 5.0f, 6.0f,
         4.0f, 5.0f, 6.0f, 7.0f
-    }));
+    });
+
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (dataLayout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<float> tmp(inputData.size());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        inputData = tmp;
+    }
+
+    auto input = MakeTensor<float, 4>(inputTensorInfo, inputData);
 
     LayerTestResult<float, 4> result(outputTensorInfo);
     result.outputExpected = input;
@@ -3080,44 +3094,48 @@ LayerTestResult<float, 4> ResizeBilinearNopTestImpl(armnn::IWorkloadFactory& wor
     return result;
 }
 
-LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& workloadFactory,
+                                                   const armnn::DataLayoutIndexed& dataLayout)
 {
-    // BatchSize = 1, Channels = 1, Height = 4, Width = 4
-    const armnn::TensorShape inputOutputShape{ 1, 1, 4, 4 };
+    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 2, 2, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 1, 1, dataLayout);
 
-    return ResizeBilinearNopTestImpl(workloadFactory, inputOutputShape, armnn::DataLayout::NCHW);
-}
-
-LayerTestResult<float, 4> ResizeBilinearNopNhwcTest(armnn::IWorkloadFactory& workloadFactory)
-{
-    // BatchSize = 1, Height = 4, Width = 4, Channels = 1
-    const armnn::TensorShape inputOutputShape{ 1, 4, 4, 1 };
-
-    return ResizeBilinearNopTestImpl(workloadFactory, inputOutputShape, armnn::DataLayout::NHWC);
-}
-
-LayerTestResult<float, 4> SimpleResizeBilinearTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                       const armnn::TensorShape& inputTensorShape,
-                                                       const armnn::TensorShape& outputTensorShape,
-                                                       armnn::DataLayout dataLayout)
-{
-    const armnn::TensorInfo inputTensorInfo(inputTensorShape, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo(outputTensorShape, armnn::DataType::Float32);
-
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+    std::vector<float> inputData({
           1.0f, 255.0f,
-        200.0f, 250.0f
-    }));
+        200.0f, 250.0f,
+
+        250.0f, 200.0f,
+        250.0f,   1.0f
+    });
 
     // The 'resize bilinear' operation projects the top-left corner of output texels into the input image,
     // then figures out the interpolants and weights. Note this is different to projecting the centre of the
-    // output texel - and thus we'll expect the output 1x1 matrix to contain, as its single element, the value
-    // that was at position (0,0) of the input matrix (rather than an average, which we would expect if projecting
-    // the centre).
+    // output texel. Thus, for a input matrix of 2x2, we'll expect the output 1x1 matrix to contain, as
+    // its single element, the value that was at position (0,0) of the input matrix (rather than an average,
+    // which we would expect if projecting the centre).
+
+    std::vector<float> outputData({
+          1.0f,
+
+        250.0f
+    });
+
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (dataLayout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<float> tmp(inputData.size());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        inputData = tmp;
+
+        std::vector<float> tmp1(outputData.size());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        outputData = tmp1;
+    }
+
+    auto input = MakeTensor<float, 4>(inputTensorInfo, inputData);
+
     LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, std::vector<float>({
-        1.0f
-    }));
+    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, outputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -3141,48 +3159,48 @@ LayerTestResult<float, 4> SimpleResizeBilinearTestImpl(armnn::IWorkloadFactory& 
     return result;
 }
 
-LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workloadFactory,
+                                                  const armnn::DataLayoutIndexed& dataLayout)
 {
-    // inputShape: BatchSize = 1, Channels = 1, Height = 2, Width = 2
-    const armnn::TensorShape inputShape{ 1, 1, 2, 2 };
+    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 2, 2, dataLayout);
 
-    // outputShape: BatchSize = 1, Channels = 1, Height = 1, Width = 1
-    const armnn::TensorShape outputShape{ 1, 1, 1, 1 };
-
-    return SimpleResizeBilinearTestImpl(workloadFactory, inputShape, outputShape, armnn::DataLayout::NCHW);
-}
-
-LayerTestResult<float, 4> SimpleResizeBilinearNhwcTest(armnn::IWorkloadFactory& workloadFactory)
-{
-    // inputShape: BatchSize = 1, Height = 2, Width = 2, Channels = 1
-    const armnn::TensorShape inputShape{ 1, 2, 2, 1 };
-
-    // outputShape: BatchSize = 1, Height = 1, Width = 1, Channels = 1
-    const armnn::TensorShape outputShape{ 1, 1, 1, 1 };
-
-    return SimpleResizeBilinearTestImpl(workloadFactory, inputShape, outputShape, armnn::DataLayout::NHWC);
-}
-
-LayerTestResult<float, 4> ResizeBilinearSqMinTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                      const armnn::TensorShape& inputTensorShape,
-                                                      const armnn::TensorShape& outputTensorShape,
-                                                      armnn::DataLayout dataLayout)
-{
-    const armnn::TensorInfo inputTensorInfo(inputTensorShape, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo(outputTensorShape, armnn::DataType::Float32);
-
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+    std::vector<float> inputData({
         1.0f, 2.0f, 3.0f, 4.0f,
         2.0f, 3.0f, 4.0f, 5.0f,
         3.0f, 4.0f, 5.0f, 6.0f,
-        4.0f, 5.0f, 6.0f, 7.0f
-    }));
+        4.0f, 5.0f, 6.0f, 7.0f,
+
+        7.0f, 6.0f, 5.0f, 4.0f,
+        6.0f, 5.0f, 4.0f, 3.0f,
+        5.0f, 4.0f, 3.0f, 2.0f,
+        4.0f, 3.0f, 2.0f, 1.0f
+    });
+
+    std::vector<float> outputData({
+        1.0f, 3.0f,
+        3.0f, 5.0f,
+
+        7.0f, 5.0f,
+        5.0f, 3.0f
+    });
+
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (dataLayout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<float> tmp(inputData.size());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        inputData = tmp;
+
+        std::vector<float> tmp1(outputData.size());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        outputData = tmp1;
+    }
+
+    auto input = MakeTensor<float, 4>(inputTensorInfo, inputData);
 
     LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, std::vector<float>({
-        1.0f, 3.0f,
-        3.0f, 5.0f
-    }));
+    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, outputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -3206,47 +3224,46 @@ LayerTestResult<float, 4> ResizeBilinearSqMinTestImpl(armnn::IWorkloadFactory& w
     return result;
 }
 
-LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloadFactory,
+                                                const armnn::DataLayoutIndexed& dataLayout)
 {
-    // inputShape: BatchSize = 1, Channels = 1, Height = 4, Width = 4
-    const armnn::TensorShape inputShape{ 1, 1, 4, 4 };
+    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 3, 5, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 2, 3, dataLayout);
 
-    // outputShape: BatchSize = 1, Channels = 1, Height = 2, Width = 2
-    const armnn::TensorShape outputShape{ 1, 1, 2, 2 };
-
-    return ResizeBilinearSqMinTestImpl(workloadFactory, inputShape, outputShape, armnn::DataLayout::NCHW);
-}
-
-LayerTestResult<float, 4> ResizeBilinearSqMinNhwcTest(armnn::IWorkloadFactory& workloadFactory)
-{
-    // inputShape: BatchSize = 1, Height = 4, Width = 4, Channels = 1
-    const armnn::TensorShape inputShape{ 1, 4, 4, 1 };
-
-    // outputShape: BatchSize = 1, Height = 2, Width = 2, Channels = 1
-    const armnn::TensorShape outputShape{ 1, 2, 2, 1 };
-
-    return ResizeBilinearSqMinTestImpl(workloadFactory, inputShape, outputShape, armnn::DataLayout::NHWC);
-}
-
-LayerTestResult<float, 4> ResizeBilinearMinTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                    const armnn::TensorShape& inputTensorShape,
-                                                    const armnn::TensorShape& outputTensorShape,
-                                                    armnn::DataLayout dataLayout)
-{
-    const armnn::TensorInfo inputTensorInfo(inputTensorShape, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo(outputTensorShape, armnn::DataType::Float32);
-
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+    std::vector<float> inputData({
           1.0f,   2.0f,   3.0f,   5.0f,   8.0f,
          13.0f,  21.0f,  34.0f,  55.0f,  89.0f,
-        144.0f, 233.0f, 377.0f, 610.0f, 987.0f
-    }));
+        144.0f, 233.0f, 377.0f, 610.0f, 987.0f,
+
+        987.0f, 610.0f, 377.0f, 233.0f, 144.0f,
+         89.0f,  55.0f,  34.0f,  21.0f,  13.0f,
+          8.0f,   5.0f,   3.0f,   2.0f,   1.0f
+    });
+
+    std::vector<float> outputData({
+          1.0f,   2.6666f,   6.00f,
+         78.5f, 179.3333f, 401.00f,
+
+        987.0f, 454.6670f, 203.33f,
+         48.5f,  22.3333f,  10.00f
+    });
+
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (dataLayout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<float> tmp(inputData.size());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        inputData = tmp;
+
+        std::vector<float> tmp1(outputData.size());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        outputData = tmp1;
+    }
+
+    auto input = MakeTensor<float, 4>(inputTensorInfo, inputData);
 
     LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, std::vector<float>({
-         1.0f,   2.6666f,   6.0f,
-        78.5f, 179.3333f, 401.0f
-    }));
+    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, outputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -3270,48 +3287,48 @@ LayerTestResult<float, 4> ResizeBilinearMinTestImpl(armnn::IWorkloadFactory& wor
     return result;
 }
 
-LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloadFactory,
+                                                const armnn::DataLayoutIndexed& dataLayout)
 {
-    // inputShape: BatchSize = 1, Channels = 1, Height = 3, Width = 5
-    const armnn::TensorShape inputShape{ 1, 1, 3, 5 };
+    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 3, 2, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 3, 5, dataLayout);
 
-    // outputShape: BatchSize = 1, Channels = 1, Height = 2, Width = 3
-    const armnn::TensorShape outputShape{ 1, 1, 2, 3 };
-
-    return ResizeBilinearMinTestImpl(workloadFactory, inputShape, outputShape, armnn::DataLayout::NCHW);
-}
-
-LayerTestResult<float, 4> ResizeBilinearMinNhwcTest(armnn::IWorkloadFactory& workloadFactory)
-{
-    // inputShape: BatchSize = 1, Height = 3, Width = 5, Channels = 1
-    const armnn::TensorShape inputShape{ 1, 3, 5, 1 };
-
-    // outputShape: BatchSize = 1, Height = 2, Width = 3, Channels = 1
-    const armnn::TensorShape outputShape{ 1, 2, 3, 1 };
-
-    return ResizeBilinearMinTestImpl(workloadFactory, inputShape, outputShape, armnn::DataLayout::NHWC);
-}
-
-LayerTestResult<float, 4> ResizeBilinearMagTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                    const armnn::TensorShape& inputTensorShape,
-                                                    const armnn::TensorShape& outputTensorShape,
-                                                    armnn::DataLayout dataLayout)
-{
-    const armnn::TensorInfo inputTensorInfo(inputTensorShape, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo(outputTensorShape, armnn::DataType::Float32);
-
-    auto input = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>({
+    std::vector<float> inputData({
           1.0f,   2.0f,
          13.0f,  21.0f,
-        144.0f, 233.0f
-    }));
+        144.0f, 233.0f,
 
-    LayerTestResult<float, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, std::vector<float>({
+        233.0f, 144.0f,
+         21.0f,  13.0f,
+          2.0f,   1.0f
+    });
+
+    std::vector<float> outputData({
           1.0f,   1.4f,   1.8f,   2.0f,   2.0f,
          13.0f,  16.2f,  19.4f,  21.0f,  21.0f,
-        144.0f, 179.6f, 215.2f, 233.0f, 233.0f
-    }));
+        144.0f, 179.6f, 215.2f, 233.0f, 233.0f,
+
+        233.0f, 197.4f, 161.8f, 144.0f, 144.0f,
+         21.0f,  17.8f,  14.6f,  13.0f,  13.0f,
+          2.0f,   1.6f,   1.2f,   1.0f,   1.0f
+    });
+
+    const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
+    if (dataLayout.GetDataLayout() == armnn::DataLayout::NHWC)
+    {
+        std::vector<float> tmp(inputData.size());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        inputData = tmp;
+
+        std::vector<float> tmp1(outputData.size());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        outputData = tmp1;
+    }
+
+    auto input = MakeTensor<float, 4>(inputTensorInfo, inputData);
+
+    LayerTestResult<float, 4> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<float, 4>(outputTensorInfo, outputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -3333,28 +3350,6 @@ LayerTestResult<float, 4> ResizeBilinearMagTestImpl(armnn::IWorkloadFactory& wor
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
     return result;
-}
-
-LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloadFactory)
-{
-    // inputShape: BatchSize = 1, Channels = 1, Height = 3, Width = 2
-    const armnn::TensorShape inputShape{ 1, 1, 3, 2 };
-
-    // outputShape: BatchSize = 1, Channels = 1, Height = 3, Width = 5
-    const armnn::TensorShape outputShape{ 1, 1, 3, 5 };
-
-    return ResizeBilinearMagTestImpl(workloadFactory, inputShape, outputShape, armnn::DataLayout::NCHW);
-}
-
-LayerTestResult<float, 4> ResizeBilinearMagNhwcTest(armnn::IWorkloadFactory& workloadFactory)
-{
-    // inputShape: BatchSize = 1, Height = 3, Width = 2, Channels = 1
-    const armnn::TensorShape inputShape{ 1, 3, 2, 1 };
-
-    // outputShape: BatchSize = 1, Height = 3, Width = 5, Channels = 1
-    const armnn::TensorShape outputShape{ 1, 3, 5, 1 };
-
-    return ResizeBilinearMagTestImpl(workloadFactory, inputShape, outputShape, armnn::DataLayout::NHWC);
 }
 
 LayerTestResult<float, 2> FakeQuantizationTest(armnn::IWorkloadFactory& workloadFactory)

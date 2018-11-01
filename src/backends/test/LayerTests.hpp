@@ -253,27 +253,25 @@ LayerTestResult<float, 4> CompareBoundedReLuTest(armnn::IWorkloadFactory& worklo
                                                  float lowerBound);
 
 // Tests that the output should be identical to the input when the output dimensions match the input ones.
-LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloadFactory,
+                                                const armnn::DataLayoutIndexed& dataLayout);
 
 // Tests the behaviour of the resize bilinear operation when rescaling a 2x2 image into a 1x1 image.
-LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& workloadFactory,
+                                                   const armnn::DataLayoutIndexed& dataLayout);
 
 // Tests the resize bilinear for minification of a square input matrix (also: input dimensions are a
 // multiple of output dimensions).
-LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workloadFactory,
+                                                  const armnn::DataLayoutIndexed& dataLayout);
 
 // Tests the resize bilinear for minification (output dimensions smaller than input dimensions).
-LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloadFactory,
+                                                const armnn::DataLayoutIndexed& dataLayout);
 
 // Tests the resize bilinear for magnification (output dimensions bigger than input dimensions).
-LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloadFactory);
-
-// Tests that execute Resize Bilinear with NHWC data layout
-LayerTestResult<float, 4> ResizeBilinearNopNhwcTest(armnn::IWorkloadFactory& workloadFactory);
-LayerTestResult<float, 4> SimpleResizeBilinearNhwcTest(armnn::IWorkloadFactory& workloadFactory);
-LayerTestResult<float, 4> ResizeBilinearSqMinNhwcTest(armnn::IWorkloadFactory& workloadFactory);
-LayerTestResult<float, 4> ResizeBilinearMinNhwcTest(armnn::IWorkloadFactory& workloadFactory);
-LayerTestResult<float, 4> ResizeBilinearMagNhwcTest(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloadFactory,
+                                                const armnn::DataLayoutIndexed& dataLayout);
 
 LayerTestResult<float, 4> BatchNormTest(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<float, 4> BatchNormNhwcTest(armnn::IWorkloadFactory& workloadFactory);

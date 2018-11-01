@@ -5,7 +5,7 @@
 
 #include <armnn/BackendId.hpp>
 
-#include <backends/test/JsonPrinterTestImpl.hpp>
+#include <backendsCommon/test/JsonPrinterTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 

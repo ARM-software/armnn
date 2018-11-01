@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backends/neon/NeonWorkloadFactory.hpp>
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/aclCommon/test/MemCopyTestImpl.hpp>
+#include <neon/NeonWorkloadFactory.hpp>
+#include <reference/RefWorkloadFactory.hpp>
+#include <aclCommon/test/MemCopyTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 

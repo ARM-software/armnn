@@ -303,9 +303,9 @@ endforeach()
 
 add_library_ex(armnn SHARED ${armnn_sources})
 
-target_include_directories(armnn PRIVATE src)
 target_include_directories(armnn PRIVATE src/armnn)
 target_include_directories(armnn PRIVATE src/armnnUtils)
+target_include_directories(armnn PRIVATE src/backends)
 
 target_link_libraries(armnn armnnUtils)
 
@@ -456,9 +456,9 @@ if(BUILD_UNIT_TESTS)
     endforeach()
 
     add_executable(UnitTests ${unittest_sources})
-    target_include_directories(UnitTests PRIVATE src)
     target_include_directories(UnitTests PRIVATE src/armnn)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
+    target_include_directories(UnitTests PRIVATE src/backends)
 
     if(VALGRIND_FOUND)
         if(HEAP_PROFILING OR LEAK_CHECKING)

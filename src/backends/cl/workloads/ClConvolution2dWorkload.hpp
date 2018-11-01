@@ -8,7 +8,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Descriptors.hpp>
 
-#include <backends/Workload.hpp>
+#include <backendsCommon/Workload.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLConvolutionLayer.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>

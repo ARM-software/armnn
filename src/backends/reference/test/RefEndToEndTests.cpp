@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backends/test/EndToEndTestImpl.hpp>
+#include <backendsCommon/test/EndToEndTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 

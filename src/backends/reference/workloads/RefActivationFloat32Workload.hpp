@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <backends/Workload.hpp>
+#include <backendsCommon/Workload.hpp>
 
 namespace armnn
 {

@@ -8,10 +8,10 @@
 #include "TypeUtils.hpp"
 #include "ClWorkloadUtils.hpp"
 
-#include <backends/aclCommon/ArmComputeUtils.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLDepthwiseConvolutionLayer.h>
 

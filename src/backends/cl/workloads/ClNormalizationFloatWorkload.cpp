@@ -4,11 +4,11 @@
 //
 
 #include "ClNormalizationFloatWorkload.hpp"
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/cl/ClLayerSupport.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <cl/ClLayerSupport.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 #include "ClWorkloadUtils.hpp"
 
 using namespace armnn::armcomputetensorutils;

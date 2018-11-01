@@ -7,9 +7,9 @@
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
-#include <backends/WorkloadData.hpp>
-#include <backends/WorkloadFactory.hpp>
-#include <backends/MemCopyWorkload.hpp>
+#include <backendsCommon/WorkloadData.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
+#include <backendsCommon/MemCopyWorkload.hpp>
 
 namespace armnn
 {

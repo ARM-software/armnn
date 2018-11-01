@@ -4,10 +4,10 @@
 //
 
 #include "NeonPooling2dWorkload.hpp"
-#include <backends/neon/NeonLayerSupport.hpp>
-#include <backends/neon/NeonTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <neon/NeonLayerSupport.hpp>
+#include <neon/NeonTensorHandle.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 
 namespace armnn
 {

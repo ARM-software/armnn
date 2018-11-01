@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <backends/Workload.hpp>
-#include <backends/WorkloadData.hpp>
+#include <backendsCommon/Workload.hpp>
+#include <backendsCommon/WorkloadData.hpp>
 
 #include "arm_compute/graph/Tensor.h"
 #include "arm_compute/runtime/NEON/functions/NELSTMLayer.h"

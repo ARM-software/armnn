@@ -5,7 +5,7 @@
 #include <armnn/LayerSupport.hpp>
 #include <armnn/Optional.hpp>
 
-#include <backends/LayerSupportRegistry.hpp>
+#include <backendsCommon/LayerSupportRegistry.hpp>
 
 #include <boost/assert.hpp>
 

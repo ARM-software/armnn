@@ -3,17 +3,17 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/test/TensorHelpers.hpp>
-#include <armnn/test/UnitTests.hpp>
+#include <test/TensorHelpers.hpp>
+#include <test/UnitTests.hpp>
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/neon/NeonLayerSupport.hpp>
-#include <backends/neon/NeonWorkloadFactory.hpp>
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/test/ActivationFixture.hpp>
-#include <backends/test/LayerTests.hpp>
-#include <backends/test/TensorCopyUtils.hpp>
-#include <backends/test/WorkloadTestUtils.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <neon/NeonLayerSupport.hpp>
+#include <neon/NeonWorkloadFactory.hpp>
+#include <reference/RefWorkloadFactory.hpp>
+#include <backendsCommon/test/ActivationFixture.hpp>
+#include <backendsCommon/test/LayerTests.hpp>
+#include <backendsCommon/test/TensorCopyUtils.hpp>
+#include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
 

@@ -5,14 +5,14 @@
 
 #include "ClContextControlFixture.hpp"
 
-#include <backends/MemCopyWorkload.hpp>
+#include <backendsCommon/MemCopyWorkload.hpp>
 
-#include <backends/aclCommon/test/CreateWorkloadClNeon.hpp>
+#include <aclCommon/test/CreateWorkloadClNeon.hpp>
 
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/cl/ClWorkloadFactory.hpp>
-#include <backends/cl/workloads/ClWorkloads.hpp>
-#include <backends/cl/workloads/ClWorkloadUtils.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <cl/ClWorkloadFactory.hpp>
+#include <cl/workloads/ClWorkloads.hpp>
+#include <cl/workloads/ClWorkloadUtils.hpp>
 
 boost::test_tools::predicate_result CompareIClTensorHandleShape(IClTensorHandle*                    tensorHandle,
                                                                 std::initializer_list<unsigned int> expectedDimensions)

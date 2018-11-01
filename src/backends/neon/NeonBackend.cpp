@@ -7,7 +7,7 @@
 #include "NeonBackendId.hpp"
 #include "NeonWorkloadFactory.hpp"
 
-#include <backends/BackendRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 
 namespace armnn
 {

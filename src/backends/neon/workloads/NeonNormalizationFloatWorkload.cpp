@@ -4,9 +4,9 @@
 //
 
 #include "NeonNormalizationFloatWorkload.hpp"
-#include <backends/neon/NeonLayerSupport.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <neon/NeonLayerSupport.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 
 using namespace armnn::armcomputetensorutils;
 

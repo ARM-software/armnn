@@ -2,9 +2,9 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/MemCopyWorkload.hpp>
-#include <backends/MakeWorkloadHelper.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/MemCopyWorkload.hpp>
+#include <backendsCommon/MakeWorkloadHelper.hpp>
 #include "RefWorkloadFactory.hpp"
 #include "RefBackendId.hpp"
 #include "workloads/RefWorkloads.hpp"

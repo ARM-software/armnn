@@ -7,7 +7,7 @@
 #include "ClBackendId.hpp"
 #include "ClWorkloadFactory.hpp"
 
-#include <backends/BackendRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 #include <boost/log/trivial.hpp>
 
 namespace armnn

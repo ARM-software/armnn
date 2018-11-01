@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <backends/neon/workloads/NeonWorkloadUtils.hpp>
+#include <neon/workloads/NeonWorkloadUtils.hpp>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
 
 namespace armnn

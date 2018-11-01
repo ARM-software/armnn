@@ -6,13 +6,13 @@
 #pragma once
 
 #include <armnn/IRuntime.hpp>
-#include <armnn/test/TensorHelpers.hpp>
+#include <test/TensorHelpers.hpp>
 
 #include <armnnOnnxParser/IOnnxParser.hpp>
 
-#include <armnnUtils/VerificationHelpers.hpp>
+#include <VerificationHelpers.hpp>
 
-#include <backends/BackendRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 
 #include <boost/format.hpp>
 

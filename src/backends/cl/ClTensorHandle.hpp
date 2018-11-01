@@ -4,8 +4,8 @@
 //
 #pragma once
 
-#include <backends/OutputHandler.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <backendsCommon/OutputHandler.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <arm_compute/runtime/CL/CLTensor.h>
 #include <arm_compute/runtime/CL/CLSubTensor.h>

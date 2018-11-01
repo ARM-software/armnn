@@ -13,7 +13,7 @@
 #include <Graph.hpp>
 #include <Layer.hpp>
 
-#include <backends/CpuTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 
 /// Checks that first comes before second in the order.

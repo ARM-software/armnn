@@ -5,9 +5,9 @@
 
 #include "NeonDepthwiseConvolutionWorkload.hpp"
 
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/neon/NeonLayerSupport.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <neon/NeonLayerSupport.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 namespace armnn
 {

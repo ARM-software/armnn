@@ -5,8 +5,8 @@
 #include "Layer.hpp"
 
 #include "Graph.hpp"
-#include <backends/WorkloadData.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <backendsCommon/WorkloadData.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <boost/cast.hpp>
 #include <boost/format.hpp>

@@ -11,9 +11,9 @@
 #include "LayerFwd.hpp"
 #include "Profiling.hpp"
 
-#include <backends/IBackendInternal.hpp>
-#include <backends/Workload.hpp>
-#include <backends/WorkloadFactory.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
+#include <backendsCommon/Workload.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
 
 #include <mutex>
 #include <unordered_map>

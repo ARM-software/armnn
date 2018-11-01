@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <backends/Workload.hpp>
-#include <backends/WorkloadData.hpp>
-#include <backends/neon/workloads/NeonWorkloadUtils.hpp>
+#include <backendsCommon/Workload.hpp>
+#include <backendsCommon/WorkloadData.hpp>
+#include <neon/workloads/NeonWorkloadUtils.hpp>
 
 namespace armnn
 {

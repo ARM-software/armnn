@@ -6,11 +6,11 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
-#include <armnn/Runtime.hpp>
+#include <Runtime.hpp>
 #include <armnn/TypesUtils.hpp>
 
-#include <armnnUtils/HeapProfiling.hpp>
-#include <armnnUtils/LeakChecking.hpp>
+#include <HeapProfiling.hpp>
+#include <LeakChecking.hpp>
 
 #ifdef WITH_VALGRIND
 #include <valgrind/memcheck.h>

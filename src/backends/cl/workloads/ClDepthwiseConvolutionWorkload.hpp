@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <backends/Workload.hpp>
+#include <backendsCommon/Workload.hpp>
 
 #include <arm_compute/runtime/IFunction.h>
 #include <arm_compute/core/Error.h>

@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/test/RuntimeTests.hpp>
+#include <test/RuntimeTests.hpp>
 
-#include <armnnUtils/LeakChecking.hpp>
+#include <LeakChecking.hpp>
 
-#include <backends/test/RuntimeTestImpl.hpp>
+#include <backendsCommon/test/RuntimeTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 

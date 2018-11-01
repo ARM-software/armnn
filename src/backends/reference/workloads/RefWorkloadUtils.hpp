@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <backends/CpuTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
-#include <armnnUtils/Half.hpp>
+#include <Half.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 

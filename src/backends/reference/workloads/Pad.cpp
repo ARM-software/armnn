@@ -4,7 +4,7 @@
 //
 
 #include "Pad.hpp"
-#include "backends/WorkloadData.hpp"
+#include "backendsCommon/WorkloadData.hpp"
 #include <boost/numeric/conversion/cast.hpp>
 #include "TensorBufferArrayView.hpp"
 #include <cmath>

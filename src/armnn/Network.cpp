@@ -9,8 +9,8 @@
 #include "Optimizer.hpp"
 #include "optimizations/All.hpp"
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/WorkloadFactory.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Utils.hpp>

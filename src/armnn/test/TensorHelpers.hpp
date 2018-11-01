@@ -18,7 +18,7 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <backends/test/QuantizeHelper.hpp>
+#include <backendsCommon/test/QuantizeHelper.hpp>
 
 #include <cmath>
 

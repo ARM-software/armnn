@@ -9,7 +9,7 @@
 #include "RefWorkloadUtils.hpp"
 #include "Profiling.hpp"
 
-#include "armnnUtils/Half.hpp"
+#include "Half.hpp"
 
 namespace armnn
 {

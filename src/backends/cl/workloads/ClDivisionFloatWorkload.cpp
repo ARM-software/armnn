@@ -4,8 +4,8 @@
 //
 
 #include "ClDivisionFloatWorkload.hpp"
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

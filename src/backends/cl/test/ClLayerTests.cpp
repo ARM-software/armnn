@@ -8,13 +8,13 @@
 #include "test/TensorHelpers.hpp"
 #include "test/UnitTests.hpp"
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/cl/ClLayerSupport.hpp>
-#include <backends/cl/ClWorkloadFactory.hpp>
-#include <backends/cl/workloads/ClWorkloadUtils.hpp>
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/test/ActivationFixture.hpp>
-#include <backends/test/LayerTests.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <cl/ClLayerSupport.hpp>
+#include <cl/ClWorkloadFactory.hpp>
+#include <cl/workloads/ClWorkloadUtils.hpp>
+#include <reference/RefWorkloadFactory.hpp>
+#include <backendsCommon/test/ActivationFixture.hpp>
+#include <backendsCommon/test/LayerTests.hpp>
 
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>

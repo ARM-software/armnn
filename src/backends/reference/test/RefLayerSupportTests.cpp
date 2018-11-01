@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/layers/ConvertFp16ToFp32Layer.hpp>
-#include <armnn/layers/ConvertFp32ToFp16Layer.hpp>
-#include <armnn/test/TensorHelpers.hpp>
+#include <layers/ConvertFp16ToFp32Layer.hpp>
+#include <layers/ConvertFp32ToFp16Layer.hpp>
+#include <test/TensorHelpers.hpp>
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/test/LayerTests.hpp>
-#include <backends/test/IsLayerSupportedTestImpl.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <reference/RefWorkloadFactory.hpp>
+#include <backendsCommon/test/LayerTests.hpp>
+#include <backendsCommon/test/IsLayerSupportedTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 

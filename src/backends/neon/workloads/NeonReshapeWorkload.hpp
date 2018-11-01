@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <backends/neon/workloads/NeonWorkloadUtils.hpp>
+#include <neon/workloads/NeonWorkloadUtils.hpp>
 
 namespace armnn
 {

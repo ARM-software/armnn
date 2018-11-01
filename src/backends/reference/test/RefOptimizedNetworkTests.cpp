@@ -4,10 +4,10 @@
 //
 
 #include <armnn/ArmNN.hpp>
-#include <armnn/Graph.hpp>
-#include <armnn/Network.hpp>
+#include <Graph.hpp>
+#include <Network.hpp>
 
-#include <backends/reference/RefWorkloadFactory.hpp>
+#include <reference/RefWorkloadFactory.hpp>
 
 #include <boost/test/unit_test.hpp>
 

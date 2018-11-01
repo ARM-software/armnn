@@ -5,8 +5,8 @@
 
 #include <armnn/BackendId.hpp>
 
-#include <backends/cl/test/ClContextControlFixture.hpp>
-#include <backends/test/JsonPrinterTestImpl.hpp>
+#include <cl/test/ClContextControlFixture.hpp>
+#include <backendsCommon/test/JsonPrinterTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 

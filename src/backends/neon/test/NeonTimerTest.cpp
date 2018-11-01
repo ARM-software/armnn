@@ -5,17 +5,17 @@
 
 #include <armnn/ArmNN.hpp>
 
-#include <armnn/test/TensorHelpers.hpp>
+#include <test/TensorHelpers.hpp>
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/WorkloadFactory.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
 
-#include <backends/neon/NeonTimer.hpp>
-#include <backends/neon/NeonWorkloadFactory.hpp>
+#include <neon/NeonTimer.hpp>
+#include <neon/NeonWorkloadFactory.hpp>
 
-#include <backends/test/LayerTests.hpp>
-#include <backends/test/TensorCopyUtils.hpp>
-#include <backends/test/WorkloadTestUtils.hpp>
+#include <backendsCommon/test/LayerTests.hpp>
+#include <backendsCommon/test/TensorCopyUtils.hpp>
+#include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
 

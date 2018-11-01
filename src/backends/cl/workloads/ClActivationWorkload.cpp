@@ -7,10 +7,10 @@
 
 #include "ClWorkloadUtils.hpp"
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/cl/ClLayerSupport.hpp>
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <cl/ClLayerSupport.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 
 namespace armnn
 {

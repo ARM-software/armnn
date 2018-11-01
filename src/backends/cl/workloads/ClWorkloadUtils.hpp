@@ -4,11 +4,11 @@
 //
 #pragma once
 
-#include <armnnUtils/Half.hpp>
+#include <Half.hpp>
 
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/cl/OpenClTimer.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <cl/OpenClTimer.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <arm_compute/runtime/CL/CLFunctions.h>
 

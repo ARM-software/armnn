@@ -4,8 +4,8 @@
 //
 
 #include "NeonSubtractionFloatWorkload.hpp"
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 namespace armnn
 {

@@ -5,8 +5,8 @@
 #include "Runtime.hpp"
 
 #include <armnn/Version.hpp>
-#include <backends/BackendRegistry.hpp>
-#include <backends/BackendContextRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
+#include <backendsCommon/BackendContextRegistry.hpp>
 
 #include <iostream>
 

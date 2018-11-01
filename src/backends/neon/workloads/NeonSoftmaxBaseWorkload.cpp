@@ -5,7 +5,7 @@
 
 #include "NeonSoftmaxBaseWorkload.hpp"
 
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 
 namespace armnn
 {

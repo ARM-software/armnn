@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <backends/WorkloadFactory.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
 
 #ifdef ARMCOMPUTENEON_ENABLED
 #include <arm_compute/runtime/MemoryGroup.h>

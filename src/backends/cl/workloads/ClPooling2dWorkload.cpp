@@ -4,10 +4,10 @@
 //
 
 #include "ClPooling2dWorkload.hpp"
-#include <backends/cl/ClLayerSupport.hpp>
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <cl/ClLayerSupport.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

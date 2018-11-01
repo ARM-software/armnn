@@ -7,7 +7,7 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
 
-#include <backends/test/QuantizeHelper.hpp>
+#include <backendsCommon/test/QuantizeHelper.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>

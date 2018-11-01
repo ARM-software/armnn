@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/Instrument.hpp>
+#include <Instrument.hpp>
 
 #include <arm_compute/runtime/CL/CLScheduler.h>
 #include <arm_compute/core/CL/OpenCL.h>

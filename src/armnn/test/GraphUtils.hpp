@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <armnn/Graph.hpp>
+#include <Graph.hpp>
 
 #include <string>
 

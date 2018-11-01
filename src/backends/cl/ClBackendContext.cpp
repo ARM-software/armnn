@@ -7,7 +7,7 @@
 #include "ClBackendId.hpp"
 #include "ClContextControl.hpp"
 
-#include <backends/BackendContextRegistry.hpp>
+#include <backendsCommon/BackendContextRegistry.hpp>
 #include <boost/log/trivial.hpp>
 
 #include <mutex>

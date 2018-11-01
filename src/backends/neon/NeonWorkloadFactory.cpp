@@ -5,21 +5,21 @@
 #include "NeonWorkloadFactory.hpp"
 #include "NeonBackendId.hpp"
 #include <armnn/Utils.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 #include <Layer.hpp>
 
 #ifdef ARMCOMPUTENEON_ENABLED
 #include <arm_compute/runtime/Allocator.h>
 
-#include <backends/MemCopyWorkload.hpp>
+#include <backendsCommon/MemCopyWorkload.hpp>
 #include "NeonTensorHandle.hpp"
 #include "workloads/NeonWorkloadUtils.hpp"
 #include "workloads/NeonWorkloads.hpp"
 
-#include <backends/aclCommon/memory/IPoolManager.hpp>
+#include <aclCommon/memory/IPoolManager.hpp>
 #endif
 
-#include <backends/MakeWorkloadHelper.hpp>
+#include <backendsCommon/MakeWorkloadHelper.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 

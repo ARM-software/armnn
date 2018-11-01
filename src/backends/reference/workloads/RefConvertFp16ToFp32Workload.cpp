@@ -8,7 +8,7 @@
 #include "RefWorkloadUtils.hpp"
 #include "FloatingPointConverter.hpp"
 
-#include <armnnUtils/Half.hpp>
+#include <Half.hpp>
 
 namespace armnn
 {

@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/test/CreateWorkload.hpp>
+#include <test/CreateWorkload.hpp>
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/reference/workloads/RefWorkloads.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <reference/RefWorkloadFactory.hpp>
+#include <reference/workloads/RefWorkloads.hpp>
 
 namespace
 {

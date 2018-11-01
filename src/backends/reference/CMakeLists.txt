@@ -14,9 +14,9 @@ list(APPEND armnnRefBackend_sources
 )
 
 add_library(armnnRefBackend OBJECT ${armnnRefBackend_sources})
-target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+target_include_directories(armnnRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 
 add_subdirectory(workloads)
 

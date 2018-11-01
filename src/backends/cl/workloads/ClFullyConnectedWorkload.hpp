@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <backends/Workload.hpp>
+#include <backendsCommon/Workload.hpp>
 
 #include <arm_compute/runtime/CL/CLFunctions.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>

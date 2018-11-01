@@ -53,6 +53,6 @@ list(APPEND armnnNeonBackendWorkloads_sources
 )
 
 add_library(armnnNeonBackendWorkloads OBJECT ${armnnNeonBackendWorkloads_sources})
-target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+target_include_directories(armnnNeonBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)

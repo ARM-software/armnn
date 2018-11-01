@@ -6,9 +6,9 @@
 #include "MeanLayer.hpp"
 #include "LayerCloneBase.hpp"
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/WorkloadData.hpp>
-#include <backends/WorkloadFactory.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/WorkloadData.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
 
 #include <cstring>
 

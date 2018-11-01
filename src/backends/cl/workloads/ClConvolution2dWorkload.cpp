@@ -7,12 +7,12 @@
 
 #include "ClWorkloadUtils.hpp"
 
-#include <backends/cl/ClLayerSupport.hpp>
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/cl/ClLayerSupport.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <cl/ClLayerSupport.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <cl/ClLayerSupport.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLConvolutionLayer.h>
 

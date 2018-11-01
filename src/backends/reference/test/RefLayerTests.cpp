@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "test/TensorHelpers.hpp"
-#include "test/UnitTests.hpp"
+#include <test/TensorHelpers.hpp>
+#include <test/UnitTests.hpp>
 
-#include <backends/reference/RefWorkloadFactory.hpp>
-#include <backends/test/LayerTests.hpp>
+#include <reference/RefWorkloadFactory.hpp>
+#include <backendsCommon/test/LayerTests.hpp>
 
 #include <boost/test/unit_test.hpp>
 

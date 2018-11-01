@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <backends/IBackendInternal.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 
 namespace armnn
 {

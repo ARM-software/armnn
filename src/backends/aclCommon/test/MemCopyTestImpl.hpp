@@ -4,11 +4,11 @@
 //
 #pragma once
 
-#include <backends/test/LayerTests.hpp>
-#include <backends/test/TensorCopyUtils.hpp>
-#include <backends/test/WorkloadTestUtils.hpp>
+#include <backendsCommon/test/LayerTests.hpp>
+#include <backendsCommon/test/TensorCopyUtils.hpp>
+#include <backendsCommon/test/WorkloadTestUtils.hpp>
 
-#include <armnn/test/TensorHelpers.hpp>
+#include <test/TensorHelpers.hpp>
 
 #include <boost/multi_array.hpp>
 

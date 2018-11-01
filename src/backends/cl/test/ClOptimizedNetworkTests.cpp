@@ -4,11 +4,11 @@
 //
 
 #include <armnn/ArmNN.hpp>
-#include <armnn/Network.hpp>
+#include <Network.hpp>
 
-#include <armnn/test/GraphUtils.hpp>
+#include <test/GraphUtils.hpp>
 
-#include <backends/cl/ClWorkloadFactory.hpp>
+#include <cl/ClWorkloadFactory.hpp>
 
 #include <boost/test/unit_test.hpp>
 

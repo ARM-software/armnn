@@ -32,7 +32,7 @@ if(ARMCOMPUTECL)
 endif()
 
 add_library(armnnClBackend OBJECT ${armnnClBackend_sources})
-target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 

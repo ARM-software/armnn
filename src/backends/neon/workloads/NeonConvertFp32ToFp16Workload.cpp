@@ -5,10 +5,10 @@
 
 #include "NeonConvertFp32ToFp16Workload.hpp"
 
-#include <armnnUtils/Half.hpp>
+#include <Half.hpp>
 #include <FloatingPointConverter.hpp>
 #include <Profiling.hpp>
-#include <backends/WorkloadUtils.hpp>
+#include <backendsCommon/WorkloadUtils.hpp>
 
 namespace armnn
 {

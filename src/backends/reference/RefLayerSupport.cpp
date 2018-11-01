@@ -6,11 +6,11 @@
 #include "RefLayerSupport.hpp"
 #include "RefBackendId.hpp"
 
-#include <armnn/InternalTypes.hpp>
-#include <armnn/LayerSupportCommon.hpp>
+#include <InternalTypes.hpp>
+#include <LayerSupportCommon.hpp>
 #include <armnn/Types.hpp>
 
-#include <backends/LayerSupportRegistry.hpp>
+#include <backendsCommon/LayerSupportRegistry.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 

@@ -8,8 +8,9 @@
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
-#include <backends/WorkloadData.hpp>
-#include <backends/WorkloadFactory.hpp>
+
+#include <backendsCommon/WorkloadData.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
 
 #include <numeric>
 

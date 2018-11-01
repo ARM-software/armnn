@@ -9,7 +9,7 @@
 #include <armnn/Utils.hpp>
 
 #include <string>
-#include <backends/CpuTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 #include <Layer.hpp>
 
 #ifdef ARMCOMPUTECL_ENABLED
@@ -17,16 +17,16 @@
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
 
-#include <backends/MemCopyWorkload.hpp>
+#include <backendsCommon/MemCopyWorkload.hpp>
 
-#include <backends/aclCommon/memory/IPoolManager.hpp>
+#include <aclCommon/memory/IPoolManager.hpp>
 
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/cl/workloads/ClWorkloads.hpp>
-#include <backends/cl/workloads/ClWorkloadUtils.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <cl/workloads/ClWorkloads.hpp>
+#include <cl/workloads/ClWorkloadUtils.hpp>
 #endif
 
-#include <backends/MakeWorkloadHelper.hpp>
+#include <backendsCommon/MakeWorkloadHelper.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/format.hpp>

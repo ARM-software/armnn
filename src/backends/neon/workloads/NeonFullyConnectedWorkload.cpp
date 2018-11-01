@@ -5,9 +5,9 @@
 
 #include "NeonFullyConnectedWorkload.hpp"
 
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 namespace armnn
 {

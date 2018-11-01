@@ -15,7 +15,7 @@
 
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 
-#include <backends/BackendRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"

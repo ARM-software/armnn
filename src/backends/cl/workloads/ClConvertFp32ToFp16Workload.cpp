@@ -4,7 +4,7 @@
 //
 
 #include "ClConvertFp32ToFp16Workload.hpp"
-#include <backends/cl/ClTensorHandle.hpp>
+#include <cl/ClTensorHandle.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

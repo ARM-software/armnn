@@ -10,7 +10,7 @@
 #include <SubGraph.hpp>
 #include <SubGraphSelector.hpp>
 
-#include <backends/CpuTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 using namespace armnn;
 

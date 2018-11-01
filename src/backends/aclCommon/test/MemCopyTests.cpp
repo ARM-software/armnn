@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/cl/ClWorkloadFactory.hpp>
-#include <backends/neon/NeonWorkloadFactory.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <cl/ClWorkloadFactory.hpp>
+#include <neon/NeonWorkloadFactory.hpp>
 
 #if ARMCOMPUTECL_ENABLED && ARMCOMPUTENEON_ENABLED
-#include <backends/aclCommon/test/MemCopyTestImpl.hpp>
-#include <backends/cl/test/ClContextControlFixture.hpp>
+#include <aclCommon/test/MemCopyTestImpl.hpp>
+#include <cl/test/ClContextControlFixture.hpp>
 #endif
 
 #include <boost/test/unit_test.hpp>

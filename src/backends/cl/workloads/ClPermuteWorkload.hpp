@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <backends/Workload.hpp>
-#include <backends/WorkloadData.hpp>
+#include <backendsCommon/Workload.hpp>
+#include <backendsCommon/WorkloadData.hpp>
 
 #include <armnn/TypesUtils.hpp>
 #include <arm_compute/runtime/CL/functions/CLPermute.h>

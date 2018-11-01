@@ -4,7 +4,7 @@
 //
 
 #include "Mean.hpp"
-#include "backends/WorkloadData.hpp"
+#include "backendsCommon/WorkloadData.hpp"
 
 #include <boost/numeric/conversion/cast.hpp>
 

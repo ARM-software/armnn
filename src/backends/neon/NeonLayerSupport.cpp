@@ -7,12 +7,12 @@
 #include "NeonBackendId.hpp"
 
 #include <armnn/Descriptors.hpp>
-#include <armnn/InternalTypes.hpp>
-#include <armnn/LayerSupportCommon.hpp>
+#include <InternalTypes.hpp>
+#include <LayerSupportCommon.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 
-#include <backends/LayerSupportRegistry.hpp>
+#include <backendsCommon/LayerSupportRegistry.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 

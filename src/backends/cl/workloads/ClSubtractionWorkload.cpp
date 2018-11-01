@@ -5,9 +5,9 @@
 
 #include "ClSubtractionWorkload.hpp"
 
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

@@ -4,17 +4,17 @@
 //
 #pragma once
 
-#include <armnn/test/CreateWorkload.hpp>
+#include <test/CreateWorkload.hpp>
 
-#include <backends/MemCopyWorkload.hpp>
-#include <backends/reference/RefWorkloadFactory.hpp>
+#include <backendsCommon/MemCopyWorkload.hpp>
+#include <reference/RefWorkloadFactory.hpp>
 
 #if ARMCOMPUTECL_ENABLED
-#include <backends/cl/ClTensorHandle.hpp>
+#include <cl/ClTensorHandle.hpp>
 #endif
 
 #if ARMCOMPUTENEON_ENABLED
-#include <backends/neon/NeonTensorHandle.hpp>
+#include <neon/NeonTensorHandle.hpp>
 #endif
 
 using namespace armnn;

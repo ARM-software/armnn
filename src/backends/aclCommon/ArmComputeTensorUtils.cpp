@@ -2,8 +2,8 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 
 #include "armnn/Exceptions.hpp"
 #include <armnn/Descriptors.hpp>

@@ -11,8 +11,8 @@
 #include "Profiling.hpp"
 #include "HeapProfiling.hpp"
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/BackendRegistry.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/assert.hpp>

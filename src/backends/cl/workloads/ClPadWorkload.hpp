@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <backends/WorkloadData.hpp>
-#include <backends/Workload.hpp>
+#include <backendsCommon/WorkloadData.hpp>
+#include <backendsCommon/Workload.hpp>
 #include <arm_compute/runtime/CL/functions/CLPadLayer.h>
 
 namespace armnn {

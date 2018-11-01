@@ -5,8 +5,8 @@
 #pragma once
 
 #include <armnn/Optional.hpp>
-#include <backends/WorkloadFactory.hpp>
-#include <backends/OutputHandler.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
+#include <backendsCommon/OutputHandler.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 

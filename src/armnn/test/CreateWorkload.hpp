@@ -8,9 +8,9 @@
 
 #include <boost/cast.hpp>
 
-#include <backends/WorkloadData.hpp>
-#include <backends/WorkloadFactory.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <backendsCommon/WorkloadData.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <Graph.hpp>
 
@@ -54,7 +54,7 @@ void CreateTensorHandles(armnn::Graph& graph, armnn::IWorkloadFactory& factory)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// The following functions are called by backends/test/CreateWorkload*.cpp
+// The following functions are called by backendsCommon/test/CreateWorkload*.cpp
 // They build very simple graphs, and then create a workload.
 // Some checks are performed on the workload to ensure parameters have been passed correctly.
 // They return the created workloads so that backend-specific checks can be performed.

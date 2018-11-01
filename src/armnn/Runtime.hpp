@@ -10,7 +10,7 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/BackendId.hpp>
-#include <backends/IBackendContext.hpp>
+#include <backendsCommon/IBackendContext.hpp>
 
 #include <mutex>
 #include <unordered_map>

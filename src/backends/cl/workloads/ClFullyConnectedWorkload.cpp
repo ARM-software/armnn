@@ -4,11 +4,11 @@
 //
 
 #include "ClFullyConnectedWorkload.hpp"
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/aclCommon/ArmComputeUtils.hpp>
-#include <backends/cl/ClLayerSupport.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
+#include <cl/ClLayerSupport.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

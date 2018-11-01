@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <armnn/Runtime.hpp>
+#include <Runtime.hpp>
 
 namespace armnn
 {

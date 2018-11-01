@@ -61,6 +61,6 @@ list(APPEND armnnClBackendWorkloads_sources
 )
 
 add_library(armnnClBackendWorkloads OBJECT ${armnnClBackendWorkloads_sources})
-target_include_directories(armnnClBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(armnnClBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnClBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+target_include_directories(armnnClBackendWorkloads PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)

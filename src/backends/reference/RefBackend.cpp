@@ -7,7 +7,7 @@
 #include "RefBackendId.hpp"
 #include "RefWorkloadFactory.hpp"
 
-#include <backends/BackendRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 
 namespace armnn
 {

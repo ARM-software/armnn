@@ -4,8 +4,8 @@
 //
 
 #include "ClPermuteWorkload.hpp"
-#include <backends/cl/ClTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
+#include <cl/ClTensorHandle.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <arm_compute/core/Error.h>
 

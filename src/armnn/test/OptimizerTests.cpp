@@ -7,7 +7,7 @@
 #include <armnn/ArmNN.hpp>
 #include <Graph.hpp>
 #include <Optimizer.hpp>
-#include <backends/CpuTensorHandle.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
 #include <FloatingPointConverter.hpp>
 
 namespace

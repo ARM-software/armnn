@@ -5,12 +5,12 @@
 
 #include "NeonConvolution2dWorkload.hpp"
 
-#include <backends/CpuTensorHandle.hpp>
-#include <backends/aclCommon/ArmComputeTensorUtils.hpp>
-#include <backends/neon/NeonLayerSupport.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <neon/NeonLayerSupport.hpp>
 
 #include <armnn/Types.hpp>
-#include <armnnUtils/Half.hpp>
+#include <Half.hpp>
 
 namespace armnn
 {

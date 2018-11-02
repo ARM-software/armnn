@@ -106,6 +106,9 @@ public:
     IConnectableLayer* AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
                                        const char* name = nullptr) override;
 
+    IConnectableLayer* AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                              const char* name = nullptr) override;
+
     IConnectableLayer* AddFloorLayer(const char* name = nullptr) override;
 
     IConnectableLayer* AddOutputLayer(LayerBindingId id, const char* name = nullptr) override;

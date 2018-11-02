@@ -302,6 +302,16 @@ bool IsSoftmaxSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsSoftmaxSupported, input, output, descriptor);
 }
 
+bool IsSpaceToBatchNdSupported(const BackendId& backend,
+                               const TensorInfo& input,
+                               const TensorInfo& output,
+                               const SpaceToBatchNdDescriptor& descriptor,
+                               char* reasonIfUnsupported,
+                               size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsSpaceToBatchNdSupported, input, output, descriptor);
+}
+
 bool IsSplitterSupported(const BackendId& backend,
                          const TensorInfo& input,
                          const ViewsDescriptor& descriptor,

@@ -238,6 +238,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateReshape(const ReshapeQueue
     return std::make_unique<NeonReshapeWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
@@ -437,6 +443,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQue
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
     const WorkloadInfo&           info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
 {
     return nullptr;
 }

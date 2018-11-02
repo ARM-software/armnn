@@ -41,6 +41,7 @@ enum class LayerType
     Reshape,
     ResizeBilinear,
     Softmax,
+    SpaceToBatchNd,
     Splitter,
     // Last layer goes here.
     LastLayer,

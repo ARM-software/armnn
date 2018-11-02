@@ -545,6 +545,12 @@ IConnectableLayer* Network::AddReshapeLayer(const ReshapeDescriptor& reshapeDesc
     return m_Graph->AddLayer<ReshapeLayer>(reshapeDescriptor, name);
 }
 
+IConnectableLayer* Network::AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                                   const char* name)
+{
+    return m_Graph->AddLayer<SpaceToBatchNdLayer>(spaceToBatchNdDescriptor, name);
+}
+
 IConnectableLayer* Network::AddFloorLayer(const char* name)
 {
     return m_Graph->AddLayer<FloorLayer>(name);

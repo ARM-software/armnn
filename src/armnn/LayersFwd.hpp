@@ -33,6 +33,7 @@
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeBilinearLayer.hpp"
 #include "layers/SoftmaxLayer.hpp"
+#include "layers/SpaceToBatchNdLayer.hpp"
 #include "layers/SplitterLayer.hpp"
 #include "layers/SubtractionLayer.hpp"
 
@@ -90,6 +91,7 @@ DECLARE_LAYER(Pooling2d)
 DECLARE_LAYER(Reshape)
 DECLARE_LAYER(ResizeBilinear)
 DECLARE_LAYER(Softmax)
+DECLARE_LAYER(SpaceToBatchNd)
 DECLARE_LAYER(Splitter)
 DECLARE_LAYER(Subtraction)
 

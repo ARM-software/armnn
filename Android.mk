@@ -101,6 +101,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/DivisionLayer.cpp \
         src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/layers/ReshapeLayer.cpp \
+        src/armnn/layers/SpaceToBatchNdLayer.cpp \
         src/armnn/layers/ResizeBilinearLayer.cpp \
         src/armnn/layers/SoftmaxLayer.cpp \
         src/armnn/layers/SplitterLayer.cpp \
@@ -229,4 +230,3 @@ LOCAL_SHARED_LIBRARIES := \
 	libOpenCL
 
 include $(BUILD_EXECUTABLE)
-

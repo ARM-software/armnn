@@ -274,6 +274,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReshape(const ReshapeQueueDe
     return MakeWorkload<ClReshapeWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
@@ -472,6 +478,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConstant(const ConstantQueue
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
     return nullptr;

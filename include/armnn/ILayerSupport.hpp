@@ -161,6 +161,11 @@ public:
     virtual bool IsReshapeSupported(const TensorInfo& input,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
+    virtual bool IsSpaceToBatchNdSupported(const TensorInfo& input,
+                                           const TensorInfo& output,
+                                           const SpaceToBatchNdDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     virtual bool IsResizeBilinearSupported(const TensorInfo& input,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 

@@ -20,6 +20,7 @@ struct MeanDescriptor;
 struct PadDescriptor;
 struct Pooling2dDescriptor;
 struct ReshapeDescriptor;
+struct SpaceToBatchNdDescriptor;
 struct ResizeBilinearDescriptor;
 struct SoftmaxDescriptor;
 struct OriginsDescriptor;

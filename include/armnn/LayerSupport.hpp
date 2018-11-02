@@ -196,6 +196,14 @@ bool IsSoftmaxSupported(const BackendId& backend,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsSpaceToBatchNdSupported(const BackendId& backend,
+                               const TensorInfo& input,
+                               const TensorInfo& output,
+                               const SpaceToBatchNdDescriptor& descriptor,
+                               char* reasonIfUnsupported = nullptr,
+                               size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsSplitterSupported(const BackendId& backend,
                          const TensorInfo& input,
                          const ViewsDescriptor& descriptor,

@@ -252,6 +252,13 @@ public:
     virtual IConnectableLayer* AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
                                                const char* name = nullptr) = 0;
 
+    /// Adds a space to batch layer to the network.
+    /// @param spaceToBatchNdDescriptor - Parameters for the space to batch operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                                      const char* name = nullptr) = 0;
+
     /// Adds a floor layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.

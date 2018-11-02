@@ -333,6 +333,24 @@ struct ReshapeDescriptor
     TensorShape m_TargetShape;
 };
 
+struct SpaceToBatchNdDescriptor
+{
+    SpaceToBatchNdDescriptor()
+    : m_DataLayout(DataLayout::NCHW)
+    {}
+
+    SpaceToBatchNdDescriptor(const std::vector<unsigned int>& blockShape,
+                             const std::vector<std::pair<unsigned int, unsigned int>>& padList)
+    : m_BlockShape(blockShape)
+    , m_PadList(padList)
+    , m_DataLayout(DataLayout::NCHW)
+    {}
+
+    std::vector<unsigned int> m_BlockShape;
+    std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
+    DataLayoutIndexed m_DataLayout;
+};
+
 // temporary descriptor for Lstm
 struct LstmDescriptor
 {

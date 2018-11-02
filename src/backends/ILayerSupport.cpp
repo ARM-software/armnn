@@ -256,6 +256,14 @@ bool ILayerSupport::IsSoftmaxSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool ILayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const SpaceToBatchNdDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool ILayerSupport::IsSplitterSupported(const TensorInfo& input,
                                         const ViewsDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const

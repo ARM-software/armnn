@@ -271,6 +271,11 @@ struct ReshapeQueueDescriptor : QueueDescriptorWithParameters<ReshapeDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct SpaceToBatchNdQueueDescriptor : QueueDescriptorWithParameters<SpaceToBatchNdDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct FloorQueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

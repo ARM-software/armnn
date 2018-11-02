@@ -542,6 +542,17 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                             reason);
             break;
         }
+        case LayerType::SpaceToBatchNd:
+        {
+            auto cLayer = boost::polymorphic_downcast<const SpaceToBatchNdLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsSpaceToBatchNdSupported(OverrideDataType(input, dataType),
+                                                                   OverrideDataType(output, dataType),
+                                                                   cLayer->GetParameters(),
+                                                                   reason);
+            break;
+        }
         case LayerType::Splitter:
         {
             auto cLayer = boost::polymorphic_downcast<const SplitterLayer*>(&layer);

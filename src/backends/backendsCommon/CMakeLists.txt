@@ -4,14 +4,11 @@
 #
 
 list(APPEND armnnBackendsCommon_sources
-    BackendContextRegistry.cpp
-    BackendContextRegistry.hpp
     BackendRegistry.cpp
     BackendRegistry.hpp
     CpuTensorHandle.cpp
     CpuTensorHandleFwd.hpp
     CpuTensorHandle.hpp
-    IBackendContext.hpp
     IBackendInternal.hpp
     ILayerSupport.cpp
     ITensorHandle.hpp

@@ -12,9 +12,7 @@
 namespace armnn
 {
 
-using BackendRegistry = RegistryCommon<IBackendInternal,
-                                       IBackendInternalUniquePtr,
-                                       EmptyInitializer>;
+using BackendRegistry = RegistryCommon<IBackendInternal, IBackendInternalUniquePtr>;
 
 BackendRegistry& BackendRegistryInstance();
 

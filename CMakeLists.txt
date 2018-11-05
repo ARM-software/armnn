@@ -154,7 +154,6 @@ list(APPEND armnn_sources
     include/armnn/ILayerSupport.hpp
     include/armnn/INetwork.hpp
     include/armnn/IProfiler.hpp
-    include/armnn/IBackend.hpp
     include/armnn/IRuntime.hpp
     include/armnn/LayerSupport.hpp
     include/armnn/LstmParams.hpp

@@ -8,7 +8,6 @@
 # file in the root of ArmNN
 
 COMMON_SOURCES := \
-    BackendContextRegistry.cpp \
     BackendRegistry.cpp \
     CpuTensorHandle.cpp \
     ILayerSupport.cpp \
@@ -27,4 +26,3 @@ COMMON_TEST_SOURCES := \
     test/WorkloadDataValidation.cpp \
     test/TensorCopyUtils.cpp \
     test/LayerTests.cpp
-

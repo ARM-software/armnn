@@ -139,6 +139,20 @@ enum class OutputShapeRounding
     Ceiling     = 1
 };
 
+/// Each backend should implement an IBackend.
+class IBackend
+{
+protected:
+    IBackend() {}
+    virtual ~IBackend() {}
+
+public:
+    virtual const BackendId& GetId() const = 0;
+};
+
+using IBackendSharedPtr = std::shared_ptr<IBackend>;
+using IBackendUniquePtr = std::unique_ptr<IBackend, void(*)(IBackend* backend)>;
+
 /// Device specific knowledge to be passed to the optimizer.
 class IDeviceSpec
 {
@@ -207,7 +221,5 @@ private:
 
 /// Define LayerGuid type.
 using LayerGuid = unsigned int;
-
-struct EmptyInitializer {};
 
 } // namespace armnn

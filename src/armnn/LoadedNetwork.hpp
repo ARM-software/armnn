@@ -40,7 +40,6 @@ public:
     Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors);
 
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
-                                                            const IRuntime::CreationOptions& options,
                                                             std::string & errorMessage);
 
     // NOTE we return by reference as the purpose of this method is only to provide
@@ -52,7 +51,7 @@ public:
     void FreeWorkingMemory();
 
 private:
-    LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, const IRuntime::CreationOptions& options);
+    LoadedNetwork(std::unique_ptr<OptimizedNetwork> net);
 
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 

@@ -9,6 +9,8 @@
 
 #include <backendsCommon/BackendRegistry.hpp>
 
+#include <boost/cast.hpp>
+
 namespace armnn
 {
 
@@ -19,7 +21,7 @@ static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
 {
     BackendRegistryInstance(),
     NeonBackend::GetIdStatic(),
-    [](const EmptyInitializer&)
+    []()
     {
         return IBackendInternalUniquePtr(new NeonBackend);
     }

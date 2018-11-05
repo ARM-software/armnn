@@ -12,8 +12,8 @@ namespace armnn
 class NeonBackend : public IBackendInternal
 {
 public:
-    NeonBackend() = default;
-    ~NeonBackend() override = default;
+    NeonBackend()  = default;
+    ~NeonBackend() = default;
 
     static const BackendId& GetIdStatic();
     const BackendId& GetId() const override { return GetIdStatic(); }

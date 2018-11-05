@@ -53,7 +53,7 @@ ILayerSupportSharedPtr GetLayerSupportPointer()
 static StaticRegistryInitializer<LayerSupportRegistry> g_RegisterHelper{
     LayerSupportRegistryInstance(),
     ClBackendId(),
-    [](const EmptyInitializer&)
+    []()
     {
         return GetLayerSupportPointer();
     }

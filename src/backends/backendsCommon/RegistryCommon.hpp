@@ -22,11 +22,11 @@ struct RegisteredTypeName
     static const char * Name() { return "UNKNOWN"; }
 };
 
-template <typename RegisteredType, typename PointerType, typename ParamType>
+template <typename RegisteredType, typename PointerType>
 class RegistryCommon
 {
 public:
-    using FactoryFunction = std::function<PointerType(const ParamType&)>;
+    using FactoryFunction = std::function<PointerType()>;
 
     void Register(const BackendId& id, FactoryFunction factory)
     {
@@ -51,20 +51,6 @@ public:
         }
 
         return it->second;
-    }
-
-    FactoryFunction GetFactory(const BackendId& id,
-                               FactoryFunction defaultFactory) const
-    {
-        auto it = m_Factories.find(id);
-        if (it == m_Factories.end())
-        {
-            return defaultFactory;
-        }
-        else
-        {
-            return it->second;
-        }
     }
 
     size_t Size() const

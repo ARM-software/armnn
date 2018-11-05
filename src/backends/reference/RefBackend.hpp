@@ -12,8 +12,8 @@ namespace armnn
 class RefBackend : public IBackendInternal
 {
 public:
-    RefBackend() = default;
-    ~RefBackend() override = default;
+    RefBackend()  = default;
+    ~RefBackend() = default;
 
     static const BackendId& GetIdStatic();
     const BackendId& GetId() const override { return GetIdStatic(); }

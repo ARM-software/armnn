@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(TestRegistryHelper)
     StaticRegistryInitializer<BackendRegistry> factoryHelper(
         BackendRegistryInstance(),
         "HelloWorld",
-        [&called](const EmptyInitializer&)
+        [&called]()
         {
             called = true;
             return armnn::IBackendInternalUniquePtr(nullptr);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(TestRegistryHelper)
     // sanity check: the factory still not called
     BOOST_TEST(called == false);
 
-    factoryFunction(EmptyInitializer());
+    factoryFunction();
     BOOST_TEST(called == true);
 }
 
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(TestDirectCallToRegistry)
     bool called = false;
     BackendRegistryInstance().Register(
         "HelloWorld",
-        [&called](const EmptyInitializer&)
+        [&called]()
         {
             called = true;
             return armnn::IBackendInternalUniquePtr(nullptr);
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(TestDirectCallToRegistry)
     // sanity check: the factory still not called
     BOOST_TEST(called == false);
 
-    factoryFunction(EmptyInitializer());
+    factoryFunction();
     BOOST_TEST(called == true);
 }
 

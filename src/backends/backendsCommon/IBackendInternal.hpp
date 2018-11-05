@@ -4,8 +4,7 @@
 //
 #pragma once
 
-#include <armnn/IBackend.hpp>
-#include <memory>
+#include <armnn/Types.hpp>
 
 namespace armnn
 {
@@ -14,6 +13,8 @@ class IWorkloadFactory;
 class IBackendInternal : public IBackend
 {
 protected:
+    // Creation must be done through a specific
+    // backend interface.
     IBackendInternal() = default;
 
 public:

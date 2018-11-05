@@ -88,8 +88,11 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
 
     const unsigned int depthMultiplier = weightInfo.GetShape()[0];
 
+    const unsigned int widthIndex = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 3 : 2;
+    const unsigned int heightIndex = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 2 : 1;
+
     //Check for optimisation opportunities.
-    bool use3x3Optimisation = (weightInfo.GetShape()[3] == 3) && (weightInfo.GetShape()[2] == 3);
+    bool use3x3Optimisation = (weightInfo.GetShape()[widthIndex] == 3) && (weightInfo.GetShape()[heightIndex] == 3);
     if (use3x3Optimisation)
     {
         m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer3x3>();

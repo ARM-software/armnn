@@ -7,6 +7,8 @@ if(ARMCOMPUTECL)
     list(APPEND armnnClBackend_sources
         ClBackend.cpp
         ClBackend.hpp
+        ClBackendContext.cpp
+        ClBackendContext.hpp
         ClBackendId.hpp
         ClContextControl.cpp
         ClContextControl.hpp

@@ -6,6 +6,7 @@
 #include "ClBackend.hpp"
 #include "ClBackendId.hpp"
 #include "ClWorkloadFactory.hpp"
+#include "ClBackendContext.hpp"
 
 #include <backendsCommon/BackendRegistry.hpp>
 
@@ -37,5 +38,12 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory() const
 {
     return std::make_unique<ClWorkloadFactory>();
 }
+
+IBackendInternal::IBackendContextPtr
+ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const
+{
+    return IBackendContextPtr{new ClBackendContext{options}};
+}
+
 
 } // namespace armnn

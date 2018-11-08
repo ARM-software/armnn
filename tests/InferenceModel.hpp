@@ -14,7 +14,7 @@
 #include <armnnOnnxParser/IOnnxParser.hpp>
 #endif
 
-#include <backends/backendsCommon/BackendRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 
 #include <boost/exception/exception.hpp>
 #include <boost/exception/diagnostic_information.hpp>

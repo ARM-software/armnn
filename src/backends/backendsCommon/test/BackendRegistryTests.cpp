@@ -6,6 +6,7 @@
 #include <armnn/Types.hpp>
 
 #include <backendsCommon/BackendRegistry.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 
 #include <boost/test/unit_test.hpp>
 

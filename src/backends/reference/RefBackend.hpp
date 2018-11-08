@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 
 namespace armnn
@@ -18,7 +19,12 @@ public:
     static const BackendId& GetIdStatic();
     const BackendId& GetId() const override { return GetIdStatic(); }
 
-    IWorkloadFactoryPtr CreateWorkloadFactory() const override;
+    IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory() const override;
+
+    IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override
+    {
+        return IBackendContextPtr{};
+    }
 };
 
 } // namespace armnn

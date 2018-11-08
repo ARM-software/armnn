@@ -9,6 +9,7 @@
 
 BACKEND_SOURCES := \
         ClBackend.cpp \
+        ClBackendContext.cpp \
         ClContextControl.cpp \
         ClLayerSupport.cpp \
         ClWorkloadFactory.cpp \

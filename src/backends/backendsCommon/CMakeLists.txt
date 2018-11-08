@@ -10,6 +10,7 @@ list(APPEND armnnBackendsCommon_sources
     CpuTensorHandleFwd.hpp
     CpuTensorHandle.hpp
     IBackendInternal.hpp
+    IBackendContext.hpp
     ILayerSupport.cpp
     ITensorHandle.hpp
     LayerSupportRegistry.cpp

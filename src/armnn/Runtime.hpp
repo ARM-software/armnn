@@ -11,8 +11,6 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/BackendId.hpp>
 
-#include <cl/ClContextControl.hpp>
-
 #include <mutex>
 #include <unordered_map>
 
@@ -89,8 +87,7 @@ private:
     mutable std::mutex m_Mutex;
 
     std::unordered_map<NetworkId, std::unique_ptr<LoadedNetwork>> m_LoadedNetworks;
-
-    ClContextControl m_ClContextControl;
+    std::unordered_map<BackendId, IBackendInternal::IBackendContextPtr> m_BackendContexts;
 
     int m_NetworkIdCounter;
 

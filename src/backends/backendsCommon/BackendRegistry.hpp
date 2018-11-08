@@ -4,14 +4,13 @@
 //
 #pragma once
 
-#include "IBackendInternal.hpp"
 #include "RegistryCommon.hpp"
-
 #include <armnn/Types.hpp>
 
 namespace armnn
 {
-
+class IBackendInternal;
+using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;
 using BackendRegistry = RegistryCommon<IBackendInternal, IBackendInternalUniquePtr>;
 
 BackendRegistry& BackendRegistryInstance();

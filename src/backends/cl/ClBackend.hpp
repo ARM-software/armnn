@@ -4,7 +4,6 @@
 //
 #pragma once
 
-#include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 
 namespace armnn
@@ -21,6 +20,7 @@ public:
 
     IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory() const override;
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
+    IBackendInternal::Optimizations GetOptimizations() const override;
 };
 
 } // namespace armnn

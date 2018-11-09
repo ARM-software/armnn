@@ -8,7 +8,9 @@
 #include "ClWorkloadFactory.hpp"
 #include "ClBackendContext.hpp"
 
+#include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
+#include <Optimizer.hpp>
 
 namespace armnn
 {
@@ -45,5 +47,9 @@ ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const
     return IBackendContextPtr{new ClBackendContext{options}};
 }
 
+IBackendInternal::Optimizations ClBackend::GetOptimizations() const
+{
+    return Optimizations{};
+}
 
 } // namespace armnn

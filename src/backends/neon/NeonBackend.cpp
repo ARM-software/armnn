@@ -7,7 +7,9 @@
 #include "NeonBackendId.hpp"
 #include "NeonWorkloadFactory.hpp"
 
+#include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
+#include <Optimizer.hpp>
 
 #include <boost/cast.hpp>
 
@@ -38,6 +40,16 @@ const BackendId& NeonBackend::GetIdStatic()
 IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory() const
 {
     return std::make_unique<NeonWorkloadFactory>();
+}
+
+IBackendInternal::IBackendContextPtr NeonBackend::CreateBackendContext(const IRuntime::CreationOptions&) const
+{
+    return IBackendContextPtr{};
+}
+
+IBackendInternal::Optimizations NeonBackend::GetOptimizations() const
+{
+    return Optimizations{};
 }
 
 } // namespace armnn

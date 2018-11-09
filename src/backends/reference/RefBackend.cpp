@@ -7,7 +7,9 @@
 #include "RefBackendId.hpp"
 #include "RefWorkloadFactory.hpp"
 
+#include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
+#include <Optimizer.hpp>
 
 #include <boost/cast.hpp>
 
@@ -38,6 +40,16 @@ const BackendId& RefBackend::GetIdStatic()
 IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory() const
 {
     return std::make_unique<RefWorkloadFactory>();
+}
+
+IBackendInternal::IBackendContextPtr RefBackend::CreateBackendContext(const IRuntime::CreationOptions&) const
+{
+    return IBackendContextPtr{};
+}
+
+IBackendInternal::Optimizations RefBackend::GetOptimizations() const
+{
+    return Optimizations{};
 }
 
 } // namespace armnn

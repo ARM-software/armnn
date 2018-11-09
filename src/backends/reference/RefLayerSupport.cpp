@@ -434,6 +434,19 @@ bool RefLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const SpaceToBatchNdDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(output);
+    ignore_unused(descriptor);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                           const ViewsDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const

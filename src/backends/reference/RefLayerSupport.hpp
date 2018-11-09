@@ -159,6 +159,11 @@ public:
                             const SoftmaxDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsSpaceToBatchNdSupported(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const SpaceToBatchNdDescriptor& descriptor,
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsSplitterSupported(const TensorInfo& input,
                              const ViewsDescriptor& descriptor,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

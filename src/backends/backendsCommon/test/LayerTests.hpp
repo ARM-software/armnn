@@ -414,3 +414,23 @@ LayerTestResult<float, 3> MeanVtsFloat2Test(armnn::IWorkloadFactory& workloadFac
 LayerTestResult<float, 3> MeanVtsFloat3Test(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> AdditionAfterMaxPoolTest(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<float, 4> SpaceToBatchNdSimpleFloat32Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsFloat32Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SpaceToBatchNdMultiBlockFloat32Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SpaceToBatchNdPaddingFloat32Test(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingUint8Test(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<float, 4> SpaceToBatchNdSimpleNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SpaceToBatchNdMultiBlockNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> SpaceToBatchNdPaddingNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory);

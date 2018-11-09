@@ -217,7 +217,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueD
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<RefSpaceToBatchNdFloat32Workload, RefSpaceToBatchNdUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,

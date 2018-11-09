@@ -26,6 +26,7 @@
 #include "Pooling2dTestImpl.hpp"
 #include "ReshapeTestImpl.hpp"
 #include "FullyConnectedTestImpl.hpp"
+#include "SpaceToBatchNdTestImpl.hpp"
 #include "SplitterTestImpl.hpp"
 #include "SoftmaxTestImpl.hpp"
 #include "NormTestImpl.hpp"
@@ -6087,4 +6088,84 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(armnn::IWorkloadFactory& work
     CopyDataFromITensorHandle(&addRet.output[0][0][0][0], addOutputHandle.get());
 
     return addRet;
+}
+
+LayerTestResult<float, 4> SpaceToBatchNdSimpleFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdSimpleTest<float>(workloadFactory);
+}
+
+LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdMultiChannelsTest<float>(workloadFactory);
+}
+
+LayerTestResult<float, 4> SpaceToBatchNdMultiBlockFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdMultiBlockTest<float>(workloadFactory);
+}
+
+LayerTestResult<float, 4> SpaceToBatchNdPaddingFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdPaddingTest<float>(workloadFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdSimpleTest<uint8_t>(workloadFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdMultiChannelsTest<uint8_t>(workloadFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdMultiBlockTest<uint8_t>(workloadFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdPaddingTest<uint8_t>(workloadFactory);
+}
+
+LayerTestResult<float, 4> SpaceToBatchNdSimpleNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdSimpleNHWCTest<float>(workloadFactory);
+}
+
+LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdMultiChannelsNHWCTest<float>(workloadFactory);
+}
+
+LayerTestResult<float, 4> SpaceToBatchNdMultiBlockNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdMultiBlockNHWCTest<float>(workloadFactory);
+}
+
+LayerTestResult<float, 4> SpaceToBatchNdPaddingNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdPaddingNHWCTest<float>(workloadFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdSimpleNHWCTest<uint8_t>(workloadFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdMultiChannelsNHWCTest<uint8_t>(workloadFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdMultiBlockNHWCTest<uint8_t>(workloadFactory);
+}
+
+LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory)
+{
+    return SpaceToBatchNdPaddingNHWCTest<uint8_t>(workloadFactory);
 }

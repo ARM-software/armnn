@@ -41,6 +41,7 @@
 #include "BatchNormImpl.hpp"
 #include "Activation.hpp"
 #include "Merger.hpp"
+#include "RefSpaceToBatchNdWorkload.hpp"
 #include "RefSplitterFloat32Workload.hpp"
 #include "RefConstantFloat32Workload.hpp"
 #include "RefActivationFloat32Workload.hpp"

@@ -86,6 +86,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefSoftmaxFloat32Workload.hpp
     RefSoftmaxUint8Workload.cpp
     RefSoftmaxUint8Workload.hpp
+    RefSpaceToBatchNdWorkload.cpp
+    RefSpaceToBatchNdWorkload.hpp
     RefSplitterFloat32Workload.cpp
     RefSplitterFloat32Workload.hpp
     RefSplitterUint8Workload.cpp
@@ -96,6 +98,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     ResizeBilinear.hpp
     Softmax.cpp
     Softmax.hpp
+    SpaceToBatchNd.hpp
+    SpaceToBatchNd.cpp
     Splitter.hpp
     TensorBufferArrayView.hpp
     Mean.cpp

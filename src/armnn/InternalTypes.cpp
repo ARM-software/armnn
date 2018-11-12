@@ -17,6 +17,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Activation: return "Activation";
         case LayerType::Addition: return "Addition";
         case LayerType::BatchNormalization: return "BatchNormalization";
+        case LayerType::BatchToSpaceNd: return "BatchToSpaceNd";
         case LayerType::Constant: return "Constant";
         case LayerType::ConvertFp16ToFp32: return "ConvertFp16ToFp32";
         case LayerType::ConvertFp32ToFp16: return "ConvertFp32ToFp16";

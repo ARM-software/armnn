@@ -97,6 +97,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateBatchNormalization(const BatchNormalizationQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const = 0;
 
+    virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& Info) const = 0;
+
     virtual std::unique_ptr<IWorkload> CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const = 0;
 

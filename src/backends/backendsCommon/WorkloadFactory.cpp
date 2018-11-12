@@ -116,6 +116,18 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                    reason);
             break;
         }
+        case LayerType::BatchToSpaceNd:
+        {
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            auto cLayer = boost::polymorphic_downcast<const BatchToSpaceNdLayer*>(&layer);
+
+            result = layerSupportObject->IsBatchToSpaceNdSupported(OverrideDataType(input, dataType),
+                                                                   OverrideDataType(output, dataType),
+                                                                   cLayer->GetParameters(),
+                                                                   reason);
+            break;
+        }
         case LayerType::Constant:
         {
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();

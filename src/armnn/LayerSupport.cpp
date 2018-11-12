@@ -12,6 +12,7 @@
 #include <cstring>
 #include <algorithm>
 #include <unordered_map>
+#include <armnn/ArmNN.hpp>
 
 namespace armnn
 {
@@ -97,6 +98,20 @@ bool IsBatchNormalizationSupported(const BackendId& backend,
                                var,
                                beta,
                                gamma,
+                               descriptor);
+}
+
+bool IsBatchToSpaceNdSupported(const BackendId& backend,
+                               const TensorInfo& input,
+                               const TensorInfo& output,
+                               const BatchToSpaceNdDescriptor& descriptor,
+                               char* reasonIfUnsupported,
+                               size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend,
+                               IsBatchToSpaceNdSupported,
+                               input,
+                               output,
                                descriptor);
 }
 

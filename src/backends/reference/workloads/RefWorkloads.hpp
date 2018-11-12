@@ -55,3 +55,5 @@
 #include "RefMeanUint8Workload.hpp"
 #include "RefMeanFloat32Workload.hpp"
 #include "RefPadWorkload.hpp"
+#include "RefBatchToSpaceNdUint8Workload.hpp"
+#include "RefBatchToSpaceNdFloat32Workload.hpp"

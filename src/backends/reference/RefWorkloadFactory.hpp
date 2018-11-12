@@ -143,6 +143,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreatePad(const PadQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info) const override;
+
+    virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const override;
 private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>

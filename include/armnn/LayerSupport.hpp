@@ -41,6 +41,14 @@ bool IsBatchNormalizationSupported(const BackendId& backend,
                                    size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsBatchToSpaceNdSupported(const BackendId& backend,
+                               const TensorInfo& input,
+                               const TensorInfo& output,
+                               const BatchToSpaceNdDescriptor& descriptor,
+                               char* reasonIfUnsupported = nullptr,
+                               size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsConstantSupported(const BackendId& backend,
                          const TensorInfo& output,
                          char* reasonIfUnsupported = nullptr,

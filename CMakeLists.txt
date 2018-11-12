@@ -175,6 +175,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ArithmeticBaseLayer.cpp
     src/armnn/layers/BatchNormalizationLayer.hpp
     src/armnn/layers/BatchNormalizationLayer.cpp
+    src/armnn/layers/BatchToSpaceNdLayer.hpp
+    src/armnn/layers/BatchToSpaceNdLayer.cpp
     src/armnn/layers/ConstantLayer.hpp
     src/armnn/layers/ConstantLayer.cpp
     src/armnn/layers/Convolution2dLayer.hpp

@@ -296,6 +296,25 @@ struct BatchNormalizationDescriptor
     DataLayoutIndexed m_DataLayout;
 };
 
+struct BatchToSpaceNdDescriptor
+{
+    BatchToSpaceNdDescriptor()
+        : m_BlockShape()
+        , m_Crops()
+        , m_DataLayout(DataLayout::NCHW)
+    {}
+
+    BatchToSpaceNdDescriptor(std::vector<unsigned int> blockShape, std::vector<std::vector<unsigned int>> crops)
+        : m_BlockShape(blockShape)
+        , m_Crops(crops)
+        , m_DataLayout(DataLayout::NCHW)
+    {}
+
+    std::vector<unsigned int> m_BlockShape;
+    std::vector<std::vector<unsigned int>> m_Crops;
+    DataLayoutIndexed m_DataLayout;
+};
+
 struct FakeQuantizationDescriptor
 {
     FakeQuantizationDescriptor()

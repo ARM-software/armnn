@@ -13,6 +13,7 @@ BACKEND_SOURCES := \
         RefWorkloadFactory.cpp \
         workloads/Activation.cpp \
         workloads/ArithmeticFunction.cpp \
+        workloads/BatchToSpaceNd.cpp \
         workloads/Broadcast.cpp \
         workloads/ConvImpl.cpp \
         workloads/FullyConnected.cpp \
@@ -25,6 +26,8 @@ BACKEND_SOURCES := \
         workloads/RefBaseConstantWorkload.cpp \
         workloads/RefBatchNormalizationFloat32Workload.cpp \
         workloads/RefBatchNormalizationUint8Workload.cpp \
+        workloads/RefBatchToSpaceNdFloat32Workload.cpp \
+        workloads/RefBatchToSpaceNdUint8Workload.cpp \
         workloads/RefConstantFloat32Workload.cpp \
         workloads/RefConstantUint8Workload.cpp \
         workloads/RefConvertFp16ToFp32Workload.cpp \

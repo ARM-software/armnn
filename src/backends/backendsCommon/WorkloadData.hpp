@@ -335,4 +335,8 @@ struct ConvertFp32ToFp16QueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct BatchToSpaceNdQueueDescriptor : QueueDescriptorWithParameters<BatchToSpaceNdDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
 } //namespace armnn

@@ -92,6 +92,20 @@ struct DummyLayer<armnn::BatchNormalizationLayer>
 };
 
 template<>
+struct DummyLayer<armnn::BatchToSpaceNdLayer>
+{
+    DummyLayer()
+    {
+        m_Layer = dummyGraph.AddLayer<armnn::BatchToSpaceNdLayer>(armnn::BatchToSpaceNdDescriptor(), "");
+    }
+    ~DummyLayer()
+    {
+        dummyGraph.EraseLayer(m_Layer);
+    }
+    armnn::BatchToSpaceNdLayer* m_Layer;
+};
+
+template<>
 struct DummyLayer<armnn::ConstantLayer, void>
 {
     DummyLayer()
@@ -305,6 +319,8 @@ DECLARE_LAYER_POLICY_2_PARAM(Activation)
 DECLARE_LAYER_POLICY_1_PARAM(Addition)
 
 DECLARE_LAYER_POLICY_2_PARAM(BatchNormalization)
+
+DECLARE_LAYER_POLICY_2_PARAM(BatchToSpaceNd)
 
 DECLARE_LAYER_POLICY_1_PARAM(Constant)
 

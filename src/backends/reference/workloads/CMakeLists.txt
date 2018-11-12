@@ -9,6 +9,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     ArithmeticFunction.cpp
     ArithmeticFunction.hpp
     BatchNormImpl.hpp
+    BatchToSpaceNd.cpp
+    BatchToSpaceNd.hpp
     Broadcast.cpp
     Broadcast.hpp
     ConvImpl.cpp
@@ -32,6 +34,10 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefBatchNormalizationFloat32Workload.hpp
     RefBatchNormalizationUint8Workload.cpp
     RefBatchNormalizationUint8Workload.hpp
+    RefBatchToSpaceNdFloat32Workload.cpp
+    RefBatchToSpaceNdFloat32Workload.hpp
+    RefBatchToSpaceNdUint8Workload.cpp
+    RefBatchToSpaceNdUint8Workload.hpp
     RefConstantFloat32Workload.cpp
     RefConstantFloat32Workload.hpp
     RefConstantUint8Workload.cpp

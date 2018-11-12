@@ -314,6 +314,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePad(const PadQueueDescriptor
     return MakeWorkload<ClPadWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 void ClWorkloadFactory::Release()
 {
     m_MemoryManager.Release();
@@ -525,6 +531,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMean(const MeanQueueDescript
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
+                                                        const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                         const WorkloadInfo& info) const
 {
     return nullptr;

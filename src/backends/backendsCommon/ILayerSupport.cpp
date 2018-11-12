@@ -59,6 +59,14 @@ bool ILayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool ILayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const BatchToSpaceNdDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool ILayerSupport::IsConstantSupported(const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const
 {

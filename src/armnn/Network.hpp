@@ -34,6 +34,9 @@ public:
 
     IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name=nullptr) override;
 
+    IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                              const char* name = nullptr) override;
+
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
         const char* name = nullptr) override;

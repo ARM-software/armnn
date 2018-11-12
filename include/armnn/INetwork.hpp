@@ -149,6 +149,13 @@ public:
     virtual IConnectableLayer* AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
                                                const char* name = nullptr) = 0;
 
+    /// Adds a batch to space ND layer to the network.
+    /// @param batchToSpaceNdDescriptor - Description of the layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                                      const char* name = nullptr) = 0;
+
     /// Adds a pooling layer to the network.
     /// @param pooling2dDescriptor - Pooling2dDescriptor to configure the pooling.
     /// @param name - Optional name for the layer.

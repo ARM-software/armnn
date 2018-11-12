@@ -17,6 +17,7 @@ enum class LayerType
     Activation = FirstLayer,
     Addition,
     BatchNormalization,
+    BatchToSpaceNd,
     Constant,
     ConvertFp16ToFp32,
     ConvertFp32ToFp16,

@@ -80,6 +80,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArithmeticBaseLayer.cpp \
         src/armnn/layers/BatchNormalizationLayer.cpp \
+        src/armnn/layers/BatchToSpaceNdLayer.cpp \
         src/armnn/layers/ConstantLayer.cpp \
         src/armnn/layers/Convolution2dLayer.cpp \
         src/armnn/layers/ConvertFp16ToFp32Layer.cpp \

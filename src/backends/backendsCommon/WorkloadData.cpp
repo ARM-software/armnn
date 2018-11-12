@@ -918,4 +918,10 @@ void PadQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "BatchToSpaceNdQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "BatchToSpaceNdQueueDescriptor");
+}
+
 } //namespace armnn

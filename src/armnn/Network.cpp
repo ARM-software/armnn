@@ -351,6 +351,12 @@ IConnectableLayer* Network::AddInputLayer(LayerBindingId id, const char* name)
     return m_Graph->AddLayer<InputLayer>(id, name);
 }
 
+IConnectableLayer* Network::AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                            const char* name)
+{
+    return m_Graph->AddLayer<BatchToSpaceNdLayer>(batchToSpaceNdDescriptor, name);
+}
+
 IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                        const ConstTensor& weights,
                                                        const ConstTensor* biases,

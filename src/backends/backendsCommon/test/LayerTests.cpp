@@ -6169,3 +6169,170 @@ LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNHWCUint8Test(armnn::IWorkloadF
 {
     return SpaceToBatchNdPaddingNHWCTest<uint8_t>(workloadFactory);
 }
+
+namespace {
+
+template<typename T, std::size_t InputDim, std::size_t OutputDim>
+LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(armnn::IWorkloadFactory &workloadFactory,
+                                                   const armnn::DataLayout& dataLayout,
+                                                   const unsigned int *inputShape,
+                                                   const std::vector<T> &inputData,
+                                                   const std::vector<unsigned int> &blockShape,
+                                                   const std::vector<std::vector<unsigned int>> &crops,
+                                                   const unsigned int *outputShape,
+                                                   const std::vector<T> &outputData,
+                                                   float scale = 1.0f,
+                                                   int32_t offset = 0)
+  {
+    auto dataType = (std::is_same<T, uint8_t>::value ? armnn::DataType::QuantisedAsymm8 : armnn::DataType::Float32);
+
+    armnn::TensorInfo inputTensorInfo(InputDim, inputShape, dataType);
+    armnn::TensorInfo outputTensorInfo(OutputDim, outputShape, dataType);
+
+    inputTensorInfo.SetQuantizationScale(scale);
+    inputTensorInfo.SetQuantizationOffset(offset);
+
+    outputTensorInfo.SetQuantizationScale(scale);
+    outputTensorInfo.SetQuantizationOffset(offset);
+
+    auto input = MakeTensor<T, InputDim>(inputTensorInfo, inputData);
+
+    LayerTestResult<T, OutputDim> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, OutputDim>(outputTensorInfo, outputData);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::BatchToSpaceNdQueueDescriptor data;
+    data.m_Parameters.m_DataLayout = dataLayout;
+    data.m_Parameters.m_BlockShape = blockShape;
+    data.m_Parameters.m_Crops = crops;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateBatchToSpaceNd(data, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), input.origin());
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+
+    return result;
+}
+
+} // anonymous namespace
+
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test1(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int inputShape[] = {4, 2, 2, 1};
+    const unsigned int outputShape[] = {1, 4, 4, 1 };
+
+    std::vector<float> input
+    ({
+        // Batch 0, Height 0, Width (2) x Channel (1)
+        1.0f, 3.0f,
+        // Batch 0, Height 1, Width (2) x Channel (1)
+        9.0f, 11.0f,
+
+
+        // Batch 1, Height 0, Width (2) x Channel (1)
+        2.0f, 4.0f,
+        // Batch 1, Height 1, Width (2) x Channel (1)
+        10.0f, 12.0f,
+
+
+        // Batch 2, Height 0, Width (2) x Channel (1)
+        5.0f, 7.0f,
+        // Batch 2, Height 1, Width (2) x Channel (1)
+        13.0f, 15.0f,
+
+        // Batch 3, Height 0, Width (2) x Channel (3)
+        6.0f, 8.0f,
+        // Batch 3, Height 1, Width (2) x Channel (1)
+        14.0f, 16.0f
+    });
+
+    std::vector<float> expectedOutput
+    ({
+        1.0f,   2.0f,  3.0f,  4.0f,
+        5.0f,   6.0f,  7.0f,  8.0f,
+        9.0f,  10.0f, 11.0f,  12.0f,
+        13.0f, 14.0f, 15.0f,  16.0f
+    });
+
+    std::vector<unsigned int> blockShape {2, 2};
+    std::vector<std::vector<unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
+            crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test2(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int inputShape[] = {4, 1, 1, 1};
+    const unsigned int outputShape[] = {1, 2, 2, 1};
+
+    std::vector<float> input
+    ({
+         // Batch 0, Height 0, Width (2) x Channel (1)
+         1.0f, 2.0f, 3.0f, 4.0f
+    });
+
+    std::vector<float> expectedOutput({1.0f,   2.0f,  3.0f,  4.0f});
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::vector<unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
+                                             crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test3(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int inputShape[] = {4, 1, 1, 3};
+    const unsigned int outputShape[] = {1, 2, 2, 3};
+
+    std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f });
+
+    std::vector<float> expectedOutput({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f });
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::vector<unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
+                                             crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(armnn::IWorkloadFactory &workloadFactory)
+{
+    const unsigned int inputShape[] = {4, 3, 1, 1};
+    const unsigned int outputShape[] = {1, 3, 2, 2};
+
+    std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f });
+
+    std::vector<float> expectedOutput
+    ({
+         // Batch 0, Channel 0, Height (2) x Width (2)
+         1.0f,  4.0f,
+         7.0f, 10.0f,
+
+         // Batch 0, Channel 1, Height (2) x Width (2)
+         2.0f,  5.0f,
+         8.0f, 11.0f,
+
+         // Batch 0, Channel 2, Height (2) x Width (2)
+         3.0f,  6.0f,
+         9.0f, 12.0f,
+    });
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::vector<unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NCHW, inputShape, input, blockShape,
+                                             crops, outputShape, expectedOutput);
+}

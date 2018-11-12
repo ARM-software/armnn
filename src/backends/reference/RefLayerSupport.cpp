@@ -101,6 +101,22 @@ bool RefLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const BatchToSpaceNdDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+    return (IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                      input.GetDataType(),
+                                      &TrueFunc<>,
+                                      &TrueFunc<>) &&
+            IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                      output.GetDataType(),
+                                      &TrueFunc<>,
+                                      &TrueFunc<>));
+}
+
 bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const
 {

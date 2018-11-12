@@ -434,3 +434,9 @@ LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNHWCUint8Test(armnn::IWorkloadFa
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory);
 LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test1(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test2(armnn::IWorkloadFactory& workloadFactory);
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test3(armnn::IWorkloadFactory& workloadFactory);
+
+LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(armnn::IWorkloadFactory &workloadFactory);

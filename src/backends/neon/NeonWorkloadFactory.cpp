@@ -279,6 +279,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePad(const PadQueueDescript
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
+                                                                     const WorkloadInfo& info) const
+{
+    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 void NeonWorkloadFactory::Release()
 {
     m_MemoryManager.Release();
@@ -491,6 +497,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMean(const MeanQueueDescri
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
+                                                                     const WorkloadInfo& info) const
 {
     return nullptr;
 }

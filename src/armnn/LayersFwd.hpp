@@ -9,6 +9,7 @@
 #include "layers/ActivationLayer.hpp"
 #include "layers/AdditionLayer.hpp"
 #include "layers/BatchNormalizationLayer.hpp"
+#include "layers/BatchToSpaceNdLayer.hpp"
 #include "layers/ConstantLayer.hpp"
 #include "layers/ConvertFp16ToFp32Layer.hpp"
 #include "layers/ConvertFp32ToFp16Layer.hpp"
@@ -67,6 +68,7 @@ constexpr LayerType LayerEnumOf(const T* = nullptr);
 DECLARE_LAYER(Activation)
 DECLARE_LAYER(Addition)
 DECLARE_LAYER(BatchNormalization)
+DECLARE_LAYER(BatchToSpaceNd)
 DECLARE_LAYER(Constant)
 DECLARE_LAYER(ConvertFp16ToFp32)
 DECLARE_LAYER(ConvertFp32ToFp16)

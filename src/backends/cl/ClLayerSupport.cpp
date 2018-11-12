@@ -10,7 +10,7 @@
 #include <InternalTypes.hpp>
 #include <LayerSupportCommon.hpp>
 
-#include <backendsCommon/LayerSupportRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 
@@ -43,21 +43,6 @@ namespace armnn
 
 namespace
 {
-
-ILayerSupportSharedPtr GetLayerSupportPointer()
-{
-    static ILayerSupportSharedPtr instance{new ClLayerSupport};
-    return instance;
-}
-
-static StaticRegistryInitializer<LayerSupportRegistry> g_RegisterHelper{
-    LayerSupportRegistryInstance(),
-    ClBackendId(),
-    []()
-    {
-        return GetLayerSupportPointer();
-    }
-};
 
 template<unsigned int FilterSize>
 bool IsMatchingSize2d(const TensorInfo& weightInfo)

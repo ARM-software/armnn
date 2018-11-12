@@ -13,6 +13,7 @@ namespace armnn
 class IWorkloadFactory;
 class IBackendContext;
 class Optimization;
+class ILayerSupport;
 
 class IBackendInternal : public IBackend
 {
@@ -30,10 +31,12 @@ public:
     using IBackendContextPtr = std::unique_ptr<IBackendContext>;
     using OptimizationPtr = std::unique_ptr<Optimization>;
     using Optimizations = std::vector<OptimizationPtr>;
+    using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;
 
     virtual IWorkloadFactoryPtr CreateWorkloadFactory() const = 0;
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
     virtual Optimizations GetOptimizations() const = 0;
+    virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

@@ -21,6 +21,7 @@ public:
     IWorkloadFactoryPtr CreateWorkloadFactory() const override;
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
     IBackendInternal::Optimizations GetOptimizations() const override;
+    IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
 };
 
 } // namespace armnn

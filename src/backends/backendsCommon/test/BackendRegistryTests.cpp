@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(TestRegistryHelper)
 
     bool called = false;
 
-    StaticRegistryInitializer<BackendRegistry> factoryHelper(
+    BackendRegistry::StaticRegistryInitializer factoryHelper(
         BackendRegistryInstance(),
         "HelloWorld",
         [&called]()

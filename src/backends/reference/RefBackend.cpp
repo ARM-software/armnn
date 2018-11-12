@@ -6,9 +6,11 @@
 #include "RefBackend.hpp"
 #include "RefBackendId.hpp"
 #include "RefWorkloadFactory.hpp"
+#include "RefLayerSupport.hpp"
 
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
+
 #include <Optimizer.hpp>
 
 #include <boost/cast.hpp>
@@ -19,7 +21,7 @@ namespace armnn
 namespace
 {
 
-static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
+static BackendRegistry::StaticRegistryInitializer g_RegisterHelper
 {
     BackendRegistryInstance(),
     RefBackend::GetIdStatic(),
@@ -50,6 +52,12 @@ IBackendInternal::IBackendContextPtr RefBackend::CreateBackendContext(const IRun
 IBackendInternal::Optimizations RefBackend::GetOptimizations() const
 {
     return Optimizations{};
+}
+
+IBackendInternal::ILayerSupportSharedPtr RefBackend::GetLayerSupport() const
+{
+    static ILayerSupportSharedPtr layerSupport{new RefLayerSupport};
+    return layerSupport;
 }
 
 } // namespace armnn

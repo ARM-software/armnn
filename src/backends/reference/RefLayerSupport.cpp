@@ -10,7 +10,7 @@
 #include <LayerSupportCommon.hpp>
 #include <armnn/Types.hpp>
 
-#include <backendsCommon/LayerSupportRegistry.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 
@@ -21,21 +21,6 @@ namespace armnn
 
 namespace
 {
-
-ILayerSupportSharedPtr GetLayerSupportPointer()
-{
-    static ILayerSupportSharedPtr instance{new RefLayerSupport};
-    return instance;
-}
-
-static StaticRegistryInitializer<LayerSupportRegistry> g_RegisterHelper{
-    LayerSupportRegistryInstance(),
-    RefBackendId(),
-    []()
-    {
-        return GetLayerSupportPointer();
-    }
-};
 
 template<typename Float32Func, typename Uint8Func, typename ... Params>
 bool IsSupportedForDataTypeRef(Optional<std::string&> reasonIfUnsupported,

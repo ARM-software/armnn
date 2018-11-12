@@ -6,6 +6,7 @@
 #include "NeonBackend.hpp"
 #include "NeonBackendId.hpp"
 #include "NeonWorkloadFactory.hpp"
+#include "NeonLayerSupport.hpp"
 
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
@@ -19,7 +20,7 @@ namespace armnn
 namespace
 {
 
-static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
+static BackendRegistry::StaticRegistryInitializer g_RegisterHelper
 {
     BackendRegistryInstance(),
     NeonBackend::GetIdStatic(),
@@ -50,6 +51,12 @@ IBackendInternal::IBackendContextPtr NeonBackend::CreateBackendContext(const IRu
 IBackendInternal::Optimizations NeonBackend::GetOptimizations() const
 {
     return Optimizations{};
+}
+
+IBackendInternal::ILayerSupportSharedPtr NeonBackend::GetLayerSupport() const
+{
+    static ILayerSupportSharedPtr layerSupport{new NeonLayerSupport};
+    return layerSupport;
 }
 
 } // namespace armnn

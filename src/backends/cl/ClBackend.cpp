@@ -7,6 +7,7 @@
 #include "ClBackendId.hpp"
 #include "ClWorkloadFactory.hpp"
 #include "ClBackendContext.hpp"
+#include "ClLayerSupport.hpp"
 
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
@@ -18,7 +19,7 @@ namespace armnn
 namespace
 {
 
-static StaticRegistryInitializer<BackendRegistry> g_RegisterHelper
+static BackendRegistry::StaticRegistryInitializer g_RegisterHelper
 {
     BackendRegistryInstance(),
     ClBackend::GetIdStatic(),
@@ -50,6 +51,12 @@ ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const
 IBackendInternal::Optimizations ClBackend::GetOptimizations() const
 {
     return Optimizations{};
+}
+
+IBackendInternal::ILayerSupportSharedPtr ClBackend::GetLayerSupport() const
+{
+    static ILayerSupportSharedPtr layerSupport{new ClLayerSupport};
+    return layerSupport;
 }
 
 } // namespace armnn

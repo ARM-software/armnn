@@ -299,19 +299,20 @@ struct BatchNormalizationDescriptor
 struct BatchToSpaceNdDescriptor
 {
     BatchToSpaceNdDescriptor()
-        : m_BlockShape()
-        , m_Crops()
+        : m_BlockShape({0, 0})
+        , m_Crops({{0, 0}, {0, 0}})
         , m_DataLayout(DataLayout::NCHW)
     {}
 
-    BatchToSpaceNdDescriptor(std::vector<unsigned int> blockShape, std::vector<std::vector<unsigned int>> crops)
+    BatchToSpaceNdDescriptor(std::vector<unsigned int> blockShape,
+                             std::vector<std::pair<unsigned int, unsigned int>> crops)
         : m_BlockShape(blockShape)
         , m_Crops(crops)
         , m_DataLayout(DataLayout::NCHW)
     {}
 
     std::vector<unsigned int> m_BlockShape;
-    std::vector<std::vector<unsigned int>> m_Crops;
+    std::vector<std::pair<unsigned int, unsigned int>> m_Crops;
     DataLayoutIndexed m_DataLayout;
 };
 

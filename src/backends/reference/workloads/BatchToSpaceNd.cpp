@@ -34,23 +34,17 @@ void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
                     const TensorInfo& inputTensorInfo,
                     const TensorInfo& outputTensorInfo,
                     const std::vector<unsigned int>& blockShape,
-                    const std::vector<std::vector<unsigned int>>& cropsData,
+                    const std::vector<std::pair<unsigned int, unsigned int>>& cropsData,
                     const float* inputData,
                     float* outputData)
 {
     TensorShape inputShape = inputTensorInfo.GetShape();
-    unsigned int inputNumDims = inputShape.GetNumDimensions();
-    if (inputNumDims != 4)
-    {
-        throw armnn::InvalidArgumentException("Expected Input with 4 Dimensions");
-    }
+
+    BOOST_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Expected Input with 4 Dimensions");
 
     TensorShape outputShape = outputTensorInfo.GetShape();
-    unsigned int outputNumDims = outputShape.GetNumDimensions();
-    if (outputNumDims != 4)
-    {
-        throw armnn::InvalidArgumentException("Expected Output with 4 Dimensions");
-    }
+
+    BOOST_ASSERT_MSG(outputShape.GetNumDimensions() == 4, "Expected Output with 4 Dimensions");
 
     const unsigned int inputBatchSize = inputShape[0];
     const unsigned int channels = inputShape[dataLayout.GetChannelsIndex()];
@@ -59,11 +53,15 @@ void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
     const unsigned int outputHeight = outputShape[dataLayout.GetHeightIndex()];
     const unsigned int outputWidth = outputShape[dataLayout.GetWidthIndex()];
 
+    BOOST_ASSERT_MSG(blockShape.size() > 0, "BlockShape must contain 1 or more entries");
+
     const unsigned int blockShapeHeight = blockShape[0];
     const unsigned int blockShapeWidth = blockShape[1];
 
-    const unsigned int cropsTop = cropsData[0][0];
-    const unsigned int cropsLeft = cropsData[1][0];
+    BOOST_ASSERT_MSG(cropsData.size() > 0, "Crops must contain 1 or more entries");
+
+    const unsigned int cropsTop = cropsData[0].first;
+    const unsigned int cropsLeft = cropsData[1].first;
 
     for (unsigned int inBatch = 0; inBatch < inputBatchSize; ++inBatch)
     {

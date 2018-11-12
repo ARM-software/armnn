@@ -6178,7 +6178,7 @@ LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(armnn::IWorkloadFactory &work
                                                    const unsigned int *inputShape,
                                                    const std::vector<T> &inputData,
                                                    const std::vector<unsigned int> &blockShape,
-                                                   const std::vector<std::vector<unsigned int>> &crops,
+                                                   const std::vector<std::pair<unsigned int, unsigned int>> &crops,
                                                    const unsigned int *outputShape,
                                                    const std::vector<T> &outputData,
                                                    float scale = 1.0f,
@@ -6266,7 +6266,7 @@ LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test1(armnn::IWorkloadFactory
     });
 
     std::vector<unsigned int> blockShape {2, 2};
-    std::vector<std::vector<unsigned int>> crops = {{0, 0}, {0, 0}};
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
     return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
             crops, outputShape, expectedOutput);
@@ -6286,7 +6286,7 @@ LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test2(armnn::IWorkloadFactory
     std::vector<float> expectedOutput({1.0f,   2.0f,  3.0f,  4.0f});
 
     std::vector<unsigned int> blockShape({2, 2});
-    std::vector<std::vector<unsigned int>> crops = {{0, 0}, {0, 0}};
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
     return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
                                              crops, outputShape, expectedOutput);
@@ -6302,7 +6302,7 @@ LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test3(armnn::IWorkloadFactory
     std::vector<float> expectedOutput({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f });
 
     std::vector<unsigned int> blockShape({2, 2});
-    std::vector<std::vector<unsigned int>> crops = {{0, 0}, {0, 0}};
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
     return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
                                              crops, outputShape, expectedOutput);
@@ -6331,7 +6331,7 @@ LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(armnn::IWorkloadFactory
     });
 
     std::vector<unsigned int> blockShape({2, 2});
-    std::vector<std::vector<unsigned int>> crops = {{0, 0}, {0, 0}};
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
     return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NCHW, inputShape, input, blockShape,
                                              crops, outputShape, expectedOutput);

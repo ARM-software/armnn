@@ -16,7 +16,7 @@ void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
                     const TensorInfo& inputTensorInfo,
                     const TensorInfo& outputTensorInfo,
                     const std::vector<unsigned int>& blockShape,
-                    const std::vector<std::vector<unsigned int>>& cropsData,
+                    const std::vector<std::pair<unsigned int, unsigned int>>& cropsData,
                     const float* inputData,
                     float* outputData);
 } // namespace armnn

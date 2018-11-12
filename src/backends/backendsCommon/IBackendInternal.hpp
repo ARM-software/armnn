@@ -12,6 +12,7 @@ namespace armnn
 {
 class IWorkloadFactory;
 class IBackendContext;
+class IMemoryManager;
 class Optimization;
 class ILayerSupport;
 
@@ -33,8 +34,16 @@ public:
     using Optimizations = std::vector<OptimizationPtr>;
     using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;
 
-    virtual IWorkloadFactoryPtr CreateWorkloadFactory() const = 0;
+    using IMemoryManagerUniquePtr = std::unique_ptr<IMemoryManager>;
+    using IMemoryManagerSharedPtr = std::shared_ptr<IMemoryManager>;
+
+    virtual IMemoryManagerUniquePtr CreateMemoryManager() const = 0;
+
+    virtual IWorkloadFactoryPtr CreateWorkloadFactory(
+        const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
+
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
+
     virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 };

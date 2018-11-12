@@ -17,7 +17,7 @@ namespace armnn
 class ClWorkloadFactory : public IWorkloadFactory
 {
 public:
-    ClWorkloadFactory();
+    ClWorkloadFactory(const std::shared_ptr<ClMemoryManager>& memoryManager);
 
     const BackendId& GetBackendId() const override;
 
@@ -134,8 +134,6 @@ public:
     virtual void Acquire() override;
 
 private:
-
-#ifdef ARMCOMPUTECL_ENABLED
     template<typename FloatWorkload, typename Uint8Workload, typename QueueDescriptorType, typename... Args>
     static std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor,
                                                    const WorkloadInfo& info,
@@ -146,8 +144,7 @@ private:
                                                    const WorkloadInfo& info,
                                                    Args&&... args);
 
-    mutable ClMemoryManager m_MemoryManager;
-#endif
+    mutable std::shared_ptr<ClMemoryManager> m_MemoryManager;
 };
 
 } // namespace armnn

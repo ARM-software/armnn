@@ -4,6 +4,7 @@
 //
 
 #include "ClContextControlFixture.hpp"
+#include "ClWorkloadFactoryHelper.hpp"
 
 #include "test/TensorHelpers.hpp"
 #include "test/UnitTests.hpp"

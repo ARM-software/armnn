@@ -8,6 +8,7 @@
 #include <armnn/Utils.hpp>
 #include <reference/RefWorkloadFactory.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
+#include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 #include "TensorHelpers.hpp"
 #include <boost/test/unit_test.hpp>
 
@@ -65,7 +66,7 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
     std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
     armnn::ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
 
-    FactoryType workloadFactory;
+    FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory();
     auto testResult = (*testFunction)(workloadFactory, args...);
     CompareTestResultIfSupported(testName, testResult);
 }
@@ -79,7 +80,7 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
 template<typename FactoryType, typename TFuncPtr, typename... Args>
 void CompareRefTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
 {
-    FactoryType workloadFactory;
+    FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory();
     armnn::RefWorkloadFactory refWorkloadFactory;
     auto testResult = (*testFunction)(workloadFactory, refWorkloadFactory, args...);
     CompareTestResultIfSupported(testName, testResult);

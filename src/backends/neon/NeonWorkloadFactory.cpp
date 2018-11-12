@@ -2,24 +2,23 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "NeonWorkloadFactory.hpp"
+
 #include "NeonBackendId.hpp"
-#include <armnn/Utils.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include "NeonTensorHandle.hpp"
+#include "NeonWorkloadFactory.hpp"
+
 #include <Layer.hpp>
 
-#ifdef ARMCOMPUTENEON_ENABLED
-#include <arm_compute/runtime/Allocator.h>
+#include <armnn/Utils.hpp>
 
-#include <backendsCommon/MemCopyWorkload.hpp>
-#include "NeonTensorHandle.hpp"
-#include "workloads/NeonWorkloadUtils.hpp"
-#include "workloads/NeonWorkloads.hpp"
-
-#endif
-
+#include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
+#include <backendsCommon/MemCopyWorkload.hpp>
 
+#include <neon/workloads/NeonWorkloadUtils.hpp>
+#include <neon/workloads/NeonWorkloads.hpp>
+
+#include <boost/core/ignore_unused.hpp>
 #include <boost/polymorphic_cast.hpp>
 
 namespace armnn
@@ -42,10 +41,8 @@ const BackendId& NeonWorkloadFactory::GetBackendId() const
     return s_Id;
 }
 
-#ifdef ARMCOMPUTENEON_ENABLED
-
-NeonWorkloadFactory::NeonWorkloadFactory()
-    : m_MemoryManager(std::make_unique<arm_compute::Allocator>(), BaseMemoryManager::MemoryAffinity::Offset)
+NeonWorkloadFactory::NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager)
+    : m_MemoryManager(memoryManager)
 {
 }
 
@@ -71,7 +68,7 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITenso
 std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
 {
     auto tensorHandle = std::make_unique<NeonTensorHandle>(tensorInfo);
-    tensorHandle->SetMemoryGroup(m_MemoryManager.GetInterLayerMemoryGroup());
+    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
 
     return tensorHandle;
 }
@@ -80,7 +77,7 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const Ten
                                                                        DataLayout dataLayout) const
 {
     auto tensorHandle = std::make_unique<NeonTensorHandle>(tensorInfo, dataLayout);
-    tensorHandle->SetMemoryGroup(m_MemoryManager.GetInterLayerMemoryGroup());
+    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
 
     return tensorHandle;
 }
@@ -107,7 +104,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueue
                                                               const WorkloadInfo&           info) const
 {
     return MakeWorkloadHelper<NeonSoftmaxFloatWorkload, NeonSoftmaxUint8Workload>(descriptor, info,
-        m_MemoryManager.GetIntraLayerManager());
+        m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
@@ -126,7 +123,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
     return MakeWorkloadHelper<NeonFullyConnectedWorkload, NeonFullyConnectedWorkload>(descriptor, info,
-        m_MemoryManager.GetIntraLayerManager());
+        m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
@@ -145,7 +142,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
     return std::make_unique<NeonConvolution2dWorkload>(descriptor, info,
-                                                       m_MemoryManager.GetIntraLayerManager());
+                                                       m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(
@@ -158,7 +155,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateNormalization(
     const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
     return MakeWorkloadHelper<NeonNormalizationFloatWorkload, NullWorkload>(descriptor, info,
-        m_MemoryManager.GetIntraLayerManager());
+        m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
@@ -220,7 +217,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateL2Normalization(const L2No
     const WorkloadInfo& info) const
 {
     return MakeWorkloadHelper<NeonL2NormalizationFloatWorkload, NullWorkload>(descriptor, info,
-        m_MemoryManager.GetIntraLayerManager());
+        m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
@@ -287,232 +284,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const Batch
 
 void NeonWorkloadFactory::Release()
 {
-    m_MemoryManager.Release();
+    m_MemoryManager->Release();
 }
 
 void NeonWorkloadFactory::Acquire()
 {
-    m_MemoryManager.Acquire();
+    m_MemoryManager->Acquire();
 }
 
-#else // Compiled without ArmCompute libs
-
-NeonWorkloadFactory::NeonWorkloadFactory()
-{
-}
-
-std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITensorHandle& parent,
-    TensorShape const& subTensorShape,
-    unsigned int const* subTensorOrigin) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                       DataLayout dataLayout) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
-                                                            const WorkloadInfo&        info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
-                                                             const WorkloadInfo&        info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo&              info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
-                                                              const WorkloadInfo&           info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
-                                                               const WorkloadInfo&            info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
-                                                             const WorkloadInfo&          info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFullyConnected(const FullyConnectedQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo&                  info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo&           info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
-                                                                const WorkloadInfo&           info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
-                                                                    const WorkloadInfo&               info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(
-    const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
-                                                                    const WorkloadInfo&                 info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
-                                                               const WorkloadInfo&            info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchNormalization(const BatchNormalizationQueueDescriptor& data,
-                                                                         const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMultiplication(const MultiplicationQueueDescriptor& data,
-                                                                     const WorkloadInfo&                  info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
-                                                              const WorkloadInfo&        info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFakeQuantization(
-        const FakeQuantizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
-    const WorkloadInfo&           info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp16ToFp32(
-    const ConvertFp16ToFp32QueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp32ToFp16(
-    const ConvertFp32ToFp16QueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& data,
-                                                               const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& data,
-                                                                  const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-void NeonWorkloadFactory::Release()
-{}
-
-void NeonWorkloadFactory::Acquire()
-{}
-
-#endif
-
-} //namespace armnn
+} // namespace armnn

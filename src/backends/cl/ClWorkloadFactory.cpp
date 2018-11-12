@@ -82,15 +82,15 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::MakeWorkload(const QueueDescriptor
     }
 }
 
-ClWorkloadFactory::ClWorkloadFactory()
-: m_MemoryManager(std::make_unique<arm_compute::CLBufferAllocator>())
+ClWorkloadFactory::ClWorkloadFactory(const std::shared_ptr<ClMemoryManager>& memoryManager)
+    : m_MemoryManager(memoryManager)
 {
 }
 
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
 {
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo);
-    tensorHandle->SetMemoryGroup(m_MemoryManager.GetInterLayerMemoryGroup());
+    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
 
     return tensorHandle;
 }
@@ -99,7 +99,7 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const Tenso
                                                                      DataLayout dataLayout) const
 {
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo, dataLayout);
-    tensorHandle->SetMemoryGroup(m_MemoryManager.GetInterLayerMemoryGroup());
+    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
 
     return tensorHandle;
 }
@@ -145,7 +145,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSoftmax(const SoftmaxQueueDe
                                                             const WorkloadInfo&           info) const
 {
     return MakeWorkload<ClSoftmaxFloatWorkload, ClSoftmaxUint8Workload>(descriptor, info,
-                                                                        m_MemoryManager.GetIntraLayerManager());
+                                                                        m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
@@ -164,7 +164,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
     return MakeWorkload<ClFullyConnectedWorkload, ClFullyConnectedWorkload>(descriptor, info,
-                                                                            m_MemoryManager.GetIntraLayerManager());
+                                                                            m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
@@ -182,7 +182,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooli
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
                                                                          const WorkloadInfo&               info) const
 {
-    return MakeWorkload<ClConvolution2dWorkload>(descriptor, info, m_MemoryManager.GetIntraLayerManager());
+    return MakeWorkload<ClConvolution2dWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthwiseConvolution2d(
@@ -322,19 +322,15 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchToSpaceNd(const BatchTo
 
 void ClWorkloadFactory::Release()
 {
-    m_MemoryManager.Release();
+    m_MemoryManager->Release();
 }
 
 void ClWorkloadFactory::Acquire()
 {
-    m_MemoryManager.Acquire();
+    m_MemoryManager->Acquire();
 }
 
 #else // #if ARMCOMPUTECL_ENABLED
-
-ClWorkloadFactory::ClWorkloadFactory()
-{
-}
 
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
 {

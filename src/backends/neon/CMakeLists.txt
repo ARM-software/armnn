@@ -30,8 +30,6 @@ else()
         NeonBackendId.hpp
         NeonLayerSupport.cpp
         NeonLayerSupport.hpp
-        NeonWorkloadFactory.cpp
-        NeonWorkloadFactory.hpp
     )
 endif()
 

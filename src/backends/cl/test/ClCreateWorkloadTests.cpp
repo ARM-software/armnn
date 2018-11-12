@@ -4,6 +4,7 @@
 //
 
 #include "ClContextControlFixture.hpp"
+#include "ClWorkloadFactoryHelper.hpp"
 
 #include <backendsCommon/MemCopyWorkload.hpp>
 
@@ -26,7 +27,7 @@ template <armnn::DataType DataType>
 static void ClCreateActivationWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreateActivationWorkloadTest<ClActivationWorkload, DataType>(factory, graph);
 
@@ -56,7 +57,7 @@ template <typename WorkloadType,
 static void ClCreateArithmethicWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload = CreateArithmeticWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateArithmeticWorkloadTest).
@@ -145,7 +146,7 @@ template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>
 static void ClCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreateBatchNormalizationWorkloadTest<BatchNormalizationWorkloadType, DataType>
                     (factory, graph, dataLayout);
@@ -194,7 +195,7 @@ BOOST_AUTO_TEST_CASE(CreateBatchNormalizationNhwcFloat16NhwcWorkload)
 BOOST_AUTO_TEST_CASE(CreateConvertFp16ToFp32Workload)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload = CreateConvertFp16ToFp32WorkloadTest<ClConvertFp16ToFp32Workload>(factory, graph);
 
     ConvertFp16ToFp32QueueDescriptor queueDescriptor = workload->GetData();
@@ -210,7 +211,7 @@ BOOST_AUTO_TEST_CASE(CreateConvertFp16ToFp32Workload)
 BOOST_AUTO_TEST_CASE(CreateConvertFp32ToFp16Workload)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload = CreateConvertFp32ToFp16WorkloadTest<ClConvertFp32ToFp16Workload>(factory, graph);
 
     ConvertFp32ToFp16QueueDescriptor queueDescriptor = workload->GetData();
@@ -227,7 +228,7 @@ template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
 static void ClConvolution2dWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload = CreateConvolution2dWorkloadTest<ClConvolution2dWorkload, DataType>(factory,
                                                                                        graph,
                                                                                        dataLayout);
@@ -269,7 +270,7 @@ template <typename DepthwiseConvolutionWorkloadType, typename armnn::DataType Da
 static void ClDepthwiseConvolutionWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreateDepthwiseConvolution2dWorkloadTest<DepthwiseConvolutionWorkloadType, DataType>
                     (factory, graph, dataLayout);
@@ -299,7 +300,7 @@ template <typename Convolution2dWorkloadType, typename armnn::DataType DataType>
 static void ClDirectConvolution2dWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload = CreateDirectConvolution2dWorkloadTest<ClConvolution2dWorkload, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateDirectConvolution2dWorkloadTest).
@@ -329,7 +330,7 @@ template <typename FullyConnectedWorkloadType, typename armnn::DataType DataType
 static void ClCreateFullyConnectedWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload =
         CreateFullyConnectedWorkloadTest<FullyConnectedWorkloadType, DataType>(factory, graph);
 
@@ -356,7 +357,7 @@ template <typename NormalizationWorkloadType, typename armnn::DataType DataType>
 static void ClNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>(factory, graph, dataLayout);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
@@ -397,7 +398,7 @@ template <typename armnn::DataType DataType>
 static void ClPooling2dWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreatePooling2dWorkloadTest<ClPooling2dWorkload, DataType>(factory, graph, dataLayout);
 
@@ -439,7 +440,7 @@ template <typename armnn::DataType DataType>
 static void ClCreateReshapeWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreateReshapeWorkloadTest<ClReshapeWorkload, DataType>(factory, graph);
 
@@ -471,7 +472,7 @@ template <typename SoftmaxWorkloadType, typename armnn::DataType DataType>
 static void ClSoftmaxWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreateSoftmaxWorkloadTest<SoftmaxWorkloadType, DataType>(factory, graph);
 
@@ -499,7 +500,7 @@ template <typename armnn::DataType DataType>
 static void ClSplitterWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreateSplitterWorkloadTest<ClSplitterWorkload, DataType>(factory, graph);
 
@@ -540,7 +541,7 @@ static void ClSplitterMergerTest()
     // of the merger.
 
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workloads =
         CreateSplitterMergerWorkloadTest<ClSplitterWorkload, ClMergerWorkload, DataType>
@@ -589,7 +590,7 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
     // We create a splitter with two outputs. That each of those outputs is used by two different activation layers.
 
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     std::unique_ptr<ClSplitterWorkload> wlSplitter;
     std::unique_ptr<ClActivationWorkload> wlActiv0_0;
     std::unique_ptr<ClActivationWorkload> wlActiv0_1;
@@ -624,7 +625,7 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
 
 BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsCl)
 {
-    ClWorkloadFactory    factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     CreateMemCopyWorkloads<IClTensorHandle>(factory);
 }
 
@@ -632,7 +633,7 @@ template <typename L2NormalizationWorkloadType, typename armnn::DataType DataTyp
 static void ClL2NormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload =
             CreateL2NormalizationWorkloadTest<L2NormalizationWorkloadType, DataType>(factory, graph, dataLayout);
 
@@ -676,7 +677,7 @@ template <typename LstmWorkloadType>
 static void ClCreateLstmWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload = CreateLstmWorkloadTest<LstmWorkloadType>(factory, graph);
 
     LstmQueueDescriptor queueDescriptor = workload->GetData();
@@ -695,7 +696,7 @@ template <typename ResizeBilinearWorkloadType, typename armnn::DataType DataType
 static void ClResizeBilinearWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreateResizeBilinearWorkloadTest<ResizeBilinearWorkloadType, DataType>(factory, graph, dataLayout);
 
@@ -741,7 +742,7 @@ template <typename MeanWorkloadType, typename armnn::DataType DataType>
 static void ClMeanWorkloadTest()
 {
     Graph graph;
-    ClWorkloadFactory factory;
+    ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     auto workload = CreateMeanWorkloadTest<MeanWorkloadType, DataType>(factory, graph);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateMeanWorkloadTest).

@@ -9,9 +9,17 @@
 #include "ClBackendContext.hpp"
 #include "ClLayerSupport.hpp"
 
-#include <backendsCommon/IBackendContext.hpp>
+#include <aclCommon/BaseMemoryManager.hpp>
+
 #include <backendsCommon/BackendRegistry.hpp>
+#include <backendsCommon/IBackendContext.hpp>
+#include <backendsCommon/IMemoryManager.hpp>
+
 #include <Optimizer.hpp>
+
+#include <arm_compute/runtime/CL/CLBufferAllocator.h>
+
+#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -37,9 +45,16 @@ const BackendId& ClBackend::GetIdStatic()
     return s_Id;
 }
 
-IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory() const
+IBackendInternal::IMemoryManagerUniquePtr ClBackend::CreateMemoryManager() const
 {
-    return std::make_unique<ClWorkloadFactory>();
+    return std::make_unique<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
+}
+
+IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
+{
+    return std::make_unique<ClWorkloadFactory>(
+        boost::polymorphic_pointer_downcast<ClMemoryManager>(memoryManager));
 }
 
 IBackendInternal::IBackendContextPtr

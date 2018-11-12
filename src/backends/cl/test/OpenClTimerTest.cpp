@@ -5,6 +5,8 @@
 
 #if (defined(__aarch64__)) || (defined(__x86_64__)) // disable test failing on FireFly/Armv7
 
+#include "ClWorkloadFactoryHelper.hpp"
+
 #include <test/TensorHelpers.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -42,7 +44,7 @@ using FactoryType = ClWorkloadFactory;
 
 BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
 {
-    ClWorkloadFactory  workloadFactory;
+    ClWorkloadFactory  workloadFactory = ClWorkloadFactoryHelper::GetFactory();
 
     const unsigned int width    = 2;
     const unsigned int height   = 3;

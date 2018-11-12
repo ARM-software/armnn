@@ -11,6 +11,7 @@ list(APPEND armnnRefBackendUnitTests_sources
     RefLayerTests.cpp
     RefOptimizedNetworkTests.cpp
     RefRuntimeTests.cpp
+    RefWorkloadFactoryHelper.hpp
 )
 
 add_library(armnnRefBackendUnitTests OBJECT ${armnnRefBackendUnitTests_sources})

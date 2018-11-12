@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "NeonWorkloadFactoryHelper.hpp"
+
 #include <armnn/ArmNN.hpp>
 
 #include <test/TensorHelpers.hpp>
@@ -35,7 +37,7 @@ BOOST_AUTO_TEST_CASE(NeonTimerGetName)
 
 BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
 {
-    NeonWorkloadFactory workloadFactory;
+    NeonWorkloadFactory workloadFactory = NeonWorkloadFactoryHelper::GetFactory();
 
     unsigned int inputWidth = 4000u;
     unsigned int inputHeight = 5000u;

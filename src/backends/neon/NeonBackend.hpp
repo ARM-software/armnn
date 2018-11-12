@@ -18,8 +18,13 @@ public:
     static const BackendId& GetIdStatic();
     const BackendId& GetId() const override { return GetIdStatic(); }
 
-    IWorkloadFactoryPtr CreateWorkloadFactory() const override;
+    IBackendInternal::IMemoryManagerUniquePtr CreateMemoryManager() const override;
+
+    IWorkloadFactoryPtr CreateWorkloadFactory(
+        const IBackendInternal::IMemoryManagerSharedPtr& memoryManager = nullptr) const override;
+
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
+
     IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
 };

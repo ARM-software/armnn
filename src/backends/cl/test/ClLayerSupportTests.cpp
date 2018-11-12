@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "ClWorkloadFactoryHelper.hpp"
+
 #include <layers/ConvertFp16ToFp32Layer.hpp>
 #include <layers/ConvertFp32ToFp16Layer.hpp>
 #include <test/TensorHelpers.hpp>
@@ -21,19 +23,19 @@ BOOST_AUTO_TEST_SUITE(ClLayerSupport)
 
 BOOST_FIXTURE_TEST_CASE(IsLayerSupportedFloat16Cl, ClContextControlFixture)
 {
-    armnn::ClWorkloadFactory factory;
+    armnn::ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     IsLayerSupportedTests<armnn::ClWorkloadFactory, armnn::DataType::Float16>(&factory);
 }
 
 BOOST_FIXTURE_TEST_CASE(IsLayerSupportedFloat32Cl, ClContextControlFixture)
 {
-    armnn::ClWorkloadFactory factory;
+    armnn::ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     IsLayerSupportedTests<armnn::ClWorkloadFactory, armnn::DataType::Float32>(&factory);
 }
 
 BOOST_FIXTURE_TEST_CASE(IsLayerSupportedUint8Cl, ClContextControlFixture)
 {
-    armnn::ClWorkloadFactory factory;
+    armnn::ClWorkloadFactory factory = ClWorkloadFactoryHelper::GetFactory();
     IsLayerSupportedTests<armnn::ClWorkloadFactory, armnn::DataType::QuantisedAsymm8>(&factory);
 }
 

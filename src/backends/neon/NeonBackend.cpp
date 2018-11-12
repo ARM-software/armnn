@@ -8,11 +8,18 @@
 #include "NeonWorkloadFactory.hpp"
 #include "NeonLayerSupport.hpp"
 
-#include <backendsCommon/IBackendContext.hpp>
+#include <aclCommon/BaseMemoryManager.hpp>
+
 #include <backendsCommon/BackendRegistry.hpp>
+#include <backendsCommon/IBackendContext.hpp>
+#include <backendsCommon/IMemoryManager.hpp>
+
 #include <Optimizer.hpp>
 
+#include <arm_compute/runtime/Allocator.h>
+
 #include <boost/cast.hpp>
+#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -38,9 +45,17 @@ const BackendId& NeonBackend::GetIdStatic()
     return s_Id;
 }
 
-IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory() const
+IBackendInternal::IMemoryManagerUniquePtr NeonBackend::CreateMemoryManager() const
 {
-    return std::make_unique<NeonWorkloadFactory>();
+    return std::make_unique<NeonMemoryManager>(std::make_unique<arm_compute::Allocator>(),
+                                               BaseMemoryManager::MemoryAffinity::Offset);
+}
+
+IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
+{
+    return std::make_unique<NeonWorkloadFactory>(
+        boost::polymorphic_pointer_downcast<NeonMemoryManager>(memoryManager));
 }
 
 IBackendInternal::IBackendContextPtr NeonBackend::CreateBackendContext(const IRuntime::CreationOptions&) const

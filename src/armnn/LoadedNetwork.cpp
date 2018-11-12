@@ -13,6 +13,7 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
+#include <backendsCommon/IMemoryManager.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/assert.hpp>
@@ -90,8 +91,11 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
         {
             auto createBackend = BackendRegistryInstance().GetFactory(backend);
             auto it = m_Backends.emplace(std::make_pair(backend, createBackend()));
-            m_WorkloadFactories.emplace(std::make_pair(backend,
-                                                       it.first->second->CreateWorkloadFactory()));
+
+            auto memoryManager   = it.first->second->CreateMemoryManager();
+            auto workloadFactory = it.first->second->CreateWorkloadFactory(std::move(memoryManager));
+
+            m_WorkloadFactories.emplace(std::make_pair(backend, std::move(workloadFactory)));
         }
         layer->CreateTensorHandles(m_OptimizedNetwork->GetGraph(), GetWorkloadFactory(*layer));
     }

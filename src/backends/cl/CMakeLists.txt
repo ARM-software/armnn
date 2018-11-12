@@ -34,8 +34,6 @@ else()
         ClContextControl.hpp
         ClLayerSupport.cpp
         ClLayerSupport.hpp
-        ClWorkloadFactory.cpp
-        ClWorkloadFactory.hpp
     )
 endif()
 

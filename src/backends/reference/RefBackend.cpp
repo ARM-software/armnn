@@ -9,6 +9,7 @@
 #include "RefLayerSupport.hpp"
 
 #include <backendsCommon/IBackendContext.hpp>
+#include <backendsCommon/IMemoryManager.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
 
 #include <Optimizer.hpp>
@@ -39,7 +40,8 @@ const BackendId& RefBackend::GetIdStatic()
     return s_Id;
 }
 
-IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory() const
+IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
 {
     return std::make_unique<RefWorkloadFactory>();
 }
@@ -47,6 +49,11 @@ IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory() const
 IBackendInternal::IBackendContextPtr RefBackend::CreateBackendContext(const IRuntime::CreationOptions&) const
 {
     return IBackendContextPtr{};
+}
+
+IBackendInternal::IMemoryManagerUniquePtr RefBackend::CreateMemoryManager() const
+{
+    return IMemoryManagerUniquePtr{};
 }
 
 IBackendInternal::Optimizations RefBackend::GetOptimizations() const

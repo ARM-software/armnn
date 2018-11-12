@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <backendsCommon/IMemoryManager.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #ifdef ARMCOMPUTENEON_ENABLED
@@ -23,7 +24,7 @@
 namespace armnn
 {
 
-class BaseMemoryManager
+class BaseMemoryManager : public IMemoryManager
 {
 public:
     enum class MemoryAffinity
@@ -35,6 +36,9 @@ public:
     BaseMemoryManager() { }
     virtual ~BaseMemoryManager() { }
 
+    void Acquire() override;
+    void Release() override;
+
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
 
     BaseMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc, MemoryAffinity memoryAffinity);
@@ -42,9 +46,6 @@ public:
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& GetIntraLayerManager() { return m_IntraLayerMemoryMgr; }
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& GetInterLayerManager() { return m_InterLayerMemoryMgr; }
     std::shared_ptr<arm_compute::IMemoryGroup>& GetInterLayerMemoryGroup()      { return m_InterLayerMemoryGroup; }
-
-    void Acquire();
-    void Release();
 
 protected:
     std::unique_ptr<arm_compute::IAllocator>            m_Allocator;

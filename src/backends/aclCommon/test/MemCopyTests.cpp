@@ -9,7 +9,11 @@
 
 #if ARMCOMPUTECL_ENABLED && ARMCOMPUTENEON_ENABLED
 #include <aclCommon/test/MemCopyTestImpl.hpp>
+
 #include <cl/test/ClContextControlFixture.hpp>
+#include <cl/test/ClWorkloadFactoryHelper.hpp>
+
+#include <neon/test/NeonWorkloadFactoryHelper.hpp>
 #endif
 
 #include <boost/test/unit_test.hpp>

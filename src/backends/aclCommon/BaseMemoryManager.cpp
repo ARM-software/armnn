@@ -77,6 +77,16 @@ void BaseMemoryManager::Release()
     BOOST_ASSERT(m_InterLayerMemoryMgr);
     m_InterLayerMemoryMgr->clear();
 }
+#else
+void BaseMemoryManager::Acquire()
+{
+    // No-op if neither NEON nor CL enabled
+}
+
+void BaseMemoryManager::Release()
+{
+    // No-op if neither NEON nor CL enabled
+}
 #endif
 
 #ifdef ARMCOMPUTENEON_ENABLED

@@ -12,6 +12,7 @@ list(APPEND armnnBackendsCommon_sources
     IBackendInternal.hpp
     IBackendContext.hpp
     ILayerSupport.cpp
+    IMemoryManager.hpp
     ITensorHandle.hpp
     MakeWorkloadHelper.hpp
     MemCopyWorkload.cpp

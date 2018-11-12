@@ -3,9 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "ClWorkloadFactoryHelper.hpp"
+
 #include <cl/ClWorkloadFactory.hpp>
-#include <reference/RefWorkloadFactory.hpp>
 #include <aclCommon/test/MemCopyTestImpl.hpp>
+
+#include <reference/RefWorkloadFactory.hpp>
+#include <reference/test/RefWorkloadFactoryHelper.hpp>
 
 #include <boost/test/unit_test.hpp>
 

@@ -32,6 +32,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     TensorCopyUtils.cpp
     TensorCopyUtils.hpp
     WorkloadDataValidation.cpp
+    WorkloadFactoryHelper.hpp
     WorkloadTestUtils.hpp
 )
 

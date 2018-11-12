@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "ClWorkloadFactoryHelper.hpp"
+
 #include <armnn/ArmNN.hpp>
 #include <Network.hpp>
 
@@ -32,7 +34,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
     // validate workloads
-    armnn::ClWorkloadFactory fact;
+    armnn::ClWorkloadFactory fact = ClWorkloadFactoryHelper::GetFactory();
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
         BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);

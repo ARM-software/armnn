@@ -35,8 +35,7 @@ BOOST_AUTO_TEST_SUITE(LayerReleaseConstantDataTest)
 
 BOOST_AUTO_TEST_CASE(ReleaseBatchNormalizationLayerConstantDataTest)
 {
-    Graph             graph;
-    ClWorkloadFactory factory;
+    Graph graph;
 
     // create the layer we're testing
     BatchNormalizationDescriptor layerDesc;
@@ -82,8 +81,7 @@ BOOST_AUTO_TEST_CASE(ReleaseBatchNormalizationLayerConstantDataTest)
 
  BOOST_AUTO_TEST_CASE(ReleaseConvolution2dLayerConstantDataTest)
  {
-     Graph             graph;
-     ClWorkloadFactory factory;
+     Graph graph;
 
      // create the layer we're testing
      Convolution2dDescriptor layerDesc;
@@ -127,8 +125,7 @@ BOOST_AUTO_TEST_CASE(ReleaseBatchNormalizationLayerConstantDataTest)
 
 BOOST_AUTO_TEST_CASE(ReleaseDepthwiseConvolution2dLayerConstantDataTest)
 {
-    Graph             graph;
-    ClWorkloadFactory factory;
+    Graph graph;
 
     // create the layer we're testing
     DepthwiseConvolution2dDescriptor layerDesc;
@@ -169,8 +166,7 @@ BOOST_AUTO_TEST_CASE(ReleaseDepthwiseConvolution2dLayerConstantDataTest)
 
 BOOST_AUTO_TEST_CASE(ReleaseFullyConnectedLayerConstantDataTest)
 {
-    Graph             graph;
-    ClWorkloadFactory factory;
+    Graph graph;
 
     // create the layer we're testing
     FullyConnectedDescriptor layerDesc;

@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "NeonWorkloadFactoryHelper.hpp"
+
 #include <backendsCommon/MemCopyWorkload.hpp>
 
 #include <aclCommon/test/CreateWorkloadClNeon.hpp>
@@ -56,7 +58,7 @@ template <typename armnn::DataType DataType>
 static void NeonCreateActivationWorkloadTest()
 {
     Graph graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto workload = CreateActivationWorkloadTest<NeonActivationWorkload, DataType>(factory, graph);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateActivationWorkloadTest).
@@ -86,7 +88,7 @@ template <typename WorkloadType,
 static void NeonCreateArithmethicWorkloadTest()
 {
     Graph graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto workload = CreateArithmeticWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
 
     DescriptorType queueDescriptor = workload->GetData();
@@ -156,7 +158,7 @@ template <typename BatchNormalizationWorkloadType, typename armnn::DataType Data
 static void NeonCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph                graph;
-    NeonWorkloadFactory  factory;
+    NeonWorkloadFactory  factory = NeonWorkloadFactoryHelper::GetFactory();
     auto workload = CreateBatchNormalizationWorkloadTest<BatchNormalizationWorkloadType, DataType>
                     (factory, graph, dataLayout);
 
@@ -198,7 +200,7 @@ template <typename armnn::DataType DataType>
 static void NeonCreateConvolution2dWorkloadTest(DataLayout dataLayout = DataLayout::NCHW)
 {
     Graph                graph;
-    NeonWorkloadFactory  factory;
+    NeonWorkloadFactory  factory = NeonWorkloadFactoryHelper::GetFactory();
     auto                 workload = CreateConvolution2dWorkloadTest<NeonConvolution2dWorkload,
                                     DataType>(factory, graph, dataLayout);
 
@@ -239,7 +241,7 @@ template <typename armnn::DataType DataType>
 static void NeonCreateDepthWiseConvolutionWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
 
     auto workload = CreateDepthwiseConvolution2dWorkloadTest<NeonDepthwiseConvolutionWorkload,
                                                              DataType>(factory, graph, dataLayout);
@@ -276,7 +278,7 @@ template <typename FullyConnectedWorkloadType, typename armnn::DataType DataType
 static void NeonCreateFullyConnectedWorkloadTest()
 {
     Graph               graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto                workload = CreateFullyConnectedWorkloadTest<FullyConnectedWorkloadType,
                                    DataType>(factory, graph);
 
@@ -304,7 +306,7 @@ template <typename NormalizationWorkloadType, typename armnn::DataType DataType>
 static void NeonCreateNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto workload = CreateNormalizationWorkloadTest<NormalizationWorkloadType, DataType>(factory, graph, dataLayout);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateNormalizationWorkloadTest).
@@ -346,7 +348,7 @@ template <typename armnn::DataType DataType>
 static void NeonCreatePooling2dWorkloadTest(DataLayout dataLayout = DataLayout::NCHW)
 {
     Graph               graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto                workload = CreatePooling2dWorkloadTest<NeonPooling2dWorkload, DataType>
                                    (factory, graph, dataLayout);
 
@@ -392,7 +394,7 @@ template <typename armnn::DataType DataType>
 static void NeonCreateReshapeWorkloadTest()
 {
     Graph               graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto                workload = CreateReshapeWorkloadTest<NeonReshapeWorkload, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateReshapeWorkloadTest).
@@ -424,7 +426,7 @@ template <typename SoftmaxWorkloadType, typename armnn::DataType DataType>
 static void NeonCreateSoftmaxWorkloadTest()
 {
     Graph               graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto workload = CreateSoftmaxWorkloadTest<SoftmaxWorkloadType, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateSoftmaxWorkloadTest).
@@ -450,7 +452,7 @@ BOOST_AUTO_TEST_CASE(CreateSoftmaxFloatWorkload)
 BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
 {
     Graph graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto workload = CreateSplitterWorkloadTest<NeonSplitterWorkload, DataType::Float32>(factory, graph);
 
     // Checks that outputs are as we expect them (see definition of CreateSplitterWorkloadTest).
@@ -477,7 +479,7 @@ BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
     // of the merger.
 
     Graph graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
 
     auto workloads =
         CreateSplitterMergerWorkloadTest<NeonSplitterWorkload, NeonMergerWorkload,
@@ -508,7 +510,7 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
     // We created a splitter with two outputs. That each of those outputs is used by two different activation layers
 
     Graph graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     std::unique_ptr<NeonSplitterWorkload> wlSplitter;
     std::unique_ptr<NeonActivationWorkload> wlActiv0_0;
     std::unique_ptr<NeonActivationWorkload> wlActiv0_1;
@@ -542,7 +544,7 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
 
 BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsNeon)
 {
-    NeonWorkloadFactory    factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     CreateMemCopyWorkloads<INeonTensorHandle>(factory);
 }
 
@@ -550,7 +552,7 @@ template <typename L2NormalizationWorkloadType, typename armnn::DataType DataTyp
 static void NeonCreateL2NormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
-    NeonWorkloadFactory factory;
+    NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
     auto workload =
             CreateL2NormalizationWorkloadTest<L2NormalizationWorkloadType, DataType>(factory, graph, dataLayout);
 

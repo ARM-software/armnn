@@ -11,7 +11,6 @@
 
 #include <boost/core/ignore_unused.hpp>
 
-
 namespace armnn
 {
 
@@ -19,7 +18,7 @@ namespace armnn
 class NeonWorkloadFactory : public IWorkloadFactory
 {
 public:
-    NeonWorkloadFactory();
+    NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager);
 
     const BackendId& GetBackendId() const override;
 
@@ -136,9 +135,7 @@ public:
     virtual void Acquire() override;
 
 private:
-#ifdef ARMCOMPUTENEON_ENABLED
-    mutable NeonMemoryManager m_MemoryManager;
-#endif
+    mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
 };
 
-} //namespace armnn
+} // namespace armnn

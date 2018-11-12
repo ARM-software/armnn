@@ -6,6 +6,7 @@
 
 #include <backendsCommon/test/LayerTests.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
+#include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <test/TensorHelpers.hpp>
@@ -75,8 +76,8 @@ LayerTestResult<float, 4> MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactor
 template<typename SrcWorkloadFactory, typename DstWorkloadFactory>
 LayerTestResult<float, 4> MemCopyTest(bool withSubtensors)
 {
-    SrcWorkloadFactory srcWorkloadFactory;
-    DstWorkloadFactory dstWorkloadFactory;
+    SrcWorkloadFactory srcWorkloadFactory = WorkloadFactoryHelper<SrcWorkloadFactory>::GetFactory();
+    DstWorkloadFactory dstWorkloadFactory = WorkloadFactoryHelper<DstWorkloadFactory>::GetFactory();
 
     return MemCopyTest(srcWorkloadFactory, dstWorkloadFactory, withSubtensors);
 }

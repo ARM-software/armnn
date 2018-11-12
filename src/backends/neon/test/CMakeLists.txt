@@ -13,6 +13,7 @@ list(APPEND armnnNeonBackendUnitTests_sources
     NeonOptimizedNetworkTests.cpp
     NeonRuntimeTests.cpp
     NeonTimerTest.cpp
+    NeonWorkloadFactoryHelper.hpp
 )
 
 add_library(armnnNeonBackendUnitTests OBJECT ${armnnNeonBackendUnitTests_sources})

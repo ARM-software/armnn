@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "NeonWorkloadFactoryHelper.hpp"
+
 #include <test/TensorHelpers.hpp>
 #include <test/UnitTests.hpp>
 

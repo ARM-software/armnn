@@ -104,51 +104,99 @@ Backends are identified by a string that must be unique across backends. This st
 wrapped in the [BackendId](../../include/armnn/BackendId.hpp) object for backward compatibility
 with previous ArmNN versions.
 
-## Registry interfaces
+## The IBackendInternal interface
 
-To integrate a new backend, it needs to be registered through the following singleton classes:
+All backends need to implement the [IBackendInternal](backendsCommon/IBackendInternal.hpp) interface.
+The interface functions to be implemented are:
 
-* [BackendRegistry](backendsCommon/BackendRegistry.hpp)
-* [LayerSupportRegistry](backendsCommon/LayerSupportRegistry.hpp)
+```c++
+    virtual IMemoryManagerUniquePtr CreateMemoryManager() const = 0;
+    virtual IWorkloadFactoryPtr CreateWorkloadFactory(
+            const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
+    virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
+    virtual Optimizations GetOptimizations() const = 0;
+    virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
+```
 
-These Registries can register a factory function together with a [BackendId](../../include/armnn/BackendId.hpp)
-key, that allows to create a registered object at a later time when needed.
+The ArmNN framework then creates instances of the IBackendInternal interface with the help of the
+[BackendRegistry](backendsCommon/BackendRegistry.hpp) singleton.
 
-There is support for statically registering the factory functions in
-the [RegistryCommon.hpp](backendsCommon/RegistryCommon.hpp) header.
+**Important:** the ```IBackendInternal``` object is not guaranteed to have a longer lifetime than
+the objects it creates. It is only intended to be a single entry point for the factory functions it has.
+The best use of this is to be a lightweight, stateless object and make no assumptions between
+its lifetime and the lifetime of the objects it creates.
 
-### The BackendRegistry and the IBackendInternal interface
+For each backend one needs to register a factory function that can
+be retrieved using a [BackendId](../../include/armnn/BackendId.hpp).
+The ArmNN framework creates the backend interfaces dynamically when
+it sees fit and it keeps these objects for a short period of time. Examples:
 
-The ```BackendRegistry``` registers a function that returns a unique pointer to an object that implements the [IBackendInternal interface](backendsCommon/IBackendInternal.hpp).
+* During optimization ArmNN needs to decide which layers are supported by the backend.
+   To do this, it creates a backends and calls the ```GetLayerSupport()``` function and creates
+   an ```ILayerSupport``` object to help deciding this.
+* During optimization ArmNN can run backend specific optimizations. It creates backend objects
+  and calls the ```GetOptimizations()``` function and it runs them on the network.
+* When the Runtime is initialized it creates an optional ```IBackendContext``` object and keeps this context alive
+  for the Runtime's lifetime. It notifies this context object before and after a network is loaded or unloaded.
+* When the LoadedNetwork creates the backend specific workloads for the layers, it creates a backend
+  specific workload factory and calls this to create the workloads.
 
-During optimization we assign backends to the layers in the network.
-When we pass the resulting optimized network to the ```LoadedNetwork```,
-it calls the factory function for all backends that are required by the
-given network. The ```LoadedNetwork``` holds a reference to these
-backend objects for its lifetime.
+## The BackendRegistry
 
-The ```LoadedNetwork``` also calls the ```CreateWorkloadFactory()```
-function for each created backend once and uses the returned backend
-specific workload factory object to create the workloads for the
-layers. The ```LoadedNetwork``` holds the workload factory objects for
-its lifetime.
+As mentioned above, all backends need to be registered through the BackendRegistry so ArmNN knows
+about them. Registration requires a unique backend id string and a lambda function that
+returns a unique pointer to the [IBackendInternal interface](backendsCommon/IBackendInternal.hpp).
 
-Examples for this concept can be found in the [RefBackend header](reference/RefBackend.hpp) and the [RefBackend implementation](reference/RefBackend.cpp).
+For registering a backend only this lambda function needs to exist, not the actual backend. This
+allows dynamically creating the backend objects when it is needed.
 
-### The LayerSupportRegistry and the ILayerSupport object
+The BackendRegistry has a few convenience functions, like we can query the registered backends and
+ are able to tell if a given backend is registered or not.
 
-ArmNN uses the [ILayerSupport](../../include/armnn/ILayerSupport.hpp)
-interface to decide if a layer with a set of parameters (ie. input and
-output tensors, descriptor, weights, filter, kernel if any) are
-supported on a given backend. The backends need a way to communicate
-this information.
+## The ILayerSupport interface
 
-In order to achieve this, the backends need to register a factory function
-that can create an object that implements the ILayerSupport interface.
-When ArmNN needs to decide if a layer is supported on a backend, it
-looks up the factory function through the registry. Then it creates an
-ILayerSupport object for the given backend and calls the corresponding
-API function to check if the layer is supported.
+ArmNN uses the [ILayerSupport](../../include/armnn/ILayerSupport.hpp) interface to decide if a layer
+with a set of parameters (i.e. input and output tensors, descriptor, weights, filter, kernel if any) are
+supported on a given backend. The backends need a way to communicate this information by implementing
+the ```GetLayerSupport()``` function on the ```IBackendInternal``` interface.
 
 Examples of this can be found in the [RefLayerSupport header](reference/RefLayerSupport.hpp)
 and the [RefLayerSupport implementation](reference/RefLayerSupport.cpp).
+
+## The IWorkloadFactory interface
+
+The [IWorkloadFactory interface](backendsCommon/WorkloadFactory.hpp) is used for creating the backend
+specific workloads. The factory function that creates the IWorkloadFactory object in the IBackendInterface
+takes an IMemoryManager object.
+
+To create a workload object the ```IWorkloadFactory``` takes a ```WorkloadInfo``` object that holds
+the input and output tensor information and a workload specific queue descriptor.
+
+## The IMemoryManager interface
+
+Backends may choose to implement custom memory management. ArmNN supports this concept through this mechanism:
+
+* the ```IBackendInternal``` interface has a ```CreateMemoryManager()``` function which is called before
+  creating the workload factory
+* the memory manager is passed to the ```CreateWorkloadFactory(...)``` function so the workload factory can
+  use it for creating the backend specific workloads
+* the LoadedNetwork calls ```Acquire()``` on the memory manager before it starts executing the network and
+  it calls ```Release()``` in its destructor
+
+## The Optimizations
+
+The backends may choose to implement backend specific optimizations. This is supported through the ```GetOptimizations()```
+method of the IBackendInternal interface. This function may return a vector of optimization objects and the optimizer
+runs these after all general optimization is performed on the network.
+
+## The IBackendContext interface
+
+Backends may need to be notified when a network is loaded or unloaded. To support that one can implement the optional
+[IBackendContext](backendsCommon/IBackendContext.hpp) interface. The framework calls the ```CreateBackendContext(...)```
+method for each backend in the Runtime. If the backend returns a valid unique pointer to a backend context, then the
+runtime will hold this for its entire lifetime. It then calls these interface functions for each stored context:
+
+* ```BeforeLoadNetwork(NetworkId networkId)```
+* ```AfterLoadNetwork(NetworkId networkId)```
+* ```BeforeUnloadNetwork(NetworkId networkId)```
+* ```AfterUnloadNetwork(NetworkId networkId)```

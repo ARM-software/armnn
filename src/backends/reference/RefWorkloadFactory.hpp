@@ -146,6 +146,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const override;
+
+    virtual std::unique_ptr<IWorkload> CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const override;
 private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>

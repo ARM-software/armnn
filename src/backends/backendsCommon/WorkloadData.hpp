@@ -339,4 +339,10 @@ struct BatchToSpaceNdQueueDescriptor : QueueDescriptorWithParameters<BatchToSpac
 {
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
+
+struct StridedSliceQueueDescriptor : QueueDescriptorWithParameters<StridedSliceDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

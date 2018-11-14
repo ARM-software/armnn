@@ -130,6 +130,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& Info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const override;
+
 private:
     mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
 };

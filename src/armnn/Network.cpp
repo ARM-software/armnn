@@ -694,6 +694,12 @@ IConnectableLayer* Network::AddPadLayer(const PadDescriptor& padDescriptor, cons
     return m_Graph->AddLayer<PadLayer>(padDescriptor,name);
 }
 
+IConnectableLayer* Network::AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
+                                                 const char* name)
+{
+    return m_Graph->AddLayer<StridedSliceLayer>(stridedSliceDescriptor, name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

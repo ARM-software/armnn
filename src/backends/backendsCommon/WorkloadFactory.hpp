@@ -138,6 +138,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreatePad(const PadQueueDescriptor& descriptor,
                                                  const WorkloadInfo& Info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& Info) const = 0;
 };
 
 } //namespace armnn

@@ -279,6 +279,14 @@ bool ILayerSupport::IsSplitterSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool ILayerSupport::IsStridedSliceSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const StridedSliceDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool ILayerSupport::IsSubtractionSupported(const TensorInfo& input0,
                                            const TensorInfo& input1,
                                            const TensorInfo& output,

@@ -36,6 +36,7 @@
 #include "layers/SoftmaxLayer.hpp"
 #include "layers/SpaceToBatchNdLayer.hpp"
 #include "layers/SplitterLayer.hpp"
+#include "layers/StridedSliceLayer.hpp"
 #include "layers/SubtractionLayer.hpp"
 
 namespace armnn
@@ -95,6 +96,7 @@ DECLARE_LAYER(ResizeBilinear)
 DECLARE_LAYER(Softmax)
 DECLARE_LAYER(SpaceToBatchNd)
 DECLARE_LAYER(Splitter)
+DECLARE_LAYER(StridedSlice)
 DECLARE_LAYER(Subtraction)
 
 }

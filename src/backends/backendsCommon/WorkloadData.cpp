@@ -924,4 +924,41 @@ void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     ValidateSingleOutput(workloadInfo, "BatchToSpaceNdQueueDescriptor");
 }
 
+void StridedSliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "StridedSliceQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "StridedSliceQueueDescriptor");
+
+    const TensorInfo& input = workloadInfo.m_InputTensorInfos[0];
+    const uint32_t rank = input.GetNumDimensions();
+
+    // Begin, End & Stride length must be of rank(input0)
+    if (m_Parameters.m_Begin.size() != rank)
+    {
+        throw InvalidArgumentException("StridedSliceLayer: Begin length must be of rank input0("
+                                       + to_string(rank) + ")");
+    }
+
+    if (m_Parameters.m_End.size() != rank)
+    {
+        throw InvalidArgumentException("StridedSliceLayer: End length must be of rank input0("
+                                       + to_string(rank) + ")");
+    }
+
+    if (m_Parameters.m_Stride.size() != rank)
+    {
+        throw InvalidArgumentException("StridedSliceLayer: Stride length must be of rank input0("
+                                       + to_string(rank) + ")");
+    }
+
+    // Stride entries must be non-zero
+    for (auto& stride : m_Parameters.m_Stride)
+    {
+        if (stride == 0)
+        {
+            throw InvalidArgumentException("StridedSliceLayer: Stride entries must be non-zero");
+        }
+    }
+}
+
 } //namespace armnn

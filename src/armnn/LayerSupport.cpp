@@ -403,4 +403,14 @@ bool IsPadSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsPadSupported, input, output, descriptor);
 }
 
+bool IsStridedSliceSupported(const BackendId& backend,
+                             const TensorInfo& input,
+                             const TensorInfo& output,
+                             const StridedSliceDescriptor& descriptor,
+                             char* reasonIfUnsupported,
+                             size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsStridedSliceSupported, input, output, descriptor);
+}
+
 }

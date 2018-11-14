@@ -311,6 +311,13 @@ public:
     virtual IConnectableLayer* AddPadLayer(const PadDescriptor& padDescriptor,
                                            const char* name = nullptr) = 0;
 
+    /// Adds a strided slice layer to the network.
+    /// @param StridedSliceDescriptor - Parameters for the strided slice operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
+                                                    const char* name = nullptr) = 0;
+
 protected:
     ~INetwork() {}
 };

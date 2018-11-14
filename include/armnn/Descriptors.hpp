@@ -421,4 +421,37 @@ struct PadDescriptor
     std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
 };
 
+struct StridedSliceDescriptor
+{
+    StridedSliceDescriptor()
+    : m_DataLayout(DataLayout::NCHW)
+    {}
+
+    StridedSliceDescriptor(const std::vector<int>& begin,
+                           const std::vector<int>& end,
+                           const std::vector<int>& stride)
+    : m_Begin(begin)
+    , m_End(end)
+    , m_Stride(stride)
+    , m_BeginMask(0)
+    , m_EndMask(0)
+    , m_ShrinkAxisMask(0)
+    , m_EllipsisMask(0)
+    , m_NewAxisMask(0)
+    , m_DataLayout(DataLayout::NCHW)
+    {}
+
+    std::vector<int> m_Begin;
+    std::vector<int> m_End;
+    std::vector<int> m_Stride;
+
+    int32_t m_BeginMask;
+    int32_t m_EndMask;
+    int32_t m_ShrinkAxisMask;
+    int32_t m_EllipsisMask;
+    int32_t m_NewAxisMask;
+
+    DataLayoutIndexed m_DataLayout;
+};
+
 }

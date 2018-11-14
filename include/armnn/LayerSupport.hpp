@@ -254,4 +254,12 @@ bool IsPadSupported(const BackendId& backend,
                      char* reasonIfUnsupported = nullptr,
                      size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsStridedSliceSupported(const BackendId& backend,
+                             const TensorInfo& input,
+                             const TensorInfo& output,
+                             const StridedSliceDescriptor& descriptor,
+                             char* reasonIfUnsupported = nullptr,
+                             size_t reasonIfUnsupportedMaxLength = 1024);
+
 }

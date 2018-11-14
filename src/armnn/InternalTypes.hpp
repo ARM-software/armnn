@@ -44,6 +44,7 @@ enum class LayerType
     Softmax,
     SpaceToBatchNd,
     Splitter,
+    StridedSlice,
     // Last layer goes here.
     LastLayer,
     Subtraction = LastLayer,

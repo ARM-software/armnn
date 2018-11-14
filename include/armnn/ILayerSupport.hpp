@@ -183,6 +183,11 @@ public:
                                      const ViewsDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
+    virtual bool IsStridedSliceSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const StridedSliceDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     virtual bool IsSubtractionSupported(const TensorInfo& input0,
                                         const TensorInfo& input1,
                                         const TensorInfo& output,

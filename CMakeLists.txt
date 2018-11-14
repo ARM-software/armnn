@@ -229,6 +229,8 @@ list(APPEND armnn_sources
     src/armnn/layers/SoftmaxLayer.cpp
     src/armnn/layers/SplitterLayer.hpp
     src/armnn/layers/SplitterLayer.cpp
+    src/armnn/layers/StridedSliceLayer.cpp
+    src/armnn/layers/StridedSliceLayer.hpp
     src/armnn/layers/SubtractionLayer.cpp
     src/armnn/layers/SubtractionLayer.hpp
     src/armnn/Descriptors.cpp

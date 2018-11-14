@@ -592,6 +592,17 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                              reason);
             break;
         }
+        case LayerType::StridedSlice:
+        {
+            auto cLayer = boost::polymorphic_downcast<const StridedSliceLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsStridedSliceSupported(OverrideDataType(input, dataType),
+                                                                 OverrideDataType(output, dataType),
+                                                                 cLayer->GetParameters(),
+                                                                 reason);
+            break;
+        }
         case LayerType::Subtraction:
         {
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();

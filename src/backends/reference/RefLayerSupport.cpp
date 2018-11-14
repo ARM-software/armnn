@@ -278,7 +278,6 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
                                       const TensorInfo* cellToOutputWeights,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(input);
     ignore_unused(outputStateIn);
     ignore_unused(cellStateIn);
     ignore_unused(scratchBuffer);
@@ -303,8 +302,10 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
     ignore_unused(projectionBias);
     ignore_unused(cellToForgetWeights);
     ignore_unused(cellToOutputWeights);
-    ignore_unused(reasonIfUnsupported);
-    return false;
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &FalseFuncU8<>);
 }
 
 bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,

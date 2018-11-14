@@ -114,13 +114,13 @@ NeonLstmFloatWorkload::NeonLstmFloatWorkload(const LstmQueueDescriptor &descript
     if (m_Data.m_Parameters.m_CifgEnabled)
     {
         // 2D tensor with dimensions [num_units * 4, batch_size] with CIFG
-        armnn::TensorInfo scratchBuffer1({ batch_size, num_units * 4 }, DataType::Float32);
+        armnn::TensorInfo scratchBuffer1({ batch_size, num_units * 3 }, DataType::Float32);
         BuildArmComputeTensor(*m_ScratchBuffer, scratchBuffer1);
     }
     else
     {
         // scratch_buffer [num_units * 3, batch_size] without CIFG
-        armnn::TensorInfo scratchBuffer2({ batch_size, num_units * 3 }, DataType::Float32);
+        armnn::TensorInfo scratchBuffer2({ batch_size, num_units * 4 }, DataType::Float32);
         BuildArmComputeTensor(*m_ScratchBuffer, scratchBuffer2);
     }
 

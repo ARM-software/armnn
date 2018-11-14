@@ -321,12 +321,8 @@ std::unique_ptr<LstmWorkload> CreateLstmWorkloadTest(armnn::IWorkloadFactory& fa
     armnn::TensorInfo lstmTensorInfo1({ batchSize, inputSize }, DataType::Float32);
     armnn::TensorInfo lstmTensorInfo2({ batchSize, numUnits}, DataType::Float32);
     armnn::TensorInfo lstmTensorInfo3({ batchSize, outputSize }, DataType::Float32);
-    armnn::TensorInfo lstmTensorInfoScratchBuff({ batchSize, numUnits*3 }, DataType::Float32);
-    if (layerDesc.m_CifgEnabled)
-    {
-        lstmTensorInfoScratchBuff.SetShape({ batchSize, numUnits*4 });
-    }
-
+    armnn::TensorInfo lstmTensorInfoScratchBuff({ batchSize, numUnits * (layerDesc.m_CifgEnabled ? 3 : 4) },
+                                                DataType::Float32);
     Connect(input, layer, lstmTensorInfo1, 0, 0);
     Connect(cellStateIn, layer, lstmTensorInfo2, 0, 1);
     Connect(outputStateIn, layer, lstmTensorInfo3, 0, 2);

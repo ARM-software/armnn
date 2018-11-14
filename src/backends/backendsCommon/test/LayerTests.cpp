@@ -925,8 +925,7 @@ LayerTestResult<float, 2> LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest(
              -0.0186926f,   0.0193662f,   -0.0115437f,  0.00422612f,  -0.0345232f,
              0.00223253f,   -0.00957321f, 0.0210624f,   0.013331f,    0.0150954f,
              0.02168f}));
-    return LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(
-        workloadFactory, memoryManager, input, expectedOutput);
+    return LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(workloadFactory, memoryManager, input, expectedOutput);
 }
 
 LayerTestResult<float, 2> LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(
@@ -6684,7 +6683,6 @@ LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(
     std::vector<unsigned int> blockShape({2, 2});
     std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
-    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager,
-        armnn::DataLayout::NHWC, inputShape, input, blockShape,
-        crops, outputShape, expectedOutput);
+    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager, armnn::DataLayout::NHWC, inputShape,
+                                               input, blockShape, crops, outputShape, expectedOutput);
 }

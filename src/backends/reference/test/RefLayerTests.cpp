@@ -336,6 +336,14 @@ ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1, PermuteFloat32ValueSet1Test)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2, PermuteFloat32ValueSet2Test)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3, PermuteFloat32ValueSet3Test)
 
+// Lstm
+ARMNN_AUTO_TEST_CASE(LstmLayerFloat32WithCifgWithPeepholeNoProjection,
+                     LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest)
+ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgNoPeepholeNoProjection,
+                     LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest)
+ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjection,
+                     LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest)
+
 // Convert from Float16 to Float32
 ARMNN_AUTO_TEST_CASE(SimpleConvertFp16ToFp32, SimpleConvertFp16ToFp32Test)
 // Convert from Float32 to Float16

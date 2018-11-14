@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include "WorkloadTestUtils.hpp"
+
 #include <string>
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
@@ -13,6 +15,7 @@
 #include "QuantizeHelper.hpp"
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include "Permute.hpp"
 #include <boost/numeric/conversion/cast.hpp>
@@ -63,18 +66,20 @@ void ApplyBias(std::vector<T>& v, float vScale, int32_t vOffset,
 }
 
 template<typename T, typename B>
-LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                  const boost::multi_array<T, 4>& originalInput,
-                                                  const boost::multi_array<T, 4>& originalKernel,
-                                                  const boost::multi_array<B, 1>& bias,
-                                                  const boost::multi_array<T, 4>& originalOutputExpected,
-                                                  float qScale,
-                                                  int32_t qOffset,
-                                                  const armnn::DataLayoutIndexed& layout = armnn::DataLayout::NCHW,
-                                                  uint32_t padLeft = 0,
-                                                  uint32_t padTop = 0,
-                                                  uint32_t padRight = 0,
-                                                  uint32_t padBottom = 0)
+LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const boost::multi_array<T, 4>& originalInput,
+    const boost::multi_array<T, 4>& originalKernel,
+    const boost::multi_array<B, 1>& bias,
+    const boost::multi_array<T, 4>& originalOutputExpected,
+    float qScale,
+    int32_t qOffset,
+    const armnn::DataLayoutIndexed& layout = armnn::DataLayout::NCHW,
+    uint32_t padLeft = 0,
+    uint32_t padTop = 0,
+    uint32_t padRight = 0,
+    uint32_t padBottom = 0)
 {
     unsigned int inputHeight   = boost::numeric_cast<unsigned int>(originalInput.shape()[2]);
     unsigned int inputWidth    = boost::numeric_cast<unsigned int>(originalInput.shape()[3]);
@@ -213,9 +218,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 
     CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
 
-    workloadFactory.Acquire();
-    workload->Execute();
-    workloadFactory.Release();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -223,20 +226,22 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 }
 
 template<typename T, typename B>
-LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                      const boost::multi_array<T, 4>& input,
-                                                      const boost::multi_array<T, 4>& kernel,
-                                                      const boost::multi_array<B, 1>& bias,
-                                                      const boost::multi_array<T, 4>& outputExpected,
-                                                      armnn::DataLayout dataLayout,
-                                                      float qScale,
-                                                      int32_t qOffset,
-                                                      uint32_t padLeft = 1,
-                                                      uint32_t padTop = 1,
-                                                      uint32_t padRight = 1,
-                                                      uint32_t padBottom = 1,
-                                                      uint32_t strideX  = 1,
-                                                      uint32_t strideY  = 1)
+LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const boost::multi_array<T, 4>& input,
+    const boost::multi_array<T, 4>& kernel,
+    const boost::multi_array<B, 1>& bias,
+    const boost::multi_array<T, 4>& outputExpected,
+    armnn::DataLayout dataLayout,
+    float qScale,
+    int32_t qOffset,
+    uint32_t padLeft = 1,
+    uint32_t padTop = 1,
+    uint32_t padRight = 1,
+    uint32_t padBottom = 1,
+    uint32_t strideX  = 1,
+    uint32_t strideY  = 1)
 {
     unsigned int inputNum       = boost::numeric_cast<unsigned int>(input.shape()[0]);
     unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[3]);
@@ -305,9 +310,7 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(armnn::IWorkloadFactory& w
 
     CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
 
-    workloadFactory.Acquire();
-    workload->Execute();
-    workloadFactory.Release();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -315,20 +318,22 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(armnn::IWorkloadFactory& w
 }
 
 template<typename T, typename B>
-LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                               const boost::multi_array<T, 4>& input,
-                                                               const boost::multi_array<T, 4>& originalKernel,
-                                                               const boost::multi_array<B, 1>& bias,
-                                                               const boost::multi_array<T, 4>& outputExpected,
-                                                               float qScale,
-                                                               int32_t qOffset,
-                                                               const armnn::DataLayoutIndexed& layout,
-                                                               uint32_t padLeft = 0,
-                                                               uint32_t padTop = 0,
-                                                               uint32_t padRight = 0,
-                                                               uint32_t padBottom = 0,
-                                                               uint32_t strideX = 1,
-                                                               uint32_t strideY = 1)
+LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const boost::multi_array<T, 4>& input,
+    const boost::multi_array<T, 4>& originalKernel,
+    const boost::multi_array<B, 1>& bias,
+    const boost::multi_array<T, 4>& outputExpected,
+    float qScale,
+    int32_t qOffset,
+    const armnn::DataLayoutIndexed& layout,
+    uint32_t padLeft = 0,
+    uint32_t padTop = 0,
+    uint32_t padRight = 0,
+    uint32_t padBottom = 0,
+    uint32_t strideX = 1,
+    uint32_t strideY = 1)
 {
     unsigned int inputNum       = boost::numeric_cast<unsigned int>(input.shape()[0]);
     unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[1]);
@@ -455,11 +460,13 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(armnn::IWorkloadF
 }
 
 template<typename T, typename B>
-LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                              float qScale,
-                                                              int32_t qOffset,
-                                                              bool biasEnabled,
-                                                              const armnn::DataLayoutIndexed& layout)
+LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
     unsigned int inputHeight = 3;
     unsigned int inputWidth = 3;
@@ -598,11 +605,13 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(armnn::IWorkloadFa
 }
 
 template<typename T, typename B>
-LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                     float qScale,
-                                                     int32_t qOffset,
-                                                     bool biasEnabled,
-                                                     const armnn::DataLayoutIndexed& layout)
+LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
     unsigned int depthMultiplier = 2;
 
@@ -799,19 +808,21 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& wo
 }
 
 template<typename T, typename B>
-LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                         const boost::multi_array<T, 4>& input,
-                                                         const boost::multi_array<T, 4>& kernel,
-                                                         const boost::multi_array<B, 1>& bias,
-                                                         const boost::multi_array<T, 4>& outputExpected,
-                                                         float qScale,
-                                                         int32_t qOffset,
-                                                         uint32_t padLeft = 0,
-                                                         uint32_t padTop = 0,
-                                                         uint32_t padRight = 0,
-                                                         uint32_t padBottom = 0,
-                                                         uint32_t strideX = 1,
-                                                         uint32_t strideY = 1)
+LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const boost::multi_array<T, 4>& input,
+    const boost::multi_array<T, 4>& kernel,
+    const boost::multi_array<B, 1>& bias,
+    const boost::multi_array<T, 4>& outputExpected,
+    float qScale,
+    int32_t qOffset,
+    uint32_t padLeft = 0,
+    uint32_t padTop = 0,
+    uint32_t padRight = 0,
+    uint32_t padBottom = 0,
+    uint32_t strideX = 1,
+    uint32_t strideY = 1)
 {
     unsigned int inputNum       = boost::numeric_cast<unsigned int>(input.shape()[0]);
     unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[3]);
@@ -898,10 +909,12 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(armnn::IWorkloadFactory
 }
 
 template<typename T>
-LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                           float qScale,
-                                           int32_t qOffset,
-                                           bool biasEnabled)
+LayerTestResult<T,4> Convolution1dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool biasEnabled)
 {
     using B = typename FullyConnectedBiasTypeForInputType<T>::Type;
 
@@ -1005,9 +1018,7 @@ LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFact
 
     CopyDataToITensorHandle(inputHandle.get(), inputData.data());
 
-    workloadFactory.Acquire();
-    workload->Execute();
-    workloadFactory.Release();
+    ExecuteWorkload(*workload, memoryManager);
 
     // Output
     LayerTestResult<T,4> ret(outputInfo);
@@ -1019,8 +1030,10 @@ LayerTestResult<T,4> Convolution1dTestImpl(armnn::IWorkloadFactory& workloadFact
 
 
 template<typename T>
-LayerTestResult<T,4> CompareConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                armnn::IWorkloadFactory& refWorkloadFactory)
+LayerTestResult<T,4> CompareConvolution2dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory)
 {
     unsigned int inputHeight   = 8;
     unsigned int inputWidth    = 16;
@@ -1104,9 +1117,7 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(armnn::IWorkloadFactory& workl
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
-    workloadFactory.Acquire();
-    workload->Execute();
-    workloadFactory.Release();
+    ExecuteWorkload(*workload, memoryManager);
 
     workloadRef->Execute();
 
@@ -1117,9 +1128,11 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(armnn::IWorkloadFactory& workl
 }
 
 template<typename T>
-LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                            armnn::IWorkloadFactory& refWorkloadFactory,
-                                                            const armnn::DataLayoutIndexed& layout)
+LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::DataLayoutIndexed& layout)
 {
     unsigned int inputHeight = 8;
     unsigned int inputWidth = 16;
@@ -1229,6 +1242,7 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(armnn::IWorkloadFact
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
     workload->Execute();
+
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());

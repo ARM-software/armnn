@@ -33,7 +33,9 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateCpuAccDeviceSupportLayerNoFallback)
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
     // validate workloads
-    armnn::NeonWorkloadFactory fact = NeonWorkloadFactoryHelper::GetFactory();
+    armnn::NeonWorkloadFactory fact =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
         BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);

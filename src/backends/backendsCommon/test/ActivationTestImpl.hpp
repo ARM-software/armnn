@@ -12,6 +12,7 @@
 #include <armnn/TypesUtils.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <test/TensorHelpers.hpp>
@@ -19,12 +20,21 @@
 #include <algorithm>
 
 template<typename T>
-LayerTestResult<T, 4> BoundedReLuTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                        float upperBound, float lowerBound,
-                                        float inputScale, int32_t inputOffset, float outputScale, int32_t outputOffset,
-                                        const std::vector<T>& inputData, const std::vector<T>& outputExpectedData,
-                                        unsigned int inputWidth, unsigned int inputHeight,
-                                        unsigned int inputChannels, unsigned int inputBatchSize)
+LayerTestResult<T, 4> BoundedReLuTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float upperBound,
+    float lowerBound,
+    float inputScale,
+    int32_t inputOffset,
+    float outputScale,
+    int32_t outputOffset,
+    const std::vector<T>& inputData,
+    const std::vector<T>& outputExpectedData,
+    unsigned int inputWidth,
+    unsigned int inputHeight,
+    unsigned int inputChannels,
+    unsigned int inputBatchSize)
 {
     unsigned int outputWidth = inputWidth;
     unsigned int outputHeight = inputHeight;
@@ -79,7 +89,9 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(armnn::IWorkloadFactory& workloadFac
     return result;
 }
 
-LayerTestResult<float, 4> BoundedReLuUpperAndLowerBoundTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> BoundedReLuUpperAndLowerBoundTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int inputWidth = 4u;
     unsigned int inputHeight = 5u;
@@ -103,11 +115,14 @@ LayerTestResult<float, 4> BoundedReLuUpperAndLowerBoundTest(armnn::IWorkloadFact
      0.999f,       1.0f,    0.89f,      1.0f,
     };
 
-    return BoundedReLuTestCommon(workloadFactory, 1.0f, -1.0f, 1.0f, 0, 1.0f, 0, input, output,
-                                 inputWidth, inputHeight, inputChannels, inputBatchSize);
+    return BoundedReLuTestCommon(
+        workloadFactory, memoryManager, 1.0f, -1.0f, 1.0f, 0, 1.0f, 0, input, output,
+        inputWidth, inputHeight, inputChannels, inputBatchSize);
 }
 
-LayerTestResult<float, 4> BoundedReLuUpperBoundOnlyTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> BoundedReLuUpperBoundOnlyTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int inputWidth = 4u;
     unsigned int inputHeight = 5u;
@@ -131,11 +146,14 @@ LayerTestResult<float, 4> BoundedReLuUpperBoundOnlyTest(armnn::IWorkloadFactory&
      0.999f,       1.2f,    0.89f,       6.0f,
     };
 
-    return BoundedReLuTestCommon(workloadFactory, 6.0f, 0.0f, 1.0f, 0, 1.0f, 0, input, output,
-                                 inputWidth, inputHeight, inputChannels, inputBatchSize);
+    return BoundedReLuTestCommon(
+        workloadFactory, memoryManager, 6.0f, 0.0f, 1.0f, 0, 1.0f, 0, input, output,
+        inputWidth, inputHeight, inputChannels, inputBatchSize);
 }
 
-LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperBoundOnlyTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperBoundOnlyTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int inputWidth     = 3u;
     unsigned int inputHeight    = 2u;
@@ -158,13 +176,15 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperBoundOnlyTest(armnn::IWorkloadF
     float outputScale    = 6.0f / 255.0f;
     int32_t outputOffset = 0;
 
-    return BoundedReLuTestCommon(workloadFactory, 6.0f, 0.0f,
+    return BoundedReLuTestCommon(workloadFactory, memoryManager, 6.0f, 0.0f,
                                  inputScale, inputOffset, outputScale, outputOffset,
                                  input, output,
                                  inputWidth, inputHeight, inputChannels, inputBatchSize);
 }
 
-LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperAndLowerBoundTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperAndLowerBoundTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int inputWidth     = 3u;
     unsigned int inputHeight    = 2u;
@@ -185,7 +205,7 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8UpperAndLowerBoundTest(armnn::IWorkl
     int32_t inputOffset = 112;
     float inputScale    = 0.0125f;
 
-    return BoundedReLuTestCommon(workloadFactory, 1.0f, -1.0f,
+    return BoundedReLuTestCommon(workloadFactory, memoryManager, 1.0f, -1.0f,
                                  inputScale, inputOffset, inputScale, inputOffset, // Input/output scale & offset same.
                                  input, output,
                                  inputWidth, inputHeight, inputChannels, inputBatchSize);
@@ -219,10 +239,12 @@ struct BoundedReLuRandomInputTestTraits
     }
 };
 
-boost::multi_array<float, 4> BoundedReLuRandomInputTest(armnn::IWorkloadFactory& workloadFactory,
-                                                        float lowerBound,
-                                                        float upperBound,
-                                                        const armnn::ActivationDescriptor& activationDescriptor)
+boost::multi_array<float, 4> BoundedReLuRandomInputTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float lowerBound,
+    float upperBound,
+    const armnn::ActivationDescriptor& activationDescriptor)
 {
     const armnn::TensorInfo inputTensorInfo = BoundedReLuRandomInputTestTraits::GetInputTensorInfo();
     const armnn::TensorInfo outputTensorInfo = BoundedReLuRandomInputTestTraits::GetOutputTensorInfo();
@@ -259,10 +281,12 @@ boost::multi_array<float, 4> BoundedReLuRandomInputTest(armnn::IWorkloadFactory&
 
 } // namespace
 
-LayerTestResult<float, 4> CompareBoundedReLuTest(armnn::IWorkloadFactory& workloadFactory,
-                                          armnn::IWorkloadFactory& otherWorkloadFactory,
-                                          float upperBound,
-                                          float lowerBound)
+LayerTestResult<float, 4> CompareBoundedReLuTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    float upperBound,
+    float lowerBound)
 {
     LayerTestResult<float, 4> result(BoundedReLuRandomInputTestTraits::GetOutputTensorInfo());
 
@@ -271,16 +295,20 @@ LayerTestResult<float, 4> CompareBoundedReLuTest(armnn::IWorkloadFactory& worklo
     activationDescriptor.m_A = upperBound;
     activationDescriptor.m_B = lowerBound;
 
-    result.output = BoundedReLuRandomInputTest(workloadFactory, 0.0f, upperBound, activationDescriptor);
-    result.outputExpected = BoundedReLuRandomInputTest(otherWorkloadFactory, 0.0f, upperBound, activationDescriptor);
+    result.output = BoundedReLuRandomInputTest(
+        workloadFactory, memoryManager, 0.0f, upperBound, activationDescriptor);
+    result.outputExpected = BoundedReLuRandomInputTest(
+        refWorkloadFactory, nullptr, 0.0f, upperBound, activationDescriptor);
 
     return result;
 }
 
 template<typename T>
-LayerTestResult<T,4> ConstantLinearActivationTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                        float qScale = 0.0f,
-                                                        int32_t qOffset = 0)
+LayerTestResult<T,4> ConstantLinearActivationTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 0.0f,
+    int32_t qOffset = 0)
 {
     unsigned int inputHeight    = 20;
     unsigned int inputWidth     = 17;
@@ -336,25 +364,31 @@ LayerTestResult<T,4> ConstantLinearActivationTestCommon(armnn::IWorkloadFactory&
     return ret;
 }
 
-LayerTestResult<float, 4> ConstantLinearActivationTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> ConstantLinearActivationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantLinearActivationTestCommon<float>(workloadFactory);
+    return ConstantLinearActivationTestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> ConstantLinearActivationUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> ConstantLinearActivationUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantLinearActivationTestCommon<uint8_t>(workloadFactory, 4.0f, 3);
+    return ConstantLinearActivationTestCommon<uint8_t>(workloadFactory, memoryManager, 4.0f, 3);
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleActivationTest(armnn::IWorkloadFactory& workloadFactory,
-                                           armnn::ActivationFunction activationFunction,
-                                           float activationParameterA,
-                                           float activationParameterB,
-                                           float qScale,
-                                           int32_t qOffset,
-                                           const std::vector<float>& inputData,
-                                           const std::vector<float>& outputExpectedData)
+LayerTestResult<T, 4> SimpleActivationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::ActivationFunction activationFunction,
+    float activationParameterA,
+    float activationParameterB,
+    float qScale,
+    int32_t qOffset,
+    const std::vector<float>& inputData,
+    const std::vector<float>& outputExpectedData)
 {
     constexpr static unsigned int inputWidth = 16u;
     constexpr static unsigned int inputHeight = 1u;
@@ -415,7 +449,11 @@ LayerTestResult<T, 4> SimpleActivationTest(armnn::IWorkloadFactory& workloadFact
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleSigmoidTestCommon(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
+LayerTestResult<T, 4> SimpleSigmoidTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
     std::vector<float> inputData = {
         -0.1f, -0.2f, -0.3f, -0.4f,
@@ -433,6 +471,7 @@ LayerTestResult<T, 4> SimpleSigmoidTestCommon(armnn::IWorkloadFactory& workloadF
     std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
 
     return SimpleActivationTest<T>(workloadFactory,
+                                   memoryManager,
                                    armnn::ActivationFunction::Sigmoid,
                                    0.f,
                                    0.f,
@@ -442,23 +481,29 @@ LayerTestResult<T, 4> SimpleSigmoidTestCommon(armnn::IWorkloadFactory& workloadF
                                    outputExpectedData);
 }
 
-LayerTestResult<float, 4> SimpleSigmoidTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SimpleSigmoidTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SimpleSigmoidTestCommon<float>(workloadFactory, 0.0f, 0);
+    return SimpleSigmoidTestCommon<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> SimpleSigmoidUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SimpleSigmoidUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SimpleSigmoidTestCommon<uint8_t>(workloadFactory, 0.1f, 50);
+    return SimpleSigmoidTestCommon<uint8_t>(workloadFactory, memoryManager, 0.1f, 50);
 }
 
 template<typename T>
-LayerTestResult<T,4> CompareActivationTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                               armnn::IWorkloadFactory& refWorkloadFactory,
-                                               armnn::ActivationFunction f,
-                                               unsigned int batchSize = 5,
-                                               float qScale = 0.0f,
-                                               int32_t qOffset = 0)
+LayerTestResult<T,4> CompareActivationTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    armnn::ActivationFunction f,
+    unsigned int batchSize = 5,
+    float qScale = 0.0f,
+    int32_t qOffset = 0)
 {
     unsigned int width     = 17;
     unsigned int height    = 29;
@@ -544,17 +589,23 @@ LayerTestResult<T,4> CompareActivationTestImpl(armnn::IWorkloadFactory& workload
     return ret;
 }
 
-LayerTestResult<float,4> CompareActivationTest(armnn::IWorkloadFactory& workloadFactory,
-                                               armnn::IWorkloadFactory& refWorkloadFactory,
-                                               armnn::ActivationFunction f,
-                                               unsigned int batchSize)
+LayerTestResult<float,4> CompareActivationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    armnn::ActivationFunction f,
+    unsigned int batchSize)
 {
-    return CompareActivationTestImpl<float>(workloadFactory, refWorkloadFactory, f, batchSize);
+    return CompareActivationTestImpl<float>(
+        workloadFactory, memoryManager, refWorkloadFactory, f, batchSize);
 }
 
-LayerTestResult<uint8_t,4> CompareActivationUint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                      armnn::IWorkloadFactory& refWorkloadFactory,
-                                                      armnn::ActivationFunction f)
+LayerTestResult<uint8_t,4> CompareActivationUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    armnn::ActivationFunction f)
 {
-    return CompareActivationTestImpl<uint8_t>(workloadFactory, refWorkloadFactory, f, 5, 0.1f, 50);
+    return CompareActivationTestImpl<uint8_t>(
+        workloadFactory, memoryManager, refWorkloadFactory, f, 5, 0.1f, 50);
 }

@@ -25,12 +25,6 @@ public:
 
     virtual const BackendId& GetBackendId() const = 0;
 
-    /// Inform the memory manager to release the memory
-    virtual void Release() { }
-
-    /// Inform the memory manager to acquire memory
-    virtual void Acquire() { }
-
     static bool IsLayerSupported(const BackendId& backendId,
                                  const IConnectableLayer& layer,
                                  Optional<DataType> dataType,

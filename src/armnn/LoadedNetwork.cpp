@@ -92,10 +92,11 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
             auto createBackend = BackendRegistryInstance().GetFactory(backend);
             auto it = m_Backends.emplace(std::make_pair(backend, createBackend()));
 
-            auto memoryManager   = it.first->second->CreateMemoryManager();
-            auto workloadFactory = it.first->second->CreateWorkloadFactory(std::move(memoryManager));
+            IBackendInternal::IMemoryManagerSharedPtr memoryManager = it.first->second->CreateMemoryManager();
+            auto workloadFactory = it.first->second->CreateWorkloadFactory(memoryManager);
 
-            m_WorkloadFactories.emplace(std::make_pair(backend, std::move(workloadFactory)));
+            m_WorkloadFactories.emplace(std::make_pair(backend,
+                std::make_pair(std::move(workloadFactory), memoryManager)));
         }
         layer->CreateTensorHandles(m_OptimizedNetwork->GetGraph(), GetWorkloadFactory(*layer));
     }
@@ -182,7 +183,7 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
             CHECK_LOCATION());
     }
 
-    workloadFactory = it->second.get();
+    workloadFactory = it->second.first.get();
 
     BOOST_ASSERT_MSG(workloadFactory, "No workload factory");
 
@@ -416,7 +417,11 @@ void LoadedNetwork::AllocateWorkingMemory()
     }
     for (auto&& workloadFactory : m_WorkloadFactories)
     {
-        workloadFactory.second->Acquire();
+        IBackendInternal::IMemoryManagerSharedPtr memoryManager = workloadFactory.second.second;
+        if (memoryManager)
+        {
+            memoryManager->Acquire();
+        }
     }
     m_IsWorkingMemAllocated = true;
 }
@@ -431,7 +436,11 @@ void LoadedNetwork::FreeWorkingMemory()
     // Informs the memory managers to release memory in it's respective memory group
     for (auto&& workloadFactory : m_WorkloadFactories)
     {
-        workloadFactory.second->Release();
+        IBackendInternal::IMemoryManagerSharedPtr memoryManager = workloadFactory.second.second;
+        if (memoryManager)
+        {
+            memoryManager->Release();
+        }
     }
     m_IsWorkingMemAllocated = false;
 }

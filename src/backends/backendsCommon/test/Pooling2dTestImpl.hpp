@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include "WorkloadTestUtils.hpp"
+
 #include "QuantizeHelper.hpp"
 
 #include <armnn/ArmNN.hpp>
@@ -11,6 +13,7 @@
 #include <Permute.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/WorkloadInfo.hpp>
 
@@ -22,12 +25,14 @@
 #include <string>
 
 template<typename T>
-LayerTestResult<T, 4> SimplePooling2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                              armnn::Pooling2dDescriptor descriptor,
-                                              float qScale,
-                                              int32_t qOffset,
-                                              const boost::multi_array<T, 4>& input,
-                                              const boost::multi_array<T, 4>& outputExpected)
+LayerTestResult<T, 4> SimplePooling2dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::Pooling2dDescriptor descriptor,
+    float qScale,
+    int32_t qOffset,
+    const boost::multi_array<T, 4>& input,
+    const boost::multi_array<T, 4>& outputExpected)
 {
     const armnn::DataLayoutIndexed dataLayout = descriptor.m_DataLayout;
     auto heightIndex = dataLayout.GetHeightIndex();
@@ -109,10 +114,12 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(armnn::IWorkloadFactory& workloadF
 //   batch size:   2
 //
 template<typename T>
-LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                                   bool forceNoPadding,
-                                                                   float qScale = 1.0f,
-                                                                   int32_t qOffset = 0)
+LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool forceNoPadding,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
@@ -225,14 +232,17 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(armnn::IWorkl
         }));
     }
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                   const armnn::DataLayoutIndexed& dataLayout = armnn::DataLayout::NCHW,
-                                                   float qScale = 1.0f,
-                                                   int32_t qOffset = 0)
+LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout = armnn::DataLayout::NCHW,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
@@ -291,14 +301,17 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(armnn::IWorkloadFactory& work
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                       armnn::DataLayoutIndexed dataLayout = armnn::DataLayout::NCHW,
-                                                       float qScale = 1.0f,
-                                                       int32_t qOffset = 0)
+LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::DataLayoutIndexed dataLayout = armnn::DataLayout::NCHW,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
@@ -357,13 +370,16 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(armnn::IWorkloadFactory& 
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                             float qScale = 1.0f,
-                                                             int32_t qOffset = 0)
+LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
@@ -405,14 +421,17 @@ LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(armnn::IWorkloadFac
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputVec);
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                  armnn::DataLayoutIndexed dataLayout = armnn::DataLayout::NCHW,
-                                                  float qScale = 1.0f,
-                                                  int32_t qOffset = 0)
+LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::DataLayoutIndexed dataLayout = armnn::DataLayout::NCHW,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -462,13 +481,16 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(armnn::IWorkloadFactory& workl
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                        float qScale = 1.0f,
-                                                        int32_t qOffset = 0)
+LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -492,13 +514,16 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(armnn::IWorkloadFactory&
             3.0f, 3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                        float qScale = 1.0f,
-                                                        int32_t qOffset = 0)
+LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -528,13 +553,16 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(armnn::IWorkloadFactory&
             3.0f, 3.0f, 3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                        float qScale = 1.0f,
-                                                        int32_t qOffset = 0)
+LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -561,13 +589,16 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(armnn::IWorkloadFactory&
             3.0f, 3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                 float qScale = 1.0f,
-                                                 int32_t qOffset = 0)
+LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -593,13 +624,16 @@ LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(armnn::IWorkloadFactory& worklo
             3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                 float qScale = 1.0f,
-                                                 int32_t qOffset = 0)
+LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -627,13 +661,16 @@ LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(armnn::IWorkloadFactory& worklo
             3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                             float qScale = 1.0f,
-                                                             int32_t qOffset = 0)
+LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::TensorInfo inputTensorInfo({ 1, 1, 1, 3 }, armnn::GetDataType<T>());
     armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, armnn::GetDataType<T>());
@@ -663,15 +700,18 @@ LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(armnn::IWorkloadFac
             0.0f, 3.0f, 0.0f, 3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> ComparePooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                 armnn::IWorkloadFactory& refWorkloadFactory,
-                                                 armnn::PoolingAlgorithm poolingType,
-                                                 float qScale = 1.0f,
-                                                 int32_t qOffset = 0)
+LayerTestResult<T, 4> ComparePooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    armnn::PoolingAlgorithm poolingType,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     const unsigned int inputWidth = 16;
     const unsigned int inputHeight = 32;
@@ -777,10 +817,12 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(armnn::IWorkloadFactory& worklo
 //   batch size:   1
 //
 template<typename T>
-LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                                   bool forceNoPadding,
-                                                                   float qScale = 1.0f,
-                                                                   int32_t qOffset = 0)
+LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool forceNoPadding,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
@@ -792,8 +834,11 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(armnn::IWorkl
     descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
+
     unsigned int inputWidth = 4;
+
     unsigned int inputHeight = 4;
+
     unsigned int outputWidth =
         (inputWidth + descriptor.m_PadLeft + descriptor.m_PadRight + descriptor.m_StrideX - descriptor.m_PoolWidth) /
         descriptor.m_StrideX;
@@ -841,7 +886,8 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(armnn::IWorkl
         forceNoPadding ? QuantizedVector<T>(qScale, qOffset, expectedOutputDataNoPadding) :
                          QuantizedVector<T>(qScale, qOffset, expectedOutputDataWithPadding));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 //
@@ -856,6 +902,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(armnn::IWorkl
 template<typename T>
 LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
         armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         bool forceNoPadding,
         float qScale = 1.0f,
         int32_t qOffset = 0)
@@ -917,14 +964,17 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
         forceNoPadding ? QuantizedVector<T>(qScale, qOffset, expectedOutputDataNoPadding) :
                          QuantizedVector<T>(qScale, qOffset, expectedOutputDataWithPadding));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 
 template<typename T>
-LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                            float qScale = 1.0f,
-                                                            int32_t qOffset = 0)
+LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
@@ -963,13 +1013,16 @@ LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(armnn::IWorkload
              1.0f,  2.0f, -4.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                            float qScale = 1.0f,
-                                                            int32_t qOffset = 0)
+LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
@@ -1009,13 +1062,16 @@ LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(armnn::IWorkloadF
              2.0f,  2.0f,  2.0f, -3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                                 float qScale = 1.0f,
-                                                                 int32_t qOffset = 0)
+LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
@@ -1054,13 +1110,16 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(armnn::IWork
             3.0f,  13.0f,  10.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                                 float qScale = 1.0f,
-                                                                 int32_t qOffset = 0)
+LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
@@ -1099,13 +1158,16 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(arm
             2.0f, 3.5f
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                                float qScale = 1.0f,
-                                                                int32_t qOffset = 0)
+LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
@@ -1145,13 +1207,16 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(armnn::IWorkl
              9.0f,  11.0f,  12.0f, 7.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                            float qScale = 1.0f,
-                                                            int32_t qOffset = 0)
+LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -1190,13 +1255,16 @@ LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(armnn::IWorkloadF
                8.0f,     1.4142f,   4.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 template<typename T>
-LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                           float qScale = 1.0f,
-                                                           int32_t qOffset = 0)
+LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
 {
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -1236,5 +1304,6 @@ LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(armnn::IWorkloadFa
             1.0540f, 1.7638f, 2.5385f, 2.3570f,
         }));
 
-    return SimplePooling2dTestImpl<T>(workloadFactory, descriptor, qScale, qOffset, input, outputExpected);
+    return SimplePooling2dTestImpl<T>(
+        workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }

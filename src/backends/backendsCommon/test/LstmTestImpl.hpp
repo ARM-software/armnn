@@ -5,6 +5,7 @@
 #pragma once
 
 #include "QuantizeHelper.hpp"
+#include "WorkloadTestUtils.hpp"
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
@@ -15,9 +16,11 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                                   const boost::multi_array<float, 2>& input,
-                                                                   const boost::multi_array<float, 2>& outputExpected)
+LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const boost::multi_array<float, 2>& input,
+        const boost::multi_array<float, 2>& outputExpected)
 {
     unsigned int batchSize = boost::numeric_cast<unsigned int>(input.shape()[0]);
     unsigned int inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
@@ -219,10 +222,12 @@ LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(armnn::IWorkl
 
 
 LayerTestResult<float, 2>
-LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                             const boost::multi_array<float, 2>& input,
-                                             const boost::multi_array<float, 2>& outputExpected) {
-
+LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const boost::multi_array<float, 2>& input,
+        const boost::multi_array<float, 2>& outputExpected)
+{
     unsigned int batchSize = 2;
     unsigned int outputSize = 16;
     unsigned int inputSize = 5;
@@ -928,9 +933,11 @@ LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory
 }
 
 
-LayerTestResult<float, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                                   const boost::multi_array<float, 2>& input,
-                                                                   const boost::multi_array<float, 2>& outputExpected)
+LayerTestResult<float, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const boost::multi_array<float, 2>& input,
+        const boost::multi_array<float, 2>& outputExpected)
 {
     bool cifgEnabled = true;
     bool peepholeEnabled = true;

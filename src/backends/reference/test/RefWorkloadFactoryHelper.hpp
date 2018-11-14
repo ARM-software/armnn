@@ -16,7 +16,14 @@ namespace
 template<>
 struct WorkloadFactoryHelper<armnn::RefWorkloadFactory>
 {
-    static armnn::RefWorkloadFactory GetFactory()
+    static armnn::IBackendInternal::IMemoryManagerSharedPtr GetMemoryManager()
+    {
+        armnn::RefBackend backend;
+        return backend.CreateMemoryManager();
+    }
+
+    static armnn::RefWorkloadFactory GetFactory(
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager = nullptr)
     {
         return armnn::RefWorkloadFactory();
     }

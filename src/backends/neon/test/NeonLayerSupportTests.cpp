@@ -22,19 +22,22 @@ BOOST_AUTO_TEST_SUITE(NeonLayerSupport)
 
 BOOST_AUTO_TEST_CASE(IsLayerSupportedFloat16Neon)
 {
-    armnn::NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
+    armnn::NeonWorkloadFactory factory =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::Float16>(&factory);
 }
 
 BOOST_AUTO_TEST_CASE(IsLayerSupportedFloat32Neon)
 {
-    armnn::NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
+    armnn::NeonWorkloadFactory factory =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::Float32>(&factory);
 }
 
 BOOST_AUTO_TEST_CASE(IsLayerSupportedUint8Neon)
 {
-    armnn::NeonWorkloadFactory factory = NeonWorkloadFactoryHelper::GetFactory();
+    armnn::NeonWorkloadFactory factory =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     IsLayerSupportedTests<armnn::NeonWorkloadFactory, armnn::DataType::QuantisedAsymm8>(&factory);
 }
 

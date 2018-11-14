@@ -66,8 +66,10 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
     std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
     armnn::ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
 
-    FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory();
-    auto testResult = (*testFunction)(workloadFactory, args...);
+    auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();
+    FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory(memoryManager);
+
+    auto testResult = (*testFunction)(workloadFactory, memoryManager, args...);
     CompareTestResultIfSupported(testName, testResult);
 }
 
@@ -80,9 +82,12 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
 template<typename FactoryType, typename TFuncPtr, typename... Args>
 void CompareRefTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
 {
-    FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory();
+    auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();
+    FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory(memoryManager);
+
     armnn::RefWorkloadFactory refWorkloadFactory;
-    auto testResult = (*testFunction)(workloadFactory, refWorkloadFactory, args...);
+
+    auto testResult = (*testFunction)(workloadFactory, memoryManager, refWorkloadFactory, args...);
     CompareTestResultIfSupported(testName, testResult);
 }
 

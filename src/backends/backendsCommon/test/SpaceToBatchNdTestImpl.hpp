@@ -4,18 +4,22 @@
 //
 #pragma once
 
+#include "WorkloadTestUtils.hpp"
+
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <test/TensorHelpers.hpp>
 
 template<typename T>
 LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
-    const armnn::IWorkloadFactory& workloadFactory,
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::TensorInfo& inputTensorInfo,
     armnn::TensorInfo& outputTensorInfo,
     std::vector<float>& inputData,
@@ -74,8 +78,10 @@ LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
 }
 
 template <typename T>
-LayerTestResult<T, 4> SpaceToBatchNdSimpleTest(armnn::IWorkloadFactory& workloadFactory,
-                                               armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
+LayerTestResult<T, 4> SpaceToBatchNdSimpleTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -101,12 +107,15 @@ LayerTestResult<T, 4> SpaceToBatchNdSimpleTest(armnn::IWorkloadFactory& workload
         1.0f, 2.0f, 3.0f, 4.0f
     });
 
-    return SpaceToBatchNdTestImpl<T>(workloadFactory, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+    return SpaceToBatchNdTestImpl<T>(
+        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template <typename T>
-LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsTest(armnn::IWorkloadFactory& workloadFactory,
-                                                      armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
+LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -137,12 +146,15 @@ LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsTest(armnn::IWorkloadFactory& w
         10.0f, 11.0f, 12.0f
     });
 
-    return SpaceToBatchNdTestImpl<T>(workloadFactory, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+    return SpaceToBatchNdTestImpl<T>(
+        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template <typename T>
-LayerTestResult<T, 4> SpaceToBatchNdMultiBlockTest(armnn::IWorkloadFactory& workloadFactory,
-                                                   armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
+LayerTestResult<T, 4> SpaceToBatchNdMultiBlockTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -174,12 +186,15 @@ LayerTestResult<T, 4> SpaceToBatchNdMultiBlockTest(armnn::IWorkloadFactory& work
         6.0f, 8.0f, 14.0f, 16.0f
     });
 
-    return SpaceToBatchNdTestImpl<T>(workloadFactory, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+    return SpaceToBatchNdTestImpl<T>(
+        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template <typename T>
-LayerTestResult<T, 4> SpaceToBatchNdPaddingTest(armnn::IWorkloadFactory& workloadFactory,
-                                                armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
+LayerTestResult<T, 4> SpaceToBatchNdPaddingTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::DataLayout dataLayout = armnn::DataLayout::NCHW)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -215,29 +230,38 @@ LayerTestResult<T, 4> SpaceToBatchNdPaddingTest(armnn::IWorkloadFactory& workloa
         0.0f, 14.0f, 16.0f
     });
 
-    return SpaceToBatchNdTestImpl<T>(workloadFactory, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+    return SpaceToBatchNdTestImpl<T>(
+        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
 template <typename T>
-LayerTestResult<T, 4> SpaceToBatchNdSimpleNHWCTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<T, 4> SpaceToBatchNdSimpleNHWCTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleTest<T>(workloadFactory, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdSimpleTest<T>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
 }
 
 template <typename T>
-LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsNHWCTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsNHWCTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsTest<T>(workloadFactory, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdMultiChannelsTest<T>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
 }
 
 template <typename T>
-LayerTestResult<T, 4> SpaceToBatchNdMultiBlockNHWCTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<T, 4> SpaceToBatchNdMultiBlockNHWCTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockTest<T>(workloadFactory, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdMultiBlockTest<T>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
 }
 
 template <typename T>
-LayerTestResult<T, 4> SpaceToBatchNdPaddingNHWCTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<T, 4> SpaceToBatchNdPaddingNHWCTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingTest<T>(workloadFactory, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdPaddingTest<T>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
 }

@@ -5,12 +5,14 @@
 #pragma once
 
 #include "QuantizeHelper.hpp"
+#include "WorkloadTestUtils.hpp"
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <test/TensorHelpers.hpp>
@@ -18,7 +20,10 @@
 #include <algorithm>
 
 template<typename T>
-LayerTestResult<T, 2> SimpleSoftmaxTestImpl(armnn::IWorkloadFactory& workloadFactory, float beta)
+LayerTestResult<T, 2> SimpleSoftmaxTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float beta)
 {
     using std::exp;
 
@@ -62,9 +67,7 @@ LayerTestResult<T, 2> SimpleSoftmaxTestImpl(armnn::IWorkloadFactory& workloadFac
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0]);
 
-    workloadFactory.Acquire();
-    workload->Execute();
-    workloadFactory.Release();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
 
@@ -85,7 +88,9 @@ LayerTestResult<T, 2> SimpleSoftmaxTestImpl(armnn::IWorkloadFactory& workloadFac
 }
 
 template<typename T>
-LayerTestResult<T, 2> CompareSoftmaxTestImpl(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<T, 2> CompareSoftmaxTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
     float beta)
 {
@@ -142,9 +147,7 @@ LayerTestResult<T, 2> CompareSoftmaxTestImpl(armnn::IWorkloadFactory& workloadFa
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0]);
 
-    workloadFactory.Acquire();
-    workload->Execute();
-    workloadFactory.Release();
+    ExecuteWorkload(*workload, memoryManager);
 
     workloadRef->Execute();
 

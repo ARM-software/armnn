@@ -130,10 +130,6 @@ public:
     virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& Info) const override;
 
-    virtual void Release() override;
-
-    virtual void Acquire() override;
-
 private:
     mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
 };

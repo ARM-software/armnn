@@ -3,9 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "WorkloadTestUtils.hpp"
+
+#include <backendsCommon/IBackendInternal.hpp>
+
 template<typename T, typename B>
 LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::TensorInfo inputTensorInfo,
     armnn::TensorInfo outputTensorInfo,
     armnn::TensorInfo weightsDesc,
@@ -41,16 +46,17 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workloadFactory.Acquire();
-    workload->Execute();
-    workloadFactory.Release();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
 
     return result;
 }
 
-LayerTestResult<float, 2> FullyConnectedFloat32Test(armnn::IWorkloadFactory& workloadFactory, bool biasEnabled,
+LayerTestResult<float, 2> FullyConnectedFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
     bool transposeWeights)
 {
     unsigned int inputWidth = 1;
@@ -120,6 +126,7 @@ LayerTestResult<float, 2> FullyConnectedFloat32Test(armnn::IWorkloadFactory& wor
 
     result = SimpleFullyConnectedTestImpl<float>(
         workloadFactory,
+        memoryManager,
         inputTensorInfo, outputTensorInfo,
         weightsDesc, biasesDesc,
         weights, bias, input,
@@ -141,7 +148,10 @@ LayerTestResult<float, 2> FullyConnectedFloat32Test(armnn::IWorkloadFactory& wor
     return result;
 }
 
-LayerTestResult<uint8_t, 2> FullyConnectedUint8Test(armnn::IWorkloadFactory& workloadFactory, bool biasEnabled)
+LayerTestResult<uint8_t, 2> FullyConnectedUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled)
 {
     constexpr static unsigned int inputWidth = 3u;
     constexpr static unsigned int inputHeight = 2u;
@@ -181,6 +191,7 @@ LayerTestResult<uint8_t, 2> FullyConnectedUint8Test(armnn::IWorkloadFactory& wor
 
     result = SimpleFullyConnectedTestImpl<uint8_t>(
         workloadFactory,
+        memoryManager,
         inputTensorInfo, outputTensorInfo,
         weightsDesc, biasesDesc,
         weights, bias, input,
@@ -210,10 +221,12 @@ LayerTestResult<uint8_t, 2> FullyConnectedUint8Test(armnn::IWorkloadFactory& wor
 // Note this is templated for consistency, but the nature of this tests makes it unlikely to be useful in Uint8 mode.
 //
 template<typename T>
-LayerTestResult<T, 2> FullyConnectedLargeTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                        bool transposeWeights,
-                                                        float qScale = 0.0f,
-                                                        int32_t qOffset = 0)
+LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool transposeWeights,
+    float qScale = 0.0f,
+    int32_t qOffset = 0)
 {
     unsigned int inputWidth = 1;
     unsigned int inputHeight = 1;
@@ -272,6 +285,7 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(armnn::IWorkloadFactory& wor
 
     result = SimpleFullyConnectedTestImpl<T>(
         workloadFactory,
+        memoryManager,
         inputTensorInfo, outputTensorInfo,
         weightsDesc, biasesDesc,
         weights, bias, input,

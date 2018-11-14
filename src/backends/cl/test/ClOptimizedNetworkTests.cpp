@@ -34,7 +34,8 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateGpuDeviceSupportLayerNoFallback)
     armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
     BOOST_CHECK(optNet);
     // validate workloads
-    armnn::ClWorkloadFactory fact = ClWorkloadFactoryHelper::GetFactory();
+    armnn::ClWorkloadFactory fact =
+        ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
     for (auto&& layer : static_cast<armnn::OptimizedNetwork*>(optNet.get())->GetGraph())
     {
         BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);

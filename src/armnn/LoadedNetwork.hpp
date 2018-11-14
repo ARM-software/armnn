@@ -62,7 +62,11 @@ private:
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
 
     using BackendPtrMap = std::unordered_map<BackendId, IBackendInternalUniquePtr>;
-    using WorkloadFactoryMap = std::unordered_map<BackendId, IBackendInternal::IWorkloadFactoryPtr>;
+
+    using WorkloadFactoryWithMemoryManager =
+        std::pair<IBackendInternal::IWorkloadFactoryPtr, IBackendInternal::IMemoryManagerSharedPtr>;
+
+    using WorkloadFactoryMap = std::unordered_map<BackendId, WorkloadFactoryWithMemoryManager>;
 
     BackendPtrMap       m_Backends;
     WorkloadFactoryMap  m_WorkloadFactories;

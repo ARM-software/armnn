@@ -129,10 +129,6 @@ public:
     virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const override;
 
-    virtual void Release() override;
-
-    virtual void Acquire() override;
-
 private:
     template<typename FloatWorkload, typename Uint8Workload, typename QueueDescriptorType, typename... Args>
     static std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor,

@@ -37,7 +37,8 @@ BOOST_AUTO_TEST_CASE(NeonTimerGetName)
 
 BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
 {
-    NeonWorkloadFactory workloadFactory = NeonWorkloadFactoryHelper::GetFactory();
+    NeonWorkloadFactory workloadFactory =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
 
     unsigned int inputWidth = 4000u;
     unsigned int inputHeight = 5000u;

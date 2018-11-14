@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "WorkloadTestUtils.hpp"
+
 #include <Half.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -12,11 +14,14 @@
 #include <armnn/TypesUtils.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 
 #include <test/TensorHelpers.hpp>
 
 
-LayerTestResult<armnn::Half, 4> SimpleConvertFp32ToFp16Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<armnn::Half, 4> SimpleConvertFp32ToFp16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     using namespace half_float::literal;
 

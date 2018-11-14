@@ -44,7 +44,8 @@ using FactoryType = ClWorkloadFactory;
 
 BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
 {
-    ClWorkloadFactory  workloadFactory = ClWorkloadFactoryHelper::GetFactory();
+    auto memoryManager = ClWorkloadFactoryHelper::GetMemoryManager();
+    ClWorkloadFactory workloadFactory = ClWorkloadFactoryHelper::GetFactory(memoryManager);
 
     const unsigned int width    = 2;
     const unsigned int height   = 3;

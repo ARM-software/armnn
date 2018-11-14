@@ -6,12 +6,18 @@
 
 #include <armnn/Tensor.hpp>
 
+#include <backendsCommon/IBackendInternal.hpp>
+#include <backendsCommon/IMemoryManager.hpp>
+#include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadInfo.hpp>
 
 namespace armnn
 {
 class ITensorHandle;
-}
+} // namespace armnn
+
+namespace
+{
 
 template <typename QueueDescriptor>
 void AddInputToWorkload(QueueDescriptor& descriptor,
@@ -54,3 +60,27 @@ void SetWorkloadOutput(QueueDescriptor& descriptor,
     descriptor.m_Outputs[index] = tensorHandle;
     info.m_OutputTensorInfos[index] = tensorInfo;
 }
+
+inline void ExecuteWorkload(armnn::IWorkload& workload,
+                            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                            bool memoryManagementRequested = true)
+{
+    const bool manageMemory = memoryManager && memoryManagementRequested;
+
+    // Acquire working memory (if needed)
+    if (manageMemory)
+    {
+        memoryManager->Acquire();
+    }
+
+    // Execute the workload
+    workload.Execute();
+
+    // Release working memory (if needed)
+    if (manageMemory)
+    {
+        memoryManager->Release();
+    }
+}
+
+} // anonymous namespace

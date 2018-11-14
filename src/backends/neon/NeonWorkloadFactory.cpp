@@ -282,14 +282,4 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const Batch
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
-void NeonWorkloadFactory::Release()
-{
-    m_MemoryManager->Release();
-}
-
-void NeonWorkloadFactory::Acquire()
-{
-    m_MemoryManager->Acquire();
-}
-
 } // namespace armnn

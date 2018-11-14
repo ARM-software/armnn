@@ -5,12 +5,14 @@
 #pragma once
 
 #include "QuantizeHelper.hpp"
+#include "WorkloadTestUtils.hpp"
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <test/TensorHelpers.hpp>
@@ -18,6 +20,7 @@
 template<typename T>
 LayerTestResult<T, 4> SimpleReshapeTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::TensorInfo inputTensorInfo,
     armnn::TensorInfo outputTensorInfo,
     const std::vector<T>& inputData,
@@ -50,7 +53,9 @@ LayerTestResult<T, 4> SimpleReshapeTestImpl(
     return ret;
 }
 
-LayerTestResult<float, 4> SimpleReshapeFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SimpleReshapeFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -91,10 +96,13 @@ LayerTestResult<float, 4> SimpleReshapeFloat32Test(armnn::IWorkloadFactory& work
         27.0f, 28.0f, 29.0f, 30.0f, 31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
     });
 
-    return SimpleReshapeTestImpl<float>(workloadFactory, inputTensorInfo, outputTensorInfo, input, outputExpected);
+    return SimpleReshapeTestImpl<float>(
+        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected);
 }
 
-LayerTestResult<float, 4> SimpleFloorTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SimpleFloorTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, armnn::DataType::Float32);
     const armnn::TensorInfo outputTensorInfo(inputTensorInfo);
@@ -130,7 +138,9 @@ LayerTestResult<float, 4> SimpleFloorTest(armnn::IWorkloadFactory& workloadFacto
     return ret;
 }
 
-LayerTestResult<uint8_t, 4> SimpleReshapeUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SimpleReshapeUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -173,5 +183,6 @@ LayerTestResult<uint8_t, 4> SimpleReshapeUint8Test(armnn::IWorkloadFactory& work
         27, 28, 29, 30, 31, 32, 33, 34, 35,
     });
 
-    return SimpleReshapeTestImpl<uint8_t>(workloadFactory, inputTensorInfo, outputTensorInfo, input, outputExpected);
+    return SimpleReshapeTestImpl<uint8_t>(
+        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected);
 }

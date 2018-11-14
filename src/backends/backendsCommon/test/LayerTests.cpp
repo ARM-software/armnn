@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include "LayerTests.hpp"
+#include "WorkloadTestUtils.hpp"
 
 #include "test/TensorHelpers.hpp"
 #include "TensorCopyUtils.hpp"
@@ -14,6 +15,7 @@
 #include <armnn/LayerSupport.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <algorithm>
@@ -101,11 +103,13 @@ boost::multi_array<T, 1> GetBias2(bool biasEnabled, float qScale, int32_t qOffse
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleConvolution2d3x5TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                       float                    qScale,
-                                                       int32_t                  qOffset,
-                                                       bool                     biasEnabled,
-                                                       const armnn::DataLayoutIndexed& layout)
+LayerTestResult<T, 4> SimpleConvolution2d3x5TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
     // Use common single-batch 3-channel 16x8 image.
     armnn::TensorInfo inputDesc({1, 3, 8, 16}, armnn::GetDataType<T>());
@@ -171,6 +175,7 @@ LayerTestResult<T, 4> SimpleConvolution2d3x5TestCommon(armnn::IWorkloadFactory& 
         })));
 
     return SimpleConvolution2dTestImpl<T>(workloadFactory,
+      memoryManager,
       input,
       kernel,
       GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(biasEnabled, qScale, qOffset),
@@ -181,11 +186,13 @@ LayerTestResult<T, 4> SimpleConvolution2d3x5TestCommon(armnn::IWorkloadFactory& 
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                       float                    qScale,
-                                                       int32_t                  qOffset,
-                                                       bool                     biasEnabled,
-                                                       const armnn::DataLayoutIndexed& layout)
+LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
     // Use a 3x3 kernel, which exercises ArmCompute's direct convolution path.
 
@@ -243,6 +250,7 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(armnn::IWorkloadFactory& 
         })));
 
     return SimpleConvolution2dTestImpl<T>(workloadFactory,
+      memoryManager,
       input,
       kernel,
       GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(biasEnabled, qScale, qOffset),
@@ -253,11 +261,13 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(armnn::IWorkloadFactory& 
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleConvolution2d3x3NhwcTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                           float                    qScale,
-                                                           int32_t                  qOffset,
-                                                           bool                     biasEnabled,
-                                                           armnn::DataLayout        dataLayout)
+LayerTestResult<T, 4> SimpleConvolution2d3x3NhwcTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool biasEnabled,
+    armnn::DataLayout dataLayout)
 {
     // Use common single-batch 5x5 image.
 
@@ -291,6 +301,7 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3NhwcTestCommon(armnn::IWorkloadFacto
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputDesc, outputData);
 
     return SimpleConvolution2dNhwcTestImpl<T>(workloadFactory,
+                                              memoryManager,
                                               input,
                                               kernel,
                                               boost::multi_array<T, 1>(),
@@ -300,46 +311,62 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3NhwcTestCommon(armnn::IWorkloadFacto
                                               qOffset);
 }
 
-LayerTestResult<float, 4> SimpleConvolution2d3x5Test(armnn::IWorkloadFactory& workloadFactory,
-                                                     bool                     biasEnabled,
-                                                     const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> SimpleConvolution2d3x5Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return SimpleConvolution2d3x5TestCommon<float>(workloadFactory, 0.f, 0, biasEnabled, layout);
+    return SimpleConvolution2d3x5TestCommon<float>(workloadFactory, memoryManager, 0.f, 0, biasEnabled, layout);
 }
 
-LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                            bool                     biasEnabled,
-                                                            const armnn::DataLayoutIndexed& layout)
+LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return SimpleConvolution2d3x5TestCommon<uint8_t>(workloadFactory, 0.5f, 50, biasEnabled, layout);
+    return SimpleConvolution2d3x5TestCommon<uint8_t>(workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
-LayerTestResult<float, 4> SimpleConvolution2d3x3Test(armnn::IWorkloadFactory& workloadFactory,
-                                                     bool                     biasEnabled,
-                                                     const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> SimpleConvolution2d3x3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return SimpleConvolution2d3x3TestCommon<float>(workloadFactory, 0.f, 0, biasEnabled, layout);
+    return SimpleConvolution2d3x3TestCommon<float>(workloadFactory, memoryManager, 0.f, 0, biasEnabled, layout);
 }
 
-LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(armnn::IWorkloadFactory& workloadFactory,
-                                                         bool                     biasEnabled)
+LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled)
 {
-    return SimpleConvolution2d3x3NhwcTestCommon<float>(workloadFactory, 0.f, 0, biasEnabled, armnn::DataLayout::NHWC);
+    return SimpleConvolution2d3x3NhwcTestCommon<float>(workloadFactory,
+                                                       memoryManager,
+                                                       0.f,
+                                                       0,
+                                                       biasEnabled,
+                                                       armnn::DataLayout::NHWC);
 }
 
-LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                            bool                     biasEnabled,
-                                                            const armnn::DataLayoutIndexed& layout)
+LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return SimpleConvolution2d3x3TestCommon<uint8_t>(workloadFactory, 0.5f, 50, biasEnabled, layout);
+    return SimpleConvolution2d3x3TestCommon<uint8_t>(workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
 template<typename T>
 LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayoutIndexed& layout,
-    float                    qScale,
-    int32_t                  qOffset)
+    float qScale,
+    int32_t qOffset)
 {
     // Use a single-batch 1-channel 3x3 image as input.
     armnn::TensorInfo inputDesc({1, 1, 3, 3}, armnn::GetDataType<T>());
@@ -381,6 +408,7 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
         })));
 
     return SimpleConvolution2dTestImpl<T>(workloadFactory,
+      memoryManager,
       input,
       kernel,
       GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(false, qScale, qOffset),
@@ -395,10 +423,12 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
 }
 
 template<typename T>
-LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                                     const armnn::DataLayoutIndexed& layout,
-                                                                     float qScale,
-                                                                     int32_t qOffset)
+LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& layout,
+    float qScale,
+    int32_t qOffset)
 {
     // Use a single-batch 1-channel 5x5 image as input.
     armnn::TensorInfo inputDesc({ 1, 1, 5, 5 }, armnn::GetDataType<T>());
@@ -434,6 +464,7 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
         })));
 
     return SimpleConvolution2dTestImpl<T>(workloadFactory,
+        memoryManager,
         input,
         kernel,
         GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(false, qScale, qOffset),
@@ -448,11 +479,13 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(armnn::IWor
 }
 
 template<typename T>
-LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                                 float qScale,
-                                                                 int32_t qOffset,
-                                                                 bool biasEnabled,
-                                                                 const armnn::DataLayoutIndexed& layout)
+LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
     // Use a single-batch 2-channel 5x5 image as input.
     armnn::TensorInfo inputTensorInfo({ 1, 2, 5, 5 }, armnn::GetDataType<T>());
@@ -504,6 +537,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloa
         })));
 
     return DepthwiseConvolution2dAsymmetricTestImpl<T>(workloadFactory,
+        memoryManager,
         input,
         kernel,
         GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(biasEnabled, qScale, qOffset),
@@ -520,10 +554,12 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(armnn::IWorkloa
 }
 
 template<typename T>
-LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                           float qScale,
-                                                           int32_t qOffset,
-                                                           bool biasEnabled)
+LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool biasEnabled)
 {
     armnn::TensorInfo inputTensorInfo({ 1, 5, 5, 2}, armnn::GetDataType<T>());
     auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
@@ -618,6 +654,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(armnn::IWorkloadFacto
         })));
 
     return DepthwiseConvolution2dNhwcTestImpl<T>(workloadFactory,
+        memoryManager,
         input,
         kernel,
         GetBias2<typename FullyConnectedBiasTypeForInputType<T>::Type>(biasEnabled, qScale, qOffset),
@@ -633,163 +670,230 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(armnn::IWorkloadFacto
 }
 
 LayerTestResult<float, 4>
-Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(armnn::IWorkloadFactory& workloadFactory,
-                                                           const armnn::DataLayoutIndexed& layout)
+Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon<float>(workloadFactory, layout, 0.0f, 0);
+    return Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon<float>(
+         workloadFactory, memoryManager, layout, 0.0f, 0);
 }
 
-LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(armnn::IWorkloadFactory& workloadFactory,
-                                                             const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return SimpleConvolution2dAsymmetricPaddingTestCommon<float>(workloadFactory, layout, 0.0f, 0);
+    return SimpleConvolution2dAsymmetricPaddingTestCommon<float>(
+        workloadFactory, memoryManager, layout, 0.0f, 0);
 }
 
-LayerTestResult<float, 4> DepthwiseConvolution2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                     bool                     biasEnabled,
-                                                     const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> DepthwiseConvolution2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return DepthwiseConvolution2dTestImpl<float, float>(workloadFactory, 0.0f, 0, biasEnabled, layout);
+    return DepthwiseConvolution2dTestImpl<float, float>(
+        workloadFactory, memoryManager, 0.0f, 0, biasEnabled, layout);
 }
 
-LayerTestResult<float, 4> DepthwiseConvolution2dDepthNhwcTest(armnn::IWorkloadFactory& workloadFactory,
-                                                              bool biasEnabled)
+LayerTestResult<float, 4> DepthwiseConvolution2dDepthNhwcTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled)
 {
-    return DepthwiseConvolution2dNhwcTestCommon<float>(workloadFactory, 0.0f, 0, biasEnabled);
+    return DepthwiseConvolution2dNhwcTestCommon<float>(workloadFactory, memoryManager, 0.0f, 0, biasEnabled);
 }
 
-LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(armnn::IWorkloadFactory& workloadFactory,
-                                                              bool biasEnabled,
-                                                              const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return DepthwiseConvolution2dDepthMul1TestImpl<float, float>(workloadFactory, 0.0f, 0, biasEnabled, layout);
+    return DepthwiseConvolution2dDepthMul1TestImpl<float, float>(
+        workloadFactory, memoryManager, 0.0f, 0, biasEnabled, layout);
 }
 
-LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(armnn::IWorkloadFactory& workloadFactory,
-                                                               bool biasEnabled,
-                                                               const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return DepthwiseConvolution2dAsymmetricTestCommon<float>(workloadFactory, 0.0f, 0, biasEnabled, layout);
+    return DepthwiseConvolution2dAsymmetricTestCommon<float>(
+        workloadFactory, memoryManager, 0.0f, 0, biasEnabled, layout);
 }
 
-LayerTestResult<uint8_t, 4> DepthwiseConvolution2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                            bool                     biasEnabled,
-                                                            const armnn::DataLayoutIndexed& layout)
+LayerTestResult<uint8_t, 4> DepthwiseConvolution2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return DepthwiseConvolution2dTestImpl<uint8_t, int32_t>(workloadFactory, 0.5f, 50, biasEnabled, layout);
+    return DepthwiseConvolution2dTestImpl<uint8_t, int32_t>(
+        workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
-LayerTestResult<uint8_t, 4> DepthwiseConvolution2dDepthMul1Uint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                                     bool biasEnabled,
-                                                                     const armnn::DataLayoutIndexed& layout)
+LayerTestResult<uint8_t, 4> DepthwiseConvolution2dDepthMul1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return DepthwiseConvolution2dDepthMul1TestImpl<uint8_t, int32_t>(workloadFactory, 0.5f, 50, biasEnabled, layout);
+    return DepthwiseConvolution2dDepthMul1TestImpl<uint8_t, int32_t>(
+        workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
-LayerTestResult<float, 4> Convolution1dTest(armnn::IWorkloadFactory& workloadFactory, bool biasEnabled)
+LayerTestResult<float, 4> Convolution1dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled)
 {
-    return Convolution1dTestImpl<float>(workloadFactory, 0.0f, 0, biasEnabled);
+    return Convolution1dTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0, biasEnabled);
 }
 
-LayerTestResult<uint8_t, 4> Convolution1dUint8Test(armnn::IWorkloadFactory& workloadFactory, bool biasEnabled)
+LayerTestResult<uint8_t, 4> Convolution1dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled)
 {
-    return Convolution1dTestImpl<uint8_t>(workloadFactory, 0.1f, 128, biasEnabled);
+    return Convolution1dTestImpl<uint8_t>(workloadFactory, memoryManager, 0.1f, 128, biasEnabled);
 }
 
-LayerTestResult<float,4> CompareConvolution2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                  armnn::IWorkloadFactory& refWorkloadFactory)
+LayerTestResult<float,4> CompareConvolution2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory)
 {
-    return CompareConvolution2dTestImpl<float>(workloadFactory, refWorkloadFactory);
+    return CompareConvolution2dTestImpl<float>(workloadFactory, memoryManager, refWorkloadFactory);
 }
 
 template<typename T>
-LayerTestResult<T,4> CompareDepthwiseConvolution2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                       armnn::IWorkloadFactory& refWorkloadFactory,
-                                                       const armnn::DataLayoutIndexed& layout)
+LayerTestResult<T,4> CompareDepthwiseConvolution2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::DataLayoutIndexed& layout)
 {
-    return CompareDepthwiseConvolution2dTestImpl<T>(workloadFactory, refWorkloadFactory, layout);
+    return CompareDepthwiseConvolution2dTestImpl<T>(workloadFactory, memoryManager, refWorkloadFactory, layout);
 }
 
 template LayerTestResult<float, 4> CompareDepthwiseConvolution2dTest<float>(
-    armnn::IWorkloadFactory&, armnn::IWorkloadFactory&, const armnn::DataLayoutIndexed&);
-template LayerTestResult<uint8_t, 4> CompareDepthwiseConvolution2dTest<uint8_t>(
-    armnn::IWorkloadFactory&, armnn::IWorkloadFactory&, const armnn::DataLayoutIndexed&);
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    armnn::IWorkloadFactory&,
+    const armnn::DataLayoutIndexed&);
 
-LayerTestResult<float,4> SimpleNormalizationAcrossTest(armnn::IWorkloadFactory& workloadFactory)
+template LayerTestResult<uint8_t, 4> CompareDepthwiseConvolution2dTest<uint8_t>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    armnn::IWorkloadFactory&,
+    const armnn::DataLayoutIndexed&);
+
+LayerTestResult<float,4> SimpleNormalizationAcrossTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     auto normMethod = armnn::NormalizationAlgorithmMethod::LocalBrightness;
     auto normChannel = armnn::NormalizationAlgorithmChannel::Across;
-    return SimpleNormalizationTestImpl(workloadFactory, normChannel, normMethod);
+    return SimpleNormalizationTestImpl(workloadFactory, memoryManager, normChannel, normMethod);
 }
 
-LayerTestResult<float,4> SimpleNormalizationWithinTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float,4> SimpleNormalizationWithinTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     auto normMethod = armnn::NormalizationAlgorithmMethod::LocalBrightness;
     auto normChannel = armnn::NormalizationAlgorithmChannel::Within;
-    return SimpleNormalizationTestImpl(workloadFactory, normChannel, normMethod);
+    return SimpleNormalizationTestImpl(workloadFactory, memoryManager, normChannel, normMethod);
 }
 
-LayerTestResult<float,4> SimpleNormalizationAcrossNhwcTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float,4> SimpleNormalizationAcrossNhwcTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     auto normMethod = armnn::NormalizationAlgorithmMethod::LocalBrightness;
     auto normChannel = armnn::NormalizationAlgorithmChannel::Across;
-    return SimpleNormalizationNhwcTestImpl(workloadFactory, normChannel, normMethod);
+    return SimpleNormalizationNhwcTestImpl(workloadFactory, memoryManager, normChannel, normMethod);
 }
 
-LayerTestResult<float,2> SimpleSoftmaxTest(armnn::IWorkloadFactory& workloadFactory, float beta)
+LayerTestResult<float,2> SimpleSoftmaxTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float beta)
 {
-    return SimpleSoftmaxTestImpl<float>(workloadFactory, beta);
+    return SimpleSoftmaxTestImpl<float>(workloadFactory, memoryManager, beta);
 }
 
-LayerTestResult<uint8_t,2> SimpleSoftmaxUint8Test(armnn::IWorkloadFactory& workloadFactory, float beta)
+LayerTestResult<uint8_t,2> SimpleSoftmaxUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float beta)
 {
-    return SimpleSoftmaxTestImpl<uint8_t>(workloadFactory, beta);
+    return SimpleSoftmaxTestImpl<uint8_t>(workloadFactory, memoryManager, beta);
 }
 
-LayerTestResult<float,4> CompareNormalizationTest(armnn::IWorkloadFactory& workloadFactory,
-                                                  armnn::IWorkloadFactory& refWorkloadFactory,
-                                                  armnn::NormalizationAlgorithmChannel normChannel,
-                                                  armnn::NormalizationAlgorithmMethod normMethod)
+LayerTestResult<float,4> CompareNormalizationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    armnn::NormalizationAlgorithmChannel normChannel,
+    armnn::NormalizationAlgorithmMethod normMethod)
 {
-    return CompareNormalizationTestImpl(workloadFactory, refWorkloadFactory, normChannel, normMethod);
+    return CompareNormalizationTestImpl(workloadFactory, memoryManager, refWorkloadFactory, normChannel, normMethod);
 }
 
-LayerTestResult<float,2> CompareSoftmaxTest(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<float,2> CompareSoftmaxTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
     float beta)
 {
-    return CompareSoftmaxTestImpl<float>(workloadFactory, refWorkloadFactory, beta);
+    return CompareSoftmaxTestImpl<float>(workloadFactory, memoryManager, refWorkloadFactory, beta);
 }
 
-LayerTestResult<uint8_t,2> CompareSoftmaxUint8Test(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<uint8_t,2> CompareSoftmaxUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
     float beta)
 {
-    return CompareSoftmaxTestImpl<uint8_t>(workloadFactory, refWorkloadFactory, beta);
+    return CompareSoftmaxTestImpl<uint8_t>(workloadFactory, memoryManager, refWorkloadFactory, beta);
 }
 
-std::vector<LayerTestResult<float,3>> SplitterTest(armnn::IWorkloadFactory& workloadFactory)
+std::vector<LayerTestResult<float,3>> SplitterTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SplitterTestCommon<float>(workloadFactory);
+    return SplitterTestCommon<float>(workloadFactory, memoryManager);
 }
 
-std::vector<LayerTestResult<uint8_t,3>> SplitterUint8Test(armnn::IWorkloadFactory& workloadFactory)
+std::vector<LayerTestResult<uint8_t,3>> SplitterUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SplitterTestCommon<uint8_t>(workloadFactory, 1.0f, 0);
+    return SplitterTestCommon<uint8_t>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
-LayerTestResult<float, 3> CopyViaSplitterTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> CopyViaSplitterTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return CopyViaSplitterTestImpl<float>(workloadFactory, 0.0f, 0);
+    return CopyViaSplitterTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<uint8_t, 3> CopyViaSplitterUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> CopyViaSplitterUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return CopyViaSplitterTestImpl<uint8_t>(workloadFactory, 1.0f, 0);
+    return CopyViaSplitterTestImpl<uint8_t>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<float, 2> LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest(
-        armnn::IWorkloadFactory& workloadFactory)
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     armnn::TensorInfo inputDesc({ 2, 2 }, armnn::GetDataType<float>());
     boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
@@ -799,11 +903,13 @@ LayerTestResult<float, 2> LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest(
     boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(outputDesc, std::vector<float>(
             {-0.36444446f, -0.00352185f, 0.12886585f, -0.05163646f,
              -0.42734814f, -0.00478661f,  0.13455015f, -0.03560682f}));
-    return LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(workloadFactory, input, expectedOutput);
+    return LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
+        workloadFactory, memoryManager, input, expectedOutput);
 }
 
 LayerTestResult<float, 2> LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest(
-        armnn::IWorkloadFactory& workloadFactory)
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     armnn::TensorInfo inputDesc({ 2, 5 }, armnn::GetDataType<float>());
     boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
@@ -819,10 +925,13 @@ LayerTestResult<float, 2> LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest(
              -0.0186926f,   0.0193662f,   -0.0115437f,  0.00422612f,  -0.0345232f,
              0.00223253f,   -0.00957321f, 0.0210624f,   0.013331f,    0.0150954f,
              0.02168f}));
-    return LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(workloadFactory, input, expectedOutput);
+    return LstmLayerFloat32NoCifgWithPeepholeWithProjectionTestImpl(
+        workloadFactory, memoryManager, input, expectedOutput);
 }
 
-LayerTestResult<float, 2> LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 2> LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     armnn::TensorInfo inputDesc({2, 2}, armnn::GetDataType<float>());
     boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
@@ -834,10 +943,13 @@ LayerTestResult<float, 2> LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(armnn
             {{-0.02973187f, 0.1229473f,   0.20885126f, -0.15358765f,
               -0.0185422f,   0.11281417f,  0.24466537f, -0.1826292f}}));
 
-    return LstmNoCifgNoPeepholeNoProjectionTestImpl(workloadFactory, input, expectedOutput);
+    return LstmNoCifgNoPeepholeNoProjectionTestImpl(
+        workloadFactory, memoryManager, input, expectedOutput);
 }
 
-LayerTestResult<float,3> MergerTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float,3> MergerTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -957,7 +1069,9 @@ LayerTestResult<float,3> MergerTest(armnn::IWorkloadFactory& workloadFactory)
     return ret;
 }
 
-LayerTestResult<float,4> AdditionTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float,4> AdditionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int batchSize = 2;
     unsigned int channels  = 2;
@@ -1047,7 +1161,9 @@ LayerTestResult<float,4> AdditionTest(armnn::IWorkloadFactory& workloadFactory)
 }
 
 template <typename T>
-LayerTestResult<T, 4> AdditionBroadcastTestImpl(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<T, 4> AdditionBroadcastTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
@@ -1123,7 +1239,9 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(armnn::IWorkloadFactory& workloa
 }
 
 template <typename T>
-LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
@@ -1193,28 +1311,38 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(armnn::IWorkloadFactory&
     return ret;
 }
 
-LayerTestResult<float, 4> AdditionBroadcastTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> AdditionBroadcastTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AdditionBroadcastTestImpl<float>(workloadFactory, 0.0f, 0);
+    return AdditionBroadcastTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> AdditionBroadcastUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> AdditionBroadcastUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AdditionBroadcastTestImpl<uint8_t>(workloadFactory, 2.f, 0);
+    return AdditionBroadcastTestImpl<uint8_t>(workloadFactory, memoryManager, 2.f, 0);
 }
 
-LayerTestResult<float, 4> AdditionBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> AdditionBroadcast1ElementTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AdditionBroadcast1ElementTestImpl<float>(workloadFactory, 0.0f, 0);
+    return AdditionBroadcast1ElementTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> AdditionBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> AdditionBroadcast1ElementUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AdditionBroadcast1ElementTestImpl<uint8_t>(workloadFactory, 0.1333333f, 128);
+    return AdditionBroadcast1ElementTestImpl<uint8_t>(workloadFactory, memoryManager, 0.1333333f, 128);
 }
 
-LayerTestResult<float,4> CompareAdditionTest(armnn::IWorkloadFactory& workloadFactory,
-                                             armnn::IWorkloadFactory& refWorkloadFactory)
+LayerTestResult<float,4> CompareAdditionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory)
 {
     unsigned int batchSize = 4;
     unsigned int channels  = 1;
@@ -1281,19 +1409,21 @@ LayerTestResult<float,4> CompareAdditionTest(armnn::IWorkloadFactory& workloadFa
 
 namespace {
 template <typename T>
-LayerTestResult<T, 4> DivisionTestHelper(armnn::IWorkloadFactory& workloadFactory,
-                                         const unsigned int shape0[4],
-                                         const std::vector<T>& values0,
-                                         float scale0,
-                                         int32_t offset0,
-                                         const unsigned int shape1[4],
-                                         const std::vector<T> & values1,
-                                         float scale1,
-                                         int32_t offset1,
-                                         const unsigned int outShape[4],
-                                         const std::vector<T> & outValues,
-                                         float outScale,
-                                         int32_t outOffset)
+LayerTestResult<T, 4> DivisionTestHelper(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const unsigned int shape0[4],
+    const std::vector<T>& values0,
+    float scale0,
+    int32_t offset0,
+    const unsigned int shape1[4],
+    const std::vector<T> & values1,
+    float scale1,
+    int32_t offset1,
+    const unsigned int outShape[4],
+    const std::vector<T> & outValues,
+    float outScale,
+    int32_t outOffset)
 {
     auto dataType = (std::is_same<T, uint8_t>::value ?
                      armnn::DataType::QuantisedAsymm8 :
@@ -1345,7 +1475,9 @@ LayerTestResult<T, 4> DivisionTestHelper(armnn::IWorkloadFactory& workloadFactor
 }
 } // anonymous namespace
 
-LayerTestResult<float,4> DivisionByZeroTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float,4> DivisionByZeroTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int width = 2;
     const unsigned int height = 2;
@@ -1367,12 +1499,15 @@ LayerTestResult<float,4> DivisionByZeroTest(armnn::IWorkloadFactory& workloadFac
                                -INFINITY, -INFINITY, INFINITY, INFINITY,  1, 1, 1, 1 });
 
     return DivisionTestHelper<float>(workloadFactory,
+                                     memoryManager,
                                      shape, input0, 1.0f, 0,
                                      shape, input1, 1.0f, 0,
                                      shape, output, 1.0f, 0);
 }
 
-LayerTestResult<float,4> DivisionTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float,4> DivisionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int width = 2;
     const unsigned int height = 2;
@@ -1395,12 +1530,15 @@ LayerTestResult<float,4> DivisionTest(armnn::IWorkloadFactory& workloadFactory)
 
 
     return DivisionTestHelper<float>(workloadFactory,
+                                     memoryManager,
                                      shape, input0, 1.0f, 0,
                                      shape, input1, 1.0f, 0,
                                      shape, output, 1.0f, 0);
 }
 
-LayerTestResult<float, 4> DivisionBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> DivisionBroadcast1ElementTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     std::vector<float> input0({ 2, 4, 6, 8, 10, 12, 14, 16});
@@ -1412,12 +1550,15 @@ LayerTestResult<float, 4> DivisionBroadcast1ElementTest(armnn::IWorkloadFactory&
 
 
     return DivisionTestHelper<float>(workloadFactory,
+                                     memoryManager,
                                      shape0, input0, 1.0f, 0,
                                      shape1, input1, 1.0f, 0,
                                      shape0, output, 1.0f, 0);
 }
 
-LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int shape0[] = { 1, 3, 3, 2 };
     std::vector<float> input0({
@@ -1434,13 +1575,16 @@ LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(armnn::IWorkloadFactory&
                                       13, 14,     15, 16,     17, 18});
 
     return DivisionTestHelper<float>(workloadFactory,
+                                     memoryManager,
                                      shape0, input0, 1.0f, 0,
                                      shape1, input1, 1.0f, 0,
                                      shape0, output, 1.0f, 0);
 }
 
 
-LayerTestResult<uint8_t,4> DivisionUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t,4> DivisionUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int width = 2;
     const unsigned int height = 2;
@@ -1460,12 +1604,15 @@ LayerTestResult<uint8_t,4> DivisionUint8Test(armnn::IWorkloadFactory& workloadFa
 
 
     return DivisionTestHelper<uint8_t>(workloadFactory,
-                                     shape, input0, 1.0f,  0,
-                                     shape, input1, 1.0f,  0,
-                                     shape, output, 0.25f, 0);
+                                       memoryManager,
+                                      shape, input0, 1.0f,  0,
+                                      shape, input1, 1.0f,  0,
+                                      shape, output, 0.25f, 0);
 }
 
-LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     std::vector<uint8_t> input0({ 2, 4, 6, 8, 10, 12, 14, 16});
@@ -1476,12 +1623,15 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(armnn::IWorkloadF
     std::vector<uint8_t> output({ 1, 2, 3, 4, 5, 6, 7, 8});
 
     return DivisionTestHelper<uint8_t>(workloadFactory,
-                                     shape0, input0, 1.0f, 0,
-                                     shape1, input1, 1.0f, 0,
-                                     shape0, output, 1.0f, 0);
+                                       memoryManager,
+                                       shape0, input0, 1.0f, 0,
+                                       shape1, input1, 1.0f, 0,
+                                       shape0, output, 1.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int shape0[] = { 1, 3, 3, 2 };
     std::vector<uint8_t> input0({1,   4,     3,  8,      5,  12,
@@ -1496,19 +1646,22 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(armnn::IWorkloadF
                                  13, 14,     15, 16,     17, 18});
 
     return DivisionTestHelper<uint8_t>(workloadFactory,
-                                     shape0, input0, 1.0f, 0,
-                                     shape1, input1, 1.0f, 0,
-                                     shape0, output, 1.0f, 0);
+                                       memoryManager,
+                                       shape0, input0, 1.0f, 0,
+                                       shape1, input1, 1.0f, 0,
+                                       shape0, output, 1.0f, 0);
 }
 
 namespace {
-LayerTestResult<float,4> MultiplicationTestHelper(armnn::IWorkloadFactory& workloadFactory,
-                                                  const unsigned int shape0[4],
-                                                  const std::vector<float> & values0,
-                                                  const unsigned int shape1[4],
-                                                  const std::vector<float> & values1,
-                                                  const unsigned int outShape[4],
-                                                  const std::vector<float> & outValues)
+LayerTestResult<float,4> MultiplicationTestHelper(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const unsigned int shape0[4],
+    const std::vector<float> & values0,
+    const unsigned int shape1[4],
+    const std::vector<float> & values1,
+    const unsigned int outShape[4],
+    const std::vector<float> & outValues)
 {
     const size_t dimensionCount = 4;
     armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, armnn::DataType::Float32};
@@ -1549,7 +1702,9 @@ LayerTestResult<float,4> MultiplicationTestHelper(armnn::IWorkloadFactory& workl
 } // anonymous namespace
 
 
-LayerTestResult<float,4> MultiplicationTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float,4> MultiplicationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int width = 2;
     const unsigned int height = 2;
@@ -1571,6 +1726,7 @@ LayerTestResult<float,4> MultiplicationTest(armnn::IWorkloadFactory& workloadFac
         12, 12, 12, 12,  20, 20, 20, 20 });
 
     return MultiplicationTestHelper(workloadFactory,
+                                    memoryManager,
                                     shape,
                                     input0,
                                     shape,
@@ -1579,7 +1735,9 @@ LayerTestResult<float,4> MultiplicationTest(armnn::IWorkloadFactory& workloadFac
                                     output);
 }
 
-LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int shape0[] = { 1, 2, 2, 2 };
     std::vector<float> input0({ 1, 2, 3, 4, 5, 6, 7, 8});
@@ -1590,6 +1748,7 @@ LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(armnn::IWorkloadFa
     std::vector<float> output({ 2, 4, 6, 8, 10, 12, 14, 16});
 
     return MultiplicationTestHelper(workloadFactory,
+                                    memoryManager,
                                     shape0,
                                     input0,
                                     shape1,
@@ -1598,7 +1757,9 @@ LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(armnn::IWorkloadFa
                                     output);
 }
 
-LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int shape0[] = { 1, 3, 3, 2 };
     std::vector<float> input0({
@@ -1615,6 +1776,7 @@ LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(armnn::IWorkloadFa
         13,  28,     15, 32,     17, 36});
 
     return MultiplicationTestHelper(workloadFactory,
+                                    memoryManager,
                                     shape0,
                                     input0,
                                     shape1,
@@ -1623,8 +1785,10 @@ LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(armnn::IWorkloadFa
                                     output);
 }
 
-LayerTestResult<float,4> CompareMultiplicationTest(armnn::IWorkloadFactory& workloadFactory,
-                                          armnn::IWorkloadFactory& refWorkloadFactory)
+LayerTestResult<float,4> CompareMultiplicationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory)
 {
     const unsigned int width = 16;
     const unsigned int height = 32;
@@ -1690,8 +1854,10 @@ LayerTestResult<float,4> CompareMultiplicationTest(armnn::IWorkloadFactory& work
     return comparisonResult;
 }
 
-LayerTestResult<float,4> CompareBatchNormTest(armnn::IWorkloadFactory& workloadFactory,
-                                     armnn::IWorkloadFactory& refWorkloadFactory)
+LayerTestResult<float,4> CompareBatchNormTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory)
 {
     const unsigned int width     = 2;
     const unsigned int height    = 3;
@@ -1772,6 +1938,7 @@ LayerTestResult<float,4> CompareBatchNormTest(armnn::IWorkloadFactory& workloadF
 template<typename T>
 void PermuteTensorData(
         armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::PermutationVector& mappings,
         armnn::TensorInfo & inputTensorInfo,
         const T * inputData,
@@ -1918,6 +2085,7 @@ void Generate3dPermuteVectorForConcat(
 template <typename T>
 void PermuteInputsForConcat(
         armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         std::vector<armnn::TensorInfo> & inputTensorInfos,
         std::vector<T *> & inputData,
         std::vector<std::vector<T>> & inputDataStorage,
@@ -1958,6 +2126,7 @@ void PermuteInputsForConcat(
         newTensorInfo.SetShape(ExpandTensorShapeTo3dForPermute(tensorInfo.GetShape()));
 
         PermuteTensorData<T>(workloadFactory,
+                             memoryManager,
                              permutations.first,
                              newTensorInfo,
                              inputData[nthInput],
@@ -1984,6 +2153,7 @@ void PermuteInputsForConcat(
 template <typename T>
 void PermuteOutputForConcat(
         armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::TensorInfo & tensorInfo,
         const armnn::PermutationVector & permuteVector,
         std::unique_ptr<armnn::ITensorHandle> && inputDataHandle,
@@ -2005,6 +2175,7 @@ void PermuteOutputForConcat(
     CopyDataFromITensorHandle(&inputData[0], inputDataHandle.get());
 
     PermuteTensorData<T>(workloadFactory,
+                         memoryManager,
                          permuteVector,
                          resultTensorInfo,
                          &inputData[0],
@@ -2014,12 +2185,14 @@ void PermuteOutputForConcat(
 }
 
 template <typename T>
-void Concatenate(armnn::IWorkloadFactory& workloadFactory,
-                 std::initializer_list<const armnn::TensorInfo> inputTensorInfosOrig,
-                 std::initializer_list<T *> inputsOrig,
-                 const armnn::TensorInfo& outputTensorInfoOrig,
-                 T * output,
-                 unsigned int concatDim)
+void Concatenate(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    std::initializer_list<const armnn::TensorInfo> inputTensorInfosOrig,
+    std::initializer_list<T *> inputsOrig,
+    const armnn::TensorInfo& outputTensorInfoOrig,
+    T * output,
+    unsigned int concatDim)
 {
     BOOST_ASSERT_MSG(output != nullptr, "output must not be null");
     if (output == nullptr)
@@ -2053,6 +2226,7 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
         // the requested axis is not supported.
         //
         PermuteInputsForConcat<T>(workloadFactory,
+                                  memoryManager,
                                   inputTensorInfos,
                                   inputs,
                                   tmpInputDataStorage,
@@ -2118,6 +2292,7 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
     if (needPermuteForConcat)
     {
         PermuteOutputForConcat<T>(workloadFactory,
+                                  memoryManager,
                                   outputTensorInfo,
                                   permuteVector,
                                   std::move(outputHandle),
@@ -2130,7 +2305,11 @@ void Concatenate(armnn::IWorkloadFactory& workloadFactory,
 }
 
 template <typename T>
-LayerTestResult<T, 1> Concatenation1dTestImpl(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
+LayerTestResult<T, 1> Concatenation1dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
     armnn::TensorInfo inputTensorInfo({ 3 }, armnn::GetDataType<T>());
 
@@ -2144,7 +2323,7 @@ LayerTestResult<T, 1> Concatenation1dTestImpl(armnn::IWorkloadFactory& workloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory,
+    Concatenate<T>(workloadFactory, memoryManager,
         { inputTensorInfo, inputTensorInfo, inputTensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2159,13 +2338,17 @@ LayerTestResult<T, 1> Concatenation1dTestImpl(armnn::IWorkloadFactory& workloadF
     return result;
 }
 
-LayerTestResult<float, 1> Concatenation1dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 1> Concatenation1dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation1dTestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation1dTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 2> Concatenation2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<T, 2> Concatenation2dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::TensorInfo& outputTensorInfo,
     unsigned int dimension,
     const float qScale,
@@ -2201,7 +2384,7 @@ LayerTestResult<T, 2> Concatenation2dTestImpl(armnn::IWorkloadFactory& workloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory,
+    Concatenate<T>(workloadFactory, memoryManager,
         { inputTensorInfo, inputTensorInfo, inputTensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2213,12 +2396,16 @@ LayerTestResult<T, 2> Concatenation2dTestImpl(armnn::IWorkloadFactory& workloadF
 }
 
 template <typename T>
-LayerTestResult<T, 2> Concatenation2dDim0TestImpl(armnn::IWorkloadFactory& workloadFactory,
-    float qScale, int32_t qOffset)
+LayerTestResult<T, 2> Concatenation2dDim0TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
     armnn::TensorInfo outputTensorInfo({ 6, 3 }, armnn::GetDataType<T>());
 
-    LayerTestResult<T, 2> result = Concatenation2dTestImpl<T>(workloadFactory, outputTensorInfo, 0, qScale, qOffset);
+    LayerTestResult<T, 2> result =
+        Concatenation2dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 0, qScale, qOffset);
     result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0
         1.0f, 2.0f, 3.0f,
@@ -2242,18 +2429,24 @@ LayerTestResult<T, 2> Concatenation2dDim0TestImpl(armnn::IWorkloadFactory& workl
     return result;
 }
 
-LayerTestResult<float, 2> Concatenation2dDim0Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 2> Concatenation2dDim0Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation2dDim0TestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation2dDim0TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 2> Concatenation2dDim1TestImpl(armnn::IWorkloadFactory& workloadFactory,
-    float qScale, int32_t qOffset)
+LayerTestResult<T, 2> Concatenation2dDim1TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
     armnn::TensorInfo outputTensorInfo({ 2, 9 }, armnn::GetDataType<T>());
 
-    LayerTestResult<T, 2> result = Concatenation2dTestImpl<T>(workloadFactory, outputTensorInfo, 1, qScale, qOffset);
+    LayerTestResult<T, 2> result =
+        Concatenation2dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 1, qScale, qOffset);
     result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0
         1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f,
@@ -2265,13 +2458,18 @@ LayerTestResult<T, 2> Concatenation2dDim1TestImpl(armnn::IWorkloadFactory& workl
     return result;
 }
 
-LayerTestResult<float, 2> Concatenation2dDim1Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 2> Concatenation2dDim1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation2dDim1TestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation2dDim1TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(armnn::IWorkloadFactory& workloadFactory, float qScale,
+LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
     int32_t qOffset)
 {
     armnn::TensorInfo input0TensorInfo({ 2, 3 }, armnn::GetDataType<T>());
@@ -2306,7 +2504,7 @@ LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory,
+    Concatenate<T>(workloadFactory, memoryManager,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2337,13 +2535,18 @@ LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(armnn::IWorkloadF
     return result;
 }
 
-LayerTestResult<float, 2> Concatenation2dDim0DiffInputDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 2> Concatenation2dDim0DiffInputDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation2dDim0DiffInputDimsTestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation2dDim0DiffInputDimsTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(armnn::IWorkloadFactory& workloadFactory, float qScale,
+LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
     int32_t qOffset)
 {
     armnn::TensorInfo input0TensorInfo({ 2, 3 }, armnn::GetDataType<T>());
@@ -2378,7 +2581,7 @@ LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory,
+    Concatenate<T>(workloadFactory, memoryManager,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2397,13 +2600,17 @@ LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(armnn::IWorkloadF
     return result;
 }
 
-LayerTestResult<float, 2> Concatenation2dDim1DiffInputDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 2> Concatenation2dDim1DiffInputDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation2dDim1DiffInputDimsTestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation2dDim1DiffInputDimsTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 3> Concatenation3dTestImpl(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<T, 3> Concatenation3dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::TensorInfo& outputTensorInfo,
     unsigned int dimension,
     float qScale,
@@ -2475,7 +2682,7 @@ LayerTestResult<T, 3> Concatenation3dTestImpl(armnn::IWorkloadFactory& workloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory,
+    Concatenate<T>(workloadFactory, memoryManager,
         { inputTensorInfo, inputTensorInfo, inputTensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2487,13 +2694,16 @@ LayerTestResult<T, 3> Concatenation3dTestImpl(armnn::IWorkloadFactory& workloadF
 }
 
 template <typename T>
-LayerTestResult<T, 3> Concatenation3dDim0TestImpl(armnn::IWorkloadFactory& workloadFactory, float qScale,
+LayerTestResult<T, 3> Concatenation3dDim0TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
     int32_t qOffset)
 {
     armnn::TensorInfo outputTensorInfo({ 6, 3, 2 }, armnn::GetDataType<T>());
 
-    LayerTestResult<T, 3> result = Concatenation3dTestImpl<T>(workloadFactory, outputTensorInfo, 0,
-        qScale, qOffset);
+    LayerTestResult<T, 3> result =
+        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 0, qScale, qOffset);
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         1.0f, 2.0f,
@@ -2552,18 +2762,24 @@ LayerTestResult<T, 3> Concatenation3dDim0TestImpl(armnn::IWorkloadFactory& workl
     return result;
 }
 
-LayerTestResult<float, 3> Concatenation3dDim0Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> Concatenation3dDim0Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim0TestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation3dDim0TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 3> Concatenation3dDim1TestImpl(armnn::IWorkloadFactory& workloadFactory,
-    float qScale, int32_t qOffset)
+LayerTestResult<T, 3> Concatenation3dDim1TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
     armnn::TensorInfo outputTensorInfo({ 2, 9, 2 }, armnn::GetDataType<T>());
 
-    LayerTestResult<T, 3> result = Concatenation3dTestImpl<T>(workloadFactory, outputTensorInfo, 1, qScale, qOffset);
+    LayerTestResult<T, 3> result =
+        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 1, qScale, qOffset);
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         1.0f, 2.0f,
@@ -2623,18 +2839,24 @@ LayerTestResult<T, 3> Concatenation3dDim1TestImpl(armnn::IWorkloadFactory& workl
     return result;
 }
 
-LayerTestResult<float, 3> Concatenation3dDim1Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> Concatenation3dDim1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim1TestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation3dDim1TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 3> Concatenation3dDim2TestImpl(armnn::IWorkloadFactory& workloadFactory,
-    float qScale, int32_t qOffset)
+LayerTestResult<T, 3> Concatenation3dDim2TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
     armnn::TensorInfo outputTensorInfo({ 2, 3, 6 }, armnn::GetDataType<T>());
 
-    LayerTestResult<T, 3> result = Concatenation3dTestImpl<T>(workloadFactory, outputTensorInfo, 2, qScale, qOffset);
+    LayerTestResult<T, 3> result =
+        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 2, qScale, qOffset);
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         1.0f, 2.0f, 7.0f, 8.0f, 13.0f, 14.0f,
@@ -2658,13 +2880,18 @@ LayerTestResult<T, 3> Concatenation3dDim2TestImpl(armnn::IWorkloadFactory& workl
     return result;
 }
 
-LayerTestResult<float, 3> Concatenation3dDim2Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> Concatenation3dDim2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim2TestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation3dDim2TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 3> Concatenation3dDim0DiffInputDimsTestImpl(armnn::IWorkloadFactory& workloadFactory, float qScale,
+LayerTestResult<T, 3> Concatenation3dDim0DiffInputDimsTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
     int32_t qOffset)
 {
     armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, armnn::GetDataType<T>());
@@ -2735,7 +2962,7 @@ LayerTestResult<T, 3> Concatenation3dDim0DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory,
+    Concatenate<T>(workloadFactory, memoryManager,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2802,13 +3029,18 @@ LayerTestResult<T, 3> Concatenation3dDim0DiffInputDimsTestImpl(armnn::IWorkloadF
     return result;
 }
 
-LayerTestResult<float, 3> Concatenation3dDim0DiffInputDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> Concatenation3dDim0DiffInputDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim0DiffInputDimsTestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation3dDim0DiffInputDimsTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(armnn::IWorkloadFactory& workloadFactory, float qScale,
+LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
     int32_t qOffset)
 {
     armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, armnn::GetDataType<T>());
@@ -2873,7 +3105,7 @@ LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory,
+    Concatenate<T>(workloadFactory, memoryManager,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -2934,13 +3166,18 @@ LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(armnn::IWorkloadF
     return result;
 }
 
-LayerTestResult<float, 3> Concatenation3dDim1DiffInputDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> Concatenation3dDim1DiffInputDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim1DiffInputDimsTestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation3dDim1DiffInputDimsTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template <typename T>
-LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(armnn::IWorkloadFactory& workloadFactory, float qScale,
+LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
     int32_t qOffset)
 {
     armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, armnn::GetDataType<T>());
@@ -3011,7 +3248,7 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(armnn::IWorkloadF
 
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory,
+    Concatenate<T>(workloadFactory, memoryManager,
         { input0TensorInfo, input1TensorInfo, input2TensorInfo },
         { input0.data(), input1.data(), input2.data() },
         outputTensorInfo,
@@ -3042,13 +3279,17 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(armnn::IWorkloadF
     return result;
 }
 
-LayerTestResult<float, 3> Concatenation3dDim2DiffInputDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> Concatenation3dDim2DiffInputDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim2DiffInputDimsTestImpl<float>(workloadFactory, 0.0f, 0);
+    return Concatenation3dDim2DiffInputDimsTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<float, 4> ResizeBilinearNopTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
     const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
     const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
@@ -3099,8 +3340,10 @@ LayerTestResult<float, 4> ResizeBilinearNopTest(armnn::IWorkloadFactory& workloa
     return result;
 }
 
-LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& workloadFactory,
-                                                   const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<float, 4> SimpleResizeBilinearTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
     const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 2, 2, dataLayout);
     const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 1, 1, dataLayout);
@@ -3163,8 +3406,10 @@ LayerTestResult<float, 4> SimpleResizeBilinearTest(armnn::IWorkloadFactory& work
     return result;
 }
 
-LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workloadFactory,
-                                                  const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<float, 4> ResizeBilinearSqMinTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
     const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
     const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 2, 2, dataLayout);
@@ -3227,8 +3472,10 @@ LayerTestResult<float, 4> ResizeBilinearSqMinTest(armnn::IWorkloadFactory& workl
     return result;
 }
 
-LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<float, 4> ResizeBilinearMinTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
     const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 3, 5, dataLayout);
     const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 2, 3, dataLayout);
@@ -3289,8 +3536,10 @@ LayerTestResult<float, 4> ResizeBilinearMinTest(armnn::IWorkloadFactory& workloa
     return result;
 }
 
-LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<float, 4> ResizeBilinearMagTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
     const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 3, 2, dataLayout);
     const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 3, 5, dataLayout);
@@ -3353,7 +3602,9 @@ LayerTestResult<float, 4> ResizeBilinearMagTest(armnn::IWorkloadFactory& workloa
     return result;
 }
 
-LayerTestResult<float, 2> FakeQuantizationTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 2> FakeQuantizationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     constexpr unsigned int width = 2;
     constexpr unsigned int height = 3;
@@ -3410,11 +3661,13 @@ LayerTestResult<float, 2> FakeQuantizationTest(armnn::IWorkloadFactory& workload
 namespace
 {
 
-LayerTestResult<float, 4> L2NormalizationTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                                  const armnn::TensorShape& inputOutputTensorShape,
-                                                  const std::vector<float>& inputValues,
-                                                  const std::vector<float>& expectedOutputValues,
-                                                  const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> L2NormalizationTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::TensorShape& inputOutputTensorShape,
+    const std::vector<float>& inputValues,
+    const std::vector<float>& expectedOutputValues,
+    const armnn::DataLayoutIndexed& layout)
 {
     const armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, armnn::DataType::Float32);
     const armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, armnn::DataType::Float32);
@@ -3458,9 +3711,7 @@ LayerTestResult<float, 4> L2NormalizationTestImpl(armnn::IWorkloadFactory& workl
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
 
-    workloadFactory.Acquire();
-    workload->Execute();
-    workloadFactory.Release();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
 
@@ -3477,7 +3728,11 @@ float CalcInvL2Norm(std::initializer_list<float> elements)
 } // anonymous namespace
 
 template<typename T>
-LayerTestResult<T, 2> Pad2dTestCommon(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
+LayerTestResult<T, 2> Pad2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
   const armnn::TensorShape inputShape{ 3, 3 };
   const armnn::TensorShape outputShape{ 7, 7 };
@@ -3541,7 +3796,11 @@ LayerTestResult<T, 2> Pad2dTestCommon(armnn::IWorkloadFactory& workloadFactory, 
 }
 
 template <typename T>
-LayerTestResult<T, 3> Pad3dTestCommon(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
+LayerTestResult<T, 3> Pad3dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
     const armnn::TensorShape inputShape{ 2, 2, 2 };
     const armnn::TensorShape outputShape{ 3, 5, 6 };
@@ -3621,7 +3880,11 @@ LayerTestResult<T, 3> Pad3dTestCommon(armnn::IWorkloadFactory& workloadFactory, 
 }
 
 template <typename T>
-LayerTestResult<T, 4> Pad4dTestCommon(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
+LayerTestResult<T, 4> Pad4dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
 {
     const armnn::TensorShape inputShape{ 2, 2, 3, 2 };
     const armnn::TensorShape outputShape{ 4, 5, 7, 4 };
@@ -3853,38 +4116,52 @@ LayerTestResult<T, 4> Pad4dTestCommon(armnn::IWorkloadFactory& workloadFactory, 
     return result;
 }
 
-LayerTestResult<uint8_t, 2> PadUint82dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 2> PadUint82dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad2dTestCommon<uint8_t>(workloadFactory, 1.0f, 0);
+  return Pad2dTestCommon<uint8_t>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
-LayerTestResult<uint8_t, 3> PadUint83dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> PadUint83dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad3dTestCommon<uint8_t>(workloadFactory, 1.0f, 0);
+  return Pad3dTestCommon<uint8_t>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> PadUint84dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> PadUint84dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad4dTestCommon<uint8_t>(workloadFactory, 1.0f, 0);
+  return Pad4dTestCommon<uint8_t>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
-LayerTestResult<float, 2> PadFloat322dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 2> PadFloat322dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad2dTestCommon<float>(workloadFactory, 0.0f, 0);
+  return Pad2dTestCommon<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<float, 3> PadFloat323dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> PadFloat323dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad3dTestCommon<float>(workloadFactory, 0.0f, 0);
+  return Pad3dTestCommon<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<float, 4> PadFloat324dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> PadFloat324dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad4dTestCommon<float>(workloadFactory, 0.0f, 0);
+  return Pad4dTestCommon<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<float, 4> L2Normalization1dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> L2Normalization1dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& layout)
 {
     // Width: 1
     // Height: 1
@@ -3946,12 +4223,15 @@ LayerTestResult<float, 4> L2Normalization1dTest(armnn::IWorkloadFactory& workloa
         10.0f * approxInvL2Norm
     };
 
-    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+
+    return L2NormalizationTestImpl(workloadFactory, memoryManager, inputOutputShape,
                                    inputValues, expectedOutputValues, layout);
 }
 
-LayerTestResult<float, 4> L2Normalization2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> L2Normalization2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& layout)
 {
     // Width: 5
     // Height: 1
@@ -3989,12 +4269,14 @@ LayerTestResult<float, 4> L2Normalization2dTest(armnn::IWorkloadFactory& workloa
         10.0f * CalcInvL2Norm({ 9.0f, 10.0f })
     };
 
-    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+    return L2NormalizationTestImpl(workloadFactory, memoryManager, inputOutputShape,
                                    inputValues, expectedOutputValues, layout);
 }
 
-LayerTestResult<float, 4> L2Normalization3dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> L2Normalization3dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& layout)
 {
     // Width: 3
     // Height: 4
@@ -4052,14 +4334,16 @@ LayerTestResult<float, 4> L2Normalization3dTest(armnn::IWorkloadFactory& workloa
         161.0f * CalcInvL2Norm({ 220.0f, 161.0f })
     };
 
-    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+    return L2NormalizationTestImpl(workloadFactory, memoryManager, inputOutputShape,
                                    inputValues, expectedOutputValues, layout);
 }
 
-LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::DataLayoutIndexed& layout)
+LayerTestResult<float, 4> L2Normalization4dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& layout)
 {
-    // Width: 3
+        // Width: 3
     // Height: 4
     // Channels: 3
     // BatchSize: 2
@@ -4195,12 +4479,14 @@ LayerTestResult<float, 4> L2Normalization4dTest(armnn::IWorkloadFactory& workloa
          88.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f })
     };
 
-    return L2NormalizationTestImpl(workloadFactory, inputOutputShape,
+    return L2NormalizationTestImpl(workloadFactory, memoryManager, inputOutputShape,
                                    inputValues, expectedOutputValues, layout);
 }
 
 template <typename T>
-LayerTestResult<T, 4> ConstantTestImpl(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<T, 4> ConstantTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
@@ -4292,17 +4578,23 @@ LayerTestResult<T, 4> ConstantTestImpl(armnn::IWorkloadFactory& workloadFactory,
     return result;
 }
 
-LayerTestResult<float, 4> ConstantTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> ConstantTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantTestImpl<float>(workloadFactory, 0.0f, 0);
+    return ConstantTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> ConstantTestUint8(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> ConstantTestUint8(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantTestImpl<uint8_t>(workloadFactory, 1.0f, 0);
+    return ConstantTestImpl<uint8_t>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
-LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> MergerUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -4435,7 +4727,9 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(armnn::IWorkloadFactory& workloadFac
     return ret;
 }
 
-LayerTestResult<uint8_t, 4> AdditionUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> AdditionUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int batchSize = 1;
     unsigned int channels = 2;
@@ -4511,19 +4805,21 @@ LayerTestResult<uint8_t, 4> AdditionUint8Test(armnn::IWorkloadFactory& workloadF
 
 namespace
 {
-LayerTestResult<uint8_t, 4> MultiplicationUint8TestHelper(armnn::IWorkloadFactory& workloadFactory,
-                                                          const unsigned int shape0[4],
-                                                          const std::vector<uint8_t> & values0,
-                                                          float scale0,
-                                                          int32_t offset0,
-                                                          const unsigned int shape1[4],
-                                                          const std::vector<uint8_t> & values1,
-                                                          float scale1,
-                                                          int32_t offset1,
-                                                          const unsigned int outShape[4],
-                                                          const std::vector<uint8_t> & outValues,
-                                                          float outScale,
-                                                          int32_t outOffset)
+LayerTestResult<uint8_t, 4> MultiplicationUint8TestHelper(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const unsigned int shape0[4],
+    const std::vector<uint8_t> & values0,
+    float scale0,
+    int32_t offset0,
+    const unsigned int shape1[4],
+    const std::vector<uint8_t> & values1,
+    float scale1,
+    int32_t offset1,
+    const unsigned int outShape[4],
+    const std::vector<uint8_t> & outValues,
+    float outScale,
+    int32_t outOffset)
 {
     armnn::TensorInfo inputTensorInfo0(4, shape0, armnn::DataType::QuantisedAsymm8);
     armnn::TensorInfo inputTensorInfo1(4, shape1, armnn::DataType::QuantisedAsymm8);
@@ -4571,7 +4867,9 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8TestHelper(armnn::IWorkloadFactor
 }
 } // anonymous namespace
 
-LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> MultiplicationUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int batchSize = 1;
     unsigned int channels = 2;
@@ -4599,6 +4897,7 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& wor
     });
 
     return MultiplicationUint8TestHelper(workloadFactory,
+                                         memoryManager,
                                          shape,
                                          input0,
                                          4.0f,
@@ -4613,7 +4912,9 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8Test(armnn::IWorkloadFactory& wor
                                          -5);
 }
 
-LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -4631,6 +4932,7 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(armnn::IWor
     });
 
     return MultiplicationUint8TestHelper(workloadFactory,
+                                         memoryManager,
                                          shape0,
                                          input0,
                                          1.0f,
@@ -4645,7 +4947,9 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(armnn::IWor
                                          0);
 }
 
-LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
@@ -4663,6 +4967,7 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(armnn::IWor
     });
 
     return MultiplicationUint8TestHelper(workloadFactory,
+                                         memoryManager,
                                          shape0,
                                          input0,
                                          1.0f,
@@ -4680,19 +4985,21 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(armnn::IWor
 namespace
 {
 template <typename T>
-LayerTestResult<T, 4> SubtractionTestHelper(armnn::IWorkloadFactory& workloadFactory,
-                                            const unsigned int shape0[4],
-                                            const std::vector<T>& values0,
-                                            float scale0,
-                                            int32_t offset0,
-                                            const unsigned int shape1[4],
-                                            const std::vector<T> & values1,
-                                            float scale1,
-                                            int32_t offset1,
-                                            const unsigned int outShape[4],
-                                            const std::vector<T> & outValues,
-                                            float outScale,
-                                            int32_t outOffset)
+LayerTestResult<T, 4> SubtractionTestHelper(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const unsigned int shape0[4],
+    const std::vector<T>& values0,
+    float scale0,
+    int32_t offset0,
+    const unsigned int shape1[4],
+    const std::vector<T> & values1,
+    float scale1,
+    int32_t offset1,
+    const unsigned int outShape[4],
+    const std::vector<T> & outValues,
+    float outScale,
+    int32_t outOffset)
 {
     auto dataType = (std::is_same<T, uint8_t>::value ?
                      armnn::DataType::QuantisedAsymm8 :
@@ -4744,7 +5051,9 @@ LayerTestResult<T, 4> SubtractionTestHelper(armnn::IWorkloadFactory& workloadFac
 }
 } // anonymous namespace
 
-LayerTestResult<uint8_t, 4> SubtractionUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SubtractionUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 2, 2 };
@@ -4754,12 +5063,15 @@ LayerTestResult<uint8_t, 4> SubtractionUint8Test(armnn::IWorkloadFactory& worklo
     std::vector<uint8_t> output({ 3, 3, 5, 5 });
 
     return SubtractionTestHelper(workloadFactory,
+                                 memoryManager,
                                  shape0, input0, 0.5f, 2,
                                  shape1, input1, 1.0f, 0,
                                  shape0, output, 1.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -4769,12 +5081,15 @@ LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(armnn::IWorklo
     std::vector<uint8_t> output({ 5, 6, 7, 8 });
 
     return SubtractionTestHelper(workloadFactory,
+                                 memoryManager,
                                  shape0, input0, 0.5f, 2,
                                  shape1, input1, 1.0f, 0,
                                  shape0, output, 1.0f, 3);
 }
 
-LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 2, 1 };
@@ -4784,12 +5099,15 @@ LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(armnn::IWorkloadFactor
     std::vector<uint8_t> output({ 8, 11, 12, 15 });
 
     return SubtractionTestHelper(workloadFactory,
+                                 memoryManager,
                                  shape0, input0, 1.0f, 0,
                                  shape1, input1, 1.0f, 0,
                                  shape0, output, 1.0f, 0);
 }
 
-LayerTestResult<float, 4> SubtractionTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SubtractionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 2, 2 };
@@ -4799,12 +5117,15 @@ LayerTestResult<float, 4> SubtractionTest(armnn::IWorkloadFactory& workloadFacto
     std::vector<float> output({ 0,  3, 3, 2 });
 
     return SubtractionTestHelper(workloadFactory,
+                                 memoryManager,
                                  shape0, input0, 1.0f, 0,
                                  shape1, input1, 1.0f, 0,
                                  shape0, output, 1.0f, 0);
 }
 
-LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 1, 1 };
@@ -4814,12 +5135,15 @@ LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(armnn::IWorkloadFacto
     std::vector<float> output({ -9,  -8, -7, -6 });
 
     return SubtractionTestHelper(workloadFactory,
+                                 memoryManager,
                                  shape0, input0, 1.0f, 0,
                                  shape1, input1, 1.0f, 0,
                                  shape0, output, 1.0f, 0);
 }
 
-LayerTestResult<float, 4> SubtractionBroadcastTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SubtractionBroadcastTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int shape0[] = { 1, 1, 2, 2 };
     const unsigned int shape1[] = { 1, 1, 1, 2 };
@@ -4829,12 +5153,15 @@ LayerTestResult<float, 4> SubtractionBroadcastTest(armnn::IWorkloadFactory& work
     std::vector<float> output({ -9,  7, -7, 9 });
 
     return SubtractionTestHelper(workloadFactory,
+                                 memoryManager,
                                  shape0, input0, 1.0f, 0,
                                  shape1, input1, 1.0f, 0,
                                  shape0, output, 1.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     constexpr unsigned int inputWidth = 4;
     constexpr unsigned int inputHeight = 4;
@@ -4886,7 +5213,9 @@ LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(armnn::IWorkloadFactory& 
     return result;
 }
 
-LayerTestResult<uint8_t, 4> SimpleResizeBilinearUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SimpleResizeBilinearUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     constexpr unsigned int inputWidth = 2;
     constexpr unsigned int inputHeight = 2;
@@ -4943,7 +5272,9 @@ LayerTestResult<uint8_t, 4> SimpleResizeBilinearUint8Test(armnn::IWorkloadFactor
     return result;
 }
 
-LayerTestResult<uint8_t, 4> ResizeBilinearSqMinUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> ResizeBilinearSqMinUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     constexpr unsigned int inputWidth = 4;
     constexpr unsigned int inputHeight = 4;
@@ -4998,7 +5329,9 @@ LayerTestResult<uint8_t, 4> ResizeBilinearSqMinUint8Test(armnn::IWorkloadFactory
     return result;
 }
 
-LayerTestResult<uint8_t, 4> ResizeBilinearMinUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> ResizeBilinearMinUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     constexpr unsigned int inputWidth = 3;
     constexpr unsigned int inputHeight = 2;
@@ -5051,7 +5384,9 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMinUint8Test(armnn::IWorkloadFactory& 
     return result;
 }
 
-LayerTestResult<uint8_t, 4> ResizeBilinearMagUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> ResizeBilinearMagUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     constexpr unsigned int inputWidth = 2;
     constexpr unsigned int inputHeight = 3;
@@ -5106,7 +5441,9 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMagUint8Test(armnn::IWorkloadFactory& 
     return result;
 }
 
-LayerTestResult<float, 4> BatchNormTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> BatchNormTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     // BatchSize: 1
     // Channels: 2
@@ -5139,11 +5476,14 @@ LayerTestResult<float, 4> BatchNormTest(armnn::IWorkloadFactory& workloadFactory
         2.f, 4.f
     };
 
-    return BatchNormTestImpl<float>(workloadFactory, inputOutputShape, inputValues, expectedOutputValues,
+    return BatchNormTestImpl<float>(workloadFactory, memoryManager,
+                                    inputOutputShape, inputValues, expectedOutputValues,
                                     0.f, 0, armnn::DataLayout::NCHW);
 }
 
-LayerTestResult<float, 4> BatchNormNhwcTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> BatchNormNhwcTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     // BatchSize: 1
     // Height: 3
@@ -5180,11 +5520,14 @@ LayerTestResult<float, 4> BatchNormNhwcTest(armnn::IWorkloadFactory& workloadFac
         6.f, 4.f
     };
 
-    return BatchNormTestImpl<float>(workloadFactory, inputOutputShape, inputValues, expectedOutputValues,
+    return BatchNormTestImpl<float>(workloadFactory, memoryManager,
+                                    inputOutputShape, inputValues, expectedOutputValues,
                                     0.f, 0, armnn::DataLayout::NHWC);
 }
 
-LayerTestResult<uint8_t, 4> BatchNormUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> BatchNormUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     // BatchSize: 1
     // Channels: 2
@@ -5217,11 +5560,14 @@ LayerTestResult<uint8_t, 4> BatchNormUint8Test(armnn::IWorkloadFactory& workload
         2.f, 4.f
     };
 
-    return BatchNormTestImpl<uint8_t>(workloadFactory, inputOutputShape, inputValues, expectedOutputValues,
+    return BatchNormTestImpl<uint8_t>(workloadFactory, memoryManager,
+                                      inputOutputShape, inputValues, expectedOutputValues,
                                       1.f/20.f, 50, armnn::DataLayout::NCHW);
 }
 
-LayerTestResult<uint8_t, 4> BatchNormUint8NhwcTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> BatchNormUint8NhwcTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     // BatchSize: 1
     // Height: 3
@@ -5258,335 +5604,461 @@ LayerTestResult<uint8_t, 4> BatchNormUint8NhwcTest(armnn::IWorkloadFactory& work
         6.f, 4.f
     };
 
-    return BatchNormTestImpl<uint8_t>(workloadFactory, inputOutputShape, inputValues, expectedOutputValues,
+    return BatchNormTestImpl<uint8_t>(workloadFactory, memoryManager,
+                                      inputOutputShape, inputValues, expectedOutputValues,
                                       1.f/20.f, 50, armnn::DataLayout::NHWC);
 }
 
-LayerTestResult<uint8_t, 4> ConstantUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> ConstantUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return ConstantTestImpl<uint8_t>(workloadFactory, 2e-6f, 1);
+    return ConstantTestImpl<uint8_t>(workloadFactory, memoryManager, 2e-6f, 1);
 }
 
-LayerTestResult<uint8_t, 1> Concatenation1dUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 1> Concatenation1dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation1dTestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation1dTestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 2> Concatenation2dDim0Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 2> Concatenation2dDim0Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation2dDim0TestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation2dDim0TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 2> Concatenation2dDim1Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 2> Concatenation2dDim1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation2dDim1TestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation2dDim1TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 2> Concatenation2dDim0DiffInputDimsUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 2> Concatenation2dDim0DiffInputDimsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation2dDim0DiffInputDimsTestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation2dDim0DiffInputDimsTestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 2> Concatenation2dDim1DiffInputDimsUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 2> Concatenation2dDim1DiffInputDimsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation2dDim1DiffInputDimsTestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation2dDim1DiffInputDimsTestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 3> Concatenation3dDim0Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> Concatenation3dDim0Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim0TestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation3dDim0TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 3> Concatenation3dDim1Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> Concatenation3dDim1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim1TestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation3dDim1TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 3> Concatenation3dDim2Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> Concatenation3dDim2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim2TestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation3dDim2TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 3> Concatenation3dDim0DiffInputDimsUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> Concatenation3dDim0DiffInputDimsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim0TestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation3dDim0TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 3> Concatenation3dDim1DiffInputDimsUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> Concatenation3dDim1DiffInputDimsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim1DiffInputDimsTestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation3dDim1DiffInputDimsTestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<uint8_t, 3> Concatenation3dDim2DiffInputDimsUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> Concatenation3dDim2DiffInputDimsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim2DiffInputDimsTestImpl<uint8_t>(workloadFactory, 0.5f, -1);
+    return Concatenation3dDim2DiffInputDimsTestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
-LayerTestResult<float, 4> SimpleMaxPooling2dSize2x2Stride2x2Test(armnn::IWorkloadFactory& workloadFactory,
-                                                                 bool forceNoPadding)
+LayerTestResult<float, 4> SimpleMaxPooling2dSize2x2Stride2x2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool forceNoPadding)
 {
-    return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<float>(workloadFactory, forceNoPadding);
+    return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<float>(workloadFactory, memoryManager, forceNoPadding);
 }
 
-LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize2x2Stride2x2Uint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                                        bool forceNoPadding)
+LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize2x2Stride2x2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool forceNoPadding)
 {
-    return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<uint8_t>(workloadFactory, forceNoPadding, 3.0f, -5);
+    return SimpleMaxPooling2dSize2x2Stride2x2TestCommon<uint8_t>(
+        workloadFactory, memoryManager, forceNoPadding, 3.0f, -5);
 }
 
-LayerTestResult<float, 4> SimpleMaxPooling2dSize3x3Stride2x4Test(armnn::IWorkloadFactory& workloadFactory,
-                                                                 bool forceNoPadding)
+LayerTestResult<float, 4> SimpleMaxPooling2dSize3x3Stride2x4Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool forceNoPadding)
 {
-    return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<float>(workloadFactory, forceNoPadding);
+    return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<float>(workloadFactory, memoryManager, forceNoPadding);
 }
 
-LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize3x3Stride2x4Uint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                                        bool forceNoPadding)
+LayerTestResult<uint8_t, 4> SimpleMaxPooling2dSize3x3Stride2x4Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool forceNoPadding)
 {
-    return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<uint8_t>(workloadFactory, forceNoPadding, 0.1f, 128);
+    return SimpleMaxPooling2dSize3x3Stride2x4TestCommon<uint8_t>(
+        workloadFactory, memoryManager, forceNoPadding, 0.1f, 128);
 }
 
-LayerTestResult<float, 4> SimpleMaxPooling2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                 const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<float, 4> SimpleMaxPooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleMaxPooling2dTestCommon<float>(workloadFactory, dataLayout);
+    return SimpleMaxPooling2dTestCommon<float>(workloadFactory, memoryManager, dataLayout);
 }
 
-LayerTestResult<uint8_t, 4> SimpleMaxPooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                        const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<uint8_t, 4> SimpleMaxPooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleMaxPooling2dTestCommon<uint8_t>(workloadFactory, dataLayout);
+    return SimpleMaxPooling2dTestCommon<uint8_t>(workloadFactory, memoryManager, dataLayout);
 }
 
-LayerTestResult<float, 4> SimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                     const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<float, 4> SimpleAveragePooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleAveragePooling2dTestCommon<float>(workloadFactory, dataLayout);
+    return SimpleAveragePooling2dTestCommon<float>(workloadFactory, memoryManager, dataLayout);
 }
 
-LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                            const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleAveragePooling2dTestCommon<uint8_t>(workloadFactory, dataLayout, 0.5, -1);
+    return SimpleAveragePooling2dTestCommon<uint8_t>(
+        workloadFactory, memoryManager, dataLayout, 0.5, -1);
 }
 
-LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(armnn::IWorkloadFactory& workloadFactory,
-                                                                            bool forceNoPadding)
+LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool forceNoPadding)
 {
-    return IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon<float>(workloadFactory, forceNoPadding);
+    return IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon<float>(
+        workloadFactory, memoryManager, forceNoPadding);
 }
 
-LayerTestResult<float, 4> LargeTensorsAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> LargeTensorsAveragePooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return LargeTensorsAveragePooling2dTestCommon<float>(workloadFactory);
+    return LargeTensorsAveragePooling2dTestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> LargeTensorsAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> LargeTensorsAveragePooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return LargeTensorsAveragePooling2dTestCommon<uint8_t>(workloadFactory, 0.5, -1);
+    return LargeTensorsAveragePooling2dTestCommon<uint8_t>(workloadFactory, memoryManager, 0.5, -1);
 }
 
-LayerTestResult<float, 4> SimpleL2Pooling2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<float, 4> SimpleL2Pooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<float>(workloadFactory, dataLayout);
+    return SimpleL2Pooling2dTestCommon<float>(workloadFactory, memoryManager, dataLayout);
 }
 
-LayerTestResult<uint8_t, 4> SimpleL2Pooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                       const armnn::DataLayoutIndexed& dataLayout)
+LayerTestResult<uint8_t, 4> SimpleL2Pooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayoutIndexed& dataLayout)
 {
-    return SimpleL2Pooling2dTestCommon<uint8_t>(workloadFactory, dataLayout);
+    return SimpleL2Pooling2dTestCommon<uint8_t>(workloadFactory, memoryManager, dataLayout);
 }
 
-LayerTestResult<float, 4> L2Pooling2dSize3Stride1Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> L2Pooling2dSize3Stride1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride1TestCommon<float>(workloadFactory);
+    return L2Pooling2dSize3Stride1TestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride1Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride1TestCommon<uint8_t>(workloadFactory);
+    return L2Pooling2dSize3Stride1TestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> L2Pooling2dSize3Stride3Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> L2Pooling2dSize3Stride3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride3TestCommon<float>(workloadFactory);
+    return L2Pooling2dSize3Stride3TestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride3Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride3TestCommon<uint8_t>(workloadFactory);
+    return L2Pooling2dSize3Stride3TestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> L2Pooling2dSize3Stride4Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> L2Pooling2dSize3Stride4Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride4TestCommon<float>(workloadFactory);
+    return L2Pooling2dSize3Stride4TestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride4Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> L2Pooling2dSize3Stride4Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize3Stride4TestCommon<uint8_t>(workloadFactory);
+    return L2Pooling2dSize3Stride4TestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> L2Pooling2dSize7Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> L2Pooling2dSize7Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize7TestCommon<float>(workloadFactory);
+    return L2Pooling2dSize7TestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> L2Pooling2dSize7Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> L2Pooling2dSize7Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize7TestCommon<uint8_t>(workloadFactory);
+    return L2Pooling2dSize7TestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> L2Pooling2dSize9Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> L2Pooling2dSize9Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize9TestCommon<float>(workloadFactory);
+    return L2Pooling2dSize9TestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> L2Pooling2dSize9Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> L2Pooling2dSize9Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return L2Pooling2dSize9TestCommon<uint8_t>(workloadFactory);
+    return L2Pooling2dSize9TestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> AsymmetricNonSquarePooling2dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> AsymmetricNonSquarePooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AsymmetricNonSquarePooling2dTestCommon<float>(workloadFactory);
+    return AsymmetricNonSquarePooling2dTestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> AsymmetricNonSquarePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> AsymmetricNonSquarePooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return AsymmetricNonSquarePooling2dTestCommon<uint8_t>(workloadFactory);
+    return AsymmetricNonSquarePooling2dTestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> ComparePooling2dTest(armnn::IWorkloadFactory& workloadFactory,
-                                               armnn::IWorkloadFactory& refWorkloadFactory,
-                                               armnn::PoolingAlgorithm  poolingType)
+LayerTestResult<float, 4> ComparePooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    armnn::PoolingAlgorithm  poolingType)
 {
-    return ComparePooling2dTestCommon<float>(workloadFactory, refWorkloadFactory, poolingType);
+    return ComparePooling2dTestCommon<float>(
+        workloadFactory, memoryManager, refWorkloadFactory, poolingType);
 }
 
-LayerTestResult<uint8_t, 4> ComparePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory,
-                                                      armnn::IWorkloadFactory& refWorkloadFactory,
-                                                      armnn::PoolingAlgorithm  poolingType)
+LayerTestResult<uint8_t, 4> ComparePooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    armnn::PoolingAlgorithm  poolingType)
 {
-    return ComparePooling2dTestCommon<uint8_t>(workloadFactory, refWorkloadFactory, poolingType, 0.1f, 128);
+    return ComparePooling2dTestCommon<uint8_t>(
+        workloadFactory, memoryManager, refWorkloadFactory, poolingType, 0.1f, 128);
 }
 
-LayerTestResult<float, 2> FullyConnectedLargeTest(armnn::IWorkloadFactory& workloadFactory,
-                                                  bool transposeWeights)
+LayerTestResult<float, 2> FullyConnectedLargeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool transposeWeights)
 {
-    return FullyConnectedLargeTestCommon<float>(workloadFactory, transposeWeights);
+    return FullyConnectedLargeTestCommon<float>(workloadFactory, memoryManager, transposeWeights);
 }
 
-LayerTestResult<float, 4> IgnorePaddingSimpleMaxPooling2dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> IgnorePaddingSimpleMaxPooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleMaxPooling2dTestCommon<float>(workloadFactory);
+    return IgnorePaddingSimpleMaxPooling2dTestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> IgnorePaddingSimpleMaxPooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> IgnorePaddingSimpleMaxPooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleMaxPooling2dTestCommon<uint8_t>(workloadFactory, 1.0f, -5);
+    return IgnorePaddingSimpleMaxPooling2dTestCommon<uint8_t>(workloadFactory, memoryManager, 1.0f, -5);
 }
 
-LayerTestResult<float, 4> IgnorePaddingMaxPooling2dSize3Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> IgnorePaddingMaxPooling2dSize3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingMaxPooling2dSize3TestCommon<float>(workloadFactory);
+    return IgnorePaddingMaxPooling2dSize3TestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> IgnorePaddingMaxPooling2dSize3Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> IgnorePaddingMaxPooling2dSize3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingMaxPooling2dSize3TestCommon<uint8_t>(workloadFactory, 1.0f, -5);
+    return IgnorePaddingMaxPooling2dSize3TestCommon<uint8_t>(workloadFactory, memoryManager, 1.0f, -5);
 }
 
-LayerTestResult<float, 4> IgnorePaddingSimpleAveragePooling2dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> IgnorePaddingSimpleAveragePooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleAveragePooling2dTestCommon<float>(workloadFactory);
+    return IgnorePaddingSimpleAveragePooling2dTestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> IgnorePaddingSimpleAveragePooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> IgnorePaddingSimpleAveragePooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleAveragePooling2dTestCommon<uint8_t>(workloadFactory);
+    return IgnorePaddingSimpleAveragePooling2dTestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<float>(workloadFactory);
+    return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<float>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingUint8Test(
-    armnn::IWorkloadFactory& workloadFactory)
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<uint8_t>(workloadFactory);
+    return IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> IgnorePaddingAveragePooling2dSize3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingAveragePooling2dSize3TestCommon<float>(workloadFactory);
+    return IgnorePaddingAveragePooling2dSize3TestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> IgnorePaddingAveragePooling2dSize3Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> IgnorePaddingAveragePooling2dSize3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingAveragePooling2dSize3TestCommon<uint8_t>(workloadFactory);
+    return IgnorePaddingAveragePooling2dSize3TestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> IgnorePaddingSimpleL2Pooling2dTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> IgnorePaddingSimpleL2Pooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleL2Pooling2dTestCommon<float>(workloadFactory);
+    return IgnorePaddingSimpleL2Pooling2dTestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> IgnorePaddingSimpleL2Pooling2dUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> IgnorePaddingSimpleL2Pooling2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingSimpleL2Pooling2dTestCommon<uint8_t>(workloadFactory);
+    return IgnorePaddingSimpleL2Pooling2dTestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> IgnorePaddingL2Pooling2dSize3Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> IgnorePaddingL2Pooling2dSize3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingL2Pooling2dSize3TestCommon<float>(workloadFactory);
+    return IgnorePaddingL2Pooling2dSize3TestCommon<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> IgnorePaddingL2Pooling2dSize3Uint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> IgnorePaddingL2Pooling2dSize3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return IgnorePaddingL2Pooling2dSize3TestCommon<uint8_t>(workloadFactory);
+    return IgnorePaddingL2Pooling2dSize3TestCommon<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> SimplePermuteFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SimplePermuteFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SimplePermuteFloat32TestCommon(workloadFactory);
+    return SimplePermuteFloat32TestCommon(workloadFactory, memoryManager);
 };
 
-LayerTestResult<uint8_t, 4> SimplePermuteUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SimplePermuteUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SimplePermuteUint8TestCommon(workloadFactory);
+    return SimplePermuteUint8TestCommon(workloadFactory, memoryManager);
 };
 
-LayerTestResult<float, 4> PermuteFloat32ValueSet1Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> PermuteFloat32ValueSet1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return PermuteFloat32ValueSet1TestCommon(workloadFactory);
+    return PermuteFloat32ValueSet1TestCommon(workloadFactory, memoryManager);
 };
 
-LayerTestResult<float, 4> PermuteFloat32ValueSet2Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> PermuteFloat32ValueSet2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return PermuteFloat32ValueSet2TestCommon(workloadFactory);
+    return PermuteFloat32ValueSet2TestCommon(workloadFactory, memoryManager);
 };
 
-LayerTestResult<float, 4> PermuteFloat32ValueSet3Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> PermuteFloat32ValueSet3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return PermuteFloat32ValueSet3TestCommon(workloadFactory);
+    return PermuteFloat32ValueSet3TestCommon(workloadFactory, memoryManager);
 };
 
 namespace
 {
 
 template <typename T, std::size_t InputDim, std::size_t OutputDim>
-LayerTestResult<T, OutputDim> MeanTestHelper(armnn::IWorkloadFactory& workloadFactory,
-                                             const unsigned int* inputShape,
-                                             const std::vector<T>& inputData,
-                                             const std::vector<unsigned int>& axis,
-                                             bool keepDims,
-                                             const unsigned int* outputShape,
-                                             const std::vector<T>& outputData,
-                                             float scale = 1.0f,
-                                             int32_t offset = 0)
+LayerTestResult<T, OutputDim> MeanTestHelper(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const unsigned int* inputShape,
+    const std::vector<T>& inputData,
+    const std::vector<unsigned int>& axis,
+    bool keepDims,
+    const unsigned int* outputShape,
+    const std::vector<T>& outputData,
+    float scale = 1.0f,
+    int32_t offset = 0)
 {
     auto dataType = (std::is_same<T, uint8_t>::value ? armnn::DataType::QuantisedAsymm8 : armnn::DataType::Float32);
 
@@ -5630,7 +6102,9 @@ LayerTestResult<T, OutputDim> MeanTestHelper(armnn::IWorkloadFactory& workloadFa
 
 } // anonymous namespace
 
-LayerTestResult<uint8_t, 1> MeanUint8SimpleTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 1> MeanUint8SimpleTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 3, 2 };
     const unsigned int outputShape[] = { 1 };
@@ -5638,10 +6112,13 @@ LayerTestResult<uint8_t, 1> MeanUint8SimpleTest(armnn::IWorkloadFactory& workloa
     std::vector<uint8_t> input({ 1, 1, 2, 2, 3, 3 });
     std::vector<uint8_t> output({ 2 });
 
-    return MeanTestHelper<uint8_t, 2, 1>(workloadFactory, inputShape, input, {}, false, outputShape, output);
+    return MeanTestHelper<uint8_t, 2, 1>(
+        workloadFactory, memoryManager, inputShape, input, {}, false, outputShape, output);
 }
 
-LayerTestResult<uint8_t, 3> MeanUint8SimpleAxisTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 3> MeanUint8SimpleAxisTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 1, 1, 3, 2 };
     const unsigned int outputShape[] = { 1, 1, 2 };
@@ -5649,10 +6126,13 @@ LayerTestResult<uint8_t, 3> MeanUint8SimpleAxisTest(armnn::IWorkloadFactory& wor
     std::vector<uint8_t> input({ 1, 1, 2, 2, 3, 3 });
     std::vector<uint8_t> output({ 2, 2 });
 
-    return MeanTestHelper<uint8_t, 4, 3>(workloadFactory, inputShape, input, { 2 }, false, outputShape, output);
+    return MeanTestHelper<uint8_t, 4, 3>(
+        workloadFactory, memoryManager, inputShape, input, { 2 }, false, outputShape, output);
 }
 
-LayerTestResult<uint8_t, 4> MeanUint8KeepDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> MeanUint8KeepDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 1, 1, 3, 2 };
     const unsigned int outputShape[] = { 1, 1, 1, 2 };
@@ -5660,10 +6140,13 @@ LayerTestResult<uint8_t, 4> MeanUint8KeepDimsTest(armnn::IWorkloadFactory& workl
     std::vector<uint8_t> input({ 1, 1, 2, 2, 3, 3 });
     std::vector<uint8_t> output({ 2, 2 });
 
-    return MeanTestHelper<uint8_t, 4, 4>(workloadFactory, inputShape, input, { 2 }, true, outputShape, output);
+    return MeanTestHelper<uint8_t, 4, 4>(
+        workloadFactory, memoryManager, inputShape, input, { 2 }, true, outputShape, output);
 }
 
-LayerTestResult<uint8_t, 4> MeanUint8MultipleDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> MeanUint8MultipleDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 2, 3, 1, 2 };
     const unsigned int outputShape[] = { 1, 3, 1, 1 };
@@ -5671,10 +6154,13 @@ LayerTestResult<uint8_t, 4> MeanUint8MultipleDimsTest(armnn::IWorkloadFactory& w
     std::vector<uint8_t> input({ 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6 });
     std::vector<uint8_t> output({ 1, 3, 5 });
 
-    return MeanTestHelper<uint8_t, 4, 4>(workloadFactory, inputShape, input, { 0, 3 }, true, outputShape, output);
+    return MeanTestHelper<uint8_t, 4, 4>(
+        workloadFactory, memoryManager, inputShape, input, { 0, 3 }, true, outputShape, output);
 }
 
-LayerTestResult<uint8_t, 1> MeanVtsUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 1> MeanVtsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 4, 3, 2 };
     const unsigned int outputShape[] = { 2 };
@@ -5683,11 +6169,14 @@ LayerTestResult<uint8_t, 1> MeanVtsUint8Test(armnn::IWorkloadFactory& workloadFa
                                  24 });
     std::vector<uint8_t> output({ 12, 13 });
 
-    return MeanTestHelper<uint8_t, 3, 1>(workloadFactory, inputShape, input, { 0, 1 }, false, outputShape,
+    return MeanTestHelper<uint8_t, 3, 1>(workloadFactory, memoryManager,
+                                         inputShape, input, { 0, 1 }, false, outputShape,
                                          output, 0.8f, 5);
 }
 
-LayerTestResult<float, 1> MeanFloatSimpleTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 1> MeanFloatSimpleTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 3, 2 };
     const unsigned int outputShape[] = { 1 };
@@ -5695,10 +6184,13 @@ LayerTestResult<float, 1> MeanFloatSimpleTest(armnn::IWorkloadFactory& workloadF
     std::vector<float> input({ 1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f });
     std::vector<float> output({ 2.0f });
 
-    return MeanTestHelper<float, 2, 1>(workloadFactory, inputShape, input, {}, false, outputShape, output);
+    return MeanTestHelper<float, 2, 1>(
+        workloadFactory, memoryManager, inputShape, input, {}, false, outputShape, output);
 }
 
-LayerTestResult<float, 3> MeanFloatSimpleAxisTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> MeanFloatSimpleAxisTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 2, 3, 1, 2 };
     const unsigned int outputShape[] = { 3, 1, 2 };
@@ -5706,10 +6198,13 @@ LayerTestResult<float, 3> MeanFloatSimpleAxisTest(armnn::IWorkloadFactory& workl
     std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f });
     std::vector<float> output({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f });
 
-    return MeanTestHelper<float, 4, 3>(workloadFactory, inputShape, input, { 0 }, false, outputShape, output);
+    return MeanTestHelper<float, 4, 3>(
+        workloadFactory, memoryManager, inputShape, input, { 0 }, false, outputShape, output);
 }
 
-LayerTestResult<float, 4> MeanFloatKeepDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> MeanFloatKeepDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 1, 1, 3, 2 };
     const unsigned int outputShape[] = { 1, 1, 1, 2 };
@@ -5717,10 +6212,13 @@ LayerTestResult<float, 4> MeanFloatKeepDimsTest(armnn::IWorkloadFactory& workloa
     std::vector<float> input({ 1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f });
     std::vector<float> output({ 2.0f, 2.0f });
 
-    return MeanTestHelper<float, 4, 4>(workloadFactory, inputShape, input, { 2 }, true, outputShape, output);
+    return MeanTestHelper<float, 4, 4>(
+        workloadFactory, memoryManager, inputShape, input, { 2 }, true, outputShape, output);
 }
 
-LayerTestResult<float, 4> MeanFloatMultipleDimsTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> MeanFloatMultipleDimsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 2, 3, 1, 2 };
     const unsigned int outputShape[] = { 1, 3, 1, 1 };
@@ -5728,10 +6226,13 @@ LayerTestResult<float, 4> MeanFloatMultipleDimsTest(armnn::IWorkloadFactory& wor
     std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f });
     std::vector<float> output({ 1.5f, 3.5f, 5.5f });
 
-    return MeanTestHelper<float, 4, 4>(workloadFactory, inputShape, input, { 0, 3 }, true, outputShape, output);
+    return MeanTestHelper<float, 4, 4>(
+        workloadFactory, memoryManager, inputShape, input, { 0, 3 }, true, outputShape, output);
 }
 
-LayerTestResult<float, 1> MeanVtsFloat1Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 1> MeanVtsFloat1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 4, 3, 2 };
     const unsigned int outputShape[] = { 2 };
@@ -5740,10 +6241,13 @@ LayerTestResult<float, 1> MeanVtsFloat1Test(armnn::IWorkloadFactory& workloadFac
                                15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f });
     std::vector<float> output({ 12.0f, 13.0f });
 
-    return MeanTestHelper<float, 3, 1>(workloadFactory, inputShape, input, { 0, 1 }, false, outputShape, output);
+    return MeanTestHelper<float, 3, 1>(
+        workloadFactory, memoryManager, inputShape, input, { 0, 1 }, false, outputShape, output);
 }
 
-LayerTestResult<float, 3> MeanVtsFloat2Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> MeanVtsFloat2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 4, 3, 2 };
     const unsigned int outputShape[] = { 1, 3, 1 };
@@ -5752,10 +6256,13 @@ LayerTestResult<float, 3> MeanVtsFloat2Test(armnn::IWorkloadFactory& workloadFac
                                15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f });
     std::vector<float> output({ 10.5f, 12.5f, 14.5f });
 
-    return MeanTestHelper<float, 3, 3>(workloadFactory, inputShape, input, { 0, 2 }, true, outputShape, output);
+    return MeanTestHelper<float, 3, 3>(
+        workloadFactory, memoryManager, inputShape, input, { 0, 2 }, true, outputShape, output);
 }
 
-LayerTestResult<float, 3> MeanVtsFloat3Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 3> MeanVtsFloat3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = { 1, 2, 2, 1 };
     const unsigned int outputShape[] = { 1, 2, 1 };
@@ -5763,10 +6270,13 @@ LayerTestResult<float, 3> MeanVtsFloat3Test(armnn::IWorkloadFactory& workloadFac
     std::vector<float> input({ 1.0f, 2.0f, 3.0f, 4.0f });
     std::vector<float> output({ 1.5f, 3.5f });
 
-    return MeanTestHelper<float, 4, 3>(workloadFactory, inputShape, input, { 2 }, false, outputShape, output);
+    return MeanTestHelper<float, 4, 3>(
+        workloadFactory, memoryManager, inputShape, input, { 2 }, false, outputShape, output);
 }
 
-LayerTestResult<float, 4> AdditionAfterMaxPoolTest(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     // Create Initial Tensor
     // 1, 2, 3
@@ -5867,99 +6377,133 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(armnn::IWorkloadFactory& work
     return addRet;
 }
 
-LayerTestResult<float, 4> SpaceToBatchNdSimpleFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SpaceToBatchNdSimpleFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleTest<float>(workloadFactory);
+    return SpaceToBatchNdSimpleTest<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsTest<float>(workloadFactory);
+    return SpaceToBatchNdMultiChannelsTest<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> SpaceToBatchNdMultiBlockFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SpaceToBatchNdMultiBlockFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockTest<float>(workloadFactory);
+    return SpaceToBatchNdMultiBlockTest<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> SpaceToBatchNdPaddingFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SpaceToBatchNdPaddingFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingTest<float>(workloadFactory);
+    return SpaceToBatchNdPaddingTest<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleTest<uint8_t>(workloadFactory);
+    return SpaceToBatchNdSimpleTest<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsTest<uint8_t>(workloadFactory);
+    return SpaceToBatchNdMultiChannelsTest<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockTest<uint8_t>(workloadFactory);
+    return SpaceToBatchNdMultiBlockTest<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingTest<uint8_t>(workloadFactory);
+    return SpaceToBatchNdPaddingTest<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> SpaceToBatchNdSimpleNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SpaceToBatchNdSimpleNHWCFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleNHWCTest<float>(workloadFactory);
+    return SpaceToBatchNdSimpleNHWCTest<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SpaceToBatchNdMultiChannelsNHWCFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsNHWCTest<float>(workloadFactory);
+    return SpaceToBatchNdMultiChannelsNHWCTest<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> SpaceToBatchNdMultiBlockNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SpaceToBatchNdMultiBlockNHWCFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockNHWCTest<float>(workloadFactory);
+    return SpaceToBatchNdMultiBlockNHWCTest<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> SpaceToBatchNdPaddingNHWCFloat32Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> SpaceToBatchNdPaddingNHWCFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingNHWCTest<float>(workloadFactory);
+    return SpaceToBatchNdPaddingNHWCTest<float>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNHWCUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleNHWCTest<uint8_t>(workloadFactory);
+    return SpaceToBatchNdSimpleNHWCTest<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiChannelsNHWCUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsNHWCTest<uint8_t>(workloadFactory);
+    return SpaceToBatchNdMultiChannelsNHWCTest<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SpaceToBatchNdMultiBlockNHWCUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockNHWCTest<uint8_t>(workloadFactory);
+    return SpaceToBatchNdMultiBlockNHWCTest<uint8_t>(workloadFactory, memoryManager);
 }
 
-LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNHWCUint8Test(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNHWCUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingNHWCTest<uint8_t>(workloadFactory);
+    return SpaceToBatchNdPaddingNHWCTest<uint8_t>(workloadFactory, memoryManager);
 }
 
 namespace {
 
 template<typename T, std::size_t InputDim, std::size_t OutputDim>
-LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(armnn::IWorkloadFactory &workloadFactory,
-                                                   const armnn::DataLayout& dataLayout,
-                                                   const unsigned int *inputShape,
-                                                   const std::vector<T> &inputData,
-                                                   const std::vector<unsigned int> &blockShape,
-                                                   const std::vector<std::pair<unsigned int, unsigned int>> &crops,
-                                                   const unsigned int *outputShape,
-                                                   const std::vector<T> &outputData,
-                                                   float scale = 1.0f,
-                                                   int32_t offset = 0)
+LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(
+    armnn::IWorkloadFactory &workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout& dataLayout,
+    const unsigned int *inputShape,
+    const std::vector<T> &inputData,
+    const std::vector<unsigned int> &blockShape,
+    const std::vector<std::pair<unsigned int, unsigned int>> &crops,
+    const unsigned int *outputShape,
+    const std::vector<T> &outputData,
+    float scale = 1.0f,
+    int32_t offset = 0)
   {
     auto dataType = (std::is_same<T, uint8_t>::value ? armnn::DataType::QuantisedAsymm8 : armnn::DataType::Float32);
 
@@ -6004,7 +6548,9 @@ LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(armnn::IWorkloadFactory &work
 
 } // anonymous namespace
 
-LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test1(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test1(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = {4, 2, 2, 1};
     const unsigned int outputShape[] = {1, 4, 4, 1 };
@@ -6045,11 +6591,14 @@ LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test1(armnn::IWorkloadFactory
     std::vector<unsigned int> blockShape {2, 2};
     std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
-    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, memoryManager,
+            armnn::DataLayout::NHWC, inputShape, input, blockShape,
             crops, outputShape, expectedOutput);
 }
 
-LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test2(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test2(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = {4, 1, 1, 1};
     const unsigned int outputShape[] = {1, 2, 2, 1};
@@ -6065,11 +6614,14 @@ LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test2(armnn::IWorkloadFactory
     std::vector<unsigned int> blockShape({2, 2});
     std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
-    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
-                                             crops, outputShape, expectedOutput);
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, memoryManager,
+        armnn::DataLayout::NHWC, inputShape, input, blockShape,
+        crops, outputShape, expectedOutput);
 }
 
-LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test3(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test3(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = {4, 1, 1, 3};
     const unsigned int outputShape[] = {1, 2, 2, 3};
@@ -6081,11 +6633,14 @@ LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test3(armnn::IWorkloadFactory
     std::vector<unsigned int> blockShape({2, 2});
     std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
-    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
-                                             crops, outputShape, expectedOutput);
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, memoryManager,
+        armnn::DataLayout::NHWC, inputShape, input, blockShape,
+        crops, outputShape, expectedOutput);
 }
 
-LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(armnn::IWorkloadFactory &workloadFactory)
+LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(
+    armnn::IWorkloadFactory &workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = {4, 3, 1, 1};
     const unsigned int outputShape[] = {1, 3, 2, 2};
@@ -6110,12 +6665,15 @@ LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(armnn::IWorkloadFactory
     std::vector<unsigned int> blockShape({2, 2});
     std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
-    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NCHW, inputShape, input, blockShape,
-                                             crops, outputShape, expectedOutput);
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, memoryManager,
+        armnn::DataLayout::NCHW, inputShape, input, blockShape,
+        crops, outputShape, expectedOutput);
 }
 
 
-LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(armnn::IWorkloadFactory& workloadFactory)
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int inputShape[] = {4, 2, 2, 1};
     const unsigned int outputShape[] = {1, 4, 4, 1};
@@ -6126,6 +6684,7 @@ LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(armnn::IWorkloadFactory&
     std::vector<unsigned int> blockShape({2, 2});
     std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
 
-    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
-                                               crops, outputShape, expectedOutput);
+    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager,
+        armnn::DataLayout::NHWC, inputShape, input, blockShape,
+        crops, outputShape, expectedOutput);
 }

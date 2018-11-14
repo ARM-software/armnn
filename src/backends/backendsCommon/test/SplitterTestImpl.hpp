@@ -4,19 +4,24 @@
 //
 #pragma once
 
+#include "WorkloadTestUtils.hpp"
+
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/test/QuantizeHelper.hpp>
 
 #include <test/TensorHelpers.hpp>
 
 template<typename T>
-std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& workloadFactory,
-                                                     float qScale = 0.0f,
-                                                     int32_t qOffset = 0)
+std::vector<LayerTestResult<T,3>> SplitterTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale = 0.0f,
+    int32_t qOffset = 0)
 {
     unsigned int inputWidth = 5;
     unsigned int inputHeight = 6;
@@ -214,7 +219,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
     CopyDataFromITensorHandle(&ret1.output[0][0][0], outputHandle1.get());
     CopyDataFromITensorHandle(&ret2.output[0][0][0], outputHandle2.get());
 
-//    // Do the second split.
+    // Do the second split.
     armnn::SplitterQueueDescriptor data2;
     armnn::WorkloadInfo info2;
     AddInputToWorkload(data2, info2, outputTensorInfo2, outputHandle2.get());
@@ -229,7 +234,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
     outputHandle3->Allocate();
     outputHandle4->Allocate();
 
-    workload2->Execute();
+    ExecuteWorkload(*workload2, memoryManager);
 
     CopyDataFromITensorHandle(&ret3.output[0][0][0], outputHandle3.get());
     CopyDataFromITensorHandle(&ret4.output[0][0][0], outputHandle4.get());
@@ -241,7 +246,10 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(armnn::IWorkloadFactory& wo
 
 
 template <typename T>
-LayerTestResult<T, 3> CopyViaSplitterTestImpl(armnn::IWorkloadFactory& workloadFactory, float qScale, int32_t qOffset)
+LayerTestResult<T, 3> CopyViaSplitterTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale, int32_t qOffset)
 {
     const armnn::TensorInfo tensorInfo({ 3, 6, 5 }, armnn::GetDataType<T>());
     auto input = MakeTensor<T, 3>(tensorInfo, QuantizedVector<T>(qScale, qOffset,

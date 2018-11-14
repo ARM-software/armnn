@@ -9,9 +9,8 @@
 #include <backendsCommon/IMemoryManager.hpp>
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 
+#include <neon/NeonBackend.hpp>
 #include <neon/NeonWorkloadFactory.hpp>
-
-#include <arm_compute/runtime/Allocator.h>
 
 #include <boost/polymorphic_pointer_cast.hpp>
 
@@ -21,12 +20,15 @@ namespace
 template<>
 struct WorkloadFactoryHelper<armnn::NeonWorkloadFactory>
 {
-    static armnn::NeonWorkloadFactory GetFactory()
+    static armnn::IBackendInternal::IMemoryManagerSharedPtr GetMemoryManager()
     {
-        armnn::IBackendInternal::IMemoryManagerSharedPtr memoryManager =
-            std::make_shared<armnn::NeonMemoryManager>(std::make_unique<arm_compute::Allocator>(),
-                                                       armnn::BaseMemoryManager::MemoryAffinity::Offset);
+        armnn::NeonBackend backend;
+        return backend.CreateMemoryManager();
+    }
 
+    static armnn::NeonWorkloadFactory GetFactory(
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    {
         return armnn::NeonWorkloadFactory(
             boost::polymorphic_pointer_downcast<armnn::NeonMemoryManager>(memoryManager));
     }

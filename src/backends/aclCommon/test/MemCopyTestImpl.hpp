@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include <backendsCommon/IBackendInternal.hpp>
+
 #include <backendsCommon/test/LayerTests.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
@@ -76,8 +78,14 @@ LayerTestResult<float, 4> MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactor
 template<typename SrcWorkloadFactory, typename DstWorkloadFactory>
 LayerTestResult<float, 4> MemCopyTest(bool withSubtensors)
 {
-    SrcWorkloadFactory srcWorkloadFactory = WorkloadFactoryHelper<SrcWorkloadFactory>::GetFactory();
-    DstWorkloadFactory dstWorkloadFactory = WorkloadFactoryHelper<DstWorkloadFactory>::GetFactory();
+    armnn::IBackendInternal::IMemoryManagerSharedPtr srcMemoryManager =
+        WorkloadFactoryHelper<SrcWorkloadFactory>::GetMemoryManager();
+
+    armnn::IBackendInternal::IMemoryManagerSharedPtr dstMemoryManager =
+        WorkloadFactoryHelper<DstWorkloadFactory>::GetMemoryManager();
+
+    SrcWorkloadFactory srcWorkloadFactory = WorkloadFactoryHelper<SrcWorkloadFactory>::GetFactory(srcMemoryManager);
+    DstWorkloadFactory dstWorkloadFactory = WorkloadFactoryHelper<DstWorkloadFactory>::GetFactory(dstMemoryManager);
 
     return MemCopyTest(srcWorkloadFactory, dstWorkloadFactory, withSubtensors);
 }

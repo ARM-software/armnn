@@ -75,7 +75,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 * Setup environment:
     ```bash
     export PATH=$HOME/armnn-devenv/google/x86_64_pb_install/bin/:$PATH
-    export LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib/:LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib/:$LD_LIBRARY_PATH
     ```
 * Compilation with Make:
     ```bash
@@ -93,7 +93,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
    ```
 #### <a name="installBaarch">Build Boost library for arm64</a>
 * Build Boost library for arm64
-    Download Boost version 1.64 from http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html  
+    Download Boost version 1.64 from http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html
     Version 1.66 is not supported.
     ```bash
     tar -zxvf boost_1_64_0.tar.gz
@@ -248,9 +248,9 @@ https://askubuntu.com/questions/430705/how-to-use-apt-get-to-download-multi-arch
     ```
     libarmnnCaffeParser.so: undefined reference to `google::protobuf:*
     ```
-* Missing or out of date protobuf compilation libraries.  
-    Use the command 'protoc --version' to check which version of protobuf is available (version 3.5.1 is required).  
-    Follow the instructions above to install protobuf 3.5.1  
+* Missing or out of date protobuf compilation libraries.
+    Use the command 'protoc --version' to check which version of protobuf is available (version 3.5.1 is required).
+    Follow the instructions above to install protobuf 3.5.1
     Note this will require you to recompile Caffe for x86_64
 
 ##

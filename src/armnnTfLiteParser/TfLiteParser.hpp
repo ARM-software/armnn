@@ -139,8 +139,7 @@ private:
     };
 
     std::pair<armnn::ConstTensor, SupportedDataStorage> CreateConstTensor(TensorRawPtr tensorPtr,
-                                                                          armnn::TensorInfo & tensorInfo,
-                                                                          bool convertFromTfToArmnnFormat);
+                                                                          armnn::TensorInfo & tensorInfo);
 
     /// The network we're building. Gets cleared after it is passed to the user
     armnn::INetworkPtr                    m_Network;

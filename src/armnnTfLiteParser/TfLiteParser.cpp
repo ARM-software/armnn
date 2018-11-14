@@ -36,6 +36,46 @@ namespace
 const PermutationVector NHWCToArmNN = { 0, 2, 3, 1 };
 const PermutationVector ArmNNToNHWC = { 0, 3, 1, 2 };
 
+IConnectableLayer* SwizzleIn(INetwork& network,
+                             IConnectableLayer* layer,
+                             unsigned int inputSlotIndex,
+                             const TensorInfo & inputInfo)
+{
+    BOOST_ASSERT(layer != nullptr);
+    // Add swizzle layer
+    std::stringstream name;
+    name << "swizzle_for-" << layer->GetName() << ":in" << inputSlotIndex;
+    IConnectableLayer* const swizzleLayer = network.AddPermuteLayer(NHWCToArmNN, name.str().c_str());
+    // Set swizzled output shape
+    const TensorInfo swizzleOutInfo = armnnUtils::Permuted(inputInfo, NHWCToArmNN);
+    swizzleLayer->GetOutputSlot(0).SetTensorInfo(swizzleOutInfo);
+    // Connect the swizzle layer to the actual layer
+    swizzleLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(inputSlotIndex));
+
+    return swizzleLayer;
+}
+
+IConnectableLayer* DeswizzleOut(INetwork& network,
+                                IConnectableLayer* layer,
+                                unsigned int outputSlotIndex,
+                                const TensorInfo & outputInfo)
+{
+    BOOST_ASSERT(layer != nullptr);
+    // Add deswizzle layer
+    std::stringstream name;
+    name << "deswizzle_for-" << layer->GetName() << ":out" << outputSlotIndex;
+    IConnectableLayer* const deswizzleLayer = network.AddPermuteLayer(ArmNNToNHWC, name.str().c_str());
+    // Set deswizzled output shape
+    deswizzleLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+    // Set original layer output shape
+    const TensorInfo deswizzleOutInfo = armnnUtils::Permuted(outputInfo, NHWCToArmNN);
+    layer->GetOutputSlot(outputSlotIndex).SetTensorInfo(deswizzleOutInfo);
+    // Connect the actual layer to the deswizzle layer
+    layer->GetOutputSlot(outputSlotIndex).Connect(deswizzleLayer->GetInputSlot(0));
+
+    return deswizzleLayer;
+}
+
 const uint32_t VIRTUAL_OPERATOR_ID = std::numeric_limits<uint32_t>::max();
 
 void CheckSubgraph(const TfLiteParser::ModelPtr & model,
@@ -361,8 +401,7 @@ template<typename T>
 std::pair<armnn::ConstTensor, std::unique_ptr<T[]>>
 CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
                       TfLiteParser::TensorRawPtr tensorPtr,
-                      armnn::TensorInfo & tensorInfo,
-                      bool convertFromTfToArmnnFormat)
+                      armnn::TensorInfo & tensorInfo)
 {
     BOOST_ASSERT_MSG(tensorPtr != nullptr, "tensorPtr is null");
     BOOST_ASSERT_MSG(bufferPtr != nullptr,
@@ -370,72 +409,8 @@ CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
             boost::format("Buffer for buffer:%1% is null") % tensorPtr->buffer).c_str());
 
     std::unique_ptr<T[]> data(new T[tensorInfo.GetNumElements()]);
-
-    if (convertFromTfToArmnnFormat)
-    {
-        tensorInfo = armnnUtils::Permuted(tensorInfo, NHWCToArmNN);
-        armnnUtils::Permute(tensorInfo.GetShape(),
-                            NHWCToArmNN,
-                            reinterpret_cast<const T *>(bufferPtr->data.data()),
-                            data.get());
-    }
-    else
-    {
-        ::memcpy(data.get(), bufferPtr->data.data(), tensorInfo.GetNumBytes());
-    }
+    ::memcpy(data.get(), bufferPtr->data.data(), tensorInfo.GetNumBytes());
     return std::make_pair(ConstTensor(tensorInfo, data.get()), std::move(data));
-}
-
-IConnectableLayer* SwizzleIn(INetwork& network,
-                             IConnectableLayer* layer,
-                             unsigned int inputSlotIndex,
-                             const TensorInfo & inputInfo)
-{
-    BOOST_ASSERT(layer != nullptr);
-    // Add swizzle layer
-    std::stringstream name;
-    name << "swizzle_for-" << layer->GetName() << ":in" << inputSlotIndex;
-    IConnectableLayer* const swizzleLayer = network.AddPermuteLayer(NHWCToArmNN, name.str().c_str());
-    // Set swizzled output shape
-    const TensorInfo swizzleOutInfo = armnnUtils::Permuted(inputInfo, NHWCToArmNN);
-    swizzleLayer->GetOutputSlot(0).SetTensorInfo(swizzleOutInfo);
-    // Connect the swizzle layer to the actual layer
-    swizzleLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(inputSlotIndex));
-
-    return swizzleLayer;
-}
-
-IConnectableLayer* DeswizzleOut(INetwork& network,
-                                IConnectableLayer* layer,
-                                unsigned int outputSlotIndex,
-                                const TensorInfo & outputInfo)
-{
-    BOOST_ASSERT(layer != nullptr);
-    // Add deswizzle layer
-    std::stringstream name;
-    name << "deswizzle_for-" << layer->GetName() << ":out" << outputSlotIndex;
-    IConnectableLayer* const deswizzleLayer = network.AddPermuteLayer(ArmNNToNHWC, name.str().c_str());
-    // Set deswizzled output shape
-    deswizzleLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-    // Set original layer output shape
-    const TensorInfo deswizzleOutInfo = armnnUtils::Permuted(outputInfo, NHWCToArmNN);
-    layer->GetOutputSlot(outputSlotIndex).SetTensorInfo(deswizzleOutInfo);
-    // Connect the actual layer to the deswizzle layer
-    layer->GetOutputSlot(outputSlotIndex).Connect(deswizzleLayer->GetInputSlot(0));
-
-    return deswizzleLayer;
-}
-
-std::pair<IConnectableLayer*, IConnectableLayer*> SwizzleInDeswizzleOut(INetwork& network,
-                                                                        IConnectableLayer* layer,
-                                                                        unsigned int inputSlotIndex,
-                                                                        const TensorInfo & inputInfo,
-                                                                        unsigned int outputSlotIndex,
-                                                                        const TensorInfo & outputInfo)
-{
-    IConnectableLayer* const swizzleLayer = SwizzleIn(network, layer, inputSlotIndex, inputInfo);
-    IConnectableLayer* const deswizzleLayer = DeswizzleOut(network, layer, outputSlotIndex, outputInfo);
-    return std::make_pair(swizzleLayer, deswizzleLayer);
 }
 
 armnn::LayerBindingId GenerateLayerBindingId(size_t subgraphIndex, size_t tensorIndex)
@@ -662,6 +637,7 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     desc.m_BiasEnabled = false;
     desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
     desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2, 3);
@@ -684,7 +660,7 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     CalcPadding(inputHeight, filterHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
     CalcPadding(inputWidth, filterWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
-    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo, true);
+    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo);
     armnn::IConnectableLayer* layer;
 
     auto layerName = boost::str(boost::format("Conv2D:%1%:%2%") % subgraphIndex % operatorIndex);
@@ -693,7 +669,7 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     {
         desc.m_BiasEnabled = true;
         armnn::TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo, false);
+        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo);
         layer = m_Network->AddConvolution2dLayer(desc,
                                                  filterTensorAndData.first,
                                                  biasTensorAndData.first,
@@ -708,20 +684,15 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
 
     BOOST_ASSERT(layer != nullptr);
 
-    // add permute layers to swizzle the input and deswizzle the output
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-    std::pair<IConnectableLayer*, IConnectableLayer*> permuteLayers =
-        SwizzleInDeswizzleOut(*m_Network, layer, 0, inputTensorInfo, 0, outputTensorInfo);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, permuteLayers.first, {inputTensorIndexes[0]});
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
-    // we need to add the activation layer and fortunately we don't need to care about the data layout
-    // beause the activation function is element-wise, so it is OK to have the activation after the trailing
-    // swizzle layer
-    layer = AddFusedActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
+    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -740,6 +711,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     desc.m_BiasEnabled = false;
     desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
     desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
     // ACL only supports a depth (channel) multiplier of 1, it is not currently stored in the descriptor
     CHECK_VALID_SIZE(CHECKED_NON_NEGATIVE(options->depth_multiplier), 1);
 
@@ -761,7 +733,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     CalcPadding(inputHeight, filterHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
     CalcPadding(inputWidth, filterWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
-    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo, true);
+    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo);
     armnn::IConnectableLayer* layer;
     auto layerName = boost::str(boost::format("DepthwiseConv2D:%1%:%2%") % subgraphIndex % operatorIndex);
 
@@ -769,7 +741,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     {
         desc.m_BiasEnabled = true;
         TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo, false);
+        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo);
         layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
                                                           filterTensorAndData.first,
                                                           biasTensorAndData.first,
@@ -783,20 +755,15 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     }
     BOOST_ASSERT(layer != nullptr);
 
-    // add permute layers to swizzle the input and deswizzle the output
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-    std::pair<IConnectableLayer*, IConnectableLayer*> permuteLayers =
-        SwizzleInDeswizzleOut(*m_Network, layer, 0, inputTensorInfo, 0, outputTensorInfo);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, permuteLayers.first, {inputTensorIndexes[0]});
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
-    // we need to add the activation layer and fortunately we don't need to care about the data layout
-    // beause the activation function is element-wise, so it is OK to have the activation after the trailing
-    // swizzle layer
-    layer = AddFusedActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
+    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -848,6 +815,7 @@ void TfLiteParser::ParsePool(size_t subgraphIndex,
     desc.m_PoolHeight = CHECKED_NON_NEGATIVE(options->filter_height);
     desc.m_PaddingMethod = PaddingMethod::Exclude;
     desc.m_OutputShapeRounding = OutputShapeRounding::Floor;
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 1);
@@ -862,25 +830,20 @@ void TfLiteParser::ParsePool(size_t subgraphIndex,
 
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
-    armnn::TensorInfo outputTensorInfo  = ToTensorInfo(outputs[0]);
 
     IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, layerName.c_str());
 
     BOOST_ASSERT(layer != nullptr);
 
-    // add permute layers to swizzle the input and deswizzle the output
-    std::pair<IConnectableLayer*, IConnectableLayer*> permuteLayers =
-            SwizzleInDeswizzleOut(*m_Network, layer, 0, inputTensorInfo, 0, outputTensorInfo);
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, permuteLayers.first, {inputTensorIndexes[0]});
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
-    // we need to add the activation layer and fortunately we don't need to care about the data layout
-    // beause the activation function is element-wise, so it is OK to have the activation after the trailing
-    // swizzle layer
-    layer = AddFusedActivationLayer(permuteLayers.second, 0, options->fused_activation_function);
+    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -1252,7 +1215,7 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
                 % CHECK_LOCATION().AsString()));
     }
 
-    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo, false);
+    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo);
     armnn::IConnectableLayer* layer;
     auto layerName = boost::str(boost::format("FullyConnected:%1%:%2%") % subgraphIndex % operatorIndex);
 
@@ -1260,7 +1223,7 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
     {
         desc.m_BiasEnabled = true;
         TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo, false);
+        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo);
         layer = m_Network->AddFullyConnectedLayer(desc,
                                                   filterTensorAndData.first,
                                                   biasTensorAndData.first,
@@ -1587,8 +1550,7 @@ TfLiteParser::BufferRawPtr TfLiteParser::GetBuffer(const ModelPtr& model, size_t
 
 std::pair<armnn::ConstTensor, TfLiteParser::SupportedDataStorage>
 TfLiteParser::CreateConstTensor(TensorRawPtr tensorPtr,
-                                armnn::TensorInfo & tensorInfo,
-                                bool convertFromTfToArmnnFormat)
+                                armnn::TensorInfo & tensorInfo)
 {
     CHECK_TENSOR_PTR(tensorPtr);
     auto bufferPtr = GetBuffer(m_Model, tensorPtr->buffer);
@@ -1600,8 +1562,7 @@ TfLiteParser::CreateConstTensor(TensorRawPtr tensorPtr,
         {
             auto constData = CreateConstTensorImpl<float>(bufferPtr,
                                                           tensorPtr,
-                                                          tensorInfo,
-                                                          convertFromTfToArmnnFormat);
+                                                          tensorInfo);
             SupportedDataStorage storage(std::move(constData.second));
             return std::make_pair(constData.first, std::move(storage));
         }
@@ -1609,8 +1570,7 @@ TfLiteParser::CreateConstTensor(TensorRawPtr tensorPtr,
         {
             auto constData = CreateConstTensorImpl<uint8_t>(bufferPtr,
                                                             tensorPtr,
-                                                            tensorInfo,
-                                                            convertFromTfToArmnnFormat);
+                                                            tensorInfo);
             SupportedDataStorage storage(std::move(constData.second));
             return std::make_pair(constData.first, std::move(storage));
         }
@@ -1618,8 +1578,7 @@ TfLiteParser::CreateConstTensor(TensorRawPtr tensorPtr,
         {
             auto constData = CreateConstTensorImpl<int32_t>(bufferPtr,
                                                             tensorPtr,
-                                                            tensorInfo,
-                                                            convertFromTfToArmnnFormat);
+                                                            tensorInfo);
             SupportedDataStorage storage(std::move(constData.second));
             return std::make_pair(constData.first, std::move(storage));
         }

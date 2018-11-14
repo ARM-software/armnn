@@ -350,6 +350,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/GraphTests.cpp
         src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
+        src/armnn/test/LayerValidateOutputTest.cpp
         src/armnn/test/NetworkTests.cpp
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptimizerTests.cpp

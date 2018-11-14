@@ -299,8 +299,7 @@ struct BatchNormalizationDescriptor
 struct BatchToSpaceNdDescriptor
 {
     BatchToSpaceNdDescriptor()
-        : m_BlockShape({0, 0})
-        , m_Crops({{0, 0}, {0, 0}})
+        : m_Crops({{0, 0}, {0, 0}})
         , m_DataLayout(DataLayout::NCHW)
     {}
 

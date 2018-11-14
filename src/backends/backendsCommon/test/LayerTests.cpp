@@ -6113,3 +6113,19 @@ LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(armnn::IWorkloadFactory
     return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, armnn::DataLayout::NCHW, inputShape, input, blockShape,
                                              crops, outputShape, expectedOutput);
 }
+
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(armnn::IWorkloadFactory& workloadFactory)
+{
+    const unsigned int inputShape[] = {4, 2, 2, 1};
+    const unsigned int outputShape[] = {1, 4, 4, 1};
+
+    std::vector<uint8_t> input({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
+    std::vector<uint8_t> expectedOutput({ 1, 5, 2, 6, 9, 13, 10, 14, 3, 7, 4, 8, 11, 15, 12, 16});
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, armnn::DataLayout::NHWC, inputShape, input, blockShape,
+                                               crops, outputShape, expectedOutput);
+}

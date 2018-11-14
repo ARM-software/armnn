@@ -385,4 +385,6 @@ ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat323, BatchToSpaceNdNhwcFloat32Test3)
 
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat321, BatchToSpaceNdNchwFloat32Test1)
 
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint1, BatchToSpaceNdNhwcUintTest1)
+
 BOOST_AUTO_TEST_SUITE_END()

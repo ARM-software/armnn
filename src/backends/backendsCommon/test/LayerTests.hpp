@@ -439,3 +439,5 @@ LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test2(armnn::IWorkloadFactory
 LayerTestResult<float, 4> BatchToSpaceNdNhwcFloat32Test3(armnn::IWorkloadFactory& workloadFactory);
 
 LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(armnn::IWorkloadFactory &workloadFactory);
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(armnn::IWorkloadFactory &workloadFactory);

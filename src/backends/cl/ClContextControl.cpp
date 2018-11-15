@@ -5,20 +5,18 @@
 
 #include "ClContextControl.hpp"
 
-#include "armnn/Exceptions.hpp"
+#include <armnn/Exceptions.hpp>
 
-#ifdef ARMCOMPUTECL_ENABLED
+#include <LeakChecking.hpp>
+
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
-#endif
 
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/polymorphic_cast.hpp>
 #include <boost/core/ignore_unused.hpp>
-
-#include "LeakChecking.hpp"
 
 namespace cl
 {
@@ -38,7 +36,6 @@ ClContextControl::ClContextControl(IGpuAccTunedParameters* clTunedParameters,
     // Ignore m_ProfilingEnabled if unused to avoid compiling problems when ArmCompute is disabled.
     boost::ignore_unused(m_ProfilingEnabled);
 
-#ifdef ARMCOMPUTECL_ENABLED
     try
     {
         std::vector<cl::Platform> platforms;
@@ -70,12 +67,10 @@ ClContextControl::ClContextControl(IGpuAccTunedParameters* clTunedParameters,
 
     // Always load the OpenCL runtime.
     LoadOpenClRuntime();
-#endif
 }
 
 ClContextControl::~ClContextControl()
 {
-#ifdef ARMCOMPUTECL_ENABLED
     // Load the OpencCL runtime without the tuned parameters to free the memory for them.
     try
     {
@@ -91,7 +86,6 @@ ClContextControl::~ClContextControl()
         std::cerr << "A CL error occurred unloading the runtime tuner parameters: "
                   << clError.what() << ". CL error code is: " << clError.err() << std::endl;
     }
-#endif
 }
 
 void ClContextControl::LoadOpenClRuntime()
@@ -106,7 +100,6 @@ void ClContextControl::UnloadOpenClRuntime()
 
 void ClContextControl::DoLoadOpenClRuntime(bool useTunedParameters)
 {
-#ifdef ARMCOMPUTECL_ENABLED
     cl::Device device = cl::Device::getDefault();
     cl::Context context;
     cl::CommandQueue commandQueue;
@@ -171,7 +164,6 @@ void ClContextControl::DoLoadOpenClRuntime(bool useTunedParameters)
         tuner = &m_clTunedParameters->m_Tuner;
     }
     arm_compute::CLScheduler::get().init(context, commandQueue, device, tuner);
-#endif
 }
 
 void ClContextControl::ClearClCache()
@@ -196,15 +188,12 @@ void IGpuAccTunedParameters::Destroy(IGpuAccTunedParameters* params)
 
 ClTunedParameters::ClTunedParameters(armnn::IGpuAccTunedParameters::Mode mode)
     : m_Mode(mode)
-#ifdef ARMCOMPUTECL_ENABLED
     , m_Tuner(mode == ClTunedParameters::Mode::UpdateTunedParameters)
-#endif
 {
 }
 
 void ClTunedParameters::Load(const char* filename)
 {
-#ifdef ARMCOMPUTECL_ENABLED
     try
     {
         m_Tuner.load_from_file(filename);
@@ -214,12 +203,10 @@ void ClTunedParameters::Load(const char* filename)
         throw armnn::Exception(std::string("Failed to load tuned parameters file '") + filename + "': " +
             e.what());
     }
-#endif
 }
 
 void ClTunedParameters::Save(const char* filename) const
 {
-#ifdef ARMCOMPUTECL_ENABLED
     try
     {
         m_Tuner.save_to_file(filename);
@@ -229,7 +216,6 @@ void ClTunedParameters::Save(const char* filename) const
         throw armnn::Exception(std::string("Failed to save tuned parameters file to '") + filename + "': " +
             e.what());
     }
-#endif
 }
 
 } // namespace armnn

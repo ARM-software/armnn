@@ -6,9 +6,7 @@
 
 #include "armnn/IRuntime.hpp"
 
-#ifdef ARMCOMPUTECL_ENABLED
 #include <arm_compute/runtime/CL/CLTuner.h>
-#endif
 
 namespace armnn
 {
@@ -54,9 +52,7 @@ public:
 
     Mode m_Mode;
 
-#ifdef ARMCOMPUTECL_ENABLED
     arm_compute::CLTuner m_Tuner;
-#endif
 };
 
 } // namespace armnn

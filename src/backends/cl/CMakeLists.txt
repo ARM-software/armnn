@@ -30,8 +30,6 @@ if(ARMCOMPUTECL)
 else()
     list(APPEND armnnClBackend_sources
         ClBackendId.hpp
-        ClContextControl.cpp
-        ClContextControl.hpp
         ClLayerSupport.cpp
         ClLayerSupport.hpp
     )

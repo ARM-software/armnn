@@ -126,27 +126,27 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeak)
     armnn::Runtime runtime(options);
     armnn::RuntimeLoadedNetworksReserve(&runtime);
 
-    // Checks for leaks before we load the network and record them so that we can see the delta after unloading.
-    VALGRIND_DO_QUICK_LEAK_CHECK;
-    VALGRIND_COUNT_LEAKS(leakedBefore, dubious, reachableBefore, suppressed);
-
-    // Builds a mock-network and load it into the runtime.
     {
-        unsigned int inputShape[] = {1, 7, 1, 1};
-        armnn::TensorInfo inputTensorInfo(4, inputShape, armnn::DataType::Float32);
+        std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
         std::unique_ptr<armnn::Network> mockNetwork1 = std::make_unique<armnn::Network>();
         mockNetwork1->AddInputLayer(0, "test layer");
 
-
-        std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
+        // Warm-up load/unload pair to put the runtime in a stable state (memory-wise).
         runtime.LoadNetwork(networkIdentifier1, Optimize(*mockNetwork1, backends, runtime.GetDeviceSpec()));
+        runtime.UnloadNetwork(networkIdentifier1);
+
+        // Checks for leaks before we load the network and record them so that we can see the delta after unloading.
+        VALGRIND_DO_QUICK_LEAK_CHECK;
+        VALGRIND_COUNT_LEAKS(leakedBefore, dubious, reachableBefore, suppressed);
+
+        // The actual test.
+        runtime.LoadNetwork(networkIdentifier1, Optimize(*mockNetwork1, backends, runtime.GetDeviceSpec()));
+        runtime.UnloadNetwork(networkIdentifier1);
+
+        VALGRIND_DO_ADDED_LEAK_CHECK;
+        VALGRIND_COUNT_LEAKS(leakedAfter, dubious, reachableAfter, suppressed);
     }
-
-    runtime.UnloadNetwork(networkIdentifier1);
-
-    VALGRIND_DO_ADDED_LEAK_CHECK;
-    VALGRIND_COUNT_LEAKS(leakedAfter, dubious, reachableAfter, suppressed);
 
     // If we're not running under Valgrind, these vars will have been initialised to 0, so this will always pass.
     BOOST_TEST(leakedBefore    == leakedAfter);

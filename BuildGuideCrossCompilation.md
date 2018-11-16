@@ -18,7 +18,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 #### <a name="buildProtobuf">Build and install Google's Protobuf library</a>
 
-* Get protobuf-all-3.5.1.tar.gz from here: https://github.com/google/protobuf/releases
+* Get protobuf-all-3.5.1.tar.gz from here: https://github.com/protocolbuffers/protobuf/releases/tag/v3.5.1
 * Extract:
     ```bash
     tar -zxvf protobuf-all-3.5.1.tar.gz

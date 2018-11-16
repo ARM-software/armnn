@@ -169,6 +169,4 @@ public:
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 }; // class NeonLayerSupport
 
-bool IsNeonDirectConvolutionPreferred(const TensorInfo& weightInfo, const Convolution2dDescriptor& desc);
-
 } // namespace armnn

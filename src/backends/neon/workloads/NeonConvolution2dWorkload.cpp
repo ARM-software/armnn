@@ -82,30 +82,14 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
                                              m_Data.m_Parameters.m_PadBottom,
                                              arm_compute::DimensionRoundingType::FLOOR);
 
-    const bool preferDirectConvolution =
-        IsNeonDirectConvolutionPreferred(m_Data.m_Weight->GetTensorInfo(),
-                                         m_Data.m_Parameters);
+    auto convolutionLayer = std::make_unique<arm_compute::NEConvolutionLayer>(memoryManager);
+    convolutionLayer->configure(&input,
+                                m_KernelTensor.get(),
+                                m_BiasTensor.get(),
+                                &output,
+                                padStrideInfo);
+    m_ConvolutionLayer.reset(convolutionLayer.release());
 
-    if (preferDirectConvolution)
-    {
-        auto directConvolutionLayer = std::make_unique<arm_compute::NEDirectConvolutionLayer>(memoryManager);
-        directConvolutionLayer->configure(&input,
-                                          m_KernelTensor.get(),
-                                          m_BiasTensor.get(),
-                                          &output,
-                                          padStrideInfo);
-        m_ConvolutionLayer.reset(directConvolutionLayer.release());
-    }
-    else
-    {
-        auto convolutionLayer = std::make_unique<arm_compute::NEConvolutionLayer>(memoryManager);
-        convolutionLayer->configure(&input,
-                                    m_KernelTensor.get(),
-                                    m_BiasTensor.get(),
-                                    &output,
-                                    padStrideInfo);
-        m_ConvolutionLayer.reset(convolutionLayer.release());
-    }
     BOOST_ASSERT(m_ConvolutionLayer);
 
     InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);

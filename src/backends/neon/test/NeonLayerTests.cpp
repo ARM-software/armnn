@@ -44,54 +44,6 @@ ARMNN_AUTO_TEST_CASE(SimpleConvolution2dAsymmetricPaddingNhwc,
                      armnn::DataLayout::NHWC)
 
 ARMNN_AUTO_TEST_CASE(SimpleConvolution2dSquareNhwc, SimpleConvolution2d3x3NhwcTest, false)
-namespace
-{
-
-armnn::Convolution2dDescriptor MakeConv2dDesc(uint32_t strideX, uint32_t strideY,
-    uint32_t padLeft = 0, uint32_t padRight = 0, uint32_t padTop = 0, uint32_t padBottom = 0)
-{
-    armnn::Convolution2dDescriptor result;
-    result.m_StrideX = strideX;
-    result.m_StrideY = strideY;
-    result.m_PadLeft = padLeft;
-    result.m_PadRight = padRight;
-    result.m_PadTop = padTop;
-    result.m_PadBottom = padBottom;
-    result.m_BiasEnabled = true;
-    return result;
-}
-
-}
-
-BOOST_AUTO_TEST_CASE(Conv2dUtils)
-{
-    // The only preferred Neon convolution is 1x1 with padding=0 and stride size {1,2,3}.
-    armnn::TensorShape shape1x1({ 1,1,1,1 });
-    armnn::TensorInfo info1x1(shape1x1, armnn::DataType::Float32);
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(1, 1)));
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(1, 2)));
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(1, 3)));
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(2, 1)));
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(2, 2)));
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(2, 3)));
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(3, 1)));
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(3, 2)));
-    BOOST_TEST(armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(3, 3)));
-
-    BOOST_TEST(!armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(4, 1)));
-    BOOST_TEST(!armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(4, 5)));
-    BOOST_TEST(!armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(3, 6)));
-
-    // non zero padding is not preferred for direct convolution
-    BOOST_TEST(!armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(1, 1, 1, 0)));
-    BOOST_TEST(!armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(1, 1, 0, 1)));
-    BOOST_TEST(!armnn::IsNeonDirectConvolutionPreferred(info1x1, MakeConv2dDesc(1, 1, 1, 1)));
-
-    // 2x2 filter not preferred for direct convolution
-    armnn::TensorShape shape2x2({ 1,1,2,2 });
-    armnn::TensorInfo info2x2(shape2x2, armnn::DataType::Float32);
-    BOOST_TEST(!armnn::IsNeonDirectConvolutionPreferred(info2x2, MakeConv2dDesc(1, 1)));
-}
 
 // Depthwise Convolution
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1,

@@ -453,38 +453,4 @@ bool NeonLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
                                    output);
 }
 
-bool IsNeonDirectConvolutionPreferred(const TensorInfo& weightInfo, const Convolution2dDescriptor& desc)
-{
-    // See arm_compute::NEDirectConvolutionLayer documentation for the supported cases,
-    // and complement with NEDirectConvolutionLayerKernel::configure() implementation.
-
-    // Only 1x1 is using direct convolution. Performance results and details are in:
-    //    https://jira.arm.com/browse/IVGCVSW-1003
-    // Measurements were taken as of clframework: f105ab972135bcd21304883eff040d7e587099bc
-
-    const bool dataTypeSupported = (weightInfo.GetDataType() == armnn::DataType::Float32);
-
-    // Strides: 1|2|3
-    const bool strideSupported = (desc.m_StrideX == 1 || desc.m_StrideX == 2 || desc.m_StrideX == 3) &&
-                                 (desc.m_StrideY == 1 || desc.m_StrideY == 2 || desc.m_StrideY == 3);
-
-    auto paddingLargerThan = [](const Convolution2dDescriptor& conv2ddesc, unsigned int value)
-    {
-        return conv2ddesc.m_PadLeft > value || conv2ddesc.m_PadRight > value ||
-               conv2ddesc.m_PadTop > value || conv2ddesc.m_PadBottom > value;
-    };
-
-    // Supported sizes and padding.
-    const bool sizeAndPaddingSupported =
-        // Pad > 0 not supported for 1x1 weights.
-        (weightInfo.GetShape()[2] == 1 && weightInfo.GetShape()[3] == 1 && !paddingLargerThan(desc, 0u));
-
-    const bool preferDirectConvolution = dataTypeSupported &&
-                                         strideSupported &&
-                                         sizeAndPaddingSupported &&
-                                         // NEDirectConvolutionLayerKernel doesn't support NULL bias.
-                                         desc.m_BiasEnabled;
-    return preferDirectConvolution;
-}
-
 } // namespace armnn

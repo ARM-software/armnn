@@ -25,7 +25,7 @@ public:
 
 private:
     // Purposely not a CLL2Normalize function. See constructor.
-    mutable arm_compute::CLNormalizationLayer m_Layer;
+    mutable arm_compute::CLL2NormalizeLayer m_Layer;
 };
 
 } //namespace armnn

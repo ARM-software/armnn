@@ -282,7 +282,7 @@ struct L2NormalizationDescriptor
         : m_DataLayout(DataLayout::NCHW)
     {}
 
-    DataLayout m_DataLayout;
+    DataLayoutIndexed m_DataLayout;
 };
 
 struct BatchNormalizationDescriptor

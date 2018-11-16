@@ -6,13 +6,11 @@
 #include "ClBackendContext.hpp"
 #include "ClContextControl.hpp"
 
-#include <boost/log/trivial.hpp>
-
-#ifdef ARMCOMPUTECL_ENABLED
 #include <arm_compute/core/CL/OpenCL.h>
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
-#endif
+
+#include <boost/log/trivial.hpp>
 
 namespace armnn
 {
@@ -26,7 +24,6 @@ struct ClBackendContext::ClContextControlWrapper
 
     bool Sync()
     {
-#ifdef ARMCOMPUTECL_ENABLED
         if (arm_compute::CLScheduler::get().context()() != NULL)
         {
             // Waits for all queued CL requests to finish before unloading the network they may be using.
@@ -38,25 +35,22 @@ struct ClBackendContext::ClContextControlWrapper
             catch (const cl::Error&)
             {
                 BOOST_LOG_TRIVIAL(warning) << "WARNING: Runtime::UnloadNetwork(): an error occurred while waiting for "
-                                            "the queued CL requests to finish";
+                                              "the queued CL requests to finish";
                 return false;
             }
         }
-#endif
+
         return true;
     }
 
     void ClearClCache()
     {
-#ifdef ARMCOMPUTECL_ENABLED
         if (arm_compute::CLScheduler::get().context()() != NULL)
         {
             // There are no loaded networks left, so clear the CL cache to free up memory
             m_ClContextControl.ClearClCache();
         }
-#endif
     }
-
 
     ClContextControl m_ClContextControl;
 };

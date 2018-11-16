@@ -4,10 +4,8 @@
 //
 #pragma once
 
-#if ARMCOMPUTENEON_ENABLED || ARMCOMPUTECL_ENABLED
-
-#include <armnn/Tensor.hpp>
 #include <armnn/Descriptors.hpp>
+#include <armnn/Tensor.hpp>
 
 #include <arm_compute/core/Types.h>
 
@@ -122,6 +120,4 @@ ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(const FullyConnected
     return fc_info;
 }
 
-}
-
-#endif // ARMCOMPUTENEON_ENABLED || ARMCOMPUTECL_ENABLED
+} // namespace armnn

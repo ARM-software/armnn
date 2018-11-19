@@ -26,16 +26,9 @@ struct ParserPrototxtFixture
 {
     ParserPrototxtFixture()
         : m_Parser(TParser::Create())
+        , m_Runtime(armnn::IRuntime::Create(armnn::IRuntime::CreationOptions()))
         , m_NetworkIdentifier(-1)
     {
-        armnn::IRuntime::CreationOptions options;
-
-        // Create runtimes for each available backend
-        const armnn::BackendIdSet availableBackendIds = armnn::BackendRegistryInstance().GetBackendIds();
-        for (auto& backendId : availableBackendIds)
-        {
-            m_Runtimes.push_back(std::make_pair(armnn::IRuntime::Create(options), backendId));
-        }
     }
 
     /// Parses and loads the network defined by the m_Prototext string.
@@ -62,7 +55,7 @@ struct ParserPrototxtFixture
 
     std::string                                         m_Prototext;
     std::unique_ptr<TParser, void(*)(TParser* parser)>  m_Parser;
-    std::vector<std::pair<armnn::IRuntimePtr, armnn::BackendId>> m_Runtimes;
+    armnn::IRuntimePtr                                  m_Runtime;
     armnn::NetworkId                                    m_NetworkIdentifier;
 
     /// If the single-input-single-output overload of Setup() is called, these will store the input and output name
@@ -98,44 +91,36 @@ template<typename TParser>
 void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::TensorShape>& inputShapes,
     const std::vector<std::string>& requestedOutputs)
 {
-    for (auto&& runtime : m_Runtimes)
-    {
-        std::string errorMessage;
+    std::string errorMessage;
 
-        armnn::INetworkPtr network =
-            m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes, requestedOutputs);
-        auto optimized = Optimize(*network,
-                { runtime.second, armnn::Compute::CpuRef }, runtime.first->GetDeviceSpec());
-        armnn::Status ret = runtime.first->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
-        if (ret != armnn::Status::Success)
-        {
-            throw armnn::Exception(boost::str(
-                boost::format("LoadNetwork failed with error: '%1%' %2%")
-                              % errorMessage
-                              % CHECK_LOCATION().AsString()));
-        }
+    armnn::INetworkPtr network =
+        m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes, requestedOutputs);
+    auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
+    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
+    if (ret != armnn::Status::Success)
+    {
+        throw armnn::Exception(boost::str(
+            boost::format("LoadNetwork failed with error: '%1%' %2%")
+                            % errorMessage
+                            % CHECK_LOCATION().AsString()));
     }
 }
 
 template<typename TParser>
 void ParserPrototxtFixture<TParser>::Setup()
 {
-    for (auto&& runtime : m_Runtimes)
-    {
-        std::string errorMessage;
+    std::string errorMessage;
 
-        armnn::INetworkPtr network =
-            m_Parser->CreateNetworkFromString(m_Prototext.c_str());
-        auto optimized = Optimize(*network,
-                { runtime.second, armnn::Compute::CpuRef }, runtime.first->GetDeviceSpec());
-        armnn::Status ret = runtime.first->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
-        if (ret != armnn::Status::Success)
-        {
-            throw armnn::Exception(boost::str(
-                boost::format("LoadNetwork failed with error: '%1%' %2%")
-                              % errorMessage
-                              % CHECK_LOCATION().AsString()));
-        }
+    armnn::INetworkPtr network =
+        m_Parser->CreateNetworkFromString(m_Prototext.c_str());
+    auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
+    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
+    if (ret != armnn::Status::Success)
+    {
+        throw armnn::Exception(boost::str(
+            boost::format("LoadNetwork failed with error: '%1%' %2%")
+                            % errorMessage
+                            % CHECK_LOCATION().AsString()));
     }
 }
 
@@ -152,49 +137,46 @@ template <std::size_t NumOutputDimensions>
 void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::vector<float>>& inputData,
     const std::map<std::string, std::vector<float>>& expectedOutputData)
 {
-    for (auto&& runtime : m_Runtimes)
+    using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+
+    // Sets up the armnn input tensors from the given vectors.
+    armnn::InputTensors inputTensors;
+    for (auto&& it : inputData)
     {
-        using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+        BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(it.first);
+        inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
+    }
 
-        // Sets up the armnn input tensors from the given vectors.
-        armnn::InputTensors inputTensors;
-        for (auto&& it : inputData)
+    // Allocates storage for the output tensors to be written to and sets up the armnn output tensors.
+    std::map<std::string, boost::multi_array<float, NumOutputDimensions>> outputStorage;
+    armnn::OutputTensors outputTensors;
+    for (auto&& it : expectedOutputData)
+    {
+        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
+        outputStorage.emplace(it.first, MakeTensor<float, NumOutputDimensions>(bindingInfo.second));
+        outputTensors.push_back(
+            { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
+    }
+
+    m_Runtime->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
+
+    // Compares each output tensor to the expected values.
+    for (auto&& it : expectedOutputData)
+    {
+        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
+        if (bindingInfo.second.GetNumElements() != it.second.size())
         {
-            BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(it.first);
-            inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
+            throw armnn::Exception(
+                boost::str(
+                    boost::format("Output tensor %1% is expected to have %2% elements. "
+                                    "%3% elements supplied. %4%") %
+                                    it.first %
+                                    bindingInfo.second.GetNumElements() %
+                                    it.second.size() %
+                                    CHECK_LOCATION().AsString()));
         }
-
-        // Allocates storage for the output tensors to be written to and sets up the armnn output tensors.
-        std::map<std::string, boost::multi_array<float, NumOutputDimensions>> outputStorage;
-        armnn::OutputTensors outputTensors;
-        for (auto&& it : expectedOutputData)
-        {
-            BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
-            outputStorage.emplace(it.first, MakeTensor<float, NumOutputDimensions>(bindingInfo.second));
-            outputTensors.push_back(
-                { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
-        }
-
-        runtime.first->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
-
-        // Compares each output tensor to the expected values.
-        for (auto&& it : expectedOutputData)
-        {
-            BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
-            if (bindingInfo.second.GetNumElements() != it.second.size())
-            {
-                throw armnn::Exception(
-                    boost::str(
-                        boost::format("Output tensor %1% is expected to have %2% elements. "
-                                      "%3% elements supplied. %4%") %
-                                      it.first %
-                                      bindingInfo.second.GetNumElements() %
-                                      it.second.size() %
-                                      CHECK_LOCATION().AsString()));
-            }
-            auto outputExpected = MakeTensor<float, NumOutputDimensions>(bindingInfo.second, it.second);
-            BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
-        }
+        auto outputExpected = MakeTensor<float, NumOutputDimensions>(bindingInfo.second, it.second);
+        BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
     }
 }
 

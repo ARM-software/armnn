@@ -5,6 +5,7 @@
 #pragma once
 
 #include "WorkloadTestUtils.hpp"
+#include "TensorUtils.hpp"
 
 #include "QuantizeHelper.hpp"
 
@@ -50,10 +51,10 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     unsigned int outputChannels  = boost::numeric_cast<unsigned int>(outputExpected.shape()[channelsIndex]);
     unsigned int outputBatchSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
 
-    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(inputBatchSize, inputChannels, inputHeight,
-                                                         inputWidth, dataLayout);
-    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(outputBatchSize, outputChannels, outputHeight,
-                                                          outputWidth, dataLayout);
+    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo<T>(inputBatchSize, inputChannels, inputHeight,
+                                                                      inputWidth, dataLayout);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(outputBatchSize, outputChannels, outputHeight,
+                                                                      outputWidth, dataLayout);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -252,8 +253,8 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
     descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo  = GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
-    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
+    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -321,8 +322,8 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
     descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo  = GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
-    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
+    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -441,8 +442,8 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
     descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo  = GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
-    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
+    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
 
     std::vector<T> inputData(
         QuantizedVector<T>(qScale, qOffset, {

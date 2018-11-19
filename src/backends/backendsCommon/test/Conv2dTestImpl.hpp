@@ -5,6 +5,7 @@
 #pragma once
 
 #include "WorkloadTestUtils.hpp"
+#include "TensorUtils.hpp"
 
 #include <string>
 #include <armnn/ArmNN.hpp>
@@ -108,10 +109,12 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
 
 
     // Note these tensors will use two (identical) batches.
-    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(2*inputNum, inputChannels, inputHeight, inputWidth, layout);
-    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(
-            2*outputNum, outputChannels, outputHeight, outputWidth, layout);
-    armnn::TensorInfo kernelDesc = GetTensorInfo<T>(kernelDepthMul, kernelChannels, kernelHeight, kernelWidth, layout);
+    armnn::TensorInfo inputTensorInfo =
+            armnnUtils::GetTensorInfo<T>(2*inputNum, inputChannels, inputHeight, inputWidth, layout);
+    armnn::TensorInfo outputTensorInfo =
+            armnnUtils::GetTensorInfo<T>(2*outputNum, outputChannels, outputHeight, outputWidth, layout);
+    armnn::TensorInfo kernelDesc =
+            armnnUtils::GetTensorInfo<T>(kernelDepthMul, kernelChannels, kernelHeight, kernelWidth, layout);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -354,9 +357,12 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     BOOST_ASSERT(!biasEnabled || bias.size() == outputChannels);
 
     // Creates the tensors.
-    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
-    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
-    armnn::TensorInfo kernelDesc = GetTensorInfo<T>(kernelChanMul, kernelChannels, kernelHeight, kernelWidth, layout);
+    armnn::TensorInfo inputTensorInfo =
+            armnnUtils::GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
+    armnn::TensorInfo outputTensorInfo =
+            armnnUtils::GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
+    armnn::TensorInfo kernelDesc =
+            armnnUtils::GetTensorInfo<T>(kernelChanMul, kernelChannels, kernelHeight, kernelWidth, layout);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -483,9 +489,11 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     unsigned int outputChannels = kernelChannels;
     unsigned int outputNum = inputNum;
 
-    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
-    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
-    armnn::TensorInfo kernelDesc = GetTensorInfo<T>(1, outputChannels, kernelHeight, kernelWidth, layout);
+    armnn::TensorInfo inputTensorInfo =
+            armnnUtils::GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
+    armnn::TensorInfo outputTensorInfo =
+            armnnUtils::GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
+    armnn::TensorInfo kernelDesc = armnnUtils::GetTensorInfo<T>(1, outputChannels, kernelHeight, kernelWidth, layout);
     armnn::TensorInfo biasDesc({ outputChannels }, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -629,11 +637,11 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     unsigned int outputChannels  = inputChannels * depthMultiplier;
     unsigned int outputBatchSize = inputBatchSize;
 
-    armnn::TensorInfo inputTensorInfo = GetTensorInfo<T>(
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo<T>(
             inputBatchSize, inputChannels, inputHeight, inputWidth, layout);
-    armnn::TensorInfo outputTensorInfo = GetTensorInfo<T>(
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(
             outputBatchSize, outputChannels, outputHeight, outputWidth, layout);
-    armnn::TensorInfo kernelDesc = GetTensorInfo<T>(
+    armnn::TensorInfo kernelDesc = armnnUtils::GetTensorInfo<T>(
             depthMultiplier, inputChannels, kernelHeight, kernelWidth, layout);
     armnn::TensorInfo biasDesc({outputChannels}, armnn::GetDataType<B>());
 

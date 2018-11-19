@@ -4,6 +4,7 @@
 //
 #include "LayerTests.hpp"
 #include "WorkloadTestUtils.hpp"
+#include "TensorUtils.hpp"
 
 #include "test/TensorHelpers.hpp"
 #include "TensorCopyUtils.hpp"
@@ -67,24 +68,6 @@ static std::vector<float> ConvInput3x8x16({
 
 // 2-channel bias used by a number of Conv2d tests.
 static std::vector<float> Bias2({0, 2});
-
-armnn::TensorShape GetTestTensorShape(unsigned int numberOfBatches,
-                                      unsigned int numberOfChannels,
-                                      unsigned int height,
-                                      unsigned int width,
-                                      const armnn::DataLayoutIndexed& dataLayout)
-{
-    switch (dataLayout.GetDataLayout())
-    {
-        case armnn::DataLayout::NCHW:
-            return armnn::TensorShape({numberOfBatches, numberOfChannels, height, width});
-        case armnn::DataLayout::NHWC:
-            return armnn::TensorShape({numberOfBatches, height, width, numberOfChannels});
-        default:
-            throw armnn::InvalidArgumentException("unknown data layout ["
-                                                  + std::to_string(static_cast<int>(dataLayout.GetDataLayout())) + "]");
-    }
-}
 
 // Helper function that returns either Bias2 or an empty vector depending on whether bias is enabled.
 template<typename T>
@@ -3859,8 +3842,8 @@ LayerTestResult<float, 4> ResizeBilinearNopTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
-    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
+    const armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
 
     std::vector<float> inputData({
         1.0f, 2.0f, 3.0f, 4.0f,
@@ -3913,8 +3896,8 @@ LayerTestResult<float, 4> SimpleResizeBilinearTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 2, 2, dataLayout);
-    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 1, 1, dataLayout);
+    const armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 2, 2, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 1, 1, dataLayout);
 
     std::vector<float> inputData({
           1.0f, 255.0f,
@@ -3979,8 +3962,8 @@ LayerTestResult<float, 4> ResizeBilinearSqMinTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
-    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 2, 2, dataLayout);
+    const armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 4, 4, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 2, 2, dataLayout);
 
     std::vector<float> inputData({
         1.0f, 2.0f, 3.0f, 4.0f,
@@ -4045,8 +4028,8 @@ LayerTestResult<float, 4> ResizeBilinearMinTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 3, 5, dataLayout);
-    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 2, 3, dataLayout);
+    const armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 3, 5, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 2, 3, dataLayout);
 
     std::vector<float> inputData({
           1.0f,   2.0f,   3.0f,   5.0f,   8.0f,
@@ -4109,8 +4092,8 @@ LayerTestResult<float, 4> ResizeBilinearMagTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout dataLayout)
 {
-    const armnn::TensorInfo inputTensorInfo = GetTensorInfo<float>(1, 2, 3, 2, dataLayout);
-    const armnn::TensorInfo outputTensorInfo = GetTensorInfo<float>(1, 2, 3, 5, dataLayout);
+    const armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 3, 2, dataLayout);
+    const armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<float>(1, 2, 3, 5, dataLayout);
 
     std::vector<float> inputData({
           1.0f,   2.0f,
@@ -4741,7 +4724,7 @@ LayerTestResult<float, 4> L2Normalization1dTest(
     unsigned int width = 1;
 
 
-    const armnn::TensorShape inputOutputShape = GetTestTensorShape(
+    const armnn::TensorShape inputOutputShape = armnnUtils::GetTensorShape(
             numberOfBatches, numberOfChannels, height, width, layout);
     std::vector<float> inputValues
     {
@@ -4810,7 +4793,7 @@ LayerTestResult<float, 4> L2Normalization2dTest(
     unsigned int height = 1;
     unsigned int width = 5;
 
-    const armnn::TensorShape inputOutputShape = GetTestTensorShape(
+    const armnn::TensorShape inputOutputShape = armnnUtils::GetTensorShape(
             numberOfBatches, numberOfChannels, height, width, layout);
     std::vector<float> inputValues
     {
@@ -4855,7 +4838,7 @@ LayerTestResult<float, 4> L2Normalization3dTest(
     unsigned int height = 4;
     unsigned int width = 3;
 
-    const armnn::TensorShape inputOutputShape = GetTestTensorShape(
+    const armnn::TensorShape inputOutputShape = armnnUtils::GetTensorShape(
             numberOfBatches, numberOfChannels, height, width, layout);
     std::vector<float> inputValues
     {
@@ -4920,7 +4903,7 @@ LayerTestResult<float, 4> L2Normalization4dTest(
     unsigned int height = 4;
     unsigned int width = 3;
 
-    const armnn::TensorShape inputOutputShape = GetTestTensorShape(
+    const armnn::TensorShape inputOutputShape = armnnUtils::GetTensorShape(
             numberOfBatches, numberOfChannels, height, width, layout);
     std::vector<float> inputValues
     {

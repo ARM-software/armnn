@@ -210,22 +210,3 @@ boost::multi_array<T, n> MakeRandomTensor(const armnn::TensorInfo& tensorInfo,
     int32_t qOffset = tensorInfo.GetQuantizationOffset();
     return MakeTensor<T, n>(tensorInfo, QuantizedVector<T>(qScale, qOffset, init));
 }
-
-template<typename T>
-armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
-                                unsigned int numberOfChannels,
-                                unsigned int height,
-                                unsigned int width,
-                                const armnn::DataLayout dataLayout)
-{
-    switch (dataLayout)
-    {
-        case armnn::DataLayout::NCHW:
-            return armnn::TensorInfo({numberOfBatches, numberOfChannels, height, width}, armnn::GetDataType<T>());
-        case armnn::DataLayout::NHWC:
-            return armnn::TensorInfo({numberOfBatches, height, width, numberOfChannels}, armnn::GetDataType<T>());
-        default:
-            throw armnn::InvalidArgumentException("unknown data layout ["
-                                                  + std::to_string(static_cast<int>(dataLayout)) + "]");
-    }
-}

@@ -76,6 +76,7 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/Logging.cpp \
         src/armnnUtils/Permute.cpp \
         src/armnnUtils/ParserHelper.cpp \
+        src/armnnUtils/TensorUtils.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArithmeticBaseLayer.cpp \

@@ -46,6 +46,8 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/VerificationHelpers.cpp
     src/armnnUtils/ParserHelper.hpp
     src/armnnUtils/ParserHelper.cpp
+    src/armnnUtils/TensorUtils.hpp
+    src/armnnUtils/TensorUtils.cpp
     )
 if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER)
     list(APPEND armnnUtils_sources

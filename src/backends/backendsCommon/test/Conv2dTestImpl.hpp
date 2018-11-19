@@ -14,6 +14,7 @@
 #include <test/TensorHelpers.hpp>
 #include "QuantizeHelper.hpp"
 
+#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
@@ -75,7 +76,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     const boost::multi_array<T, 4>& originalOutputExpected,
     float qScale,
     int32_t qOffset,
-    const armnn::DataLayoutIndexed& layout = armnn::DataLayout::NCHW,
+    const armnn::DataLayout layout = armnn::DataLayout::NCHW,
     uint32_t padLeft = 0,
     uint32_t padTop = 0,
     uint32_t padRight = 0,
@@ -137,7 +138,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
 
     // at this point if we require it permute the input data
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
         armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
@@ -166,7 +167,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     outputData.insert(outputData.end(), outputImage.begin(), outputImage.end());
 
     // at this point if we require it permute the expected output
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(outputData.size());
         armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp.data());
@@ -187,7 +188,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
     // Permute the kernel if necessary
     boost::multi_array<T, 4> kernel = boost::multi_array<T, 4>(originalKernel);
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernel.data(), kernel.data());
     }
@@ -210,7 +211,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     data.m_Parameters.m_PadTop = padTop;
     data.m_Parameters.m_PadBottom = padBottom;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
-    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
+    data.m_Parameters.m_DataLayout = layout;
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvolution2d(data, info);
     inputHandle->Allocate();
@@ -327,7 +328,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     const boost::multi_array<T, 4>& outputExpected,
     float qScale,
     int32_t qOffset,
-    const armnn::DataLayoutIndexed& layout,
+    const armnn::DataLayout layout,
     uint32_t padLeft = 0,
     uint32_t padTop = 0,
     uint32_t padRight = 0,
@@ -377,7 +378,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
 
     // At this point if we require it permute the input data
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
         armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
@@ -401,7 +402,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     LayerTestResult<T, 4> ret(outputTensorInfo);
 
     // At this point if we require it permute the expected output
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(outputData.size());
         armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp.data());
@@ -417,7 +418,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
 
     // Permute the kernel if necessary
     boost::multi_array<T, 4> kernel = boost::multi_array<T, 4>(originalKernel);
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernel.data(), kernel.data());
     }
@@ -440,7 +441,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     data.m_Parameters.m_PadTop = padTop;
     data.m_Parameters.m_PadBottom = padBottom;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
-    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
+    data.m_Parameters.m_DataLayout = layout;
 
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
@@ -466,7 +467,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     float qScale,
     int32_t qOffset,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout)
+    const armnn::DataLayout layout)
 {
     unsigned int inputHeight = 3;
     unsigned int inputWidth = 3;
@@ -511,7 +512,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
             }));
     // at this point if we require it permute the input data
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
         armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
@@ -533,7 +534,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
                     0.f, 0.f,  0.f,
                     -1.f, 0.f, -1.f,
             }));
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(kernelData.size());
         armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, kernelData.data(), tmp.data());
@@ -557,7 +558,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     }
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(outputImage.size());
         armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputImage.data(), tmp.data());
@@ -589,7 +590,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     data.m_Parameters.m_PadTop = 0;
     data.m_Parameters.m_PadBottom = 0;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
-    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
+    data.m_Parameters.m_DataLayout = layout;
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
     inputHandle->Allocate();
@@ -611,7 +612,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     float qScale,
     int32_t qOffset,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout)
+    const armnn::DataLayout layout)
 {
     unsigned int depthMultiplier = 2;
 
@@ -672,7 +673,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     std::vector<T> inputData = originalInputData;
     // at this point if we require it permute the input data
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, originalInputData.data(), inputData.data());
     }
@@ -709,7 +710,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
                     0, 0, 0
             }));
     std::vector<T> kernelData = originalKernelData;
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernelData.data(), kernelData.data());
     }
@@ -762,7 +763,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
     std::vector<T> outputImage = originalOutputImage;
-    if (layout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (layout == armnn::DataLayout::NHWC)
     {
         armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, originalOutputImage.data(), outputImage.data());
     }
@@ -792,7 +793,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     data.m_Parameters.m_PadTop = 1;
     data.m_Parameters.m_PadBottom = 1;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
-    data.m_Parameters.m_DataLayout = layout.GetDataLayout();
+    data.m_Parameters.m_DataLayout = layout;
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
     inputHandle->Allocate();

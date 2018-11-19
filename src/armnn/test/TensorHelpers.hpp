@@ -216,9 +216,9 @@ armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
                                 unsigned int numberOfChannels,
                                 unsigned int height,
                                 unsigned int width,
-                                const armnn::DataLayoutIndexed& dataLayout)
+                                const armnn::DataLayout dataLayout)
 {
-    switch (dataLayout.GetDataLayout())
+    switch (dataLayout)
     {
         case armnn::DataLayout::NCHW:
             return armnn::TensorInfo({numberOfBatches, numberOfChannels, height, width}, armnn::GetDataType<T>());
@@ -226,6 +226,6 @@ armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
             return armnn::TensorInfo({numberOfBatches, height, width, numberOfChannels}, armnn::GetDataType<T>());
         default:
             throw armnn::InvalidArgumentException("unknown data layout ["
-                                                  + std::to_string(static_cast<int>(dataLayout.GetDataLayout())) + "]");
+                                                  + std::to_string(static_cast<int>(dataLayout)) + "]");
     }
 }

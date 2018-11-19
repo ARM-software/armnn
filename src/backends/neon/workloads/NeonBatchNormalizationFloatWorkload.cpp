@@ -21,20 +21,18 @@ arm_compute::Status NeonBatchNormalizationValidate(const TensorInfo& input,
                                                    const TensorInfo& gamma,
                                                    const BatchNormalizationDescriptor& descriptor)
 {
-    const DataLayout dataLayout = descriptor.m_DataLayout.GetDataLayout();
-
     const arm_compute::TensorInfo aclInputInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(input, dataLayout);
+          armcomputetensorutils::BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(output, dataLayout);
+          armcomputetensorutils::BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclMeanInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(mean, dataLayout);
+          armcomputetensorutils::BuildArmComputeTensorInfo(mean, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclVarInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(var, dataLayout);
+          armcomputetensorutils::BuildArmComputeTensorInfo(var, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclBetaInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(beta, dataLayout);
+          armcomputetensorutils::BuildArmComputeTensorInfo(beta, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclGammaInfo =
-          armcomputetensorutils::BuildArmComputeTensorInfo(gamma, dataLayout);
+          armcomputetensorutils::BuildArmComputeTensorInfo(gamma, descriptor.m_DataLayout);
 
     return arm_compute::NEBatchNormalizationLayer::validate(&aclInputInfo,
                                                             &aclOutputInfo,
@@ -54,7 +52,7 @@ NeonBatchNormalizationFloatWorkload::NeonBatchNormalizationFloatWorkload(
     arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout.GetDataLayout());
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 

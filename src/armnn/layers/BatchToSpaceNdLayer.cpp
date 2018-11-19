@@ -10,6 +10,7 @@
 
 #include <armnn/TypesUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -50,7 +51,7 @@ void BatchToSpaceNdLayer::ValidateTensorShapesFromInputs()
 
 std::vector<TensorShape> BatchToSpaceNdLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    const DataLayoutIndexed & dataLayout = m_Param.m_DataLayout;
+    const DataLayoutIndexed dataLayout = m_Param.m_DataLayout;
     const TensorShape& inputShape = inputShapes[0];
     unsigned int inBatchSize = inputShape[0];
     unsigned int channelSize = inputShape[dataLayout.GetChannelsIndex()];

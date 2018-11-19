@@ -9,6 +9,7 @@
 
 #include <armnn/TypesUtils.hpp>
 
+#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -48,8 +49,9 @@ std::vector<TensorShape> SpaceToBatchNdLayer::InferOutputShapes(const std::vecto
                                                      1U,
                                                      std::multiplies<>());
 
-    unsigned int heightIndex = m_Param.m_DataLayout.GetHeightIndex();
-    unsigned int widthIndex = m_Param.m_DataLayout.GetWidthIndex();
+    DataLayoutIndexed dimensionIndices = m_Param.m_DataLayout;
+    unsigned int heightIndex = dimensionIndices.GetHeightIndex();
+    unsigned int widthIndex = dimensionIndices.GetWidthIndex();
 
     std::pair<unsigned int, unsigned int> heightPad = m_Param.m_PadList[0];
     std::pair<unsigned int, unsigned int> widthPad = m_Param.m_PadList[1];

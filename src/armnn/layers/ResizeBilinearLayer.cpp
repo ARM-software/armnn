@@ -7,6 +7,7 @@
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
+#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -34,10 +35,10 @@ std::vector<TensorShape> ResizeBilinearLayer::InferOutputShapes(const std::vecto
 {
     BOOST_ASSERT(inputShapes.size() == 1);
     const TensorShape& inputShape = inputShapes[0];
-
+    const DataLayoutIndexed dimensionIndices = m_Param.m_DataLayout;
     unsigned int outWidth = m_Param.m_TargetWidth;
     unsigned int outHeight = m_Param.m_TargetHeight;
-    unsigned int outChannels = inputShape[m_Param.m_DataLayout.GetChannelsIndex()];
+    unsigned int outChannels = inputShape[dimensionIndices.GetChannelsIndex()];
     unsigned int outBatch = inputShape[0];
 
     TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NHWC ?

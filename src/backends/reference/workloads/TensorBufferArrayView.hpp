@@ -7,6 +7,8 @@
 
 #include <armnn/Tensor.hpp>
 
+#include <backendsCommon/DataLayoutIndexed.hpp>
+
 #include <boost/assert.hpp>
 
 namespace armnn

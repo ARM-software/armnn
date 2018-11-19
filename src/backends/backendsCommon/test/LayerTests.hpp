@@ -58,13 +58,13 @@ LayerTestResult<float, 4> SimpleConvolution2d3x5Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> SimpleConvolution2d3x3Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -75,12 +75,12 @@ LayerTestResult<float, 4>
 Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float,   4> Convolution1dTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -96,7 +96,7 @@ LayerTestResult<float, 4> DepthwiseConvolution2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> DepthwiseConvolution2dDepthNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -107,13 +107,13 @@ LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float,   4> SimpleMaxPooling2dSize2x2Stride2x2Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -154,22 +154,22 @@ LayerTestResult<uint8_t, 4> IgnorePaddingMaxPooling2dSize3Uint8Test(
 LayerTestResult<float,   4> SimpleMaxPooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 LayerTestResult<uint8_t, 4> SimpleMaxPooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 LayerTestResult<float,   4> SimpleAveragePooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 LayerTestResult<uint8_t, 4> SimpleAveragePooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 LayerTestResult<float,   4> IgnorePaddingAveragePooling2dSize3x2Stride2x2Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -203,12 +203,12 @@ LayerTestResult<uint8_t, 4> IgnorePaddingAveragePooling2dSize3Uint8Test(
 LayerTestResult<float,   4> SimpleL2Pooling2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 LayerTestResult<uint8_t, 4> SimpleL2Pooling2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 LayerTestResult<float,   4> L2Pooling2dSize3Stride1Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -464,7 +464,7 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> CompareNormalizationTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -606,32 +606,32 @@ LayerTestResult<float, 4> CompareBoundedReLuTest(
 LayerTestResult<float, 4> ResizeBilinearNopTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 // Tests the behaviour of the resize bilinear operation when rescaling a 2x2 image into a 1x1 image.
 LayerTestResult<float, 4> SimpleResizeBilinearTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 // Tests the resize bilinear for minification of a square input matrix (also: input dimensions are a
 // multiple of output dimensions).
 LayerTestResult<float, 4> ResizeBilinearSqMinTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 // Tests the resize bilinear for minification (output dimensions smaller than input dimensions).
 LayerTestResult<float, 4> ResizeBilinearMinTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout dataLayout);
 
 // Tests the resize bilinear for magnification (output dimensions bigger than input dimensions).
 LayerTestResult<float, 4> ResizeBilinearMagTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout);
+    const armnn::DataLayout  dataLayout);
 
 LayerTestResult<float, 4> BatchNormTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -648,22 +648,22 @@ LayerTestResult<float, 2> FakeQuantizationTest(
 LayerTestResult<float, 4> L2Normalization1dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> L2Normalization2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> L2Normalization3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> L2Normalization4dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> ConstantTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -765,25 +765,25 @@ LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<uint8_t, 4> DepthwiseConvolution2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<uint8_t, 4> DepthwiseConvolution2dDepthMul1Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
-    const armnn::DataLayoutIndexed& layout);
+    const armnn::DataLayout layout);
 
 LayerTestResult<uint8_t, 4> ConstantLinearActivationUint8Test(
     armnn::IWorkloadFactory& workloadFactory,

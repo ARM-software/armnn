@@ -18,9 +18,9 @@ arm_compute::Status NeonPooling2dWorkloadValidate(const TensorInfo& input,
     const Pooling2dDescriptor& descriptor)
 {
     const arm_compute::TensorInfo aclInputInfo =
-            BuildArmComputeTensorInfo(input, descriptor.m_DataLayout.GetDataLayout());
+            BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo =
-            BuildArmComputeTensorInfo(output, descriptor.m_DataLayout.GetDataLayout());
+            BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
     arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(descriptor);
 
@@ -36,7 +36,7 @@ NeonPooling2dWorkload::NeonPooling2dWorkload(
     arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout.GetDataLayout());
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 

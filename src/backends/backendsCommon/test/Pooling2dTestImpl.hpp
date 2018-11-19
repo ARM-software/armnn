@@ -34,10 +34,11 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     const boost::multi_array<T, 4>& input,
     const boost::multi_array<T, 4>& outputExpected)
 {
-    const armnn::DataLayoutIndexed dataLayout = descriptor.m_DataLayout;
-    auto heightIndex = dataLayout.GetHeightIndex();
-    auto widthIndex = dataLayout.GetWidthIndex();
-    auto channelsIndex = dataLayout.GetChannelsIndex();
+    const armnn::DataLayout dataLayout = descriptor.m_DataLayout;
+    const armnn::DataLayoutIndexed dimensionIndices = dataLayout;
+    auto heightIndex = dimensionIndices.GetHeightIndex();
+    auto widthIndex = dimensionIndices.GetWidthIndex();
+    auto channelsIndex = dimensionIndices.GetChannelsIndex();
 
     unsigned int inputHeight     = boost::numeric_cast<unsigned int>(input.shape()[heightIndex]);
     unsigned int inputWidth      = boost::numeric_cast<unsigned int>(input.shape()[widthIndex]);
@@ -240,7 +241,7 @@ template<typename T>
 LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayoutIndexed& dataLayout = armnn::DataLayout::NCHW,
+    const armnn::DataLayout dataLayout = armnn::DataLayout::NCHW,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -286,7 +287,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
         }));
 
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
-    if (dataLayout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
         armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
@@ -309,7 +310,7 @@ template<typename T>
 LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::DataLayoutIndexed dataLayout = armnn::DataLayout::NCHW,
+    armnn::DataLayout dataLayout = armnn::DataLayout::NCHW,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -355,7 +356,7 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
         }));
 
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
-    if (dataLayout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
         armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
@@ -429,7 +430,7 @@ template<typename T>
 LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::DataLayoutIndexed dataLayout = armnn::DataLayout::NCHW,
+    armnn::DataLayout dataLayout = armnn::DataLayout::NCHW,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -466,7 +467,7 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
         }));
 
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
-    if (dataLayout.GetDataLayout() == armnn::DataLayout::NHWC)
+    if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
         armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());

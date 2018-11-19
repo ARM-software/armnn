@@ -198,7 +198,7 @@ struct Pooling2dDescriptor
     uint32_t            m_StrideY;
     OutputShapeRounding m_OutputShapeRounding;
     PaddingMethod       m_PaddingMethod;
-    DataLayoutIndexed   m_DataLayout;
+    DataLayout   m_DataLayout;
 };
 
 struct FullyConnectedDescriptor
@@ -286,7 +286,7 @@ struct L2NormalizationDescriptor
         : m_DataLayout(DataLayout::NCHW)
     {}
 
-    DataLayoutIndexed m_DataLayout;
+    DataLayout m_DataLayout;
 };
 
 struct BatchNormalizationDescriptor
@@ -297,7 +297,7 @@ struct BatchNormalizationDescriptor
     {}
 
     float m_Eps;
-    DataLayoutIndexed m_DataLayout;
+    DataLayout m_DataLayout;
 };
 
 struct BatchToSpaceNdDescriptor
@@ -316,7 +316,7 @@ struct BatchToSpaceNdDescriptor
 
     std::vector<unsigned int> m_BlockShape;
     std::vector<std::pair<unsigned int, unsigned int>> m_Crops;
-    DataLayoutIndexed m_DataLayout;
+    DataLayout m_DataLayout;
 };
 
 struct FakeQuantizationDescriptor
@@ -340,7 +340,7 @@ struct ResizeBilinearDescriptor
 
     uint32_t          m_TargetWidth;
     uint32_t          m_TargetHeight;
-    DataLayoutIndexed m_DataLayout;
+    DataLayout m_DataLayout;
 };
 
 struct ReshapeDescriptor
@@ -371,7 +371,7 @@ struct SpaceToBatchNdDescriptor
 
     std::vector<unsigned int> m_BlockShape;
     std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
-    DataLayoutIndexed m_DataLayout;
+    DataLayout m_DataLayout;
 };
 
 // temporary descriptor for Lstm
@@ -455,7 +455,7 @@ struct StridedSliceDescriptor
     int32_t m_EllipsisMask;
     int32_t m_NewAxisMask;
 
-    DataLayoutIndexed m_DataLayout;
+    DataLayout m_DataLayout;
 };
 
 }

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <armnn/Types.hpp>

@@ -8,6 +8,7 @@
 
 #include <boost/cast.hpp>
 
+#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -133,11 +134,11 @@ std::unique_ptr<WorkloadType> CreateArithmeticWorkloadTest(armnn::IWorkloadFacto
 
 template <typename BatchNormalizationFloat32Workload, armnn::DataType DataType>
 std::unique_ptr<BatchNormalizationFloat32Workload> CreateBatchNormalizationWorkloadTest(
-    armnn::IWorkloadFactory& factory, armnn::Graph& graph, DataLayoutIndexed dataLayout = DataLayout::NCHW)
+    armnn::IWorkloadFactory& factory, armnn::Graph& graph, DataLayout dataLayout = DataLayout::NCHW)
 {
 
     TensorShape tensorShape;
-    switch (dataLayout.GetDataLayout())
+    switch (dataLayout)
     {
         case DataLayout::NHWC:
             tensorShape = { 2, 4, 4, 3 };
@@ -184,7 +185,7 @@ std::unique_ptr<BatchNormalizationFloat32Workload> CreateBatchNormalizationWorkl
     BOOST_TEST((queueDescriptor.m_Variance->GetTensorInfo() == TensorInfo({3}, DataType)));
     BOOST_TEST((queueDescriptor.m_Gamma->GetTensorInfo() == TensorInfo({3}, DataType)));
     BOOST_TEST((queueDescriptor.m_Beta->GetTensorInfo() == TensorInfo({3}, DataType)));
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout.GetDataLayout() == dataLayout));
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -842,13 +843,12 @@ void CreateSplitterMultipleInputsOneOutputWorkloadTest(armnn::IWorkloadFactory& 
 template <typename ResizeBilinearWorkload, armnn::DataType DataType>
 std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::IWorkloadFactory& factory,
                                                                          armnn::Graph& graph,
-                                                                         DataLayoutIndexed dataLayout =
-                                                                             DataLayout::NCHW)
+                                                                         DataLayout dataLayout = DataLayout::NCHW)
 {
     TensorShape inputShape;
     TensorShape outputShape;
 
-    switch (dataLayout.GetDataLayout()) {
+    switch (dataLayout) {
         case DataLayout::NHWC:
             inputShape =  { 2, 4, 4, 3 };
             outputShape = { 2, 2, 2, 3 };
@@ -861,8 +861,9 @@ std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::
 
     // Creates the layer we're testing.
     ResizeBilinearDescriptor resizeDesc;
-    resizeDesc.m_TargetWidth = outputShape[dataLayout.GetWidthIndex()];
-    resizeDesc.m_TargetHeight = outputShape[dataLayout.GetHeightIndex()];
+    DataLayoutIndexed dimensionIndices = dataLayout;
+    resizeDesc.m_TargetWidth = outputShape[dimensionIndices.GetWidthIndex()];
+    resizeDesc.m_TargetHeight = outputShape[dimensionIndices.GetHeightIndex()];
     resizeDesc.m_DataLayout = dataLayout;
     Layer* const layer = graph.AddLayer<ResizeBilinearLayer>(resizeDesc, "layer");
 
@@ -883,7 +884,7 @@ std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::
     ResizeBilinearQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout.GetDataLayout() == dataLayout));
+    BOOST_TEST((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

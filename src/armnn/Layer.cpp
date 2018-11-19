@@ -132,7 +132,6 @@ Layer::Layer(unsigned int numInputSlots,
 : m_OutputHandlers(numOutputSlots)
 , m_LayerName(name ? name : "")
 , m_Type(type)
-, m_DataLayout(layout)
 , m_BackendId(UninitializedBackendId())
 , m_Guid(GenerateLayerGuid())
 {

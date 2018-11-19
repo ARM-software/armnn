@@ -28,17 +28,6 @@ protected:
     LayerWithParameters(unsigned int numInputSlots,
                         unsigned int numOutputSlots,
                         LayerType type,
-                        DataLayout layout,
-                        const Parameters& param,
-                        const char* name)
-    :   Layer(numInputSlots, numOutputSlots, type, layout, name)
-    ,   m_Param(param)
-    {
-    }
-
-    LayerWithParameters(unsigned int numInputSlots,
-                        unsigned int numOutputSlots,
-                        LayerType type,
                         const Parameters& param,
                         const char* name)
         : Layer(numInputSlots, numOutputSlots, type, name)

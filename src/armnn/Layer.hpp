@@ -235,8 +235,6 @@ public:
 
     DataType GetDataType() const;
 
-    DataLayout GetDataLayout() const { return m_DataLayout; }
-
     const BackendId& GetBackendId() const { return m_BackendId; }
     void SetBackendId(const BackendId& id) { m_BackendId = id; }
 
@@ -344,7 +342,6 @@ private:
     std::vector<OutputSlot> m_OutputSlots;
 
     const LayerType m_Type;
-    const DataLayout m_DataLayout;
     BackendId m_BackendId;
 
     /// Used for sorting.

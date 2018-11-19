@@ -6,18 +6,26 @@
 #pragma once
 
 #include <backendsCommon/Workload.hpp>
+#include <neon/workloads/NeonWorkloadUtils.hpp>
 
 namespace armnn
 {
+arm_compute::Status NeonMergerWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
+                                               const TensorInfo& output,
+                                               const MergerDescriptor& descriptor);
+
 class NeonMergerWorkload : public BaseWorkload<MergerQueueDescriptor>
 {
 public:
-    using BaseWorkload<MergerQueueDescriptor>::BaseWorkload;
+    NeonMergerWorkload(const MergerQueueDescriptor& descriptor, const WorkloadInfo& info);
 
-    virtual void Execute() const override
-    {
-        // With subtensors, merger is a no-op.
-    }
+    using BaseWorkload<MergerQueueDescriptor>::BaseWorkload;
+    void Execute() const override;
+
+private:
+    mutable arm_compute::NEConcatenateLayer m_Layer;
+    bool m_Execute;
+
 };
 
 } //namespace armnn

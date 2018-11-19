@@ -322,10 +322,12 @@ bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
 }
 
 bool RefLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
+                                        const TensorInfo& output,
                                         const OriginsDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     ignore_unused(descriptor);
+    ignore_unused(output);
     return IsSupportedForDataTypeRef(reasonIfUnsupported,
                                      inputs[0]->GetDataType(),
                                      &TrueFunc<>,

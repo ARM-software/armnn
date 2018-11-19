@@ -471,7 +471,9 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             auto endPtr = boost::make_transform_iterator(inputs.end(), getTensorInfoPtr);
             std::vector<const TensorInfo*> inputPtrs(beginPtr, endPtr);
 
-            result = layerSupportObject->IsMergerSupported(inputPtrs, cLayer->GetParameters(), reason);
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsMergerSupported(inputPtrs, output, cLayer->GetParameters(), reason);
             break;
         }
         case LayerType::Multiplication:

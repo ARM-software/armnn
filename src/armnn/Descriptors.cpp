@@ -72,13 +72,15 @@ PermutationVector::PermutationVector(std::initializer_list<ValueType> dimMapping
 }
 
 OriginsDescriptor::OriginsDescriptor()
-: m_NumViews(0)
+: m_ConcatAxis(1)
+, m_NumViews(0)
 , m_NumDimensions(0)
 , m_ViewOrigins(nullptr)
 {}
 
 OriginsDescriptor::OriginsDescriptor(uint32_t numViews, uint32_t numDimensions /*= 4*/)
-: m_NumViews(numViews)
+: m_ConcatAxis(1)
+, m_NumViews(numViews)
 , m_NumDimensions(numDimensions)
 , m_ViewOrigins(numViews && numDimensions > 0 ? new uint32_t *[numViews]() : nullptr)
 {
@@ -89,7 +91,8 @@ OriginsDescriptor::OriginsDescriptor(uint32_t numViews, uint32_t numDimensions /
 }
 
 OriginsDescriptor::OriginsDescriptor(const OriginsDescriptor& other)
-: m_NumViews(other.m_NumViews)
+: m_ConcatAxis(other.m_ConcatAxis)
+, m_NumViews(other.m_NumViews)
 , m_NumDimensions(other.m_NumDimensions)
 , m_ViewOrigins(other.m_NumViews && other.m_NumDimensions > 0 ? new uint32_t *[other.m_NumViews]() : nullptr)
 {
@@ -119,6 +122,15 @@ OriginsDescriptor& OriginsDescriptor::operator=(OriginsDescriptor rhs)
 {
     swap(*this, rhs);
     return *this;
+}
+
+void OriginsDescriptor::SetConcatAxis(unsigned int concatAxis)
+{
+    m_ConcatAxis = concatAxis;
+}
+unsigned int OriginsDescriptor::GetConcatAxis() const
+{
+    return m_ConcatAxis;
 }
 
 Status OriginsDescriptor::SetViewOriginCoord(uint32_t view, uint32_t coord, uint32_t value)
@@ -284,6 +296,7 @@ void swap(OriginsDescriptor& first, OriginsDescriptor& second)
     swap(first.m_NumViews, second.m_NumViews);
     swap(first.m_NumDimensions, second.m_NumDimensions);
     swap(first.m_ViewOrigins, second.m_ViewOrigins);
+    swap(first.m_ConcatAxis, second.m_ConcatAxis);
 }
 
 void swap(ViewsDescriptor& first, ViewsDescriptor& second)

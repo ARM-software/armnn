@@ -390,6 +390,16 @@ void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         throw InvalidArgumentException("MergerQueueDescriptor: At least one TensorInfo output needs to be provided.");
     }
 
+    if(m_Parameters.GetConcatAxis() > workloadInfo.m_InputTensorInfos[0].GetShape().GetNumDimensions())
+    {
+        throw InvalidArgumentException("Invalid Concatenation Axis provided");
+    }
+
+    if (workloadInfo.m_InputTensorInfos[0].GetShape().GetNumDimensions() - m_Parameters.GetConcatAxis() == 1)
+    {
+        return;
+    }
+
     if (workloadInfo.m_InputTensorInfos.size() != m_ViewOrigins.size())
     {
         throw InvalidArgumentException(

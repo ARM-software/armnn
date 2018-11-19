@@ -23,6 +23,7 @@
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
+#include "workloads/NeonMergerWorkload.hpp"
 #include "workloads/NeonMultiplicationFloatWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
@@ -334,14 +335,25 @@ bool NeonLayerSupport::IsMeanSupported(const TensorInfo& input,
 }
 
 bool NeonLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
+                                         const TensorInfo& output,
                                          const OriginsDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
-    return IsSupportedForDataTypeNeon(reasonIfUnsupported,
-                                      inputs[0]->GetDataType(),
-                                      &TrueFunc<>,
-                                      &TrueFunc<>);
+    if(descriptor.GetNumDimensions() - descriptor.GetConcatAxis() == 1)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonMergerWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       inputs,
+                                       output,
+                                       descriptor);
+    }
+    else
+     {
+         return IsSupportedForDataTypeNeon(reasonIfUnsupported,
+                                           inputs[0]->GetDataType(),
+                                           &TrueFunc<>,
+                                           &TrueFunc<>);
+      }
 }
 
 bool NeonLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,

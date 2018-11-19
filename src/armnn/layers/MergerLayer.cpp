@@ -40,7 +40,10 @@ void MergerLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& fact
     //just needs to make sure that the outputs of the prev layer
     //are made subtensors of the output of the merger layer.
     m_OutputHandlers[0].CreateTensorHandles(factory);
-    if (factory.SupportsSubTensors())
+
+    signed long innerAxis = m_Param.GetNumDimensions() - m_Param.GetConcatAxis();
+
+    if (factory.SupportsSubTensors() && innerAxis != 1)
     {
         std::queue<MergerLayer*> m_MergerLayers;
 

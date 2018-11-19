@@ -2235,6 +2235,7 @@ void Concatenate(
     }
 
     armnn::OriginsDescriptor viewsDescriptor = CreateMergerDescriptorForConcatenation(inputTensorInfos, concatDim);
+    queueDescriptor.m_Parameters = viewsDescriptor;
 
     queueDescriptor.m_ViewOrigins.reserve(viewsDescriptor.GetNumViews());
     for (unsigned int i = 0; i < viewsDescriptor.GetNumViews(); ++i)

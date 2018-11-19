@@ -117,6 +117,7 @@ public:
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
+                           const TensorInfo& output,
                            const OriginsDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 

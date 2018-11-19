@@ -27,6 +27,7 @@
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
 #include "workloads/ClLstmFloatWorkload.hpp"
 #include "workloads/ClMeanWorkload.hpp"
+#include "workloads/ClMergerWorkload.hpp"
 #include "workloads/ClMultiplicationWorkload.hpp"
 #include "workloads/ClNormalizationFloatWorkload.hpp"
 #include "workloads/ClPadWorkload.hpp"
@@ -366,14 +367,25 @@ bool ClLayerSupport::IsMeanSupported(const TensorInfo& input,
 }
 
 bool ClLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
+                                       const TensorInfo& output,
                                        const OriginsDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
-    return IsSupportedForDataTypeCl(reasonIfUnsupported,
-                                    inputs[0]->GetDataType(),
-                                    &TrueFunc<>,
-                                    &FalseFuncU8<>);
+    if(descriptor.GetNumDimensions() - descriptor.GetConcatAxis() == 1)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(ClMergerWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       inputs,
+                                       output,
+                                       descriptor);
+    }
+    else
+    {
+        return IsSupportedForDataTypeCl(reasonIfUnsupported,
+                                        inputs[0]->GetDataType(),
+                                        &TrueFunc<>,
+                                        &FalseFuncU8<>);
+    }
 }
 
 bool ClLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,

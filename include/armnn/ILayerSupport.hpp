@@ -132,6 +132,7 @@ public:
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     virtual bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
+                                   const TensorInfo& output,
                                    const OriginsDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 

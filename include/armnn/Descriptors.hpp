@@ -63,11 +63,14 @@ struct OriginsDescriptor
     const uint32_t* GetViewOrigin(uint32_t idx) const;
     void ReorderOrigins(unsigned int*  newOrdering, unsigned int numNewOrdering);
     friend void swap(OriginsDescriptor& first, OriginsDescriptor& second);
+    void SetConcatAxis(unsigned int concatAxis);
+    unsigned int GetConcatAxis() const;
 
 private:
-    uint32_t   m_NumViews;
-    uint32_t   m_NumDimensions;
-    uint32_t** m_ViewOrigins;
+    unsigned int m_ConcatAxis;
+    uint32_t     m_NumViews;
+    uint32_t     m_NumDimensions;
+    uint32_t**   m_ViewOrigins;
 };
 
 struct ViewsDescriptor
@@ -138,6 +141,7 @@ OriginsDescriptor CreateMergerDescriptorForConcatenation(TensorShapeIt first, Te
     }
 
     OriginsDescriptor viewsDescriptor(static_cast<uint32_t>(numInputs), numDimensions);
+    viewsDescriptor.SetConcatAxis(concatenationDimension);
 
     uint32_t viewIndex = 0u;
     uint32_t coordAlongConcatDim = 0u;

@@ -257,12 +257,13 @@ bool IsLstmSupported(const BackendId& backend, const TensorInfo& input, const Te
 }
 bool IsMergerSupported(const BackendId& backend,
                        std::vector<const TensorInfo*> inputs,
+                       const TensorInfo& output,
                        const OriginsDescriptor& descriptor,
                        char* reasonIfUnsupported,
                        size_t reasonIfUnsupportedMaxLength)
 {
     BOOST_ASSERT(inputs.size() > 0);
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergerSupported, inputs, descriptor);
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergerSupported, inputs, output, descriptor);
 }
 
 bool IsMultiplicationSupported(const BackendId& backend,

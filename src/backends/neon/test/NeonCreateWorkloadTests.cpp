@@ -616,4 +616,39 @@ BOOST_AUTO_TEST_CASE(CreateL2NormalizationNhwcWorkload)
     NeonCreateL2NormalizationWorkloadTest<NeonL2NormalizationFloatWorkload, DataType::Float32>(DataLayout::NHWC);
 }
 
+template <typename MergerWorkloadType, armnn::DataType DataType>
+static void NeonCreateMergerWorkloadTest(std::initializer_list<unsigned int> outputShape,
+                                         unsigned int concatAxis)
+{
+    Graph graph;
+    NeonWorkloadFactory factory =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateMergerWorkloadTest<MergerWorkloadType, DataType>(factory, graph, outputShape, concatAxis);
+
+    MergerQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle0 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto inputHandle1 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[1]);
+    auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle0, TensorInfo({ 2, 3, 2, 5 }, DataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle1, TensorInfo({ 2, 3, 2, 5 }, DataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim0Float32Workload)
+{
+    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim1Float32Workload)
+{
+    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim3Float32Workload)
+{
+    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -803,4 +803,39 @@ BOOST_AUTO_TEST_CASE(CreateMeanUint8Workload)
     ClMeanWorkloadTest<ClMeanWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
+template <typename MergerWorkloadType, armnn::DataType DataType>
+static void ClCreateMergerWorkloadTest(std::initializer_list<unsigned int> outputShape,
+                                       unsigned int concatAxis)
+{
+    Graph graph;
+    ClWorkloadFactory factory =
+        ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateMergerWorkloadTest<MergerWorkloadType, DataType>(factory, graph, outputShape, concatAxis);
+
+    MergerQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle0  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto inputHandle1  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[1]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle0, { 2, 3, 2, 5 }));
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle1, { 2, 3, 2, 5 }));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, outputShape));
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim0Float32Workload)
+{
+    ClCreateMergerWorkloadTest<ClMergerWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim1Float32Workload)
+{
+    ClCreateMergerWorkloadTest<ClMergerWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim3Float32Workload)
+{
+    ClCreateMergerWorkloadTest<ClMergerWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

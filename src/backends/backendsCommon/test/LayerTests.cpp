@@ -1994,9 +1994,9 @@ armnn::OriginsDescriptor CreateMergerDescriptorForConcatenation(
 }
 
 //
-// Concatenation is only supported for N and C dimensions for NCHW. In case of
-// <4 dimensions we need to make sure that the concat dimensions are at least
-// the 3rd slowest iterating one.
+// Concatenation is only supported for N and C dimensions for NCHW and the inner most dimension
+// In case of <4 dimensions we need to make sure that the concat dimensions are at least
+// the 3rd slowest iterating one or the inner most dimension.
 //
 
 bool NeedPermuteForConcat(
@@ -2022,7 +2022,7 @@ bool NeedPermuteForConcat(
         }
     }
 
-    return (nDimensions-concatDim) < 3;
+    return (nDimensions < 3 || (nDimensions == 3 && (nDimensions-concatDim) < 3 && (nDimensions-concatDim) != 1));
 }
 
 armnn::TensorShape ExpandTensorShapeTo3dForPermute(const armnn::TensorShape & inputShape)
@@ -2050,7 +2050,6 @@ void Generate3dPermuteVectorForConcat(
 {
     BOOST_ASSERT_MSG(numDimensions <= 3,
        "Only dimensions 1,2 and 3 are supported by this helper");
-
     unsigned int expandedBy = 3 - numDimensions;
     unsigned int expandedConcatAxis = concatDim + expandedBy;
 
@@ -2110,6 +2109,7 @@ void PermuteInputsForConcat(
         {
             numDims = tensorInfo.GetShape().GetNumDimensions();
             Generate3dPermuteVectorForConcat(numDims, concatDim, permutations);
+
             // Store the reverese permutation.
             permuteVector = permutations.second;
             BOOST_ASSERT_MSG(!permuteVector.IsEqual(identity),
@@ -2191,7 +2191,8 @@ void Concatenate(
     std::initializer_list<T *> inputsOrig,
     const armnn::TensorInfo& outputTensorInfoOrig,
     T * output,
-    unsigned int concatDim)
+    unsigned int concatDim,
+    bool useSubtensor)
 {
     BOOST_ASSERT_MSG(output != nullptr, "output must not be null");
     if (output == nullptr)
@@ -2201,8 +2202,6 @@ void Concatenate(
         // an assert for Debug builds.
         return;
     }
-
-    armnn::MergerQueueDescriptor queueDescriptor;
 
     // Saves a copy of the parameters which we might need to change.
     std::vector<armnn::TensorInfo> inputTensorInfos(inputTensorInfosOrig.begin(), inputTensorInfosOrig.end());
@@ -2234,35 +2233,51 @@ void Concatenate(
                                   outputTensorInfo);
     }
 
-    armnn::OriginsDescriptor viewsDescriptor = CreateMergerDescriptorForConcatenation(inputTensorInfos, concatDim);
-    queueDescriptor.m_Parameters = viewsDescriptor;
-
-    queueDescriptor.m_ViewOrigins.reserve(viewsDescriptor.GetNumViews());
-    for (unsigned int i = 0; i < viewsDescriptor.GetNumViews(); ++i)
-    {
-        queueDescriptor.m_ViewOrigins.emplace_back(std::vector<unsigned int>(viewsDescriptor.GetViewOrigin(i),
-            viewsDescriptor.GetViewOrigin(i) + viewsDescriptor.GetNumDimensions()));
-    }
-
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    armnn::WorkloadInfo workloadInfo;
 
     std::vector<std::unique_ptr<armnn::ITensorHandle>> inputHandles;
     inputHandles.reserve(inputCount);
 
-    const bool subTensorsSupported = workloadFactory.SupportsSubTensors();
-    for (unsigned int i = 0; i < inputCount; ++i)
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::MergerQueueDescriptor queueDescriptor;
+    armnn::OriginsDescriptor viewsDescriptor = CreateMergerDescriptorForConcatenation(inputTensorInfos, concatDim);
+    queueDescriptor.m_Parameters = viewsDescriptor;
+
+    if (useSubtensor)
     {
-        const armnn::TensorInfo& inputTensorInfo = inputTensorInfos[i];
+        queueDescriptor.m_ViewOrigins.reserve(viewsDescriptor.GetNumViews());
+        for (unsigned int i = 0; i < viewsDescriptor.GetNumViews(); ++i)
+        {
+            queueDescriptor.m_ViewOrigins.emplace_back(std::vector<unsigned int>(viewsDescriptor.GetViewOrigin(i),
+                viewsDescriptor.GetViewOrigin(i) + viewsDescriptor.GetNumDimensions()));
+        }
 
-        std::unique_ptr<armnn::ITensorHandle> inputHandle = subTensorsSupported ?
-            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo.GetShape(),
-                queueDescriptor.m_ViewOrigins[i].m_Origin.data())
-            : workloadFactory.CreateTensorHandle(inputTensorInfo);
+        outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-        inputHandles.emplace_back(std::move(inputHandle));
+        const bool subTensorsSupported = workloadFactory.SupportsSubTensors();
+        for (unsigned int i = 0; i < inputCount; ++i)
+        {
+            const armnn::TensorInfo& inputTensorInfo = inputTensorInfos[i];
+            std::unique_ptr<armnn::ITensorHandle> inputHandle =
+                subTensorsSupported ?
+                    workloadFactory.CreateSubTensorHandle(*outputHandle,
+                                                          inputTensorInfo.GetShape(),
+                                                          queueDescriptor.m_ViewOrigins[i].m_Origin.data()) :
+                    workloadFactory.CreateTensorHandle(inputTensorInfo);
+
+            inputHandles.emplace_back(std::move(inputHandle));
+        }
+
     }
-
-    armnn::WorkloadInfo workloadInfo;
+    else
+    {
+        for (unsigned int i = 0; i < inputCount; ++i)
+        {
+            std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfos[i]);
+            inputHandles.emplace_back(std::move(inputHandle));
+        }
+    }
 
     for (unsigned int i = 0; i < inputCount; ++i)
     {
@@ -2324,11 +2339,12 @@ LayerTestResult<T, 1> Concatenation1dTestImpl(
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
     Concatenate<T>(workloadFactory, memoryManager,
-        { inputTensorInfo, inputTensorInfo, inputTensorInfo },
-        { input0.data(), input1.data(), input2.data() },
-        outputTensorInfo,
-        output.data(),
-        0);
+                   { inputTensorInfo, inputTensorInfo, inputTensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   0,
+                   true);
 
     result.output = MakeTensor<T, 1>(outputTensorInfo, output);
     result.outputExpected = MakeTensor<T, 1>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
@@ -2385,11 +2401,12 @@ LayerTestResult<T, 2> Concatenation2dTestImpl(
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
     Concatenate<T>(workloadFactory, memoryManager,
-        { inputTensorInfo, inputTensorInfo, inputTensorInfo },
-        { input0.data(), input1.data(), input2.data() },
-        outputTensorInfo,
-        output.data(),
-        dimension);
+                   { inputTensorInfo, inputTensorInfo, inputTensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   dimension,
+                   true);
 
     result.output = MakeTensor<T, 2>(outputTensorInfo, output);
     return result;
@@ -2505,11 +2522,12 @@ LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
     Concatenate<T>(workloadFactory, memoryManager,
-        { input0TensorInfo, input1TensorInfo, input2TensorInfo },
-        { input0.data(), input1.data(), input2.data() },
-        outputTensorInfo,
-        output.data(),
-        0);
+                   { input0TensorInfo, input1TensorInfo, input2TensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   0,
+                   true);
 
     result.output = MakeTensor<T, 2>(outputTensorInfo, output);
     result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
@@ -2582,11 +2600,12 @@ LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
     Concatenate<T>(workloadFactory, memoryManager,
-        { input0TensorInfo, input1TensorInfo, input2TensorInfo },
-        { input0.data(), input1.data(), input2.data() },
-        outputTensorInfo,
-        output.data(),
-        1);
+                   { input0TensorInfo, input1TensorInfo, input2TensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   1,
+                   true);
 
     result.output = MakeTensor<T, 2>(outputTensorInfo, output);
     result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
@@ -2613,6 +2632,7 @@ LayerTestResult<T, 3> Concatenation3dTestImpl(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::TensorInfo& outputTensorInfo,
     unsigned int dimension,
+    bool useSubtensor,
     float qScale,
     int32_t qOffset)
 {
@@ -2683,11 +2703,12 @@ LayerTestResult<T, 3> Concatenation3dTestImpl(
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
     Concatenate<T>(workloadFactory, memoryManager,
-        { inputTensorInfo, inputTensorInfo, inputTensorInfo },
-        { input0.data(), input1.data(), input2.data() },
-        outputTensorInfo,
-        output.data(),
-        dimension);
+                   { inputTensorInfo, inputTensorInfo, inputTensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   dimension,
+                   useSubtensor);
 
     result.output = MakeTensor<T, 3>(outputTensorInfo, output);
     return result;
@@ -2703,7 +2724,7 @@ LayerTestResult<T, 3> Concatenation3dDim0TestImpl(
     armnn::TensorInfo outputTensorInfo({ 6, 3, 2 }, armnn::GetDataType<T>());
 
     LayerTestResult<T, 3> result =
-        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 0, qScale, qOffset);
+        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 0, true, qScale, qOffset);
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         1.0f, 2.0f,
@@ -2759,6 +2780,7 @@ LayerTestResult<T, 3> Concatenation3dDim0TestImpl(
         // Batch 5, Channel 2
         35.0f, 36.0f
     }));
+
     return result;
 }
 
@@ -2779,7 +2801,8 @@ LayerTestResult<T, 3> Concatenation3dDim1TestImpl(
     armnn::TensorInfo outputTensorInfo({ 2, 9, 2 }, armnn::GetDataType<T>());
 
     LayerTestResult<T, 3> result =
-        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 1, qScale, qOffset);
+        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 1, true, qScale, qOffset);
+
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         1.0f, 2.0f,
@@ -2850,13 +2873,15 @@ template <typename T>
 LayerTestResult<T, 3> Concatenation3dDim2TestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor,
     float qScale,
     int32_t qOffset)
 {
     armnn::TensorInfo outputTensorInfo({ 2, 3, 6 }, armnn::GetDataType<T>());
 
     LayerTestResult<T, 3> result =
-        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 2, qScale, qOffset);
+        Concatenation3dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 2, useSubtensor, qScale, qOffset);
+
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         1.0f, 2.0f, 7.0f, 8.0f, 13.0f, 14.0f,
@@ -2882,9 +2907,10 @@ LayerTestResult<T, 3> Concatenation3dDim2TestImpl(
 
 LayerTestResult<float, 3> Concatenation3dDim2Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor)
 {
-    return Concatenation3dDim2TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concatenation3dDim2TestImpl<float>(workloadFactory, memoryManager, useSubtensor, 0.0f, 0);
 }
 
 template <typename T>
@@ -2963,11 +2989,12 @@ LayerTestResult<T, 3> Concatenation3dDim0DiffInputDimsTestImpl(
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
     Concatenate<T>(workloadFactory, memoryManager,
-        { input0TensorInfo, input1TensorInfo, input2TensorInfo },
-        { input0.data(), input1.data(), input2.data() },
-        outputTensorInfo,
-        output.data(),
-        0);
+                   { input0TensorInfo, input1TensorInfo, input2TensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   0,
+                   true);
 
     result.output = MakeTensor<T, 3>(outputTensorInfo, output);
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
@@ -3106,11 +3133,12 @@ LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
     Concatenate<T>(workloadFactory, memoryManager,
-        { input0TensorInfo, input1TensorInfo, input2TensorInfo },
-        { input0.data(), input1.data(), input2.data() },
-        outputTensorInfo,
-        output.data(),
-        1);
+                   { input0TensorInfo, input1TensorInfo, input2TensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   1,
+                   true);
 
     result.output = MakeTensor<T, 3>(outputTensorInfo, output);
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
@@ -3177,6 +3205,7 @@ template <typename T>
 LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor,
     float qScale,
     int32_t qOffset)
 {
@@ -3249,11 +3278,12 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(
     std::vector<T> output;
     output.resize(outputTensorInfo.GetNumElements());
     Concatenate<T>(workloadFactory, memoryManager,
-        { input0TensorInfo, input1TensorInfo, input2TensorInfo },
-        { input0.data(), input1.data(), input2.data() },
-        outputTensorInfo,
-        output.data(),
-        2);
+                   { input0TensorInfo, input1TensorInfo, input2TensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   2,
+                   useSubtensor);
 
     result.output = MakeTensor<T, 3>(outputTensorInfo, output);
     result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
@@ -3281,9 +3311,547 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(
 
 LayerTestResult<float, 3> Concatenation3dDim2DiffInputDimsTest(
     armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor)
+{
+    return Concatenation3dDim2DiffInputDimsTestImpl<float>(workloadFactory, memoryManager, useSubtensor, 0.0f, 0);
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::TensorInfo& outputTensorInfo,
+    unsigned int dimension,
+    bool useSubtensor,
+    float qScale,
+    int32_t qOffset)
+{
+    armnn::TensorInfo inputTensorInfo({ 1, 3, 2, 2 }, armnn::GetDataType<T>());
+
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f
+    }));
+
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f,
+        19.0f, 20.0f,
+        21.0f, 22.0f
+    }));
+
+    auto input2 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        21.0f, 22.0f,
+        23.0f, 24.0f,
+        25.0f, 26.0f,
+        27.0f, 28.0f,
+        29.0f, 30.0f,
+        31.0f, 32.0f
+    }));
+
+    LayerTestResult<T, 4> result(outputTensorInfo);
+
+    std::vector<T> output;
+    output.resize(outputTensorInfo.GetNumElements());
+
+    Concatenate<T>(workloadFactory,
+                   memoryManager,
+                   {inputTensorInfo, inputTensorInfo, inputTensorInfo},
+                   {input0.data(), input1.data(), input2.data()},
+                   outputTensorInfo,
+                   output.data(),
+                   dimension,
+                   useSubtensor);
+
+    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
+    return result;
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dDim0TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    armnn::TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, armnn::GetDataType<T>());
+
+    LayerTestResult<T, 4> result = Concatenation4dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 0,
+                                                              true, qScale, qOffset);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f,
+
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f,
+        19.0f, 20.0f,
+        21.0f, 22.0f,
+
+        21.0f, 22.0f,
+        23.0f, 24.0f,
+        25.0f, 26.0f,
+        27.0f, 28.0f,
+        29.0f, 30.0f,
+        31.0f, 32.0f
+    }));
+    return result;
+}
+
+LayerTestResult<float, 4> Concatenation4dDim0Test(
+    armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim2DiffInputDimsTestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concatenation4dDim0TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dDim1TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    armnn::TensorInfo outputTensorInfo({ 1, 9, 2, 2 }, armnn::GetDataType<T>());
+
+    LayerTestResult<T, 4> result = Concatenation4dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 1,
+                                                              true, qScale, qOffset);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f,
+
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f,
+        19.0f, 20.0f,
+        21.0f, 22.0f,
+
+        21.0f, 22.0f,
+        23.0f, 24.0f,
+        25.0f, 26.0f,
+        27.0f, 28.0f,
+        29.0f, 30.0f,
+        31.0f, 32.0f
+    }));
+
+    return result;
+}
+
+LayerTestResult<float, 4> Concatenation4dDim1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDim1TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dDim2TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 6, 2 }, armnn::GetDataType<T>());
+
+    LayerTestResult<T, 4> result = Concatenation4dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 2,
+                                                              true, qScale, qOffset);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        21.0f, 22.0f,
+        23.0f, 24.0f,
+
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f,
+        25.0f, 26.0f,
+        27.0f, 28.0f,
+
+        9.0f, 10.0f,
+        11.0f, 12.0f,
+        19.0f, 20.0f,
+        21.0f, 22.0f,
+        29.0f, 30.0f,
+        31.0f, 32.0f
+    }));
+
+    return result;
+}
+
+LayerTestResult<float, 4> Concatenation4dDim2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDim2TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dDim3TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool useSubtensor)
+{
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 2, 6 }, armnn::GetDataType<T>());
+
+    LayerTestResult<T, 4> result = Concatenation4dTestImpl<T>(workloadFactory, memoryManager, outputTensorInfo, 3,
+                                                              useSubtensor, qScale, qOffset);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        11.0f, 12.0f,
+        21.0f, 22.0f,
+        3.0f, 4.0f,
+        13.0f, 14.0f,
+        23.0f, 24.0f,
+
+        5.0f, 6.0f,
+        15.0f, 16.0f,
+        25.0f, 26.0f,
+        7.0f, 8.0f,
+        17.0f, 18.0f,
+        27.0f, 28.0f,
+
+        9.0f, 10.0f,
+        19.0f, 20.0f,
+        29.0f, 30.0f,
+        11.0f, 12.0f,
+        21.0f, 22.0f,
+        31.0f, 32.0f
+    }));
+
+    return result;
+}
+
+LayerTestResult<float, 4> Concatenation4dDim3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor)
+{
+    return Concatenation4dDim3TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0, useSubtensor);
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dDiffShapeDim0TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    unsigned int dimension = 0;
+    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, armnn::GetDataType<T>());
+
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f
+    }));
+
+    armnn::TensorInfo inputTensorInfo1({ 2, 3, 2, 2 }, armnn::GetDataType<T>());
+
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f,
+        19.0f, 20.0f,
+        21.0f, 22.0f,
+
+        21.0f, 22.0f,
+        23.0f, 24.0f,
+        25.0f, 26.0f,
+        27.0f, 28.0f,
+        29.0f, 30.0f,
+        31.0f, 32.0f
+
+    }));
+
+    armnn::TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, armnn::GetDataType<T>());
+
+    LayerTestResult<T, 4> result(outputTensorInfo);
+
+    std::vector<T> output;
+    output.resize(outputTensorInfo.GetNumElements());
+    Concatenate<T>(workloadFactory,
+                   memoryManager,
+                   {inputTensorInfo0, inputTensorInfo1},
+                   {input0.data(), input1.data()},
+                   outputTensorInfo,
+                   output.data(),
+                   dimension,
+                   true);
+
+    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f,
+
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f,
+        19.0f, 20.0f,
+        21.0f, 22.0f,
+
+        21.0f, 22.0f,
+        23.0f, 24.0f,
+        25.0f, 26.0f,
+        27.0f, 28.0f,
+        29.0f, 30.0f,
+        31.0f, 32.0f
+    }));
+
+    return result;
+}
+
+LayerTestResult<float, 4> Concatenation4dDiffShapeDim0Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDiffShapeDim0TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dDiffShapeDim1TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    unsigned int dimension = 1;
+    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, armnn::GetDataType<T>());
+
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f
+    }));
+
+    armnn::TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, armnn::GetDataType<T>());
+
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f,
+
+    }));
+
+    armnn::TensorInfo outputTensorInfo({ 1, 5, 2, 2 }, armnn::GetDataType<T>());
+
+    LayerTestResult<T, 4> result(outputTensorInfo);
+
+    std::vector<T> output;
+    output.resize(outputTensorInfo.GetNumElements());
+    Concatenate<T>(workloadFactory,
+                   memoryManager,
+                   {inputTensorInfo0, inputTensorInfo1},
+                   {input0.data(), input1.data()},
+                   outputTensorInfo,
+                   output.data(),
+                   dimension,
+                   true);
+
+    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f,
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f
+    }));
+
+    return result;
+}
+
+LayerTestResult<float, 4> Concatenation4dDiffShapeDim1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDiffShapeDim1TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dDiffShapeDim2TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    unsigned int dimension = 2;
+    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, armnn::GetDataType<T>());
+
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f
+    }));
+
+    armnn::TensorInfo inputTensorInfo1({ 1, 3, 3, 2 }, armnn::GetDataType<T>());
+
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+        17.0f, 18.0f,
+        19.0f, 20.0f,
+        21.0f, 22.0f,
+        23.0f, 24.0f,
+        25.0f, 26.0f,
+        27.0f, 28.0f
+    }));
+
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 5, 2 }, armnn::GetDataType<T>());
+
+    LayerTestResult<T, 4> result(outputTensorInfo);
+
+    std::vector<T> output;
+    output.resize(outputTensorInfo.GetNumElements());
+    Concatenate<T>(workloadFactory,
+                   memoryManager,
+                   {inputTensorInfo0, inputTensorInfo1},
+                   {input0.data(), input1.data()},
+                   outputTensorInfo,
+                   output.data(),
+                   dimension,
+                   true);
+
+    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        11.0f, 12.0f,
+        13.0f, 14.0f,
+        15.0f, 16.0f,
+
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        17.0f, 18.0f,
+        19.0f, 20.0f,
+        21.0f, 22.0f,
+
+        9.0f, 10.0f,
+        11.0f, 12.0f,
+        23.0f, 24.0f,
+        25.0f, 26.0f,
+        27.0f, 28.0f
+    }));
+
+    return result;
+}
+
+LayerTestResult<float, 4> Concatenation4dDiffShapeDim2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDiffShapeDim2TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
+template <typename T>
+LayerTestResult<T, 4> Concatenation4dDiffShapeDim3TestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    bool useSubtensor)
+{
+    unsigned int dimension = 3;
+    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, armnn::GetDataType<T>());
+
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f,
+        3.0f, 4.0f,
+        5.0f, 6.0f,
+        7.0f, 8.0f,
+        9.0f, 10.0f,
+        11.0f, 12.0f
+    }));
+
+    armnn::TensorInfo inputTensorInfo1({ 1, 3, 2, 3 }, armnn::GetDataType<T>());
+
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
+        11.0f, 12.0f, 13.0f,
+        14.0f, 15.0f, 16.0f,
+
+        17.0f, 18.0f, 19.0f,
+        20.0f, 21.0f, 22.0f,
+
+        23.0f, 24.0f, 25.0f,
+        26.0f, 27.0f, 28.0f
+    }));
+
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 2, 5 }, armnn::GetDataType<T>());
+
+    LayerTestResult<T, 4> result(outputTensorInfo);
+
+    std::vector<T> output;
+    output.resize(outputTensorInfo.GetNumElements());
+    Concatenate<T>(workloadFactory,
+                   memoryManager,
+                   {inputTensorInfo0, inputTensorInfo1},
+                   {input0.data(), input1.data()},
+                   outputTensorInfo,
+                   output.data(),
+                   dimension,
+                   useSubtensor);
+
+    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
+        1.0f, 2.0f, 11.0f, 12.0f, 13.0f,
+        3.0f, 4.0f, 14.0f, 15.0f, 16.0f,
+        5.0f, 6.0f, 17.0f, 18.0f, 19.0f,
+        7.0f, 8.0f, 20.0f, 21.0f, 22.0f,
+        9.0f, 10.0f, 23.0f, 24.0f, 25.0f,
+        11.0f, 12.0f, 26.0f, 27.0f, 28.0f
+    }));
+
+    return result;
+}
+
+LayerTestResult<float, 4> Concatenation4dDiffShapeDim3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor)
+{
+    return Concatenation4dDiffShapeDim3TestImpl<float>(workloadFactory, memoryManager, 0.0f, 0, useSubtensor);
 }
 
 LayerTestResult<float, 4> ResizeBilinearNopTest(
@@ -5667,9 +6235,10 @@ LayerTestResult<uint8_t, 3> Concatenation3dDim1Uint8Test(
 
 LayerTestResult<uint8_t, 3> Concatenation3dDim2Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor)
 {
-    return Concatenation3dDim2TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concatenation3dDim2TestImpl<uint8_t>(workloadFactory, memoryManager, useSubtensor, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concatenation3dDim0DiffInputDimsUint8Test(
@@ -5688,9 +6257,67 @@ LayerTestResult<uint8_t, 3> Concatenation3dDim1DiffInputDimsUint8Test(
 
 LayerTestResult<uint8_t, 3> Concatenation3dDim2DiffInputDimsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor)
+{
+    return Concatenation3dDim2DiffInputDimsTestImpl<uint8_t>(workloadFactory, memoryManager, useSubtensor, 0.5f, -1);
+}
+
+LayerTestResult<uint8_t, 4> Concatenation4dDim0Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concatenation3dDim2DiffInputDimsTestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concatenation4dDim0TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
+}
+
+LayerTestResult<uint8_t, 4> Concatenation4dDim1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDim1TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
+}
+
+LayerTestResult<uint8_t, 4> Concatenation4dDim2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDim2TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
+}
+
+LayerTestResult<uint8_t, 4> Concatenation4dDim3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager, bool useSubtensor)
+{
+    return Concatenation4dDim3TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1, useSubtensor);
+}
+
+LayerTestResult<uint8_t, 4> Concatenation4dDiffShapeDim0Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDiffShapeDim0TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
+}
+
+LayerTestResult<uint8_t, 4> Concatenation4dDiffShapeDim1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDiffShapeDim1TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
+}
+
+LayerTestResult<uint8_t, 4> Concatenation4dDiffShapeDim2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concatenation4dDiffShapeDim2TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1);
+}
+
+LayerTestResult<uint8_t, 4> Concatenation4dDiffShapeDim3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor)
+{
+    return Concatenation4dDiffShapeDim3TestImpl<uint8_t>(workloadFactory, memoryManager, 0.5f, -1, useSubtensor);
 }
 
 LayerTestResult<float, 4> SimpleMaxPooling2dSize2x2Stride2x2Test(

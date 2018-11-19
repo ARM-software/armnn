@@ -609,4 +609,58 @@ BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
     RefCreateReshapeWorkloadTest<RefReshapeUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
+template <typename MergerWorkloadType, armnn::DataType DataType>
+static void RefCreateMergerWorkloadTest(const armnn::TensorShape& outputShape,
+                                        unsigned int concatAxis)
+{
+    Graph graph;
+    RefWorkloadFactory factory;
+    auto workload = CreateMergerWorkloadTest<MergerWorkloadType, DataType>(factory, graph, outputShape, concatAxis);
+
+    CheckInputsOutput(std::move(workload),
+                      TensorInfo({ 2, 3, 2, 5 }, DataType),
+                      TensorInfo({ 2, 3, 2, 5 }, DataType),
+                      TensorInfo(outputShape, DataType));
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim0Float32Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerFloat32Workload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim0Uint8Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerUint8Workload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim1Float32Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerFloat32Workload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim1Uint8Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerUint8Workload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim2Float32Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerFloat32Workload, armnn::DataType::Float32>({ 2, 3, 4, 5 }, 2);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim2Uint8Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerUint8Workload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 4, 5 }, 2);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim3Float32Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerFloat32Workload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim3Uint8Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerUint8Workload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

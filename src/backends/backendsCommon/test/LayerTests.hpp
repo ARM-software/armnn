@@ -366,7 +366,8 @@ LayerTestResult<float, 3> Concatenation3dDim1Test(
 
 LayerTestResult<float, 3> Concatenation3dDim2Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor);
 
 LayerTestResult<float, 3> Concatenation3dDim0DiffInputDimsTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -378,7 +379,76 @@ LayerTestResult<float, 3> Concatenation3dDim1DiffInputDimsTest(
 
 LayerTestResult<float, 3> Concatenation3dDim2DiffInputDimsTest(
     armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor);
+
+LayerTestResult<float, 4> Concatenation4dDim0Test(
+    armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> Concatenation4dDim1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> Concatenation4dDim2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> Concatenation4dDim3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor);
+
+LayerTestResult<float, 4> Concatenation4dDiffShapeDim0Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> Concatenation4dDiffShapeDim1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> Concatenation4dDiffShapeDim2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> Concatenation4dDiffShapeDim3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor);
+
+LayerTestResult<uint8_t, 4> Concatenation4dDim0Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> Concatenation4dDim1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> Concatenation4dDim2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> Concatenation4dDim3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor);
+
+LayerTestResult<uint8_t, 4> Concatenation4dDiffShapeDim0Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> Concatenation4dDiffShapeDim1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> Concatenation4dDiffShapeDim2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> Concatenation4dDiffShapeDim3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor);
 
 LayerTestResult<uint8_t, 4> SimpleSigmoidUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -781,7 +851,8 @@ LayerTestResult<uint8_t, 3> Concatenation3dDim1Uint8Test(
 
 LayerTestResult<uint8_t, 3> Concatenation3dDim2Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor);
 
 LayerTestResult<uint8_t, 3> Concatenation3dDim0DiffInputDimsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -793,7 +864,8 @@ LayerTestResult<uint8_t, 3> Concatenation3dDim1DiffInputDimsUint8Test(
 
 LayerTestResult<uint8_t, 3> Concatenation3dDim2DiffInputDimsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor);
 
 LayerTestResult<float, 2> FullyConnectedLargeTest(
     armnn::IWorkloadFactory& workloadFactory,

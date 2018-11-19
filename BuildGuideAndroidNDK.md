@@ -165,6 +165,8 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	 CXX_FLAGS="-fPIE -fPIC" \
 	 cmake .. \
       -DCMAKE_SYSTEM_NAME=Android \
+      -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
+      -DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$HOME/armnn-devenv/toolchains/aarch64-android-r16b/ \
       -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
       -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary/ \
       -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \

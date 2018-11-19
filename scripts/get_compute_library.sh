@@ -46,6 +46,9 @@ done
 DIR="$( cd -P "$( dirname "$SRC" )" >/dev/null && pwd )"
 pushd ${DIR} > /dev/null
 cd ../..
+if [ -z "$USERNAME" ]; then
+    USERNAME=$USER
+fi
 if [ -z "$GITHUB_USERNAME" ]; then
     GITHUB_USERNAME=$USERNAME
     echo "setting GITHUB_USERNAME: ${GITHUB_USERNAME} use -g command line option to change"

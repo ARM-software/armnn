@@ -4,9 +4,9 @@ ArmNN allows adding new backends through the 'Pluggable Backend' mechanism.
 
 ## How to add a new backend
 
-Backends reside under [src/backends](./) in separate subfolders. For Linux builds they must have a ```backend.cmake``` file
+Backends reside under [src/backends](./), in separate subfolders. For Linux builds they must have a ```backend.cmake``` file
 which is read automatically by [src/backends/backends.cmake](backends.cmake). The ```backend.cmake``` file
-under the backend specific folder is then included by the main CMakeLists.txt file at the root of the
+under the backend-specific folder is then included by the main CMakeLists.txt file at the root of the
 ArmNN source tree.
 
 ### The backend.cmake file
@@ -14,8 +14,8 @@ ArmNN source tree.
 The ```backend.cmake``` has three main purposes:
 
 1. It makes sure the artifact (a cmake OBJECT library) is linked into the ArmNN shared library by appending the name of the library to the ```armnnLibraries``` list.
-2. It makes sure that the subdirectory where backend sources reside gets included in the build.
-3. To include backend specific unit tests, the object library for the unit tests needs to be added to the ```armnnUnitTestLibraries``` list.
+2. It makes sure that the subdirectory where backend sources reside gets included into the build.
+3. To include backend-specific unit tests, the object library for the unit tests needs to be added to the ```armnnUnitTestLibraries``` list.
 
 
 Example ```backend.cmake``` file taken from [reference/backend.cmake](reference/backend.cmake):
@@ -37,7 +37,7 @@ list(APPEND armnnLibraries armnnRefBackend armnnRefBackendWorkloads)
 #
 # Backend specific unit tests can be integrated through the
 # armnnUnitTestLibraries variable. This makes sure that the
-# UnitTests executable can run the backend specific unit
+# UnitTests executable can run the backend-specific unit
 # tests.
 #
 list(APPEND armnnUnitTestLibraries armnnRefBackendUnitTests)
@@ -58,7 +58,7 @@ ArmNN on Android uses the native Android build system. New backends are integrat
 ```backend.mk``` file which has a single variable called ```BACKEND_SOURCES``` listing all cpp
 files to be built by the Android build system for the ArmNN shared library.
 
-Optionally, backend specific unit tests can be added similarly, by
+Optionally, backend-specific unit tests can be added similarly, by
 appending the list of cpp files to the ```BACKEND_TEST_SOURCES``` variable.
 
 Example taken from [reference/backend.mk](reference/backend.mk):
@@ -134,21 +134,21 @@ it sees fit and it keeps these objects for a short period of time. Examples:
 * During optimization ArmNN needs to decide which layers are supported by the backend.
    To do this, it creates a backends and calls the ```GetLayerSupport()``` function and creates
    an ```ILayerSupport``` object to help deciding this.
-* During optimization ArmNN can run backend specific optimizations. It creates backend objects
+* During optimization ArmNN can run backend-specific optimizations. It creates backend objects
   and calls the ```GetOptimizations()``` function and it runs them on the network.
 * When the Runtime is initialized it creates an optional ```IBackendContext``` object and keeps this context alive
   for the Runtime's lifetime. It notifies this context object before and after a network is loaded or unloaded.
-* When the LoadedNetwork creates the backend specific workloads for the layers, it creates a backend
+* When the LoadedNetwork creates the backend-specific workloads for the layers, it creates a backend
   specific workload factory and calls this to create the workloads.
 
 ## The BackendRegistry
 
 As mentioned above, all backends need to be registered through the BackendRegistry so ArmNN knows
-about them. Registration requires a unique backend id string and a lambda function that
+about them. Registration requires a unique backend ID string and a lambda function that
 returns a unique pointer to the [IBackendInternal interface](backendsCommon/IBackendInternal.hpp).
 
 For registering a backend only this lambda function needs to exist, not the actual backend. This
-allows dynamically creating the backend objects when it is needed.
+allows dynamically creating the backend objects when they are needed.
 
 The BackendRegistry has a few convenience functions, like we can query the registered backends and
  are able to tell if a given backend is registered or not.
@@ -174,27 +174,28 @@ the input and output tensor information and a workload specific queue descriptor
 
 ## The IMemoryManager interface
 
-Backends may choose to implement custom memory management. ArmNN supports this concept through this mechanism:
+Backends may choose to implement custom memory management. ArmNN supports this concept through the following
+mechanism:
 
 * the ```IBackendInternal``` interface has a ```CreateMemoryManager()``` function which is called before
   creating the workload factory
 * the memory manager is passed to the ```CreateWorkloadFactory(...)``` function so the workload factory can
-  use it for creating the backend specific workloads
+  use it for creating the backend-specific workloads
 * the LoadedNetwork calls ```Acquire()``` on the memory manager before it starts executing the network and
   it calls ```Release()``` in its destructor
 
 ## The Optimizations
 
-The backends may choose to implement backend specific optimizations. This is supported through the ```GetOptimizations()```
+The backends may choose to implement backend-specific optimizations. This is supported through the ```GetOptimizations()```
 method of the IBackendInternal interface. This function may return a vector of optimization objects and the optimizer
 runs these after all general optimization is performed on the network.
 
 ## The IBackendContext interface
 
-Backends may need to be notified when a network is loaded or unloaded. To support that one can implement the optional
+Backends may need to be notified whenever a network is loaded or unloaded. To support that, one can implement the optional
 [IBackendContext](backendsCommon/IBackendContext.hpp) interface. The framework calls the ```CreateBackendContext(...)```
 method for each backend in the Runtime. If the backend returns a valid unique pointer to a backend context, then the
-runtime will hold this for its entire lifetime. It then calls these interface functions for each stored context:
+runtime will hold this for its entire lifetime. It then calls the following interface functions for each stored context:
 
 * ```BeforeLoadNetwork(NetworkId networkId)```
 * ```AfterLoadNetwork(NetworkId networkId)```

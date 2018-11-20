@@ -838,4 +838,19 @@ BOOST_AUTO_TEST_CASE(CreateMergerDim3Float32Workload)
     ClCreateMergerWorkloadTest<ClMergerWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
 }
 
+BOOST_AUTO_TEST_CASE(CreateMergerDim0Uint8Workload)
+{
+    ClCreateMergerWorkloadTest<ClMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim1Uint8Workload)
+{
+    ClCreateMergerWorkloadTest<ClMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim3Uint8Workload)
+{
+    ClCreateMergerWorkloadTest<ClMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

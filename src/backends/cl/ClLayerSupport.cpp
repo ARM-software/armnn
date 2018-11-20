@@ -384,7 +384,7 @@ bool ClLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inpu
         return IsSupportedForDataTypeCl(reasonIfUnsupported,
                                         inputs[0]->GetDataType(),
                                         &TrueFunc<>,
-                                        &FalseFuncU8<>);
+                                        &TrueFunc<>);
     }
 }
 

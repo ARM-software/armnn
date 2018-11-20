@@ -5,8 +5,11 @@
 #pragma once
 
 #include <armnn/ArmNN.hpp>
+#include <armnn/INetwork.hpp>
 
 #include <backendsCommon/test/QuantizeHelper.hpp>
+
+#include <boost/test/unit_test.hpp>
 
 #include <vector>
 
@@ -97,6 +100,53 @@ inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
         QuantizedVector<uint8_t>(scale, offset, { 6.f, 5.f, 4.f, 3.f, 2.f, 1.f }), // Const input.
         QuantizedVector<uint8_t>(scale, offset, { 7.f, 7.f, 7.f, 7.f, 7.f, 7.f })  // Expected output.
     );
+}
+
+template<typename T>
+void EndToEndLayerTestImpl(INetworkPtr network,
+                           const std::map<int, std::vector<T>>& inputTensorData,
+                           const std::map<int, std::vector<T>>& expectedOutputData,
+                           std::vector<BackendId> backends)
+{
+    // Create runtime in which test will run
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // optimize the network
+    IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec());
+
+    // Loads it into the runtime.
+    NetworkId netId;
+    runtime->LoadNetwork(netId, std::move(optNet));
+
+    InputTensors inputTensors;
+    inputTensors.reserve(inputTensorData.size());
+    for (auto&& it : inputTensorData)
+    {
+        inputTensors.push_back({it.first,
+                                ConstTensor(runtime->GetInputTensorInfo(netId, it.first), it.second.data())});
+    }
+    OutputTensors outputTensors;
+    outputTensors.reserve(expectedOutputData.size());
+    std::map<int, std::vector<T>> outputStorage;
+    for (auto&& it : expectedOutputData)
+    {
+        std::vector<T> out(it.second.size());
+        outputStorage.emplace(it.first, out);
+        outputTensors.push_back({it.first,
+                                 Tensor(runtime->GetOutputTensorInfo(netId, it.first),
+                                               outputStorage.at(it.first).data())});
+    }
+
+    // Does the inference.
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    // Checks the results.
+    for (auto&& it : expectedOutputData)
+    {
+        std::vector<T> out = outputStorage.at(it.first);
+        BOOST_TEST(it.second == out);
+    }
 }
 
 } // anonymous namespace

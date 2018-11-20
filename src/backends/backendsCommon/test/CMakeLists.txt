@@ -9,6 +9,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     BackendIdTests.cpp
     BackendRegistryTests.cpp
     BatchNormTestImpl.hpp
+    CommonTestUtils.hpp
     Conv2dTestImpl.hpp
     ConvertFp16ToFp32TestImpl.hpp
     ConvertFp32ToFp16TestImpl.hpp
@@ -21,6 +22,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     LayerTests.hpp
     LstmTestImpl.hpp
     NormTestImpl.hpp
+    MergerTestImpl.hpp
     OptimizedNetworkTests.cpp
     PermuteTestImpl.hpp
     Pooling2dTestImpl.hpp

@@ -4,15 +4,17 @@
 //
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
+#include <backendsCommon/test/MergerTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(NeonEndToEnd)
 
+std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuAcc};
+
 BOOST_AUTO_TEST_CASE(ConstantUsage_Neon_Float32)
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    BOOST_TEST(ConstantUsageFloat32Test(backends));
+    BOOST_TEST(ConstantUsageFloat32Test(defaultBackends));
 }
 
 BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
@@ -47,6 +49,36 @@ BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+}
+
+BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim0Test)
+{
+    MergerDim0EndToEnd<float>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim0Uint8Test)
+{
+    MergerDim0EndToEnd<uint8_t>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim1Test)
+{
+    MergerDim1EndToEnd<float>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim1Uint8Test)
+{
+    MergerDim1EndToEnd<uint8_t>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim3Test)
+{
+    MergerDim3EndToEnd<float>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim3Uint8Test)
+{
+    MergerDim3EndToEnd<uint8_t>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

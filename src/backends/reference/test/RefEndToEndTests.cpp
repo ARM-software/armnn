@@ -4,21 +4,22 @@
 //
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
+#include <backendsCommon/test/MergerTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(RefEndToEnd)
 
+std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuRef};
+
 BOOST_AUTO_TEST_CASE(ConstantUsage_Ref_Float32)
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    BOOST_TEST(ConstantUsageFloat32Test(backends));
+    BOOST_TEST(ConstantUsageFloat32Test(defaultBackends));
 }
 
 BOOST_AUTO_TEST_CASE(ConstantUsage_Ref_Uint8)
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    BOOST_TEST(ConstantUsageUint8Test(backends));
+    BOOST_TEST(ConstantUsageUint8Test(defaultBackends));
 }
 
 BOOST_AUTO_TEST_CASE(Unsigned8)
@@ -51,8 +52,7 @@ BOOST_AUTO_TEST_CASE(Unsigned8)
     softmax->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // optimize the network
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    IOptimizedNetworkPtr optNet = Optimize(*net, defaultBackends, runtime->GetDeviceSpec());
 
     // Loads it into the runtime.
     NetworkId netId;
@@ -115,8 +115,7 @@ BOOST_AUTO_TEST_CASE(TrivialAdd)
     add->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     // optimize the network
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    IOptimizedNetworkPtr optNet = Optimize(*net, defaultBackends, runtime->GetDeviceSpec());
 
     // Loads it into the runtime.
     NetworkId netId;
@@ -214,8 +213,7 @@ BOOST_AUTO_TEST_CASE(MultipleOutputs)
     activation3->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     // optimize the network
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    IOptimizedNetworkPtr optNet = Optimize(*net, defaultBackends, runtime->GetDeviceSpec());
 
     // Loads it into the runtime.
     NetworkId netId;
@@ -246,6 +244,46 @@ BOOST_AUTO_TEST_CASE(MultipleOutputs)
     BOOST_TEST(output1Data == std::vector<float>({ 1.f, 1.f, 1.f, 1.f, 1.f, 0.f, -1.f, -1.f, 1.f, 1.f })); // ReLu1
     BOOST_TEST(output2Data == std::vector<float>({ 3.f, 5.f, 2.f, 3.f, 6.f, 0.f, 0.f, 0.f, 3.f, 3.f })); // ReLu6
     BOOST_TEST(output3Data == std::vector<float>({ 3.f, 5.f, 2.f, 3.f, 5.f, 2.f, 2.f, 2.f, 3.f, 3.f })); // [2, 5]
+}
+
+BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim0Test)
+{
+    MergerDim0EndToEnd<float>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim0Uint8Test)
+{
+    MergerDim0EndToEnd<uint8_t>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim1Test)
+{
+    MergerDim1EndToEnd<float>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim1Uint8Test)
+{
+    MergerDim1EndToEnd<uint8_t>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim2Test)
+{
+    MergerDim2EndToEnd<float>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim2Uint8Test)
+{
+    MergerDim2EndToEnd<uint8_t>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim3Test)
+{
+    MergerDim3EndToEnd<float>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim3Uint8Test)
+{
+    MergerDim3EndToEnd<uint8_t>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

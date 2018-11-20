@@ -41,7 +41,7 @@ void MergerLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& fact
     //are made subtensors of the output of the merger layer.
     m_OutputHandlers[0].CreateTensorHandles(factory);
 
-    signed long innerAxis = m_Param.GetNumDimensions() - m_Param.GetConcatAxis();
+    unsigned int innerAxis = m_Param.GetNumDimensions() - m_Param.GetConcatAxis();
 
     if (factory.SupportsSubTensors() && innerAxis != 1)
     {

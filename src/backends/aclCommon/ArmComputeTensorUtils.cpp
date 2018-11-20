@@ -40,7 +40,7 @@ arm_compute::TensorShape BuildArmComputeTensorShape(const armnn::TensorShape& te
     for (unsigned int i = 0; i < tensorShape.GetNumDimensions(); i++)
     {
         // Note that our dimensions are stored in the opposite order to ACL's.
-        shape.set(tensorShape.GetNumDimensions() - i - 1, tensorShape[i]);
+        shape.set(tensorShape.GetNumDimensions() - i - 1, tensorShape[i], false);
 
         // TensorShape::set() flattens leading ones, so that batch size 1 cannot happen.
         // arm_compute tensors expect this.

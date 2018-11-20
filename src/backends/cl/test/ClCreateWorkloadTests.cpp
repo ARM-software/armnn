@@ -37,8 +37,8 @@ static void ClCreateActivationWorkloadTest()
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {1}));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {1}));
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {1, 1}));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {1, 1}));
 }
 
 BOOST_AUTO_TEST_CASE(CreateActivationFloatWorkload)
@@ -208,8 +208,8 @@ BOOST_AUTO_TEST_CASE(CreateConvertFp16ToFp32Workload)
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {3, 2, 3}));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 2, 3}));
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {1, 3, 2, 3}));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {1, 3, 2, 3}));
     BOOST_TEST((inputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F16));
     BOOST_TEST((outputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F32));
 }
@@ -226,8 +226,8 @@ BOOST_AUTO_TEST_CASE(CreateConvertFp32ToFp16Workload)
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {3, 2, 3}));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {3, 2, 3}));
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {1, 3, 2, 3}));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {1, 3, 2, 3}));
     BOOST_TEST((inputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F32));
     BOOST_TEST((outputHandle->GetTensor().info()->data_type() == arm_compute::DataType::F16));
 }
@@ -469,7 +469,7 @@ static void ClCreateReshapeWorkloadTest()
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
     BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {4, 1}));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {4})); // Leading size 1 dimensions are collapsed by ACL.
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, {1, 4}));
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeFloatWorkload)
@@ -537,9 +537,7 @@ static void ClSplitterWorkloadTest()
     BOOST_TEST(CompareIClTensorHandleShape(outputHandle2, {2, 7, 7}));
 
     auto outputHandle0 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    // NOTE: At the moment the CL collapses the tensor to a 2 dim when dimension zero = 1
-    //       we are raising this difference between the NEON and CL libs as an issue with the compute library team.
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle0, {7, 7}));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle0, {1, 7, 7}));
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterFloatWorkload)
@@ -784,8 +782,8 @@ static void ClMeanWorkloadTest()
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
     // The first dimension (batch size) in both input and output is singular thus it has been reduced by ACL.
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 3, 7, 4 }));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 4 }));
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, {  1, 3, 7, 4 }));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 1, 4 }));
 }
 
 BOOST_AUTO_TEST_CASE(CreateMeanFloat32Workload)

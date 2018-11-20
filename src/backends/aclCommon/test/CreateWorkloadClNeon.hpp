@@ -47,7 +47,9 @@ boost::test_tools::predicate_result CompareTensorHandleShape(IComputeTensorHandl
         if (info->dimension(i) != expectedDimension)
         {
             boost::test_tools::predicate_result res(false);
-            res.message() << "Different dimension [" << info->dimension(i) << "!=" << expectedDimension << "]";
+            res.message() << "For dimension " << i <<
+                             " expected size " << expectedDimension <<
+                             " got " << info->dimension(i);
             return res;
         }
 

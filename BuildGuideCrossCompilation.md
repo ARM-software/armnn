@@ -149,6 +149,10 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     cd build/
     export LD_LIBRARY_PATH=`pwd`
     ```
+* Create a symbolic link to libprotobuf.so.15.0.1:
+    ```
+    ln -s libprotobuf.so.15.0.1 ./libprotobuf.so.15
+    ```
 * Run the UnitTests:
     ```
     ./UnitTests
@@ -202,7 +206,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     /usr/lib/gcc-cross/aarch64-linux-gnu/5/../../../../aarch64-linux-gnu/bin/ld: warning: libz.so.1, needed by /home/<username>/armNN/usr/lib64/libprotobuf.so.15.0.0, not found (try using -rpath or -rpath-link)
     ```
 
-* Missing arm64 libraries for libz.so.1, these can be added by adding a second architecture to dpkg and explicitely installing them:
+* Missing arm64 libraries for libz.so.1, these can be added by adding a second architecture to dpkg and explicitly installing them:
     ```bash
     sudo dpkg --add-architecture arm64
     sudo apt-get install zlib1g:arm64

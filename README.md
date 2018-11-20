@@ -40,3 +40,8 @@ Individual files contain the following tag instead of the full license text.
     SPDX-License-Identifier: MIT
 
 This enables machine processing of license information based on the SPDX License Identifiers that are available here: http://spdx.org/licenses/
+
+### Contributions
+
+The ArmNN project welcomes contributions. Please see the [Contributor Guide](ContributorGuide.md) for
+more details.

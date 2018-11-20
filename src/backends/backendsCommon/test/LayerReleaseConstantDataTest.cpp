@@ -8,8 +8,6 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
-#include <cl/ClWorkloadFactory.hpp>
-
 #include <boost/cast.hpp>
 #include <boost/test/unit_test.hpp>
 

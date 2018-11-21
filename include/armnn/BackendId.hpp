@@ -132,31 +132,14 @@ private:
     std::string m_Id;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const BackendId& id)
-{
-    os << id.Get();
-    return os;
 }
-
-template <template <class...> class TContainer>
-inline std::ostream& operator<<(std::ostream& os,
-                                const TContainer<BackendId>& ids)
-{
-    os << '[';
-    for (const auto& id : ids) { os << id << " "; }
-    os << ']';
-    return os;
-}
-
-using BackendIdSet = std::unordered_set<BackendId>;
-
-} // namespace armnn
 
 namespace std
 {
 
 // make BackendId compatible with std hashtables by reusing the hash
-// function for strings
+// function for strings.
+// Note this must come *before* the first use of unordered_set<BackendId>.
 template <>
 struct hash<armnn::BackendId>
 {
@@ -168,3 +151,27 @@ struct hash<armnn::BackendId>
 };
 
 } // namespace std
+
+namespace armnn
+{
+
+inline std::ostream& operator<<(std::ostream& os, const BackendId& id)
+{
+    os << id.Get();
+    return os;
+}
+
+template <template <typename...> class TContainer, typename... TContainerTemplateArgs>
+std::ostream& operator<<(std::ostream& os,
+                                const TContainer<BackendId, TContainerTemplateArgs...>& ids)
+{
+    os << '[';
+    for (const auto& id : ids) { os << id << " "; }
+    os << ']';
+    return os;
+}
+
+using BackendIdSet = std::unordered_set<BackendId>;
+
+} // namespace armnn
+

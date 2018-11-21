@@ -11,7 +11,7 @@
 namespace armnn
 {
 
-// Clock class that uses the same timestamp function as the Mali DDK.
+// Clock class that uses the same timestamp function as the Mali DDK where possible.
 class monotonic_clock_raw {
 public:
     using duration = std::chrono::nanoseconds;
@@ -19,9 +19,15 @@ public:
 
     static std::chrono::time_point<monotonic_clock_raw, std::chrono::nanoseconds> now() noexcept
     {
+#if defined(__unix__)
         timespec ts;
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-        return time_point(std::chrono::nanoseconds(ts.tv_sec*1000000000 + ts.tv_nsec));
+        return time_point(std::chrono::nanoseconds(ts.tv_sec * 1000000000 + ts.tv_nsec));
+#else
+        // On other platforms we have to make do with the standard C++ API, which may not exactly match
+        // the Mali DDK.
+        return std::chrono::time_point<monotonic_clock_raw, std::chrono::nanoseconds>();
+#endif
     }
 };
 

@@ -62,14 +62,16 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     cd caffe
     cp Makefile.config.example Makefile.config
     ```
-* Adjust Makefile.config (for example, if using Anaconda Python, or if cuDNN is desired):
+* Adjust Makefile.config as necessary for your environment, for example:
     ```
-    CPU only version -
+    #CPU only version:
     CPU_ONLY := 1
-    Add hdf5 and protobuf include and library directories (Replace $HOME with your actual /home/username dir)
-        INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/include/
-        LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/lib/
-    g++ need to be version 5
+
+    #Add hdf5 and protobuf include and library directories (Replace $HOME with explicit /home/username dir):
+    INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/include/
+    LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/lib/
+
+    #g++ needs to be version 5:
     CUSTOM_CXX := g++-5
     ```
 * Setup environment:
@@ -88,9 +90,9 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 
 #### <a name="installCCT">Cross-compiling ToolChain</a>
 * Install the standard cross-compilation libraries for arm64:
-   ```
-   sudo apt install crossbuild-essential-arm64
-   ```
+    ```
+    sudo apt install crossbuild-essential-arm64
+    ```
 #### <a name="installBaarch">Build Boost library for arm64</a>
 * Build Boost library for arm64
     Download Boost version 1.64 from http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html
@@ -216,9 +218,9 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 * If apt-get update returns 404 errors for arm64 repos refer to section 5 below.
 * Alternatively the missing arm64 version of libz.so.1 can be downloaded and installed from a .deb package here:
       https://launchpad.net/ubuntu/wily/arm64/zlib1g/1:1.2.8.dfsg-2ubuntu4
-  ```bash
-  sudo dpkg -i zlib1g_1.2.8.dfsg-2ubuntu4_arm64.deb
-  ```
+    ```bash
+    sudo dpkg -i zlib1g_1.2.8.dfsg-2ubuntu4_arm64.deb
+    ```
 ##
 #### Unable to install arm64 packages after adding arm64 architecture
 * Using sudo apt-get update should add all of the required repos for arm64 but if it does not or you are getting 404 errors the following instructions can be used to add the repos manually:

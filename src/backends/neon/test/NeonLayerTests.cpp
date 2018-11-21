@@ -324,6 +324,8 @@ ARMNN_AUTO_TEST_CASE(AddBroadcast1Element, AdditionBroadcast1ElementTest)
 
 // Sub
 ARMNN_AUTO_TEST_CASE(SimpleSub, SubtractionTest)
+ARMNN_AUTO_TEST_CASE(SubBroadcast1Element, SubtractionBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(SubBroadcast, SubtractionBroadcastTest)
 
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)

@@ -946,6 +946,12 @@ void StridedSliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) con
     const TensorInfo& input = workloadInfo.m_InputTensorInfos[0];
     const uint32_t rank = input.GetNumDimensions();
 
+    if (rank > 4)
+    {
+        throw InvalidArgumentException(
+            "StridedSliceLayer: Input tensors with rank greater than 4 are not supported");
+    }
+
     // Begin, End & Stride length must be of rank(input0)
     if (m_Parameters.m_Begin.size() != rank)
     {

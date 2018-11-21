@@ -17,6 +17,8 @@ public:
 
     StridedSliceLayer* Clone(Graph& graph) const override;
 
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
+
     void ValidateTensorShapesFromInputs() override;
 
 protected:

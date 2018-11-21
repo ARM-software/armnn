@@ -427,10 +427,6 @@ struct PadDescriptor
 
 struct StridedSliceDescriptor
 {
-    StridedSliceDescriptor()
-    : m_DataLayout(DataLayout::NCHW)
-    {}
-
     StridedSliceDescriptor(const std::vector<int>& begin,
                            const std::vector<int>& end,
                            const std::vector<int>& stride)
@@ -444,6 +440,15 @@ struct StridedSliceDescriptor
     , m_NewAxisMask(0)
     , m_DataLayout(DataLayout::NCHW)
     {}
+
+    StridedSliceDescriptor()
+    : StridedSliceDescriptor({}, {}, {})
+    {}
+
+    int GetStartForAxis(const TensorShape& inputShape, unsigned int axis) const;
+    int GetStopForAxis(const TensorShape& inputShape,
+                       unsigned int axis,
+                       int startForAxis) const;
 
     std::vector<int> m_Begin;
     std::vector<int> m_End;

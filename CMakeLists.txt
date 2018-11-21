@@ -256,6 +256,7 @@ list(APPEND armnn_sources
     src/armnn/LoadedNetwork.hpp
     src/armnn/Network.cpp
     src/armnn/Network.hpp
+    src/armnn/NetworkUtils.cpp
     src/armnn/NetworkUtils.hpp
     src/armnn/Observable.cpp
     src/armnn/Observable.hpp

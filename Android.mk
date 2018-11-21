@@ -122,6 +122,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Layer.cpp \
         src/armnn/LoadedNetwork.cpp \
         src/armnn/Network.cpp \
+        src/armnn/NetworkUtils.cpp \
         src/armnn/WallClockTimer.cpp \
         src/armnn/ProfilingEvent.cpp \
         src/armnn/Profiling.cpp \

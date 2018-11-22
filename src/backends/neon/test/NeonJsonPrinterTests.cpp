@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_SUITE(NeonJsonPrinter)
 BOOST_AUTO_TEST_CASE(SoftmaxProfilerJsonPrinterCpuAccTest)
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJsonPrinterResult(backends);
+    RunSoftmaxProfilerJsonPrinterTest(backends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -23,6 +23,7 @@ COMMON_SOURCES := \
 # up by the Android.mk file in the root of ArmNN
 
 COMMON_TEST_SOURCES := \
-    test/WorkloadDataValidation.cpp \
+    test/JsonPrinterTestImpl.cpp \
+    test/LayerTests.cpp \
     test/TensorCopyUtils.cpp \
-    test/LayerTests.cpp
+    test/WorkloadDataValidation.cpp

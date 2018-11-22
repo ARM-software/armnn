@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_SUITE(RefJsonPrinter)
 BOOST_AUTO_TEST_CASE(SoftmaxProfilerJsonPrinterCpuRefTest)
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJsonPrinterResult(backends);
+    RunSoftmaxProfilerJsonPrinterTest(backends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

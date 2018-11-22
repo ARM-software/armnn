@@ -17,7 +17,7 @@ BOOST_FIXTURE_TEST_SUITE(ClJsonPrinter, ClProfilingContextControlFixture)
 BOOST_AUTO_TEST_CASE(SoftmaxProfilerJsonPrinterGpuAccTest)
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    SetupSoftmaxProfilerWithSpecifiedBackendsAndValidateJsonPrinterResult(backends);
+    RunSoftmaxProfilerJsonPrinterTest(backends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

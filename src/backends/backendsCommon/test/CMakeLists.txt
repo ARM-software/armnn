@@ -16,6 +16,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     EndToEndTestImpl.hpp
     FullyConnectedTestImpl.hpp
     IsLayerSupportedTestImpl.hpp
+    JsonPrinterTestImpl.cpp
     JsonPrinterTestImpl.hpp
     LayerReleaseConstantDataTest.cpp
     LayerTests.cpp

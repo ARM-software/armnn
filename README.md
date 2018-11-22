@@ -4,11 +4,11 @@ For more information about Arm NN, see: <https://developer.arm.com/products/proc
 
 There is a getting started guide here using TensorFlow: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-tensorflow>
 
-There is a getting started guide here using TensorFlow Lite: [TensorFlow Lite Support](src/armnnTfLiteParser/README.md)
+There is a getting started guide here using TensorFlow Lite: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-tensorflow-lite>
 
 There is a getting started guide here using Caffe: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-caffe>
 
-There is a getting started guide here using ONNX: [ONNX Support](src/armnnOnnxParser/README.md)
+There is a getting started guide here using ONNX: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-onnx>
 
 There is a guide for backend development: [Backend development guide](src/backends/README.md)
 

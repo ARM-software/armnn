@@ -70,9 +70,6 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     #Add hdf5 and protobuf include and library directories (Replace $HOME with explicit /home/username dir):
     INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/include/
     LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/ $HOME/armnn-devenv/google/x86_64_pb_install/lib/
-
-    #g++ needs to be version 5:
-    CUSTOM_CXX := g++-5
     ```
 * Setup environment:
     ```bash

@@ -58,10 +58,12 @@ BACKEND_SOURCES := \
         workloads/RefSoftmaxFloat32Workload.cpp \
         workloads/RefSoftmaxUint8Workload.cpp \
         workloads/RefSpaceToBatchNdWorkload.cpp \
+        workloads/RefStridedSliceWorkload.cpp \
         workloads/RefSplitterFloat32Workload.cpp \
         workloads/RefSplitterUint8Workload.cpp \
         workloads/ResizeBilinear.cpp \
         workloads/SpaceToBatchNd.cpp \
+        workloads/StridedSlice.cpp \
         workloads/Softmax.cpp
 
 # BACKEND_TEST_SOURCES contains the list of files to be included

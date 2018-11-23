@@ -32,6 +32,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     RuntimeTestImpl.hpp
     SoftmaxTestImpl.hpp
     SplitterTestImpl.hpp
+    StridedSliceTestImpl.hpp
     TensorCopyUtils.cpp
     TensorCopyUtils.hpp
     WorkloadDataValidation.cpp

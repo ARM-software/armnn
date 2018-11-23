@@ -98,6 +98,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefSplitterFloat32Workload.hpp
     RefSplitterUint8Workload.cpp
     RefSplitterUint8Workload.hpp
+    RefStridedSliceWorkload.cpp
+    RefStridedSliceWorkload.hpp
     RefWorkloads.hpp
     RefWorkloadUtils.hpp
     ResizeBilinear.cpp
@@ -107,6 +109,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     SpaceToBatchNd.hpp
     SpaceToBatchNd.cpp
     Splitter.hpp
+    StridedSlice.hpp
+    StridedSlice.cpp
     TensorBufferArrayView.hpp
     Mean.cpp
     Mean.hpp

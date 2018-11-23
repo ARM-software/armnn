@@ -32,6 +32,7 @@
 #include "SpaceToBatchNdTestImpl.hpp"
 #include "SplitterTestImpl.hpp"
 #include "SoftmaxTestImpl.hpp"
+#include "StridedSliceTestImpl.hpp"
 #include "NormTestImpl.hpp"
 #include "PermuteTestImpl.hpp"
 #include "LstmTestImpl.hpp"
@@ -7296,4 +7297,130 @@ LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(
 
     return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager, armnn::DataLayout::NHWC, inputShape,
                                                input, blockShape, crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<float, 4> StridedSlice4DFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice4DTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 4> StridedSlice4DReverseFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice4DReverseTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 4> StridedSliceSimpleStrideFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceSimpleStrideTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 4> StridedSliceSimpleRangeMaskFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceSimpleRangeMaskTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 3> StridedSlice3DFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice3DTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 3> StridedSlice3DReverseFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice3DReverseTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> StridedSlice2DFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice2DTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> StridedSlice2DReverseFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice2DReverseTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> StridedSlice4DUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice4DTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> StridedSlice4DReverseUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice4DReverseTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> StridedSliceSimpleStrideUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceSimpleStrideTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> StridedSliceSimpleRangeMaskUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceSimpleRangeMaskTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 3> StridedSlice3DUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice3DTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 3> StridedSlice3DReverseUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice3DReverseTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> StridedSlice2DUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice2DTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> StridedSlice2DReverseUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice2DReverseTest<uint8_t>(workloadFactory, memoryManager);
 }

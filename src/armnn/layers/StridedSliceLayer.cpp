@@ -65,7 +65,7 @@ std::vector<TensorShape> StridedSliceLayer::InferOutputShapes(
         int newSize = stride > 0 ? ((stop - start) + stride - 1) / stride :
                                    ((start - stop) - stride - 1) / -stride;
 
-        newSize = std::min(0, newSize);
+        newSize = std::max(0, newSize);
 
         outputShape.push_back(boost::numeric_cast<unsigned int>(newSize));
     }

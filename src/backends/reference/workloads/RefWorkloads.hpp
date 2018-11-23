@@ -43,6 +43,7 @@
 #include "Merger.hpp"
 #include "RefSpaceToBatchNdWorkload.hpp"
 #include "RefSplitterFloat32Workload.hpp"
+#include "RefStridedSliceWorkload.hpp"
 #include "RefConstantFloat32Workload.hpp"
 #include "RefActivationFloat32Workload.hpp"
 #include "RefConvolution2dFloat32Workload.hpp"

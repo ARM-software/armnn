@@ -83,7 +83,10 @@ std::unique_ptr<YoloDatabase::TTestCaseData> YoloDatabase::GetTestCaseData(unsig
     try
     {
         InferenceTestImage image(imagePath.c_str());
-        image.Resize(YoloImageWidth, YoloImageHeight, CHECK_LOCATION());
+        if (YoloImageWidth != image.GetWidth() || YoloImageHeight != image.GetHeight())
+        {
+            image.Resize(YoloImageWidth, YoloImageHeight, CHECK_LOCATION());
+        }
         imageData = GetImageDataInArmNnLayoutAsNormalizedFloats(ImageChannelLayout::Rgb, image);
     }
     catch (const InferenceTestImageException& e)

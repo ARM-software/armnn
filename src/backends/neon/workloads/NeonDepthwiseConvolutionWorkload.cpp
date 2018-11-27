@@ -8,6 +8,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <neon/NeonLayerSupport.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/DataLayoutIndexed.hpp>
 
 namespace armnn
 {
@@ -60,10 +61,25 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     m_KernelTensor = std::make_unique<arm_compute::Tensor>();
     BuildArmComputeTensor(*m_KernelTensor, weightInfo, m_Data.m_Parameters.m_DataLayout);
 
+    INeonTensorHandle* inputTensorHandle = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0]);
+    INeonTensorHandle* outputTensorHandle =  static_cast<INeonTensorHandle*>(m_Data.m_Outputs[0]);
+    DataLayoutIndexed dataLayoutIndex(m_Data.m_Parameters.m_DataLayout);
+
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
         BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
+    }
+    else
+    {
+        // Workaround for COMPMID-1813
+        m_BiasTensor = std::make_unique<arm_compute::Tensor>();
+        TensorInfo biasTensorInfo({weightInfo.GetShape()[dataLayoutIndex.GetChannelsIndex()]},
+                                  weightInfo.GetDataType() == DataType::QuantisedAsymm8 ? DataType::Signed32 :
+                                                                                          weightInfo.GetDataType(),
+                                  weightInfo.GetQuantizationScale() *
+                                  info.m_InputTensorInfos[0].GetQuantizationScale());
+        BuildArmComputeTensor(*m_BiasTensor, biasTensorInfo, m_Data.m_Parameters.m_DataLayout);
     }
 
     arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
@@ -76,14 +92,16 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
 
     m_Data.ValidateInputsOutputs("NeonDepthwiseConvolutionWorkload", 1, 1);
 
-    arm_compute::ITensor& input  = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = static_cast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input  = inputTensorHandle->GetTensor();
+    arm_compute::ITensor& output = outputTensorHandle->GetTensor();
 
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    bool use3x3Optimisation = weightInfo.GetShape()[3] == 3 && weightInfo.GetShape()[2] == 3;
+    bool use3x3Optimisation = weightInfo.GetShape()[dataLayoutIndex.GetWidthIndex()] == 3 &&
+                              weightInfo.GetShape()[dataLayoutIndex.GetHeightIndex()] == 3;
+
     if (use3x3Optimisation)
     {
         m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer3x3>();
@@ -109,9 +127,13 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
 
     InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
 
-    if (m_BiasTensor)
+    if (m_Data.m_Parameters.m_BiasEnabled)
     {
         InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
+    }
+    else
+    {
+        InitialiseArmComputeTensorEmpty(*m_BiasTensor);
     }
 
     m_pDepthwiseConvolutionLayer->prepare();

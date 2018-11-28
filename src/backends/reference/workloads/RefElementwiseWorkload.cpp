@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "RefArithmeticWorkload.hpp"
-#include "ArithmeticFunction.hpp"
+#include "RefElementwiseWorkload.hpp"
+#include "ElementwiseFunction.hpp"
 #include "RefWorkloadUtils.hpp"
 #include "Profiling.hpp"
 #include <vector>
@@ -13,7 +13,7 @@ namespace armnn
 {
 
 template <typename ParentDescriptor, typename Functor>
-void BaseFloat32ArithmeticWorkload<ParentDescriptor, Functor>::ExecuteImpl(const char * debugString) const
+void BaseFloat32ElementwiseWorkload<ParentDescriptor, Functor>::ExecuteImpl(const char * debugString) const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, debugString);
 
@@ -26,11 +26,11 @@ void BaseFloat32ArithmeticWorkload<ParentDescriptor, Functor>::ExecuteImpl(const
     const float* inData1 = GetInputTensorDataFloat(1, data);
     float* outData = GetOutputTensorDataFloat(0, data);
 
-    ArithmeticFunction<Functor>(inShape0, inShape1, outShape, inData0, inData1, outData);
+    ElementwiseFunction<Functor>(inShape0, inShape1, outShape, inData0, inData1, outData);
 }
 
 template <typename ParentDescriptor, typename Functor>
-void BaseUint8ArithmeticWorkload<ParentDescriptor, Functor>::ExecuteImpl(const char * debugString) const
+void BaseUint8ElementwiseWorkload<ParentDescriptor, Functor>::ExecuteImpl(const char * debugString) const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, debugString);
 
@@ -44,7 +44,7 @@ void BaseUint8ArithmeticWorkload<ParentDescriptor, Functor>::ExecuteImpl(const c
 
     std::vector<float> results(outputInfo.GetNumElements());
 
-    ArithmeticFunction<Functor>(inputInfo0.GetShape(),
+    ElementwiseFunction<Functor>(inputInfo0.GetShape(),
                                 inputInfo1.GetShape(),
                                 outputInfo.GetShape(),
                                 dequant0.data(),
@@ -56,14 +56,14 @@ void BaseUint8ArithmeticWorkload<ParentDescriptor, Functor>::ExecuteImpl(const c
 
 }
 
-template class armnn::BaseFloat32ArithmeticWorkload<armnn::AdditionQueueDescriptor, std::plus<float>>;
-template class armnn::BaseUint8ArithmeticWorkload<armnn::AdditionQueueDescriptor, std::plus<float>>;
+template class armnn::BaseFloat32ElementwiseWorkload<armnn::AdditionQueueDescriptor, std::plus<float>>;
+template class armnn::BaseUint8ElementwiseWorkload<armnn::AdditionQueueDescriptor, std::plus<float>>;
 
-template class armnn::BaseFloat32ArithmeticWorkload<armnn::SubtractionQueueDescriptor, std::minus<float>>;
-template class armnn::BaseUint8ArithmeticWorkload<armnn::SubtractionQueueDescriptor, std::minus<float>>;
+template class armnn::BaseFloat32ElementwiseWorkload<armnn::SubtractionQueueDescriptor, std::minus<float>>;
+template class armnn::BaseUint8ElementwiseWorkload<armnn::SubtractionQueueDescriptor, std::minus<float>>;
 
-template class armnn::BaseFloat32ArithmeticWorkload<armnn::MultiplicationQueueDescriptor, std::multiplies<float>>;
-template class armnn::BaseUint8ArithmeticWorkload<armnn::MultiplicationQueueDescriptor, std::multiplies<float>>;
+template class armnn::BaseFloat32ElementwiseWorkload<armnn::MultiplicationQueueDescriptor, std::multiplies<float>>;
+template class armnn::BaseUint8ElementwiseWorkload<armnn::MultiplicationQueueDescriptor, std::multiplies<float>>;
 
-template class armnn::BaseFloat32ArithmeticWorkload<armnn::DivisionQueueDescriptor, std::divides<float>>;
-template class armnn::BaseUint8ArithmeticWorkload<armnn::DivisionQueueDescriptor, std::divides<float>>;
+template class armnn::BaseFloat32ElementwiseWorkload<armnn::DivisionQueueDescriptor, std::divides<float>>;
+template class armnn::BaseUint8ElementwiseWorkload<armnn::DivisionQueueDescriptor, std::divides<float>>;

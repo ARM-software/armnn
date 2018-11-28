@@ -6,8 +6,6 @@
 list(APPEND armnnRefBackendWorkloads_sources
     Activation.cpp
     Activation.hpp
-    ArithmeticFunction.cpp
-    ArithmeticFunction.hpp
     BatchNormImpl.hpp
     BatchToSpaceNd.cpp
     BatchToSpaceNd.hpp
@@ -15,6 +13,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Broadcast.hpp
     ConvImpl.cpp
     ConvImpl.hpp
+    ElementwiseFunction.cpp
+    ElementwiseFunction.hpp
     FullyConnected.cpp
     FullyConnected.hpp
     Merger.hpp
@@ -26,8 +26,6 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefActivationFloat32Workload.hpp
     RefActivationUint8Workload.cpp
     RefActivationUint8Workload.hpp
-    RefArithmeticWorkload.cpp
-    RefArithmeticWorkload.hpp
     RefBaseConstantWorkload.cpp
     RefBaseConstantWorkload.hpp
     RefBatchNormalizationFloat32Workload.cpp
@@ -50,6 +48,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefConvolution2dFloat32Workload.hpp
     RefConvolution2dUint8Workload.cpp
     RefConvolution2dUint8Workload.hpp
+    RefElementwiseWorkload.cpp
+    RefElementwiseWorkload.hpp
     RefDepthwiseConvolution2dFloat32Workload.cpp
     RefDepthwiseConvolution2dFloat32Workload.hpp
     RefDepthwiseConvolution2dUint8Workload.cpp

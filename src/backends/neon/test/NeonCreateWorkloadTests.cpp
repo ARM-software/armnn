@@ -87,13 +87,13 @@ template <typename WorkloadType,
           typename DescriptorType,
           typename LayerType,
           armnn::DataType DataType>
-static void NeonCreateArithmethicWorkloadTest()
+static void NeonCreateElementwiseWorkloadTest()
 {
     Graph graph;
     NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
 
-    auto workload = CreateArithmeticWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
+    auto workload = CreateElementwiseWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
 
     DescriptorType queueDescriptor = workload->GetData();
     auto inputHandle1 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
@@ -107,7 +107,7 @@ static void NeonCreateArithmethicWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 {
-    NeonCreateArithmethicWorkloadTest<NeonAdditionFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonAdditionFloatWorkload,
                                       AdditionQueueDescriptor,
                                       AdditionLayer,
                                       DataType::Float16>();
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    NeonCreateArithmethicWorkloadTest<NeonAdditionFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonAdditionFloatWorkload,
                                       AdditionQueueDescriptor,
                                       AdditionLayer,
                                       DataType::Float32>();
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 {
-    NeonCreateArithmethicWorkloadTest<NeonSubtractionFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonSubtractionFloatWorkload,
                                       SubtractionQueueDescriptor,
                                       SubtractionLayer,
                                       DataType::Float16>();
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 {
-    NeonCreateArithmethicWorkloadTest<NeonSubtractionFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonSubtractionFloatWorkload,
                                       SubtractionQueueDescriptor,
                                       SubtractionLayer,
                                       DataType::Float32>();
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
 {
-    NeonCreateArithmethicWorkloadTest<NeonMultiplicationFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonMultiplicationFloatWorkload,
                                       MultiplicationQueueDescriptor,
                                       MultiplicationLayer,
                                       DataType::Float16>();
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
 {
-    NeonCreateArithmethicWorkloadTest<NeonMultiplicationFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonMultiplicationFloatWorkload,
                                       MultiplicationQueueDescriptor,
                                       MultiplicationLayer,
                                       DataType::Float32>();

@@ -12,17 +12,16 @@ BACKEND_SOURCES := \
         RefLayerSupport.cpp \
         RefWorkloadFactory.cpp \
         workloads/Activation.cpp \
-        workloads/ArithmeticFunction.cpp \
         workloads/BatchToSpaceNd.cpp \
         workloads/Broadcast.cpp \
         workloads/ConvImpl.cpp \
+        workloads/ElementwiseFunction.cpp \
         workloads/FullyConnected.cpp \
         workloads/Mean.cpp \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
         workloads/RefActivationFloat32Workload.cpp \
         workloads/RefActivationUint8Workload.cpp \
-        workloads/RefArithmeticWorkload.cpp \
         workloads/RefBaseConstantWorkload.cpp \
         workloads/RefBatchNormalizationFloat32Workload.cpp \
         workloads/RefBatchNormalizationUint8Workload.cpp \
@@ -36,6 +35,7 @@ BACKEND_SOURCES := \
         workloads/RefConvolution2dUint8Workload.cpp \
         workloads/RefDepthwiseConvolution2dFloat32Workload.cpp \
         workloads/RefDepthwiseConvolution2dUint8Workload.cpp \
+        workloads/RefElementwiseWorkload.cpp \
         workloads/RefFakeQuantizationFloat32Workload.cpp \
         workloads/RefFloorFloat32Workload.cpp \
         workloads/RefFullyConnectedFloat32Workload.cpp \

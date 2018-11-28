@@ -6,8 +6,8 @@
 #pragma once
 
 #include "RefConstantUint8Workload.hpp"
-#include "ArithmeticFunction.hpp"
-#include "RefArithmeticWorkload.hpp"
+#include "ElementwiseFunction.hpp"
+#include "RefElementwiseWorkload.hpp"
 #include "ConvImpl.hpp"
 #include "RefBaseConstantWorkload.hpp"
 #include "RefConvolution2dUint8Workload.hpp"

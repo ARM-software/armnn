@@ -55,15 +55,15 @@ template <typename WorkloadType,
           typename DescriptorType,
           typename LayerType,
           armnn::DataType DataType>
-static void ClCreateArithmethicWorkloadTest()
+static void ClCreateElementwiseWorkloadTest()
 {
     Graph graph;
     ClWorkloadFactory factory =
         ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
 
-    auto workload = CreateArithmeticWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
+    auto workload = CreateElementwiseWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
 
-    // Checks that inputs/outputs are as we expect them (see definition of CreateArithmeticWorkloadTest).
+    // Checks that inputs/outputs are as we expect them (see definition of CreateElementwiseWorkloadTest).
     DescriptorType queueDescriptor = workload->GetData();
     auto inputHandle1 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto inputHandle2 = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[1]);
@@ -75,7 +75,7 @@ static void ClCreateArithmethicWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    ClCreateArithmethicWorkloadTest<ClAdditionWorkload,
+    ClCreateElementwiseWorkloadTest<ClAdditionWorkload,
                                     AdditionQueueDescriptor,
                                     AdditionLayer,
                                     armnn::DataType::Float32>();
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 {
-    ClCreateArithmethicWorkloadTest<ClAdditionWorkload,
+    ClCreateElementwiseWorkloadTest<ClAdditionWorkload,
                                     AdditionQueueDescriptor,
                                     AdditionLayer,
                                     armnn::DataType::Float16>();
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 {
-    ClCreateArithmethicWorkloadTest<ClSubtractionWorkload,
+    ClCreateElementwiseWorkloadTest<ClSubtractionWorkload,
                                     SubtractionQueueDescriptor,
                                     SubtractionLayer,
                                     armnn::DataType::Float32>();
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 {
-    ClCreateArithmethicWorkloadTest<ClSubtractionWorkload,
+    ClCreateElementwiseWorkloadTest<ClSubtractionWorkload,
                                     SubtractionQueueDescriptor,
                                     SubtractionLayer,
                                     armnn::DataType::Float16>();
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkloadTest)
 {
-    ClCreateArithmethicWorkloadTest<ClMultiplicationWorkload,
+    ClCreateElementwiseWorkloadTest<ClMultiplicationWorkload,
                                     MultiplicationQueueDescriptor,
                                     MultiplicationLayer,
                                     armnn::DataType::Float32>();
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkloadTest)
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16WorkloadTest)
 {
-    ClCreateArithmethicWorkloadTest<ClMultiplicationWorkload,
+    ClCreateElementwiseWorkloadTest<ClMultiplicationWorkload,
                                     MultiplicationQueueDescriptor,
                                     MultiplicationLayer,
                                     armnn::DataType::Float16>();
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16WorkloadTest)
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8WorkloadTest)
 {
-    ClCreateArithmethicWorkloadTest<ClMultiplicationWorkload,
+    ClCreateElementwiseWorkloadTest<ClMultiplicationWorkload,
                                     MultiplicationQueueDescriptor,
                                     MultiplicationLayer,
                                     armnn::DataType::QuantisedAsymm8>();
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8WorkloadTest)
 
 BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkloadTest)
 {
-    ClCreateArithmethicWorkloadTest<ClDivisionFloatWorkload,
+    ClCreateElementwiseWorkloadTest<ClDivisionFloatWorkload,
                                     DivisionQueueDescriptor,
                                     DivisionLayer,
                                     armnn::DataType::Float32>();
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkloadTest)
 
 BOOST_AUTO_TEST_CASE(CreateDivisionFloat16WorkloadTest)
 {
-    ClCreateArithmethicWorkloadTest<ClDivisionFloatWorkload,
+    ClCreateElementwiseWorkloadTest<ClDivisionFloatWorkload,
                                     DivisionQueueDescriptor,
                                     DivisionLayer,
                                     armnn::DataType::Float16>();

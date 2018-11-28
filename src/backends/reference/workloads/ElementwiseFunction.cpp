@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ArithmeticFunction.hpp"
+#include "ElementwiseFunction.hpp"
 #include "Broadcast.hpp"
 #include <functional>
 
@@ -11,7 +11,7 @@ namespace armnn
 {
 
 template <typename Functor>
-ArithmeticFunction<Functor>::ArithmeticFunction(const TensorShape& inShape0,
+ElementwiseFunction<Functor>::ElementwiseFunction(const TensorShape& inShape0,
                                                 const TensorShape& inShape1,
                                                 const TensorShape& outShape,
                                                 const float* inData0,
@@ -23,7 +23,7 @@ ArithmeticFunction<Functor>::ArithmeticFunction(const TensorShape& inShape0,
 
 } //namespace armnn
 
-template struct armnn::ArithmeticFunction<std::plus<float>>;
-template struct armnn::ArithmeticFunction<std::minus<float>>;
-template struct armnn::ArithmeticFunction<std::multiplies<float>>;
-template struct armnn::ArithmeticFunction<std::divides<float>>;
+template struct armnn::ElementwiseFunction<std::plus<float>>;
+template struct armnn::ElementwiseFunction<std::minus<float>>;
+template struct armnn::ElementwiseFunction<std::multiplies<float>>;
+template struct armnn::ElementwiseFunction<std::divides<float>>;

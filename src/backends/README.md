@@ -68,7 +68,7 @@ BACKEND_SOURCES := \
         RefLayerSupport.cpp \
         RefWorkloadFactory.cpp \
         workloads/Activation.cpp \
-        workloads/ArithmeticFunction.cpp \
+        workloads/ElementwiseFunction.cpp \
         workloads/Broadcast.cpp \
         ...
 

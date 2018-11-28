@@ -11,9 +11,9 @@ namespace armnn
 {
 
 template <typename Functor>
-struct ArithmeticFunction
+struct ElementwiseFunction
 {
-    ArithmeticFunction(const TensorShape& inShape0,
+    ElementwiseFunction(const TensorShape& inShape0,
                        const TensorShape& inShape1,
                        const TensorShape& outShape,
                        const float* inData0,

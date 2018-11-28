@@ -67,11 +67,12 @@ template <typename WorkloadType,
           typename DescriptorType,
           typename LayerType,
           armnn::DataType DataType>
-static void RefCreateArithmethicWorkloadTest()
+static void RefCreateElementwiseWorkloadTest()
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateArithmeticWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
+    auto workload = CreateElementwiseWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(
+        factory, graph);
 
     CheckInputsOutput(std::move(workload),
         TensorInfo({ 2, 3 }, DataType),
@@ -81,66 +82,66 @@ static void RefCreateArithmethicWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    RefCreateArithmethicWorkloadTest<RefAdditionFloat32Workload,
-                                     AdditionQueueDescriptor,
-                                     AdditionLayer,
-                                     armnn::DataType::Float32>();
+    RefCreateElementwiseWorkloadTest<RefAdditionFloat32Workload,
+        AdditionQueueDescriptor,
+        AdditionLayer,
+        armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateAdditionUint8Workload)
 {
-    RefCreateArithmethicWorkloadTest<RefAdditionUint8Workload,
-                                     AdditionQueueDescriptor,
-                                     AdditionLayer,
-                                     armnn::DataType::QuantisedAsymm8>();
+    RefCreateElementwiseWorkloadTest<RefAdditionUint8Workload,
+        AdditionQueueDescriptor,
+        AdditionLayer,
+        armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 {
-    RefCreateArithmethicWorkloadTest<RefSubtractionFloat32Workload,
-                                     SubtractionQueueDescriptor,
-                                     SubtractionLayer,
-                                     armnn::DataType::Float32>();
+    RefCreateElementwiseWorkloadTest<RefSubtractionFloat32Workload,
+        SubtractionQueueDescriptor,
+        SubtractionLayer,
+        armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionUint8Workload)
 {
-    RefCreateArithmethicWorkloadTest<RefSubtractionUint8Workload,
-                                     SubtractionQueueDescriptor,
-                                     SubtractionLayer,
-                                     armnn::DataType::QuantisedAsymm8>();
+    RefCreateElementwiseWorkloadTest<RefSubtractionUint8Workload,
+        SubtractionQueueDescriptor,
+        SubtractionLayer,
+        armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
 {
-    RefCreateArithmethicWorkloadTest<RefMultiplicationFloat32Workload,
-                                     MultiplicationQueueDescriptor,
-                                     MultiplicationLayer,
-                                     armnn::DataType::Float32>();
+    RefCreateElementwiseWorkloadTest<RefMultiplicationFloat32Workload,
+        MultiplicationQueueDescriptor,
+        MultiplicationLayer,
+        armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
 {
-    RefCreateArithmethicWorkloadTest<RefMultiplicationUint8Workload,
-                                     MultiplicationQueueDescriptor,
-                                     MultiplicationLayer,
-                                     armnn::DataType::QuantisedAsymm8>();
+    RefCreateElementwiseWorkloadTest<RefMultiplicationUint8Workload,
+        MultiplicationQueueDescriptor,
+        MultiplicationLayer,
+        armnn::DataType::QuantisedAsymm8>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkload)
 {
-    RefCreateArithmethicWorkloadTest<RefDivisionFloat32Workload,
-                                     DivisionQueueDescriptor,
-                                     DivisionLayer,
-                                     armnn::DataType::Float32>();
+    RefCreateElementwiseWorkloadTest<RefDivisionFloat32Workload,
+        DivisionQueueDescriptor,
+        DivisionLayer,
+        armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDivisionUint8Workload)
 {
-    RefCreateArithmethicWorkloadTest<RefDivisionUint8Workload,
-                                     DivisionQueueDescriptor,
-                                     DivisionLayer,
-                                     armnn::DataType::QuantisedAsymm8>();
+    RefCreateElementwiseWorkloadTest<RefDivisionUint8Workload,
+        DivisionQueueDescriptor,
+        DivisionLayer,
+        armnn::DataType::QuantisedAsymm8>();
 }
 
 template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>

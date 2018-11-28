@@ -103,8 +103,8 @@ template <typename WorkloadType,
           typename DescriptorType,
           typename LayerType,
           armnn::DataType DataType>
-std::unique_ptr<WorkloadType> CreateArithmeticWorkloadTest(armnn::IWorkloadFactory& factory,
-                                                           armnn::Graph&            graph)
+std::unique_ptr<WorkloadType> CreateElementwiseWorkloadTest(armnn::IWorkloadFactory & factory,
+                                                            armnn::Graph & graph)
 {
     // Creates the layer we're testing.
     Layer* const layer = graph.AddLayer<LayerType>("layer");

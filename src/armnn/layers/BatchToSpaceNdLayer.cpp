@@ -9,10 +9,14 @@
 #include "BatchToSpaceNdLayer.hpp"
 
 #include <armnn/TypesUtils.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
+
+#include <DataLayoutIndexed.hpp>
+
+using namespace armnnUtils;
 
 namespace armnn
 {

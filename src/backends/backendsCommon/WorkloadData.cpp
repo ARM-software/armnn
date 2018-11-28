@@ -6,7 +6,7 @@
 
 #include "CpuTensorHandle.hpp"
 
-#include <backendsCommon/DataLayoutIndexed.hpp>
+#include <DataLayoutIndexed.hpp>
 
 #include <algorithm>
 #include <iomanip>
@@ -14,6 +14,8 @@
 #include <sstream>
 
 #include <boost/format.hpp>
+
+using namespace armnnUtils;
 
 namespace armnn
 {

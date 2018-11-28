@@ -1,0 +1,46 @@
+﻿//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+
+#include "DataLayoutIndexed.hpp"
+
+using namespace armnn;
+
+namespace armnnUtils
+{
+
+DataLayoutIndexed::DataLayoutIndexed(armnn::DataLayout dataLayout)
+    : m_DataLayout(dataLayout)
+{
+    switch (dataLayout)
+    {
+        case armnn::DataLayout::NHWC:
+            m_ChannelsIndex = 3;
+            m_HeightIndex   = 1;
+            m_WidthIndex    = 2;
+            break;
+        case armnn::DataLayout::NCHW:
+            m_ChannelsIndex = 1;
+            m_HeightIndex   = 2;
+            m_WidthIndex    = 3;
+            break;
+        default:
+            throw armnn::InvalidArgumentException("Unknown DataLayout value: " +
+                                                  std::to_string(static_cast<int>(dataLayout)));
+    }
+}
+
+// Definition in include/armnn/Types.hpp
+bool operator==(const DataLayout& dataLayout, const DataLayoutIndexed& indexed)
+{
+    return dataLayout == indexed.GetDataLayout();
+}
+
+// Definition in include/armnn/Types.hpp
+bool operator==(const DataLayoutIndexed& indexed, const DataLayout& dataLayout)
+{
+    return indexed.GetDataLayout() == dataLayout;
+}
+
+} // namespace armnnUtils

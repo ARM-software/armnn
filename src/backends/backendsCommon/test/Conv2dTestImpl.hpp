@@ -7,20 +7,23 @@
 #include "WorkloadTestUtils.hpp"
 #include "TensorUtils.hpp"
 
-#include <string>
+#include <Permute.hpp>
+#include <DataLayoutIndexed.hpp>
+
+#include <test/TensorHelpers.hpp>
+
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 
-#include <test/TensorHelpers.hpp>
-#include "QuantizeHelper.hpp"
-
-#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-#include "Permute.hpp"
+#include <backendsCommon/test/QuantizeHelper.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
+
+#include <string>
 
 // Mapping from input type to bias type for fully connected layers.
 // float => float, uint8_t => int32_t
@@ -1141,7 +1144,7 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
-    const armnn::DataLayoutIndexed& layout)
+    const armnnUtils::DataLayoutIndexed& layout)
 {
     unsigned int inputHeight = 8;
     unsigned int inputWidth = 16;

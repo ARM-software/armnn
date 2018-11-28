@@ -43,12 +43,12 @@ ARMNN_BACKEND_SOURCES :=
 # (included from the given makefile) to the ARMNN_BACKEND_SOURCES list
 #
 $(foreach mkPath,$(ARMNN_BACKEND_COMMON_MAKEFILE_DIRS),\
-   $(eval include $(LOCAL_PATH)/$(mkPath)/common.mk)\
-   $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(COMMON_SOURCES))))
+        $(eval include $(LOCAL_PATH)/$(mkPath)/common.mk)\
+        $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(COMMON_SOURCES))))
 
 $(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
-   $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
-   $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(BACKEND_SOURCES))))
+        $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
+        $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(BACKEND_SOURCES))))
 
 # Mark source files as dependent on Android.mk and backend makefiles
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk \
@@ -61,22 +61,27 @@ LOCAL_EXPORT_C_INCLUDES := \
         $(ARMNN_BACKENDS_HEADER_PATH)
 
 LOCAL_C_INCLUDES := \
-	$(OPENCL_HEADER_PATH) \
-	$(NN_HEADER_PATH) \
-	$(ARMNN_HEADER_PATH) \
-	$(ARMNN_MAIN_HEADER_PATH) \
-	$(ARMNN_SOURCE_HEADER_PATH) \
-	$(ARMNN_SOURCE_UTILS_HEADER_PATH) \
+        $(OPENCL_HEADER_PATH) \
+        $(NN_HEADER_PATH) \
+        $(ARMNN_HEADER_PATH) \
+        $(ARMNN_MAIN_HEADER_PATH) \
+        $(ARMNN_SOURCE_HEADER_PATH) \
+        $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
         $(ARMNN_BACKENDS_HEADER_PATH)
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_SOURCES) \
+        src/armnnUtils/CsvReader.cpp \
+        src/armnnUtils/DataLayoutIndexed.cpp \
         src/armnnUtils/DotSerializer.cpp \
         src/armnnUtils/FloatingPointConverter.cpp \
+        src/armnnUtils/HeapProfiling.cpp \
+        src/armnnUtils/LeakChecking.cpp \
         src/armnnUtils/Logging.cpp \
-        src/armnnUtils/Permute.cpp \
         src/armnnUtils/ParserHelper.cpp \
+        src/armnnUtils/Permute.cpp \
         src/armnnUtils/TensorUtils.cpp \
+        src/armnnUtils/VerificationHelpers.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArithmeticBaseLayer.cpp \
@@ -136,7 +141,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Observable.cpp
 
 LOCAL_STATIC_LIBRARIES := \
-	armnn-arm_compute \
+        armnn-arm_compute \
         libboost_log \
         libboost_system \
         libboost_thread
@@ -173,70 +178,70 @@ ARMNN_BACKEND_TEST_SOURCES :=
 # (included from the given makefile) to the ARMNN_BACKEND_TEST_SOURCES list
 #
 $(foreach mkPath,$(ARMNN_BACKEND_COMMON_MAKEFILE_DIRS), \
-   $(eval include $(LOCAL_PATH)/$(mkPath)/common.mk) \
-   $(eval ARMNN_BACKEND_TEST_SOURCES := $(ARMNN_BACKEND_TEST_SOURCES) \
-   $(patsubst %,$(mkPath)/%,$(COMMON_TEST_SOURCES))))
+        $(eval include $(LOCAL_PATH)/$(mkPath)/common.mk) \
+        $(eval ARMNN_BACKEND_TEST_SOURCES := $(ARMNN_BACKEND_TEST_SOURCES) \
+        $(patsubst %,$(mkPath)/%,$(COMMON_TEST_SOURCES))))
 
 $(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS), \
-   $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk) \
-   $(eval ARMNN_BACKEND_TEST_SOURCES := $(ARMNN_BACKEND_TEST_SOURCES) \
-   $(patsubst %,$(mkPath)/%,$(BACKEND_TEST_SOURCES))))
+        $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk) \
+        $(eval ARMNN_BACKEND_TEST_SOURCES := $(ARMNN_BACKEND_TEST_SOURCES) \
+        $(patsubst %,$(mkPath)/%,$(BACKEND_TEST_SOURCES))))
 
 # Mark source files as dependent on Android.mk
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
 LOCAL_C_INCLUDES := \
-	$(OPENCL_HEADER_PATH) \
-	$(NN_HEADER_PATH) \
-	$(ARMNN_HEADER_PATH) \
-	$(ARMNN_MAIN_HEADER_PATH) \
-	$(ARMNN_SOURCE_HEADER_PATH) \
-	$(ARMNN_SOURCE_UTILS_HEADER_PATH) \
+        $(OPENCL_HEADER_PATH) \
+        $(NN_HEADER_PATH) \
+        $(ARMNN_HEADER_PATH) \
+        $(ARMNN_MAIN_HEADER_PATH) \
+        $(ARMNN_SOURCE_HEADER_PATH) \
+        $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
         $(ARMNN_BACKENDS_HEADER_PATH)
 
 LOCAL_CFLAGS := \
-	-std=c++14 \
-	-fexceptions \
-	-frtti \
-	-isystem vendor/arm/android-nn-driver/boost_1_64_0 \
-	-DARMCOMPUTECL_ENABLED \
-	-DARMCOMPUTENEON_ENABLED
+        -std=c++14 \
+        -fexceptions \
+        -frtti \
+        -isystem vendor/arm/android-nn-driver/boost_1_64_0 \
+        -DARMCOMPUTECL_ENABLED \
+        -DARMCOMPUTENEON_ENABLED
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_TEST_SOURCES) \
-	src/armnn/test/UnitTests.cpp \
-	src/armnn/test/EndToEndTest.cpp \
-	src/armnn/test/UtilsTests.cpp \
-	src/armnn/test/GraphTests.cpp \
-	src/armnn/test/RuntimeTests.cpp \
+        src/armnn/test/UnitTests.cpp \
+        src/armnn/test/EndToEndTest.cpp \
+        src/armnn/test/UtilsTests.cpp \
+        src/armnn/test/GraphTests.cpp \
+        src/armnn/test/RuntimeTests.cpp \
         src/armnn/test/SubGraphTests.cpp \
-	src/armnn/test/TensorTest.cpp \
-	src/armnn/test/NetworkTests.cpp \
-	src/armnn/test/InstrumentTests.cpp \
-	src/armnn/test/ProfilingEventTest.cpp \
-	src/armnn/test/ObservableTest.cpp \
-	src/armnn/test/OptionalTest.cpp
+        src/armnn/test/TensorTest.cpp \
+        src/armnn/test/NetworkTests.cpp \
+        src/armnn/test/InstrumentTests.cpp \
+        src/armnn/test/ProfilingEventTest.cpp \
+        src/armnn/test/ObservableTest.cpp \
+        src/armnn/test/OptionalTest.cpp
 
 LOCAL_STATIC_LIBRARIES := \
-	libneuralnetworks_common \
-	libboost_log \
-	libboost_system \
-	libboost_unit_test_framework \
-	libboost_thread \
-	armnn-arm_compute
+        libneuralnetworks_common \
+        libboost_log \
+        libboost_system \
+        libboost_unit_test_framework \
+        libboost_thread \
+        armnn-arm_compute
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libarmnn
 
 LOCAL_SHARED_LIBRARIES := \
-	libbase \
-	libhidlbase \
-	libhidltransport \
-	libhidlmemory \
-	liblog \
-	libutils \
-	android.hardware.neuralnetworks@1.0 \
-	android.hidl.allocator@1.0 \
-	android.hidl.memory@1.0 \
-	libOpenCL
+        libbase \
+        libhidlbase \
+        libhidltransport \
+        libhidlmemory \
+        liblog \
+        libutils \
+        android.hardware.neuralnetworks@1.0 \
+        android.hidl.allocator@1.0 \
+        android.hidl.memory@1.0 \
+        libOpenCL
 
 include $(BUILD_EXECUTABLE)

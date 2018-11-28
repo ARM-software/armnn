@@ -7,9 +7,13 @@
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
-#include <backendsCommon/DataLayoutIndexed.hpp>
+
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
+
+#include <DataLayoutIndexed.hpp>
+
+using namespace armnnUtils;
 
 namespace armnn
 {

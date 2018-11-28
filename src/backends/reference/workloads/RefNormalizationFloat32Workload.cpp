@@ -15,6 +15,8 @@
 #include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+using namespace armnnUtils;
+
 namespace armnn
 {
 

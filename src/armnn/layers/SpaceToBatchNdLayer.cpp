@@ -9,11 +9,14 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
+#include <DataLayoutIndexed.hpp>
+
 #include <numeric>
+
+using namespace armnnUtils;
 
 namespace armnn
 {

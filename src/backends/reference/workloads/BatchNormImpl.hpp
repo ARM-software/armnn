@@ -10,6 +10,8 @@
 
 #include <armnn/Tensor.hpp>
 
+#include <DataLayoutIndexed.hpp>
+
 #include <cmath>
 
 namespace armnn
@@ -34,7 +36,7 @@ static void BatchNormImpl(NormData     data,
                                         outputData,
                                         data.m_Parameters.m_DataLayout);
 
-    DataLayoutIndexed dataLayout(data.m_Parameters.m_DataLayout);
+    armnnUtils::DataLayoutIndexed dataLayout(data.m_Parameters.m_DataLayout);
 
     for (unsigned int c = 0; c < inputInfo.GetShape()[dataLayout.GetChannelsIndex()]; c++)
     {

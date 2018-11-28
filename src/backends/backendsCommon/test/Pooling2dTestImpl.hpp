@@ -20,6 +20,8 @@
 
 #include <test/TensorHelpers.hpp>
 
+#include <DataLayoutIndexed.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <algorithm>
@@ -36,7 +38,7 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     const boost::multi_array<T, 4>& outputExpected)
 {
     const armnn::DataLayout dataLayout = descriptor.m_DataLayout;
-    const armnn::DataLayoutIndexed dimensionIndices = dataLayout;
+    const armnnUtils::DataLayoutIndexed dimensionIndices = dataLayout;
     auto heightIndex = dimensionIndices.GetHeightIndex();
     auto widthIndex = dimensionIndices.GetWidthIndex();
     auto channelsIndex = dimensionIndices.GetChannelsIndex();

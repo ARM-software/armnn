@@ -12,6 +12,8 @@
 
 #include <cmath>
 
+using namespace armnnUtils;
+
 namespace armnn
 {
 

@@ -10,7 +10,7 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <backendsCommon/DataLayoutIndexed.hpp>
+#include <DataLayoutIndexed.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -73,7 +73,7 @@ static void ConvImpl(ConvData data,
                                             GetOutputTensorData<InputType>(0, data),
                                             data.m_Parameters.m_DataLayout);
 
-    const DataLayoutIndexed dataLayoutIndexed(data.m_Parameters.m_DataLayout);
+    const armnnUtils::DataLayoutIndexed dataLayoutIndexed(data.m_Parameters.m_DataLayout);
     const unsigned int channelsIndex = dataLayoutIndexed.GetChannelsIndex();
     const unsigned int heightIndex   = dataLayoutIndexed.GetHeightIndex();
     const unsigned int widthIndex    = dataLayoutIndexed.GetWidthIndex();

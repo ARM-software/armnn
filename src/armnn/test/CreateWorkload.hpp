@@ -8,12 +8,12 @@
 
 #include <boost/cast.hpp>
 
-#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <Graph.hpp>
+#include <DataLayoutIndexed.hpp>
 
 #include <utility>
 
@@ -861,7 +861,7 @@ std::unique_ptr<ResizeBilinearWorkload> CreateResizeBilinearWorkloadTest(armnn::
 
     // Creates the layer we're testing.
     ResizeBilinearDescriptor resizeDesc;
-    DataLayoutIndexed dimensionIndices = dataLayout;
+    armnnUtils::DataLayoutIndexed dimensionIndices = dataLayout;
     resizeDesc.m_TargetWidth = outputShape[dimensionIndices.GetWidthIndex()];
     resizeDesc.m_TargetHeight = outputShape[dimensionIndices.GetHeightIndex()];
     resizeDesc.m_DataLayout = dataLayout;

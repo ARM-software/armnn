@@ -7,15 +7,15 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <backendsCommon/DataLayoutIndexed.hpp>
+#include <DataLayoutIndexed.hpp>
 
 namespace armnn
 {
 
-void ResizeBilinear(const float*      in,
-                    const TensorInfo& inputInfo,
-                    float*            out,
-                    const TensorInfo& outputInfo,
-                    DataLayoutIndexed dataLayout = DataLayout::NCHW);
+void ResizeBilinear(const float*                  in,
+                    const TensorInfo&             inputInfo,
+                    float*                        out,
+                    const TensorInfo&             outputInfo,
+                    armnnUtils::DataLayoutIndexed dataLayout = DataLayout::NCHW);
 
 } //namespace armnn

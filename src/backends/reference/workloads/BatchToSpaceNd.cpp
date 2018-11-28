@@ -11,6 +11,8 @@
 
 #include <boost/assert.hpp>
 
+using namespace armnnUtils;
+
 namespace armnn
 {
 

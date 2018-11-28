@@ -29,9 +29,11 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/GraphTopologicalSort.hpp
     src/armnnUtils/Half.hpp
     src/armnnUtils/Logging.hpp
-    src/armnnUtils/Permute.hpp
     src/armnnUtils/Logging.cpp
+    src/armnnUtils/Permute.hpp
     src/armnnUtils/Permute.cpp
+    src/armnnUtils/DataLayoutIndexed.cpp
+    src/armnnUtils/DataLayoutIndexed.hpp
     src/armnnUtils/DotSerializer.cpp
     src/armnnUtils/DotSerializer.hpp
     src/armnnUtils/HeapProfiling.cpp
@@ -137,14 +139,15 @@ if(BUILD_TF_LITE_PARSER)
         include/armnnTfLiteParser/ITfLiteParser.hpp
         src/armnnTfLiteParser/TfLiteParser.hpp
         src/armnnTfLiteParser/TfLiteParser.cpp
-     )
+        )
 
-     add_library_ex(armnnTfLiteParser SHARED ${armnn_tf_lite_parser_sources})
+    add_library_ex(armnnTfLiteParser SHARED ${armnn_tf_lite_parser_sources})
 
-     target_include_directories(armnnTfLiteParser PRIVATE src/armnnUtils)
+    target_include_directories(armnnTfLiteParser PRIVATE src/armnn)
+    target_include_directories(armnnTfLiteParser PRIVATE src/armnnUtils)
 
-     target_link_libraries(armnnTfLiteParser ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
-     target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
+    target_link_libraries(armnnTfLiteParser ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
+    target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
 endif()
 
 list(APPEND armnn_sources

@@ -7,9 +7,9 @@
 
 #include <armnn/Tensor.hpp>
 
-#include <backendsCommon/DataLayoutIndexed.hpp>
-
 #include <boost/assert.hpp>
+
+#include <DataLayoutIndexed.hpp>
 
 namespace armnn
 {
@@ -19,7 +19,8 @@ template <typename DataType>
 class TensorBufferArrayView
 {
 public:
-    TensorBufferArrayView(const TensorShape& shape, DataType* data, DataLayoutIndexed dataLayout = DataLayout::NCHW)
+    TensorBufferArrayView(const TensorShape& shape, DataType* data,
+                          armnnUtils::DataLayoutIndexed dataLayout = DataLayout::NCHW)
         : m_Shape(shape)
         , m_Data(data)
         , m_DataLayout(dataLayout)
@@ -60,9 +61,9 @@ public:
     }
 
 private:
-    const TensorShape m_Shape;
-    DataType*         m_Data;
-    DataLayoutIndexed m_DataLayout;
+    const TensorShape             m_Shape;
+    DataType*                     m_Data;
+    armnnUtils::DataLayoutIndexed m_DataLayout;
 };
 
 } //namespace armnn

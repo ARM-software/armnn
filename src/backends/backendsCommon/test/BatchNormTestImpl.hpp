@@ -16,6 +16,8 @@
 
 #include <test/TensorHelpers.hpp>
 
+#include <DataLayoutIndexed.hpp>
+
 template<typename T>
 LayerTestResult<T, 4> BatchNormTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
@@ -30,7 +32,7 @@ LayerTestResult<T, 4> BatchNormTestImpl(
     armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, armnn::GetDataType<T>());
     armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, armnn::GetDataType<T>());
 
-    armnn::DataLayoutIndexed dataLayoutIndexed(dataLayout);
+    armnnUtils::DataLayoutIndexed dataLayoutIndexed(dataLayout);
 
     armnn::TensorInfo tensorInfo({ inputOutputTensorShape[dataLayoutIndexed.GetChannelsIndex()] },
                                  armnn::GetDataType<T>());

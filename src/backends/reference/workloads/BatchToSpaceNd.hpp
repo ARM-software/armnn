@@ -5,15 +5,17 @@
 
 #pragma once
 
-#include <backendsCommon/DataLayoutIndexed.hpp>
+#include <armnn/Types.hpp>
+
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
-#include <armnn/Types.hpp>
+
+#include <DataLayoutIndexed.hpp>
 
 namespace armnn
 {
 
-void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
+void BatchToSpaceNd(const armnnUtils::DataLayoutIndexed& dataLayout,
                     const TensorInfo& inputTensorInfo,
                     const TensorInfo& outputTensorInfo,
                     const std::vector<unsigned int>& blockShape,

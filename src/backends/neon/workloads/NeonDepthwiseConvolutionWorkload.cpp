@@ -8,7 +8,10 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <neon/NeonLayerSupport.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/DataLayoutIndexed.hpp>
+
+#include <DataLayoutIndexed.hpp>
+
+using namespace armnnUtils;
 
 namespace armnn
 {

@@ -5,7 +5,9 @@
 
 #include "SpaceToBatchNd.hpp"
 
-#include <backendsCommon/DataLayoutIndexed.hpp>
+#include <DataLayoutIndexed.hpp>
+
+using namespace armnnUtils;
 
 namespace armnn
 {

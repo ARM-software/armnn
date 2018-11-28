@@ -9,7 +9,6 @@
 
 COMMON_SOURCES := \
     BackendRegistry.cpp \
-    DataLayoutIndexed.cpp \
     CpuTensorHandle.cpp \
     ILayerSupport.cpp \
     MemCopyWorkload.cpp \

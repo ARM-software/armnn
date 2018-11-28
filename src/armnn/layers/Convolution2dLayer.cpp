@@ -8,8 +8,11 @@
 
 #include <armnn/TypesUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/DataLayoutIndexed.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
+
+#include <DataLayoutIndexed.hpp>
+
+using namespace armnnUtils;
 
 namespace armnn
 {

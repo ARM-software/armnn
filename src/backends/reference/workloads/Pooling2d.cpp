@@ -135,6 +135,8 @@ namespace
     }
 }
 
+using namespace armnnUtils;
+
 namespace armnn
 {
 
@@ -144,7 +146,7 @@ void Pooling2d(const float* in,
                const TensorInfo& outputInfo,
                const Pooling2dDescriptor& params)
 {
-    const armnn::DataLayoutIndexed dataLayout = params.m_DataLayout;
+    const DataLayoutIndexed dataLayout = params.m_DataLayout;
     auto channelsIndex = dataLayout.GetChannelsIndex();
     auto heightIndex = dataLayout.GetHeightIndex();
     auto widthIndex = dataLayout.GetWidthIndex();

@@ -9,8 +9,6 @@ list(APPEND armnnBackendsCommon_sources
     CpuTensorHandle.cpp
     CpuTensorHandleFwd.hpp
     CpuTensorHandle.hpp
-    DataLayoutIndexed.hpp
-    DataLayoutIndexed.cpp
     IBackendInternal.hpp
     IBackendContext.hpp
     ILayerSupport.cpp

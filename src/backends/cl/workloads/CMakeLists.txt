@@ -10,6 +10,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClAdditionWorkload.hpp
     ClBatchNormalizationFloatWorkload.cpp
     ClBatchNormalizationFloatWorkload.hpp
+    ClBatchToSpaceNdWorkload.cpp
+    ClBatchToSpaceNdWorkload.hpp
     ClConstantWorkload.cpp
     ClConstantWorkload.hpp
     ClConvertFp16ToFp32Workload.cpp

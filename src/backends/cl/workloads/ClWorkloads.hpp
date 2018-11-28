@@ -8,6 +8,7 @@
 #include "ClAdditionWorkload.hpp"
 #include "ClConstantWorkload.hpp"
 #include "ClBatchNormalizationFloatWorkload.hpp"
+#include "ClBatchToSpaceNdWorkload.hpp"
 #include "ClConvolution2dWorkload.hpp"
 #include "ClDepthwiseConvolutionWorkload.hpp"
 #include "ClDivisionFloatWorkload.hpp"

@@ -18,6 +18,7 @@
 #include "workloads/ClAdditionWorkload.hpp"
 #include "workloads/ClActivationWorkload.hpp"
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
+#include "workloads/ClBatchToSpaceNdWorkload.hpp"
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
 #include "workloads/ClConvertFp32ToFp16Workload.hpp"
 #include "workloads/ClConvolution2dWorkload.hpp"
@@ -162,6 +163,18 @@ bool ClLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                    var,
                                    beta,
                                    gamma,
+                                   descriptor);
+}
+
+bool ClLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const BatchToSpaceNdDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClBatchToSpaceNdWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
                                    descriptor);
 }
 

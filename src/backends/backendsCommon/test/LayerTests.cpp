@@ -7281,6 +7281,60 @@ LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(
         crops, outputShape, expectedOutput);
 }
 
+LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test2(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int inputShape[] = {4, 1, 1, 1};
+    const unsigned int outputShape[] = {1, 1, 2, 2};
+
+    std::vector<float> input
+            ({
+                     // Batch 0, Height 0, Width (2) x Channel (1)
+                     1.0f, 2.0f, 3.0f, 4.0f
+             });
+
+    std::vector<float> expectedOutput({1.0f,   2.0f,  3.0f,  4.0f});
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, memoryManager,
+                                             armnn::DataLayout::NCHW, inputShape, input, blockShape,
+                                             crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test3(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int inputShape[] = {4, 3, 1, 1};
+    const unsigned int outputShape[] = {1, 3, 2, 2};
+
+    std::vector<float> input({ 1.0f, 3.0f, 5.0f, 7.0f, 9.0f, 11.0f, 2.0f, 4.0f, 6.0f, 8.0f, 10.0f, 12.0f });
+
+    std::vector<float> expectedOutput
+            ({
+                     // Batch 0, Channel 0, Height (2) x Width (2)
+                     1.0f,  7.0f,
+                     2.0f,  8.0f,
+
+                     // Batch 0, Channel 1, Height (2) x Width (2)
+                     3.0f,  9.0f,
+                     4.0f, 10.0f,
+
+                     // Batch 0, Channel 2, Height (2) x Width (2)
+                     5.0f, 11.0f,
+                     6.0f, 12.0f,
+             });
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<float, 4, 4>(workloadFactory, memoryManager,
+                                             armnn::DataLayout::NCHW, inputShape, input, blockShape,
+                                             crops, outputShape, expectedOutput);
+}
 
 LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(
     armnn::IWorkloadFactory& workloadFactory,
@@ -7423,4 +7477,132 @@ LayerTestResult<uint8_t, 2> StridedSlice2DReverseUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return StridedSlice2DReverseTest<uint8_t>(workloadFactory, memoryManager);
+}
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest2(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int inputShape[] = {4, 1, 1, 1};
+    const unsigned int outputShape[] = {1, 2, 2, 1};
+
+    std::vector<uint8_t> input
+            ({
+                     // Batch 0, Height 0, Width (2) x Channel (1)
+                     1, 2, 3, 4
+             });
+
+    std::vector<uint8_t> expectedOutput({1, 2, 3, 4});
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager,
+                                               armnn::DataLayout::NHWC, inputShape, input, blockShape,
+                                               crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest3(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int inputShape[] = {4, 1, 1, 3};
+    const unsigned int outputShape[] = {1, 2, 2, 3};
+
+    std::vector<uint8_t> input({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+
+    std::vector<uint8_t> expectedOutput({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager,
+                                               armnn::DataLayout::NHWC, inputShape, input, blockShape,
+                                               crops, outputShape, expectedOutput);
+}
+
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNchwUintTest1(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int inputShape[] = {4, 3, 1, 1};
+    const unsigned int outputShape[] = {1, 3, 2, 2};
+
+    std::vector<uint8_t> input({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+
+    std::vector<uint8_t> expectedOutput
+            ({
+                     // Batch 0, Channel 0, Height (2) x Width (2)
+                     1,  4,
+                     7, 10,
+
+                     // Batch 0, Channel 1, Height (2) x Width (2)
+                     2,  5,
+                     8, 11,
+
+                     // Batch 0, Channel 2, Height (2) x Width (2)
+                     3,  6,
+                     9, 12,
+             });
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager,
+                                               armnn::DataLayout::NCHW, inputShape, input, blockShape,
+                                               crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNchwUintTest2(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int inputShape[] = {4, 1, 1, 1};
+    const unsigned int outputShape[] = {1, 1, 2, 2};
+
+    std::vector<uint8_t> input
+            ({
+                     // Batch 0, Height 0, Width (2) x Channel (1)
+                     1, 2, 3, 4
+             });
+
+    std::vector<uint8_t> expectedOutput({1, 2, 3, 4});
+
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager,
+                                             armnn::DataLayout::NCHW, inputShape, input, blockShape,
+                                             crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNchwUintTest3(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int inputShape[] = {4, 3, 1, 1};
+    const unsigned int outputShape[] = {1, 3, 2, 2};
+
+    std::vector<uint8_t> input({ 1, 3, 5, 7, 9, 11, 2, 4, 6, 8, 10, 12 });
+
+    std::vector<uint8_t> expectedOutput
+            ({
+                     // Batch 0, Channel 0, Height (2) x Width (2)
+                     1,  7,
+                     2,  8,
+
+                     // Batch 0, Channel 1, Height (2) x Width (2)
+                     3,  9,
+                     4, 10,
+
+                     // Batch 0, Channel 2, Height (2) x Width (2)
+                     5, 11,
+                     6, 12,
+             });
+    std::vector<unsigned int> blockShape({2, 2});
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}, {0, 0}};
+
+    return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager,
+                                               armnn::DataLayout::NCHW, inputShape, input, blockShape,
+                                               crops, outputShape, expectedOutput);
 }

@@ -1068,14 +1068,42 @@ LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test1(
     armnn::IWorkloadFactory &workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test2(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> BatchToSpaceNdNchwFloat32Test3(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest1(
     armnn::IWorkloadFactory &workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest2(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNhwcUintTest3(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNchwUintTest1(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNchwUintTest2(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> BatchToSpaceNdNchwUintTest3(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<float, 4> StridedSlice4DFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
+    
 LayerTestResult<float, 4> StridedSlice4DReverseFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

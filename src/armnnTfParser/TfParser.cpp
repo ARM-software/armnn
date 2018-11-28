@@ -14,6 +14,7 @@
 #include <ParserHelper.hpp>
 #include <Permute.hpp>
 #include <VerificationHelpers.hpp>
+#include <DataLayoutIndexed.hpp>
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
@@ -36,6 +37,7 @@
 #include <numeric>
 #include <functional>
 
+using namespace armnnUtils;
 using namespace armnn;
 
 namespace armnnTfParser
@@ -752,6 +754,16 @@ public:
         return constTensor;
     }
 
+    const T* GetStorage() const
+    {
+        return m_Storage.data();
+    }
+
+    const TensorInfo& GetTensorInfo() const
+    {
+        return m_TensorInfo;
+    }
+
 private:
     ///< Manages the lifetime of the tensor data.
     std::vector<T> m_Storage;
@@ -1059,59 +1071,85 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
 
     CHECK_DATA_FORMAT(nodeDef, dataFormat, "Conv2D");
 
-    if (dataFormat == "NHWC")
-    {
-        desc.m_StrideX = strides[2];
-        desc.m_StrideY = strides[1];
-        // Swizzles input to supported memory layout.
-        inputTensorInfo = armnnUtils::Permuted(inputSlot.GetTensorInfo(), NHWCToArmNN);
-    }
-    else if (dataFormat == "NCHW")
-    {
-        desc.m_StrideX = strides[3];
-        desc.m_StrideY = strides[2];
-    }
+    DataLayout dataLayout = dataFormat == "NHWC" ? DataLayout::NHWC : DataLayout::NCHW;
 
-    uint32_t inputHeight = inputTensorInfo.GetShape()[2];
-    uint32_t inputWidth = inputTensorInfo.GetShape()[3];
+    desc.m_DataLayout = dataLayout;
 
-    std::vector<float> outputTensorData;
+    DataLayoutIndexed dataLayoutIndexed(dataLayout);
 
-    ConstTensor weightTensor = weightNode->GetConstTensor(true, outputTensorData);
+    desc.m_StrideX = strides[dataLayoutIndexed.GetWidthIndex()];
+    desc.m_StrideY = strides[dataLayoutIndexed.GetHeightIndex()];
 
-    uint32_t weightHeight = weightTensor.GetShape()[2];
-    uint32_t weightWidth = weightTensor.GetShape()[3];
+    uint32_t inputHeight = inputTensorInfo.GetShape()[dataLayoutIndexed.GetHeightIndex()];
+    uint32_t inputWidth  = inputTensorInfo.GetShape()[dataLayoutIndexed.GetWidthIndex()];
+
+    // Mappings from TensorFlow filter tensors to the ArmNN filter tensors.
+    // Tensorflow weights are [H, W, In, Out].
+    // ArmNN weights have to be [Out, H, W, In] when the data layout is NHWC,
+    // and [Out, In, H, W] when the data layout is NCHW.
+    PermutationVector permutationVector =
+            dataLayout == DataLayout::NHWC ?
+                std::initializer_list<unsigned int>{ 1, 2, 3, 0 } : // NHWC: [H, W, In, Out] -> [Out, H, W, In]
+                std::initializer_list<unsigned int>{ 2, 3, 1, 0 };  // NCHW: [H, W, In, Out] -> [Out, In, H, W]
+
+    // Swizzle the tensor using the given permutation vector.
+    const TensorInfo& weightTensorInfo = weightNode->GetTensorInfo();
+    const TensorInfo weightTensorSwizzledInfo = armnnUtils::Permuted(weightTensorInfo, permutationVector);
+
+    // Swizzles the content of the tensor's permanent storage into a local storage.
+    std::vector<float> weightTensorSwizzledData(weightTensorInfo.GetNumElements());
+    armnnUtils::Permute(weightTensorSwizzledInfo.GetShape(), permutationVector,
+                        weightNode->GetStorage(), weightTensorSwizzledData.data());
+
+    // Create a weight tensor with the newly swizzled data.
+    ConstTensor weightTensor(weightTensorSwizzledInfo, weightTensorSwizzledData);
+
+    uint32_t weightHeight = weightTensor.GetShape()[dataLayoutIndexed.GetHeightIndex()];
+    uint32_t weightWidth  = weightTensor.GetShape()[dataLayoutIndexed.GetWidthIndex()];
 
     bool padding = false;
     TensorInfo outputInfo;
+    unsigned int outputHeight = 0;
+    unsigned int outputWidth = 0;
 
     CHECK_PADDING_TYPE(nodeDef, paddingString);
 
     if (paddingString == "SAME")
     {
         padding = true;
-        outputInfo = TensorInfo({ inputTensorInfo.GetShape()[0],
-                                  weightTensor.GetShape()[0],
-                                  static_cast<uint32_t>(ceil(
-                                      static_cast<float>(inputHeight) /
-                                      static_cast<float>(desc.m_StrideY))),
-                                  static_cast<uint32_t>(ceil(
-                                      static_cast<float>(inputWidth) /
-                                      static_cast<float>(desc.m_StrideX)))
-                                }, DataType::Float32);
+
+        outputHeight = static_cast<uint32_t>(ceil(static_cast<float>(inputHeight) /
+                                                  static_cast<float>(desc.m_StrideY)));
+        outputWidth  = static_cast<uint32_t>(ceil(static_cast<float>(inputWidth) /
+                                                  static_cast<float>(desc.m_StrideX)));
     }
     else if (paddingString == "VALID")
     {
         padding = false;
+
+        outputHeight = static_cast<uint32_t>(ceil(static_cast<float>(inputHeight - weightHeight + 1) /
+                                                  static_cast<float>(desc.m_StrideY)));
+        outputWidth  = static_cast<uint32_t>(ceil(static_cast<float>(inputWidth - weightWidth + 1) /
+                                                  static_cast<float>(desc.m_StrideX)));
+    }
+
+    switch (dataLayout)
+    {
+    case DataLayout::NHWC:
+        outputInfo = TensorInfo({ inputTensorInfo.GetShape()[0],
+                                  outputHeight,
+                                  outputWidth,
+                                  weightTensor.GetShape()[0] },
+                                DataType::Float32);
+        break;
+    case DataLayout::NCHW:
+    default:
         outputInfo = TensorInfo({ inputTensorInfo.GetShape()[0],
                                   weightTensor.GetShape()[0],
-                                  static_cast<uint32_t>(ceil(
-                                      static_cast<float>(inputHeight - weightHeight + 1) /
-                                      static_cast<float>(desc.m_StrideY))),
-                                  static_cast<uint32_t>(ceil(
-                                      static_cast<float>(inputWidth - weightWidth + 1) /
-                                      static_cast<float>(desc.m_StrideX)))
-                                }, DataType::Float32);
+                                  outputHeight,
+                                  outputWidth },
+                                DataType::Float32);
+        break;
     }
 
     CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, padding);
@@ -1119,15 +1157,7 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
 
     IConnectableLayer* layer = m_Network->AddConvolution2dLayer(desc, weightTensor, nodeDef.name().c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-
-    if (dataFormat == "NHWC")
-    {
-        layer = SwizzleInDeswizzleOut(*m_Network, inputSlot, *layer, nodeDef.name());
-    }
-    else
-    {
-        inputSlot.Connect(layer->GetInputSlot(0));
-    }
+    inputSlot.Connect(layer->GetInputSlot(0));
 
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }

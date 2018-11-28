@@ -15,6 +15,8 @@
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <DataLayoutIndexed.hpp>
+
 #include <cmath>
 #include <limits>
 
@@ -74,6 +76,7 @@ static void ConvImpl(ConvData data,
                                             data.m_Parameters.m_DataLayout);
 
     const armnnUtils::DataLayoutIndexed dataLayoutIndexed(data.m_Parameters.m_DataLayout);
+
     const unsigned int channelsIndex = dataLayoutIndexed.GetChannelsIndex();
     const unsigned int heightIndex   = dataLayoutIndexed.GetHeightIndex();
     const unsigned int widthIndex    = dataLayoutIndexed.GetWidthIndex();
@@ -91,10 +94,10 @@ static void ConvImpl(ConvData data,
     unsigned int heightFilter = filterInfo.GetShape()[heightIndex];
     unsigned int widthFilter  = filterInfo.GetShape()[widthIndex];
 
-    unsigned int paddingTop = data.m_Parameters.m_PadTop;
+    unsigned int paddingTop  = data.m_Parameters.m_PadTop;
     unsigned int paddingLeft = data.m_Parameters.m_PadLeft;
-    unsigned int hStride  = data.m_Parameters.m_StrideY;
-    unsigned int xStride  = data.m_Parameters.m_StrideX;
+    unsigned int xStride     = data.m_Parameters.m_StrideX;
+    unsigned int yStride     = data.m_Parameters.m_StrideY;
 
     // The world's least efficient convolution.
     for (unsigned int batchIdx = 0; batchIdx < batchSize; batchIdx++)
@@ -168,7 +171,7 @@ static void ConvImpl(ConvData data,
                                 AccumulatorType filterValue = filterData[filterIndex] -
                                     boost::numeric_cast<AccumulatorType>(filterOffset);
 
-                                unsigned int yInput = yOutput * hStride + yFilter;
+                                unsigned int yInput = yOutput * yStride + yFilter;
                                 unsigned int xInput = xOutput * xStride + xFilter;
 
                                 AccumulatorType inputValue;

@@ -1,4 +1,4 @@
-#Arm NN ONNX parser
+# Arm NN ONNX parser
 
 `armnnOnnxParser` is a library for loading neural networks defined in ONNX protobuf files into the Arm NN runtime.
 

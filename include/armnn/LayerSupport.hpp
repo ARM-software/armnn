@@ -145,6 +145,14 @@ bool IsLstmSupported(const BackendId& backend, const TensorInfo& input, const Te
                      size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsMaximumSupported(const BackendId& backend,
+                        const TensorInfo& input0,
+                        const TensorInfo& input1,
+                        const TensorInfo& output,
+                        char* reasonIfUnSupported = nullptr,
+                        size_t reasonIfUnSupportedMaxLength = 0);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsMergerSupported(const BackendId& backend,
                        const std::vector<const TensorInfo*> inputs,
                        const TensorInfo& output,

@@ -22,6 +22,7 @@
 #include "layers/InputLayer.hpp"
 #include "layers/L2NormalizationLayer.hpp"
 #include "layers/LstmLayer.hpp"
+#include "layers/MaximumLayer.hpp"
 #include "layers/MeanLayer.hpp"
 #include "layers/MemCopyLayer.hpp"
 #include "layers/MergerLayer.hpp"
@@ -82,6 +83,7 @@ DECLARE_LAYER(FullyConnected)
 DECLARE_LAYER(Input)
 DECLARE_LAYER(L2Normalization)
 DECLARE_LAYER(Lstm)
+DECLARE_LAYER(Maximum)
 DECLARE_LAYER(Mean)
 DECLARE_LAYER(MemCopy)
 DECLARE_LAYER(Merger)

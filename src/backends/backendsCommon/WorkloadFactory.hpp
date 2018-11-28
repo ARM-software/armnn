@@ -133,6 +133,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const = 0;
 
+    virtual std::unique_ptr<IWorkload> CreateMaximum(const MaximumQueueDescriptor& descriptor,
+                                                     const WorkloadInfo& info) const = 0;
+
     virtual std::unique_ptr<IWorkload> CreateMean(const MeanQueueDescriptor& descriptor,
                                                   const WorkloadInfo& Info) const = 0;
 

@@ -258,6 +258,12 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
     return MakeWorkload<RefSubtractionFloat32Workload, RefSubtractionUint8Workload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMaximum(
+    const MaximumQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
     const MeanQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {

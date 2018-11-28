@@ -124,6 +124,8 @@ public:
 
     IConnectableLayer* AddSubtractionLayer(const char* name = nullptr) override;
 
+    IConnectableLayer* AddMaximumLayer(const char* name = nullptr) override;
+
     IConnectableLayer* AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name = nullptr) override;
 
     IConnectableLayer* AddPadLayer(const PadDescriptor& padDescriptor, const char* name = nullptr) override;

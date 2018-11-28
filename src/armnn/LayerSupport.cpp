@@ -255,6 +255,17 @@ bool IsLstmSupported(const BackendId& backend, const TensorInfo& input, const Te
                                cellToInputWeights, inputGateBias, projectionWeights,
                                projectionBias, cellToForgetWeights, cellToOutputWeights);
 }
+
+bool IsMaximumSupported(const BackendId& backend,
+                        const TensorInfo& input0,
+                        const TensorInfo& input1,
+                        const TensorInfo& output,
+                        char* reasonIfUnsupported,
+                        size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMaximumSupported, input0, input1, output);
+}
+
 bool IsMergerSupported(const BackendId& backend,
                        std::vector<const TensorInfo*> inputs,
                        const TensorInfo& output,

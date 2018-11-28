@@ -199,6 +199,12 @@ struct SubtractionQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+// Maximum layer workload data.
+struct MaximumQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Mean layer workload data.
 struct MeanQueueDescriptor : QueueDescriptorWithParameters<MeanDescriptor>
 {

@@ -30,6 +30,7 @@ enum class LayerType
     Input,
     L2Normalization,
     Lstm,
+    Maximum,
     Mean,
     MemCopy,
     Merger,

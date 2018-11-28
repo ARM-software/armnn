@@ -450,6 +450,18 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                      reason);
             break;
         }
+        case LayerType::Maximum:
+        {
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsMaximumSupported(OverrideDataType(input0, dataType),
+                                                            OverrideDataType(input1, dataType),
+                                                            OverrideDataType(output, dataType),
+                                                            reason);
+            break;
+        }
         case LayerType::Merger:
         {
             auto cLayer = boost::polymorphic_downcast<const MergerLayer*>(&layer);

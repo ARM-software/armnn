@@ -296,6 +296,11 @@ public:
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddSubtractionLayer(const char* name = nullptr) = 0;
 
+    /// Add a Maximum layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @ return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddMaximumLayer(const char* name = nullptr) = 0;
+
     /// Add a Mean layer to the network.
     /// @param meanDescriptor - Parameters for the mean operation.
     /// @param name - Optional name for the layer.

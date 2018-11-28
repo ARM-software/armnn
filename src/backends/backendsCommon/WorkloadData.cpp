@@ -887,6 +887,19 @@ void SubtractionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) cons
                                        "second input");
 }
 
+void MaximumQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTwoInputs(workloadInfo, "MaximumQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "MaximumQueueDescriptor");
+
+    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                                       workloadInfo.m_InputTensorInfos[1],
+                                       workloadInfo.m_OutputTensorInfos[0],
+                                       "MaximumQueueDescriptor",
+                                       "first input",
+                                       "second input");
+}
+
 void MeanQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     ValidateSingleInput(workloadInfo, "MeanQueueDescriptor");

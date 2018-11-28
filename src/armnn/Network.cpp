@@ -507,6 +507,11 @@ IConnectableLayer* Network::AddSplitterLayer(const ViewsDescriptor& splitterDesc
     return m_Graph->AddLayer<SplitterLayer>(splitterDescriptor, name);
 }
 
+IConnectableLayer* Network::AddMaximumLayer(const char* name)
+{
+    return m_Graph->AddLayer<MaximumLayer>(name);
+}
+
 IConnectableLayer* Network::AddMergerLayer(const OriginsDescriptor& mergerDescriptor,
     const char* name)
 {

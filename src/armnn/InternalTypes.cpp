@@ -30,6 +30,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Input: return "Input";
         case LayerType::L2Normalization: return "L2Normalization";
         case LayerType::Lstm: return "Lstm";
+        case LayerType::Maximum: return "Maximum";
         case LayerType::Mean: return "Mean";
         case LayerType::MemCopy: return "MemCopy";
         case LayerType::Merger: return "Merger";

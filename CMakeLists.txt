@@ -201,6 +201,8 @@ list(APPEND armnn_sources
     src/armnn/layers/L2NormalizationLayer.cpp
     src/armnn/layers/LstmLayer.cpp
     src/armnn/layers/LstmLayer.hpp
+    src/armnn/layers/MaximumLayer.cpp
+    src/armnn/layers/MaximumLayer.hpp
     src/armnn/layers/MeanLayer.hpp
     src/armnn/layers/MeanLayer.cpp
     src/armnn/layers/MemCopyLayer.hpp

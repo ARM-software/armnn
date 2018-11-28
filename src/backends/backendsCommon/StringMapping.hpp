@@ -19,6 +19,7 @@ public:
     enum Id {
         RefAdditionWorkload_Execute,
         RefSubtractionWorkload_Execute,
+        RefMaximumWorkload_Execute,
         RefMultiplicationWorkload_Execute,
         RefDivisionWorkload_Execute,
         MAX_STRING_ID

@@ -17,6 +17,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     ElementwiseFunction.hpp
     FullyConnected.cpp
     FullyConnected.hpp
+    Maximum.hpp
     Merger.hpp
     Pad.cpp
     Pad.hpp

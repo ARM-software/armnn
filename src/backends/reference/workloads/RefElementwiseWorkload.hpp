@@ -9,6 +9,7 @@
 #include <backendsCommon/StringMapping.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
+#include "Maximum.hpp"
 
 namespace armnn
 {
@@ -118,5 +119,18 @@ using RefDivisionUint8Workload =
                           DataType::QuantisedAsymm8,
                           DivisionQueueDescriptor,
                           StringMapping::RefDivisionWorkload_Execute>;
+
+
+using RefMaximumFloat32Workload =
+    RefElementwiseWorkload<armnn::maximum<float>,
+                          DataType::Float32,
+                          MaximumQueueDescriptor,
+                          StringMapping::RefMaximumWorkload_Execute>;
+
+using RefMaximumUint8Workload =
+    RefElementwiseWorkload<armnn::maximum<float>,
+                           DataType::QuantisedAsymm8,
+                           MaximumQueueDescriptor,
+                           StringMapping::RefMaximumWorkload_Execute>;
 
 } // armnn

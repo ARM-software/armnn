@@ -308,6 +308,19 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
                                      &FalseFuncU8<>);
 }
 
+bool RefLayerSupport::IsMaximumSupported(const TensorInfo& input0,
+                                         const TensorInfo& input1,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(input1);
+    ignore_unused(output);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input0.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       const MeanDescriptor& descriptor,

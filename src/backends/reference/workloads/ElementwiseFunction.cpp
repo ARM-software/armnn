@@ -7,6 +7,8 @@
 #include "Broadcast.hpp"
 #include <functional>
 
+#include "Maximum.hpp"
+
 namespace armnn
 {
 
@@ -27,3 +29,4 @@ template struct armnn::ElementwiseFunction<std::plus<float>>;
 template struct armnn::ElementwiseFunction<std::minus<float>>;
 template struct armnn::ElementwiseFunction<std::multiplies<float>>;
 template struct armnn::ElementwiseFunction<std::divides<float>>;
+template struct armnn::ElementwiseFunction<armnn::maximum<float>>;

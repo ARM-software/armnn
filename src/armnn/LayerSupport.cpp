@@ -425,4 +425,14 @@ bool IsStridedSliceSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsStridedSliceSupported, input, output, descriptor);
 }
 
+bool IsMinimumSupported(const BackendId& backend,
+                        const TensorInfo& input0,
+                        const TensorInfo& input1,
+                        const TensorInfo& output,
+                        char* reasonIfUnsupported,
+                        size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMinimumSupported, input0, input1, output);
+}
+
 }

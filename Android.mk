@@ -97,6 +97,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/MeanLayer.cpp \
         src/armnn/layers/MemCopyLayer.cpp \
         src/armnn/layers/MergerLayer.cpp \
+        src/armnn/layers/MinimumLayer.cpp \
         src/armnn/layers/MultiplicationLayer.cpp \
         src/armnn/layers/NormalizationLayer.cpp \
         src/armnn/layers/OutputLayer.cpp \

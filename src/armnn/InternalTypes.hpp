@@ -34,6 +34,7 @@ enum class LayerType
     Mean,
     MemCopy,
     Merger,
+    Minimum,
     Multiplication,
     Normalization,
     Output,

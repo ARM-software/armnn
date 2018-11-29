@@ -705,6 +705,11 @@ IConnectableLayer* Network::AddStridedSliceLayer(const StridedSliceDescriptor& s
     return m_Graph->AddLayer<StridedSliceLayer>(stridedSliceDescriptor, name);
 }
 
+IConnectableLayer* Network::AddMinimumLayer(const char* name)
+{
+    return m_Graph->AddLayer<MinimumLayer>(name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

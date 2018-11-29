@@ -207,6 +207,14 @@ bool ILayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> input
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool ILayerSupport::IsMinimumSupported(const TensorInfo& input0,
+                                       const TensorInfo& input1,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool ILayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
                                               const TensorInfo& input1,
                                               const TensorInfo& output,

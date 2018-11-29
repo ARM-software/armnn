@@ -294,4 +294,10 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateStridedSlice(const Strided
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
+{
+    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 } // namespace armnn

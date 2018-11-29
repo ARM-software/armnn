@@ -994,4 +994,17 @@ void StridedSliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) con
     }
 }
 
+void MinimumQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTwoInputs(workloadInfo, "MinimumQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "MinimumQueueDescriptor");
+
+    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                                       workloadInfo.m_InputTensorInfos[1],
+                                       workloadInfo.m_OutputTensorInfos[0],
+                                       "MinimumQueueDescriptor",
+                                       "first input",
+                                       "second input");
+}
+
 } //namespace armnn

@@ -141,6 +141,11 @@ public:
                                    const OriginsDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
+    virtual bool IsMinimumSupported(const TensorInfo& input0,
+                                    const TensorInfo& input1,
+                                    const TensorInfo& ouput,
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     virtual bool IsMultiplicationSupported(const TensorInfo& input0,
                                            const TensorInfo& input1,
                                            const TensorInfo& output,

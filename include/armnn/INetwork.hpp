@@ -323,6 +323,11 @@ public:
     virtual IConnectableLayer* AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
                                                     const char* name = nullptr) = 0;
 
+    /// Add a Minimum layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @ return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddMinimumLayer(const char* name = nullptr) = 0;
+
 protected:
     ~INetwork() {}
 };

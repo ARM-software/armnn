@@ -351,4 +351,9 @@ struct StridedSliceQueueDescriptor : QueueDescriptorWithParameters<StridedSliceD
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct MinimumQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

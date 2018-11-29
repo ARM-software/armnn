@@ -26,6 +26,7 @@
 #include "layers/MeanLayer.hpp"
 #include "layers/MemCopyLayer.hpp"
 #include "layers/MergerLayer.hpp"
+#include "layers/MinimumLayer.hpp"
 #include "layers/MultiplicationLayer.hpp"
 #include "layers/NormalizationLayer.hpp"
 #include "layers/OutputLayer.hpp"
@@ -87,6 +88,7 @@ DECLARE_LAYER(Maximum)
 DECLARE_LAYER(Mean)
 DECLARE_LAYER(MemCopy)
 DECLARE_LAYER(Merger)
+DECLARE_LAYER(Minimum)
 DECLARE_LAYER(Multiplication)
 DECLARE_LAYER(Normalization)
 DECLARE_LAYER(Output)

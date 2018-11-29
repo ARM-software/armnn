@@ -25,8 +25,7 @@ public:
     virtual void Execute() const override;
 
 private:
-    // Purposely not a NEL2Normalize function. See constructor.
-    mutable arm_compute::NENormalizationLayer m_Layer;
+    mutable arm_compute::NEL2NormalizeLayer m_Layer;
 };
 
 } //namespace armnn

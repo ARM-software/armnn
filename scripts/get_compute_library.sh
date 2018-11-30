@@ -68,7 +68,7 @@ pushd clframework > /dev/null
 # git fetch ssh://$GITHUB_USERNAME@review.mlplatform.org:29418/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
 
 # For pinning to a revision use this:
-CLFRAMEWORKREVISION="8f2cbfa15bfb0e49ca6a334a220f0e36964289d6" # commit on master after the fix for CLBatchToSpace
+CLFRAMEWORKREVISION="2897e61e8fe04aaf95540f4525c3dd3f7f46ebfa" # commit on master after fix for NEL2Normalization for FP32/FP16 & NHWC
 git fetch ssh://$GITHUB_USERNAME@review.mlplatform.org:29418/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode
 

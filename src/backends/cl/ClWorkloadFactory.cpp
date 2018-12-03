@@ -332,4 +332,10 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMinimum(const MinimumQueueDe
     return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 } // namespace armnn

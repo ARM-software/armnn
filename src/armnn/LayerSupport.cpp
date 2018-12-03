@@ -167,6 +167,15 @@ bool IsConvolution2dSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsConvolution2dSupported, input, output, descriptor, weights, biases);
 }
 
+bool IsDebugSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsDebugSupported, input, output);
+}
+
 bool IsDivisionSupported(const BackendId& backend,
                          const TensorInfo& input0,
                          const TensorInfo& input1,

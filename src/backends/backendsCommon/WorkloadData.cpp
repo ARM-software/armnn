@@ -1007,4 +1007,10 @@ void MinimumQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                        "second input");
 }
 
+void DebugQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "DebugQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "DebugQueueDescriptor");
+}
+
 } //namespace armnn

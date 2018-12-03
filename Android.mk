@@ -86,6 +86,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/Convolution2dLayer.cpp \
         src/armnn/layers/ConvertFp16ToFp32Layer.cpp \
         src/armnn/layers/ConvertFp32ToFp16Layer.cpp \
+        src/armnn/layers/DebugLayer.cpp \
         src/armnn/layers/DepthwiseConvolution2dLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
         src/armnn/layers/FloorLayer.cpp \

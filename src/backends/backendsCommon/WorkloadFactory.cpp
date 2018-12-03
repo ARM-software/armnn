@@ -199,6 +199,16 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             reason.value() = "Unsupported backend type";
             break;
         }
+        case LayerType::Debug:
+        {
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsDebugSupported(OverrideDataType(input, dataType),
+                                                          OverrideDataType(output, dataType),
+                                                          reason);
+            break;
+        }
         case LayerType::DepthwiseConvolution2d:
         {
             auto cLayer = boost::polymorphic_downcast<const DepthwiseConvolution2dLayer*>(&layer);

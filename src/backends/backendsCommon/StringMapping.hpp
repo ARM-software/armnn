@@ -37,6 +37,7 @@ private:
     {
         m_Strings[RefAdditionWorkload_Execute] = "RefAdditionWorkload_Execute";
         m_Strings[RefSubtractionWorkload_Execute] = "RefSubtractionWorkload_Execute";
+        m_Strings[RefMaximumWorkload_Execute] = "RefMaximumWorkload_Execute";
         m_Strings[RefMultiplicationWorkload_Execute] = "RefMultiplicationWorkload_Execute";
         m_Strings[RefDivisionWorkload_Execute] = "RefDivisionWorkload_Execute";
     }

@@ -19,6 +19,8 @@
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
+#include <reference/workloads/RefWorkloads.hpp>
+
 #include <algorithm>
 #include <boost/cast.hpp>
 
@@ -1633,6 +1635,248 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(
                                        shape0, input0, 1.0f, 0,
                                        shape1, input1, 1.0f, 0,
                                        shape0, output, 1.0f, 0);
+}
+
+template<typename DescriptorType>
+std::unique_ptr<armnn::IWorkload> CreateWorkload(
+    const armnn::IWorkloadFactory& workloadFactory,
+    const armnn::WorkloadInfo& info,
+    const DescriptorType& descriptor)
+{
+    return CreateWorkload(workloadFactory, info, descriptor);
+};
+
+template<>
+std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MaximumQueueDescriptor>(
+    const armnn::IWorkloadFactory& workloadFactory,
+    const armnn::WorkloadInfo& info,
+    const armnn::MaximumQueueDescriptor& descriptor)
+{
+    return workloadFactory.CreateMaximum(descriptor, info);
+}
+
+namespace {
+    template <typename Descriptor, typename dataType>
+    LayerTestResult<dataType, 4> ElementwiseTestHelper
+        (armnn::IWorkloadFactory & workloadFactory,
+         const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager,
+         const unsigned int shape0[4], std::vector<dataType> values0,
+         const unsigned int shape1[4], std::vector<dataType> values1,
+         const unsigned int outShape[4], std::vector<dataType> outValues,
+         float qScale = 0.0f, int qOffset = 0)
+    {
+        const size_t dimensionCount = 4;
+        armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, armnn::GetDataType<dataType>()};
+        armnn::TensorInfo inputTensorInfo1{dimensionCount, shape1, armnn::GetDataType<dataType>()};
+        armnn::TensorInfo outputTensorInfo{dimensionCount, outShape, armnn::GetDataType<dataType>()};
+
+        auto input0 = MakeTensor<dataType, 4>(inputTensorInfo0, values0);
+        auto input1 = MakeTensor<dataType, 4>(inputTensorInfo1, values1);
+
+        if (armnn::IsQuantizedType<dataType>())
+        {
+            inputTensorInfo0.SetQuantizationScale(qScale);
+            inputTensorInfo0.SetQuantizationOffset(qOffset);
+
+            inputTensorInfo1.SetQuantizationScale(qScale);
+            inputTensorInfo1.SetQuantizationOffset(qOffset);
+
+            outputTensorInfo.SetQuantizationScale(qScale);
+            outputTensorInfo.SetQuantizationOffset(qOffset);
+        }
+
+        LayerTestResult<dataType,4> ret(outputTensorInfo);
+
+        std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
+        std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
+        std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+        Descriptor data;
+        armnn::WorkloadInfo info;
+        AddInputToWorkload(data, info, inputTensorInfo0, inputHandle0.get());
+        AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
+        AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+        auto workload = CreateWorkload<Descriptor>(workloadFactory, info, data);
+
+        inputHandle0->Allocate();
+        inputHandle1->Allocate();
+        outputHandle->Allocate();
+
+        CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
+        CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
+
+        ExecuteWorkload(*workload, memoryManager);
+
+        CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+
+        ret.outputExpected = MakeTensor<dataType, 4>(outputTensorInfo, outValues);
+        return ret;
+    }
+}
+
+
+LayerTestResult<float, 4> MaximumSimpleTest(armnn::IWorkloadFactory& workloadFactory,
+                                           const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int width = 2;
+    const unsigned int height = 2;
+    const unsigned int channelCount = 2;
+    const unsigned int batchSize = 2;
+
+    unsigned int shape[] = { batchSize, channelCount, height, width };
+
+    std::vector<float> input0({ 1, 1, 1, 1,  5, 5, 5, 5,
+                                3, 3, 3, 3,  4, 4, 4, 4 });
+
+    std::vector<float> input1({ 2, 2, 2, 2,  3, 3, 3, 3,
+                                4, 4, 4, 4,  5, 5, 5, 5 });
+
+    std::vector<float> output({ 2, 2, 2, 2,  5, 5, 5, 5,
+                                4, 4, 4, 4,  5, 5, 5, 5 });
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, float>
+            (workloadFactory,
+             memoryManager,
+             shape,
+             input0,
+             shape,
+             input1,
+             shape,
+             output);
+}
+
+LayerTestResult<float, 4> MaximumBroadcast1ElementTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape0[] = { 1, 2, 2, 2 };
+    std::vector<float> input0({ 1, 2, 3, 4, 5, 6, 7, 8});
+
+    unsigned int shape1[] = { 1, 1, 1, 1 };
+    std::vector<float> input1({ 2 });
+
+    std::vector<float> output({ 2, 2, 3, 4, 5, 6, 7, 8});
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, float>
+            (workloadFactory,
+             memoryManager,
+             shape0,
+             input0,
+             shape1,
+             input1,
+             shape0,
+             output);
+}
+
+LayerTestResult<float, 4> MaximumBroadcast1DVectorTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<float> input0({ 1, 2, 3, 4, 5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    std::vector<float> input1({ 1, 2, 3});
+
+    std::vector<float> output({ 1, 2, 3, 4, 5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, float>
+            (workloadFactory,
+             memoryManager,
+             shape0,
+             input0,
+             shape1,
+             input1,
+             shape0,
+             output);
+}
+
+LayerTestResult<uint8_t, 4> MaximumUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape[] = { 2, 2, 2, 2 };
+
+    // See dequantized values to the right.
+    std::vector<uint8_t> input0({ 1, 1, 1, 1, 6, 6, 6, 6,
+                                  3, 3, 3, 3, 4, 4, 4, 4 });
+
+    std::vector<uint8_t> input1({ 2, 2, 2, 2, 3, 3, 3, 3,
+                                  4, 4, 4, 4, 5, 5, 5, 5 });
+
+    std::vector<uint8_t> output({ 2, 2, 2, 2, 6, 6, 6, 6,
+                                  4, 4, 4, 4, 5, 5, 5, 5 });
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, uint8_t >
+            (workloadFactory,
+             memoryManager,
+             shape,
+             input0,
+             shape,
+             input1,
+             shape,
+             output,
+             1.0f,
+             0);
+}
+
+LayerTestResult<uint8_t, 4> MaximumBroadcast1ElementUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<uint8_t> input0({ 1, 2, 3, 4,  5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    std::vector<uint8_t> input1({2});
+
+    std::vector<uint8_t> output({ 2, 2, 3, 4, 5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, uint8_t >
+            (workloadFactory,
+             memoryManager,
+             shape0,
+             input0,
+             shape1,
+             input1,
+             shape0,
+             output,
+             1.0f,
+             0);
+}
+
+LayerTestResult<uint8_t, 4> MaximumBroadcast1DVectorUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<uint8_t> input0({ 1, 2, 3, 4, 5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    std::vector<uint8_t> input1({ 1, 10, 3});
+
+    std::vector<uint8_t> output({ 1, 10, 3, 4, 10, 6,
+                                  7, 10, 9, 10, 11, 12 });
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, uint8_t >
+            (workloadFactory,
+             memoryManager,
+             shape0,
+             input0,
+             shape1,
+             input1,
+             shape0,
+             output,
+             1.0f,
+             0);
 }
 
 namespace {

@@ -233,6 +233,14 @@ ARMNN_AUTO_TEST_CASE(DivisionUint8, DivisionUint8Test)
 ARMNN_AUTO_TEST_CASE(DivisionUint8Broadcast1Element, DivisionBroadcast1ElementUint8Test)
 ARMNN_AUTO_TEST_CASE(DivisionUint8Broadcast1DVector, DivisionBroadcast1DVectorUint8Test)
 
+//Max
+ARMNN_AUTO_TEST_CASE(SimpleMaximum, MaximumSimpleTest)
+ARMNN_AUTO_TEST_CASE(MaximumBroadcast1Element, MaximumBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(MaximumBroadcast1DVector, MaximumBroadcast1DVectorTest)
+ARMNN_AUTO_TEST_CASE(MaximumUint8, MaximumUint8Test)
+ARMNN_AUTO_TEST_CASE(MaximumBroadcast1ElementUint8, MaximumBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE(MaximumBroadcast1DVectorUint8, MaximumBroadcast1DVectorUint8Test)
+
 // Mul
 ARMNN_AUTO_TEST_CASE(SimpleMultiplication, MultiplicationTest)
 ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1Element, MultiplicationBroadcast1ElementTest)

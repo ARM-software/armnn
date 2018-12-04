@@ -2078,19 +2078,16 @@ ParsedTfOperationPtr TfParser::ParseLrn(const tensorflow::NodeDef& nodeDef, cons
     normalizationDescriptor.m_Beta = ReadMandatoryNodeFloatAttribute(nodeDef, "beta");
     normalizationDescriptor.m_K = ReadMandatoryNodeFloatAttribute(nodeDef, "bias");
     normalizationDescriptor.m_NormSize = ReadMandatoryNodeUint32Attribute(nodeDef, "depth_radius");
+    normalizationDescriptor.m_DataLayout = armnn::DataLayout::NHWC;
 
     // The window size must be an odd value. For a window size of (2 * n + 1), TensorFlow defines depth_radius = n.
     normalizationDescriptor.m_NormSize = normalizationDescriptor.m_NormSize * 2 + 1;
 
     IOutputSlot& prevLayerOutputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
-
     IConnectableLayer* layer = m_Network->AddNormalizationLayer(normalizationDescriptor,
         nodeDef.name().c_str());
-
-    const TensorInfo permutedInfo = armnnUtils::Permuted(prevLayerOutputSlot.GetTensorInfo(), NHWCToArmNN);
-    layer->GetOutputSlot(0).SetTensorInfo(permutedInfo);
-
-    layer = SwizzleInDeswizzleOut(*m_Network, prevLayerOutputSlot, *layer, nodeDef.name());
+    prevLayerOutputSlot.Connect(layer->GetInputSlot(0));
+    layer->GetOutputSlot(0).SetTensorInfo(prevLayerOutputSlot.GetTensorInfo());
 
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }

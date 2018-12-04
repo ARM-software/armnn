@@ -512,6 +512,11 @@ IConnectableLayer* Network::AddMaximumLayer(const char* name)
     return m_Graph->AddLayer<MaximumLayer>(name);
 }
 
+IConnectableLayer* Network::AddMinimumLayer(const char* name)
+{
+    return m_Graph->AddLayer<MinimumLayer>(name);
+}
+
 IConnectableLayer* Network::AddMergerLayer(const OriginsDescriptor& mergerDescriptor,
     const char* name)
 {
@@ -703,11 +708,6 @@ IConnectableLayer* Network::AddStridedSliceLayer(const StridedSliceDescriptor& s
                                                  const char* name)
 {
     return m_Graph->AddLayer<StridedSliceLayer>(stridedSliceDescriptor, name);
-}
-
-IConnectableLayer* Network::AddMinimumLayer(const char* name)
-{
-    return m_Graph->AddLayer<MinimumLayer>(name);
 }
 
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)

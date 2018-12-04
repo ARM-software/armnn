@@ -22,6 +22,7 @@ public:
         RefMaximumWorkload_Execute,
         RefMultiplicationWorkload_Execute,
         RefDivisionWorkload_Execute,
+        RefMinimumWorkload_Execute,
         MAX_STRING_ID
     };
 
@@ -40,6 +41,7 @@ private:
         m_Strings[RefMaximumWorkload_Execute] = "RefMaximumWorkload_Execute";
         m_Strings[RefMultiplicationWorkload_Execute] = "RefMultiplicationWorkload_Execute";
         m_Strings[RefDivisionWorkload_Execute] = "RefDivisionWorkload_Execute";
+        m_Strings[RefMinimumWorkload_Execute] = "RefMinimumWorkload_Execute";
     }
 
     StringMapping(const StringMapping &) = delete;

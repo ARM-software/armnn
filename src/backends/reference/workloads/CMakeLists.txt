@@ -19,6 +19,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     FullyConnected.hpp
     Maximum.hpp
     Merger.hpp
+    Minimum.hpp
     Pad.cpp
     Pad.hpp
     Pooling2d.cpp

@@ -347,6 +347,19 @@ bool RefLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inp
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsMinimumSupported(const TensorInfo& input0,
+                                         const TensorInfo& input1,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(input1);
+    ignore_unused(output);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input0.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool RefLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
                                                 const TensorInfo& input1,
                                                 const TensorInfo& output,

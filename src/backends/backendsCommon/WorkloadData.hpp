@@ -351,6 +351,7 @@ struct StridedSliceQueueDescriptor : QueueDescriptorWithParameters<StridedSliceD
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+// Minimum layer workload data.
 struct MinimumQueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

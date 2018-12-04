@@ -7,6 +7,7 @@
 #include <backendsCommon/test/MergerTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/execution_monitor.hpp>
 
 BOOST_AUTO_TEST_SUITE(RefEndToEnd)
 
@@ -245,6 +246,71 @@ BOOST_AUTO_TEST_CASE(MultipleOutputs)
     BOOST_TEST(output2Data == std::vector<float>({ 3.f, 5.f, 2.f, 3.f, 6.f, 0.f, 0.f, 0.f, 3.f, 3.f })); // ReLu6
     BOOST_TEST(output3Data == std::vector<float>({ 3.f, 5.f, 2.f, 3.f, 5.f, 2.f, 2.f, 2.f, 3.f, 3.f })); // [2, 5]
 }
+
+BOOST_AUTO_TEST_CASE(TrivialMin)
+{
+    using namespace armnn;
+
+    // Create runtime in which test will run
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    armnn::INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input1 = net->AddInputLayer(0);
+    IConnectableLayer* input2 = net->AddInputLayer(1);
+    IConnectableLayer* min    = net->AddMinimumLayer();
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input1->GetOutputSlot(0).Connect(min->GetInputSlot(0));
+    input2->GetOutputSlot(0).Connect(min->GetInputSlot(1));
+    min->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Sets the tensors in the network.
+    TensorInfo tensorInfo(TensorShape({1, 1, 1, 4}), DataType::Float32);
+    input1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    input2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    min->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    // optimize the network
+    IOptimizedNetworkPtr optNet = Optimize(*net, defaultBackends, runtime->GetDeviceSpec());
+
+    // Loads it into the runtime.
+    NetworkId netId;
+    runtime->LoadNetwork(netId, std::move(optNet));
+
+    // Creates structures for input & output - matching android nn test.
+    std::vector<float> input1Data
+        {
+            1.0f, 2.0f, 3.0f, 4.0f
+        };
+    std::vector<float> input2Data
+        {
+            2.0f, 1.0f, 5.0f, 2.0f
+        };
+    std::vector<float> outputData(4);
+
+    InputTensors inputTensors
+        {
+            {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input1Data.data())},
+            {1,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input2Data.data())}
+        };
+    OutputTensors outputTensors
+        {
+            {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
+        };
+
+    // Does the inference.
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    // Checks the results
+    BOOST_TEST(outputData[0] == 1);
+    BOOST_TEST(outputData[1] == 1);
+    BOOST_TEST(outputData[2] == 3);
+    BOOST_TEST(outputData[3] == 2);
+}
+
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim0Test)
 {

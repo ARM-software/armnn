@@ -1655,6 +1655,15 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MaximumQueueDescriptor>(
     return workloadFactory.CreateMaximum(descriptor, info);
 }
 
+template<>
+std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MinimumQueueDescriptor>(
+    const armnn::IWorkloadFactory& workloadFactory,
+    const armnn::WorkloadInfo& info,
+    const armnn::MinimumQueueDescriptor& descriptor)
+{
+    return workloadFactory.CreateMinimum(descriptor, info);
+}
+
 namespace {
     template <typename Descriptor, typename dataType>
     LayerTestResult<dataType, 4> ElementwiseTestHelper
@@ -1866,7 +1875,7 @@ LayerTestResult<uint8_t, 4> MaximumBroadcast1DVectorUint8Test(
     std::vector<uint8_t> output({ 1, 10, 3, 4, 10, 6,
                                   7, 10, 9, 10, 11, 12 });
 
-    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, uint8_t >
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, uint8_t>
             (workloadFactory,
              memoryManager,
              shape0,
@@ -1877,6 +1886,78 @@ LayerTestResult<uint8_t, 4> MaximumBroadcast1DVectorUint8Test(
              output,
              1.0f,
              0);
+}
+
+LayerTestResult<float, 4> MinimumBroadcast1ElementTest1(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape0[] = { 1, 2, 2, 2 };
+    std::vector<float> input0({ 1, 2, 3, 4, 5, 6, 7, 8});
+
+    unsigned int shape1[] = { 1, 1, 1, 1 };
+    std::vector<float> input1({ 2 });
+
+    std::vector<float> output({ 1, 2, 2, 2, 2, 2, 2, 2});
+
+    return ElementwiseTestHelper<armnn::MinimumQueueDescriptor, float>(workloadFactory,
+                                                                       memoryManager,
+                                                                       shape0,
+                                                                       input0,
+                                                                       shape1,
+                                                                       input1,
+                                                                       shape0,
+                                                                       output);
+}
+
+
+LayerTestResult<float, 4> MinimumBroadcast1ElementTest2(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape0[] = { 1, 2, 2, 2 };
+    std::vector<float> input0({ 1, 6, 3, 2, 8, 9, 1, 10});
+
+    unsigned int shape1[] = { 1, 1, 1, 1 };
+    std::vector<float> input1({ 5 });
+
+    std::vector<float> output({ 1, 5, 3, 2, 5, 5, 1, 5});
+
+    return ElementwiseTestHelper<armnn::MinimumQueueDescriptor, float>(workloadFactory,
+                                                                       memoryManager,
+                                                                       shape0,
+                                                                       input0,
+                                                                       shape1,
+                                                                       input1,
+                                                                       shape0,
+                                                                       output);
+}
+
+LayerTestResult<uint8_t, 4> MinimumBroadcast1DVectorUint8Test(
+    armnn::IWorkloadFactory & workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<uint8_t> input0({ 1, 2, 3, 3, 2, 1,
+                                  7, 1, 2, 3, 4, 5 });
+
+    std::vector<uint8_t> input1({ 1, 2, 3});
+
+    std::vector<uint8_t> output({ 1, 2, 3, 1, 2, 1,
+                                  1, 1, 2, 1, 2, 3 });
+
+    return ElementwiseTestHelper<armnn::MinimumQueueDescriptor, uint8_t>(workloadFactory,
+                                                                         memoryManager,
+                                                                         shape0,
+                                                                         input0,
+                                                                         shape1,
+                                                                         input1,
+                                                                         shape0,
+                                                                         output,
+                                                                         1.0f,
+                                                                         0);
 }
 
 namespace {

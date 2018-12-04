@@ -270,6 +270,12 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
     return MakeWorkload<RefMeanFloat32Workload, RefMeanUint8Workload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMinimum(
+    const MinimumQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    return MakeWorkload<RefMinimumFloat32Workload, RefMinimumUint8Workload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info) const
 {
@@ -286,12 +292,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStridedSlice(const StridedS
                                                                   const WorkloadInfo& info) const
 {
     return MakeWorkload<RefStridedSliceFloat32Workload, RefStridedSliceUint8Workload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
-                                                             const WorkloadInfo& info) const
-{
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,

@@ -1008,6 +1008,18 @@ LayerTestResult<float, 3> MeanVtsFloat3Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+LayerTestResult<float, 4> MinimumBroadcast1ElementTest1(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> MinimumBroadcast1ElementTest2(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> MinimumBroadcast1DVectorUint8Test(
+    armnn::IWorkloadFactory & workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager);
+
 LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

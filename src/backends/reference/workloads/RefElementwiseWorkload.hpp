@@ -10,6 +10,9 @@
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include "Maximum.hpp"
+#include "Minimum.hpp"
+
+
 
 namespace armnn
 {
@@ -133,4 +136,15 @@ using RefMaximumUint8Workload =
                            MaximumQueueDescriptor,
                            StringMapping::RefMaximumWorkload_Execute>;
 
+using RefMinimumFloat32Workload =
+    RefElementwiseWorkload<minimum<float>,
+                          DataType::Float32,
+                          MinimumQueueDescriptor,
+                          StringMapping::RefMinimumWorkload_Execute>;
+
+using RefMinimumUint8Workload =
+    RefElementwiseWorkload<minimum<float>,
+                          DataType::QuantisedAsymm8,
+                          MinimumQueueDescriptor,
+                          StringMapping::RefMinimumWorkload_Execute>;
 } // armnn

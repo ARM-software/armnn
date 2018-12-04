@@ -385,6 +385,7 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "Maximum",               &TfParser::ParseMaximum },
     { "Minimum",               &TfParser::ParseMinimum },
     { "Pad",                   &TfParser::ParsePad },
+    { "Sub",                   &TfParser::ParseSub },
 };
 
 ITfParser* ITfParser::CreateRaw()
@@ -1608,6 +1609,45 @@ ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
 
     outputInfo.SetShape(TensorShape(input0Shape.GetNumDimensions(), outputShape.data()));
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+}
+
+ParsedTfOperationPtr TfParser::ParseSub(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+{
+    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+
+    IOutputSlot* input0Slot = &inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
+    IOutputSlot* input1Slot = &inputs[1].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1].m_Index);
+
+    const TensorInfo& input0Info = input0Slot->GetTensorInfo();
+    const TensorInfo& input1Info = input1Slot->GetTensorInfo();
+
+    if (input0Info.GetNumDimensions() == 1)
+    {
+        const bool isNHWC = true;
+        input0Slot = AddBroadcastReshapeLayer(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
+    }
+
+    if (input1Info.GetNumDimensions() == 1)
+    {
+        const bool isNHWC = true;
+        input1Slot = AddBroadcastReshapeLayer(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
+    }
+
+    IConnectableLayer* const layer = m_Network->AddSubtractionLayer(nodeDef.name().c_str());
+
+    input0Slot->Connect(layer->GetInputSlot(0));
+    input1Slot->Connect(layer->GetInputSlot(1));
+
+    if (input0Info.GetNumDimensions() == 1)
+    {
+        layer->GetOutputSlot(0).SetTensorInfo(input1Slot->GetTensorInfo());
+    }
+    else
+    {
+        layer->GetOutputSlot(0).SetTensorInfo(input0Slot->GetTensorInfo());
+    }
 
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }

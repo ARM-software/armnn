@@ -369,6 +369,7 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "MaxPool",               &TfParser::ParseMaxPool },
     { "AvgPool",               &TfParser::ParseAvgPool },
     { "Maximum",               &TfParser::ParseMaximum },
+    { "Minimum",               &TfParser::ParseMinimum },
 };
 
 ITfParser* ITfParser::CreateRaw()
@@ -1422,6 +1423,60 @@ ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
 
         return AddMaximumLayer(nodeDef);
     }
+}
+
+ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
+                                            const tensorflow::GraphDef& graphDef)
+{
+    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+
+    IOutputSlot* input0Slot = &inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
+    IOutputSlot* input1Slot = &inputs[1].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1].m_Index);
+    const unsigned int input0Dim = input0Slot->GetTensorInfo().GetNumDimensions();
+    const unsigned int input1Dim = input1Slot->GetTensorInfo().GetNumDimensions();
+
+    if (input0Dim != input1Dim)
+    {
+        // broadcasting where input0 and input1 have different number of dimensions
+        // is only supported for 1D and 4D tensors pair
+        if (input0Dim == 1 && input1Dim == 4)
+        {
+            input0Slot = AddBroadcastReshapeLayer(input1Slot, input0Slot, true, *m_Network, nodeDef);
+        }
+        else if (input0Dim == 4 && input1Dim == 1)
+        {
+            input1Slot = AddBroadcastReshapeLayer(input0Slot, input1Slot, true, *m_Network, nodeDef);
+        }
+        else
+        {
+            throw ParseException(
+                boost::str(
+                    boost::format("Unsupported broadcast configuration for Minimum operation %1% %2%")
+                    % nodeDef.name()
+                    % CHECK_LOCATION().AsString()));
+        }
+    }
+
+    IConnectableLayer* const layer = m_Network->AddMinimumLayer(nodeDef.name().c_str());
+
+    input0Slot->Connect(layer->GetInputSlot(0));
+    input1Slot->Connect(layer->GetInputSlot(1));
+
+    TensorInfo outputInfo = input0Slot->GetTensorInfo();
+    std::vector<unsigned int> outputShape;
+
+    const TensorShape& input0Shape = input0Slot->GetTensorInfo().GetShape();
+    const TensorShape& input1Shape = input1Slot->GetTensorInfo().GetShape();
+
+    for (unsigned int i = 0; i < input0Shape.GetNumDimensions(); i++)
+    {
+        outputShape.push_back(std::max(input0Shape[i], input1Shape[i]));
+    }
+
+    outputInfo.SetShape(TensorShape(input0Shape.GetNumDimensions(), outputShape.data()));
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
 ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,

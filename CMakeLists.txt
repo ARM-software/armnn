@@ -392,6 +392,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/LocalResponseNormalization.cpp
             src/armnnTfParser/test/Maximum.cpp
             src/armnnTfParser/test/MaximumForLeakyRelu.cpp
+            src/armnnTfParser/test/Minimum.cpp
             src/armnnTfParser/test/Multiplication.cpp
             src/armnnTfParser/test/MultiOutput.cpp
             src/armnnTfParser/test/PassThru.cpp

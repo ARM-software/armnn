@@ -1375,27 +1375,34 @@ bool TfParser::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef
     return false;
 }
 
-// For max nodes, we only support those as part of a leaky relu, i.e.,
-// as part for a max(mul(a, x), x) expression. We thus need to
-// identify one input as a multiplication with a scalar constant,
-// extract the constant and the two inputs, verify that the two other
-// inputs are the same node, and then create a leaky relu node.
-
 ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
                                             const tensorflow::GraphDef& graphDef)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+    if (inputs.size() != 2)
+    {
+        throw ParseException(
+            boost::str(
+                boost::format(
+                    "Maximum expects two inputs!. Got %1% for Node %2% %3%")
+                % inputs.size()
+                % nodeDef.name()
+                % CHECK_LOCATION().AsString()));
+    }
+
     auto inputNode0 = inputs[0].m_IndexedValue->GetNode();
     auto inputNode1 = inputs[1].m_IndexedValue->GetNode();
     IOutputSlot* outputOfLeakyRelu = nullptr;
 
     ActivationDescriptor desc;
 
-    // There are four possible scenarios we need to support (respectively below):
-    // 1, max(mul(a, x), x)
-    // 2, max(mul(x, a), x)
-    // 3, max(x, mul(a, x))
-    // 4, max(x, mul(x, a))
+    // A max node may be part of a LeakyRelu, with one input as a multiplication with a scalar constant,
+    // i.e. one of the four possible scenarios:
+    //  1, max(mul(a, x), x)
+    //  2, max(mul(x, a), x)
+    //  3, max(x, mul(a, x))
+    //  4, max(x, mul(x, a))
+    // These are handled by an activation layer.
 
     if (IsSupportedLeakyReluPattern(inputNode0, 0, inputs[1], &outputOfLeakyRelu, desc) ||
         IsSupportedLeakyReluPattern(inputNode0, 1, inputs[1], &outputOfLeakyRelu, desc) ||
@@ -1411,14 +1418,9 @@ ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
     }
     else
     {
-        throw ParseException(
-            boost::str(
-                boost::format(
-                    "ArmNN currenly offers limited support for Maximum node when it can be fused to "
-                    "form a LeakyRelu activation as leakyrelu=max(mul(alpha, X), X). "
-                    "Node: %1% %2%")
-                    % nodeDef.name()
-                    % CHECK_LOCATION().AsString()));
+        // Anything else is just a maximum layer.
+
+        return AddMaximumLayer(nodeDef);
     }
 }
 
@@ -2180,6 +2182,49 @@ ParsedTfOperationPtr TfParser::AddRealDivLayer(const tensorflow::NodeDef& nodeDe
         layer->GetOutputSlot(0).SetTensorInfo(input0Slot->GetTensorInfo());
 
     }
+    return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+}
+
+ParsedTfOperationPtr TfParser::AddMaximumLayer(const tensorflow::NodeDef& nodeDef)
+{
+    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+
+    IOutputSlot* input0Slot = &inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
+    IOutputSlot* input1Slot = &inputs[1].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1].m_Index);
+
+    auto const input0NumDims = input0Slot->GetTensorInfo().GetNumDimensions();
+    auto const input1NumDims = input1Slot->GetTensorInfo().GetNumDimensions();
+
+    if (input0NumDims < input1NumDims)
+    {
+        const bool isNHWC = true;
+        input0Slot = AddBroadcastReshapeLayer(input1Slot, input0Slot, isNHWC, *m_Network, nodeDef);
+    }
+    if (input1NumDims < input0NumDims)
+    {
+        const bool isNHWC = true;
+        input1Slot = AddBroadcastReshapeLayer(input0Slot, input1Slot, isNHWC, *m_Network, nodeDef);
+    }
+
+    IConnectableLayer* const layer = m_Network->AddMaximumLayer(nodeDef.name().c_str());
+
+    input0Slot->Connect(layer->GetInputSlot(0));
+    input1Slot->Connect(layer->GetInputSlot(1));
+
+    TensorInfo outputInfo = input0Slot->GetTensorInfo();
+    std::vector<unsigned int> outputShape;
+
+    const TensorShape& input0Shape = input0Slot->GetTensorInfo().GetShape();
+    const TensorShape& input1Shape = input1Slot->GetTensorInfo().GetShape();
+
+    for (unsigned int i = 0; i < input0Shape.GetNumDimensions(); i++)
+    {
+        outputShape.push_back(std::max(input0Shape[i], input1Shape[i]));
+    }
+
+    outputInfo.SetShape(TensorShape(input0Shape.GetNumDimensions(), outputShape.data()));
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 

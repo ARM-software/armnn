@@ -155,6 +155,7 @@ private:
     ParsedTfOperationPtr AddActivationLayer(const tensorflow::NodeDef& nodeDef, armnn::ActivationDescriptor& desc);
     ParsedTfOperationPtr AddAdditionLayer(const tensorflow::NodeDef& nodeDef, bool isBiasAdd = false);
     ParsedTfOperationPtr AddRealDivLayer(const tensorflow::NodeDef& nodeDef);
+    ParsedTfOperationPtr AddMaximumLayer(const tensorflow::NodeDef& nodeDef);
 
 private:
     armnn::IConnectableLayer* AddMultiplicationLayer(const tensorflow::NodeDef& nodeDef);

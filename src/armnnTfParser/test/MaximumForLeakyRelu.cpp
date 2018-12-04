@@ -36,7 +36,6 @@ struct UnsupportedMaximumFixture
                 name: "Maximum"
                 op: "Maximum"
                 input: "graphInput"
-                input: "graphInput"
                 attr {
                     key: "dtype"
                     value {

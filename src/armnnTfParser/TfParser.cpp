@@ -370,6 +370,7 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "AvgPool",               &TfParser::ParseAvgPool },
     { "Maximum",               &TfParser::ParseMaximum },
     { "Minimum",               &TfParser::ParseMinimum },
+    { "Pad",                   &TfParser::ParsePad },
 };
 
 ITfParser* ITfParser::CreateRaw()
@@ -986,15 +987,17 @@ template<typename Type>
 bool TfParser::HasParsedConstTensor(const std::string & nodeName) const
 {
     auto it = m_ParsedTfOperations.find(nodeName);
-    if (it == m_ParsedTfOperations.end() ||
-        dynamic_cast<ParsedConstTfOperation<Type>*>(it->second.get()) == nullptr)
+    if (it == m_ParsedTfOperations.end())
     {
         return false;
     }
-    else
-    {
-        return true;
-    }
+    return dynamic_cast<ParsedConstTfOperation<Type>*>(it->second.get()) != nullptr;
+}
+
+template<typename Type>
+bool TfParser::HasParsedConstTensor(ParsedTfOperation* parsedTfOpPtr) const
+{
+    return dynamic_cast<ParsedConstTfOperation<Type>*>(parsedTfOpPtr) != nullptr;
 }
 
 ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
@@ -1476,6 +1479,131 @@ ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
     outputInfo.SetShape(TensorShape(input0Shape.GetNumDimensions(), outputShape.data()));
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
+    return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+}
+
+unsigned int CheckPaddingTensor(const ConstTensor& paddingTensor,
+                                const TensorInfo& inputTensorInfo,
+                                const std::string& nodeName)
+{
+    unsigned int rank = paddingTensor.GetShape()[0];
+    unsigned int expectedRank = inputTensorInfo.GetNumDimensions();
+    if (rank != expectedRank)
+    {
+        throw ParseException(
+                boost::str(
+                        boost::format(
+                                "Expected the padding tensor to be of rank %1 not %2 on Node %3 %4.")
+                        % expectedRank
+                        % rank
+                        % nodeName
+                        % CHECK_LOCATION().AsString()));
+    }
+    unsigned int second = paddingTensor.GetShape()[1];
+    if (second != 2)
+    {
+        throw ParseException(
+                boost::str(
+                        boost::format(
+                                "Expected the padding tensor to be of dimensions [%1, 2] not [%1, %2] on Node %3 %4.")
+                        % rank
+                        % second
+                        % nodeName
+                        % CHECK_LOCATION().AsString()));
+    }
+    return rank;
+}
+
+TensorInfo CalculatePaddedOutputTensorInfo(const TensorInfo& inputTensorInfo,
+                                           const std::vector<std::pair<unsigned int, unsigned int>>& padList)
+{
+    unsigned int numDims = inputTensorInfo.GetNumDimensions();
+    std::vector<unsigned int> outDims;
+    for (unsigned int i = 0; i < numDims; ++i)
+    {
+        unsigned int dimSize = inputTensorInfo.GetShape()[i];
+        const std::pair<unsigned int, unsigned int>& dimPadding = padList[i];
+        dimSize += dimPadding.first;
+        dimSize += dimPadding.second;
+        outDims.push_back(dimSize);
+    }
+    TensorInfo paddedTensorInfo = inputTensorInfo;
+    unsigned int outDimsSize = static_cast<unsigned int>(outDims.size());
+    paddedTensorInfo.SetShape(TensorShape{ outDimsSize, outDims.data() });
+    return paddedTensorInfo;
+}
+
+ParsedTfOperationPtr TfParser::ParsePad(const tensorflow::NodeDef& nodeDef,
+                                        const tensorflow::GraphDef& graphDef)
+{
+    // input consists of:
+    // input[0] the tensor which will be padded
+    // input[1] the tensor holding the padding values
+    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
+    IOutputSlot& previousLayerOutputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
+    TensorInfo inputTensorInfo = previousLayerOutputSlot.GetTensorInfo();
+    if (!HasParsedConstTensor<int32_t>(inputs[1].m_IndexedValue))
+    {
+        throw ParseException(
+                boost::str(
+                        boost::format(
+                                "ArmNN only supports Pad with constant padding. "
+                                "Input %1%. Node %2% %3%")
+                        % inputs[1].m_IndexedValue->GetNode().name()
+                        % nodeDef.name()
+                        % CHECK_LOCATION().AsString()));
+
+    }
+    ParsedConstTfOperation<int32_t>* paddingTensorOp =
+            boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
+
+    std::vector<int32_t> paddingTensorData;
+    ConstTensor paddingTensor = paddingTensorOp->GetConstTensor(false, paddingTensorData);
+    // paddings is an integer tensor with shape [n, 2], where n is the rank of tensor
+    // and should match the rank of the input tensor that is being padded.
+    // For each dimension D of input, paddings[D, 0] indicates how many values to add
+    // before the contents of tensor in that dimension, and paddings[D, 1] indicates how
+    // many values to add after the contents of tensor in that dimension
+    // This needs to be translated into a padList for ACL
+    std::vector<std::pair<unsigned int, unsigned int>> padList;
+    unsigned int rank = CheckPaddingTensor(paddingTensor, inputTensorInfo, nodeDef.name());
+    for (unsigned int i = 0; i < rank; ++i)
+    {
+        std::pair<unsigned int, unsigned int> paddingForDim;
+        for (unsigned int j = 0; j < 2; j++)
+        {
+            unsigned int index = (i * 2) + j;
+            int paddingAmount = paddingTensorData[index];
+            // make sure we can cast to an unsigned value
+            if (paddingAmount < 0)
+            {
+                throw ParseException(
+                        boost::str(
+                                boost::format(
+                                        "Negative amount %1 specified at [%2, %3] of padding tensor on Node %4 %5.")
+                                % paddingAmount
+                                % i
+                                % j
+                                % nodeDef.name()
+                                % CHECK_LOCATION().AsString()));
+            }
+            if (j == 0)
+            {
+                paddingForDim.first = static_cast<unsigned int>(paddingAmount);
+            }
+            else
+            {
+                paddingForDim.second = static_cast<unsigned int>(paddingAmount);
+            }
+        }
+        padList.push_back(paddingForDim);
+    }
+    PadDescriptor padDescriptor(padList);
+    IConnectableLayer* layer = m_Network->AddPadLayer(padDescriptor, nodeDef.name().c_str());
+    previousLayerOutputSlot.Connect(layer->GetInputSlot(0));
+    // Use the padding to calculate the new output tensor shape
+    TensorInfo outputTensorInfo = CalculatePaddedOutputTensorInfo(inputTensorInfo, padList);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 

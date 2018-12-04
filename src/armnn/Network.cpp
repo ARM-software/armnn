@@ -272,9 +272,10 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                            << " for data type " << GetDataTypeName(dataType)
                            << " (reason: " << reasonIfUnsupported
                            << "), falling back to the next backend.";
-                BOOST_LOG_TRIVIAL(warning) << warningMsg.str();
+                std::string wMsg = warningMsg.str();
+                BOOST_LOG_TRIVIAL(warning) << wMsg;
                 if (errMessages) {
-                    errMessages.value().push_back(warningMsg.str());
+                    errMessages.value().push_back(wMsg);
                 }
             }
             else

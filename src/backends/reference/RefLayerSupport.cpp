@@ -400,11 +400,12 @@ bool RefLayerSupport::IsPadSupported(const TensorInfo& input,
                                      const PadDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(input);
     ignore_unused(output);
     ignore_unused(descriptor);
-    ignore_unused(reasonIfUnsupported);
-    return false;
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
 }
 
 bool RefLayerSupport::IsPermuteSupported(const TensorInfo& input,

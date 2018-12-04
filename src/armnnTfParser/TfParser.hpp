@@ -124,6 +124,8 @@ private:
     /// Checks if there is a pre-parsed const tensor available with the given name and Type.
     template<typename Type>
     bool HasParsedConstTensor(const std::string & nodeName) const;
+    template<typename Type>
+    bool HasParsedConstTensor(ParsedTfOperation* parsedTfOpPtr) const;
 
     ParsedTfOperationPtr ParseAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseBiasAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
@@ -153,6 +155,7 @@ private:
         armnn::PoolingAlgorithm pooltype);
     ParsedTfOperationPtr ParseMaximum(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseMinimum(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
+    ParsedTfOperationPtr ParsePad(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr AddActivationLayer(const tensorflow::NodeDef& nodeDef, armnn::ActivationDescriptor& desc);
     ParsedTfOperationPtr AddAdditionLayer(const tensorflow::NodeDef& nodeDef, bool isBiasAdd = false);
     ParsedTfOperationPtr AddRealDivLayer(const tensorflow::NodeDef& nodeDef);

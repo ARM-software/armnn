@@ -397,6 +397,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/MaximumForLeakyRelu.cpp
             src/armnnTfParser/test/Minimum.cpp
             src/armnnTfParser/test/Multiplication.cpp
+            src/armnnTfParser/test/Pad.cpp
             src/armnnTfParser/test/MultiOutput.cpp
             src/armnnTfParser/test/PassThru.cpp
             src/armnnTfParser/test/Pooling.cpp

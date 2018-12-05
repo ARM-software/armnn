@@ -12,20 +12,23 @@
 namespace armnn
 {
 
-DebugLayer::DebugLayer(const char* name) : Layer(1, 1, LayerType::Debug, name)
+DebugLayer::DebugLayer(const DebugDescriptor& param, const char* name)
+    : LayerWithParameters(1, 1, LayerType::Debug, param, name)
 {}
 
 std::unique_ptr<IWorkload> DebugLayer::CreateWorkload(const Graph& graph,
                                                       const IWorkloadFactory& factory) const
 {
     DebugQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_LayerName = m_Param.m_LayerName;
+    descriptor.m_Parameters.m_SlotIndex = m_Param.m_SlotIndex;
 
     return factory.CreateDebug(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
 DebugLayer* DebugLayer::Clone(Graph& graph) const
 {
-    return CloneBase<DebugLayer>(graph, GetName());
+    return CloneBase<DebugLayer>(graph, m_Param, GetName());
 }
 
 void DebugLayer::ValidateTensorShapesFromInputs()

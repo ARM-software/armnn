@@ -464,4 +464,19 @@ struct StridedSliceDescriptor
     DataLayout m_DataLayout;
 };
 
+struct DebugDescriptor
+{
+    DebugDescriptor()
+    : m_SlotIndex(0)
+    {}
+
+    DebugDescriptor(const std::string name, unsigned int index)
+    : m_LayerName(name)
+    , m_SlotIndex(index)
+    {}
+
+    std::string m_LayerName;
+    unsigned int m_SlotIndex;
+};
+
 }

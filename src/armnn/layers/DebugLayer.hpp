@@ -4,12 +4,12 @@
 //
 #pragma once
 
-#include <Layer.hpp>
+#include "LayerWithParameters.hpp"
 
 namespace armnn
 {
 
-class DebugLayer : public Layer
+class DebugLayer : public LayerWithParameters<DebugDescriptor>
 {
 public:
     virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,
@@ -20,7 +20,7 @@ public:
     void ValidateTensorShapesFromInputs() override;
 
 protected:
-    DebugLayer(const char* name);
+    DebugLayer(const DebugDescriptor& param, const char* name);
     ~DebugLayer() = default;
 };
 

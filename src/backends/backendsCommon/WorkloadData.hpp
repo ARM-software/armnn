@@ -357,7 +357,7 @@ struct MinimumQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-struct DebugQueueDescriptor : QueueDescriptor
+struct DebugQueueDescriptor : QueueDescriptorWithParameters<DebugDescriptor>
 {
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

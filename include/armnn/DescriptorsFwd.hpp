@@ -27,6 +27,7 @@ struct SoftmaxDescriptor;
 struct OriginsDescriptor;
 struct ViewsDescriptor;
 struct StridedSliceDescriptor;
+struct DebugDescriptor;
 
 using MergerDescriptor = OriginsDescriptor;
 using SplitterDescriptor = ViewsDescriptor;

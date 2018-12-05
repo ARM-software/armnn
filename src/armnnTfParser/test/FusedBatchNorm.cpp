@@ -7,11 +7,13 @@
 #include "armnnTfParser/ITfParser.hpp"
 #include "ParserPrototxtFixture.hpp"
 
+#include <array>
+
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
 struct FusedBatchNormFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
-    FusedBatchNormFixture()
+    explicit FusedBatchNormFixture(const std::string& dataLayout)
     {
         m_Prototext = "node { \n"
             "  name: \"graphInput\" \n"
@@ -143,33 +145,62 @@ struct FusedBatchNormFixture : public armnnUtils::ParserPrototxtFixture<armnnTfP
             "  attr { \n"
             "    key: \"data_format\" \n"
             "    value { \n"
-            "      s: \"NHWC\" \n"
-            "    } \n"
-            "  } \n"
-            "  attr { \n"
-            "    key: \"epsilon\" \n"
-            "    value { \n"
-            "      f: 0.0010000000475 \n"
-            "    } \n"
-            "  } \n"
-            "  attr { \n"
-            "    key: \"is_training\" \n"
-            "    value { \n"
-            "      b: false \n"
-            "    } \n"
-            "  } \n"
-            "} \n";
+            "      s: \"";
+        m_Prototext.append(dataLayout);
+        m_Prototext.append("\" \n"
+                           "    } \n"
+                           "  } \n"
+                           "  attr { \n"
+                           "    key: \"epsilon\" \n"
+                           "    value { \n"
+                           "      f: 0.0010000000475 \n"
+                           "    } \n"
+                           "  } \n"
+                           "  attr { \n"
+                           "    key: \"is_training\" \n"
+                           "    value { \n"
+                           "      b: false \n"
+                           "    } \n"
+                           "  } \n"
+                           "} \n");
 
-        SetupSingleInputSingleOutput({1, 3, 3, 1}, "graphInput", "output");
+        // Set the input shape according to the data layout
+        std::array<unsigned int, 4> dims;
+        if (dataLayout == "NHWC")
+        {
+            dims = { 1u, 3u, 3u, 1u };
+        }
+        else // dataLayout == "NCHW"
+        {
+            dims = { 1u, 1u, 3u, 3u };
+        }
+
+        SetupSingleInputSingleOutput(armnn::TensorShape(4, dims.data()), "graphInput", "output");
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseFusedBatchNorm, FusedBatchNormFixture)
+struct FusedBatchNormNhwcFixture : FusedBatchNormFixture
 {
-    RunTest<4>({1, 2, 3, 4, 5, 6, 7, 8, 9},             // Input data.
-               {-2.8277204f, -2.12079024f, -1.4138602f,
-                -0.7069301f, 0.0f, 0.7069301f,
-                1.4138602f, 2.12079024f, 2.8277204f});  // Expected output data.
+    FusedBatchNormNhwcFixture() : FusedBatchNormFixture("NHWC"){}
+};
+BOOST_FIXTURE_TEST_CASE(ParseFusedBatchNormNhwc, FusedBatchNormNhwcFixture)
+{
+    RunTest<4>({ 1, 2, 3, 4, 5, 6, 7, 8, 9 },               // Input data.
+               { -2.8277204f, -2.12079024f, -1.4138602f,
+                 -0.7069301f,  0.0f,         0.7069301f,
+                  1.4138602f,  2.12079024f,  2.8277204f }); // Expected output data.
+}
+
+struct FusedBatchNormNchwFixture : FusedBatchNormFixture
+{
+    FusedBatchNormNchwFixture() : FusedBatchNormFixture("NCHW"){}
+};
+BOOST_FIXTURE_TEST_CASE(ParseFusedBatchNormNchw, FusedBatchNormNchwFixture)
+{
+    RunTest<4>({ 1, 2, 3, 4, 5, 6, 7, 8, 9 },               // Input data.
+               { -2.8277204f, -2.12079024f, -1.4138602f,
+                 -0.7069301f,  0.0f,         0.7069301f,
+                  1.4138602f,  2.12079024f,  2.8277204f }); // Expected output data.
 }
 
 BOOST_AUTO_TEST_SUITE_END()

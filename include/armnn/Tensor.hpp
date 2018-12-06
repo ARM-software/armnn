@@ -21,6 +21,8 @@ public:
     /// Empty (invalid) constructor.
     TensorShape();
 
+    TensorShape(unsigned int numDimensions);
+
     TensorShape(unsigned int numDimensions, const unsigned int* dimensionSizes);
 
     TensorShape(std::initializer_list<unsigned int> dimensionSizeList);

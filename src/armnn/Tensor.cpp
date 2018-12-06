@@ -23,6 +23,22 @@ TensorShape::TensorShape()
 {
 }
 
+TensorShape::TensorShape(unsigned int numDimensions)
+ : m_NumDimensions(numDimensions)
+{
+    if (numDimensions < 1)
+    {
+        throw InvalidArgumentException("Tensor numDimensions must be greater than 0");
+    }
+
+    if (numDimensions > MaxNumOfTensorDimensions)
+    {
+        throw InvalidArgumentException("Tensor numDimensions must be less than or equal to MaxNumOfTensorDimensions");
+    }
+
+    std::fill(m_Dimensions.begin(), m_Dimensions.begin() + m_NumDimensions, 0);
+}
+
 TensorShape::TensorShape(const unsigned int numDimensions, const unsigned int* const dimensionSizes)
  : m_NumDimensions(numDimensions)
 {

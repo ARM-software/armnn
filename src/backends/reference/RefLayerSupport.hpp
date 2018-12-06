@@ -54,6 +54,11 @@ public:
                                   const Optional<TensorInfo>& biases,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsDebugSupported(const TensorInfo& input,
+                          const TensorInfo& output,
+                          const DebugDescriptor& descriptor,
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const DepthwiseConvolution2dDescriptor& descriptor,

@@ -13,6 +13,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     Conv2dTestImpl.hpp
     ConvertFp16ToFp32TestImpl.hpp
     ConvertFp32ToFp16TestImpl.hpp
+    DebugTestImpl.hpp
     EndToEndTestImpl.hpp
     FullyConnectedTestImpl.hpp
     IsLayerSupportedTestImpl.hpp

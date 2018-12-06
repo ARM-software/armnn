@@ -13,6 +13,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Broadcast.hpp
     ConvImpl.cpp
     ConvImpl.hpp
+    Debug.cpp
+    Debug.hpp
     ElementwiseFunction.cpp
     ElementwiseFunction.hpp
     FullyConnected.cpp
@@ -52,6 +54,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefConvolution2dUint8Workload.hpp
     RefElementwiseWorkload.cpp
     RefElementwiseWorkload.hpp
+    RefDebugWorkload.cpp
+    RefDebugWorkload.hpp
     RefDepthwiseConvolution2dFloat32Workload.cpp
     RefDepthwiseConvolution2dFloat32Workload.hpp
     RefDepthwiseConvolution2dUint8Workload.cpp

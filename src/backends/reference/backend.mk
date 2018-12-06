@@ -15,6 +15,7 @@ BACKEND_SOURCES := \
         workloads/BatchToSpaceNd.cpp \
         workloads/Broadcast.cpp \
         workloads/ConvImpl.cpp \
+        workloads/Debug.cpp \
         workloads/ElementwiseFunction.cpp \
         workloads/FullyConnected.cpp \
         workloads/Mean.cpp \
@@ -33,6 +34,7 @@ BACKEND_SOURCES := \
         workloads/RefConvertFp32ToFp16Workload.cpp \
         workloads/RefConvolution2dFloat32Workload.cpp \
         workloads/RefConvolution2dUint8Workload.cpp \
+        workloads/RefDebugWorkload.cpp \
         workloads/RefDepthwiseConvolution2dFloat32Workload.cpp \
         workloads/RefDepthwiseConvolution2dUint8Workload.cpp \
         workloads/RefElementwiseWorkload.cpp \

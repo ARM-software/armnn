@@ -58,3 +58,4 @@
 #include "RefPadWorkload.hpp"
 #include "RefBatchToSpaceNdUint8Workload.hpp"
 #include "RefBatchToSpaceNdFloat32Workload.hpp"
+#include "RefDebugWorkload.hpp"

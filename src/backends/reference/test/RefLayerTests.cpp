@@ -454,4 +454,15 @@ ARMNN_AUTO_TEST_CASE(StridedSlice3DReverseUint8, StridedSlice3DReverseUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice2DUint8, StridedSlice2DUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice2DReverseUint8, StridedSlice2DReverseUint8Test)
 
+// Debug
+ARMNN_AUTO_TEST_CASE(Debug4DFloat32, Debug4DFloat32Test)
+ARMNN_AUTO_TEST_CASE(Debug3DFloat32, Debug3DFloat32Test)
+ARMNN_AUTO_TEST_CASE(Debug2DFloat32, Debug2DFloat32Test)
+ARMNN_AUTO_TEST_CASE(Debug1DFloat32, Debug1DFloat32Test)
+
+ARMNN_AUTO_TEST_CASE(Debug4DUint8, Debug4DUint8Test)
+ARMNN_AUTO_TEST_CASE(Debug3DUint8, Debug3DUint8Test)
+ARMNN_AUTO_TEST_CASE(Debug2DUint8, Debug2DUint8Test)
+ARMNN_AUTO_TEST_CASE(Debug1DUint8, Debug1DUint8Test)
+
 BOOST_AUTO_TEST_SUITE_END()

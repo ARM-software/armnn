@@ -40,6 +40,7 @@
 #include "LstmTestImpl.hpp"
 #include "ConvertFp16ToFp32TestImpl.hpp"
 #include "ConvertFp32ToFp16TestImpl.hpp"
+#include "DebugTestImpl.hpp"
 
 // 3-channel 16x8 image used as common input data for a number of Conv2d tests.
 static std::vector<float> ConvInput3x8x16({
@@ -7930,4 +7931,60 @@ LayerTestResult<uint8_t, 4> BatchToSpaceNdNchwUintTest3(
     return BatchToSpaceNdHelper<uint8_t, 4, 4>(workloadFactory, memoryManager,
                                                armnn::DataLayout::NCHW, inputShape, input, blockShape,
                                                crops, outputShape, expectedOutput);
+}
+
+LayerTestResult<float, 4> Debug4DFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug4DTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 3> Debug3DFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug3DTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> Debug2DFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug2DTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 1> Debug1DFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug1DTest<float>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> Debug4DUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug4DTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 3> Debug3DUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug3DTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> Debug2DUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug2DTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 1> Debug1DUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Debug1DTest<uint8_t>(workloadFactory, memoryManager);
 }

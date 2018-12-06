@@ -1305,7 +1305,7 @@ TensorInfo OutputShapeOfExpandDims(const tensorflow::NodeDef& nodeDef, TensorInf
         // and insert 1 dimension at index 'expandDim'
         if (expandDim < 0)
         {
-            auto outputDimSize = boost::numeric_cast<uint32_t>(outputDims.size() + 1);
+            int outputDimSize = boost::numeric_cast<int>(outputDims.size() + 1);
             auto getPosition = std::next(outputDims.begin() + outputDimSize, expandDim);
             outputDims.insert(getPosition, 1);
         }

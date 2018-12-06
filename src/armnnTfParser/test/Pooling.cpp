@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
 struct Pooling2dFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
-    explicit Pooling2dFixture(const char* poolingtype)
+    explicit Pooling2dFixture(const char* poolingtype, std::string dataLayout, std::string paddingOption)
     {
         m_Prototext =  "node {\n"
             "  name: \"Placeholder\"\n"
@@ -50,24 +50,40 @@ struct Pooling2dFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser
                                "  attr {\n"
                                "    key: \"data_format\"\n"
                                "    value {\n"
-                               "      s: \"NHWC\"\n"
+                               "      s: \"");
+        m_Prototext.append(dataLayout);
+        m_Prototext.append("\"\n"
                                "    }\n"
                                "  }\n"
                                "  attr {\n"
                                "    key: \"ksize\"\n"
                                "    value {\n"
                                "      list {\n"
-                               "        i: 1\n"
+
+                               "        i: 1\n");
+        if(dataLayout == "NHWC")
+        {
+            m_Prototext.append("        i: 2\n"
                                "        i: 2\n"
+                               "        i: 1\n");
+        }
+        else
+        {
+            m_Prototext.append("        i: 1\n"
                                "        i: 2\n"
-                               "        i: 1\n"
+                               "        i: 2\n");
+        }
+        m_Prototext.append(
                                "      }\n"
                                "    }\n"
                                "  }\n"
                                "  attr {\n"
                                "    key: \"padding\"\n"
                                "    value {\n"
-                               "      s: \"VALID\"\n"
+                               "      s: \"");
+        m_Prototext.append(paddingOption);
+        m_Prototext.append(
+                               "\"\n"
                                "    }\n"
                                "  }\n"
                                "  attr {\n"
@@ -83,29 +99,88 @@ struct Pooling2dFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser
                                "  }\n"
                                "}\n");
 
-        SetupSingleInputSingleOutput({ 1, 2, 2, 1 }, "Placeholder", poolingtype);
+        if(dataLayout == "NHWC")
+        {
+            SetupSingleInputSingleOutput({ 1, 2, 2, 1 }, "Placeholder", poolingtype);
+        }
+        else
+        {
+            SetupSingleInputSingleOutput({ 1, 1, 2, 2 }, "Placeholder", poolingtype);
+        }
     }
 };
 
 
-struct MaxPoolFixture : Pooling2dFixture
+struct MaxPoolFixtureNhwcValid : Pooling2dFixture
 {
-    MaxPoolFixture() : Pooling2dFixture("MaxPool") {}
+    MaxPoolFixtureNhwcValid() : Pooling2dFixture("MaxPool", "NHWC", "VALID") {}
 };
-BOOST_FIXTURE_TEST_CASE(ParseMaxPool, MaxPoolFixture)
+BOOST_FIXTURE_TEST_CASE(ParseMaxPoolNhwcValid, MaxPoolFixtureNhwcValid)
 {
     RunTest<4>({1.0f, 2.0f, 3.0f, -4.0f}, {3.0f});
 }
 
-
-struct AvgPoolFixture : Pooling2dFixture
+struct MaxPoolFixtureNchwValid : Pooling2dFixture
 {
-    AvgPoolFixture() : Pooling2dFixture("AvgPool") {}
+    MaxPoolFixtureNchwValid() : Pooling2dFixture("MaxPool", "NCHW", "VALID") {}
 };
-BOOST_FIXTURE_TEST_CASE(ParseAvgPool, AvgPoolFixture)
+BOOST_FIXTURE_TEST_CASE(ParseMaxPoolNchwValid, MaxPoolFixtureNchwValid)
+{
+    RunTest<4>({1.0f, 2.0f, 3.0f, -4.0f}, {3.0f});
+}
+
+struct MaxPoolFixtureNhwcSame : Pooling2dFixture
+{
+    MaxPoolFixtureNhwcSame() : Pooling2dFixture("MaxPool", "NHWC", "SAME") {}
+};
+BOOST_FIXTURE_TEST_CASE(ParseMaxPoolNhwcSame, MaxPoolFixtureNhwcSame)
+{
+    RunTest<4>({1.0f, 2.0f, 3.0f, -4.0f}, {3.0f, 2.0f, 3.0f, -4.0f});
+}
+
+struct MaxPoolFixtureNchwSame : Pooling2dFixture
+{
+    MaxPoolFixtureNchwSame() : Pooling2dFixture("MaxPool", "NCHW", "SAME") {}
+};
+BOOST_FIXTURE_TEST_CASE(ParseMaxPoolNchwSame, MaxPoolFixtureNchwSame)
+{
+    RunTest<4>({1.0f, 2.0f, 3.0f, -4.0f}, {3.0f, 2.0f, 3.0f, -4.0f});
+}
+
+struct AvgPoolFixtureNhwcValid : Pooling2dFixture
+{
+    AvgPoolFixtureNhwcValid() : Pooling2dFixture("AvgPool", "NHWC", "VALID") {}
+};
+BOOST_FIXTURE_TEST_CASE(ParseAvgPoolNhwcValid, AvgPoolFixtureNhwcValid)
 {
     RunTest<4>({1.0f, 2.0f, 3.0f, 4.0f}, {2.5f});
 }
 
+struct AvgPoolFixtureNchwValid : Pooling2dFixture
+{
+    AvgPoolFixtureNchwValid() : Pooling2dFixture("AvgPool", "NCHW", "VALID") {}
+};
+BOOST_FIXTURE_TEST_CASE(ParseAvgPoolNchwValid, AvgPoolFixtureNchwValid)
+{
+    RunTest<4>({1.0f, 2.0f, 3.0f, 4.0f}, {2.5f});
+}
+
+struct AvgPoolFixtureNhwcSame : Pooling2dFixture
+{
+    AvgPoolFixtureNhwcSame() : Pooling2dFixture("AvgPool", "NHWC", "SAME") {}
+};
+BOOST_FIXTURE_TEST_CASE(ParseAvgPoolNhwcSame, AvgPoolFixtureNhwcSame)
+{
+    RunTest<4>({1.0f, 2.0f, 3.0f, 4.0f}, {2.5f, 3.0f, 3.5f, 4.0f});
+}
+
+struct AvgPoolFixtureNchwSame : Pooling2dFixture
+{
+    AvgPoolFixtureNchwSame() : Pooling2dFixture("AvgPool", "NCHW", "SAME") {}
+};
+BOOST_FIXTURE_TEST_CASE(ParseAvgPoolNchwSame, AvgPoolFixtureNchwSame)
+{
+    RunTest<4>({1.0f, 2.0f, 3.0f, 4.0f}, {2.5f, 3.0f, 3.5f, 4.0f});
+}
 
 BOOST_AUTO_TEST_SUITE_END()

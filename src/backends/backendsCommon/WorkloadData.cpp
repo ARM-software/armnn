@@ -313,8 +313,6 @@ void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     ValidateSingleInput(workloadInfo, "SoftmaxQueueDescriptor");
     ValidateSingleOutput(workloadInfo, "SoftmaxQueueDescriptor");
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "SoftmaxQueueDescriptor", 2, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "SoftmaxQueueDescriptor", 2, "output");
 
     ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
                               workloadInfo.m_OutputTensorInfos[0],

@@ -123,11 +123,6 @@ void GetDataFromBlob(const LayerParameter& layerParam, vector<float>& outData, u
     }
 }
 
-bool IsInRange(unsigned int value, unsigned int min, unsigned int max)
-{
-    return (value >= min && value <= max) ? true : false;
-}
-
 template <typename T>
 size_t SizeOfVectorData(const vector<T>& vec)
 {
@@ -243,35 +238,6 @@ ValueType GetOptionalWithFallback(const ParamType& param,
             } \
         }, \
         DEFAULT_VALUE)
-
-
-void ValidateEqualValuesInRange(unsigned int valueA,
-                                const char* valueNameA,
-                                unsigned int valueB,
-                                const char* valueNameB,
-                                unsigned int min,
-                                unsigned int max,
-                                const armnn::CheckLocation& location)
-{
-    if (!IsInRange(valueA, min, max) || !IsInRange(valueB, min, max) || (valueA != valueB))
-    {
-        throw ParseException(
-            boost::str(
-                boost::format(
-                    "%1%=%2% and %3%=%4% must be equal and within the valid range"
-                    "of [%5%, %6%] %7%") %
-                    valueNameA %
-                    valueA %
-                    valueNameB %
-                    valueB %
-                    min %
-                    max %
-                    location.AsString()));
-    }
-}
-
-#define VALIDATE_EQUAL_VALUES_IN_RANGE(A, B, MIN_RANGE, MAX_RANGE) \
-    ValidateEqualValuesInRange(A, #A, B, #B, MIN_RANGE, MAX_RANGE, CHECK_LOCATION())
 
 } // namespace <anonymous>
 
@@ -943,8 +909,6 @@ void CaffeParserBase::ParsePoolingLayer(const LayerParameter& layerParam)
         kernel_w = inputInfo.GetShape()[3];
     }
 
-    VALIDATE_EQUAL_VALUES_IN_RANGE(kernel_h, kernel_w, 0, 11);
-
     unsigned int stride_h = GET_OPTIONAL_WITH_FALLBACK(param, PoolingParameter,
                                                        stride_h, stride, unsigned int, notFound);
     unsigned int stride_w = GET_OPTIONAL_WITH_FALLBACK(param, PoolingParameter,
@@ -956,14 +920,10 @@ void CaffeParserBase::ParsePoolingLayer(const LayerParameter& layerParam)
         stride_w = 1;
     }
 
-    VALIDATE_EQUAL_VALUES_IN_RANGE(stride_h, stride_w, 0, 11);
-
     unsigned int pad_h = GET_OPTIONAL_WITH_FALLBACK(param, PoolingParameter,
                                                     pad_h, pad, unsigned int, 0u);
     unsigned int pad_w = GET_OPTIONAL_WITH_FALLBACK(param, PoolingParameter,
                                                     pad_w, pad, unsigned int, 0u);
-
-    VALIDATE_EQUAL_VALUES_IN_RANGE(pad_h, pad_w, 0, 11);
 
     // Populate Weight and Bias Filter Descriptor
     Pooling2dDescriptor pooling2dDescriptor;

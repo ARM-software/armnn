@@ -36,6 +36,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Multiplication: return "Multiplication";
         case LayerType::Normalization: return "Normalization";
         case LayerType::Output: return "Output";
+        case LayerType::Pad: return "Pad";
         case LayerType::Permute: return "Permute";
         case LayerType::Pooling2d: return "Pooling2d";
         case LayerType::Reshape: return "Reshape";

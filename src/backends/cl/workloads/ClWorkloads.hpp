@@ -28,6 +28,7 @@
 #include "ClSoftmaxFloatWorkload.hpp"
 #include "ClSoftmaxUint8Workload.hpp"
 #include "ClSplitterWorkload.hpp"
+#include "ClStridedSliceWorkload.hpp"
 #include "ClSubtractionWorkload.hpp"
 #include "ClConvertFp16ToFp32Workload.hpp"
 #include "ClConvertFp32ToFp16Workload.hpp"

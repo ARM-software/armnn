@@ -57,6 +57,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClSoftmaxUint8Workload.cpp
     ClSoftmaxUint8Workload.hpp
     ClSplitterWorkload.hpp
+    ClStridedSliceWorkload.cpp
+    ClStridedSliceWorkload.hpp
     ClSubtractionWorkload.cpp
     ClSubtractionWorkload.hpp
     ClWorkloads.hpp

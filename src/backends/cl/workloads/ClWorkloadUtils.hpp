@@ -39,6 +39,27 @@ void CopyArmComputeClTensorData(arm_compute::CLTensor& dstTensor, const T* srcDa
     dstTensor.unmap();
 }
 
+inline auto SetClStridedSliceData(const std::vector<int>& m_begin,
+                                  const std::vector<int>& m_end,
+                                  const std::vector<int>& m_stride)
+{
+    arm_compute::Coordinates starts;
+    arm_compute::Coordinates ends;
+    arm_compute::Coordinates strides;
+
+    unsigned int num_dims = static_cast<unsigned int>(m_begin.size());
+
+    for (unsigned int i = 0; i < num_dims; i++) {
+        unsigned int revertedIndex = num_dims - i - 1;
+
+        starts.set(i, static_cast<int>(m_begin[revertedIndex]));
+        ends.set(i, static_cast<int>(m_end[revertedIndex]));
+        strides.set(i, static_cast<int>(m_stride[revertedIndex]));
+    }
+
+    return std::make_tuple(starts, ends, strides);
+}
+
 inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
                                              const ConstCpuTensorHandle* handle)
 {

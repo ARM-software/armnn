@@ -35,6 +35,7 @@
 #include "workloads/ClPermuteWorkload.hpp"
 #include "workloads/ClPooling2dWorkload.hpp"
 #include "workloads/ClSoftmaxBaseWorkload.hpp"
+#include "workloads/ClStridedSliceWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"
 #endif
 
@@ -495,6 +496,18 @@ bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                     input.GetDataType(),
                                     &TrueFunc<>,
                                     &TrueFunc<>);
+}
+
+bool ClLayerSupport::IsStridedSliceSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const StridedSliceDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClStridedSliceWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsSubtractionSupported(const TensorInfo& input0,

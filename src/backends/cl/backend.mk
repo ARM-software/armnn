@@ -40,6 +40,7 @@ BACKEND_SOURCES := \
         workloads/ClSoftmaxBaseWorkload.cpp \
         workloads/ClSoftmaxFloatWorkload.cpp \
         workloads/ClSoftmaxUint8Workload.cpp \
+        workloads/ClStridedSliceWorkload.cpp \
         workloads/ClSubtractionWorkload.cpp
 
 # BACKEND_TEST_SOURCES contains the list of files to be included

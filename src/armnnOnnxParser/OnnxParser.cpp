@@ -214,7 +214,8 @@ armnn::TensorInfo ToTensorInfo(const onnx::ValueInfoProto& info)
               boost::str(
                   boost::format("'%1%' is not a currently supported datatype for tensor %2%."
                                 " Supported dataTypes are FLOAT, INT32 and INT64.  %3%") %
-                                onnx::TensorProto::DataType_Name(info.type().tensor_type().elem_type()) %
+                                onnx::TensorProto::DataType_Name(
+                                    static_cast<onnx::TensorProto::DataType>(info.type().tensor_type().elem_type())) %
                                 info.name() %
                                 CHECK_LOCATION().AsString() ));
       }
@@ -637,7 +638,8 @@ void OnnxParser::SetupInfo(const google::protobuf::RepeatedPtrField<onnx::ValueI
     {
         m_TensorsInfo[tensor.name()] = OnnxTensor();
         m_TensorsInfo[tensor.name()].m_info = std::make_unique<TensorInfo>(ToTensorInfo(tensor));
-        m_TensorsInfo[tensor.name()].m_dtype = tensor.type().tensor_type().elem_type();
+        m_TensorsInfo[tensor.name()].m_dtype =
+            static_cast<onnx::TensorProto::DataType>(tensor.type().tensor_type().elem_type());
     }
 }
 
@@ -850,7 +852,8 @@ void OnnxParser::ParseConstant(const onnx::NodeProto& node)
     const onnx::TensorProto& onnxTensor = node.attribute(0).t();
 
     //ONNX can have Float16 and double constant nodes but ArmNN only supports float32
-    CHECK_VALID_DATATYPE(node.name(), onnxTensor.name(), onnxTensor.data_type(), onnx::TensorProto::FLOAT);
+    CHECK_VALID_DATATYPE(node.name(), onnxTensor.name(),
+                         static_cast<onnx::TensorProto::DataType>(onnxTensor.data_type()), onnx::TensorProto::FLOAT);
 
     //Register this as a m_ConstParam so we know we can use it as a constant param in future layers.
     m_TensorsInfo[node.output(0)].m_tensor = std::make_unique<const onnx::TensorProto>(onnxTensor);

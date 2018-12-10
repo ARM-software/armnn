@@ -282,21 +282,6 @@ ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta2Uint8, SimpleSoftmaxUint8Test, 2.0f)
 ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
 ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 
-// Softmax
-BOOST_AUTO_TEST_CASE(Softmax4dSupport)
-{
-    const unsigned int numDimensions = 4u;
-    std::array<unsigned int, numDimensions> dimensionSizes;
-    dimensionSizes.fill(1u);
-
-    const armnn::TensorInfo inputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
-    const armnn::TensorInfo outputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
-
-    // 4D Softmax should be reported as unsupported on the NEON backend
-    armnn::NeonLayerSupport layerSupport;
-    BOOST_TEST(!layerSupport.IsSoftmaxSupported(inputInfo, outputInfo, armnn::SoftmaxDescriptor()));
-}
-
 // Splitter
 ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)
 ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)

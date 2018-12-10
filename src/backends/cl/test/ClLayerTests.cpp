@@ -121,21 +121,6 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetricNhwc,
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetricNhwc,
                      DepthwiseConvolution2dAsymmetricTest, false, armnn::DataLayout::NHWC)
 
-// Softmax
-BOOST_AUTO_TEST_CASE(Softmax4dSupport)
-{
-    const unsigned int numDimensions = 4u;
-    std::array<unsigned int, numDimensions> dimensionSizes;
-    dimensionSizes.fill(1u);
-
-    const armnn::TensorInfo inputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
-    const armnn::TensorInfo outputInfo(numDimensions, &dimensionSizes.front(), armnn::DataType::Float32);
-
-    // 4D Softmax should be reported as unsupported on the CL backend
-    armnn::ClLayerSupport layerSupport;
-    BOOST_TEST(!layerSupport.IsSoftmaxSupported(inputInfo, outputInfo, armnn::SoftmaxDescriptor()));
-}
-
 // Splitter
 ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)
 ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)

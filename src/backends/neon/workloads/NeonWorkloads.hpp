@@ -5,7 +5,7 @@
 
 #pragma once
 #include "NeonActivationWorkload.hpp"
-#include "NeonAdditionFloatWorkload.hpp"
+#include "NeonAdditionWorkload.hpp"
 #include "NeonBatchNormalizationFloatWorkload.hpp"
 #include "NeonConstantWorkload.hpp"
 #include "NeonConvertFp16ToFp32Workload.hpp"

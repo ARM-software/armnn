@@ -14,7 +14,7 @@ BACKEND_SOURCES := \
         NeonTimer.cpp \
         NeonWorkloadFactory.cpp \
         workloads/NeonActivationWorkload.cpp \
-        workloads/NeonAdditionFloatWorkload.cpp \
+        workloads/NeonAdditionWorkload.cpp \
         workloads/NeonBatchNormalizationFloatWorkload.cpp \
         workloads/NeonConstantWorkload.cpp \
         workloads/NeonConvertFp16ToFp32Workload.cpp \

@@ -17,7 +17,7 @@
 #include <boost/core/ignore_unused.hpp>
 
 #ifdef ARMCOMPUTENEON_ENABLED
-#include "workloads/NeonAdditionFloatWorkload.hpp"
+#include "workloads/NeonAdditionWorkload.hpp"
 #include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonBatchNormalizationFloatWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"

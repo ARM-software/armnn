@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NeonAdditionFloatWorkload.hpp"
+#include "NeonAdditionWorkload.hpp"
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
@@ -25,11 +25,11 @@ arm_compute::Status NeonAdditionWorkloadValidate(const TensorInfo& input0,
 }
 
 
-NeonAdditionFloatWorkload::NeonAdditionFloatWorkload(const AdditionQueueDescriptor& descriptor,
-                                                     const WorkloadInfo& info)
-    : FloatWorkload<AdditionQueueDescriptor>(descriptor, info)
+NeonAdditionWorkload::NeonAdditionWorkload(const AdditionQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info)
+    : BaseWorkload<AdditionQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("NeonAdditionFloatWorkload", 2, 1);
+    m_Data.ValidateInputsOutputs("NeonAdditionWorkload", 2, 1);
 
     arm_compute::ITensor& input1 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& input2 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
@@ -38,9 +38,9 @@ NeonAdditionFloatWorkload::NeonAdditionFloatWorkload(const AdditionQueueDescript
     m_AddLayer.configure(&input1, &input2, &output, arm_compute::ConvertPolicy::SATURATE);
 }
 
-void NeonAdditionFloatWorkload::Execute() const
+void NeonAdditionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonAdditionFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonAdditionWorkload_Execute");
     m_AddLayer.run();
 }
 

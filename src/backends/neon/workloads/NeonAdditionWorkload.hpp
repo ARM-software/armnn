@@ -14,10 +14,10 @@ arm_compute::Status NeonAdditionWorkloadValidate(const TensorInfo& input0,
                                                  const TensorInfo& input1,
                                                  const TensorInfo& output);
 
-class NeonAdditionFloatWorkload : public FloatWorkload<AdditionQueueDescriptor>
+class NeonAdditionWorkload : public BaseWorkload<AdditionQueueDescriptor>
 {
 public:
-    NeonAdditionFloatWorkload(const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonAdditionWorkload(const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info);
     virtual void Execute() const override;
 
 private:

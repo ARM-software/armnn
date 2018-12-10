@@ -161,7 +161,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateNormalization(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                                       const WorkloadInfo&            info) const
 {
-    return MakeWorkloadHelper<NeonAdditionFloatWorkload, NullWorkload>(descriptor, info);
+    return std::make_unique<NeonAdditionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMultiplication(

@@ -107,7 +107,7 @@ static void NeonCreateElementwiseWorkloadTest()
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 {
-    NeonCreateElementwiseWorkloadTest<NeonAdditionFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonAdditionWorkload,
                                       AdditionQueueDescriptor,
                                       AdditionLayer,
                                       DataType::Float16>();
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 {
-    NeonCreateElementwiseWorkloadTest<NeonAdditionFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonAdditionWorkload,
                                       AdditionQueueDescriptor,
                                       AdditionLayer,
                                       DataType::Float32>();

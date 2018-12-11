@@ -9,11 +9,15 @@
 #include <string>
 #include <iostream>
 
+#include <Permute.hpp>
+using namespace armnnUtils;
+using namespace armnn;
+
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
 struct DepthwiseConvolution2dFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>
 {
-    explicit DepthwiseConvolution2dFixture(const char* paddingType)
+    explicit DepthwiseConvolution2dFixture(const std::string& dataLayout, const char* paddingType)
     {
         m_Prototext = "node { \n"
                       "    name: \"graphInput\" \n"
@@ -25,26 +29,9 @@ struct DepthwiseConvolution2dFixture : public armnnUtils::ParserPrototxtFixture<
                       "      } \n"
                       "    } \n"
                       "    attr { \n"
-                      "      key: \"value\" \n"
+                      "      key: \"shape\" \n"
                       "      value { \n"
-                      "        tensor { \n"
-                      "          dtype: DT_FLOAT \n"
-                      "          tensor_shape { \n"
-                      "            dim { \n"
-                      "              size: 1 \n"
-                      "            } \n"
-                      "            dim { \n"
-                      "              size: 1 \n"
-                      "            } \n"
-                      "            dim { \n"
-                      "              size: 3 \n"
-                      "            } \n"
-                      "            dim { \n"
-                      "              size: 3 \n"
-                      "            } \n"
-                      "          } \n"
-                      "          tensor_content: \"\\000\\000\\200?\\000\\000\\000@\\000\\000@@\\000\\000\\200@"
-                      "\\000\\000\\240@\\000\\000\\300@\\000\\000\\340@\\000\\000\\000A\\000\\000\\020A\" \n"
+                      "        shape { \n"
                       "        } \n"
                       "      } \n"
                       "    } \n"
@@ -104,13 +91,15 @@ struct DepthwiseConvolution2dFixture : public armnnUtils::ParserPrototxtFixture<
                       "  attr { \n"
                       "    key: \"data_format\" \n"
                       "    value { \n"
-                      "      s: \"NHWC\" \n"
+                      "      s: \"";
+        m_Prototext.append(dataLayout);
+        m_Prototext.append("\"\n"
                       "    } \n"
                       "  } \n"
                       "  attr { \n"
                       "    key: \"padding\" \n"
                       "    value { \n"
-                      "      s: \"";
+                      "      s: \"");
         m_Prototext.append(paddingType);
         m_Prototext.append("\"\n"
                       "    } \n"
@@ -134,32 +123,63 @@ struct DepthwiseConvolution2dFixture : public armnnUtils::ParserPrototxtFixture<
                       "  } \n"
                       "} \n");
 
-        SetupSingleInputSingleOutput({ 1, 1, 3, 3 }, "graphInput", "potato");
+        if(dataLayout == "NHWC")
+        {
+            SetupSingleInputSingleOutput({ 1u, 1u, 3u, 3u }, "graphInput", "potato");
+        }
+        else
+        {
+            SetupSingleInputSingleOutput({ 1u, 3u, 1u, 3u }, "graphInput", "potato");
+        }
     }
 };
 
-struct DepthwiseConvolution2dSameFixture : DepthwiseConvolution2dFixture
+struct DepthwiseConvolution2dNhwcSameFixture : DepthwiseConvolution2dFixture
 {
-    DepthwiseConvolution2dSameFixture() : DepthwiseConvolution2dFixture("SAME") { }
+    DepthwiseConvolution2dNhwcSameFixture() : DepthwiseConvolution2dFixture("NHWC", "SAME") { }
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DSame, DepthwiseConvolution2dSameFixture)
+BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DNhwcSame, DepthwiseConvolution2dNhwcSameFixture)
 {
     RunTest<4>({ 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                { 2.5f, 5.f,  2.5f, 3.5f, 7.f,  3.5f, 4.5f, 9.f,  4.5f,
                  6.f,  12.f, 6.f,  7.5f, 15.f, 7.5f, 9.f,  18.f, 9.f,
-                 5.5f, 11.f, 5.5f, 6.5f, 13.f, 6.5f, 7.5f, 15.f, 7.5f});
+                 5.5f, 11.f, 5.5f, 6.5f, 13.f, 6.5f, 7.5f, 15.f, 7.5f });
 }
 
-struct DepthwiseConvolution2dValidFixture : DepthwiseConvolution2dFixture
+struct DepthwiseConvolution2dNchwSameFixture : DepthwiseConvolution2dFixture
 {
-    DepthwiseConvolution2dValidFixture() : DepthwiseConvolution2dFixture("VALID") { }
+    DepthwiseConvolution2dNchwSameFixture() : DepthwiseConvolution2dFixture("NCHW", "SAME") { }
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DValid, DepthwiseConvolution2dValidFixture)
+BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DNchwSame, DepthwiseConvolution2dNchwSameFixture)
+{
+    RunTest<4>({ 1, 4, 7, 2, 5, 8, 3, 6, 9 },
+               { 2.5f, 6.f, 5.5f, 5.f, 12.f, 11.f, 2.5f, 6.f, 5.5f,
+                 3.5f, 7.5f, 6.5f, 7.f, 15.f, 13.f, 3.5f, 7.5f, 6.5f,
+                 4.5f, 9.f, 7.5f, 9.f, 18.f, 15.f, 4.5f, 9.f, 7.5f });
+}
+
+struct DepthwiseConvolution2dNhwcValidFixture : DepthwiseConvolution2dFixture
+{
+    DepthwiseConvolution2dNhwcValidFixture() : DepthwiseConvolution2dFixture("NHWC", "VALID") { }
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DNhwcValid, DepthwiseConvolution2dNhwcValidFixture)
 {
     RunTest<4>({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, // input data
-               { 6.f,  12.f, 6.f,  7.5f, 15.f, 7.5f, 9.f,  18.f, 9.f });  // output expected data
+               { 6.f, 12.f, 6.f, 7.5f, 15.f, 7.5f, 9.f, 18.f, 9.f });  // output expected data
+}
+
+struct DepthwiseConvolution2dNchwValidFixture : DepthwiseConvolution2dFixture
+{
+    DepthwiseConvolution2dNchwValidFixture() : DepthwiseConvolution2dFixture("NCHW", "VALID") { }
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseDepthwiseConv2DNchwValid, DepthwiseConvolution2dNchwValidFixture)
+{
+     RunTest<4>({ 1, 4, 7, 2, 5, 8, 3, 6, 9 },
+                { 6.f, 12.f, 6.f, 7.5f, 15.f, 7.5f, 9.f, 18.f, 9.f });
 }
 
 

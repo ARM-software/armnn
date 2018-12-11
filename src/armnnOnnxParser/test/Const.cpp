@@ -37,7 +37,7 @@ struct ConstMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPars
                               float_data: 6.0
 
                           }
-                          type: FLOAT
+                          type: 1
                         }
                         name:  "constantNode"
                         op_type:  "Constant"
@@ -46,7 +46,7 @@ struct ConstMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPars
                           name:  "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                  dim {
                                     dim_value: 7
@@ -64,14 +64,14 @@ struct ConstMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPars
 
 struct ConstValidFixture : ConstMainFixture
 {
-    ConstValidFixture() : ConstMainFixture("FLOAT") {
+    ConstValidFixture() : ConstMainFixture("1") {
         Setup();
     }
 };
 
 struct ConstInvalidFixture : ConstMainFixture
 {
-    ConstInvalidFixture() : ConstMainFixture("FLOAT16") { }
+    ConstInvalidFixture() : ConstMainFixture("10") { }
 };
 
 BOOST_FIXTURE_TEST_CASE(ValidConstTest, ConstValidFixture)

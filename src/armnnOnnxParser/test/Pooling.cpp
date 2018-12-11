@@ -73,7 +73,7 @@ struct PoolingMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPa
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1
@@ -100,14 +100,14 @@ struct PoolingMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPa
 
 struct MaxPoolValidFixture : PoolingMainFixture
 {
-    MaxPoolValidFixture() : PoolingMainFixture("FLOAT", "\"MaxPool\"") {
+    MaxPoolValidFixture() : PoolingMainFixture("1", "\"MaxPool\"") {
         Setup();
     }
 };
 
 struct MaxPoolInvalidFixture : PoolingMainFixture
 {
-    MaxPoolInvalidFixture() : PoolingMainFixture("FLOAT16", "\"MaxPool\"") { }
+    MaxPoolInvalidFixture() : PoolingMainFixture("10", "\"MaxPool\"") { }
 };
 
 BOOST_FIXTURE_TEST_CASE(ValidMaxPoolTest, MaxPoolValidFixture)
@@ -117,7 +117,7 @@ BOOST_FIXTURE_TEST_CASE(ValidMaxPoolTest, MaxPoolValidFixture)
 
 struct AvgPoolValidFixture : PoolingMainFixture
 {
-    AvgPoolValidFixture() : PoolingMainFixture("FLOAT", "\"AveragePool\"") {
+    AvgPoolValidFixture() : PoolingMainFixture("1", "\"AveragePool\"") {
         Setup();
     }
 };
@@ -138,7 +138,7 @@ struct PoolingWithPadFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -191,7 +191,7 @@ struct PoolingWithPadFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1
@@ -243,7 +243,7 @@ struct GlobalAvgFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPars
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -271,7 +271,7 @@ struct GlobalAvgFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPars
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1

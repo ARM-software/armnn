@@ -31,7 +31,7 @@ struct ProtoxtTestFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPa
                           name:  "Input"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 2
@@ -44,7 +44,7 @@ struct ProtoxtTestFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPa
                           name:  "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                  dim {
                                     dim_value: 1

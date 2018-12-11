@@ -25,7 +25,7 @@ struct SimpleDepthConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnn
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -47,7 +47,7 @@ struct SimpleDepthConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnn
                         name: "Weight"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 3
@@ -70,7 +70,7 @@ struct SimpleDepthConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnn
                           dims: 1
                           dims: 2
                           dims: 2
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 1
                           float_data: 1
                           float_data: 1
@@ -126,7 +126,7 @@ struct SimpleDepthConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnn
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1

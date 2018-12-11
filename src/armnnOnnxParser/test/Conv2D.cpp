@@ -25,7 +25,7 @@ struct SimpleConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxP
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -47,7 +47,7 @@ struct SimpleConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxP
                         name: "Weight"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -70,7 +70,7 @@ struct SimpleConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxP
                           dims: 1
                           dims: 3
                           dims: 3
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 2
                           float_data: 1
                           float_data: 0
@@ -123,7 +123,7 @@ struct SimpleConv2DFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxP
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1
@@ -164,7 +164,7 @@ struct Conv2DWithBiasesFixture :  public armnnUtils::ParserPrototxtFixture<armnn
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -186,7 +186,7 @@ struct Conv2DWithBiasesFixture :  public armnnUtils::ParserPrototxtFixture<armnn
                         name: "Weight"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -209,7 +209,7 @@ struct Conv2DWithBiasesFixture :  public armnnUtils::ParserPrototxtFixture<armnn
                           dims: 1
                           dims: 2
                           dims: 2
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 2
                           float_data: 1
                           float_data: 0
@@ -220,7 +220,7 @@ struct Conv2DWithBiasesFixture :  public armnnUtils::ParserPrototxtFixture<armnn
                           name: "Bias"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 4
@@ -231,7 +231,7 @@ struct Conv2DWithBiasesFixture :  public armnnUtils::ParserPrototxtFixture<armnn
                         }
                         initializer {
                             dims: 4
-                            data_type: FLOAT
+                            data_type: 1
                             float_data: 10
                             float_data: 0
                             float_data: 0
@@ -280,7 +280,7 @@ struct Conv2DWithBiasesFixture :  public armnnUtils::ParserPrototxtFixture<armnn
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1
@@ -322,7 +322,7 @@ struct Conv2DDimReducingFixture :  public armnnUtils::ParserPrototxtFixture<armn
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -344,7 +344,7 @@ struct Conv2DDimReducingFixture :  public armnnUtils::ParserPrototxtFixture<armn
                         name: "Weight"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 2
@@ -367,7 +367,7 @@ struct Conv2DDimReducingFixture :  public armnnUtils::ParserPrototxtFixture<armn
                           dims: 3
                           dims: 1
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: -1
                           float_data: 2
                           float_data: 0
@@ -412,7 +412,7 @@ struct Conv2DDimReducingFixture :  public armnnUtils::ParserPrototxtFixture<armn
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1

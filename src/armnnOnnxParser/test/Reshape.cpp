@@ -38,7 +38,7 @@ struct ReshapeMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPa
                          name: "Shape"
                          type {
                            tensor_type {
-                             elem_type: INT64
+                             elem_type: 7
                              shape {
                                dim {
                                  dim_value: 2
@@ -57,7 +57,7 @@ struct ReshapeMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPa
                       }
                       initializer {
                         dims: 2
-                        data_type: INT64
+                        data_type: 7
                         int64_data: 2
                         int64_data: 2
                         name: "Shape"
@@ -66,7 +66,7 @@ struct ReshapeMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPa
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 2
@@ -87,14 +87,14 @@ struct ReshapeMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxPa
 
 struct ReshapeValidFixture : ReshapeMainFixture
 {
-    ReshapeValidFixture() : ReshapeMainFixture("FLOAT") {
+    ReshapeValidFixture() : ReshapeMainFixture("1") {
         Setup();
     }
 };
 
 struct ReshapeInvalidFixture : ReshapeMainFixture
 {
-    ReshapeInvalidFixture() : ReshapeMainFixture("FLOAT16") { }
+    ReshapeInvalidFixture() : ReshapeMainFixture("10") { }
 };
 
 BOOST_FIXTURE_TEST_CASE(ValidReshapeTest, ReshapeValidFixture)

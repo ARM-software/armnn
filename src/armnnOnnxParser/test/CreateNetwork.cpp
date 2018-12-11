@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(CreateNetworkFromString)
                                  name:  "Output"
                                  type {
                                     tensor_type {
-                                      elem_type: FLOAT
+                                      elem_type: 1
                                       shape {
                                         dim {
                                            dim_value: 1

@@ -25,7 +25,7 @@ struct ReluMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParse
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 4
@@ -44,7 +44,7 @@ struct ReluMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParse
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 4

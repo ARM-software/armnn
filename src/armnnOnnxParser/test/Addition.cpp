@@ -78,7 +78,7 @@ struct AddMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser
                               name: "Output"
                               type {
                                  tensor_type {
-                                   elem_type: FLOAT
+                                   elem_type: 1
                                    shape {
                                        dim {
                                            dim_value: 1
@@ -105,14 +105,14 @@ struct AddMainFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser
 
 struct AddValidFixture : AddMainFixture
 {
-    AddValidFixture() : AddMainFixture("FLOAT") {
+    AddValidFixture() : AddMainFixture("1") {
         Setup();
     }
 };
 
 struct AddInvalidFixture : AddMainFixture
 {
-    AddInvalidFixture() : AddMainFixture("INT32") { }
+    AddInvalidFixture() : AddMainFixture("6") { }
 };
 
 struct AddValidBroadcastFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>
@@ -131,7 +131,7 @@ struct AddValidBroadcastFixture : public armnnUtils::ParserPrototxtFixture<armnn
                         name: "Input0"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -153,7 +153,7 @@ struct AddValidBroadcastFixture : public armnnUtils::ParserPrototxtFixture<armnn
                          name: "Input1"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                  dim {
                                    dim_value: 4
@@ -175,7 +175,7 @@ struct AddValidBroadcastFixture : public armnnUtils::ParserPrototxtFixture<armnn
                               name: "Output"
                               type {
                                  tensor_type {
-                                   elem_type: FLOAT
+                                   elem_type: 1
                                    shape {
                                        dim {
                                            dim_value: 1
@@ -217,7 +217,7 @@ struct AddInvalidBroadcastFixture : public armnnUtils::ParserPrototxtFixture<arm
                         name: "Input0"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -239,7 +239,7 @@ struct AddInvalidBroadcastFixture : public armnnUtils::ParserPrototxtFixture<arm
                          name: "Input1"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                  dim {
                                    dim_value: 4
@@ -261,7 +261,7 @@ struct AddInvalidBroadcastFixture : public armnnUtils::ParserPrototxtFixture<arm
                               name: "Output"
                               type {
                                  tensor_type {
-                                   elem_type: FLOAT
+                                   elem_type: 1
                                    shape {
                                        dim {
                                            dim_value: 1

@@ -25,7 +25,7 @@ struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -47,7 +47,7 @@ struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<
                          name: "mean"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                dim {
                                  dim_value: 1
@@ -60,7 +60,7 @@ struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<
                           name: "var"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -73,7 +73,7 @@ struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<
                            name: "scale"
                            type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                  dim {
                                    dim_value: 1
@@ -86,7 +86,7 @@ struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<
                             name: "bias"
                             type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                     dim_value: 1
@@ -107,30 +107,30 @@ struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<
                          attribute {
                            name: "epsilon"
                            f:  0.0010000000475
-                           type: FLOAT
+                           type: 1
                          }
                       }
                       initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 5.0
                           name: "mean"
                         }
                       initializer {
                         dims: 1
-                        data_type: FLOAT
+                        data_type: 1
                         float_data: 2.0
                         name: "var"
                       }
                       initializer {
                         dims: 1
-                        data_type: FLOAT
+                        data_type: 1
                         float_data: 0.0
                         name: "bias"
                       }
                       initializer {
                         dims: 1
-                        data_type: FLOAT
+                        data_type: 1
                         float_data: 1.0
                         name: "scale"
                       }
@@ -138,7 +138,7 @@ struct BatchNormalizationMainFixture : public armnnUtils::ParserPrototxtFixture<
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1
@@ -189,7 +189,7 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -211,7 +211,7 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
                          name: "mean"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                dim {
                                  dim_value: 2
@@ -224,7 +224,7 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
                           name: "var"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 2
@@ -237,7 +237,7 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
                            name: "scale"
                            type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                  dim {
                                    dim_value: 2
@@ -250,7 +250,7 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
                             name: "bias"
                             type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                     dim_value: 2
@@ -271,33 +271,33 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
                          attribute {
                            name: "epsilon"
                            f:  0.00001
-                           type: FLOAT
+                           type: 1
                          }
                       }
                       initializer {
                           dims: 2
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 0.0
                           float_data: 3.0
                           name: "mean"
                         }
                       initializer {
                         dims: 2
-                        data_type: FLOAT
+                        data_type: 1
                         float_data: 1.0
                         float_data: 1.5
                         name: "var"
                       }
                       initializer {
                         dims: 2
-                        data_type: FLOAT
+                        data_type: 1
                         float_data: 0.0
                         float_data: 1.0
                         name: "bias"
                       }
                       initializer {
                         dims: 2
-                        data_type: FLOAT
+                        data_type: 1
                         float_data: 1.0
                         float_data: 1.5
                         name: "scale"
@@ -306,7 +306,7 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 1

@@ -26,7 +26,7 @@ struct MatMulFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser:
                          name: "Input"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                dim {
                                  dim_value: 1
@@ -42,7 +42,7 @@ struct MatMulFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser:
                           name: "Const"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -56,7 +56,7 @@ struct MatMulFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser:
                         }
                         initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 17.0
                           name: "Const"
                        }
@@ -71,7 +71,7 @@ struct MatMulFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser:
                            name:  "Output"
                            type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                      dim_value: 1
@@ -115,7 +115,7 @@ struct FullyConnectedFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                          name: "Input"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                dim {
                                  dim_value: 1
@@ -131,7 +131,7 @@ struct FullyConnectedFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                           name: "Weight"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -145,7 +145,7 @@ struct FullyConnectedFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                         }
                         initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 2
                           name: "Weight"
                        }
@@ -153,7 +153,7 @@ struct FullyConnectedFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                           name: "Bias"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -164,7 +164,7 @@ struct FullyConnectedFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                         }
                         initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 1
                           name: "Bias"
                        }
@@ -186,7 +186,7 @@ struct FullyConnectedFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                             name: "AddInput"
                             type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                     dim_value: 1
@@ -202,7 +202,7 @@ struct FullyConnectedFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                            name:  "Output"
                            type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                      dim_value: 1
@@ -254,7 +254,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                          name: "Input"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                dim {
                                  dim_value: 1
@@ -270,7 +270,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                           name: "Weight"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -284,7 +284,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                         }
                         initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 2
                           name: "Weight"
                        }
@@ -292,7 +292,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                           name: "Bias"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -303,7 +303,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                         }
                         initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 1
                           name: "Bias"
                        }
@@ -311,7 +311,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                           name: "Bias_1"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -322,7 +322,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                         }
                         initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 10.0
                           name: "Bias_1"
                        }
@@ -358,7 +358,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                             name: "AddInput"
                             type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                     dim_value: 1
@@ -374,7 +374,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                            name:  "AddOutput"
                            type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                      dim_value: 1
@@ -390,7 +390,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                             name:  "AddOutput_1"
                             type {
                                tensor_type {
-                                 elem_type: FLOAT
+                                 elem_type: 1
                                  shape {
                                    dim {
                                       dim_value: 1
@@ -406,7 +406,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                              name:  "Output"
                              type {
                                 tensor_type {
-                                  elem_type: FLOAT
+                                  elem_type: 1
                                   shape {
                                     dim {
                                        dim_value: 1
@@ -458,7 +458,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                          name: "Input"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                dim {
                                  dim_value: 1
@@ -474,7 +474,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                           name: "Weight"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -488,7 +488,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                         }
                         initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 2
                           name: "Weight"
                        }
@@ -496,7 +496,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                           name: "Bias"
                           type {
                             tensor_type {
-                              elem_type: FLOAT
+                              elem_type: 1
                               shape {
                                 dim {
                                   dim_value: 1
@@ -507,7 +507,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                         }
                         initializer {
                           dims: 1
-                          data_type: FLOAT
+                          data_type: 1
                           float_data: 1
                           name: "Bias"
                        }
@@ -537,7 +537,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                             name: "AddInput"
                             type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                     dim_value: 1
@@ -553,7 +553,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                            name:  "AddOutput"
                            type {
                               tensor_type {
-                                elem_type: FLOAT
+                                elem_type: 1
                                 shape {
                                   dim {
                                      dim_value: 1
@@ -569,7 +569,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                              name:  "Output"
                              type {
                                 tensor_type {
-                                  elem_type: FLOAT
+                                  elem_type: 1
                                   shape {
                                     dim {
                                        dim_value: 1

@@ -29,7 +29,7 @@ struct GetInputsOutputsMainFixture : public armnnUtils::ParserPrototxtFixture<ar
                         name: "Input"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 4
@@ -48,7 +48,7 @@ struct GetInputsOutputsMainFixture : public armnnUtils::ParserPrototxtFixture<ar
                           name: "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                    dim {
                                        dim_value: 4
@@ -101,7 +101,7 @@ struct GetEmptyInputsOutputsFixture : public armnnUtils::ParserPrototxtFixture<a
                           name: "value"
                           t {
                               dims: 7
-                              data_type: FLOAT
+                              data_type: 1
                               float_data: 0.0
                               float_data: 1.0
                               float_data: 2.0
@@ -111,7 +111,7 @@ struct GetEmptyInputsOutputsFixture : public armnnUtils::ParserPrototxtFixture<a
                               float_data: 6.0
 
                           }
-                          type: FLOAT
+                          type: 1
                         }
                         name:  "constantNode"
                         op_type:  "Constant"
@@ -120,7 +120,7 @@ struct GetEmptyInputsOutputsFixture : public armnnUtils::ParserPrototxtFixture<a
                           name:  "Output"
                           type {
                              tensor_type {
-                               elem_type: FLOAT
+                               elem_type: 1
                                shape {
                                  dim {
                                     dim_value: 7
@@ -171,7 +171,7 @@ struct GetInputsMultipleFixture : public armnnUtils::ParserPrototxtFixture<armnn
                         name: "Input0"
                         type {
                           tensor_type {
-                            elem_type: FLOAT
+                            elem_type: 1
                             shape {
                               dim {
                                 dim_value: 1
@@ -193,7 +193,7 @@ struct GetInputsMultipleFixture : public armnnUtils::ParserPrototxtFixture<armnn
                          name: "Input1"
                          type {
                            tensor_type {
-                             elem_type: FLOAT
+                             elem_type: 1
                              shape {
                                  dim {
                                    dim_value: 4
@@ -215,7 +215,7 @@ struct GetInputsMultipleFixture : public armnnUtils::ParserPrototxtFixture<armnn
                               name: "Output"
                               type {
                                  tensor_type {
-                                   elem_type: FLOAT
+                                   elem_type: 1
                                    shape {
                                        dim {
                                            dim_value: 1

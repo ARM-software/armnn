@@ -129,6 +129,12 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(Fp32NetworkToFp16Converter()));
     }
 
+    // if debug optimization is set, then print out data after each layer
+    if (options.m_Debug)
+    {
+        Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(InsertDebugLayer()));
+    }
+
     // We know that DeviceSpec should be the only implementation of IDeviceSpec.
     const DeviceSpec& spec = *boost::polymorphic_downcast<const DeviceSpec*>(&deviceSpec);
     auto const& supportedBackends = spec.GetSupportedBackends();

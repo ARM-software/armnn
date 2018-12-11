@@ -12,3 +12,4 @@
 #include "MovePermuteUp.hpp"
 #include "OptimizeInverseConversions.hpp"
 #include "ConvertFp32NetworkToFp16.hpp"
+#include "AddDebug.hpp"

@@ -74,4 +74,33 @@ std::vector<ConvertFp32ToFp16Layer*> InsertConvertFp32ToFp16LayersAfter(Graph& g
     return convertLayers;
 }
 
+
+std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer)
+{
+    std::vector<DebugLayer*> debugLayers;
+    debugLayers.reserve(layer.GetNumOutputSlots());
+
+    // Change outputs to DataType::Float16
+    for (auto&& outputSlot = layer.BeginOutputSlots(); outputSlot != layer.EndOutputSlots(); ++outputSlot)
+    {
+        // Insert debug layer after the layer
+        const std::string name =
+            std::string("DebugLayerAfter") + layer.GetName();
+
+        const DebugDescriptor descriptor;
+
+        DebugLayer* debugLayer =
+            graph.InsertNewLayer<DebugLayer>(*outputSlot, descriptor, name.c_str());
+
+        // Sets output tensor info for the debug layer.
+        TensorInfo debugInfo = debugLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+
+        debugLayer->GetOutputSlot().SetTensorInfo(debugInfo);
+
+        debugLayers.emplace_back(debugLayer);
+    }
+
+    return debugLayers;
+}
+
 } // namespace armnn

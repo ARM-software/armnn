@@ -298,6 +298,7 @@ list(APPEND armnn_sources
     src/armnn/optimizations/SquashEqualSiblings.hpp
     src/armnn/optimizations/OptimizeInverseConversions.hpp
     src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
+    src/armnn/optimizations/AddDebug.hpp
     third-party/half/half.hpp
     )
 

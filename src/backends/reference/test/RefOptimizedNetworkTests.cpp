@@ -10,6 +10,7 @@
 #include <reference/RefWorkloadFactory.hpp>
 
 #include <boost/test/unit_test.hpp>
+#include <test/GraphUtils.hpp>
 
 BOOST_AUTO_TEST_SUITE(RefOptimizedNetwork)
 
@@ -207,6 +208,52 @@ BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnCpuRef)
              "}\n";
 
     BOOST_TEST(ss.str() == expected.str());
+}
+
+BOOST_AUTO_TEST_CASE(DebugTestOnCpuRef)
+{
+    armnn::Network net;
+
+    armnn::ActivationDescriptor activation1Descriptor;
+    activation1Descriptor.m_Function = armnn::ActivationFunction::BoundedReLu;
+    activation1Descriptor.m_A = 1.f;
+    activation1Descriptor.m_B = -1.f;
+
+    // Defines layers.
+    auto input = net.AddInputLayer(0, "InputLayer");
+    auto activation = net.AddActivationLayer(activation1Descriptor, "ActivationLayer");
+    auto output = net.AddOutputLayer(0, "OutputLayer");
+
+    // Connects layers.
+    input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    armnn::TensorShape shape({4});
+    armnn::TensorInfo info(shape, armnn::DataType::Float32);
+    input->GetOutputSlot(0).SetTensorInfo(info);
+    activation->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
+
+    armnn::OptimizerOptions optimizerOptions;
+    optimizerOptions.m_Debug = true;
+
+    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec(),
+                                                               optimizerOptions);
+
+    const armnn::Graph& graph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
+    // Tests that all layers are present in the graph.
+    BOOST_TEST(graph.GetNumLayers() == 5);
+
+    // Tests that the vertices exist and have correct names.
+    BOOST_TEST(GraphHasNamedLayer(graph, "InputLayer"));
+    BOOST_TEST(GraphHasNamedLayer(graph, "DebugLayerAfterInputLayer"));
+    BOOST_TEST(GraphHasNamedLayer(graph, "ActivationLayer"));
+    BOOST_TEST(GraphHasNamedLayer(graph, "DebugLayerAfterActivationLayer"));
+    BOOST_TEST(GraphHasNamedLayer(graph, "OutputLayer"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

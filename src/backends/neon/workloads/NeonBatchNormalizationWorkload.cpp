@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NeonBatchNormalizationFloatWorkload.hpp"
+#include "NeonBatchNormalizationWorkload.hpp"
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <armnn/ArmNN.hpp>
@@ -43,11 +43,11 @@ arm_compute::Status NeonBatchNormalizationValidate(const TensorInfo& input,
                                                             descriptor.m_Eps);
 }
 
-NeonBatchNormalizationFloatWorkload::NeonBatchNormalizationFloatWorkload(
+NeonBatchNormalizationWorkload::NeonBatchNormalizationWorkload(
     const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : FloatWorkload<BatchNormalizationQueueDescriptor>(descriptor, info)
+    : BaseWorkload<BatchNormalizationQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("NeonBatchNormalizationFloatWorkload", 1, 1);
+    m_Data.ValidateInputsOutputs("NeonBatchNormalizationWorkload", 1, 1);
 
     arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
@@ -87,13 +87,13 @@ NeonBatchNormalizationFloatWorkload::NeonBatchNormalizationFloatWorkload(
     FreeUnusedTensors();
 }
 
-void NeonBatchNormalizationFloatWorkload::Execute() const
+void NeonBatchNormalizationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonBatchNormalizationFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonBatchNormalizationWorkload_Execute");
     m_Layer.run();
 }
 
-void NeonBatchNormalizationFloatWorkload::FreeUnusedTensors()
+void NeonBatchNormalizationWorkload::FreeUnusedTensors()
 {
     FreeTensorIfUnused(m_Mean);
     FreeTensorIfUnused(m_Variance);

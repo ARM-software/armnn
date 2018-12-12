@@ -185,7 +185,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateSubtraction(
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateBatchNormalization(
     const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NeonBatchNormalizationFloatWorkload, NullWorkload>(descriptor, info);
+    return std::make_unique<NeonBatchNormalizationWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,

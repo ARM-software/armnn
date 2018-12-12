@@ -18,11 +18,11 @@ arm_compute::Status NeonBatchNormalizationValidate(const TensorInfo& input,
                                                    const TensorInfo& gamma,
                                                    const BatchNormalizationDescriptor& descriptor);
 
-class NeonBatchNormalizationFloatWorkload : public FloatWorkload<BatchNormalizationQueueDescriptor>
+class NeonBatchNormalizationWorkload : public BaseWorkload<BatchNormalizationQueueDescriptor>
 {
 public:
-    NeonBatchNormalizationFloatWorkload(const BatchNormalizationQueueDescriptor& descriptor,
-                                        const WorkloadInfo& info);
+    NeonBatchNormalizationWorkload(const BatchNormalizationQueueDescriptor& descriptor,
+                                   const WorkloadInfo& info);
     virtual void Execute() const override;
 
 private:
@@ -37,6 +37,4 @@ private:
 };
 
 } //namespace armnn
-
-
 

@@ -183,23 +183,23 @@ static void NeonCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16NchwWorkload)
 {
-    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float16>(DataLayout::NCHW);
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float16>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16NhwcWorkload)
 {
-    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float16>(DataLayout::NHWC);
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float16>(DataLayout::NHWC);
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatNchwWorkload)
 {
-    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float32>(DataLayout::NCHW);
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float32>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloatNhwcWorkload)
 {
-    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationFloatWorkload, DataType::Float32>(DataLayout::NHWC);
+    NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float32>(DataLayout::NHWC);
 }
 
 template <typename armnn::DataType DataType>

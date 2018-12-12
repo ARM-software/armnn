@@ -697,30 +697,14 @@ public:
         m_Layer->GetOutputSlot(0).SetTensorInfo(m_TensorInfo);
     }
 
-    ConstTensor GetConstTensor(bool swizzleForConvolutionWeights, std::vector<T>& outputTensorData) const
+    ConstTensor GetConstTensor(std::vector<T>& outputTensorData) const
     {
-        // Mappings from TensorFlow filter tensors to the ArmNN filter tensors.
-        // Tensorflow weights are [H, W, In, Out].
-        // ArmNN weights are [Out, In, H, W].
-        static const PermutationVector HWIOToOIHW = {2, 3, 1, 0};
-
-        const TensorInfo outInfo = swizzleForConvolutionWeights
-                                   ? armnnUtils::Permuted(m_TensorInfo, HWIOToOIHW)
-                                   : m_TensorInfo;
-
         outputTensorData.resize(m_TensorInfo.GetNumElements());
 
-        // Copies or swizzles from the permanent storage into the storage the caller provided.
-        if (swizzleForConvolutionWeights)
-        {
-            armnnUtils::Permute(outInfo.GetShape(), HWIOToOIHW, m_Storage.data(), outputTensorData.data());
-        }
-        else
-        {
-            memcpy(outputTensorData.data(), m_Storage.data(), m_TensorInfo.GetNumBytes());
-        }
+        memcpy(outputTensorData.data(), m_Storage.data(), m_TensorInfo.GetNumBytes());
+
         // Updates the result to point to the user provided storage.
-        ConstTensor constTensor(outInfo, outputTensorData);
+        ConstTensor constTensor(m_TensorInfo, outputTensorData);
         return constTensor;
     }
 
@@ -1421,16 +1405,16 @@ ParsedTfOperationPtr TfParser::ParseFusedBatchNorm(const tensorflow::NodeDef& no
     // Data for the parsed tensor args (scale, offset, mean, variance) must be stored
     // locally until the layer is added.
     std::vector<float> scaleTensorData;
-    ConstTensor scaleTensor = scaleNode->GetConstTensor(false, scaleTensorData);
+    ConstTensor scaleTensor = scaleNode->GetConstTensor(scaleTensorData);
 
     std::vector<float> offsetTensorData;
-    ConstTensor offsetTensor = offsetNode->GetConstTensor(false, offsetTensorData);
+    ConstTensor offsetTensor = offsetNode->GetConstTensor(offsetTensorData);
 
     std::vector<float> meanTensorData;
-    ConstTensor meanTensor = meanNode->GetConstTensor(false, meanTensorData);
+    ConstTensor meanTensor = meanNode->GetConstTensor(meanTensorData);
 
     std::vector<float> varianceTensorData;
-    ConstTensor varianceTensor = varianceNode->GetConstTensor(false, varianceTensorData);
+    ConstTensor varianceTensor = varianceNode->GetConstTensor(varianceTensorData);
 
     IConnectableLayer* layer = m_Network->AddBatchNormalizationLayer(desc,
                                                                      meanTensor,
@@ -1481,7 +1465,7 @@ bool TfParser::IsSupportedLeakyReluPattern(const tensorflow::NodeDef& mulNodeDef
                         inputs[alphaLayerIndex].m_IndexedValue);
 
                 std::vector<float> const_data;
-                ConstTensor const_tensor = alpha->GetConstTensor(false, const_data);
+                ConstTensor const_tensor = alpha->GetConstTensor(const_data);
 
                 if (const_data.size() == 1)
                 {
@@ -1715,7 +1699,7 @@ ParsedTfOperationPtr TfParser::ParsePad(const tensorflow::NodeDef& nodeDef,
             boost::polymorphic_downcast<ParsedConstTfOperation<int32_t>*>(inputs[1].m_IndexedValue);
 
     std::vector<int32_t> paddingTensorData;
-    ConstTensor paddingTensor = paddingTensorOp->GetConstTensor(false, paddingTensorData);
+    ConstTensor paddingTensor = paddingTensorOp->GetConstTensor(paddingTensorData);
     // paddings is an integer tensor with shape [n, 2], where n is the rank of tensor
     // and should match the rank of the input tensor that is being padded.
     // For each dimension D of input, paddings[D, 0] indicates how many values to add
@@ -1791,7 +1775,7 @@ ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
 
     // Get the axis tensor data
     std::vector<int32_t> axisTensorData;
-    shapeNode->GetConstTensor(false, axisTensorData);
+    shapeNode->GetConstTensor(axisTensorData);
 
     // This concatDim indicates the data format: 3 is the NHWC, 1 is the NCHW.
     const unsigned int concatDim = static_cast<unsigned int>(axisTensorData[0]);
@@ -1924,7 +1908,7 @@ ParsedTfOperationPtr TfParser::ParseReshape(const tensorflow::NodeDef& nodeDef,
     TensorInfo inputTensorInfo = prevLayerOutputSlot.GetTensorInfo();
 
     std::vector<int32_t> shapeTensorData;
-    ConstTensor shapeTensor = shapeNode->GetConstTensor(false, shapeTensorData);
+    ConstTensor shapeTensor = shapeNode->GetConstTensor(shapeTensorData);
     const TensorInfo outputTensorInfo = PrepareReshape(inputTensorInfo, shapeTensorData);
 
     TensorShape targetShape = outputTensorInfo.GetShape();
@@ -1971,7 +1955,7 @@ ParsedTfOperationPtr TfParser::ParseResizeBilinear(const tensorflow::NodeDef& no
 
     // Data for the parsed tensor args (size) must be stored locally.
     std::vector<int32_t> sizeTensorData;
-    ConstTensor sizeTensor = sizeNode->GetConstTensor(false, sizeTensorData);
+    ConstTensor sizeTensor = sizeNode->GetConstTensor(sizeTensorData);
 
     // The descriptor only has target height and width attributes, which we get from the size tensor.
     ResizeBilinearDescriptor desc;
@@ -2664,7 +2648,7 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
 
     std::vector<float> weightTensorData;
     // Handles weight.
-    ConstTensor weights = weightNode->GetConstTensor(false, weightTensorData);
+    ConstTensor weights = weightNode->GetConstTensor(weightTensorData);
 
     FullyConnectedDescriptor desc;
     desc.m_BiasEnabled = addNodeDef != nullptr;
@@ -2674,7 +2658,7 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
     if (addNodeDef != nullptr)
     {
         std::vector<float> biasTensorData;
-        ConstTensor biases = biasNode->GetConstTensor(false, biasTensorData);
+        ConstTensor biases = biasNode->GetConstTensor(biasTensorData);
 
         if (weights.GetShape()[1] != biases.GetShape()[0])
         {

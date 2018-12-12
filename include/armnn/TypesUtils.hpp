@@ -79,11 +79,12 @@ constexpr unsigned int GetDataTypeSize(DataType dataType)
 {
     switch (dataType)
     {
-        case DataType::Float16:     return 2U;
+        case DataType::Float16:          return 2U;
         case DataType::Float32:
-        case DataType::Signed32:   return 4U;
-        case DataType::QuantisedAsymm8: return 1U;
-        default:                  return 0U;
+        case DataType::Signed32:         return 4U;
+        case DataType::QuantisedAsymm8:  return 1U;
+        case DataType::Boolean:          return 1U;
+        default:                         return 0U;
     }
 }
 
@@ -165,6 +166,12 @@ template<>
 struct GetDataTypeImpl<int32_t>
 {
     static constexpr DataType Value = DataType::Signed32;
+};
+
+template<>
+struct GetDataTypeImpl<bool>
+{
+    static constexpr DataType Value = DataType::Boolean;
 };
 
 template <typename T>

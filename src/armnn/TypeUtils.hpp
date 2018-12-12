@@ -33,6 +33,12 @@ struct ResolveTypeImpl<DataType::Float32>
     using Type = float;
 };
 
+template<>
+struct ResolveTypeImpl<DataType::Boolean>
+{
+    using Type = bool;
+};
+
 template<DataType DT>
 using ResolveType = typename ResolveTypeImpl<DT>::Type;
 

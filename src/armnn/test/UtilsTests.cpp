@@ -20,6 +20,7 @@ BOOST_AUTO_TEST_CASE(DataTypeSize)
     BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::Float32) == 4);
     BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::QuantisedAsymm8) == 1);
     BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::Signed32) == 4);
+    BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::Boolean) == 1);
 }
 
 BOOST_AUTO_TEST_CASE(GetDataTypeTest)
@@ -27,6 +28,7 @@ BOOST_AUTO_TEST_CASE(GetDataTypeTest)
     BOOST_TEST((armnn::GetDataType<float>() == armnn::DataType::Float32));
     BOOST_TEST((armnn::GetDataType<uint8_t>() == armnn::DataType::QuantisedAsymm8));
     BOOST_TEST((armnn::GetDataType<int32_t>() == armnn::DataType::Signed32));
+    BOOST_TEST((armnn::GetDataType<bool>() == armnn::DataType::Boolean));
 }
 
 BOOST_AUTO_TEST_CASE(PermuteDescriptorWithTooManyMappings)

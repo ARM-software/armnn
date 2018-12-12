@@ -26,9 +26,10 @@ enum class Status
 enum class DataType
 {
     Float16 = 0,
-    Float32   = 1,
+    Float32 = 1,
     QuantisedAsymm8 = 2,
-    Signed32  = 3
+    Signed32 = 3,
+    Boolean = 4
 };
 
 enum class DataLayout

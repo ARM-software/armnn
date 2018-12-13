@@ -2,14 +2,15 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
-#include "ArithmeticBaseLayer.hpp"
+#include "ElementwiseBaseLayer.hpp"
 
 namespace armnn
 {
 
-class SubtractionLayer : public ArithmeticBaseLayer
+class SubtractionLayer : public ElementwiseBaseLayer
 {
 public:
     virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,

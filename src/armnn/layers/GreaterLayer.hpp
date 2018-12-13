@@ -10,17 +10,17 @@
 namespace armnn
 {
 
-class DivisionLayer : public ElementwiseBaseLayer
+class GreaterLayer : public ElementwiseBaseLayer
 {
 public:
     virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,
                                                       const IWorkloadFactory& factory) const override;
 
-    DivisionLayer* Clone(Graph& graph) const override;
+    GreaterLayer* Clone(Graph& graph) const override;
 
 protected:
-    DivisionLayer(const char* name);
-    ~DivisionLayer() = default;
+    GreaterLayer(const char* name);
+    ~GreaterLayer() = default;
 };
 
-} // namespace
+} //namespace armnn

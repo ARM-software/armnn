@@ -84,7 +84,6 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/VerificationHelpers.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
-        src/armnn/layers/ArithmeticBaseLayer.cpp \
         src/armnn/layers/BatchNormalizationLayer.cpp \
         src/armnn/layers/BatchToSpaceNdLayer.cpp \
         src/armnn/layers/ConstantLayer.cpp \
@@ -93,9 +92,11 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ConvertFp32ToFp16Layer.cpp \
         src/armnn/layers/DebugLayer.cpp \
         src/armnn/layers/DepthwiseConvolution2dLayer.cpp \
+        src/armnn/layers/ElementwiseBaseLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
         src/armnn/layers/FloorLayer.cpp \
         src/armnn/layers/FullyConnectedLayer.cpp \
+        src/armnn/layers/GreaterLayer.cpp \
         src/armnn/layers/InputLayer.cpp \
         src/armnn/layers/L2NormalizationLayer.cpp \
         src/armnn/layers/LstmLayer.cpp \

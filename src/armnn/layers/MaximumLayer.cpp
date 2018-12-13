@@ -14,8 +14,9 @@ namespace armnn
 {
 
 MaximumLayer::MaximumLayer(const char* name)
-: ArithmeticBaseLayer(2, 1, LayerType::Maximum, name)
-{}
+    : ElementwiseBaseLayer(2, 1, LayerType::Maximum, name)
+{
+}
 
 std::unique_ptr<IWorkload> MaximumLayer::CreateWorkload(const Graph& graph,
                                                         const IWorkloadFactory& factory) const

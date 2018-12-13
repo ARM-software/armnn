@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "DivisionLayer.hpp"
 
 #include "LayerCloneBase.hpp"
@@ -14,7 +15,7 @@ namespace armnn
 {
 
 DivisionLayer::DivisionLayer(const char* name)
-    : ArithmeticBaseLayer(2, 1, LayerType::Division, name)
+    : ElementwiseBaseLayer(2, 1, LayerType::Division, name)
 {
 }
 

@@ -2,7 +2,8 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "ArithmeticBaseLayer.hpp"
+
+#include "ElementwiseBaseLayer.hpp"
 
 #include "InternalTypes.hpp"
 #include "armnn/Exceptions.hpp"
@@ -13,13 +14,13 @@
 namespace armnn
 {
 
-ArithmeticBaseLayer::ArithmeticBaseLayer(unsigned int numInputSlots, unsigned int numOutputSlots,
-                                         LayerType type, const char* name)
+ElementwiseBaseLayer::ElementwiseBaseLayer(unsigned int numInputSlots, unsigned int numOutputSlots,
+                                           LayerType type, const char* name)
     : Layer(numInputSlots, numOutputSlots, type, name)
 {
 }
 
-std::vector<TensorShape> ArithmeticBaseLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
+std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
     BOOST_ASSERT(inputShapes.size() == 2);
     auto& input0 = inputShapes[0];
@@ -47,7 +48,7 @@ std::vector<TensorShape> ArithmeticBaseLayer::InferOutputShapes(const std::vecto
     return std::vector<TensorShape>({ TensorShape(numDims, dims.data()) });
 }
 
-void ArithmeticBaseLayer::ValidateTensorShapesFromInputs()
+void ElementwiseBaseLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(2, CHECK_LOCATION());
 

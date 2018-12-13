@@ -20,6 +20,7 @@
 #include "layers/FakeQuantizationLayer.hpp"
 #include "layers/FloorLayer.hpp"
 #include "layers/FullyConnectedLayer.hpp"
+#include "layers/GreaterLayer.hpp"
 #include "layers/InputLayer.hpp"
 #include "layers/L2NormalizationLayer.hpp"
 #include "layers/LstmLayer.hpp"
@@ -83,6 +84,7 @@ DECLARE_LAYER(Division)
 DECLARE_LAYER(FakeQuantization)
 DECLARE_LAYER(Floor)
 DECLARE_LAYER(FullyConnected)
+DECLARE_LAYER(Greater)
 DECLARE_LAYER(Input)
 DECLARE_LAYER(L2Normalization)
 DECLARE_LAYER(Lstm)

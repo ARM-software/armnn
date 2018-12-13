@@ -342,6 +342,8 @@ DECLARE_LAYER_POLICY_1_PARAM(Floor)
 
 DECLARE_LAYER_POLICY_2_PARAM(FullyConnected)
 
+DECLARE_LAYER_POLICY_1_PARAM(Greater)
+
 DECLARE_LAYER_POLICY_CUSTOM_PARAM(Input, armnn::LayerBindingId)
 
 DECLARE_LAYER_POLICY_2_PARAM(L2Normalization)
@@ -516,7 +518,7 @@ template<typename FactoryType, armnn::DataType DataType, armnn::LayerType Type>
 bool IsLayerSupportedTestsImpl(FactoryType *factory, Tag<armnn::LayerType::LastLayer>)
 {
     return IsLayerSupportedTest<FactoryType, DataType, Type>(factory, Tag<Type>());
-};
+}
 
 // Recursive function to test and enter in the LayerType enum and then iterate on the next entry.
 template<typename FactoryType, armnn::DataType DataType, armnn::LayerType Type>
@@ -527,14 +529,14 @@ bool IsLayerSupportedTestsImpl(FactoryType *factory, Tag<Type>)
     return v &&
     IsLayerSupportedTestsImpl<FactoryType, DataType, NextType(Type)>
         (factory, Tag<NextType(Type)>());
-};
+}
 
 // Helper function to pass through to the test framework.
 template<typename FactoryType, armnn::DataType DataType>
 bool IsLayerSupportedTests(FactoryType *factory)
 {
     return IsLayerSupportedTestsImpl<FactoryType, DataType>(factory, Tag<armnn::LayerType::FirstLayer>());
-};
+}
 
 template<armnn::LayerType Type>
 bool TestLayerTypeMatches()
@@ -549,20 +551,20 @@ bool TestLayerTypeMatches()
     bool v = Type == layer.m_Layer->GetType();
     BOOST_CHECK_MESSAGE(v, ss.str());
     return v;
-};
+}
 
 template<armnn::LayerType Type>
 bool LayerTypeMatchesTestImpl(Tag<armnn::LayerType::LastLayer>)
 {
     return TestLayerTypeMatches<Type>();
-};
+}
 
 template<armnn::LayerType Type>
 bool LayerTypeMatchesTestImpl(Tag<Type>)
 {
     return TestLayerTypeMatches<Type>() &&
         LayerTypeMatchesTestImpl<NextType(Type)>(Tag<NextType(Type)>());
-};
+}
 
 template<typename FactoryType, typename LayerType, armnn::DataType InputDataType , armnn::DataType OutputDataType>
 bool IsConvertLayerSupportedTests(std::string& reasonIfUnsupported)
@@ -584,6 +586,6 @@ bool IsConvertLayerSupportedTests(std::string& reasonIfUnsupported)
     bool result = FactoryType::IsLayerSupported(*layer, InputDataType, reasonIfUnsupported);
 
     return result;
-};
+}
 
 } //namespace

@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "MinimumLayer.hpp"
 
 #include "LayerCloneBase.hpp"
@@ -14,7 +15,7 @@ namespace armnn
 {
 
 MinimumLayer::MinimumLayer(const char* name)
-    : ArithmeticBaseLayer(2, 1, LayerType::Minimum, name)
+    : ElementwiseBaseLayer(2, 1, LayerType::Minimum, name)
 {
 }
 

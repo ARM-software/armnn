@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "SubtractionLayer.hpp"
 
 #include "LayerCloneBase.hpp"
@@ -14,7 +15,7 @@ namespace armnn
 {
 
 SubtractionLayer::SubtractionLayer(const char* name)
-    : ArithmeticBaseLayer(2, 1, LayerType::Subtraction, name)
+    : ElementwiseBaseLayer(2, 1, LayerType::Subtraction, name)
 {
 }
 

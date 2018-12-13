@@ -28,6 +28,7 @@ enum class LayerType
     FakeQuantization,
     Floor,
     FullyConnected,
+    Greater,
     Input,
     L2Normalization,
     Lstm,

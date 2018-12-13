@@ -28,6 +28,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::FakeQuantization: return "FakeQuantization";
         case LayerType::Floor: return "Floor";
         case LayerType::FullyConnected: return "FullyConnected";
+        case LayerType::Greater: return "Greater";
         case LayerType::Input: return "Input";
         case LayerType::L2Normalization: return "L2Normalization";
         case LayerType::Lstm: return "Lstm";
@@ -39,6 +40,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Multiplication: return "Multiplication";
         case LayerType::Normalization: return "Normalization";
         case LayerType::Output: return "Output";
+        case LayerType::Pad: return "Pad";
         case LayerType::Permute: return "Permute";
         case LayerType::Pooling2d: return "Pooling2d";
         case LayerType::Reshape: return "Reshape";
@@ -48,7 +50,6 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Splitter: return "Splitter";
         case LayerType::StridedSlice: return "StridedSlice";
         case LayerType::Subtraction: return "Subtraction";
-        case LayerType::Pad: return "Pad";
         default:
             BOOST_ASSERT_MSG(false, "Unknown layer type");
             return "Unknown";

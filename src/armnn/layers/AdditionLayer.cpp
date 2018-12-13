@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "AdditionLayer.hpp"
 
 #include "LayerCloneBase.hpp"
@@ -14,7 +15,7 @@ namespace armnn
 {
 
 AdditionLayer::AdditionLayer(const char* name)
-    : ArithmeticBaseLayer(2, 1, LayerType::Addition, name)
+    : ElementwiseBaseLayer(2, 1, LayerType::Addition, name)
 {
 }
 

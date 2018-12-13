@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include "ArithmeticBaseLayer.hpp"
+#include "ElementwiseBaseLayer.hpp"
 
 namespace armnn
 {
 
-class MinimumLayer : public ArithmeticBaseLayer
+class MinimumLayer : public ElementwiseBaseLayer
 {
 public:
     virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph,

@@ -176,8 +176,6 @@ list(APPEND armnn_sources
     src/armnn/layers/ActivationLayer.cpp
     src/armnn/layers/AdditionLayer.hpp
     src/armnn/layers/AdditionLayer.cpp
-    src/armnn/layers/ArithmeticBaseLayer.hpp
-    src/armnn/layers/ArithmeticBaseLayer.cpp
     src/armnn/layers/BatchNormalizationLayer.hpp
     src/armnn/layers/BatchNormalizationLayer.cpp
     src/armnn/layers/BatchToSpaceNdLayer.hpp
@@ -194,12 +192,16 @@ list(APPEND armnn_sources
     src/armnn/layers/DebugLayer.cpp
     src/armnn/layers/DepthwiseConvolution2dLayer.hpp
     src/armnn/layers/DepthwiseConvolution2dLayer.cpp
+    src/armnn/layers/ElementwiseBaseLayer.hpp
+    src/armnn/layers/ElementwiseBaseLayer.cpp
     src/armnn/layers/FakeQuantizationLayer.hpp
     src/armnn/layers/FakeQuantizationLayer.cpp
     src/armnn/layers/FloorLayer.hpp
     src/armnn/layers/FloorLayer.cpp
     src/armnn/layers/FullyConnectedLayer.hpp
     src/armnn/layers/FullyConnectedLayer.cpp
+    src/armnn/layers/GreaterLayer.cpp
+    src/armnn/layers/GreaterLayer.hpp
     src/armnn/layers/InputLayer.hpp
     src/armnn/layers/InputLayer.cpp
     src/armnn/layers/L2NormalizationLayer.hpp

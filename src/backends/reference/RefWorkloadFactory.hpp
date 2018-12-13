@@ -156,6 +156,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateMinimum(const MinimumQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreateGreater(const GreaterQueueDescriptor& descriptor,
+                                                     const WorkloadInfo& info) const override;
+
     virtual std::unique_ptr<IWorkload> CreateDebug(const DebugQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 private:

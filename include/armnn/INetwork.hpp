@@ -328,6 +328,11 @@ public:
     /// @ return - Interface for configuring the layer.
     virtual IConnectableLayer* AddMinimumLayer(const char* name = nullptr) = 0;
 
+    /// Add a Greater layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @ return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddGreaterLayer(const char* name = nullptr) = 0;
+
 protected:
     ~INetwork() {}
 };

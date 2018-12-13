@@ -208,6 +208,11 @@ public:
                                         const TensorInfo& input1,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
+    virtual bool IsGreaterSupported(const TensorInfo& input0,
+                                    const TensorInfo& input1,
+                                    const TensorInfo& ouput,
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 }; // class ILayerSupport
 
 using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;

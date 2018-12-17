@@ -153,7 +153,7 @@ void ValidateBiasTensorQuantization(const TensorInfo& biasTensor, const TensorIn
             to_string(biasTensor.GetQuantizationOffset()));
     }
     const float expectedScale = inputTensorInfo.GetQuantizationScale() * weightsTensorInfo.GetQuantizationScale();
-    if (std::abs(biasTensor.GetQuantizationScale() - expectedScale) > 0.000000001f)
+    if (std::abs(biasTensor.GetQuantizationScale() - expectedScale) > 0.00000001f)
     {
         // Print the float values with extra precision to see very small differences
         std::stringstream msg;

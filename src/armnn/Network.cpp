@@ -722,6 +722,11 @@ IConnectableLayer* Network::AddGreaterLayer(const char* name)
     return m_Graph->AddLayer<GreaterLayer>(name);
 }
 
+IConnectableLayer* Network::AddEqualLayer(const char* name)
+{
+    return m_Graph->AddLayer<GreaterLayer>(name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

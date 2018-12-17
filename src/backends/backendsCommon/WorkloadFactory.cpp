@@ -240,6 +240,17 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                      reason);
             break;
         }
+        case LayerType::Equal:
+        {
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsEqualSupported(OverrideDataType(input0, dataType),
+                                                          OverrideDataType(input1, dataType),
+                                                          OverrideDataType(output, dataType),
+                                                          reason);
+            break;
+        }
         case LayerType::FakeQuantization:
         {
             auto cLayer = boost::polymorphic_downcast<const FakeQuantizationLayer*>(&layer);

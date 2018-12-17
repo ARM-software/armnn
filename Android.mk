@@ -93,6 +93,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/DebugLayer.cpp \
         src/armnn/layers/DepthwiseConvolution2dLayer.cpp \
         src/armnn/layers/ElementwiseBaseLayer.cpp \
+        src/armnn/layers/EqualLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
         src/armnn/layers/FloorLayer.cpp \
         src/armnn/layers/FullyConnectedLayer.cpp \

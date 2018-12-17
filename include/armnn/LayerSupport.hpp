@@ -295,4 +295,11 @@ bool IsGreaterSupported(const BackendId& backend,
                         char* reasonIfUnsupported = nullptr,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsEqualSupported(const BackendId& backend,
+                      const TensorInfo& input0,
+                      const TensorInfo& input1,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported = nullptr,
+                      size_t reasonIfUnsupportedMaxLength = 1024);
 }

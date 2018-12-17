@@ -194,6 +194,8 @@ list(APPEND armnn_sources
     src/armnn/layers/DepthwiseConvolution2dLayer.cpp
     src/armnn/layers/ElementwiseBaseLayer.hpp
     src/armnn/layers/ElementwiseBaseLayer.cpp
+    src/armnn/layers/EqualLayer.hpp
+    src/armnn/layers/EqualLayer.cpp
     src/armnn/layers/FakeQuantizationLayer.hpp
     src/armnn/layers/FakeQuantizationLayer.cpp
     src/armnn/layers/FloorLayer.hpp

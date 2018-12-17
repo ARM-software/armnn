@@ -17,6 +17,7 @@
 #include "layers/DebugLayer.hpp"
 #include "layers/DepthwiseConvolution2dLayer.hpp"
 #include "layers/DivisionLayer.hpp"
+#include "layers/EqualLayer.hpp"
 #include "layers/FakeQuantizationLayer.hpp"
 #include "layers/FloorLayer.hpp"
 #include "layers/FullyConnectedLayer.hpp"
@@ -81,6 +82,7 @@ DECLARE_LAYER(Convolution2d)
 DECLARE_LAYER(Debug)
 DECLARE_LAYER(DepthwiseConvolution2d)
 DECLARE_LAYER(Division)
+DECLARE_LAYER(Equal)
 DECLARE_LAYER(FakeQuantization)
 DECLARE_LAYER(Floor)
 DECLARE_LAYER(FullyConnected)

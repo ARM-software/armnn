@@ -282,6 +282,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePad(const PadQueueDescript
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
+{
+    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                                      const WorkloadInfo& info) const
 {

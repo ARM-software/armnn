@@ -25,6 +25,7 @@ enum class LayerType
     Debug,
     DepthwiseConvolution2d,
     Division,
+    Equal,
     FakeQuantization,
     Floor,
     FullyConnected,

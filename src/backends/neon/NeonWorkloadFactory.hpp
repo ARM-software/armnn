@@ -130,6 +130,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreatePad(const PadQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreateEqual(const EqualQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const override;
+
     virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& Info) const override;
 

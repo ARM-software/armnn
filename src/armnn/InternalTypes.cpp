@@ -25,6 +25,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Debug: return "Debug";
         case LayerType::DepthwiseConvolution2d: return "DepthwiseConvolution2d";
         case LayerType::Division: return "Division";
+        case LayerType::Equal: return "Equal";
         case LayerType::FakeQuantization: return "FakeQuantization";
         case LayerType::Floor: return "Floor";
         case LayerType::FullyConnected: return "FullyConnected";

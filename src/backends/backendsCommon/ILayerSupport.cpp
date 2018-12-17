@@ -123,6 +123,14 @@ bool ILayerSupport::IsDivisionSupported(const TensorInfo& input0,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool ILayerSupport::IsEqualSupported(const armnn::TensorInfo& input0,
+                                     const armnn::TensorInfo& input1,
+                                     const armnn::TensorInfo& output,
+                                     armnn::Optional<std::string &> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool ILayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
                                                 const FakeQuantizationDescriptor& descriptor,
                                                 Optional<std::string&> reasonIfUnsupported) const

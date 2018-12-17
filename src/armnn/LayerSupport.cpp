@@ -455,4 +455,14 @@ bool IsGreaterSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsGreaterSupported, input0, input1, output);
 }
 
+bool IsEqualSupported(const BackendId& backend,
+                      const TensorInfo& input0,
+                      const TensorInfo& input1,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsEqualSupported, input0, input1, output);
+}
+
 }

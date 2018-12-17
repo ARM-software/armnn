@@ -193,6 +193,7 @@ public:
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsResizeBilinearSupported(const TensorInfo& input,
+                                   const TensorInfo& output,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsRsqrtSupported(const TensorInfo& input,

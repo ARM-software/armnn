@@ -513,8 +513,10 @@ bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
 }
 
 bool RefLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
+    ignore_unused(output);
     return IsSupportedForDataTypeRef(reasonIfUnsupported,
                                      input.GetDataType(),
                                      &TrueFunc<>,

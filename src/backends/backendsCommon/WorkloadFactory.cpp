@@ -620,7 +620,10 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         case LayerType::ResizeBilinear:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            result = layerSupportObject->IsResizeBilinearSupported(OverrideDataType(input, dataType), reason);
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsResizeBilinearSupported(OverrideDataType(input, dataType),
+                                                                   OverrideDataType(output, dataType),
+                                                                   reason);
             break;
         }
         case LayerType::Rsqrt:

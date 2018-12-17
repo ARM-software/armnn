@@ -431,10 +431,11 @@ bool IsReshapeSupported(const BackendId& backend,
 
 bool IsResizeBilinearSupported(const BackendId& backend,
                                const TensorInfo& input,
+                               const TensorInfo& output,
                                char* reasonIfUnsupported,
                                size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsResizeBilinearSupported, input);
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsResizeBilinearSupported, input, output);
 }
 
 bool IsRsqrtSupported(const BackendId& backend,

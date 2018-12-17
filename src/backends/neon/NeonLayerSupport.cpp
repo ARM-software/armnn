@@ -32,6 +32,7 @@
 #include "workloads/NeonFullyConnectedWorkload.hpp"
 #include "workloads/NeonPermuteWorkload.hpp"
 #include "workloads/NeonPooling2dWorkload.hpp"
+#include "workloads/NeonResizeBilinearWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
 #include "workloads/NeonSubtractionFloatWorkload.hpp"
 #endif
@@ -372,6 +373,16 @@ bool NeonLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                       input.GetDataType(),
                                       &TrueFunc<>,
                                       &TrueFunc<>);
+}
+
+bool NeonLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonResizeBilinearWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool NeonLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

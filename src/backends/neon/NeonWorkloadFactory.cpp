@@ -203,7 +203,7 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateResizeBilinear(
     const ResizeBilinearQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return nullptr;
+    return std::make_unique<NeonResizeBilinearWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFakeQuantization(

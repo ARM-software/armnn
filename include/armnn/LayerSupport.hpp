@@ -275,6 +275,7 @@ bool IsReshapeSupported(const BackendId& backend,
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsResizeBilinearSupported(const BackendId& backend,
                                const TensorInfo& input,
+                               const TensorInfo& output,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 

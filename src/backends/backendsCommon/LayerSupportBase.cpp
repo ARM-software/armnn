@@ -316,6 +316,7 @@ bool LayerSupportBase::IsReshapeSupported(const TensorInfo& input,
 }
 
 bool LayerSupportBase::IsResizeBilinearSupported(const TensorInfo& input,
+                                                 const TensorInfo& output,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);

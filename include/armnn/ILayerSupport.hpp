@@ -213,6 +213,7 @@ public:
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsResizeBilinearSupported(const TensorInfo& input,
+                                           const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsRsqrtSupported(const TensorInfo& input,

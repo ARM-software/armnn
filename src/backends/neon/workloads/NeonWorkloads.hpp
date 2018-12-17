@@ -25,6 +25,7 @@
 #include "NeonPermuteWorkload.hpp"
 #include "NeonPooling2dWorkload.hpp"
 #include "NeonReshapeWorkload.hpp"
+#include "NeonResizeBilinearWorkload.hpp"
 #include "NeonSoftmaxFloatWorkload.hpp"
 #include "NeonSoftmaxUint8Workload.hpp"
 #include "NeonSplitterWorkload.hpp"

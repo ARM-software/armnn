@@ -46,6 +46,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonPooling2dWorkload.hpp
     NeonReshapeWorkload.cpp
     NeonReshapeWorkload.hpp
+    NeonResizeBilinearWorkload.cpp
+    NeonResizeBilinearWorkload.hpp
     NeonSoftmaxBaseWorkload.cpp
     NeonSoftmaxBaseWorkload.hpp
     NeonSoftmaxFloatWorkload.cpp

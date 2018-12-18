@@ -102,6 +102,7 @@ private:
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
     void ParseAdd(size_t subgraphIndex, size_t operatorIndex);
+    void ParseMul(size_t subgraphIndex, size_t operatorIndex);
 
     void ParsePool(size_t subgraphIndex, size_t operatorIndex, armnn::PoolingAlgorithm algorithm);
 

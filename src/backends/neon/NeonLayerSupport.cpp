@@ -210,6 +210,18 @@ bool NeonLayerSupport::IsDivisionSupported(const TensorInfo& input0,
     return false;
 }
 
+bool NeonLayerSupport::IsEqualSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(input0);
+    ignore_unused(input1);
+    ignore_unused(output);
+    ignore_unused(reasonIfUnsupported);
+    return false;
+}
+
 bool NeonLayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
                                                    const FakeQuantizationDescriptor& descriptor,
                                                    Optional<std::string&> reasonIfUnsupported) const

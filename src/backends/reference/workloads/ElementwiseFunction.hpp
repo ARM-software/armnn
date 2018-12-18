@@ -14,11 +14,11 @@ template <typename Functor>
 struct ElementwiseFunction
 {
     ElementwiseFunction(const TensorShape& inShape0,
-                       const TensorShape& inShape1,
-                       const TensorShape& outShape,
-                       const float* inData0,
-                       const float* inData1,
-                       float* outData);
+                        const TensorShape& inShape1,
+                        const TensorShape& outShape,
+                        const float* inData0,
+                        const float* inData1,
+                        float* outData);
 };
 
 } //namespace armnn

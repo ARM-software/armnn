@@ -61,6 +61,11 @@ public:
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsEqualSupported(const TensorInfo& input0,
+                          const TensorInfo& input1,
+                          const TensorInfo& output,
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsFakeQuantizationSupported(const TensorInfo& input,
                                      const FakeQuantizationDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

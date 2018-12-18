@@ -15,11 +15,11 @@ namespace armnn
 
 template <typename Functor>
 ElementwiseFunction<Functor>::ElementwiseFunction(const TensorShape& inShape0,
-                                                const TensorShape& inShape1,
-                                                const TensorShape& outShape,
-                                                const float* inData0,
-                                                const float* inData1,
-                                                float* outData)
+                                                  const TensorShape& inShape1,
+                                                  const TensorShape& outShape,
+                                                  const float* inData0,
+                                                  const float* inData1,
+                                                  float* outData)
 {
     BroadcastLoop(inShape0, inShape1, outShape).Unroll(Functor(), 0, inData0, inData1, outData);
 }
@@ -32,3 +32,4 @@ template struct armnn::ElementwiseFunction<std::multiplies<float>>;
 template struct armnn::ElementwiseFunction<std::divides<float>>;
 template struct armnn::ElementwiseFunction<armnn::maximum<float>>;
 template struct armnn::ElementwiseFunction<armnn::minimum<float>>;
+template struct armnn::ElementwiseFunction<std::equal_to<float>>;

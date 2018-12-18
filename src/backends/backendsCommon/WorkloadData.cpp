@@ -1013,4 +1013,17 @@ void DebugQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateSingleOutput(workloadInfo, "DebugQueueDescriptor");
 }
 
+void EqualQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTwoInputs(workloadInfo, "EqualQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "EqualQueueDescriptor");
+
+    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                                       workloadInfo.m_InputTensorInfos[1],
+                                       workloadInfo.m_OutputTensorInfos[0],
+                                       "EqualQueueDescriptor",
+                                       "first input",
+                                       "second input");
+}
+
 } //namespace armnn

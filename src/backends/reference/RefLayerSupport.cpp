@@ -203,6 +203,21 @@ bool RefLayerSupport::IsDivisionSupported(const TensorInfo& input0,
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsEqualSupported(const TensorInfo& input0,
+                                       const TensorInfo& input1,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(input0);
+    ignore_unused(input1);
+    ignore_unused(output);
+    ignore_unused(reasonIfUnsupported);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input0.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool RefLayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
                                                   const FakeQuantizationDescriptor& descriptor,
                                                   Optional<std::string&> reasonIfUnsupported) const

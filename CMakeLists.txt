@@ -398,6 +398,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Equal.cpp
             src/armnnTfParser/test/ExpandDims.cpp
             src/armnnTfParser/test/FusedBatchNorm.cpp
+            src/armnnTfParser/test/Greater.cpp
             src/armnnTfParser/test/Identity.cpp
             src/armnnTfParser/test/LocalResponseNormalization.cpp
             src/armnnTfParser/test/Maximum.cpp

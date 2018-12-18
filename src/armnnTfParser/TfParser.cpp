@@ -333,6 +333,7 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "DepthwiseConv2dNative", &TfParser::ParseDepthwiseConv2D },
     { "ExpandDims",            &TfParser::ParseExpandDims },
     { "FusedBatchNorm",        &TfParser::ParseFusedBatchNorm },
+    { "Greater",               &TfParser::ParseGreater},
     { "ConcatV2",              &TfParser::ParseConcat },
     { "LRN",                   &TfParser::ParseLrn },
     { "MatMul",                &TfParser::ParseMatMul },
@@ -1590,6 +1591,18 @@ ParsedTfOperationPtr TfParser::ProcessElementwiseLayer(
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+}
+
+ParsedTfOperationPtr TfParser::ParseGreater(const tensorflow::NodeDef& nodeDef,
+                                            const tensorflow::GraphDef& graphDef)
+{
+    std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Greater");
+    IOutputSlot* input0Slot = inputLayers.first;
+    IOutputSlot* input1Slot = inputLayers.second;
+
+    IConnectableLayer* const layer = m_Network->AddGreaterLayer(nodeDef.name().c_str());
+
+    return ProcessElementwiseLayer(input0Slot, input1Slot, layer, nodeDef);
 }
 
 ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,

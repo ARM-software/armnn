@@ -18,7 +18,7 @@ ConstCpuTensorHandle::ConstCpuTensorHandle(const TensorInfo& tensorInfo)
 }
 
 template <>
-const void* ConstCpuTensorHandle::GetConstTensor() const
+const void* ConstCpuTensorHandle::GetConstTensor<void>() const
 {
     return m_Memory;
 }
@@ -30,7 +30,7 @@ CpuTensorHandle::CpuTensorHandle(const TensorInfo& tensorInfo)
 }
 
 template <>
-void* CpuTensorHandle::GetTensor() const
+void* CpuTensorHandle::GetTensor<void>() const
 {
     return m_MutableMemory;
 }

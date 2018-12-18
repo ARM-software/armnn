@@ -414,18 +414,18 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
 {
     // Creates the layer we're testing.
     DepthwiseConvolution2dDescriptor layerDesc;
-    layerDesc.m_PadLeft         = 1;
-    layerDesc.m_PadRight        = 2;
-    layerDesc.m_PadTop          = 1;
-    layerDesc.m_PadBottom       = 2;
-    layerDesc.m_StrideX         = 1;
-    layerDesc.m_StrideY         = 1;
-    layerDesc.m_BiasEnabled     = false;
-    layerDesc.m_DataLayout = dataLayout;
+    layerDesc.m_PadLeft     = 1;
+    layerDesc.m_PadRight    = 2;
+    layerDesc.m_PadTop      = 1;
+    layerDesc.m_PadBottom   = 2;
+    layerDesc.m_StrideX     = 1;
+    layerDesc.m_StrideY     = 1;
+    layerDesc.m_BiasEnabled = false;
+    layerDesc.m_DataLayout  = dataLayout;
 
     DepthwiseConvolution2dLayer* const layer = graph.AddLayer<DepthwiseConvolution2dLayer>(layerDesc, "layer");
 
-    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({1, 4, 4, 2}, DataType));
+    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(TensorInfo({1, 2, 4, 4}, DataType)); // [ M, I, H, W ]
     layer->m_Weight->Allocate();
 
     // Creates extra layers.
@@ -457,7 +457,7 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
 
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
     BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
-    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({1, 4, 4, 2}, DataType)));
+    BOOST_TEST((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({1, 2, 4, 4}, DataType)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

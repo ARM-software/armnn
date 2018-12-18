@@ -327,7 +327,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const boost::multi_array<T, 4>& input,
-    const boost::multi_array<T, 4>& originalKernel,
+    const boost::multi_array<T, 4>& kernel,
     const boost::multi_array<B, 1>& bias,
     const boost::multi_array<T, 4>& outputExpected,
     float qScale,
@@ -344,10 +344,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[1]);
     unsigned int inputHeight    = boost::numeric_cast<unsigned int>(input.shape()[2]);
     unsigned int inputWidth     = boost::numeric_cast<unsigned int>(input.shape()[3]);
-    unsigned int kernelChanMul  = boost::numeric_cast<unsigned int>(originalKernel.shape()[0]);
-    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(originalKernel.shape()[1]);
-    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(originalKernel.shape()[2]);
-    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(originalKernel.shape()[3]);
+    unsigned int kernelChanMul  = boost::numeric_cast<unsigned int>(kernel.shape()[0]);
+    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(kernel.shape()[1]);
+    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(kernel.shape()[2]);
+    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(kernel.shape()[3]);
     unsigned int outputNum      = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
     unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
     unsigned int outputHeight   = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
@@ -362,8 +362,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
             armnnUtils::GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
     armnn::TensorInfo outputTensorInfo =
             armnnUtils::GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
-    armnn::TensorInfo kernelDesc =
-            armnnUtils::GetTensorInfo<T>(kernelChanMul, kernelChannels, kernelHeight, kernelWidth, layout);
+    armnn::TensorInfo kernelDesc({kernelChanMul, kernelChannels, kernelHeight, kernelWidth}, armnn::GetDataType<T>());
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -423,13 +422,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
 
     armnn::ScopedCpuTensorHandle weightsTensor(kernelDesc);
 
-    // Permute the kernel if necessary
-    boost::multi_array<T, 4> kernel = boost::multi_array<T, 4>(originalKernel);
-    if (layout == armnn::DataLayout::NHWC)
-    {
-        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernel.data(), kernel.data());
-    }
-
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
 
     armnn::ScopedCpuTensorHandle biasTensor(biasDesc);
@@ -484,6 +476,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     unsigned int kernelHeight = 3;
     unsigned int kernelWidth = 3;
     unsigned int kernelChannels = inputChannels;
+    unsigned int kernelDepthMultiplier = 1;
 
     unsigned int outputHeight = 1;
     unsigned int outputWidth = 1;
@@ -494,7 +487,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
             armnnUtils::GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
     armnn::TensorInfo outputTensorInfo =
             armnnUtils::GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
-    armnn::TensorInfo kernelDesc = armnnUtils::GetTensorInfo<T>(1, outputChannels, kernelHeight, kernelWidth, layout);
+    armnn::TensorInfo kernelDesc({kernelDepthMultiplier, kernelChannels, kernelHeight, kernelWidth},
+                                 armnn::GetDataType<T>());
     armnn::TensorInfo biasDesc({ outputChannels }, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -543,12 +537,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
                     0.f, 0.f,  0.f,
                     -1.f, 0.f, -1.f,
             }));
-    if (layout == armnn::DataLayout::NHWC)
-    {
-        std::vector<T> tmp(kernelData.size());
-        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, kernelData.data(), tmp.data());
-        kernelData = tmp;
-    }
     auto kernel = MakeTensor<T, 4>(kernelDesc, kernelData);
 
     // Manually calculated.
@@ -642,8 +630,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
             inputBatchSize, inputChannels, inputHeight, inputWidth, layout);
     armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(
             outputBatchSize, outputChannels, outputHeight, outputWidth, layout);
-    armnn::TensorInfo kernelDesc = armnnUtils::GetTensorInfo<T>(
-            depthMultiplier, inputChannels, kernelHeight, kernelWidth, layout);
+    armnn::TensorInfo kernelDesc({depthMultiplier, inputChannels, kernelHeight, kernelWidth},
+                                 armnn::GetDataType<T>());
     armnn::TensorInfo biasDesc({outputChannels}, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -692,7 +680,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
         {0, 2, 1, -1}));
     auto bias = MakeTensor<B, 1>(biasDesc, biasV);
 
-    std::vector<T> originalKernelData = std::vector<T>(
+    std::vector<T> kernelData = std::vector<T>(
             QuantizedVector<T>(kernelDesc.GetQuantizationScale(), kernelDesc.GetQuantizationOffset(), {
                     1, 1, 1,
                     1, -1, 1,
@@ -717,12 +705,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
                     0, 1, 0,
                     0, 0, 0,
                     0, 0, 0
+
             }));
-    std::vector<T> kernelData = originalKernelData;
-    if (layout == armnn::DataLayout::NHWC)
-    {
-        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernelData.data(), kernelData.data());
-    }
     auto kernel = MakeTensor<T, 4>(kernelDesc, kernelData);
 
     // Manually calculated.
@@ -840,9 +824,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
     unsigned int inputWidth     = boost::numeric_cast<unsigned int>(input.shape()[2]);
 
     unsigned int kernelChanMul  = boost::numeric_cast<unsigned int>(kernel.shape()[0]);
-    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(kernel.shape()[3]);
-    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(kernel.shape()[1]);
-    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(kernel.shape()[2]);
+    unsigned int kernelChannels = boost::numeric_cast<unsigned int>(kernel.shape()[1]);
+    unsigned int kernelHeight   = boost::numeric_cast<unsigned int>(kernel.shape()[2]);
+    unsigned int kernelWidth    = boost::numeric_cast<unsigned int>(kernel.shape()[3]);
 
     unsigned int outputNum      = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
     unsigned int outputChannels = boost::numeric_cast<unsigned int>(outputExpected.shape()[3]);
@@ -853,7 +837,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
     armnn::TensorInfo inputTensorInfo({inputNum, inputHeight, inputWidth, inputChannels}, armnn::GetDataType<T>());
     armnn::TensorInfo outputTensorInfo({outputNum, outputHeight, outputWidth, outputChannels},
                                        armnn::GetDataType<T>());
-    armnn::TensorInfo kernelDesc({kernelChanMul, kernelHeight, kernelWidth, kernelChannels}, armnn::GetDataType<T>());
+    armnn::TensorInfo kernelDesc({kernelChanMul, kernelChannels, kernelHeight, kernelWidth}, armnn::GetDataType<T>());
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
 
     // Set quantization parameters if the requested type is a quantized type.
@@ -1068,10 +1052,10 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     armnn::TensorInfo kernelDesc;
     armnn::TensorInfo biasDesc;
 
-    unsigned int inputShape[]    = {inputNum, inputChannels, inputHeight, inputWidth};
-    unsigned int outputShape[]   = {outputNum, outputChannels, outputHeight, outputWidth};
-    unsigned int kernelShape[]   = {outputChannels, inputChannels, kernelHeight, kernelWidth};
-    unsigned int biasShape[]     = {outputChannels};
+    unsigned int inputShape[]  = {inputNum, inputChannels, inputHeight, inputWidth};
+    unsigned int outputShape[] = {outputNum, outputChannels, outputHeight, outputWidth};
+    unsigned int kernelShape[] = {outputChannels, inputChannels, kernelHeight, kernelWidth};
+    unsigned int biasShape[]   = {outputChannels};
 
     inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>());
     outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>());
@@ -1171,19 +1155,17 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
 
     std::vector<unsigned int> inputShape;
     std::vector<unsigned int> outputShape;
-    std::vector<unsigned int> kernelShape;
-    std::vector<unsigned int> biasShape= { outputChannels };
+    std::vector<unsigned int> kernelShape{ channelMultiplier, inputChannels, kernelHeight, kernelWidth };
+    std::vector<unsigned int> biasShape{ outputChannels };
     switch (layout.GetDataLayout())
     {
         case armnn::DataLayout::NCHW:
             inputShape =  { inputNum, inputChannels, inputHeight, inputWidth };
             outputShape = { outputNum, outputChannels, outputHeight, outputWidth };
-            kernelShape = { channelMultiplier, inputChannels, kernelHeight, kernelWidth };
             break;
         case armnn::DataLayout ::NHWC:
             inputShape =  { inputNum, inputHeight, inputWidth, inputChannels };
             outputShape = { outputNum, outputHeight, outputWidth, outputChannels };
-            kernelShape = { channelMultiplier, kernelHeight, kernelWidth, inputChannels };
             break;
         default:
             throw armnn::InvalidArgumentException("unknown data layout ["

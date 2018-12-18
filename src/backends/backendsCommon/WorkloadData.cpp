@@ -593,9 +593,10 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
 
     const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;
 
-    //inputChannels * channelMultiplier should be equal to outputChannels.
+    // Expected weight shape: [ M, I, H, W ] - This shape does NOT depend on the data layout
+    // inputChannels * channelMultiplier should be equal to outputChannels.
     const unsigned int numWeightChannelMultiplier = m_Weight->GetTensorInfo().GetShape()[0];
-    const unsigned int numWeightInputChannels = m_Weight->GetTensorInfo().GetShape()[channelIndex];
+    const unsigned int numWeightInputChannels = m_Weight->GetTensorInfo().GetShape()[1];
     const unsigned int numWeightOutputChannels = workloadInfo.m_OutputTensorInfos[0].GetShape()[channelIndex];
     if (numWeightChannelMultiplier * numWeightInputChannels != numWeightOutputChannels)
     {

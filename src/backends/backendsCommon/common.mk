@@ -14,7 +14,8 @@ COMMON_SOURCES := \
     MemCopyWorkload.cpp \
     OutputHandler.cpp \
     WorkloadData.cpp \
-    WorkloadFactory.cpp
+    WorkloadFactory.cpp \
+    WorkloadUtils.cpp
 
 # COMMON_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked

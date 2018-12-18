@@ -27,10 +27,7 @@ void RefConvolution2dUint8Workload::Execute() const
     const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
     const uint8_t* weightsData = m_Weight->template GetConstTensor<uint8_t>();
     const TensorInfo& weightsInfo = GetTensorInfo(m_Weight.get());
-    const int32_t* biasData = m_Data.m_Parameters.m_BiasEnabled ?
-        m_Bias->template GetConstTensor<int32_t>() :
-        nullptr;
-    uint8_t* outputData = GetOutputTensorDataU8(0, m_Data);
+    const int32_t* biasData = m_Data.m_Parameters.m_BiasEnabled ? m_Bias->template GetConstTensor<int32_t>() : nullptr;
     const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
     const TensorInfo& filterInfo = m_Weight->GetTensorInfo();
 
@@ -39,7 +36,7 @@ void RefConvolution2dUint8Workload::Execute() const
         inputData, inputInfo.GetQuantizationScale(),  inputInfo.GetQuantizationOffset(),
         weightsData, weightsInfo.GetQuantizationScale(), weightsInfo.GetQuantizationOffset(),
         biasData,
-        outputData, outputInfo.GetQuantizationScale(), outputInfo.GetQuantizationOffset(), filterInfo);
+        outputInfo.GetQuantizationScale(), outputInfo.GetQuantizationOffset(), filterInfo);
 }
 
 } //namespace armnn

@@ -401,7 +401,8 @@ template<typename T>
 std::pair<armnn::ConstTensor, std::unique_ptr<T[]>>
 CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
                       TfLiteParser::TensorRawPtr tensorPtr,
-                      armnn::TensorInfo & tensorInfo)
+                      armnn::TensorInfo& tensorInfo,
+                      armnn::Optional<armnn::PermutationVector&> permutationVector)
 {
     BOOST_ASSERT_MSG(tensorPtr != nullptr, "tensorPtr is null");
     BOOST_ASSERT_MSG(bufferPtr != nullptr,
@@ -409,7 +410,20 @@ CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
             boost::format("Buffer for buffer:%1% is null") % tensorPtr->buffer).c_str());
 
     std::unique_ptr<T[]> data(new T[tensorInfo.GetNumElements()]);
-    ::memcpy(data.get(), bufferPtr->data.data(), tensorInfo.GetNumBytes());
+
+    if (permutationVector.has_value() && permutationVector.value().GetSize() > 0)
+    {
+        tensorInfo = armnnUtils::Permuted(tensorInfo, permutationVector.value());
+        armnnUtils::Permute(tensorInfo.GetShape(),
+                            permutationVector.value(),
+                            reinterpret_cast<const T *>(bufferPtr->data.data()),
+                            data.get());
+    }
+    else
+    {
+        ::memcpy(data.get(), bufferPtr->data.data(), tensorInfo.GetNumBytes());
+    }
+
     return std::make_pair(ConstTensor(tensorInfo, data.get()), std::move(data));
 }
 
@@ -660,7 +674,9 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     CalcPadding(inputHeight, filterHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
     CalcPadding(inputWidth, filterWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
-    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo);
+    auto filterTensorAndData = CreateConstTensor(inputs[1],
+                                                 filterTensorInfo,
+                                                 armnn::Optional<armnn::PermutationVector&>());
     armnn::IConnectableLayer* layer;
 
     auto layerName = boost::str(boost::format("Conv2D:%1%:%2%") % subgraphIndex % operatorIndex);
@@ -669,7 +685,9 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     {
         desc.m_BiasEnabled = true;
         armnn::TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo);
+        auto biasTensorAndData = CreateConstTensor(inputs[2],
+                                                   biasTensorInfo,
+                                                   armnn::Optional<armnn::PermutationVector&>());
         layer = m_Network->AddConvolution2dLayer(desc,
                                                  filterTensorAndData.first,
                                                  biasTensorAndData.first,
@@ -723,17 +741,27 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
 
-    // assuming input is NHWC
+    // Assuming input is NHWC
     unsigned int inputHeight = inputTensorInfo.GetShape()[1];
     unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
-    // assuming the filter is OHWI : Output, H, W, Input
+
+    // TensorflowLite weights come in the format [1, H, W, I * M]
     unsigned int filterHeight = filterTensorInfo.GetShape()[1];
     unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
+
+    // Reshape weights as [ H, W, I, M ]
+    filterTensorInfo.SetShape({ filterHeight,
+                                filterWidth,
+                                inputTensorInfo.GetShape()[3],
+                                filterTensorInfo.GetShape()[3] / inputTensorInfo.GetShape()[3] });
+
+    // Mappings from TensorflowLite filter tensors to the ArmNN filter tensors (ArmNN weights have to be [M, I, H, W])
+    PermutationVector permutationVector{ 2, 3, 1, 0 }; // [H, W, I, M] -> [M, I, H, W]
 
     CalcPadding(inputHeight, filterHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
     CalcPadding(inputWidth, filterWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
-    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo);
+    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo, permutationVector);
     armnn::IConnectableLayer* layer;
     auto layerName = boost::str(boost::format("DepthwiseConv2D:%1%:%2%") % subgraphIndex % operatorIndex);
 
@@ -741,7 +769,9 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     {
         desc.m_BiasEnabled = true;
         TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo);
+        auto biasTensorAndData = CreateConstTensor(inputs[2],
+                                                   biasTensorInfo,
+                                                   armnn::Optional<armnn::PermutationVector&>());
         layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
                                                           filterTensorAndData.first,
                                                           biasTensorAndData.first,
@@ -1228,7 +1258,9 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
                 % CHECK_LOCATION().AsString()));
     }
 
-    auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo);
+    auto filterTensorAndData = CreateConstTensor(inputs[1],
+                                                 filterTensorInfo,
+                                                 armnn::Optional<armnn::PermutationVector&>());
     armnn::IConnectableLayer* layer;
     auto layerName = boost::str(boost::format("FullyConnected:%1%:%2%") % subgraphIndex % operatorIndex);
 
@@ -1236,7 +1268,9 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
     {
         desc.m_BiasEnabled = true;
         TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensor(inputs[2], biasTensorInfo);
+        auto biasTensorAndData = CreateConstTensor(inputs[2],
+                                                   biasTensorInfo,
+                                                   armnn::Optional<armnn::PermutationVector&>());
         layer = m_Network->AddFullyConnectedLayer(desc,
                                                   filterTensorAndData.first,
                                                   biasTensorAndData.first,
@@ -1561,9 +1595,25 @@ TfLiteParser::BufferRawPtr TfLiteParser::GetBuffer(const ModelPtr& model, size_t
     return model->buffers[bufferIndex].get();
 }
 
+template<typename T>
+std::pair<armnn::ConstTensor, TfLiteParser::SupportedDataStorage>
+TfLiteParser::CreateConstTensorAndStoreData(TfLiteParser::BufferRawPtr bufferPtr,
+                                            TfLiteParser::TensorRawPtr tensorPtr,
+                                            armnn::TensorInfo& tensorInfo,
+                                            armnn::Optional<armnn::PermutationVector&> permutationVector)
+{
+    auto constData = CreateConstTensorImpl<T>(bufferPtr,
+                                              tensorPtr,
+                                              tensorInfo,
+                                              permutationVector);
+    TfLiteParser::SupportedDataStorage storage(std::move(constData.second));
+    return std::make_pair(constData.first, std::move(storage));
+}
+
 std::pair<armnn::ConstTensor, TfLiteParser::SupportedDataStorage>
 TfLiteParser::CreateConstTensor(TensorRawPtr tensorPtr,
-                                armnn::TensorInfo & tensorInfo)
+                                armnn::TensorInfo& tensorInfo,
+                                armnn::Optional<armnn::PermutationVector&> permutationVector)
 {
     CHECK_TENSOR_PTR(tensorPtr);
     auto bufferPtr = GetBuffer(m_Model, tensorPtr->buffer);
@@ -1572,29 +1622,20 @@ TfLiteParser::CreateConstTensor(TensorRawPtr tensorPtr,
     switch (tensorInfo.GetDataType())
     {
         case armnn::DataType::Float32:
-        {
-            auto constData = CreateConstTensorImpl<float>(bufferPtr,
-                                                          tensorPtr,
-                                                          tensorInfo);
-            SupportedDataStorage storage(std::move(constData.second));
-            return std::make_pair(constData.first, std::move(storage));
-        }
+            return CreateConstTensorAndStoreData<float>(bufferPtr,
+                                                        tensorPtr,
+                                                        tensorInfo,
+                                                        permutationVector);
         case armnn::DataType::QuantisedAsymm8:
-        {
-            auto constData = CreateConstTensorImpl<uint8_t>(bufferPtr,
-                                                            tensorPtr,
-                                                            tensorInfo);
-            SupportedDataStorage storage(std::move(constData.second));
-            return std::make_pair(constData.first, std::move(storage));
-        }
+            return CreateConstTensorAndStoreData<uint8_t>(bufferPtr,
+                                                          tensorPtr,
+                                                          tensorInfo,
+                                                          permutationVector);
         case armnn::DataType::Signed32:
-        {
-            auto constData = CreateConstTensorImpl<int32_t>(bufferPtr,
-                                                            tensorPtr,
-                                                            tensorInfo);
-            SupportedDataStorage storage(std::move(constData.second));
-            return std::make_pair(constData.first, std::move(storage));
-        }
+            return CreateConstTensorAndStoreData<int32_t>(bufferPtr,
+                                                          tensorPtr,
+                                                          tensorInfo,
+                                                          permutationVector);
         default:
         {
             std::stringstream errString;

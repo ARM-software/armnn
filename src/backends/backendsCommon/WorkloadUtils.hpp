@@ -6,8 +6,13 @@
 #pragma once
 
 #include "ITensorHandle.hpp"
+#include "CpuTensorHandle.hpp"
 
 #include <armnn/Tensor.hpp>
+
+#include <Permute.hpp>
+#include <Profiling.hpp>
+#include <Half.hpp>
 
 #include <boost/cast.hpp>
 
@@ -15,26 +20,28 @@ namespace armnn
 {
 namespace
 {
+
 template<typename ArrayType, typename Arg>
 void AssignValues(unsigned int num, unsigned int& idx, const ArrayType& array, Arg& arg)
 {
- if (idx >= num)
- {
-     return;
- }
+    if (idx >= num)
+    {
+        return;
+    }
 
- arg = array[(num - 1) - idx];
- idx++;
-};
+    arg = array[(num - 1) - idx];
+    idx++;
+}
 
 template<typename T, typename ArrayType, typename ...Args>
 void AssignValues(unsigned int num, unsigned int idx, const ArrayType& array, T& assignee, Args& ... args)
 {
- AssignValues(num, idx, array, assignee);
+    AssignValues(num, idx, array, assignee);
 
- AssignValues(num, idx, array, args...);
+    AssignValues(num, idx, array, args...);
 }
-} // namespace
+
+} // anonymous namespace
 
 template<typename CopyFunc>
 void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* dstTensor, CopyFunc copy)
@@ -141,5 +148,17 @@ void GatherTensorHandlePairs(const DescriptorType& descriptor,
         tensorHandlePairs.emplace_back(srcTensorHandle, dstTensorHandle);
     }
 }
+
+armnn::ConstTensor PermuteTensor(const ConstCpuTensorHandle* tensor,
+                                 const PermutationVector& permutationVector,
+                                 void* permuteBuffer);
+
+void ReshapeWeightsForAcl(TensorInfo& weightInfo, DataLayout dataLayout);
+
+TensorInfo ConvertWeightTensorInfoFromArmnnToAcl(const TensorInfo& weightInfo, DataLayout dataLayout);
+
+armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstCpuTensorHandle* weightTensor,
+                                                     DataLayout dataLayout,
+                                                     void* permuteBuffer);
 
 } //namespace armnn

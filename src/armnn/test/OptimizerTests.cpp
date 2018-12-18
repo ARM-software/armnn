@@ -898,7 +898,7 @@ BOOST_AUTO_TEST_CASE(DepthwiseConv2dValidateTensorShapesFromInputsNhwc)
 {
     Graph graph;
     const unsigned int inputShape[] = { 1, 3, 3, 2 };
-    const unsigned int weightsShape[] = { 1, 3, 3, 2 };
+    const unsigned int weightsShape[] = { 1, 2, 3, 3 };
     const unsigned int outputShape[] = { 1, 1, 1, 2 };
     CreateDepthwiseConvolution2dGraph(graph, inputShape, weightsShape, outputShape, DataLayout::NHWC);
 

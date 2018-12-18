@@ -36,15 +36,15 @@ arm_compute::TensorShape BuildArmComputeTensorShape(const armnn::TensorShape& te
 /// armnn::ITensorInfo.
 arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo);
 
-/// Utility function used to convert armnn::DataLayout to arm_compute::DataLayout
-/// armnn::DataLayout.
-arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout);
-
 /// Utility function used to setup an arm_compute::ITensorInfo object whose dimensions are based on the given
 /// armnn::ITensorInfo.
 /// armnn::DataLayout.
 arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo,
                                                   armnn::DataLayout dataLayout);
+
+/// Utility function used to convert armnn::DataLayout to arm_compute::DataLayout
+/// armnn::DataLayout.
+arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout);
 
 /// Utility function used to setup an arm_compute::PoolingLayerInfo object from an armnn::Pooling2dDescriptor.
 arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDescriptor& descriptor);

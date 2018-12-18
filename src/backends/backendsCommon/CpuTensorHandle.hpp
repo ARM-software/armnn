@@ -72,6 +72,9 @@ private:
     const void* m_Memory;
 };
 
+template<>
+const void* ConstCpuTensorHandle::GetConstTensor<void>() const;
+
 // Abstract specialization of ConstCpuTensorHandle that allows write access to the same data.
 class CpuTensorHandle : public ConstCpuTensorHandle
 {
@@ -98,6 +101,9 @@ private:
     CpuTensorHandle& operator=(const CpuTensorHandle& other) = delete;
     void* m_MutableMemory;
 };
+
+template <>
+void* CpuTensorHandle::GetTensor<void>() const;
 
 // A CpuTensorHandle that owns the wrapped memory region.
 class ScopedCpuTensorHandle : public CpuTensorHandle

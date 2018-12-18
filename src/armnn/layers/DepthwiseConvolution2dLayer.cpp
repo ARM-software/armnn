@@ -24,7 +24,7 @@ DepthwiseConvolution2dLayer::DepthwiseConvolution2dLayer(const DepthwiseConvolut
 {
 }
 
-std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const Graph&                  graph,
+std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const Graph& graph,
                                                                        const IWorkloadFactory& factory) const
 {
     // on this level constant data should not be released..
@@ -59,34 +59,40 @@ std::vector<TensorShape>
 DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
     BOOST_ASSERT(inputShapes.size() == 2);
-    const TensorShape& inputShape = inputShapes[0];
-    const TensorShape filterShape = inputShapes[1];
+    const TensorShape& inputShape  = inputShapes[0];
+    const TensorShape& filterShape = inputShapes[1];
 
     BOOST_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Convolutions will always have 4D input.");
 
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
-    unsigned int inWidth = inputShape[dataLayoutIndex.GetWidthIndex()];
-    unsigned int inHeight = inputShape[dataLayoutIndex.GetHeightIndex()];
-    unsigned int inBatchSize = inputShape[0];
+    unsigned int inputBatchSize = inputShape[0];
+    unsigned int inputHeight    = inputShape[dataLayoutIndex.GetHeightIndex()];
+    unsigned int inputWidth     = inputShape[dataLayoutIndex.GetWidthIndex()];
+    unsigned int inputChannels  = inputShape[dataLayoutIndex.GetChannelsIndex()];
 
-    unsigned int filterWidth = filterShape[dataLayoutIndex.GetWidthIndex()];
-    unsigned int readWidth = (inWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - (filterWidth);
-    unsigned int outWidth =  1 + (readWidth / m_Param.m_StrideX);
+    // Expected filter shape: [ M, I, H, W ] - This shape does NOT depend on the data layout
+    // Namely: [ depth multiplier, input channels, filter height, filter width ]
+    // Output channels = input channels * depthMultiplier
 
-    unsigned int filterHeight = filterShape[dataLayoutIndex.GetHeightIndex()];
-    unsigned int readHeight = (inHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - (filterHeight);
-    unsigned int outHeight = 1 + (readHeight / m_Param.m_StrideY);
     unsigned int depthMultiplier = filterShape[0];
 
-    unsigned int outChannels = filterShape[dataLayoutIndex.GetChannelsIndex()] * depthMultiplier;
-    unsigned int outBatchSize = inBatchSize;
+    unsigned int filterHeight = filterShape[2];
+    unsigned int readHeight   = (inputHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - filterHeight;
+    unsigned int outputHeight = 1 + (readHeight / m_Param.m_StrideY);
+
+    unsigned int filterWidth = filterShape[3];
+    unsigned int readWidth   = (inputWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - filterWidth;
+    unsigned int outputWidth = 1 + (readWidth / m_Param.m_StrideX);
+
+    unsigned int outputChannels  = inputChannels * depthMultiplier;
+    unsigned int outputBatchSize = inputBatchSize;
 
     TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NHWC ?
-        TensorShape( { outBatchSize, outHeight, outWidth, outChannels } ) :
-        TensorShape( { outBatchSize, outChannels, outHeight, outWidth });
+                              TensorShape{ outputBatchSize, outputHeight, outputWidth, outputChannels } :
+                              TensorShape{ outputBatchSize, outputChannels, outputHeight, outputWidth };
 
-    return std::vector<TensorShape>({ tensorShape });
+    return std::vector<TensorShape>{ tensorShape };
 }
 
 void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()

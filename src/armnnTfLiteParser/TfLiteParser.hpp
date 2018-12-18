@@ -129,17 +129,31 @@ private:
     // We don't care about the content, and we want a single datatype to simplify the code.
     struct SupportedDataStorage
     {
-        std::unique_ptr<float[]>    m_FloatData;
-        std::unique_ptr<uint8_t[]>  m_Uint8Data;
-        std::unique_ptr<int32_t[]>  m_Int32Data;
+    public:
+        // Convenience constructors
+        SupportedDataStorage(std::unique_ptr<float[]>&&   data);
+        SupportedDataStorage(std::unique_ptr<uint8_t[]>&& data);
+        SupportedDataStorage(std::unique_ptr<int32_t[]>&& data);
 
-        SupportedDataStorage(std::unique_ptr<float[]> && data);
-        SupportedDataStorage(std::unique_ptr<uint8_t[]> && data);
-        SupportedDataStorage(std::unique_ptr<int32_t[]> && data);
+    private:
+        // Pointers to the data buffers
+        std::unique_ptr<float[]>   m_FloatData;
+        std::unique_ptr<uint8_t[]> m_Uint8Data;
+        std::unique_ptr<int32_t[]> m_Int32Data;
     };
 
-    std::pair<armnn::ConstTensor, SupportedDataStorage> CreateConstTensor(TensorRawPtr tensorPtr,
-                                                                          armnn::TensorInfo & tensorInfo);
+
+    template<typename T>
+    std::pair<armnn::ConstTensor, TfLiteParser::SupportedDataStorage>
+    CreateConstTensorAndStoreData(TfLiteParser::BufferRawPtr bufferPtr,
+                                  TfLiteParser::TensorRawPtr tensorPtr,
+                                  armnn::TensorInfo& tensorInfo,
+                                  armnn::Optional<armnn::PermutationVector&> permutationVector);
+
+    std::pair<armnn::ConstTensor, SupportedDataStorage>
+    CreateConstTensor(TensorRawPtr tensorPtr,
+                      armnn::TensorInfo& tensorInfo,
+                      armnn::Optional<armnn::PermutationVector&> permutationVector);
 
     /// The network we're building. Gets cleared after it is passed to the user
     armnn::INetworkPtr                    m_Network;

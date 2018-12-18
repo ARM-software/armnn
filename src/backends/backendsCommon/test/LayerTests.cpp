@@ -661,28 +661,18 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(
             24, 49
         })));
 
-    armnn::TensorInfo kernelTensorInfo({ 1, 4, 4, 2}, armnn::GetDataType<T>());
+    armnn::TensorInfo kernelTensorInfo({ 1, 2, 4, 4 }, armnn::GetDataType<T>());
     auto kernel = MakeTensor<T, 4>(kernelTensorInfo, std::vector<T>(
         QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(), {
-             32, 16,
-             31, 15,
-             30, 14,
-             29, 13,
+             32, 31, 30, 29,
+             28, 27, 26, 25,
+             24, 23, 22, 21,
+             20, 19, 18, 17,
 
-             28, 12,
-             27, 11,
-             26, 10,
-             25,  9,
-
-             24,  8,
-             23,  7,
-             22,  6,
-             21,  5,
-
-             20,  4,
-             19,  3,
-             18,  2,
-             17,  1
+             16, 15, 14, 13,
+             12, 11, 10,  9,
+              8,  7,  6,  5,
+              4,  3,  2,  1
         })));
 
     armnn::TensorInfo outputTensorInfo({ 1, 5, 5, 2}, armnn::GetDataType<T>());

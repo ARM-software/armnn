@@ -9,6 +9,7 @@
 #include <armnn/Tensor.hpp>
 
 #include <cassert>
+#include <cstring>
 
 namespace
 {
@@ -46,10 +47,29 @@ public:
         Unroll(0, srcData, dstData, srcEnd, dstEnd);
     }
 
+    void Unroll(const void* srcData, void* dstData, size_t dataTypeSize)
+    {
+        assert(srcData);
+        assert(dstData);
+        assert(dataTypeSize > 0);
+
+        const unsigned char* srcDataPtr = reinterpret_cast<const unsigned char*>(srcData);
+        unsigned char* dstDataPtr       = reinterpret_cast<unsigned char*>(dstData);
+
+        const unsigned char* const srcEndPtr = srcDataPtr + m_DstShape.GetNumElements() * dataTypeSize;
+        unsigned char* const       dstEndPtr = dstDataPtr + m_DstShape.GetNumElements() * dataTypeSize;
+
+        Unroll(0, srcDataPtr, dstDataPtr, srcEndPtr, dstEndPtr, dataTypeSize);
+    }
+
 private:
     template <typename T>
     void Unroll(size_type dimension, const T* srcData, T* dstData, const T* srcEnd, T* dstEnd)
     {
+        assert(srcData);
+        assert(dstData);
+        assert(srcEnd);
+        assert(dstEnd);
         assert(srcData < srcEnd);
         assert(dstData < dstEnd);
 
@@ -65,6 +85,35 @@ private:
 
                 srcData += m_SrcStrides[dimension];
                 dstData += m_DstStrides[dimension];
+            }
+        }
+    }
+
+    void Unroll(size_type dimension,
+                const unsigned char* srcData, unsigned char* dstData,
+                const unsigned char* srcEnd, unsigned char* dstEnd,
+                size_t dataTypeSize)
+    {
+        assert(srcData);
+        assert(dstData);
+        assert(srcEnd);
+        assert(dstEnd);
+        assert(srcData < srcEnd);
+        assert(dstData < dstEnd);
+        assert(dataTypeSize > 0);
+
+        if (dimension >= m_DstShape.GetNumDimensions())
+        {
+            ::memcpy(dstData, srcData, dataTypeSize);
+        }
+        else
+        {
+            for (size_type i = 0; i < m_DstShape[dimension]; i++)
+            {
+                Unroll(dimension + 1, srcData, dstData, srcEnd, dstEnd, dataTypeSize);
+
+                srcData += m_SrcStrides[dimension] * dataTypeSize;
+                dstData += m_DstStrides[dimension] * dataTypeSize;
             }
         }
     }
@@ -102,6 +151,12 @@ armnn::TensorInfo Permuted(const armnn::TensorInfo& info, const armnn::Permutati
     return outInfo;
 }
 
+void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
+             const void* src, void* dst, size_t dataTypeSize)
+{
+    PermuteLoop(dstShape, mappings).Unroll(src, dst, dataTypeSize);
+}
+
 template <typename T>
 void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings, const T* src, T* dst)
 {
@@ -117,5 +172,7 @@ template void Permute(const armnn::TensorShape& dstShape, const armnn::Permutati
                       const uint8_t* src, uint8_t* dst);
 template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
                       const int32_t* src, int32_t* dst);
+template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
+                      const bool* src, bool* dst);
 
 } // namespace armnnUtils

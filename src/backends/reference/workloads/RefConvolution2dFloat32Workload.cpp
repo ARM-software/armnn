@@ -23,15 +23,13 @@ void RefConvolution2dFloat32Workload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConvolution2dFloat32Workload_Execute");
 
-    float*       outputData = GetOutputTensorDataFloat(0, m_Data);
     const float* inputData  = GetInputTensorDataFloat(0, m_Data);
-    const float* weightData = m_Weight->template GetConstTensor<float>();
-    const float* biasData   = m_Data.m_Parameters.m_BiasEnabled ?
-        m_Bias->template GetConstTensor<float>() : nullptr;
+    const float* filterData = m_Weight->template GetConstTensor<float>();
+    const float* biasData   = m_Data.m_Parameters.m_BiasEnabled ? m_Bias->template GetConstTensor<float>() : nullptr;
     const TensorInfo& filterInfo = m_Weight->GetTensorInfo();
 
     ConvImpl<armnn::Convolution2dQueueDescriptor, float, float, float>(
-        m_Data, inputData, 0.0f, 0, weightData, 0.0f, 0, biasData, outputData, 0.0f, 0, filterInfo);
+        m_Data, inputData, 0.0f, 0, filterData, 0.0f, 0, biasData, 0.0f, 0, filterInfo);
 }
 
 } //namespace armnn

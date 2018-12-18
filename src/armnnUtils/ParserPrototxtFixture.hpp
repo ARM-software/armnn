@@ -14,8 +14,6 @@
 #include <Network.hpp>
 #include <VerificationHelpers.hpp>
 
-#include <backendsCommon/BackendRegistry.hpp>
-
 #include <boost/format.hpp>
 
 #include <string>

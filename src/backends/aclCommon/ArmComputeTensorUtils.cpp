@@ -109,19 +109,6 @@ arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tenso
     return arm_compute::TensorInfo(aclTensorShape, 1, aclDataType, aclQuantizationInfo);
 }
 
-arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout)
-{
-    switch(dataLayout)
-    {
-        case armnn::DataLayout::NHWC : return arm_compute::DataLayout::NHWC;
-
-        case armnn::DataLayout::NCHW : return arm_compute::DataLayout::NCHW;
-
-        default: throw InvalidArgumentException("Unknown armnn::DataLayout: [" +
-                                                std::to_string(static_cast<int>(dataLayout)) + "]");
-    }
-}
-
 arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo,
                                                   armnn::DataLayout dataLayout)
 {
@@ -134,6 +121,19 @@ arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tenso
     clTensorInfo.set_data_layout(ConvertDataLayout(dataLayout));
 
     return clTensorInfo;
+}
+
+arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout)
+{
+    switch(dataLayout)
+    {
+        case armnn::DataLayout::NHWC : return arm_compute::DataLayout::NHWC;
+
+        case armnn::DataLayout::NCHW : return arm_compute::DataLayout::NCHW;
+
+        default: throw InvalidArgumentException("Unknown armnn::DataLayout: [" +
+                                                std::to_string(static_cast<int>(dataLayout)) + "]");
+    }
 }
 
 arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDescriptor& descriptor)

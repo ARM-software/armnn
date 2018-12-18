@@ -57,7 +57,6 @@ static void ConvImpl(ConvData data,
                      float filterScale,
                      int32_t filterOffset,
                      const BiasType* biasData,
-                     InputType* outputData,
                      float outputScale,
                      int32_t outputOffset,
                      const TensorInfo& filterInfo,
@@ -68,10 +67,10 @@ static void ConvImpl(ConvData data,
         throw InvalidArgumentException("Bias is enabled but the bias data is invalid");
     }
 
-    const TensorInfo& inputInfo0  = GetTensorInfo(data.m_Inputs[0]);
-    const TensorInfo& outputInfo0 = GetTensorInfo(data.m_Outputs[0]);
+    const TensorInfo& inputInfo  = GetTensorInfo(data.m_Inputs[0]);
+    const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[0]);
 
-    TensorBufferArrayView<InputType> output(outputInfo0.GetShape(),
+    TensorBufferArrayView<InputType> output(outputInfo.GetShape(),
                                             GetOutputTensorData<InputType>(0, data),
                                             data.m_Parameters.m_DataLayout);
 
@@ -81,18 +80,18 @@ static void ConvImpl(ConvData data,
     const unsigned int heightIndex   = dataLayoutIndexed.GetHeightIndex();
     const unsigned int widthIndex    = dataLayoutIndexed.GetWidthIndex();
 
-    unsigned int depthMult      = depthwise ? filterInfo.GetShape()[0] : 1;
-    unsigned int channelsInput  = filterInfo.GetShape()[channelsIndex];
-    unsigned int channelsOutput = depthwise ? channelsInput * depthMult : filterInfo.GetShape()[0];
+    unsigned int depthMultiplier = depthwise ? filterInfo.GetShape()[0] : 1;
+    unsigned int inputChannels   = depthwise ? filterInfo.GetShape()[1] : filterInfo.GetShape()[channelsIndex];
+    unsigned int outputChannels  = depthwise ? inputChannels * depthMultiplier : filterInfo.GetShape()[0];
 
-    unsigned int batchSize    = outputInfo0.GetShape()[0];
-    unsigned int heightOutput = outputInfo0.GetShape()[heightIndex];
-    unsigned int widthOutput  = outputInfo0.GetShape()[widthIndex];
-    unsigned int heightInput  = inputInfo0.GetShape()[heightIndex];
-    unsigned int widthInput   = inputInfo0.GetShape()[widthIndex];
+    unsigned int batchSize    = outputInfo.GetShape()[0];
+    unsigned int outputHeight = outputInfo.GetShape()[heightIndex];
+    unsigned int outputWidth  = outputInfo.GetShape()[widthIndex];
+    unsigned int inputHeight  = inputInfo.GetShape()[heightIndex];
+    unsigned int inputWidth   = inputInfo.GetShape()[widthIndex];
 
-    unsigned int heightFilter = filterInfo.GetShape()[heightIndex];
-    unsigned int widthFilter  = filterInfo.GetShape()[widthIndex];
+    unsigned int filterHeight = depthwise ? filterInfo.GetShape()[2] : filterInfo.GetShape()[heightIndex];
+    unsigned int filterWidth  = depthwise ? filterInfo.GetShape()[3] : filterInfo.GetShape()[widthIndex];
 
     unsigned int paddingTop  = data.m_Parameters.m_PadTop;
     unsigned int paddingLeft = data.m_Parameters.m_PadLeft;
@@ -102,68 +101,56 @@ static void ConvImpl(ConvData data,
     // The world's least efficient convolution.
     for (unsigned int batchIdx = 0; batchIdx < batchSize; batchIdx++)
     {
-        for (unsigned int cOutput = 0; cOutput < channelsOutput; cOutput++)
+        for (unsigned int cOutput = 0; cOutput < outputChannels; cOutput++)
         {
-            for (unsigned int yOutput = 0; yOutput < heightOutput; yOutput++)
+            for (unsigned int yOutput = 0; yOutput < outputHeight; yOutput++)
             {
-                for (unsigned int xOutput = 0; xOutput < widthOutput; xOutput++)
+                for (unsigned int xOutput = 0; xOutput < outputWidth; xOutput++)
                 {
                     // This loop goes over each output element.
                     AccumulatorType sum = AccumulatorType();
 
                     // For depthwise, each output channel corresponds to exactly one input channel.
                     // For normal, must loop over each input channel.
-                    for (unsigned int cInput = 0; cInput < (depthwise ? 1 : channelsInput); cInput++)
+                    for (unsigned int cInput = 0; cInput < (depthwise ? 1 : inputChannels); cInput++)
                     {
                         unsigned int depthwiseMultiplierIdx = 0;
                         if (depthwise)
                         {
-                            cInput = cOutput / depthMult;
-                            depthwiseMultiplierIdx = cOutput % depthMult;
+                            cInput = cOutput / depthMultiplier;
+                            depthwiseMultiplierIdx = cOutput % depthMultiplier;
                         }
 
-                        for (unsigned int yFilter = 0; yFilter < heightFilter; yFilter++)
+                        for (unsigned int yFilter = 0; yFilter < filterHeight; yFilter++)
                         {
-                            for (unsigned int xFilter = 0; xFilter < widthFilter; xFilter++)
+                            for (unsigned int xFilter = 0; xFilter < filterWidth; xFilter++)
                             {
                                 // This loop goes over each input element for each output element.
 
-                                unsigned int filterIndex;
+                                unsigned int filterIndex = 0;
 
                                 // Since dimensionality of kernel depends on depthwiseness, so does index.
                                 if (depthwise)
                                 {
-                                    if (data.m_Parameters.m_DataLayout == DataLayout::NHWC)
-                                    {
-                                        filterIndex = depthwiseMultiplierIdx * heightFilter * widthFilter
-                                                        * channelsInput +
-                                                      yFilter * widthFilter * channelsInput +
-                                                      xFilter * channelsInput +
-                                                      cInput;
-                                    }
-                                    else
-                                    {
-                                        filterIndex = depthwiseMultiplierIdx * widthFilter * heightFilter
-                                                        * channelsInput +
-                                                      cInput * widthFilter * heightFilter +
-                                                      yFilter * widthFilter +
-                                                      xFilter;
-                                    }
+                                    filterIndex = depthwiseMultiplierIdx * filterWidth * filterHeight * inputChannels +
+                                                  cInput * filterWidth * filterHeight +
+                                                  yFilter * filterWidth +
+                                                  xFilter;
                                 }
                                 else
                                 {
                                     if (data.m_Parameters.m_DataLayout == DataLayout::NHWC)
                                     {
-                                        filterIndex = cOutput * heightFilter * widthFilter * channelsInput +
-                                                      yFilter * widthFilter * channelsInput +
-                                                      xFilter * channelsInput +
+                                        filterIndex = cOutput * filterHeight * filterWidth * inputChannels +
+                                                      yFilter * filterWidth * inputChannels +
+                                                      xFilter * inputChannels +
                                                       cInput;
                                     }
                                     else
                                     {
-                                        filterIndex = cOutput * widthFilter * heightFilter * channelsInput +
-                                                      cInput  * widthFilter * heightFilter +
-                                                      yFilter * widthFilter +
+                                        filterIndex = cOutput * filterWidth * filterHeight * inputChannels +
+                                                      cInput  * filterWidth * filterHeight +
+                                                      yFilter * filterWidth +
                                                       xFilter;
                                     }
                                 }
@@ -177,8 +164,8 @@ static void ConvImpl(ConvData data,
                                 AccumulatorType inputValue;
 
                                 // Check if we're in the padding.
-                                if (yInput < paddingTop || yInput >= heightInput + paddingTop ||
-                                    xInput < paddingLeft || xInput >= widthInput + paddingLeft )
+                                if (yInput < paddingTop || yInput >= inputHeight + paddingTop ||
+                                    xInput < paddingLeft || xInput >= inputWidth + paddingLeft )
                                 {
                                     inputValue = AccumulatorType();
                                 }
@@ -188,17 +175,17 @@ static void ConvImpl(ConvData data,
 
                                     if (data.m_Parameters.m_DataLayout == DataLayout::NHWC)
                                     {
-                                        inputIndex = batchIdx * heightInput * widthInput  * channelsInput +
-                                                     (yInput - paddingTop) * widthInput * channelsInput +
-                                                     (xInput - paddingLeft) * channelsInput +
+                                        inputIndex = batchIdx * inputHeight * inputWidth  * inputChannels +
+                                                     (yInput - paddingTop) * inputWidth * inputChannels +
+                                                     (xInput - paddingLeft) * inputChannels +
                                                      cInput;
 
                                     }
                                     else
                                     {
-                                        inputIndex = batchIdx * widthInput * heightInput * channelsInput +
-                                                     widthInput * heightInput * cInput +
-                                                     widthInput * (yInput - paddingTop) +
+                                        inputIndex = batchIdx * inputWidth * inputHeight * inputChannels +
+                                                     inputWidth * inputHeight * cInput +
+                                                     inputWidth * (yInput - paddingTop) +
                                                      xInput - paddingLeft;
                                     }
 

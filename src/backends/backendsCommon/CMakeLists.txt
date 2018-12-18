@@ -27,6 +27,7 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadFactory.hpp
     Workload.hpp
     WorkloadInfo.hpp
+    WorkloadUtils.cpp
     WorkloadUtils.hpp
 )
 

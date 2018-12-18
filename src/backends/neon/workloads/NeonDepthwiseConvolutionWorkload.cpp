@@ -8,10 +8,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <neon/NeonLayerSupport.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-
-#include <DataLayoutIndexed.hpp>
-
-using namespace armnnUtils;
+#include <backendsCommon/WorkloadUtils.hpp>
 
 namespace armnn
 {
@@ -19,17 +16,23 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& input,
-    const TensorInfo& output,
-    const DepthwiseConvolution2dDescriptor& descriptor,
-    const TensorInfo& weights,
-    const Optional<TensorInfo>& biases)
+                                                             const TensorInfo& output,
+                                                             const DepthwiseConvolution2dDescriptor& descriptor,
+                                                             const TensorInfo& weights,
+                                                             const Optional<TensorInfo>& biases)
 {
-    const arm_compute::TensorInfo aclInputInfo =
-        BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
-    const arm_compute::TensorInfo aclOutputInfo =
-        BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
-    const arm_compute::TensorInfo aclWeightsInfo =
-        BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclInputInfo  = BuildArmComputeTensorInfo(input,  descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
+
+    // ArmNN's weight format is [ M, I, H, W ]
+    const unsigned int aclDepthMultiplier = weights.GetShape()[0];
+
+    // Convert the weight format from ArmNN's [ M, I, H, W ] (does NOT depend on the data layout) to either
+    // [ 1, H, W, I * M ] (if NHWC) or [ 1, I * M, H, W ] (if NCHW), as required by the compute library
+    TensorInfo weightsPermuted = ConvertWeightTensorInfoFromArmnnToAcl(weights, descriptor.m_DataLayout);
+
+    // Convert the weights into the compute library format
+    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weightsPermuted, descriptor.m_DataLayout);
 
     arm_compute::TensorInfo aclBiasesInfo;
     arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
@@ -42,9 +45,7 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 
-    const arm_compute::PadStrideInfo aclPadStrideInfo =
-        BuildArmComputePadStrideInfo(descriptor);
-    const unsigned int aclDepthMultiplier = weights.GetShape()[0];
+    const arm_compute::PadStrideInfo aclPadStrideInfo = BuildArmComputePadStrideInfo(descriptor);
 
     return arm_compute::NEDepthwiseConvolutionLayer::validate(&aclInputInfo,
                                                               &aclWeightsInfo,
@@ -59,14 +60,21 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     const WorkloadInfo& info)
     : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
-    const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
+    // ArmNN's weight format is [ M, I, H, W ]
+    auto& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
+    // Allocate a buffer for the swizzling of the weight tensor
+    std::unique_ptr<unsigned char[]> permuteBuffer(new unsigned char[m_Data.m_Weight->GetTensorInfo().GetNumBytes()]);
+
+    // Convert the weight format from ArmNN's [ M, I, H, W ] (does NOT depend on the data layout) to either
+    // [ 1, H, W, I * M ] (if NHWC) or [ 1, I * M, H, W ] (if NCHW), as required by the compute library
+    ConstTensor weightPermuted = ConvertWeightTensorFromArmnnToAcl(m_Data.m_Weight,
+                                                                   m_Data.m_Parameters.m_DataLayout,
+                                                                   permuteBuffer.get());
+
+    // Convert the weights into the compute library format
     m_KernelTensor = std::make_unique<arm_compute::Tensor>();
-    BuildArmComputeTensor(*m_KernelTensor, weightInfo, m_Data.m_Parameters.m_DataLayout);
-
-    INeonTensorHandle* inputTensorHandle = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0]);
-    INeonTensorHandle* outputTensorHandle =  static_cast<INeonTensorHandle*>(m_Data.m_Outputs[0]);
-    DataLayoutIndexed dataLayoutIndex(m_Data.m_Parameters.m_DataLayout);
+    BuildArmComputeTensor(*m_KernelTensor, weightPermuted.GetInfo(), m_Data.m_Parameters.m_DataLayout);
 
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
@@ -84,6 +92,9 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
 
     m_Data.ValidateInputsOutputs("NeonDepthwiseConvolutionWorkload", 1, 1);
 
+    INeonTensorHandle* inputTensorHandle  = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0]);
+    INeonTensorHandle* outputTensorHandle = static_cast<INeonTensorHandle*>(m_Data.m_Outputs[0]);
+
     arm_compute::ITensor& input  = inputTensorHandle->GetTensor();
     arm_compute::ITensor& output = outputTensorHandle->GetTensor();
 
@@ -91,9 +102,11 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    bool use3x3Optimisation = weightInfo.GetShape()[dataLayoutIndex.GetWidthIndex()] == 3 &&
-                              weightInfo.GetShape()[dataLayoutIndex.GetHeightIndex()] == 3;
+    // Get the depth multiplier
+    const unsigned int depthMultiplier = weightInfo.GetShape()[0];
 
+    // Check for optimisation opportunities.
+    bool use3x3Optimisation = (weightInfo.GetShape()[2] == 3) && (weightInfo.GetShape()[3] == 3);
     if (use3x3Optimisation)
     {
         m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer3x3>();
@@ -102,7 +115,8 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
                                                            m_KernelTensor.get(),
                                                            m_BiasTensor.get(),
                                                            &output,
-                                                           padStrideInfo);
+                                                           padStrideInfo,
+                                                           depthMultiplier);
     }
     else
     {
@@ -112,12 +126,14 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
                                                            m_KernelTensor.get(),
                                                            m_BiasTensor.get(),
                                                            &output,
-                                                           padStrideInfo);
+                                                           padStrideInfo,
+                                                           depthMultiplier);
     }
 
     BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
 
-    InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
+    ScopedCpuTensorHandle weightsPermutedHandle(weightPermuted);
+    InitializeArmComputeTensorData(*m_KernelTensor, &weightsPermutedHandle);
 
     if (m_Data.m_Parameters.m_BiasEnabled)
     {

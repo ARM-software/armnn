@@ -445,6 +445,7 @@ if(BUILD_UNIT_TESTS)
         list(APPEND unittest_sources
              src/armnnTfLiteParser/test/ParserFlatbuffersFixture.hpp
              src/armnnTfLiteParser/test/Activations.cpp
+             src/armnnTfLiteParser/test/Addition.cpp
              src/armnnTfLiteParser/test/AvgPool2D.cpp
              src/armnnTfLiteParser/test/Concatenation.cpp
              src/armnnTfLiteParser/test/Conv2D.cpp

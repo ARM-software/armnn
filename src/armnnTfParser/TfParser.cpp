@@ -353,6 +353,7 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "AvgPool",               &TfParser::ParseAvgPool },
     { "Maximum",               &TfParser::ParseMaximum },
     { "Minimum",               &TfParser::ParseMinimum },
+    { "Equal",                 &TfParser::ParseEqual },
     { "Pad",                   &TfParser::ParsePad },
     { "Sub",                   &TfParser::ParseSub },
 };
@@ -1530,8 +1531,8 @@ ParsedTfOperationPtr TfParser::ParseMaximum(const tensorflow::NodeDef& nodeDef,
     }
 }
 
-ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
-                                            const tensorflow::GraphDef& graphDef)
+std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> TfParser::ProcessElementwiseInputSlots(
+            const tensorflow::NodeDef& nodeDef, const std::string& layerName)
 {
     std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 2);
 
@@ -1555,15 +1556,22 @@ ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
         else
         {
             throw ParseException(
-                boost::str(
-                    boost::format("Unsupported broadcast configuration for Minimum operation %1% %2%")
-                    % nodeDef.name()
-                    % CHECK_LOCATION().AsString()));
+                    boost::str(
+                            boost::format("Unsupported broadcast configuration for %1% operation %2% %3%")
+                            % layerName
+                            % nodeDef.name()
+                            % CHECK_LOCATION().AsString()));
         }
     }
+    return {input0Slot, input1Slot};
+}
 
-    IConnectableLayer* const layer = m_Network->AddMinimumLayer(nodeDef.name().c_str());
-
+ParsedTfOperationPtr TfParser::ProcessElementwiseLayer(
+        IOutputSlot* input0Slot,
+        IOutputSlot* input1Slot,
+        IConnectableLayer* const layer,
+        const tensorflow::NodeDef& nodeDef)
+{
     input0Slot->Connect(layer->GetInputSlot(0));
     input1Slot->Connect(layer->GetInputSlot(1));
 
@@ -1582,6 +1590,30 @@ ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+}
+
+ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,
+                                          const tensorflow::GraphDef& graphDef)
+{
+    std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Equal");
+    IOutputSlot* input0Slot = inputLayers.first;
+    IOutputSlot* input1Slot = inputLayers.second;
+
+    IConnectableLayer* const layer = m_Network->AddEqualLayer(nodeDef.name().c_str());
+
+    return ProcessElementwiseLayer(input0Slot, input1Slot, layer, nodeDef);
+}
+
+ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,
+                                            const tensorflow::GraphDef& graphDef)
+{
+    std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> inputLayers = ProcessElementwiseInputSlots(nodeDef, "Minimum");
+    IOutputSlot* input0Slot = inputLayers.first;
+    IOutputSlot* input1Slot = inputLayers.second;
+
+    IConnectableLayer* const layer = m_Network->AddMinimumLayer(nodeDef.name().c_str());
+
+    return ProcessElementwiseLayer(input0Slot, input1Slot, layer, nodeDef);
 }
 
 ParsedTfOperationPtr TfParser::ParseSub(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)

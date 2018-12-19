@@ -395,6 +395,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Concat.cpp
             src/armnnTfParser/test/ConcatOfConcats.cpp
             src/armnnTfParser/test/DepthwiseConvolution2d.cpp
+            src/armnnTfParser/test/Equal.cpp
             src/armnnTfParser/test/ExpandDims.cpp
             src/armnnTfParser/test/FusedBatchNorm.cpp
             src/armnnTfParser/test/Identity.cpp

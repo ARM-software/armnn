@@ -13,6 +13,7 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace armnn
@@ -154,6 +155,7 @@ private:
     ParsedTfOperationPtr ParseAvgPool(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParsePooling2d(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef,
         armnn::PoolingAlgorithm pooltype);
+    ParsedTfOperationPtr ParseEqual(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseMaximum(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseMinimum(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParsePad(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
@@ -174,6 +176,15 @@ private:
                                     const OutputOfParsedTfOperation& otherOp,
                                     armnn::IOutputSlot** outputOfLeakyRelu,
                                     armnn::ActivationDescriptor & desc);
+
+    std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> ProcessElementwiseInputSlots(
+            const tensorflow::NodeDef& nodeDef, const std::string& layerName);
+
+    ParsedTfOperationPtr ProcessElementwiseLayer(
+            armnn::IOutputSlot* input0Slot,
+            armnn::IOutputSlot* input1Slot,
+            armnn::IConnectableLayer* const layer,
+            const tensorflow::NodeDef& nodeDef);
 
     static std::pair<armnn::LayerBindingId, armnn::TensorInfo> GetBindingInfo(const std::string& layerName,
         const char* bindingPointDesc,

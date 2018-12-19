@@ -45,11 +45,11 @@ void BaseUint8ElementwiseWorkload<ParentDescriptor, Functor>::ExecuteImpl(const 
     std::vector<float> results(outputInfo.GetNumElements());
 
     ElementwiseFunction<Functor>(inputInfo0.GetShape(),
-                                inputInfo1.GetShape(),
-                                outputInfo.GetShape(),
-                                dequant0.data(),
-                                dequant1.data(),
-                                results.data());
+                                 inputInfo1.GetShape(),
+                                 outputInfo.GetShape(),
+                                 dequant0.data(),
+                                 dequant1.data(),
+                                 results.data());
 
     Quantize(GetOutputTensorDataU8(0, data), results.data(), outputInfo);
 }
@@ -76,3 +76,6 @@ template class armnn::BaseUint8ElementwiseWorkload<armnn::MinimumQueueDescriptor
 
 template class armnn::BaseFloat32ElementwiseWorkload<armnn::EqualQueueDescriptor, std::equal_to<float>>;
 template class armnn::BaseUint8ElementwiseWorkload<armnn::EqualQueueDescriptor, std::equal_to<float>>;
+
+template class armnn::BaseFloat32ElementwiseWorkload<armnn::GreaterQueueDescriptor, std::greater<float>>;
+template class armnn::BaseUint8ElementwiseWorkload<armnn::GreaterQueueDescriptor, std::greater<float>>;

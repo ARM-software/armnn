@@ -1026,4 +1026,17 @@ void EqualQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                        "second input");
 }
 
+void GreaterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTwoInputs(workloadInfo, "GreaterQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "GreaterQueueDescriptor");
+
+    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                                       workloadInfo.m_InputTensorInfos[1],
+                                       workloadInfo.m_OutputTensorInfos[0],
+                                       "GreaterQueueDescriptor",
+                                       "first input",
+                                       "second input");
+}
+
 } //namespace armnn

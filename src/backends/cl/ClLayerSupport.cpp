@@ -303,6 +303,18 @@ bool ClLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    descriptor);
 }
 
+bool ClLayerSupport::IsGreaterSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(input0);
+    ignore_unused(input1);
+    ignore_unused(output);
+    ignore_unused(reasonIfUnsupported);
+    return false;
+}
+
 bool ClLayerSupport::IsInputSupported(const TensorInfo& input,
                                       Optional<std::string&> reasonIfUnsupported) const
 {

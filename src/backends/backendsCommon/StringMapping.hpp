@@ -19,11 +19,12 @@ public:
     enum Id {
         RefAdditionWorkload_Execute,
         RefEqualWorkload_Execute,
-        RefSubtractionWorkload_Execute,
-        RefMaximumWorkload_Execute,
-        RefMultiplicationWorkload_Execute,
         RefDivisionWorkload_Execute,
+        RefGreaterWorkload_Execute,
+        RefMaximumWorkload_Execute,
         RefMinimumWorkload_Execute,
+        RefMultiplicationWorkload_Execute,
+        RefSubtractionWorkload_Execute,
         MAX_STRING_ID
     };
 
@@ -38,12 +39,13 @@ private:
     StringMapping()
     {
         m_Strings[RefAdditionWorkload_Execute] = "RefAdditionWorkload_Execute";
-        m_Strings[RefEqualWorkload_Execute] = "RefEqualWorkload_Execute";
-        m_Strings[RefSubtractionWorkload_Execute] = "RefSubtractionWorkload_Execute";
-        m_Strings[RefMaximumWorkload_Execute] = "RefMaximumWorkload_Execute";
-        m_Strings[RefMultiplicationWorkload_Execute] = "RefMultiplicationWorkload_Execute";
         m_Strings[RefDivisionWorkload_Execute] = "RefDivisionWorkload_Execute";
+        m_Strings[RefEqualWorkload_Execute] = "RefEqualWorkload_Execute";
+        m_Strings[RefGreaterWorkload_Execute] = "RefGreaterWorkload_Execute";
+        m_Strings[RefMaximumWorkload_Execute] = "RefMaximumWorkload_Execute";
         m_Strings[RefMinimumWorkload_Execute] = "RefMinimumWorkload_Execute";
+        m_Strings[RefMultiplicationWorkload_Execute] = "RefMultiplicationWorkload_Execute";
+        m_Strings[RefSubtractionWorkload_Execute] = "RefSubtractionWorkload_Execute";
     }
 
     StringMapping(const StringMapping &) = delete;

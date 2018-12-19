@@ -12,8 +12,6 @@
 #include "Maximum.hpp"
 #include "Minimum.hpp"
 
-
-
 namespace armnn
 {
 
@@ -86,7 +84,6 @@ using RefAdditionUint8Workload =
                           AdditionQueueDescriptor,
                           StringMapping::RefAdditionWorkload_Execute>;
 
-
 using RefSubtractionFloat32Workload =
     RefElementwiseWorkload<std::minus<float>,
                           DataType::Float32,
@@ -132,9 +129,9 @@ using RefMaximumFloat32Workload =
 
 using RefMaximumUint8Workload =
     RefElementwiseWorkload<armnn::maximum<float>,
-                           DataType::QuantisedAsymm8,
-                           MaximumQueueDescriptor,
-                           StringMapping::RefMaximumWorkload_Execute>;
+                          DataType::QuantisedAsymm8,
+                          MaximumQueueDescriptor,
+                          StringMapping::RefMaximumWorkload_Execute>;
 
 using RefMinimumFloat32Workload =
     RefElementwiseWorkload<minimum<float>,
@@ -159,4 +156,16 @@ using RefEqualUint8Workload =
                           DataType::QuantisedAsymm8,
                           EqualQueueDescriptor,
                           StringMapping::RefEqualWorkload_Execute>;
+
+using RefGreaterFloat32Workload =
+    RefElementwiseWorkload<std::greater<float>,
+                          DataType::Float32,
+                          GreaterQueueDescriptor,
+                          StringMapping::RefGreaterWorkload_Execute>;
+
+using RefGreaterUint8Workload =
+    RefElementwiseWorkload<std::greater<float>,
+                          DataType::QuantisedAsymm8,
+                          GreaterQueueDescriptor,
+                          StringMapping::RefGreaterWorkload_Execute>;
 } // armnn

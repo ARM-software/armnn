@@ -441,6 +441,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_ADD]               =  &TfLiteParser::ParseAdd;
     m_ParserFunctions[tflite::BuiltinOperator_MUL]               =  &TfLiteParser::ParseMul;
     m_ParserFunctions[tflite::BuiltinOperator_MEAN]              =  &TfLiteParser::ParseMean;
+    m_ParserFunctions[tflite::BuiltinOperator_PAD]               =  &TfLiteParser::ParsePad;
 }
 
 void TfLiteParser::ResetParser()
@@ -1045,6 +1046,41 @@ void TfLiteParser::ParseMean(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Mean:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddMeanLayer(desc, layerName.c_str());
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParsePad(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    TfLiteParser::TensorRawPtrVector inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+
+    TfLiteParser::TensorRawPtrVector outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo padTensorInfo = ToTensorInfo(inputs[1]);
+    BufferRawPtr bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+
+    std::vector<unsigned int> padBuffer(padTensorInfo.GetNumElements());
+    ::memcpy(padBuffer.data(), bufferPtr->data.data(), padTensorInfo.GetNumBytes());
+
+    size_t step = 2;
+    armnn::PadDescriptor desc;
+    for (unsigned int i = 0; i < padTensorInfo.GetNumElements() / step; ++i)
+    {
+        desc.m_PadList.emplace_back(padBuffer[i * step], padBuffer[i * step + 1]);
+    }
+
+    auto layerName = boost::str(boost::format("Pad:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

@@ -27,6 +27,7 @@
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
 #include "workloads/ClLstmFloatWorkload.hpp"
+#include "workloads/ClMaximumWorkload.hpp"
 #include "workloads/ClMeanWorkload.hpp"
 #include "workloads/ClMergerWorkload.hpp"
 #include "workloads/ClMultiplicationWorkload.hpp"
@@ -390,6 +391,18 @@ bool ClLayerSupport::IsLstmSupported(const TensorInfo& input,
                                    projectionBias,
                                    cellToForgetWeights,
                                    cellToOutputWeights);
+}
+
+bool ClLayerSupport::IsMaximumSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClMaximumWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool ClLayerSupport::IsMeanSupported(const TensorInfo& input,

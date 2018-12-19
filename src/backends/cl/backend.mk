@@ -28,6 +28,7 @@ BACKEND_SOURCES := \
         workloads/ClFullyConnectedWorkload.cpp \
         workloads/ClL2NormalizationFloatWorkload.cpp \
         workloads/ClLstmFloatWorkload.cpp \
+        workloads/ClMaximumWorkload.cpp \
         workloads/ClMeanWorkload.cpp \
         workloads/ClMergerWorkload.cpp \
         workloads/ClMultiplicationWorkload.cpp \

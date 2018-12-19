@@ -32,6 +32,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClL2NormalizationFloatWorkload.hpp
     ClLstmFloatWorkload.cpp
     ClLstmFloatWorkload.hpp
+    ClMaximumWorkload.cpp
+    ClMaximumWorkload.hpp
     ClMeanWorkload.cpp
     ClMeanWorkload.hpp
     ClMergerWorkload.cpp

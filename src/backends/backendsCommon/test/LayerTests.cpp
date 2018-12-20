@@ -298,6 +298,71 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3NhwcTestCommon(
                                               qOffset);
 }
 
+template<typename T>
+LayerTestResult<T, 4> SimpleConvolution2d3x3Stride2x2TestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset,
+        bool biasEnabled,
+        const armnn::DataLayout& dataLayout)
+{
+    // Input is a single-batch, 1 channel, 5x5 image.
+    armnn::TensorInfo inputDesc({1, 5, 5, 1}, armnn::GetDataType<T>());
+    boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputDesc,
+            {
+                1, 5, 2, 3, 5,
+                8, 7, 3, 6, 3,
+                3, 3, 9, 1, 9,
+                4, 1, 8, 1, 3,
+                6, 8, 1, 9, 2
+            });
+
+    // Use a 3x3 kernel.
+    armnn::TensorInfo kernelDesc({1, 3, 3, 1}, armnn::GetDataType<T>());
+    boost::multi_array<T, 4> kernel = MakeTensor<T, 4>(kernelDesc,
+            {
+                4, 5, 6,
+                0, 0, 0,
+                3, 2, 1
+            });
+
+    // Expected output is a single-batch, 1 channel, 3x3 image.
+    armnn::TensorInfo outputDesc({1, 3, 3, 1}, armnn::GetDataType<T>());
+
+    const std::vector<T> outputData =
+            {
+                23, 33, 24,
+                91, 99, 48,
+                26, 50, 19
+            };
+
+    boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputDesc, outputData);
+
+    uint32_t padLeft = 1;
+    uint32_t padTop = 1;
+    uint32_t padRight = 1;
+    uint32_t padBottom = 1;
+    uint32_t strideX  = 2;
+    uint32_t strideY  = 2;
+
+    return SimpleConvolution2dNhwcTestImpl<T>(workloadFactory,
+                                              memoryManager,
+                                              input,
+                                              kernel,
+                                              boost::multi_array<T, 1>(),
+                                              expectedOutput,
+                                              dataLayout,
+                                              qScale,
+                                              qOffset,
+                                              padLeft,
+                                              padTop,
+                                              padRight,
+                                              padBottom,
+                                              strideX,
+                                              strideY);
+}
+
 LayerTestResult<float, 4> SimpleConvolution2d3x5Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -336,6 +401,20 @@ LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(
                                                        0,
                                                        biasEnabled,
                                                        armnn::DataLayout::NHWC);
+}
+
+LayerTestResult<float, 4> SimpleConvolution2d3x3Stride2x2Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout)
+{
+    return SimpleConvolution2d3x3Stride2x2TestCommon<float>(workloadFactory,
+                                                            memoryManager,
+                                                            0.f,
+                                                            0,
+                                                            biasEnabled,
+                                                            layout);
 }
 
 LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(

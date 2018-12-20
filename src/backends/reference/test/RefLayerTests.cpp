@@ -42,6 +42,11 @@ ARMNN_AUTO_TEST_CASE(SimpleConvolution2d3x3Uint8Nhwc, SimpleConvolution2d3x3Uint
 ARMNN_AUTO_TEST_CASE(UnbiasedConvolution2dSquare, SimpleConvolution2d3x3Test, false, armnn::DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(UnbiasedConvolution2dSquareNhwc, SimpleConvolution2d3x3Test, false, armnn::DataLayout::NHWC)
 
+ARMNN_AUTO_TEST_CASE(UnbiasedConvolution2dSquareStride2x2Nhwc,
+                     SimpleConvolution2d3x3Stride2x2Test,
+                     false,
+                     armnn::DataLayout::NHWC)
+
 ARMNN_AUTO_TEST_CASE(SimpleConvolution2dAsymmetricPaddingLargerThanHalfKernelSize,
                      Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest,
                      armnn::DataLayout::NCHW)

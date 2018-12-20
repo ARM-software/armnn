@@ -66,6 +66,12 @@ LayerTestResult<float, 4> SimpleConvolution2d3x3Test(
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+LayerTestResult<float, 4> SimpleConvolution2d3x3Stride2x2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
 LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

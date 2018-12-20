@@ -84,7 +84,9 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     uint32_t padLeft = 0,
     uint32_t padTop = 0,
     uint32_t padRight = 0,
-    uint32_t padBottom = 0)
+    uint32_t padBottom = 0,
+    uint32_t strideX = 1,
+    uint32_t strideY = 1)
 {
     unsigned int inputHeight   = boost::numeric_cast<unsigned int>(originalInput.shape()[2]);
     unsigned int inputWidth    = boost::numeric_cast<unsigned int>(originalInput.shape()[3]);
@@ -181,10 +183,6 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     }
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
-    // Todo: nontrivial padding and strides.
-    uint32_t                    strideX  = 1;
-    uint32_t                    strideY  = 1;
-
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
@@ -240,7 +238,7 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
     const boost::multi_array<T, 4>& kernel,
     const boost::multi_array<B, 1>& bias,
     const boost::multi_array<T, 4>& outputExpected,
-    armnn::DataLayout dataLayout,
+    const armnn::DataLayout dataLayout,
     float qScale,
     int32_t qOffset,
     uint32_t padLeft = 1,

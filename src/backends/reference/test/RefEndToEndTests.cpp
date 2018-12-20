@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 #include <backendsCommon/test/MergerTestImpl.hpp>
+#include <backendsCommon/test/ArithmeticTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
@@ -311,6 +312,69 @@ BOOST_AUTO_TEST_CASE(TrivialMin)
     BOOST_TEST(outputData[3] == 2);
 }
 
+BOOST_AUTO_TEST_CASE(RefEqualSimpleEndToEndTest)
+{
+    const std::vector<float > expectedOutput({ 1, 1, 1, 1,  0, 0, 0, 0,
+                                               0, 0, 0, 0,  1, 1, 1, 1 });
+
+    ArithmeticSimpleEndToEnd<float>(defaultBackends, LayerType::Equal, expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(RefGreaterSimpleEndToEndTest)
+{
+    const std::vector<float> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
+                                              0, 0, 0, 0,  0, 0, 0, 0 });
+
+    ArithmeticSimpleEndToEnd<float>(defaultBackends, LayerType::Greater, expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(RefEqualSimpleEndToEndUint8Test)
+{
+    const std::vector<uint8_t> expectedOutput({ 1, 1, 1, 1,  0, 0, 0, 0,
+                                                0, 0, 0, 0,  1, 1, 1, 1 });
+
+    ArithmeticSimpleEndToEnd<uint8_t>(defaultBackends, LayerType::Equal, expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(RefGreaterSimpleEndToEndUint8Test)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
+                                                0, 0, 0, 0,  0, 0, 0, 0 });
+
+    ArithmeticSimpleEndToEnd<uint8_t>(defaultBackends, LayerType::Greater, expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(RefEqualBroadcastEndToEndTest)
+{
+    const std::vector<float > expectedOutput({ 1, 0, 1, 1, 0, 0,
+                                               0, 0, 0, 0, 0, 0 });
+
+    ArithmeticBroadcastEndToEnd<float>(defaultBackends, LayerType::Equal, expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(RefGreaterBroadcastEndToEndTest)
+{
+    const std::vector<float> expectedOutput({ 0, 1, 0, 0, 0, 1,
+                                              1, 1, 1, 1, 1, 1 });
+
+    ArithmeticBroadcastEndToEnd<float>(defaultBackends, LayerType::Greater, expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(RefEqualBroadcastEndToEndUint8Test)
+{
+    const std::vector<uint8_t > expectedOutput({ 1, 0, 1, 1, 0, 0,
+                                                 0, 0, 0, 0, 0, 0 });
+
+    ArithmeticBroadcastEndToEnd<uint8_t>(defaultBackends, LayerType::Equal, expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(RefGreaterBroadcastEndToEndUint8Test)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 1, 0, 0, 0, 1,
+                                                1, 1, 1, 1, 1, 1 });
+
+    ArithmeticBroadcastEndToEnd<uint8_t>(defaultBackends, LayerType::Greater, expectedOutput);
+}
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim0Test)
 {

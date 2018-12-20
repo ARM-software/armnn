@@ -10,6 +10,7 @@
 #include <arm_compute/core/ITensor.h>
 #include <arm_compute/core/TensorInfo.h>
 #include <arm_compute/core/Types.h>
+#include <arm_compute/core/Size2D.h>
 
 #include <boost/cast.hpp>
 
@@ -48,6 +49,9 @@ arm_compute::NormalizationLayerInfo BuildArmComputeNormalizationLayerInfo(const 
 
 /// Utility function used to setup an arm_compute::PermutationVector object from an armnn::PermutationVector.
 arm_compute::PermutationVector BuildArmComputePermutationVector(const armnn::PermutationVector& vector);
+
+/// Utility function used to setup an arm_compute::Size2D object from width and height values.
+arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsigned int height);
 
 /// Utility function used to setup an arm_compute::PadStrideInfo object from an armnn layer descriptor.
 template <typename Descriptor>

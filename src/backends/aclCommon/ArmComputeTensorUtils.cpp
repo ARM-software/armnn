@@ -159,5 +159,10 @@ arm_compute::PermutationVector BuildArmComputePermutationVector(const armnn::Per
     return aclPerm;
 }
 
+arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsigned int height)
+{
+    return arm_compute::Size2D(width, height);
+}
+
 } // namespace armcomputetensorutils
 } // namespace armnn

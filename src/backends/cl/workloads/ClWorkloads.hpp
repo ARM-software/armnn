@@ -28,6 +28,7 @@
 #include "ClResizeBilinearFloatWorkload.hpp"
 #include "ClSoftmaxFloatWorkload.hpp"
 #include "ClSoftmaxUint8Workload.hpp"
+#include "ClSpaceToBatchNdWorkload.hpp"
 #include "ClSplitterWorkload.hpp"
 #include "ClStridedSliceWorkload.hpp"
 #include "ClSubtractionWorkload.hpp"

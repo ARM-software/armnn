@@ -36,6 +36,7 @@
 #include "workloads/ClPermuteWorkload.hpp"
 #include "workloads/ClPooling2dWorkload.hpp"
 #include "workloads/ClSoftmaxBaseWorkload.hpp"
+#include "workloads/ClSpaceToBatchNdWorkload.hpp"
 #include "workloads/ClStridedSliceWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"
 #endif
@@ -522,6 +523,18 @@ bool ClLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
 {
     ignore_unused(descriptor);
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClSoftmaxWorkloadValidate, reasonIfUnsupported, input, output);
+}
+
+bool ClLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const SpaceToBatchNdDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClSpaceToBatchNdWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,

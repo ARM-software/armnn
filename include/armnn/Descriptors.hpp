@@ -360,7 +360,9 @@ struct ReshapeDescriptor
 struct SpaceToBatchNdDescriptor
 {
     SpaceToBatchNdDescriptor()
-    : m_DataLayout(DataLayout::NCHW)
+    : m_BlockShape({1, 1})
+    , m_PadList({{0, 0}, {0, 0}})
+    , m_DataLayout(DataLayout::NCHW)
     {}
 
     SpaceToBatchNdDescriptor(const std::vector<unsigned int>& blockShape,

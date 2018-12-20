@@ -28,6 +28,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonL2NormalizationFloatWorkload.hpp
     NeonLstmFloatWorkload.cpp
     NeonLstmFloatWorkload.hpp
+    NeonMaximumWorkload.cpp
+    NeonMaximumWorkload.hpp
     NeonMergerWorkload.cpp
     NeonMergerWorkload.hpp
     NeonMultiplicationFloatWorkload.cpp

@@ -121,6 +121,11 @@ public:
                          const TensorInfo* cellToOutputWeights,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsMaximumSupported(const TensorInfo& input0,
+                            const TensorInfo& input1,
+                            const TensorInfo& output,
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsMeanSupported(const TensorInfo& input,
                          const TensorInfo& output,
                          const MeanDescriptor& descriptor,

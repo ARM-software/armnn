@@ -25,6 +25,7 @@ BACKEND_SOURCES := \
         workloads/NeonFullyConnectedWorkload.cpp \
         workloads/NeonL2NormalizationFloatWorkload.cpp \
         workloads/NeonLstmFloatWorkload.cpp \
+        workloads/NeonMaximumWorkload.cpp \
         workloads/NeonMergerWorkload.cpp \
         workloads/NeonMultiplicationFloatWorkload.cpp \
         workloads/NeonNormalizationFloatWorkload.cpp \

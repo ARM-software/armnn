@@ -16,6 +16,7 @@
 #include "NeonFullyConnectedWorkload.hpp"
 #include "NeonL2NormalizationFloatWorkload.hpp"
 #include "NeonLstmFloatWorkload.hpp"
+#include "NeonMaximumWorkload.hpp"
 #include "NeonMergerWorkload.hpp"
 #include "NeonMultiplicationFloatWorkload.hpp"
 #include "NeonNormalizationFloatWorkload.hpp"

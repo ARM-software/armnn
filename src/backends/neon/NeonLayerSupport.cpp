@@ -23,6 +23,7 @@
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
+#include "workloads/NeonMaximumWorkload.hpp"
 #include "workloads/NeonMergerWorkload.hpp"
 #include "workloads/NeonMultiplicationFloatWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
@@ -344,6 +345,18 @@ bool NeonLayerSupport::IsLstmSupported(const TensorInfo& input,
     ignore_unused(cellToOutputWeights);
     ignore_unused(reasonIfUnsupported);
     return false;
+}
+
+bool NeonLayerSupport::IsMaximumSupported(const TensorInfo& input0,
+                                          const TensorInfo& input1,
+                                          const TensorInfo& output,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonMaximumWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool NeonLayerSupport::IsMeanSupported(const TensorInfo& input,

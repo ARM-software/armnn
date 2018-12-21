@@ -15,15 +15,21 @@
 namespace armnn
 {
 
+/// An ActivationDescriptor for the ActivationLayer.
 struct ActivationDescriptor
 {
     ActivationDescriptor() : m_Function(ActivationFunction::Sigmoid), m_A(0), m_B(0) {};
 
+    /// @brief The activation function to use
+    /// (Sigmoid, TanH, Linear, ReLu, BoundedReLu, SoftReLu, LeakyReLu, Abs, Sqrt, Square).
     ActivationFunction m_Function;
+    /// Alpha upper bound value used by the activation functions. (BoundedReLu, Linear, TanH).
     float              m_A;
+    /// Beta lower bound value used by the activation functions. (BoundedReLu, Linear, TanH).
     float              m_B;
 };
 
+/// A PermuteDescriptor for the PermuteLayer.
 struct PermuteDescriptor
 {
     PermuteDescriptor()
@@ -34,18 +40,22 @@ struct PermuteDescriptor
         : m_DimMappings(dimMappings)
     {
     }
-
+    /// @brief Indicates how to translate tensor elements from a given source into the target destination, when
+    /// source and target potentially have different memory layouts e.g. {0U, 3U, 1U, 2U}.
     PermutationVector m_DimMappings;
 };
 
+/// A SoftmaxDescriptor for the SoftmaxLayer.
 struct SoftmaxDescriptor
 {
     SoftmaxDescriptor() : m_Beta(1.0f) {};
-
+    /// Exponentiation value.
     float              m_Beta;
 };
 
-
+/// @brief An OriginsDescriptor for the MergerLayer.
+/// Descriptor to configure the merging process. Number of views must be equal to the number of inputs, and
+/// their order must match - e.g. first view corresponds to the first input, second view to the second input, etc.
 struct OriginsDescriptor
 {
     OriginsDescriptor();
@@ -57,13 +67,24 @@ struct OriginsDescriptor
 
     OriginsDescriptor& operator=(OriginsDescriptor rhs);
 
+    /// @Brief Set the view origin coordinates. The arguments are: view, dimension, value.
+    /// If the view is greater than or equal to GetNumViews(), then the view argument is out of range.
+    /// If the coord is greater than or equal to GetNumViews(), then the coord argument is out of range.
     Status SetViewOriginCoord(uint32_t view, uint32_t coord, uint32_t value);
+    /// Get the number of views.
     uint32_t GetNumViews() const;
+    /// Get the number of dimensions.
     uint32_t GetNumDimensions() const;
+    /// Return the view origin at the int value idx.
     const uint32_t* GetViewOrigin(uint32_t idx) const;
+    /// @brief Reorders the viewOrigins in accordance with the indices presented in newOrdering array.
+    /// The number of views must match number of elements in the new ordering array.
     void ReorderOrigins(unsigned int*  newOrdering, unsigned int numNewOrdering);
+    /// Swap the ViewsDescriptor values first and second.
     friend void swap(OriginsDescriptor& first, OriginsDescriptor& second);
+    /// Set the concatenation axis value.
     void SetConcatAxis(unsigned int concatAxis);
+    /// Get the concatenation axis value.
     unsigned int GetConcatAxis() const;
 
 private:
@@ -73,6 +94,9 @@ private:
     uint32_t**   m_ViewOrigins;
 };
 
+/// @brief A ViewsDescriptor for the SplitterLayer.
+/// Descriptor to configure the splitting process. Number of Views must be equal to the number of outputs, and
+/// their order must match - e.g. first view corresponds to the first output, second view to the second output, etc.
 struct ViewsDescriptor
 {
     ViewsDescriptor(uint32_t numViews, uint32_t numDimensions = 4);
@@ -84,22 +108,33 @@ struct ViewsDescriptor
 
     ViewsDescriptor& operator=(ViewsDescriptor rhs);
 
+    /// @Brief Set the view origin coordinates. The arguments are: view, dimension, value.
+    /// If the view is greater than or equal to GetNumViews(), then the view argument is out of range.
+    /// If the coord is greater than or equal to GetNumViews(), then the coord argument is out of range.
     Status SetViewOriginCoord(uint32_t view, uint32_t coord, uint32_t value);
+    /// @brief Set the size of the views. The arguments are: view, dimension, value.
+    /// If the view is greater than or equal to GetNumViews(), then the view argument is out of range.
+    /// If the coord is greater than or equal to GetNumViews(), then the coord argument is out of range.
     Status SetViewSize(uint32_t view, uint32_t coord, uint32_t value);
 
+    /// Get the number of views.
     uint32_t GetNumViews() const;
+    /// Get the number of dimensions.
     uint32_t GetNumDimensions() const;
+    /// Get the view origin at the int value idx.
     const uint32_t* GetViewOrigin(uint32_t idx) const;
+    /// Get the view sizes at the int value idx.
     const uint32_t* GetViewSizes(uint32_t idx) const;
 
+    /// Swap the ViewsDescriptor value first and second.
     friend void swap(ViewsDescriptor& first, ViewsDescriptor& second);
 private:
     OriginsDescriptor m_Origins;
     uint32_t**        m_ViewSizes;
 };
 
-/// Convenience template to create an OriginsDescriptor to use when creating a Merger layer for performing concatenation
-/// of a number of input tensors
+/// @brief Convenience template to create an OriginsDescriptor to use when creating a MergerLayer for performing
+/// concatenation of a number of input tensors.
 template <typename TensorShapeIt>
 OriginsDescriptor CreateMergerDescriptorForConcatenation(TensorShapeIt first, TensorShapeIt last,
     unsigned int concatenationDimension)
@@ -170,6 +205,7 @@ OriginsDescriptor CreateMergerDescriptorForConcatenation(TensorShapeIt first, Te
     return viewsDescriptor;
 }
 
+/// A Pooling2dDescriptor for the Pooling2dLayer.
 struct Pooling2dDescriptor
 {
     Pooling2dDescriptor()
@@ -187,20 +223,33 @@ struct Pooling2dDescriptor
     , m_DataLayout(DataLayout::NCHW)
     {};
 
+    /// The pooling algorithm to use (Max. Average, L2).
     PoolingAlgorithm    m_PoolType;
+    /// Padding left value in the width dimension.
     uint32_t            m_PadLeft;
+    /// Padding right value in the width dimension.
     uint32_t            m_PadRight;
+    /// Padding top value in the height dimension.
     uint32_t            m_PadTop;
+    /// Padding bottom value in the height dimension.
     uint32_t            m_PadBottom;
+    /// Pooling width value.
     uint32_t            m_PoolWidth;
+    /// Pooling height value.
     uint32_t            m_PoolHeight;
+    /// Stride value when proceeding through input for the width dimension.
     uint32_t            m_StrideX;
+    /// Stride value when proceeding through input for the height dimension.
     uint32_t            m_StrideY;
+    /// The rounding method for the output shape. (Floor, Ceiling).
     OutputShapeRounding m_OutputShapeRounding;
+    /// The padding method to be used. (Exclude, IgnoreValue).
     PaddingMethod       m_PaddingMethod;
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout   m_DataLayout;
 };
 
+/// A FullyConnectedDescriptor for the FullyConnectedLayer.
 struct FullyConnectedDescriptor
 {
     FullyConnectedDescriptor()
@@ -208,10 +257,13 @@ struct FullyConnectedDescriptor
     , m_TransposeWeightMatrix(false)
     {};
 
+    /// Enable/disable bias.
     bool m_BiasEnabled;
+    /// Enable/disable transpose weight matrix.
     bool m_TransposeWeightMatrix;
 };
 
+/// A Convolution2dDescriptor for the Convolution2dLayer.
 struct Convolution2dDescriptor
 {
     Convolution2dDescriptor()
@@ -225,16 +277,25 @@ struct Convolution2dDescriptor
     , m_DataLayout(DataLayout::NCHW)
     {};
 
+    /// Padding left value in the width dimension.
     uint32_t             m_PadLeft;
+    /// Padding right value in the width dimension.
     uint32_t             m_PadRight;
+    /// Padding top value in the height dimension.
     uint32_t             m_PadTop;
+    /// Padding bottom value in the height dimension.
     uint32_t             m_PadBottom;
+    /// Stride value when proceeding through input for the width dimension.
     uint32_t             m_StrideX;
+    /// Stride value when proceeding through input for the height dimension.
     uint32_t             m_StrideY;
+    /// Enable/disable bias.
     bool                 m_BiasEnabled;
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout           m_DataLayout;
 };
 
+/// A DepthwiseConvolution2dDescriptor for the DepthwiseConvolution2dLayer.
 struct DepthwiseConvolution2dDescriptor
 {
     DepthwiseConvolution2dDescriptor()
@@ -248,17 +309,25 @@ struct DepthwiseConvolution2dDescriptor
     ,   m_DataLayout(DataLayout::NCHW)
     {}
 
+    /// Padding left value in the width dimension.
     uint32_t   m_PadLeft;
+    /// Padding right value in the width dimension.
     uint32_t   m_PadRight;
+    /// Padding top value in the height dimension.
     uint32_t   m_PadTop;
+    /// Padding bottom value in the height dimension.
     uint32_t   m_PadBottom;
+    /// Stride value when proceeding through input for the width dimension.
     uint32_t   m_StrideX;
+    /// Stride value when proceeding through input for the height dimension.
     uint32_t   m_StrideY;
+    /// Enable/disable bias.
     bool       m_BiasEnabled;
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };
 
-
+/// A NormalizationDescriptor for the NormalizationLayer.
 struct NormalizationDescriptor
 {
     NormalizationDescriptor()
@@ -271,24 +340,34 @@ struct NormalizationDescriptor
     , m_DataLayout(DataLayout::NCHW)
     {}
 
+    /// Normalization channel algorithm to use (Across, Within).
     NormalizationAlgorithmChannel m_NormChannelType;
+    /// Normalization method algorithm to use (LocalBrightness, LocalContrast).
     NormalizationAlgorithmMethod  m_NormMethodType;
+    /// Depth radius value.
     uint32_t                      m_NormSize;
+    /// Alpha value for the normalization equation.
     float                         m_Alpha;
+    /// Beta value for the normalization equation.
     float                         m_Beta;
+    /// Kappa value used for the across channel normalization equation.
     float                         m_K;
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout                    m_DataLayout;
 };
 
+/// A L2NormalizationDescriptor for the L2NormalizationLayer.
 struct L2NormalizationDescriptor
 {
     L2NormalizationDescriptor()
         : m_DataLayout(DataLayout::NCHW)
     {}
 
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };
 
+/// A BatchNormalizationDescriptor for the BatchNormalizationLayer.
 struct BatchNormalizationDescriptor
 {
     BatchNormalizationDescriptor()
@@ -296,10 +375,13 @@ struct BatchNormalizationDescriptor
     , m_DataLayout(DataLayout::NCHW)
     {}
 
+    /// Value to add to the variance. Used to avoid dividing by zero.
     float m_Eps;
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };
 
+/// A BatchToSpaceNdDescriptor for the BatchToSpaceNdLayer.
 struct BatchToSpaceNdDescriptor
 {
     BatchToSpaceNdDescriptor()
@@ -315,11 +397,15 @@ struct BatchToSpaceNdDescriptor
         , m_DataLayout(DataLayout::NCHW)
     {}
 
+    /// Block shape values.
     std::vector<unsigned int> m_BlockShape;
+    /// The values to crop from the input dimension.
     std::vector<std::pair<unsigned int, unsigned int>> m_Crops;
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };
 
+/// A FakeQuantizationDescriptor for the FakeQuantizationLayer.
 struct FakeQuantizationDescriptor
 {
     FakeQuantizationDescriptor()
@@ -327,10 +413,13 @@ struct FakeQuantizationDescriptor
     , m_Max(6.0f)
     {}
 
+    /// Minimum value.
     float m_Min;
+    /// Maximum value.
     float m_Max;
 };
 
+/// A ResizeBilinearDescriptor for the ResizeBilinearLayer.
 struct ResizeBilinearDescriptor
 {
     ResizeBilinearDescriptor()
@@ -339,11 +428,15 @@ struct ResizeBilinearDescriptor
     , m_DataLayout(DataLayout::NCHW)
     {}
 
+    /// Target width value.
     uint32_t          m_TargetWidth;
+    /// Target height value.
     uint32_t          m_TargetHeight;
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };
 
+/// A ReshapeDescriptor for the ReshapeLayer.
 struct ReshapeDescriptor
 {
     ReshapeDescriptor()
@@ -354,9 +447,11 @@ struct ReshapeDescriptor
     : m_TargetShape(shape)
     {}
 
+    /// Target shape value.
     TensorShape m_TargetShape;
 };
 
+/// A SpaceToBatchNdDescriptor for the SpaceToBatchNdLayer.
 struct SpaceToBatchNdDescriptor
 {
     SpaceToBatchNdDescriptor()
@@ -372,12 +467,16 @@ struct SpaceToBatchNdDescriptor
     , m_DataLayout(DataLayout::NCHW)
     {}
 
+    /// Block shape value.
     std::vector<unsigned int> m_BlockShape;
+    /// @brief Specifies the padding values for the input dimension:
+    /// heightPad{top, bottom} widthPad{left, right}.
     std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };
 
-// temporary descriptor for Lstm
+/// An LstmDescriptor for the LstmLayer.
 struct LstmDescriptor
 {
     LstmDescriptor()
@@ -389,14 +488,22 @@ struct LstmDescriptor
     , m_ProjectionEnabled(false)
     {}
 
+    /// @brief The activation function to use.
+    /// 0: None, 1: Relu, 3: Relu6, 4: Tanh, 6: Sigmoid.
     uint32_t m_ActivationFunc;
+    /// Clipping threshold value for the cell state.
     float m_ClippingThresCell;
+    /// Clipping threshold value for the projection.
     float m_ClippingThresProj;
+    /// Enable/disable cifg (coupled input & forget gate).
     bool m_CifgEnabled;
+    /// Enable/disable peephole.
     bool m_PeepholeEnabled;
+    /// Enable/disable the projection layer.
     bool m_ProjectionEnabled;
 };
 
+/// A MeanDescriptor for the MeanLayer.
 struct MeanDescriptor
 {
     MeanDescriptor()
@@ -409,10 +516,13 @@ struct MeanDescriptor
     , m_KeepDims(keepDims)
     {}
 
+    /// Values for the dimensions to reduce.
     std::vector<unsigned int> m_Axis;
+    /// Enable/disable keep dimensions. If true, then the reduced dimensions that are of length 1 are kept.
     bool m_KeepDims;
 };
 
+/// A PadDescriptor for the PadLayer.
 struct PadDescriptor
 {
     PadDescriptor()
@@ -422,12 +532,14 @@ struct PadDescriptor
     : m_PadList(padList)
     {}
 
-    // first is number of values to add before the tensor in the dimension,
-    // second is the number of values to add after the tensor in the dimension
-    // the number of pairs should match the number of dimensions in the input tensor.
+    /// @brief Specifies the padding for input dimension.
+    /// First is the number of values to add before the tensor in the dimension.
+    /// Second is the number of values to add after the tensor in the dimension.
+    /// The number of pairs should match the number of dimensions in the input tensor.
     std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
 };
 
+/// A StridedSliceDescriptor for the StridedSliceLayer.
 struct StridedSliceDescriptor
 {
     StridedSliceDescriptor(const std::vector<int>& begin,
@@ -453,19 +565,32 @@ struct StridedSliceDescriptor
                        unsigned int axis,
                        int startForAxis) const;
 
+    /// Begin values for the input that will be sliced.
     std::vector<int> m_Begin;
+    /// End values for the input that will be sliced.
     std::vector<int> m_End;
+    /// Stride values for the input that will be sliced.
     std::vector<int> m_Stride;
 
+    /// @brief Begin mask value. If set, then the begin is disregarded and the fullest
+    /// range is used for the dimension.
     int32_t m_BeginMask;
+    /// @brief End mask value. If set, then the end is disregarded and the fullest range
+    /// is used for the dimension.
     int32_t m_EndMask;
+    /// Shrink axis mask value. If set, the nth specification shrinks the dimensionality by 1.
     int32_t m_ShrinkAxisMask;
+    /// Ellipsis mask value.
     int32_t m_EllipsisMask;
+    /// @brief New axis mask value. If set, the begin, end and stride is disregarded and
+    /// a new 1 dimension is inserted to this location of the output tensor.
     int32_t m_NewAxisMask;
 
+    /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };
 
+/// A DebugDescriptor for the DebugLayer.
 struct DebugDescriptor
 {
     DebugDescriptor()
@@ -477,7 +602,9 @@ struct DebugDescriptor
     , m_SlotIndex(index)
     {}
 
+    /// The name of the debug layer.
     std::string m_LayerName;
+    /// The slot index of the debug layer.
     unsigned int m_SlotIndex;
 };
 

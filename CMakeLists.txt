@@ -367,6 +367,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp
         src/armnn/test/GraphTests.cpp
+        src/armnn/test/GraphUtils.cpp
         src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/LayerValidateOutputTest.cpp
@@ -390,6 +391,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Activations.cpp
             src/armnnTfParser/test/Addition.cpp
             src/armnnTfParser/test/AddN.cpp
+            src/armnnTfParser/test/Assert.cpp
             src/armnnTfParser/test/BiasAdd.cpp
             src/armnnTfParser/test/BroadcastForAdd.cpp
             src/armnnTfParser/test/Convolution2d.cpp

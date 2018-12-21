@@ -8,18 +8,16 @@
 
 #include <string>
 
-namespace
-{
 
-bool GraphHasNamedLayer(const armnn::Graph& graph, const std::string& name)
-{
-    for (auto&& layer : graph)
-    {
-        if (layer->GetName() == name)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-}
+bool GraphHasNamedLayer(const armnn::Graph& graph, const std::string& name);
+
+armnn::Layer* GetFirstLayerWithName(armnn::Graph& graph, const std::string& name);
+
+bool CheckNumberOfInputSlot(armnn::Layer* layer, unsigned int num);
+
+bool CheckNumberOfOutputSlot(armnn::Layer* layer, unsigned int num);
+
+bool IsConnected(armnn::Layer* srcLayer, armnn::Layer* destLayer,
+                 unsigned int srcSlot, unsigned int destSlot,
+                 const armnn::TensorInfo& expectedTensorInfo);
+

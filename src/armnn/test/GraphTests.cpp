@@ -29,18 +29,6 @@ bool CheckOrder(const armnn::Graph& graph, const armnn::Layer* first, const armn
     return (secondPos != order.end());
 }
 
-static armnn::Layer* GetFirstLayerWithName(armnn::Graph& graph, const std::string& name)
-{
-    for (auto&& layer : graph)
-    {
-        if (layer->GetNameStr() == name)
-        {
-            return layer;
-        }
-    }
-    return nullptr;
-}
-
 BOOST_AUTO_TEST_SUITE(Graph)
 
 BOOST_AUTO_TEST_CASE(ClassGraph)

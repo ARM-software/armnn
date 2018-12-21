@@ -357,7 +357,11 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "Minimum",               &TfParser::ParseMinimum },
     { "Equal",                 &TfParser::ParseEqual },
     { "Pad",                   &TfParser::ParsePad },
-    { "Sub",                   &TfParser::ParseSub },
+    { "Sub",                   &TfParser::ParseSub }
+};
+
+const std::list<std::string> TfParser::m_ControlInputs = {
+    "Assert"
 };
 
 ITfParser* ITfParser::CreateRaw()
@@ -544,14 +548,8 @@ TfParser::GetTfInputNodes(const tensorflow::NodeDef& nodeDef) const
 
         if (nodeDef.input(j)[0] == '^') // I couldn't find a better test for control inputs.
         {
-            throw ParseException(
-                boost::str(
-                    boost::format(
-                        "Node '%1%' has Control Input '%2%' for input #%3% which is unsupported. %4%")
-                        % nodeDef.name()
-                        % nodeDef.input(j)
-                        % j
-                        % CHECK_LOCATION().AsString()));
+            // We currently allow Control Input from TensorFlow graph but we ignore them from ArmNN graph.
+            continue;
         }
 
         auto inputIt = m_NodesByName.find(outputId.m_IndexedValue);
@@ -2941,6 +2939,12 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
     }
 
     const std::string& operation = nodeDef.op();
+    auto itControlInput = std::find(m_ControlInputs.begin(), m_ControlInputs.end(), operation);
+    if (itControlInput != m_ControlInputs.end())
+    {
+        // We currently allow Control Input from TensorFlow graph but we ignore them from ArmNN graph.
+        return;
+    }
     auto it = ms_OperationNameToParsingFunctions.find(operation);
     if (it != ms_OperationNameToParsingFunctions.end())
     {

@@ -215,6 +215,7 @@ LOCAL_SRC_FILES := \
         src/armnn/test/EndToEndTest.cpp \
         src/armnn/test/UtilsTests.cpp \
         src/armnn/test/GraphTests.cpp \
+        src/armnn/test/GraphUtils.cpp \
         src/armnn/test/RuntimeTests.cpp \
         src/armnn/test/SubGraphTests.cpp \
         src/armnn/test/TensorTest.cpp \

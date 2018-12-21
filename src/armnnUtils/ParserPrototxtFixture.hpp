@@ -6,10 +6,12 @@
 #pragma once
 
 #include <armnn/IRuntime.hpp>
+
 #include <test/TensorHelpers.hpp>
 
 #include <armnnOnnxParser/IOnnxParser.hpp>
 
+#include <Network.hpp>
 #include <VerificationHelpers.hpp>
 
 #include <backendsCommon/BackendRegistry.hpp>
@@ -40,6 +42,9 @@ struct ParserPrototxtFixture
     void Setup(const std::map<std::string, armnn::TensorShape>& inputShapes,
         const std::vector<std::string>& requestedOutputs);
     void Setup();
+    armnn::IOptimizedNetworkPtr SetupOptimizedNetwork(
+        const std::map<std::string,armnn::TensorShape>& inputShapes,
+        const std::vector<std::string>& requestedOutputs);
     /// @}
 
     /// Executes the network with the given input tensor and checks the result against the given output tensor.
@@ -122,6 +127,17 @@ void ParserPrototxtFixture<TParser>::Setup()
                             % errorMessage
                             % CHECK_LOCATION().AsString()));
     }
+}
+
+template<typename TParser>
+armnn::IOptimizedNetworkPtr ParserPrototxtFixture<TParser>::SetupOptimizedNetwork(
+    const std::map<std::string,armnn::TensorShape>& inputShapes,
+    const std::vector<std::string>& requestedOutputs)
+{
+    armnn::INetworkPtr network =
+        m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes, requestedOutputs);
+    auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
+    return optimized;
 }
 
 template<typename TParser>

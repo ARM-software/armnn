@@ -10,6 +10,7 @@
 #include "armnn/Tensor.hpp"
 #include "armnn/INetwork.hpp"
 
+#include <list>
 #include <map>
 #include <memory>
 #include <unordered_map>
@@ -240,6 +241,8 @@ private:
 
     /// Map of TensorFlow operation names to parsing member functions.
     static const std::map<std::string, OperationParsingFunction> ms_OperationNameToParsingFunctions;
+
+    static const std::list<std::string> m_ControlInputs;
 
     std::map<std::string, armnn::TensorShape> m_InputShapes;
     std::vector<std::string> m_RequestedOutputs;

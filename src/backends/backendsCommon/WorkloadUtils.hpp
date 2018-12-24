@@ -86,8 +86,13 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
                  dstChannelStride,
                  dstBatchStride);
 
-    auto srcData = static_cast<const uint8_t*>(srcTensor->Map());
-    auto dstData = static_cast<uint8_t*>(dstTensor->Map());
+    const unsigned char* srcData;
+    unsigned char* dstData;
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Synchronize buffers");
+        srcData = static_cast<const uint8_t *>(srcTensor->Map());
+        dstData = static_cast<uint8_t *>(dstTensor->Map());
+    }
 
     size_t copyLength = std::min(srcWidth*srcWidthStride, dstWidth*dstWidthStride);
     size_t copyHeight = std::min(srcHeight, dstHeight);

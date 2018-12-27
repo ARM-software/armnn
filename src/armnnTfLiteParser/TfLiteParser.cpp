@@ -597,6 +597,7 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
 
         SetupInputLayers(subgraphIndex);
         SetupOutputLayers(subgraphIndex);
+        AddConstantLayers(subgraphIndex);
 
         ++subgraphIndex;
     }
@@ -1744,6 +1745,36 @@ void TfLiteParser::SetupOutputLayers(size_t subgraphIndex)
                            VIRTUAL_OPERATOR_ID,
                            layer,
                            { static_cast<uint32_t>(tensorIdAndPtr.first) });
+    }
+}
+
+void TfLiteParser::AddConstantLayers(size_t subgraphIndex) {
+    CHECK_SUBGRAPH(m_Model, subgraphIndex);
+    const auto & subGraphPtr = m_Model->subgraphs[subgraphIndex];
+
+    for (size_t subgraphIndex = 0; subgraphIndex < m_SubgraphConnections.size(); ++subgraphIndex)
+    {
+        for (size_t tensorIndex = 0; tensorIndex < m_SubgraphConnections[subgraphIndex].size(); ++tensorIndex)
+        {
+            if (m_SubgraphConnections[subgraphIndex][tensorIndex].outputSlot == nullptr &&
+                m_SubgraphConnections[subgraphIndex][tensorIndex].inputSlots.size() > 0)
+            {
+                TensorRawPtr tensorPtr = subGraphPtr->tensors[tensorIndex].get();
+                armnn::TensorInfo tensorInfo = ToTensorInfo(tensorPtr);
+                auto tensorAndData = CreateConstTensor(tensorPtr, tensorInfo);
+
+                std::string layerName = boost::str(boost::format("Constant:%1%") % tensorPtr->name);
+                IConnectableLayer *layer =
+                    m_Network->AddConstantLayer(tensorAndData.first, layerName.c_str());
+
+                layer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+                RegisterOutputSlots(subgraphIndex,
+                                    VIRTUAL_OPERATOR_ID,
+                                    layer,
+                                    { tensorIndex });
+
+            }
+        }
     }
 }
 

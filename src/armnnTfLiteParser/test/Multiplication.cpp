@@ -108,4 +108,40 @@ BOOST_FIXTURE_TEST_CASE(ParseMultiplication, SimpleMultiplicationFixture)
                                                                  45.0f, 50.0f, 55.0f } } });
 }
 
+struct MultiplicationBroadcastFixture4D1D : public MultiplicationFixture
+{
+    MultiplicationBroadcastFixture4D1D() : MultiplicationFixture("[ 1, 2, 2, 3 ]", "[ 1 ]", "[ 1, 2, 2, 3 ]") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseMultiplicationBroadcast4D1D, MultiplicationBroadcastFixture4D1D)
+{
+    RunTest<4, float>(0, {{ "inputTensor1", { 0.0f,  1.0f,  2.0f,
+                                              3.0f,  4.0f,  5.0f,
+                                              6.0f,  7.0f,  8.0f,
+                                              9.0f, 10.0f, 11.0f } },
+                         { "inputTensor2", { 5.0f } } },
+                         {{ "outputTensor", { 0.0f,  5.0f, 10.0f,
+                                             15.0f, 20.0f, 25.0f,
+                                             30.0f, 35.0f, 40.0f,
+                                             45.0f, 50.0f, 55.0f } } });
+}
+
+struct MultiplicationBroadcastFixture1D4D : public MultiplicationFixture
+{
+    MultiplicationBroadcastFixture1D4D() : MultiplicationFixture("[ 1 ]", "[ 1, 2, 2, 3 ]", "[ 1, 2, 2, 3 ]") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseMultiplicationBroadcast1D4D, MultiplicationBroadcastFixture1D4D)
+{
+    RunTest<4, float>(0, {{ "inputTensor1", { 3.0f } },
+                          { "inputTensor2", { 0.0f,  1.0f,  2.0f,
+                                              3.0f,  4.0f,  5.0f,
+                                              6.0f,  7.0f,  8.0f,
+                                              9.0f, 10.0f, 11.0f } } },
+                         {{ "outputTensor", { 0.0f,  3.0f,  6.0f,
+                                              9.0f, 12.0f, 15.0f,
+                                             18.0f, 21.0f, 24.0f,
+                                             27.0f, 30.0f, 33.0f } } });
+}
+
 BOOST_AUTO_TEST_SUITE_END()

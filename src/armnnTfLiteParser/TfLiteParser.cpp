@@ -588,6 +588,7 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
 
         SetupInputLayers(subgraphIndex);
         SetupOutputLayers(subgraphIndex);
+        SetupConstantLayers(subgraphIndex);
 
         ++subgraphIndex;
     }
@@ -1739,6 +1740,39 @@ void TfLiteParser::SetupOutputLayers(size_t subgraphIndex)
                            VIRTUAL_OPERATOR_ID,
                            layer,
                            { static_cast<uint32_t>(tensorIdAndPtr.first) });
+    }
+}
+
+void TfLiteParser::SetupConstantLayers(size_t subgraphIndex)
+{
+    CHECK_SUBGRAPH(m_Model, subgraphIndex);
+
+    const auto & subGraphPtr = m_Model->subgraphs[subgraphIndex];
+    for (unsigned int subgraphIndex = 0; subgraphIndex < m_SubgraphConnections.size(); ++subgraphIndex)
+    {
+        for (unsigned int tensorIndex = 0; tensorIndex < m_SubgraphConnections[subgraphIndex].size(); ++tensorIndex)
+        {
+            if (m_SubgraphConnections[subgraphIndex][tensorIndex].outputSlot == nullptr &&
+                m_SubgraphConnections[subgraphIndex][tensorIndex].inputSlots.size() > 0)
+            {
+                TensorRawPtr tensorPtr = subGraphPtr->tensors[tensorIndex].get();
+                armnn::TensorInfo tensorInfo = ToTensorInfo(tensorPtr);
+                auto tensorAndData = CreateConstTensor(tensorPtr,
+                                                       tensorInfo,
+                                                       armnn::Optional<armnn::PermutationVector&>());
+
+                std::string layerName = boost::str(boost::format("Constant:%1%") % tensorPtr->name);
+                IConnectableLayer *layer =
+                    m_Network->AddConstantLayer(tensorAndData.first, layerName.c_str());
+
+                layer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+                RegisterOutputSlots(subgraphIndex,
+                                    VIRTUAL_OPERATOR_ID,
+                                    layer,
+                                    { tensorIndex });
+
+            }
+        }
     }
 }
 

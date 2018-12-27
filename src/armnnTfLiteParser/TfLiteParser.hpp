@@ -123,6 +123,7 @@ private:
 
     void SetupInputLayers(size_t subgraphIndex);
     void SetupOutputLayers(size_t subgraphIndex);
+    void SetupConstantLayers(size_t subgraphIndex);
 
     void ResetParser();
 

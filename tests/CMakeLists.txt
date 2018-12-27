@@ -188,6 +188,12 @@ if (BUILD_TF_LITE_PARSER)
         ImagePreprocessor.hpp
         ImagePreprocessor.cpp)
     TfLiteParserTest(TfLiteInceptionV3Quantized-Armnn "${TfLiteInceptionV3Quantized-Armnn_sources}")
+
+    set(TfLiteResNetV2-Armnn_sources
+        TfLiteResNetV2-Armnn/TfLiteResNetV2-Armnn.cpp
+        ImagePreprocessor.hpp
+        ImagePreprocessor.cpp)
+    TfLiteParserTest(TfLiteResNetV2-Armnn "${TfLiteResNetV2-Armnn_sources}")
 endif()
 
 if (BUILD_ONNX_PARSER)

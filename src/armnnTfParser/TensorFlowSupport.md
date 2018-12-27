@@ -108,6 +108,10 @@ The parser only supports `ResizeMethod.BILINEAR` with `align_corners=False`. See
 
 The parser only supports 2D inputs and does not support selecting the `softmax` dimension. See the TensorFlow [softmax documentation](https://www.tensorflow.org/api_docs/python/tf/nn/softmax) for more information.
 
+**split**
+
+Arm NN supports split along the channel dimension for data formats NHWC and NCHW.
+
 **maximum**
 
 where maximum is used in one of the following ways

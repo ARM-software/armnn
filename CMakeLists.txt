@@ -421,6 +421,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/FullyConnected.cpp
             src/armnnTfParser/test/Constant.cpp
             src/armnnTfParser/test/TestMultiInputsOutputs.cpp
+            src/armnnTfParser/test/Split.cpp
             src/armnnTfParser/test/Squeeze.cpp
             src/armnnTfParser/test/Sub.cpp)
     endif()

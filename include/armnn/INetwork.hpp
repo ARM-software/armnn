@@ -338,6 +338,11 @@ public:
     /// @ return - Interface for configuring the layer.
     virtual IConnectableLayer* AddEqualLayer(const char* name = nullptr) = 0;
 
+    /// Add Reciprocal of square root layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @ return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) = 0;
+
 protected:
     ~INetwork() {}
 };

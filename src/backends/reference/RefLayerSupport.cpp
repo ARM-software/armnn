@@ -495,6 +495,17 @@ bool RefLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsRsqrtSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(output);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &FalseFuncU8<>);
+}
+
 bool RefLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const SoftmaxDescriptor& descriptor,

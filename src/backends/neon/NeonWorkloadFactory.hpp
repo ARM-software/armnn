@@ -148,6 +148,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateDebug(const DebugQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const override;
+
 private:
     mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
 };

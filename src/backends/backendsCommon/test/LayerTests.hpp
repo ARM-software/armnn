@@ -639,6 +639,30 @@ LayerTestResult<float, 4> ResizeBilinearMagTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout  dataLayout);
 
+LayerTestResult<float, 2> Rsqrt2dTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::TensorInfo inputTensorInfo,
+        const armnn::TensorInfo outputTensorInfo,
+        std::vector<float> inputValues,
+        std::vector<float> expectedOutputValues);
+
+LayerTestResult<float, 2> Rsqrt2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 3> Rsqrt3dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 2> RsqrtZeroTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 2> RsqrtNegativeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<float, 4> BatchNormTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

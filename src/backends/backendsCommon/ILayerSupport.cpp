@@ -336,4 +336,11 @@ bool ILayerSupport::IsGreaterSupported(const TensorInfo& input0,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool ILayerSupport::IsRsqrtSupported(const TensorInfo &input,
+                                     const TensorInfo &output,
+                                     Optional<std::string &> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 } // namespace armnn

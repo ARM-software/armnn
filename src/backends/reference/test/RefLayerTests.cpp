@@ -380,6 +380,12 @@ ARMNN_AUTO_TEST_CASE(SimpleFloor, SimpleFloorTest)
 ARMNN_AUTO_TEST_CASE(SimpleReshapeFloat32, SimpleReshapeFloat32Test)
 ARMNN_AUTO_TEST_CASE(SimpleReshapeUint8, SimpleReshapeUint8Test)
 
+// Rsqrt
+ARMNN_AUTO_TEST_CASE(Rsqrt2d, Rsqrt2dTest)
+ARMNN_AUTO_TEST_CASE(Rsqrt3d, Rsqrt3dTest)
+ARMNN_AUTO_TEST_CASE(RsqrtZero, RsqrtZeroTest)
+ARMNN_AUTO_TEST_CASE(RsqrtNegative, RsqrtNegativeTest)
+
 // Permute
 ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteFloat32Test)
 ARMNN_AUTO_TEST_CASE(SimplePermuteUint8, SimplePermuteUint8Test)

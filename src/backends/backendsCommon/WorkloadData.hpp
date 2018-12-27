@@ -373,4 +373,9 @@ struct DebugQueueDescriptor : QueueDescriptorWithParameters<DebugDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct RsqrtQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

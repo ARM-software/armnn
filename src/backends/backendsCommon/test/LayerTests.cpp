@@ -6734,6 +6734,170 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMagUint8Test(
     return result;
 }
 
+LayerTestResult<float, 2> Rsqrt2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::TensorInfo inputTensorInfo,
+    const armnn::TensorInfo outputTensorInfo,
+    std::vector<float> inputValues,
+    std::vector<float> expectedOutputValues)
+{
+    auto inputTensor = MakeTensor<float, 2>(inputTensorInfo, std::vector<float>(inputValues));
+
+    LayerTestResult<float, 2> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<float, 2>(outputTensorInfo, std::vector<float>(expectedOutputValues));
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::RsqrtQueueDescriptor descriptor;
+
+    armnn::WorkloadInfo info;
+
+    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateRsqrt(descriptor, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
+
+    return result;
+}
+LayerTestResult<float, 2> Rsqrt2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 2, 2 };
+    const armnn::TensorShape outputShape{ 2, 2 };
+
+    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+
+    std::vector<float> inputValues
+            {
+                    1.f, 4.f,
+                    16.f, 25.f
+            };
+
+    std::vector<float> expectedOutputValues
+            {
+                    1.f, 0.5f,
+                    0.25f, 0.2f
+            };
+
+    return Rsqrt2dTestCommon(workloadFactory, memoryManager,
+                             inputTensorInfo, outputTensorInfo,
+                             inputValues, expectedOutputValues);
+}
+
+LayerTestResult<float, 3> Rsqrt3dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 3, 1, 2 };
+    const armnn::TensorShape outputShape{ 3, 1, 2 };
+
+    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+
+    std::vector<float> inputValues
+            {
+                    1.f, 4.f, 16.f,
+                    25.f, 64.f, 100.f
+            };
+
+    std::vector<float> expectedOutputValues
+            {
+                    1.f, 0.5f, 0.25f,
+                    0.2f, 0.125f, 0.1f
+            };
+
+    auto inputTensor = MakeTensor<float, 3>(inputTensorInfo, std::vector<float>(inputValues));
+
+    LayerTestResult<float, 3> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<float, 3>(outputTensorInfo, std::vector<float >(expectedOutputValues));
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::RsqrtQueueDescriptor descriptor;
+
+    armnn::WorkloadInfo info;
+
+    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateRsqrt(descriptor, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0]);
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0][0], outputHandle.get());
+
+    return result;
+}
+
+LayerTestResult<float, 2> RsqrtZeroTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 1, 2 };
+    const armnn::TensorShape outputShape{ 1, 2 };
+
+    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+
+    std::vector<float> inputValues
+            {
+                    0.f, -0.f
+            };
+
+    std::vector<float> expectedOutputValues
+            {
+                    INFINITY, -INFINITY
+            };
+
+    return Rsqrt2dTestCommon(workloadFactory, memoryManager,
+                             inputTensorInfo, outputTensorInfo,
+                             inputValues, expectedOutputValues);
+}
+
+LayerTestResult<float, 2> RsqrtNegativeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 1, 2 };
+    const armnn::TensorShape outputShape{ 1, 2 };
+
+    const armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+
+    std::vector<float> inputValues
+            {
+                    -25.f, -16.f
+            };
+
+    std::vector<float> expectedOutputValues
+            {
+                    -NAN, -NAN
+            };
+
+    return Rsqrt2dTestCommon(workloadFactory, memoryManager,
+                             inputTensorInfo, outputTensorInfo,
+                             inputValues, expectedOutputValues);
+}
+
 LayerTestResult<float, 4> BatchNormTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

@@ -600,6 +600,15 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             result = layerSupportObject->IsResizeBilinearSupported(OverrideDataType(input, dataType), reason);
             break;
         }
+        case LayerType::Rsqrt:
+        {
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsRsqrtSupported(OverrideDataType(input, dataType),
+                                                          OverrideDataType(output, dataType),
+                                                          reason);
+            break;
+        }
         case LayerType::Softmax:
         {
             auto cLayer = boost::polymorphic_downcast<const SoftmaxLayer*>(&layer);

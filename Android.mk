@@ -113,13 +113,14 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/PermuteLayer.cpp \
         src/armnn/layers/Pooling2dLayer.cpp \
         src/armnn/layers/DivisionLayer.cpp \
-        src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/layers/ReshapeLayer.cpp \
-        src/armnn/layers/SpaceToBatchNdLayer.cpp \
         src/armnn/layers/ResizeBilinearLayer.cpp \
+        src/armnn/layers/RsqrtLayer.cpp \
+        src/armnn/layers/SpaceToBatchNdLayer.cpp \
         src/armnn/layers/SoftmaxLayer.cpp \
         src/armnn/layers/SplitterLayer.cpp \
         src/armnn/layers/StridedSliceLayer.cpp \
+        src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/Descriptors.cpp \
         src/armnn/Exceptions.cpp \
         src/armnn/Graph.cpp \

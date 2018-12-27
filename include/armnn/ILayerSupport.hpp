@@ -195,6 +195,10 @@ public:
     virtual bool IsResizeBilinearSupported(const TensorInfo& input,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
+    virtual bool IsRsqrtSupported(const TensorInfo& input,
+                                  const TensorInfo& output,
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     virtual bool IsSoftmaxSupported(const TensorInfo& input,
                                     const TensorInfo& output,
                                     const SoftmaxDescriptor& descriptor,

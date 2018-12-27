@@ -156,6 +156,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateDebug(const DebugQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const = 0;
 };
 
 } //namespace armnn

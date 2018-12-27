@@ -46,6 +46,7 @@ enum class LayerType
     Pooling2d,
     Reshape,
     ResizeBilinear,
+    Rsqrt,
     Softmax,
     SpaceToBatchNd,
     Splitter,

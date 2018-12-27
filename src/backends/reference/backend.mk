@@ -57,6 +57,7 @@ BACKEND_SOURCES := \
         workloads/RefReshapeUint8Workload.cpp \
         workloads/RefResizeBilinearFloat32Workload.cpp \
         workloads/RefResizeBilinearUint8Workload.cpp \
+        workloads/RefRsqrtFloat32Workload.cpp \
         workloads/RefSoftmaxFloat32Workload.cpp \
         workloads/RefSoftmaxUint8Workload.cpp \
         workloads/RefSpaceToBatchNdWorkload.cpp \
@@ -64,6 +65,7 @@ BACKEND_SOURCES := \
         workloads/RefSplitterFloat32Workload.cpp \
         workloads/RefSplitterUint8Workload.cpp \
         workloads/ResizeBilinear.cpp \
+        workloads/Rsqrt.cpp \
         workloads/SpaceToBatchNd.cpp \
         workloads/StridedSlice.cpp \
         workloads/StringMapping.cpp \

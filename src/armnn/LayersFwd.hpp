@@ -38,6 +38,7 @@
 #include "layers/Pooling2dLayer.hpp"
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeBilinearLayer.hpp"
+#include "layers/RsqrtLayer.hpp"
 #include "layers/SoftmaxLayer.hpp"
 #include "layers/SpaceToBatchNdLayer.hpp"
 #include "layers/SplitterLayer.hpp"
@@ -103,6 +104,7 @@ DECLARE_LAYER(Permute)
 DECLARE_LAYER(Pooling2d)
 DECLARE_LAYER(Reshape)
 DECLARE_LAYER(ResizeBilinear)
+DECLARE_LAYER(Rsqrt)
 DECLARE_LAYER(Softmax)
 DECLARE_LAYER(SpaceToBatchNd)
 DECLARE_LAYER(Splitter)

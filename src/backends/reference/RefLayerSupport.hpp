@@ -185,6 +185,10 @@ public:
     bool IsResizeBilinearSupported(const TensorInfo& input,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsRsqrtSupported(const TensorInfo& input,
+                          const TensorInfo& output,
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsSoftmaxSupported(const TensorInfo& input,
                             const TensorInfo& output,
                             const SoftmaxDescriptor& descriptor,

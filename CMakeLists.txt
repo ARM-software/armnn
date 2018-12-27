@@ -240,6 +240,8 @@ list(APPEND armnn_sources
     src/armnn/layers/SpaceToBatchNdLayer.cpp
     src/armnn/layers/ResizeBilinearLayer.hpp
     src/armnn/layers/ResizeBilinearLayer.cpp
+    src/armnn/layers/RsqrtLayer.cpp
+    src/armnn/layers/RsqrtLayer.hpp
     src/armnn/layers/SoftmaxLayer.hpp
     src/armnn/layers/SoftmaxLayer.cpp
     src/armnn/layers/SplitterLayer.hpp

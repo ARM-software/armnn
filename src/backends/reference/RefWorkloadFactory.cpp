@@ -312,4 +312,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescr
     return MakeWorkload<RefDebugFloat32Workload, RefDebugUint8Workload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return MakeWorkload<RefRsqrtFloat32Workload, NullWorkload>(descriptor, info);
+}
+
 } // namespace armnn

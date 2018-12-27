@@ -389,6 +389,15 @@ bool IsReshapeSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsReshapeSupported, input);
 }
 
+bool IsRsqrtSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsRsqrtSupported, input, output);
+}
+
 bool IsFloorSupported(const BackendId& backend,
                       const TensorInfo& input,
                       const TensorInfo& output,

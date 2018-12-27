@@ -139,6 +139,8 @@ public:
 
     IConnectableLayer* AddEqualLayer(const char* name = nullptr) override;
 
+    IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) override;
+
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
         const ConstTensor& weights,

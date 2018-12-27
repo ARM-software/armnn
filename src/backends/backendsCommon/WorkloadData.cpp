@@ -1040,4 +1040,15 @@ void GreaterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                        "second input");
 }
 
+void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "RsqrtQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "RsqrtQueueDescriptor");
+    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                              workloadInfo.m_OutputTensorInfos[0],
+                              "RsqrtQueueDescriptor",
+                              "input",
+                              "output");
+}
+
 } //namespace armnn

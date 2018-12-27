@@ -124,6 +124,10 @@ private:
 
     void ResetParser();
 
+    void AddBroadcastReshapeLayer(size_t subgraphIndex,
+                                  size_t operatorIndex,
+                                  armnn::IConnectableLayer* layer);
+
     /// Attach an activation layer to the one passed as a parameter
     armnn::IConnectableLayer* AddFusedActivationLayer(armnn::IConnectableLayer* layer,
                                                       unsigned int outputSlot,

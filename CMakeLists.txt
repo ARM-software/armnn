@@ -389,6 +389,7 @@ if(BUILD_UNIT_TESTS)
         list(APPEND unittest_sources
             src/armnnTfParser/test/Activations.cpp
             src/armnnTfParser/test/Addition.cpp
+            src/armnnTfParser/test/AddN.cpp
             src/armnnTfParser/test/BiasAdd.cpp
             src/armnnTfParser/test/BroadcastForAdd.cpp
             src/armnnTfParser/test/Convolution2d.cpp

@@ -129,6 +129,7 @@ private:
     bool HasParsedConstTensor(ParsedTfOperation* parsedTfOpPtr) const;
 
     ParsedTfOperationPtr ParseAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
+    ParsedTfOperationPtr ParseAddN(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseBiasAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseConv2D(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseDepthwiseConv2D(const tensorflow::NodeDef& nodeDef,const tensorflow::GraphDef& graphDef);
@@ -186,6 +187,31 @@ private:
             armnn::IOutputSlot* input1Slot,
             armnn::IConnectableLayer* const layer,
             const tensorflow::NodeDef& nodeDef);
+
+    armnn::IConnectableLayer* CreateAdditionLayer(
+            const tensorflow::NodeDef& nodeDef,
+            armnn::IOutputSlot* input0Slot,
+            armnn::IOutputSlot* input1Slot,
+            const std::string& layerName);
+
+    armnn::IConnectableLayer* CreateAdditionLayer(
+            const tensorflow::NodeDef& nodeDef,
+            const OutputOfParsedTfOperation& opOne,
+            const OutputOfParsedTfOperation& opTwo,
+            unsigned int numberOfAddition);
+
+    armnn::IConnectableLayer* CreateAdditionLayer(
+            const tensorflow::NodeDef& nodeDef,
+            armnn::IConnectableLayer* layerOne,
+            armnn::IConnectableLayer* layerTwo,
+            unsigned int numberOfAddition,
+            unsigned long numberOfLayersToConnect,
+            bool isOdd);
+
+    armnn::IConnectableLayer* CreateAdditionLayer(
+            const tensorflow::NodeDef& nodeDef,
+            const OutputOfParsedTfOperation& op,
+            armnn::IConnectableLayer* layer);
 
     static std::pair<armnn::LayerBindingId, armnn::TensorInfo> GetBindingInfo(const std::string& layerName,
         const char* bindingPointDesc,

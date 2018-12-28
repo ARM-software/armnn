@@ -327,6 +327,7 @@ OutputId ParseOutputId(const std::string & name)
 const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_OperationNameToParsingFunctions = {
     { "Const",                 &TfParser::ParseConst },
     { "Add",                   &TfParser::ParseAdd },
+    { "AddN",                  &TfParser::ParseAddN },
     { "BiasAdd",               &TfParser::ParseBiasAdd },
     { "Identity",              &TfParser::ParseIdentity },
     { "Conv2D",                &TfParser::ParseConv2D },
@@ -608,6 +609,183 @@ TfParser::GetInputParsedTfOperationsChecked(const tensorflow::NodeDef& nodeDef,
         result.push_back(OutputOfParsedTfOperation(parsedOp,node.m_Index));
     }
     return result;
+}
+
+IConnectableLayer* TfParser::CreateAdditionLayer(
+            const tensorflow::NodeDef& nodeDef,
+            IOutputSlot* input0Slot,
+            IOutputSlot* input1Slot,
+            const std::string& layerName)
+{
+    const TensorInfo& input0Info = input0Slot->GetTensorInfo();
+    const TensorInfo& input1Info = input1Slot->GetTensorInfo();
+
+    const unsigned int input0Dim = input0Info.GetNumDimensions();
+    const unsigned int input1Dim = input1Info.GetNumDimensions();
+    if (input0Dim != input1Dim)
+    {
+        // broadcasting where input0 and input1 have different number of dimensions
+        // is only supported for 1D and 4D tensors pair
+        if (input0Dim == 1 && input1Dim == 4)
+        {
+            input0Slot = AddBroadcastReshapeLayer(input1Slot, input0Slot, true, *m_Network, nodeDef);
+        }
+        else if (input0Dim == 4 && input1Dim == 1)
+        {
+            input1Slot = AddBroadcastReshapeLayer(input0Slot, input1Slot, true, *m_Network, nodeDef);
+        }
+        else
+        {
+            throw ParseException(
+                    boost::str(
+                            boost::format("Unsupported broadcast configuration for %1% operation %2% %3%")
+                            % layerName
+                            % nodeDef.name()
+                            % CHECK_LOCATION().AsString()));
+        }
+    }
+    IConnectableLayer* const layer = m_Network->AddAdditionLayer(layerName.c_str());
+
+    input0Slot->Connect(layer->GetInputSlot(0));
+    input1Slot->Connect(layer->GetInputSlot(1));
+
+    // Ensure the output tensor has the correct dimensions even if a broadcast has been done
+    TensorInfo outputInfo = input0Slot->GetTensorInfo();
+    std::vector<unsigned int> outputShape;
+
+    const TensorShape& input0Shape = input0Slot->GetTensorInfo().GetShape();
+    const TensorShape& input1Shape = input1Slot->GetTensorInfo().GetShape();
+
+    for (unsigned int i = 0; i < input0Shape.GetNumDimensions(); i++)
+    {
+        outputShape.push_back(std::max(input0Shape[i], input1Shape[i]));
+    }
+
+    outputInfo.SetShape(TensorShape(input0Shape.GetNumDimensions(), outputShape.data()));
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    return layer;
+}
+
+IConnectableLayer* TfParser::CreateAdditionLayer(
+            const tensorflow::NodeDef& nodeDef,
+            IConnectableLayer* layerOne,
+            IConnectableLayer* layerTwo,
+            unsigned int numberOfAddition,
+            unsigned long numberOfLayersToConnect,
+            bool isOdd)
+{
+    IOutputSlot* input0Slot = &layerOne->GetOutputSlot(0);
+    IOutputSlot* input1Slot = &layerTwo->GetOutputSlot(0);
+    std::string layerName(nodeDef.name());
+    if (isOdd || numberOfLayersToConnect != 2)
+    {
+        // we are not connecting the final layer
+        layerName.append("_addN_").append(std::to_string(numberOfAddition));
+    }
+    return CreateAdditionLayer(nodeDef, input0Slot, input1Slot, layerName);
+}
+
+IConnectableLayer* TfParser::CreateAdditionLayer(
+        const tensorflow::NodeDef& nodeDef,
+        const OutputOfParsedTfOperation& opOne,
+        const OutputOfParsedTfOperation& opTwo,
+        unsigned int numberOfAddition)
+{
+    IOutputSlot* input0Slot = &opOne.m_IndexedValue->ResolveArmnnOutputSlot(opOne.m_Index);
+    IOutputSlot* input1Slot = &opTwo.m_IndexedValue->ResolveArmnnOutputSlot(opTwo.m_Index);
+    std::string layerName(nodeDef.name());
+    layerName.append("_addN_").append(std::to_string(numberOfAddition));
+    return CreateAdditionLayer(nodeDef, input0Slot, input1Slot, layerName);
+}
+
+IConnectableLayer* TfParser::CreateAdditionLayer(
+            const tensorflow::NodeDef& nodeDef,
+            const OutputOfParsedTfOperation& op,
+            IConnectableLayer* layer)
+{
+    IOutputSlot* input0Slot = &op.m_IndexedValue->ResolveArmnnOutputSlot(op.m_Index);
+    IOutputSlot* input1Slot = &layer->GetOutputSlot(0);
+    return CreateAdditionLayer(nodeDef, input0Slot, input1Slot, nodeDef.name());
+}
+
+ParsedTfOperationPtr TfParser::ParseAddN(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)
+{
+    uint32_t numberOfInputs = ReadMandatoryNodeUint32Attribute(nodeDef, "N");
+    if (numberOfInputs < 2)
+    {
+        // should never happen
+        throw ParseException(
+                boost::str(
+                        boost::format(
+                                "AddN Node with name '%1%' has less than two (%2) inputs %3%")
+                        % nodeDef.name()
+                        % std::to_string(numberOfInputs)
+                        % CHECK_LOCATION().AsString()));
+    }
+    else if (numberOfInputs == 2)
+    {
+        //this is the same as a simple Add operation
+        return AddAdditionLayer(nodeDef, false);
+    }
+    else
+    {
+        // build a binary tree of Add layers and return the final Add as the return from the function
+        // if we have an odd number of inputs then the final Add will consist of a layer connecting to an
+        // OutputOfParsedTfOperation, otherwise it will be two layers being added together
+        std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, numberOfInputs);
+        unsigned int numberOfAdditions = 0;
+        std::vector<IConnectableLayer*> layers;
+        // NOTE: at this point we will have a minimum of three inputs
+        for (unsigned int i = 0; i < numberOfInputs; ++i)
+        {
+            // every time i is odd we have two inputs to process.
+            bool onSecondItem = i % 2;
+            if (onSecondItem)
+            {
+                ++numberOfAdditions;
+                IConnectableLayer* newLayer = CreateAdditionLayer(
+                        nodeDef, inputs[ i - 1], inputs[i], numberOfAdditions);
+                layers.push_back(newLayer);
+            }
+        }
+
+        std::vector<IConnectableLayer*> layersToConnect(layers);
+        unsigned long numberOfLayersToConnect = layersToConnect.size();
+        bool isOdd = numberOfInputs % 2;
+
+        while (numberOfLayersToConnect > 1)
+        {
+            layers.clear();
+            for (unsigned long i = 0; i < numberOfLayersToConnect; ++i) {
+                bool onSecondItem = i % 2;
+                if (onSecondItem) {
+                    ++numberOfAdditions;
+                    IConnectableLayer* newLayer = CreateAdditionLayer(
+                        nodeDef,
+                        layersToConnect[i - 1],
+                        layersToConnect[i],
+                        numberOfAdditions,
+                        numberOfLayersToConnect,
+                        isOdd);
+                    layers.push_back(newLayer);
+                }
+            }
+            //OK... need to go again... maybe
+            layersToConnect = layers;
+            numberOfLayersToConnect = layersToConnect.size();
+        }
+        IConnectableLayer* finalLayer = layersToConnect[0];
+        // if we had an odd number of inputs we need to connect the final layer to the
+        // last OutputOfParsedTfOperation in order to create the last Add layer we will
+        // be handing back.
+        if (isOdd)
+        {
+            // connect the final layer to the last op
+            finalLayer = CreateAdditionLayer(nodeDef, inputs[numberOfInputs - 1], finalLayer);
+        }
+        return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, finalLayer);
+    }
 }
 
 ParsedTfOperationPtr TfParser::ParseAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef)

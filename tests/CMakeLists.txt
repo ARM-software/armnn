@@ -200,6 +200,12 @@ if (BUILD_TF_LITE_PARSER)
         ImagePreprocessor.hpp
         ImagePreprocessor.cpp)
     TfLiteParserTest(TfLiteResNetV2-Armnn "${TfLiteResNetV2-Armnn_sources}")
+
+    set(TfLiteMnasNet-Armnn_sources
+        TfLiteMnasNet-Armnn/TfLiteMnasNet-Armnn.cpp
+        ImagePreprocessor.hpp
+        ImagePreprocessor.cpp)
+    TfLiteParserTest(TfLiteMnasNet-Armnn "${TfLiteMnasNet-Armnn_sources}")
 endif()
 
 if (BUILD_ONNX_PARSER)

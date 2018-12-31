@@ -68,7 +68,7 @@ pushd clframework > /dev/null
 # git fetch ssh://$GITHUB_USERNAME@review.mlplatform.org:29418/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
 
 # For pinning to a revision use this:
-CLFRAMEWORKREVISION="92fd94336e4b169005d88af401fe57bcbd50521b" # commit on CL elementwise min, max, and squared diff
+CLFRAMEWORKREVISION="3f8aac4474b245b20c07b3a5384577a83f4950a7" # Improvements for depthwise stride
 git fetch ssh://$GITHUB_USERNAME@review.mlplatform.org:29418/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode
 

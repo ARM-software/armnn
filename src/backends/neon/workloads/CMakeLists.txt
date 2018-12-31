@@ -30,6 +30,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonLstmFloatWorkload.hpp
     NeonMaximumWorkload.cpp
     NeonMaximumWorkload.hpp
+    NeonMeanWorkload.cpp
+    NeonMeanWorkload.hpp
     NeonMergerWorkload.cpp
     NeonMergerWorkload.hpp
     NeonMultiplicationFloatWorkload.cpp

@@ -3,20 +3,21 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ClMeanWorkload.hpp"
+#include "NeonMeanWorkload.hpp"
 
-#include <cl/ClTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
-#include "ClWorkloadUtils.hpp"
+#include <neon/NeonTensorHandle.hpp>
+
+#include "NeonWorkloadUtils.hpp"
 
 namespace armnn
 {
 using namespace armcomputetensorutils;
 
-arm_compute::Status ClMeanValidate(const TensorInfo& input,
-                                   const TensorInfo& output,
-                                   const MeanDescriptor& desc)
+arm_compute::Status NeonMeanWorkloadValidate(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const MeanDescriptor& desc)
 {
     const arm_compute::TensorInfo aclInputInfo  = armcomputetensorutils::BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
@@ -25,16 +26,16 @@ arm_compute::Status ClMeanValidate(const TensorInfo& input,
                                                                           input.GetNumDimensions(),
                                                                           desc.m_Axis);
 
-    return arm_compute::CLReduceMean::validate(&aclInputInfo, coords, desc.m_KeepDims, &aclOutputInfo);
+    return arm_compute::NEReduceMean::validate(&aclInputInfo, coords, desc.m_KeepDims, &aclOutputInfo);
 }
 
-ClMeanWorkload::ClMeanWorkload(const MeanQueueDescriptor& descriptor, const WorkloadInfo& info)
+NeonMeanWorkload::NeonMeanWorkload(const MeanQueueDescriptor& descriptor, const WorkloadInfo& info)
     : BaseWorkload<MeanQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("ClMeanWorkload", 1, 1);
+    m_Data.ValidateInputsOutputs("NeonMeanWorkload", 1, 1);
 
-    arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input  = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = static_cast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     arm_compute::Coordinates coords = BuildArmComputeReductionCoordinates(input.info()->num_dimensions(),
                                                                           info.m_InputTensorInfos[0].GetNumDimensions(),
@@ -43,9 +44,9 @@ ClMeanWorkload::ClMeanWorkload(const MeanQueueDescriptor& descriptor, const Work
     m_Layer.configure(&input, coords, m_Data.m_Parameters.m_KeepDims, &output);
 }
 
-void ClMeanWorkload::Execute() const
+void NeonMeanWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL("ClMeanWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMeanWorkload_Execute");
     m_Layer.run();
 }
 

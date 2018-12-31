@@ -31,6 +31,48 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType)
     }
 }
 
+arm_compute::Coordinates BuildArmComputeReductionCoordinates(size_t inputDimensions,
+                                                             unsigned int originalInputRank,
+                                                             const std::vector<unsigned int>& armnnAxes)
+{
+    arm_compute::Coordinates outAclCoords;
+
+    if (armnnAxes.empty())
+    {
+        // If no reduction axes were provided, then the input must be reduced along all dimensions.
+        // Since Compute Library does not accept an empty vector as the reduction dimensions, we then
+        // manually create a vector including all the input dimensions (in reversed order) as:
+        //
+        // { inputDimensions - 1, inputDimensions - 2, ..., 1, 0 }
+        //
+        outAclCoords.set_num_dimensions(inputDimensions);
+        std::generate(outAclCoords.begin(), outAclCoords.end(), [d = inputDimensions - 1] () mutable { return d--; });
+    }
+    else
+    {
+        // Create a vector of reduction dimensions (in reversed order) with the given reduction axes.
+        //
+        // Adjust the given reduction axes according to the original rank of the input tensor (before ACL applied any
+        // dimension correction).
+        // For example, if the input tensor originally had 4 dimensions, and one of the reduction axes was 2, then the
+        // new value for that reduction axis should be 1.
+        //
+        // Example:
+        // ArmNN input shape = { 1, 1, 3, 2 } -> ACL input shape = { 2, 3 }
+        // ArmNN reduction axis = { 2 }       -> ACL reduction axis = { 1 }
+        // ArmNN reduction axis = { 3 }       -> ACL reduction axis = { 0 }
+        //
+        // The transformation: ACL reduction axis index = original rank - ArmNN reduction axis index - 1
+        //
+        outAclCoords.set_num_dimensions(armnnAxes.size());
+        std::transform(armnnAxes.begin(), armnnAxes.end(),
+                       outAclCoords.begin(),
+                       [originalInputRank](unsigned int i){ return originalInputRank - i - 1; });
+    }
+
+    return outAclCoords;
+}
+
 arm_compute::TensorShape BuildArmComputeTensorShape(const armnn::TensorShape& tensorShape)
 {
     arm_compute::TensorShape shape;

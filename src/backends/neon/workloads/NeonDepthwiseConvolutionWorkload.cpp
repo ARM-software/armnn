@@ -73,17 +73,6 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
         BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
     }
-    else
-    {
-        // Workaround for COMPMID-1813
-        m_BiasTensor = std::make_unique<arm_compute::Tensor>();
-        TensorInfo biasTensorInfo({weightInfo.GetShape()[dataLayoutIndex.GetChannelsIndex()]},
-                                  weightInfo.GetDataType() == DataType::QuantisedAsymm8 ? DataType::Signed32 :
-                                                                                          weightInfo.GetDataType(),
-                                  weightInfo.GetQuantizationScale() *
-                                  info.m_InputTensorInfos[0].GetQuantizationScale());
-        BuildArmComputeTensor(*m_BiasTensor, biasTensorInfo, m_Data.m_Parameters.m_DataLayout);
-    }
 
     arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
                                              m_Data.m_Parameters.m_StrideY,
@@ -133,10 +122,6 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
-    }
-    else
-    {
-        InitialiseArmComputeTensorEmpty(*m_BiasTensor);
     }
 
     m_pDepthwiseConvolutionLayer->prepare();

@@ -7,6 +7,7 @@
 
 #include <layers/ConvertFp16ToFp32Layer.hpp>
 #include <layers/ConvertFp32ToFp16Layer.hpp>
+#include <layers/MeanLayer.hpp>
 #include <test/TensorHelpers.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -104,6 +105,16 @@ BOOST_FIXTURE_TEST_CASE(IsConvertFp32ToFp16SupportedFp32OutputCl, ClContextContr
 
     BOOST_CHECK(!result);
     BOOST_CHECK_EQUAL(reasonIfUnsupported, "Output should be Float16");
+}
+
+BOOST_FIXTURE_TEST_CASE(IsMeanSupportedCl, ClContextControlFixture)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsMeanLayerSupportedTests<armnn::ClWorkloadFactory,
+      armnn::DataType::Float32, armnn::DataType::Float32>(reasonIfUnsupported);
+
+    BOOST_CHECK(result);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

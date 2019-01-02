@@ -61,4 +61,14 @@ BOOST_AUTO_TEST_CASE(IsConvertFp32ToFp16SupportedNeon)
     BOOST_CHECK(result);
 }
 
+BOOST_AUTO_TEST_CASE(IsMeanSupportedNeon)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsMeanLayerSupportedTests<armnn::NeonWorkloadFactory,
+      armnn::DataType::Float32, armnn::DataType::Float32>(reasonIfUnsupported);
+
+    BOOST_CHECK(result);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

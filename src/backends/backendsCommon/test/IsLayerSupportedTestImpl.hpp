@@ -592,4 +592,30 @@ bool IsConvertLayerSupportedTests(std::string& reasonIfUnsupported)
     return result;
 }
 
+template<typename FactoryType, armnn::DataType InputDataType , armnn::DataType OutputDataType>
+bool IsMeanLayerSupportedTests(std::string& reasonIfUnsupported)
+{
+    armnn::Graph graph;
+    static const std::vector<unsigned> axes = {1, 0};
+    armnn::MeanDescriptor desc(axes, false);
+
+    armnn::Layer* const layer = graph.AddLayer<armnn::MeanLayer>(desc, "LayerName");
+
+    armnn::Layer* const input = graph.AddLayer<armnn::InputLayer>(0, "input");
+    armnn::Layer* const output = graph.AddLayer<armnn::OutputLayer>(0, "output");
+
+    armnn::TensorInfo inputTensorInfo({4, 3, 2}, InputDataType);
+    armnn::TensorInfo outputTensorInfo({2}, OutputDataType);
+
+    input->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
+    input->GetOutputHandler(0).SetTensorInfo(inputTensorInfo);
+    layer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    layer->GetOutputHandler(0).SetTensorInfo(outputTensorInfo);
+
+    bool result = FactoryType::IsLayerSupported(*layer, InputDataType, reasonIfUnsupported);
+
+    return result;
+}
+
+
 } //namespace

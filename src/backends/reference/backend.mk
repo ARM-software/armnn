@@ -66,6 +66,7 @@ BACKEND_SOURCES := \
         workloads/ResizeBilinear.cpp \
         workloads/SpaceToBatchNd.cpp \
         workloads/StridedSlice.cpp \
+        workloads/StringMapping.cpp \
         workloads/Softmax.cpp
 
 # BACKEND_TEST_SOURCES contains the list of files to be included

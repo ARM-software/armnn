@@ -13,7 +13,6 @@ COMMON_SOURCES := \
     ILayerSupport.cpp \
     MemCopyWorkload.cpp \
     OutputHandler.cpp \
-    StringMapping.cpp \
     WorkloadData.cpp \
     WorkloadFactory.cpp
 

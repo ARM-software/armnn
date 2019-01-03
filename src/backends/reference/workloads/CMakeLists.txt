@@ -117,6 +117,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Splitter.hpp
     StridedSlice.hpp
     StridedSlice.cpp
+    StringMapping.cpp
+    StringMapping.hpp
     TensorBufferArrayView.hpp
     Mean.cpp
     Mean.hpp

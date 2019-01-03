@@ -6,11 +6,11 @@
 #pragma once
 
 #include <armnn/Types.hpp>
-#include <backendsCommon/StringMapping.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include "Maximum.hpp"
 #include "Minimum.hpp"
+#include "StringMapping.hpp"
 
 namespace armnn
 {

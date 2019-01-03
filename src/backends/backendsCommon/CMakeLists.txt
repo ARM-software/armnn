@@ -19,8 +19,6 @@ list(APPEND armnnBackendsCommon_sources
     MemCopyWorkload.hpp
     OutputHandler.cpp
     OutputHandler.hpp
-    StringMapping.cpp
-    StringMapping.hpp
     WorkloadDataCollector.hpp
     WorkloadData.cpp
     WorkloadDataFwd.hpp

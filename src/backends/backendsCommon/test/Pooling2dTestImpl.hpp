@@ -293,11 +293,11 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
     if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(T));
         inputData = tmp;
 
         std::vector<T> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data(), sizeof(T));
         outputData = tmp1;
     }
 
@@ -362,11 +362,11 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
     if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(T));
         inputData = tmp;
 
         std::vector<T> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data(), sizeof(T));
         outputData = tmp1;
     }
 
@@ -473,11 +473,11 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
     if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(T));
         inputData = tmp;
 
         std::vector<T> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data(), sizeof(T));
         outputData = tmp1;
     }
 

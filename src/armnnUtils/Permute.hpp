@@ -17,7 +17,4 @@ armnn::TensorInfo Permuted(const armnn::TensorInfo& info, const armnn::Permutati
 void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
              const void* src, void* dst, size_t dataTypeSize);
 
-template <typename T>
-void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings, const T* src, T* dst);
-
 } // namespace armnnUtils

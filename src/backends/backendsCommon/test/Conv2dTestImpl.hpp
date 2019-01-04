@@ -149,7 +149,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(T));
         inputData = tmp;
     }
 
@@ -178,7 +178,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp.data(), sizeof(T));
         outputData = tmp;
     }
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
@@ -194,7 +194,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     boost::multi_array<T, 4> kernel = boost::multi_array<T, 4>(originalKernel);
     if (layout == armnn::DataLayout::NHWC)
     {
-        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernel.data(), kernel.data());
+        armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernel.data(), kernel.data(), sizeof(T));
     }
     AllocateAndCopyDataToITensorHandle(&weightsTensor, &kernel[0][0][0][0]);
 
@@ -387,7 +387,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(T));
         inputData = tmp;
     }
 
@@ -411,7 +411,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp.data(), sizeof(T));
         outputData = tmp;
     }
 
@@ -518,7 +518,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(T));
         inputData = tmp;
     }
     auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
@@ -558,7 +558,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<T> tmp(outputImage.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputImage.data(), tmp.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputImage.data(), tmp.data(), sizeof(T));
         outputImage = tmp;
     }
 
@@ -672,7 +672,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
     if (layout == armnn::DataLayout::NHWC)
     {
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, originalInputData.data(), inputData.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC,
+                            originalInputData.data(), inputData.data(), sizeof(T));
     }
     auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
 
@@ -758,7 +759,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     std::vector<T> outputImage = originalOutputImage;
     if (layout == armnn::DataLayout::NHWC)
     {
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, originalOutputImage.data(), outputImage.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC,
+                            originalOutputImage.data(), outputImage.data(), sizeof(T));
     }
 
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputImage);

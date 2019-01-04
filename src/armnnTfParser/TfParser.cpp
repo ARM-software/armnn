@@ -1232,7 +1232,7 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
     // Swizzles the content of the tensor's permanent storage into a local storage.
     std::vector<float> weightTensorSwizzledData(weightTensorInfo.GetNumElements());
     armnnUtils::Permute(weightTensorSwizzledInfo.GetShape(), permutationVector,
-                        weightNode->GetStorage(), weightTensorSwizzledData.data());
+                        weightNode->GetStorage(), weightTensorSwizzledData.data(), sizeof(float));
 
     // Create a weight tensor with the newly swizzled data.
     ConstTensor weightTensor(weightTensorSwizzledInfo, weightTensorSwizzledData);
@@ -1350,7 +1350,7 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
     // Swizzles the content of the tensor's permanent storage into a local storage.
     std::vector<float> weightTensorSwizzledData(weightTensorInfo.GetNumElements());
     armnnUtils::Permute(weightTensorSwizzledInfo.GetShape(), permutationVector,
-                        weightNode->GetStorage(), weightTensorSwizzledData.data());
+                        weightNode->GetStorage(), weightTensorSwizzledData.data(), sizeof(float));
 
     // Create a weight tensor with the newly swizzled data.
     ConstTensor weightTensor(weightTensorSwizzledInfo, weightTensorSwizzledData);

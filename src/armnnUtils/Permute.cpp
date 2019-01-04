@@ -39,14 +39,6 @@ public:
         }
     }
 
-    template <typename T>
-    void Unroll(const T* srcData, T* dstData)
-    {
-        const T* const srcEnd = srcData + m_DstShape.GetNumElements();
-        T* const       dstEnd = dstData + m_DstShape.GetNumElements();
-        Unroll(0, srcData, dstData, srcEnd, dstEnd);
-    }
-
     void Unroll(const void* srcData, void* dstData, size_t dataTypeSize)
     {
         assert(srcData);
@@ -63,32 +55,6 @@ public:
     }
 
 private:
-    template <typename T>
-    void Unroll(size_type dimension, const T* srcData, T* dstData, const T* srcEnd, T* dstEnd)
-    {
-        assert(srcData);
-        assert(dstData);
-        assert(srcEnd);
-        assert(dstEnd);
-        assert(srcData < srcEnd);
-        assert(dstData < dstEnd);
-
-        if (dimension >= m_DstShape.GetNumDimensions())
-        {
-            *dstData = *srcData;
-        }
-        else
-        {
-            for (size_type i = 0; i < m_DstShape[dimension]; i++)
-            {
-                Unroll(dimension + 1, srcData, dstData, srcEnd, dstEnd);
-
-                srcData += m_SrcStrides[dimension];
-                dstData += m_DstStrides[dimension];
-            }
-        }
-    }
-
     void Unroll(size_type dimension,
                 const unsigned char* srcData, unsigned char* dstData,
                 const unsigned char* srcEnd, unsigned char* dstEnd,
@@ -156,23 +122,5 @@ void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector&
 {
     PermuteLoop(dstShape, mappings).Unroll(src, dst, dataTypeSize);
 }
-
-template <typename T>
-void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings, const T* src, T* dst)
-{
-    PermuteLoop(dstShape, mappings).Unroll(src, dst);
-}
-
-// Instantiates for types.
-template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
-                      const armnn::Half* src, armnn::Half* dst);
-template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
-                      const float* src, float* dst);
-template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
-                      const uint8_t* src, uint8_t* dst);
-template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
-                      const int32_t* src, int32_t* dst);
-template void Permute(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings,
-                      const bool* src, bool* dst);
 
 } // namespace armnnUtils

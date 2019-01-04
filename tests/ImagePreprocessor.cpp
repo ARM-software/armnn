@@ -44,7 +44,7 @@ unsigned int ImagePreprocessor<TDataType>::GetLabelAndResizedImageAsFloat(unsign
         const armnn::PermutationVector NHWCToArmNN = { 0, 2, 3, 1 };
         armnn::TensorShape dstShape({m_BatchSize, 3, m_Height, m_Width});
         std::vector<float> tempImage(result.size());
-        armnnUtils::Permute<float>(dstShape, NHWCToArmNN, result.data(), tempImage.data());
+        armnnUtils::Permute(dstShape, NHWCToArmNN, result.data(), tempImage.data(), sizeof(float));
         result.swap(tempImage);
     }
 

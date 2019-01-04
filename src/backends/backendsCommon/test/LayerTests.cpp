@@ -4602,7 +4602,7 @@ LayerTestResult<float, 4> ResizeBilinearNopTest(
     if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(float));
         inputData = tmp;
     }
 
@@ -4664,11 +4664,11 @@ LayerTestResult<float, 4> SimpleResizeBilinearTest(
     if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(float));
         inputData = tmp;
 
         std::vector<float> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data(), sizeof(float));
         outputData = tmp1;
     }
 
@@ -4730,11 +4730,11 @@ LayerTestResult<float, 4> ResizeBilinearSqMinTest(
     if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(float));
         inputData = tmp;
 
         std::vector<float> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data(), sizeof(float));
         outputData = tmp1;
     }
 
@@ -4794,11 +4794,11 @@ LayerTestResult<float, 4> ResizeBilinearMinTest(
     if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(float));
         inputData = tmp;
 
         std::vector<float> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data(), sizeof(float));
         outputData = tmp1;
     }
 
@@ -4860,11 +4860,11 @@ LayerTestResult<float, 4> ResizeBilinearMagTest(
     if (dataLayout == armnn::DataLayout::NHWC)
     {
         std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(float));
         inputData = tmp;
 
         std::vector<float> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputData.data(), tmp1.data(), sizeof(float));
         outputData = tmp1;
     }
 
@@ -4970,7 +4970,7 @@ LayerTestResult<float, 4> L2NormalizationTestImpl(
     if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), tmp.data(), sizeof(float));
         inputData = tmp;
     }
 
@@ -4981,7 +4981,8 @@ LayerTestResult<float, 4> L2NormalizationTestImpl(
     if (layout == armnn::DataLayout::NHWC)
     {
         std::vector<float> tmp(expectedOutputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, expectedOutputData.data(), tmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC,
+                            expectedOutputData.data(), tmp.data(), sizeof(float));
         expectedOutputData = tmp;
     }
     result.outputExpected = MakeTensor<float, 4>(inputTensorInfo, std::vector<float>(expectedOutputData));

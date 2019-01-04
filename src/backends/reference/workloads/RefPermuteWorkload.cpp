@@ -23,7 +23,8 @@ void RefPermuteWorkload<DataType>::Execute() const
     const ITensorHandle*     dst      = m_Data.m_Outputs[0];
     const PermutationVector& mappings = m_Data.m_Parameters.m_DimMappings;
 
-    armnnUtils::Permute(GetTensorInfo(dst).GetShape(), mappings, GetConstCpuData<T>(src), GetCpuData<T>(dst));
+    armnnUtils::Permute(GetTensorInfo(dst).GetShape(), mappings,
+                        GetConstCpuData<void>(src), GetCpuData<void>(dst), sizeof(T));
 }
 
 template class RefPermuteWorkload<DataType::Float16>;

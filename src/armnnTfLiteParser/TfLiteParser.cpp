@@ -414,10 +414,8 @@ CreateConstTensorImpl(TfLiteParser::BufferRawPtr bufferPtr,
     if (permutationVector.has_value() && permutationVector.value().GetSize() > 0)
     {
         tensorInfo = armnnUtils::Permuted(tensorInfo, permutationVector.value());
-        armnnUtils::Permute(tensorInfo.GetShape(),
-                            permutationVector.value(),
-                            reinterpret_cast<const T *>(bufferPtr->data.data()),
-                            data.get());
+        armnnUtils::Permute(tensorInfo.GetShape(), permutationVector.value(),
+                            reinterpret_cast<const T*>(bufferPtr->data.data()), data.get(), sizeof(T));
     }
     else
     {

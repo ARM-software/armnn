@@ -35,11 +35,13 @@ LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
         outputTensorInfo = armnnUtils::Permuted(outputTensorInfo, NCHWToNHWC);
 
         std::vector<float> inputTmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC, inputData.data(), inputTmp.data());
+        armnnUtils::Permute(inputTensorInfo.GetShape(), NCHWToNHWC,
+                            inputData.data(), inputTmp.data(), sizeof(float));
         inputData = inputTmp;
 
         std::vector<float> outputTmp(outputExpectedData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC, outputExpectedData.data(), outputTmp.data());
+        armnnUtils::Permute(outputTensorInfo.GetShape(), NCHWToNHWC,
+                            outputExpectedData.data(), outputTmp.data(), sizeof(float));
         outputExpectedData = outputTmp;
     }
 

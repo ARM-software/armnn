@@ -254,28 +254,6 @@ bool ClLayerSupport::IsDivisionSupported(const TensorInfo& input0,
                                    output);
 }
 
-bool ClLayerSupport::IsEqualSupported(const TensorInfo& input0,
-                                      const TensorInfo& input1,
-                                      const TensorInfo& output,
-                                      Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input0);
-    ignore_unused(input1);
-    ignore_unused(output);
-    ignore_unused(reasonIfUnsupported);
-    return false;
-}
-
-bool ClLayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
-                                                 const FakeQuantizationDescriptor& descriptor,
-                                                 Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input);
-    ignore_unused(descriptor);
-    ignore_unused(reasonIfUnsupported);
-    return false;
-}
-
 bool ClLayerSupport::IsFloorSupported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported) const
@@ -303,18 +281,6 @@ bool ClLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    weights,
                                    biases,
                                    descriptor);
-}
-
-bool ClLayerSupport::IsGreaterSupported(const TensorInfo& input0,
-                                        const TensorInfo& input1,
-                                        const TensorInfo& output,
-                                        Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input0);
-    ignore_unused(input1);
-    ignore_unused(output);
-    ignore_unused(reasonIfUnsupported);
-    return false;
 }
 
 bool ClLayerSupport::IsInputSupported(const TensorInfo& input,

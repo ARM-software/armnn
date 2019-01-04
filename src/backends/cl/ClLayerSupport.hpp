@@ -66,15 +66,6 @@ public:
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsEqualSupported(const TensorInfo& input0,
-                          const TensorInfo& input1,
-                          const TensorInfo& output,
-                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    bool IsFakeQuantizationSupported(const TensorInfo& input,
-                                     const FakeQuantizationDescriptor& descriptor,
-                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
     bool IsFloorSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
@@ -85,11 +76,6 @@ public:
                                    const TensorInfo& biases,
                                    const FullyConnectedDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    bool IsGreaterSupported(const TensorInfo& input0,
-                            const TensorInfo& input1,
-                            const TensorInfo& ouput,
-                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsInputSupported(const TensorInfo& input,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

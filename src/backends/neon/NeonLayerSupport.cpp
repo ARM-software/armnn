@@ -200,40 +200,6 @@ bool NeonLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                    biases);
 }
 
-bool NeonLayerSupport::IsDivisionSupported(const TensorInfo& input0,
-                                           const TensorInfo& input1,
-                                           const TensorInfo& output,
-                                           Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input0);
-    ignore_unused(input1);
-    ignore_unused(output);
-    ignore_unused(reasonIfUnsupported);
-    return false;
-}
-
-bool NeonLayerSupport::IsEqualSupported(const TensorInfo& input0,
-                                        const TensorInfo& input1,
-                                        const TensorInfo& output,
-                                        Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input0);
-    ignore_unused(input1);
-    ignore_unused(output);
-    ignore_unused(reasonIfUnsupported);
-    return false;
-}
-
-bool NeonLayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
-                                                   const FakeQuantizationDescriptor& descriptor,
-                                                   Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input);
-    ignore_unused(descriptor);
-    ignore_unused(reasonIfUnsupported);
-    return false;
-}
-
 bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const
@@ -263,18 +229,6 @@ bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    descriptor);
 }
 
-bool NeonLayerSupport::IsGreaterSupported(const TensorInfo& input0,
-                                          const TensorInfo& input1,
-                                          const TensorInfo& output,
-                                          Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input0);
-    ignore_unused(input1);
-    ignore_unused(output);
-    ignore_unused(reasonIfUnsupported);
-    return false;
-}
-
 bool NeonLayerSupport::IsInputSupported(const TensorInfo& input,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
@@ -290,62 +244,6 @@ bool NeonLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                                   Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonL2NormalizationWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
-}
-
-bool NeonLayerSupport::IsLstmSupported(const TensorInfo& input,
-                                       const TensorInfo& outputStateIn,
-                                       const TensorInfo& cellStateIn,
-                                       const TensorInfo& scratchBuffer,
-                                       const TensorInfo& outputStateOut,
-                                       const TensorInfo& cellStateOut,
-                                       const TensorInfo& output,
-                                       const LstmDescriptor& descriptor,
-                                       const TensorInfo& inputToForgetWeights,
-                                       const TensorInfo& inputToCellWeights,
-                                       const TensorInfo& inputToOutputWeights,
-                                       const TensorInfo& recurrentToForgetWeights,
-                                       const TensorInfo& recurrentToCellWeights,
-                                       const TensorInfo& recurrentToOutputWeights,
-                                       const TensorInfo& forgetGateBias,
-                                       const TensorInfo& cellBias,
-                                       const TensorInfo& outputGateBias,
-                                       const TensorInfo* inputToInputWeights,
-                                       const TensorInfo* recurrentToInputWeights,
-                                       const TensorInfo* cellToInputWeights,
-                                       const TensorInfo* inputGateBias,
-                                       const TensorInfo* projectionWeights,
-                                       const TensorInfo* projectionBias,
-                                       const TensorInfo* cellToForgetWeights,
-                                       const TensorInfo* cellToOutputWeights,
-                                       Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input);
-    ignore_unused(outputStateIn);
-    ignore_unused(cellStateIn);
-    ignore_unused(scratchBuffer);
-    ignore_unused(outputStateOut);
-    ignore_unused(cellStateOut);
-    ignore_unused(output);
-    ignore_unused(descriptor);
-    ignore_unused(inputToForgetWeights);
-    ignore_unused(inputToCellWeights);
-    ignore_unused(inputToOutputWeights);
-    ignore_unused(recurrentToForgetWeights);
-    ignore_unused(recurrentToCellWeights);
-    ignore_unused(recurrentToOutputWeights);
-    ignore_unused(forgetGateBias);
-    ignore_unused(cellBias);
-    ignore_unused(outputGateBias);
-    ignore_unused(inputToInputWeights);
-    ignore_unused(recurrentToInputWeights);
-    ignore_unused(cellToInputWeights);
-    ignore_unused(inputGateBias);
-    ignore_unused(projectionWeights);
-    ignore_unused(projectionBias);
-    ignore_unused(cellToForgetWeights);
-    ignore_unused(cellToOutputWeights);
-    ignore_unused(reasonIfUnsupported);
-    return false;
 }
 
 bool NeonLayerSupport::IsMaximumSupported(const TensorInfo& input0,
@@ -425,18 +323,6 @@ bool NeonLayerSupport::IsOutputSupported(const TensorInfo& output,
                                       output.GetDataType(),
                                       &TrueFunc<>,
                                       &TrueFunc<>);
-}
-
-bool NeonLayerSupport::IsPadSupported(const TensorInfo& input,
-                                      const TensorInfo& output,
-                                      const PadDescriptor& descriptor,
-                                      Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input);
-    ignore_unused(output);
-    ignore_unused(descriptor);
-    ignore_unused(reasonIfUnsupported);
-    return false;
 }
 
 bool NeonLayerSupport::IsPermuteSupported(const TensorInfo& input,

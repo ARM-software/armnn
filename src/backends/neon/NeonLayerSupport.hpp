@@ -56,20 +56,6 @@ public:
                                          const Optional<TensorInfo>& biases,
                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsDivisionSupported(const TensorInfo& input0,
-                             const TensorInfo& input1,
-                             const TensorInfo& output,
-                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    bool IsEqualSupported(const TensorInfo& input0,
-                          const TensorInfo& input1,
-                          const TensorInfo& output,
-                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    bool IsFakeQuantizationSupported(const TensorInfo& input,
-                                     const FakeQuantizationDescriptor& descriptor,
-                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
     bool IsFloorSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
@@ -81,11 +67,6 @@ public:
                                    const FullyConnectedDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsGreaterSupported(const TensorInfo& input0,
-                            const TensorInfo& input1,
-                            const TensorInfo& ouput,
-                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
     bool IsInputSupported(const TensorInfo& input,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
@@ -93,33 +74,6 @@ public:
                                     const TensorInfo& output,
                                     const L2NormalizationDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    bool IsLstmSupported(const TensorInfo& input,
-                         const TensorInfo& outputStateIn,
-                         const TensorInfo& cellStateIn,
-                         const TensorInfo& scratchBuffer,
-                         const TensorInfo& outputStateOut,
-                         const TensorInfo& cellStateOut,
-                         const TensorInfo& output,
-                         const LstmDescriptor& descriptor,
-                         const TensorInfo& inputToForgetWeights,
-                         const TensorInfo& inputToCellWeights,
-                         const TensorInfo& inputToOutputWeights,
-                         const TensorInfo& recurrentToForgetWeights,
-                         const TensorInfo& recurrentToCellWeights,
-                         const TensorInfo& recurrentToOutputWeights,
-                         const TensorInfo& forgetGateBias,
-                         const TensorInfo& cellBias,
-                         const TensorInfo& outputGateBias,
-                         const TensorInfo* inputToInputWeights,
-                         const TensorInfo* recurrentToInputWeights,
-                         const TensorInfo* cellToInputWeights,
-                         const TensorInfo* inputGateBias,
-                         const TensorInfo* projectionWeights,
-                         const TensorInfo* projectionBias,
-                         const TensorInfo* cellToForgetWeights,
-                         const TensorInfo* cellToOutputWeights,
-                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsMaximumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
@@ -148,11 +102,6 @@ public:
 
     bool IsOutputSupported(const TensorInfo& output,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    bool IsPadSupported(const TensorInfo& input,
-                        const TensorInfo& output,
-                        const PadDescriptor& descriptor,
-                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsPermuteSupported(const TensorInfo& input,
                             const TensorInfo& output,

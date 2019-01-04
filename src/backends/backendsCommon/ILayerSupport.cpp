@@ -21,7 +21,7 @@ bool DefaultLayerSupport(const char* func,
     if (reasonIfUnsupported)
     {
         std::stringstream message;
-        message << func << "is not implemented [" << file << ":" << line << "]";
+        message << func << " is not implemented [" << file << ":" << line << "]";
 
         reasonIfUnsupported.value() = message.str();
     }

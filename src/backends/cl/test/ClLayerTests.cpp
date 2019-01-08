@@ -361,6 +361,11 @@ ARMNN_AUTO_TEST_CASE(MeanVtsFloat1, MeanVtsFloat1Test)
 ARMNN_AUTO_TEST_CASE(MeanVtsFloat2, MeanVtsFloat2Test)
 ARMNN_AUTO_TEST_CASE(MeanVtsFloat3, MeanVtsFloat3Test)
 
+// Minimum
+ARMNN_AUTO_TEST_CASE(MinimumBroadcast1Element1, MinimumBroadcast1ElementTest1)
+ARMNN_AUTO_TEST_CASE(MinimumBroadcast1Element2, MinimumBroadcast1ElementTest2)
+ARMNN_AUTO_TEST_CASE(MinimumBroadcast1DVectorUint8, MinimumBroadcast1DVectorUint8Test)
+
 // Space To Batch Nd
 ARMNN_AUTO_TEST_CASE(SpaceToBatchNdSimpleFloat32, SpaceToBatchNdSimpleFloat32Test)
 ARMNN_AUTO_TEST_CASE(SpaceToBatchNdMultiChannelsFloat32, SpaceToBatchNdMultiChannelsFloat32Test)

@@ -19,6 +19,7 @@
 #include "ClMergerWorkload.hpp"
 #include "ClMaximumWorkload.hpp"
 #include "ClMeanWorkload.hpp"
+#include "ClMinimumWorkload.hpp"
 #include "ClMultiplicationWorkload.hpp"
 #include "ClNormalizationFloatWorkload.hpp"
 #include "ClPermuteWorkload.hpp"

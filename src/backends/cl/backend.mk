@@ -31,6 +31,7 @@ BACKEND_SOURCES := \
         workloads/ClMaximumWorkload.cpp \
         workloads/ClMeanWorkload.cpp \
         workloads/ClMergerWorkload.cpp \
+        workloads/ClMinimumWorkload.cpp \
         workloads/ClMultiplicationWorkload.cpp \
         workloads/ClNormalizationFloatWorkload.cpp \
         workloads/ClPadWorkload.cpp \

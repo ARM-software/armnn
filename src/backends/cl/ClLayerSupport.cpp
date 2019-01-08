@@ -30,6 +30,7 @@
 #include "workloads/ClMaximumWorkload.hpp"
 #include "workloads/ClMeanWorkload.hpp"
 #include "workloads/ClMergerWorkload.hpp"
+#include "workloads/ClMinimumWorkload.hpp"
 #include "workloads/ClMultiplicationWorkload.hpp"
 #include "workloads/ClNormalizationFloatWorkload.hpp"
 #include "workloads/ClPadWorkload.hpp"
@@ -404,6 +405,18 @@ bool ClLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inpu
                                         &TrueFunc<>,
                                         &TrueFunc<>);
     }
+}
+
+bool ClLayerSupport::IsMinimumSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClMinimumWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool ClLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,

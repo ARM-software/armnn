@@ -38,6 +38,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClMeanWorkload.hpp
     ClMergerWorkload.cpp
     ClMergerWorkload.hpp
+    ClMinimumWorkload.cpp
+    ClMinimumWorkload.hpp
     ClMultiplicationWorkload.cpp
     ClMultiplicationWorkload.hpp
     ClNormalizationFloatWorkload.cpp

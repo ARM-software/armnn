@@ -5,7 +5,12 @@
 
 #pragma once
 
-#include <neon/workloads/NeonWorkloadUtils.hpp>
+#include <backendsCommon/Workload.hpp>
+
+#include <arm_compute/runtime/IFunction.h>
+#include <arm_compute/runtime/Tensor.h>
+
+#include <memory>
 
 namespace armnn
 {

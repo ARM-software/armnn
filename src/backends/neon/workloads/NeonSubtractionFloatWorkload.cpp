@@ -4,8 +4,12 @@
 //
 
 #include "NeonSubtractionFloatWorkload.hpp"
+
+#include "NeonWorkloadUtils.hpp"
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
+
+#include <arm_compute/runtime/NEON/functions/NEArithmeticSubtraction.h>
 
 namespace armnn
 {
@@ -34,13 +38,15 @@ NeonSubtractionFloatWorkload::NeonSubtractionFloatWorkload(const SubtractionQueu
     arm_compute::ITensor& input2 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_SubLayer.configure(&input1, &input2, &output, arm_compute::ConvertPolicy::SATURATE);
+    auto layer = std::make_unique<arm_compute::NEArithmeticSubtraction>();
+    layer->configure(&input1, &input2, &output, arm_compute::ConvertPolicy::SATURATE);
+    m_SubLayer.reset(layer.release());
 }
 
 void NeonSubtractionFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSubtractionFloatWorkload_Execute");
-    m_SubLayer.run();
+    m_SubLayer->run();
 }
 
 } //namespace armnn

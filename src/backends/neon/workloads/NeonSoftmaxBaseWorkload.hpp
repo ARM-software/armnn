@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <neon/workloads/NeonWorkloadUtils.hpp>
+#include <armnn/Descriptors.hpp>
+#include <arm_compute/core/Error.h>
 
 namespace armnn
 {

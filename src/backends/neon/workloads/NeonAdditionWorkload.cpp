@@ -4,8 +4,12 @@
 //
 
 #include "NeonAdditionWorkload.hpp"
+#include "NeonWorkloadUtils.hpp"
+
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
+
+#include <arm_compute/runtime/NEON/functions/NEArithmeticAddition.h>
 
 namespace armnn
 {
@@ -35,13 +39,15 @@ NeonAdditionWorkload::NeonAdditionWorkload(const AdditionQueueDescriptor& descri
     arm_compute::ITensor& input2 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_AddLayer.configure(&input1, &input2, &output, arm_compute::ConvertPolicy::SATURATE);
+    auto layer = std::make_unique<arm_compute::NEArithmeticAddition>();
+    layer->configure(&input1, &input2, &output, arm_compute::ConvertPolicy::SATURATE);
+    m_AddLayer.reset(layer.release());
 }
 
 void NeonAdditionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonAdditionWorkload_Execute");
-    m_AddLayer.run();
+    m_AddLayer->run();
 }
 
 } //namespace armnn

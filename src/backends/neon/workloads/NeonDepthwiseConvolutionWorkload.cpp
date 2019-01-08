@@ -5,10 +5,17 @@
 
 #include "NeonDepthwiseConvolutionWorkload.hpp"
 
+#include "NeonWorkloadUtils.hpp"
+
+#include <DataLayoutIndexed.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <neon/NeonLayerSupport.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadUtils.hpp>
+
+#include <arm_compute/runtime/NEON/functions/NEDepthwiseConvolutionLayer.h>
+
+using namespace armnnUtils;
 
 namespace armnn
 {

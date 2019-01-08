@@ -5,6 +5,9 @@
 
 #include "NeonMultiplicationFloatWorkload.hpp"
 
+#include "NeonWorkloadUtils.hpp"
+
+#include <arm_compute/runtime/NEON/functions/NEPixelWiseMultiplication.h>
 
 namespace armnn
 {
@@ -41,18 +44,20 @@ NeonMultiplicationFloatWorkload::NeonMultiplicationFloatWorkload(const Multiplic
     // At the time of writing, configure() will fail if a rounding policy other than TO_ZERO is supplied to it,
     // when providing a scale of 1.0 for F32 tensors, even though the provided rounding policy appears to be
     // ignored for F32 tensors.
-    m_PixelWiseMultiplication.configure(&input1,
-                                        &input2,
-                                        &output,
-                                        1.0f,
-                                        arm_compute::ConvertPolicy::SATURATE,
-                                        arm_compute::RoundingPolicy::TO_ZERO);
+    auto layer = std::make_unique<arm_compute::NEPixelWiseMultiplication>();
+    layer->configure(&input1,
+                     &input2,
+                     &output,
+                     1.0f,
+                     arm_compute::ConvertPolicy::SATURATE,
+                     arm_compute::RoundingPolicy::TO_ZERO);
+    m_PixelWiseMultiplication.reset(layer.release());
 }
 
 void NeonMultiplicationFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMultiplicationFloatWorkload_Execute");
-    m_PixelWiseMultiplication.run();
+    m_PixelWiseMultiplication->run();
 }
 
 } //namespace armnn

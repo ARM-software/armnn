@@ -5,7 +5,10 @@
 
 #pragma once
 
-#include <neon/workloads/NeonWorkloadUtils.hpp>
+#include <backendsCommon/Workload.hpp>
+
+#include <arm_compute/core/Error.h>
+#include <arm_compute/runtime/IFunction.h>
 
 namespace armnn
 {
@@ -21,7 +24,7 @@ public:
     void Execute() const override;
 
 private:
-    mutable arm_compute::NEActivationLayer m_ActivationLayer;
+    std::unique_ptr<arm_compute::IFunction> m_ActivationLayer;
 };
 
 } //namespace armnn

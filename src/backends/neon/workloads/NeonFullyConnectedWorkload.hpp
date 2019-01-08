@@ -5,9 +5,12 @@
 
 #pragma once
 
-#include <neon/workloads/NeonWorkloadUtils.hpp>
+#include <backendsCommon/Workload.hpp>
 
+#include <arm_compute/core/Error.h>
+#include <arm_compute/runtime/IFunction.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
+#include <arm_compute/runtime/Tensor.h>
 
 #include <memory>
 
@@ -28,7 +31,7 @@ public:
     virtual void Execute() const override;
 
 private:
-    mutable arm_compute::NEFullyConnectedLayer m_FullyConnectedLayer;
+    std::unique_ptr<arm_compute::IFunction> m_FullyConnectedLayer;
 
     std::unique_ptr<arm_compute::Tensor> m_WeightsTensor;
     std::unique_ptr<arm_compute::Tensor> m_BiasesTensor;

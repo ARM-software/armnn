@@ -4,7 +4,10 @@
 //
 
 #include "NeonActivationWorkload.hpp"
+#include "NeonWorkloadUtils.hpp"
 #include <aclCommon/ArmComputeUtils.hpp>
+
+#include <arm_compute/runtime/NEON/functions/NEActivationLayer.h>
 
 namespace armnn
 {
@@ -43,13 +46,16 @@ NeonActivationWorkload::NeonActivationWorkload(const ActivationQueueDescriptor& 
     arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_ActivationLayer.configure(&input, &output, activationLayerInfo);
+    auto layer = std::make_unique<arm_compute::NEActivationLayer>();
+    layer->configure(&input, &output, activationLayerInfo);
+
+    m_ActivationLayer.reset(layer.release());
 }
 
 void NeonActivationWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonActivationWorkload_Execute");
-    m_ActivationLayer.run();
+    m_ActivationLayer->run();
 }
 
 } //namespace armnn

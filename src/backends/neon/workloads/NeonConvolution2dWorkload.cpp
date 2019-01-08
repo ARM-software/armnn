@@ -7,7 +7,9 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-#include <neon/NeonLayerSupport.hpp>
+#include <neon/workloads/NeonWorkloadUtils.hpp>
+
+#include <arm_compute/runtime/NEON/functions/NEConvolutionLayer.h>
 
 #include <armnn/Types.hpp>
 #include <Half.hpp>

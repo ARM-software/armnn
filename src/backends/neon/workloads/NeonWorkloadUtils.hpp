@@ -9,7 +9,6 @@
 #include <neon/NeonTensorHandle.hpp>
 #include <neon/NeonTimer.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <arm_compute/runtime/NEON/NEFunctions.h>
 
 #include <Half.hpp>
 

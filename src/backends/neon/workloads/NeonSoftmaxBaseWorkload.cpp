@@ -7,6 +7,8 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
+#include <arm_compute/runtime/NEON/functions/NESoftmaxLayer.h>
+
 namespace armnn
 {
 

@@ -5,6 +5,12 @@
 
 #include "NeonFloorFloatWorkload.hpp"
 
+#include "NeonWorkloadUtils.hpp"
+
+#include <arm_compute/runtime/NEON/functions/NEFloor.h>
+
+#include <boost/polymorphic_cast.hpp>
+
 namespace armnn
 {
 NeonFloorFloatWorkload::NeonFloorFloatWorkload(const FloorQueueDescriptor& descriptor,
@@ -16,13 +22,15 @@ NeonFloorFloatWorkload::NeonFloorFloatWorkload(const FloorQueueDescriptor& descr
     arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_Layer.configure(&input, &output);
+    auto layer = std::make_unique<arm_compute::NEFloor>();
+    layer->configure(&input, &output);
+    m_Layer.reset(layer.release());
 }
 
 void NeonFloorFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonFloorFloatWorkload_Execute");
-    m_Layer.run();
+    m_Layer->run();
 }
 } //namespace armnn
 

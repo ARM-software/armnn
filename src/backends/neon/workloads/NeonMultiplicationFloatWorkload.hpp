@@ -5,7 +5,12 @@
 
 #pragma once
 
-#include <neon/workloads/NeonWorkloadUtils.hpp>
+#include <backendsCommon/Workload.hpp>
+
+#include <arm_compute/core/Error.h>
+#include <arm_compute/runtime/IFunction.h>
+
+#include <memory>
 
 namespace armnn
 {
@@ -20,7 +25,7 @@ public:
     virtual void Execute() const override;
 
 private:
-    mutable arm_compute::NEPixelWiseMultiplication m_PixelWiseMultiplication;
+    std::unique_ptr<arm_compute::IFunction> m_PixelWiseMultiplication;
 };
 
 } //namespace armnn

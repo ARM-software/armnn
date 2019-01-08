@@ -4,11 +4,14 @@
 //
 
 #include "NeonMergerWorkload.hpp"
-#include <armnn/ArmNN.hpp>
+
+#include "NeonWorkloadUtils.hpp"
+
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <neon/NeonTensorHandle.hpp>
 
+#include <arm_compute/runtime/NEON/functions/NEConcatenateLayer.h>
 
 namespace armnn
 {
@@ -66,9 +69,11 @@ const MergerQueueDescriptor& descriptor, const WorkloadInfo& info)
 
     arm_compute::DataLayoutDimension aclAxis = arm_compute::DataLayoutDimension::WIDTH;
 
-    m_Layer.configure(aclInputs, &output, aclAxis);
+    auto layer = std::make_unique<arm_compute::NEConcatenateLayer>();
+    layer->configure(aclInputs, &output, aclAxis);
+    m_Layer.reset(layer.release());
 
-    m_Layer.prepare();
+    m_Layer->prepare();
 }
 
 void NeonMergerWorkload::Execute() const
@@ -76,7 +81,7 @@ void NeonMergerWorkload::Execute() const
     if (m_Execute)
     {
         ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMergerWorkload_Execute");
-        m_Layer.run();
+        m_Layer->run();
     }
 }
 

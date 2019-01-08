@@ -5,8 +5,12 @@
 
 #pragma once
 
-#include <neon/workloads/NeonWorkloadUtils.hpp>
+#include <backendsCommon/Workload.hpp>
+
+#include <arm_compute/runtime/IFunction.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
+
+#include <memory>
 
 namespace armnn
 {
@@ -19,7 +23,7 @@ public:
     virtual void Execute() const override;
 
 private:
-    mutable arm_compute::NESoftmaxLayer m_SoftmaxLayer;
+    std::unique_ptr<arm_compute::IFunction> m_SoftmaxLayer;
 };
 
 } //namespace armnn

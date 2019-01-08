@@ -6,7 +6,11 @@
 #pragma once
 
 #include <backendsCommon/Workload.hpp>
-#include <neon/workloads/NeonWorkloadUtils.hpp>
+
+#include <arm_compute/core/Error.h>
+#include <arm_compute/runtime/IFunction.h>
+#
+#include <memory>
 
 namespace armnn
 {
@@ -23,7 +27,7 @@ public:
     void Execute() const override;
 
 private:
-    mutable arm_compute::NEConcatenateLayer m_Layer;
+    std::unique_ptr<arm_compute::IFunction> m_Layer;
     bool m_Execute;
 
 };

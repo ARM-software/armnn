@@ -4,7 +4,12 @@
 //
 
 #include "NeonL2NormalizationFloatWorkload.hpp"
+
+#include "NeonWorkloadUtils.hpp"
+
 #include <aclCommon/ArmComputeUtils.hpp>
+
+#include <arm_compute/runtime/NEON/functions/NEL2NormalizeLayer.h>
 
 namespace armnn
 {
@@ -25,7 +30,6 @@ arm_compute::Status NeonL2NormalizationWorkloadValidate(const TensorInfo& input,
 NeonL2NormalizationFloatWorkload::NeonL2NormalizationFloatWorkload(const L2NormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info, std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : FloatWorkload<L2NormalizationQueueDescriptor>(descriptor, info)
-    , m_Layer(memoryManager)
 {
     m_Data.ValidateInputsOutputs("NeonL2NormalizationFloatWorkload", 1, 1);
 
@@ -38,13 +42,15 @@ NeonL2NormalizationFloatWorkload::NeonL2NormalizationFloatWorkload(const L2Norma
 
     unsigned int axis = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
 
-    m_Layer.configure(&input, &output, axis);
+    auto layer = std::make_unique<arm_compute::NEL2NormalizeLayer>(memoryManager);
+    layer->configure(&input, &output, axis);
+    m_Layer.reset(layer.release());
 }
 
 void NeonL2NormalizationFloatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonL2NormalizationFloatWorkload_Execute");
-    m_Layer.run();
+    m_Layer->run();
 }
 
 } //namespace armnn

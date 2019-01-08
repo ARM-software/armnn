@@ -4,10 +4,14 @@
 //
 
 #include "NeonPooling2dWorkload.hpp"
-#include <neon/NeonLayerSupport.hpp>
+
+#include "NeonWorkloadUtils.hpp"
+
 #include <neon/NeonTensorHandle.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+
+#include <arm_compute/runtime/NEON/functions/NEPoolingLayer.h>
 
 namespace armnn
 {
@@ -42,13 +46,15 @@ NeonPooling2dWorkload::NeonPooling2dWorkload(
 
     arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(m_Data.m_Parameters);
 
-    m_PoolingLayer.configure(&input, &output, layerInfo);
+    auto layer = std::make_unique<arm_compute::NEPoolingLayer>();
+    layer->configure(&input, &output, layerInfo);
+    m_PoolingLayer.reset(layer.release());
 }
 
 void NeonPooling2dWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonPooling2dWorkload_Execute");
-    m_PoolingLayer.run();
+    m_PoolingLayer->run();
 }
 
 } //namespace armnn

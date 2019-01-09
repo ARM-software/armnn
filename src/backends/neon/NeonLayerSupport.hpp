@@ -90,6 +90,11 @@ public:
                            const OriginsDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsMinimumSupported(const TensorInfo& input0,
+                            const TensorInfo& input1,
+                            const TensorInfo& output,
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsMultiplicationSupported(const TensorInfo& input0,
                                    const TensorInfo& input1,
                                    const TensorInfo& output,

@@ -26,6 +26,7 @@
 #include "workloads/NeonMaximumWorkload.hpp"
 #include "workloads/NeonMeanWorkload.hpp"
 #include "workloads/NeonMergerWorkload.hpp"
+#include "workloads/NeonMinimumWorkload.hpp"
 #include "workloads/NeonMultiplicationFloatWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
@@ -290,6 +291,18 @@ bool NeonLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> in
                                            &TrueFunc<>,
                                            &TrueFunc<>);
       }
+}
+
+bool NeonLayerSupport::IsMinimumSupported(const TensorInfo& input0,
+                                          const TensorInfo& input1,
+                                          const TensorInfo& output,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonMinimumWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool NeonLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,

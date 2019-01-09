@@ -19,6 +19,7 @@
 #include "NeonMaximumWorkload.hpp"
 #include "NeonMeanWorkload.hpp"
 #include "NeonMergerWorkload.hpp"
+#include "NeonMinimumWorkload.hpp"
 #include "NeonMultiplicationFloatWorkload.hpp"
 #include "NeonNormalizationFloatWorkload.hpp"
 #include "NeonPermuteWorkload.hpp"

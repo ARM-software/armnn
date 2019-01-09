@@ -303,7 +303,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateStridedSlice(const Strided
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+    return std::make_unique<NeonMinimumWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,

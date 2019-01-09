@@ -417,6 +417,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/RealDiv.cpp
             src/armnnTfParser/test/Reshape.cpp
             src/armnnTfParser/test/ResizeBilinear.cpp
+            src/armnnTfParser/test/Rsqrt.cpp
             src/armnnTfParser/test/Shape.cpp
             src/armnnTfParser/test/Softmax.cpp
             src/armnnTfParser/test/TestDependencies.cpp

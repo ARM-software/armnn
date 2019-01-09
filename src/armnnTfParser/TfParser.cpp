@@ -345,6 +345,7 @@ const std::map<std::string, TfParser::OperationParsingFunction> TfParser::ms_Ope
     { "Relu6",                 &TfParser::ParseRelu6 },
     { "Reshape",               &TfParser::ParseReshape },
     { "ResizeBilinear",        &TfParser::ParseResizeBilinear },
+    { "Rsqrt",                 &TfParser::ParseRsqrt },
     { "Shape",                 &TfParser::ParseShape },
     { "Squeeze",               &TfParser::ParseSqueeze },
     { "Sigmoid",               &TfParser::ParseSigmoid },
@@ -2443,6 +2444,22 @@ ParsedTfOperationPtr TfParser::ParseSigmoid(const tensorflow::NodeDef& nodeDef,
     activationDesc.m_Function = ActivationFunction::Sigmoid;
 
     return AddActivationLayer(nodeDef, activationDesc);
+}
+
+ParsedTfOperationPtr TfParser::ParseRsqrt(const tensorflow::NodeDef &nodeDef,
+    const tensorflow::GraphDef &graphDef)
+{
+    boost::ignore_unused(graphDef);
+
+    std::vector<OutputOfParsedTfOperation> inputs = GetInputParsedTfOperationsChecked(nodeDef, 1);
+
+    IConnectableLayer* const layer = m_Network->AddRsqrtLayer(nodeDef.name().c_str());
+
+    IOutputSlot& prevLayerOutputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
+    prevLayerOutputSlot.Connect(layer->GetInputSlot(0));
+    layer->GetOutputSlot(0).SetTensorInfo(prevLayerOutputSlot.GetTensorInfo());
+
+    return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
 }
 
 ParsedTfOperationPtr TfParser::ParseSoftmax(const tensorflow::NodeDef& nodeDef,

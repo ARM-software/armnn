@@ -16,11 +16,9 @@
 #include <unordered_map>
 #include <armnn/ArmNN.hpp>
 
-namespace armnn
-{
-
 namespace
 {
+
 /// Helper function to copy a full string to a truncated version.
 void CopyErrorMessage(char* truncatedString, const char* fullString, size_t maxLength)
 {
@@ -33,10 +31,13 @@ void CopyErrorMessage(char* truncatedString, const char* fullString, size_t maxL
     }
 }
 
-}
+} // anonymous namespace
+
+namespace armnn
+{
 
 // Helper macro to avoid code duplication.
-// Forwards function func to funcRef, funcNeon or funcCl, depending on the value of compute.
+// Forwards function func to funcRef, funcNeon or funcCl, depending on the value of backendId.
 #define FORWARD_LAYER_SUPPORT_FUNC(backendId, func, ...) \
     std::string reasonIfUnsupportedFull; \
     bool isSupported; \
@@ -177,26 +178,6 @@ bool IsDebugSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsDebugSupported, input, output, descriptor);
 }
 
-bool IsDivisionSupported(const BackendId& backend,
-                         const TensorInfo& input0,
-                         const TensorInfo& input1,
-                         const TensorInfo& output,
-                         char* reasonIfUnsupported,
-                         size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsDivisionSupported, input0, input1, output);
-}
-
-bool IsSubtractionSupported(const BackendId& backend,
-                            const TensorInfo& input0,
-                            const TensorInfo& input1,
-                            const TensorInfo& output,
-                            char* reasonIfUnsupported,
-                            size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsSubtractionSupported, input0, input1, output);
-}
-
 bool IsDepthwiseConvolutionSupported(const BackendId& backend,
                                      const TensorInfo& input,
                                      const TensorInfo& output,
@@ -209,14 +190,49 @@ bool IsDepthwiseConvolutionSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsDepthwiseConvolutionSupported, input, output, descriptor, weights, biases);
 }
 
-bool IsInputSupported(const BackendId& backend,
-                      const TensorInfo& input,
+bool IsDivisionSupported(const BackendId& backend,
+                         const TensorInfo& input0,
+                         const TensorInfo& input1,
+                         const TensorInfo& output,
+                         char* reasonIfUnsupported,
+                         size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsDivisionSupported, input0, input1, output);
+}
+
+bool IsEqualSupported(const BackendId& backend,
+                      const TensorInfo& input0,
+                      const TensorInfo& input1,
+                      const TensorInfo& output,
                       char* reasonIfUnsupported,
                       size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsInputSupported, input);
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsEqualSupported, input0, input1, output);
 }
 
+bool IsFakeQuantizationSupported(const BackendId& backend,
+                                 const TensorInfo& input,
+                                 const FakeQuantizationDescriptor& descriptor,
+                                 char* reasonIfUnsupported,
+                                 size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsFakeQuantizationSupported, input, descriptor);
+}
+
+bool IsFloorSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    // By definition (that is, regardless of compute device), shapes and data type must match.
+    if (input.GetShape() != output.GetShape() || input.GetDataType() != output.GetDataType())
+    {
+        return false;
+    }
+
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsFloorSupported, input, output);
+}
 bool IsFullyConnectedSupported(const BackendId& backend,
                                const TensorInfo& input,
                                const TensorInfo& output,
@@ -228,6 +244,25 @@ bool IsFullyConnectedSupported(const BackendId& backend,
 {
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsFullyConnectedSupported, input, output, weights, biases, descriptor);
 }
+
+bool IsGreaterSupported(const BackendId& backend,
+                        const TensorInfo& input0,
+                        const TensorInfo& input1,
+                        const TensorInfo& output,
+                        char* reasonIfUnsupported,
+                        size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsGreaterSupported, input0, input1, output);
+}
+
+bool IsInputSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsInputSupported, input);
+}
+
 
 bool IsL2NormalizationSupported(const BackendId& backend,
                                 const TensorInfo& input,
@@ -276,6 +311,25 @@ bool IsMaximumSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsMaximumSupported, input0, input1, output);
 }
 
+bool IsMeanSupported(const BackendId& backend,
+                     const TensorInfo& input,
+                     const TensorInfo& output,
+                     const MeanDescriptor& descriptor,
+                     char* reasonIfUnsupported,
+                     size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMeanSupported, input, output, descriptor);
+}
+
+bool IsMemCopySupported(const BackendId &backend,
+                        const TensorInfo &input,
+                        const TensorInfo &output,
+                        char *reasonIfUnsupported,
+                        size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMemCopySupported, input, output);
+}
+
 bool IsMergerSupported(const BackendId& backend,
                        std::vector<const TensorInfo*> inputs,
                        const TensorInfo& output,
@@ -285,6 +339,16 @@ bool IsMergerSupported(const BackendId& backend,
 {
     BOOST_ASSERT(inputs.size() > 0);
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergerSupported, inputs, output, descriptor);
+}
+
+bool IsMinimumSupported(const BackendId& backend,
+                        const TensorInfo& input0,
+                        const TensorInfo& input1,
+                        const TensorInfo& output,
+                        char* reasonIfUnsupported,
+                        size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMinimumSupported, input0, input1, output);
 }
 
 bool IsMultiplicationSupported(const BackendId& backend,
@@ -315,6 +379,17 @@ bool IsOutputSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsOutputSupported, output);
 }
 
+bool IsPadSupported(const BackendId& backend,
+                    const TensorInfo& input,
+                    const TensorInfo& output,
+                    const PadDescriptor& descriptor,
+                    char* reasonIfUnsupported,
+                    size_t reasonIfUnsupportedMaxLength)
+{
+
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsPadSupported, input, output, descriptor);
+}
+
 bool IsPermuteSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,
@@ -335,12 +410,30 @@ bool IsPooling2dSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsPooling2dSupported, input, output, descriptor);
 }
 
+bool IsReshapeSupported(const BackendId& backend,
+                        const TensorInfo& input,
+                        const ReshapeDescriptor& descriptor,
+                        char* reasonIfUnsupported,
+                        size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsReshapeSupported, input, descriptor);
+}
+
 bool IsResizeBilinearSupported(const BackendId& backend,
                                const TensorInfo& input,
                                char* reasonIfUnsupported,
                                size_t reasonIfUnsupportedMaxLength)
 {
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsResizeBilinearSupported, input);
+}
+
+bool IsRsqrtSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsRsqrtSupported, input, output);
 }
 
 bool IsSoftmaxSupported(const BackendId& backend,
@@ -372,68 +465,6 @@ bool IsSplitterSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsSplitterSupported, input, descriptor);
 }
 
-bool IsFakeQuantizationSupported(const BackendId& backend,
-                                 const TensorInfo& input,
-                                 const FakeQuantizationDescriptor& descriptor,
-                                 char* reasonIfUnsupported,
-                                 size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsFakeQuantizationSupported, input, descriptor);
-}
-
-bool IsReshapeSupported(const BackendId& backend,
-                        const TensorInfo& input,
-                        char* reasonIfUnsupported,
-                        size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsReshapeSupported, input);
-}
-
-bool IsRsqrtSupported(const BackendId& backend,
-                      const TensorInfo& input,
-                      const TensorInfo& output,
-                      char* reasonIfUnsupported,
-                      size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsRsqrtSupported, input, output);
-}
-
-bool IsFloorSupported(const BackendId& backend,
-                      const TensorInfo& input,
-                      const TensorInfo& output,
-                      char* reasonIfUnsupported,
-                      size_t reasonIfUnsupportedMaxLength)
-{
-    // By definition (that is, regardless of compute device), shapes and data type must match.
-    if (input.GetShape() != output.GetShape() || input.GetDataType() != output.GetDataType())
-    {
-        return false;
-    }
-
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsFloorSupported, input, output);
-}
-
-bool IsMeanSupported(const BackendId& backend,
-                     const TensorInfo& input,
-                     const TensorInfo& output,
-                     const MeanDescriptor& descriptor,
-                     char* reasonIfUnsupported,
-                     size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMeanSupported, input, output, descriptor);
-}
-
-bool IsPadSupported(const BackendId& backend,
-                    const TensorInfo& input,
-                    const TensorInfo& output,
-                    const PadDescriptor& descriptor,
-                    char* reasonIfUnsupported,
-                    size_t reasonIfUnsupportedMaxLength)
-{
-
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsPadSupported, input, output, descriptor);
-}
-
 bool IsStridedSliceSupported(const BackendId& backend,
                              const TensorInfo& input,
                              const TensorInfo& output,
@@ -444,34 +475,14 @@ bool IsStridedSliceSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsStridedSliceSupported, input, output, descriptor);
 }
 
-bool IsMinimumSupported(const BackendId& backend,
-                        const TensorInfo& input0,
-                        const TensorInfo& input1,
-                        const TensorInfo& output,
-                        char* reasonIfUnsupported,
-                        size_t reasonIfUnsupportedMaxLength)
+bool IsSubtractionSupported(const BackendId& backend,
+                            const TensorInfo& input0,
+                            const TensorInfo& input1,
+                            const TensorInfo& output,
+                            char* reasonIfUnsupported,
+                            size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMinimumSupported, input0, input1, output);
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsSubtractionSupported, input0, input1, output);
 }
 
-bool IsGreaterSupported(const BackendId& backend,
-                        const TensorInfo& input0,
-                        const TensorInfo& input1,
-                        const TensorInfo& output,
-                        char* reasonIfUnsupported,
-                        size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsGreaterSupported, input0, input1, output);
-}
-
-bool IsEqualSupported(const BackendId& backend,
-                      const TensorInfo& input0,
-                      const TensorInfo& input1,
-                      const TensorInfo& output,
-                      char* reasonIfUnsupported,
-                      size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsEqualSupported, input0, input1, output);
-}
-
-}
+} // namespace armnn

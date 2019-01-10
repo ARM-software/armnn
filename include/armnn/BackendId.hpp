@@ -20,13 +20,13 @@ namespace armnn
 //
 enum class Compute
 {
+    Undefined = 0,
     /// CPU Execution: Reference C++ kernels
-    CpuRef      = 0,
+    CpuRef    = 1,
     /// CPU Execution: NEON: ArmCompute
-    CpuAcc      = 1,
+    CpuAcc    = 2,
     /// GPU Execution: OpenCL: ArmCompute
-    GpuAcc      = 2,
-    Undefined   = 5
+    GpuAcc    = 3
 };
 
 /// Deprecated function that will be removed together with
@@ -46,7 +46,8 @@ constexpr char const* GetComputeDeviceAsCString(Compute compute)
 /// the Compute enum
 inline std::ostream& operator<<(std::ostream& os, const std::vector<Compute>& compute)
 {
-    for (const Compute& comp : compute) {
+    for (const Compute& comp : compute)
+    {
         os << GetComputeDeviceAsCString(comp) << " ";
     }
     return os;
@@ -56,7 +57,8 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<Compute>& co
 /// the Compute enum
 inline std::ostream& operator<<(std::ostream& os, const std::set<Compute>& compute)
 {
-    for (const Compute& comp : compute) {
+    for (const Compute& comp : compute)
+    {
         os << GetComputeDeviceAsCString(comp) << " ";
     }
     return os;
@@ -70,13 +72,10 @@ inline std::ostream& operator<<(std::ostream& os, const Compute& compute)
     return os;
 }
 
-struct UninitializedBackendId {};
-
 class BackendId final
 {
 public:
-    BackendId() { GetComputeDeviceAsCString(Compute::Undefined); }
-    BackendId(UninitializedBackendId) { GetComputeDeviceAsCString(Compute::Undefined); }
+    BackendId() : m_Id(GetComputeDeviceAsCString(Compute::Undefined)) {}
     BackendId(const std::string& id) : m_Id{id} {}
     BackendId(const char* id) : m_Id{id} {}
 
@@ -132,7 +131,7 @@ private:
     std::string m_Id;
 };
 
-}
+} // namespace armnn
 
 namespace std
 {
@@ -163,7 +162,7 @@ inline std::ostream& operator<<(std::ostream& os, const BackendId& id)
 
 template <template <typename...> class TContainer, typename... TContainerTemplateArgs>
 std::ostream& operator<<(std::ostream& os,
-                                const TContainer<BackendId, TContainerTemplateArgs...>& ids)
+                         const TContainer<BackendId, TContainerTemplateArgs...>& ids)
 {
     os << '[';
     for (const auto& id : ids) { os << id << " "; }

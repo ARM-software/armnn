@@ -271,6 +271,15 @@ bool NeonLayerSupport::IsMeanSupported(const TensorInfo& input,
                                    descriptor);
 }
 
+bool NeonLayerSupport::IsMemCopySupported(const TensorInfo &input,
+                                          const TensorInfo &output,
+                                          Optional<std::string &> reasonIfUnsupported) const
+{
+    ignore_unused(input);
+    ignore_unused(output);
+    return true;
+}
+
 bool NeonLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                          const TensorInfo& output,
                                          const OriginsDescriptor& descriptor,
@@ -355,20 +364,14 @@ bool NeonLayerSupport::IsPooling2dSupported(const TensorInfo& input,
 }
 
 bool NeonLayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                          const ReshapeDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
+    ignore_unused(descriptor);
     return IsSupportedForDataTypeNeon(reasonIfUnsupported,
                                       input.GetDataType(),
                                       &TrueFunc<>,
                                       &TrueFunc<>);
-}
-
-bool NeonLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
-                                                 Optional<std::string&> reasonIfUnsupported) const
-{
-    ignore_unused(input);
-    ignore_unused(reasonIfUnsupported);
-    return false;
 }
 
 bool NeonLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

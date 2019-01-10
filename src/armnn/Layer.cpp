@@ -132,7 +132,7 @@ Layer::Layer(unsigned int numInputSlots,
 : m_OutputHandlers(numOutputSlots)
 , m_LayerName(name ? name : "")
 , m_Type(type)
-, m_BackendId(UninitializedBackendId())
+, m_BackendId()
 , m_Guid(GenerateLayerGuid())
 {
     m_InputSlots.reserve(numInputSlots);

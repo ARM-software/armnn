@@ -2,10 +2,12 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include <boost/test/unit_test.hpp>
 
 #include "ProfilingEvent.hpp"
 #include "Profiling.hpp"
+
 #include <thread>
 
 using namespace armnn;
@@ -24,7 +26,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEventTest)
     Event testEvent(eventName,
                     nullptr,
                     nullptr,
-                    armnn::Compute::Undefined,
+                    BackendId(),
                     std::move(insts1));
 
     BOOST_CHECK_EQUAL(testEvent.GetName(), "EventName");
@@ -41,17 +43,18 @@ BOOST_AUTO_TEST_CASE(ProfilingEventTest)
     BOOST_CHECK_GE(testEvent.GetMeasurements().front().m_Value, 10.0);
 
     // create a sub event with CpuAcc
+    BackendId cpuAccBackendId(Compute::CpuAcc);
     Event::Instruments insts2;
     insts2.emplace_back(std::make_unique<WallClockTimer>());
     Event testEvent2(eventName,
                      profileManager.GetProfiler(),
                      &testEvent,
-                     Compute::CpuAcc,
+                     cpuAccBackendId,
                      std::move(insts2));
 
     BOOST_CHECK_EQUAL(&testEvent, testEvent2.GetParentEvent());
     BOOST_CHECK_EQUAL(profileManager.GetProfiler(), testEvent2.GetProfiler());
-    BOOST_CHECK_EQUAL(Compute::CpuAcc, testEvent2.GetComputeDevice());
+    BOOST_CHECK(cpuAccBackendId == testEvent2.GetBackendId());
 }
 
 BOOST_AUTO_TEST_CASE(ProfilingEventTestOnGpuAcc)
@@ -66,7 +69,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEventTestOnGpuAcc)
     Event testEvent(eventName,
                     nullptr,
                     nullptr,
-                    armnn::Compute::Undefined,
+                    BackendId(),
                     std::move(insts1));
 
     BOOST_CHECK_EQUAL(testEvent.GetName(), "GPUEvent");
@@ -83,13 +86,18 @@ BOOST_AUTO_TEST_CASE(ProfilingEventTestOnGpuAcc)
     BOOST_CHECK_GE(testEvent.GetMeasurements().front().m_Value, 10.0);
 
     // create a sub event
+    BackendId gpuAccBackendId(Compute::GpuAcc);
     Event::Instruments insts2;
     insts2.emplace_back(std::make_unique<WallClockTimer>());
-    Event testEvent2(eventName, profileManager.GetProfiler(), &testEvent, Compute::GpuAcc, std::move(insts2));
+    Event testEvent2(eventName,
+                     profileManager.GetProfiler(),
+                     &testEvent,
+                     gpuAccBackendId,
+                     std::move(insts2));
 
     BOOST_CHECK_EQUAL(&testEvent, testEvent2.GetParentEvent());
     BOOST_CHECK_EQUAL(profileManager.GetProfiler(), testEvent2.GetProfiler());
-    BOOST_CHECK_EQUAL(Compute::GpuAcc, testEvent2.GetComputeDevice());
+    BOOST_CHECK(gpuAccBackendId == testEvent2.GetBackendId());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

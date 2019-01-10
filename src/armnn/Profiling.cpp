@@ -132,7 +132,7 @@ void Profiler::AnalyzeEventSequenceAndWriteResults(ItertType first, ItertType la
                       << std::setw(20) << durationMs
                       << std::setw(20) << startTimeMs
                       << std::setw(20) << stopTimeMs
-                      << std::setw(20) << GetComputeDeviceAsCString(eventPtr->GetComputeDevice())
+                      << std::setw(20) << eventPtr->GetBackendId().Get()
                       << std::endl;
         }
         outStream << std::endl;
@@ -194,10 +194,12 @@ void Profiler::EnableProfiling(bool enableProfiling)
     m_ProfilingEnabled = enableProfiling;
 }
 
-Event* Profiler::BeginEvent(Compute compute, const std::string& label, std::vector<InstrumentPtr>&& instruments)
+Event* Profiler::BeginEvent(const BackendId& backendId,
+                            const std::string& label,
+                            std::vector<InstrumentPtr>&& instruments)
 {
     Event* parent = m_Parents.empty() ? nullptr : m_Parents.top();
-    m_EventSequence.push_back(std::make_unique<Event>(label, this, parent, compute, std::move(instruments)));
+    m_EventSequence.push_back(std::make_unique<Event>(label, this, parent, backendId, std::move(instruments)));
     Event* event = m_EventSequence.back().get();
     event->Start();
 

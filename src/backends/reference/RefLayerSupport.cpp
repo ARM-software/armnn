@@ -390,6 +390,17 @@ bool RefLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inp
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsMemCopySupported(const TensorInfo &input,
+                                         const TensorInfo &output,
+                                         Optional<std::string &> reasonIfUnsupported) const
+{
+    ignore_unused(output);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool RefLayerSupport::IsMinimumSupported(const TensorInfo& input0,
                                          const TensorInfo& input1,
                                          const TensorInfo& output,
@@ -478,8 +489,10 @@ bool RefLayerSupport::IsPooling2dSupported(const TensorInfo& input,
 }
 
 bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                         const ReshapeDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
+    ignore_unused(descriptor);
     return IsSupportedForDataTypeRef(reasonIfUnsupported,
                                      input.GetDataType(),
                                      &TrueFunc<>,

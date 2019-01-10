@@ -4,12 +4,12 @@
 //
 #pragma once
 
-#include <armnn/ILayerSupport.hpp>
+#include <backendsCommon/LayerSupportBase.hpp>
 
 namespace armnn
 {
 
-class ClLayerSupport : public ILayerSupport
+class ClLayerSupport : public LayerSupportBase
 {
 public:
     bool IsActivationSupported(const TensorInfo& input,
@@ -122,6 +122,10 @@ public:
                          const MeanDescriptor& descriptor,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsMemCopySupported(const TensorInfo& input,
+                            const TensorInfo& output,
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
                            const OriginsDescriptor& descriptor,
@@ -161,6 +165,7 @@ public:
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsReshapeSupported(const TensorInfo& input,
+                            const ReshapeDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsResizeBilinearSupported(const TensorInfo& input,

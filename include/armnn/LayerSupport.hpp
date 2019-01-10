@@ -105,16 +105,24 @@ bool IsDivisionSupported(const BackendId& backend,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsSubtractionSupported(const BackendId& backend,
-                            const TensorInfo& input0,
-                            const TensorInfo& input1,
-                            const TensorInfo& output,
-                            char* reasonIfUnsupported = nullptr,
-                            size_t reasonIfUnsupportedMaxLength = 1024);
+bool IsEqualSupported(const BackendId& backend,
+                      const TensorInfo& input0,
+                      const TensorInfo& input1,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported = nullptr,
+                      size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsInputSupported(const BackendId& backend,
+bool IsFakeQuantizationSupported(const BackendId& backend,
+                                 const TensorInfo& input,
+                                 const FakeQuantizationDescriptor& descriptor,
+                                 char* reasonIfUnsupported = nullptr,
+                                 size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsFloorSupported(const BackendId& backend,
                       const TensorInfo& input,
+                      const TensorInfo& output,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
@@ -127,6 +135,20 @@ bool IsFullyConnectedSupported(const BackendId& backend,
                                const FullyConnectedDescriptor& descriptor,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsGreaterSupported(const BackendId& backend,
+                        const TensorInfo& input0,
+                        const TensorInfo& input1,
+                        const TensorInfo& output,
+                        char* reasonIfUnsupported = nullptr,
+                        size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsInputSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      char* reasonIfUnsupported = nullptr,
+                      size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsL2NormalizationSupported(const BackendId& backend,
@@ -161,12 +183,35 @@ bool IsMaximumSupported(const BackendId& backend,
                         size_t reasonIfUnSupportedMaxLength = 0);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsMeanSupported(const BackendId& backend,
+                     const TensorInfo& input,
+                     const TensorInfo& output,
+                     const MeanDescriptor& descriptor,
+                     char* reasonIfUnsupported = nullptr,
+                     size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsMemCopySupported(const BackendId& backend,
+                        const TensorInfo& input,
+                        const TensorInfo& output,
+                        char* reasonIfUnsupported = nullptr,
+                        size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsMergerSupported(const BackendId& backend,
                        const std::vector<const TensorInfo*> inputs,
                        const TensorInfo& output,
                        const OriginsDescriptor& descriptor,
                        char* reasonIfUnsupported = nullptr,
                        size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsMinimumSupported(const BackendId& backend,
+                        const TensorInfo& input0,
+                        const TensorInfo& input1,
+                        const TensorInfo& output,
+                        char* reasonIfUnsupported = nullptr,
+                        size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsMultiplicationSupported(const BackendId& backend,
@@ -191,6 +236,14 @@ bool IsOutputSupported(const BackendId& backend,
                        size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsPadSupported(const BackendId& backend,
+                     const TensorInfo& input,
+                     const TensorInfo& output,
+                     const PadDescriptor& descriptor,
+                     char* reasonIfUnsupported = nullptr,
+                     size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsPermuteSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,
@@ -207,10 +260,24 @@ bool IsPooling2dSupported(const BackendId& backend,
                           size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsReshapeSupported(const BackendId& backend,
+                        const TensorInfo& input,
+                        const ReshapeDescriptor& descriptor,
+                        char* reasonIfUnsupported = nullptr,
+                        size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsResizeBilinearSupported(const BackendId& backend,
                                const TensorInfo& input,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsRsqrtSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported = nullptr,
+                      size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsSoftmaxSupported(const BackendId& backend,
@@ -236,49 +303,6 @@ bool IsSplitterSupported(const BackendId& backend,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsFakeQuantizationSupported(const BackendId& backend,
-                                 const TensorInfo& input,
-                                 const FakeQuantizationDescriptor& descriptor,
-                                 char* reasonIfUnsupported = nullptr,
-                                 size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsReshapeSupported(const BackendId& backend,
-                        const TensorInfo& input,
-                        char* reasonIfUnsupported = nullptr,
-                        size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsRsqrtSupported(const BackendId& backend,
-                      const TensorInfo& input,
-                      const TensorInfo& output,
-                      char* reasonIfUnsupported = nullptr,
-                      size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsFloorSupported(const BackendId& backend,
-                      const TensorInfo& input,
-                      const TensorInfo& output,
-                      char* reasonIfUnsupported = nullptr,
-                      size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsMeanSupported(const BackendId& backend,
-                     const TensorInfo& input,
-                     const TensorInfo& output,
-                     const MeanDescriptor& descriptor,
-                     char* reasonIfUnsupported = nullptr,
-                     size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsPadSupported(const BackendId& backend,
-                     const TensorInfo& input,
-                     const TensorInfo& output,
-                     const PadDescriptor& descriptor,
-                     char* reasonIfUnsupported = nullptr,
-                     size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsStridedSliceSupported(const BackendId& backend,
                              const TensorInfo& input,
                              const TensorInfo& output,
@@ -287,26 +311,10 @@ bool IsStridedSliceSupported(const BackendId& backend,
                              size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsMinimumSupported(const BackendId& backend,
-                        const TensorInfo& input0,
-                        const TensorInfo& input1,
-                        const TensorInfo& output,
-                        char* reasonIfUnsupported = nullptr,
-                        size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsGreaterSupported(const BackendId& backend,
-                        const TensorInfo& input0,
-                        const TensorInfo& input1,
-                        const TensorInfo& output,
-                        char* reasonIfUnsupported = nullptr,
-                        size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
-bool IsEqualSupported(const BackendId& backend,
-                      const TensorInfo& input0,
-                      const TensorInfo& input1,
-                      const TensorInfo& output,
-                      char* reasonIfUnsupported = nullptr,
-                      size_t reasonIfUnsupportedMaxLength = 1024);
+bool IsSubtractionSupported(const BackendId& backend,
+                            const TensorInfo& input0,
+                            const TensorInfo& input1,
+                            const TensorInfo& output,
+                            char* reasonIfUnsupported = nullptr,
+                            size_t reasonIfUnsupportedMaxLength = 1024);
 }

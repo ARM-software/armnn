@@ -27,10 +27,10 @@ public:
     using Instruments = std::vector<InstrumentPtr>;
 
     Event(const std::string& eventName,
-        Profiler* profiler,
-        Event* parent,
-        const Compute computeDevice,
-        std::vector<InstrumentPtr>&& instrument);
+          Profiler* profiler,
+          Event* parent,
+          const BackendId backendId,
+          std::vector<InstrumentPtr>&& instrument);
 
     Event(const Event& other) = delete;
 
@@ -62,9 +62,9 @@ public:
     /// \return Pointer of the parent event
     const Event* GetParentEvent() const;
 
-    /// Get the compute device of the event
-    /// \return Compute device of the event
-    Compute GetComputeDevice() const;
+    /// Get the backend id of the event
+    /// \return Backend id of the event
+    BackendId GetBackendId() const;
 
     /// Assignment operator
     Event& operator=(const Event& other) = delete;
@@ -82,8 +82,8 @@ private:
     /// Stores optional parent event
     Event* m_Parent;
 
-    /// Compute device
-    Compute m_ComputeDevice;
+    /// Backend id
+    BackendId m_BackendId;
 
     /// Instruments to use
     Instruments m_Instruments;

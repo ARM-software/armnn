@@ -2,14 +2,15 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
-#include <backendsCommon/LayerSupportBase.hpp>
+#include <armnn/ILayerSupport.hpp>
 
 namespace armnn
 {
 
-class RefLayerSupport : public LayerSupportBase
+class LayerSupportBase : public ILayerSupport
 {
 public:
     bool IsActivationSupported(const TensorInfo& input,
@@ -141,14 +142,14 @@ public:
                          const MeanDescriptor& descriptor,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsMemCopySupported(const TensorInfo& input,
+                            const TensorInfo& output,
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
                            const OriginsDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    bool IsMemCopySupported(const TensorInfo& input,
-                            const TensorInfo& output,
-                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsMinimumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,

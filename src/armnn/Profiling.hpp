@@ -35,7 +35,7 @@ public:
 
     // Marks the beginning of a user-defined event.
     // No attempt will be made to copy the name string: it must be known at compile time.
-    Event* BeginEvent(Compute compute, const std::string& name, std::vector<InstrumentPtr>&& instruments);
+    Event* BeginEvent(const BackendId& backendId, const std::string& name, std::vector<InstrumentPtr>&& instruments);
 
     // Marks the end of a user-defined event.
     void EndEvent(Event* event);
@@ -117,7 +117,7 @@ public:
     using InstrumentPtr = std::unique_ptr<Instrument>;
 
     template<typename... Args>
-    ScopedProfilingEvent(Compute compute, const std::string& name, Args... args)
+    ScopedProfilingEvent(const BackendId& backendId, const std::string& name, Args... args)
         : m_Event(nullptr)
         , m_Profiler(ProfilerManager::GetInstance().GetProfiler())
     {
@@ -126,7 +126,7 @@ public:
             std::vector<InstrumentPtr> instruments(0);
             instruments.reserve(sizeof...(args)); //One allocation
             ConstructNextInVector(instruments, args...);
-            m_Event = m_Profiler->BeginEvent(compute, name, std::move(instruments));
+            m_Event = m_Profiler->BeginEvent(backendId, name, std::move(instruments));
         }
     }
 
@@ -152,15 +152,15 @@ private:
         ConstructNextInVector(instruments, args...);
     }
 
-    Event* m_Event;                                 ///< Event to track
-    Profiler* m_Profiler;                           ///< Profiler used
+    Event* m_Event;       ///< Event to track
+    Profiler* m_Profiler; ///< Profiler used
 };
 
 } // namespace armnn
 
 // The event name must be known at compile time
-#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(compute, /*name,*/ ...) \
-    armnn::ScopedProfilingEvent e_##__FILE__##__LINE__(compute, /*name,*/ __VA_ARGS__);
+#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, /*name,*/ ...) \
+    armnn::ScopedProfilingEvent e_##__FILE__##__LINE__(backendId, /*name,*/ __VA_ARGS__);
 
-#define ARMNN_SCOPED_PROFILING_EVENT(compute, name) \
-    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(compute, name, armnn::WallClockTimer())
+#define ARMNN_SCOPED_PROFILING_EVENT(backendId, name) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, name, armnn::WallClockTimer())

@@ -11,7 +11,8 @@ list(APPEND armnnBackendsCommon_sources
     CpuTensorHandle.hpp
     IBackendInternal.hpp
     IBackendContext.hpp
-    ILayerSupport.cpp
+    LayerSupportBase.cpp
+    LayerSupportBase.hpp
     IMemoryManager.hpp
     ITensorHandle.hpp
     MakeWorkloadHelper.hpp

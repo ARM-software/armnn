@@ -11,12 +11,12 @@ namespace armnn
 Event::Event(const std::string& eventName,
              Profiler* profiler,
              Event* parent,
-             const Compute computeDevice,
+             const BackendId backendId,
              std::vector<InstrumentPtr>&& instruments)
     : m_EventName(eventName)
     , m_Profiler(profiler)
     , m_Parent(parent)
-    , m_ComputeDevice(computeDevice)
+    , m_BackendId(backendId)
     , m_Instruments(std::move(instruments))
 {
 }
@@ -25,7 +25,7 @@ Event::Event(Event&& other) noexcept
     : m_EventName(std::move(other.m_EventName))
     , m_Profiler(other.m_Profiler)
     , m_Parent(other.m_Parent)
-    , m_ComputeDevice(other.m_ComputeDevice)
+    , m_BackendId(other.m_BackendId)
     , m_Instruments(std::move(other.m_Instruments))
 
 {
@@ -79,9 +79,9 @@ const Event* Event::GetParentEvent() const
     return m_Parent;
 }
 
-Compute Event::GetComputeDevice() const
+BackendId Event::GetBackendId() const
 {
-    return m_ComputeDevice;
+    return m_BackendId;
 }
 
 Event& Event::operator=(Event&& other) noexcept
@@ -94,7 +94,7 @@ Event& Event::operator=(Event&& other) noexcept
     m_EventName = other.m_EventName;
     m_Profiler = other.m_Profiler;
     m_Parent = other.m_Parent;
-    m_ComputeDevice = other.m_ComputeDevice;
+    m_BackendId = other.m_BackendId;
     other.m_Profiler = nullptr;
     other.m_Parent = nullptr;
     return *this;

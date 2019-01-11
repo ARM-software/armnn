@@ -11,15 +11,8 @@
 namespace armnn
 {
 
-
 template<DataType DT>
 struct ResolveTypeImpl;
-
-template<>
-struct ResolveTypeImpl<DataType::QuantisedAsymm8>
-{
-    using Type = uint8_t;
-};
 
 template <>
 struct ResolveTypeImpl<DataType::Float16>
@@ -34,6 +27,18 @@ struct ResolveTypeImpl<DataType::Float32>
 };
 
 template<>
+struct ResolveTypeImpl<DataType::QuantisedAsymm8>
+{
+    using Type = uint8_t;
+};
+
+template<>
+struct ResolveTypeImpl<DataType::Signed32>
+{
+    using Type = int32_t;
+};
+
+template<>
 struct ResolveTypeImpl<DataType::Boolean>
 {
     using Type = bool;
@@ -41,6 +46,5 @@ struct ResolveTypeImpl<DataType::Boolean>
 
 template<DataType DT>
 using ResolveType = typename ResolveTypeImpl<DT>::Type;
-
 
 } //namespace armnn

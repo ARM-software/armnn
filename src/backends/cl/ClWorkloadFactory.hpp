@@ -150,6 +150,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 
+    virtual std::unique_ptr<IWorkload> CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const override;
+
 private:
     template<typename FloatWorkload, typename Uint8Workload, typename QueueDescriptorType, typename... Args>
     static std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor,

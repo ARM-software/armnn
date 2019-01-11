@@ -1051,4 +1051,9 @@ void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                               "output");
 }
 
+void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    // This is internally generated so it should not need validation.
+}
+
 } //namespace armnn

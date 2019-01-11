@@ -92,6 +92,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ConvertFp32ToFp16Layer.cpp \
         src/armnn/layers/DebugLayer.cpp \
         src/armnn/layers/DepthwiseConvolution2dLayer.cpp \
+        src/armnn/layers/DivisionLayer.cpp \
         src/armnn/layers/ElementwiseBaseLayer.cpp \
         src/armnn/layers/EqualLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
@@ -112,7 +113,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/PadLayer.cpp \
         src/armnn/layers/PermuteLayer.cpp \
         src/armnn/layers/Pooling2dLayer.cpp \
-        src/armnn/layers/DivisionLayer.cpp \
+        src/armnn/layers/PreCompiledLayer.cpp \
         src/armnn/layers/ReshapeLayer.cpp \
         src/armnn/layers/ResizeBilinearLayer.cpp \
         src/armnn/layers/RsqrtLayer.cpp \

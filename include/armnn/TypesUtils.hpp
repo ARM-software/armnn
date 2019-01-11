@@ -135,6 +135,16 @@ constexpr const char* GetDataTypeName(DataType dataType)
     }
 }
 
+constexpr const char* GetDataLayoutName(DataLayout dataLayout)
+{
+    switch (dataLayout)
+    {
+        case DataLayout::NCHW: return "NCHW";
+        case DataLayout::NHWC: return "NHWC";
+        default:               return "Unknown";
+    }
+}
+
 
 template<typename T>
 struct IsHalfType

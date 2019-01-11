@@ -180,7 +180,7 @@ void MergerLayer::ValidateTensorShapesFromInputs()
     VerifyLayerConnections(m_Param.GetNumViews(), CHECK_LOCATION());
 
     std::vector<TensorShape> inputShapes;
-    for (uint i = 0; i < GetNumInputSlots(); ++i)
+    for (unsigned int i = 0; i < GetNumInputSlots(); ++i)
     {
         inputShapes.push_back(GetInputSlot(i).GetConnection()->GetTensorInfo().GetShape());
     }

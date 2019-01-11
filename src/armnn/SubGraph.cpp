@@ -69,4 +69,34 @@ const SubGraph::Layers & SubGraph::GetLayers() const
     return m_Layers;
 }
 
+SubGraph::Layers::iterator SubGraph::begin()
+{
+    return m_Layers.begin();
+}
+
+SubGraph::Layers::iterator SubGraph::end()
+{
+    return m_Layers.end();
+}
+
+SubGraph::Layers::const_iterator SubGraph::begin() const
+{
+    return m_Layers.begin();
+}
+
+SubGraph::Layers::const_iterator SubGraph::end() const
+{
+    return m_Layers.end();
+}
+
+SubGraph::Layers::const_iterator SubGraph::cbegin() const
+{
+    return begin();
+}
+
+SubGraph::Layers::const_iterator SubGraph::cend() const
+{
+    return end();
+}
+
 } // namespace armnn

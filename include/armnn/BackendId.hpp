@@ -170,7 +170,8 @@ std::ostream& operator<<(std::ostream& os,
     return os;
 }
 
-using BackendIdSet = std::unordered_set<BackendId>;
+using BackendIdVector = std::vector<BackendId>;
+using BackendIdSet    = std::unordered_set<BackendId>;
 
 } // namespace armnn
 

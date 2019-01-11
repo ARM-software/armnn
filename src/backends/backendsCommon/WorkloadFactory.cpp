@@ -193,14 +193,13 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         case LayerType::Debug:
         {
             auto cLayer = boost::polymorphic_downcast<const DebugLayer*>(&layer);
-            const DebugDescriptor& descriptor = cLayer->GetParameters();
 
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
             result = layerSupportObject->IsDebugSupported(OverrideDataType(input, dataType),
                                                           OverrideDataType(output, dataType),
-                                                          descriptor,
+                                                          cLayer->GetParameters(),
                                                           reason);
             break;
         }
@@ -575,6 +574,15 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                               OverrideDataType(output, dataType),
                                                               cLayer->GetParameters(),
                                                               reason);
+            break;
+        }
+        case LayerType::PreCompiled:
+        {
+            auto cLayer = boost::polymorphic_downcast<const PreCompiledLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            result = layerSupportObject->IsPreCompiledSupported(OverrideDataType(input, dataType),
+                                                                cLayer->GetParameters(),
+                                                                reason);
             break;
         }
         case LayerType::Division:

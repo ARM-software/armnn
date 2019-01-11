@@ -34,8 +34,6 @@ bool ParseCommandLine(int argc, char** argv, IInferenceTestCaseProvider& testCas
 {
     namespace po = boost::program_options;
 
-    std::string computeDeviceStr;
-
     po::options_description desc("Options");
 
     try

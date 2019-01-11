@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
 namespace armnn
@@ -10,24 +11,25 @@ struct ActivationDescriptor;
 struct BatchNormalizationDescriptor;
 struct BatchToSpaceNdDescriptor;
 struct Convolution2dDescriptor;
+struct DebugDescriptor;
 struct DepthwiseConvolution2dDescriptor;
 struct FakeQuantizationDescriptor;
 struct FullyConnectedDescriptor;
-struct LstmDescriptor;
-struct PermuteDescriptor;
-struct NormalizationDescriptor;
 struct L2NormalizationDescriptor;
+struct LstmDescriptor;
 struct MeanDescriptor;
+struct NormalizationDescriptor;
+struct OriginsDescriptor;
 struct PadDescriptor;
+struct PermuteDescriptor;
 struct Pooling2dDescriptor;
+struct PreCompiledDescriptor;
 struct ReshapeDescriptor;
-struct SpaceToBatchNdDescriptor;
 struct ResizeBilinearDescriptor;
 struct SoftmaxDescriptor;
-struct OriginsDescriptor;
-struct ViewsDescriptor;
+struct SpaceToBatchNdDescriptor;
 struct StridedSliceDescriptor;
-struct DebugDescriptor;
+struct ViewsDescriptor;
 
 using MergerDescriptor = OriginsDescriptor;
 using SplitterDescriptor = ViewsDescriptor;

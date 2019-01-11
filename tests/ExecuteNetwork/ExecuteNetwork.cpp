@@ -463,9 +463,9 @@ int main(int argc, const char* argv[])
              "as they are expected to be defined in the file for each test in particular.")
             ("concurrent,n", po::bool_switch()->default_value(false),
              "Whether or not the test cases should be executed in parallel")
-            ("model-format,f", po::value(&modelFormat),
+            ("model-format,f", po::value(&modelFormat)->required(),
              "caffe-binary, caffe-text, onnx-binary, onnx-text, tflite-binary, tensorflow-binary or tensorflow-text.")
-            ("model-path,m", po::value(&modelPath), "Path to model file, e.g. .caffemodel, .prototxt,"
+            ("model-path,m", po::value(&modelPath)->required(), "Path to model file, e.g. .caffemodel, .prototxt,"
              " .tflite, .onnx")
             ("compute,c", po::value<std::vector<std::string>>()->multitoken(),
              backendsMessage.c_str())

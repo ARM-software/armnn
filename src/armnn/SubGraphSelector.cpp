@@ -166,7 +166,7 @@ SubGraphSelector::SelectSubGraphs(Graph& graph,
             {
                 infoPtr->CollectNonSelectedOutputSlots(outputs, selector);
                 infoPtr->CollectNonSelectedInputs(inputs, selector);
-                layers.insert(infoPtr->m_Layer);
+                layers.push_back(infoPtr->m_Layer);
             }
             result.emplace_back(
                 std::make_unique<SubGraph>(

@@ -189,6 +189,10 @@ public:
                                       const Pooling2dDescriptor& descriptor,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsPreCompiledSupported(const TensorInfo& input,
+                                        const PreCompiledDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsReshapeSupported(const TensorInfo& input,
                                     const ReshapeDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;

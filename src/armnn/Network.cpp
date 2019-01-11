@@ -2,11 +2,14 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "Network.hpp"
 #include "Graph.hpp"
 #include "Layer.hpp"
 #include "DeviceSpec.hpp"
 #include "Optimizer.hpp"
+#include "SubGraphSelector.hpp"
+#include "BackendSettings.hpp"
 #include "optimizations/All.hpp"
 
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -71,6 +74,41 @@ Status OptimizedNetwork::SerializeToDot(std::ostream& stream) const
     return m_Graph->SerializeToDot(stream);
 }
 
+struct OptimizationResult
+{
+    bool m_Warning;
+    bool m_Error;
+
+    OptimizationResult()
+        : m_Warning(false)
+        , m_Error(false)
+    {}
+};
+
+void ReportError(const std::string& errorMessage,
+                 Optional<std::vector<std::string>&> errorMessages)
+{
+    std::stringstream fullErrorMessage;
+    fullErrorMessage << "ERROR: " << errorMessage;
+    BOOST_LOG_TRIVIAL(warning) << fullErrorMessage.str();
+    if (errorMessages)
+    {
+        errorMessages.value().push_back(fullErrorMessage.str());
+    }
+}
+
+void ReportWarning(const std::string& warningMessage,
+                   Optional<std::vector<std::string>&> warningMessages)
+{
+    std::stringstream fullWarningMessage;
+    fullWarningMessage << "WARNING: " << warningMessage;
+    BOOST_LOG_TRIVIAL(warning) << fullWarningMessage.str();
+    if (warningMessages)
+    {
+        warningMessages.value().push_back(fullWarningMessage.str());
+    }
+}
+
 bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string>&> errMessages)
 {
     bool noErrors = true;
@@ -82,108 +120,50 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
             if (0.f == info.GetQuantizationScale()) {
                 noErrors = false;
                 std::stringstream ss;
-                ss << "ERROR: output " << i << " of layer " << GetLayerTypeAsCString(layer->GetType())
+                ss << "output " << i << " of layer " << GetLayerTypeAsCString(layer->GetType())
                    << " (" << layer->GetNameStr() << ") is of type"
                    << " Quantized 8 bit but its scale parameter has not been set";
-                BOOST_LOG_TRIVIAL(warning) << ss.str() ;
-                if (errMessages) {
-                    errMessages.value().push_back(ss.str());
-                }
+                ReportError(ss.str(), errMessages);
             }
         }
     }
     return noErrors;
 }
 
-IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
-                              const std::vector<BackendId>& backendPreferences,
-                              const IDeviceSpec& deviceSpec,
-                              const OptimizerOptions& options,
-                              Optional<std::vector<std::string>&> errMessages)
+OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
+                                  BackendSettings& backendSettings,
+                                  Graph::Iterator& firstLayer,
+                                  Graph::Iterator& lastLayer,
+                                  Optional<std::vector<std::string>&> errMessages)
 {
-    if (backendPreferences.empty()) {
-        throw armnn::InvalidArgumentException("Invoked Optimize with no backends specified");
-    }
-    const Network& network = *boost::polymorphic_downcast<const Network*>(&inNetwork);
-    std::unique_ptr<Graph> graph = std::make_unique<Graph>(network.GetGraph());
+    OptimizationResult result;
 
-    auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph)), &IOptimizedNetwork::Destroy);
-
-    OptimizedNetwork* optNetObjPtr = boost::polymorphic_downcast<OptimizedNetwork*>(optNet.get());
-
-    // Perform optimisation passes
-    using namespace optimizations;
-    Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(SquashEqualPermuteSiblings(),
-                                                                SquashEqualReshapeSiblings(),
-                                                                OptimizeInversePermutes(),
-                                                                MovePermuteUp(),
-                                                                PermuteAsReshape(),
-                                                                OptimizeConsecutiveReshapes()));
-
-    // Infer the tensor infos for all output slots. Throws an exception on failure.
-    optNetObjPtr->GetGraph().InferTensorInfos();
-
-    // if Fp32 to Fp16 optimization is set convert Fp32 network to Fp16
-    if (options.m_ReduceFp32ToFp16)
-    {
-        Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(Fp32NetworkToFp16Converter()));
-    }
-
-    // if debug optimization is set, then print out data after each layer
-    if (options.m_Debug)
-    {
-        Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(InsertDebugLayer()));
-    }
-
-    // We know that DeviceSpec should be the only implementation of IDeviceSpec.
-    const DeviceSpec& spec = *boost::polymorphic_downcast<const DeviceSpec*>(&deviceSpec);
-    auto const& supportedBackends = spec.GetSupportedBackends();
-
-    // determine which of the preferred backends we have available for use
-    // and whether we have specified CpuRef as one of those backends.
-    bool cpuRefUsed = false;
-    std::vector<BackendId> availablePreferredBackends;
-    for (const auto& backend : backendPreferences)
-    {
-        // Check if the backend is in the available backend devices.
-        if (supportedBackends.count(backend) > 0)
-        {
-            availablePreferredBackends.push_back(backend);
-            if (backend == armnn::Compute::CpuRef) {
-                cpuRefUsed = true;
-            }
-        }
-    }
-    if (availablePreferredBackends.empty()) {
-        std::stringstream failureMsg;
-        failureMsg << "ERROR: None of the preferred backends " << backendPreferences
-                   << " are supported. Current platform provides " << supportedBackends;
-        BOOST_LOG_TRIVIAL(warning) << failureMsg.str();
-        if (errMessages) {
-            errMessages.value().push_back(failureMsg.str());
-        }
-        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
-    }
-
-    auto ReturnWithError = [&](Layer* layer)
+    // Helper lambda to compose meaningful error message before returning with error
+    auto ReturnWithError = [&](const Layer* layer)
     {
         std::stringstream failureMsg;
-        failureMsg << "ERROR: Layer of type " << GetLayerTypeAsCString(layer->GetType())
-                   << " is not supported on any preferred backend " << backendPreferences;
-        BOOST_LOG_TRIVIAL(warning) << failureMsg.str();
-        if (errMessages) {
-            errMessages.value().push_back(failureMsg.str());
-        }
-        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
+        failureMsg << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
+                   << " is not supported on any preferred backend " << backendSettings.m_PreferredBackends;
+        ReportError(failureMsg.str(), errMessages);
+
+        result.m_Error = true;
+        return result;
     };
 
-    // The backends that we choose to run layers on
-    std::unordered_set<BackendId> chosenBackends;
-
-    // Assign a compute device for all nodes
-    bool bErrorFound = false;
-    for (auto&& layer : optNetObjPtr->GetGraph())
+    auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
+    if (availablePreferredBackends.empty())
     {
+        std::stringstream failureMsg;
+        failureMsg << "No preferred backends are available";
+        ReportError(failureMsg.str(), errMessages);
+
+        result.m_Error = true;
+        return result;
+    }
+
+    for (auto it = firstLayer; it != lastLayer; ++it)
+    {
+        auto layer = *it;
         DataType dataType = layer->GetDataType();
         std::string reasonIfUnsupported;
         bool found = false;
@@ -191,8 +171,9 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         {
             // don't bomb immediately, find all the quantized outputs
             // which haven't had a scale set and report them all back.
-            bErrorFound = true;
+            result.m_Error = true;
         }
+
         for (const auto& backend : availablePreferredBackends)
         {
             // need to set the compute device on the layer
@@ -273,38 +254,36 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                     }
                 }
                 std::stringstream warningMsg;
-                warningMsg << "WARNING: Layer of type " << GetLayerTypeAsCString(layer->GetType())
+                warningMsg << "Layer of type " << GetLayerTypeAsCString(layer->GetType())
                            << " is not supported on requested backend " << layer->GetBackendId().Get()
                            << " for data type " << GetDataTypeName(dataType)
                            << " (reason: " << reasonIfUnsupported
                            << "), falling back to the next backend.";
-                std::string wMsg = warningMsg.str();
-                BOOST_LOG_TRIVIAL(warning) << wMsg;
-                if (errMessages) {
-                    errMessages.value().push_back(wMsg);
-                }
+                ReportWarning(warningMsg.str(), errMessages);
             }
             else
             {
                 found = true;
-                chosenBackends.insert(backend);
+                backendSettings.m_SelectedBackends.insert(backend);
                 break;
             }
         }
 
         // If the layer is unsupported by any devices, log and return a null network.
-        if (!found) {
+        if (!found)
+        {
             // NOTE: if the layer is not an operation queue type AND we have not got CpuRef as a
             //       fallback we should set the compute device on the layer to CpuRef (these are not
             //       available as accelerated operations, or are only available under certain
             //       conditions, currently they comprise MemCopy, Constant, Permute)
             armnn::LayerType layerType = layer->GetType();
-            if (!cpuRefUsed && (layerType == armnn::LayerType::MemCopy ||
-                                layerType == armnn::LayerType::Constant ||
-                                layerType == armnn::LayerType::Permute))
+            if (!backendSettings.IsCpuRefUsed() && (layerType == armnn::LayerType::MemCopy ||
+                                                    layerType == armnn::LayerType::Constant ||
+                                                    layerType == armnn::LayerType::Permute))
             {
-                layer->SetBackendId(armnn::Compute::CpuRef);
-                chosenBackends.insert(armnn::Compute::CpuRef);
+                BackendId cpuBackendId(armnn::Compute::CpuRef);
+                layer->SetBackendId(cpuBackendId);
+                backendSettings.m_SelectedBackends.insert(cpuBackendId);
             }
             else
             {
@@ -312,13 +291,174 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
             }
         }
     }
-    if (bErrorFound)
+
+    return result;
+}
+
+OptimizationResult InsertPreCompiledLayers(OptimizedNetwork* optNetObjPtr,
+                                           const IBackendInternalUniquePtr& backendObjPtr,
+                                           BackendSettings& backendSettings,
+                                           Optional<std::vector<std::string>&> errMessages)
+{
+    BOOST_ASSERT(backendObjPtr);
+
+    OptimizationResult result;
+
+    // Select sub-graphs based on backend
+    SubGraphSelector::SubGraphs subGraphs =
+            SubGraphSelector::SelectSubGraphs(optNetObjPtr->GetGraph(),
+                                              // select layers assigned to requested backend
+                                              [&](const Layer& layer)
+                                              {
+                                                  return layer.GetType() != LayerType::Input &&
+                                                         layer.GetType() != LayerType::Output &&
+                                                         layer.GetBackendId() == backendObjPtr->GetId();
+                                              });
+
+    if (subGraphs.empty())
     {
+        // No sub-graphs found -> return with no error
+        return result;
+    }
+
+    // Convert sub-graphs and substitute them with pre-compiled layers
+    unsigned int index = 0u;
+    for (auto& subGraph : subGraphs)
+    {
+        // Create a pre-compiled layer
+        PreCompiledLayer* preCompiledLayer = CreatePreCompiledLayer(optNetObjPtr->GetGraph(),
+                                                                    *subGraph,
+                                                                    index++,
+                                                                    backendObjPtr);
+        if (preCompiledLayer)
+        {
+            // Substitute sub-graph with pre-compiled layer in graph
+            optNetObjPtr->GetGraph().SubstituteSubGraph(std::move(subGraph), preCompiledLayer);
+        }
+        else
+        {
+            // Failed to create pre-compiled layer from sub-graph ->
+            // re-assign sub-graph layers to other available backends
+            std::stringstream warningMsg;
+            warningMsg << "Sub-graph #" << index << " failed to compile on "
+                       << backendObjPtr->GetId() << ". Re-assigning backends to "
+                       << subGraph->GetLayers().size() << " layers inside sub-graph";
+            ReportWarning(warningMsg.str(), errMessages);
+
+            backendSettings.m_IgnoredBackends = { backendObjPtr->GetId() };
+
+            Graph::Iterator firstLayer = subGraph->begin();
+            Graph::Iterator lastLayer  = subGraph->end();
+            OptimizationResult reassignmentResult = AssignBackends(optNetObjPtr,
+                                                                   backendSettings,
+                                                                   firstLayer,
+                                                                   lastLayer,
+                                                                   errMessages);
+
+            if (reassignmentResult.m_Error)
+            {
+                result.m_Error = true;
+                return result;
+            }
+        }
+    }
+
+    return result;
+}
+
+IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
+                              const std::vector<BackendId>& backendPreferences,
+                              const IDeviceSpec& deviceSpec,
+                              const OptimizerOptions& options,
+                              Optional<std::vector<std::string>&> errMessages)
+{
+    if (backendPreferences.empty())
+    {
+        throw armnn::InvalidArgumentException("Invoked Optimize with no backends specified");
+    }
+
+    const Network& network = *boost::polymorphic_downcast<const Network*>(&inNetwork);
+    std::unique_ptr<Graph> graph = std::make_unique<Graph>(network.GetGraph());
+
+    auto optNet = IOptimizedNetworkPtr(new OptimizedNetwork(std::move(graph)), &IOptimizedNetwork::Destroy);
+
+    OptimizedNetwork* optNetObjPtr = boost::polymorphic_downcast<OptimizedNetwork*>(optNet.get());
+
+    // Perform optimisation passes
+    using namespace optimizations;
+    Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(SquashEqualPermuteSiblings(),
+                                                                SquashEqualReshapeSiblings(),
+                                                                OptimizeInversePermutes(),
+                                                                MovePermuteUp(),
+                                                                PermuteAsReshape(),
+                                                                OptimizeConsecutiveReshapes()));
+
+    // Infer the tensor infos for all output slots. Throws an exception on failure.
+    optNetObjPtr->GetGraph().InferTensorInfos();
+
+    // If Fp32 to Fp16 optimization is set convert Fp32 network to Fp16
+    if (options.m_ReduceFp32ToFp16)
+    {
+        Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(Fp32NetworkToFp16Converter()));
+    }
+
+    // Initialize backend settings
+    BackendSettings backendSettings(backendPreferences, deviceSpec);
+    if (backendSettings.GetAvailablePreferredBackends().empty())
+    {
+        std::stringstream failureMsg;
+        failureMsg << "None of the preferred backends " << backendPreferences
+                   << " are supported. Current platform provides " << backendSettings.m_SupportedBackends;
+        ReportError(failureMsg.str(), errMessages);
+        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
+    }
+
+    // Assign an available backend to each layer
+    Graph::Iterator firstLayer = optNetObjPtr->GetGraph().begin();
+    Graph::Iterator lastLayer  = optNetObjPtr->GetGraph().end();
+    OptimizationResult assigBackendsResult = AssignBackends(optNetObjPtr,
+                                                            backendSettings,
+                                                            firstLayer,
+                                                            lastLayer,
+                                                            errMessages);
+    if (assigBackendsResult.m_Error)
+    {
+        // Failed to assign a backend to each layer
         return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
     }
 
     Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(OptimizeInverseConversionsFp16(),
                                                                 OptimizeInverseConversionsFp32()));
+
+    // Insert pre-compiled layers where required by the backend
+    // TODO: This is a dummy/default backend id used for making the code build until
+    //       we've properly refactored the optimizer
+    const BackendId backendId(Compute::Undefined);
+    auto const& backendRegistry = BackendRegistryInstance();
+    if (backendRegistry.IsBackendRegistered(backendId))
+    {
+        // Obtain a backend object using the registered factory
+        auto backendFactory = backendRegistry.GetFactory(backendId);
+        auto backendObjPtr  = backendFactory();
+
+        OptimizationResult insertPreCompiledLayersResult = InsertPreCompiledLayers(optNetObjPtr,
+                                                                                   backendObjPtr,
+                                                                                   backendSettings,
+                                                                                   errMessages);
+        if (insertPreCompiledLayersResult.m_Error)
+        {
+            // Failed to insert pre-compiled layers
+            return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
+        }
+    }
+
+    // If the debug flag is set, then insert a DebugLayer after each layer.
+    // NOTE: This optimization can only happen strictly after the PreCompiled layers have
+    //       already been inserted
+    if (options.m_Debug)
+    {
+        Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(InsertDebugLayer()));
+    }
 
     optNetObjPtr->GetGraph().AddCopyLayers();
 
@@ -327,7 +467,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(ConvertConstantsHalfToFloat()));
 
     // Run backend specific optimizations
-    for (auto&& chosenBackend : chosenBackends)
+    for (auto&& chosenBackend : backendSettings.m_SelectedBackends)
     {
         auto factoryFun = BackendRegistryInstance().GetFactory(chosenBackend);
         auto backendPtr = factoryFun();

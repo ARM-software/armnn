@@ -63,6 +63,12 @@ IBackendInternal::IBackendContextPtr NeonBackend::CreateBackendContext(const IRu
     return IBackendContextPtr{};
 }
 
+IBackendInternal::ISubGraphConverterPtr NeonBackend::CreateSubGraphConverter(
+    const std::shared_ptr<SubGraph>& subGraph) const
+{
+    return ISubGraphConverterPtr{};
+}
+
 IBackendInternal::Optimizations NeonBackend::GetOptimizations() const
 {
     return Optimizations{};

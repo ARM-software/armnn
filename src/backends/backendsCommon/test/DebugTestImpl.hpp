@@ -64,15 +64,15 @@ LayerTestResult<T, Dim> DebugTestImpl(
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), input.data());
-  
+
     std::ostringstream oss;
     std::streambuf* coutStreambuf = std::cout.rdbuf();
     std::cout.rdbuf(oss.rdbuf());
 
     ExecuteWorkload(*workload, memoryManager);
-  
+
     std::cout.rdbuf(coutStreambuf);
-    
+
     BOOST_TEST(oss.str() == expectedStringOutput);
 
     CopyDataFromITensorHandle(ret.output.data(), outputHandle.get());

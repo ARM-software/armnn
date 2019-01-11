@@ -44,6 +44,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Pad: return "Pad";
         case LayerType::Permute: return "Permute";
         case LayerType::Pooling2d: return "Pooling2d";
+        case LayerType::PreCompiled: return "PreCompiled";
         case LayerType::Reshape: return "Reshape";
         case LayerType::Rsqrt: return "Rsqrt";
         case LayerType::ResizeBilinear: return "ResizeBilinear";

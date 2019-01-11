@@ -98,4 +98,4 @@ template void Debug<uint8_t>(const TensorInfo& inputInfo,
                              const DebugDescriptor& descriptor,
                              const uint8_t* inputData,
                              uint8_t* outputData);
-} //namespace armnn
+} // namespace armnn

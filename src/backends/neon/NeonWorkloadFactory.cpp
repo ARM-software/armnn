@@ -324,4 +324,10 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateRsqrt(const RsqrtQueueDesc
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 } // namespace armnn

@@ -18,25 +18,29 @@ BOOST_AUTO_TEST_SUITE(NeonMemCopy)
 
 BOOST_AUTO_TEST_CASE(CopyBetweenCpuAndNeon)
 {
-    LayerTestResult<float, 4> result = MemCopyTest<armnn::RefWorkloadFactory, armnn::NeonWorkloadFactory>(false);
+    LayerTestResult<float, 4> result =
+        MemCopyTest<armnn::RefWorkloadFactory, armnn::NeonWorkloadFactory, armnn::DataType::Float32>(false);
     BOOST_TEST(CompareTensors(result.output, result.outputExpected));
 }
 
 BOOST_AUTO_TEST_CASE(CopyBetweenNeonAndCpu)
 {
-    LayerTestResult<float, 4> result = MemCopyTest<armnn::NeonWorkloadFactory, armnn::RefWorkloadFactory>(false);
+    LayerTestResult<float, 4> result =
+        MemCopyTest<armnn::NeonWorkloadFactory, armnn::RefWorkloadFactory, armnn::DataType::Float32>(false);
     BOOST_TEST(CompareTensors(result.output, result.outputExpected));
 }
 
 BOOST_AUTO_TEST_CASE(CopyBetweenCpuAndNeonWithSubtensors)
 {
-    LayerTestResult<float, 4> result = MemCopyTest<armnn::RefWorkloadFactory, armnn::NeonWorkloadFactory>(true);
+    LayerTestResult<float, 4> result =
+        MemCopyTest<armnn::RefWorkloadFactory, armnn::NeonWorkloadFactory, armnn::DataType::Float32>(true);
     BOOST_TEST(CompareTensors(result.output, result.outputExpected));
 }
 
 BOOST_AUTO_TEST_CASE(CopyBetweenNeonAndCpuWithSubtensors)
 {
-    LayerTestResult<float, 4> result = MemCopyTest<armnn::NeonWorkloadFactory, armnn::RefWorkloadFactory>(true);
+    LayerTestResult<float, 4> result =
+        MemCopyTest<armnn::NeonWorkloadFactory, armnn::RefWorkloadFactory, armnn::DataType::Float32>(true);
     BOOST_TEST(CompareTensors(result.output, result.outputExpected));
 }
 

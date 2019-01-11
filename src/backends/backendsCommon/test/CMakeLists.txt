@@ -28,6 +28,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     OptimizedNetworkTests.cpp
     PermuteTestImpl.hpp
     Pooling2dTestImpl.hpp
+    PreCompiledTestImpl.cpp
+    PreCompiledTestImpl.hpp
     QuantizeHelper.hpp
     ReshapeTestImpl.hpp
     RuntimeTestImpl.hpp

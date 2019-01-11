@@ -5,8 +5,8 @@
 
 # single place to use wildcards, so we can include
 # yet unknown backend modules and corresponding common libraries
-FILE(GLOB commonIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/common.cmake)
-FILE(GLOB backendIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/backend.cmake)
+file(GLOB commonIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/common.cmake)
+file(GLOB backendIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/backend.cmake)
 
 # prefer to include common code first
 foreach(includeFile ${commonIncludes})

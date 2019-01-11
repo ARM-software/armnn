@@ -63,6 +63,12 @@ ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const
     return IBackendContextPtr{new ClBackendContext{options}};
 }
 
+IBackendInternal::ISubGraphConverterPtr ClBackend::CreateSubGraphConverter(
+    const std::shared_ptr<SubGraph>& subGraph) const
+{
+    return ISubGraphConverterPtr{};
+}
+
 IBackendInternal::Optimizations ClBackend::GetOptimizations() const
 {
     return Optimizations{};

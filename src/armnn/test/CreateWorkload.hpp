@@ -14,6 +14,8 @@
 
 #include <Graph.hpp>
 #include <DataLayoutIndexed.hpp>
+#include <Network.hpp>
+#include <TypeUtils.hpp>
 
 #include <utility>
 
@@ -1091,6 +1093,132 @@ std::unique_ptr<MergerWorkload> CreateMergerWorkloadTest(armnn::IWorkloadFactory
     BOOST_TEST_CHECKPOINT("created merger workload");
 
     return std::move(workloadMerger);
+}
+
+template <typename PreCompiledWorkload, armnn::DataType dataType>
+std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> CreatePreCompiledWorkloadTest(
+    armnn::IWorkloadFactory& factory,
+    armnn::Graph& graph,
+    bool biasEnabled = false)
+{
+    // To create a PreCompiled layer, create a network and Optimize it.
+    armnn::Network net;
+
+    // Add an input layer
+    armnn::IConnectableLayer* const inputLayer = net.AddInputLayer(0, "input layer");
+    BOOST_TEST(inputLayer);
+
+    // ArmNN weights tensor shape is OIHW (out channels, in channels, height, width) for NCHW
+    // ArmNN weights tensor shape is OHWI (out channels, height, width, in channels) for NHWC
+    // this test is using NHWC, so the weights shape is OHWI
+    TensorInfo weightsTensorInfo(TensorShape({16, 1, 1, 16}), dataType, 0.9f, 0);
+    unsigned int weightsLength = weightsTensorInfo.GetNumElements();
+
+    using WeightType = armnn::ResolveType<dataType>;
+    std::vector<WeightType> convWeightsData(weightsLength);
+    for (unsigned int i = 0; i < weightsLength; ++i)
+    {
+        convWeightsData[i] = static_cast<WeightType>(i);
+    }
+
+    armnn::ConstTensor weights(weightsTensorInfo, convWeightsData);
+
+    // Add a layer that can be used in the PreCompiled layer
+    armnn::Convolution2dDescriptor convDesc2d;
+    convDesc2d.m_StrideX = 1;
+    convDesc2d.m_StrideY = 1;
+    convDesc2d.m_BiasEnabled = biasEnabled;
+    convDesc2d.m_DataLayout = armnn::DataLayout::NHWC;
+
+    armnn::IConnectableLayer* convLayer = nullptr;
+    const std::string convLayerName("conv layer");
+
+    if (biasEnabled)
+    {
+        constexpr armnn::DataType biasDataType = ( dataType == armnn::DataType::QuantisedAsymm8) ?
+            armnn::DataType::Signed32 : armnn::DataType::Float32;
+
+        TensorInfo biasTensorInfo(TensorShape({1, 1, 1, 16}), biasDataType, 0.9f * 0.9f, 0);
+        unsigned int biasLength = biasTensorInfo.GetNumElements();
+
+        using BiasType = armnn::ResolveType<biasDataType>;
+        std::vector<BiasType> biasData(biasLength);
+        std::fill(biasData.begin(), biasData.end(), static_cast<BiasType>(0));
+
+        armnn::ConstTensor biases(biasTensorInfo, biasData);
+
+        // Create convolution layer with biases
+        convLayer = net.AddConvolution2dLayer(convDesc2d, weights, biases, convLayerName.c_str());
+    }
+    else
+    {
+        // Create convolution layer without biases
+        convLayer = net.AddConvolution2dLayer(convDesc2d, weights, convLayerName.c_str());
+    }
+
+    BOOST_TEST(convLayer);
+
+    // Add an output layer
+    armnn::IConnectableLayer* const outputLayer = net.AddOutputLayer(0, "output layer");
+    BOOST_TEST(outputLayer);
+
+    // set the tensors in the network (NHWC format)
+    TensorInfo inputTensorInfo(TensorShape({ 1, 16, 16, 16 }), dataType);
+    if (dataType == armnn::DataType::QuantisedAsymm8)
+    {
+        inputTensorInfo.SetQuantizationOffset(0);
+        inputTensorInfo.SetQuantizationScale(0.9f);
+    }
+
+    TensorInfo outputTensorInfo(TensorShape({1, 16, 16, 16}), dataType);
+    if (dataType == armnn::DataType::QuantisedAsymm8)
+    {
+        outputTensorInfo.SetQuantizationOffset(0);
+        outputTensorInfo.SetQuantizationScale(0.9f);
+    }
+
+    // Connect the layers
+    inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+
+    convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    convLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    // Optimize the network for the backend supported by the factory
+    std::vector<armnn::BackendId> backends = {factory.GetBackendId()};
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::OptimizerOptions optimizerOptions;
+    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec(),
+                                                               optimizerOptions);
+    BOOST_CHECK(optimizedNet != nullptr);
+
+    // Find the PreCompiled layer in the optimised graph
+    armnn::Graph& optimisedGraph = static_cast<armnn::OptimizedNetwork*>(optimizedNet.get())->GetGraph();
+    Layer* preCompiledLayer = nullptr;
+    for (auto& layer : optimisedGraph)
+    {
+        if (layer->GetType() == LayerType::PreCompiled)
+        {
+            preCompiledLayer = layer;
+        }
+    }
+    BOOST_TEST(preCompiledLayer);
+
+    // Create the TensorHandles.
+    CreateTensorHandles(optimisedGraph, factory);
+
+    // Make the workload and check it.
+    auto workload = MakeAndCheckWorkload<PreCompiledWorkload>(*preCompiledLayer, optimisedGraph, factory);
+
+    PreCompiledQueueDescriptor queueDescriptor = workload->GetData();
+    BOOST_TEST(queueDescriptor.m_Inputs.size()  == 1);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+
+    // Returns the workload so we can do extra, backend-specific tests.
+    // NOTE: We need to return the optimised network as well, otherwise it gets
+    // out of scope and the tensor handles get destructed
+    return std::make_pair(std::move(optimizedNet), std::move(workload));
 }
 
 }

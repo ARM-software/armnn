@@ -2,11 +2,12 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "RefDebugWorkload.hpp"
 #include "Debug.hpp"
-
 #include "RefWorkloadUtils.hpp"
-#include "TypeUtils.hpp"
+
+#include <TypeUtils.hpp>
 
 namespace armnn
 {
@@ -30,4 +31,4 @@ void RefDebugWorkload<DataType>::Execute() const
 template class RefDebugWorkload<DataType::Float32>;
 template class RefDebugWorkload<DataType::QuantisedAsymm8>;
 
-} //namespace armnn
+} // namespace armnn

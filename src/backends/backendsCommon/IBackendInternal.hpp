@@ -6,6 +6,10 @@
 
 #include <armnn/Types.hpp>
 #include <armnn/IRuntime.hpp>
+
+#include <ISubGraphConverter.hpp>
+#include <SubGraph.hpp>
+
 #include <vector>
 
 namespace armnn
@@ -37,12 +41,16 @@ public:
     using IMemoryManagerUniquePtr = std::unique_ptr<IMemoryManager>;
     using IMemoryManagerSharedPtr = std::shared_ptr<IMemoryManager>;
 
+    using ISubGraphConverterPtr = std::unique_ptr<ISubGraphConverter>;
+
     virtual IMemoryManagerUniquePtr CreateMemoryManager() const = 0;
 
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
         const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
 
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
+
+    virtual ISubGraphConverterPtr CreateSubGraphConverter(const std::shared_ptr<SubGraph>& subGraph) const = 0;
 
     virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;

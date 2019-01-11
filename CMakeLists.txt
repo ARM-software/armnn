@@ -234,6 +234,8 @@ list(APPEND armnn_sources
     src/armnn/layers/Pooling2dLayer.cpp
     src/armnn/layers/DivisionLayer.cpp
     src/armnn/layers/DivisionLayer.hpp
+    src/armnn/layers/PreCompiledLayer.hpp
+    src/armnn/layers/PreCompiledLayer.cpp
     src/armnn/layers/ReshapeLayer.hpp
     src/armnn/layers/ReshapeLayer.cpp
     src/armnn/layers/SpaceToBatchNdLayer.hpp
@@ -250,6 +252,7 @@ list(APPEND armnn_sources
     src/armnn/layers/StridedSliceLayer.hpp
     src/armnn/layers/SubtractionLayer.cpp
     src/armnn/layers/SubtractionLayer.hpp
+    src/armnn/BackendSettings.hpp
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
     src/armnn/Exceptions.cpp
@@ -259,6 +262,7 @@ list(APPEND armnn_sources
     src/armnn/Instrument.hpp
     src/armnn/InternalTypes.cpp
     src/armnn/InternalTypes.hpp
+    src/armnn/ISubGraphConverter.hpp
     src/armnn/JsonPrinter.cpp
     src/armnn/JsonPrinter.hpp
     src/armnn/Layer.cpp

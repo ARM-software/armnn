@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include <TypeUtils.hpp>
+
 #include <backendsCommon/IBackendInternal.hpp>
 
 #include <backendsCommon/test/LayerTests.hpp>
@@ -18,33 +20,29 @@
 namespace
 {
 
-LayerTestResult<float, 4> MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactory,
-                                      armnn::IWorkloadFactory& dstWorkloadFactory,
-                                      bool withSubtensors)
+template<armnn::DataType dataType, typename T = armnn::ResolveType<dataType>>
+LayerTestResult<T, 4> MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactory,
+                                  armnn::IWorkloadFactory& dstWorkloadFactory,
+                                  bool withSubtensors)
 {
     const std::array<unsigned int, 4> shapeData = { { 1u, 1u, 6u, 5u } };
     const armnn::TensorShape tensorShape(4, shapeData.data());
-    const armnn::TensorInfo tensorInfo(tensorShape, armnn::DataType::Float32);
-    boost::multi_array<float, 4> inputData = MakeTensor<float, 4>(tensorInfo, std::vector<float>(
+    const armnn::TensorInfo tensorInfo(tensorShape, dataType);
+    boost::multi_array<T, 4> inputData = MakeTensor<T, 4>(tensorInfo, std::vector<T>(
         {
-            1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
-
-            6.0f, 7.0f, 8.0f, 9.0f, 10.0f,
-
-            11.0f, 12.0f, 13.0f, 14.0f, 15.0f,
-
-            16.0f, 17.0f, 18.0f, 19.0f, 20.0f,
-
-            21.0f, 22.0f, 23.0f, 24.0f, 25.0f,
-
-            26.0f, 27.0f, 28.0f, 29.0f, 30.0f,
+             1,  2,  3,  4,  5,
+             6,  7,  8,  9, 10,
+            11, 12, 13, 14, 15,
+            16, 17, 18, 19, 20,
+            21, 22, 23, 24, 25,
+            26, 27, 28, 29, 30,
         })
     );
 
-    LayerTestResult<float, 4> ret(tensorInfo);
+    LayerTestResult<T, 4> ret(tensorInfo);
     ret.outputExpected = inputData;
 
-    boost::multi_array<float, 4> outputData(shapeData);
+    boost::multi_array<T, 4> outputData(shapeData);
 
     auto inputTensorHandle = srcWorkloadFactory.CreateTensorHandle(tensorInfo);
     auto outputTensorHandle = dstWorkloadFactory.CreateTensorHandle(tensorInfo);
@@ -75,8 +73,11 @@ LayerTestResult<float, 4> MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactor
     return ret;
 }
 
-template<typename SrcWorkloadFactory, typename DstWorkloadFactory>
-LayerTestResult<float, 4> MemCopyTest(bool withSubtensors)
+template<typename SrcWorkloadFactory,
+         typename DstWorkloadFactory,
+         armnn::DataType dataType,
+         typename T = armnn::ResolveType<dataType>>
+LayerTestResult<T, 4> MemCopyTest(bool withSubtensors)
 {
     armnn::IBackendInternal::IMemoryManagerSharedPtr srcMemoryManager =
         WorkloadFactoryHelper<SrcWorkloadFactory>::GetMemoryManager();
@@ -87,7 +88,7 @@ LayerTestResult<float, 4> MemCopyTest(bool withSubtensors)
     SrcWorkloadFactory srcWorkloadFactory = WorkloadFactoryHelper<SrcWorkloadFactory>::GetFactory(srcMemoryManager);
     DstWorkloadFactory dstWorkloadFactory = WorkloadFactoryHelper<DstWorkloadFactory>::GetFactory(dstMemoryManager);
 
-    return MemCopyTest(srcWorkloadFactory, dstWorkloadFactory, withSubtensors);
+    return MemCopyTest<dataType>(srcWorkloadFactory, dstWorkloadFactory, withSubtensors);
 }
 
 } // anonymous namespace

@@ -6,6 +6,7 @@
 
 #include "LayersFwd.hpp"
 #include "IGraphObservable.hpp"
+#include "SubGraph.hpp"
 
 #include <armnn/Types.hpp>
 #include <armnn/TensorFwd.hpp>
@@ -159,6 +160,8 @@ public:
     /// and relinking them via an intermediary copy layers.
     void AddCopyLayers();
 
+    void SubstituteSubGraph(std::unique_ptr<SubGraph> subGraph, IConnectableLayer* substituteLayer);
+
     void InferTensorInfos();
 
     void AttachObservable(IGraphObservable* const observable, GraphEvent notifyOnEvent) {
@@ -209,6 +212,9 @@ private:
     std::unordered_set<LayerBindingId> m_InputIds;
     std::unordered_set<LayerBindingId> m_OutputIds;
     std::unordered_map<const Layer*, Iterator> m_PosInGraphMap;
+
+    void ReplaceSubGraphConnections(const SubGraph& subGraph, IConnectableLayer* substituteLayer);
+    void EraseSubGraphLayers(const SubGraph &subGraph);
 
     /// Mutable to allow sorting on const object.
     mutable LayersList m_Layers;

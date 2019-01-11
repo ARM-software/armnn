@@ -378,4 +378,16 @@ struct RsqrtQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct PreCompiledQueueDescriptor : QueueDescriptorWithParameters<PreCompiledDescriptor>
+{
+    PreCompiledQueueDescriptor()
+        : m_PreCompiledObject(nullptr)
+    {
+    }
+
+    std::shared_ptr<void> m_PreCompiledObject;
+
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

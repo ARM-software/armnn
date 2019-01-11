@@ -44,6 +44,7 @@ enum class LayerType
     Pad,
     Permute,
     Pooling2d,
+    PreCompiled,
     Reshape,
     ResizeBilinear,
     Rsqrt,
@@ -53,7 +54,7 @@ enum class LayerType
     StridedSlice,
     // Last layer goes here.
     LastLayer,
-    Subtraction = LastLayer,
+    Subtraction = LastLayer
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

@@ -37,6 +37,7 @@
 #include "StridedSliceTestImpl.hpp"
 #include "NormTestImpl.hpp"
 #include "PermuteTestImpl.hpp"
+#include "PreCompiledTestImpl.hpp"
 #include "LstmTestImpl.hpp"
 #include "ConvertFp16ToFp32TestImpl.hpp"
 #include "ConvertFp32ToFp16TestImpl.hpp"
@@ -8566,4 +8567,39 @@ LayerTestResult<uint8_t, 1> Debug1DUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return Debug1DTest<uint8_t>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> PreCompiledConvolution2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return PreCompiledConvolution2dTestImpl(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> PreCompiledConvolution2dStride2x2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return PreCompiledConvolution2dStride2x2TestImpl(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> PreCompiledDepthwiseConvolution2dTest(
+    armnn::IWorkloadFactory & workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager)
+{
+    return PreCompiledDepthwiseConvolution2dTestImpl(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> PreCompiledDepthwiseConvolution2dStride2x2Test(
+    armnn::IWorkloadFactory & workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager)
+{
+    return PreCompiledDepthwiseConvolution2dStride2x2TestImpl(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> PreCompiledMaxPooling2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return PreCompiledMaxPooling2dTestImpl(workloadFactory, memoryManager);
 }

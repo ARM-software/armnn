@@ -17,6 +17,20 @@ using namespace armnn;
 namespace
 {
 
+bool AreAnySubGraphLayersPresentInGraph(const SubGraph::Layers &subGraphLayers, const Graph &graph)
+{
+    for(auto&& layer : subGraphLayers)
+    {
+        auto posInGraph = std::find(graph.begin(), graph.end(), layer);
+        if(posInGraph != graph.end())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //
 // this helper only works if all layers where the inputs connect to are not selected
 //
@@ -111,6 +125,235 @@ void CompareSubGraphs(SubGraphSelector::SubGraphPtr & result,
 }
 
 } // namespace <anonymous>
+
+BOOST_AUTO_TEST_SUITE(SubGraphSubstitution)
+
+BOOST_AUTO_TEST_CASE(SingleInputSingleOutput)
+{
+    // Construct graph
+    Graph graph;
+
+    Layer* const inputLayer = graph.AddLayer<InputLayer>(0, "input");
+
+    Convolution2dDescriptor convDescriptor;
+    Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
+    Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+
+    Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    // Construct sub-graph
+    SubGraphSelector::SubGraphPtr subGraph =
+            CreateSubGraphFrom(CreateInputsFrom({convLayer1}), CreateOutputsFrom({convLayer2}), {});
+
+    // Save sub-graph connections for comparison after substitution
+    IOutputSlot* subGraphInputConn = subGraph->GetInputSlot(0)->GetConnection();
+    IInputSlot* subGraphOutputConn = subGraph->GetOutputSlot(0)->GetConnection(0);
+
+    // Construct dummy pre-compiled layer
+    PreCompiledDescriptor preCompiledDescriptor(1, 1);
+    Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+
+    // Substitute sub-graph with pre-compiled layer
+    graph.SubstituteSubGraph(std::move(subGraph), preCompiledLayer);
+
+    // Check that connections are correct after substitution
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subGraphInputConn);
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subGraphOutputConn);
+}
+
+BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
+{
+    // Construct graph
+    Graph graph;
+
+    Layer* const inputLayer = graph.AddLayer<InputLayer>(0, "input");
+
+    ViewsDescriptor splitterDescriptor(2);
+    Layer* const splitterLayer = graph.AddLayer<SplitterLayer>(splitterDescriptor, "splitter");
+
+    Convolution2dDescriptor convDescriptor;
+    Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
+    Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+
+    OriginsDescriptor mergerDescriptor(2);
+    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+
+    Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
+
+    inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
+    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    // Construct sub-graph
+    SubGraphSelector::SubGraphPtr subGraph =
+            CreateSubGraphFrom(CreateInputsFrom({convLayer1, convLayer2}), CreateOutputsFrom({mergerLayer}), {});
+
+    // Save sub-graph connections for comparison after substitution
+    IOutputSlot* subGraphInputConn1 = subGraph->GetInputSlot(0)->GetConnection();
+    IOutputSlot* subGraphInputConn2 = subGraph->GetInputSlot(1)->GetConnection();
+
+    IInputSlot* subGraphOutputConn = subGraph->GetOutputSlot(0)->GetConnection(0);
+
+    // Construct dummy pre-compiled layer
+    PreCompiledDescriptor preCompiledDescriptor(2, 1);
+    Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+
+    // Substitute sub-graph with pre-compiled layer
+    graph.SubstituteSubGraph(std::move(subGraph), preCompiledLayer);
+
+    // Check that connections are correct after substitution
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subGraphInputConn1);
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(1).GetConnection(), subGraphInputConn2);
+
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subGraphOutputConn);
+}
+
+BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
+{
+    // Construct graph
+    Graph graph;
+
+    Layer* const inputLayer = graph.AddLayer<InputLayer>(0, "input");
+
+    Convolution2dDescriptor convDescriptor;
+    Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
+    Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+    OriginsDescriptor mergerDescriptor(2);
+    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+    Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
+
+    ViewsDescriptor splitterDescriptor(2);
+    Layer* const splitterLayer = graph.AddLayer<SplitterLayer>(splitterDescriptor, "splitter");
+
+    inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
+    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    // Construct sub-graph
+    SubGraphSelector::SubGraphPtr subGraph =
+            CreateSubGraphFrom(CreateInputsFrom({splitterLayer}), CreateOutputsFrom({convLayer1, convLayer2}), {});
+
+    // Save sub-graph connections for comparison after substitution
+    IOutputSlot* subGraphInputConn1 = subGraph->GetInputSlot(0)->GetConnection();
+
+    IInputSlot* subGraphOutputConn1 = subGraph->GetOutputSlot(0)->GetConnection(0);
+    IInputSlot* subGraphOutputConn2 = subGraph->GetOutputSlot(1)->GetConnection(0);
+
+    // Construct dummy pre-compiled layer
+    PreCompiledDescriptor preCompiledDescriptor(1, 2);
+    Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+
+    // Substitute sub-graph with pre-compiled layer
+    graph.SubstituteSubGraph(std::move(subGraph), preCompiledLayer);
+
+    // Check that connections are correct after substitution
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subGraphInputConn1);
+
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subGraphOutputConn1);
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(1).GetConnection(0), subGraphOutputConn2);
+}
+
+BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
+{
+    // Construct graph
+    Graph graph;
+
+    Layer* const inputLayer = graph.AddLayer<InputLayer>(0, "input");
+
+    ViewsDescriptor splitterDescriptor(2);
+    Layer* const splitterLayer = graph.AddLayer<SplitterLayer>(splitterDescriptor, "splitter");
+
+    Convolution2dDescriptor convDescriptor;
+    Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
+    Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+
+    OriginsDescriptor mergerDescriptor(2);
+    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+
+    Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
+
+    inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
+    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    // Construct sub-graph
+    SubGraphSelector::SubGraphPtr subGraph = CreateSubGraphFrom(CreateInputsFrom({convLayer1, convLayer2}),
+                                                                CreateOutputsFrom({convLayer1, convLayer2}),
+                                                                {});
+
+    // Save sub-graph connections for comparison after substitution
+    IOutputSlot* subGraphInputConn1 = subGraph->GetInputSlot(0)->GetConnection();
+    IOutputSlot* subGraphInputConn2 = subGraph->GetInputSlot(1)->GetConnection();
+
+    IInputSlot* subGraphOutputConn1 = subGraph->GetOutputSlot(0)->GetConnection(0);
+    IInputSlot* subGraphOutputConn2 = subGraph->GetOutputSlot(1)->GetConnection(0);
+
+    // Construct dummy pre-compiled layer
+    PreCompiledDescriptor preCompiledDescriptor(2, 2);
+    Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+
+    // Substitute sub-graph with pre-compiled layer
+    graph.SubstituteSubGraph(std::move(subGraph), preCompiledLayer);
+
+    // Check that connections are correct after substitution
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subGraphInputConn1);
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(1).GetConnection(), subGraphInputConn2);
+
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subGraphOutputConn1);
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(1).GetConnection(0), subGraphOutputConn2);
+}
+
+BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
+{
+    // Construct graph
+    Graph graph;
+
+    graph.AddLayer<InputLayer>(0, "input");
+
+    ViewsDescriptor splitterDescriptor(2);
+    Layer* const splitterLayer = graph.AddLayer<SplitterLayer>(splitterDescriptor, "splitter");
+
+    Convolution2dDescriptor convDescriptor;
+    Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
+    Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+
+    OriginsDescriptor mergerDescriptor(2);
+    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+
+    graph.AddLayer<OutputLayer>(0, "output");
+
+    // Construct sub-graph
+    SubGraphSelector::SubGraphPtr subGraph =
+            CreateSubGraphFrom({}, {}, {splitterLayer, convLayer1, convLayer2, mergerLayer});
+
+    // Construct dummy pre-compiled layer
+    PreCompiledDescriptor preCompiledDescriptor(0, 0);
+    Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+
+    // Save sub-graph layers for later verification
+    const SubGraph::Layers subGraphLayers = subGraph->GetLayers();
+
+    // Substitute sub-graph with pre-compiled layer
+    graph.SubstituteSubGraph(std::move(subGraph), preCompiledLayer);
+
+    // Check that the layers belonging to the sub-graph have been erased from the graph after substitution
+    BOOST_CHECK(!AreAnySubGraphLayersPresentInGraph(subGraphLayers, graph));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(SubGraphSelection)
 
@@ -581,6 +824,170 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
                                            {m1, m2, m3, m4, m5});
 
         CompareSubGraphs(subGraphs[0], expected);
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(IntegrationTests)
+
+BOOST_AUTO_TEST_CASE(SingleSubGraph)
+{
+    // This test case represents the scenario when we have one subgraph
+    // in which two layers have GpuAcc backend assigned
+
+    //Construct graph
+    Graph graph;
+
+    Layer* const inputLayer = graph.AddLayer<InputLayer>(0, "input");
+
+    Convolution2dDescriptor convDescriptor;
+    Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
+    convLayer1->SetBackendId(Compute::GpuAcc);
+
+    Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+    convLayer2->SetBackendId(Compute::GpuAcc);
+
+    Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    // GpuAcc sub graph selector
+    SubGraphSelector::SubGraphs subGraphs =
+        SubGraphSelector::SelectSubGraphs(
+            graph,
+            // select the GpuAcc layers only
+            [](const Layer & l){
+                bool toSelect = (l.GetBackendId() == Compute::GpuAcc);
+                return toSelect;
+            });
+
+    BOOST_TEST(subGraphs.size() == 1);
+    if(subGraphs.size() == 1)
+    {
+        BOOST_TEST((subGraphs[0] != nullptr));
+
+        if (subGraphs[0].get() != nullptr)
+        {
+            unsigned int numInputSlots = boost::numeric_cast<unsigned int>(subGraphs[0]->GetInputSlots().size());
+            unsigned int numOutputSlots = boost::numeric_cast<unsigned int>(subGraphs[0]->GetOutputSlots().size());
+
+            BOOST_TEST((numInputSlots == 1));
+            BOOST_TEST((numOutputSlots == 1));
+
+            // Save sub-graph connections for comparison after substitution
+            IOutputSlot* subGraphInputConn1 = subGraphs[0]->GetInputSlot(0)->GetConnection();
+            IInputSlot* subGraphOutputConn1 = subGraphs[0]->GetOutputSlot(0)->GetConnection(0);
+
+            // Construct dummy pre-compiled layer
+            PreCompiledDescriptor preCompiledDescriptor(numInputSlots, numOutputSlots);
+            Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+
+            // Substitute sub-graph with pre-compiled layer
+            graph.SubstituteSubGraph((std::move(subGraphs[0])), preCompiledLayer);
+
+            // Check that connections are correct after substitution
+            BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subGraphInputConn1);
+
+            BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subGraphOutputConn1);
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(MultipleSubGraphs)
+{
+    // This test case represents the scenario when we have two subgraphs
+    // in which two layers have CpuAcc backend assigned
+
+    //Construct graph
+    Graph graph;
+
+    Layer* const inputLayer = graph.AddLayer<InputLayer>(0, "input");
+
+    ViewsDescriptor splitterDescriptor(2);
+    Layer* const splitterLayer = graph.AddLayer<SplitterLayer>(splitterDescriptor, "splitter");
+    splitterLayer->SetBackendId(Compute::CpuAcc);
+
+    Convolution2dDescriptor convDescriptor;
+    Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
+    Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+
+    OriginsDescriptor mergerDescriptor(2);
+    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+    mergerLayer->SetBackendId(Compute::CpuAcc);
+
+    Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
+
+    inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
+    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    // CpuAcc sub graph selector
+    SubGraphSelector::SubGraphs subGraphs =
+        SubGraphSelector::SelectSubGraphs(
+            graph,
+            // select the CpuAcc layers only
+            [](const Layer & l){
+                bool toSelect = (l.GetBackendId() == Compute::CpuAcc);
+                return toSelect;
+            });
+
+    BOOST_TEST(subGraphs.size() == 2);
+    if(subGraphs.size() == 2)
+    {
+        BOOST_TEST((subGraphs[0] != nullptr));
+        BOOST_TEST((subGraphs[1] != nullptr));
+
+        if (subGraphs[0].get() != nullptr && subGraphs[1].get() != nullptr)
+        {
+            //Sort subGraphs by their inputSlot size.
+            std::sort(subGraphs.begin(), subGraphs.end(),
+                      [](SubGraphSelector::SubGraphPtr & lhs, SubGraphSelector::SubGraphPtr & rhs)
+                      {
+                          return (lhs->GetInputSlots().size() < rhs->GetInputSlots().size());
+                      }
+            );
+
+            unsigned int numInputSlots1  = boost::numeric_cast<unsigned int>(subGraphs[0]->GetInputSlots().size());
+            unsigned int numOutputSlots1 = boost::numeric_cast<unsigned int>(subGraphs[0]->GetOutputSlots().size());
+
+            unsigned int numInputSlots2  = boost::numeric_cast<unsigned int>(subGraphs[1]->GetInputSlots().size());
+            unsigned int numOutputSlots2 = boost::numeric_cast<unsigned int>(subGraphs[1]->GetOutputSlots().size());
+
+            // Save sub-graph connections for comparison after substitution
+            IOutputSlot* subGraph1InputConn  = subGraphs[0]->GetInputSlot(0)->GetConnection();
+            IInputSlot* subGraph1OutputConn1 = subGraphs[0]->GetOutputSlot(0)->GetConnection(0);
+            IInputSlot* subGraph1OutputConn2 = subGraphs[0]->GetOutputSlot(1)->GetConnection(0);
+
+            // Save sub-graph connections for comparison after substitution
+            IOutputSlot* subGraph2InputConn1 = subGraphs[1]->GetInputSlot(0)->GetConnection();
+            IOutputSlot* subGraph2InputConn2 = subGraphs[1]->GetInputSlot(1)->GetConnection();
+            IInputSlot* subGraph2OutputConn  = subGraphs[1]->GetOutputSlot(0)->GetConnection(0);
+
+            PreCompiledDescriptor preCompiledDescriptor1(numInputSlots1, numOutputSlots1);
+            Layer* const preCompiledLayer1 = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor1, "pre-compiled1");
+
+            PreCompiledDescriptor preCompiledDescriptor2(numInputSlots2, numOutputSlots2);
+            Layer* const preCompiledLayer2 = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor2, "pre-compiled2");
+
+            // Substitute sub-graph with pre-compiled layer
+            graph.SubstituteSubGraph((std::move(subGraphs[0])), preCompiledLayer1);
+            graph.SubstituteSubGraph((std::move(subGraphs[1])), preCompiledLayer2);
+
+            // Check that connections are correct after substitution
+            BOOST_CHECK_EQUAL(preCompiledLayer1->GetInputSlot(0).GetConnection(), subGraph1InputConn);
+            BOOST_CHECK_EQUAL(preCompiledLayer1->GetOutputSlot(0).GetConnection(0), subGraph1OutputConn1);
+            BOOST_CHECK_EQUAL(preCompiledLayer1->GetOutputSlot(1).GetConnection(0), subGraph1OutputConn2);
+
+            BOOST_CHECK_EQUAL(preCompiledLayer2->GetInputSlot(0).GetConnection(), subGraph2InputConn1);
+            BOOST_CHECK_EQUAL(preCompiledLayer2->GetInputSlot(1).GetConnection(), subGraph2InputConn2);
+            BOOST_CHECK_EQUAL(preCompiledLayer2->GetOutputSlot(0).GetConnection(0), subGraph2OutputConn);
+        }
     }
 }
 

@@ -8,7 +8,7 @@
 #include "Layer.hpp"
 
 #include <vector>
-#include <unordered_set>
+#include <list>
 
 namespace armnn
 {
@@ -24,7 +24,7 @@ class SubGraph final
 public:
     using InputSlots = std::vector<InputSlot *>;
     using OutputSlots = std::vector<OutputSlot *>;
-    using Layers = std::unordered_set<Layer *>;
+    using Layers = std::list<Layer*>;
 
     SubGraph();
     SubGraph(InputSlots && inputs,
@@ -43,6 +43,15 @@ public:
 
     unsigned int GetNumInputSlots() const;
     unsigned int GetNumOutputSlots() const;
+
+    Layers::iterator begin();
+    Layers::iterator end();
+
+    Layers::const_iterator begin() const;
+    Layers::const_iterator end() const;
+
+    Layers::const_iterator cbegin() const;
+    Layers::const_iterator cend() const;
 
 private:
     InputSlots m_InputSlots;

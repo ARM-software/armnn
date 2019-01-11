@@ -364,16 +364,15 @@ protected:
 
 struct OptimizerOptions
 {
-    OptimizerOptions() :
-    m_ReduceFp32ToFp16(false)
-    , m_Debug(false)
+    OptimizerOptions()
+        : m_ReduceFp32ToFp16(false)
+        , m_Debug(false)
     {}
 
     OptimizerOptions(bool reduceFp32ToFp16, bool debug)
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
-    {
-    }
+    {}
 
     // Reduce Fp32 data to Fp16 for faster processing
     bool m_ReduceFp32ToFp16;

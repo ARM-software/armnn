@@ -18,7 +18,7 @@ namespace armnn
 /// An ActivationDescriptor for the ActivationLayer.
 struct ActivationDescriptor
 {
-    ActivationDescriptor() : m_Function(ActivationFunction::Sigmoid), m_A(0), m_B(0) {};
+    ActivationDescriptor() : m_Function(ActivationFunction::Sigmoid), m_A(0), m_B(0) {}
 
     /// @brief The activation function to use
     /// (Sigmoid, TanH, Linear, ReLu, BoundedReLu, SoftReLu, LeakyReLu, Abs, Sqrt, Square).
@@ -48,7 +48,7 @@ struct PermuteDescriptor
 /// A SoftmaxDescriptor for the SoftmaxLayer.
 struct SoftmaxDescriptor
 {
-    SoftmaxDescriptor() : m_Beta(1.0f) {};
+    SoftmaxDescriptor() : m_Beta(1.0f) {}
     /// Exponentiation value.
     float              m_Beta;
 };
@@ -221,7 +221,7 @@ struct Pooling2dDescriptor
     , m_OutputShapeRounding(OutputShapeRounding::Floor)
     , m_PaddingMethod(PaddingMethod::Exclude)
     , m_DataLayout(DataLayout::NCHW)
-    {};
+    {}
 
     /// The pooling algorithm to use (Max. Average, L2).
     PoolingAlgorithm    m_PoolType;
@@ -255,7 +255,7 @@ struct FullyConnectedDescriptor
     FullyConnectedDescriptor()
     : m_BiasEnabled(false)
     , m_TransposeWeightMatrix(false)
-    {};
+    {}
 
     /// Enable/disable bias.
     bool m_BiasEnabled;
@@ -275,7 +275,7 @@ struct Convolution2dDescriptor
     , m_StrideY(0)
     , m_BiasEnabled(false)
     , m_DataLayout(DataLayout::NCHW)
-    {};
+    {}
 
     /// Padding left value in the width dimension.
     uint32_t             m_PadLeft;
@@ -606,6 +606,19 @@ struct DebugDescriptor
     std::string m_LayerName;
     /// The slot index of the debug layer.
     unsigned int m_SlotIndex;
+};
+
+/// A PreCompiledDescriptor for the PreCompiledLayer.
+struct PreCompiledDescriptor
+{
+    PreCompiledDescriptor(unsigned int numInputSlots = 1u, unsigned int numOutputSlots = 1u)
+        : m_NumInputSlots(numInputSlots), m_NumOutputSlots(numOutputSlots)
+    {}
+
+    ~PreCompiledDescriptor() = default;
+
+    unsigned int m_NumInputSlots;
+    unsigned int m_NumOutputSlots;
 };
 
 }

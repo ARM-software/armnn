@@ -386,7 +386,10 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/TensorTest.cpp
         src/armnn/test/UnitTests.cpp
         src/armnn/test/UnitTests.hpp
-        src/armnn/test/UtilsTests.cpp)
+        src/armnn/test/UtilsTests.cpp
+        src/armnnUtils/test/ParsePrototxtFixtureTest.cpp
+        src/armnnUtils/test/ParserHelperTest.cpp
+        )
 
     if(BUILD_TF_PARSER)
         list(APPEND unittest_sources
@@ -408,6 +411,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/LocalResponseNormalization.cpp
             src/armnnTfParser/test/Maximum.cpp
             src/armnnTfParser/test/MaximumForLeakyRelu.cpp
+            src/armnnTfParser/test/Mean.cpp
             src/armnnTfParser/test/Minimum.cpp
             src/armnnTfParser/test/Multiplication.cpp
             src/armnnTfParser/test/Pad.cpp
@@ -426,7 +430,8 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/TestMultiInputsOutputs.cpp
             src/armnnTfParser/test/Split.cpp
             src/armnnTfParser/test/Squeeze.cpp
-            src/armnnTfParser/test/Sub.cpp)
+            src/armnnTfParser/test/Sub.cpp
+            )
     endif()
 
     if(BUILD_TF_LITE_PARSER)

@@ -164,6 +164,14 @@ bool LayerSupportBase::IsGatherSupported(const armnn::TensorInfo& input0,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsGreaterSupported(const TensorInfo& input0,
+                                          const TensorInfo& input1,
+                                          const TensorInfo& output,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsInputSupported(const TensorInfo& input,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
@@ -313,6 +321,13 @@ bool LayerSupportBase::IsResizeBilinearSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsRsqrtSupported(const TensorInfo &input,
+                                        const TensorInfo &output,
+                                        Optional<std::string &> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsSoftmaxSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           const SoftmaxDescriptor& descriptor,
@@ -348,21 +363,6 @@ bool LayerSupportBase::IsSubtractionSupported(const TensorInfo& input0,
                                               const TensorInfo& input1,
                                               const TensorInfo& output,
                                               Optional<std::string&> reasonIfUnsupported) const
-{
-    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
-}
-
-bool LayerSupportBase::IsGreaterSupported(const TensorInfo& input0,
-                                          const TensorInfo& input1,
-                                          const TensorInfo& output,
-                                          Optional<std::string&> reasonIfUnsupported) const
-{
-    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
-}
-
-bool LayerSupportBase::IsRsqrtSupported(const TensorInfo &input,
-                                        const TensorInfo &output,
-                                        Optional<std::string &> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }

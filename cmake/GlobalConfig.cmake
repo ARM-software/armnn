@@ -67,7 +67,7 @@ endif()
 
 # Compiler flags for Debug builds
 if(COMPILER_IS_GNU_LIKE)
-    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "/MDd /ZI /Od")
     # Disable SAFESEH which is necessary for Edit and Continue to work

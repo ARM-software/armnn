@@ -430,28 +430,6 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     Optimizer::Pass(optNetObjPtr->GetGraph(), MakeOptimizations(OptimizeInverseConversionsFp16(),
                                                                 OptimizeInverseConversionsFp32()));
 
-    // Insert pre-compiled layers where required by the backend
-    // TODO: This is a dummy/default backend id used for making the code build until
-    //       we've properly refactored the optimizer
-    const BackendId backendId(Compute::Undefined);
-    auto const& backendRegistry = BackendRegistryInstance();
-    if (backendRegistry.IsBackendRegistered(backendId))
-    {
-        // Obtain a backend object using the registered factory
-        auto backendFactory = backendRegistry.GetFactory(backendId);
-        auto backendObjPtr  = backendFactory();
-
-        OptimizationResult insertPreCompiledLayersResult = InsertPreCompiledLayers(optNetObjPtr,
-                                                                                   backendObjPtr,
-                                                                                   backendSettings,
-                                                                                   errMessages);
-        if (insertPreCompiledLayersResult.m_Error)
-        {
-            // Failed to insert pre-compiled layers
-            return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
-        }
-    }
-
     // If the debug flag is set, then insert a DebugLayer after each layer.
     // NOTE: This optimization can only happen strictly after the PreCompiled layers have
     //       already been inserted
@@ -588,8 +566,7 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayerImpl(
         throw InvalidArgumentException("AddDepthwiseConvolution2dLayer: biases cannot be NULL");
     }
 
-    const auto layer = m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor,
-            name);
+    const auto layer = m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor, name);
 
     layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights);
 

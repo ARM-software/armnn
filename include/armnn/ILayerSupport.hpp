@@ -102,6 +102,11 @@ public:
                                            const FullyConnectedDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsGreaterSupported(const TensorInfo& input0,
+                                    const TensorInfo& input1,
+                                    const TensorInfo& ouput,
+                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsInputSupported(const TensorInfo& input,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
@@ -232,11 +237,6 @@ public:
                                         const TensorInfo& input1,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
-    virtual bool IsGreaterSupported(const TensorInfo& input0,
-                                    const TensorInfo& input1,
-                                    const TensorInfo& ouput,
-                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 }; // class ILayerSupport
 
 using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;

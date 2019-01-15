@@ -439,6 +439,7 @@ if(BUILD_UNIT_TESTS)
     endif()
 
     if(BUILD_TF_LITE_PARSER)
+        enable_language(ASM)
         list(APPEND unittest_sources
              src/armnnTfLiteParser/test/ParserFlatbuffersFixture.hpp
              src/armnnTfLiteParser/test/Activations.cpp
@@ -458,7 +459,9 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/GetTensorIds.cpp
              src/armnnTfLiteParser/test/GetSubgraphInputsOutputs.cpp
              src/armnnTfLiteParser/test/GetInputsOutputs.cpp
+             src/armnnTfLiteParser/test/Schema.s
              )
+        set_source_files_properties(src/armnnTfLiteParser/test/Schema.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
     endif()
 
     if(BUILD_CAFFE_PARSER)

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "Schema.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
@@ -89,24 +90,12 @@ struct ParserFlatbuffersFixture
 
     bool ReadStringToBinary()
     {
-        const char* schemafileName = getenv("ARMNN_TF_LITE_SCHEMA_PATH");
-        if (schemafileName == nullptr)
-        {
-            schemafileName = ARMNN_TF_LITE_SCHEMA_PATH;
-        }
-        std::string schemafile;
-
-        bool ok = flatbuffers::LoadFile(schemafileName, false, &schemafile);
-        BOOST_ASSERT_MSG(ok, "Couldn't load schema file " ARMNN_TF_LITE_SCHEMA_PATH);
-        if (!ok)
-        {
-            return false;
-        }
+        std::string schemafile(&tflite_schema_start, &tflite_schema_end);
 
         // parse schema first, so we can use it to parse the data after
         flatbuffers::Parser parser;
 
-        ok &= parser.Parse(schemafile.c_str());
+        bool ok = parser.Parse(schemafile.c_str());
         BOOST_ASSERT_MSG(ok, "Failed to parse schema file");
 
         ok &= parser.Parse(m_JsonString.c_str());

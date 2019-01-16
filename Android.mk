@@ -98,6 +98,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/FakeQuantizationLayer.cpp \
         src/armnn/layers/FloorLayer.cpp \
         src/armnn/layers/FullyConnectedLayer.cpp \
+        src/armnn/layers/GatherLayer.cpp \
         src/armnn/layers/GreaterLayer.cpp \
         src/armnn/layers/InputLayer.cpp \
         src/armnn/layers/L2NormalizationLayer.cpp \

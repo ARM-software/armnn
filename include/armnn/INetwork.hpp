@@ -343,6 +343,11 @@ public:
     /// @ return - Interface for configuring the layer.
     virtual IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) = 0;
 
+    /// Add Gather layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @ return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddGatherLayer(const char* name = nullptr) = 0;
+
 protected:
     ~INetwork() {}
 };

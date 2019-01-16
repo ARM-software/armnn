@@ -330,4 +330,10 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePreCompiled(const PreCompi
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGather(const armnn::GatherQueueDescriptor& descriptor,
+                                                             const armnn::WorkloadInfo& info) const
+{
+    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 } // namespace armnn

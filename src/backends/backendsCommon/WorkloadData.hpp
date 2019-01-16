@@ -378,6 +378,11 @@ struct RsqrtQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct GatherQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct PreCompiledQueueDescriptor : QueueDescriptorWithParameters<PreCompiledDescriptor>
 {
     PreCompiledQueueDescriptor()

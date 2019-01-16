@@ -1051,6 +1051,12 @@ void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                               "output");
 }
 
+void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTwoInputs(workloadInfo, "GatherQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "GatherQueueDescriptor");
+}
+
 void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     // This is internally generated so it should not need validation.

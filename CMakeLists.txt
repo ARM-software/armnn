@@ -202,6 +202,8 @@ list(APPEND armnn_sources
     src/armnn/layers/FloorLayer.cpp
     src/armnn/layers/FullyConnectedLayer.hpp
     src/armnn/layers/FullyConnectedLayer.cpp
+    src/armnn/layers/GatherLayer.cpp
+    src/armnn/layers/GatherLayer.hpp
     src/armnn/layers/GreaterLayer.cpp
     src/armnn/layers/GreaterLayer.hpp
     src/armnn/layers/InputLayer.hpp

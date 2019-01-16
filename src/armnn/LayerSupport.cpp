@@ -245,6 +245,16 @@ bool IsFullyConnectedSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsFullyConnectedSupported, input, output, weights, biases, descriptor);
 }
 
+bool IsGatherSupported(const BackendId& backend,
+                       const TensorInfo& input0,
+                       const TensorInfo& input1,
+                       const TensorInfo& output,
+                       char* reasonIfUnsupported,
+                       size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsGatherSupported, input0, input1, output);
+}
+
 bool IsGreaterSupported(const BackendId& backend,
                         const TensorInfo& input0,
                         const TensorInfo& input1,

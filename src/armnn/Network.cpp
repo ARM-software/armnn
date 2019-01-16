@@ -872,6 +872,11 @@ IConnectableLayer* Network::AddRsqrtLayer(const char * name)
     return m_Graph->AddLayer<RsqrtLayer>(name);
 }
 
+IConnectableLayer* Network::AddGatherLayer(const char* name)
+{
+    return m_Graph->AddLayer<GatherLayer>(name);
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

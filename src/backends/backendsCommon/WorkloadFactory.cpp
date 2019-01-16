@@ -315,6 +315,17 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                reason);
             break;
         }
+        case LayerType::Gather:
+        {
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsGatherSupported(OverrideDataType(input0, dataType),
+                                                           OverrideDataType(input1, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           reason);
+            break;
+        }
         case LayerType::Input:
         {
             const TensorInfo& input = layer.GetOutputSlot(0).GetTensorInfo();
@@ -477,16 +488,16 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                             reason);
             break;
         }
-    case LayerType::MemCopy:
-    {
-        const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-        const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+        case LayerType::MemCopy:
+        {
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-        result = layerSupportObject->IsMemCopySupported(OverrideDataType(input, dataType),
-                                                        OverrideDataType(output, dataType),
-                                                        reason);
-        break;
-    }
+            result = layerSupportObject->IsMemCopySupported(OverrideDataType(input, dataType),
+                                                            OverrideDataType(output, dataType),
+                                                            reason);
+            break;
+        }
         case LayerType::Merger:
         {
             auto cLayer = boost::polymorphic_downcast<const MergerLayer*>(&layer);

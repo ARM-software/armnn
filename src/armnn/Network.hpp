@@ -66,6 +66,8 @@ public:
         const ConstTensor& biases,
         const char* name = nullptr) override;
 
+    IConnectableLayer* AddGatherLayer(const char* name = nullptr) override;
+
     IConnectableLayer* AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
                                        const char* name = nullptr) override;
 

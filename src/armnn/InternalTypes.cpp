@@ -29,6 +29,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::FakeQuantization: return "FakeQuantization";
         case LayerType::Floor: return "Floor";
         case LayerType::FullyConnected: return "FullyConnected";
+        case LayerType::Gather: return "Gather";
         case LayerType::Greater: return "Greater";
         case LayerType::Input: return "Input";
         case LayerType::L2Normalization: return "L2Normalization";

@@ -162,6 +162,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const = 0;
+
+    virtual std::unique_ptr<IWorkload> CreateGather(const GatherQueueDescriptor& descriptor,
+                                                    const WorkloadInfo& info) const = 0;
 };
 
 } //namespace armnn

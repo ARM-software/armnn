@@ -137,6 +137,11 @@ public:
                                  const TensorInfo* cellToOutputWeights,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsGatherSupported(const TensorInfo& input0,
+                                   const TensorInfo& input1,
+                                   const TensorInfo& output,
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsMaximumSupported(const TensorInfo& input0,
                                     const TensorInfo& input1,
                                     const TensorInfo& output,

@@ -324,4 +324,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompil
     return nullptr;
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const armnn::GatherQueueDescriptor& descriptor,
+                                                            const armnn::WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 } // namespace armnn

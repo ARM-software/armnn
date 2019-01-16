@@ -156,6 +156,14 @@ bool LayerSupportBase::IsFullyConnectedSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsGatherSupported(const armnn::TensorInfo& input0,
+                                         const armnn::TensorInfo& input1,
+                                         const armnn::TensorInfo& output,
+                                         armnn::Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsInputSupported(const TensorInfo& input,
                                         Optional<std::string&> reasonIfUnsupported) const
 {

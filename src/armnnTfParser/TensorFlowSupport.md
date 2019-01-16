@@ -30,6 +30,10 @@ See the TensorFlow [local_response_normalization documentation](https://www.tens
 
 See the TensorFlow [max_pool documentation](https://www.tensorflow.org/api_docs/python/tf/nn/max_pool) for more information.
 
+**reduce_mean**
+
+See the TensorFlow [reduce_mean documentation](https://www.tensorflow.org/api_docs/python/tf/reduce_mean) for more information.
+
 **relu**
 
  See the TensorFlow [relu documentation](https://www.tensorflow.org/api_docs/python/tf/nn/relu) for more information.

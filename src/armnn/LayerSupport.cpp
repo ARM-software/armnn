@@ -57,7 +57,7 @@ void CopyErrorMessage(char* truncatedString, const char* fullString, size_t maxL
             isSupported = layerSupportObject->func(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
             CopyErrorMessage(reasonIfUnsupported, reasonIfUnsupportedFull.c_str(), reasonIfUnsupportedMaxLength); \
         } \
-    } catch (InvalidArgumentException e) { \
+    } catch (InvalidArgumentException &e) { \
         /* re-throwing with more context information */ \
         throw InvalidArgumentException(e, "Failed to check layer support", CHECK_LOCATION()); \
     } \

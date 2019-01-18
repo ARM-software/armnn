@@ -257,6 +257,19 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,
+                                        const armnn::TensorInfo& input1,
+                                        const armnn::TensorInfo& output,
+                                        armnn::Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(input1);
+    ignore_unused(output);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input0.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool RefLayerSupport::IsGreaterSupported(const TensorInfo& input0,
                                          const TensorInfo& input1,
                                          const TensorInfo& output,

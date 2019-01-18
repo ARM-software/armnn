@@ -18,6 +18,7 @@ BACKEND_SOURCES := \
         workloads/Debug.cpp \
         workloads/ElementwiseFunction.cpp \
         workloads/FullyConnected.cpp \
+        workloads/Gather.cpp \
         workloads/Mean.cpp \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
@@ -42,6 +43,7 @@ BACKEND_SOURCES := \
         workloads/RefFloorFloat32Workload.cpp \
         workloads/RefFullyConnectedFloat32Workload.cpp \
         workloads/RefFullyConnectedUint8Workload.cpp \
+        workloads/RefGatherWorkload.cpp \
         workloads/RefL2NormalizationFloat32Workload.cpp \
         workloads/RefLstmFloat32Workload.cpp \
         workloads/RefMeanFloat32Workload.cpp \

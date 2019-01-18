@@ -32,6 +32,7 @@
 #include "Pooling2dTestImpl.hpp"
 #include "ReshapeTestImpl.hpp"
 #include "FullyConnectedTestImpl.hpp"
+#include "GatherTestImpl.hpp"
 #include "SpaceToBatchNdTestImpl.hpp"
 #include "SplitterTestImpl.hpp"
 #include "SoftmaxTestImpl.hpp"
@@ -8688,4 +8689,47 @@ LayerTestResult<uint8_t, 4> PreCompiledMaxPooling2dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return PreCompiledMaxPooling2dTestImpl(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 1> Gather1DParamsFloatTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Gather1DParamsTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 1> Gather1DParamsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Gather1DParamsTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> GatherMultiDimParamsFloatTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherMultiDimParamsTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> GatherMultiDimParamsUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherMultiDimParamsTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 4> GatherMultiDimParamsMultiDimIndicesFloatTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherMultiDimParamsMultiDimIndicesTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> GatherMultiDimParamsMultiDimIndicesUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherMultiDimParamsMultiDimIndicesTestImpl<armnn::DataType::QuantisedAsymm8>(
+        workloadFactory, memoryManager);
 }

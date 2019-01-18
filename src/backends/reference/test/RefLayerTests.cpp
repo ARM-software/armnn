@@ -492,4 +492,12 @@ ARMNN_AUTO_TEST_CASE(Debug3DUint8, Debug3DUint8Test)
 ARMNN_AUTO_TEST_CASE(Debug2DUint8, Debug2DUint8Test)
 ARMNN_AUTO_TEST_CASE(Debug1DUint8, Debug1DUint8Test)
 
+// Gather
+ARMNN_AUTO_TEST_CASE(Gather1DParamsFloat, Gather1DParamsFloatTest)
+ARMNN_AUTO_TEST_CASE(Gather1DParamsUint8, Gather1DParamsUint8Test)
+ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsFloat, GatherMultiDimParamsFloatTest)
+ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsUint8, GatherMultiDimParamsUint8Test)
+ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsMultiDimIndicesFloat, GatherMultiDimParamsMultiDimIndicesFloatTest)
+ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsMultiDimIndicesUint8, GatherMultiDimParamsMultiDimIndicesUint8Test)
+
 BOOST_AUTO_TEST_SUITE_END()

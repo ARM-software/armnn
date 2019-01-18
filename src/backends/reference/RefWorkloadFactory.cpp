@@ -318,16 +318,16 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescr
     return MakeWorkload<RefRsqrtFloat32Workload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const armnn::GatherQueueDescriptor& descriptor,
+                                                            const armnn::WorkloadInfo& info) const
+{
+    return MakeWorkload<RefGatherFloat32Workload, RefGatherUint8Workload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
                                                                  const WorkloadInfo& info) const
 {
     return nullptr;
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const armnn::GatherQueueDescriptor& descriptor,
-                                                            const armnn::WorkloadInfo& info) const
-{
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
 } // namespace armnn

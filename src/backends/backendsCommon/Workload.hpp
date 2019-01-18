@@ -116,10 +116,35 @@ public:
                                          return it.GetDataType() == InputDataType;
                                      }),
                          "Trying to create workload with incorrect type");
+
         BOOST_ASSERT_MSG(std::all_of(info.m_OutputTensorInfos.begin(),
                                      info.m_OutputTensorInfos.end(),
                                      [&](auto it){
                                          return it.GetDataType() == OutputDataType;
+                                     }),
+                         "Trying to create workload with incorrect type");
+    }
+};
+
+// FirstInputTypedWorkload used to check type of the first input
+template <typename QueueDescriptor, armnn::DataType DataType>
+class FirstInputTypedWorkload : public BaseWorkload<QueueDescriptor>
+{
+public:
+
+    FirstInputTypedWorkload(const QueueDescriptor& descriptor, const WorkloadInfo& info)
+        : BaseWorkload<QueueDescriptor>(descriptor, info)
+    {
+        if (!info.m_InputTensorInfos.empty())
+        {
+            BOOST_ASSERT_MSG(info.m_InputTensorInfos.front().GetDataType() == DataType,
+                                 "Trying to create workload with incorrect type");
+        }
+
+        BOOST_ASSERT_MSG(std::all_of(info.m_OutputTensorInfos.begin(),
+                                     info.m_OutputTensorInfos.end(),
+                                     [&](auto it){
+                                         return it.GetDataType() == DataType;
                                      }),
                          "Trying to create workload with incorrect type");
     }

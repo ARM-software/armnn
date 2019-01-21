@@ -9,8 +9,6 @@
 
 #include <test/TensorHelpers.hpp>
 
-#include <armnnOnnxParser/IOnnxParser.hpp>
-
 #include <Network.hpp>
 #include <VerificationHelpers.hpp>
 
@@ -60,9 +58,6 @@ struct ParserPrototxtFixture
     template <std::size_t NumOutputDimensions>
     void RunTest(const std::map<std::string, std::vector<float>>& inputData,
         const std::map<std::string, std::vector<float>>& expectedOutputData);
-
-    /// Converts an int value into the Protobuf octal representation
-    std::string ConvertInt32ToOctalString(int value);
 
     std::string                                         m_Prototext;
     std::unique_ptr<TParser, void(*)(TParser* parser)>  m_Parser;
@@ -251,21 +246,6 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
         auto outputExpected = MakeTensor<float, NumOutputDimensions>(bindingInfo.second, it.second);
         BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
     }
-}
-
-template<typename TParser>
-std::string ParserPrototxtFixture<TParser>::ConvertInt32ToOctalString(int value)
-{
-    std::stringstream ss;
-    std::string returnString;
-    for (int i = 0; i < 4; ++i)
-    {
-        ss << "\\";
-        ss << std::setw(3) << std::setfill('0') << std::oct << ((value >> (i * 8)) & 0xFF);
-    }
-
-    ss >> returnString;
-    return returnString;
 }
 
 } // namespace armnnUtils

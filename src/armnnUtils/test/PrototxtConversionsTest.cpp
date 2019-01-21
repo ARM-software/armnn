@@ -3,17 +3,16 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <ParserPrototxtFixture.hpp>
+#include <PrototxtConversions.hpp>
 
 #include <boost/test/unit_test.hpp>
-#include "armnnTfParser/ITfParser.hpp"
 
-BOOST_AUTO_TEST_SUITE(ParsePrototxtFixtureSuite)
+BOOST_AUTO_TEST_SUITE(PrototxtConversions)
 
-using Fixture = armnnUtils::ParserPrototxtFixture<armnnTfParser::ITfParser>;
-
-BOOST_FIXTURE_TEST_CASE(ConvertInt32ToOctalStringTest, Fixture)
+BOOST_AUTO_TEST_CASE(ConvertInt32ToOctalStringTest)
 {
+    using armnnUtils::ConvertInt32ToOctalString;
+
     std::string octalString = ConvertInt32ToOctalString(1);
     BOOST_ASSERT(octalString.compare("\\\\001\\\\000\\\\000\\\\000"));
 

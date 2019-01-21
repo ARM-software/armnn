@@ -3,9 +3,12 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <boost/test/unit_test.hpp>
 #include "armnnTfParser/ITfParser.hpp"
-#include "ParserPrototxtFixture.hpp"
+
+#include <ParserPrototxtFixture.hpp>
+#include <PrototxtConversions.hpp>
+
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(TensorflowParser)
 
@@ -29,7 +32,7 @@ struct MeanFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::ITf
 
         for (unsigned int i = 0; i < protobufAxis.size(); ++i)
         {
-            protobufAxisString.append(ConvertInt32ToOctalString(static_cast<int>(protobufAxis[i])));
+            protobufAxisString.append(armnnUtils::ConvertInt32ToOctalString(static_cast<int>(protobufAxis[i])));
         }
 
         m_Prototext = R"(node {

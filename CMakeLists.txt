@@ -48,14 +48,12 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/VerificationHelpers.cpp
     src/armnnUtils/ParserHelper.hpp
     src/armnnUtils/ParserHelper.cpp
+    src/armnnUtils/ParserPrototxtFixture.hpp
+    src/armnnUtils/PrototxtConversions.hpp
+    src/armnnUtils/PrototxtConversions.cpp
     src/armnnUtils/TensorUtils.hpp
     src/armnnUtils/TensorUtils.cpp
     )
-if(BUILD_TF_PARSER OR BUILD_CAFFE_PARSER)
-    list(APPEND armnnUtils_sources
-    src/armnnUtils/ParserPrototxtFixture.hpp
-    )
-endif()
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
 
@@ -394,7 +392,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/UnitTests.cpp
         src/armnn/test/UnitTests.hpp
         src/armnn/test/UtilsTests.cpp
-        src/armnnUtils/test/ParsePrototxtFixtureTest.cpp
+        src/armnnUtils/test/PrototxtConversionsTest.cpp
         src/armnnUtils/test/ParserHelperTest.cpp
         )
 

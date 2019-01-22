@@ -588,8 +588,11 @@ int main(int argc, const char* argv[])
     }
     else // Run single test
     {
-        // Get the preferred order of compute devices.
-        std::vector<std::string> computeDevicesAsStrings = vm["compute"].as<std::vector<std::string>>();
+        // Get the preferred order of compute devices. If none are specified, default to using CpuRef
+        const std::string computeOption("compute");
+        std::vector<std::string> computeDevicesAsStrings = CheckOption(vm, computeOption.c_str()) ?
+            vm[computeOption].as<std::vector<std::string>>() :
+            std::vector<std::string>({ "CpuRef" });
         std::vector<armnn::BackendId> computeDevices(computeDevicesAsStrings.begin(), computeDevicesAsStrings.end());
 
         // Remove duplicates from the list of compute devices.

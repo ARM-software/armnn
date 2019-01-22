@@ -54,9 +54,9 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
     int32_t qOffset = 0;
     float qScale = 0.f;
 
-    TensorInfo inputTensorInfo({num, channels, height, width}, GetDataType<float>());
-    TensorInfo outputTensorInfo({num, channels, height, width}, GetDataType<float>());
-    TensorInfo tensorInfo({channels}, GetDataType<float>());
+    TensorInfo inputTensorInfo({num, channels, height, width}, DataType::Float32);
+    TensorInfo outputTensorInfo({num, channels, height, width}, DataType::Float32);
+    TensorInfo tensorInfo({channels}, DataType::Float32);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(IsQuantizedType<float>())

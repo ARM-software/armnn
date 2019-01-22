@@ -255,6 +255,7 @@ list(APPEND armnn_sources
     src/armnn/layers/SubtractionLayer.cpp
     src/armnn/layers/SubtractionLayer.hpp
     src/armnn/BackendSettings.hpp
+    src/armnn/CompatibleTypes.hpp
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
     src/armnn/Exceptions.cpp

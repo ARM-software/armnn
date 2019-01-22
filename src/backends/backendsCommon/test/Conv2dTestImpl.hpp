@@ -6,6 +6,7 @@
 
 #include "WorkloadTestUtils.hpp"
 #include "TensorUtils.hpp"
+#include "TypeUtils.hpp"
 
 #include <Permute.hpp>
 #include <DataLayoutIndexed.hpp>
@@ -70,7 +71,8 @@ void ApplyBias(std::vector<T>& v, float vScale, int32_t vOffset,
     }
 }
 
-template<typename T, typename B>
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType,
+         typename T = armnn::ResolveType<ArmnnType>, typename B = armnn::ResolveType<ArmnnBType>>
 LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -115,12 +117,12 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
 
     // Note these tensors will use two (identical) batches.
     armnn::TensorInfo inputTensorInfo =
-            armnnUtils::GetTensorInfo<T>(2*inputNum, inputChannels, inputHeight, inputWidth, layout);
+            armnnUtils::GetTensorInfo(2*inputNum, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
     armnn::TensorInfo outputTensorInfo =
-            armnnUtils::GetTensorInfo<T>(2*outputNum, outputChannels, outputHeight, outputWidth, layout);
+            armnnUtils::GetTensorInfo(2*outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
     armnn::TensorInfo kernelDesc =
-            armnnUtils::GetTensorInfo<T>(kernelDepthMul, kernelChannels, kernelHeight, kernelWidth, layout);
-    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
+            armnnUtils::GetTensorInfo(kernelDepthMul, kernelChannels, kernelHeight, kernelWidth, layout, ArmnnType);
+    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -230,7 +232,8 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     return ret;
 }
 
-template<typename T, typename B>
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType,
+         typename T = armnn::ResolveType<ArmnnType>, typename B = armnn::ResolveType<ArmnnBType>>
 LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -266,11 +269,11 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
     bool biasEnabled = bias.size() > 0;
 
     // Creates the tensors.
-    armnn::TensorInfo inputTensorInfo({inputNum, inputHeight, inputWidth, inputChannels}, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({inputNum, inputHeight, inputWidth, inputChannels}, ArmnnType);
     armnn::TensorInfo outputTensorInfo({outputNum, outputHeight, outputWidth, outputChannels},
-                                       armnn::GetDataType<T>());
-    armnn::TensorInfo kernelDesc({kernelChanMul, kernelHeight, kernelWidth, kernelChannels}, armnn::GetDataType<T>());
-    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
+                                       ArmnnType);
+    armnn::TensorInfo kernelDesc({kernelChanMul, kernelHeight, kernelWidth, kernelChannels}, ArmnnType);
+    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
 
     // Construct the input data.
     std::vector<T> inputData;
@@ -322,7 +325,8 @@ LayerTestResult<T, 4> SimpleConvolution2dNhwcTestImpl(
     return ret;
 }
 
-template<typename T, typename B>
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType,
+         typename T = armnn::ResolveType<ArmnnType>, typename B = armnn::ResolveType<ArmnnBType>>
 LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -359,11 +363,11 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
 
     // Creates the tensors.
     armnn::TensorInfo inputTensorInfo =
-            armnnUtils::GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
+            armnnUtils::GetTensorInfo(inputNum, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
     armnn::TensorInfo outputTensorInfo =
-            armnnUtils::GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
-    armnn::TensorInfo kernelDesc({kernelChanMul, kernelChannels, kernelHeight, kernelWidth}, armnn::GetDataType<T>());
-    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
+            armnnUtils::GetTensorInfo(outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
+    armnn::TensorInfo kernelDesc({kernelChanMul, kernelChannels, kernelHeight, kernelWidth}, ArmnnType);
+    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if (armnn::IsQuantizedType<T>())
@@ -459,7 +463,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     return ret;
 }
 
-template<typename T, typename B>
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -468,6 +472,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     bool biasEnabled,
     const armnn::DataLayout layout)
 {
+    using B = armnn::ResolveType<ArmnnBType>;
+
     unsigned int inputHeight = 3;
     unsigned int inputWidth = 3;
     unsigned int inputChannels = 2;
@@ -484,12 +490,12 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     unsigned int outputNum = inputNum;
 
     armnn::TensorInfo inputTensorInfo =
-            armnnUtils::GetTensorInfo<T>(inputNum, inputChannels, inputHeight, inputWidth, layout);
+            armnnUtils::GetTensorInfo(inputNum, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
     armnn::TensorInfo outputTensorInfo =
-            armnnUtils::GetTensorInfo<T>(outputNum, outputChannels, outputHeight, outputWidth, layout);
+            armnnUtils::GetTensorInfo(outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
     armnn::TensorInfo kernelDesc({kernelDepthMultiplier, kernelChannels, kernelHeight, kernelWidth},
-                                 armnn::GetDataType<T>());
-    armnn::TensorInfo biasDesc({ outputChannels }, armnn::GetDataType<B>());
+                                 ArmnnType);
+    armnn::TensorInfo biasDesc({ outputChannels }, ArmnnBType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -602,7 +608,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     return ret;
 }
 
-template<typename T, typename B>
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -611,6 +617,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     bool biasEnabled,
     const armnn::DataLayout layout)
 {
+    using B = armnn::ResolveType<ArmnnBType>;
+
     unsigned int depthMultiplier = 2;
 
     unsigned int inputHeight    = 8;
@@ -626,13 +634,13 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     unsigned int outputChannels  = inputChannels * depthMultiplier;
     unsigned int outputBatchSize = inputBatchSize;
 
-    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo<T>(
-            inputBatchSize, inputChannels, inputHeight, inputWidth, layout);
-    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(
-            outputBatchSize, outputChannels, outputHeight, outputWidth, layout);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo(
+            inputBatchSize, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(
+            outputBatchSize, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
     armnn::TensorInfo kernelDesc({depthMultiplier, inputChannels, kernelHeight, kernelWidth},
-                                 armnn::GetDataType<T>());
-    armnn::TensorInfo biasDesc({outputChannels}, armnn::GetDataType<B>());
+                                 ArmnnType);
+    armnn::TensorInfo biasDesc({outputChannels}, ArmnnBType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -803,7 +811,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     return ret;
 }
 
-template<typename T, typename B>
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType,
+         typename T = armnn::ResolveType<ArmnnType>, typename B = armnn::ResolveType<ArmnnBType>>
 LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -836,11 +845,11 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
     unsigned int outputWidth    = boost::numeric_cast<unsigned int>(outputExpected.shape()[2]);
 
     // Creates the tensors.
-    armnn::TensorInfo inputTensorInfo({inputNum, inputHeight, inputWidth, inputChannels}, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({inputNum, inputHeight, inputWidth, inputChannels}, ArmnnType);
     armnn::TensorInfo outputTensorInfo({outputNum, outputHeight, outputWidth, outputChannels},
-                                       armnn::GetDataType<T>());
-    armnn::TensorInfo kernelDesc({kernelChanMul, kernelChannels, kernelHeight, kernelWidth}, armnn::GetDataType<T>());
-    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, armnn::GetDataType<B>());
+                                       ArmnnType);
+    armnn::TensorInfo kernelDesc({kernelChanMul, kernelChannels, kernelHeight, kernelWidth}, ArmnnType);
+    armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if (armnn::IsQuantizedType<T>())
@@ -904,7 +913,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
     return ret;
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T,4> Convolution1dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -912,8 +921,7 @@ LayerTestResult<T,4> Convolution1dTestImpl(
     int32_t qOffset,
     bool biasEnabled)
 {
-    using B = typename FullyConnectedBiasTypeForInputType<T>::Type;
-
+    using B = armnn::ResolveType<ArmnnBType>;
     // Until we have a specialist 1D convolution layer, we can fake one using
     // 2D convolution with the final dimension set to 1.
     // I don't anticipate this being particularly slow, given that convolution is implemented
@@ -928,10 +936,10 @@ LayerTestResult<T,4> Convolution1dTestImpl(
     unsigned int stride         = 1;
     unsigned int outputSize     = 7; // (inputSize + 2 * padSize - kernelSize + 1) / stride.
 
-    armnn::TensorInfo inputInfo({batchSize, inputChannels, inputSize, 1}, armnn::GetDataType<T>());
-    armnn::TensorInfo outputInfo({batchSize, outputChannels, outputSize, 1}, armnn::GetDataType<T>());
-    armnn::TensorInfo kernelInfo({outputChannels, inputChannels, kernelSize, 1}, armnn::GetDataType<T>());
-    armnn::TensorInfo biasInfo({outputChannels}, armnn::GetDataType<B>());
+    armnn::TensorInfo inputInfo({batchSize, inputChannels, inputSize, 1}, ArmnnType);
+    armnn::TensorInfo outputInfo({batchSize, outputChannels, outputSize, 1}, ArmnnType);
+    armnn::TensorInfo kernelInfo({outputChannels, inputChannels, kernelSize, 1}, ArmnnType);
+    armnn::TensorInfo biasInfo({outputChannels}, ArmnnBType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -1023,9 +1031,7 @@ LayerTestResult<T,4> Convolution1dTestImpl(
     return ret;
 }
 
-
-
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T,4> CompareConvolution2dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1059,10 +1065,10 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     unsigned int kernelShape[] = {outputChannels, inputChannels, kernelHeight, kernelWidth};
     unsigned int biasShape[]   = {outputChannels};
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>());
-    kernelDesc = armnn::TensorInfo(4, kernelShape, armnn::GetDataType<T>());
-    biasDesc = armnn::TensorInfo(1, biasShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
+    kernelDesc = armnn::TensorInfo(4, kernelShape, ArmnnType);
+    biasDesc = armnn::TensorInfo(1, biasShape, ArmnnType);
 
     LayerTestResult<T,4> ret(outputTensorInfo);
 
@@ -1123,7 +1129,7 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     return ret;
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1178,11 +1184,11 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     float outputQScale = armnn::IsQuantizedType<T>() ? 2.0f : 0;
     int32_t qOffset = 0;
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape.data(), armnn::GetDataType<T>(), inputsQScale, qOffset);
-    outputTensorInfo = armnn::TensorInfo(4, outputShape.data(), armnn::GetDataType<T>(), outputQScale, qOffset);
-    kernelDesc = armnn::TensorInfo(4, kernelShape.data(), armnn::GetDataType<T>(), inputsQScale, qOffset);
+    inputTensorInfo = armnn::TensorInfo(4, inputShape.data(), ArmnnType, inputsQScale, qOffset);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape.data(), ArmnnType, outputQScale, qOffset);
+    kernelDesc = armnn::TensorInfo(4, kernelShape.data(), ArmnnType, inputsQScale, qOffset);
     biasDesc = armnn::TensorInfo(
-            1, biasShape.data(), armnn::GetBiasDataType(armnn::GetDataType<T>()), inputsQScale, qOffset);
+        1, biasShape.data(), armnn::GetBiasDataType(ArmnnType), inputsQScale, qOffset);
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
 

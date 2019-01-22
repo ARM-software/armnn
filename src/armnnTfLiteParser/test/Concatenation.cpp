@@ -100,10 +100,11 @@ struct ConcatenationFixtureNegativeDim : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationNegativeDim, ConcatenationFixtureNegativeDim)
 {
-    RunTest<4, uint8_t>(0,
-                        {{"inputTensor1", { 0, 1, 2, 3 }},
-                         {"inputTensor2", { 4, 5, 6, 7 }}},
-                        {{"outputTensor", { 0, 1, 2, 3, 4, 5, 6, 7 }}});
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+        0,
+        {{"inputTensor1", { 0, 1, 2, 3 }},
+        {"inputTensor2", { 4, 5, 6, 7 }}},
+        {{"outputTensor", { 0, 1, 2, 3, 4, 5, 6, 7 }}});
 }
 
 struct ConcatenationFixtureNCHW : ConcatenationFixture
@@ -113,10 +114,11 @@ struct ConcatenationFixtureNCHW : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationNCHW, ConcatenationFixtureNCHW)
 {
-    RunTest<4, uint8_t>(0,
-                      {{"inputTensor1", { 0, 1, 2, 3 }},
-                       {"inputTensor2", { 4, 5, 6, 7 }}},
-                      {{"outputTensor", { 0, 1, 2, 3, 4, 5, 6, 7 }}});
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+        0,
+        {{"inputTensor1", { 0, 1, 2, 3 }},
+        {"inputTensor2", { 4, 5, 6, 7 }}},
+        {{"outputTensor", { 0, 1, 2, 3, 4, 5, 6, 7 }}});
 }
 
 struct ConcatenationFixtureNHWC : ConcatenationFixture
@@ -126,10 +128,11 @@ struct ConcatenationFixtureNHWC : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationNHWC, ConcatenationFixtureNHWC)
 {
-    RunTest<4, uint8_t>(0,
-                        {{"inputTensor1", { 0, 1, 2, 3 }},
-                         {"inputTensor2", { 4, 5, 6, 7 }}},
-                        {{"outputTensor", { 0, 1, 4, 5, 2, 3, 6, 7 }}});
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+        0,
+        {{"inputTensor1", { 0, 1, 2, 3 }},
+        {"inputTensor2", { 4, 5, 6, 7 }}},
+        {{"outputTensor", { 0, 1, 4, 5, 2, 3, 6, 7 }}});
 }
 
 struct ConcatenationFixtureDim1 : ConcatenationFixture
@@ -139,15 +142,16 @@ struct ConcatenationFixtureDim1 : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationDim1, ConcatenationFixtureDim1)
 {
-    RunTest<4, uint8_t>(0,
-                        { { "inputTensor1", {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11,
-                                               12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 } },
-                          { "inputTensor2", {  50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                                               62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73 } } },
-                        { { "outputTensor", {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11,
-                                               12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-                                               50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                                               62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73 } } });
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+        0,
+        { { "inputTensor1", {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11,
+                               12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 } },
+        { "inputTensor2", {  50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+                             62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73 } } },
+        { { "outputTensor", {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11,
+                               12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                               50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+                               62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73 } } });
 }
 
 struct ConcatenationFixtureDim3 : ConcatenationFixture
@@ -157,31 +161,32 @@ struct ConcatenationFixtureDim3 : ConcatenationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseConcatenationDim3, ConcatenationFixtureDim3)
 {
-    RunTest<4, uint8_t>(0,
-                        { { "inputTensor1", {  0,  1,  2,  3,
-                                               4,  5,  6,  7,
-                                               8,  9, 10, 11,
-                                               12, 13, 14, 15,
-                                               16, 17, 18, 19,
-                                               20, 21, 22, 23 } },
-                          { "inputTensor2", {  50, 51, 52, 53,
-                                               54, 55, 56, 57,
-                                               58, 59, 60, 61,
-                                               62, 63, 64, 65,
-                                               66, 67, 68, 69,
-                                               70, 71, 72, 73 } } },
-                        { { "outputTensor", {  0,  1,  2,  3,
-                                               50, 51, 52, 53,
-                                               4,  5,  6,  7,
-                                               54, 55, 56, 57,
-                                               8,  9,  10, 11,
-                                               58, 59, 60, 61,
-                                               12, 13, 14, 15,
-                                               62, 63, 64, 65,
-                                               16, 17, 18, 19,
-                                               66, 67, 68, 69,
-                                               20, 21, 22, 23,
-                                               70, 71, 72, 73 } } });
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+        0,
+        { { "inputTensor1", {  0,  1,  2,  3,
+                               4,  5,  6,  7,
+                               8,  9, 10, 11,
+                               12, 13, 14, 15,
+                               16, 17, 18, 19,
+                               20, 21, 22, 23 } },
+        { "inputTensor2", {  50, 51, 52, 53,
+                             54, 55, 56, 57,
+                             58, 59, 60, 61,
+                             62, 63, 64, 65,
+                             66, 67, 68, 69,
+                             70, 71, 72, 73 } } },
+        { { "outputTensor", {  0,  1,  2,  3,
+                               50, 51, 52, 53,
+                               4,  5,  6,  7,
+                               54, 55, 56, 57,
+                               8,  9,  10, 11,
+                               58, 59, 60, 61,
+                               12, 13, 14, 15,
+                               62, 63, 64, 65,
+                               16, 17, 18, 19,
+                               66, 67, 68, 69,
+                               20, 21, 22, 23,
+                               70, 71, 72, 73 } } });
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -80,7 +80,7 @@ LayerTestResult<T, Dim> DebugTestImpl(
     return ret;
 }
 
-template <typename T>
+template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Debug4DTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -95,8 +95,8 @@ LayerTestResult<T, 4> Debug4DTest(
     desc.m_Parameters.m_LayerName = "TestOutput";
     desc.m_Parameters.m_SlotIndex = 1;
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     std::vector<float> input = std::vector<float>(
     {
@@ -131,7 +131,7 @@ LayerTestResult<T, 4> Debug4DTest(
                                expectedStringOutput);
 }
 
-template <typename T>
+template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 3> Debug3DTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -145,8 +145,8 @@ LayerTestResult<T, 3> Debug3DTest(
     armnn::DebugQueueDescriptor desc;
     desc.m_Parameters.m_LayerName = "TestOutput";
 
-    inputTensorInfo = armnn::TensorInfo(3, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(3, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(3, outputShape, ArmnnType);
 
     std::vector<float> input = std::vector<float>(
     {
@@ -179,7 +179,7 @@ LayerTestResult<T, 3> Debug3DTest(
                                expectedStringOutput);
 }
 
-template <typename T>
+template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 2> Debug2DTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -193,8 +193,8 @@ LayerTestResult<T, 2> Debug2DTest(
     armnn::DebugQueueDescriptor desc;
     desc.m_Parameters.m_LayerName = "TestOutput";
 
-    inputTensorInfo = armnn::TensorInfo(2, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(2, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(2, outputShape, ArmnnType);
 
     std::vector<float> input = std::vector<float>(
     {
@@ -225,7 +225,7 @@ LayerTestResult<T, 2> Debug2DTest(
                                expectedStringOutput);
 }
 
-template <typename T>
+template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 1> Debug1DTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -239,8 +239,8 @@ LayerTestResult<T, 1> Debug1DTest(
     armnn::DebugQueueDescriptor desc;
     desc.m_Parameters.m_LayerName = "TestOutput";
 
-    inputTensorInfo = armnn::TensorInfo(1, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(1, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(1, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(1, outputShape, ArmnnType);
 
     std::vector<float> input = std::vector<float>(
     {

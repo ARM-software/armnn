@@ -53,32 +53,32 @@ BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
 
 BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim0Test)
 {
-    MergerDim0EndToEnd<float>(defaultBackends);
+    MergerDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim0Uint8Test)
 {
-    MergerDim0EndToEnd<uint8_t>(defaultBackends);
+    MergerDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim1Test)
 {
-    MergerDim1EndToEnd<float>(defaultBackends);
+    MergerDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim1Uint8Test)
 {
-    MergerDim1EndToEnd<uint8_t>(defaultBackends);
+    MergerDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim3Test)
 {
-    MergerDim3EndToEnd<float>(defaultBackends);
+    MergerDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim3Uint8Test)
 {
-    MergerDim3EndToEnd<uint8_t>(defaultBackends);
+    MergerDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

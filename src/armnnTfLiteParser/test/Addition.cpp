@@ -97,11 +97,11 @@ struct SimpleAddFixture : AddFixture
 
 BOOST_FIXTURE_TEST_CASE(SimpleAdd, SimpleAddFixture)
 {
-  RunTest<2, uint8_t>(0,
-                      {{"inputTensor1", { 0, 1, 2, 3 }},
-                       {"inputTensor2", { 4, 5, 6, 7 }}},
-                      {{"outputTensor", { 4, 6, 8, 10 }}});
+  RunTest<2, armnn::DataType::QuantisedAsymm8>(
+      0,
+      {{"inputTensor1", { 0, 1, 2, 3 }},
+      {"inputTensor2", { 4, 5, 6, 7 }}},
+      {{"outputTensor", { 4, 6, 8, 10 }}});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

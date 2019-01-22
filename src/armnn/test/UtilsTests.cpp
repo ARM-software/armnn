@@ -23,14 +23,6 @@ BOOST_AUTO_TEST_CASE(DataTypeSize)
     BOOST_TEST(armnn::GetDataTypeSize(armnn::DataType::Boolean) == 1);
 }
 
-BOOST_AUTO_TEST_CASE(GetDataTypeTest)
-{
-    BOOST_TEST((armnn::GetDataType<float>() == armnn::DataType::Float32));
-    BOOST_TEST((armnn::GetDataType<uint8_t>() == armnn::DataType::QuantisedAsymm8));
-    BOOST_TEST((armnn::GetDataType<int32_t>() == armnn::DataType::Signed32));
-    BOOST_TEST((armnn::GetDataType<bool>() == armnn::DataType::Boolean));
-}
-
 BOOST_AUTO_TEST_CASE(PermuteDescriptorWithTooManyMappings)
 {
     BOOST_CHECK_THROW(armnn::PermuteDescriptor({ 0u, 1u, 2u, 3u, 4u }), armnn::InvalidArgumentException);
@@ -80,9 +72,6 @@ BOOST_AUTO_TEST_CASE(HalfType)
     using ResolvedType = armnn::ResolveType<armnn::DataType::Float16>;
     constexpr bool isHalfType = std::is_same<armnn::Half, ResolvedType>::value;
     BOOST_CHECK(isHalfType);
-
-    armnn::DataType dt = armnn::GetDataType<armnn::Half>();
-    BOOST_CHECK(dt == armnn::DataType::Float16);
 
     //Test utility functions return correct size
     BOOST_CHECK(GetDataTypeSize(armnn::DataType::Float16) == 2);

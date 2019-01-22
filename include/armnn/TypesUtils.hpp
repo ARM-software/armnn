@@ -151,45 +151,6 @@ struct IsHalfType
     : std::integral_constant<bool, std::is_floating_point<T>::value && sizeof(T) == 2>
 {};
 
-template<typename T, typename U=T>
-struct GetDataTypeImpl;
-
-template<typename T>
-struct GetDataTypeImpl<T, typename std::enable_if_t<IsHalfType<T>::value, T>>
-{
-    static constexpr DataType Value = DataType::Float16;
-};
-
-template<>
-struct GetDataTypeImpl<float>
-{
-    static constexpr DataType Value = DataType::Float32;
-};
-
-template<>
-struct GetDataTypeImpl<uint8_t>
-{
-    static constexpr DataType Value = DataType::QuantisedAsymm8;
-};
-
-template<>
-struct GetDataTypeImpl<int32_t>
-{
-    static constexpr DataType Value = DataType::Signed32;
-};
-
-template<>
-struct GetDataTypeImpl<bool>
-{
-    static constexpr DataType Value = DataType::Boolean;
-};
-
-template <typename T>
-constexpr DataType GetDataType()
-{
-    return GetDataTypeImpl<T>::Value;
-}
-
 template<typename T>
 constexpr bool IsQuantizedType()
 {
@@ -257,16 +218,15 @@ inline float Dequantize(QuantizedType value, float scale, int32_t offset)
     return dequantized;
 }
 
-template <typename DataType>
+template <armnn::DataType DataType>
 void VerifyTensorInfoDataType(const armnn::TensorInfo & info)
 {
-    auto expectedType = armnn::GetDataType<DataType>();
-    if (info.GetDataType() != expectedType)
+    if (info.GetDataType() != DataType)
     {
         std::stringstream ss;
         ss << "Unexpected datatype:" << armnn::GetDataTypeName(info.GetDataType())
             << " for tensor:" << info.GetShape()
-            << ". The type expected to be: " << armnn::GetDataTypeName(expectedType);
+            << ". The type expected to be: " << armnn::GetDataTypeName(DataType);
         throw armnn::Exception(ss.str());
     }
 }

@@ -71,8 +71,7 @@ struct SoftmaxFixture : public ParserFlatbuffersFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseSoftmaxLite, SoftmaxFixture)
 {
-    RunTest<2, uint8_t>(0, { 0, 0, 100, 0, 0, 0, 0 }, { 0, 0, 255, 0, 0, 0, 0 });
+    RunTest<2, armnn::DataType::QuantisedAsymm8>(0, { 0, 0, 100, 0, 0, 0, 0 }, { 0, 0, 255, 0, 0, 0, 0 });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

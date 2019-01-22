@@ -121,6 +121,18 @@ LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+LayerTestResult<float, 4> CompareDepthwiseConvolution2dFloatTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::DataLayout layout);
+
+LayerTestResult<uint8_t, 4> CompareDepthwiseConvolution2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory,
+    const armnn::DataLayout layout);
+
 LayerTestResult<float,   4> SimpleMaxPooling2dSize2x2Stride2x2Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

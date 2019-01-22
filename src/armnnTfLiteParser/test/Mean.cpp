@@ -91,9 +91,8 @@ struct SimpleMeanNoReduceFixture : public MeanNoReduceFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseMeanNoReduce, SimpleMeanNoReduceFixture)
 {
-    RunTest<2, float>(0, {{ "inputTensor", { 1.0f, 1.0f, 2.0f, 2.0f } } },
-                         {{ "outputTensor", { 1.5f } } });
+    RunTest<2, armnn::DataType::Float32>(0, {{ "inputTensor", { 1.0f, 1.0f, 2.0f, 2.0f } } },
+                                            {{ "outputTensor", { 1.5f } } });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

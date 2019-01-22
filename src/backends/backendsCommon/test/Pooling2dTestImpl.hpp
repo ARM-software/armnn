@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <string>
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimplePooling2dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -53,10 +53,11 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
     unsigned int outputChannels  = boost::numeric_cast<unsigned int>(outputExpected.shape()[channelsIndex]);
     unsigned int outputBatchSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[0]);
 
-    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo<T>(inputBatchSize, inputChannels, inputHeight,
-                                                                      inputWidth, dataLayout);
-    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(outputBatchSize, outputChannels, outputHeight,
-                                                                      outputWidth, dataLayout);
+    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo(
+        inputBatchSize, inputChannels, inputHeight, inputWidth, dataLayout, ArmnnType);
+
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(
+        outputBatchSize, outputChannels, outputHeight, outputWidth, dataLayout, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -117,7 +118,7 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
 //   channels:     2
 //   batch size:   2
 //
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -148,8 +149,8 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
     unsigned int channels = 2;
     unsigned int batchSize = 2;
 
-    armnn::TensorInfo inputTensorInfo({ batchSize, channels, inputHeight, inputWidth }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ batchSize, channels, outputHeight, outputWidth }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ batchSize, channels, inputHeight, inputWidth }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ batchSize, channels, outputHeight, outputWidth }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -236,11 +237,11 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
         }));
     }
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -255,8 +256,8 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
     descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
-    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
+    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo(1, 2, 4, 4, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(1, 2, 2, 2, dataLayout, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -305,11 +306,11 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -324,8 +325,8 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
     descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
-    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
+    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo(1, 2, 4, 4, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(1, 2, 2, 2, dataLayout, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -374,11 +375,11 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -395,8 +396,8 @@ LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(
     descriptor.m_PadBottom = 50;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
-    armnn::TensorInfo inputTensorInfo({ 5, 3, 52, 60 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 5, 3, 11, 13 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 5, 3, 52, 60 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 5, 3, 11, 13 }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -425,11 +426,11 @@ LayerTestResult<T, 4> LargeTensorsAveragePooling2dTestCommon(
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputVec);
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -444,8 +445,8 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
     descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo<T>(1, 2, 4, 4, dataLayout);
-    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo<T>(1, 2, 2, 2, dataLayout);
+    armnn::TensorInfo inputTensorInfo  = armnnUtils::GetTensorInfo(1, 2, 4, 4, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(1, 2, 2, 2, dataLayout, ArmnnType);
 
     std::vector<T> inputData(
         QuantizedVector<T>(qScale, qOffset, {
@@ -485,11 +486,11 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputData);
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -502,7 +503,7 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(
     descriptor.m_StrideX = descriptor.m_StrideY = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             2.0f, 1.0f, 5.0f, 2.0f,
@@ -511,18 +512,18 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(
             2.0f, 1.0f, 5.0f, 2.0f,
         }));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             3.0f, 3.0f,
             3.0f, 3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -535,7 +536,7 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
     descriptor.m_StrideX = descriptor.m_StrideY = 3;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f,
@@ -549,7 +550,7 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
         }));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             3.0f, 3.0f, 3.0f,
@@ -557,11 +558,11 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
             3.0f, 3.0f, 3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -574,7 +575,7 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
     descriptor.m_StrideX = descriptor.m_StrideY = 4;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 7, 7 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 7, 7 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             2.0f, 1.0f, 5.0f, 0.0f, 2.0f, 1.0f, 5.0f,
@@ -586,18 +587,18 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
             5.0f, 4.0f, 1.0f, 0.0f, 5.0f, 4.0f, 1.0f,
         }));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             3.0f, 3.0f,
             3.0f, 3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -610,7 +611,7 @@ LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
     descriptor.m_StrideX = descriptor.m_StrideY = 7;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 7, 7 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 7, 7 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             1.0f, 0.0f, 2.0f, 0.0f,  3.0f, 0.0f, 4.0f,
@@ -622,17 +623,17 @@ LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
             0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
         }));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 1 }, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 1 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -645,7 +646,7 @@ LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
     descriptor.m_StrideX = descriptor.m_StrideY = 9;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f,
@@ -659,25 +660,25 @@ LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
         }));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 1 }, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 1 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
         QuantizedVector<T>(qScale, qOffset, {
             3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 1, 3 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 1, 3 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, ArmnnType);
 
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
@@ -704,11 +705,11 @@ LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(
             0.0f, 3.0f, 0.0f, 3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> ComparePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -737,8 +738,8 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
     unsigned int inputShape[] = { batchSize, channelCount, inputHeight, inputWidth };
     unsigned int outputShape[] = { batchSize, channelCount, outputHeight, outputWidth };
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -820,7 +821,7 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
 //   channels:     1
 //   batch size:   1
 //
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -870,10 +871,10 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
         618.0f, 582.0f
     };
 
-    armnn::TensorInfo inputTensorInfo({ batchSize, channels, inputHeight, inputWidth }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ batchSize, channels, inputHeight, inputWidth }, ArmnnType);
 
     // Scale and offset should match input - we're just calculating maximum values.
-    armnn::TensorInfo outputTensorInfo({ batchSize, channels, outputHeight, outputWidth }, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo({ batchSize, channels, outputHeight, outputWidth }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -890,7 +891,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
         forceNoPadding ? QuantizedVector<T>(qScale, qOffset, expectedOutputDataNoPadding) :
                          QuantizedVector<T>(qScale, qOffset, expectedOutputDataWithPadding));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
@@ -903,7 +904,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
 //   channels:     1
 //   batch size:   1
 //
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -948,10 +949,10 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
         10.5f,
     };
 
-    armnn::TensorInfo inputTensorInfo({ batchSize, channels, inputHeight, inputWidth }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ batchSize, channels, inputHeight, inputWidth }, ArmnnType);
 
     // Scale and offset should match input - we're just calculating average values.
-    armnn::TensorInfo outputTensorInfo({ batchSize, channels, outputHeight, outputWidth }, armnn::GetDataType<T>());
+    armnn::TensorInfo outputTensorInfo({ batchSize, channels, outputHeight, outputWidth }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -968,12 +969,12 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
         forceNoPadding ? QuantizedVector<T>(qScale, qOffset, expectedOutputDataNoPadding) :
                          QuantizedVector<T>(qScale, qOffset, expectedOutputDataWithPadding));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -990,8 +991,8 @@ LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(
     descriptor.m_PadBottom = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -1017,11 +1018,11 @@ LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(
              1.0f,  2.0f, -4.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1038,8 +1039,8 @@ LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(
     descriptor.m_PadBottom = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -1066,11 +1067,11 @@ LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(
              2.0f,  2.0f,  2.0f, -3.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1087,8 +1088,8 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(
     descriptor.m_PadBottom = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -1114,11 +1115,11 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(
             3.0f,  13.0f,  10.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1136,8 +1137,8 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
     descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Ceiling;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4}, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4}, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -1162,11 +1163,11 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(
             2.0f, 3.5f
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1183,8 +1184,8 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(
     descriptor.m_PadBottom = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -1211,11 +1212,11 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(
              9.0f,  11.0f,  12.0f, 7.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1232,8 +1233,8 @@ LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(
     descriptor.m_PadBottom = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -1259,11 +1260,11 @@ LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(
                8.0f,     1.4142f,   4.0f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }
 
-template<typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1280,8 +1281,8 @@ LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
     descriptor.m_PadBottom = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4 }, armnn::GetDataType<T>());
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -1308,6 +1309,6 @@ LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
             1.0540f, 1.7638f, 2.5385f, 2.3570f,
         }));
 
-    return SimplePooling2dTestImpl<T>(
+    return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
 }

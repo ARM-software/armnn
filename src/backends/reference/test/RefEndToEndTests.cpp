@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE(RefEqualSimpleEndToEndTest)
     const std::vector<float > expectedOutput({ 1, 1, 1, 1,  0, 0, 0, 0,
                                                0, 0, 0, 0,  1, 1, 1, 1 });
 
-    ArithmeticSimpleEndToEnd<float>(defaultBackends, LayerType::Equal, expectedOutput);
+    ArithmeticSimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, LayerType::Equal, expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefGreaterSimpleEndToEndTest)
@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_CASE(RefGreaterSimpleEndToEndTest)
     const std::vector<float> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
                                               0, 0, 0, 0,  0, 0, 0, 0 });
 
-    ArithmeticSimpleEndToEnd<float>(defaultBackends, LayerType::Greater, expectedOutput);
+    ArithmeticSimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, LayerType::Greater, expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefEqualSimpleEndToEndUint8Test)
@@ -333,7 +333,7 @@ BOOST_AUTO_TEST_CASE(RefEqualSimpleEndToEndUint8Test)
     const std::vector<uint8_t> expectedOutput({ 1, 1, 1, 1,  0, 0, 0, 0,
                                                 0, 0, 0, 0,  1, 1, 1, 1 });
 
-    ArithmeticSimpleEndToEnd<uint8_t>(defaultBackends, LayerType::Equal, expectedOutput);
+    ArithmeticSimpleEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, LayerType::Equal, expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefGreaterSimpleEndToEndUint8Test)
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE(RefGreaterSimpleEndToEndUint8Test)
     const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
                                                 0, 0, 0, 0,  0, 0, 0, 0 });
 
-    ArithmeticSimpleEndToEnd<uint8_t>(defaultBackends, LayerType::Greater, expectedOutput);
+    ArithmeticSimpleEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, LayerType::Greater, expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefEqualBroadcastEndToEndTest)
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE(RefEqualBroadcastEndToEndTest)
     const std::vector<float > expectedOutput({ 1, 0, 1, 1, 0, 0,
                                                0, 0, 0, 0, 0, 0 });
 
-    ArithmeticBroadcastEndToEnd<float>(defaultBackends, LayerType::Equal, expectedOutput);
+    ArithmeticBroadcastEndToEnd<armnn::DataType::Float32>(defaultBackends, LayerType::Equal, expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefGreaterBroadcastEndToEndTest)
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_CASE(RefGreaterBroadcastEndToEndTest)
     const std::vector<float> expectedOutput({ 0, 1, 0, 0, 0, 1,
                                               1, 1, 1, 1, 1, 1 });
 
-    ArithmeticBroadcastEndToEnd<float>(defaultBackends, LayerType::Greater, expectedOutput);
+    ArithmeticBroadcastEndToEnd<armnn::DataType::Float32>(defaultBackends, LayerType::Greater, expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefEqualBroadcastEndToEndUint8Test)
@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_CASE(RefEqualBroadcastEndToEndUint8Test)
     const std::vector<uint8_t > expectedOutput({ 1, 0, 1, 1, 0, 0,
                                                  0, 0, 0, 0, 0, 0 });
 
-    ArithmeticBroadcastEndToEnd<uint8_t>(defaultBackends, LayerType::Equal, expectedOutput);
+    ArithmeticBroadcastEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, LayerType::Equal, expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefGreaterBroadcastEndToEndUint8Test)
@@ -373,47 +373,47 @@ BOOST_AUTO_TEST_CASE(RefGreaterBroadcastEndToEndUint8Test)
     const std::vector<uint8_t> expectedOutput({ 0, 1, 0, 0, 0, 1,
                                                 1, 1, 1, 1, 1, 1 });
 
-    ArithmeticBroadcastEndToEnd<uint8_t>(defaultBackends, LayerType::Greater, expectedOutput);
+    ArithmeticBroadcastEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, LayerType::Greater, expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim0Test)
 {
-    MergerDim0EndToEnd<float>(defaultBackends);
+    MergerDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim0Uint8Test)
 {
-    MergerDim0EndToEnd<uint8_t>(defaultBackends);
+    MergerDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim1Test)
 {
-    MergerDim1EndToEnd<float>(defaultBackends);
+    MergerDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim1Uint8Test)
 {
-    MergerDim1EndToEnd<uint8_t>(defaultBackends);
+    MergerDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim2Test)
 {
-    MergerDim2EndToEnd<float>(defaultBackends);
+    MergerDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim2Uint8Test)
 {
-    MergerDim2EndToEnd<uint8_t>(defaultBackends);
+    MergerDim2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim3Test)
 {
-    MergerDim3EndToEnd<float>(defaultBackends);
+    MergerDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim3Uint8Test)
 {
-    MergerDim3EndToEnd<uint8_t>(defaultBackends);
+    MergerDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

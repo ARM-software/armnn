@@ -79,7 +79,7 @@ LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
     return ret;
 }
 
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdSimpleTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -96,8 +96,8 @@ LayerTestResult<T, 4> SpaceToBatchNdSimpleTest(
     desc.m_Parameters.m_BlockShape = {2, 2};
     desc.m_Parameters.m_PadList = {{0, 0}, {0, 0}};
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     std::vector<float> input = std::vector<float>(
     {
@@ -113,7 +113,7 @@ LayerTestResult<T, 4> SpaceToBatchNdSimpleTest(
         workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -130,8 +130,8 @@ LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsTest(
     desc.m_Parameters.m_BlockShape = {2, 2};
     desc.m_Parameters.m_PadList = {{0, 0}, {0, 0}};
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     std::vector<float> input = std::vector<float>(
     {
@@ -152,7 +152,7 @@ LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsTest(
         workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdMultiBlockTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -169,8 +169,8 @@ LayerTestResult<T, 4> SpaceToBatchNdMultiBlockTest(
     desc.m_Parameters.m_BlockShape = {2, 2};
     desc.m_Parameters.m_PadList = {{0, 0}, {0, 0}};
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     std::vector<float> input = std::vector<float>(
     {
@@ -192,7 +192,7 @@ LayerTestResult<T, 4> SpaceToBatchNdMultiBlockTest(
         workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -209,8 +209,8 @@ LayerTestResult<T, 4> SpaceToBatchNdPaddingTest(
     desc.m_Parameters.m_BlockShape = {2, 2};
     desc.m_Parameters.m_PadList = {{0, 0}, {2, 0}};
 
-    inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::GetDataType<T>());
-    outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::GetDataType<T>());
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
 
     std::vector<float> input = std::vector<float>(
     {
@@ -236,34 +236,34 @@ LayerTestResult<T, 4> SpaceToBatchNdPaddingTest(
         workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdSimpleNHWCTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdSimpleTest<T>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdSimpleTest<ArmnnType>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
 }
 
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdMultiChannelsNHWCTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiChannelsTest<T>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdMultiChannelsTest<ArmnnType>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
 }
 
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdMultiBlockNHWCTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdMultiBlockTest<T>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdMultiBlockTest<ArmnnType>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
 }
 
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SpaceToBatchNdPaddingNHWCTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToBatchNdPaddingTest<T>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
+    return SpaceToBatchNdPaddingTest<ArmnnType>(workloadFactory, memoryManager, armnn::DataLayout::NHWC);
 }

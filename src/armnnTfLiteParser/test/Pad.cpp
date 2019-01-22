@@ -92,13 +92,13 @@ struct SimplePadFixture : public PadFixture
 
 BOOST_FIXTURE_TEST_CASE(ParsePad, SimplePadFixture)
 {
-    RunTest<2, float>(0,
-                      {{ "inputTensor",  { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f }}},
-                      {{ "outputTensor", { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                                           0.0f, 0.0f, 1.0f, 2.0f, 3.0f, 0.0f, 0.0f,
-                                           0.0f, 0.0f, 4.0f, 5.0f, 6.0f, 0.0f, 0.0f,
-                                           0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }}});
+    RunTest<2, armnn::DataType::Float32>
+        (0,
+         {{ "inputTensor",  { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f }}},
+         {{ "outputTensor", { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                              0.0f, 0.0f, 1.0f, 2.0f, 3.0f, 0.0f, 0.0f,
+                              0.0f, 0.0f, 4.0f, 5.0f, 6.0f, 0.0f, 0.0f,
+                              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }}});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

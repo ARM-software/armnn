@@ -866,7 +866,7 @@ public:
         m_Storage(tensorData, tensorData + tensorInfo.GetNumElements()),
         m_TensorInfo(tensorInfo)
     {
-        BOOST_ASSERT(tensorInfo.GetDataType() == GetDataType<T>());
+        BOOST_ASSERT(GetDataTypeSize(tensorInfo.GetDataType()) == sizeof(T));
     }
 
     void CreateLayerDeferred() override

@@ -59,10 +59,10 @@ BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
     unsigned int outputBatchSize = inputBatchSize;
 
     armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth },
-        armnn::GetDataType<float>());
+        armnn::DataType::Float32);
 
     armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth },
-        armnn::GetDataType<float>());
+        armnn::DataType::Float32);
 
     LayerTestResult<float, 4> result(inputTensorInfo);
 

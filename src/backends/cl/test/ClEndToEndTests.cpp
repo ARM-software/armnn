@@ -19,32 +19,32 @@ BOOST_AUTO_TEST_CASE(ConstantUsage_Cl_Float32)
 
 BOOST_AUTO_TEST_CASE(ClMergerEndToEndDim0Test)
 {
-    MergerDim0EndToEnd<float>(defaultBackends);
+    MergerDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClMergerEndToEndDim0Uint8Test)
 {
-    MergerDim0EndToEnd<uint8_t>(defaultBackends);
+    MergerDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClMergerEndToEndDim1Test)
 {
-    MergerDim1EndToEnd<float>(defaultBackends);
+    MergerDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClMergerEndToEndDim1Uint8Test)
 {
-    MergerDim1EndToEnd<uint8_t>(defaultBackends);
+    MergerDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClMergerEndToEndDim3Test)
 {
-    MergerDim3EndToEnd<float>(defaultBackends);
+    MergerDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClMergerEndToEndDim3Uint8Test)
 {
-    MergerDim3EndToEnd<uint8_t>(defaultBackends);
+    MergerDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -94,19 +94,18 @@ struct SimpleMultiplicationFixture : public MultiplicationFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseMultiplication, SimpleMultiplicationFixture)
 {
-    RunTest<4, float>(0, {{ "inputTensor1", { 0.0f,  1.0f,  2.0f,
-                                              3.0f,  4.0f,  5.0f,
-                                              6.0f,  7.0f,  8.0f,
-                                              9.0f, 10.0f, 11.0f } },
-                         { "inputTensor2", { 1.0f,  1.0f,  1.0f,
-                                             5.0f,  5.0f,  5.0f,
-                                             1.0f,  1.0f,  1.0f,
-                                             5.0f,  5.0f,  5.0f} } },
-                         {{ "outputTensor", { 0.0f,  1.0f,  2.0f,
-                                             15.0f, 20.0f, 25.0f,
-                                              6.0f,  7.0f,  8.0f,
-                                             45.0f, 50.0f, 55.0f } } });
+    RunTest<4, armnn::DataType::Float32>(0, {{ "inputTensor1", { 0.0f,  1.0f,  2.0f,
+                                                                 3.0f,  4.0f,  5.0f,
+                                                                 6.0f,  7.0f,  8.0f,
+                                                                 9.0f, 10.0f, 11.0f } },
+                                             { "inputTensor2", { 1.0f,  1.0f,  1.0f,
+                                                                 5.0f,  5.0f,  5.0f,
+                                                                 1.0f,  1.0f,  1.0f,
+                                                                 5.0f,  5.0f,  5.0f} } },
+                                             {{ "outputTensor", { 0.0f,  1.0f,  2.0f,
+                                                                 15.0f, 20.0f, 25.0f,
+                                                                  6.0f,  7.0f,  8.0f,
+                                                                 45.0f, 50.0f, 55.0f } } });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

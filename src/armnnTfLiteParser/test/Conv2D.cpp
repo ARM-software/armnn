@@ -89,7 +89,7 @@ struct SimpleConv2DFixture : public ParserFlatbuffersFixture
 
 BOOST_FIXTURE_TEST_CASE( ParseSimpleConv2D, SimpleConv2DFixture )
 {
-    RunTest<4, uint8_t>(
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
         0,
         {
             1, 2, 3,
@@ -219,7 +219,7 @@ struct SimpleConv2DWithBiasesFixture : Conv2DWithBiasesFixture
 
 BOOST_FIXTURE_TEST_CASE( ParseConv2DWithBias, SimpleConv2DWithBiasesFixture )
 {
-    RunTest<4, uint8_t>(
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
         0,
         {
             1, 2,
@@ -290,7 +290,7 @@ BOOST_FIXTURE_TEST_CASE( ParseConv2DAndReluWithBias, ReluConv2DWithBiasesFixture
     uint8_t outZero = 20;
     uint8_t fz = 4; // filter zero point
 
-    RunTest<4, uint8_t>(
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
         0,
         {
             1, 2,
@@ -331,7 +331,7 @@ BOOST_FIXTURE_TEST_CASE( ParseConv2DAndRelu6WithBias, Relu6Conv2DWithBiasesFixtu
 {
     uint8_t relu6Min = 6 / 2; // divide by output scale
 
-    RunTest<4, uint8_t>(
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
         0,
         {
             1, 2,

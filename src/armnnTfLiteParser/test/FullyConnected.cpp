@@ -125,7 +125,7 @@ struct FullyConnectedWithNoBiasFixture : FullyConnectedFixture
 
 BOOST_FIXTURE_TEST_CASE(FullyConnectedWithNoBias, FullyConnectedWithNoBiasFixture)
 {
-    RunTest<2, uint8_t>(
+    RunTest<2, armnn::DataType::QuantisedAsymm8>(
         0,
         { 10, 20, 30, 40 },
         { 400/2 });
@@ -145,7 +145,7 @@ struct FullyConnectedWithBiasFixture : FullyConnectedFixture
 
 BOOST_FIXTURE_TEST_CASE(ParseFullyConnectedWithBias, FullyConnectedWithBiasFixture)
 {
-    RunTest<2, uint8_t>(
+    RunTest<2, armnn::DataType::QuantisedAsymm8>(
         0,
         { 10, 20, 30, 40 },
         { (400+10)/2 });

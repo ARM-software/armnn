@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CpuTensorHandleFwd.hpp"
+#include "CompatibleTypes.hpp"
 
 #include <armnn/TypesUtils.hpp>
 
@@ -22,7 +23,7 @@ public:
     template <typename T>
     const T* GetConstTensor() const
     {
-        BOOST_ASSERT(GetTensorInfo().GetDataType() == GetDataType<T>());
+        BOOST_ASSERT(CompatibleTypes<T>(GetTensorInfo().GetDataType()));
         return reinterpret_cast<const T*>(m_Memory);
     }
 
@@ -82,7 +83,7 @@ public:
     template <typename T>
     T* GetTensor() const
     {
-        BOOST_ASSERT(GetTensorInfo().GetDataType() == GetDataType<T>());
+        BOOST_ASSERT(CompatibleTypes<T>(GetTensorInfo().GetDataType()));
         return reinterpret_cast<T*>(m_MutableMemory);
     }
 

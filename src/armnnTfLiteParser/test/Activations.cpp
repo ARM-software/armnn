@@ -70,8 +70,8 @@ struct ReLuFixture : ActivationFixture
 };
 BOOST_FIXTURE_TEST_CASE(ParseReLu, ReLuFixture)
 {
-    RunTest<2, float>(0, { -1.0f, -0.5f, 1.25f, -3.0f, 0.0f, 0.5f, -0.75f },
-                      { 0.0f, 0.0f, 1.25f, 0.0f, 0.0f, 0.5f, 0.0f });
+    RunTest<2, armnn::DataType::Float32>(0, { -1.0f, -0.5f, 1.25f, -3.0f, 0.0f, 0.5f, -0.75f },
+                                         { 0.0f, 0.0f, 1.25f, 0.0f, 0.0f, 0.5f, 0.0f });
 }
 
 struct ReLu6Fixture : ActivationFixture
@@ -80,8 +80,8 @@ struct ReLu6Fixture : ActivationFixture
 };
 BOOST_FIXTURE_TEST_CASE(ParseReLu6, ReLu6Fixture)
 {
-    RunTest<2, float>(0, { -1.0f, -0.5f, 7.25f, -3.0f, 0.0f, 0.5f, -0.75f },
-                      { 0.0f, 0.0f, 6.0f, 0.0f, 0.0f, 0.5f, 0.0f });
+    RunTest<2, armnn::DataType::Float32>(0, { -1.0f, -0.5f, 7.25f, -3.0f, 0.0f, 0.5f, -0.75f },
+                                         { 0.0f, 0.0f, 6.0f, 0.0f, 0.0f, 0.5f, 0.0f });
 }
 
 BOOST_AUTO_TEST_SUITE_END()

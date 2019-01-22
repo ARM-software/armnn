@@ -90,11 +90,13 @@ private:
     using OperatorParsingFunction = void(TfLiteParser::*)(size_t subgraphIndex, size_t operatorIndex);
 
     void ParseUnsupportedOperator(size_t subgraphIndex, size_t operatorIndex);
+    void ParseActivation(size_t subgraphIndex, size_t operatorIndex, armnn::ActivationFunction activationType);
     void ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
+    void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
     void ParseMaxPool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);

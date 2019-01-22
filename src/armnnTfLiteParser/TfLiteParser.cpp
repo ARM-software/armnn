@@ -464,6 +464,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]           =  &TfLiteParser::ParseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D] =  &TfLiteParser::ParseDepthwiseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]   =  &TfLiteParser::ParseFullyConnected;
+    m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]          =  &TfLiteParser::ParseLogistic;
     m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]       =  &TfLiteParser::ParseMaxPool2D;
     m_ParserFunctions[tflite::BuiltinOperator_RELU]              =  &TfLiteParser::ParseRelu;
     m_ParserFunctions[tflite::BuiltinOperator_RELU6]             =  &TfLiteParser::ParseRelu6;
@@ -1219,42 +1220,26 @@ void TfLiteParser::ParsePad(size_t subgraphIndex, size_t operatorIndex)
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
 
+
 void TfLiteParser::ParseRelu(size_t subgraphIndex, size_t operatorIndex)
 {
-    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    boost::ignore_unused(operatorPtr);
-
-    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(inputs.size(), 1);
-
-    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(outputs.size(), 1);
-
-    auto layerName = str(boost::format("Activation:RELU:%1%:%2%") % subgraphIndex % operatorIndex);
-    ActivationDescriptor activationDesc;
-    activationDesc.m_Function = ActivationFunction::ReLu;
-    IConnectableLayer* const layer  =
-        m_Network->AddActivationLayer(activationDesc, layerName.c_str());
-
-    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    // register the input connection slots for the layer, connections are made after all layers have been created
-    // only the tensors for the inputs are relevant, exclude the const tensors
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
-
-    // register the output connection slots for the layer, connections are made after all layers have been created
-    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+    ParseActivation(subgraphIndex,operatorIndex, ActivationFunction::ReLu);
 }
 
 void TfLiteParser::ParseRelu6(size_t subgraphIndex, size_t operatorIndex)
 {
-    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+    ParseActivation(subgraphIndex,operatorIndex, ActivationFunction::BoundedReLu);
+}
 
+void TfLiteParser::ParseLogistic(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseActivation(subgraphIndex,operatorIndex,ActivationFunction::Sigmoid);
+}
+
+
+void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, ActivationFunction activationType)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
     const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
     boost::ignore_unused(operatorPtr);
 
@@ -1264,13 +1249,38 @@ void TfLiteParser::ParseRelu6(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto layerName = str(boost::format("Activation:RELU6:%1%:%2%") % subgraphIndex % operatorIndex);
+    auto layerName = str(boost::format("Activation:"));
     ActivationDescriptor activationDesc;
-    activationDesc.m_Function = ActivationFunction::BoundedReLu;
-    activationDesc.m_A = 6.0f;
-    activationDesc.m_B = 0.0f;
-    IConnectableLayer* const layer  =
-        m_Network->AddActivationLayer(activationDesc, layerName.c_str());
+    activationDesc.m_Function = activationType;
+
+    switch (activationType)
+    {
+        case ActivationFunction::ReLu:
+        {
+            layerName += str(boost::format("RELU:%1%:%2%") % subgraphIndex % operatorIndex);
+            break;
+        }
+        case ActivationFunction::BoundedReLu:
+        {
+            layerName += str(boost::format("RELU6:%1%:%2%") % subgraphIndex % operatorIndex);
+            activationDesc.m_A = 6.0f;
+            activationDesc.m_B = 0.0f;
+            break;
+        }
+        case ActivationFunction::Sigmoid:
+        {
+            layerName += str(boost::format("SIGMOID:%1%:%2%") % subgraphIndex % operatorIndex);
+            break;
+        }
+        default:
+        {
+            throw ParseException(
+                boost::str(boost::format("Unexpected ActivationFunction[%1%] when creating layerName "
+                                         " %2% ") %static_cast<int>(activationType)% CHECK_LOCATION().AsString()));
+        }
+    }
+
+    IConnectableLayer* const layer = m_Network->AddActivationLayer(activationDesc, layerName.c_str());
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1284,7 +1294,6 @@ void TfLiteParser::ParseRelu6(size_t subgraphIndex, size_t operatorIndex)
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
-
 armnn::TensorInfo TfLiteParser::OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
                                                      const std::vector<int32_t> & targetDimsIn)
 {

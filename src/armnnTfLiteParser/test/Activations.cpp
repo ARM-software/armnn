@@ -84,4 +84,13 @@ BOOST_FIXTURE_TEST_CASE(ParseReLu6, ReLu6Fixture)
                                          { 0.0f, 0.0f, 6.0f, 0.0f, 0.0f, 0.5f, 0.0f });
 }
 
+struct SigmoidFixture : ActivationFixture
+{
+    SigmoidFixture() : ActivationFixture("LOGISTIC", "FLOAT32") {}
+};
+BOOST_FIXTURE_TEST_CASE(ParseLogistic, SigmoidFixture)
+{
+    RunTest<2, armnn::DataType::Float32>(0, { -1.0f,     -0.5f,      4.0f,       -4.0f,  0.0f,      0.5f,     -0.75f },
+                                         {0.268941f, 0.377541f, 0.982013f,  0.0179862f,  0.5f, 0.622459f,  0.320821f });
+}
 BOOST_AUTO_TEST_SUITE_END()

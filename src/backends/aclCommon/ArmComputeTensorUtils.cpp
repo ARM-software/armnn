@@ -25,6 +25,8 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType)
             return arm_compute::DataType::QASYMM8;
         case armnn::DataType::Signed32:
             return arm_compute::DataType::S32;
+        case armnn::DataType::Boolean:
+            return arm_compute::DataType::U8;
         default:
             BOOST_ASSERT_MSG(false, "Unknown data type");
             return arm_compute::DataType::UNKNOWN;

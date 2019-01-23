@@ -41,7 +41,7 @@ struct ResolveTypeImpl<DataType::Signed32>
 template<>
 struct ResolveTypeImpl<DataType::Boolean>
 {
-    using Type = bool;
+    using Type = uint8_t;
 };
 
 template<DataType DT>

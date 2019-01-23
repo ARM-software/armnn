@@ -129,6 +129,7 @@ constexpr const char* GetDataTypeName(DataType dataType)
         case DataType::Float32:         return "Float32";
         case DataType::QuantisedAsymm8: return "Unsigned8";
         case DataType::Signed32:        return "Signed32";
+        case DataType::Boolean:         return "Boolean";
 
         default:
             return "Unknown";

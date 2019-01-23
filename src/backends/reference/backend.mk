@@ -24,13 +24,11 @@ BACKEND_SOURCES := \
         workloads/Pooling2d.cpp \
         workloads/RefActivationFloat32Workload.cpp \
         workloads/RefActivationUint8Workload.cpp \
-        workloads/RefBaseConstantWorkload.cpp \
         workloads/RefBatchNormalizationFloat32Workload.cpp \
         workloads/RefBatchNormalizationUint8Workload.cpp \
         workloads/RefBatchToSpaceNdFloat32Workload.cpp \
         workloads/RefBatchToSpaceNdUint8Workload.cpp \
-        workloads/RefConstantFloat32Workload.cpp \
-        workloads/RefConstantUint8Workload.cpp \
+        workloads/RefConstantWorkload.cpp \
         workloads/RefConvertFp16ToFp32Workload.cpp \
         workloads/RefConvertFp32ToFp16Workload.cpp \
         workloads/RefConvolution2dFloat32Workload.cpp \

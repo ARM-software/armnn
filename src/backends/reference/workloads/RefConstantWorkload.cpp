@@ -1,9 +1,9 @@
-﻿//
+//
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "RefBaseConstantWorkload.hpp"
+#include "RefConstantWorkload.hpp"
 
 #include "RefWorkloadUtils.hpp"
 
@@ -17,7 +17,7 @@ namespace armnn
 {
 
 template <armnn::DataType DataType>
-void RefBaseConstantWorkload<DataType>::Execute() const
+void RefConstantWorkload<DataType>::Execute() const
 {
     // Considering the reference backend independently, it could be possible to initialise the intermediate tensor
     // created by the layer output handler at workload construction time, rather than at workload execution time.
@@ -27,6 +27,8 @@ void RefBaseConstantWorkload<DataType>::Execute() const
     // could have a non-owning reference to the layer output tensor managed by the const input layer); again, this is
     // not an option for other backends, and the extra complexity required to make this work for the reference backend
     // may not be worth the effort (skipping a memory copy in the first inference).
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConstantWorkload_Execute");
+
     if (!m_RanOnce)
     {
         const ConstantQueueDescriptor& data = this->m_Data;
@@ -43,7 +45,8 @@ void RefBaseConstantWorkload<DataType>::Execute() const
     }
 }
 
-template class RefBaseConstantWorkload<DataType::Float32>;
-template class RefBaseConstantWorkload<DataType::QuantisedAsymm8>;
+template class RefConstantWorkload<DataType::Float32>;
+template class RefConstantWorkload<DataType::QuantisedAsymm8>;
+template class RefConstantWorkload<DataType::Signed32>;
 
 } //namespace armnn

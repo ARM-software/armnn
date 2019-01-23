@@ -4,6 +4,7 @@
 //
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
+#include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
 #include <backendsCommon/test/MergerTestImpl.hpp>
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 
@@ -414,6 +415,26 @@ BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim3Test)
 BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim3Uint8Test)
 {
     MergerDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefGatherFloatTest)
+{
+    GatherEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefGatherUint8Test)
+{
+    GatherEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefGatherMultiDimFloatTest)
+{
+    GatherMultiDimEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefGatherMultiDimUint8Test)
+{
+    GatherMultiDimEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

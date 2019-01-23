@@ -32,8 +32,6 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefActivationFloat32Workload.hpp
     RefActivationUint8Workload.cpp
     RefActivationUint8Workload.hpp
-    RefBaseConstantWorkload.cpp
-    RefBaseConstantWorkload.hpp
     RefBatchNormalizationFloat32Workload.cpp
     RefBatchNormalizationFloat32Workload.hpp
     RefBatchNormalizationUint8Workload.cpp
@@ -42,10 +40,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefBatchToSpaceNdFloat32Workload.hpp
     RefBatchToSpaceNdUint8Workload.cpp
     RefBatchToSpaceNdUint8Workload.hpp
-    RefConstantFloat32Workload.cpp
-    RefConstantFloat32Workload.hpp
-    RefConstantUint8Workload.cpp
-    RefConstantUint8Workload.hpp
+    RefConstantWorkload.cpp
+    RefConstantWorkload.hpp
     RefConvertFp16ToFp32Workload.cpp
     RefConvertFp16ToFp32Workload.hpp
     RefConvertFp32ToFp16Workload.cpp

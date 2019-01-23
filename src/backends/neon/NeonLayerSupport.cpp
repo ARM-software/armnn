@@ -71,6 +71,7 @@ bool IsSupportedForDataTypeNeon(Optional<std::string&> reasonIfUnsupported,
                                          floatFuncPtr,
                                          floatFuncPtr,
                                          uint8FuncPtr,
+                                         &FalseFunc<>,
                                          std::forward<Params>(params)...);
 }
 
@@ -212,7 +213,8 @@ bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,
                                          input.GetDataType(),
                                          &FalseFuncF16<>,
                                          &TrueFunc<>,
-                                         &FalseFuncU8<>);
+                                         &FalseFuncU8<>,
+                                         &FalseFuncI32<>);
 }
 
 bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,

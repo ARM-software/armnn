@@ -12,12 +12,13 @@
 namespace armnn
 {
 
-template<typename Float16Func, typename Float32Func, typename Uint8Func, typename ... Params>
+template<typename Float16Func, typename Float32Func, typename Uint8Func, typename Int32Func, typename ... Params>
 bool IsSupportedForDataTypeGeneric(Optional<std::string&> reasonIfUnsupported,
                                    DataType dataType,
                                    Float16Func float16FuncPtr,
                                    Float32Func float32FuncPtr,
                                    Uint8Func uint8FuncPtr,
+                                   Int32Func int32FuncPtr,
                                    Params&&... params)
 {
     switch(dataType)
@@ -28,6 +29,8 @@ bool IsSupportedForDataTypeGeneric(Optional<std::string&> reasonIfUnsupported,
             return float32FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
         case DataType::QuantisedAsymm8:
             return uint8FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
+        case DataType::Signed32:
+            return int32FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
         default:
             return false;
     }
@@ -71,6 +74,16 @@ bool FalseFuncU8(Optional<std::string&> reasonIfUnsupported, Params&&... params)
     if (reasonIfUnsupported)
     {
         reasonIfUnsupported.value() = "Layer is not supported with 8-bit data type";
+    }
+    return false;
+}
+
+template<typename ... Params>
+bool FalseFuncI32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
+{
+    if (reasonIfUnsupported)
+    {
+        reasonIfUnsupported.value() = "Layer is not supported with int32 data type";
     }
     return false;
 }

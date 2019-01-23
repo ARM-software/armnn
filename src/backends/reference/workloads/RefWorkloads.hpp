@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include "RefConstantUint8Workload.hpp"
 #include "ElementwiseFunction.hpp"
 #include "RefElementwiseWorkload.hpp"
 #include "ConvImpl.hpp"
-#include "RefBaseConstantWorkload.hpp"
+#include "RefConstantWorkload.hpp"
 #include "RefConvolution2dUint8Workload.hpp"
 #include "RefSplitterUint8Workload.hpp"
 #include "RefResizeBilinearUint8Workload.hpp"
@@ -46,7 +45,6 @@
 #include "RefSpaceToBatchNdWorkload.hpp"
 #include "RefSplitterFloat32Workload.hpp"
 #include "RefStridedSliceWorkload.hpp"
-#include "RefConstantFloat32Workload.hpp"
 #include "RefActivationFloat32Workload.hpp"
 #include "RefConvolution2dFloat32Workload.hpp"
 #include "Pooling2d.hpp"

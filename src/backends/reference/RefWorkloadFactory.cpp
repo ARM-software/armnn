@@ -24,7 +24,7 @@ template <typename F32Workload, typename U8Workload, typename QueueDescriptorTyp
 std::unique_ptr<IWorkload> RefWorkloadFactory::MakeWorkload(const QueueDescriptorType& descriptor,
     const WorkloadInfo& info) const
 {
-    return armnn::MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload, NullWorkload>(descriptor, info);
 }
 
 RefWorkloadFactory::RefWorkloadFactory()
@@ -126,8 +126,8 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&           info) const
 {
-    return MakeWorkloadHelper<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteUint8Workload>
-        (descriptor, info);
+    return MakeWorkloadHelper<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteUint8Workload,
+        NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
@@ -205,7 +205,8 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2Nor
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefConstantFloat32Workload, RefConstantUint8Workload>(descriptor, info);
+    return MakeWorkloadHelper<NullWorkload, RefConstantFloat32Workload, RefConstantUint8Workload,
+        RefConstantInt32Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,

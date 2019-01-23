@@ -162,6 +162,9 @@ template <typename QueueDescriptor>
 using Uint8Workload = TypedWorkload<QueueDescriptor, armnn::DataType::QuantisedAsymm8>;
 
 template <typename QueueDescriptor>
+using Int32Workload = TypedWorkload<QueueDescriptor, armnn::DataType::Signed32>;
+
+template <typename QueueDescriptor>
 using Float16ToFloat32Workload = MultiTypedWorkload<QueueDescriptor,
                                                     armnn::DataType::Float16,
                                                     armnn::DataType::Float32>;

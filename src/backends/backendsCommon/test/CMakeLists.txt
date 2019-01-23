@@ -16,6 +16,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     DebugTestImpl.hpp
     EndToEndTestImpl.hpp
     FullyConnectedTestImpl.hpp
+    GatherTestImpl.hpp
+    GatherEndToEndTestImpl.hpp
     IsLayerSupportedTestImpl.hpp
     JsonPrinterTestImpl.cpp
     JsonPrinterTestImpl.hpp

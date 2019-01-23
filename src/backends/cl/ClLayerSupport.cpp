@@ -121,6 +121,7 @@ bool IsSupportedForDataTypeCl(Optional<std::string&> reasonIfUnsupported,
                                       floatFuncPtr,
                                       floatFuncPtr,
                                       uint8FuncPtr,
+                                      &FalseFunc<>,
                                       std::forward<Params>(params)...);
 }
 
@@ -265,7 +266,8 @@ bool ClLayerSupport::IsFloorSupported(const TensorInfo& input,
                                          input.GetDataType(),
                                          &FalseFuncF16<>,
                                          &TrueFunc<>,
-                                         &FalseFuncU8<>);
+                                         &FalseFuncU8<>,
+                                         &FalseFuncI32<>);
 }
 
 bool ClLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,

@@ -68,6 +68,11 @@ public:
                                          const Optional<TensorInfo>& biases,
                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsDetectionPostProcessSupported(const TensorInfo& input0,
+                                         const TensorInfo& input1,
+                                         const DetectionPostProcessDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsDivisionSupported(const TensorInfo& input0,
                              const TensorInfo& input1,
                              const TensorInfo& output,

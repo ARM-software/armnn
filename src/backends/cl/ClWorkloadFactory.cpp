@@ -186,6 +186,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthwiseConvolution2d(
     return MakeWorkload<ClDepthwiseConvolutionWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDetectionPostProcess(
+    const armnn::DetectionPostProcessQueueDescriptor& descriptor, const armnn::WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
                                                                          const WorkloadInfo&                 info) const
 {

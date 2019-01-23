@@ -79,6 +79,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateDepthwiseConvolution2d(
         const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const = 0;
 
+    virtual std::unique_ptr<IWorkload> CreateDetectionPostProcess(
+        const DetectionPostProcessQueueDescriptor& descriptor, const WorkloadInfo& info) const = 0;
+
     virtual std::unique_ptr<IWorkload> CreateNormalization(const NormalizationQueueDescriptor& descriptor,
                                                            const WorkloadInfo&                 info) const = 0;
 

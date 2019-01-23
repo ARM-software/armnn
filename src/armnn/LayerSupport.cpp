@@ -190,6 +190,13 @@ bool IsDepthwiseConvolutionSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsDepthwiseConvolutionSupported, input, output, descriptor, weights, biases);
 }
 
+bool IsDetectionPostProcessSupported(const BackendId& backend,
+                                     const TensorInfo& input0,
+                                     const TensorInfo& input1,
+                                     const DetectionPostProcessDescriptor& descriptor,
+                                     char* reasonIfUnsupported,
+                                     size_t reasonIfUnsupportedMaxLength);
+
 bool IsDivisionSupported(const BackendId& backend,
                          const TensorInfo& input0,
                          const TensorInfo& input1,

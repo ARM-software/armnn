@@ -327,6 +327,10 @@ struct DepthwiseConvolution2dDescriptor
     DataLayout m_DataLayout;
 };
 
+struct DetectionPostProcessDescriptor
+{
+};
+
 /// A NormalizationDescriptor for the NormalizationLayer.
 struct NormalizationDescriptor
 {

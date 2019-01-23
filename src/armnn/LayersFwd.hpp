@@ -16,6 +16,7 @@
 #include "layers/Convolution2dLayer.hpp"
 #include "layers/DebugLayer.hpp"
 #include "layers/DepthwiseConvolution2dLayer.hpp"
+#include "layers/DetectionPostProcessLayer.hpp"
 #include "layers/DivisionLayer.hpp"
 #include "layers/EqualLayer.hpp"
 #include "layers/FakeQuantizationLayer.hpp"
@@ -84,6 +85,7 @@ DECLARE_LAYER(ConvertFp32ToFp16)
 DECLARE_LAYER(Convolution2d)
 DECLARE_LAYER(Debug)
 DECLARE_LAYER(DepthwiseConvolution2d)
+DECLARE_LAYER(DetectionPostProcess)
 DECLARE_LAYER(Division)
 DECLARE_LAYER(Equal)
 DECLARE_LAYER(FakeQuantization)

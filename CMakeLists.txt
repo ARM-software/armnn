@@ -191,6 +191,8 @@ list(APPEND armnn_sources
     src/armnn/layers/DebugLayer.cpp
     src/armnn/layers/DepthwiseConvolution2dLayer.hpp
     src/armnn/layers/DepthwiseConvolution2dLayer.cpp
+    src/armnn/layers/DetectionPostProcessLayer.hpp
+    src/armnn/layers/DetectionPostProcessLayer.cpp
     src/armnn/layers/ElementwiseBaseLayer.hpp
     src/armnn/layers/ElementwiseBaseLayer.cpp
     src/armnn/layers/EqualLayer.hpp

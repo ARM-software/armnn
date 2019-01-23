@@ -594,6 +594,12 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, &biases, name);
 }
 
+IConnectableLayer* Network::AddDetectionPostProcessLayer(const armnn::DetectionPostProcessDescriptor& descriptor,
+                                                         const char* name)
+{
+    return m_Graph->AddLayer<DetectionPostProcessLayer>(descriptor, name);
+}
+
 IConnectableLayer* Network::AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
                                             const char* name)
 {

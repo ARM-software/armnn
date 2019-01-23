@@ -127,6 +127,13 @@ public:
         const ConstTensor& biases,
         const char* name = nullptr) = 0;
 
+    /// Adds a Detection PostProcess layer to the network.
+    /// @param descriptor - Description of the Detection PostProcess layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddDetectionPostProcessLayer(
+        const DetectionPostProcessDescriptor& descriptor, const char* name = nullptr) =0;
+
     /// Adds a fully connected layer to the network.
     /// @param fullyConnectedDescriptor - Description of the fully connected layer.
     /// @param weights - Tensor for the weights data.

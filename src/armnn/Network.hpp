@@ -57,6 +57,10 @@ public:
         const ConstTensor&                      biases,
         const char*                             name = nullptr) override;
 
+    IConnectableLayer* AddDetectionPostProcessLayer(
+        const DetectionPostProcessDescriptor& descriptor,
+        const char* name = nullptr) override;
+
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
         const ConstTensor& weights,
         const char* name = nullptr) override;

@@ -151,6 +151,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDepthwiseConvolution2d(
         RefDepthwiseConvolution2dUint8Workload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDetectionPostProcess(
+    const armnn::DetectionPostProcessQueueDescriptor& descriptor, const armnn::WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateNormalization(
     const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {

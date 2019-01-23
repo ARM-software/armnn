@@ -230,6 +230,18 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                      reason);
             break;
         }
+        case LayerType::DetectionPostProcess:
+        {
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            auto cLayer = boost::polymorphic_downcast<const DetectionPostProcessLayer*>(&layer);
+            const DetectionPostProcessDescriptor& descriptor = cLayer->GetParameters();
+            result = layerSupportObject->IsDetectionPostProcessSupported(input0,
+                                                                         input1,
+                                                                         descriptor,
+                                                                         reason);
+            break;
+        }
         case LayerType::Equal:
         {
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();

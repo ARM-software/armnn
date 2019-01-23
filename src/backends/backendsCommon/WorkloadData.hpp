@@ -169,6 +169,11 @@ struct DepthwiseConvolution2dQueueDescriptor : QueueDescriptorWithParameters<Dep
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct DetectionPostProcessQueueDescriptor : QueueDescriptorWithParameters<DetectionPostProcessDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Normalization layer workload data.
 struct NormalizationQueueDescriptor : QueueDescriptorWithParameters<NormalizationDescriptor>
 {

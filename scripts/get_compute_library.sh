@@ -56,7 +56,7 @@ fi
 
 if [ ! -d clframework ]; then
 echo "+++ Cloning clframework"
-  git clone ssh://$GITHUB_USERNAME@review.mlplatform.org:29418/ml/ComputeLibrary clframework
+  git clone https://review.mlplatform.org/ml/ComputeLibrary clframework
   AssertZeroExitCode "Cloning CL Framework failed"
 fi
 pushd clframework > /dev/null
@@ -65,15 +65,15 @@ pushd clframework > /dev/null
 
 # For pinnning to a ref use this:
 # CLFRAMEWORKREVISION="branches/arm_compute_18_11" # Release 18.11
-# git fetch ssh://$GITHUB_USERNAME@review.mlplatform.org:29418/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
+# git fetch  https://review.mlplatform.org/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
 
 # For pinning to a revision use this:
 CLFRAMEWORKREVISION="e8c0c4397a508169282e5859410d5d6cdc87edbe" # Master towards 19.02
-git fetch ssh://$GITHUB_USERNAME@review.mlplatform.org:29418/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
+git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode
 
 # Set commit hook so we can submit reviews to gerrit
-scp -p -P 29418 $GITHUB_USERNAME@review.mlplatform.org:hooks/commit-msg .git/hooks/
+(curl -Lo `git rev-parse --git-dir`/hooks/commit-msg https://review.mlplatform.org/tools/hooks/commit-msg; chmod +x `git rev-parse --git-dir`/hooks/commit-msg)
 AssertZeroExitCode
 
 popd > /dev/null # out of clframework

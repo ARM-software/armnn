@@ -110,7 +110,7 @@ void MergerDim0EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }, { 1,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0,expectedOutput }};
 
-    EndToEndLayerTestImpl<T, T>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -174,7 +174,7 @@ void MergerDim1EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }, { 1,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0,expectedOutput }};
 
-    EndToEndLayerTestImpl<T>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -238,7 +238,7 @@ void MergerDim2EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }, { 1,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0,expectedOutput }};
 
-    EndToEndLayerTestImpl<T>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -301,7 +301,7 @@ void MergerDim3EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }, { 1,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0,expectedOutput }};
 
-    EndToEndLayerTestImpl<T>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
 } // anonymous namespace

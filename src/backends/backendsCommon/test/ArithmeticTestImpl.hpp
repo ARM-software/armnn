@@ -78,7 +78,7 @@ void ArithmeticSimpleEndToEnd(const std::vector<BackendId>& backends,
     std::map<int, std::vector<TInput>> inputTensorData = {{ 0, input0 }, { 1, input1 }};
     std::map<int, std::vector<TOutput>> expectedOutputData = {{ 0, expectedOutput }};
 
-    EndToEndLayerTestImpl<TInput, TOutput>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnInputType, ArmnnOutputType>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnInputType,
@@ -107,7 +107,7 @@ void ArithmeticBroadcastEndToEnd(const std::vector<BackendId>& backends,
     std::map<int, std::vector<TInput>> inputTensorData = {{ 0, input0 }, { 1, input1 }};
     std::map<int, std::vector<TOutput>> expectedOutputData = {{ 0, expectedOutput }};
 
-    EndToEndLayerTestImpl<TInput, TOutput>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnInputType, ArmnnOutputType>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
 } // anonymous namespace

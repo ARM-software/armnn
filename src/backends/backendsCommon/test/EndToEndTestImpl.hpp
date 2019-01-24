@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include "TypeUtils.hpp"
+
 #include <armnn/ArmNN.hpp>
 #include <armnn/INetwork.hpp>
 
@@ -102,7 +104,14 @@ inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
     );
 }
 
-template<typename TInput, typename TOutput>
+template<typename T>
+bool CompareBoolean(T a, T b)
+{
+    return (a == 0 && b == 0) ||(a != 0 && b != 0);
+};
+
+template<DataType ArmnnIType, DataType ArmnnOType,
+         typename TInput = ResolveType<ArmnnIType>, typename TOutput = ResolveType<ArmnnOType>>
 void EndToEndLayerTestImpl(INetworkPtr network,
                            const std::map<int, std::vector<TInput>>& inputTensorData,
                            const std::map<int, std::vector<TOutput>>& expectedOutputData,
@@ -145,7 +154,17 @@ void EndToEndLayerTestImpl(INetworkPtr network,
     for (auto&& it : expectedOutputData)
     {
         std::vector<TOutput> out = outputStorage.at(it.first);
-        BOOST_TEST(it.second == out);
+        if (ArmnnOType == DataType::Boolean)
+        {
+            for (unsigned int i = 0; i < out.size(); ++i)
+            {
+                BOOST_TEST(CompareBoolean<TOutput>(it.second[i], out[i]));
+            }
+        }
+        else
+        {
+            BOOST_TEST(it.second == out);
+        }
     }
 }
 

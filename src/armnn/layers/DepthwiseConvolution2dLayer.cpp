@@ -120,4 +120,17 @@ Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()
     return {m_Weight, m_Bias};
 }
 
+void DepthwiseConvolution2dLayer::Accept(ILayerVisitor& visitor) const
+{
+    ConstTensor dummy;
+    if (GetParameters().m_BiasEnabled)
+    {
+        visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), dummy, dummy, GetName());
+    }
+    else
+    {
+        visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), dummy, GetName());
+    }
+}
+
 } // namespace armnn

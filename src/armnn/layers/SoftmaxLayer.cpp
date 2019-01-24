@@ -43,4 +43,9 @@ void SoftmaxLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void SoftmaxLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitSoftmaxLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

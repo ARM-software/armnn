@@ -195,4 +195,9 @@ void MergerLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void MergerLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitMergerLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn armnn

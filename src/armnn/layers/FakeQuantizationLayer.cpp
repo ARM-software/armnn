@@ -44,4 +44,9 @@ void FakeQuantizationLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void FakeQuantizationLayer::Accept(ILayerVisitor& visitor) const
+{
+    throw armnn::Exception("FakeQuantizationLayer should not appear in an input graph");
+}
+
 } // namespace armnn

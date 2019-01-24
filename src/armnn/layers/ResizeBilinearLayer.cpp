@@ -66,4 +66,9 @@ void ResizeBilinearLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void ResizeBilinearLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitResizeBilinearLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

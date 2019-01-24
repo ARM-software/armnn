@@ -100,4 +100,9 @@ void MeanLayer::ValidateTensorShapesFromInputs()
         inferredShape);
 }
 
+void MeanLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitMeanLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

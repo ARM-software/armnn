@@ -34,6 +34,8 @@ public:
     /// will lead to a valid configuration of @ref StridedSliceLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a StridedSliceLayer.
     /// @param [in] param StridedSliceDescriptor to configure the strided slice layer.

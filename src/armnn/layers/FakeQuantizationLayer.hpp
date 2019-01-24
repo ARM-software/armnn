@@ -28,6 +28,8 @@ public:
     /// will lead to a valid configuration of @ref FakeQuantizationLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a FakeQuantizationLayer.
     /// @param [in] param FakeQuantizationDescriptor to configure the fake quantization operation.

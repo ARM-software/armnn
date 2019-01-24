@@ -31,4 +31,9 @@ MultiplicationLayer* MultiplicationLayer::Clone(Graph& graph) const
     return CloneBase<MultiplicationLayer>(graph, GetName());
 }
 
+void MultiplicationLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitMultiplicationLayer(this, GetName());
+}
+
 } // namespace armnn

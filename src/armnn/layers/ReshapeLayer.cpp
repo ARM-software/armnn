@@ -49,4 +49,9 @@ void ReshapeLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void ReshapeLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitReshapeLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

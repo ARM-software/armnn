@@ -43,6 +43,8 @@ public:
                m_Param.m_TargetShape == boost::polymorphic_downcast<const ReshapeLayer*>(&other)->m_Param.m_TargetShape;
     }
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a ReshapeLayer.
     /// @param [in] param ReshapeDescriptor to configure the reshape operation.

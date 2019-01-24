@@ -24,6 +24,8 @@ public:
     /// @param [in] graph The graph into which this layer is being cloned.
     EqualLayer* Clone(Graph& graph) const override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a EqualLayer.
     /// @param [in] name Optional name for the layer.

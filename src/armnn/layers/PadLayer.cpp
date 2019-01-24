@@ -42,4 +42,9 @@ void PadLayer::ValidateTensorShapesFromInputs()
     return;
 }
 
+void PadLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitPadLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

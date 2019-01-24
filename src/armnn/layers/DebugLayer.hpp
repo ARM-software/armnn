@@ -28,6 +28,8 @@ public:
     /// will lead to a valid configuration of @ref DebugLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a DebugLayer.
     /// @param [in] param DebugDescriptor to configure the debug layer.

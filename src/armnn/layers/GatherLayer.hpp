@@ -29,6 +29,8 @@ public:
     /// will lead to a valid configuration of @ref GatherLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a GatherLayer.
     /// @param [in] name Optional name for the layer.

@@ -31,4 +31,9 @@ DivisionLayer* DivisionLayer::Clone(Graph& graph) const
     return CloneBase<DivisionLayer>(graph, GetName());
 }
 
+void DivisionLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitDivisionLayer(this, GetName());
+}
+
 } // namespace armnn

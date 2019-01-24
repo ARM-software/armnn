@@ -82,4 +82,9 @@ void SpaceToBatchNdLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void SpaceToBatchNdLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitSpaceToBatchNdLayer(this, GetParameters(), GetName());
+}
+
 } // namespace

@@ -28,6 +28,8 @@ public:
     /// will lead to a valid configuration of @ref SoftmaxLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a SoftmaxLayer.
     /// @param [in] param SoftmaxDescriptor to configure the softmax operation.

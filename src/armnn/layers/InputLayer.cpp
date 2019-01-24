@@ -34,4 +34,9 @@ void InputLayer::ValidateTensorShapesFromInputs()
                                                "InputLayer should already have the TensorInfo set.");
 }
 
+void InputLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitInputLayer(this, this->GetBindingId(), GetName());
+}
+
 } // namespace

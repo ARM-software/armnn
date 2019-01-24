@@ -44,4 +44,9 @@ void FloorLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void FloorLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitFloorLayer(this, GetName());
+}
+
 } // namespace armnn

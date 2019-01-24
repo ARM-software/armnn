@@ -39,6 +39,8 @@ public:
     /// Free up the constant source data stored by the layer.
     void ReleaseConstantData() override {};
 
+    void Accept(ILayerVisitor& visitor) const override;
+
     std::unique_ptr<ScopedCpuTensorHandle> m_LayerOutput;
 protected:
     /// Constructor to create a ConstantLayer.

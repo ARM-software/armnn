@@ -42,4 +42,9 @@ void ActivationLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void ActivationLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitActivationLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

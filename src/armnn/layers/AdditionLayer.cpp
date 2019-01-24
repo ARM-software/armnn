@@ -31,4 +31,9 @@ AdditionLayer* AdditionLayer::Clone(Graph& graph) const
     return CloneBase<AdditionLayer>(graph, GetName());
 }
 
+void AdditionLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitAdditionLayer(this, GetName());
+}
+
 } // namespace armnn

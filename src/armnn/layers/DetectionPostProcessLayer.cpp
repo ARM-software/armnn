@@ -36,4 +36,9 @@ void DetectionPostProcessLayer::ValidateTensorShapesFromInputs()
     VerifyLayerConnections(2, CHECK_LOCATION());
 }
 
+void DetectionPostProcessLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitDetectionPostProcessLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

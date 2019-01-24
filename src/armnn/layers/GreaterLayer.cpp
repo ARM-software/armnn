@@ -31,4 +31,9 @@ GreaterLayer* GreaterLayer::Clone(Graph& graph) const
     return CloneBase<GreaterLayer>(graph, GetName());
 }
 
+void GreaterLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitGreaterLayer(this, GetName());
+}
+
 } // namespace armnn

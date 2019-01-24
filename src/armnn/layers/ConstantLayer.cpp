@@ -51,4 +51,10 @@ void ConstantLayer::ValidateTensorShapesFromInputs()
         outShape);
 }
 
+void ConstantLayer::Accept(ILayerVisitor& visitor) const
+{
+    ConstTensor dummy;
+    visitor.VisitConstantLayer(this, dummy, GetName());
+}
+
 } // namespace armnn

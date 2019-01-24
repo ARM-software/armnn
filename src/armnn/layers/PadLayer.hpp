@@ -29,6 +29,8 @@ public:
     /// will lead to a valid configuration of @ref PadLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a PadLayer.
     /// @param [in] param PadDescriptor to configure the pad operation.

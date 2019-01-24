@@ -110,4 +110,17 @@ Layer::ConstantTensors Convolution2dLayer::GetConstantTensorsByRef()
     return {m_Weight, m_Bias};
 }
 
+void Convolution2dLayer::Accept(ILayerVisitor& visitor) const
+{
+    ConstTensor dummy;
+    if (GetParameters().m_BiasEnabled)
+    {
+        visitor.VisitConvolution2dLayer(this, GetParameters(), dummy, dummy, GetName());
+    }
+    else
+    {
+        visitor.VisitConvolution2dLayer(this, GetParameters(), dummy, GetName());
+    }
+}
+
 } // namespace armnn

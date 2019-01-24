@@ -46,4 +46,10 @@ void DebugLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void DebugLayer::Accept(ILayerVisitor& visitor) const
+{
+    // by design debug layers are never in input graphs
+    throw armnn::Exception("DebugLayer should never appear in an input graph");
+}
+
 } // namespace armnn

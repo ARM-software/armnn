@@ -31,4 +31,9 @@ MinimumLayer* MinimumLayer::Clone(Graph& graph) const
     return CloneBase<MinimumLayer>(graph, GetName());
 }
 
+void MinimumLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitMinimumLayer(this, GetName());
+}
+
 } // namespace armnn

@@ -25,6 +25,8 @@ public:
     /// @param [in] graph The graph into which this layer is being cloned.
     MultiplicationLayer* Clone(Graph& graph) const override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a MultiplicationLayer.
     /// @param [in] name Optional name for the layer

@@ -28,6 +28,8 @@ public:
     /// will lead to a valid configuration of @ref MemCopyLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a MemCopyLayer.
     /// @param [in] name Optional name for the layer.

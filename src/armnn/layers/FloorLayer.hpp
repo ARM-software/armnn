@@ -28,6 +28,8 @@ public:
     /// will lead to a valid configuration of @ref FloorLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a FloorLayer.
     /// @param [in] name Optional name for the layer.

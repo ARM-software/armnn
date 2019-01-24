@@ -30,4 +30,9 @@ MaximumLayer* MaximumLayer::Clone(Graph& graph) const
     return CloneBase<MaximumLayer>(graph, GetName());
 }
 
+void MaximumLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitMaximumLayer(this, GetName());
+}
+
 } // namespace armnn

@@ -118,4 +118,10 @@ std::vector<TensorShape> BatchToSpaceNdLayer::InferOutputShapes(const std::vecto
         return std::vector<TensorShape>({ TensorShape({ outputBatchSize, channelSize, outputHeight, outputWidth }) });
     }
 }
+
+void BatchToSpaceNdLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitBatchToSpaceNdLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

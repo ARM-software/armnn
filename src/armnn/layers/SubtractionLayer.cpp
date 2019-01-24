@@ -31,4 +31,9 @@ SubtractionLayer* SubtractionLayer::Clone(Graph& graph) const
     return CloneBase<SubtractionLayer>(graph, GetName());
 }
 
+void SubtractionLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitSubtractionLayer(this, GetName());
+}
+
 } // namespace armnn

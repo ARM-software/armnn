@@ -114,4 +114,9 @@ void Pooling2dLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void Pooling2dLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitPooling2dLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

@@ -98,4 +98,9 @@ void SplitterLayer::ValidateTensorShapesFromInputs()
     }
 }
 
+void SplitterLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitSplitterLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

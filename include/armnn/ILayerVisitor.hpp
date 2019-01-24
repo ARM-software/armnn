@@ -13,6 +13,10 @@ namespace armnn
 {
 class ILayerVisitor
 {
+protected:
+    ILayerVisitor() {}
+    virtual ~ILayerVisitor() {}
+
 public:
     /// Function that an InputLayer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
@@ -57,6 +61,15 @@ public:
                                                   const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
                                                   const char* name = nullptr) = 0;
+
+    /// Function that a Detection PostProcess layer should call back to when its
+    /// Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param descriptor - Description of the Detection PostProcess layer.
+    /// @param name - Optional name for the layer.
+    virtual void VisitDetectionPostProcessLayer(const IConnectableLayer* layer,
+                                                const DetectionPostProcessDescriptor& descriptor,
+                                                const char* name = nullptr) = 0;
 
     /// Function that a 2D depthwise convolution layer with biases should call back to when its
     /// Accept(ILayerVisitor&) function is invoked.

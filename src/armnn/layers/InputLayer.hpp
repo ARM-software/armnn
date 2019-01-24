@@ -28,6 +28,8 @@ public:
     /// will lead to a valid configuration of @ref InputLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create an InputLayer.
     /// @param id The layer binding id number.

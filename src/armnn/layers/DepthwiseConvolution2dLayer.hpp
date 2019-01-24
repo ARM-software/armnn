@@ -41,6 +41,8 @@ public:
     /// @return A vector to the inferred output shape.
     std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a DepthwiseConvolution2dLayer.
     /// @param [in] param DepthwiseConvolution2dDescriptor to configure the depthwise convolution2d.

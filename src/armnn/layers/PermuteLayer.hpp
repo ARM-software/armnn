@@ -58,6 +58,8 @@ public:
                GetPermutation().IsEqual(boost::polymorphic_downcast<const PermuteLayer*>(&other)->GetPermutation());
     }
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a PermuteLayer.
     /// @param [in] param PermuteDescriptor to configure the permute operation.

@@ -53,4 +53,9 @@ void PreCompiledLayer::SetPreCompiledObject(const std::shared_ptr<void>& preComp
     m_PreCompiledObject = preCompiledObject;
 }
 
+void PreCompiledLayer::Accept(ILayerVisitor& visitor) const
+{
+    throw armnn::Exception("PreCompiledLayer should not appear in an input graph");
+}
+
 } // namespace armnn

@@ -249,4 +249,10 @@ Layer::ConstantTensors LstmLayer::GetConstantTensorsByRef()
             m_PeepholeParameters.m_CellToOutputWeights};
 }
 
+void LstmLayer::Accept(ILayerVisitor& visitor) const
+{
+    LstmInputParams dummy;
+    visitor.VisitLstmLayer(this, GetParameters(), dummy, GetName());
+}
+
 } // namespace armnn

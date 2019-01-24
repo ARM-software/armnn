@@ -8,6 +8,7 @@
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Optional.hpp>
+#include <armnn/ILayerVisitor.hpp>
 
 #include <armnn/Types.hpp>
 
@@ -70,6 +71,8 @@ public:
     virtual std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const = 0;
 
     virtual LayerGuid GetGuid() const = 0;
+
+    virtual void Accept(ILayerVisitor& visitor) const = 0;
 protected:
       /// Objects are not deletable via the handle
     ~IConnectableLayer() {}

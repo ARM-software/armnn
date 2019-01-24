@@ -23,6 +23,8 @@ public:
     /// Creates a dynamically-allocated copy of this layer.
     /// @param [in] graph The graph into which this layer is being cloned.
     AdditionLayer* Clone(Graph& graph) const override;
+    
+    void Accept(ILayerVisitor& visitor) const override;
 
 protected:
     /// Constructor to create an AdditionLayer.

@@ -52,4 +52,9 @@ void PermuteLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void PermuteLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitPermuteLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

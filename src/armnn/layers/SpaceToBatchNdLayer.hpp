@@ -35,6 +35,8 @@ public:
     /// will lead to a valid configuration of @ref SpaceToBatchNdLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a SpaceToBatchNdLayer.
     /// @param [in] param SpaceToBatchNdDescriptor to configure the SpaceToBatchNdLayer operation.

@@ -29,6 +29,8 @@ public:
     /// will lead to a valid configuration of @ref DetectionPostProcessLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a DetectionPostProcessLayer.
     /// @param [in] param DetectionPostProcessDescriptor to configure the detection postprocess.

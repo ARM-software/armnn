@@ -60,4 +60,9 @@ void GatherLayer::ValidateTensorShapesFromInputs()
         inferredShape);
 }
 
+void GatherLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitGatherLayer(this, GetName());
+}
+
 } // namespace armnn

@@ -45,4 +45,9 @@ void RsqrtLayer::ValidateTensorShapesFromInputs()
             inferredShapes[0]);
 }
 
+void RsqrtLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitRsqrtLayer(this, GetName());
+}
+
 } // namespace armnn

@@ -29,6 +29,8 @@ public:
     /// will lead to a valid configuration of @ref ConvertFp16ToFp32Layer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a ConvertFp16ToFp32Layer.
     /// @param [in] name Optional name for the layer.

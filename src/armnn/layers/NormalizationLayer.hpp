@@ -28,6 +28,8 @@ public:
     /// will lead to a valid configuration of @ref NormalizationLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a NormalizationLayer.
     /// @param [in] param NormalizationDescriptor to configure the normalization operation.

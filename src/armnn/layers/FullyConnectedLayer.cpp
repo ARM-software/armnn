@@ -86,4 +86,17 @@ Layer::ConstantTensors FullyConnectedLayer::GetConstantTensorsByRef()
     return {m_Weight, m_Bias};
 }
 
+void FullyConnectedLayer::Accept(ILayerVisitor& visitor) const
+{
+    ConstTensor dummy;
+    if (GetParameters().m_BiasEnabled)
+    {
+        visitor.VisitFullyConnectedLayer(this, GetParameters(), dummy, dummy, GetName());
+    }
+    else
+    {
+        visitor.VisitFullyConnectedLayer(this, GetParameters(), dummy, GetName());
+    }
+}
+
 } // namespace armnn

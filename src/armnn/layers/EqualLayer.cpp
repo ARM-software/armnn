@@ -31,4 +31,9 @@ EqualLayer* EqualLayer::Clone(Graph& graph) const
     return CloneBase<EqualLayer>(graph, GetName());
 }
 
+void EqualLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitEqualLayer(this, GetName());
+}
+
 } // namespace armnn

@@ -26,6 +26,9 @@ public:
     /// Check if the input tensor shape(s) will lead to a valid configuration of @ref ActivationLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
+
 protected:
     /// Constructor to create an ActivationLayer.
     /// @param [in] param ActivationDescriptor to configure the activation operation.

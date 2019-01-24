@@ -39,6 +39,8 @@ public:
     /// will lead to a valid configuration of @ref BatchNormalizationLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a BatchNormalizationLayer.
     /// @param [in] param BatchNormalizationDescriptor to configure the batch normalization operation.

@@ -88,4 +88,9 @@ void StridedSliceLayer::ValidateTensorShapesFromInputs()
                     inferredShapes[0]);
 }
 
+void StridedSliceLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitStridedSliceLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

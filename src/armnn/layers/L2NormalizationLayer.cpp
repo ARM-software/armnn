@@ -44,4 +44,9 @@ void L2NormalizationLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void L2NormalizationLayer::Accept(ILayerVisitor& visitor) const
+{
+    visitor.VisitL2NormalizationLayer(this, GetParameters(), GetName());
+}
+
 } // namespace armnn

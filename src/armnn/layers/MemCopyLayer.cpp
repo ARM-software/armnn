@@ -46,4 +46,9 @@ void MemCopyLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0]);
 }
 
+void MemCopyLayer::Accept(ILayerVisitor& visitor) const
+{
+    throw armnn::Exception("MemCopyLayer should not appear in an input graph");
+}
+
 } // namespace armnn

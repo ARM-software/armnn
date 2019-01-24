@@ -34,6 +34,8 @@ public:
     /// @return A vector to the inferred output shape.
     std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a BatchToSpaceNdLayer.
     /// @param [in] param BatchToSpaceNdDescriptor to configure the BatchToSpaceNd operation.

@@ -29,6 +29,8 @@ public:
     /// will lead to a valid configuration of @ref MeanLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create a MeanLayer.
     /// @param [in] param MeanDescriptor to configure the mean operation.

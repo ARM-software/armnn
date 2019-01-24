@@ -37,6 +37,8 @@ public:
     /// will lead to a valid configuration of @ref OutputLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 protected:
     /// Constructor to create an OutputLayer.
     /// @param id The layer binding id number.

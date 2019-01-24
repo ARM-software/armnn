@@ -24,7 +24,7 @@ public:
     YoloTestCase(Model& model,
         unsigned int testCaseId,
         YoloTestCaseData& testCaseData)
-     : InferenceModelTestCase<Model>(model, testCaseId, std::move(testCaseData.m_InputImage), YoloOutputSize)
+     : InferenceModelTestCase<Model>(model, testCaseId, { std::move(testCaseData.m_InputImage) }, { YoloOutputSize })
      , m_FloatComparer(boost::math::fpc::percent_tolerance(1.0f))
      , m_TopObjectDetections(std::move(testCaseData.m_TopObjectDetections))
     {
@@ -34,7 +34,7 @@ public:
     {
         using Boost3dArray = boost::multi_array<float, 3>;
 
-        const std::vector<float>& output = this->GetOutput();
+        const std::vector<float>& output = this->GetOutputs()[0];
         BOOST_ASSERT(output.size() == YoloOutputSize);
 
         constexpr Boost3dArray::index gridSize = 7;
@@ -178,7 +178,7 @@ class YoloTestCaseProvider : public IInferenceTestCaseProvider
 {
 public:
     template <typename TConstructModelCallable>
-    YoloTestCaseProvider(TConstructModelCallable constructModel)
+    explicit YoloTestCaseProvider(TConstructModelCallable constructModel)
         : m_ConstructModel(constructModel)
     {
     }

@@ -27,6 +27,7 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <vector>
 #include <type_traits>
 
 namespace
@@ -73,20 +74,19 @@ using QuantizationParams = std::pair<float,int32_t>;
 
 struct Params
 {
-    std::string m_ModelPath;
-    std::string m_InputBinding;
-    std::string m_OutputBinding;
-    const armnn::TensorShape* m_InputTensorShape;
-    std::vector<armnn::BackendId> m_ComputeDevice;
-    bool m_EnableProfiling;
-    size_t m_SubgraphId;
-    bool m_IsModelBinary;
-    bool m_VisualizePostOptimizationModel;
-    bool m_EnableFp16TurboMode;
+    std::string                     m_ModelPath;
+    std::vector<std::string>        m_InputBindings;
+    std::vector<armnn::TensorShape> m_InputShapes;
+    std::vector<std::string>        m_OutputBindings;
+    std::vector<armnn::BackendId>   m_ComputeDevice;
+    bool                            m_EnableProfiling;
+    size_t                          m_SubgraphId;
+    bool                            m_IsModelBinary;
+    bool                            m_VisualizePostOptimizationModel;
+    bool                            m_EnableFp16TurboMode;
 
     Params()
-        : m_InputTensorShape(nullptr)
-        , m_ComputeDevice{armnn::Compute::CpuRef}
+        : m_ComputeDevice{armnn::Compute::CpuRef}
         , m_EnableProfiling(false)
         , m_SubgraphId(0)
         , m_IsModelBinary(true)
@@ -105,33 +105,54 @@ public:
     using BindingPointInfo = InferenceModelInternal::BindingPointInfo;
 
     static armnn::INetworkPtr Create(const Params& params,
-                                     BindingPointInfo& inputBindings,
-                                     BindingPointInfo& outputBindings)
+                                     std::vector<BindingPointInfo>& inputBindings,
+                                     std::vector<BindingPointInfo>& outputBindings)
     {
-      const std::string& modelPath = params.m_ModelPath;
+        const std::string& modelPath = params.m_ModelPath;
 
-      // Create a network from a file on disk
-      auto parser(IParser::Create());
+        // Create a network from a file on disk
+        auto parser(IParser::Create());
 
-      std::map<std::string, armnn::TensorShape> inputShapes;
-      if (params.m_InputTensorShape)
-      {
-          inputShapes[params.m_InputBinding] = *params.m_InputTensorShape;
-      }
-      std::vector<std::string> requestedOutputs{ params.m_OutputBinding };
-      armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};
+        std::map<std::string, armnn::TensorShape> inputShapes;
+        if (!params.m_InputShapes.empty())
+        {
+            const size_t numInputShapes   = params.m_InputShapes.size();
+            const size_t numInputBindings = params.m_InputBindings.size();
+            if (numInputShapes < numInputBindings)
+            {
+                throw armnn::Exception(boost::str(boost::format(
+                    "Not every input has its tensor shape specified: expected=%1%, got=%2%")
+                    % numInputBindings % numInputShapes));
+            }
 
-      {
-          ARMNN_SCOPED_HEAP_PROFILING("Parsing");
-          // Handle text and binary input differently by calling the corresponding parser function
-          network = (params.m_IsModelBinary ?
-              parser->CreateNetworkFromBinaryFile(modelPath.c_str(), inputShapes, requestedOutputs) :
-              parser->CreateNetworkFromTextFile(modelPath.c_str(), inputShapes, requestedOutputs));
-      }
+            for (size_t i = 0; i < numInputShapes; i++)
+            {
+                inputShapes[params.m_InputBindings[i]] = params.m_InputShapes[i];
+            }
+        }
 
-      inputBindings  = parser->GetNetworkInputBindingInfo(params.m_InputBinding);
-      outputBindings = parser->GetNetworkOutputBindingInfo(params.m_OutputBinding);
-      return network;
+        std::vector<std::string> requestedOutputs = params.m_OutputBindings;
+        armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};
+
+        {
+            ARMNN_SCOPED_HEAP_PROFILING("Parsing");
+            // Handle text and binary input differently by calling the corresponding parser function
+            network = (params.m_IsModelBinary ?
+                parser->CreateNetworkFromBinaryFile(modelPath.c_str(), inputShapes, requestedOutputs) :
+                parser->CreateNetworkFromTextFile(modelPath.c_str(), inputShapes, requestedOutputs));
+        }
+
+        for (const std::string& inputLayerName : params.m_InputBindings)
+        {
+            inputBindings.push_back(parser->GetNetworkInputBindingInfo(inputLayerName));
+        }
+
+        for (const std::string& outputLayerName : params.m_OutputBindings)
+        {
+            outputBindings.push_back(parser->GetNetworkOutputBindingInfo(outputLayerName));
+        }
+
+        return network;
     }
 };
 
@@ -145,24 +166,36 @@ public:
     using BindingPointInfo = InferenceModelInternal::BindingPointInfo;
 
     static armnn::INetworkPtr Create(const Params& params,
-                                     BindingPointInfo& inputBindings,
-                                     BindingPointInfo& outputBindings)
+                                     std::vector<BindingPointInfo>& inputBindings,
+                                     std::vector<BindingPointInfo>& outputBindings)
     {
-      const std::string& modelPath = params.m_ModelPath;
+        const std::string& modelPath = params.m_ModelPath;
 
-      // Create a network from a file on disk
-      auto parser(IParser::Create());
+        // Create a network from a file on disk
+        auto parser(IParser::Create());
 
-      armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};
+        armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};
 
-      {
-          ARMNN_SCOPED_HEAP_PROFILING("Parsing");
-          network = parser->CreateNetworkFromBinaryFile(modelPath.c_str());
-      }
+        {
+            ARMNN_SCOPED_HEAP_PROFILING("Parsing");
+            network = parser->CreateNetworkFromBinaryFile(modelPath.c_str());
+        }
 
-      inputBindings  = parser->GetNetworkInputBindingInfo(params.m_SubgraphId, params.m_InputBinding);
-      outputBindings = parser->GetNetworkOutputBindingInfo(params.m_SubgraphId, params.m_OutputBinding);
-      return network;
+        for (const std::string& inputLayerName : params.m_InputBindings)
+        {
+            BindingPointInfo inputBinding =
+                parser->GetNetworkInputBindingInfo(params.m_SubgraphId, inputLayerName);
+            inputBindings.push_back(inputBinding);
+        }
+
+        for (const std::string& outputLayerName : params.m_OutputBindings)
+        {
+            BindingPointInfo outputBinding =
+                parser->GetNetworkOutputBindingInfo(params.m_SubgraphId, outputLayerName);
+            outputBindings.push_back(outputBinding);
+        }
+
+        return network;
     }
 };
 #endif
@@ -177,67 +210,111 @@ public:
     using BindingPointInfo = InferenceModelInternal::BindingPointInfo;
 
     static armnn::INetworkPtr Create(const Params& params,
-                                     BindingPointInfo& inputBindings,
-                                     BindingPointInfo& outputBindings)
+                                     std::vector<BindingPointInfo>& inputBindings,
+                                     std::vector<BindingPointInfo>& outputBindings)
     {
-      const std::string& modelPath = params.m_ModelPath;
+        const std::string& modelPath = params.m_ModelPath;
 
-      // Create a network from a file on disk
-      auto parser(IParser::Create());
+        // Create a network from a file on disk
+        auto parser(IParser::Create());
 
-      armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};
+        armnn::INetworkPtr network{nullptr, [](armnn::INetwork *){}};
 
-      {
-          ARMNN_SCOPED_HEAP_PROFILING("Parsing");
-          network = (params.m_IsModelBinary ?
-              parser->CreateNetworkFromBinaryFile(modelPath.c_str()) :
-              parser->CreateNetworkFromTextFile(modelPath.c_str()));
-      }
+        {
+            ARMNN_SCOPED_HEAP_PROFILING("Parsing");
+            network = (params.m_IsModelBinary ?
+                parser->CreateNetworkFromBinaryFile(modelPath.c_str()) :
+                parser->CreateNetworkFromTextFile(modelPath.c_str()));
+        }
 
-      inputBindings  = parser->GetNetworkInputBindingInfo(params.m_InputBinding);
-      outputBindings = parser->GetNetworkOutputBindingInfo(params.m_OutputBinding);
-      return network;
+        for (const std::string& inputLayerName : params.m_InputBindings)
+        {
+            BindingPointInfo inputBinding = parser->GetNetworkInputBindingInfo(inputLayerName);
+            inputBindings.push_back(inputBinding);
+        }
+
+        for (const std::string& outputLayerName : params.m_OutputBindings)
+        {
+            BindingPointInfo outputBinding = parser->GetNetworkOutputBindingInfo(outputLayerName);
+            outputBindings.push_back(outputBinding);
+        }
+
+        return network;
     }
 };
 #endif
 
 template<typename TContainer>
-inline armnn::InputTensors MakeInputTensors(const InferenceModelInternal::BindingPointInfo& input,
-    const TContainer& inputTensorData)
+inline armnn::InputTensors MakeInputTensors(
+    const std::vector<InferenceModelInternal::BindingPointInfo>& inputBindings,
+    const std::vector<TContainer>& inputDataContainers)
 {
-    if (inputTensorData.size() != input.second.GetNumElements())
+    armnn::InputTensors inputTensors;
+
+    const size_t numInputs = inputBindings.size();
+    if (numInputs != inputDataContainers.size())
     {
-        try
-        {
-            throw armnn::Exception(boost::str(boost::format("Input tensor has incorrect size. Expected %1% elements "
-                "but got %2%.") % input.second.GetNumElements() % inputTensorData.size()));
-        } catch (const boost::exception& e)
-        {
-            // Coverity fix: it should not be possible to get here but boost::str and boost::format can both
-            // throw uncaught exceptions, convert them to armnn exceptions and rethrow.
-            throw armnn::Exception(diagnostic_information(e));
-        }
+        throw armnn::Exception(boost::str(boost::format("Number of inputs does not match number of "
+            "tensor data containers: %1% != %2%") % numInputs % inputDataContainers.size()));
     }
-    return { { input.first, armnn::ConstTensor(input.second, inputTensorData.data()) } };
+
+    for (size_t i = 0; i < numInputs; i++)
+    {
+        const InferenceModelInternal::BindingPointInfo& inputBinding = inputBindings[i];
+        const TContainer& inputData = inputDataContainers[i];
+
+        if (inputData.size() != inputBinding.second.GetNumElements())
+        {
+            throw armnn::Exception("Input tensor has incorrect size");
+        }
+
+        armnn::ConstTensor inputTensor(inputBinding.second, inputData.data());
+        inputTensors.push_back(std::make_pair(inputBinding.first, inputTensor));
+    }
+
+    return inputTensors;
 }
 
 template<typename TContainer>
-inline armnn::OutputTensors MakeOutputTensors(const InferenceModelInternal::BindingPointInfo& output,
-    TContainer& outputTensorData)
+inline armnn::OutputTensors MakeOutputTensors(
+    const std::vector<InferenceModelInternal::BindingPointInfo>& outputBindings,
+    std::vector<TContainer>& outputDataContainers)
 {
-    if (outputTensorData.size() != output.second.GetNumElements())
+    armnn::OutputTensors outputTensors;
+
+    const size_t numOutputs = outputBindings.size();
+    if (numOutputs != outputDataContainers.size())
     {
-        throw armnn::Exception("Output tensor has incorrect size");
+        throw armnn::Exception(boost::str(boost::format("Number of outputs does not match number of "
+            "tensor data containers: %1% != %2%") % numOutputs % outputDataContainers.size()));
     }
-    return { { output.first, armnn::Tensor(output.second, outputTensorData.data()) } };
+
+    for (size_t i = 0; i < numOutputs; i++)
+    {
+        const InferenceModelInternal::BindingPointInfo& outputBinding = outputBindings[i];
+        TContainer& outputData = outputDataContainers[i];
+
+        if (outputData.size() != outputBinding.second.GetNumElements())
+        {
+            throw armnn::Exception("Output tensor has incorrect size");
+        }
+
+        armnn::Tensor outputTensor(outputBinding.second, outputData.data());
+        outputTensors.push_back(std::make_pair(outputBinding.first, outputTensor));
+    }
+
+    return outputTensors;
 }
 
 template <typename IParser, typename TDataType>
 class InferenceModel
 {
 public:
-    using DataType = TDataType;
-    using Params = InferenceModelInternal::Params;
+    using DataType           = TDataType;
+    using Params             = InferenceModelInternal::Params;
+    using BindingPointInfo   = InferenceModelInternal::BindingPointInfo;
+    using QuantizationParams = InferenceModelInternal::QuantizationParams;
+    using TContainer         = std::vector<TDataType>;
 
     struct CommandLineOptions
     {
@@ -290,8 +367,8 @@ public:
             throw armnn::Exception("Some backend IDs are invalid: " + invalidBackends);
         }
 
-        armnn::INetworkPtr network = CreateNetworkImpl<IParser>::Create(params, m_InputBindingInfo,
-           m_OutputBindingInfo);
+        armnn::INetworkPtr network =
+            CreateNetworkImpl<IParser>::Create(params, m_InputBindings, m_OutputBindings);
 
         armnn::IOptimizedNetworkPtr optNet{nullptr, [](armnn::IOptimizedNetwork *){}};
         {
@@ -327,14 +404,41 @@ public:
         }
     }
 
-    unsigned int GetOutputSize() const
+    void CheckInputIndexIsValid(unsigned int inputIndex) const
     {
-        return m_OutputBindingInfo.second.GetNumElements();
+        if (m_InputBindings.size() < inputIndex + 1)
+        {
+            throw armnn::Exception(boost::str(boost::format("Input index out of range: %1%") % inputIndex));
+        }
     }
 
-    void Run(const std::vector<TDataType>& input, std::vector<TDataType>& output)
+    void CheckOutputIndexIsValid(unsigned int outputIndex) const
     {
-        BOOST_ASSERT(output.size() == GetOutputSize());
+        if (m_OutputBindings.size() < outputIndex + 1)
+        {
+            throw armnn::Exception(boost::str(boost::format("Output index out of range: %1%") % outputIndex));
+        }
+    }
+
+    unsigned int GetOutputSize(unsigned int outputIndex = 0u) const
+    {
+        CheckOutputIndexIsValid(outputIndex);
+        return m_OutputBindings[outputIndex].second.GetNumElements();
+    }
+
+    void Run(const std::vector<TContainer>& inputContainers, std::vector<TContainer>& outputContainers)
+    {
+        for (unsigned int i = 0; i < outputContainers.size(); i++)
+        {
+            const unsigned int expectedOutputDataSize = GetOutputSize(i);
+            const unsigned int actualOutputDataSize   = boost::numeric_cast<unsigned int>(outputContainers[i].size());
+            if (actualOutputDataSize < expectedOutputDataSize)
+            {
+                unsigned int outputIndex = boost::numeric_cast<unsigned int>(i);
+                throw armnn::Exception(boost::str(boost::format("Not enough data for output #%1%: expected "
+                    "%2% elements, got %3%") % outputIndex % expectedOutputDataSize % actualOutputDataSize));
+            }
+        }
 
         std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkIdentifier);
         if (profiler)
@@ -343,8 +447,8 @@ public:
         }
 
         armnn::Status ret = m_Runtime->EnqueueWorkload(m_NetworkIdentifier,
-                                                       MakeInputTensors(input),
-                                                       MakeOutputTensors(output));
+                                                       MakeInputTensors(inputContainers),
+                                                       MakeOutputTensors(outputContainers));
 
         // if profiling is enabled print out the results
         if (profiler && profiler->IsProfilingEnabled())
@@ -358,39 +462,62 @@ public:
         }
     }
 
-    const InferenceModelInternal::BindingPointInfo & GetInputBindingInfo() const
+    const BindingPointInfo& GetInputBindingInfo(unsigned int inputIndex = 0u) const
     {
-        return m_InputBindingInfo;
+        CheckInputIndexIsValid(inputIndex);
+        return m_InputBindings[inputIndex];
     }
 
-    const InferenceModelInternal::BindingPointInfo & GetOutputBindingInfo() const
+    const std::vector<BindingPointInfo>& GetInputBindingInfos() const
     {
-        return m_OutputBindingInfo;
+        return m_InputBindings;
     }
 
-    InferenceModelInternal::QuantizationParams GetQuantizationParams() const
+    const BindingPointInfo& GetOutputBindingInfo(unsigned int outputIndex = 0u) const
     {
-        return std::make_pair(m_OutputBindingInfo.second.GetQuantizationScale(),
-                              m_OutputBindingInfo.second.GetQuantizationOffset());
+        CheckOutputIndexIsValid(outputIndex);
+        return m_OutputBindings[outputIndex];
+    }
+
+    const std::vector<BindingPointInfo>& GetOutputBindingInfos() const
+    {
+        return m_OutputBindings;
+    }
+
+    QuantizationParams GetQuantizationParams(unsigned int outputIndex = 0u) const
+    {
+        CheckOutputIndexIsValid(outputIndex);
+        return std::make_pair(m_OutputBindings[outputIndex].second.GetQuantizationScale(),
+                              m_OutputBindings[outputIndex].second.GetQuantizationOffset());
+    }
+
+    std::vector<QuantizationParams> GetAllQuantizationParams() const
+    {
+        std::vector<QuantizationParams> quantizationParams;
+        for (unsigned int i = 0u; i < m_OutputBindings.size(); i++)
+        {
+            quantizationParams.push_back(GetQuantizationParams(i));
+        }
+        return quantizationParams;
     }
 
 private:
     armnn::NetworkId m_NetworkIdentifier;
     std::shared_ptr<armnn::IRuntime> m_Runtime;
 
-    InferenceModelInternal::BindingPointInfo m_InputBindingInfo;
-    InferenceModelInternal::BindingPointInfo m_OutputBindingInfo;
+    std::vector<InferenceModelInternal::BindingPointInfo> m_InputBindings;
+    std::vector<InferenceModelInternal::BindingPointInfo> m_OutputBindings;
     bool m_EnableProfiling;
 
     template<typename TContainer>
-    armnn::InputTensors MakeInputTensors(const TContainer& inputTensorData)
+    armnn::InputTensors MakeInputTensors(const std::vector<TContainer>& inputDataContainers)
     {
-        return ::MakeInputTensors(m_InputBindingInfo, inputTensorData);
+        return ::MakeInputTensors(m_InputBindings, inputDataContainers);
     }
 
     template<typename TContainer>
-    armnn::OutputTensors MakeOutputTensors(TContainer& outputTensorData)
+    armnn::OutputTensors MakeOutputTensors(std::vector<TContainer>& outputDataContainers)
     {
-        return ::MakeOutputTensors(m_OutputBindingInfo, outputTensorData);
+        return ::MakeOutputTensors(m_OutputBindings, outputDataContainers);
     }
 };

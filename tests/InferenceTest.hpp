@@ -100,31 +100,40 @@ template <typename TModel>
 class InferenceModelTestCase : public IInferenceTestCase
 {
 public:
+    using TContainer = std::vector<typename TModel::DataType>;
+
     InferenceModelTestCase(TModel& model,
-        unsigned int testCaseId,
-        std::vector<typename TModel::DataType> modelInput,
-        unsigned int outputSize)
+                           unsigned int testCaseId,
+                           const std::vector<TContainer>& inputs,
+                           const std::vector<unsigned int>& outputSizes)
         : m_Model(model)
         , m_TestCaseId(testCaseId)
-        , m_Input(std::move(modelInput))
+        , m_Inputs(std::move(inputs))
     {
-        m_Output.resize(outputSize);
+        // Initialize output vector
+        const size_t numOutputs = outputSizes.size();
+        m_Outputs.resize(numOutputs);
+
+        for (size_t i = 0; i < numOutputs; i++)
+        {
+            m_Outputs[i].resize(outputSizes[i]);
+        }
     }
 
     virtual void Run() override
     {
-        m_Model.Run(m_Input, m_Output);
+        m_Model.Run(m_Inputs, m_Outputs);
     }
 
 protected:
     unsigned int GetTestCaseId() const { return m_TestCaseId; }
-    const std::vector<typename TModel::DataType>& GetOutput() const { return m_Output; }
+    const std::vector<TContainer>& GetOutputs() const { return m_Outputs; }
 
 private:
-    TModel& m_Model;
-    unsigned int m_TestCaseId;
-    std::vector<typename TModel::DataType> m_Input;
-    std::vector<typename TModel::DataType> m_Output;
+    TModel&                 m_Model;
+    unsigned int            m_TestCaseId;
+    std::vector<TContainer> m_Inputs;
+    std::vector<TContainer> m_Outputs;
 };
 
 template <typename TDataType>

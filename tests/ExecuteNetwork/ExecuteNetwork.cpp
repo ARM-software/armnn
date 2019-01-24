@@ -137,13 +137,12 @@ std::vector<unsigned int> ParseArray(std::istream& stream)
         [](const std::string& s) { return boost::numeric_cast<unsigned int>(std::stoi(s)); });
 }
 
-void PrintArray(const std::vector<float>& v)
+void PrintOutputData(const std::string& outputLayerName, const std::vector<float>& data)
 {
-    for (size_t i = 0; i < v.size(); i++)
-    {
-        printf("%f ", v[i]);
-    }
-    printf("\n");
+    std::cout << outputLayerName << ": ";
+    std::copy(data.begin(), data.end(),
+              std::ostream_iterator<float>(std::cout, " "));
+    std::cout << std::endl;
 }
 
 void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
@@ -179,8 +178,10 @@ int MainImpl(const char* modelPath,
              const size_t subgraphId,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
+    using TContainer = std::vector<TDataType>;
+
     // Loads input tensor.
-    std::vector<TDataType> input;
+    TContainer inputDataContainer;
     {
         std::ifstream inputTensorFile(inputTensorDataFilePath);
         if (!inputTensorFile.good())
@@ -188,7 +189,7 @@ int MainImpl(const char* modelPath,
             BOOST_LOG_TRIVIAL(fatal) << "Failed to load input tensor data file from " << inputTensorDataFilePath;
             return EXIT_FAILURE;
         }
-        input = ParseArray<TDataType>(inputTensorFile);
+        inputDataContainer = ParseArray<TDataType>(inputTensorFile);
     }
 
     try
@@ -198,19 +199,23 @@ int MainImpl(const char* modelPath,
         params.m_ModelPath = modelPath;
         params.m_IsModelBinary = isModelBinary;
         params.m_ComputeDevice = computeDevice;
-        params.m_InputBinding = inputName;
-        params.m_InputTensorShape = inputTensorShape;
-        params.m_OutputBinding = outputName;
+        params.m_InputBindings = { inputName };
+        params.m_InputShapes = { *inputTensorShape };
+        params.m_OutputBindings = { outputName };
         params.m_EnableProfiling = enableProfiling;
         params.m_SubgraphId = subgraphId;
         InferenceModel<TParser, TDataType> model(params, runtime);
 
-        // Executes the model.
-        std::vector<TDataType> output(model.GetOutputSize());
-        model.Run(input, output);
+        // Executes the model
+        const size_t numOutputs = params.m_OutputBindings.size();
+        std::vector<TContainer> outputDataContainers(numOutputs);
+        model.Run({ inputDataContainer }, outputDataContainers);
 
-        // Prints the output tensor.
-        PrintArray(output);
+        // Print output tensors
+        for (size_t i = 0; i < numOutputs; i++)
+        {
+            PrintOutputData(params.m_OutputBindings[i], outputDataContainers[i]);
+        }
     }
     catch (armnn::Exception const& e)
     {

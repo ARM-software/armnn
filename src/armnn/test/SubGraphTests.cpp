@@ -34,7 +34,7 @@ bool AreAnySubGraphLayersPresentInGraph(const SubGraph::Layers &subGraphLayers, 
 //
 // this helper only works if all layers where the inputs connect to are not selected
 //
-SubGraph::InputSlots CreateInputsFrom(const std::vector<Layer *> & layers)
+SubGraph::InputSlots CreateInputsFrom(const std::vector<Layer*>& layers)
 {
     SubGraph::InputSlots result;
     for (auto&& layer : layers)
@@ -50,7 +50,7 @@ SubGraph::InputSlots CreateInputsFrom(const std::vector<Layer *> & layers)
 //
 // this helper only works if all layers where the outputs connect to are not selected
 //
-SubGraph::OutputSlots CreateOutputsFrom(const std::vector<Layer *> & layers)
+SubGraph::OutputSlots CreateOutputsFrom(const std::vector<Layer*>& layers)
 {
     SubGraph::OutputSlots result;
     for (auto && layer : layers)
@@ -67,11 +67,12 @@ SubGraph::OutputSlots CreateOutputsFrom(const std::vector<Layer *> & layers)
 // this takes the inputs, outputs and layers as a copy and the move these copies into the
 // resulting subgraph, so the pass bay value is intentional
 //
-SubGraphSelector::SubGraphPtr CreateSubGraphFrom(SubGraph::InputSlots inputs,
-                                                 SubGraph::OutputSlots outputs,
-                                                 SubGraph::Layers layers)
+SubGraphSelector::SubGraphPtr CreateSubGraphFrom(Graph& graph,
+                                                 SubGraph::InputSlots&& inputs,
+                                                 SubGraph::OutputSlots&& outputs,
+                                                 SubGraph::Layers&& layers)
 {
-    return std::make_unique<SubGraph>(std::move(inputs), std::move(outputs), std::move(layers));
+    return std::make_unique<SubGraph>(&graph, std::move(inputs), std::move(outputs), std::move(layers));
 }
 
 template <typename T, typename Iterator>
@@ -146,8 +147,10 @@ BOOST_AUTO_TEST_CASE(SingleInputSingleOutput)
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubGraphSelector::SubGraphPtr subGraph =
-            CreateSubGraphFrom(CreateInputsFrom({convLayer1}), CreateOutputsFrom({convLayer2}), {});
+    SubGraphSelector::SubGraphPtr subGraph = CreateSubGraphFrom(graph,
+                                                                CreateInputsFrom({convLayer1}),
+                                                                CreateOutputsFrom({convLayer2}),
+                                                                {});
 
     // Save sub-graph connections for comparison after substitution
     IOutputSlot* subGraphInputConn = subGraph->GetInputSlot(0)->GetConnection();
@@ -192,8 +195,10 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
     mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubGraphSelector::SubGraphPtr subGraph =
-            CreateSubGraphFrom(CreateInputsFrom({convLayer1, convLayer2}), CreateOutputsFrom({mergerLayer}), {});
+    SubGraphSelector::SubGraphPtr subGraph = CreateSubGraphFrom(graph,
+                                                                CreateInputsFrom({convLayer1, convLayer2}),
+                                                                CreateOutputsFrom({mergerLayer}),
+                                                                {});
 
     // Save sub-graph connections for comparison after substitution
     IOutputSlot* subGraphInputConn1 = subGraph->GetInputSlot(0)->GetConnection();
@@ -240,8 +245,10 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubGraphSelector::SubGraphPtr subGraph =
-            CreateSubGraphFrom(CreateInputsFrom({splitterLayer}), CreateOutputsFrom({convLayer1, convLayer2}), {});
+    SubGraphSelector::SubGraphPtr subGraph = CreateSubGraphFrom(graph,
+                                                                CreateInputsFrom({splitterLayer}),
+                                                                CreateOutputsFrom({convLayer1, convLayer2}),
+                                                                {});
 
     // Save sub-graph connections for comparison after substitution
     IOutputSlot* subGraphInputConn1 = subGraph->GetInputSlot(0)->GetConnection();
@@ -290,7 +297,8 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubGraphSelector::SubGraphPtr subGraph = CreateSubGraphFrom(CreateInputsFrom({convLayer1, convLayer2}),
+    SubGraphSelector::SubGraphPtr subGraph = CreateSubGraphFrom(graph,
+                                                                CreateInputsFrom({convLayer1, convLayer2}),
                                                                 CreateOutputsFrom({convLayer1, convLayer2}),
                                                                 {});
 
@@ -336,8 +344,10 @@ BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
     graph.AddLayer<OutputLayer>(0, "output");
 
     // Construct sub-graph
-    SubGraphSelector::SubGraphPtr subGraph =
-            CreateSubGraphFrom({}, {}, {splitterLayer, convLayer1, convLayer2, mergerLayer});
+    SubGraphSelector::SubGraphPtr subGraph = CreateSubGraphFrom(graph,
+                                                                {},
+                                                                {},
+                                                                {splitterLayer, convLayer1, convLayer2, mergerLayer});
 
     // Construct dummy pre-compiled layer
     PreCompiledDescriptor preCompiledDescriptor(0, 0);
@@ -356,6 +366,36 @@ BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(SubGraphSelection)
+
+BOOST_AUTO_TEST_CASE(SubGraphForEmptyGraph)
+{
+    Graph graph;
+    SubGraph subGraph(graph);
+
+    BOOST_TEST(subGraph.GetInputSlots().empty());
+    BOOST_TEST(subGraph.GetOutputSlots().empty());
+    BOOST_TEST(subGraph.GetLayers().empty());
+}
+
+BOOST_AUTO_TEST_CASE(SubGraphForEntireGraph)
+{
+    Graph graph;
+
+    auto output = graph.AddLayer<OutputLayer>(0, "output");
+    auto mid0 = graph.InsertNewLayer<ActivationLayer>(output->GetInputSlot(0),
+                                                      ActivationDescriptor{},
+                                                      "mid0");
+    auto mid1 = graph.InsertNewLayer<ActivationLayer>(mid0->GetInputSlot(0),
+                                                      ActivationDescriptor{},
+                                                      "mid1");
+    graph.InsertNewLayer<InputLayer>(mid1->GetInputSlot(0), 0, "input");
+
+    SubGraph subGraph(graph);
+
+    BOOST_TEST(subGraph.GetInputSlots().empty());
+    BOOST_TEST(subGraph.GetOutputSlots().empty());
+    BOOST_TEST(subGraph.GetLayers().size() == graph.GetNumLayers());
+}
 
 BOOST_AUTO_TEST_CASE(NoSubGraphsForNoMatch)
 {
@@ -390,7 +430,8 @@ BOOST_AUTO_TEST_CASE(OneSubGraphsSelectedASingleMatch)
     BOOST_TEST(subGraphs.size() == 1);
     if (subGraphs.size() == 1)
     {
-        auto expected = CreateSubGraphFrom(CreateInputsFrom({output}),
+        auto expected = CreateSubGraphFrom(graph,
+                                           CreateInputsFrom({output}),
                                            // outputs of 'output' will be empty
                                            CreateOutputsFrom({output}),
                                            {output});
@@ -425,7 +466,8 @@ BOOST_AUTO_TEST_CASE(MultipleLayersSelectedInTheMiddle)
     BOOST_TEST(subGraphs.size() == 1);
     if (subGraphs.size() == 1)
     {
-        auto expected = CreateSubGraphFrom(CreateInputsFrom({mid1}),
+        auto expected = CreateSubGraphFrom(graph,
+                                           CreateInputsFrom({mid1}),
                                            CreateOutputsFrom({mid0}),
                                            {mid1, mid0});
 
@@ -496,11 +538,13 @@ BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
             });
 
     // expected results to test against
-    auto largerSubGraph = CreateSubGraphFrom(CreateInputsFrom({m1, m4}),
+    auto largerSubGraph = CreateSubGraphFrom(graph,
+                                             CreateInputsFrom({m1, m4}),
                                              CreateOutputsFrom({m3, m4}),
                                              {m1, m4, m2, m3});
 
-    auto smallerSubGraph = CreateSubGraphFrom(CreateInputsFrom({m5}),
+    auto smallerSubGraph = CreateSubGraphFrom(graph,
+                                              CreateInputsFrom({m5}),
                                               CreateOutputsFrom({m5}),
                                               {m5});
 
@@ -572,11 +616,13 @@ BOOST_AUTO_TEST_CASE(MultipleSimpleSubGraphs)
             });
 
     // expected results to test against
-    auto largerSubGraph = CreateSubGraphFrom(CreateInputsFrom({m1}),
+    auto largerSubGraph = CreateSubGraphFrom(graph,
+                                             CreateInputsFrom({m1}),
                                              CreateOutputsFrom({m2}),
                                              {m1, m2});
 
-    auto smallerSubGraph = CreateSubGraphFrom(CreateInputsFrom({m3}),
+    auto smallerSubGraph = CreateSubGraphFrom(graph,
+                                              CreateInputsFrom({m3}),
                                               CreateOutputsFrom({m3}),
                                               {m3});
 
@@ -644,7 +690,8 @@ BOOST_AUTO_TEST_CASE(SimpleLinearTest)
     BOOST_CHECK(subGraphs.size() == 1);
     if(subGraphs.size() == 1)
     {
-        auto expected = CreateSubGraphFrom(CreateInputsFrom({layerM1}),
+        auto expected = CreateSubGraphFrom(graph,
+                                           CreateInputsFrom({layerM1}),
                                            CreateOutputsFrom({layerM2}),
                                            {layerM1, layerM2});
 
@@ -699,7 +746,8 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
     BOOST_CHECK(subGraphs.size() == 1);
     if (subGraphs.size() == 1)
     {
-        auto expected = CreateSubGraphFrom(CreateInputsFrom({layerM1, layerM2}),
+        auto expected = CreateSubGraphFrom(graph,
+                                           CreateInputsFrom({layerM1, layerM2}),
                                            CreateOutputsFrom({layerM3}),
                                            {layerM1, layerM2, layerM3});
 
@@ -755,7 +803,8 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     BOOST_CHECK(subGraphs.size() == 1);
     if(subGraphs.size() == 1)
     {
-        auto expected = CreateSubGraphFrom(CreateInputsFrom({layerM1}),
+        auto expected = CreateSubGraphFrom(graph,
+                                           CreateInputsFrom({layerM1}),
                                            CreateOutputsFrom({layerM2, layerM3}),
                                            {layerM1, layerM2, layerM3});
 
@@ -819,7 +868,8 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     BOOST_CHECK(subGraphs.size() == 1);
     if (subGraphs.size() == 1)
     {
-        auto expected = CreateSubGraphFrom(CreateInputsFrom({m1, m2}),
+        auto expected = CreateSubGraphFrom(graph,
+                                           CreateInputsFrom({m1, m2}),
                                            CreateOutputsFrom({m4, m5}),
                                            {m1, m2, m3, m4, m5});
 

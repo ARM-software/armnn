@@ -73,4 +73,13 @@ IBackendInternal::ILayerSupportSharedPtr RefBackend::GetLayerSupport() const
     return layerSupport;
 }
 
+IBackendInternal::SubGraphUniquePtr RefBackend::OptimizeSubGraph(const SubGraph& subGraph,
+                                                                 bool& optimizationAttempted) const
+{
+    // Not trying to optimize the given sub-graph
+    optimizationAttempted = false;
+
+    return SubGraphUniquePtr{};
+}
+
 } // namespace armnn

@@ -111,49 +111,4 @@ std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer)
     return debugLayers;
 }
 
-PreCompiledLayer* CreatePreCompiledLayer(Graph& graph,
-                                         const SubGraph& subGraph,
-                                         unsigned int subGraphIndex,
-                                         const IBackendInternalUniquePtr& backendObjPtr)
-{
-    BOOST_ASSERT(backendObjPtr);
-
-    IBackendInternal::ISubGraphConverterPtr converter =
-            backendObjPtr->CreateSubGraphConverter(std::make_shared<SubGraph>(subGraph));
-    if (!converter)
-    {
-        return nullptr;
-    }
-
-    try
-    {
-        // Attempt to convert and compile sub-graph
-        auto preCompiledObject = converter->GetOutput();
-    }
-    catch (std::exception&)
-    {
-        return nullptr;
-    }
-
-    // Create pre-compiled layer
-    std::string name = "pre-compiled" + std::to_string(subGraphIndex);
-    PreCompiledLayer* preCompiledLayer = graph.AddLayer<PreCompiledLayer>(
-        PreCompiledDescriptor(subGraph.GetNumInputSlots(), subGraph.GetNumOutputSlots()), name.c_str());
-
-    // Copy output tensor infos from sub-graph
-    for (unsigned int i = 0u; i < subGraph.GetNumOutputSlots(); i++)
-    {
-        preCompiledLayer->GetOutputSlot(i).SetTensorInfo(subGraph.GetOutputSlot(i)->GetTensorInfo());
-    }
-
-    // Assign pre-compiled object to layer
-    preCompiledLayer->SetPreCompiledObject(converter->GetOutput());
-
-    // Set the backend-id for the pre-compiled layer
-    BackendId backendId = backendObjPtr->GetId();
-    preCompiledLayer->SetBackendId(backendId);
-
-    return preCompiledLayer;
-}
-
 } // namespace armnn

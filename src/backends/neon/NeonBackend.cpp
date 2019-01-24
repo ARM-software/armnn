@@ -80,4 +80,13 @@ IBackendInternal::ILayerSupportSharedPtr NeonBackend::GetLayerSupport() const
     return layerSupport;
 }
 
+IBackendInternal::SubGraphUniquePtr NeonBackend::OptimizeSubGraph(const SubGraph& subGraph,
+                                                                  bool& optimizationAttempted) const
+{
+    // Not trying to optimize the given sub-graph
+    optimizationAttempted = false;
+
+    return SubGraphUniquePtr{};
+}
+
 } // namespace armnn

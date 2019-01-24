@@ -125,6 +125,8 @@ public:
         return m_Id < other.m_Id;
     }
 
+    bool IsCpuRef() const { return m_Id == GetComputeDeviceAsCString(Compute::CpuRef); }
+
     const std::string& Get() const { return m_Id; }
 
 private:

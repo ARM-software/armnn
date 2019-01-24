@@ -43,6 +43,8 @@ public:
 
     using ISubGraphConverterPtr = std::unique_ptr<ISubGraphConverter>;
 
+    using SubGraphUniquePtr = std::unique_ptr<SubGraph>;
+
     virtual IMemoryManagerUniquePtr CreateMemoryManager() const = 0;
 
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
@@ -54,6 +56,8 @@ public:
 
     virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
+
+    virtual SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph, bool& optimizationAttempted) const = 0;
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

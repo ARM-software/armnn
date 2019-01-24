@@ -30,6 +30,9 @@ public:
 
     IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
+
+    IBackendInternal::SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph,
+                                                         bool& optimizationAttempted) const override;
 };
 
 } // namespace armnn

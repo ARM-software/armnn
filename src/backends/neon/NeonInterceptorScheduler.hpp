@@ -28,6 +28,8 @@ public:
 
     void run_workloads(std::vector<Workload> &workloads) override;
 
+    void run_tagged_workloads(std::vector<Workload> &workloads, const char *tag) override;
+
     void SetKernels(NeonTimer::KernelMeasurements* kernels) { m_Kernels = kernels; }
     NeonTimer::KernelMeasurements* GetKernels() { return m_Kernels; }
 private:

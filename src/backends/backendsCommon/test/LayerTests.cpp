@@ -1783,66 +1783,98 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::GreaterQueueDescriptor>(
 }
 
 namespace {
-    template <typename Descriptor, armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-    LayerTestResult<T, 4> ElementwiseTestHelper
-        (armnn::IWorkloadFactory & workloadFactory,
-         const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager,
-         const unsigned int shape0[4], std::vector<T> values0,
-         const unsigned int shape1[4], std::vector<T> values1,
-         const unsigned int outShape[4], std::vector<T> outValues,
-         float qScale = 0.0f, int qOffset = 0)
+
+template <typename Descriptor,
+          armnn::DataType ArmnnTypeInput,
+          armnn::DataType ArmnnTypeOutput,
+          typename TInput = armnn::ResolveType<ArmnnTypeInput>,
+          typename TOutput = armnn::ResolveType<ArmnnTypeOutput>>
+LayerTestResult<TOutput, 4> ElementwiseTestHelper(
+    armnn::IWorkloadFactory & workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager,
+    const unsigned int shape0[4], std::vector<TInput> values0,
+    const unsigned int shape1[4], std::vector<TInput> values1,
+    const unsigned int outShape[4], std::vector<TOutput> outValues,
+    float qScale = 0.0f, int qOffset = 0)
+{
+    const size_t dimensionCount = 4;
+    armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, ArmnnTypeInput};
+    armnn::TensorInfo inputTensorInfo1{dimensionCount, shape1, ArmnnTypeInput};
+    armnn::TensorInfo outputTensorInfo{dimensionCount, outShape, ArmnnTypeOutput};
+
+    auto input0 = MakeTensor<TInput, 4>(inputTensorInfo0, values0);
+    auto input1 = MakeTensor<TInput, 4>(inputTensorInfo1, values1);
+
+    if (armnn::IsQuantizedType<TInput>())
     {
-        const size_t dimensionCount = 4;
-        armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, ArmnnType};
-        armnn::TensorInfo inputTensorInfo1{dimensionCount, shape1, ArmnnType};
-        armnn::TensorInfo outputTensorInfo{dimensionCount, outShape, ArmnnType};
+        inputTensorInfo0.SetQuantizationScale(qScale);
+        inputTensorInfo0.SetQuantizationOffset(qOffset);
 
-        auto input0 = MakeTensor<T, 4>(inputTensorInfo0, values0);
-        auto input1 = MakeTensor<T, 4>(inputTensorInfo1, values1);
+        inputTensorInfo1.SetQuantizationScale(qScale);
+        inputTensorInfo1.SetQuantizationOffset(qOffset);
 
-        if (armnn::IsQuantizedType<T>())
-        {
-            inputTensorInfo0.SetQuantizationScale(qScale);
-            inputTensorInfo0.SetQuantizationOffset(qOffset);
-
-            inputTensorInfo1.SetQuantizationScale(qScale);
-            inputTensorInfo1.SetQuantizationOffset(qOffset);
-
-            outputTensorInfo.SetQuantizationScale(qScale);
-            outputTensorInfo.SetQuantizationOffset(qOffset);
-        }
-
-        LayerTestResult<T,4> ret(outputTensorInfo);
-
-        std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
-        std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-        std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
-        Descriptor data;
-        armnn::WorkloadInfo info;
-        AddInputToWorkload(data, info, inputTensorInfo0, inputHandle0.get());
-        AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
-        AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
-        auto workload = CreateWorkload<Descriptor>(workloadFactory, info, data);
-
-        inputHandle0->Allocate();
-        inputHandle1->Allocate();
-        outputHandle->Allocate();
-
-        CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
-        CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
-
-        ExecuteWorkload(*workload, memoryManager);
-
-        CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
-
-        ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outValues);
-        return ret;
+        outputTensorInfo.SetQuantizationScale(qScale);
+        outputTensorInfo.SetQuantizationOffset(qOffset);
     }
+
+    LayerTestResult<TOutput,4> ret(outputTensorInfo);
+
+    if(ArmnnTypeOutput == armnn::DataType::Boolean)
+    {
+        ret.compareBoolean = true;
+    }
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    Descriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo0, inputHandle0.get());
+    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+    auto workload = CreateWorkload<Descriptor>(workloadFactory, info, data);
+
+    inputHandle0->Allocate();
+    inputHandle1->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
+
+    ExecuteWorkload(*workload, memoryManager);
+
+    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+
+    ret.outputExpected = MakeTensor<TOutput, 4>(outputTensorInfo, outValues);
+    return ret;
 }
 
-LayerTestResult<float, 4> EqualSimpleTest(armnn::IWorkloadFactory& workloadFactory,
-                                          const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+template <typename Descriptor, armnn::DataType ArmnnT, typename T = armnn::ResolveType<ArmnnT>>
+LayerTestResult<T, 4> ElementwiseTestHelper(
+    armnn::IWorkloadFactory & workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager,
+    const unsigned int shape0[4], std::vector<T> values0,
+    const unsigned int shape1[4], std::vector<T> values1,
+    const unsigned int outShape[4], std::vector<T> outValues,
+    float qScale = 0.0f, int qOffset = 0)
+{
+    return ElementwiseTestHelper<Descriptor, ArmnnT, ArmnnT>
+        (workloadFactory,
+         memoryManager,
+         shape0,
+         values0,
+         shape1,
+         values1,
+         outShape,
+         outValues,
+         qScale,
+         qOffset);
+}
+}
+
+LayerTestResult<uint8_t, 4> EqualSimpleTest(armnn::IWorkloadFactory& workloadFactory,
+                                            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int width = 2;
     const unsigned int height = 2;
@@ -1857,10 +1889,10 @@ LayerTestResult<float, 4> EqualSimpleTest(armnn::IWorkloadFactory& workloadFacto
     std::vector<float> input1({ 1, 1, 1, 1,  3, 3, 3, 3,
                                 5, 5, 5, 5,  4, 4, 4, 4 });
 
-    std::vector<float> output({ 1, 1, 1, 1,  0, 0, 0, 0,
-                                0, 0, 0, 0,  1, 1, 1, 1 });
+    std::vector<uint8_t> output({ 1, 1, 1, 1,  0, 0, 0, 0,
+                                  0, 0, 0, 0,  1, 1, 1, 1 });
 
-    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::Float32>(
+    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::Float32, armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape,
@@ -1871,7 +1903,7 @@ LayerTestResult<float, 4> EqualSimpleTest(armnn::IWorkloadFactory& workloadFacto
         output);
 }
 
-LayerTestResult<float, 4> EqualBroadcast1ElementTest(
+LayerTestResult<uint8_t, 4> EqualBroadcast1ElementTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -1881,9 +1913,9 @@ LayerTestResult<float, 4> EqualBroadcast1ElementTest(
     unsigned int shape1[] = { 1, 1, 1, 1 };
     std::vector<float> input1({ 1 });
 
-    std::vector<float> output({ 1, 0, 0, 0, 0, 0, 0, 0});
+    std::vector<uint8_t> output({ 1, 0, 0, 0, 0, 0, 0, 0});
 
-    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::Float32>(
+    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::Float32, armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -1894,7 +1926,7 @@ LayerTestResult<float, 4> EqualBroadcast1ElementTest(
         output);
 }
 
-LayerTestResult<float, 4> EqualBroadcast1DVectorTest(
+LayerTestResult<uint8_t, 4> EqualBroadcast1DVectorTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -1906,10 +1938,10 @@ LayerTestResult<float, 4> EqualBroadcast1DVectorTest(
 
     std::vector<float> input1({ 1, 2, 3});
 
-    std::vector<float> output({ 1, 1, 1, 0, 0, 0,
-                                0, 0, 0, 0, 0, 0 });
+    std::vector<uint8_t> output({ 1, 1, 1, 0, 0, 0,
+                                  0, 0, 0, 0, 0, 0 });
 
-    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::Float32>(
+    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::Float32, armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -1928,7 +1960,7 @@ LayerTestResult<uint8_t, 4> EqualUint8Test(
 
     // See dequantized values to the right.
     std::vector<uint8_t> input0({ 1, 1, 1, 1, 6, 6, 6, 6,
-                                  3, 3, 3, 3, 5, 5, 5, 5 });
+                                  3, 3, 3, 3, 7, 7, 7, 7 });
 
     std::vector<uint8_t> input1({ 2, 2, 2, 2, 6, 6, 6, 6,
                                   3, 3, 3, 3, 5, 5, 5, 5 });
@@ -1936,7 +1968,9 @@ LayerTestResult<uint8_t, 4> EqualUint8Test(
     std::vector<uint8_t> output({ 0, 0, 0, 0, 1, 1, 1, 1,
                                   1, 1, 1, 1, 0, 0, 0, 0 });
 
-    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<armnn::EqualQueueDescriptor,
+                                 armnn::DataType::QuantisedAsymm8,
+                                 armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape,
@@ -1964,7 +1998,9 @@ LayerTestResult<uint8_t, 4> EqualBroadcast1ElementUint8Test(
     std::vector<uint8_t> output({ 1, 0, 0, 0, 0, 0,
                                   0, 0, 0, 0, 0, 0 });
 
-    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<armnn::EqualQueueDescriptor,
+                                 armnn::DataType::QuantisedAsymm8,
+                                 armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -1992,7 +2028,9 @@ LayerTestResult<uint8_t, 4> EqualBroadcast1DVectorUint8Test(
     std::vector<uint8_t> output({ 1, 0, 1, 0, 0, 0,
                                   0, 0, 0, 0, 0, 0 });
 
-    return ElementwiseTestHelper<armnn::EqualQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<armnn::EqualQueueDescriptor,
+                                 armnn::DataType::QuantisedAsymm8,
+                                 armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -2005,7 +2043,7 @@ LayerTestResult<uint8_t, 4> EqualBroadcast1DVectorUint8Test(
         0);
 }
 
-LayerTestResult<float, 4> GreaterSimpleTest(armnn::IWorkloadFactory& workloadFactory,
+LayerTestResult<uint8_t, 4> GreaterSimpleTest(armnn::IWorkloadFactory& workloadFactory,
                                             const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const unsigned int width = 2;
@@ -2021,10 +2059,10 @@ LayerTestResult<float, 4> GreaterSimpleTest(armnn::IWorkloadFactory& workloadFac
     std::vector<float> input1({ 1, 1, 1, 1,  3, 3, 3, 3,
                                 5, 5, 5, 5,  4, 4, 4, 4 });
 
-    std::vector<float> output({ 0, 0, 0, 0,  1, 1, 1, 1,
-                                0, 0, 0, 0,  0, 0, 0, 0 });
+    std::vector<uint8_t> output({ 0, 0, 0, 0,  1, 1, 1, 1,
+                                  0, 0, 0, 0,  0, 0, 0, 0 });
 
-    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::Float32>(
+    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::Float32, armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape,
@@ -2035,7 +2073,7 @@ LayerTestResult<float, 4> GreaterSimpleTest(armnn::IWorkloadFactory& workloadFac
         output);
 }
 
-LayerTestResult<float, 4> GreaterBroadcast1ElementTest(
+LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -2045,9 +2083,9 @@ LayerTestResult<float, 4> GreaterBroadcast1ElementTest(
     unsigned int shape1[] = { 1, 1, 1, 1 };
     std::vector<float> input1({ 1 });
 
-    std::vector<float> output({ 0, 1, 1, 1, 1, 1, 1, 1});
+    std::vector<uint8_t> output({ 0, 1, 1, 1, 1, 1, 1, 1});
 
-    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::Float32>(
+    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::Float32, armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -2058,7 +2096,7 @@ LayerTestResult<float, 4> GreaterBroadcast1ElementTest(
         output);
 }
 
-LayerTestResult<float, 4> GreaterBroadcast1DVectorTest(
+LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -2070,10 +2108,10 @@ LayerTestResult<float, 4> GreaterBroadcast1DVectorTest(
 
     std::vector<float> input1({ 1, 3, 2});
 
-    std::vector<float> output({ 0, 0, 1, 1, 1, 1,
-                                1, 1, 1, 1, 1, 1 });
+    std::vector<uint8_t> output({ 0, 0, 1, 1, 1, 1,
+                                  1, 1, 1, 1, 1, 1 });
 
-    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::Float32>(
+    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::Float32, armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -2100,7 +2138,9 @@ LayerTestResult<uint8_t, 4> GreaterUint8Test(
     std::vector<uint8_t> output({ 0, 0, 0, 0, 0, 0, 0, 0,
                                   1, 1, 1, 1, 0, 0, 0, 0 });
 
-    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor,
+                                 armnn::DataType::QuantisedAsymm8,
+                                 armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape,
@@ -2128,7 +2168,9 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementUint8Test(
     std::vector<uint8_t> output({ 0, 1, 1, 1, 1, 1,
                                   1, 1, 1, 1, 1, 1 });
 
-    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor,
+                                 armnn::DataType::QuantisedAsymm8,
+                                 armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -2156,7 +2198,9 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorUint8Test(
     std::vector<uint8_t> output({ 0, 1, 0, 1, 1, 1,
                                   1, 1, 1, 1, 1, 1 });
 
-    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+    return ElementwiseTestHelper<armnn::GreaterQueueDescriptor,
+                                 armnn::DataType::QuantisedAsymm8,
+                                 armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -2235,7 +2279,7 @@ LayerTestResult<float, 4> MaximumBroadcast1DVectorTest(
     std::vector<float> input1({ 1, 2, 3});
 
     std::vector<float> output({ 1, 2, 3, 4, 5, 6,
-                                  7, 8, 9, 10, 11, 12 });
+                                7, 8, 9, 10, 11, 12 });
 
     return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, armnn::DataType::Float32>(
         workloadFactory,

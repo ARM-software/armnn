@@ -165,6 +165,19 @@ template <typename QueueDescriptor>
 using Int32Workload = TypedWorkload<QueueDescriptor, armnn::DataType::Signed32>;
 
 template <typename QueueDescriptor>
+using BooleanWorkload = TypedWorkload<QueueDescriptor, armnn::DataType::Boolean>;
+
+template <typename QueueDescriptor>
+using BaseFloat32ComparisonWorkload = MultiTypedWorkload<QueueDescriptor,
+                                                         armnn::DataType::Float32,
+                                                         armnn::DataType::Boolean>;
+
+template <typename QueueDescriptor>
+using BaseUint8ComparisonWorkload = MultiTypedWorkload<QueueDescriptor,
+                                                       armnn::DataType::QuantisedAsymm8,
+                                                       armnn::DataType::Boolean>;
+
+template <typename QueueDescriptor>
 using Float16ToFloat32Workload = MultiTypedWorkload<QueueDescriptor,
                                                     armnn::DataType::Float16,
                                                     armnn::DataType::Float32>;

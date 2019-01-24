@@ -144,28 +144,4 @@ using RefMinimumUint8Workload =
                           DataType::QuantisedAsymm8,
                           MinimumQueueDescriptor,
                           StringMapping::RefMinimumWorkload_Execute>;
-
-using RefEqualFloat32Workload =
-    RefElementwiseWorkload<std::equal_to<float>,
-                          DataType::Float32,
-                          EqualQueueDescriptor,
-                          StringMapping::RefEqualWorkload_Execute>;
-
-using RefEqualUint8Workload =
-    RefElementwiseWorkload<std::equal_to<float>,
-                          DataType::QuantisedAsymm8,
-                          EqualQueueDescriptor,
-                          StringMapping::RefEqualWorkload_Execute>;
-
-using RefGreaterFloat32Workload =
-    RefElementwiseWorkload<std::greater<float>,
-                          DataType::Float32,
-                          GreaterQueueDescriptor,
-                          StringMapping::RefGreaterWorkload_Execute>;
-
-using RefGreaterUint8Workload =
-    RefElementwiseWorkload<std::greater<float>,
-                          DataType::QuantisedAsymm8,
-                          GreaterQueueDescriptor,
-                          StringMapping::RefGreaterWorkload_Execute>;
 } // armnn

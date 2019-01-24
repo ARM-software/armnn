@@ -1741,6 +1741,33 @@ std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> TfParser::ProcessElementwise
     return {input0Slot, input1Slot};
 }
 
+ParsedTfOperationPtr TfParser::ProcessComparisonLayer(
+    IOutputSlot* input0Slot,
+    IOutputSlot* input1Slot,
+    IConnectableLayer* const layer,
+    const tensorflow::NodeDef& nodeDef)
+{
+    input0Slot->Connect(layer->GetInputSlot(0));
+    input1Slot->Connect(layer->GetInputSlot(1));
+
+    TensorInfo outputInfo = input0Slot->GetTensorInfo();
+    outputInfo.SetDataType(DataType::Boolean);
+    std::vector<unsigned int> outputShape;
+
+    const TensorShape& input0Shape = input0Slot->GetTensorInfo().GetShape();
+    const TensorShape& input1Shape = input1Slot->GetTensorInfo().GetShape();
+
+    for (unsigned int i = 0; i < input0Shape.GetNumDimensions(); i++)
+    {
+        outputShape.push_back(std::max(input0Shape[i], input1Shape[i]));
+    }
+
+    outputInfo.SetShape(TensorShape(input0Shape.GetNumDimensions(), outputShape.data()));
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    return std::make_unique<SingleLayerParsedTfOperation>(this, nodeDef, layer);
+}
+
 ParsedTfOperationPtr TfParser::ProcessElementwiseLayer(
         IOutputSlot* input0Slot,
         IOutputSlot* input1Slot,
@@ -1812,7 +1839,7 @@ ParsedTfOperationPtr TfParser::ParseGreater(const tensorflow::NodeDef& nodeDef,
 
     IConnectableLayer* const layer = m_Network->AddGreaterLayer(nodeDef.name().c_str());
 
-    return ProcessElementwiseLayer(input0Slot, input1Slot, layer, nodeDef);
+    return ProcessComparisonLayer(input0Slot, input1Slot, layer, nodeDef);
 }
 
 ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,
@@ -1824,7 +1851,7 @@ ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,
 
     IConnectableLayer* const layer = m_Network->AddEqualLayer(nodeDef.name().c_str());
 
-    return ProcessElementwiseLayer(input0Slot, input1Slot, layer, nodeDef);
+    return ProcessComparisonLayer(input0Slot, input1Slot, layer, nodeDef);
 }
 
 ParsedTfOperationPtr TfParser::ParseMinimum(const tensorflow::NodeDef& nodeDef,

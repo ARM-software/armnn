@@ -17,7 +17,7 @@
 namespace
 {
 
-template<typename armnn::DataType DataType>
+template<armnn::DataType ArmnnTypeInput, armnn::DataType ArmnnTypeOutput>
 INetworkPtr CreateArithmeticNetwork(const std::vector<TensorShape>& inputShapes,
                                     const TensorShape& outputShape,
                                     const LayerType type,
@@ -39,22 +39,25 @@ INetworkPtr CreateArithmeticNetwork(const std::vector<TensorShape>& inputShapes,
 
     for (unsigned int i = 0; i < inputShapes.size(); ++i)
     {
-        TensorInfo inputTensorInfo(inputShapes[i], DataType, qScale, qOffset);
+        TensorInfo inputTensorInfo(inputShapes[i], ArmnnTypeInput, qScale, qOffset);
         IConnectableLayer* input = net->AddInputLayer(boost::numeric_cast<LayerBindingId>(i));
         Connect(input, arithmeticLayer, inputTensorInfo, 0, i);
     }
 
-    TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset);
+    TensorInfo outputTensorInfo(outputShape, ArmnnTypeOutput, qScale, qOffset);
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
     Connect(arithmeticLayer, output, outputTensorInfo, 0, 0);
 
     return net;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnInputType,
+         armnn::DataType ArmnnOutputType,
+         typename TInput = armnn::ResolveType<ArmnnInputType>,
+         typename TOutput = armnn::ResolveType<ArmnnOutputType>>
 void ArithmeticSimpleEndToEnd(const std::vector<BackendId>& backends,
                               const LayerType type,
-                              const std::vector<T> expectedOutput)
+                              const std::vector<TOutput> expectedOutput)
 {
     using namespace armnn;
 
@@ -62,26 +65,29 @@ void ArithmeticSimpleEndToEnd(const std::vector<BackendId>& backends,
     const TensorShape& outputShape = { 2, 2, 2, 2 };
 
     // Builds up the structure of the network
-    INetworkPtr net = CreateArithmeticNetwork<ArmnnType>(inputShapes, outputShape, type);
+    INetworkPtr net = CreateArithmeticNetwork<ArmnnInputType, ArmnnOutputType>(inputShapes, outputShape, type);
 
     BOOST_TEST_CHECKPOINT("create a network");
 
-    const std::vector<T> input0({ 1, 1, 1, 1,  5, 5, 5, 5,
-                                  3, 3, 3, 3,  4, 4, 4, 4 });
+    const std::vector<TInput> input0({ 1, 1, 1, 1,  5, 5, 5, 5,
+                                       3, 3, 3, 3,  4, 4, 4, 4 });
 
-    const std::vector<T> input1({ 1, 1, 1, 1,  3, 3, 3, 3,
-                                  5, 5, 5, 5,  4, 4, 4, 4 });
+    const std::vector<TInput> input1({ 1, 1, 1, 1,  3, 3, 3, 3,
+                                       5, 5, 5, 5,  4, 4, 4, 4 });
 
-    std::map<int, std::vector<T>> inputTensorData = {{ 0, input0 }, { 1, input1 }};
-    std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput }};
+    std::map<int, std::vector<TInput>> inputTensorData = {{ 0, input0 }, { 1, input1 }};
+    std::map<int, std::vector<TOutput>> expectedOutputData = {{ 0, expectedOutput }};
 
-    EndToEndLayerTestImpl<T>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<TInput, TOutput>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnInputType,
+         armnn::DataType ArmnnOutputType,
+         typename TInput = armnn::ResolveType<ArmnnInputType>,
+         typename TOutput = armnn::ResolveType<ArmnnOutputType>>
 void ArithmeticBroadcastEndToEnd(const std::vector<BackendId>& backends,
                                  const LayerType type,
-                                 const std::vector<T> expectedOutput)
+                                 const std::vector<TOutput> expectedOutput)
 {
     using namespace armnn;
 
@@ -89,19 +95,19 @@ void ArithmeticBroadcastEndToEnd(const std::vector<BackendId>& backends,
     const TensorShape& outputShape = { 1, 2, 2, 3 };
 
     // Builds up the structure of the network
-    INetworkPtr net = CreateArithmeticNetwork<ArmnnType>(inputShapes, outputShape, type);
+    INetworkPtr net = CreateArithmeticNetwork<ArmnnInputType, ArmnnOutputType>(inputShapes, outputShape, type);
 
     BOOST_TEST_CHECKPOINT("create a network");
 
-    const std::vector<T> input0({ 1, 2, 3, 1, 0, 6,
-                                  7, 8, 9, 10, 11, 12 });
+    const std::vector<TInput> input0({ 1, 2, 3, 1, 0, 6,
+                                       7, 8, 9, 10, 11, 12 });
 
-    const std::vector<T> input1({ 1, 1, 3 });
+    const std::vector<TInput> input1({ 1, 1, 3 });
 
-    std::map<int, std::vector<T>> inputTensorData = {{ 0, input0 }, { 1, input1 }};
-    std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput }};
+    std::map<int, std::vector<TInput>> inputTensorData = {{ 0, input0 }, { 1, input1 }};
+    std::map<int, std::vector<TOutput>> expectedOutputData = {{ 0, expectedOutput }};
 
-    EndToEndLayerTestImpl<T>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<TInput, TOutput>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
 } // anonymous namespace

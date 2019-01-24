@@ -47,11 +47,13 @@ struct LayerTestResult
         output.resize(shape);
         outputExpected.resize(shape);
         supported = true;
+        compareBoolean = false;
     }
 
     boost::multi_array<T, n> output;
     boost::multi_array<T, n> outputExpected;
     bool supported;
+    bool compareBoolean;
 };
 
 LayerTestResult<float, 4> SimpleConvolution2d3x5Test(
@@ -909,15 +911,15 @@ LayerTestResult<uint8_t, 3> Concatenation3dDim2DiffInputDimsUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor);
 
-LayerTestResult<float, 4> EqualSimpleTest(
+LayerTestResult<uint8_t, 4> EqualSimpleTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 4> EqualBroadcast1ElementTest(
+LayerTestResult<uint8_t, 4> EqualBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 4> EqualBroadcast1DVectorTest(
+LayerTestResult<uint8_t, 4> EqualBroadcast1DVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -933,15 +935,15 @@ LayerTestResult<uint8_t, 4> EqualBroadcast1DVectorUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 4> GreaterSimpleTest(
+LayerTestResult<uint8_t, 4> GreaterSimpleTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 4> GreaterBroadcast1ElementTest(
+LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 4> GreaterBroadcast1DVectorTest(
+LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

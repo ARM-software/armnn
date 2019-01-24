@@ -12,13 +12,15 @@
 namespace armnn
 {
 
-template<typename Float16Func, typename Float32Func, typename Uint8Func, typename Int32Func, typename ... Params>
+template<typename Float16Func, typename Float32Func, typename Uint8Func, typename Int32Func, typename BooleanFunc,
+         typename ... Params>
 bool IsSupportedForDataTypeGeneric(Optional<std::string&> reasonIfUnsupported,
                                    DataType dataType,
                                    Float16Func float16FuncPtr,
                                    Float32Func float32FuncPtr,
                                    Uint8Func uint8FuncPtr,
                                    Int32Func int32FuncPtr,
+                                   BooleanFunc booleanFuncPtr,
                                    Params&&... params)
 {
     switch(dataType)
@@ -31,6 +33,8 @@ bool IsSupportedForDataTypeGeneric(Optional<std::string&> reasonIfUnsupported,
             return uint8FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
         case DataType::Signed32:
             return int32FuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
+        case DataType::Boolean:
+            return booleanFuncPtr(reasonIfUnsupported, std::forward<Params>(params)...);
         default:
             return false;
     }

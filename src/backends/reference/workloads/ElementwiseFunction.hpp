@@ -10,15 +10,15 @@
 namespace armnn
 {
 
-template <typename Functor>
+template <typename Functor, typename dataTypeInput, typename dataTypeOutput>
 struct ElementwiseFunction
 {
     ElementwiseFunction(const TensorShape& inShape0,
                         const TensorShape& inShape1,
                         const TensorShape& outShape,
-                        const float* inData0,
-                        const float* inData1,
-                        float* outData);
+                        const dataTypeInput* inData0,
+                        const dataTypeInput* inData1,
+                        dataTypeOutput* outData);
 };
 
 } //namespace armnn

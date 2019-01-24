@@ -40,6 +40,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefBatchToSpaceNdFloat32Workload.hpp
     RefBatchToSpaceNdUint8Workload.cpp
     RefBatchToSpaceNdUint8Workload.hpp
+    RefComparisonWorkload.cpp
+    RefComparisonWorkload.hpp
     RefConstantWorkload.cpp
     RefConstantWorkload.hpp
     RefConvertFp16ToFp32Workload.cpp

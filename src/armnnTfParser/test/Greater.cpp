@@ -91,9 +91,9 @@ struct GreaterFixtureTwoByTwo : public GreaterFixtureAutoSetup
 
 BOOST_FIXTURE_TEST_CASE(ParseGreaterTwoByTwo, GreaterFixtureTwoByTwo)
 {
-    RunTest<2>({ { "input0", { 1.0f, 2.0f, 3.0f, 4.0f} },
-                 { "input1", { 1.0f, 5.0f, 2.0f, 2.0f} } },
-               { { "output", { 0.0f, 0.0f, 1.0f, 1.0f} } });
+    RunComparisonTest<2>({ { "input0", { 1.0f, 2.0f, 3.0f, 4.0f} },
+                           { "input1", { 1.0f, 5.0f, 2.0f, 2.0f} } },
+                         { { "output", { 0, 0, 1, 1} } });
 }
 
 struct GreaterBroadcast1DAnd4D : public GreaterFixtureAutoSetup
@@ -103,9 +103,9 @@ struct GreaterBroadcast1DAnd4D : public GreaterFixtureAutoSetup
 
 BOOST_FIXTURE_TEST_CASE(ParseGreaterBroadcast1DToTwoByTwo, GreaterBroadcast1DAnd4D)
 {
-    RunTest<4>({ { "input0", { 2.0f } },
-                 { "input1", { 1.0f, 2.0f, 3.0f, 2.0f } } },
-               { { "output", { 1.0f, 0.0f, 0.0f, 0.0f } } });
+    RunComparisonTest<4>({ { "input0", { 2.0f } },
+                           { "input1", { 1.0f, 2.0f, 3.0f, 2.0f } } },
+                         { { "output", { 1, 0, 0, 0 } } });
 }
 
 struct GreaterBroadcast4DAnd1D : public GreaterFixtureAutoSetup
@@ -115,9 +115,9 @@ struct GreaterBroadcast4DAnd1D : public GreaterFixtureAutoSetup
 
 BOOST_FIXTURE_TEST_CASE(ParseGreaterBroadcast4DAnd1D, GreaterBroadcast4DAnd1D)
 {
-    RunTest<4>({ { "input0", { 1.0f, 2.0f, 3.0f, 2.0f } },
-                 { "input1", { 3.0f } } },
-               { { "output", { 0.0f, 0.0f, 0.0f, 0.0f } } });
+    RunComparisonTest<4>({ { "input0", { 1.0f, 2.0f, 3.0f, 2.0f } },
+                           { "input1", { 3.0f } } },
+                         { { "output", { 0, 0, 0, 0 } } });
 }
 
 struct GreaterMultiDimBroadcast : public GreaterFixtureAutoSetup
@@ -127,13 +127,13 @@ struct GreaterMultiDimBroadcast : public GreaterFixtureAutoSetup
 
 BOOST_FIXTURE_TEST_CASE(ParseGreaterMultiDimBroadcast, GreaterMultiDimBroadcast)
 {
-    RunTest<4>({ { "input0", { 1.0f, 2.0f } },
-                 { "input1", { 1.0f, 2.0f, 3.0f,
-                               3.0f, 2.0f, 2.0f } } },
-               { { "output", { 0.0f, 0.0f, 0.0f,
-                               1.0f, 0.0f, 0.0f,
-                               0.0f, 0.0f, 0.0f,
-                               0.0f, 0.0f, 0.0f } } });
+    RunComparisonTest<4>({ { "input0", { 1.0f, 2.0f } },
+                           { "input1", { 1.0f, 2.0f, 3.0f,
+                                         3.0f, 2.0f, 2.0f } } },
+                         { { "output", { 0, 0, 0,
+                                         1, 0, 0,
+                                         0, 0, 0,
+                                         0, 0, 0 } } });
 }
 
 BOOST_AUTO_TEST_SUITE_END()

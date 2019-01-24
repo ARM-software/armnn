@@ -1025,6 +1025,11 @@ void EqualQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                        "EqualQueueDescriptor",
                                        "first input",
                                        "second input");
+
+    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Boolean)
+    {
+        throw InvalidArgumentException("EqualQueueDescriptor: Output tensor type must be Boolean.");
+    }
 }
 
 void GreaterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
@@ -1038,6 +1043,11 @@ void GreaterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                        "GreaterQueueDescriptor",
                                        "first input",
                                        "second input");
+
+    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Boolean)
+    {
+        throw InvalidArgumentException("GreaterQueueDescriptor: Output tensor type must be Boolean.");
+    }
 }
 
 void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

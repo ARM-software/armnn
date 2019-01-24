@@ -102,10 +102,10 @@ inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
     );
 }
 
-template<typename T>
+template<typename TInput, typename TOutput>
 void EndToEndLayerTestImpl(INetworkPtr network,
-                           const std::map<int, std::vector<T>>& inputTensorData,
-                           const std::map<int, std::vector<T>>& expectedOutputData,
+                           const std::map<int, std::vector<TInput>>& inputTensorData,
+                           const std::map<int, std::vector<TOutput>>& expectedOutputData,
                            std::vector<BackendId> backends)
 {
     // Create runtime in which test will run
@@ -128,10 +128,10 @@ void EndToEndLayerTestImpl(INetworkPtr network,
     }
     OutputTensors outputTensors;
     outputTensors.reserve(expectedOutputData.size());
-    std::map<int, std::vector<T>> outputStorage;
+    std::map<int, std::vector<TOutput>> outputStorage;
     for (auto&& it : expectedOutputData)
     {
-        std::vector<T> out(it.second.size());
+        std::vector<TOutput> out(it.second.size());
         outputStorage.emplace(it.first, out);
         outputTensors.push_back({it.first,
                                  Tensor(runtime->GetOutputTensorInfo(netId, it.first),
@@ -144,7 +144,7 @@ void EndToEndLayerTestImpl(INetworkPtr network,
     // Checks the results.
     for (auto&& it : expectedOutputData)
     {
-        std::vector<T> out = outputStorage.at(it.first);
+        std::vector<TOutput> out = outputStorage.at(it.first);
         BOOST_TEST(it.second == out);
     }
 }

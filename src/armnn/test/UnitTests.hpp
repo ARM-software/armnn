@@ -41,7 +41,7 @@ void CompareTestResultIfSupported(const std::string& testName, const LayerTestRe
         "The test name does not match the supportedness it is reporting");
     if (testResult.supported)
     {
-        BOOST_TEST(CompareTensors(testResult.output, testResult.outputExpected));
+        BOOST_TEST(CompareTensors(testResult.output, testResult.outputExpected, testResult.compareBoolean));
     }
 }
 

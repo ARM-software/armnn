@@ -24,7 +24,8 @@ template <typename F32Workload, typename U8Workload, typename QueueDescriptorTyp
 std::unique_ptr<IWorkload> RefWorkloadFactory::MakeWorkload(const QueueDescriptorType& descriptor,
     const WorkloadInfo& info) const
 {
-    return armnn::MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload, NullWorkload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload, NullWorkload, NullWorkload>(descriptor,
+                                                                                                        info);
 }
 
 RefWorkloadFactory::RefWorkloadFactory()
@@ -90,7 +91,8 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateOutput(const OutputQueueDes
         throw InvalidArgumentException("RefWorkloadFactory::CreateOutput: data input and output differ in byte count.");
     }
 
-    return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
+    return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload,
+                              CopyMemGenericWorkload, NullWorkload, CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
@@ -127,7 +129,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const Permut
                                                                     const WorkloadInfo&           info) const
 {
     return MakeWorkloadHelper<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteUint8Workload,
-        NullWorkload>(descriptor, info);
+        NullWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
@@ -206,7 +208,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConstant(const ConstantQueu
     const WorkloadInfo& info) const
 {
     return MakeWorkloadHelper<NullWorkload, RefConstantFloat32Workload, RefConstantUint8Workload,
-        RefConstantInt32Workload>(descriptor, info);
+        RefConstantInt32Workload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,

@@ -60,3 +60,4 @@
 #include "RefBatchToSpaceNdFloat32Workload.hpp"
 #include "RefDebugWorkload.hpp"
 #include "RefRsqrtFloat32Workload.hpp"
+#include "RefComparisonWorkload.hpp"

@@ -67,11 +67,16 @@ bool SelectiveCompare(T a, T b)
     return SelectiveComparer<T, armnn::IsQuantizedType<T>()>::Compare(a, b);
 };
 
-
+template<typename T>
+bool SelectiveCompareBoolean(T a, T b)
+{
+    return (((a == 0) && (b == 0)) || ((a != 0) && (b != 0)));
+};
 
 template <typename T, std::size_t n>
 boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n>& a,
-                                                   const boost::multi_array<T, n>& b)
+                                                   const boost::multi_array<T, n>& b,
+                                                   bool compareBoolean = false)
 {
     // Checks they are same shape.
     for (unsigned int i=0; i<n; i++)
@@ -103,7 +108,17 @@ boost::test_tools::predicate_result CompareTensors(const boost::multi_array<T, n
 
     while (true)
     {
-        bool comparison = SelectiveCompare(a(indices), b(indices));
+        bool comparison;
+        // As true for uint8_t is non-zero (1-255) we must have a dedicated compare for Booleans.
+        if(compareBoolean)
+        {
+            comparison = SelectiveCompareBoolean(a(indices), b(indices));
+        }
+        else
+        {
+            comparison = SelectiveCompare(a(indices), b(indices));
+        }
+
         if (!comparison)
         {
             ++numFailedElements;

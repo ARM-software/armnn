@@ -126,7 +126,8 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateInput(const InputQueueDescri
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
+    return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload, CopyMemGenericWorkload, NullWorkload,
+        CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,

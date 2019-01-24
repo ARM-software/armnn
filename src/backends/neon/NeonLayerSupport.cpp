@@ -72,6 +72,7 @@ bool IsSupportedForDataTypeNeon(Optional<std::string&> reasonIfUnsupported,
                                          floatFuncPtr,
                                          uint8FuncPtr,
                                          &FalseFunc<>,
+                                         &FalseFunc<>,
                                          std::forward<Params>(params)...);
 }
 
@@ -214,7 +215,8 @@ bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,
                                          &FalseFuncF16<>,
                                          &TrueFunc<>,
                                          &FalseFuncU8<>,
-                                         &FalseFuncI32<>);
+                                         &FalseFuncI32<>,
+                                         &FalseFuncU8<>);
 }
 
 bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
@@ -344,10 +346,14 @@ bool NeonLayerSupport::IsNormalizationSupported(const TensorInfo& input,
 bool NeonLayerSupport::IsOutputSupported(const TensorInfo& output,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeNeon(reasonIfUnsupported,
-                                      output.GetDataType(),
-                                      &TrueFunc<>,
-                                      &TrueFunc<>);
+    return IsNeonBackendSupported(reasonIfUnsupported) &&
+           IsSupportedForDataTypeGeneric(reasonIfUnsupported,
+                                         output.GetDataType(),
+                                         &TrueFunc<>,
+                                         &TrueFunc<>,
+                                         &TrueFunc<>,
+                                         &FalseFuncI32<>,
+                                         &TrueFunc<>);
 }
 
 bool NeonLayerSupport::IsPermuteSupported(const TensorInfo& input,

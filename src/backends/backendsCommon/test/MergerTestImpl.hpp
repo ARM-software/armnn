@@ -110,7 +110,7 @@ void MergerDim0EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }, { 1,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0,expectedOutput }};
 
-    EndToEndLayerTestImpl<T>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<T, T>(move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>

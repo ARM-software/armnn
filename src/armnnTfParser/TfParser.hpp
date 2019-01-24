@@ -187,6 +187,12 @@ private:
     std::pair<armnn::IOutputSlot*, armnn::IOutputSlot*> ProcessElementwiseInputSlots(
             const tensorflow::NodeDef& nodeDef, const std::string& layerName);
 
+    ParsedTfOperationPtr ProcessComparisonLayer(
+        armnn::IOutputSlot* input0Slot,
+        armnn::IOutputSlot* input1Slot,
+        armnn::IConnectableLayer* const layer,
+        const tensorflow::NodeDef& nodeDef);
+
     ParsedTfOperationPtr ProcessElementwiseLayer(
             armnn::IOutputSlot* input0Slot,
             armnn::IOutputSlot* input1Slot,

@@ -91,7 +91,8 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateInput(const InputQueueDesc
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
                                                              const WorkloadInfo&        info) const
 {
-    return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
+    return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload,
+                              CopyMemGenericWorkload, NullWorkload, CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,

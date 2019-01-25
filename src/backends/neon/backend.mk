@@ -31,6 +31,7 @@ BACKEND_SOURCES := \
         workloads/NeonMinimumWorkload.cpp \
         workloads/NeonMultiplicationFloatWorkload.cpp \
         workloads/NeonNormalizationFloatWorkload.cpp \
+        workloads/NeonPadWorkload.cpp \
         workloads/NeonPermuteWorkload.cpp \
         workloads/NeonPooling2dWorkload.cpp \
         workloads/NeonReshapeWorkload.cpp \

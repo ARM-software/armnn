@@ -22,6 +22,7 @@
 #include "NeonMinimumWorkload.hpp"
 #include "NeonMultiplicationFloatWorkload.hpp"
 #include "NeonNormalizationFloatWorkload.hpp"
+#include "NeonPadWorkload.hpp"
 #include "NeonPermuteWorkload.hpp"
 #include "NeonPooling2dWorkload.hpp"
 #include "NeonReshapeWorkload.hpp"

@@ -112,6 +112,11 @@ public:
     bool IsOutputSupported(const TensorInfo& output,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsPadSupported(const TensorInfo& input,
+                        const TensorInfo& output,
+                        const PadDescriptor& descriptor,
+                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsPermuteSupported(const TensorInfo& input,
                             const TensorInfo& output,
                             const PermuteDescriptor& descriptor,

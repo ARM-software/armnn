@@ -30,6 +30,7 @@
 #include "workloads/NeonMultiplicationFloatWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
+#include "workloads/NeonPadWorkload.hpp"
 #include "workloads/NeonPermuteWorkload.hpp"
 #include "workloads/NeonPooling2dWorkload.hpp"
 #include "workloads/NeonResizeBilinearWorkload.hpp"
@@ -354,6 +355,18 @@ bool NeonLayerSupport::IsOutputSupported(const TensorInfo& output,
                                          &TrueFunc<>,
                                          &FalseFuncI32<>,
                                          &TrueFunc<>);
+}
+
+bool NeonLayerSupport::IsPadSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const PadDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonPadWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsPermuteSupported(const TensorInfo& input,

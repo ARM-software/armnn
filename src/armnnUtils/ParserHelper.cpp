@@ -16,12 +16,16 @@ namespace armnnUtils
 const armnn::PermutationVector NHWCToArmNN = { 0, 2, 3, 1 };
 const armnn::PermutationVector ArmNNToNHWC = { 0, 3, 1, 2 };
 
-void ProcessConcatInputTensorInfo(armnn::TensorInfo& inputTensorInfo, armnn::OriginsDescriptor& concatDescriptor,
-                                  const unsigned int& concatAxis, unsigned int inputIndex,
-                                  std::vector<unsigned int>& mergeDimSizes, unsigned int& mergeDim)
+void ProcessConcatInputTensorInfo(armnn::TensorInfo& inputTensorInfo,
+                                  armnn::OriginsDescriptor& concatDescriptor,
+                                  const unsigned int& concatAxis,
+                                  unsigned int inputIndex,
+                                  unsigned int& mergeDimOrigin)
 {
+    const uint32_t inputRank = concatDescriptor.GetNumDimensions();
+
     // double check dimensions of the tensors
-    if (inputTensorInfo.GetNumDimensions() != armnn::MaxNumOfTensorDimensions)
+    if (inputTensorInfo.GetNumDimensions() != inputRank)
     {
         throw armnn::ParseException(
             boost::str(
@@ -29,33 +33,19 @@ void ProcessConcatInputTensorInfo(armnn::TensorInfo& inputTensorInfo, armnn::Ori
                     "The number of dimensions: %1% for input tensors of the "
                     "concatenation op should be %2% %3%")
                 % inputTensorInfo.GetNumDimensions()
-                % armnn::MaxNumOfTensorDimensions
+                % inputRank
                 % CHECK_LOCATION().AsString()));
     }
 
-    // if concatenation axis is 3 then need to be permuted
-    if (concatAxis == 3)
-    {
-        inputTensorInfo = armnnUtils::Permuted(inputTensorInfo, NHWCToArmNN);
-    }
-
-    for (unsigned int dim = 0; dim < armnn::MaxNumOfTensorDimensions; ++dim)
-    {
-        mergeDimSizes[dim] = inputTensorInfo.GetShape()[dim];
-    }
-
-    // Concatenation dimension 1 is the only dimension supported in ArmNN
-    const unsigned int concatenationDim = 1;
-
-    for (unsigned int j = 0; j < concatenationDim; ++j)
+    for (unsigned int j = 0; j < concatAxis; ++j)
     {
         concatDescriptor.SetViewOriginCoord(inputIndex, j, 0);
     }
 
-    concatDescriptor.SetViewOriginCoord(inputIndex, concatenationDim, mergeDim);
-    mergeDim += mergeDimSizes[concatenationDim];
+    concatDescriptor.SetViewOriginCoord(inputIndex, concatAxis, mergeDimOrigin);
+    mergeDimOrigin += inputTensorInfo.GetShape()[concatAxis];
 
-    for (unsigned int j = concatenationDim + 1; j < armnn::MaxNumOfTensorDimensions; ++j)
+    for (unsigned int j = concatAxis + 1; j < inputRank; ++j)
     {
         concatDescriptor.SetViewOriginCoord(inputIndex, j, 0);
     }

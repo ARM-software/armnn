@@ -189,4 +189,55 @@ BOOST_FIXTURE_TEST_CASE(ParseConcatenationDim3, ConcatenationFixtureDim3)
                                70, 71, 72, 73 } } });
 }
 
+struct ConcatenationFixture3DDim0 : ConcatenationFixture
+{
+    ConcatenationFixture3DDim0() : ConcatenationFixture("[ 1, 2, 3]", "[ 2, 2, 3]", "[ 3, 2, 3]", "0" ) {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseConcatenation3DDim0, ConcatenationFixture3DDim0)
+{
+    RunTest<3, armnn::DataType::QuantisedAsymm8>(
+        0,
+        { { "inputTensor1", { 0,  1,  2,  3,  4,  5 } },
+          { "inputTensor2", { 6,  7,  8,  9, 10, 11,
+                             12, 13, 14, 15, 16, 17 } } },
+        { { "outputTensor", { 0,  1,  2,  3,  4,  5,
+                              6,  7,  8,  9, 10, 11,
+                             12, 13, 14, 15, 16, 17 } } });
+}
+
+struct ConcatenationFixture3DDim1 : ConcatenationFixture
+{
+    ConcatenationFixture3DDim1() : ConcatenationFixture("[ 1, 2, 3]", "[ 1, 4, 3]", "[ 1, 6, 3]", "1" ) {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseConcatenation3DDim1, ConcatenationFixture3DDim1)
+{
+    RunTest<3, armnn::DataType::QuantisedAsymm8>(
+        0,
+        { { "inputTensor1", { 0,  1,  2,  3,  4,  5 } },
+          { "inputTensor2", { 6,  7,  8,  9, 10, 11,
+                             12, 13, 14, 15, 16, 17 } } },
+        { { "outputTensor", { 0,  1,  2,  3,  4,  5,
+                              6,  7,  8,  9, 10, 11,
+                             12, 13, 14, 15, 16, 17 } } });
+}
+
+struct ConcatenationFixture3DDim2 : ConcatenationFixture
+{
+    ConcatenationFixture3DDim2() : ConcatenationFixture("[ 1, 2, 3]", "[ 1, 2, 6]", "[ 1, 2, 9]", "2" ) {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseConcatenation3DDim2, ConcatenationFixture3DDim2)
+{
+    RunTest<3, armnn::DataType::QuantisedAsymm8>(
+        0,
+        { { "inputTensor1", { 0,  1,  2,
+                              3,  4,  5 } },
+          { "inputTensor2", { 6,  7,  8,  9, 10, 11,
+                             12, 13, 14, 15, 16, 17 } } },
+        { { "outputTensor", { 0,  1,  2,  6,  7,  8,  9, 10, 11,
+                              3,  4,  5, 12, 13, 14, 15, 16, 17 } } });
+}
+
 BOOST_AUTO_TEST_SUITE_END()

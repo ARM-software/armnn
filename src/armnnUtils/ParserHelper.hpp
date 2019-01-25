@@ -10,9 +10,11 @@
 namespace armnnUtils
 {
 
-void ProcessConcatInputTensorInfo(armnn::TensorInfo& inputTensorInfo, armnn::OriginsDescriptor& concatDescriptor,
-                                  const unsigned int& concatAxis, unsigned int inputIndex,
-                                  std::vector<unsigned int>& mergeDimSizes, unsigned int& mergeDim);
+void ProcessConcatInputTensorInfo(armnn::TensorInfo& inputTensorInfo,
+                                  armnn::OriginsDescriptor& concatDescriptor,
+                                  const unsigned int& concatAxis,
+                                  unsigned int inputIndex,
+                                  unsigned int& mergeDimOrigin);
 
 /// Creates a tensor info after reducing the dimensions mentioned in axisData.
 void CalculateReducedOutputTensoInfo(const armnn::TensorInfo& inputTensorInfo, const armnn::TensorInfo& axisTensorInfo,

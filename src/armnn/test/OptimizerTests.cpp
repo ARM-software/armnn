@@ -1050,4 +1050,39 @@ BOOST_AUTO_TEST_CASE(GatherValidateTensorShapesFromInputsMultiDimIndices)
     BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
 }
 
+BOOST_AUTO_TEST_CASE(DetectionPostProcessValidateTensorShapes)
+{
+    Graph graph;
+    armnn::TensorInfo boxEncodingsInfo({1, 10, 4}, DataType::QuantisedAsymm8);
+    armnn::TensorInfo scoresInfo({1, 10, 4}, DataType::QuantisedAsymm8);
+    std::vector<uint8_t> anchorsVector(40);
+    armnn::ConstTensor anchors(armnn::TensorInfo({10, 4}, armnn::DataType::QuantisedAsymm8), anchorsVector);
+
+    armnn::TensorInfo detectionBoxesInfo({1, 3, 4}, DataType::QuantisedAsymm8);
+    armnn::TensorInfo detectionScoresInfo({1, 3}, DataType::QuantisedAsymm8);
+    armnn::TensorInfo detectionClassesInfo({1, 3}, DataType::QuantisedAsymm8);
+    armnn::TensorInfo numDetectionInfo({1}, DataType::QuantisedAsymm8);
+
+    Layer* input0 = graph.AddLayer<InputLayer>(0, "boxEncodings");
+    input0->GetOutputSlot().SetTensorInfo(boxEncodingsInfo);
+
+    Layer* input1 = graph.AddLayer<InputLayer>(1, "score");
+    input1->GetOutputSlot().SetTensorInfo(scoresInfo);
+
+    DetectionPostProcessDescriptor descriptor;
+    descriptor.m_MaxDetections = 3;
+
+    DetectionPostProcessLayer* layer = graph.AddLayer<DetectionPostProcessLayer>(descriptor, "detectionPostProcess");
+    layer->m_Anchors = std::make_unique<armnn::ScopedCpuTensorHandle>(anchors);
+    layer->GetOutputSlot(0).SetTensorInfo(detectionBoxesInfo);
+    layer->GetOutputSlot(1).SetTensorInfo(detectionScoresInfo);
+    layer->GetOutputSlot(2).SetTensorInfo(detectionClassesInfo);
+    layer->GetOutputSlot(3).SetTensorInfo(numDetectionInfo);
+
+    input0->GetOutputSlot().Connect(layer->GetInputSlot(0));
+    input1->GetOutputSlot().Connect(layer->GetInputSlot(1));
+
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

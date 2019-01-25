@@ -329,6 +329,42 @@ struct DepthwiseConvolution2dDescriptor
 
 struct DetectionPostProcessDescriptor
 {
+    DetectionPostProcessDescriptor()
+    : m_MaxDetections(0)
+    , m_MaxClassesPerDetection(1)
+    , m_DetectionsPerClass(100)
+    , m_NmsScoreThreshold(0)
+    , m_NmsIouThreshold(0)
+    , m_NumClasses(0)
+    , m_UseRegularNms(false)
+    , m_ScaleX(0)
+    , m_ScaleY(0)
+    , m_ScaleW(0)
+    , m_ScaleH(0)
+    {}
+
+    /// Maximum numbers of detections.
+    uint32_t m_MaxDetections;
+    /// Maximum numbers of classes per detection, used in Fast NMS.
+    uint32_t m_MaxClassesPerDetection;
+    /// Detections per classes, used in Regular NMS.
+    uint32_t m_DetectionsPerClass;
+    /// NMS score threshold.
+    float m_NmsScoreThreshold;
+    /// Intersection over union threshold.
+    float m_NmsIouThreshold;
+    /// Number of classes.
+    int32_t m_NumClasses;
+    /// Use Regular NMS.
+    bool m_UseRegularNms;
+    /// Center size encoding scale x.
+    float m_ScaleX;
+    /// Center size encoding scale y.
+    float m_ScaleY;
+    /// Center size encoding scale weight.
+    float m_ScaleW;
+    /// Center size encoding scale height.
+    float m_ScaleH;
 };
 
 /// A NormalizationDescriptor for the NormalizationLayer.

@@ -10,10 +10,15 @@
 namespace armnn
 {
 
+class ScopedCpuTensorHandle;
+
 /// This layer represents a detection postprocess operator.
 class DetectionPostProcessLayer : public LayerWithParameters<DetectionPostProcessDescriptor>
 {
 public:
+    /// A unique pointer to store Anchor values.
+    std::unique_ptr<ScopedCpuTensorHandle> m_Anchors;
+
     /// Makes a workload for the DetectionPostProcess type.
     /// @param [in] graph The graph where this layer can be found.
     /// @param [in] factory The workload factory which will create the workload.
@@ -39,6 +44,10 @@ protected:
 
     /// Default destructor
     ~DetectionPostProcessLayer() = default;
+
+    /// Retrieve the handles to the constant values stored by the layer.
+    /// @return A vector of the constant tensors stored by this layer.
+    ConstantTensors GetConstantTensorsByRef() override;
 };
 
 } // namespace armnn

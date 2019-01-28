@@ -71,8 +71,11 @@ Layer::ConstantTensors BatchNormalizationLayer::GetConstantTensorsByRef()
 
 void BatchNormalizationLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor dummy;
-    visitor.VisitBatchNormalizationLayer(this, GetParameters(), dummy, dummy, dummy, dummy);
+    ConstTensor meanTensor(m_Mean->GetTensorInfo(), m_Mean->GetTensor<void*>()) ;
+    ConstTensor varianceTensor(m_Variance->GetTensorInfo(), m_Variance->GetTensor<void*>()) ;
+    ConstTensor betaTensor(m_Beta->GetTensorInfo(), m_Beta->GetTensor<void*>()) ;
+    ConstTensor gammaTensor(m_Gamma->GetTensorInfo(), m_Gamma->GetTensor<void*>()) ;
+    visitor.VisitBatchNormalizationLayer(this, GetParameters(), meanTensor, varianceTensor, betaTensor, gammaTensor);
 }
 
 } // namespace armnn

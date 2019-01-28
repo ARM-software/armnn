@@ -88,14 +88,15 @@ Layer::ConstantTensors FullyConnectedLayer::GetConstantTensorsByRef()
 
 void FullyConnectedLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor dummy;
+    ConstTensor weightsTensor(m_Weight->GetTensorInfo(), m_Weight->GetTensor<void*>()) ;
+    ConstTensor biasTensor(m_Bias->GetTensorInfo(), m_Bias->GetConstTensor<void*>());
     if (GetParameters().m_BiasEnabled)
     {
-        visitor.VisitFullyConnectedLayer(this, GetParameters(), dummy, dummy, GetName());
+        visitor.VisitFullyConnectedLayer(this, GetParameters(), weightsTensor, biasTensor, GetName());
     }
     else
     {
-        visitor.VisitFullyConnectedLayer(this, GetParameters(), dummy, GetName());
+        visitor.VisitFullyConnectedLayer(this, GetParameters(), weightsTensor, GetName());
     }
 }
 

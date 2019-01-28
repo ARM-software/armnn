@@ -122,14 +122,15 @@ Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()
 
 void DepthwiseConvolution2dLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor dummy;
+    ConstTensor weightsTensor(m_Weight->GetTensorInfo(), m_Weight->GetTensor<void*>()) ;
+    ConstTensor biasTensor(m_Bias->GetTensorInfo(), m_Bias->GetConstTensor<void*>());
     if (GetParameters().m_BiasEnabled)
     {
-        visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), dummy, dummy, GetName());
+        visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), weightsTensor, biasTensor, GetName());
     }
     else
     {
-        visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), dummy, GetName());
+        visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), weightsTensor, GetName());
     }
 }
 

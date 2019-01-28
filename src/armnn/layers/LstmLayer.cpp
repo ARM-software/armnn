@@ -251,8 +251,115 @@ Layer::ConstantTensors LstmLayer::GetConstantTensorsByRef()
 
 void LstmLayer::Accept(ILayerVisitor& visitor) const
 {
-    LstmInputParams dummy;
-    visitor.VisitLstmLayer(this, GetParameters(), dummy, GetName());
+    LstmInputParams inputParams;
+    if (m_CifgParameters.m_InputToInputWeights != nullptr)
+    {
+        ConstTensor inputToInputWeightsTensor(m_CifgParameters.m_InputToInputWeights->GetTensorInfo(),
+                                              m_CifgParameters.m_InputToInputWeights->GetConstTensor<void*>());
+        inputParams.m_InputToInputWeights = &inputToInputWeightsTensor;
+    }
+    if (m_BasicParameters.m_InputToForgetWeights != nullptr)
+    {
+        ConstTensor inputToForgetWeightsTensor(m_BasicParameters.m_InputToForgetWeights->GetTensorInfo(),
+                                               m_BasicParameters.m_InputToForgetWeights->GetConstTensor<void*>());
+        inputParams.m_InputToForgetWeights = &inputToForgetWeightsTensor;
+    }
+    if (m_BasicParameters.m_InputToCellWeights != nullptr)
+    {
+        ConstTensor inputToCellWeightsTensor(m_BasicParameters.m_InputToCellWeights->GetTensorInfo(),
+                                             m_BasicParameters.m_InputToCellWeights->GetConstTensor<void*>());
+        inputParams.m_InputToCellWeights = &inputToCellWeightsTensor;
+    }
+    if (m_BasicParameters.m_InputToOutputWeights != nullptr)
+    {
+        ConstTensor inputToOutputWeightsTensor(m_BasicParameters.m_InputToOutputWeights->GetTensorInfo(),
+                                               m_BasicParameters.m_InputToOutputWeights->GetConstTensor<void*>());
+        inputParams.m_InputToOutputWeights = &inputToOutputWeightsTensor;
+    }
+    if (m_CifgParameters.m_RecurrentToInputWeights != nullptr)
+    {
+        ConstTensor recurrentToInputWeightsTensor(
+                m_CifgParameters.m_RecurrentToInputWeights->GetTensorInfo(),
+                m_CifgParameters.m_RecurrentToInputWeights->GetConstTensor<void*>());
+        inputParams.m_RecurrentToInputWeights = &recurrentToInputWeightsTensor;
+    }
+    if (m_BasicParameters.m_RecurrentToForgetWeights != nullptr)
+    {
+        ConstTensor recurrentToForgetWeightsTensor(
+                m_BasicParameters.m_RecurrentToForgetWeights->GetTensorInfo(),
+                m_BasicParameters.m_RecurrentToForgetWeights->GetConstTensor<void*>());
+        inputParams.m_RecurrentToForgetWeights = &recurrentToForgetWeightsTensor;
+    }
+    if (m_BasicParameters.m_RecurrentToCellWeights != nullptr)
+    {
+        ConstTensor recurrentToCellWeightsTensor(
+                m_BasicParameters.m_RecurrentToCellWeights->GetTensorInfo(),
+                m_BasicParameters.m_RecurrentToCellWeights->GetConstTensor<void*>());
+        inputParams.m_RecurrentToCellWeights = &recurrentToCellWeightsTensor;
+    }
+    if (m_BasicParameters.m_RecurrentToOutputWeights != nullptr)
+    {
+        ConstTensor recurrentToOutputWeightsTensor(
+                m_BasicParameters.m_RecurrentToOutputWeights->GetTensorInfo(),
+                m_BasicParameters.m_RecurrentToOutputWeights->GetConstTensor<void*>());
+        inputParams.m_RecurrentToOutputWeights = &recurrentToOutputWeightsTensor;
+    }
+    if (m_CifgParameters.m_CellToInputWeights != nullptr)
+    {
+        ConstTensor cellToInputWeightsTensor(m_CifgParameters.m_CellToInputWeights->GetTensorInfo(),
+                                             m_CifgParameters.m_CellToInputWeights->GetConstTensor<void*>());
+        inputParams.m_CellToInputWeights = &cellToInputWeightsTensor;
+    }
+    if (m_PeepholeParameters.m_CellToForgetWeights != nullptr)
+    {
+        ConstTensor cellToForgetWeightsTensor(m_PeepholeParameters.m_CellToForgetWeights->GetTensorInfo(),
+                                              m_PeepholeParameters.m_CellToForgetWeights->GetConstTensor<void*>());
+        inputParams.m_CellToForgetWeights = &cellToForgetWeightsTensor;
+    }
+    if (m_PeepholeParameters.m_CellToOutputWeights != nullptr)
+    {
+        ConstTensor cellToOutputWeightsTensor(m_PeepholeParameters.m_CellToOutputWeights->GetTensorInfo(),
+                                              m_PeepholeParameters.m_CellToOutputWeights->GetConstTensor<void*>());
+        inputParams.m_CellToOutputWeights = &cellToOutputWeightsTensor;
+    }
+    if (m_CifgParameters.m_InputGateBias != nullptr)
+    {
+        ConstTensor inputGateBiasTensor(m_CifgParameters.m_InputGateBias->GetTensorInfo(),
+                                        m_CifgParameters.m_InputGateBias->GetConstTensor<void*>());
+        inputParams.m_InputGateBias = &inputGateBiasTensor;
+    }
+    if (m_BasicParameters.m_ForgetGateBias != nullptr)
+    {
+        ConstTensor forgetGateBiasTensor(m_BasicParameters.m_ForgetGateBias->GetTensorInfo(),
+                                         m_BasicParameters.m_ForgetGateBias->GetConstTensor<void*>());
+        inputParams.m_ForgetGateBias = &forgetGateBiasTensor;
+    }
+    if (m_BasicParameters.m_CellBias != nullptr)
+    {
+        ConstTensor cellBiasTensor(m_BasicParameters.m_CellBias->GetTensorInfo(),
+                                   m_BasicParameters.m_CellBias->GetConstTensor<void*>());
+        inputParams.m_CellBias = &cellBiasTensor;
+    }
+    if (m_BasicParameters.m_OutputGateBias != nullptr)
+    {
+        ConstTensor outputGateBias(m_BasicParameters.m_OutputGateBias->GetTensorInfo(),
+                                   m_BasicParameters.m_OutputGateBias->GetConstTensor<void*>());
+        inputParams.m_OutputGateBias = &outputGateBias;
+    }
+    if (m_ProjectionParameters.m_ProjectionWeights != nullptr)
+    {
+        ConstTensor projectionWeightsTensor(m_ProjectionParameters.m_ProjectionWeights->GetTensorInfo(),
+                                            m_ProjectionParameters.m_ProjectionWeights->GetConstTensor<void*>());
+        inputParams.m_ProjectionWeights = &projectionWeightsTensor;
+    }
+    if (m_ProjectionParameters.m_ProjectionBias != nullptr)
+    {
+        ConstTensor projectionBiasTensor(m_ProjectionParameters.m_ProjectionBias->GetTensorInfo(),
+                                         m_ProjectionParameters.m_ProjectionBias->GetConstTensor<void*>());
+        inputParams.m_ProjectionBias = &projectionBiasTensor;
+    }
+
+    visitor.VisitLstmLayer(this, GetParameters(), inputParams, GetName());
 }
 
 } // namespace armnn

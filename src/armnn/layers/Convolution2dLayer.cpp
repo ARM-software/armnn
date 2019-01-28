@@ -112,14 +112,15 @@ Layer::ConstantTensors Convolution2dLayer::GetConstantTensorsByRef()
 
 void Convolution2dLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor dummy;
+    ConstTensor weightsTensor(m_Weight->GetTensorInfo(), m_Weight->GetTensor<void*>()) ;
+    ConstTensor biasTensor(m_Bias->GetTensorInfo(), m_Bias->GetConstTensor<void*>());
     if (GetParameters().m_BiasEnabled)
     {
-        visitor.VisitConvolution2dLayer(this, GetParameters(), dummy, dummy, GetName());
+        visitor.VisitConvolution2dLayer(this, GetParameters(), weightsTensor, biasTensor, GetName());
     }
     else
     {
-        visitor.VisitConvolution2dLayer(this, GetParameters(), dummy, GetName());
+        visitor.VisitConvolution2dLayer(this, GetParameters(), weightsTensor, GetName());
     }
 }
 

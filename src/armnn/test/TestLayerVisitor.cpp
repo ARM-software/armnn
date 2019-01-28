@@ -25,4 +25,9 @@ void TestLayerVisitor::CheckLayerName(const char* name)
     }
 };
 
+void TestLayerVisitor::CheckLayerPointer(const IConnectableLayer* layer)
+{
+    BOOST_CHECK(layer != nullptr);
+};
+
 } //namespace armnn

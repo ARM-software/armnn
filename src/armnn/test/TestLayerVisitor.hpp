@@ -16,11 +16,19 @@ protected:
 
     void CheckLayerName(const char* name);
 
+    void CheckLayerPointer(const IConnectableLayer* layer);
+
 private:
     const char* m_LayerName;
 
 public:
-    explicit TestLayerVisitor(const char* name) : m_LayerName(name) {};
+    explicit TestLayerVisitor(const char* name) : m_LayerName(name)
+    {
+        if (name == nullptr)
+        {
+            m_LayerName = "";
+        }
+    };
 
     virtual void VisitInputLayer(const IConnectableLayer* layer,
                                  LayerBindingId id,

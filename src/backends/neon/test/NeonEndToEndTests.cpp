@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 #include <backendsCommon/test/MergerTestImpl.hpp>
+#include <backendsCommon/test/ArithmeticTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -49,6 +50,46 @@ BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+}
+
+BOOST_AUTO_TEST_CASE(NeonGreaterSimpleEndToEndTest)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
+                                                0, 0, 0, 0,  0, 0, 0, 0 });
+
+    ArithmeticSimpleEndToEnd<armnn::DataType::Float32, armnn::DataType::Boolean>(defaultBackends,
+                                                                                 LayerType::Greater,
+                                                                                 expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(NeonGreaterSimpleEndToEndUint8Test)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
+                                                0, 0, 0, 0,  0, 0, 0, 0 });
+
+    ArithmeticSimpleEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Boolean>(defaultBackends,
+                                                                                         LayerType::Greater,
+                                                                                         expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(NeonGreaterBroadcastEndToEndTest)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 1, 0, 0, 0, 1,
+                                                1, 1, 1, 1, 1, 1 });
+
+    ArithmeticBroadcastEndToEnd<armnn::DataType::Float32, armnn::DataType::Boolean>(defaultBackends,
+                                                                                    LayerType::Greater,
+                                                                                    expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(NeonGreaterBroadcastEndToEndUint8Test)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 1, 0, 0, 0, 1,
+                                                1, 1, 1, 1, 1, 1 });
+
+    ArithmeticBroadcastEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Boolean>(defaultBackends,
+                                                                                            LayerType::Greater,
+                                                                                            expectedOutput);
 }
 
 BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim0Test)

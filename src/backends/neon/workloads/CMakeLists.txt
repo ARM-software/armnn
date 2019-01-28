@@ -24,6 +24,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonFloorFloatWorkload.hpp
     NeonFullyConnectedWorkload.cpp
     NeonFullyConnectedWorkload.hpp
+    NeonGreaterWorkload.cpp
+    NeonGreaterWorkload.hpp
     NeonL2NormalizationFloatWorkload.cpp
     NeonL2NormalizationFloatWorkload.hpp
     NeonLstmFloatWorkload.cpp

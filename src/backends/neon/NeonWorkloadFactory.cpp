@@ -316,7 +316,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMinimum(const MinimumQueue
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkloadHelper<NeonGreaterFloat32Workload, NeonGreaterUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,

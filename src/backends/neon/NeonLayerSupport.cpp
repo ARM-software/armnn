@@ -22,6 +22,7 @@
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
+#include "workloads/NeonGreaterWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonMaximumWorkload.hpp"
 #include "workloads/NeonMeanWorkload.hpp"
@@ -234,6 +235,18 @@ bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    weights,
                                    biases,
                                    descriptor);
+}
+
+bool NeonLayerSupport::IsGreaterSupported(const armnn::TensorInfo& input0,
+                                          const armnn::TensorInfo& input1,
+                                          const armnn::TensorInfo& output,
+                                          armnn::Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonGreaterWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool NeonLayerSupport::IsInputSupported(const TensorInfo& input,

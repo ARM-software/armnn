@@ -382,6 +382,14 @@ ARMNN_AUTO_TEST_CASE(L2Normalization4dNhwc, L2Normalization4dTest, armnn::DataLa
 // Floor
 ARMNN_AUTO_TEST_CASE(SimpleFloor, SimpleFloorTest)
 
+// Greater
+ARMNN_AUTO_TEST_CASE(SimpleGreater, GreaterSimpleTest)
+ARMNN_AUTO_TEST_CASE(GreaterBroadcast1Element, GreaterBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(GreaterBroadcast1DVector, GreaterBroadcast1DVectorTest)
+ARMNN_AUTO_TEST_CASE(GreaterUint8, GreaterUint8Test)
+ARMNN_AUTO_TEST_CASE(GreaterBroadcast1ElementUint8, GreaterBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE(GreaterBroadcast1DVectorUint8, GreaterBroadcast1DVectorUint8Test)
+
 // Reshape
 ARMNN_AUTO_TEST_CASE(SimpleReshapeFloat32, SimpleReshapeFloat32Test)
 ARMNN_AUTO_TEST_CASE(SimpleReshapeUint8, SimpleReshapeUint8Test)

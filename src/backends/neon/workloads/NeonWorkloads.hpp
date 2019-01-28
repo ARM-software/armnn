@@ -14,6 +14,7 @@
 #include "NeonDepthwiseConvolutionWorkload.hpp"
 #include "NeonFloorFloatWorkload.hpp"
 #include "NeonFullyConnectedWorkload.hpp"
+#include "NeonGreaterWorkload.hpp"
 #include "NeonL2NormalizationFloatWorkload.hpp"
 #include "NeonLstmFloatWorkload.hpp"
 #include "NeonMaximumWorkload.hpp"

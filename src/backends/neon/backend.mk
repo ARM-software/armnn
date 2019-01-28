@@ -23,6 +23,7 @@ BACKEND_SOURCES := \
         workloads/NeonDepthwiseConvolutionWorkload.cpp \
         workloads/NeonFloorFloatWorkload.cpp \
         workloads/NeonFullyConnectedWorkload.cpp \
+        workloads/NeonGreaterWorkload.cpp \
         workloads/NeonL2NormalizationFloatWorkload.cpp \
         workloads/NeonLstmFloatWorkload.cpp \
         workloads/NeonMaximumWorkload.cpp \

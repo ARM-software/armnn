@@ -348,7 +348,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMinimum(const MinimumQueueDe
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<ClGreaterFloat32Workload, ClGreaterUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,

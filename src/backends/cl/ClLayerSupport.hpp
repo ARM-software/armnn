@@ -77,6 +77,11 @@ public:
                                    const FullyConnectedDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsGreaterSupported(const TensorInfo& input0,
+                            const TensorInfo& input1,
+                            const TensorInfo& ouput,
+                            Optional<std::string&> reasonIfUnsupported) const override;
+
     bool IsInputSupported(const TensorInfo& input,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 

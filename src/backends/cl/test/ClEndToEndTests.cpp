@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 #include <backendsCommon/test/MergerTestImpl.hpp>
+#include <backendsCommon/test/ArithmeticTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -46,5 +47,46 @@ BOOST_AUTO_TEST_CASE(ClMergerEndToEndDim3Uint8Test)
 {
     MergerDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
+
+BOOST_AUTO_TEST_CASE(ClGreaterSimpleEndToEndTest)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
+                                                0, 0, 0, 0,  0, 0, 0, 0 });
+
+    ArithmeticSimpleEndToEnd<armnn::DataType::Float32, armnn::DataType::Boolean>(defaultBackends,
+                                                                                 LayerType::Greater,
+                                                                                 expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(ClGreaterSimpleEndToEndUint8Test)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
+                                                0, 0, 0, 0,  0, 0, 0, 0 });
+
+    ArithmeticSimpleEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Boolean>(defaultBackends,
+                                                                                         LayerType::Greater,
+                                                                                         expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(ClGreaterBroadcastEndToEndTest)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 1, 0, 0, 0, 1,
+                                                1, 1, 1, 1, 1, 1 });
+
+    ArithmeticBroadcastEndToEnd<armnn::DataType::Float32, armnn::DataType::Boolean>(defaultBackends,
+                                                                                    LayerType::Greater,
+                                                                                    expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(ClGreaterBroadcastEndToEndUint8Test)
+{
+    const std::vector<uint8_t> expectedOutput({ 0, 1, 0, 0, 0, 1,
+                                                1, 1, 1, 1, 1, 1 });
+
+    ArithmeticBroadcastEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Boolean>(defaultBackends,
+                                                                                            LayerType::Greater,
+                                                                                            expectedOutput);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

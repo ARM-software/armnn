@@ -25,6 +25,7 @@
 #include "workloads/ClDepthwiseConvolutionWorkload.hpp"
 #include "workloads/ClDivisionFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
+#include "workloads/ClGreaterWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
 #include "workloads/ClLstmFloatWorkload.hpp"
 #include "workloads/ClMaximumWorkload.hpp"
@@ -286,6 +287,18 @@ bool ClLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    weights,
                                    biases,
                                    descriptor);
+}
+
+bool ClLayerSupport::IsGreaterSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClGreaterWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool ClLayerSupport::IsInputSupported(const TensorInfo& input,

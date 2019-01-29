@@ -14,6 +14,7 @@
 #include "ClDivisionFloatWorkload.hpp"
 #include "ClFloorFloatWorkload.hpp"
 #include "ClFullyConnectedWorkload.hpp"
+#include "ClGreaterWorkload.hpp"
 #include "ClL2NormalizationFloatWorkload.hpp"
 #include "ClLstmFloatWorkload.hpp"
 #include "ClMergerWorkload.hpp"

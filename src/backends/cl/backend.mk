@@ -26,6 +26,7 @@ BACKEND_SOURCES := \
         workloads/ClDivisionFloatWorkload.cpp \
         workloads/ClFloorFloatWorkload.cpp \
         workloads/ClFullyConnectedWorkload.cpp \
+        workloads/ClGreaterWorkload.cpp \
         workloads/ClL2NormalizationFloatWorkload.cpp \
         workloads/ClLstmFloatWorkload.cpp \
         workloads/ClMaximumWorkload.cpp \

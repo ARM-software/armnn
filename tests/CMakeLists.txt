@@ -164,6 +164,13 @@ if (BUILD_TF_LITE_PARSER)
         ImagePreprocessor.cpp)
     TfLiteParserTest(TfLiteMobilenetQuantized-Armnn "${TfLiteMobilenetQuantized-Armnn_sources}")
 
+    set(TfLiteMobileNetSsd-Armnn_sources
+        TfLiteMobileNetSsd-Armnn/TfLiteMobileNetSsd-Armnn.cpp
+        MobileNetSsdDatabase.hpp
+        MobileNetSsdInferenceTest.hpp
+        ObjectDetectionCommon.hpp)
+    TfLiteParserTest(TfLiteMobileNetSsd-Armnn "${TfLiteMobileNetSsd-Armnn_sources}")
+
     set(TfLiteVGG16Quantized-Armnn_sources
         TfLiteVGG16Quantized-Armnn/TfLiteVGG16Quantized-Armnn.cpp
         ImagePreprocessor.hpp

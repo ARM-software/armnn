@@ -206,9 +206,12 @@ int MainImpl(const char* modelPath,
         params.m_SubgraphId = subgraphId;
         InferenceModel<TParser, TDataType> model(params, runtime);
 
-        // Executes the model
-        const size_t numOutputs = params.m_OutputBindings.size();
-        std::vector<TContainer> outputDataContainers(numOutputs);
+        const size_t numOutputs    = params.m_OutputBindings.size();
+        const size_t containerSize = model.GetOutputSize();
+
+        std::vector<TContainer> outputDataContainers(numOutputs, TContainer(containerSize));
+
+        // Execute model
         model.Run({ inputDataContainer }, outputDataContainers);
 
         // Print output tensors

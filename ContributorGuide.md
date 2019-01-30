@@ -4,6 +4,16 @@ The ArmNN project is open for external contributors and welcomes contributions. 
 under the [MIT license](https://spdx.org/licenses/MIT.html) and all accepted contributions must have
 the same license.
 
+## Developer Certificate of Origin (DCO)
+
+Before the ArmNN project accepts your contribution, you need to certify its origin and give us your permission.  To manage this process we use Developer Certificate of Origin (DCO) V1.1 (https://developercertificate.org/).
+
+To indicate that you agree to the the terms of the DCO, you "sign off" your contribution by adding a line with your name and e-mail address to every git commit message:
+
+Signed-off-by: John Doe <john.doe@example.org>
+
+You must use your real name, no pseudonyms or anonymous contributions are accepted.
+
 ## Releases
 
 Official ArmNN releases are published through the official [ArmNN Github repository](https://github.com/ARM-software/armnn).

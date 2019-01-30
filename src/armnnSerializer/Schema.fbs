@@ -1,0 +1,111 @@
+//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+
+namespace armnn.armnnSerializer;
+
+file_identifier "ARMN";
+
+file_extension "armnn";
+
+enum DataType : byte {
+    Float16 = 0,
+    Float32 = 1,
+    QuantisedAsymm8 = 2,
+    Signed32 = 3,
+    Boolean = 4
+}
+
+table TensorInfo {
+    dimensions:[uint];
+    dataType:DataType;
+    quantizationScale:float = 1.0;
+    quantizationOffset:int = 0;
+}
+
+struct Connection {
+    sourceLayerIndex:uint;
+    outputSlotIndex:uint;
+}
+
+table ByteData {
+    data:[byte];
+}
+
+table ShortData {
+    data:[short];
+}
+
+table IntData {
+    data:[int];
+}
+
+table LongData {
+    data:[long];
+}
+
+union ConstTensorData { ByteData, ShortData, IntData, LongData }
+
+table ConstTensor {
+    info:TensorInfo;
+    data:ConstTensorData;
+}
+
+table InputSlot {
+    index:uint;
+    connection:Connection;
+}
+
+table OutputSlot {
+    index:uint;
+    tensorInfo:TensorInfo;
+}
+
+enum LayerType : uint {
+    Addition = 0,
+    Input = 1,
+    Output = 2
+}
+
+// Base layer table to be used as part of other layers
+table LayerBase {
+    index:uint;
+    layerName:string;
+    layerType:LayerType;
+    inputSlots:[InputSlot];
+    outputSlots:[OutputSlot];
+}
+
+table BindableLayerBase {
+    base:LayerBase;
+    layerBindingId:int;
+}
+
+// Table for each layer defined below
+table AdditionLayer {
+    base:LayerBase;
+}
+
+table InputLayer {
+    base:BindableLayerBase;
+}
+
+table OutputLayer {
+    base:BindableLayerBase;
+}
+
+union Layer {
+    AdditionLayer,
+    InputLayer,
+    OutputLayer
+}
+
+// Root type for serialized data is the graph of the network
+table SerializedGraph {
+    layers:[Layer];
+    inputIds:[int];
+    outputIds:[int];
+}
+
+root_type SerializedGraph;

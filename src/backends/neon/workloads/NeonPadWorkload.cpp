@@ -49,7 +49,14 @@ arm_compute::Status NeonPadWorkloadValidate(const TensorInfo& input,
 {
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output);
-    arm_compute::PaddingList padList = static_cast<arm_compute::PaddingList>(descriptor.m_PadList);
+
+    std::vector<std::pair<unsigned int, unsigned int>> reversed_PadList(descriptor.m_PadList.size());
+
+    std::reverse_copy(std::begin(descriptor.m_PadList),
+                      std::end(descriptor.m_PadList),
+                      std::begin(reversed_PadList));
+
+    arm_compute::PaddingList padList = static_cast<arm_compute::PaddingList>(reversed_PadList);
 
     return arm_compute::NEPadLayer::validate(&aclInputInfo, &aclOutputInfo, padList);
 }

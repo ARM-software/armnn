@@ -342,7 +342,7 @@ int ClassifierInferenceTestMain(int argc,
                     }
 
                     modelParams.m_IsModelBinary = isModelBinary;
-                    modelParams.m_ComputeDevice = modelOptions.m_ComputeDevice;
+                    modelParams.m_ComputeDevices = modelOptions.GetComputeDevicesAsBackendIds();
                     modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
                     modelParams.m_EnableFp16TurboMode = modelOptions.m_EnableFp16TurboMode;
 

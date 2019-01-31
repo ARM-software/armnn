@@ -16,6 +16,7 @@
 
 #include <backendsCommon/BackendRegistry.hpp>
 
+#include <boost/algorithm/string/join.hpp>
 #include <boost/exception/exception.hpp>
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/log/trivial.hpp>
@@ -24,6 +25,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <algorithm>
+#include <iterator>
 #include <fstream>
 #include <map>
 #include <string>
@@ -78,7 +81,7 @@ struct Params
     std::vector<std::string>        m_InputBindings;
     std::vector<armnn::TensorShape> m_InputShapes;
     std::vector<std::string>        m_OutputBindings;
-    std::vector<armnn::BackendId>   m_ComputeDevice;
+    std::vector<armnn::BackendId>   m_ComputeDevices;
     bool                            m_EnableProfiling;
     size_t                          m_SubgraphId;
     bool                            m_IsModelBinary;
@@ -86,7 +89,7 @@ struct Params
     bool                            m_EnableFp16TurboMode;
 
     Params()
-        : m_ComputeDevice{armnn::Compute::CpuRef}
+        : m_ComputeDevices{"CpuRef"}
         , m_EnableProfiling(false)
         , m_SubgraphId(0)
         , m_IsModelBinary(true)
@@ -319,16 +322,23 @@ public:
     struct CommandLineOptions
     {
         std::string m_ModelDir;
-        std::vector<armnn::BackendId> m_ComputeDevice;
+        std::vector<std::string> m_ComputeDevices;
         bool m_VisualizePostOptimizationModel;
         bool m_EnableFp16TurboMode;
+
+        std::vector<armnn::BackendId> GetComputeDevicesAsBackendIds()
+        {
+            std::vector<armnn::BackendId> backendIds;
+            std::copy(m_ComputeDevices.begin(), m_ComputeDevices.end(), std::back_inserter(backendIds));
+            return backendIds;
+        }
     };
 
     static void AddCommandLineOptions(boost::program_options::options_description& desc, CommandLineOptions& options)
     {
         namespace po = boost::program_options;
 
-        std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuAcc, armnn::Compute::CpuRef};
+        const std::vector<std::string> defaultComputes = { "CpuAcc", "CpuRef" };
 
         const std::string backendsMessage = "Which device to run layers on by default. Possible choices: "
                                           + armnn::BackendRegistryInstance().GetBackendIdsAsString();
@@ -336,8 +346,9 @@ public:
         desc.add_options()
             ("model-dir,m", po::value<std::string>(&options.m_ModelDir)->required(),
                 "Path to directory containing model files (.caffemodel/.prototxt/.tflite)")
-            ("compute,c", po::value<std::vector<armnn::BackendId>>(&options.m_ComputeDevice)->default_value
-                (defaultBackends), backendsMessage.c_str())
+            ("compute,c", po::value<std::vector<std::string>>(&options.m_ComputeDevices)->
+                default_value(defaultComputes, boost::algorithm::join(defaultComputes, ", "))->
+                multitoken(), backendsMessage.c_str())
             ("visualize-optimized-model,v",
                 po::value<bool>(&options.m_VisualizePostOptimizationModel)->default_value(false),
              "Produce a dot file useful for visualizing the graph post optimization."
@@ -362,7 +373,7 @@ public:
         }
 
         std::string invalidBackends;
-        if (!CheckRequestedBackendsAreValid(params.m_ComputeDevice, armnn::Optional<std::string&>(invalidBackends)))
+        if (!CheckRequestedBackendsAreValid(params.m_ComputeDevices, armnn::Optional<std::string&>(invalidBackends)))
         {
             throw armnn::Exception("Some backend IDs are invalid: " + invalidBackends);
         }
@@ -377,7 +388,7 @@ public:
             armnn::OptimizerOptions options;
             options.m_ReduceFp32ToFp16 = params.m_EnableFp16TurboMode;
 
-            optNet = armnn::Optimize(*network, params.m_ComputeDevice, m_Runtime->GetDeviceSpec(), options);
+            optNet = armnn::Optimize(*network, params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);
             if (!optNet)
             {
                 throw armnn::Exception("Optimize returned nullptr");

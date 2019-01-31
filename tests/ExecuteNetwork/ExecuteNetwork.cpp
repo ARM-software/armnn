@@ -171,7 +171,7 @@ void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
 template<typename TParser, typename TDataType>
 int MainImpl(const char* modelPath,
              bool isModelBinary,
-             const std::vector<armnn::BackendId>& computeDevice,
+             const std::vector<armnn::BackendId>& computeDevices,
              const char* inputName,
              const armnn::TensorShape* inputTensorShape,
              const char* inputTensorDataFilePath,
@@ -200,7 +200,7 @@ int MainImpl(const char* modelPath,
         typename InferenceModel<TParser, TDataType>::Params params;
         params.m_ModelPath = modelPath;
         params.m_IsModelBinary = isModelBinary;
-        params.m_ComputeDevice = computeDevice;
+        params.m_ComputeDevices = computeDevices;
         params.m_InputBindings = { inputName };
         params.m_InputShapes = { *inputTensorShape };
         params.m_OutputBindings = { outputName };

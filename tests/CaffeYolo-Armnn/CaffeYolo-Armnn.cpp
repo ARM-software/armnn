@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
                         modelParams.m_OutputBindings = { "fc12" };
                         modelParams.m_InputShapes = { inputTensorShape };
                         modelParams.m_IsModelBinary = true;
-                        modelParams.m_ComputeDevice = modelOptions.m_ComputeDevice;
+                        modelParams.m_ComputeDevices = modelOptions.GetComputeDevicesAsBackendIds();
                         modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
                         modelParams.m_EnableFp16TurboMode = modelOptions.m_EnableFp16TurboMode;
 

@@ -7,6 +7,12 @@
 # in the Android build and it is picked up by the Android.mk
 # file in the root of ArmNN
 
+# The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
+
+# ARMNN_COMPUTE_CL_ENABLED == 1
+# Include the source files for the CL backend
+
 BACKEND_SOURCES := \
         ClBackend.cpp \
         ClBackendContext.cpp \
@@ -46,10 +52,24 @@ BACKEND_SOURCES := \
         workloads/ClSpaceToBatchNdWorkload.cpp \
         workloads/ClStridedSliceWorkload.cpp \
         workloads/ClSubtractionWorkload.cpp
+else
+
+# ARMNN_COMPUTE_CL_ENABLED == 0
+# No source file will be compiled for the CL backend
+
+BACKEND_SOURCES :=
+
+endif
 
 # BACKEND_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked
 # up by the Android.mk file in the root of ArmNN
+
+# The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
+
+# ARMNN_COMPUTE_CL_ENABLED == 1
+# Include the source files for the CL backend tests
 
 BACKEND_TEST_SOURCES := \
         test/ClCreateWorkloadTests.cpp \
@@ -62,3 +82,11 @@ BACKEND_TEST_SOURCES := \
         test/ClRuntimeTests.cpp \
         test/Fp16SupportTest.cpp \
         test/OpenClTimerTest.cpp
+else
+
+# ARMNN_COMPUTE_CL_ENABLED == 0
+# No source file will be compiled for the CL backend tests
+
+BACKEND_TEST_SOURCES :=
+
+endif

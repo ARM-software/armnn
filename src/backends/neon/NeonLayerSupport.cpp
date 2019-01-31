@@ -16,7 +16,7 @@
 
 #include <boost/core/ignore_unused.hpp>
 
-#ifdef ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTENEON_ENABLED)
 #include "workloads/NeonAdditionWorkload.hpp"
 #include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
@@ -49,7 +49,7 @@ namespace
 
 bool IsNeonBackendSupported(Optional<std::string&> reasonIfUnsupported)
 {
-#if ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTENEON_ENABLED)
     return true;
 #else
     if (reasonIfUnsupported)
@@ -78,7 +78,7 @@ bool IsSupportedForDataTypeNeon(Optional<std::string&> reasonIfUnsupported,
                                          std::forward<Params>(params)...);
 }
 
-#if ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTENEON_ENABLED)
 template<class FuncType, class... Args>
 inline bool IsWorkloadSupported(FuncType& func, Optional<std::string&> reasonIfUnsupported, Args&&... args)
 {

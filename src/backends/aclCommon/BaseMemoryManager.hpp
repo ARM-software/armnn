@@ -7,11 +7,11 @@
 #include <backendsCommon/IMemoryManager.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#ifdef ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTENEON_ENABLED)
 #include <arm_compute/runtime/MemoryGroup.h>
 #endif
 
-#ifdef ARMCOMPUTECL_ENABLED
+#if defined(ARMCOMPUTECL_ENABLED)
 #include <arm_compute/runtime/CL/CLMemoryGroup.h>
 #endif
 
@@ -40,7 +40,6 @@ public:
     void Release() override;
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
-
     BaseMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc, MemoryAffinity memoryAffinity);
 
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& GetIntraLayerManager() { return m_IntraLayerMemoryMgr; }
@@ -57,17 +56,16 @@ protected:
 
     virtual std::shared_ptr<arm_compute::IMemoryGroup>
     CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager) = 0;
-
 #endif
 };
 
+#if defined(ARMCOMPUTENEON_ENABLED)
 class NeonMemoryManager : public BaseMemoryManager
 {
 public:
     NeonMemoryManager() {}
     virtual ~NeonMemoryManager() {}
 
-#ifdef ARMCOMPUTENEON_ENABLED
     NeonMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc, MemoryAffinity memoryAffinity)
     : BaseMemoryManager(std::move(alloc), memoryAffinity)
     {
@@ -75,18 +73,18 @@ public:
     }
 
 protected:
-    virtual std::shared_ptr<arm_compute::IMemoryGroup>
+    std::shared_ptr<arm_compute::IMemoryGroup>
     CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager) override;
-#endif
 };
+#endif
 
+#if defined(ARMCOMPUTECL_ENABLED)
 class ClMemoryManager : public BaseMemoryManager
 {
 public:
     ClMemoryManager() {}
     virtual ~ClMemoryManager() {}
 
-#ifdef ARMCOMPUTECL_ENABLED
     ClMemoryManager(std::unique_ptr<arm_compute::IAllocator> alloc)
     : BaseMemoryManager(std::move(alloc), MemoryAffinity::Buffer)
     {
@@ -94,9 +92,9 @@ public:
     }
 
 protected:
-    virtual std::shared_ptr<arm_compute::IMemoryGroup>
+    std::shared_ptr<arm_compute::IMemoryGroup>
     CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager) override;
-#endif
 };
+#endif
 
 } //namespace armnn

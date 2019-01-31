@@ -89,7 +89,7 @@ void BaseMemoryManager::Release()
 }
 #endif
 
-#ifdef ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTENEON_ENABLED)
 std::shared_ptr<arm_compute::IMemoryGroup>
 NeonMemoryManager::CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
 {
@@ -97,7 +97,7 @@ NeonMemoryManager::CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryMa
 }
 #endif
 
-#ifdef ARMCOMPUTECL_ENABLED
+#if defined(ARMCOMPUTECL_ENABLED)
 std::shared_ptr<arm_compute::IMemoryGroup>
 ClMemoryManager::CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
 {

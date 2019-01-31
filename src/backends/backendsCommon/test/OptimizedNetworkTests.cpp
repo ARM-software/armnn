@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateDeviceNonSupportLayerWithFallback)
         // If NEON is enabled, Input and Output layers are supported by CpuAcc,
         // the other layers are supported by CpuRef.
         // If NEON is not enabled, all layers are supported by CpuRef.
-#if ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTENEON_ENABLED)
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
             BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback
         // If only CL is enabled, Input and Output layers are supported by GpuAcc,
         // the other layers are supported by CpuRef.
         // If neither NEON, nor CL is enabled, all layers are supported by CpuRef.
-#if ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTENEON_ENABLED)
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
             BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback
         {
             BOOST_CHECK(layer->GetBackendId() == armnn::Compute::CpuRef);
         }
-#elif ARMCOMPUTECL_ENABLED
+#elif defined(ARMCOMPUTECL_ENABLED)
         if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
         {
             BOOST_CHECK(layer->GetBackendId() == armnn::Compute::GpuAcc);

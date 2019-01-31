@@ -14,7 +14,7 @@
 
 #include <boost/core/ignore_unused.hpp>
 
-#ifdef ARMCOMPUTECL_ENABLED
+#if defined(ARMCOMPUTECL_ENABLED)
 #include "workloads/ClAdditionWorkload.hpp"
 #include "workloads/ClActivationWorkload.hpp"
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
@@ -72,7 +72,7 @@ bool IsMatchingStride(uint32_t actualStride)
 
 bool IsClBackendSupported(Optional<std::string&> reasonIfUnsupported)
 {
-#if ARMCOMPUTECL_ENABLED
+#if defined(ARMCOMPUTECL_ENABLED)
     return true;
 #else
     if (reasonIfUnsupported)
@@ -83,13 +83,13 @@ bool IsClBackendSupported(Optional<std::string&> reasonIfUnsupported)
 #endif
 }
 
-#if ARMCOMPUTECL_ENABLED
+#if defined(ARMCOMPUTECL_ENABLED)
 #define FORWARD_CL_LAYER_SUPPORT_FUNC(expr) (expr)
 #else
 #define FORWARD_CL_LAYER_SUPPORT_FUNC(expr) IsClBackendSupported(reasonIfUnsupported)
 #endif
 
-#if ARMCOMPUTECL_ENABLED
+#if defined(ARMCOMPUTECL_ENABLED)
 template<class FuncType, class... Args>
 inline bool IsWorkloadSupported(FuncType&& func, Optional<std::string&> reasonIfUnsupported, Args&&... args)
 {

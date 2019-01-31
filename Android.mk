@@ -158,10 +158,18 @@ LOCAL_SHARED_LIBRARIES := \
 LOCAL_CFLAGS := \
         -std=c++14 \
         -fexceptions \
-        -DARMCOMPUTECL_ENABLED \
-        -DARMCOMPUTENEON_ENABLED \
         -Wno-unused-parameter \
         -frtti
+# The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
+LOCAL_CFLAGS += \
+        -DARMCOMPUTECL_ENABLED
+endif # ARMNN_COMPUTE_CL_ENABLED == 1
+# The variable to enable/disable the NEON backend (ARMNN_COMPUTE_NEON_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
+LOCAL_CFLAGS += \
+        -DARMCOMPUTENEON_ENABLED
+endif # ARMNN_COMPUTE_NEON_ENABLED == 1
 
 include $(BUILD_STATIC_LIBRARY)
 
@@ -209,9 +217,17 @@ LOCAL_CFLAGS := \
         -std=c++14 \
         -fexceptions \
         -frtti \
-        -isystem vendor/arm/android-nn-driver/boost_1_64_0 \
-        -DARMCOMPUTECL_ENABLED \
+        -isystem vendor/arm/android-nn-driver/boost_1_64_0
+# The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
+LOCAL_CFLAGS += \
+        -DARMCOMPUTECL_ENABLED
+endif # ARMNN_COMPUTE_CL_ENABLED == 1
+# The variable to enable/disable the NEON backend (ARMNN_COMPUTE_NEON_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
+LOCAL_CFLAGS += \
         -DARMCOMPUTENEON_ENABLED
+endif # ARMNN_COMPUTE_NEON_ENABLED == 1
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_TEST_SOURCES) \

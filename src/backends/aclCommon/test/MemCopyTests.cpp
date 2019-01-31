@@ -4,15 +4,14 @@
 //
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-#include <cl/ClWorkloadFactory.hpp>
-#include <neon/NeonWorkloadFactory.hpp>
-
-#if ARMCOMPUTECL_ENABLED && ARMCOMPUTENEON_ENABLED
 #include <aclCommon/test/MemCopyTestImpl.hpp>
 
+#if defined(ARMCOMPUTECL_ENABLED) && defined(ARMCOMPUTENEON_ENABLED)
+#include <cl/ClWorkloadFactory.hpp>
 #include <cl/test/ClContextControlFixture.hpp>
 #include <cl/test/ClWorkloadFactoryHelper.hpp>
 
+#include <neon/NeonWorkloadFactory.hpp>
 #include <neon/test/NeonWorkloadFactoryHelper.hpp>
 #endif
 
@@ -41,7 +40,7 @@ BOOST_AUTO_TEST_CASE(AclTypeConversions)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#if ARMCOMPUTECL_ENABLED && ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTECL_ENABLED) && defined(ARMCOMPUTENEON_ENABLED)
 
 BOOST_FIXTURE_TEST_SUITE(MemCopyClNeon, ClContextControlFixture)
 

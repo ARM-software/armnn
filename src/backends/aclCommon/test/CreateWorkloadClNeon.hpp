@@ -9,11 +9,11 @@
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <reference/RefWorkloadFactory.hpp>
 
-#if ARMCOMPUTECL_ENABLED
+#if defined(ARMCOMPUTECL_ENABLED)
 #include <cl/ClTensorHandle.hpp>
 #endif
 
-#if ARMCOMPUTENEON_ENABLED
+#if defined(ARMCOMPUTENEON_ENABLED)
 #include <neon/NeonTensorHandle.hpp>
 #endif
 

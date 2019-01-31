@@ -143,9 +143,33 @@ if(BUILD_TF_LITE_PARSER)
 
     target_include_directories(armnnTfLiteParser PRIVATE src/armnn)
     target_include_directories(armnnTfLiteParser PRIVATE src/armnnUtils)
+    target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
 
     target_link_libraries(armnnTfLiteParser ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
     target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
+endif()
+
+if(BUILD_ARMNN_SERIALIZER)
+    add_custom_command (
+        OUTPUT  src/armnnSerializer/Schema_generated.h
+        COMMAND ${FLATC_DIR}/flatc -o ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer --cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/armnnSerializer/Schema.fbs
+    )
+
+    set(armnn_serializer_sources)
+    list(APPEND armnn_serializer_sources
+        src/armnnSerializer/Schema_generated.h
+        )
+
+    add_library_ex(armnnSerializer SHARED ${armnn_serializer_sources})
+
+    target_include_directories(armnnSerializer PRIVATE src/armnn)
+    target_include_directories(armnnSerializer PRIVATE src/armnnUtils)
+
+    # System include to suppress warnings for flatbuffers generated files
+    target_include_directories(armnnSerializer SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
+
+    target_link_libraries(armnnSerializer armnn ${FLATBUFFERS_LIBRARY})
 endif()
 
 list(APPEND armnn_sources
@@ -362,6 +386,9 @@ endif()
 if(BUILD_TF_LITE_PARSER)
     install(TARGETS armnnTfLiteParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
+if(BUILD_ARMNN_SERIALIZER)
+    install(TARGETS armnnSerializer DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+endif()
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 target_link_libraries(armnn ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
@@ -532,6 +559,10 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(UnitTests PRIVATE src/armnn)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
     target_include_directories(UnitTests PRIVATE src/backends)
+
+    if(BUILD_TF_LITE_PARSER)
+        target_include_directories(UnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+    endif()
 
     if(VALGRIND_FOUND)
         if(HEAP_PROFILING OR LEAK_CHECKING)

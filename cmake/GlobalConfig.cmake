@@ -13,6 +13,8 @@ option(LEAK_CHECKING "Build with leak checking enabled" OFF)
 option(GPERFTOOLS_ROOT "Location where the gperftools 'include' and 'lib' folders to be found" Off)
 # options used for tensorflow lite support
 option(BUILD_TF_LITE_PARSER "Build Tensorflow Lite parser" OFF)
+option(BUILD_ARMNN_SERIALIZER "Build Armnn Serializer" OFF)
+option(FLATC_DIR "Path to Flatbuffers compiler" OFF)
 option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OFF)
 option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
 
@@ -163,29 +165,18 @@ if(BUILD_ONNX_PARSER)
     include_directories(SYSTEM "${ONNX_GENERATED_SOURCES}")
 endif()
 
-
-# Flatbuffers support for TF Lite
-if(BUILD_TF_LITE_PARSER)
-    find_path(TF_LITE_SCHEMA_INCLUDE_PATH
-              schema_generated.h
-              HINTS ${TF_LITE_GENERATED_PATH})
-
-    if(NOT TF_LITE_SCHEMA_INCLUDE_PATH)
-        message(WARNING
-          "Couldn't find 'schema_generated.h' at ${TF_LITE_GENERATED_PATH}. Disabling Tf Lite support")
-        set(BUILD_TF_LITE_PARSER Off)
-    else()
-        message(STATUS "Tf Lite generated header found at: ${TF_LITE_SCHEMA_INCLUDE_PATH}")
-    endif()
-
+# Flatbuffers support for TF Lite and Armnn Serializer
+if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER)
     # verify we have a valid flatbuffers include path
     find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
               HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
 
     if(NOT FLATBUFFERS_INCLUDE_PATH)
         message(WARNING
-          "Couldn't find 'flatbuffers/flatbuffers.h' at ${FLATBUFFERS_ROOT}/include. Disabling Tf Lite support")
+          "Couldn't find 'flatbuffers/flatbuffers.h' at ${FLATBUFFERS_ROOT}/include. \
+           Disabling Tf Lite and Armnn Serializer support")
         set(BUILD_TF_LITE_PARSER Off)
+        set(BUILD_ARMNN_SERIALIZER Off)
     else()
         message(STATUS "Flatbuffers headers are located at: ${FLATBUFFERS_INCLUDE_PATH}")
     endif()
@@ -196,16 +187,35 @@ if(BUILD_TF_LITE_PARSER)
 
     if(NOT FLATBUFFERS_LIBRARY)
         message(WARNING
-          "Couldn't find flatbuffers library. Disabling Tf Lite support")
+          "Couldn't find flatbuffers library. Disabling Tf Lite and Armnn Serializer support")
         set(BUILD_TF_LITE_PARSER Off)
+        set(BUILD_ARMNN_SERIALIZER Off)
     else()
         message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
     endif()
 
+    # Setup includes and libs only if we still want Tf Lite or Armnn Serializer
+    if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER)
+        include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
+    endif()
+endif()
+
+# Flatbuffers schema support for TF Lite
+if(BUILD_TF_LITE_PARSER)
+    find_path(TF_LITE_SCHEMA_INCLUDE_PATH
+              schema_generated.h
+              HINTS ${TF_LITE_GENERATED_PATH})
+
+    if(NOT TF_LITE_SCHEMA_INCLUDE_PATH)
+        message(WARNING
+                "Couldn't find 'schema_generated.h' at ${TF_LITE_GENERATED_PATH}. Disabling Tf Lite support")
+        set(BUILD_TF_LITE_PARSER Off)
+    else()
+        message(STATUS "Tf Lite generated header found at: ${TF_LITE_SCHEMA_INCLUDE_PATH}")
+    endif()
+
     # Setup includes and libs only if we still want Tf Lite
     if(BUILD_TF_LITE_PARSER)
-        include_directories(SYSTEM "${TF_LITE_SCHEMA_INCLUDE_PATH}")
-        include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
         add_definitions(-DARMNN_TF_LITE_PARSER)
         add_definitions(-DARMNN_TF_LITE_SCHEMA_PATH="${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs")
     endif()
@@ -344,6 +354,10 @@ endif()
 
 if(NOT BUILD_TF_LITE_PARSER)
     message(STATUS "Tensorflow Lite parser support is disabled")
+endif()
+
+if(NOT BUILD_ARMNN_SERIALIZER)
+    message(STATUS "Armnn Serializer support is disabled")
 endif()
 
 # ArmNN source files required for all build options

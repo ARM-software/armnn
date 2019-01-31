@@ -56,7 +56,7 @@ public:
     /// Updates this sub-graph with the contents of the whole given graph.
     void Update(Graph& graph);
 
-    /// Adds a new layer, of type LayerType, to the graph this sub-graph is a view of.
+    /// Adds a new layer, of type LayerType, to the parent graph of this sub-graph.
     template <typename LayerT, typename... Args>
     LayerT* AddLayer(Args&&... args) const;
 
@@ -85,8 +85,13 @@ public:
 private:
     void CheckSubGraph();
 
+    /// The list of pointers to the input slots of the parent graph.
     InputSlots m_InputSlots;
+
+    /// The list of pointers to the output slots of the parent graph.
     OutputSlots m_OutputSlots;
+
+    /// The list of pointers to the layers of the parent graph.
     Layers m_Layers;
 
     /// Pointer to the graph this sub-graph is a view of.

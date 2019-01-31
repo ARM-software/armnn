@@ -318,9 +318,9 @@ void Graph::SubstituteSubGraph(std::unique_ptr<SubGraph> subGraph, const SubGrap
 void Graph::ReplaceSubGraphConnections(const SubGraph& subGraph, IConnectableLayer* substituteLayer)
 {
     BOOST_ASSERT(substituteLayer != nullptr);
-    BOOST_ASSERT_MSG(std::find(m_Layers.begin(), m_Layers.end(), substituteLayer) != m_Layers.end(),
-                     "Substitute layer is not a member of graph");
 
+    // Create a new sub-graph with only the given layer, using
+    // the given sub-graph as a reference of which parent graph to use
     SubGraph substituteSubGraph(subGraph, substituteLayer);
     ReplaceSubGraphConnections(subGraph, substituteSubGraph);
 }

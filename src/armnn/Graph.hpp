@@ -161,6 +161,8 @@ public:
     /// and relinking them via an intermediary copy layers.
     void AddCopyLayers();
 
+    /// Substitutes the given sub-graph with either a new layer or a new sub-graph.
+    /// In either case, the given layer or all the layers in the given sub-graph must belong to this graph.
     void SubstituteSubGraph(std::unique_ptr<SubGraph> subGraph, IConnectableLayer* substituteLayer);
     void SubstituteSubGraph(std::unique_ptr<SubGraph> subGraph, const SubGraph& substituteSubGraph);
 

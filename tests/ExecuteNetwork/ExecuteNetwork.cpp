@@ -140,9 +140,11 @@ std::vector<unsigned int> ParseArray(std::istream& stream)
 void PrintOutputData(const std::string& outputLayerName, const std::vector<float>& data)
 {
     std::cout << outputLayerName << ": ";
-    std::copy(data.begin(), data.end(),
-              std::ostream_iterator<float>(std::cout, " "));
-    std::cout << std::endl;
+    for (size_t i = 0; i < data.size(); i++)
+    {
+        printf("%f ", data[i]);
+    }
+    printf("\n");
 }
 
 void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
@@ -209,15 +211,19 @@ int MainImpl(const char* modelPath,
         const size_t numOutputs    = params.m_OutputBindings.size();
         const size_t containerSize = model.GetOutputSize();
 
-        std::vector<TContainer> outputDataContainers(numOutputs, TContainer(containerSize));
+        // Set up input data container
+        std::vector<TContainer> inputData(1, std::move(inputDataContainer));
+
+        // Set up output data container
+        std::vector<TContainer> outputData(numOutputs, TContainer(containerSize));
 
         // Execute model
-        model.Run({ inputDataContainer }, outputDataContainers);
+        model.Run(inputData, outputData);
 
         // Print output tensors
         for (size_t i = 0; i < numOutputs; i++)
         {
-            PrintOutputData(params.m_OutputBindings[i], outputDataContainers[i]);
+            PrintOutputData(params.m_OutputBindings[i], outputData[i]);
         }
     }
     catch (armnn::Exception const& e)

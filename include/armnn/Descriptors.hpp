@@ -354,7 +354,7 @@ struct DetectionPostProcessDescriptor
     /// Intersection over union threshold.
     float m_NmsIouThreshold;
     /// Number of classes.
-    int32_t m_NumClasses;
+    uint32_t m_NumClasses;
     /// Use Regular NMS.
     bool m_UseRegularNms;
     /// Center size encoding scale x.

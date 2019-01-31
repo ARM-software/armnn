@@ -187,4 +187,9 @@ using Float32ToFloat16Workload = MultiTypedWorkload<QueueDescriptor,
                                                     armnn::DataType::Float32,
                                                     armnn::DataType::Float16>;
 
+template <typename QueueDescriptor>
+using Uint8ToFloat32Workload = MultiTypedWorkload<QueueDescriptor,
+                                                  armnn::DataType::QuantisedAsymm8,
+                                                  armnn::DataType::Float32>;
+
 } //namespace armnn

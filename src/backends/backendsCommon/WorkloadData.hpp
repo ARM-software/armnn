@@ -171,6 +171,13 @@ struct DepthwiseConvolution2dQueueDescriptor : QueueDescriptorWithParameters<Dep
 
 struct DetectionPostProcessQueueDescriptor : QueueDescriptorWithParameters<DetectionPostProcessDescriptor>
 {
+    DetectionPostProcessQueueDescriptor()
+        : m_Anchors(nullptr)
+    {
+    }
+
+    const ConstCpuTensorHandle* m_Anchors;
+
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 

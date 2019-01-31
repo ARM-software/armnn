@@ -15,6 +15,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     ConvImpl.hpp
     Debug.cpp
     Debug.hpp
+    DetectionPostProcess.cpp
+    DetectionPostProcess.hpp
     ElementwiseFunction.cpp
     ElementwiseFunction.hpp
     FullyConnected.cpp
@@ -60,6 +62,10 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefDepthwiseConvolution2dFloat32Workload.hpp
     RefDepthwiseConvolution2dUint8Workload.cpp
     RefDepthwiseConvolution2dUint8Workload.hpp
+    RefDetectionPostProcessUint8Workload.cpp
+    RefDetectionPostProcessUint8Workload.hpp
+    RefDetectionPostProcessFloat32Workload.cpp
+    RefDetectionPostProcessFloat32Workload.hpp
     RefFakeQuantizationFloat32Workload.cpp
     RefFakeQuantizationFloat32Workload.hpp
     RefFloorFloat32Workload.cpp

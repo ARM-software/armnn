@@ -38,6 +38,8 @@
 #include "ResizeBilinear.hpp"
 #include "RefNormalizationFloat32Workload.hpp"
 #include "RefDepthwiseConvolution2dFloat32Workload.hpp"
+#include "RefDetectionPostProcessFloat32Workload.hpp"
+#include "RefDetectionPostProcessUint8Workload.hpp"
 #include "RefPooling2dUint8Workload.hpp"
 #include "BatchNormImpl.hpp"
 #include "Activation.hpp"

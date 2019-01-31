@@ -16,6 +16,7 @@ BACKEND_SOURCES := \
         workloads/Broadcast.cpp \
         workloads/ConvImpl.cpp \
         workloads/Debug.cpp \
+        workloads/DetectionPostProcess.cpp \
         workloads/ElementwiseFunction.cpp \
         workloads/FullyConnected.cpp \
         workloads/Gather.cpp \
@@ -37,6 +38,8 @@ BACKEND_SOURCES := \
         workloads/RefDebugWorkload.cpp \
         workloads/RefDepthwiseConvolution2dFloat32Workload.cpp \
         workloads/RefDepthwiseConvolution2dUint8Workload.cpp \
+        workloads/RefDetectionPostProcessFloat32Workload.cpp \
+        workloads/RefDetectionPostProcessUint8Workload.cpp \
         workloads/RefElementwiseWorkload.cpp \
         workloads/RefFakeQuantizationFloat32Workload.cpp \
         workloads/RefFloorFloat32Workload.cpp \

@@ -454,6 +454,12 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMin, ResizeBilinearSqMinTest, armnn::DataLa
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMin, ResizeBilinearMinTest, armnn::DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMag, ResizeBilinearMagTest, armnn::DataLayout::NCHW)
 
+ARMNN_AUTO_TEST_CASE(ResizeBilinearNopUint8, ResizeBilinearNopUint8Test)
+ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint8, SimpleResizeBilinearUint8Test)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint8, ResizeBilinearSqMinUint8Test)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint8, ResizeBilinearMinUint8Test)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8, ResizeBilinearMagUint8Test)
+
 // Resize Bilinear - NHWC data layout
 ARMNN_AUTO_TEST_CASE(ResizeBilinearNopNhwc, ResizeBilinearNopTest, armnn::DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearNhwc, SimpleResizeBilinearTest, armnn::DataLayout::NHWC)

@@ -392,6 +392,8 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/SubGraphTests.cpp
         src/armnn/test/TensorHelpers.hpp
         src/armnn/test/TensorTest.cpp
+        src/armnn/test/TestInputOutputLayerVisitor.cpp
+        src/armnn/test/TestInputOutputLayerVisitor.hpp
         src/armnn/test/TestLayerVisitor.cpp
         src/armnn/test/TestLayerVisitor.hpp
         src/armnn/test/TestNameOnlyLayerVisitor.cpp

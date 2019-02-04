@@ -648,9 +648,13 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
 }
 
 IConnectableLayer* Network::AddDetectionPostProcessLayer(const armnn::DetectionPostProcessDescriptor& descriptor,
-                                                         const char* name)
+                                                         const ConstTensor& anchors, const char* name)
 {
-    return m_Graph->AddLayer<DetectionPostProcessLayer>(descriptor, name);
+    const auto layer = m_Graph->AddLayer<DetectionPostProcessLayer>(descriptor, name);
+
+    layer->m_Anchors = std::make_unique<ScopedCpuTensorHandle>(anchors);
+
+    return layer;
 }
 
 IConnectableLayer* Network::AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,

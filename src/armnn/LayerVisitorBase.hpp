@@ -57,6 +57,7 @@ public:
 
     virtual void VisitDetectionPostProcessLayer(const IConnectableLayer*,
                                                 const DetectionPostProcessDescriptor&,
+                                                const ConstTensor&,
                                                 const char*) { DefaultPolicy::Apply(); }
 
     virtual void VisitFullyConnectedLayer(const IConnectableLayer*,

@@ -24,12 +24,15 @@ std::unique_ptr<IWorkload> DetectionPostProcessLayer::CreateWorkload(const armnn
                                                                      const armnn::IWorkloadFactory& factory) const
 {
     DetectionPostProcessQueueDescriptor descriptor;
+    descriptor.m_Anchors = m_Anchors.get();
     return factory.CreateDetectionPostProcess(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
 DetectionPostProcessLayer* DetectionPostProcessLayer::Clone(Graph& graph) const
 {
-    return CloneBase<DetectionPostProcessLayer>(graph, m_Param, GetName());
+    auto layer = CloneBase<DetectionPostProcessLayer>(graph, m_Param, GetName());
+    layer->m_Anchors = m_Anchors ? std::make_unique<ScopedCpuTensorHandle>(*m_Anchors) : nullptr;
+    return std::move(layer);
 }
 
 void DetectionPostProcessLayer::ValidateTensorShapesFromInputs()
@@ -72,7 +75,8 @@ Layer::ConstantTensors DetectionPostProcessLayer::GetConstantTensorsByRef()
 
 void DetectionPostProcessLayer::Accept(ILayerVisitor& visitor) const
 {
-    visitor.VisitDetectionPostProcessLayer(this, GetParameters(), GetName());
+    ConstTensor anchorTensor(m_Anchors->GetTensorInfo(), m_Anchors->GetConstTensor<void>());
+    visitor.VisitDetectionPostProcessLayer(this, GetParameters(), anchorTensor, GetName());
 }
 
 } // namespace armnn

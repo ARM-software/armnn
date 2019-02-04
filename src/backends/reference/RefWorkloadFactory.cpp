@@ -154,7 +154,16 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDepthwiseConvolution2d(
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDetectionPostProcess(
     const armnn::DetectionPostProcessQueueDescriptor& descriptor, const armnn::WorkloadInfo& info) const
 {
-    return MakeWorkload<RefDetectionPostProcessFloat32Workload, RefDetectionPostProcessUint8Workload>(descriptor, info);
+    const DataType dataType = info.m_InputTensorInfos[0].GetDataType();
+    switch (dataType)
+    {
+        case DataType::Float32:
+            return std::make_unique<RefDetectionPostProcessFloat32Workload>(descriptor, info);
+        case DataType::QuantisedAsymm8:
+            return std::make_unique<RefDetectionPostProcessUint8Workload>(descriptor, info);
+        default:
+            return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateNormalization(

@@ -105,15 +105,15 @@ void AllocateOutputData(unsigned int numOutput, unsigned int numSelected, const 
     for (unsigned int i = 0; i < numOutput; ++i)
         {
             unsigned int boxIndex = i * 4;
-            unsigned int boxConorIndex = selectedBoxes[outputIndices[i]] * 4;
             if (i < numSelected)
             {
+                unsigned int boxCornorIndex = selectedBoxes[outputIndices[i]] * 4;
                 detectionScores[i] = selectedScores[outputIndices[i]];
                 detectionClasses[i] = boost::numeric_cast<float>(selectedClasses[outputIndices[i]]);
-                detectionBoxes[boxIndex] = boxCorners[boxConorIndex];
-                detectionBoxes[boxIndex + 1] = boxCorners[boxConorIndex + 1];
-                detectionBoxes[boxIndex + 2] = boxCorners[boxConorIndex + 2];
-                detectionBoxes[boxIndex + 3] = boxCorners[boxConorIndex + 3];
+                detectionBoxes[boxIndex] = boxCorners[boxCornorIndex];
+                detectionBoxes[boxIndex + 1] = boxCorners[boxCornorIndex + 1];
+                detectionBoxes[boxIndex + 2] = boxCorners[boxCornorIndex + 2];
+                detectionBoxes[boxIndex + 3] = boxCorners[boxCornorIndex + 3];
             }
             else
             {
@@ -125,7 +125,7 @@ void AllocateOutputData(unsigned int numOutput, unsigned int numSelected, const 
                 detectionBoxes[boxIndex + 3] = 0.0f;
             }
         }
-        numDetections[0] = boost::numeric_cast<float>(numOutput);
+        numDetections[0] = boost::numeric_cast<float>(numSelected);
 }
 
 } // anonymous namespace
@@ -216,7 +216,7 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
         std::vector<unsigned int> outputIndices = GenerateRangeK(numSelected);
         TopKSort(numOutput, outputIndices.data(), selectedScoresAfterNms.data(), numSelected);
 
-        AllocateOutputData(numOutput, numSelected, boxCorners, outputIndices,
+        AllocateOutputData(detectionBoxesInfo.GetShape()[1], numOutput, boxCorners, outputIndices,
                            selectedBoxesAfterNms, selectedClasses, selectedScoresAfterNms,
                            detectionBoxes, detectionScores, detectionClasses, numDetections);
     }
@@ -255,7 +255,7 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
         unsigned int numSelected = boost::numeric_cast<unsigned int>(selectedIndices.size());
         unsigned int numOutput = std::min(desc.m_MaxDetections,  numSelected);
 
-        AllocateOutputData(numOutput, numSelected, boxCorners, selectedIndices,
+        AllocateOutputData(detectionBoxesInfo.GetShape()[1], numOutput, boxCorners, selectedIndices,
                            boxIndices, maxScoreClasses, maxScores,
                            detectionBoxes, detectionScores, detectionClasses, numDetections);
     }

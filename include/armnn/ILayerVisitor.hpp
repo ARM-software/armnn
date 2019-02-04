@@ -79,9 +79,11 @@ public:
     /// Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param descriptor - Description of the Detection PostProcess layer.
+    /// @param anchors - Tensor for the anchors.
     /// @param name - Optional name for the layer.
     virtual void VisitDetectionPostProcessLayer(const IConnectableLayer* layer,
                                                 const DetectionPostProcessDescriptor& descriptor,
+                                                const ConstTensor& anchors,
                                                 const char* name = nullptr) = 0;
 
     /// Function that a fully connected layer without biases should call back to when its Accept(ILayerVisitor&)

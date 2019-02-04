@@ -61,6 +61,7 @@ public:
 
     virtual void VisitDetectionPostProcessLayer(const IConnectableLayer* layer,
                                                 const DetectionPostProcessDescriptor& descriptor,
+                                                const ConstTensor& anchors,
                                                 const char* name = nullptr) {};
 
     virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,

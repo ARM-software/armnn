@@ -59,6 +59,7 @@ public:
 
     IConnectableLayer* AddDetectionPostProcessLayer(
         const DetectionPostProcessDescriptor& descriptor,
+        const ConstTensor& anchors,
         const char* name = nullptr) override;
 
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,

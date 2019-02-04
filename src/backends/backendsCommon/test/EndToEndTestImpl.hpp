@@ -163,7 +163,10 @@ void EndToEndLayerTestImpl(INetworkPtr network,
         }
         else
         {
-            BOOST_TEST(it.second == out);
+            for (unsigned int i = 0; i < out.size(); ++i)
+            {
+                BOOST_TEST(it.second[i] == out[i], boost::test_tools::tolerance(0.000001f));
+            }
         }
     }
 }

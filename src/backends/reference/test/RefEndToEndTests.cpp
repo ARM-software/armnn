@@ -4,6 +4,8 @@
 //
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
+
+#include <backendsCommon/test/DetectionPostProcessTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
 #include <backendsCommon/test/MergerTestImpl.hpp>
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
@@ -451,6 +453,170 @@ BOOST_AUTO_TEST_CASE(RefGatherMultiDimFloatTest)
 BOOST_AUTO_TEST_CASE(RefGatherMultiDimUint8Test)
 {
     GatherMultiDimEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefDetectionPostProcessRegularNmsTest)
+{
+    std::vector<float> boxEncodings({
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, -1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f
+    });
+    std::vector<float> scores({
+        0.0f, 0.9f, 0.8f,
+        0.0f, 0.75f, 0.72f,
+        0.0f, 0.6f, 0.5f,
+        0.0f, 0.93f, 0.95f,
+        0.0f, 0.5f, 0.4f,
+        0.0f, 0.3f, 0.2f
+    });
+    std::vector<float> anchors({
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 10.5f, 1.0f, 1.0f,
+        0.5f, 10.5f, 1.0f, 1.0f,
+        0.5f, 100.5f, 1.0f, 1.0f
+    });
+    DetectionPostProcessRegularNmsEndToEnd<armnn::DataType::Float32>(defaultBackends, boxEncodings, scores, anchors);
+}
+
+inline void QuantizeData(uint8_t* quant, const float* dequant, const TensorInfo& info)
+{
+    for (size_t i = 0; i < info.GetNumElements(); i++)
+    {
+        quant[i] = armnn::Quantize<uint8_t>(dequant[i], info.GetQuantizationScale(), info.GetQuantizationOffset());
+    }
+}
+
+BOOST_AUTO_TEST_CASE(RefDetectionPostProcessRegularNmsUint8Test)
+{
+    armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
+    armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);
+    armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
+
+    boxEncodingsInfo.SetQuantizationScale(1.0f);
+    boxEncodingsInfo.SetQuantizationOffset(1);
+    scoresInfo.SetQuantizationScale(0.01f);
+    scoresInfo.SetQuantizationOffset(0);
+    anchorsInfo.SetQuantizationScale(0.5f);
+    anchorsInfo.SetQuantizationOffset(0);
+
+    std::vector<float> boxEncodings({
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, -1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f
+    });
+    std::vector<float> scores({
+        0.0f, 0.9f, 0.8f,
+        0.0f, 0.75f, 0.72f,
+        0.0f, 0.6f, 0.5f,
+        0.0f, 0.93f, 0.95f,
+        0.0f, 0.5f, 0.4f,
+        0.0f, 0.3f, 0.2f
+    });
+    std::vector<float> anchors({
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 10.5f, 1.0f, 1.0f,
+        0.5f, 10.5f, 1.0f, 1.0f,
+        0.5f, 100.5f, 1.0f, 1.0f
+    });
+
+    std::vector<uint8_t> qBoxEncodings(boxEncodings.size(), 0);
+    std::vector<uint8_t> qScores(scores.size(), 0);
+    std::vector<uint8_t> qAnchors(anchors.size(), 0);
+    QuantizeData(qBoxEncodings.data(), boxEncodings.data(), boxEncodingsInfo);
+    QuantizeData(qScores.data(), scores.data(), scoresInfo);
+    QuantizeData(qAnchors.data(), anchors.data(), anchorsInfo);
+    DetectionPostProcessRegularNmsEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, qBoxEncodings,
+                                                                             qScores, qAnchors,
+                                                                             1.0f, 1, 0.01f, 0, 0.5f, 0);
+}
+
+BOOST_AUTO_TEST_CASE(RefDetectionPostProcessFastNmsTest)
+{
+    std::vector<float> boxEncodings({
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, -1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f
+    });
+    std::vector<float> scores({
+        0.0f, 0.9f, 0.8f,
+        0.0f, 0.75f, 0.72f,
+        0.0f, 0.6f, 0.5f,
+        0.0f, 0.93f, 0.95f,
+        0.0f, 0.5f, 0.4f,
+        0.0f, 0.3f, 0.2f
+    });
+    std::vector<float> anchors({
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 10.5f, 1.0f, 1.0f,
+        0.5f, 10.5f, 1.0f, 1.0f,
+        0.5f, 100.5f, 1.0f, 1.0f
+    });
+    DetectionPostProcessFastNmsEndToEnd<armnn::DataType::Float32>(defaultBackends, boxEncodings, scores, anchors);
+}
+
+BOOST_AUTO_TEST_CASE(RefDetectionPostProcessFastNmsUint8Test)
+{
+    armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
+    armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);
+    armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
+
+    boxEncodingsInfo.SetQuantizationScale(1.0f);
+    boxEncodingsInfo.SetQuantizationOffset(1);
+    scoresInfo.SetQuantizationScale(0.01f);
+    scoresInfo.SetQuantizationOffset(0);
+    anchorsInfo.SetQuantizationScale(0.5f);
+    anchorsInfo.SetQuantizationOffset(0);
+
+    std::vector<float> boxEncodings({
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, -1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f
+    });
+    std::vector<float> scores({
+        0.0f, 0.9f, 0.8f,
+        0.0f, 0.75f, 0.72f,
+        0.0f, 0.6f, 0.5f,
+        0.0f, 0.93f, 0.95f,
+        0.0f, 0.5f, 0.4f,
+        0.0f, 0.3f, 0.2f
+    });
+    std::vector<float> anchors({
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 10.5f, 1.0f, 1.0f,
+        0.5f, 10.5f, 1.0f, 1.0f,
+        0.5f, 100.5f, 1.0f, 1.0f
+    });
+
+    std::vector<uint8_t> qBoxEncodings(boxEncodings.size(), 0);
+    std::vector<uint8_t> qScores(scores.size(), 0);
+    std::vector<uint8_t> qAnchors(anchors.size(), 0);
+    QuantizeData(qBoxEncodings.data(), boxEncodings.data(), boxEncodingsInfo);
+    QuantizeData(qScores.data(), scores.data(), scoresInfo);
+    QuantizeData(qAnchors.data(), anchors.data(), anchorsInfo);
+    DetectionPostProcessFastNmsEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, qBoxEncodings,
+                                                                          qScores, qAnchors,
+                                                                          1.0f, 1, 0.01f, 0, 0.5f, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

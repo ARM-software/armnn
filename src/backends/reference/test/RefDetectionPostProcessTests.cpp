@@ -74,8 +74,8 @@ void DetectionPostProcessTestImpl(bool useRegularNms, const std::vector<float>& 
                                   const std::vector<float>& expectedNumDetections)
 {
     armnn::TensorInfo boxEncodingsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
-    armnn::TensorInfo scoresInfo({ 1, 6, 4 }, armnn::DataType::Float32);
-    armnn::TensorInfo anchorsInfo({ 1, 6, 4 }, armnn::DataType::Float32);
+    armnn::TensorInfo scoresInfo({ 1, 6, 3 }, armnn::DataType::Float32);
+    armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
 
     armnn::TensorInfo detectionBoxesInfo({ 1, 3, 4 }, armnn::DataType::Float32);
     armnn::TensorInfo detectionScoresInfo({ 1, 3 }, armnn::DataType::Float32);

@@ -1101,8 +1101,8 @@ void DetectionPostProcessQueueDescriptor::Validate(const WorkloadInfo& workloadI
     const TensorInfo& scoresInfo =  workloadInfo.m_InputTensorInfos[1];
     const TensorInfo& anchorsInfo = m_Anchors->GetTensorInfo();
     const TensorInfo& detectionBoxesInfo = workloadInfo.m_OutputTensorInfos[0];
-    const TensorInfo& detectionScoresInfo = workloadInfo.m_OutputTensorInfos[1];
-    const TensorInfo& detectionClassesInfo = workloadInfo.m_OutputTensorInfos[2];
+    const TensorInfo& detectionClassesInfo = workloadInfo.m_OutputTensorInfos[1];
+    const TensorInfo& detectionScoresInfo = workloadInfo.m_OutputTensorInfos[2];
     const TensorInfo& numDetectionsInfo = workloadInfo.m_OutputTensorInfos[3];
 
     ValidateTensorNumDimensions(boxEncodingsInfo, "DetectionPostProcessQueueDescriptor", 3, "box encodings");

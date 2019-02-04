@@ -9,6 +9,7 @@
 #include <test/UnitTests.hpp>
 
 #include <reference/RefWorkloadFactory.hpp>
+#include <backendsCommon/test/DetectionPostProcessLayerTestImpl.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -499,5 +500,24 @@ ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsFloat, GatherMultiDimParamsFloatTest)
 ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsUint8, GatherMultiDimParamsUint8Test)
 ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsMultiDimIndicesFloat, GatherMultiDimParamsMultiDimIndicesFloatTest)
 ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsMultiDimIndicesUint8, GatherMultiDimParamsMultiDimIndicesUint8Test)
+
+// Detection PostProcess
+BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsFloat)
+{
+    DetectionPostProcessRegularNmsFloatTest<armnn::RefWorkloadFactory>();
+}
+BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsFloat)
+{
+    DetectionPostProcessFastNmsFloatTest<armnn::RefWorkloadFactory>();
+}
+BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsUint8)
+{
+    DetectionPostProcessRegularNmsUint8Test<armnn::RefWorkloadFactory>();
+}
+BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsUint8)
+{
+    DetectionPostProcessFastNmsUint8Test<armnn::RefWorkloadFactory>();
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

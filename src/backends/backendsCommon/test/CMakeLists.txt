@@ -14,6 +14,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ConvertFp16ToFp32TestImpl.hpp
     ConvertFp32ToFp16TestImpl.hpp
     DebugTestImpl.hpp
+    DetectionPostProcessLayerTestImpl.hpp
     DetectionPostProcessTestImpl.hpp
     EndToEndTestImpl.hpp
     FullyConnectedTestImpl.hpp

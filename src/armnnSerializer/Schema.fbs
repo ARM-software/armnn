@@ -101,9 +101,13 @@ union Layer {
     OutputLayer
 }
 
+table AnyLayer {
+    layer:Layer;
+}
+
 // Root type for serialized data is the graph of the network
 table SerializedGraph {
-    layers:[Layer];
+    layers:[AnyLayer];
     inputIds:[int];
     outputIds:[int];
 }

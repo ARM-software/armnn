@@ -75,7 +75,8 @@ void BatchNormalizationLayer::Accept(ILayerVisitor& visitor) const
     ConstTensor varianceTensor(m_Variance->GetTensorInfo(), m_Variance->Map(true));
     ConstTensor betaTensor(m_Beta->GetTensorInfo(), m_Beta->Map(true));
     ConstTensor gammaTensor(m_Gamma->GetTensorInfo(), m_Gamma->Map(true));
-    visitor.VisitBatchNormalizationLayer(this, GetParameters(), meanTensor, varianceTensor, betaTensor, gammaTensor);
+    visitor.VisitBatchNormalizationLayer(
+            this, GetParameters(), meanTensor, varianceTensor, betaTensor, gammaTensor, GetName());
 }
 
 } // namespace armnn

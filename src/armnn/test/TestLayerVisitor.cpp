@@ -30,4 +30,22 @@ void TestLayerVisitor::CheckLayerPointer(const IConnectableLayer* layer)
     BOOST_CHECK(layer != nullptr);
 };
 
+void TestLayerVisitor::CheckConstTensors(const ConstTensor& expected, const ConstTensor& actual)
+{
+    BOOST_CHECK(expected.GetInfo() == actual.GetInfo());
+    BOOST_CHECK(expected.GetNumDimensions() == actual.GetNumDimensions());
+    BOOST_CHECK(expected.GetNumElements() == actual.GetNumElements());
+    BOOST_CHECK(expected.GetNumBytes() == actual.GetNumBytes());
+    if (expected.GetNumBytes() == actual.GetNumBytes())
+    {
+        //check data is the same byte by byte
+        const unsigned char* expectedPtr = static_cast<const unsigned char*>(expected.GetMemoryArea());
+        const unsigned char* actualPtr = static_cast<const unsigned char*>(actual.GetMemoryArea());
+        for (unsigned int i = 0; i < expected.GetNumBytes(); i++)
+        {
+            BOOST_CHECK(*(expectedPtr + i) == *(actualPtr + i));
+        }
+    }
+}
+
 } //namespace armnn

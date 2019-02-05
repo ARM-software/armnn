@@ -53,7 +53,7 @@ void ConstantLayer::ValidateTensorShapesFromInputs()
 
 void ConstantLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor layerOutputTensor(m_LayerOutput->GetTensorInfo(), m_LayerOutput->GetTensor<void*>()) ;
+    ConstTensor layerOutputTensor(m_LayerOutput->GetTensorInfo(), m_LayerOutput->Map(true)) ;
     visitor.VisitConstantLayer(this, layerOutputTensor, GetName());
 }
 

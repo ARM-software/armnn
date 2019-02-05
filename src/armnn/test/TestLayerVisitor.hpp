@@ -5,6 +5,7 @@
 #pragma once
 
 #include <armnn/ILayerVisitor.hpp>
+#include <armnn/Descriptors.hpp>
 
 namespace armnn
 {
@@ -17,6 +18,8 @@ protected:
     void CheckLayerName(const char* name);
 
     void CheckLayerPointer(const IConnectableLayer* layer);
+
+    void CheckConstTensors(const ConstTensor& expected, const ConstTensor& actual);
 
 private:
     const char* m_LayerName;

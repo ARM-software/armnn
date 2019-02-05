@@ -407,6 +407,8 @@ endif()
 if(BUILD_UNIT_TESTS)
     set(unittest_sources)
     list(APPEND unittest_sources
+        src/armnn/test/ConstTensorLayerVisitor.hpp
+        src/armnn/test/ConstTensorLayerVisitor.cpp
         src/armnn/test/CreateWorkload.hpp
         src/armnn/test/CsvReaderTest.cpp
         src/armnn/test/EndToEndTest.cpp

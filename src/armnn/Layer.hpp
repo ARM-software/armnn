@@ -141,6 +141,10 @@ public:
         return Disconnect(*boost::polymorphic_downcast<InputSlot*>(&slot));
     }
 
+    unsigned int CalculateIndexOnOwner() const;
+
+    bool operator==(const OutputSlot& other) const;
+
 private:
     void ValidateConnectionIndex(unsigned int index) const;
 

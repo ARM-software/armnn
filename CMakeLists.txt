@@ -157,6 +157,7 @@ list(APPEND armnn_sources
     include/armnn/ILayerSupport.hpp
     include/armnn/ILayerVisitor.hpp
     include/armnn/INetwork.hpp
+    include/armnn/INetworkQuantizer.hpp
     include/armnn/IProfiler.hpp
     include/armnn/IRuntime.hpp
     include/armnn/LayerSupport.hpp
@@ -275,10 +276,13 @@ list(APPEND armnn_sources
     src/armnn/LayersFwd.hpp
     src/armnn/LayerSupportCommon.hpp
     src/armnn/LayerSupport.cpp
+    src/armnn/LayerVisitorBase.hpp
     src/armnn/LoadedNetwork.cpp
     src/armnn/LoadedNetwork.hpp
     src/armnn/Network.cpp
     src/armnn/Network.hpp
+    src/armnn/NetworkQuantizer.cpp
+    src/armnn/NetworkQuantizer.hpp
     src/armnn/NetworkUtils.cpp
     src/armnn/NetworkUtils.hpp
     src/armnn/Observable.cpp
@@ -289,10 +293,14 @@ list(APPEND armnn_sources
     src/armnn/ProfilingEvent.cpp
     src/armnn/ProfilingEvent.hpp
     src/armnn/Profiling.hpp
+    src/armnn/QuantizerVisitor.cpp
+    src/armnn/QuantizerVisitor.hpp
     src/armnn/Runtime.cpp
     src/armnn/Runtime.hpp
     src/armnn/SerializeLayerParameters.cpp
     src/armnn/SerializeLayerParameters.hpp
+    src/armnn/StaticRangeVisitor.cpp
+    src/armnn/StaticRangeVisitor.hpp
     src/armnn/SubGraph.cpp
     src/armnn/SubGraph.hpp
     src/armnn/SubGraphSelector.cpp

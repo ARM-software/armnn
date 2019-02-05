@@ -106,6 +106,35 @@ void OutputSlot::MoveAllConnections(OutputSlot& destination)
     }
 }
 
+unsigned int OutputSlot::CalculateIndexOnOwner() const
+{
+    for (unsigned int i=0; i < GetOwningLayer().GetNumOutputSlots(); i++)
+    {
+        if (GetOwningLayer().GetOutputSlot(i) == (*this))
+        {
+            return i;
+        }
+    }
+    BOOST_ASSERT_MSG(false, "Did not find slot on owner.");
+    return 0; // Error
+}
+
+bool OutputSlot::operator==(const OutputSlot& other) const
+{
+    bool isSame = other.GetNumConnections() == GetNumConnections();
+    if (!isSame)
+    {
+        return false;
+    }
+
+    for (unsigned int i=0; i < GetNumConnections(); i++)
+    {
+        isSame &= other.GetConnection(i) == GetConnection(i);
+    }
+    return isSame;
+}
+
+
 void OutputSlot::ValidateConnectionIndex(unsigned int index) const
 {
     if (boost::numeric_cast<std::size_t>(index) >= m_Connections.size())

@@ -16,7 +16,7 @@ namespace armnn
 {
 
 /// Visitor class to establish min/max ranges based on the type of the layer
-class StaticRangeVisitor : public LayerVisitorBase
+class StaticRangeVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
 public:
     StaticRangeVisitor() = default;

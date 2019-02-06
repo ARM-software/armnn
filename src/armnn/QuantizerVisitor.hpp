@@ -18,7 +18,7 @@ namespace armnn
 class StaticRangeVisitor;
 
 /// Visitor object for quantizing layers in a network
-class QuantizerVisitor : public LayerVisitorBase
+class QuantizerVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
 public:
     QuantizerVisitor(StaticRangeVisitor* ranges);
@@ -36,8 +36,8 @@ private:
     /// Connects the layer to preceeding layers and sets the quantization parameters based on recorded ranges
     void SetQuantizedInputConnections(const IConnectableLayer *srcLayer, IConnectableLayer *quantizedLayer);
 
-    /// Record the guid so we can easily find it later
-    void RecordLayer(IConnectableLayer* layer);
+    /// Record the guids so we can easily find the layers later
+    void RecordLayer(const IConnectableLayer* srcLayer, IConnectableLayer* qLayer);
 
 
     StaticRangeVisitor* m_Ranges;           ///< Previously recorded min/max ranges per intermediate tensor

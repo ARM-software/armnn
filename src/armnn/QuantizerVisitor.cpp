@@ -45,8 +45,6 @@ QuantizerVisitor::QuantizerVisitor(armnn::StaticRangeVisitor* ranges)
 void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer *srcLayer,
                                                     IConnectableLayer *quantizedLayer)
 {
-    m_OldToNewGuidMap[srcLayer->GetGuid()] = quantizedLayer->GetGuid();
-
     for (unsigned int i=0; i < srcLayer->GetNumInputSlots(); i++)
     {
         const IInputSlot& srcInputSlot = srcLayer->GetInputSlot(i);
@@ -74,6 +72,7 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer *src
             info.SetDataType(DataType::QuantisedAsymm8);
             info.SetQuantizationOffset(qParams.first);
             info.SetQuantizationScale(qParams.second);
+            newOutputSlot.SetTensorInfo(info);
         }
         else
         {
@@ -83,28 +82,29 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer *src
     }
 }
 
-void QuantizerVisitor::RecordLayer(IConnectableLayer* layer)
+void QuantizerVisitor::RecordLayer(const IConnectableLayer* srcLayer, IConnectableLayer* quantizedLayer)
 {
-    m_GuidToLayerMap[layer->GetGuid()] = layer;
+    m_OldToNewGuidMap[srcLayer->GetGuid()] = quantizedLayer->GetGuid();
+    m_GuidToLayerMap[quantizedLayer->GetGuid()] = quantizedLayer;
 }
 
 void QuantizerVisitor::VisitAdditionLayer(const IConnectableLayer *layer, const char *name)
 {
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddAdditionLayer(name);
-    RecordLayer(newLayer);
+    RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
 
 void QuantizerVisitor::VisitInputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name)
 {
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddInputLayer(id, name);
-    RecordLayer(newLayer);
+    RecordLayer(layer, newLayer);
 }
 
 void QuantizerVisitor::VisitOutputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name)
 {
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddOutputLayer(id, name);
-    RecordLayer(newLayer);
+    RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
 

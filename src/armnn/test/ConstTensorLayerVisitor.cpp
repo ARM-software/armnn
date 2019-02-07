@@ -64,11 +64,11 @@ void TestLstmLayerVisitor::CheckConstTensorPtrs(const std::string& name,
 {
     if (expected == nullptr)
     {
-        BOOST_TEST(actual == nullptr, name + " actual should have been a nullptr");
+        BOOST_CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
     }
     else
     {
-        BOOST_TEST(actual != nullptr, name + " actual should have been set");
+        BOOST_CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
         if (actual != nullptr)
         {
             CheckConstTensors(*expected, *actual);

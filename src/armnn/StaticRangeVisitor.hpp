@@ -34,6 +34,9 @@ public:
                                       const ConstTensor& beta,
                                       const ConstTensor& gamma,
                                       const char* name = nullptr) override;
+    void VisitActivationLayer(const IConnectableLayer *layer,
+                              const ActivationDescriptor& activationDescriptor,
+                              const char *name = nullptr) override;
 
     /// Retreive the default range
     MinMaxRange DefaultRange() const { return std::make_pair(-15.0f, 15.0f); }

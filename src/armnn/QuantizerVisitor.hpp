@@ -27,6 +27,9 @@ public:
     // Functions to quantize the individual layers, overridden from ILayerVisitor
     void VisitInputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name = nullptr) override;
     void VisitAdditionLayer(const IConnectableLayer *layer, const char *name = nullptr) override;
+    void VisitActivationLayer(const IConnectableLayer *layer,
+                              const ActivationDescriptor& activationDescriptor,
+                              const char *name = nullptr) override;
     void VisitOutputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name = nullptr)  override;
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& desc,

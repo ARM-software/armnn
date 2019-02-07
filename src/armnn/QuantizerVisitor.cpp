@@ -147,6 +147,15 @@ void QuantizerVisitor::VisitAdditionLayer(const IConnectableLayer *layer, const 
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitActivationLayer(const IConnectableLayer *layer,
+                                            const ActivationDescriptor& activationDescriptor,
+                                            const char *name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddActivationLayer(activationDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitInputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name)
 {
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddInputLayer(id, name);

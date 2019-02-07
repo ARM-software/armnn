@@ -58,7 +58,7 @@ namespace armnn
             isSupported = layerSupportObject->func(__VA_ARGS__, Optional<std::string&>(reasonIfUnsupportedFull)); \
             CopyErrorMessage(reasonIfUnsupported, reasonIfUnsupportedFull.c_str(), reasonIfUnsupportedMaxLength); \
         } \
-    } catch (InvalidArgumentException e) { \
+    } catch (const InvalidArgumentException &e) { \
         /* re-throwing with more context information */ \
         throw InvalidArgumentException(e, "Failed to check layer support", CHECK_LOCATION()); \
     } \

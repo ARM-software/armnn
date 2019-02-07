@@ -429,6 +429,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_RELU]              =  &TfLiteParser::ParseRelu;
     m_ParserFunctions[tflite::BuiltinOperator_RELU6]             =  &TfLiteParser::ParseRelu6;
     m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]           =  &TfLiteParser::ParseReshape;
+    m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]   =  &TfLiteParser::ParseResizeBilinear;
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]           =  &TfLiteParser::ParseSoftmax;
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]           =  &TfLiteParser::ParseSqueeze;
     m_ParserFunctions[tflite::BuiltinOperator_SUB]               =  &TfLiteParser::ParseSub;
@@ -1357,6 +1358,42 @@ void TfLiteParser::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseResizeBilinear(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo sizeTensorInfo = ToTensorInfo(inputs[1]);
+
+    // Data for the parsed tensor args (size) must be stored locally.
+    std::vector<int32_t> sizeTensorData(sizeTensorInfo.GetNumElements());
+
+    BufferRawPtr sizeBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    ::memcpy(sizeTensorData.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
+
+    ResizeBilinearDescriptor desc;
+    desc.m_TargetHeight = static_cast<uint32_t> (sizeTensorData[0]);
+    desc.m_TargetWidth = static_cast<uint32_t> (sizeTensorData[1]);
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
+
+    auto layerName = boost::str(boost::format("ResizeBilinear:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddResizeBilinearLayer(desc, layerName.c_str());
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
 }
 
 void TfLiteParser::ParseConcatenation(size_t subgraphIndex, size_t operatorIndex)

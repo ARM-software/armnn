@@ -553,6 +553,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Multiplication.cpp
              src/armnnTfLiteParser/test/Pad.cpp
              src/armnnTfLiteParser/test/Reshape.cpp
+             src/armnnTfLiteParser/test/ResizeBilinear.cpp
              src/armnnTfLiteParser/test/Softmax.cpp
              src/armnnTfLiteParser/test/Sub.cpp
              src/armnnTfLiteParser/test/Squeeze.cpp

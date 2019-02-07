@@ -104,6 +104,7 @@ private:
     void ParseReshape(size_t subgraphIndex, size_t operatorIndex);
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSub(size_t subgraphIndex, size_t operatorIndex);
     void ParseAdd(size_t subgraphIndex, size_t operatorIndex);
     void ParseMul(size_t subgraphIndex, size_t operatorIndex);
     void ParseMean(size_t subgraphIndex, size_t operatorIndex);

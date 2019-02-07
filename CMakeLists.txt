@@ -554,6 +554,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Pad.cpp
              src/armnnTfLiteParser/test/Reshape.cpp
              src/armnnTfLiteParser/test/Softmax.cpp
+             src/armnnTfLiteParser/test/Sub.cpp
              src/armnnTfLiteParser/test/Squeeze.cpp
              src/armnnTfLiteParser/test/LoadModel.cpp
              src/armnnTfLiteParser/test/GetBuffer.cpp

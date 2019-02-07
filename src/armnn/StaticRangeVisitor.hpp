@@ -8,9 +8,9 @@
 #include "LayerVisitorBase.hpp"
 
 #include <armnn/INetwork.hpp>
+#include <armnn/INetworkQuantizer.hpp>
 
-#include <map>
-#include <vector>
+#include <unordered_map>
 
 namespace armnn
 {
@@ -18,15 +18,16 @@ namespace armnn
 /// Visitor class to establish min/max ranges based on the type of the layer
 class StaticRangeVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
-public:
-    StaticRangeVisitor() = default;
-    ~StaticRangeVisitor() = default;
-
-    using MinMaxRange = std::pair<float, float>;
+private:
+    using MinMaxRange  = std::pair<float, float>;
     using MinMaxRanges = std::vector<MinMaxRange>;
 
+public:
+    StaticRangeVisitor(std::unordered_map<LayerGuid, MinMaxRanges>& guidToRangesMap);
+    ~StaticRangeVisitor() = default;
+
     /// Functions to set the Range on a per-layer-type basis
-    void VisitAdditionLayer(const IConnectableLayer *layer, const char *name = nullptr) override;
+    void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& desc,
                                       const ConstTensor& mean,
@@ -34,22 +35,22 @@ public:
                                       const ConstTensor& beta,
                                       const ConstTensor& gamma,
                                       const char* name = nullptr) override;
-    void VisitActivationLayer(const IConnectableLayer *layer,
+    void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& activationDescriptor,
-                              const char *name = nullptr) override;
+                              const char* name = nullptr) override;
 
-    /// Retreive the default range
+    /// Retrieve the default range
     MinMaxRange DefaultRange() const { return std::make_pair(-15.0f, 15.0f); }
 
-    /// Retreive the Range for a particular output slot on a particular layer
+    /// Retrieve the Range for a particular output slot on a particular layer
     MinMaxRange GetRange(LayerGuid guid, unsigned int idx) const;
 
 private:
     /// Set the range for an output slot on a layer
     void SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max);
 
-    /// Mapping from Guid to an array of ranges for outputs
-    std::map<LayerGuid, MinMaxRanges> m_GuidToRangesMap;
+    /// Mapping from a layer Guid to an array of ranges for outputs
+    std::unordered_map<LayerGuid, MinMaxRanges>& m_GuidToRangesMap;
 };
 
 } //namespace armnn

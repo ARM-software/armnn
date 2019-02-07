@@ -7,9 +7,6 @@
 
 #include <armnn/INetwork.hpp>
 
-#include <memory>
-
-
 namespace armnn
 {
 
@@ -23,11 +20,14 @@ public:
     static INetworkQuantizerPtr Create(INetwork* inputNetwork);  ///< Create Quantizer object wrapped in unique_ptr
     static void Destroy(INetworkQuantizer* quantizer);           ///< Destroy Quantizer object
 
+    /// Overrides the default quantization values for the input layer with the given id
+    virtual void OverrideInputRange(LayerBindingId layerId, float min, float max) = 0;
+
     /// Extract final quantized network
     virtual INetworkPtr ExportNetwork() = 0;
 
 protected:
-    virtual ~INetworkQuantizer() {};
+    virtual ~INetworkQuantizer() {}
 };
 
 } //namespace armnn

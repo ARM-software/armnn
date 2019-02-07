@@ -11,11 +11,19 @@
 #include "../LayerVisitorBase.hpp"
 #include "../Network.hpp"
 #include "../Graph.hpp"
+#include "../NetworkQuantizerUtils.hpp"
+#include "../OverrideInputRangeVisitor.hpp"
 
 #include <boost/test/unit_test.hpp>
 
+#include <unordered_map>
+
 namespace armnn
 {
+using MinMaxRange = std::pair<float, float>;
+using MinMaxRanges = std::vector<MinMaxRange>;
+using MinMaxRangeMap = std::unordered_map<LayerGuid, MinMaxRanges>;
+
 BOOST_AUTO_TEST_SUITE(Quantizer)
 
 class TestQuantization : public LayerVisitorBase<VisitorThrowingPolicy>
@@ -44,12 +52,9 @@ public:
 void VisitLayersTopologically(const INetwork* inputNetwork, ILayerVisitor& visitor)
 {
     auto network = boost::polymorphic_downcast<const Network*>(inputNetwork);
-
     auto graph = network->GetGraph().TopologicalSort();
-    for (auto layer : graph)
-    {
-        layer->Accept(visitor);
-    }
+
+    VisitLayers(graph, visitor);
 }
 
 BOOST_AUTO_TEST_CASE(QuantizeAddition)
@@ -370,5 +375,89 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+BOOST_AUTO_TEST_CASE(OverrideInputRangeEmptyNetwork)
+{
+    MinMaxRangeMap guidToRangesMap; // Empty map of ranges
+    MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
+
+    Network network; // Empty network
+    auto inputLayers = network.GetGraph().GetInputLayers(); // Empty list of input layers
+
+    OverrideInputRangeVisitor overrideInputRangeVisitor(guidToRangesMap, 0, minMaxRange);
+    VisitLayers(inputLayers, overrideInputRangeVisitor);
+
+    BOOST_CHECK(guidToRangesMap.empty()); // Check that the map of ranges remained untouched
+}
+
+BOOST_AUTO_TEST_CASE(OverrideInputRangeNoInputLayers)
+{
+    MinMaxRangeMap guidToRangesMap; // Empty map of ranges
+    MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
+
+    Network network;
+    network.AddAdditionLayer(); // Network with no input layers
+    auto inputLayers = network.GetGraph().GetInputLayers(); // Empty list of input layers
+
+    OverrideInputRangeVisitor overrideInputRangeVisitor(guidToRangesMap, 0, minMaxRange);
+    VisitLayers(inputLayers, overrideInputRangeVisitor);
+
+    BOOST_CHECK(guidToRangesMap.empty()); // Check that the map of ranges remained untouched
+}
+
+BOOST_AUTO_TEST_CASE(OverrideInputRangeInputLayers)
+{
+    MinMaxRangeMap guidToRangesMap; // Empty map of ranges
+    MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
+
+    Network network;
+
+    // Adding the layers
+    IConnectableLayer* input0 = network.AddInputLayer(0);
+    IConnectableLayer* input1 = network.AddInputLayer(1);
+    IConnectableLayer* addition = network.AddAdditionLayer();
+    IConnectableLayer* output = network.AddOutputLayer(2);
+
+    // Connecting the layer
+    input0->GetOutputSlot(0).Connect(addition->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(addition->GetInputSlot(1));
+    addition->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Setting the TensorInfos
+    TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+    input0->GetOutputSlot(0).SetTensorInfo(info);
+    input1->GetOutputSlot(0).SetTensorInfo(info);
+    addition->GetOutputSlot(0).SetTensorInfo(info);
+
+    auto inputLayers = network.GetGraph().GetInputLayers(); // List of input layers
+
+    // Trying to override the input range for the input layer with binding id 3 (does not exist in the network)
+    OverrideInputRangeVisitor overrideInputRangeVisitorLayer3(guidToRangesMap, 3, minMaxRange);
+    VisitLayers(inputLayers, overrideInputRangeVisitorLayer3);
+
+    // Check that the map of ranges remained untouched
+    BOOST_CHECK(guidToRangesMap.empty());
+
+    // Override the input range for the input layer with binding id 1
+    OverrideInputRangeVisitor overrideInputRangeVisitorLayer1(guidToRangesMap, 1, minMaxRange);
+    VisitLayers(inputLayers, overrideInputRangeVisitorLayer1);
+
+    // Check that the map of ranges has been populated
+    BOOST_CHECK(!guidToRangesMap.empty());
+
+    // Check that an entry for the input layer with binding id 0 does not exist
+    BOOST_CHECK(guidToRangesMap.find(input0->GetGuid()) == guidToRangesMap.end());
+
+    // Check that an entry for the input layer with binding id 1 exists
+    BOOST_CHECK(guidToRangesMap.find(input1->GetGuid()) != guidToRangesMap.end());
+
+    // Check that at least a value has been added for the input layer with binding id 1
+    BOOST_CHECK(!guidToRangesMap[input1->GetGuid()].empty());
+
+    // Check the the overridden values are what we intended to set
+    BOOST_CHECK(guidToRangesMap[input1->GetGuid()].at(0).first  == minMaxRange.first);
+    BOOST_CHECK(guidToRangesMap[input1->GetGuid()].at(0).second == minMaxRange.second);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
-} //namespace armnn
+} // namespace armnn

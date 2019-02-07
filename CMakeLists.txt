@@ -307,12 +307,16 @@ list(APPEND armnn_sources
     src/armnn/Network.hpp
     src/armnn/NetworkQuantizer.cpp
     src/armnn/NetworkQuantizer.hpp
+    src/armnn/NetworkQuantizerUtils.cpp
+    src/armnn/NetworkQuantizerUtils.hpp
     src/armnn/NetworkUtils.cpp
     src/armnn/NetworkUtils.hpp
     src/armnn/Observable.cpp
     src/armnn/Observable.hpp
     src/armnn/Optimizer.cpp
     src/armnn/Optimizer.hpp
+    src/armnn/OverrideInputRangeVisitor.cpp
+    src/armnn/OverrideInputRangeVisitor.hpp
     src/armnn/Profiling.cpp
     src/armnn/ProfilingEvent.cpp
     src/armnn/ProfilingEvent.hpp

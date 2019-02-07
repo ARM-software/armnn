@@ -12,6 +12,20 @@
 namespace armnn
 {
 
+StaticRangeVisitor::StaticRangeVisitor(std::unordered_map<LayerGuid, MinMaxRanges>& guidToRangesMap)
+    : m_GuidToRangesMap(guidToRangesMap)
+{}
+
+StaticRangeVisitor::MinMaxRange StaticRangeVisitor::GetRange(LayerGuid guid, unsigned int idx) const
+{
+    auto search = m_GuidToRangesMap.find(guid);
+    if (search == m_GuidToRangesMap.end())
+    {
+        return DefaultRange();
+    }
+    return search->second.at(idx);
+}
+
 void StaticRangeVisitor::SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max)
 {
     auto& ranges = m_GuidToRangesMap[layer->GetGuid()];
@@ -23,20 +37,10 @@ void StaticRangeVisitor::SetRange(const IConnectableLayer* layer, unsigned int o
     ranges[outputIdx] = std::make_pair(min, max);
 }
 
-StaticRangeVisitor::MinMaxRange StaticRangeVisitor::GetRange(LayerGuid guid, unsigned int idx) const
-{
-    auto found = m_GuidToRangesMap.find(guid);
-    if (found != m_GuidToRangesMap.end())
-    {
-        return found->second.at(idx);
-    }
-    return DefaultRange();
-}
-
-void StaticRangeVisitor::VisitAdditionLayer(const IConnectableLayer *layer, const char *name)
+void StaticRangeVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
 {
     SetRange(layer, 0, -20.f, 20.f);
-};
+}
 
 void StaticRangeVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                                       const BatchNormalizationDescriptor& desc,
@@ -55,9 +59,9 @@ void StaticRangeVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* l
     SetRange(layer, 0, -15.0f, 15.0f);
 }
 
-void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer *layer,
+void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
                                               const ActivationDescriptor& activationDescriptor,
-                                              const char *name)
+                                              const char* name)
 {
     switch (activationDescriptor.m_Function)
     {

@@ -5,6 +5,7 @@
 
 #include "StaticRangeVisitor.hpp"
 
+#include <boost/core/ignore_unused.hpp>
 
 namespace armnn
 {
@@ -34,5 +35,22 @@ void StaticRangeVisitor::VisitAdditionLayer(const IConnectableLayer *layer, cons
 {
     SetRange(layer, 0, -20.f, 20.f);
 };
+
+void StaticRangeVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* layer,
+                                                      const BatchNormalizationDescriptor& desc,
+                                                      const ConstTensor& mean,
+                                                      const ConstTensor& variance,
+                                                      const ConstTensor& beta,
+                                                      const ConstTensor& gamma,
+                                                      const char* name)
+{
+    boost::ignore_unused(desc);
+    boost::ignore_unused(mean);
+    boost::ignore_unused(variance);
+    boost::ignore_unused(beta);
+    boost::ignore_unused(gamma);
+    boost::ignore_unused(name);
+    SetRange(layer, 0, -15.0f, 15.0f);
+}
 
 } //namespace armnn

@@ -28,6 +28,13 @@ public:
     void VisitInputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name = nullptr) override;
     void VisitAdditionLayer(const IConnectableLayer *layer, const char *name = nullptr) override;
     void VisitOutputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name = nullptr)  override;
+    void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
+                                      const BatchNormalizationDescriptor& desc,
+                                      const ConstTensor& mean,
+                                      const ConstTensor& variance,
+                                      const ConstTensor& beta,
+                                      const ConstTensor& gamma,
+                                      const char* name = nullptr) override;
 
     // Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }

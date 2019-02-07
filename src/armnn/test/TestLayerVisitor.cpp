@@ -28,7 +28,7 @@ void TestLayerVisitor::CheckLayerName(const char* name)
 void TestLayerVisitor::CheckLayerPointer(const IConnectableLayer* layer)
 {
     BOOST_CHECK(layer != nullptr);
-};
+}
 
 void TestLayerVisitor::CheckConstTensors(const ConstTensor& expected, const ConstTensor& actual)
 {

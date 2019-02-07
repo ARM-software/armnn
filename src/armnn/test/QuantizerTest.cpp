@@ -30,8 +30,8 @@ class TestQuantization : public LayerVisitorBase<VisitorThrowingPolicy>
 {
 public:
     virtual void VisitInputLayer(const IConnectableLayer* layer,
-        LayerBindingId id,
-        const char* name = nullptr)
+                                 LayerBindingId id,
+                                 const char* name = nullptr)
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -40,12 +40,12 @@ public:
         BOOST_TEST((info.GetQuantizationOffset() == 128));
 
         // Based off current default [-15.0f, 15.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f );
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f);
     }
 
     virtual void VisitOutputLayer(const IConnectableLayer* layer,
-        LayerBindingId id,
-        const char* name = nullptr)
+                                  LayerBindingId id,
+                                  const char* name = nullptr)
     {}
 };
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(QuantizeAddition)
             BOOST_TEST((info.GetQuantizationOffset() == 128));
 
             // Based off current static value [-20.0f, 20.0f]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 40.0f/255.0f, 0.000001f );
+            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 40.0f/255.0f, 0.000001f);
         }
     };
 
@@ -105,8 +105,8 @@ class TestActivationQuantization : public TestQuantization
 {
 public:
     virtual void VisitActivationLayer(const IConnectableLayer* layer,
-        const ActivationDescriptor& descriptor,
-        const char* name = nullptr)
+                                      const ActivationDescriptor& descriptor,
+                                      const char* name = nullptr)
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -115,7 +115,7 @@ public:
         BOOST_TEST((info.GetQuantizationOffset() == 0));
 
         // Based off current static value [-20.0f, 20.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 15.0f/255.0f, 0.000001f );
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 15.0f/255.0f, 0.000001f);
     }
 };
 
@@ -202,8 +202,8 @@ BOOST_AUTO_TEST_CASE(QuantizeBoundedReluActivation)
     {
     public:
         virtual void VisitActivationLayer(const IConnectableLayer* layer,
-            const ActivationDescriptor& descriptor,
-            const char* name = nullptr)
+                                          const ActivationDescriptor& descriptor,
+                                          const char* name = nullptr)
         {
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBoundedReluActivation)
             BOOST_TEST((info.GetQuantizationOffset() == 0));
 
             // Based off current static value [0.0f, 3.5f(<-layer upper bound)]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 3.5f/255.0f, 0.000001f );
+            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 3.5f/255.0f, 0.000001f);
         }
     };
 
@@ -234,8 +234,8 @@ BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
     {
     public:
         virtual void VisitActivationLayer(const IConnectableLayer* layer,
-            const ActivationDescriptor& descriptor,
-            const char* name = nullptr)
+                                          const ActivationDescriptor& descriptor,
+                                          const char* name = nullptr)
         {
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
             BOOST_TEST((info.GetQuantizationOffset() == 128));
 
             // Based off current static value [-1.0f, 1.0f]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 2.0f/255.0f, 0.000001f );
+            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 2.0f/255.0f, 0.000001f);
         }
     };
 
@@ -266,8 +266,8 @@ BOOST_AUTO_TEST_CASE(QuantizeLeakyReLuActivation)
     {
     public:
         virtual void VisitActivationLayer(const IConnectableLayer* layer,
-            const ActivationDescriptor& descriptor,
-            const char* name = nullptr)
+                                          const ActivationDescriptor& descriptor,
+                                          const char* name = nullptr)
         {
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_CASE(QuantizeLeakyReLuActivation)
             BOOST_TEST((info.GetQuantizationOffset() == 64));
 
             // Based off current static value [-5.0f, 15.0f]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f );
+            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f);
         }
     };
 
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
             BOOST_TEST((info.GetQuantizationOffset() == 128));
 
             // Based off current static value [-15.0f, 15.0f]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f );
+            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f);
 
             //Test constants
             BOOST_TEST((mean.GetInfo().GetDataType() == DataType::QuantisedAsymm8));

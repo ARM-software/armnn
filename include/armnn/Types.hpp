@@ -114,8 +114,8 @@ using IBackendUniquePtr = std::unique_ptr<IBackend, void(*)(IBackend* backend)>;
 class IDeviceSpec
 {
 protected:
-    IDeviceSpec() {};
-    virtual ~IDeviceSpec() {};
+    IDeviceSpec() {}
+    virtual ~IDeviceSpec() {}
 };
 
 /// Type of identifiers for bindable layers (inputs, outputs).

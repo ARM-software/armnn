@@ -20,7 +20,7 @@ OverrideInputRangeVisitor::OverrideInputRangeVisitor(std::unordered_map<LayerGui
     , m_MinMaxRange(minMaxRange)
 {}
 
-void OverrideInputRangeVisitor::VisitInputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name)
+void OverrideInputRangeVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
     if (m_LayerId != id)
     {

@@ -24,7 +24,7 @@
 namespace armnn
 {
 
-INetworkQuantizer* INetworkQuantizer::CreateRaw(INetwork *inputNetwork)
+INetworkQuantizer* INetworkQuantizer::CreateRaw(INetwork* inputNetwork)
 {
     return new NetworkQuantizer(inputNetwork);
 }

@@ -108,7 +108,7 @@ void OutputSlot::MoveAllConnections(OutputSlot& destination)
 
 unsigned int OutputSlot::CalculateIndexOnOwner() const
 {
-    for (unsigned int i=0; i < GetOwningLayer().GetNumOutputSlots(); i++)
+    for (unsigned int i = 0; i < GetOwningLayer().GetNumOutputSlots(); i++)
     {
         if (GetOwningLayer().GetOutputSlot(i) == (*this))
         {
@@ -127,13 +127,12 @@ bool OutputSlot::operator==(const OutputSlot& other) const
         return false;
     }
 
-    for (unsigned int i=0; i < GetNumConnections(); i++)
+    for (unsigned int i = 0; i < GetNumConnections(); i++)
     {
         isSame &= other.GetConnection(i) == GetConnection(i);
     }
     return isSame;
 }
-
 
 void OutputSlot::ValidateConnectionIndex(unsigned int index) const
 {

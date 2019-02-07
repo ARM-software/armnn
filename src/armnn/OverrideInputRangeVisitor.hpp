@@ -26,7 +26,7 @@ public:
                               const MinMaxRange& minMaxRange);
     ~OverrideInputRangeVisitor() = default;
 
-    void VisitInputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name = nullptr) override;
+    void VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override;
 
 private:
     /// Sets the range for the given input layer

@@ -432,6 +432,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_RESHAPE]           =  &TfLiteParser::ParseReshape;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]   =  &TfLiteParser::ParseResizeBilinear;
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]           =  &TfLiteParser::ParseSoftmax;
+    m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND] =  &TfLiteParser::ParseSpaceToBatchND;
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]           =  &TfLiteParser::ParseSqueeze;
     m_ParserFunctions[tflite::BuiltinOperator_SUB]               =  &TfLiteParser::ParseSub;
     m_ParserFunctions[tflite::BuiltinOperator_ADD]               =  &TfLiteParser::ParseAdd;
@@ -986,6 +987,54 @@ void TfLiteParser::ParseSoftmax(size_t subgraphIndex, size_t operatorIndex)
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
     // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 3);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo blockShapeTensorInfo = ToTensorInfo(inputs[1]);
+    BufferRawPtr blockShapeBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+
+    armnn::TensorInfo padListTensorInfo = ToTensorInfo(inputs[2]);
+    BufferRawPtr padListBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+
+    std::vector<unsigned int> blockShape(blockShapeTensorInfo.GetNumElements());
+    ::memcpy(blockShape.data(), blockShapeBufferPtr->data.data(), blockShapeTensorInfo.GetNumBytes());
+
+    std::vector<unsigned int> padListVector(padListTensorInfo.GetNumElements());
+    ::memcpy(padListVector.data(), padListBufferPtr->data.data(), padListTensorInfo.GetNumBytes());
+
+    size_t step = 2;
+    std::vector<std::pair<unsigned int, unsigned int>> padList;
+    for (unsigned int i = 0; i < padListTensorInfo.GetNumElements() / step; ++i)
+    {
+        padList.emplace_back(padListVector[i * step], padListVector[i * step + 1]);
+    }
+
+    armnn::SpaceToBatchNdDescriptor desc;
+    desc.m_BlockShape = blockShape;
+    desc.m_PadList = padList;
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+
+    auto layerName = boost::str(boost::format("SpaceToBatchND:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddSpaceToBatchNdLayer(desc, layerName.c_str());
+
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }

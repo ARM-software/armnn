@@ -159,6 +159,9 @@ if(BUILD_ARMNN_SERIALIZER)
     set(armnn_serializer_sources)
     list(APPEND armnn_serializer_sources
         src/armnnSerializer/Schema_generated.h
+        include/armnnDeserializeParser/IDeserializeParser.hpp
+        src/armnnDeserializeParser/DeserializeParser.hpp
+        src/armnnDeserializeParser/DeserializeParser.cpp
         )
 
     add_library_ex(armnnSerializer SHARED ${armnn_serializer_sources})
@@ -539,6 +542,17 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
+    if(BUILD_ARMNN_SERIALIZER)
+        enable_language(ASM)
+        list(APPEND unittest_sources
+                src/armnnSerializer/Schema_generated.h
+                src/armnnDeserializeParser/test/DeserializeAdd.cpp
+                src/armnnDeserializeParser/test/ParserFlatbuffersSerializeFixture.hpp
+                src/armnnDeserializeParser/test/SchemaSerialize.s
+                )
+        set_source_files_properties(src/armnnDeserializeParser/test/SchemaSerialize.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
+    endif()
+
     if(BUILD_ONNX_PARSER)
         list(APPEND unittest_sources
             src/armnnOnnxParser/test/Constructor.cpp
@@ -567,6 +581,10 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
     target_include_directories(UnitTests PRIVATE src/backends)
 
+    if(BUILD_ARMNN_SERIALIZER)
+        target_include_directories(UnitTests SYSTEM PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer")
+    endif()
+
     if(BUILD_TF_LITE_PARSER)
         target_include_directories(UnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
     endif()
@@ -592,6 +610,10 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_CAFFE_PARSER)
         target_link_libraries(UnitTests armnnCaffeParser)
+    endif()
+
+    if(BUILD_ARMNN_SERIALIZER)
+        target_link_libraries(UnitTests armnnSerializer)
     endif()
 
     if(BUILD_TF_LITE_PARSER)

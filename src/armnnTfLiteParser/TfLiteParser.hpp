@@ -92,6 +92,7 @@ private:
     void ParseUnsupportedOperator(size_t subgraphIndex, size_t operatorIndex);
     void ParseActivation(size_t subgraphIndex, size_t operatorIndex, armnn::ActivationFunction activationType);
     void ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex);
+    void ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);

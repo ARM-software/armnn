@@ -3160,12 +3160,12 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
         type      = attr.type();
     }
 
-    if (type != tensorflow::DT_FLOAT && nodeDef.op() != "Const")
+    if ((type != tensorflow::DT_FLOAT && type != tensorflow::DT_INT32) && nodeDef.op() != "Const")
     {
         throw ParseException(
             boost::str(
                 boost::format(
-                    "Currently only FLOAT is supported for tensorflow nodes (apart from Const). "
+                    "Currently only FLOAT and INT32 are supported for tensorflow nodes (apart from Const). "
                     "Got %1% for Node %2% %3%")
                     % tensorflow::DataType_Name(type)
                     % nodeDef.name()

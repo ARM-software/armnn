@@ -34,16 +34,16 @@ public:
 
     TestCaseResult ProcessResult(const InferenceTestOptions& options) override
     {
-        const std::vector<float>& output1 = this->GetOutputs()[0]; // bounding boxes
+        const std::vector<float>& output1 = boost::get<std::vector<float>>(this->GetOutputs()[0]); // bounding boxes
         BOOST_ASSERT(output1.size() == k_OutputSize1);
 
-        const std::vector<float>& output2 = this->GetOutputs()[1]; // classes
+        const std::vector<float>& output2 = boost::get<std::vector<float>>(this->GetOutputs()[1]); // classes
         BOOST_ASSERT(output2.size() == k_OutputSize2);
 
-        const std::vector<float>& output3 = this->GetOutputs()[2]; // scores
+        const std::vector<float>& output3 = boost::get<std::vector<float>>(this->GetOutputs()[2]); // scores
         BOOST_ASSERT(output3.size() == k_OutputSize3);
 
-        const std::vector<float>& output4 = this->GetOutputs()[3]; // number of valid detections
+        const std::vector<float>& output4 = boost::get<std::vector<float>>(this->GetOutputs()[3]); // valid detections
         BOOST_ASSERT(output4.size() == k_OutputSize4);
 
         // Extract detected objects from output data

@@ -27,6 +27,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/program_options.hpp>
+#include <boost/variant.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -42,7 +43,7 @@ namespace
 namespace po = boost::program_options;
 
 template<typename T, typename TParseElementFunc>
-std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseElementFunc)
+std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseElementFunc, const char * chars = "\t ,:")
 {
     std::vector<T> result;
     // Processes line-by-line.
@@ -53,7 +54,7 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
         try
         {
             // Coverity fix: boost::split() may throw an exception of type boost::bad_function_call.
-            boost::split(tokens, line, boost::algorithm::is_any_of("\t ,;:"), boost::token_compress_on);
+            boost::split(tokens, line, boost::algorithm::is_any_of(chars), boost::token_compress_on);
         }
         catch (const std::exception& e)
         {
@@ -137,14 +138,17 @@ std::vector<unsigned int> ParseArray(std::istream& stream)
         [](const std::string& s) { return boost::numeric_cast<unsigned int>(std::stoi(s)); });
 }
 
-void PrintOutputData(const std::string& outputLayerName, const std::vector<float>& data)
+template<>
+std::vector<int> ParseArray(std::istream& stream)
 {
-    std::cout << outputLayerName << ": ";
-    for (size_t i = 0; i < data.size(); i++)
-    {
-        printf("%f ", data[i]);
-    }
-    printf("\n");
+    return ParseArrayImpl<int>(stream, [](const std::string& s) { return std::stoi(s); });
+}
+
+std::vector<std::string> ParseInputString(const std::string& inputString, const char * chars)
+{
+    std::stringstream stream(inputString);
+
+    return ParseArrayImpl<std::string>(stream, [](const std::string& s) { return boost::trim_copy(s); }, chars);
 }
 
 void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
@@ -172,26 +176,38 @@ template<typename TParser, typename TDataType>
 int MainImpl(const char* modelPath,
              bool isModelBinary,
              const std::vector<armnn::BackendId>& computeDevices,
-             const char* inputName,
-             const armnn::TensorShape* inputTensorShape,
-             const char* inputTensorDataFilePath,
-             const char* outputName,
+             const std::vector<string>& inputNames,
+             const std::vector<std::unique_ptr<armnn::TensorShape>>& inputTensorShapes,
+             const std::vector<string>& inputTensorDataFilePaths,
+             const std::vector<string>& inputTypes,
+             const std::vector<string>& outputNames,
              bool enableProfiling,
              const size_t subgraphId,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
-    using TContainer = std::vector<TDataType>;
+    using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
-    // Loads input tensor.
-    TContainer inputDataContainer;
+    std::vector<TContainer> inputDataContainers;
+
+    for(unsigned int i = 0; i < inputTensorDataFilePaths.size(); ++i)
     {
-        std::ifstream inputTensorFile(inputTensorDataFilePath);
-        if (!inputTensorFile.good())
+        std::ifstream inputTensorFile(inputTensorDataFilePaths[i]);
+
+        if (inputTypes[i].compare("float") == 0)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Failed to load input tensor data file from " << inputTensorDataFilePath;
+            inputDataContainers.push_back(ParseArray<float>(inputTensorFile));
+        }
+        else if (inputTypes[i].compare("int") == 0)
+        {
+            inputDataContainers.push_back(ParseArray<int>(inputTensorFile));;
+        }
+        else
+        {
+            BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << inputTypes[i] << "\". ";
             return EXIT_FAILURE;
         }
-        inputDataContainer = ParseArray<TDataType>(inputTensorFile);
+
+        inputTensorFile.close();
     }
 
     try
@@ -201,29 +217,49 @@ int MainImpl(const char* modelPath,
         params.m_ModelPath = modelPath;
         params.m_IsModelBinary = isModelBinary;
         params.m_ComputeDevices = computeDevices;
-        params.m_InputBindings = { inputName };
-        params.m_InputShapes = { *inputTensorShape };
-        params.m_OutputBindings = { outputName };
+
+        for(const std::string& inputName: inputNames)
+        {
+            params.m_InputBindings.push_back(inputName);
+        }
+
+        for(unsigned int i = 0; i < inputTensorShapes.size(); ++i)
+        {
+            params.m_InputShapes.push_back(*inputTensorShapes[i]);
+        }
+
+        for(const std::string& outputName: outputNames)
+        {
+            params.m_OutputBindings.push_back(outputName);
+        }
+
         params.m_EnableProfiling = enableProfiling;
         params.m_SubgraphId = subgraphId;
         InferenceModel<TParser, TDataType> model(params, runtime);
 
-        const size_t numOutputs    = params.m_OutputBindings.size();
-        const size_t containerSize = model.GetOutputSize();
+        const size_t numOutputs = params.m_OutputBindings.size();
+        std::vector<TContainer> outputDataContainers;
 
-        // Set up input data container
-        std::vector<TContainer> inputData(1, std::move(inputDataContainer));
+        for (unsigned int i = 0; i < numOutputs; ++i)
+        {
+            outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
+        }
 
-        // Set up output data container
-        std::vector<TContainer> outputData(numOutputs, TContainer(containerSize));
-
-        // Execute model
-        model.Run(inputData, outputData);
+        model.Run(inputDataContainers, outputDataContainers);
 
         // Print output tensors
         for (size_t i = 0; i < numOutputs; i++)
         {
-            PrintOutputData(params.m_OutputBindings[i], outputData[i]);
+            boost::apply_visitor([&](auto&& value)
+                                 {
+                                     std::cout << params.m_OutputBindings[i] << ": ";
+                                     for (size_t i = 0; i < value.size(); ++i)
+                                     {
+                                         printf("%f ", static_cast<float>(value[i]));
+                                     }
+                                     printf("\n");
+                                 },
+                                 outputDataContainers[i]);
         }
     }
     catch (armnn::Exception const& e)
@@ -236,17 +272,26 @@ int MainImpl(const char* modelPath,
 }
 
 // This will run a test
-int RunTest(const std::string& modelFormat,
-            const std::string& inputTensorShapeStr,
+int RunTest(const std::string& format,
+            const std::string& inputTensorShapesStr,
             const vector<armnn::BackendId>& computeDevice,
-            const std::string& modelPath,
-            const std::string& inputName,
-            const std::string& inputTensorDataFilePath,
-            const std::string& outputName,
+            const std::string& path,
+            const std::string& inputNames,
+            const std::string& inputTensorDataFilePaths,
+            const std::string& inputTypes,
+            const std::string& outputNames,
             bool enableProfiling,
             const size_t subgraphId,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
+    std::string modelFormat = boost::trim_copy(format);
+    std::string modelPath = boost::trim_copy(path);
+    std::vector<std::string> inputNamesVector = ParseInputString(inputNames, ",");
+    std::vector<std::string> inputTensorShapesVector = ParseInputString(inputTensorShapesStr, ";");
+    std::vector<std::string> inputTensorDataFilePathsVector = ParseInputString(inputTensorDataFilePaths, ",");
+    std::vector<std::string> outputNamesVector = ParseInputString(outputNames, ",");
+    std::vector<std::string> inputTypesVector = ParseInputString(inputTypes, ",");
+
     // Parse model binary flag from the model-format string we got from the command-line
     bool isModelBinary;
     if (modelFormat.find("bin") != std::string::npos)
@@ -263,22 +308,55 @@ int RunTest(const std::string& modelFormat,
         return EXIT_FAILURE;
     }
 
-    // Parse input tensor shape from the string we got from the command-line.
-    std::unique_ptr<armnn::TensorShape> inputTensorShape;
-    if (!inputTensorShapeStr.empty())
+    if ((inputTensorShapesVector.size() != 0) && (inputTensorShapesVector.size() != inputNamesVector.size()))
     {
-        std::stringstream ss(inputTensorShapeStr);
-        std::vector<unsigned int> dims = ParseArray<unsigned int>(ss);
+        BOOST_LOG_TRIVIAL(fatal) << "input-name and input-tensor-shape must have the same amount of elements.";
+        return EXIT_FAILURE;
+    }
 
-        try
+    if ((inputTensorDataFilePathsVector.size() != 0) &&
+        (inputTensorDataFilePathsVector.size() != inputNamesVector.size()))
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "input-name and input-tensor-data must have the same amount of elements.";
+        return EXIT_FAILURE;
+    }
+
+    if (inputTypesVector.size() == 0)
+    {
+        //Defaults the value of all inputs to "float"
+        for(unsigned int i = 0; i < inputNamesVector.size(); ++i)
         {
-            // Coverity fix: An exception of type armnn::InvalidArgumentException is thrown and never caught.
-            inputTensorShape = std::make_unique<armnn::TensorShape>(dims.size(), dims.data());
+            inputTypesVector.push_back("float");
         }
-        catch (const armnn::InvalidArgumentException& e)
+    }
+    else if ((inputTypesVector.size() != 0) && (inputTypesVector.size() != inputNamesVector.size()))
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "input-name and input-type must have the same amount of elements.";
+        return EXIT_FAILURE;
+    }
+
+    // Parse input tensor shape from the string we got from the command-line.
+    std::vector<std::unique_ptr<armnn::TensorShape>> inputTensorShapes;
+
+    if (!inputTensorShapesVector.empty())
+    {
+        inputTensorShapes.reserve(inputTensorShapesVector.size());
+
+        for(const std::string& shape : inputTensorShapesVector)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Cannot create tensor shape: " << e.what();
-            return EXIT_FAILURE;
+            std::stringstream ss(shape);
+            std::vector<unsigned int> dims = ParseArray<unsigned int>(ss);
+
+            try
+            {
+                // Coverity fix: An exception of type armnn::InvalidArgumentException is thrown and never caught.
+                inputTensorShapes.push_back(std::make_unique<armnn::TensorShape>(dims.size(), dims.data()));
+            }
+            catch (const armnn::InvalidArgumentException& e)
+            {
+                BOOST_LOG_TRIVIAL(fatal) << "Cannot create tensor shape: " << e.what();
+                return EXIT_FAILURE;
+            }
         }
     }
 
@@ -287,9 +365,9 @@ int RunTest(const std::string& modelFormat,
     {
 #if defined(ARMNN_CAFFE_PARSER)
         return MainImpl<armnnCaffeParser::ICaffeParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
-                                                               inputName.c_str(), inputTensorShape.get(),
-                                                               inputTensorDataFilePath.c_str(), outputName.c_str(),
-                                                               enableProfiling, subgraphId, runtime);
+                                                               inputNamesVector, inputTensorShapes,
+                                                               inputTensorDataFilePathsVector, inputTypesVector,
+                                                               outputNamesVector, enableProfiling, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
@@ -299,9 +377,9 @@ int RunTest(const std::string& modelFormat,
 {
 #if defined(ARMNN_ONNX_PARSER)
     return MainImpl<armnnOnnxParser::IOnnxParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
-                                                         inputName.c_str(), inputTensorShape.get(),
-                                                         inputTensorDataFilePath.c_str(), outputName.c_str(),
-                                                         enableProfiling, subgraphId, runtime);
+                                                         inputNamesVector, inputTensorShapes,
+                                                         inputTensorDataFilePathsVector, inputTypesVector,
+                                                         outputNamesVector, enableProfiling, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
     return EXIT_FAILURE;
@@ -311,9 +389,9 @@ int RunTest(const std::string& modelFormat,
     {
 #if defined(ARMNN_TF_PARSER)
         return MainImpl<armnnTfParser::ITfParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
-                                                         inputName.c_str(), inputTensorShape.get(),
-                                                         inputTensorDataFilePath.c_str(), outputName.c_str(),
-                                                         enableProfiling, subgraphId, runtime);
+                                                         inputNamesVector, inputTensorShapes,
+                                                         inputTensorDataFilePathsVector, inputTypesVector,
+                                                         outputNamesVector, enableProfiling, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
@@ -329,9 +407,10 @@ int RunTest(const std::string& modelFormat,
             return EXIT_FAILURE;
         }
         return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
-                                                                 inputName.c_str(), inputTensorShape.get(),
-                                                                 inputTensorDataFilePath.c_str(), outputName.c_str(),
-                                                                 enableProfiling, subgraphId, runtime);
+                                                                 inputNamesVector, inputTensorShapes,
+                                                                 inputTensorDataFilePathsVector, inputTypesVector,
+                                                                 outputNamesVector, enableProfiling, subgraphId,
+                                                                 runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
             "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
@@ -351,10 +430,11 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
 {
     std::string modelFormat;
     std::string modelPath;
-    std::string inputName;
-    std::string inputTensorShapeStr;
-    std::string inputTensorDataFilePath;
-    std::string outputName;
+    std::string inputNames;
+    std::string inputTensorShapes;
+    std::string inputTensorDataFilePaths;
+    std::string outputNames;
+    std::string inputTypes;
 
     size_t subgraphId = 0;
 
@@ -372,15 +452,21 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
          " .onnx")
         ("compute,c", po::value<std::vector<armnn::BackendId>>()->multitoken(),
          backendsMessage.c_str())
-        ("input-name,i", po::value(&inputName), "Identifier of the input tensor in the network.")
+        ("input-name,i", po::value(&inputNames), "Identifier of the input tensors in the network separated by comma.")
         ("subgraph-number,n", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be "
-         "executed. Defaults to 0")
-        ("input-tensor-shape,s", po::value(&inputTensorShapeStr),
-         "The shape of the input tensor in the network as a flat array of integers separated by whitespace. "
+         "executed. Defaults to 0.")
+        ("input-tensor-shape,s", po::value(&inputTensorShapes),
+         "The shape of the input tensors in the network as a flat array of integers separated by comma. "
+         "Several shapes can be passed separating them by semicolon. "
          "This parameter is optional, depending on the network.")
-        ("input-tensor-data,d", po::value(&inputTensorDataFilePath),
-         "Path to a file containing the input data as a flat array separated by whitespace.")
-        ("output-name,o", po::value(&outputName), "Identifier of the output tensor in the network.");
+        ("input-tensor-data,d", po::value(&inputTensorDataFilePaths),
+         "Path to files containing the input data as a flat array separated by whitespace. "
+         "Several paths can be passed separating them by comma.")
+        ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
+         "If unset, defaults to \"float\" for all defined inputs. "
+         "Accepted values (float or int).")
+        ("output-name,o", po::value(&outputNames),
+         "Identifier of the output tensors in the network separated by comma.");
     }
     catch (const std::exception& e)
     {
@@ -415,14 +501,6 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
         return EXIT_FAILURE;
     }
 
-    // Remove leading and trailing whitespaces from the parsed arguments.
-    boost::trim(modelFormat);
-    boost::trim(modelPath);
-    boost::trim(inputName);
-    boost::trim(inputTensorShapeStr);
-    boost::trim(inputTensorDataFilePath);
-    boost::trim(outputName);
-
     // Get the preferred order of compute devices.
     std::vector<armnn::BackendId> computeDevices = vm["compute"].as<std::vector<armnn::BackendId>>();
 
@@ -438,8 +516,8 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
         return EXIT_FAILURE;
     }
 
-    return RunTest(modelFormat, inputTensorShapeStr, computeDevices,
-                   modelPath, inputName, inputTensorDataFilePath, outputName, enableProfiling, subgraphId, runtime);
+    return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames, inputTensorDataFilePaths,
+                   inputTypes, outputNames,  enableProfiling, subgraphId);
 }
 
 int main(int argc, const char* argv[])
@@ -457,10 +535,11 @@ int main(int argc, const char* argv[])
 
     std::string modelFormat;
     std::string modelPath;
-    std::string inputName;
-    std::string inputTensorShapeStr;
-    std::string inputTensorDataFilePath;
-    std::string outputName;
+    std::string inputNames;
+    std::string inputTensorShapes;
+    std::string inputTensorDataFilePaths;
+    std::string outputNames;
+    std::string inputTypes;
 
     size_t subgraphId = 0;
 
@@ -483,15 +562,22 @@ int main(int argc, const char* argv[])
              " .tflite, .onnx")
             ("compute,c", po::value<std::vector<std::string>>()->multitoken(),
              backendsMessage.c_str())
-            ("input-name,i", po::value(&inputName), "Identifier of the input tensor in the network.")
+            ("input-name,i", po::value(&inputNames),
+             "Identifier of the input tensors in the network separated by comma.")
             ("subgraph-number,x", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be executed."
               "Defaults to 0")
-            ("input-tensor-shape,s", po::value(&inputTensorShapeStr),
-             "The shape of the input tensor in the network as a flat array of integers separated by whitespace. "
+            ("input-tensor-shape,s", po::value(&inputTensorShapes),
+             "The shape of the input tensors in the network as a flat array of integers separated by comma. "
+             "Several shapes can be passed separating them by semicolon. "
              "This parameter is optional, depending on the network.")
-            ("input-tensor-data,d", po::value(&inputTensorDataFilePath),
-             "Path to a file containing the input data as a flat array separated by whitespace.")
-            ("output-name,o", po::value(&outputName), "Identifier of the output tensor in the network.")
+            ("input-tensor-data,d", po::value(&inputTensorDataFilePaths),
+             "Path to files containing the input data as a flat array separated by whitespace. "
+             "Several paths can be passed separating them by comma. ")
+            ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
+             "If unset, defaults to \"float\" for all defined inputs. "
+             "Accepted values (float or int)")
+            ("output-name,o", po::value(&outputNames),
+             "Identifier of the output tensors in the network separated by comma.")
             ("event-based-profiling,e", po::bool_switch()->default_value(false),
              "Enables built in profiler. If unset, defaults to off.");
     }
@@ -632,7 +718,7 @@ int main(int argc, const char* argv[])
             return EXIT_FAILURE;
         }
 
-        return RunTest(modelFormat, inputTensorShapeStr, computeDevices,
-                       modelPath, inputName, inputTensorDataFilePath, outputName, enableProfiling, subgraphId);
+        return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames, inputTensorDataFilePaths,
+                       inputTypes, outputNames,  enableProfiling, subgraphId);
     }
 }

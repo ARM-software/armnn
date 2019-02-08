@@ -28,6 +28,7 @@ namespace armnn
 namespace test
 {
 
+using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
 template <typename TTestCaseDatabase, typename TModel>
 ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
@@ -39,7 +40,8 @@ ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
     unsigned int testCaseId,
     unsigned int label,
     std::vector<typename TModel::DataType> modelInput)
-    : InferenceModelTestCase<TModel>(model, testCaseId, { std::move(modelInput) }, { model.GetOutputSize() })
+    : InferenceModelTestCase<TModel>(
+            model, testCaseId, std::vector<TContainer>{ modelInput }, { model.GetOutputSize() })
     , m_Label(label)
     , m_QuantizationParams(model.GetQuantizationParams())
     , m_NumInferencesRef(numInferencesRef)
@@ -58,21 +60,26 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
     std::map<float,int> resultMap;
     {
         int index = 0;
-        for (const auto & o : output)
-        {
-            float prob = ToFloat<typename TModel::DataType>::Convert(o, m_QuantizationParams);
-            int classification = index++;
 
-            // Take the first class with each probability
-            // This avoids strange results when looping over batched results produced
-            // with identical test data.
-            std::map<float, int>::iterator lb = resultMap.lower_bound(prob);
-            if (lb == resultMap.end() ||
-                !resultMap.key_comp()(prob, lb->first)) {
-                // If the key is not already in the map, insert it.
-                resultMap.insert(lb, std::map<float, int>::value_type(prob, classification));
-            }
-        }
+        boost::apply_visitor([&](auto&& value)
+                             {
+                                 for (const auto & o : value)
+                                 {
+                                     float prob = ToFloat<typename TModel::DataType>::Convert(o, m_QuantizationParams);
+                                     int classification = index++;
+
+                                     // Take the first class with each probability
+                                     // This avoids strange results when looping over batched results produced
+                                     // with identical test data.
+                                     std::map<float, int>::iterator lb = resultMap.lower_bound(prob);
+                                     if (lb == resultMap.end() ||
+                                         !resultMap.key_comp()(prob, lb->first)) {
+                                         // If the key is not already in the map, insert it.
+                                         resultMap.insert(lb, std::map<float, int>::value_type(prob, classification));
+                                     }
+                                 }
+                             },
+                             output);
     }
 
     {
@@ -86,8 +93,13 @@ TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(cons
         }
     }
 
-    const unsigned int prediction = boost::numeric_cast<unsigned int>(
-        std::distance(output.begin(), std::max_element(output.begin(), output.end())));
+    unsigned int prediction = 0;
+    boost::apply_visitor([&](auto&& value)
+                         {
+                             prediction = boost::numeric_cast<unsigned int>(
+                                     std::distance(value.begin(), std::max_element(value.begin(), value.end())));
+                         },
+                         output);
 
     // If we're just running the defaultTestCaseIds, each one must be classified correctly.
     if (params.m_IterationCount == 0 && prediction != m_Label)

@@ -100,7 +100,7 @@ template <typename TModel>
 class InferenceModelTestCase : public IInferenceTestCase
 {
 public:
-    using TContainer = std::vector<typename TModel::DataType>;
+    using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
     InferenceModelTestCase(TModel& model,
                            unsigned int testCaseId,
@@ -112,11 +112,11 @@ public:
     {
         // Initialize output vector
         const size_t numOutputs = outputSizes.size();
-        m_Outputs.resize(numOutputs);
+        m_Outputs.reserve(numOutputs);
 
         for (size_t i = 0; i < numOutputs; i++)
         {
-            m_Outputs[i].resize(outputSizes[i]);
+            m_Outputs.push_back(std::vector<typename TModel::DataType>(outputSizes[i]));
         }
     }
 
@@ -147,6 +147,12 @@ struct ToFloat<float>
         // assuming that float models are not quantized
         return value;
     }
+
+    static inline float Convert(int value, const InferenceModelInternal::QuantizationParams &)
+    {
+        // assuming that float models are not quantized
+        return static_cast<float>(value);
+    }
 };
 
 template <>
@@ -156,6 +162,22 @@ struct ToFloat<uint8_t>
                                 const InferenceModelInternal::QuantizationParams & quantizationParams)
     {
         return armnn::Dequantize<uint8_t>(value,
+                                          quantizationParams.first,
+                                          quantizationParams.second);
+    }
+
+    static inline float Convert(int value,
+                                const InferenceModelInternal::QuantizationParams & quantizationParams)
+    {
+        return armnn::Dequantize<uint8_t>(static_cast<uint8_t>(value),
+                                          quantizationParams.first,
+                                          quantizationParams.second);
+    }
+
+    static inline float Convert(float value,
+                                const InferenceModelInternal::QuantizationParams & quantizationParams)
+    {
+        return armnn::Dequantize<uint8_t>(static_cast<uint8_t>(value),
                                           quantizationParams.first,
                                           quantizationParams.second);
     }

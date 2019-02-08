@@ -330,6 +330,8 @@ list(APPEND armnn_sources
     src/armnn/QuantizerVisitor.hpp
     src/armnn/Runtime.cpp
     src/armnn/Runtime.hpp
+    src/armnn/RangeTracker.cpp
+    src/armnn/RangeTracker.hpp
     src/armnn/SerializeLayerParameters.cpp
     src/armnn/SerializeLayerParameters.hpp
     src/armnn/StaticRangeVisitor.cpp

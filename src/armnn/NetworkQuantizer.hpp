@@ -9,7 +9,7 @@
 #include <armnn/INetworkQuantizer.hpp>
 #include <armnn/Types.hpp>
 
-#include <unordered_map>
+#include "RangeTracker.hpp"
 
 namespace armnn
 {
@@ -23,13 +23,11 @@ public:
     INetworkPtr ExportNetwork() override;
 
 private:
-    using MinMaxRange  = std::pair<float, float>;
-    using MinMaxRanges = std::vector<MinMaxRange>;
-
+    /// Original input network to quantize
     INetwork* m_InputNetwork;
 
     /// Mapping from Guid to an array of ranges for outputs
-    std::unordered_map<LayerGuid, MinMaxRanges> m_GuidToRangesMap;
+    RangeTracker m_Ranges;
 };
 
 } //namespace armnn

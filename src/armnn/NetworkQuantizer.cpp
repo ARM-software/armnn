@@ -45,7 +45,7 @@ void NetworkQuantizer::OverrideInputRange(LayerBindingId layerId, float min, flo
     auto inputLayers = graph.GetInputLayers();
 
     // Walk the input layers of the graph and override the quantization parameters of the one with the given id
-    OverrideInputRangeVisitor overrideInputRangeVisitor(m_GuidToRangesMap, layerId, MinMaxRange{min, max});
+    OverrideInputRangeVisitor overrideInputRangeVisitor(m_Ranges, layerId, RangeTracker::MinMaxRange{min, max});
     VisitLayers(inputLayers, overrideInputRangeVisitor);
 }
 
@@ -54,11 +54,11 @@ INetworkPtr NetworkQuantizer::ExportNetwork()
     const Graph& graph = boost::polymorphic_downcast<const Network*>(m_InputNetwork)->GetGraph().TopologicalSort();
 
     // Step 1) Walk the graph and register min/max values for intermediate tensors
-    StaticRangeVisitor rangeVisitor(m_GuidToRangesMap);
+    StaticRangeVisitor rangeVisitor(m_Ranges);
     VisitLayers(graph, rangeVisitor);
 
     // Step 2) Convert input InputNetwork to Quantized InputNetwork
-    QuantizerVisitor quantizerVisitor(&rangeVisitor);
+    QuantizerVisitor quantizerVisitor(m_Ranges);
     VisitLayers(graph, quantizerVisitor);
 
     return quantizerVisitor.RetrieveFinalNetwork();

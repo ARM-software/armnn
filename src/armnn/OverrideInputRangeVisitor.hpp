@@ -7,6 +7,7 @@
 
 #include "NetworkQuantizer.hpp"
 #include "armnn/LayerVisitorBase.hpp"
+#include "RangeTracker.hpp"
 
 #include <unordered_map>
 
@@ -21,7 +22,7 @@ private:
     using MinMaxRanges = std::vector<MinMaxRange>;
 
 public:
-    OverrideInputRangeVisitor(std::unordered_map<LayerGuid, MinMaxRanges>& guidToRangesMap,
+    OverrideInputRangeVisitor(RangeTracker& ranges,
                               LayerBindingId layerId,
                               const MinMaxRange& minMaxRange);
     ~OverrideInputRangeVisitor() = default;
@@ -29,11 +30,8 @@ public:
     void VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override;
 
 private:
-    /// Sets the range for the given input layer
-    void SetRange(const IConnectableLayer* layer);
-
     /// Mapping from a layer Guid to an array of ranges for outputs
-    std::unordered_map<LayerGuid, MinMaxRanges>& m_GuidToRangesMap;
+    RangeTracker& m_Ranges;
 
     /// The id of the input layer of which to override the input range
     LayerBindingId m_LayerId;

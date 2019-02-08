@@ -24,7 +24,7 @@ class StaticRangeVisitor;
 class QuantizerVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
 public:
-    QuantizerVisitor(const StaticRangeVisitor* staticRangeVisitor);
+    QuantizerVisitor(const RangeTracker& rangeTracker);
     ~QuantizerVisitor() = default;
 
     /// Functions to quantize the individual layers, overridden from ILayerVisitor
@@ -79,7 +79,7 @@ private:
     void RecordLayer(const IConnectableLayer* srcLayer, IConnectableLayer* qLayer);
 
     /// Reference to the static range visitor used to retrieve the quantization ranges
-    const StaticRangeVisitor* m_StaticRangeVisitor;
+    const RangeTracker& m_Ranges;
 
     /// Quantized version of the model we are building up
     INetworkPtr m_QuantizedNetwork;

@@ -12,29 +12,13 @@
 namespace armnn
 {
 
-StaticRangeVisitor::StaticRangeVisitor(std::unordered_map<LayerGuid, MinMaxRanges>& guidToRangesMap)
-    : m_GuidToRangesMap(guidToRangesMap)
+StaticRangeVisitor::StaticRangeVisitor(RangeTracker& rangeTracker)
+    : m_RangeTracker(rangeTracker)
 {}
-
-StaticRangeVisitor::MinMaxRange StaticRangeVisitor::GetRange(LayerGuid guid, unsigned int idx) const
-{
-    auto search = m_GuidToRangesMap.find(guid);
-    if (search == m_GuidToRangesMap.end())
-    {
-        return DefaultRange();
-    }
-    return search->second.at(idx);
-}
 
 void StaticRangeVisitor::SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max)
 {
-    auto& ranges = m_GuidToRangesMap[layer->GetGuid()];
-
-    if (ranges.size() < layer->GetNumOutputSlots())
-    {
-        ranges.resize(layer->GetNumOutputSlots());
-    }
-    ranges[outputIdx] = std::make_pair(min, max);
+    m_RangeTracker.SetRange(layer, outputIdx, min, max);
 }
 
 void StaticRangeVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)

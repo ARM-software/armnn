@@ -12,36 +12,20 @@
 namespace armnn
 {
 
-OverrideInputRangeVisitor::OverrideInputRangeVisitor(std::unordered_map<LayerGuid, MinMaxRanges>& guidToRangesMap,
+OverrideInputRangeVisitor::OverrideInputRangeVisitor(RangeTracker& ranges,
                                                      LayerBindingId layerId,
                                                      const MinMaxRange& minMaxRange)
-    : m_GuidToRangesMap(guidToRangesMap)
+    : m_Ranges(ranges)
     , m_LayerId(layerId)
     , m_MinMaxRange(minMaxRange)
 {}
 
 void OverrideInputRangeVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
-    if (m_LayerId != id)
+    if (m_LayerId == id)
     {
-        // Not the layer we are looking for
-        return;
+        m_Ranges.SetRange(layer, 0, m_MinMaxRange.first, m_MinMaxRange.second);
     }
-
-    SetRange(layer);
-}
-
-void OverrideInputRangeVisitor::SetRange(const IConnectableLayer* layer)
-{
-    BOOST_ASSERT(layer);
-
-    auto& ranges = m_GuidToRangesMap[layer->GetGuid()];
-
-    if (ranges.size() < layer->GetNumOutputSlots())
-    {
-        ranges.resize(layer->GetNumOutputSlots());
-    }
-    ranges[0] = m_MinMaxRange;
 }
 
 } // namespace armnn

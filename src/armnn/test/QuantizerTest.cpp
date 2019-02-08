@@ -13,6 +13,7 @@
 #include "../Graph.hpp"
 #include "../NetworkQuantizerUtils.hpp"
 #include "../OverrideInputRangeVisitor.hpp"
+#include "../RangeTracker.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -377,36 +378,36 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
 
 BOOST_AUTO_TEST_CASE(OverrideInputRangeEmptyNetwork)
 {
-    MinMaxRangeMap guidToRangesMap; // Empty map of ranges
-    MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
+    RangeTracker ranges;
+    RangeTracker::MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
 
     Network network; // Empty network
     auto inputLayers = network.GetGraph().GetInputLayers(); // Empty list of input layers
 
-    OverrideInputRangeVisitor overrideInputRangeVisitor(guidToRangesMap, 0, minMaxRange);
+    OverrideInputRangeVisitor overrideInputRangeVisitor(ranges, 0, minMaxRange);
     VisitLayers(inputLayers, overrideInputRangeVisitor);
 
-    BOOST_CHECK(guidToRangesMap.empty()); // Check that the map of ranges remained untouched
+    BOOST_CHECK(ranges.IsEmpty()); // Check that the map of ranges remained untouched
 }
 
 BOOST_AUTO_TEST_CASE(OverrideInputRangeNoInputLayers)
 {
-    MinMaxRangeMap guidToRangesMap; // Empty map of ranges
+    RangeTracker ranges;
     MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
 
     Network network;
     network.AddAdditionLayer(); // Network with no input layers
     auto inputLayers = network.GetGraph().GetInputLayers(); // Empty list of input layers
 
-    OverrideInputRangeVisitor overrideInputRangeVisitor(guidToRangesMap, 0, minMaxRange);
+    OverrideInputRangeVisitor overrideInputRangeVisitor(ranges, 0, minMaxRange);
     VisitLayers(inputLayers, overrideInputRangeVisitor);
 
-    BOOST_CHECK(guidToRangesMap.empty()); // Check that the map of ranges remained untouched
+    BOOST_CHECK(ranges.IsEmpty()); // Check that the map of ranges remained untouched
 }
 
 BOOST_AUTO_TEST_CASE(OverrideInputRangeInputLayers)
 {
-    MinMaxRangeMap guidToRangesMap; // Empty map of ranges
+    RangeTracker ranges;
     MinMaxRange minMaxRange(-12.3f, 45.6f); // Range to use for the override
 
     Network network;
@@ -432,31 +433,27 @@ BOOST_AUTO_TEST_CASE(OverrideInputRangeInputLayers)
     auto inputLayers = network.GetGraph().GetInputLayers(); // List of input layers
 
     // Trying to override the input range for the input layer with binding id 3 (does not exist in the network)
-    OverrideInputRangeVisitor overrideInputRangeVisitorLayer3(guidToRangesMap, 3, minMaxRange);
+    OverrideInputRangeVisitor overrideInputRangeVisitorLayer3(ranges, 3, minMaxRange);
     VisitLayers(inputLayers, overrideInputRangeVisitorLayer3);
 
     // Check that the map of ranges remained untouched
-    BOOST_CHECK(guidToRangesMap.empty());
+    BOOST_CHECK(ranges.IsEmpty());
 
     // Override the input range for the input layer with binding id 1
-    OverrideInputRangeVisitor overrideInputRangeVisitorLayer1(guidToRangesMap, 1, minMaxRange);
+    OverrideInputRangeVisitor overrideInputRangeVisitorLayer1(ranges, 1, minMaxRange);
     VisitLayers(inputLayers, overrideInputRangeVisitorLayer1);
 
     // Check that the map of ranges has been populated
-    BOOST_CHECK(!guidToRangesMap.empty());
+    BOOST_CHECK(!ranges.IsEmpty());
 
     // Check that an entry for the input layer with binding id 0 does not exist
-    BOOST_CHECK(guidToRangesMap.find(input0->GetGuid()) == guidToRangesMap.end());
+    BOOST_CHECK(!ranges.HasRanges(input0->GetGuid()));
 
     // Check that an entry for the input layer with binding id 1 exists
-    BOOST_CHECK(guidToRangesMap.find(input1->GetGuid()) != guidToRangesMap.end());
-
-    // Check that at least a value has been added for the input layer with binding id 1
-    BOOST_CHECK(!guidToRangesMap[input1->GetGuid()].empty());
+    BOOST_CHECK(ranges.HasRanges(input1->GetGuid()));
 
     // Check the the overridden values are what we intended to set
-    BOOST_CHECK(guidToRangesMap[input1->GetGuid()].at(0).first  == minMaxRange.first);
-    BOOST_CHECK(guidToRangesMap[input1->GetGuid()].at(0).second == minMaxRange.second);
+    BOOST_CHECK(ranges.GetRange(input1->GetGuid(), 0) == minMaxRange);
 }
 
 INetworkPtr CreateNetworkWithFullyConnectedLayer(const bool biasEnabled)

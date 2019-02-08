@@ -6,11 +6,11 @@
 #pragma once
 
 #include "armnn/LayerVisitorBase.hpp"
+#include "RangeTracker.hpp"
 
 #include <armnn/INetwork.hpp>
 #include <armnn/INetworkQuantizer.hpp>
 
-#include <unordered_map>
 
 namespace armnn
 {
@@ -18,12 +18,8 @@ namespace armnn
 /// Visitor class to establish min/max ranges based on the type of the layer
 class StaticRangeVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
-private:
-    using MinMaxRange  = std::pair<float, float>;
-    using MinMaxRanges = std::vector<MinMaxRange>;
-
 public:
-    StaticRangeVisitor(std::unordered_map<LayerGuid, MinMaxRanges>& guidToRangesMap);
+    StaticRangeVisitor(RangeTracker& rangeTracker);
     ~StaticRangeVisitor() = default;
 
     /// Functions to set the Range on a per-layer-type basis
@@ -61,18 +57,13 @@ public:
     void VisitSoftmaxLayer(const IConnectableLayer* layer,
                            const SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;
-    /// Retrieve the default range
-    MinMaxRange DefaultRange() const { return std::make_pair(-15.0f, 15.0f); }
-
-    /// Retrieve the Range for a particular output slot on a particular layer
-    MinMaxRange GetRange(LayerGuid guid, unsigned int idx) const;
 
 private:
     /// Set the range for an output slot on a layer
     void SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max);
 
     /// Mapping from a layer Guid to an array of ranges for outputs
-    std::unordered_map<LayerGuid, MinMaxRanges>& m_GuidToRangesMap;
+    RangeTracker& m_RangeTracker;
 };
 
 } //namespace armnn

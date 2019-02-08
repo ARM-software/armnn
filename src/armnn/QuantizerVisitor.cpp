@@ -11,11 +11,10 @@
 namespace armnn
 {
 
-QuantizerVisitor::QuantizerVisitor(const StaticRangeVisitor* staticRangeVisitor)
-    : m_StaticRangeVisitor(staticRangeVisitor)
+QuantizerVisitor::QuantizerVisitor(const RangeTracker& rangeTracker)
+    : m_Ranges(rangeTracker)
     , m_QuantizedNetwork(INetwork::Create())
 {
-    BOOST_ASSERT(m_StaticRangeVisitor);
 }
 
 void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* srcLayer,
@@ -45,7 +44,7 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* src
         newOutputSlot.Connect(newInputSlot);
 
         // Fetch the min/max ranges that were computed earlier
-        auto range = m_StaticRangeVisitor->GetRange(layerToFind.GetGuid(), i);
+        auto range = m_Ranges.GetRange(layerToFind.GetGuid(), i);
         auto qParams = ComputeQAsymmParams(8, range.first, range.second);
 
         // Set the quantization params

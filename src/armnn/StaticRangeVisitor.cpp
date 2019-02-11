@@ -87,4 +87,28 @@ void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
     }
 }
 
+void StaticRangeVisitor::VisitFullyConnectedLayer(const armnn::IConnectableLayer *layer,
+                                                  const armnn::FullyConnectedDescriptor& desc,
+                                                  const ConstTensor& weights,
+                                                  const char *name)
+{
+    boost::ignore_unused(desc);
+    boost::ignore_unused(weights);
+    boost::ignore_unused(name);
+    SetRange(layer, 0, -15.0f, 15.0f);
+}
+
+void StaticRangeVisitor::VisitFullyConnectedLayer(const armnn::IConnectableLayer *layer,
+                                                  const armnn::FullyConnectedDescriptor& desc,
+                                                  const ConstTensor& weights,
+                                                  const ConstTensor& bias,
+                                                  const char *name)
+{
+    boost::ignore_unused(desc);
+    boost::ignore_unused(weights);
+    boost::ignore_unused(bias);
+    boost::ignore_unused(name);
+    SetRange(layer, 0, -15.0f, 15.0f);
+}
+
 } //namespace armnn

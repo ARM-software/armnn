@@ -41,8 +41,17 @@ public:
                                       const ConstTensor& beta,
                                       const ConstTensor& gamma,
                                       const char* name = nullptr) override;
+    void VisitFullyConnectedLayer(const IConnectableLayer *layer,
+                                  const FullyConnectedDescriptor&,
+                                  const ConstTensor&,
+                                  const char *name = nullptr)  override;
+    void VisitFullyConnectedLayer(const IConnectableLayer *layer,
+                                  const FullyConnectedDescriptor&,
+                                  const ConstTensor&,
+                                  const ConstTensor&,
+                                  const char *name = nullptr)  override;
 
-    /// Extract the quantized network
+    // Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 
 private:

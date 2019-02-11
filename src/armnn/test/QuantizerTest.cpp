@@ -459,5 +459,112 @@ BOOST_AUTO_TEST_CASE(OverrideInputRangeInputLayers)
     BOOST_CHECK(guidToRangesMap[input1->GetGuid()].at(0).second == minMaxRange.second);
 }
 
+INetworkPtr CreateNetworkWithFullyConnectedLayer(const bool biasEnabled)
+{
+    FullyConnectedDescriptor desc;
+    desc.m_BiasEnabled = biasEnabled;
+    auto network = INetwork::Create();
+
+    TensorShape shape{3U};
+    TensorInfo info(shape, DataType::Float32);
+
+    std::vector<float> weightsData{-1.0f, 1.5f, 2.0f};
+    ConstTensor weights(info, weightsData);
+
+    // Add the layers
+    IConnectableLayer* input0 = network->AddInputLayer(0);
+    IConnectableLayer* fullyConnected;
+    if (desc.m_BiasEnabled)
+    {
+        std::vector<float> biasData{10.0f, 20.0f, 30.0f};
+        ConstTensor bias(info, biasData);
+        fullyConnected = network->AddFullyConnectedLayer(desc, weights, bias);
+    }
+    else
+    {
+        fullyConnected = network->AddFullyConnectedLayer(desc, weights);
+    }
+    IConnectableLayer* output = network->AddOutputLayer(1);
+
+    // Establish connections
+    input0->GetOutputSlot(0).Connect(fullyConnected->GetInputSlot(0));
+    fullyConnected->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Set TensorInfo
+    input0->GetOutputSlot(0).SetTensorInfo(info);
+    fullyConnected->GetOutputSlot(0).SetTensorInfo(info);
+
+    return network;
+}
+
+class TestFullyConnectedQuantization : public TestQuantization
+{
+public:
+    virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
+                                          const FullyConnectedDescriptor& desc,
+                                          const ConstTensor& weights,
+                                          const char* name = nullptr)
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 128));
+
+        // Based off current static value [-15.0f, 15.0f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f );
+
+        //Test constants
+        BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
+
+        BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == 85));
+    }
+
+    virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
+                                          const FullyConnectedDescriptor& desc,
+                                          const ConstTensor& weights,
+                                          const ConstTensor& bias,
+                                          const char* name = nullptr)
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 128));
+
+        // Based off current static value [-15.0f, 15.0f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f );
+
+        //Test constants
+        BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+        BOOST_TEST((bias.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(bias.GetInfo().GetQuantizationScale(), 30.0f/255.0f, 0.000001f);
+
+        BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == 85));
+    }
+};
+
+void ValidateFullyConnectedLayer(const bool biasEnabled)
+{
+    auto network = CreateNetworkWithFullyConnectedLayer(biasEnabled);
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestFullyConnectedQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeFullyConnected)
+{
+    ValidateFullyConnectedLayer(false);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeFullyConnectedBiasEnabled)
+{
+    ValidateFullyConnectedLayer(true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 } // namespace armnn

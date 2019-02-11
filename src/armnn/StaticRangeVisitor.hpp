@@ -38,6 +38,15 @@ public:
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& activationDescriptor,
                               const char* name = nullptr) override;
+    void VisitFullyConnectedLayer(const armnn::IConnectableLayer *layer,
+                                  const armnn::FullyConnectedDescriptor& desc,
+                                  const ConstTensor& weights,
+                                  const char *name) override;
+    void VisitFullyConnectedLayer(const armnn::IConnectableLayer *layer,
+                                  const armnn::FullyConnectedDescriptor& desc,
+                                  const ConstTensor& weights,
+                                  const ConstTensor& bias,
+                                  const char *name) override;
 
     /// Retrieve the default range
     MinMaxRange DefaultRange() const { return std::make_pair(-15.0f, 15.0f); }

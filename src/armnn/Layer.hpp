@@ -105,6 +105,8 @@ public:
 
     Layer& GetOwningLayer() const { return m_OwningLayer; }
 
+    LayerGuid GetOwningLayerGuid() const override;
+
     const OutputHandler& GetOutputHandler() const { return m_OutputHandler; }
     OutputHandler& GetOutputHandler() { return m_OutputHandler; }
 
@@ -141,7 +143,7 @@ public:
         return Disconnect(*boost::polymorphic_downcast<InputSlot*>(&slot));
     }
 
-    unsigned int CalculateIndexOnOwner() const;
+    unsigned int CalculateIndexOnOwner() const override;
 
     bool operator==(const OutputSlot& other) const;
 

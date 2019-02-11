@@ -917,6 +917,14 @@ IConnectableLayer* Network::AddGatherLayer(const char* name)
     return m_Graph->AddLayer<GatherLayer>(name);
 }
 
+void Network::Accept(ILayerVisitor& visitor) const
+{
+    for (auto layer : GetGraph())
+    {
+        layer->Accept(visitor);
+    };
+}
+
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
     : m_Graph(std::move(graph))
 {

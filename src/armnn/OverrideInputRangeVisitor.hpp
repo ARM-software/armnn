@@ -6,7 +6,7 @@
 #pragma once
 
 #include "NetworkQuantizer.hpp"
-#include "LayerVisitorBase.hpp"
+#include "armnn/LayerVisitorBase.hpp"
 
 #include <unordered_map>
 

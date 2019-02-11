@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "LayerVisitorBase.hpp"
+#include "armnn/LayerVisitorBase.hpp"
 
 #include <armnn/INetwork.hpp>
 #include <armnn/INetworkQuantizer.hpp>

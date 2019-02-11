@@ -226,7 +226,7 @@ DeserializeParser::LayerBaseRawPtrVector DeserializeParser::GetGraphInputs(const
 
     for (unsigned int i=0; i<numInputs; ++i)
     {
-        uint32_t inputId = CHECKED_NON_NEGATIVE(graphPtr->inputIds()->Get(i));
+        uint32_t inputId = graphPtr->inputIds()->Get(i);
         result[i] = GetBaseLayer(graphPtr, static_cast<uint32_t>(inputId));
     }
     return result;
@@ -241,7 +241,7 @@ DeserializeParser::LayerBaseRawPtrVector DeserializeParser::GetGraphOutputs(cons
 
     for (unsigned int i=0; i<numOutputs; ++i)
     {
-        uint32_t outputId = CHECKED_NON_NEGATIVE(graphPtr->outputIds()->Get(i));
+        uint32_t outputId = graphPtr->outputIds()->Get(i);
         result[i] = GetBaseLayer(graphPtr, static_cast<uint32_t>(outputId));
     }
     return result;

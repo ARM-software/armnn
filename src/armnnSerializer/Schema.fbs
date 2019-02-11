@@ -108,8 +108,8 @@ table AnyLayer {
 // Root type for serialized data is the graph of the network
 table SerializedGraph {
     layers:[AnyLayer];
-    inputIds:[int];
-    outputIds:[int];
+    inputIds:[uint];
+    outputIds:[uint];
 }
 
 root_type SerializedGraph;

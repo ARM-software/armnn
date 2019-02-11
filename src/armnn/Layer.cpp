@@ -143,6 +143,11 @@ void OutputSlot::ValidateConnectionIndex(unsigned int index) const
     }
 }
 
+LayerGuid OutputSlot::GetOwningLayerGuid() const
+{
+    return GetOwningLayer().GetGuid();
+}
+
 namespace {
 LayerGuid GenerateLayerGuid()
 {
@@ -335,5 +340,4 @@ std::vector<TensorShape> Layer::InferOutputShapes(const std::vector<TensorShape>
     }
     return inputShapes;
 }
-
 } // namespace armnn

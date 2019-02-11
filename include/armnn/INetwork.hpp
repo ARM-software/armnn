@@ -17,7 +17,6 @@
 
 namespace armnn
 {
-
 /// @brief An input connection slot for a layer.
 /// The input slot can be connected to an output slot of the preceding layer in the graph.
 /// Only one connection to the input slot is allowed.
@@ -47,6 +46,10 @@ public:
 
     virtual int Connect(IInputSlot& destination) = 0;
     virtual void Disconnect(IInputSlot& slot) = 0;
+
+    virtual unsigned int CalculateIndexOnOwner() const = 0;
+
+    virtual LayerGuid GetOwningLayerGuid() const = 0;
 
 protected:
     /// Not user deletable.
@@ -360,6 +363,8 @@ public:
     /// @param name - Optional name for the layer.
     /// @ return - Interface for configuring the layer.
     virtual IConnectableLayer* AddGatherLayer(const char* name = nullptr) = 0;
+
+    virtual void Accept(ILayerVisitor& visitor) const = 0;
 
 protected:
     ~INetwork() {}

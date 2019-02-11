@@ -148,6 +148,8 @@ public:
 
     IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) override;
 
+    void Accept(ILayerVisitor& visitor) const override;
+
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
         const ConstTensor& weights,

@@ -158,8 +158,10 @@ if(BUILD_ARMNN_SERIALIZER)
 
     set(armnn_serializer_sources)
     list(APPEND armnn_serializer_sources
-        src/armnnSerializer/Schema_generated.h
         include/armnnDeserializeParser/IDeserializeParser.hpp
+        src/armnnSerializer/Schema_generated.h
+        src/armnnSerializer/Serializer.hpp
+        src/armnnSerializer/Serializer.cpp
         src/armnnDeserializeParser/DeserializeParser.hpp
         src/armnnDeserializeParser/DeserializeParser.cpp
         )
@@ -188,6 +190,7 @@ list(APPEND armnn_sources
     include/armnn/IProfiler.hpp
     include/armnn/IRuntime.hpp
     include/armnn/LayerSupport.hpp
+    include/armnn/LayerVisitorBase.hpp
     include/armnn/LstmParams.hpp
     include/armnn/NetworkFwd.hpp
     include/armnn/Optional.hpp
@@ -303,7 +306,6 @@ list(APPEND armnn_sources
     src/armnn/LayersFwd.hpp
     src/armnn/LayerSupportCommon.hpp
     src/armnn/LayerSupport.cpp
-    src/armnn/LayerVisitorBase.hpp
     src/armnn/LoadedNetwork.cpp
     src/armnn/LoadedNetwork.hpp
     src/armnn/Network.cpp
@@ -546,6 +548,7 @@ if(BUILD_UNIT_TESTS)
         enable_language(ASM)
         list(APPEND unittest_sources
                 src/armnnSerializer/Schema_generated.h
+                src/armnnSerializer/test/SerializerTests.cpp
                 src/armnnDeserializeParser/test/DeserializeAdd.cpp
                 src/armnnDeserializeParser/test/ParserFlatbuffersSerializeFixture.hpp
                 src/armnnDeserializeParser/test/SchemaSerialize.s
@@ -581,10 +584,6 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
     target_include_directories(UnitTests PRIVATE src/backends)
 
-    if(BUILD_ARMNN_SERIALIZER)
-        target_include_directories(UnitTests SYSTEM PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer")
-    endif()
-
     if(BUILD_TF_LITE_PARSER)
         target_include_directories(UnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
     endif()
@@ -613,6 +612,7 @@ if(BUILD_UNIT_TESTS)
     endif()
 
     if(BUILD_ARMNN_SERIALIZER)
+        target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
         target_link_libraries(UnitTests armnnSerializer)
     endif()
 

@@ -8,7 +8,7 @@
 #include <armnn/INetworkQuantizer.hpp>
 #include <armnn/Types.hpp>
 
-#include "../LayerVisitorBase.hpp"
+#include "armnn/LayerVisitorBase.hpp"
 #include "../Network.hpp"
 #include "../Graph.hpp"
 #include "../NetworkQuantizerUtils.hpp"

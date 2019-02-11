@@ -52,7 +52,9 @@ public:
                                   const ConstTensor& weights,
                                   const Optional<ConstTensor>& biases,
                                   const char *name) override;
-
+    void VisitSoftmaxLayer(const IConnectableLayer* layer,
+                           const SoftmaxDescriptor& softmaxDescriptor,
+                           const char* name = nullptr) override;
     /// Retrieve the default range
     MinMaxRange DefaultRange() const { return std::make_pair(-15.0f, 15.0f); }
 

@@ -629,5 +629,55 @@ BOOST_AUTO_TEST_CASE(QuantizeConvolution2dWithBiases)
     TestQuantizeConvolution2d(true);
 }
 
+class TestSoftmaxQuantization : public TestQuantization
+{
+public:
+    virtual void VisitSoftmaxLayer(const IConnectableLayer* layer,
+                                   const SoftmaxDescriptor& descriptor,
+                                   const char* name = nullptr)
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() ==  DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 0));
+
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 1.0f/255.0f, 0.000001f );
+    }
+};
+
+INetworkPtr CreateNetworkWithSoftmaxLayer(const SoftmaxDescriptor& descriptor)
+{
+    auto network = INetwork::Create();
+    // Add the layers
+    IConnectableLayer* input0 = network->AddInputLayer(0);
+    IConnectableLayer* softmax = network->AddSoftmaxLayer(descriptor);
+    IConnectableLayer* output = network->AddOutputLayer(2);
+
+    // Establish connections
+    input0->GetOutputSlot(0).Connect(softmax->GetInputSlot(0));
+    softmax->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Set TensorInfo
+    TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+    input0->GetOutputSlot(0).SetTensorInfo(info);
+    softmax->GetOutputSlot(0).SetTensorInfo(info);
+
+    return network;
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeSoftmax)
+{
+    SoftmaxDescriptor descriptor;
+    descriptor.m_Beta = 1.0f;
+
+    auto network = CreateNetworkWithSoftmaxLayer(descriptor);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestSoftmaxQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 } // namespace armnn

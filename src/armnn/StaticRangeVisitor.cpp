@@ -113,4 +113,12 @@ void StaticRangeVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer
     SetRange(layer, 0, -15.0f, 15.0f);
 }
 
+void StaticRangeVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
+                                           const SoftmaxDescriptor& softmaxDescriptor,
+                                           const char* name)
+{
+    boost::ignore_unused(softmaxDescriptor);
+    SetRange(layer, 0, 0.f, 1.f);
+}
+
 } //namespace armnn

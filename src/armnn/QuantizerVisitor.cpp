@@ -177,4 +177,13 @@ void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-} // namespace armnn
+void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
+                                         const SoftmaxDescriptor& softmaxDescriptor,
+                                         const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSoftmaxLayer(softmaxDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+} //namespace armnn

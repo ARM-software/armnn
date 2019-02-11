@@ -48,4 +48,14 @@ void TestLayerVisitor::CheckConstTensors(const ConstTensor& expected, const Cons
     }
 }
 
+void TestLayerVisitor::CheckOptionalConstTensors(const Optional<ConstTensor>& expected,
+                                                 const Optional<ConstTensor>& actual)
+{
+    BOOST_CHECK(expected.has_value() == actual.has_value());
+    if (expected.has_value() && actual.has_value())
+    {
+        CheckConstTensors(expected.value(), actual.value());
+    }
+}
+
 } //namespace armnn

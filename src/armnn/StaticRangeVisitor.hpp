@@ -28,6 +28,7 @@ public:
 
     /// Functions to set the Range on a per-layer-type basis
     void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
+
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& desc,
                                       const ConstTensor& mean,
@@ -35,26 +36,21 @@ public:
                                       const ConstTensor& beta,
                                       const ConstTensor& gamma,
                                       const char* name = nullptr) override;
+
     void VisitConvolution2dLayer(const IConnectableLayer* layer,
                                  const Convolution2dDescriptor& convolution2dDescriptor,
                                  const ConstTensor& weights,
+                                 const Optional<ConstTensor>& biases,
                                  const char* name = nullptr) override;
-    void VisitConvolution2dLayer(const IConnectableLayer* layer,
-                                 const Convolution2dDescriptor& convolution2dDescriptor,
-                                 const ConstTensor& weights,
-                                 const ConstTensor& biases,
-                                 const char* name = nullptr) override;
+
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& activationDescriptor,
                               const char* name = nullptr) override;
-    void VisitFullyConnectedLayer(const armnn::IConnectableLayer *layer,
-                                  const armnn::FullyConnectedDescriptor& desc,
+
+    void VisitFullyConnectedLayer(const IConnectableLayer *layer,
+                                  const FullyConnectedDescriptor& desc,
                                   const ConstTensor& weights,
-                                  const char *name) override;
-    void VisitFullyConnectedLayer(const armnn::IConnectableLayer *layer,
-                                  const armnn::FullyConnectedDescriptor& desc,
-                                  const ConstTensor& weights,
-                                  const ConstTensor& bias,
+                                  const Optional<ConstTensor>& biases,
                                   const char *name) override;
 
     /// Retrieve the default range

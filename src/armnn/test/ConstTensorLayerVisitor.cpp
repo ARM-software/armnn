@@ -122,11 +122,11 @@ BOOST_AUTO_TEST_CASE(CheckConvolution2dLayer)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
-    TestConvolution2dLayerVisitor visitor(descriptor, weights);
+    TestConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional());
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights);
     layer->Accept(visitor);
@@ -146,11 +146,11 @@ BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayer)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
-    TestConvolution2dLayerVisitor visitor(descriptor, weights, layerName);
+    TestConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional(), layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, layerName);
     layer->Accept(visitor);
@@ -170,16 +170,15 @@ BOOST_AUTO_TEST_CASE(CheckConvolution2dLayerWithBiases)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor biases(TensorInfo(4, biasDimensions.data(), armnn::DataType::Float32), biasData);
+    ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
 
+    TestConvolution2dLayerVisitor visitor(descriptor, weights, Optional<ConstTensor>(biases));
 
-    TestConvolution2dWithBiasLayerVisitor visitor(descriptor, weights, biases);
-
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, biases);
     layer->Accept(visitor);
@@ -200,15 +199,15 @@ BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayerWithBiases)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor biases(TensorInfo(4, biasDimensions.data(), armnn::DataType::Float32), biasData);
+    ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
 
-    TestConvolution2dWithBiasLayerVisitor visitor(descriptor, weights, biases, layerName);
+    TestConvolution2dLayerVisitor visitor(descriptor, weights, Optional<ConstTensor>(biases), layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, biases, layerName);
     layer->Accept(visitor);
@@ -227,11 +226,11 @@ BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayer)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
-    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional());
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights);
     layer->Accept(visitor);
@@ -251,11 +250,11 @@ BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayer)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
-    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, layerName);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional(), layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, layerName);
     layer->Accept(visitor);
@@ -275,15 +274,15 @@ BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayerWithBiases)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor biases(TensorInfo(4, biasDimensions.data(), armnn::DataType::Float32), biasData);
+    ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
 
-    TestDepthwiseConvolution2dWithBiasLayerVisitor visitor(descriptor, weights, biases);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, Optional<ConstTensor>(biases));
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, biases);
     layer->Accept(visitor);
@@ -304,15 +303,15 @@ BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayerWithBiases)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor biases(TensorInfo(4, biasDimensions.data(), armnn::DataType::Float32), biasData);
+    ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
 
-    TestDepthwiseConvolution2dWithBiasLayerVisitor visitor(descriptor, weights, biases, layerName);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, Optional<ConstTensor>(biases), layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, biases, layerName);
     layer->Accept(visitor);
@@ -325,11 +324,11 @@ BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayer)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
-    TestFullyConnectedLayerVistor visitor(descriptor, weights);
+    TestFullyConnectedLayerVistor visitor(descriptor, weights, EmptyOptional());
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights);
     layer->Accept(visitor);
@@ -343,11 +342,11 @@ BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayer)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
-    TestFullyConnectedLayerVistor visitor(descriptor, weights, layerName);
+    TestFullyConnectedLayerVistor visitor(descriptor, weights, EmptyOptional(), layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, layerName);
     layer->Accept(visitor);
@@ -361,15 +360,15 @@ BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayerWithBiases)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor biases(TensorInfo(4, biasDimensions.data(), armnn::DataType::Float32), biasData);
+    ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
 
-    TestFullyConnectedLayerWithBiasesVisitor visitor(descriptor, weights, biases);
+    TestFullyConnectedLayerVistor visitor(descriptor, weights, Optional<ConstTensor>(biases));
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, biases);
     layer->Accept(visitor);
@@ -384,15 +383,15 @@ BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayerWithBiases)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor weights(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor biases(TensorInfo(4, biasDimensions.data(), armnn::DataType::Float32), biasData);
+    ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
 
-    TestFullyConnectedLayerWithBiasesVisitor visitor(descriptor, weights, biases, layerName);
+    TestFullyConnectedLayerVistor visitor(descriptor, weights, Optional<ConstTensor>(biases), layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, biases, layerName);
     layer->Accept(visitor);
@@ -406,23 +405,23 @@ BOOST_AUTO_TEST_CASE(CheckBatchNormalizationLayer)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor mean(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor mean(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     std::vector<float> varianceData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> varianceDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor variance(TensorInfo(4, varianceDimensions.data(), armnn::DataType::Float32), varianceData);
+    ConstTensor variance(TensorInfo(4, varianceDimensions.data(), DataType::Float32), varianceData);
 
     std::vector<float> betaData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> betaDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor beta(TensorInfo(4, betaDimensions.data(), armnn::DataType::Float32), betaData);
+    ConstTensor beta(TensorInfo(4, betaDimensions.data(), DataType::Float32), betaData);
 
     std::vector<float> gammaData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> gammaDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor gamma(TensorInfo(4, gammaDimensions.data(), armnn::DataType::Float32), gammaData);
+    ConstTensor gamma(TensorInfo(4, gammaDimensions.data(), DataType::Float32), gammaData);
 
     TestBatchNormalizationLayerVisitor visitor(descriptor, mean, variance, beta, gamma);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddBatchNormalizationLayer(descriptor, mean, variance, beta, gamma);
     layer->Accept(visitor);
@@ -437,23 +436,23 @@ BOOST_AUTO_TEST_CASE(CheckNamedBatchNormalizationLayer)
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor mean(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor mean(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     std::vector<float> varianceData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> varianceDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor variance(TensorInfo(4, varianceDimensions.data(), armnn::DataType::Float32), varianceData);
+    ConstTensor variance(TensorInfo(4, varianceDimensions.data(), DataType::Float32), varianceData);
 
     std::vector<float> betaData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> betaDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor beta(TensorInfo(4, betaDimensions.data(), armnn::DataType::Float32), betaData);
+    ConstTensor beta(TensorInfo(4, betaDimensions.data(), DataType::Float32), betaData);
 
     std::vector<float> gammaData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> gammaDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor gamma(TensorInfo(4, gammaDimensions.data(), armnn::DataType::Float32), gammaData);
+    ConstTensor gamma(TensorInfo(4, gammaDimensions.data(), DataType::Float32), gammaData);
 
     TestBatchNormalizationLayerVisitor visitor(descriptor, mean, variance, beta, gamma, layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddBatchNormalizationLayer(
             descriptor, mean, variance, beta, gamma, layerName);
@@ -464,11 +463,11 @@ BOOST_AUTO_TEST_CASE(CheckConstLayer)
 {
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor input(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor input(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     TestConstantLayerVisitor visitor(input);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddConstantLayer(input);
     layer->Accept(visitor);
@@ -479,11 +478,11 @@ BOOST_AUTO_TEST_CASE(CheckNamedConstLayer)
     const char* layerName = "ConstantLayer";
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    armnn::ConstTensor input(TensorInfo(4, dimensions.data(), armnn::DataType::Float32), data);
+    ConstTensor input(TensorInfo(4, dimensions.data(), DataType::Float32), data);
 
     TestConstantLayerVisitor visitor(input, layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddConstantLayer(input, layerName);
     layer->Accept(visitor);
@@ -499,48 +498,48 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerBasic)
 
     std::vector<float> inputToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), armnn::DataType::Float32), inputToForgetWeightsData);
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::Float32), inputToForgetWeightsData);
 
     std::vector<float> inputToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), armnn::DataType::Float32), inputToCellWeightsData);
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::Float32), inputToCellWeightsData);
 
     std::vector<float> inputToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), armnn::DataType::Float32), inputToOutputWeightsData);
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::Float32), inputToOutputWeightsData);
 
     std::vector<float> recurrentToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), armnn::DataType::Float32), recurrentToForgetWeightsData);
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::Float32), recurrentToForgetWeightsData);
 
     std::vector<float> recurrentToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), armnn::DataType::Float32), recurrentToCellWeightsData);
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::Float32), recurrentToCellWeightsData);
 
     std::vector<float> recurrentToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToOutputWeightsData);
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::Float32), recurrentToOutputWeightsData);
 
     std::vector<float> forgetGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(TensorInfo(
-            4, forgetGateBiasDimensions.data(), armnn::DataType::Float32), forgetGateBiasData);
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Float32), forgetGateBiasData);
 
     std::vector<float> cellBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(TensorInfo(
-            4, cellBiasDimensions.data(), armnn::DataType::Float32), cellBiasData);
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Float32), cellBiasData);
 
     std::vector<float> outputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(TensorInfo(
-            4, outputGateBiasDimensions.data(), armnn::DataType::Float32), outputGateBiasData);
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Float32), outputGateBiasData);
 
     LstmInputParams params;
     params.m_InputToForgetWeights = &inputToForgetWeights;
@@ -555,7 +554,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerBasic)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -572,48 +571,48 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerBasic)
 
     std::vector<float> inputToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), armnn::DataType::Float32), inputToForgetWeightsData);
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::Float32), inputToForgetWeightsData);
 
     std::vector<float> inputToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), armnn::DataType::Float32), inputToCellWeightsData);
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::Float32), inputToCellWeightsData);
 
     std::vector<float> inputToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), armnn::DataType::Float32), inputToOutputWeightsData);
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::Float32), inputToOutputWeightsData);
 
     std::vector<float> recurrentToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), armnn::DataType::Float32), recurrentToForgetWeightsData);
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::Float32), recurrentToForgetWeightsData);
 
     std::vector<float> recurrentToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), armnn::DataType::Float32), recurrentToCellWeightsData);
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::Float32), recurrentToCellWeightsData);
 
     std::vector<float> recurrentToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToOutputWeightsData);
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::Float32), recurrentToOutputWeightsData);
 
     std::vector<float> forgetGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(TensorInfo(
-            4, forgetGateBiasDimensions.data(), armnn::DataType::Float32), forgetGateBiasData);
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Float32), forgetGateBiasData);
 
     std::vector<float> cellBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(TensorInfo(
-            4, cellBiasDimensions.data(), armnn::DataType::Float32), cellBiasData);
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Float32), cellBiasData);
 
     std::vector<float> outputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(TensorInfo(
-            4, outputGateBiasDimensions.data(), armnn::DataType::Float32), outputGateBiasData);
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Float32), outputGateBiasData);
 
     LstmInputParams params;
     params.m_InputToForgetWeights = &inputToForgetWeights;
@@ -628,7 +627,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerBasic)
 
     TestLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
@@ -644,68 +643,68 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerCifgDisabled)
 
     std::vector<float> inputToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), armnn::DataType::Float32), inputToForgetWeightsData);
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::Float32), inputToForgetWeightsData);
 
     std::vector<float> inputToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), armnn::DataType::Float32), inputToCellWeightsData);
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::Float32), inputToCellWeightsData);
 
     std::vector<float> inputToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), armnn::DataType::Float32), inputToOutputWeightsData);
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::Float32), inputToOutputWeightsData);
 
     std::vector<float> recurrentToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), armnn::DataType::Float32), recurrentToForgetWeightsData);
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::Float32), recurrentToForgetWeightsData);
 
     std::vector<float> recurrentToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), armnn::DataType::Float32), recurrentToCellWeightsData);
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::Float32), recurrentToCellWeightsData);
 
     std::vector<float> recurrentToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToOutputWeightsData);
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::Float32), recurrentToOutputWeightsData);
 
     std::vector<float> forgetGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(TensorInfo(
-            4, forgetGateBiasDimensions.data(), armnn::DataType::Float32), forgetGateBiasData);
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Float32), forgetGateBiasData);
 
     std::vector<float> cellBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(TensorInfo(
-            4, cellBiasDimensions.data(), armnn::DataType::Float32), cellBiasData);
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Float32), cellBiasData);
 
     std::vector<float> outputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(TensorInfo(
-            4, outputGateBiasDimensions.data(), armnn::DataType::Float32), outputGateBiasData);
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Float32), outputGateBiasData);
 
     std::vector<float> inputToInputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToInputWeights(
-            TensorInfo(4, inputToInputWeightsDimensions.data(), armnn::DataType::Float32), inputToInputWeightsData);
+    ConstTensor inputToInputWeights(
+            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::Float32), inputToInputWeightsData);
 
     std::vector<float> recurrentToInputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToInputWeights(TensorInfo(
-            4, recurrentToInputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToInputWeightsData);
+    ConstTensor recurrentToInputWeights(TensorInfo(
+            4, recurrentToInputWeightsDimensions.data(), DataType::Float32), recurrentToInputWeightsData);
 
     std::vector<float> cellToInputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellToInputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellToInputWeights(
-            TensorInfo(4, cellToInputWeightsDimensions.data(), armnn::DataType::Float32), cellToInputWeightsData);
+    ConstTensor cellToInputWeights(
+            TensorInfo(4, cellToInputWeightsDimensions.data(), DataType::Float32), cellToInputWeightsData);
 
     std::vector<float> inputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputGateBias(
-            TensorInfo(4, inputGateBiasDimensions.data(), armnn::DataType::Float32), inputGateBiasData);
+    ConstTensor inputGateBias(
+            TensorInfo(4, inputGateBiasDimensions.data(), DataType::Float32), inputGateBiasData);
 
         LstmInputParams params;
     params.m_InputToForgetWeights = &inputToForgetWeights;
@@ -725,7 +724,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerCifgDisabled)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer* const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -742,68 +741,68 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerCifgDisabled)
 
     std::vector<float> inputToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), armnn::DataType::Float32), inputToForgetWeightsData);
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::Float32), inputToForgetWeightsData);
 
     std::vector<float> inputToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), armnn::DataType::Float32), inputToCellWeightsData);
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::Float32), inputToCellWeightsData);
 
     std::vector<float> inputToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), armnn::DataType::Float32), inputToOutputWeightsData);
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::Float32), inputToOutputWeightsData);
 
     std::vector<float> recurrentToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), armnn::DataType::Float32), recurrentToForgetWeightsData);
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::Float32), recurrentToForgetWeightsData);
 
     std::vector<float> recurrentToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), armnn::DataType::Float32), recurrentToCellWeightsData);
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::Float32), recurrentToCellWeightsData);
 
     std::vector<float> recurrentToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToOutputWeightsData);
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::Float32), recurrentToOutputWeightsData);
 
     std::vector<float> forgetGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(TensorInfo(
-            4, forgetGateBiasDimensions.data(), armnn::DataType::Float32), forgetGateBiasData);
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Float32), forgetGateBiasData);
 
     std::vector<float> cellBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(TensorInfo(
-            4, cellBiasDimensions.data(), armnn::DataType::Float32), cellBiasData);
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Float32), cellBiasData);
 
     std::vector<float> outputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(TensorInfo(
-            4, outputGateBiasDimensions.data(), armnn::DataType::Float32), outputGateBiasData);
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Float32), outputGateBiasData);
 
     std::vector<float> inputToInputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToInputWeights(
-            TensorInfo(4, inputToInputWeightsDimensions.data(), armnn::DataType::Float32), inputToInputWeightsData);
+    ConstTensor inputToInputWeights(
+            TensorInfo(4, inputToInputWeightsDimensions.data(), DataType::Float32), inputToInputWeightsData);
 
     std::vector<float> recurrentToInputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToInputWeights(TensorInfo(
-            4, recurrentToInputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToInputWeightsData);
+    ConstTensor recurrentToInputWeights(TensorInfo(
+            4, recurrentToInputWeightsDimensions.data(), DataType::Float32), recurrentToInputWeightsData);
 
     std::vector<float> cellToInputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellToInputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellToInputWeights(
-            TensorInfo(4, cellToInputWeightsDimensions.data(), armnn::DataType::Float32), cellToInputWeightsData);
+    ConstTensor cellToInputWeights(
+            TensorInfo(4, cellToInputWeightsDimensions.data(), DataType::Float32), cellToInputWeightsData);
 
     std::vector<float> inputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputGateBias(
-            TensorInfo(4, inputGateBiasDimensions.data(), armnn::DataType::Float32), inputGateBiasData);
+    ConstTensor inputGateBias(
+            TensorInfo(4, inputGateBiasDimensions.data(), DataType::Float32), inputGateBiasData);
 
     LstmInputParams params;
     params.m_InputToForgetWeights = &inputToForgetWeights;
@@ -823,7 +822,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerCifgDisabled)
 
     TestLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
@@ -841,58 +840,58 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerPeephole)
 
     std::vector<float> inputToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), armnn::DataType::Float32), inputToForgetWeightsData);
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::Float32), inputToForgetWeightsData);
 
     std::vector<float> inputToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), armnn::DataType::Float32), inputToCellWeightsData);
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::Float32), inputToCellWeightsData);
 
     std::vector<float> inputToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), armnn::DataType::Float32), inputToOutputWeightsData);
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::Float32), inputToOutputWeightsData);
 
     std::vector<float> recurrentToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), armnn::DataType::Float32), recurrentToForgetWeightsData);
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::Float32), recurrentToForgetWeightsData);
 
     std::vector<float> recurrentToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), armnn::DataType::Float32), recurrentToCellWeightsData);
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::Float32), recurrentToCellWeightsData);
 
     std::vector<float> recurrentToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToOutputWeightsData);
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::Float32), recurrentToOutputWeightsData);
 
     std::vector<float> forgetGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(TensorInfo(
-            4, forgetGateBiasDimensions.data(), armnn::DataType::Float32), forgetGateBiasData);
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Float32), forgetGateBiasData);
 
     std::vector<float> cellBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(TensorInfo(
-            4, cellBiasDimensions.data(), armnn::DataType::Float32), cellBiasData);
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Float32), cellBiasData);
 
     std::vector<float> outputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(TensorInfo(
-            4, outputGateBiasDimensions.data(), armnn::DataType::Float32), outputGateBiasData);
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Float32), outputGateBiasData);
 
     std::vector<float> cellToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellToForgetWeights(
-            TensorInfo(4, cellToForgetWeightsDimensions.data(), armnn::DataType::Float32), cellToForgetWeightsData);
+    ConstTensor cellToForgetWeights(
+            TensorInfo(4, cellToForgetWeightsDimensions.data(), DataType::Float32), cellToForgetWeightsData);
 
     std::vector<float> cellToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellToOutputWeights(
-            TensorInfo(4, cellToOutputWeightsDimensions.data(), armnn::DataType::Float32), cellToOutputWeightsData);
+    ConstTensor cellToOutputWeights(
+            TensorInfo(4, cellToOutputWeightsDimensions.data(), DataType::Float32), cellToOutputWeightsData);
 
             LstmInputParams params;
     params.m_InputToForgetWeights = &inputToForgetWeights;
@@ -910,7 +909,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerPeephole)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -928,58 +927,58 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerPeephole)
 
     std::vector<float> inputToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), armnn::DataType::Float32), inputToForgetWeightsData);
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::Float32), inputToForgetWeightsData);
 
     std::vector<float> inputToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), armnn::DataType::Float32), inputToCellWeightsData);
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::Float32), inputToCellWeightsData);
 
     std::vector<float> inputToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), armnn::DataType::Float32), inputToOutputWeightsData);
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::Float32), inputToOutputWeightsData);
 
     std::vector<float> recurrentToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), armnn::DataType::Float32), recurrentToForgetWeightsData);
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::Float32), recurrentToForgetWeightsData);
 
     std::vector<float> recurrentToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), armnn::DataType::Float32), recurrentToCellWeightsData);
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::Float32), recurrentToCellWeightsData);
 
     std::vector<float> recurrentToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToOutputWeightsData);
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::Float32), recurrentToOutputWeightsData);
 
     std::vector<float> forgetGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(TensorInfo(
-            4, forgetGateBiasDimensions.data(), armnn::DataType::Float32), forgetGateBiasData);
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Float32), forgetGateBiasData);
 
     std::vector<float> cellBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(TensorInfo(
-            4, cellBiasDimensions.data(), armnn::DataType::Float32), cellBiasData);
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Float32), cellBiasData);
 
     std::vector<float> outputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(TensorInfo(
-            4, outputGateBiasDimensions.data(), armnn::DataType::Float32), outputGateBiasData);
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Float32), outputGateBiasData);
 
     std::vector<float> cellToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellToForgetWeights(
-            TensorInfo(4, cellToForgetWeightsDimensions.data(), armnn::DataType::Float32), cellToForgetWeightsData);
+    ConstTensor cellToForgetWeights(
+            TensorInfo(4, cellToForgetWeightsDimensions.data(), DataType::Float32), cellToForgetWeightsData);
 
     std::vector<float> cellToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellToOutputWeights(
-            TensorInfo(4, cellToOutputWeightsDimensions.data(), armnn::DataType::Float32), cellToOutputWeightsData);
+    ConstTensor cellToOutputWeights(
+            TensorInfo(4, cellToOutputWeightsDimensions.data(), DataType::Float32), cellToOutputWeightsData);
 
     LstmInputParams params;
     params.m_InputToForgetWeights = &inputToForgetWeights;
@@ -997,7 +996,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerPeephole)
 
     TestLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);
@@ -1015,58 +1014,58 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerProjection)
 
     std::vector<float> inputToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), armnn::DataType::Float32), inputToForgetWeightsData);
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::Float32), inputToForgetWeightsData);
 
     std::vector<float> inputToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), armnn::DataType::Float32), inputToCellWeightsData);
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::Float32), inputToCellWeightsData);
 
     std::vector<float> inputToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), armnn::DataType::Float32), inputToOutputWeightsData);
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::Float32), inputToOutputWeightsData);
 
     std::vector<float> recurrentToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), armnn::DataType::Float32), recurrentToForgetWeightsData);
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::Float32), recurrentToForgetWeightsData);
 
     std::vector<float> recurrentToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), armnn::DataType::Float32), recurrentToCellWeightsData);
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::Float32), recurrentToCellWeightsData);
 
     std::vector<float> recurrentToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToOutputWeightsData);
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::Float32), recurrentToOutputWeightsData);
 
     std::vector<float> forgetGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(TensorInfo(
-            4, forgetGateBiasDimensions.data(), armnn::DataType::Float32), forgetGateBiasData);
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Float32), forgetGateBiasData);
 
     std::vector<float> cellBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(TensorInfo(
-            4, cellBiasDimensions.data(), armnn::DataType::Float32), cellBiasData);
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Float32), cellBiasData);
 
     std::vector<float> outputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(TensorInfo(
-            4, outputGateBiasDimensions.data(), armnn::DataType::Float32), outputGateBiasData);
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Float32), outputGateBiasData);
 
     std::vector<float> projectionBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> projectionBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor projectionBias(
-            TensorInfo(4, projectionBiasDimensions.data(), armnn::DataType::Float32), projectionBiasData);
+    ConstTensor projectionBias(
+            TensorInfo(4, projectionBiasDimensions.data(), DataType::Float32), projectionBiasData);
 
     std::vector<float> projectionWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> projectionWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor projectionWeights(
-            TensorInfo(4, projectionWeightsDimensions.data(), armnn::DataType::Float32), projectionWeightsData);
+    ConstTensor projectionWeights(
+            TensorInfo(4, projectionWeightsDimensions.data(), DataType::Float32), projectionWeightsData);
 
             LstmInputParams params;
     params.m_InputToForgetWeights = &inputToForgetWeights;
@@ -1084,7 +1083,7 @@ BOOST_AUTO_TEST_CASE(CheckLstmLayerProjection)
 
     TestLstmLayerVisitor visitor(descriptor, params);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params);
     layer->Accept(visitor);
@@ -1102,58 +1101,58 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerProjection)
 
     std::vector<float> inputToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(
-            TensorInfo(4, inputToForgetWeightsDimensions.data(), armnn::DataType::Float32), inputToForgetWeightsData);
+    ConstTensor inputToForgetWeights(
+            TensorInfo(4, inputToForgetWeightsDimensions.data(), DataType::Float32), inputToForgetWeightsData);
 
     std::vector<float> inputToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(
-            TensorInfo(4, inputToCellWeightsDimensions.data(), armnn::DataType::Float32), inputToCellWeightsData);
+    ConstTensor inputToCellWeights(
+            TensorInfo(4, inputToCellWeightsDimensions.data(), DataType::Float32), inputToCellWeightsData);
 
     std::vector<float> inputToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(
-            TensorInfo(4, inputToOutputWeightsDimensions.data(), armnn::DataType::Float32), inputToOutputWeightsData);
+    ConstTensor inputToOutputWeights(
+            TensorInfo(4, inputToOutputWeightsDimensions.data(), DataType::Float32), inputToOutputWeightsData);
 
     std::vector<float> recurrentToForgetWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(), armnn::DataType::Float32), recurrentToForgetWeightsData);
+    ConstTensor recurrentToForgetWeights(TensorInfo(
+            4, recurrentToForgetWeightsDimensions.data(), DataType::Float32), recurrentToForgetWeightsData);
 
     std::vector<float> recurrentToCellWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(), armnn::DataType::Float32), recurrentToCellWeightsData);
+    ConstTensor recurrentToCellWeights(TensorInfo(
+            4, recurrentToCellWeightsDimensions.data(), DataType::Float32), recurrentToCellWeightsData);
 
     std::vector<float> recurrentToOutputWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(), armnn::DataType::Float32), recurrentToOutputWeightsData);
+    ConstTensor recurrentToOutputWeights(TensorInfo(
+            4, recurrentToOutputWeightsDimensions.data(), DataType::Float32), recurrentToOutputWeightsData);
 
     std::vector<float> forgetGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(TensorInfo(
-            4, forgetGateBiasDimensions.data(), armnn::DataType::Float32), forgetGateBiasData);
+    ConstTensor forgetGateBias(TensorInfo(
+            4, forgetGateBiasDimensions.data(), DataType::Float32), forgetGateBiasData);
 
     std::vector<float> cellBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(TensorInfo(
-            4, cellBiasDimensions.data(), armnn::DataType::Float32), cellBiasData);
+    ConstTensor cellBias(TensorInfo(
+            4, cellBiasDimensions.data(), DataType::Float32), cellBiasData);
 
     std::vector<float> outputGateBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(TensorInfo(
-            4, outputGateBiasDimensions.data(), armnn::DataType::Float32), outputGateBiasData);
+    ConstTensor outputGateBias(TensorInfo(
+            4, outputGateBiasDimensions.data(), DataType::Float32), outputGateBiasData);
 
     std::vector<float> projectionBiasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> projectionBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor projectionBias(
-            TensorInfo(4, projectionBiasDimensions.data(), armnn::DataType::Float32), projectionBiasData);
+    ConstTensor projectionBias(
+            TensorInfo(4, projectionBiasDimensions.data(), DataType::Float32), projectionBiasData);
 
     std::vector<float> projectionWeightsData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> projectionWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor projectionWeights(
-            TensorInfo(4, projectionWeightsDimensions.data(), armnn::DataType::Float32), projectionWeightsData);
+    ConstTensor projectionWeights(
+            TensorInfo(4, projectionWeightsDimensions.data(), DataType::Float32), projectionWeightsData);
 
     LstmInputParams params;
     params.m_InputToForgetWeights = &inputToForgetWeights;
@@ -1171,7 +1170,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedLstmLayerProjection)
 
     TestLstmLayerVisitor visitor(descriptor, params, layerName);
 
-    armnn::Network net;
+    Network net;
 
     IConnectableLayer *const layer = net.AddLstmLayer(descriptor, params, layerName);
     layer->Accept(visitor);

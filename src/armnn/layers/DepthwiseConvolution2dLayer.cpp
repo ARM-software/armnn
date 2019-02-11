@@ -122,16 +122,16 @@ Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()
 
 void DepthwiseConvolution2dLayer::Accept(ILayerVisitor& visitor) const
 {
-    ConstTensor weightsTensor(m_Weight->GetTensorInfo(), m_Weight->Map(true)) ;
+    ConstTensor weightsTensor(m_Weight->GetTensorInfo(), m_Weight->Map(true));
+    Optional<ConstTensor> optionalBiasTensor = EmptyOptional();
+
     if (GetParameters().m_BiasEnabled)
     {
         ConstTensor biasTensor(m_Bias->GetTensorInfo(), m_Bias->Map(true));
-        visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), weightsTensor, biasTensor, GetName());
+        optionalBiasTensor = Optional<ConstTensor>(biasTensor);
     }
-    else
-    {
-        visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), weightsTensor, GetName());
-    }
+
+    visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), weightsTensor, optionalBiasTensor, GetName());
 }
 
 } // namespace armnn

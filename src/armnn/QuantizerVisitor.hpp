@@ -29,11 +29,15 @@ public:
 
     /// Functions to quantize the individual layers, overridden from ILayerVisitor
     void VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override;
+
     void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
+
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& activationDescriptor,
                               const char* name = nullptr) override;
+
     void VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr)  override;
+
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& desc,
                                       const ConstTensor& mean,
@@ -41,25 +45,17 @@ public:
                                       const ConstTensor& beta,
                                       const ConstTensor& gamma,
                                       const char* name = nullptr) override;
+
     void VisitFullyConnectedLayer(const IConnectableLayer *layer,
                                   const FullyConnectedDescriptor&,
                                   const ConstTensor&,
-                                  const char *name = nullptr)  override;
-    void VisitFullyConnectedLayer(const IConnectableLayer *layer,
-                                  const FullyConnectedDescriptor&,
-                                  const ConstTensor&,
-                                  const ConstTensor&,
+                                  const Optional<ConstTensor>&,
                                   const char *name = nullptr)  override;
 
-    // Extract the quantized network
     void VisitConvolution2dLayer(const IConnectableLayer* layer,
                                  const Convolution2dDescriptor& convolution2dDescriptor,
                                  const ConstTensor& weights,
-                                 const char* name = nullptr) override;
-    void VisitConvolution2dLayer(const IConnectableLayer* layer,
-                                 const Convolution2dDescriptor& convolution2dDescriptor,
-                                 const ConstTensor& weights,
-                                 const ConstTensor& biases,
+                                 const Optional<ConstTensor>& biases,
                                  const char* name = nullptr) override;
 
     /// Extract the quantized network

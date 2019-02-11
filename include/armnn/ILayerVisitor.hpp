@@ -6,6 +6,7 @@
 
 #include <armnn/NetworkFwd.hpp>
 #include <armnn/DescriptorsFwd.hpp>
+#include <armnn/Optional.hpp>
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Types.hpp>
 
@@ -27,52 +28,30 @@ public:
                                  LayerBindingId id,
                                  const char* name = nullptr) = 0;
 
-    /// Function that a 2D convolution layer without biases should call back to when its Accept(ILayerVisitor&)
+    /// Function that a 2D convolution layer should call back to when its Accept(ILayerVisitor&)
     /// function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param convolution2dDescriptor - Description of the 2D convolution layer.
     /// @param weights - Tensor for the weights data.
+    /// @param biases - Optional tensor for the bias data. If specified, must match the output tensor shape.
     /// @param name - Optional name for the layer.
     virtual void VisitConvolution2dLayer(const IConnectableLayer* layer,
                                          const Convolution2dDescriptor& convolution2dDescriptor,
                                          const ConstTensor& weights,
+                                         const Optional<ConstTensor>& biases,
                                          const char* name = nullptr) = 0;
-
-    /// Function that a 2D convolution layer with bias should call back to when its Accept(ILayerVisitor&)
-    /// function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param convolution2dDescriptor - Description of the 2D convolution layer.
-    /// @param weights - Tensor for the weights data.
-    /// @param biases - Tensor for the bias data. Must match the output tensor shape.
-    /// @param name - Optional name for the layer.
-    virtual void VisitConvolution2dLayer(const IConnectableLayer* layer,
-                                         const Convolution2dDescriptor& convolution2dDescriptor,
-                                         const ConstTensor& weights,
-                                         const ConstTensor& biases,
-                                         const char* name = nullptr) = 0;
-
-    /// Function that a 2D depthwise convolution layer without biases should call back to when its
-    /// Accept(ILayerVisitor&) function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
-    /// @param weights - Tensor for the weights. Expected format: [channelMultiplier, inputChannels, height, width].
-    /// @param name - Optional name for the layer.
-    virtual void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
-                                                  const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-                                                  const ConstTensor& weights,
-                                                  const char* name = nullptr) = 0;
 
     /// Function that a 2D depthwise convolution layer with biases should call back to when its
     /// Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
     /// @param weights - Tensor for the weights. Expected format: [channelMultiplier, inputChannels, height, width].
-    /// @param biases - Tensor for the bias data. Must match the output tensor shape.
+    /// @param biases - Optional tensor for the bias data. If specified, must match the output tensor shape.
     /// @param name - Optional name for the layer.
     virtual void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
                                                   const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
-                                                  const ConstTensor& biases,
+                                                  const Optional<ConstTensor>& biases,
                                                   const char* name = nullptr) = 0;
 
     /// Function that a Detection PostProcess layer should call back to when its
@@ -86,28 +65,17 @@ public:
                                                 const ConstTensor& anchors,
                                                 const char* name = nullptr) = 0;
 
-    /// Function that a fully connected layer without biases should call back to when its Accept(ILayerVisitor&)
+    /// Function that a fully connected layer should call back to when its Accept(ILayerVisitor&)
     /// function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param fullyConnectedDescriptor - Description of the fully connected layer.
     /// @param weights - Tensor for the weights data.
+    /// @param biases - Optional tensor for the bias data.
     /// @param name - Optional name for the layer.
     virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
                                           const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                           const ConstTensor& weights,
-                                          const char* name = nullptr) = 0;
-
-    /// Function that a fully connected layer with biases should call back to when its Accept(ILayerVisitor&)
-    /// function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param fullyConnectedDescriptor - Description of the fully connected layer.
-    /// @param weights - Tensor for the weights data.
-    /// @param biases - Tensor for the bias data.
-    /// @param name - Optional name for the layer.
-    virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
-                                          const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                          const ConstTensor& weights,
-                                          const ConstTensor& biases,
+                                          const Optional<ConstTensor>& biases,
                                           const char* name = nullptr) = 0;
 
     /// Function that a permute layer should call back to when its Accept(ILayerVisitor&) function is invoked.

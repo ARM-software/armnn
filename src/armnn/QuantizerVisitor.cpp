@@ -82,29 +82,24 @@ void QuantizerVisitor::VisitActivationLayer(const IConnectableLayer* layer,
 void QuantizerVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
                                                 const FullyConnectedDescriptor& desc,
                                                 const ConstTensor& weights,
+                                                const Optional<ConstTensor>& biases,
                                                 const char *name)
 {
     std::vector<uint8_t> weightsBacking;
     ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
 
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc, qWeights, name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
-}
+    IConnectableLayer* newLayer;
+    if (biases.has_value())
+    {
+        std::vector<uint8_t> biasBacking;
+        ConstTensor qBias = CreateQuantizedConst(biases.value(), biasBacking);
+        newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc, qWeights, qBias, name);
+    }
+    else
+    {
+        newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc, qWeights, name);
+    }
 
-void QuantizerVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
-                                                const FullyConnectedDescriptor& desc,
-                                                const ConstTensor& weights,
-                                                const ConstTensor& bias,
-                                                const char *name)
-{
-    std::vector<uint8_t> weightsBacking;
-    ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
-
-    std::vector<uint8_t> biasBacking;
-    ConstTensor qBias = CreateQuantizedConst(bias, biasBacking);
-
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc, qWeights, qBias, name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
@@ -156,36 +151,30 @@ void QuantizerVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* lay
 void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
                                                const Convolution2dDescriptor& convolution2dDescriptor,
                                                const ConstTensor& weights,
+                                               const Optional<ConstTensor>& biases,
                                                const char* name)
 {
     std::vector<uint8_t> weightsBacking;
     ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
 
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor,
-                                                                            qWeights,
-                                                                            name);
+    IConnectableLayer* newLayer;
+    if (biases.has_value())
+    {
+        std::vector<uint8_t> biasesBacking;
+        ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+
+        newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor,
+                                                             qWeights,
+                                                             qBiases,
+                                                             name);
+    }
+    else
+    {
+        newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor, qWeights, name);
+    }
+
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
-                                               const Convolution2dDescriptor& convolution2dDescriptor,
-                                               const ConstTensor& weights,
-                                               const ConstTensor& biases,
-                                               const char* name)
-{
-    std::vector<uint8_t> weightsBacking;
-    ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
-
-    std::vector<uint8_t> biasesBacking;
-    ConstTensor qBiases = CreateQuantizedConst(weights, biasesBacking);
-
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor,
-                                                                            qWeights,
-                                                                            qBiases,
-                                                                            name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
-}
-
-} //namespace armnn
+} // namespace armnn

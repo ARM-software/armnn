@@ -500,10 +500,11 @@ INetworkPtr CreateNetworkWithFullyConnectedLayer(const bool biasEnabled)
 class TestFullyConnectedQuantization : public TestQuantization
 {
 public:
-    virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
-                                          const FullyConnectedDescriptor& desc,
-                                          const ConstTensor& weights,
-                                          const char* name = nullptr)
+    void VisitFullyConnectedLayer(const IConnectableLayer* layer,
+                                  const FullyConnectedDescriptor& desc,
+                                  const ConstTensor& weights,
+                                  const Optional<ConstTensor>& biases,
+                                  const char* name = nullptr) override
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -514,37 +515,17 @@ public:
         // Based off current static value [-15.0f, 15.0f]
         BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f );
 
-        //Test constants
+        //Test weights
         BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-
         BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
-
         BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == 85));
-    }
 
-    virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
-                                          const FullyConnectedDescriptor& desc,
-                                          const ConstTensor& weights,
-                                          const ConstTensor& bias,
-                                          const char* name = nullptr)
-    {
-        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
-
-        BOOST_TEST((info.GetQuantizationOffset() == 128));
-
-        // Based off current static value [-15.0f, 15.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f );
-
-        //Test constants
-        BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-        BOOST_TEST((bias.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-
-        BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
-        BOOST_CHECK_CLOSE(bias.GetInfo().GetQuantizationScale(), 30.0f/255.0f, 0.000001f);
-
-        BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == 85));
+        // Test biases
+        if (biases.has_value())
+        {
+            BOOST_TEST((biases.value().GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+            BOOST_CHECK_CLOSE(biases.value().GetInfo().GetQuantizationScale(), 30.0f/255.0f, 0.000001f);
+        }
     }
 };
 
@@ -570,8 +551,9 @@ class TestConv2dQuantization : public TestQuantization
 {
 public:
     virtual void VisitConvolution2dLayer(const IConnectableLayer *layer,
-                                         const Convolution2dDescriptor &convolution2dDescriptor,
-                                         const ConstTensor &weights,
+                                         const Convolution2dDescriptor& convolution2dDescriptor,
+                                         const ConstTensor& weights,
+                                         const Optional<ConstTensor>& biases,
                                          const char *name = nullptr)
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
@@ -581,24 +563,18 @@ public:
         // Based off current static value [-15.0f, 15.0f]
         BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / 255.0f, 0.000001f);
 
-        // test weights const
+        // Test weitghs
         BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
         BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), 3.0f / 255.0f, 0.000001f);
         BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == 85));
-    }
 
-    virtual void VisitConvolution2dLayer(const IConnectableLayer *layer,
-                                         const Convolution2dDescriptor &convolution2dDescriptor,
-                                         const ConstTensor &weights,
-                                         const ConstTensor &biases,
-                                         const char *name = nullptr)
-    {
-        VisitConvolution2dLayer(layer, convolution2dDescriptor, weights, name);
-
-        // test biases const
-        BOOST_TEST((biases.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-        BOOST_CHECK_CLOSE(biases.GetInfo().GetQuantizationScale(), 3.0f / 255.0f, 0.000001f);
-        BOOST_TEST((biases.GetInfo().GetQuantizationOffset() == 85));
+        // Test biases
+        if (biases.has_value())
+        {
+            BOOST_TEST((biases.value().GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+            BOOST_CHECK_CLOSE(biases.value().GetInfo().GetQuantizationScale(), 3.0f / 255.0f, 0.000001f);
+            BOOST_TEST((biases.value().GetInfo().GetQuantizationOffset() == 85));
+        }
     }
 };
 

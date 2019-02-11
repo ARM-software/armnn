@@ -62,22 +62,14 @@ void StaticRangeVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* l
 void StaticRangeVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
                                                  const Convolution2dDescriptor& convolution2dDescriptor,
                                                  const ConstTensor& weights,
+                                                 const Optional<ConstTensor>& biases,
                                                  const char* name)
 {
     boost::ignore_unused(convolution2dDescriptor);
     boost::ignore_unused(weights);
+    boost::ignore_unused(biases);
     boost::ignore_unused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
-}
-
-void StaticRangeVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
-                                                 const Convolution2dDescriptor& convolution2dDescriptor,
-                                                 const ConstTensor& weights,
-                                                 const ConstTensor& biases,
-                                                 const char* name)
-{
-    boost::ignore_unused(biases);
-    VisitConvolution2dLayer(layer, convolution2dDescriptor, weights, name);
 }
 
 void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
@@ -108,26 +100,15 @@ void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
     }
 }
 
-void StaticRangeVisitor::VisitFullyConnectedLayer(const armnn::IConnectableLayer *layer,
-                                                  const armnn::FullyConnectedDescriptor& desc,
+void StaticRangeVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
+                                                  const FullyConnectedDescriptor& desc,
                                                   const ConstTensor& weights,
+                                                  const Optional<ConstTensor>& biases,
                                                   const char *name)
 {
     boost::ignore_unused(desc);
     boost::ignore_unused(weights);
-    boost::ignore_unused(name);
-    SetRange(layer, 0, -15.0f, 15.0f);
-}
-
-void StaticRangeVisitor::VisitFullyConnectedLayer(const armnn::IConnectableLayer *layer,
-                                                  const armnn::FullyConnectedDescriptor& desc,
-                                                  const ConstTensor& weights,
-                                                  const ConstTensor& bias,
-                                                  const char *name)
-{
-    boost::ignore_unused(desc);
-    boost::ignore_unused(weights);
-    boost::ignore_unused(bias);
+    boost::ignore_unused(biases);
     boost::ignore_unused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
 }

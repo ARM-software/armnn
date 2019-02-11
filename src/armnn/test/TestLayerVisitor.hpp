@@ -21,6 +21,8 @@ protected:
 
     void CheckConstTensors(const ConstTensor& expected, const ConstTensor& actual);
 
+    void CheckOptionalConstTensors(const Optional<ConstTensor>& expected, const Optional<ConstTensor>& actual);
+
 private:
     const char* m_LayerName;
 
@@ -33,161 +35,146 @@ public:
         }
     }
 
-    virtual void VisitInputLayer(const IConnectableLayer* layer,
-                                 LayerBindingId id,
-                                 const char* name = nullptr) {}
+    void VisitInputLayer(const IConnectableLayer* layer,
+                         LayerBindingId id,
+                         const char* name = nullptr) override {}
 
-    virtual void VisitConvolution2dLayer(const IConnectableLayer* layer,
-                                         const Convolution2dDescriptor& convolution2dDescriptor,
-                                         const ConstTensor& weights,
-                                         const char* name = nullptr) {}
+    void VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                 const Convolution2dDescriptor& convolution2dDescriptor,
+                                 const ConstTensor& weights,
+                                 const Optional<ConstTensor>& biases,
+                                 const char* name = nullptr) override {}
 
-    virtual void VisitConvolution2dLayer(const IConnectableLayer* layer,
-                                         const Convolution2dDescriptor& convolution2dDescriptor,
-                                         const ConstTensor& weights,
-                                         const ConstTensor& biases,
-                                         const char* name = nullptr) {}
-
-    virtual void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
-                                                  const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-                                                  const ConstTensor& weights,
-                                                  const char* name = nullptr) {}
-
-    virtual void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
-                                                  const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-                                                  const ConstTensor& weights,
-                                                  const ConstTensor& biases,
-                                                  const char* name = nullptr) {}
-
-    virtual void VisitDetectionPostProcessLayer(const IConnectableLayer* layer,
-                                                const DetectionPostProcessDescriptor& descriptor,
-                                                const ConstTensor& anchors,
-                                                const char* name = nullptr) {}
-
-    virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
-                                          const FullyConnectedDescriptor& fullyConnectedDescriptor,
+    void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
+                                          const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
                                           const ConstTensor& weights,
-                                          const char* name = nullptr) {}
+                                          const Optional<ConstTensor>& biases,
+                                          const char* name = nullptr) override {}
 
-    virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
-                                          const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                          const ConstTensor& weights,
-                                          const ConstTensor& biases,
-                                          const char* name = nullptr) {}
+    void VisitDetectionPostProcessLayer(const IConnectableLayer* layer,
+                                        const DetectionPostProcessDescriptor& descriptor,
+                                        const ConstTensor& anchors,
+                                        const char* name = nullptr) override {}
 
-    virtual void VisitPermuteLayer(const IConnectableLayer* layer,
-                                   const PermuteDescriptor& permuteDescriptor,
-                                   const char* name = nullptr) {}
+    void VisitFullyConnectedLayer(const IConnectableLayer* layer,
+                                  const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                  const ConstTensor& weights,
+                                  const Optional<ConstTensor>& biases,
+                                  const char* name = nullptr) override {}
 
-    virtual void VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
-                                          const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
-                                          const char* name = nullptr) {}
+    void VisitPermuteLayer(const IConnectableLayer* layer,
+                           const PermuteDescriptor& permuteDescriptor,
+                           const char* name = nullptr) override {}
 
-    virtual void VisitPooling2dLayer(const IConnectableLayer* layer,
-                                     const Pooling2dDescriptor& pooling2dDescriptor,
-                                     const char* name = nullptr) {}
+    void VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
+                                  const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                  const char* name = nullptr) override {}
 
-    virtual void VisitActivationLayer(const IConnectableLayer* layer,
-                                      const ActivationDescriptor& activationDescriptor,
-                                      const char* name = nullptr) {}
+    void VisitPooling2dLayer(const IConnectableLayer* layer,
+                             const Pooling2dDescriptor& pooling2dDescriptor,
+                             const char* name = nullptr) override {}
 
-    virtual void VisitNormalizationLayer(const IConnectableLayer* layer,
-                                         const NormalizationDescriptor& normalizationDescriptor,
-                                         const char* name = nullptr) {}
+    void VisitActivationLayer(const IConnectableLayer* layer,
+                              const ActivationDescriptor& activationDescriptor,
+                              const char* name = nullptr) override {}
 
-    virtual void VisitSoftmaxLayer(const IConnectableLayer* layer,
-                                   const SoftmaxDescriptor& softmaxDescriptor,
-                                   const char* name = nullptr) {}
+    void VisitNormalizationLayer(const IConnectableLayer* layer,
+                                 const NormalizationDescriptor& normalizationDescriptor,
+                                 const char* name = nullptr) override {}
 
-    virtual void VisitSplitterLayer(const IConnectableLayer* layer,
-                                    const ViewsDescriptor& splitterDescriptor,
-                                    const char* name = nullptr) {}
+    void VisitSoftmaxLayer(const IConnectableLayer* layer,
+                           const SoftmaxDescriptor& softmaxDescriptor,
+                           const char* name = nullptr) override {}
 
-    virtual void VisitMergerLayer(const IConnectableLayer* layer,
-                                  const OriginsDescriptor& mergerDescriptor,
-                                  const char* name = nullptr) {}
+    void VisitSplitterLayer(const IConnectableLayer* layer,
+                            const ViewsDescriptor& splitterDescriptor,
+                            const char* name = nullptr) override {}
 
-    virtual void VisitAdditionLayer(const IConnectableLayer* layer,
-                                    const char* name = nullptr) {}
+    void VisitMergerLayer(const IConnectableLayer* layer,
+                          const OriginsDescriptor& mergerDescriptor,
+                          const char* name = nullptr) override {}
 
-    virtual void VisitMultiplicationLayer(const IConnectableLayer* layer,
-                                          const char* name = nullptr) {}
+    void VisitAdditionLayer(const IConnectableLayer* layer,
+                            const char* name = nullptr) override {}
 
-    virtual void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
-                                              const BatchNormalizationDescriptor& desc,
-                                              const ConstTensor& mean,
-                                              const ConstTensor& variance,
-                                              const ConstTensor& beta,
-                                              const ConstTensor& gamma,
-                                              const char* name = nullptr) {}
+    void VisitMultiplicationLayer(const IConnectableLayer* layer,
+                                  const char* name = nullptr) override {}
 
-    virtual void VisitResizeBilinearLayer(const IConnectableLayer* layer,
-                                          const ResizeBilinearDescriptor& resizeDesc,
-                                          const char* name = nullptr) {}
+    void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
+                                      const BatchNormalizationDescriptor& desc,
+                                      const ConstTensor& mean,
+                                      const ConstTensor& variance,
+                                      const ConstTensor& beta,
+                                      const ConstTensor& gamma,
+                                      const char* name = nullptr) override {}
 
-    virtual void VisitL2NormalizationLayer(const IConnectableLayer* layer,
-                                           const L2NormalizationDescriptor& desc,
-                                           const char* name = nullptr) {}
+    void VisitResizeBilinearLayer(const IConnectableLayer* layer,
+                                  const ResizeBilinearDescriptor& resizeDesc,
+                                  const char* name = nullptr) override {}
 
-    virtual void VisitConstantLayer(const IConnectableLayer* layer,
-                                    const ConstTensor& input,
-                                    const char* name = nullptr) {}
+    void VisitL2NormalizationLayer(const IConnectableLayer* layer,
+                                   const L2NormalizationDescriptor& desc,
+                                   const char* name = nullptr) override {}
 
-    virtual void VisitReshapeLayer(const IConnectableLayer* layer,
-                                   const ReshapeDescriptor& reshapeDescriptor,
-                                   const char* name = nullptr) {}
+    void VisitConstantLayer(const IConnectableLayer* layer,
+                            const ConstTensor& input,
+                            const char* name = nullptr) override {}
 
-    virtual void VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
-                                          const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
-                                          const char* name = nullptr) {}
+    void VisitReshapeLayer(const IConnectableLayer* layer,
+                           const ReshapeDescriptor& reshapeDescriptor,
+                           const char* name = nullptr) override {}
 
-    virtual void VisitFloorLayer(const IConnectableLayer* layer,
-                                 const char* name = nullptr) {}
+    void VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
+                                  const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                  const char* name = nullptr) override {}
 
-    virtual void VisitOutputLayer(const IConnectableLayer* layer,
-                                  LayerBindingId id,
-                                  const char* name = nullptr) {}
+    void VisitFloorLayer(const IConnectableLayer* layer,
+                         const char* name = nullptr) override {}
 
-    virtual void VisitLstmLayer(const IConnectableLayer* layer,
-                                const LstmDescriptor& descriptor,
-                                const LstmInputParams& params,
-                                const char* name = nullptr) {}
+    void VisitOutputLayer(const IConnectableLayer* layer,
+                          LayerBindingId id,
+                          const char* name = nullptr) override {}
 
-    virtual void VisitDivisionLayer(const IConnectableLayer* layer,
-                                    const char* name = nullptr) {}
+    void VisitLstmLayer(const IConnectableLayer* layer,
+                        const LstmDescriptor& descriptor,
+                        const LstmInputParams& params,
+                        const char* name = nullptr) override {}
 
-    virtual void VisitSubtractionLayer(const IConnectableLayer* layer,
-                                       const char* name = nullptr) {}
+    void VisitDivisionLayer(const IConnectableLayer* layer,
+                            const char* name = nullptr) override {}
 
-    virtual void VisitMaximumLayer(const IConnectableLayer* layer,
-                                   const char* name = nullptr) {}
+    void VisitSubtractionLayer(const IConnectableLayer* layer,
+                               const char* name = nullptr) override {}
 
-    virtual void VisitMeanLayer(const IConnectableLayer* layer,
-                                const MeanDescriptor& meanDescriptor,
-                                const char* name = nullptr) {}
+    void VisitMaximumLayer(const IConnectableLayer* layer,
+                           const char* name = nullptr) override {}
 
-    virtual void VisitPadLayer(const IConnectableLayer* layer,
-                               const PadDescriptor& padDescriptor,
-                               const char* name = nullptr) {}
+    void VisitMeanLayer(const IConnectableLayer* layer,
+                        const MeanDescriptor& meanDescriptor,
+                        const char* name = nullptr) override {}
 
-    virtual void VisitStridedSliceLayer(const IConnectableLayer* layer,
-                                        const StridedSliceDescriptor& stridedSliceDescriptor,
-                                        const char* name = nullptr) {}
+    void VisitPadLayer(const IConnectableLayer* layer,
+                       const PadDescriptor& padDescriptor,
+                       const char* name = nullptr) override {}
 
-    virtual void VisitMinimumLayer(const IConnectableLayer* layer,
-                                   const char* name = nullptr) {}
+    void VisitStridedSliceLayer(const IConnectableLayer* layer,
+                                const StridedSliceDescriptor& stridedSliceDescriptor,
+                                const char* name = nullptr) override {}
 
-    virtual void VisitGreaterLayer(const IConnectableLayer* layer,
-                                   const char* name = nullptr) {}
+    void VisitMinimumLayer(const IConnectableLayer* layer,
+                           const char* name = nullptr) override {}
 
-    virtual void VisitEqualLayer(const IConnectableLayer* layer,
-                                 const char* name = nullptr) {}
+    void VisitGreaterLayer(const IConnectableLayer* layer,
+                           const char* name = nullptr) override {}
 
-    virtual void VisitRsqrtLayer(const IConnectableLayer* layer,
-                                 const char* name = nullptr) {}
+    void VisitEqualLayer(const IConnectableLayer* layer,
+                         const char* name = nullptr) override {}
 
-    virtual void VisitGatherLayer(const IConnectableLayer* layer,
-                                  const char* name = nullptr) {}
+    void VisitRsqrtLayer(const IConnectableLayer* layer,
+                         const char* name = nullptr) override {}
+
+    void VisitGatherLayer(const IConnectableLayer* layer,
+                          const char* name = nullptr) override {}
 };
 
 } //namespace armnn

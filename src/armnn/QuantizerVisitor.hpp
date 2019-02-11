@@ -80,6 +80,10 @@ public:
                              const Pooling2dDescriptor& pooling2dDescriptor,
                              const char* name = nullptr) override;
 
+    void VisitConstantLayer(const IConnectableLayer* layer,
+                            const ConstTensor& input,
+                            const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

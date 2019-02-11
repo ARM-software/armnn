@@ -23,7 +23,7 @@ void TestLayerVisitor::CheckLayerName(const char* name)
     {
         BOOST_CHECK_EQUAL(m_LayerName, name);
     }
-};
+}
 
 void TestLayerVisitor::CheckLayerPointer(const IConnectableLayer* layer)
 {

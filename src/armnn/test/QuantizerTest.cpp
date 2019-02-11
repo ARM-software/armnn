@@ -25,14 +25,17 @@ using MinMaxRange = std::pair<float, float>;
 using MinMaxRanges = std::vector<MinMaxRange>;
 using MinMaxRangeMap = std::unordered_map<LayerGuid, MinMaxRanges>;
 
+const float g_QuantizationBase = 255.0f;
+const float g_TestTolerance = 0.000001f;
+
 BOOST_AUTO_TEST_SUITE(Quantizer)
 
 class TestQuantization : public LayerVisitorBase<VisitorThrowingPolicy>
 {
 public:
-    virtual void VisitInputLayer(const IConnectableLayer* layer,
-                                 LayerBindingId id,
-                                 const char* name = nullptr)
+    void VisitInputLayer(const IConnectableLayer* layer,
+                         LayerBindingId id,
+                         const char* name = nullptr) override
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -41,12 +44,12 @@ public:
         BOOST_TEST((info.GetQuantizationOffset() == 128));
 
         // Based off current default [-15.0f, 15.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / g_QuantizationBase, g_TestTolerance);
     }
 
-    virtual void VisitOutputLayer(const IConnectableLayer* layer,
-                                  LayerBindingId id,
-                                  const char* name = nullptr)
+    void VisitOutputLayer(const IConnectableLayer* layer,
+                          LayerBindingId id,
+                          const char* name = nullptr) override
     {}
 };
 
@@ -58,25 +61,25 @@ void VisitLayersTopologically(const INetwork* inputNetwork, ILayerVisitor& visit
     VisitLayers(graph, visitor);
 }
 
+class TestAdditionQuantization : public TestQuantization
+{
+public:
+    void VisitAdditionLayer(const IConnectableLayer* layer,
+                            const char* name = nullptr) override
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 128));
+
+        // Based off current static value [-20.0f, 20.0f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 40.0f / g_QuantizationBase, g_TestTolerance);
+    }
+};
+
 BOOST_AUTO_TEST_CASE(QuantizeAddition)
 {
-    class TestAdditionQuantization : public TestQuantization
-    {
-    public:
-        virtual void VisitAdditionLayer(const IConnectableLayer* layer,
-                                        const char* name = nullptr)
-        {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-            BOOST_TEST((info.GetDataType() ==  DataType::QuantisedAsymm8));
-
-            BOOST_TEST((info.GetQuantizationOffset() == 128));
-
-            // Based off current static value [-20.0f, 20.0f]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 40.0f/255.0f, 0.000001f);
-        }
-    };
-
     auto network = INetwork::Create();
 
     // Add the layers
@@ -90,7 +93,7 @@ BOOST_AUTO_TEST_CASE(QuantizeAddition)
     input1->GetOutputSlot(0).Connect(addition->GetInputSlot(1));
     addition->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    //Set TensorInfo
+    // Set TensorInfo
     TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
     input0->GetOutputSlot(0).SetTensorInfo(info);
@@ -105,9 +108,9 @@ BOOST_AUTO_TEST_CASE(QuantizeAddition)
 class TestActivationQuantization : public TestQuantization
 {
 public:
-    virtual void VisitActivationLayer(const IConnectableLayer* layer,
-                                      const ActivationDescriptor& descriptor,
-                                      const char* name = nullptr)
+    void VisitActivationLayer(const IConnectableLayer* layer,
+                              const ActivationDescriptor& descriptor,
+                              const char* name = nullptr) override
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -116,13 +119,14 @@ public:
         BOOST_TEST((info.GetQuantizationOffset() == 0));
 
         // Based off current static value [-20.0f, 20.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 15.0f/255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 15.0f / g_QuantizationBase, g_TestTolerance);
     }
 };
 
 INetworkPtr CreateNetworkWithActivationLayer(const ActivationDescriptor& descriptor)
 {
     auto network = INetwork::Create();
+
     // Add the layers
     IConnectableLayer* input0 = network->AddInputLayer(0);
     IConnectableLayer* activation = network->AddActivationLayer(descriptor);
@@ -132,7 +136,7 @@ INetworkPtr CreateNetworkWithActivationLayer(const ActivationDescriptor& descrip
     input0->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
     activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    //Set TensorInfo
+    // Set TensorInfo
     TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
     input0->GetOutputSlot(0).SetTensorInfo(info);
@@ -197,26 +201,26 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftReLuActivation)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+class TestBoundedReluActivationQuantization : public TestQuantization
+{
+public:
+    void VisitActivationLayer(const IConnectableLayer* layer,
+                              const ActivationDescriptor& descriptor,
+                              const char* name = nullptr) override
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 0));
+
+        // Based off current static value [0.0f, 3.5f(<-layer upper bound)]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 3.5f / g_QuantizationBase, g_TestTolerance);
+    }
+};
+
 BOOST_AUTO_TEST_CASE(QuantizeBoundedReluActivation)
 {
-    class TestBoundedReluActivationQuantization : public TestQuantization
-    {
-    public:
-        virtual void VisitActivationLayer(const IConnectableLayer* layer,
-                                          const ActivationDescriptor& descriptor,
-                                          const char* name = nullptr)
-        {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-            BOOST_TEST((info.GetDataType() ==  DataType::QuantisedAsymm8));
-
-            BOOST_TEST((info.GetQuantizationOffset() == 0));
-
-            // Based off current static value [0.0f, 3.5f(<-layer upper bound)]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 3.5f/255.0f, 0.000001f);
-        }
-    };
-
     ActivationDescriptor descriptor;
     descriptor.m_Function = ActivationFunction::BoundedReLu;
     descriptor.m_A        = 3.5f;
@@ -229,26 +233,26 @@ BOOST_AUTO_TEST_CASE(QuantizeBoundedReluActivation)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+class TestTanHActivationQuantization : public TestQuantization
+{
+public:
+    void VisitActivationLayer(const IConnectableLayer* layer,
+                              const ActivationDescriptor& descriptor,
+                              const char* name = nullptr) override
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 128));
+
+        // Based off current static value [-1.0f, 1.0f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 2.0f / g_QuantizationBase, g_TestTolerance);
+    }
+};
+
 BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
 {
-    class TestTanHActivationQuantization : public TestQuantization
-    {
-    public:
-        virtual void VisitActivationLayer(const IConnectableLayer* layer,
-                                          const ActivationDescriptor& descriptor,
-                                          const char* name = nullptr)
-        {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-            BOOST_TEST((info.GetDataType() ==  DataType::QuantisedAsymm8));
-
-            BOOST_TEST((info.GetQuantizationOffset() == 128));
-
-            // Based off current static value [-1.0f, 1.0f]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 2.0f/255.0f, 0.000001f);
-        }
-    };
-
     ActivationDescriptor descriptor;
     descriptor.m_Function = ActivationFunction::TanH;
     descriptor.m_A        = 3.5f;
@@ -264,9 +268,9 @@ BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
 class TestLeakyReLuActivationQuantization : public TestQuantization
 {
 public:
-    virtual void VisitActivationLayer(const IConnectableLayer* layer,
-                                      const ActivationDescriptor& descriptor,
-                                      const char* name = nullptr)
+    void VisitActivationLayer(const IConnectableLayer* layer,
+                              const ActivationDescriptor& descriptor,
+                              const char* name = nullptr) override
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -275,7 +279,7 @@ public:
         BOOST_TEST((info.GetQuantizationOffset() == 64));
 
         // Based off current static value [-5.0f, 15.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f / g_QuantizationBase, g_TestTolerance);
     }
 protected:
     // used by the descendant classes which test layers
@@ -307,54 +311,44 @@ BOOST_AUTO_TEST_CASE(QuantizeLeakyReLuActivation)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+class TestBatchNormalizationQuantization : public TestQuantization
+{
+public:
+    void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
+                                      const BatchNormalizationDescriptor& desc,
+                                      const ConstTensor& mean,
+                                      const ConstTensor& variance,
+                                      const ConstTensor& beta,
+                                      const ConstTensor& gamma,
+                                      const char* name = nullptr) override
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 128));
+
+        // Based off current static value [-15.0f, 15.0f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / g_QuantizationBase, g_TestTolerance);
+
+        // Test constants
+        BOOST_TEST((mean.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+        BOOST_TEST((variance.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+        BOOST_TEST((beta.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+        BOOST_TEST((gamma.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+
+        float expectedQuantizationScale = 3.0f / g_QuantizationBase;
+        BOOST_CHECK_CLOSE(mean.GetInfo().GetQuantizationScale(),     expectedQuantizationScale, g_TestTolerance);
+        BOOST_CHECK_CLOSE(variance.GetInfo().GetQuantizationScale(), expectedQuantizationScale, g_TestTolerance);
+        BOOST_CHECK_CLOSE(beta.GetInfo().GetQuantizationScale(),     expectedQuantizationScale, g_TestTolerance);
+        BOOST_CHECK_CLOSE(gamma.GetInfo().GetQuantizationScale(),    expectedQuantizationScale, g_TestTolerance);
+
+        BOOST_TEST((mean.GetInfo().GetQuantizationOffset() == 85));
+    }
+};
+
 BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
 {
-
-    class TestQuantization : public LayerVisitorBase<VisitorThrowingPolicy>
-    {
-    public:
-        virtual void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
-                                                  const BatchNormalizationDescriptor& desc,
-                                                  const ConstTensor& mean,
-                                                  const ConstTensor& variance,
-                                                  const ConstTensor& beta,
-                                                  const ConstTensor& gamma,
-                                                  const char* name = nullptr)
-        {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-            BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
-
-            BOOST_TEST((info.GetQuantizationOffset() == 128));
-
-            // Based off current static value [-15.0f, 15.0f]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f);
-
-            //Test constants
-            BOOST_TEST((mean.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-            BOOST_TEST((variance.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-            BOOST_TEST((beta.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-            BOOST_TEST((gamma.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-
-            BOOST_CHECK_CLOSE(mean.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
-            BOOST_CHECK_CLOSE(variance.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
-            BOOST_CHECK_CLOSE(beta.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
-            BOOST_CHECK_CLOSE(gamma.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
-
-            BOOST_TEST((mean.GetInfo().GetQuantizationOffset() == 85));
-        }
-
-        virtual void VisitInputLayer(const IConnectableLayer* layer,
-                                     LayerBindingId id,
-                                     const char* name = nullptr)
-        {}
-
-        virtual void VisitOutputLayer(const IConnectableLayer* layer,
-                                      LayerBindingId id,
-                                      const char* name = nullptr)
-        {}
-    };
-
     auto network = INetwork::Create();
 
     TensorShape shape{3U};
@@ -381,12 +375,12 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
     input0->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
     batchNorm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    //Set TensorInfo
+    // Set TensorInfo
     input0->GetOutputSlot(0).SetTensorInfo(info);
     batchNorm->GetOutputSlot(0).SetTensorInfo(info);
 
     auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestQuantization validator;
+    TestBatchNormalizationQuantization validator;
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
@@ -501,7 +495,7 @@ INetworkPtr CreateNetworkWithFullyConnectedLayer(const bool biasEnabled)
     input0->GetOutputSlot(0).Connect(fullyConnected->GetInputSlot(0));
     fullyConnected->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    //Set TensorInfo
+    // Set TensorInfo
     input0->GetOutputSlot(0).SetTensorInfo(info);
     fullyConnected->GetOutputSlot(0).SetTensorInfo(info);
 
@@ -524,18 +518,20 @@ public:
         BOOST_TEST((info.GetQuantizationOffset() == 128));
 
         // Based off current static value [-15.0f, 15.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f/255.0f, 0.000001f );
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / g_QuantizationBase, g_TestTolerance );
 
-        //Test weights
+        // Test weights
         BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-        BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), 3.0f/255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), 3.0f / g_QuantizationBase, g_TestTolerance);
         BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == 85));
 
         // Test biases
         if (biases.has_value())
         {
             BOOST_TEST((biases.value().GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-            BOOST_CHECK_CLOSE(biases.value().GetInfo().GetQuantizationScale(), 30.0f/255.0f, 0.000001f);
+            BOOST_CHECK_CLOSE(biases.value().GetInfo().GetQuantizationScale(),
+                              30.0f / g_QuantizationBase,
+                              g_TestTolerance);
         }
     }
 };
@@ -561,23 +557,23 @@ BOOST_AUTO_TEST_CASE(QuantizeFullyConnectedBiasEnabled)
 class TestConv2dQuantization : public TestQuantization
 {
 public:
-    virtual void VisitConvolution2dLayer(const IConnectableLayer *layer,
-                                         const Convolution2dDescriptor& convolution2dDescriptor,
-                                         const ConstTensor& weights,
-                                         const Optional<ConstTensor>& biases,
-                                         const char *name = nullptr)
+    void VisitConvolution2dLayer(const IConnectableLayer *layer,
+                                 const Convolution2dDescriptor& convolution2dDescriptor,
+                                 const ConstTensor& weights,
+                                 const Optional<ConstTensor>& biases,
+                                 const char *name = nullptr) override
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
         BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
         BOOST_TEST((info.GetQuantizationOffset() == 128));
 
         // Based off current static value [-15.0f, 15.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / 255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / g_QuantizationBase, g_TestTolerance);
 
         // Test weights
         // Instantiate expected values
-        const float quantizationScale = 3.0f / 255.0f;
-        const float tolerance = 3.0f / 255.0f;
+        const float quantizationScale = 3.0f / g_QuantizationBase;
+        const float tolerance = 3.0f / g_QuantizationBase;
         const int quantizationOffset = 85;
         BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
         BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), quantizationScale, tolerance);
@@ -625,7 +621,7 @@ void TestQuantizeConvolution2d(bool useBiases)
     input0->GetOutputSlot(0).Connect(conv2d->GetInputSlot(0));
     conv2d->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    //Set TensorInfo
+    // Set TensorInfo
     input0->GetOutputSlot(0).SetTensorInfo(info);
     conv2d->GetOutputSlot(0).SetTensorInfo(info);
 
@@ -647,23 +643,23 @@ BOOST_AUTO_TEST_CASE(QuantizeConvolution2dWithBiases)
 class TestDepthwiseConv2dQuantization : public TestQuantization
 {
 public:
-    virtual void VisitDepthwiseConvolution2dLayer(const IConnectableLayer *layer,
-                                                  const DepthwiseConvolution2dDescriptor& desc,
-                                                  const ConstTensor& weights,
-                                                  const Optional<ConstTensor>& biases,
-                                                  const char *name = nullptr)
+    void VisitDepthwiseConvolution2dLayer(const IConnectableLayer *layer,
+                                          const DepthwiseConvolution2dDescriptor& desc,
+                                          const ConstTensor& weights,
+                                          const Optional<ConstTensor>& biases,
+                                          const char *name = nullptr) override
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
         BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
         BOOST_TEST((info.GetQuantizationOffset() == 128));
 
         // Based off current static value [-15.0f, 15.0f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / 255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / g_QuantizationBase, g_TestTolerance);
 
         // Test weights
         // Instantiate expected values
-        const float quantizationScale = 3.0f / 255.0f;
-        const float tolerance = 3.0f / 255.0f;
+        const float quantizationScale = 3.0f / g_QuantizationBase;
+        const float tolerance = 3.0f / g_QuantizationBase;
         const int quantizationOffset = 85;
         BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
         BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), quantizationScale, tolerance);
@@ -733,9 +729,9 @@ BOOST_AUTO_TEST_CASE(QuantizeDepthwiseConvolution2dWithBiases)
 class TestSoftmaxQuantization : public TestQuantization
 {
 public:
-    virtual void VisitSoftmaxLayer(const IConnectableLayer* layer,
-                                   const SoftmaxDescriptor& descriptor,
-                                   const char* name = nullptr)
+    void VisitSoftmaxLayer(const IConnectableLayer* layer,
+                           const SoftmaxDescriptor& descriptor,
+                           const char* name = nullptr) override
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -743,13 +739,14 @@ public:
 
         BOOST_TEST((info.GetQuantizationOffset() == 0));
 
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 1.0f/255.0f, 0.000001f );
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 1.0f / g_QuantizationBase, g_TestTolerance );
     }
 };
 
 INetworkPtr CreateNetworkWithSoftmaxLayer(const SoftmaxDescriptor& descriptor)
 {
     auto network = INetwork::Create();
+
     // Add the layers
     IConnectableLayer* input0 = network->AddInputLayer(0);
     IConnectableLayer* softmax = network->AddSoftmaxLayer(descriptor);
@@ -759,7 +756,7 @@ INetworkPtr CreateNetworkWithSoftmaxLayer(const SoftmaxDescriptor& descriptor)
     input0->GetOutputSlot(0).Connect(softmax->GetInputSlot(0));
     softmax->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    //Set TensorInfo
+    // Set TensorInfo
     TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
     input0->GetOutputSlot(0).SetTensorInfo(info);
@@ -822,9 +819,9 @@ BOOST_AUTO_TEST_CASE(QuantizePermute)
     class TestPermuteQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        virtual void VisitPermuteLayer(const IConnectableLayer* layer,
-                                       const PermuteDescriptor& desc,
-                                       const char* name = nullptr)
+        void VisitPermuteLayer(const IConnectableLayer* layer,
+                               const PermuteDescriptor& desc,
+                               const char* name = nullptr) override
         {
             CheckForwardedQuantizationSettings(layer);
         }
@@ -853,9 +850,9 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
     class TestSpaceToBatchQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        virtual void VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
-                                              const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
-                                              const char* name = nullptr) override
+        void VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
+                                      const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                      const char* name = nullptr) override
         {
             CheckForwardedQuantizationSettings(layer);
         }
@@ -882,9 +879,9 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
 class TestPooling2dQuantization : public TestLeakyReLuActivationQuantization
 {
 public:
-    virtual void VisitPooling2dLayer(const IConnectableLayer* layer,
-                                     const Pooling2dDescriptor& desc,
-                                     const char* name = nullptr)
+    void VisitPooling2dLayer(const IConnectableLayer* layer,
+                             const Pooling2dDescriptor& desc,
+                             const char* name = nullptr) override
     {
         TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
@@ -893,7 +890,7 @@ public:
         BOOST_TEST((info.GetQuantizationOffset() == 64));
 
         // Based off parent LeakyReLu [-5.f, 15.f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f / g_QuantizationBase, g_TestTolerance);
     }
 };
 
@@ -928,6 +925,55 @@ BOOST_AUTO_TEST_CASE(QuantizePooling2d)
 
     auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
     TestPooling2dQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
+class TestConstantQuantization : public TestAdditionQuantization
+{
+public:
+    void VisitConstantLayer(const IConnectableLayer* layer,
+                            const ConstTensor& input,
+                            const char* name = nullptr) override
+    {
+        BOOST_CHECK(std::string(name) == "ConstantLayer");
+
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+        BOOST_CHECK(info.GetDataType() == DataType::QuantisedAsymm8);
+        BOOST_CHECK(info.GetQuantizationOffset() == 64);
+
+        // Based off the range of values in the const tensor used for the test: [-2.0f, 6.0f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 8.0f / g_QuantizationBase, g_TestTolerance);
+    }
+};
+
+BOOST_AUTO_TEST_CASE(QuantizeConstant)
+{
+    auto network = INetwork::Create();
+
+    // Constant layer data
+    const char* name = "ConstantLayer";
+    std::vector<float> data = {-2.0f, -1.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
+    std::vector<unsigned int> dimensions = {1, 1, 3, 3};
+    TensorInfo tensorInfo(4, dimensions.data(), DataType::Float32);
+    ConstTensor constantTensor(tensorInfo, data);
+
+    // Add the layers
+    IConnectableLayer* input    = network->AddInputLayer(0);
+    IConnectableLayer* constant = network->AddConstantLayer(constantTensor, name);
+    IConnectableLayer* addition = network->AddAdditionLayer();
+    IConnectableLayer* output   = network->AddOutputLayer(1);
+
+    // Establish connections
+    input->GetOutputSlot(0).Connect(addition->GetInputSlot(0));
+    constant->GetOutputSlot(0).Connect(addition->GetInputSlot(1));
+    addition->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Set TensorInfo in the remaining layers
+    input->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    addition->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestConstantQuantization validator;
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 

@@ -37,11 +37,12 @@ public:
     std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
     /// Free up the constant source data stored by the layer.
-    void ReleaseConstantData() override {};
+    void ReleaseConstantData() override {}
 
     void Accept(ILayerVisitor& visitor) const override;
 
     std::unique_ptr<ScopedCpuTensorHandle> m_LayerOutput;
+
 protected:
     /// Constructor to create a ConstantLayer.
     /// @param [in] name Optional name for the layer.
@@ -52,7 +53,6 @@ protected:
 
     /// Retrieve the handles to the constant values stored by the layer.
     ConstantTensors GetConstantTensorsByRef() override { return {m_LayerOutput}; }
-
 };
 
 } // namespace

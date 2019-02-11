@@ -18,8 +18,7 @@ namespace armnn
 class OverrideInputRangeVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
 private:
-    using MinMaxRange  = std::pair<float, float>;
-    using MinMaxRanges = std::vector<MinMaxRange>;
+    using MinMaxRange  = RangeTracker::MinMaxRange;
 
 public:
     OverrideInputRangeVisitor(RangeTracker& ranges,

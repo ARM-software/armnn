@@ -44,7 +44,7 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* src
         newOutputSlot.Connect(newInputSlot);
 
         // Fetch the min/max ranges that were computed earlier
-        auto range = m_Ranges.GetRange(layerToFind.GetGuid(), i);
+        auto range = m_Ranges.GetRange(layerToFind.GetGuid(), slotIdx);
         auto qParams = ComputeQAsymmParams(8, range.first, range.second);
 
         // Set the quantization params
@@ -240,6 +240,17 @@ void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddSoftmaxLayer(softmaxDescriptor, name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitConstantLayer(const IConnectableLayer* layer,
+                                          const ConstTensor& input,
+                                          const char* name)
+{
+    std::vector<uint8_t> inputBacking;
+    ConstTensor qInput = CreateQuantizedConst(input, inputBacking);
+
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConstantLayer(qInput, name);
+    RecordLayer(layer, newLayer);
 }
 
 } //namespace armnn

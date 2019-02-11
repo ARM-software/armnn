@@ -266,7 +266,7 @@ public:
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddConstantLayer(const ConstTensor& input,
-        const char* name = nullptr) = 0;
+                                                const char* name = nullptr) = 0;
 
     /// Adds a reshape layer to the network.
     /// @param reshapeDescriptor - Parameters for the reshape operation.

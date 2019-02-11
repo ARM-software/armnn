@@ -17,12 +17,14 @@ public:
     explicit TestConvolution2dLayerVisitor(const Convolution2dDescriptor& convolution2dDescriptor,
                                            const ConstTensor& weights,
                                            const Optional<ConstTensor>& biases,
-                                           const char* name = nullptr) : TestLayerVisitor(name),
-                                                                         m_Descriptor(convolution2dDescriptor),
-                                                                         m_Weights(weights),
-                                                                         m_Biases(biases) {};
+                                           const char* name = nullptr)
+        : TestLayerVisitor(name)
+        , m_Descriptor(convolution2dDescriptor)
+        , m_Weights(weights)
+        , m_Biases(biases)
+    {}
 
-    virtual ~TestConvolution2dLayerVisitor() {};
+    virtual ~TestConvolution2dLayerVisitor() {}
 
     void VisitConvolution2dLayer(const IConnectableLayer* layer,
                                  const Convolution2dDescriptor& convolution2dDescriptor,
@@ -52,12 +54,14 @@ public:
     explicit TestDepthwiseConvolution2dLayerVisitor(const DepthwiseConvolution2dDescriptor& descriptor,
                                                     const ConstTensor& weights,
                                                     const Optional<ConstTensor>& biases,
-                                                    const char* name = nullptr) : TestLayerVisitor(name),
-                                                                                  m_Descriptor(descriptor),
-                                                                                  m_Weights(weights),
-                                                                                  m_Biases(biases) {};
+                                                    const char* name = nullptr)
+        : TestLayerVisitor(name)
+        , m_Descriptor(descriptor)
+        , m_Weights(weights)
+        , m_Biases(biases)
+    {}
 
-    virtual ~TestDepthwiseConvolution2dLayerVisitor() {};
+    virtual ~TestDepthwiseConvolution2dLayerVisitor() {}
 
     void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
                                           const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
@@ -87,12 +91,14 @@ public:
     explicit TestFullyConnectedLayerVistor(const FullyConnectedDescriptor& descriptor,
                                            const ConstTensor& weights,
                                            const Optional<ConstTensor> biases,
-                                           const char* name = nullptr) : TestLayerVisitor(name),
-                                                                         m_Descriptor(descriptor),
-                                                                         m_Weights(weights),
-                                                                         m_Biases(biases) {};
+                                           const char* name = nullptr)
+        : TestLayerVisitor(name)
+        , m_Descriptor(descriptor)
+        , m_Weights(weights)
+        , m_Biases(biases)
+    {}
 
-    virtual ~TestFullyConnectedLayerVistor() {};
+    virtual ~TestFullyConnectedLayerVistor() {}
 
     void VisitFullyConnectedLayer(const IConnectableLayer* layer,
                                   const FullyConnectedDescriptor& fullyConnectedDescriptor,
@@ -123,12 +129,15 @@ public:
                                        const ConstTensor& variance,
                                        const ConstTensor& beta,
                                        const ConstTensor& gamma,
-                                       const char* name = nullptr) : TestLayerVisitor(name),
-                                                                     m_Descriptor(descriptor),
-                                                                     m_Mean(mean),
-                                                                     m_Variance(variance),
-                                                                     m_Beta(beta),
-                                                                     m_Gamma(gamma) {};
+                                       const char* name = nullptr)
+        : TestLayerVisitor(name)
+        , m_Descriptor(descriptor)
+        , m_Mean(mean)
+        , m_Variance(variance)
+        , m_Beta(beta)
+        , m_Gamma(gamma)
+    {}
+
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& descriptor,
                                       const ConstTensor& mean,
@@ -148,6 +157,7 @@ public:
 
 protected:
     void CheckDescriptor(const BatchNormalizationDescriptor& descriptor);
+
 private:
     BatchNormalizationDescriptor m_Descriptor;
     ConstTensor m_Mean;
@@ -159,8 +169,11 @@ private:
 class TestConstantLayerVisitor : public TestLayerVisitor
 {
 public:
-    explicit TestConstantLayerVisitor(const ConstTensor& input, const char* name = nullptr) :
-        TestLayerVisitor(name), m_Input(input) {};
+    explicit TestConstantLayerVisitor(const ConstTensor& input,
+                                      const char* name = nullptr)
+        : TestLayerVisitor(name)
+        , m_Input(input)
+    {}
 
     void VisitConstantLayer(const IConnectableLayer* layer,
                             const ConstTensor& input,
@@ -180,8 +193,11 @@ class TestLstmLayerVisitor : public TestLayerVisitor
 public:
     explicit TestLstmLayerVisitor(const LstmDescriptor& descriptor,
                                   const LstmInputParams& params,
-                                  const char* name = nullptr) :
-                                      TestLayerVisitor(name), m_Descriptor(descriptor), m_InputParams(params) {};
+                                  const char* name = nullptr)
+        : TestLayerVisitor(name)
+        , m_Descriptor(descriptor)
+        , m_InputParams(params)
+    {}
 
     void VisitLstmLayer(const IConnectableLayer* layer,
                         const LstmDescriptor& descriptor,

@@ -59,6 +59,27 @@ void StaticRangeVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* l
     SetRange(layer, 0, -15.0f, 15.0f);
 }
 
+void StaticRangeVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                                 const Convolution2dDescriptor& convolution2dDescriptor,
+                                                 const ConstTensor& weights,
+                                                 const char* name)
+{
+    boost::ignore_unused(convolution2dDescriptor);
+    boost::ignore_unused(weights);
+    boost::ignore_unused(name);
+    SetRange(layer, 0, -15.0f, 15.0f);
+}
+
+void StaticRangeVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                                 const Convolution2dDescriptor& convolution2dDescriptor,
+                                                 const ConstTensor& weights,
+                                                 const ConstTensor& biases,
+                                                 const char* name)
+{
+    boost::ignore_unused(biases);
+    VisitConvolution2dLayer(layer, convolution2dDescriptor, weights, name);
+}
+
 void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
                                               const ActivationDescriptor& activationDescriptor,
                                               const char* name)

@@ -153,4 +153,39 @@ void QuantizerVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* lay
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                               const Convolution2dDescriptor& convolution2dDescriptor,
+                                               const ConstTensor& weights,
+                                               const char* name)
+{
+    std::vector<uint8_t> weightsBacking;
+    ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
+
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor,
+                                                                            qWeights,
+                                                                            name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                               const Convolution2dDescriptor& convolution2dDescriptor,
+                                               const ConstTensor& weights,
+                                               const ConstTensor& biases,
+                                               const char* name)
+{
+    std::vector<uint8_t> weightsBacking;
+    ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
+
+    std::vector<uint8_t> biasesBacking;
+    ConstTensor qBiases = CreateQuantizedConst(weights, biasesBacking);
+
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor,
+                                                                            qWeights,
+                                                                            qBiases,
+                                                                            name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 } //namespace armnn

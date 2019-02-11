@@ -35,6 +35,15 @@ public:
                                       const ConstTensor& beta,
                                       const ConstTensor& gamma,
                                       const char* name = nullptr) override;
+    void VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                 const Convolution2dDescriptor& convolution2dDescriptor,
+                                 const ConstTensor& weights,
+                                 const char* name = nullptr) override;
+    void VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                 const Convolution2dDescriptor& convolution2dDescriptor,
+                                 const ConstTensor& weights,
+                                 const ConstTensor& biases,
+                                 const char* name = nullptr) override;
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& activationDescriptor,
                               const char* name = nullptr) override;

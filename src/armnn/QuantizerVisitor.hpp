@@ -52,6 +52,17 @@ public:
                                   const char *name = nullptr)  override;
 
     // Extract the quantized network
+    void VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                 const Convolution2dDescriptor& convolution2dDescriptor,
+                                 const ConstTensor& weights,
+                                 const char* name = nullptr) override;
+    void VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                 const Convolution2dDescriptor& convolution2dDescriptor,
+                                 const ConstTensor& weights,
+                                 const ConstTensor& biases,
+                                 const char* name = nullptr) override;
+
+    /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 
 private:

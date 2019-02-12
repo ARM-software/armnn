@@ -213,7 +213,8 @@ bool Serializer::SaveSerializedToStream(std::ostream& stream)
 {
     flatbuffers::FlatBufferBuilder& fbBuilder = m_SerializerVisitor.GetFlatBufferBuilder();
 
-    stream.write(reinterpret_cast<const char*>(fbBuilder.GetBufferPointer()), fbBuilder.GetSize());
+    auto bytesToWrite = boost::numeric_cast<std::streamsize>(fbBuilder.GetSize());
+    stream.write(reinterpret_cast<const char*>(fbBuilder.GetBufferPointer()), bytesToWrite);
     return !stream.bad();
 }
 

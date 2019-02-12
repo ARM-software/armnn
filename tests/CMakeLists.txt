@@ -241,7 +241,7 @@ if (BUILD_ONNX_PARSER)
     OnnxParserTest(OnnxMobileNet-Armnn "${OnnxMobileNet-Armnn_sources}")
 endif()
 
-if (BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER)
+if (BUILD_ARMNN_SERIALIZER OR BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER)
     set(ExecuteNetwork_sources
         ExecuteNetwork/ExecuteNetwork.cpp)
 
@@ -250,6 +250,9 @@ if (BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_
     target_include_directories(ExecuteNetwork PRIVATE ../src/armnnUtils)
     target_include_directories(ExecuteNetwork PRIVATE ../src/backends)
 
+    if (BUILD_ARMNN_SERIALIZER)
+        target_link_libraries(ExecuteNetwork armnnSerializer)
+    endif()
     if (BUILD_CAFFE_PARSER)
         target_link_libraries(ExecuteNetwork armnnCaffeParser)
     endif()

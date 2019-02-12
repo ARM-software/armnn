@@ -47,9 +47,9 @@ public:
                                       const char* name = nullptr) override;
 
     void VisitFullyConnectedLayer(const IConnectableLayer *layer,
-                                  const FullyConnectedDescriptor&,
-                                  const ConstTensor&,
-                                  const Optional<ConstTensor>&,
+                                  const FullyConnectedDescriptor& desc,
+                                  const ConstTensor& weights,
+                                  const Optional<ConstTensor>& biases,
                                   const char *name = nullptr)  override;
 
     void VisitConvolution2dLayer(const IConnectableLayer* layer,
@@ -66,6 +66,10 @@ public:
 
     void VisitSoftmaxLayer(const IConnectableLayer* layer,
                            const SoftmaxDescriptor& softmaxDescriptor,
+                           const char* name = nullptr) override;
+
+    void VisitPermuteLayer(const IConnectableLayer* layer,
+                           const PermuteDescriptor& permuteDescriptor,
                            const char* name = nullptr) override;
 
     /// Extract the quantized network

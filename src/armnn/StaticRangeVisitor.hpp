@@ -54,6 +54,11 @@ public:
                                   const ConstTensor& weights,
                                   const Optional<ConstTensor>& biases,
                                   const char *name) override;
+
+    void VisitPermuteLayer(const IConnectableLayer* layer,
+                           const PermuteDescriptor& permuteDescriptor,
+                           const char* name) override;
+
     void VisitSoftmaxLayer(const IConnectableLayer* layer,
                            const SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;
@@ -61,6 +66,8 @@ public:
 private:
     /// Set the range for an output slot on a layer
     void SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max);
+
+    void ForwardParentParameters(const IConnectableLayer* layer);
 
     /// Mapping from a layer Guid to an array of ranges for outputs
     RangeTracker& m_RangeTracker;

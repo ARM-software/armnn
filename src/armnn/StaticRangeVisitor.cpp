@@ -21,6 +21,12 @@ void StaticRangeVisitor::SetRange(const IConnectableLayer* layer, unsigned int o
     m_RangeTracker.SetRange(layer, outputIdx, min, max);
 }
 
+void StaticRangeVisitor::ForwardParentParameters(const IConnectableLayer* layer)
+{
+    const auto parentRange = m_RangeTracker.GetRange(layer->GetInputSlot(0).GetConnection()->GetOwningLayerGuid(), 0);
+    SetRange(layer, 0, parentRange.first, parentRange.second);
+}
+
 void StaticRangeVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
 {
     SetRange(layer, 0, -20.f, 20.f);
@@ -108,6 +114,14 @@ void StaticRangeVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer
     boost::ignore_unused(biases);
     boost::ignore_unused(name);
     SetRange(layer, 0, -15.0f, 15.0f);
+}
+
+void StaticRangeVisitor::VisitPermuteLayer(const IConnectableLayer* layer,
+                                           const PermuteDescriptor& permuteDescriptor,
+                                           const char* name)
+{
+    boost::ignore_unused(permuteDescriptor);
+    ForwardParentParameters(layer);
 }
 
 void StaticRangeVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,

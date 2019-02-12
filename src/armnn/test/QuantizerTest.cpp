@@ -261,26 +261,26 @@ BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+class TestLeakyReLuActivationQuantization : public TestQuantization
+{
+public:
+    virtual void VisitActivationLayer(const IConnectableLayer* layer,
+                                      const ActivationDescriptor& descriptor,
+                                      const char* name = nullptr)
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() ==  DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 64));
+
+        // Based off current static value [-5.0f, 15.0f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f);
+    }
+};
+
 BOOST_AUTO_TEST_CASE(QuantizeLeakyReLuActivation)
 {
-    class TestLeakyReLuActivationQuantization : public TestQuantization
-    {
-    public:
-        virtual void VisitActivationLayer(const IConnectableLayer* layer,
-                                          const ActivationDescriptor& descriptor,
-                                          const char* name = nullptr)
-        {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-            BOOST_TEST((info.GetDataType() ==  DataType::QuantisedAsymm8));
-
-            BOOST_TEST((info.GetQuantizationOffset() == 64));
-
-            // Based off current static value [-5.0f, 15.0f]
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f);
-        }
-    };
-
     ActivationDescriptor descriptor;
     descriptor.m_Function = ActivationFunction::LeakyReLu;
     descriptor.m_A        = 3.5f;
@@ -763,6 +763,59 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftmax)
 
     auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
     TestSoftmaxQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizePermute)
+{
+
+    class TestPermuteQuantization : public TestLeakyReLuActivationQuantization
+    {
+    public:
+        virtual void VisitPermuteLayer(const IConnectableLayer* layer,
+                                       const PermuteDescriptor& desc,
+                                       const char* name = nullptr)
+        {
+            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+            BOOST_TEST((info.GetQuantizationOffset() == 64));
+
+            // Based off parent LeakyReLu [-5.f, 15.f]
+            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f);
+        }
+    };
+
+    auto network = INetwork::Create();
+
+    TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+
+    PermuteDescriptor desc;
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::LeakyReLu;
+    activationDescriptor.m_A        = 3.5f;
+    activationDescriptor.m_B        = -10.0f;
+
+    // Add the layers
+    IConnectableLayer* input0 = network->AddInputLayer(0);
+    IConnectableLayer* activation = network->AddActivationLayer(activationDescriptor);
+    IConnectableLayer* permute = network->AddPermuteLayer(desc);
+    IConnectableLayer* output = network->AddOutputLayer(3);
+
+    // Establish connections
+    input0->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(permute->GetInputSlot(0));
+    permute->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Set TensorInfo
+    input0->GetOutputSlot(0).SetTensorInfo(info);
+    activation->GetOutputSlot(0).SetTensorInfo(info);
+    permute->GetOutputSlot(0).SetTensorInfo(info);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestPermuteQuantization validator;
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 

@@ -205,6 +205,16 @@ void QuantizerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer*
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+
+void QuantizerVisitor::VisitPermuteLayer(const IConnectableLayer* layer,
+                                         const PermuteDescriptor& permuteDescriptor,
+                                         const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddPermuteLayer(permuteDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                          const SoftmaxDescriptor& softmaxDescriptor,
                                          const char* name)

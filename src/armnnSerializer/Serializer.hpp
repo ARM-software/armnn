@@ -29,6 +29,9 @@ public:
                           armnn::LayerBindingId id,
                           const char* name = nullptr) override;
 
+    void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,
+                                  const char* name = nullptr) override;
+
     /// Serializes the network to ArmNN SerializedGraph.
     /// @param [in] inNetwork The network to be serialized.
     void Serialize(const armnn::INetwork& inNetwork);

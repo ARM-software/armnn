@@ -132,7 +132,8 @@ DeserializeParser::DeserializeParser()
 m_ParserFunctions(Layer_MAX+1, &DeserializeParser::ParseUnsupportedLayer)
 {
     // register supported layers
-    m_ParserFunctions[Layer_AdditionLayer]   =  &DeserializeParser::ParseAdd;
+    m_ParserFunctions[Layer_AdditionLayer]         =  &DeserializeParser::ParseAdd;
+    m_ParserFunctions[Layer_MultiplicationLayer]   =  &DeserializeParser::ParseMultiplication;
 }
 
 DeserializeParser::LayerBaseRawPtr DeserializeParser::GetBaseLayer(const GraphPtr& graphPtr, unsigned int layerIndex)
@@ -145,6 +146,8 @@ DeserializeParser::LayerBaseRawPtr DeserializeParser::GetBaseLayer(const GraphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
         case Layer::Layer_InputLayer:
            return graphPtr->layers()->Get(layerIndex)->layer_as_InputLayer()->base()->base();
+        case Layer::Layer_MultiplicationLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_MultiplicationLayer()->base();
         case Layer::Layer_OutputLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_OutputLayer()->base()->base();
         case Layer::Layer_NONE:
@@ -574,6 +577,26 @@ void DeserializeParser::ParseAdd(unsigned int layerIndex)
 
     auto layerName = boost::str(boost::format("Addition:%1%") % layerIndex);
     IConnectableLayer* layer = m_Network->AddAdditionLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(layerIndex, layer);
+    RegisterOutputSlots(layerIndex, layer);
+}
+
+void DeserializeParser::ParseMultiplication(unsigned int layerIndex)
+{
+    CHECK_LAYERS(m_Graph, 0, layerIndex);
+    auto inputs = GetInputs(m_Graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = boost::str(boost::format("Multiplication:%1%") % layerIndex);
+    IConnectableLayer* layer = m_Network->AddMultiplicationLayer(layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

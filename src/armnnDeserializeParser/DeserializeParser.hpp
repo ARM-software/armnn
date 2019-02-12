@@ -64,6 +64,7 @@ private:
 
     void ParseUnsupportedLayer(unsigned int serializeGraphIndex);
     void ParseAdd(unsigned int serializeGraphIndex);
+    void ParseMultiplication(unsigned int serializeGraphIndex);
 
     void RegisterOutputSlotOfConnection(uint32_t connectionIndex, armnn::IOutputSlot* slot);
     void RegisterInputSlotOfConnection(uint32_t connectionIndex, armnn::IInputSlot* slot);

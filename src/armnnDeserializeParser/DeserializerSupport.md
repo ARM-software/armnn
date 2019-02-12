@@ -7,5 +7,6 @@ This reference guide provides a list of layers which can be deserialized current
 The Arm NN SDK Deserialize parser currently supports the following layers:
 
 * Addition
+* Multiplication
 
 More machine learning layers will be supported in future releases.

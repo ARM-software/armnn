@@ -552,6 +552,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnSerializer/Schema_generated.h
                 src/armnnSerializer/test/SerializerTests.cpp
                 src/armnnDeserializeParser/test/DeserializeAdd.cpp
+                src/armnnDeserializeParser/test/DeserializeMultiplication.cpp
                 src/armnnDeserializeParser/test/ParserFlatbuffersSerializeFixture.hpp
                 src/armnnDeserializeParser/test/SchemaSerialize.s
                 )

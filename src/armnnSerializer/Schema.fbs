@@ -65,7 +65,8 @@ table OutputSlot {
 enum LayerType : uint {
     Addition = 0,
     Input = 1,
-    Output = 2
+    Multiplication = 2,
+    Output = 3
 }
 
 // Base layer table to be used as part of other layers
@@ -91,6 +92,10 @@ table InputLayer {
     base:BindableLayerBase;
 }
 
+table MultiplicationLayer {
+    base:LayerBase;
+}
+
 table OutputLayer {
     base:BindableLayerBase;
 }
@@ -98,6 +103,7 @@ table OutputLayer {
 union Layer {
     AdditionLayer,
     InputLayer,
+    MultiplicationLayer,
     OutputLayer
 }
 

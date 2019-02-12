@@ -88,6 +88,20 @@ void Serializer::VisitAdditionLayer(const IConnectableLayer* layer, const char* 
     CreateAnyLayer(flatBufferAdditionLayer.o, serializer::Layer::Layer_AdditionLayer);
 }
 
+// Build FlatBuffer for Multiplication Layer
+void Serializer::VisitMultiplicationLayer(const IConnectableLayer* layer, const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferMultiplicationBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Multiplication);
+
+    // Create the FlatBuffer MultiplicationLayer
+    auto flatBufferMultiplicationLayer =
+        serializer::CreateMultiplicationLayer(m_flatBufferBuilder, flatBufferMultiplicationBaseLayer);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferMultiplicationLayer.o, serializer::Layer::Layer_MultiplicationLayer);
+}
+
 void Serializer::Serialize(const INetwork& inNetwork)
 {
     // Iterate through to network

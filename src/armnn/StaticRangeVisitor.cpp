@@ -72,6 +72,19 @@ void StaticRangeVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
     SetRange(layer, 0, -15.0f, 15.0f);
 }
 
+void StaticRangeVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
+                                                          const DepthwiseConvolution2dDescriptor& desc,
+                                                          const ConstTensor& weights,
+                                                          const Optional<ConstTensor>& biases,
+                                                          const char* name)
+{
+    boost::ignore_unused(desc);
+    boost::ignore_unused(weights);
+    boost::ignore_unused(biases);
+    boost::ignore_unused(name);
+    SetRange(layer, 0, -15.0f, 15.0f);
+}
+
 void StaticRangeVisitor::VisitActivationLayer(const IConnectableLayer* layer,
                                               const ActivationDescriptor& activationDescriptor,
                                               const char* name)

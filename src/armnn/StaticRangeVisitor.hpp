@@ -43,6 +43,12 @@ public:
                                  const Optional<ConstTensor>& biases,
                                  const char* name = nullptr) override;
 
+    void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
+                                          const DepthwiseConvolution2dDescriptor& desc,
+                                          const ConstTensor& weights,
+                                          const Optional<ConstTensor>& biases,
+                                          const char* name = nullptr) override;
+
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& activationDescriptor,
                               const char* name = nullptr) override;

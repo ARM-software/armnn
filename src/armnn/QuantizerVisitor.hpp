@@ -58,6 +58,12 @@ public:
                                  const Optional<ConstTensor>& biases,
                                  const char* name = nullptr) override;
 
+    void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
+                                          const DepthwiseConvolution2dDescriptor& desc,
+                                          const ConstTensor& weights,
+                                          const Optional<ConstTensor>& biases,
+                                          const char* name = nullptr) override;
+
     void VisitSoftmaxLayer(const IConnectableLayer* layer,
                            const SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;

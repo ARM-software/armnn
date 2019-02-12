@@ -563,17 +563,21 @@ public:
         // Based off current static value [-15.0f, 15.0f]
         BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / 255.0f, 0.000001f);
 
-        // Test weitghs
+        // Test weights
+        // Instantiate expected values
+        const float quantizationScale = 3.0f / 255.0f;
+        const float tolerance = 3.0f / 255.0f;
+        const int quantizationOffset = 85;
         BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-        BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), 3.0f / 255.0f, 0.000001f);
-        BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == 85));
+        BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), quantizationScale, tolerance);
+        BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == quantizationOffset));
 
         // Test biases
         if (biases.has_value())
         {
             BOOST_TEST((biases.value().GetInfo().GetDataType() == DataType::QuantisedAsymm8));
-            BOOST_CHECK_CLOSE(biases.value().GetInfo().GetQuantizationScale(), 3.0f / 255.0f, 0.000001f);
-            BOOST_TEST((biases.value().GetInfo().GetQuantizationOffset() == 85));
+            BOOST_CHECK_CLOSE(biases.value().GetInfo().GetQuantizationScale(), quantizationScale, tolerance);
+            BOOST_TEST((biases.value().GetInfo().GetQuantizationOffset() == quantizationOffset));
         }
     }
 };
@@ -627,6 +631,92 @@ BOOST_AUTO_TEST_CASE(QuantizeConvolution2d)
 BOOST_AUTO_TEST_CASE(QuantizeConvolution2dWithBiases)
 {
     TestQuantizeConvolution2d(true);
+}
+
+class TestDepthwiseConv2dQuantization : public TestQuantization
+{
+public:
+    virtual void VisitDepthwiseConvolution2dLayer(const IConnectableLayer *layer,
+                                                  const DepthwiseConvolution2dDescriptor& desc,
+                                                  const ConstTensor& weights,
+                                                  const Optional<ConstTensor>& biases,
+                                                  const char *name = nullptr)
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+        BOOST_TEST((info.GetQuantizationOffset() == 128));
+
+        // Based off current static value [-15.0f, 15.0f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 30.0f / 255.0f, 0.000001f);
+
+        // Test weights
+        // Instantiate expected values
+        const float quantizationScale = 3.0f / 255.0f;
+        const float tolerance = 3.0f / 255.0f;
+        const int quantizationOffset = 85;
+        BOOST_TEST((weights.GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+        BOOST_CHECK_CLOSE(weights.GetInfo().GetQuantizationScale(), quantizationScale, tolerance);
+        BOOST_TEST((weights.GetInfo().GetQuantizationOffset() == quantizationOffset));
+
+        // Test biases
+        if (biases.has_value())
+        {
+            BOOST_TEST((biases.value().GetInfo().GetDataType() == DataType::QuantisedAsymm8));
+            BOOST_CHECK_CLOSE(biases.value().GetInfo().GetQuantizationScale(), quantizationScale, tolerance);
+            BOOST_TEST((biases.value().GetInfo().GetQuantizationOffset() == quantizationOffset));
+        }
+    }
+};
+
+void TestQuantizeDepthwiseConvolution2d(bool useBiases)
+{
+    auto network = INetwork::Create();
+
+    TensorShape shape{3U};
+    TensorInfo info(shape, DataType::Float32);
+
+    std::vector<float> weightsData{-1.0f, 1.5f, 2.0f};
+    ConstTensor weights(info, weightsData);
+
+    DepthwiseConvolution2dDescriptor descriptor;
+    descriptor.m_BiasEnabled = useBiases;
+
+    // Add the layers
+    IConnectableLayer* input0 = network->AddInputLayer(0);
+    IConnectableLayer* depthwiseConv2d;
+    if (useBiases)
+    {
+        std::vector<float> biasesData{-1.0f, 1.5f, 2.0f};
+        ConstTensor biases(info, biasesData);
+        depthwiseConv2d = network->AddDepthwiseConvolution2dLayer(descriptor, weights, biases);
+    }
+    else
+    {
+        depthwiseConv2d = network->AddDepthwiseConvolution2dLayer(descriptor, weights);
+    }
+    IConnectableLayer* output = network->AddOutputLayer(1);
+
+    // Establish connections
+    input0->GetOutputSlot(0).Connect(depthwiseConv2d->GetInputSlot(0));
+    depthwiseConv2d->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Set TensorInfo
+    input0->GetOutputSlot(0).SetTensorInfo(info);
+    depthwiseConv2d->GetOutputSlot(0).SetTensorInfo(info);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestDepthwiseConv2dQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeDepthwiseConvolution2d)
+{
+    TestQuantizeDepthwiseConvolution2d(false);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeDepthwiseConvolution2dWithBiases)
+{
+    TestQuantizeDepthwiseConvolution2d(true);
 }
 
 class TestSoftmaxQuantization : public TestQuantization

@@ -177,6 +177,35 @@ void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
+                                                        const DepthwiseConvolution2dDescriptor& desc,
+                                                        const ConstTensor& weights,
+                                                        const Optional<ConstTensor>& biases,
+                                                        const char* name)
+{
+    std::vector<uint8_t> weightsBacking;
+    ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
+
+    IConnectableLayer* newLayer;
+    if (biases.has_value())
+    {
+        std::vector<uint8_t> biasesBacking;
+        ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+
+        newLayer = m_QuantizedNetwork->AddDepthwiseConvolution2dLayer(desc,
+                                                                      qWeights,
+                                                                      qBiases,
+                                                                      name);
+    }
+    else
+    {
+        newLayer = m_QuantizedNetwork->AddDepthwiseConvolution2dLayer(desc, qWeights, name);
+    }
+
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                          const SoftmaxDescriptor& softmaxDescriptor,
                                          const char* name)

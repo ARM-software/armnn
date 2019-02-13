@@ -134,6 +134,14 @@ void StaticRangeVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer
     ForwardParentParameters(layer);
 }
 
+void StaticRangeVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
+                                             const Pooling2dDescriptor& pooling2dDescriptor,
+                                             const char* name)
+{
+    boost::ignore_unused(pooling2dDescriptor);
+    ForwardParentParameters(layer);
+}
+
 void StaticRangeVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                            const SoftmaxDescriptor& softmaxDescriptor,
                                            const char* name)

@@ -879,5 +879,57 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+class TestPooling2dQuantization : public TestLeakyReLuActivationQuantization
+{
+public:
+    virtual void VisitPooling2dLayer(const IConnectableLayer* layer,
+                                     const Pooling2dDescriptor& desc,
+                                     const char* name = nullptr)
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 64));
+
+        // Based off parent LeakyReLu [-5.f, 15.f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f);
+    }
+};
+
+BOOST_AUTO_TEST_CASE(QuantizePooling2d)
+{
+    auto network = INetwork::Create();
+
+    TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+
+    Pooling2dDescriptor desc;
+    ActivationDescriptor activationDescriptor;
+    activationDescriptor.m_Function = ActivationFunction::LeakyReLu;
+    activationDescriptor.m_A        = 3.5f;
+    activationDescriptor.m_B        = -10.0f;
+
+    // Add the layers
+    IConnectableLayer* input0 = network->AddInputLayer(0);
+    IConnectableLayer* activation = network->AddActivationLayer(activationDescriptor);
+    IConnectableLayer* pooling2d = network->AddPooling2dLayer(desc);
+    IConnectableLayer* output = network->AddOutputLayer(3);
+
+    // Establish connections
+    input0->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(pooling2d->GetInputSlot(0));
+    pooling2d->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Set TensorInfo
+    input0->GetOutputSlot(0).SetTensorInfo(info);
+    activation->GetOutputSlot(0).SetTensorInfo(info);
+    pooling2d->GetOutputSlot(0).SetTensorInfo(info);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestPooling2dQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 } // namespace armnn

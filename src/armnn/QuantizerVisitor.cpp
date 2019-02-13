@@ -224,6 +224,15 @@ void QuantizerVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
+                                           const Pooling2dDescriptor& pooling2dDescriptor,
+                                           const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddPooling2dLayer(pooling2dDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                          const SoftmaxDescriptor& softmaxDescriptor,
                                          const char* name)

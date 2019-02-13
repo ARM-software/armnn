@@ -63,6 +63,10 @@ public:
                                   const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                   const char* name = nullptr) override;
 
+    void VisitPooling2dLayer(const IConnectableLayer* layer,
+                             const Pooling2dDescriptor& pooling2dDescriptor,
+                             const char* name) override;
+
     void VisitSoftmaxLayer(const IConnectableLayer* layer,
                            const SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;

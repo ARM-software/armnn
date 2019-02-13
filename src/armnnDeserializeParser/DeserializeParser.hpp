@@ -42,7 +42,7 @@ public:
 
 public:
     // testable helpers
-    static GraphPtr LoadGraphFromFile(const char* fileName);
+    static GraphPtr LoadGraphFromFile(const char* fileName, std::string& fileContent);
     static GraphPtr LoadGraphFromBinary(const uint8_t* binaryContent, size_t len);
     static TensorRawPtrVector GetInputs(const GraphPtr& graph, unsigned int layerIndex);
     static TensorRawPtrVector GetOutputs(const GraphPtr& graph, unsigned int layerIndex);
@@ -81,6 +81,10 @@ private:
     armnn::INetworkPtr                    m_Network;
     GraphPtr                              m_Graph;
     std::vector<LayerParsingFunction>     m_ParserFunctions;
+
+    /// This holds the data of the file that was read in from CreateNetworkFromBinaryFile
+    /// Needed for m_Graph to point to
+    std::string                           m_FileContent;
 
     /// A mapping of an output slot to each of the input slots it should be connected to
     /// The outputSlot is from the layer that creates this tensor as one of its outputs

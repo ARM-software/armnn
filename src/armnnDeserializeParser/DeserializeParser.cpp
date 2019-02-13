@@ -72,7 +72,7 @@ void CheckLayers(const DeserializeParser::GraphPtr& graph,
             boost::str(
                 boost::format("%1% was called with invalid (null) graph. "
                               "Possible reason is that the graph is not yet loaded and Unpack(ed). "
-                              "layers:%2% at %4%") %
+                              "layers:%2% at %3%") %
                 location.m_Function %
                 layersIndex %
                 location.FileLine()));
@@ -82,7 +82,7 @@ void CheckLayers(const DeserializeParser::GraphPtr& graph,
         throw ParseException(
             boost::str(
                 boost::format("%1% was called with an invalid layers index. "
-                              "layers:%2% at %4%") %
+                              "layers:%2% at %3%") %
                 location.m_Function %
                 layersIndex %
                 location.FileLine()));
@@ -322,7 +322,7 @@ void IDeserializeParser::Destroy(IDeserializeParser* parser)
 INetworkPtr DeserializeParser::CreateNetworkFromBinaryFile(const char* graphFile)
 {
     ResetParser();
-    m_Graph = LoadGraphFromFile(graphFile);
+    m_Graph = LoadGraphFromFile(graphFile, m_FileContent);
     return CreateNetworkFromGraph();
 }
 
@@ -333,7 +333,7 @@ INetworkPtr DeserializeParser::CreateNetworkFromBinary(const std::vector<uint8_t
      return CreateNetworkFromGraph();
 }
 
-DeserializeParser::GraphPtr DeserializeParser::LoadGraphFromFile(const char* fileName)
+DeserializeParser::GraphPtr DeserializeParser::LoadGraphFromFile(const char* fileName, std::string& fileContent)
 {
     if (fileName == nullptr)
     {
@@ -350,7 +350,8 @@ DeserializeParser::GraphPtr DeserializeParser::LoadGraphFromFile(const char* fil
                                                CHECK_LOCATION().AsString()));
     }
     std::ifstream file(fileName, std::ios::binary);
-    std::string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    fileContent = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
     return LoadGraphFromBinary(reinterpret_cast<const uint8_t*>(fileContent.c_str()), fileContent.size());
 }
 
@@ -606,5 +607,3 @@ void DeserializeParser::ParseMultiplication(unsigned int layerIndex)
 }
 
 }
-
-

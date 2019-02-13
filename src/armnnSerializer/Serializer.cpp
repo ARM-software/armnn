@@ -36,7 +36,7 @@ serializer::DataType GetFlatBufferDataType(DataType dataType)
 }
 
 // Build FlatBuffer for Input Layer
-void Serializer::VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
+void SerializerVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
     // Create FlatBuffer BaseLayer
     auto flatBufferInputBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Input);
@@ -57,7 +57,7 @@ void Serializer::VisitInputLayer(const IConnectableLayer* layer, LayerBindingId 
 }
 
 // Build FlatBuffer for Output Layer
-void Serializer::VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
+void SerializerVisitor::VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
     // Create FlatBuffer BaseLayer
     auto flatBufferOutputBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Output);
@@ -76,7 +76,7 @@ void Serializer::VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId
 }
 
 // Build FlatBuffer for Addition Layer
-void Serializer::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
+void SerializerVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
 {
     // Create FlatBuffer BaseLayer
     auto flatBufferAdditionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Addition);
@@ -89,7 +89,7 @@ void Serializer::VisitAdditionLayer(const IConnectableLayer* layer, const char* 
 }
 
 // Build FlatBuffer for Multiplication Layer
-void Serializer::VisitMultiplicationLayer(const IConnectableLayer* layer, const char* name)
+void SerializerVisitor::VisitMultiplicationLayer(const IConnectableLayer* layer, const char* name)
 {
     // Create FlatBuffer BaseLayer
     auto flatBufferMultiplicationBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Multiplication);
@@ -102,29 +102,8 @@ void Serializer::VisitMultiplicationLayer(const IConnectableLayer* layer, const 
     CreateAnyLayer(flatBufferMultiplicationLayer.o, serializer::Layer::Layer_MultiplicationLayer);
 }
 
-void Serializer::Serialize(const INetwork& inNetwork)
-{
-    // Iterate through to network
-    inNetwork.Accept(*this);
-
-    // Create FlatBuffer SerializedGraph
-    auto serializedGraph = serializer::CreateSerializedGraph(m_flatBufferBuilder,
-                                                             m_flatBufferBuilder.CreateVector(m_serializedLayers),
-                                                             m_flatBufferBuilder.CreateVector(m_inputIds),
-                                                             m_flatBufferBuilder.CreateVector(m_outputIds));
-
-    // Serialize the graph
-    m_flatBufferBuilder.Finish(serializedGraph);
-}
-
-bool Serializer::SaveSerializedToStream(std::ostream& stream)
-{
-    stream.write(reinterpret_cast<const char*>(m_flatBufferBuilder.GetBufferPointer()), m_flatBufferBuilder.GetSize());
-    return !stream.bad();
-}
-
-fb::Offset<serializer::LayerBase> Serializer::CreateLayerBase(const IConnectableLayer* layer,
-                                                              const serializer::LayerType layerType)
+fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
+                                                                     const serializer::LayerType layerType)
 {
     std::vector<fb::Offset<serializer::InputSlot>> inputSlots = CreateInputSlots(layer);
     std::vector<fb::Offset<serializer::OutputSlot>> outputSlots = CreateOutputSlots(layer);
@@ -137,7 +116,7 @@ fb::Offset<serializer::LayerBase> Serializer::CreateLayerBase(const IConnectable
                                        m_flatBufferBuilder.CreateVector(outputSlots));
 }
 
-void Serializer::CreateAnyLayer(const flatbuffers::Offset<void>& layer, const serializer::Layer serializerLayer)
+void SerializerVisitor::CreateAnyLayer(const flatbuffers::Offset<void>& layer, const serializer::Layer serializerLayer)
 {
     auto anyLayer = armnn::armnnSerializer::CreateAnyLayer(m_flatBufferBuilder,
                                                            serializerLayer,
@@ -145,7 +124,7 @@ void Serializer::CreateAnyLayer(const flatbuffers::Offset<void>& layer, const se
     m_serializedLayers.push_back(anyLayer);
 }
 
-std::vector<fb::Offset<serializer::InputSlot>> Serializer::CreateInputSlots(const IConnectableLayer* layer)
+std::vector<fb::Offset<serializer::InputSlot>> SerializerVisitor::CreateInputSlots(const IConnectableLayer* layer)
 {
     std::vector<fb::Offset <serializer::InputSlot>> inputSlots;
 
@@ -165,7 +144,7 @@ std::vector<fb::Offset<serializer::InputSlot>> Serializer::CreateInputSlots(cons
     return inputSlots;
 }
 
-std::vector<fb::Offset<serializer::OutputSlot>> Serializer::CreateOutputSlots(const IConnectableLayer* layer)
+std::vector<fb::Offset<serializer::OutputSlot>> SerializerVisitor::CreateOutputSlots(const IConnectableLayer* layer)
 {
     std::vector<fb::Offset<serializer::OutputSlot>> outputSlots;
 
@@ -197,4 +176,45 @@ std::vector<fb::Offset<serializer::OutputSlot>> Serializer::CreateOutputSlots(co
     return outputSlots;
 }
 
-} //namespace armnnSerializer
+
+ISerializer* ISerializer::CreateRaw()
+{
+    return new Serializer();
+}
+
+ISerializerPtr ISerializer::Create()
+{
+    return ISerializerPtr(CreateRaw(), &ISerializer::Destroy);
+}
+
+void ISerializer::Destroy(ISerializer* serializer)
+{
+    delete serializer;
+}
+
+void Serializer::Serialize(const INetwork& inNetwork)
+{
+    // Iterate through to network
+    inNetwork.Accept(m_SerializerVisitor);
+    flatbuffers::FlatBufferBuilder& fbBuilder = m_SerializerVisitor.GetFlatBufferBuilder();
+
+    // Create FlatBuffer SerializedGraph
+    auto serializedGraph = serializer::CreateSerializedGraph(
+        fbBuilder,
+        fbBuilder.CreateVector(m_SerializerVisitor.GetSerializedLayers()),
+        fbBuilder.CreateVector(m_SerializerVisitor.GetInputIds()),
+        fbBuilder.CreateVector(m_SerializerVisitor.GetOutputIds()));
+
+    // Serialize the graph
+    fbBuilder.Finish(serializedGraph);
+}
+
+bool Serializer::SaveSerializedToStream(std::ostream& stream)
+{
+    flatbuffers::FlatBufferBuilder& fbBuilder = m_SerializerVisitor.GetFlatBufferBuilder();
+
+    stream.write(reinterpret_cast<const char*>(fbBuilder.GetBufferPointer()), fbBuilder.GetSize());
+    return !stream.bad();
+}
+
+} //nameespace armnnSerializer

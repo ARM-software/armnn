@@ -158,6 +158,7 @@ if(BUILD_ARMNN_SERIALIZER)
 
     set(armnn_serializer_sources)
     list(APPEND armnn_serializer_sources
+        include/armnnSerializer/ISerializer.hpp
         include/armnnDeserializeParser/IDeserializeParser.hpp
         src/armnnSerializer/Schema_generated.h
         src/armnnSerializer/Serializer.hpp

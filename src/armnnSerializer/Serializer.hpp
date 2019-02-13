@@ -6,17 +6,40 @@
 
 #include <armnn/ILayerVisitor.hpp>
 #include <armnn/LayerVisitorBase.hpp>
+
+#include <armnnSerializer/ISerializer.hpp>
+
 #include <iostream>
 #include <Schema_generated.h>
 
 namespace armnnSerializer
 {
 
-class Serializer : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+class SerializerVisitor : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
 {
 public:
-    Serializer() {};
-    ~Serializer() {};
+    SerializerVisitor() {};
+    ~SerializerVisitor() {};
+
+    flatbuffers::FlatBufferBuilder& GetFlatBufferBuilder()
+    {
+        return m_flatBufferBuilder;
+    }
+
+    std::vector<unsigned int>& GetInputIds()
+    {
+        return m_inputIds;
+    }
+
+    std::vector<unsigned int>& GetOutputIds()
+    {
+        return m_outputIds;
+    }
+
+    std::vector<flatbuffers::Offset<armnn::armnnSerializer::AnyLayer>>& GetSerializedLayers()
+    {
+        return m_serializedLayers;
+    }
 
     void VisitAdditionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
@@ -31,15 +54,6 @@ public:
 
     void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,
                                   const char* name = nullptr) override;
-
-    /// Serializes the network to ArmNN SerializedGraph.
-    /// @param [in] inNetwork The network to be serialized.
-    void Serialize(const armnn::INetwork& inNetwork);
-
-    /// Serializes the SerializedGraph to the stream.
-    /// @param [stream] the stream to save to
-    /// @return true if graph is Serialized to the Stream, false otherwise
-    bool SaveSerializedToStream(std::ostream& stream);
 
 private:
 
@@ -70,6 +84,27 @@ private:
 
     /// Guids of all Output Layers required by the SerializedGraph.
     std::vector<unsigned int> m_outputIds;
+};
+
+class Serializer : public ISerializer
+{
+public:
+    Serializer() {};
+    ~Serializer() {};
+
+    /// Serializes the network to ArmNN SerializedGraph.
+    /// @param [in] inNetwork The network to be serialized.
+    void Serialize(const armnn::INetwork& inNetwork) override;
+
+    /// Serializes the SerializedGraph to the stream.
+    /// @param [stream] the stream to save to
+    /// @return true if graph is Serialized to the Stream, false otherwise
+    bool SaveSerializedToStream(std::ostream& stream) override;
+
+private:
+
+    /// Visitor to contruct serialized network
+    SerializerVisitor m_SerializerVisitor;
 };
 
 } //namespace armnnSerializer

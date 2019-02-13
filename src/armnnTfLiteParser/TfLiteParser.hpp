@@ -100,6 +100,7 @@ private:
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
     void ParseMaxPool2D(size_t subgraphIndex, size_t operatorIndex);
+    void ParseMaximum(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);
     void ParseReshape(size_t subgraphIndex, size_t operatorIndex);

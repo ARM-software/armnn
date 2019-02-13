@@ -549,6 +549,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/DepthwiseConvolution2D.cpp
              src/armnnTfLiteParser/test/DetectionPostProcess.cpp
              src/armnnTfLiteParser/test/FullyConnected.cpp
+             src/armnnTfLiteParser/test/Maximum.cpp
              src/armnnTfLiteParser/test/MaxPool2D.cpp
              src/armnnTfLiteParser/test/Mean.cpp
              src/armnnTfLiteParser/test/Multiplication.cpp

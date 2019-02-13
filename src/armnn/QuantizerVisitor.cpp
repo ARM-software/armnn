@@ -215,6 +215,15 @@ void QuantizerVisitor::VisitPermuteLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
+                                                const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                                const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSpaceToBatchNdLayer(spaceToBatchNdDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                          const SoftmaxDescriptor& softmaxDescriptor,
                                          const char* name)

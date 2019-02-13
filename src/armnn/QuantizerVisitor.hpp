@@ -72,6 +72,10 @@ public:
                            const PermuteDescriptor& permuteDescriptor,
                            const char* name = nullptr) override;
 
+    void VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
+                                  const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                  const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

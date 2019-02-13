@@ -121,6 +121,16 @@ void StaticRangeVisitor::VisitPermuteLayer(const IConnectableLayer* layer,
                                            const char* name)
 {
     boost::ignore_unused(permuteDescriptor);
+    boost::ignore_unused(name);
+    ForwardParentParameters(layer);
+}
+
+void StaticRangeVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
+                                                  const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                                  const char* name)
+{
+    boost::ignore_unused(spaceToBatchNdDescriptor);
+    boost::ignore_unused(name);
     ForwardParentParameters(layer);
 }
 

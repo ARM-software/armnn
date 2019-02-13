@@ -59,6 +59,10 @@ public:
                            const PermuteDescriptor& permuteDescriptor,
                            const char* name) override;
 
+    void VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
+                                  const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                  const char* name = nullptr) override;
+
     void VisitSoftmaxLayer(const IConnectableLayer* layer,
                            const SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;

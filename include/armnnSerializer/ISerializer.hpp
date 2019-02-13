@@ -31,7 +31,7 @@ public:
     virtual bool SaveSerializedToStream(std::ostream& stream) = 0;
 
 protected:
-    virtual ~ISerializer() {};
+    virtual ~ISerializer() {}
 };
 
 } //namespace armnnSerializer

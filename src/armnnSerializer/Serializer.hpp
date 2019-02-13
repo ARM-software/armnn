@@ -18,8 +18,8 @@ namespace armnnSerializer
 class SerializerVisitor : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
 {
 public:
-    SerializerVisitor() {};
-    ~SerializerVisitor() {};
+    SerializerVisitor() {}
+    ~SerializerVisitor() {}
 
     flatbuffers::FlatBufferBuilder& GetFlatBufferBuilder()
     {
@@ -89,8 +89,8 @@ private:
 class Serializer : public ISerializer
 {
 public:
-    Serializer() {};
-    ~Serializer() {};
+    Serializer() {}
+    ~Serializer() {}
 
     /// Serializes the network to ArmNN SerializedGraph.
     /// @param [in] inNetwork The network to be serialized.

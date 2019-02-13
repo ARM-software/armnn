@@ -218,4 +218,4 @@ bool Serializer::SaveSerializedToStream(std::ostream& stream)
     return !stream.bad();
 }
 
-} //nameespace armnnSerializer
+} // namespace armnnSerializer

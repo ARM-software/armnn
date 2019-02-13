@@ -561,6 +561,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/SpaceToBatchND.cpp
              src/armnnTfLiteParser/test/Sub.cpp
              src/armnnTfLiteParser/test/Squeeze.cpp
+             src/armnnTfLiteParser/test/StridedSlice.cpp
              src/armnnTfLiteParser/test/LoadModel.cpp
              src/armnnTfLiteParser/test/GetBuffer.cpp
              src/armnnTfLiteParser/test/OutputShapeOfSqueeze.cpp

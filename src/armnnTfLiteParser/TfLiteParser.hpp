@@ -109,6 +109,7 @@ private:
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
+    void ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSub(size_t subgraphIndex, size_t operatorIndex);
     void ParseAdd(size_t subgraphIndex, size_t operatorIndex);
     void ParseMul(size_t subgraphIndex, size_t operatorIndex);

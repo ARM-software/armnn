@@ -436,6 +436,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]           =  &TfLiteParser::ParseSoftmax;
     m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND] =  &TfLiteParser::ParseSpaceToBatchND;
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]           =  &TfLiteParser::ParseSqueeze;
+    m_ParserFunctions[tflite::BuiltinOperator_STRIDED_SLICE]     =  &TfLiteParser::ParseStridedSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SUB]               =  &TfLiteParser::ParseSub;
     m_ParserFunctions[tflite::BuiltinOperator_ADD]               =  &TfLiteParser::ParseAdd;
     m_ParserFunctions[tflite::BuiltinOperator_MUL]               =  &TfLiteParser::ParseMul;
@@ -1182,6 +1183,62 @@ void TfLiteParser::ParseSqueeze(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = boost::str(boost::format("Squeeze:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 4);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto * options = operatorPtr->builtin_options.AsStridedSliceOptions();
+
+    StridedSliceDescriptor desc;
+    desc.m_BeginMask = options->begin_mask;
+    desc.m_EllipsisMask = options->ellipsis_mask;
+    desc.m_EndMask = options->end_mask;
+    desc.m_NewAxisMask = options->new_axis_mask;
+    desc.m_ShrinkAxisMask = options->shrink_axis_mask;
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
+
+    armnn::TensorInfo beginTensorInfo = ToTensorInfo(inputs[1]);
+    BufferRawPtr beginBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+
+    std::vector<int> begin(beginTensorInfo.GetNumElements());
+    ::memcpy(begin.data(), beginBufferPtr->data.data(), beginTensorInfo.GetNumBytes());
+
+    armnn::TensorInfo endTensorInfo = ToTensorInfo(inputs[2]);
+    BufferRawPtr endBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+
+    std::vector<int> end(endTensorInfo.GetNumElements());
+    ::memcpy(end.data(), endBufferPtr->data.data(), endTensorInfo.GetNumBytes());
+
+    armnn::TensorInfo strideTensorInfo = ToTensorInfo(inputs[3]);
+    BufferRawPtr strideBufferPtr = GetBuffer(m_Model, inputs[3]->buffer);
+
+    std::vector<int> stride(strideTensorInfo.GetNumElements());
+    ::memcpy(stride.data(), strideBufferPtr->data.data(), strideTensorInfo.GetNumBytes());
+
+    desc.m_Begin = begin;
+    desc.m_End = end;
+    desc.m_Stride = stride;
+
+    auto layerName = boost::str(boost::format("StridedSlice:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddStridedSliceLayer(desc, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));

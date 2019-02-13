@@ -552,6 +552,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Maximum.cpp
              src/armnnTfLiteParser/test/MaxPool2D.cpp
              src/armnnTfLiteParser/test/Mean.cpp
+             src/armnnTfLiteParser/test/Minimum.cpp
              src/armnnTfLiteParser/test/Multiplication.cpp
              src/armnnTfLiteParser/test/Pad.cpp
              src/armnnTfLiteParser/test/Reshape.cpp

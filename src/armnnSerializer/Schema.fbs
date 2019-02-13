@@ -66,7 +66,8 @@ enum LayerType : uint {
     Addition = 0,
     Input = 1,
     Multiplication = 2,
-    Output = 3
+    Output = 3,
+    Softmax = 4
 }
 
 // Base layer table to be used as part of other layers
@@ -96,6 +97,15 @@ table MultiplicationLayer {
     base:LayerBase;
 }
 
+table SoftmaxLayer {
+    base:LayerBase;
+    descriptor:SoftmaxDescriptor;
+}
+
+table SoftmaxDescriptor {
+    beta:float;
+}
+
 table OutputLayer {
     base:BindableLayerBase;
 }
@@ -104,7 +114,8 @@ union Layer {
     AdditionLayer,
     InputLayer,
     MultiplicationLayer,
-    OutputLayer
+    OutputLayer,
+    SoftmaxLayer
 }
 
 table AnyLayer {

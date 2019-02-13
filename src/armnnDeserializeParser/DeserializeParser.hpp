@@ -62,9 +62,10 @@ private:
     // signature for the parser functions
     using LayerParsingFunction = void(DeserializeParser::*)(unsigned int layerIndex);
 
-    void ParseUnsupportedLayer(unsigned int serializeGraphIndex);
-    void ParseAdd(unsigned int serializeGraphIndex);
-    void ParseMultiplication(unsigned int serializeGraphIndex);
+    void ParseUnsupportedLayer(unsigned int layerIndex);
+    void ParseAdd(unsigned int layerIndex);
+    void ParseMultiplication(unsigned int layerIndex);
+    void ParseSoftmax(unsigned int layerIndex);
 
     void RegisterOutputSlotOfConnection(uint32_t connectionIndex, armnn::IOutputSlot* slot);
     void RegisterInputSlotOfConnection(uint32_t connectionIndex, armnn::IInputSlot* slot);

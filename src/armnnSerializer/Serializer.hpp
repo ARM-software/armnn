@@ -9,7 +9,6 @@
 
 #include <armnnSerializer/ISerializer.hpp>
 
-#include <iostream>
 #include <unordered_map>
 
 #include <Schema_generated.h>
@@ -56,6 +55,10 @@ public:
 
     void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,
                                   const char* name = nullptr) override;
+
+    void VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                           const armnn::SoftmaxDescriptor& softmaxDescriptor,
+                           const char* name = nullptr) override;
 
 private:
 

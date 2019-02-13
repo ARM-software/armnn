@@ -119,6 +119,27 @@ void SerializerVisitor::VisitMultiplicationLayer(const IConnectableLayer* layer,
     CreateAnyLayer(flatBufferMultiplicationLayer.o, serializer::Layer::Layer_MultiplicationLayer);
 }
 
+// Build FlatBuffer for Softmax Layer
+void SerializerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
+                                          const SoftmaxDescriptor& softmaxDescriptor,
+                                          const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferSoftmaxBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Softmax);
+
+    // Create the FlatBuffer SoftmaxDescriptor
+    auto flatBufferSoftmaxDesc =
+        serializer::CreateSoftmaxDescriptor(m_flatBufferBuilder, softmaxDescriptor.m_Beta);
+
+    // Create the FlatBuffer SoftmaxLayer
+    auto flatBufferSoftmaxLayer =
+        serializer::CreateSoftmaxLayer(m_flatBufferBuilder,
+                                       flatBufferSoftmaxBaseLayer,
+                                       flatBufferSoftmaxDesc);
+
+    CreateAnyLayer(flatBufferSoftmaxLayer.o, serializer::Layer::Layer_SoftmaxLayer);
+}
+
 fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {

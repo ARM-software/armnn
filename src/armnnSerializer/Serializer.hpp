@@ -10,6 +10,8 @@
 #include <armnnSerializer/ISerializer.hpp>
 
 #include <iostream>
+#include <unordered_map>
+
 #include <Schema_generated.h>
 
 namespace armnnSerializer
@@ -18,7 +20,7 @@ namespace armnnSerializer
 class SerializerVisitor : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
 {
 public:
-    SerializerVisitor() {}
+    SerializerVisitor() : m_layerId(0) {};
     ~SerializerVisitor() {}
 
     flatbuffers::FlatBufferBuilder& GetFlatBufferBuilder()
@@ -65,6 +67,9 @@ private:
     /// Creates the serializer AnyLayer for the layer and adds it to m_serializedLayers.
     void CreateAnyLayer(const flatbuffers::Offset<void>& layer, const armnn::armnnSerializer::Layer serializerLayer);
 
+    ///Function which maps Guid to an index
+    uint32_t GetSerializedId(unsigned int guid);
+
     /// Creates the serializer InputSlots for the layer.
     std::vector<flatbuffers::Offset<armnn::armnnSerializer::InputSlot>> CreateInputSlots(
             const armnn::IConnectableLayer* layer);
@@ -84,6 +89,12 @@ private:
 
     /// Guids of all Output Layers required by the SerializedGraph.
     std::vector<unsigned int> m_outputIds;
+
+    /// Mapped Guids of all Layers to match our index.
+    std::unordered_map<unsigned int, uint32_t > m_guidMap;
+
+    /// layer within our FlatBuffer index.
+    uint32_t m_layerId;
 };
 
 class Serializer : public ISerializer

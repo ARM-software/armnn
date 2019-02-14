@@ -35,6 +35,23 @@ serializer::DataType GetFlatBufferDataType(DataType dataType)
     }
 }
 
+uint32_t SerializerVisitor::GetSerializedId(unsigned int guid)
+{
+    std::pair<unsigned int, uint32_t> guidPair(guid, m_layerId);
+
+    if (m_guidMap.empty())
+    {
+        m_guidMap.insert(guidPair);
+    }
+    else if (m_guidMap.find(guid) == m_guidMap.end())
+    {
+        guidPair.second = ++m_layerId;
+        m_guidMap.insert(guidPair);
+        return m_layerId;
+    }
+    return m_layerId;
+}
+
 // Build FlatBuffer for Input Layer
 void SerializerVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
@@ -47,7 +64,7 @@ void SerializerVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBin
                                                                                 id);
 
     // Push layer Guid to outputIds.
-    m_inputIds.push_back(layer->GetGuid());
+    m_inputIds.push_back(GetSerializedId(layer->GetGuid()));
 
     // Create the FlatBuffer InputLayer
     auto flatBufferInputLayer = serializer::CreateInputLayer(m_flatBufferBuilder, flatBufferInputBindableBaseLayer);
@@ -67,7 +84,7 @@ void SerializerVisitor::VisitOutputLayer(const IConnectableLayer* layer, LayerBi
                                                                                  flatBufferOutputBaseLayer,
                                                                                  id);
     // Push layer Guid to outputIds.
-    m_outputIds.push_back(layer->GetGuid());
+    m_outputIds.push_back(GetSerializedId(layer->GetGuid()));
 
     // Create the FlatBuffer OutputLayer
     auto flatBufferOutputLayer = serializer::CreateOutputLayer(m_flatBufferBuilder, flatBufferOutputBindableBaseLayer);
@@ -109,7 +126,7 @@ fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConn
     std::vector<fb::Offset<serializer::OutputSlot>> outputSlots = CreateOutputSlots(layer);
 
     return serializer::CreateLayerBase(m_flatBufferBuilder,
-                                       layer->GetGuid(),
+                                       GetSerializedId(layer->GetGuid()),
                                        m_flatBufferBuilder.CreateString(layer->GetName()),
                                        layerType,
                                        m_flatBufferBuilder.CreateVector(inputSlots),
@@ -137,7 +154,8 @@ std::vector<fb::Offset<serializer::InputSlot>> SerializerVisitor::CreateInputSlo
         const IOutputSlot* connection = inputSlot.GetConnection();
 
         // Create FlatBuffer Connection
-        serializer::Connection conn(connection->GetOwningLayerGuid(), connection->CalculateIndexOnOwner());
+        serializer::Connection conn(GetSerializedId(inputSlot.GetConnection()->GetOwningLayerGuid()),
+                                    connection->CalculateIndexOnOwner());
         // Create FlatBuffer InputSlot
         inputSlots.push_back(serializer::CreateInputSlot(m_flatBufferBuilder, slotIndex, &conn));
     }

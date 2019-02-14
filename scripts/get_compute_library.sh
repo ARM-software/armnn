@@ -68,7 +68,7 @@ pushd clframework > /dev/null
 # git fetch  https://review.mlplatform.org/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
 
 # For pinning to a revision use this:
-CLFRAMEWORKREVISION="83bbf77358fa682e426b80d92de5a0c1ba05347d" # Master towards 19.02
+CLFRAMEWORKREVISION="6eb90d7d8ef73decf6e3973a89c2b2badd0b9635" # Master towards 19.02
 git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode
 

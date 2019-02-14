@@ -198,4 +198,13 @@ void StaticRangeVisitor::VisitMergerLayer(const IConnectableLayer* layer,
     SetRange(layer, 0, min, max);
 }
 
+void StaticRangeVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
+                                           const ReshapeDescriptor& reshapeDescriptor,
+                                           const char* name)
+{
+    boost::ignore_unused(reshapeDescriptor);
+    boost::ignore_unused(name);
+    ForwardParentParameters(layer);
+}
+
 } //namespace armnn

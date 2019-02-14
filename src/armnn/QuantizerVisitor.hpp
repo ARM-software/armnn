@@ -88,6 +88,10 @@ public:
                           const OriginsDescriptor& mergerDescriptor,
                           const char* name = nullptr) override;
 
+    void VisitReshapeLayer(const IConnectableLayer* layer,
+                           const ReshapeDescriptor& reshapeDescriptor,
+                           const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

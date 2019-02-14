@@ -1052,5 +1052,36 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeReshape)
+{
+    class TestReshapeQuantization : public TestLeakyReLuActivationQuantization
+    {
+    public:
+        virtual void VisitReshapeLayer(const IConnectableLayer* layer,
+                                       const ReshapeDescriptor& reshapeDescriptor,
+                                       const char* name = nullptr) override
+        {
+            CheckForwardedQuantizationSettings(layer);
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+
+    IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
+
+    // Add the layer under test
+    ReshapeDescriptor descriptor({1, 2, 3, 4});
+    IConnectableLayer* reshape = network->AddReshapeLayer(descriptor);
+
+    CompleteLeakyReluNetwork(network.get(), activation, reshape, info);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestReshapeQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 } // namespace armnn

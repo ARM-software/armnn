@@ -262,4 +262,13 @@ void QuantizerVisitor::VisitConstantLayer(const IConnectableLayer* layer,
     RecordLayer(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
+                                         const ReshapeDescriptor& reshapeDescriptor,
+                                         const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddReshapeLayer(reshapeDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 } //namespace armnn

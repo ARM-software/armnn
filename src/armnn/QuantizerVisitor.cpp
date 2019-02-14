@@ -233,6 +233,15 @@ void QuantizerVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitMergerLayer(const IConnectableLayer* layer,
+                                        const OriginsDescriptor& mergerDescriptor,
+                                        const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddMergerLayer(mergerDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                          const SoftmaxDescriptor& softmaxDescriptor,
                                          const char* name)

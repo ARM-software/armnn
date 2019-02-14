@@ -177,7 +177,24 @@ void StaticRangeVisitor::VisitConstantLayer(const IConnectableLayer* layer,
         min = std::min(min, inputValue);
         max = std::max(max, inputValue);
     }
+    SetRange(layer, 0, min, max);
+}
 
+void StaticRangeVisitor::VisitMergerLayer(const IConnectableLayer* layer,
+                                          const OriginsDescriptor& mergerDescriptor,
+                                          const char* name)
+{
+    float min = std::numeric_limits<float>::max();
+    float max = std::numeric_limits<float>::lowest();
+    for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)
+    {
+        const IOutputSlot* outputSlot = layer->GetInputSlot(i).GetConnection();
+        LayerGuid layerId = outputSlot->GetOwningLayerGuid();
+        unsigned int slotIndex = outputSlot->CalculateIndexOnOwner();
+        RangeTracker::MinMaxRange range = m_RangeTracker.GetRange(layerId, slotIndex);
+        min = std::min(min, range.first);
+        max = std::max(max, range.second);
+    }
     SetRange(layer, 0, min, max);
 }
 

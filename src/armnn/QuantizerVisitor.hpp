@@ -84,6 +84,10 @@ public:
                             const ConstTensor& input,
                             const char* name = nullptr) override;
 
+    void VisitMergerLayer(const IConnectableLayer* layer,
+                          const OriginsDescriptor& mergerDescriptor,
+                          const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

@@ -75,6 +75,10 @@ public:
                             const ConstTensor& input,
                             const char* name = nullptr) override;
 
+    void VisitMergerLayer(const IConnectableLayer* layer,
+                          const OriginsDescriptor& mergerDescriptor,
+                          const char* name = nullptr) override;
+
 private:
     /// Set the range for an output slot on a layer
     void SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max);

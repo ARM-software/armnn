@@ -293,7 +293,7 @@ protected:
         BOOST_TEST((info.GetQuantizationOffset() == 64));
 
         // Based off parent LeakyReLu [-5.f, 15.f]
-        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/255.0f, 0.000001f);
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/g_QuantizationBase, g_TestTolerance);
     }
 };
 
@@ -974,6 +974,81 @@ BOOST_AUTO_TEST_CASE(QuantizeConstant)
 
     auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
     TestConstantQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeMerger)
+{
+    class TestMergerVisitor : public LayerVisitorBase<VisitorThrowingPolicy>
+    {
+    public:
+        TestMergerVisitor(float min, float max) : m_Min(min), m_Max(max) {}
+
+        virtual void VisitInputLayer(const IConnectableLayer* layer,
+                                     LayerBindingId id,
+                                     const char* name = nullptr)
+        {}
+        virtual void VisitOutputLayer(const IConnectableLayer* layer,
+                                      LayerBindingId id,
+                                      const char* name = nullptr)
+        {}
+        virtual void VisitMergerLayer(const IConnectableLayer* layer,
+                                      const OriginsDescriptor& mergerDescriptor,
+                                      const char* name = nullptr)
+        {
+            std::pair<int, float> expectedValues = ComputeQAsymmParams(8, m_Min, m_Max);
+
+            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+            BOOST_TEST((info.GetQuantizationOffset() == expectedValues.first));
+
+            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), expectedValues.second, 0.000001f);
+        }
+
+    private:
+        float m_Min;
+        float m_Max;
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    IConnectableLayer* input0 = network->AddInputLayer(0);
+    IConnectableLayer* input1 = network->AddInputLayer(1);
+    IConnectableLayer* input2 = network->AddInputLayer(2);
+
+    OriginsDescriptor descriptor(3, 1);
+    IConnectableLayer* merger = network->AddMergerLayer(descriptor);
+
+    IConnectableLayer* output0 = network->AddOutputLayer(3);
+
+    // Establish connections
+    input0->GetOutputSlot(0).Connect(merger->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(merger->GetInputSlot(1));
+    input2->GetOutputSlot(0).Connect(merger->GetInputSlot(2));
+    merger->GetOutputSlot(0).Connect(output0->GetInputSlot(0));
+
+    // Set TensorInfo
+    TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+
+    input0->GetOutputSlot(0).SetTensorInfo(info);
+    input1->GetOutputSlot(0).SetTensorInfo(info);
+    input2->GetOutputSlot(0).SetTensorInfo(info);
+    merger->GetOutputSlot(0).SetTensorInfo(info);
+
+    INetworkQuantizerPtr quantizerPtr =  INetworkQuantizer::Create(network.get());
+    // Override the input ranges
+    float min = -15.5f;
+    float max = 45.3f;
+
+    quantizerPtr->OverrideInputRange(0, (min + 2.1f), (max - 3.2f));
+    quantizerPtr->OverrideInputRange(1, (min + 6.7f), max);
+    quantizerPtr->OverrideInputRange(2, min, (max - 7.8f));
+
+    auto quantizedNetwork = quantizerPtr->ExportNetwork();
+    TestMergerVisitor validator(min, max);
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 

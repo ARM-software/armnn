@@ -99,7 +99,7 @@ struct AddFixture : public ParserFlatbuffersSerializeFixture
                 layer_type: "OutputLayer",
                 layer: {
                         base:{
-                              layerBindingId: 3,
+                              layerBindingId: 0,
                               base: {
                                     index: 3,
                                     layerName: "OutputLayer",

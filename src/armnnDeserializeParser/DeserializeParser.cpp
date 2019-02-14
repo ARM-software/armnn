@@ -465,7 +465,7 @@ void DeserializeParser::SetupInputLayers()
     for (auto const& input : inputs)
     {
         IConnectableLayer* layer =
-            m_Network->AddInputLayer(static_cast<int>(input->index()), input->layerName()->c_str());
+            m_Network->AddInputLayer(GetBindingLayerInfo(m_Graph, input->index()), input->layerName()->c_str());
 
         auto tensorInfo = ToTensorInfo(input->outputSlots()->Get(0)->tensorInfo());
         layer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
@@ -481,7 +481,7 @@ void DeserializeParser::SetupOutputLayers()
     for (auto const& output : outputs)
     {
         IConnectableLayer* layer =
-            m_Network->AddOutputLayer(static_cast<int>(output->index()), output->layerName()->c_str());
+            m_Network->AddOutputLayer(GetBindingLayerInfo(m_Graph, output->index()), output->layerName()->c_str());
 
         RegisterInputSlots(output->index(), layer);
     }

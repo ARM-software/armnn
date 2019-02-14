@@ -633,3 +633,23 @@ if(BUILD_UNIT_TESTS)
 
     addDllCopyCommands(UnitTests)
 endif()
+
+if (BUILD_ARMNN_SERIALIZER AND BUILD_TF_PARSER)
+    set(ArmnnConverter_sources
+        src/armnnConverter/ArmnnConverter.cpp)
+
+    add_executable_ex(ArmnnConverter ${ArmnnConverter_sources})
+    target_include_directories(ArmnnConverter PRIVATE src/armnn)
+    target_include_directories(ArmnnConverter PRIVATE src/armnnUtils)
+
+    target_link_libraries(ArmnnConverter armnnTfParser)
+    target_link_libraries(ArmnnConverter armnnSerializer)
+
+    target_link_libraries(ArmnnConverter armnn)
+    target_link_libraries(ArmnnConverter ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(ArmnnConverter
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_PROGRAM_OPTIONS_LIBRARY})
+    addDllCopyCommands(ArmnnConverter)
+endif()

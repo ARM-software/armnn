@@ -791,7 +791,7 @@ IConnectableLayer* CreateStartOfLeakyReluNetwork(INetwork* network, const Tensor
     // Establish connections
     input0->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
 
-    //Set TensorInfo
+    // Set TensorInfo
     input0->GetOutputSlot(0).SetTensorInfo(info);
     activation->GetOutputSlot(0).SetTensorInfo(info);
 
@@ -918,7 +918,7 @@ BOOST_AUTO_TEST_CASE(QuantizePooling2d)
     activation->GetOutputSlot(0).Connect(pooling2d->GetInputSlot(0));
     pooling2d->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    //Set TensorInfo
+    // Set TensorInfo
     input0->GetOutputSlot(0).SetTensorInfo(info);
     activation->GetOutputSlot(0).SetTensorInfo(info);
     pooling2d->GetOutputSlot(0).SetTensorInfo(info);
@@ -1080,6 +1080,43 @@ BOOST_AUTO_TEST_CASE(QuantizeReshape)
 
     auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
     TestReshapeQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
+class TestSplitterQuantization : public TestLeakyReLuActivationQuantization
+{
+public:
+    virtual void VisitSplitterLayer(const IConnectableLayer* layer,
+                                    const SplitterDescriptor& desc,
+                                    const char* name = nullptr)
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+        BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
+
+        BOOST_TEST((info.GetQuantizationOffset() == 64));
+
+        // Based off parent LeakyReLu [-5.f, 15.f]
+        BOOST_CHECK_CLOSE(info.GetQuantizationScale(), 20.0f/g_QuantizationBase, g_TestTolerance);
+    }
+};
+
+BOOST_AUTO_TEST_CASE(QuantizeSplitter)
+{
+    auto network = INetwork::Create();
+
+    TensorShape shape{3U};
+    TensorInfo info(shape, DataType::Float32);
+
+    IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
+
+    // Add the layer under test
+    ViewsDescriptor splitterDesc(2,4);
+    IConnectableLayer* splitter = network->AddSplitterLayer(splitterDesc);
+    CompleteLeakyReluNetwork(network.get(), activation, splitter, info);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestSplitterQuantization validator;
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 

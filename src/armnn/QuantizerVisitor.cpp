@@ -262,6 +262,15 @@ void QuantizerVisitor::VisitConstantLayer(const IConnectableLayer* layer,
     RecordLayer(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
+                                          const SplitterDescriptor& splitterDescriptor,
+                                          const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSplitterLayer(splitterDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
                                          const ReshapeDescriptor& reshapeDescriptor,
                                          const char* name)

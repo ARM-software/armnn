@@ -207,4 +207,12 @@ void StaticRangeVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
     ForwardParentParameters(layer);
 }
 
+void StaticRangeVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
+                                            const SplitterDescriptor& splitterDescriptor,
+                                            const char* name)
+{
+    boost::ignore_unused(splitterDescriptor);
+    ForwardParentParameters(layer);
+}
+
 } //namespace armnn

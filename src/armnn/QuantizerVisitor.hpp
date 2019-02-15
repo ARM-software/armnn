@@ -76,6 +76,10 @@ public:
                                   const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                   const char* name = nullptr) override;
 
+    void VisitSplitterLayer(const IConnectableLayer* layer,
+                            const SplitterDescriptor& splitterDescriptor,
+                            const char* name = nullptr) override;
+
     void VisitPooling2dLayer(const IConnectableLayer* layer,
                              const Pooling2dDescriptor& pooling2dDescriptor,
                              const char* name = nullptr) override;

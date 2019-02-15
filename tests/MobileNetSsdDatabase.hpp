@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <armnn/TypesUtils.hpp>
+#include <backendsCommon/test/QuantizeHelper.hpp>
 
 #include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -26,25 +27,27 @@ namespace
 struct MobileNetSsdTestCaseData
 {
     MobileNetSsdTestCaseData(
-        std::vector<float> inputData,
+        std::vector<uint8_t> inputData,
         std::vector<DetectedObject> expectedOutput)
         : m_InputData(std::move(inputData))
         , m_ExpectedOutput(std::move(expectedOutput))
     {}
 
-    std::vector<float>          m_InputData;
+    std::vector<uint8_t>        m_InputData;
     std::vector<DetectedObject> m_ExpectedOutput;
 };
 
 class MobileNetSsdDatabase
 {
 public:
-    explicit MobileNetSsdDatabase(const std::string& imageDir);
+    explicit MobileNetSsdDatabase(const std::string& imageDir, float scale, int offset);
 
     std::unique_ptr<MobileNetSsdTestCaseData> GetTestCaseData(unsigned int testCaseId);
 
 private:
     std::string m_ImageDir;
+    float m_Scale;
+    int m_Offset;
 };
 
 constexpr unsigned int k_MobileNetSsdImageWidth  = 300u;
@@ -56,12 +59,14 @@ const std::array<ObjectDetectionInput, 1> g_PerTestCaseInput =
     ObjectDetectionInput
     {
         "Cat.jpg",
-        DetectedObject(16, BoundingBox(0.21678525f, 0.0859828f, 0.9271242f, 0.9453231f), 0.79296875f)
+        DetectedObject(16, BoundingBox(0.208961248f, 0.0852333307f, 0.92757535f, 0.940263629f), 0.79296875f)
     }
 };
 
-MobileNetSsdDatabase::MobileNetSsdDatabase(const std::string& imageDir)
+MobileNetSsdDatabase::MobileNetSsdDatabase(const std::string& imageDir, float scale, int offset)
     : m_ImageDir(imageDir)
+    , m_Scale(scale)
+    , m_Offset(offset)
 {}
 
 std::unique_ptr<MobileNetSsdTestCaseData> MobileNetSsdDatabase::GetTestCaseData(unsigned int testCaseId)
@@ -72,7 +77,7 @@ std::unique_ptr<MobileNetSsdTestCaseData> MobileNetSsdDatabase::GetTestCaseData(
 
     // Load test case input
     const std::string imagePath = m_ImageDir + testCaseInput.first;
-    std::vector<float> imageData;
+    std::vector<uint8_t> imageData;
     try
     {
         InferenceTestImage image(imagePath.c_str());
@@ -86,7 +91,8 @@ std::unique_ptr<MobileNetSsdTestCaseData> MobileNetSsdDatabase::GetTestCaseData(
         }
 
         // Get image data as a vector of floats
-        imageData = GetImageDataInArmNnLayoutAsNormalizedFloats(ImageChannelLayout::Rgb, image);
+        std::vector<float> floatImageData = GetImageDataAsNormalizedFloats(ImageChannelLayout::Rgb, image);
+        imageData = QuantizedVector<uint8_t>(m_Scale, m_Offset, floatImageData);
     }
     catch (const InferenceTestImageException& e)
     {

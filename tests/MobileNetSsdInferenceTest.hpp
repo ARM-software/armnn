@@ -126,7 +126,7 @@ public:
     }
 
 private:
-    static constexpr unsigned int k_NumDetections = 10u;
+    static constexpr unsigned int k_NumDetections = 1u;
 
     static constexpr unsigned int k_OutputSize1 = k_NumDetections * 4u;
     static constexpr unsigned int k_OutputSize2 = k_NumDetections;
@@ -169,8 +169,8 @@ public:
         {
             return false;
         }
-
-        m_Database = std::make_unique<MobileNetSsdDatabase>(m_DataDir.c_str());
+        std::pair<float, int32_t> qParams = m_Model->GetQuantizationParams();
+        m_Database = std::make_unique<MobileNetSsdDatabase>(m_DataDir.c_str(), qParams.first, qParams.second);
         if (!m_Database)
         {
             return false;

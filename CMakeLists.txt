@@ -2,7 +2,7 @@
 # Copyright © 2017 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-cmake_minimum_required (VERSION 3.0.2) # 3.0.2 required for return() statement used in AddDllCopyCommands.cmake.
+cmake_minimum_required (VERSION 3.0.2) # 3.0.2 required for return() statement used in AddDllCopyCommands.cmake
 project(armnn)
 
 set(additional_cmake_files)
@@ -179,6 +179,38 @@ if(BUILD_ARMNN_SERIALIZER)
 
     target_link_libraries(armnnSerializer armnn ${FLATBUFFERS_LIBRARY})
 endif()
+
+if(BUILD_ARMNN_QUANTIZER)
+
+    if(NOT BUILD_ARMNN_SERIALIZER)
+        message(ERROR, "In order to build the ArmNN Quantization Tool you must set BUILD_ARMNN_SERIALZER = YES")
+    endif()
+
+    add_executable_ex(ArmnnQuantizer
+        src/armnnQuantizer/CommandLineProcessor.hpp
+        src/armnnQuantizer/CommandLineProcessor.cpp
+        src/armnnQuantizer/ArmNNQuantizerMain.cpp)
+
+    target_include_directories(ArmnnQuantizer PRIVATE include/armnnDeserializeParser)
+
+    target_link_libraries(ArmnnQuantizer
+            ${Boost_SYSTEM_LIBRARY}
+            ${Boost_PROGRAM_OPTIONS_LIBRARY}
+            ${Boost_FILESYSTEM_LIBRARY}
+            ${Boost_LOG_LIBRARY}
+            ${Boost_THREAD_LIBRARY} )
+
+    target_link_libraries(ArmnnQuantizer
+            armnnSerializer
+            armnn
+            ${FLATBUFFERS_LIBRARY})
+
+    if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
+        target_link_libraries(ArmnnQuantizer pthread)
+    endif()
+
+endif()
+
 
 list(APPEND armnn_sources
     include/armnn/ArmNN.hpp

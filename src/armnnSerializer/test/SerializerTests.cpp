@@ -145,6 +145,12 @@ BOOST_AUTO_TEST_CASE(SerializeAddition)
     armnn::IConnectableLayer* const outputLayer0 = network->AddOutputLayer(0);
     additionLayer0->GetOutputSlot(0).Connect(outputLayer0->GetInputSlot(0));
 
+    armnn::TensorShape shape{1U};
+    armnn::TensorInfo info(shape, armnn::DataType::Float32);
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    additionLayer0->GetOutputSlot(0).SetTensorInfo(info);
+
     armnnSerializer::Serializer serializer;
     serializer.Serialize(*network);
 
@@ -169,6 +175,10 @@ BOOST_AUTO_TEST_CASE(SerializeMultiplication)
 
     armnn::IConnectableLayer* const outputLayer0 = network->AddOutputLayer(0);
     multiplicationLayer0->GetOutputSlot(0).Connect(outputLayer0->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    multiplicationLayer0->GetOutputSlot(0).SetTensorInfo(info);
 
     armnnSerializer::Serializer serializer;
     serializer.Serialize(*network);

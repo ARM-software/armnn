@@ -14,6 +14,7 @@ option(GPERFTOOLS_ROOT "Location where the gperftools 'include' and 'lib' folder
 # options used for tensorflow lite support
 option(BUILD_TF_LITE_PARSER "Build Tensorflow Lite parser" OFF)
 option(BUILD_ARMNN_SERIALIZER "Build Armnn Serializer" OFF)
+option(BUILD_ARMNN_QUANTIZER "Build ArmNN quantizer" OFF)
 option(FLATC_DIR "Path to Flatbuffers compiler" OFF)
 option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OFF)
 option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
@@ -364,6 +365,10 @@ endif()
 
 if(NOT BUILD_ARMNN_SERIALIZER)
     message(STATUS "Armnn Serializer support is disabled")
+endif()
+
+if(NOT BUILD_ARMNN_QUANTIZER)
+    message(STATUS "ArmNN Quantizer support is disabled")
 endif()
 
 # ArmNN source files required for all build options

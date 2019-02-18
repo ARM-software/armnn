@@ -1153,5 +1153,35 @@ BOOST_AUTO_TEST_CASE(QuantizeResizeBilinear)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+class TestStridedSliceQuantization : public TestLeakyReLuActivationQuantization
+{
+public:
+    virtual void VisitStridedSliceLayer(const IConnectableLayer* layer,
+                                        const StridedSliceDescriptor& desc,
+                                        const char* name = nullptr)
+    {
+        CheckForwardedQuantizationSettings(layer);
+    }
+};
+
+BOOST_AUTO_TEST_CASE(QuantizeStridedSlice)
+{
+    auto network = INetwork::Create();
+
+    TensorShape shape{3U};
+    TensorInfo info(shape, DataType::Float32);
+
+    IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
+
+    // Add the layer under test
+    StridedSliceDescriptor stridedSliceDesc;
+    IConnectableLayer* stridedSlice = network->AddStridedSliceLayer(stridedSliceDesc);
+    CompleteLeakyReluNetwork(network.get(), activation, stridedSlice, info);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestStridedSliceQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 } // namespace armnn

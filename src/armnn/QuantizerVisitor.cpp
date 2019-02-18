@@ -289,4 +289,13 @@ void QuantizerVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
+                                              const StridedSliceDescriptor& stridedSliceDescriptor,
+                                              const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddStridedSliceLayer(stridedSliceDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 } //namespace armnn

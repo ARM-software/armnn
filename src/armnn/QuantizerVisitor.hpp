@@ -100,6 +100,10 @@ public:
                                   const ResizeBilinearDescriptor& resizeDesc,
                                   const char* name = nullptr) override;
 
+    void VisitStridedSliceLayer(const IConnectableLayer* layer,
+                                const StridedSliceDescriptor& stridedSliceDescriptor,
+                                const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

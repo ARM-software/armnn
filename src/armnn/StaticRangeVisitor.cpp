@@ -225,4 +225,13 @@ void StaticRangeVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer
     ForwardParentParameters(layer);
 }
 
+void StaticRangeVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
+                                                const StridedSliceDescriptor& stridedSliceDescriptor,
+                                                const char* name)
+{
+    boost::ignore_unused(stridedSliceDescriptor);
+    boost::ignore_unused(name);
+    ForwardParentParameters(layer);
+}
+
 } //namespace armnn

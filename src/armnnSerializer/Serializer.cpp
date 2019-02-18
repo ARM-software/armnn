@@ -36,7 +36,7 @@ uint32_t SerializerVisitor::GetSerializedId(unsigned int guid)
         m_guidMap.insert(guidPair);
         return m_layerId;
     }
-    return m_layerId;
+    return m_guidMap[guid];
 }
 
 // Build FlatBuffer for Input Layer

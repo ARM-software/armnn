@@ -87,6 +87,10 @@ public:
                             const SplitterDescriptor& splitterDescriptor,
                             const char* name = nullptr) override;
 
+    void VisitResizeBilinearLayer(const IConnectableLayer* layer,
+                                  const ResizeBilinearDescriptor& resizeDesc,
+                                  const char* name = nullptr) override;
+
 private:
     /// Set the range for an output slot on a layer
     void SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max);

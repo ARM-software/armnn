@@ -212,6 +212,16 @@ void StaticRangeVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
                                             const char* name)
 {
     boost::ignore_unused(splitterDescriptor);
+    boost::ignore_unused(name);
+    ForwardParentParameters(layer);
+}
+
+void StaticRangeVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer,
+                                                  const ResizeBilinearDescriptor& resizeDesc,
+                                                  const char* name)
+{
+    boost::ignore_unused(resizeDesc);
+    boost::ignore_unused(name);
     ForwardParentParameters(layer);
 }
 

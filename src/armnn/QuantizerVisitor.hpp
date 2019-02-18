@@ -96,6 +96,10 @@ public:
                            const ReshapeDescriptor& reshapeDescriptor,
                            const char* name = nullptr) override;
 
+    void VisitResizeBilinearLayer(const IConnectableLayer* layer,
+                                  const ResizeBilinearDescriptor& resizeDesc,
+                                  const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

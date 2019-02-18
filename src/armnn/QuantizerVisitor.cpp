@@ -280,4 +280,13 @@ void QuantizerVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer,
+                                                const ResizeBilinearDescriptor& resizeDesc,
+                                                const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddResizeBilinearLayer(resizeDesc, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 } //namespace armnn

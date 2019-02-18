@@ -1120,5 +1120,38 @@ BOOST_AUTO_TEST_CASE(QuantizeSplitter)
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeResizeBilinear)
+{
+    class TestResizeBilinearQuantization : public TestLeakyReLuActivationQuantization
+    {
+    public:
+        void VisitResizeBilinearLayer(const IConnectableLayer* layer,
+                                      const ResizeBilinearDescriptor& resizeDescriptor,
+                                      const char* name = nullptr) override
+        {
+            CheckForwardedQuantizationSettings(layer);
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+
+    IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
+
+    // Add the layer under test
+    ResizeBilinearDescriptor descriptor;
+    descriptor.m_TargetHeight = 3;
+    descriptor.m_TargetWidth = 3;
+    IConnectableLayer* spaceToBatch = network->AddResizeBilinearLayer(descriptor);
+
+    CompleteLeakyReluNetwork(network.get(), activation, spaceToBatch, info);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestResizeBilinearQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 } // namespace armnn

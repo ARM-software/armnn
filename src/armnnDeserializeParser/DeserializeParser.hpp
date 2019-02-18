@@ -17,6 +17,7 @@ public:
     // Shorthands for deserializer types
     using GraphPtr = const armnn::armnnSerializer::SerializedGraph *;
     using TensorRawPtr = const armnn::armnnSerializer::TensorInfo *;
+    using PoolingDescriptor = const armnn::armnnSerializer::Pooling2dDescriptor *;
     using TensorRawPtrVector = std::vector<TensorRawPtr>;
     using LayerRawPtr = const armnn::armnnSerializer::LayerBase *;
     using LayerBaseRawPtr = const armnn::armnnSerializer::LayerBase *;
@@ -50,6 +51,8 @@ public:
     static LayerBaseRawPtrVector GetGraphOutputs(const GraphPtr& graphPtr);
     static LayerBaseRawPtr GetBaseLayer(const GraphPtr& graphPtr, unsigned int layerIndex);
     static int32_t GetBindingLayerInfo(const GraphPtr& graphPtr, unsigned int layerIndex);
+    armnn::Pooling2dDescriptor GetPoolingDescriptor(PoolingDescriptor pooling2dDescriptor,
+                                                    unsigned int layerIndex);
 
 private:
     // No copying allowed until it is wanted and properly implemented
@@ -65,6 +68,7 @@ private:
     void ParseUnsupportedLayer(unsigned int layerIndex);
     void ParseAdd(unsigned int layerIndex);
     void ParseMultiplication(unsigned int layerIndex);
+    void ParsePooling2d(unsigned int layerIndex);
     void ParseSoftmax(unsigned int layerIndex);
 
     void RegisterOutputSlotOfConnection(uint32_t connectionIndex, armnn::IOutputSlot* slot);
@@ -82,6 +86,7 @@ private:
     armnn::INetworkPtr                    m_Network;
     GraphPtr                              m_Graph;
     std::vector<LayerParsingFunction>     m_ParserFunctions;
+    std::string                           m_layerName;
 
     /// This holds the data of the file that was read in from CreateNetworkFromBinaryFile
     /// Needed for m_Graph to point to

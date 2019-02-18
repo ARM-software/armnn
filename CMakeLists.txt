@@ -163,6 +163,8 @@ if(BUILD_ARMNN_SERIALIZER)
         src/armnnSerializer/Schema_generated.h
         src/armnnSerializer/Serializer.hpp
         src/armnnSerializer/Serializer.cpp
+        src/armnnSerializer/SerializerUtils.hpp
+        src/armnnSerializer/SerializerUtils.cpp
         src/armnnDeserializeParser/DeserializeParser.hpp
         src/armnnDeserializeParser/DeserializeParser.cpp
         )
@@ -554,6 +556,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnSerializer/test/SerializerTests.cpp
                 src/armnnDeserializeParser/test/DeserializeAdd.cpp
                 src/armnnDeserializeParser/test/DeserializeMultiplication.cpp
+                src/armnnDeserializeParser/test/DeserializePooling2d.cpp
                 src/armnnDeserializeParser/test/ParserFlatbuffersSerializeFixture.hpp
                 src/armnnDeserializeParser/test/SchemaSerialize.s
                 )

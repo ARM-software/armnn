@@ -17,6 +17,11 @@ enum DataType : byte {
     Boolean = 4
 }
 
+enum DataLayout : byte {
+    NHWC = 0,
+    NCHW = 1
+}
+
 table TensorInfo {
     dimensions:[uint];
     dataType:DataType;
@@ -67,7 +72,8 @@ enum LayerType : uint {
     Input = 1,
     Multiplication = 2,
     Output = 3,
-    Softmax = 4
+    Pooling2d = 4,
+    Softmax = 5
 }
 
 // Base layer table to be used as part of other layers
@@ -97,6 +103,42 @@ table MultiplicationLayer {
     base:LayerBase;
 }
 
+table Pooling2dLayer {
+    base:LayerBase;
+    descriptor:Pooling2dDescriptor;
+}
+
+enum PoolingAlgorithm : byte {
+    Max = 0,
+    Average = 1,
+    L2 = 2
+}
+
+enum OutputShapeRounding : byte {
+    Floor = 0,
+    Ceiling = 1
+}
+
+enum PaddingMethod : byte {
+    IgnoreValue = 0,
+    Exclude = 1
+}
+
+table Pooling2dDescriptor {
+    poolType:PoolingAlgorithm;
+    padLeft:uint;
+    padRight:uint;
+    padTop:uint;
+    padBottom:uint;
+    poolWidth:uint;
+    poolHeight:uint;
+    strideX:uint;
+    strideY:uint;
+    outputShapeRounding:OutputShapeRounding;
+    paddingMethod:PaddingMethod;
+    dataLayout:DataLayout;
+}
+
 table SoftmaxLayer {
     base:LayerBase;
     descriptor:SoftmaxDescriptor;
@@ -115,6 +157,7 @@ union Layer {
     InputLayer,
     MultiplicationLayer,
     OutputLayer,
+    Pooling2dLayer,
     SoftmaxLayer
 }
 

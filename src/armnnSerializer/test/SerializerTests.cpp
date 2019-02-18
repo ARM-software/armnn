@@ -15,12 +15,34 @@
 #include <vector>
 
 #include <boost/test/unit_test.hpp>
-
 #include <flatbuffers/idl.h>
 
-BOOST_AUTO_TEST_SUITE(SerializerTests)
+using armnnDeserializeParser::IDeserializeParser;
 
-armnnDeserializeParser::IDeserializeParserPtr g_Parser = armnnDeserializeParser::IDeserializeParser::Create();
+namespace
+{
+
+armnn::INetworkPtr DeserializeNetwork(const std::string& serializerString)
+{
+    std::vector<std::uint8_t> const serializerVector{serializerString.begin(), serializerString.end()};
+    return armnnDeserializeParser::IDeserializeParser::Create()->CreateNetworkFromBinary(serializerVector);
+}
+
+std::string SerializeNetwork(const armnn::INetwork& network)
+{
+    armnnSerializer::Serializer serializer;
+    serializer.Serialize(network);
+
+    std::stringstream stream;
+    serializer.SaveSerializedToStream(stream);
+
+    std::string serializerString{stream.str()};
+    return serializerString;
+}
+
+} // anonymous namespace
+
+BOOST_AUTO_TEST_SUITE(SerializerTests)
 
 BOOST_AUTO_TEST_CASE(SimpleNetworkSerialization)
 {
@@ -78,55 +100,47 @@ BOOST_AUTO_TEST_CASE(SimpleSoftmaxIntegration)
 
     // Create test network
     armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer *const inputLayer   = network->AddInputLayer(0);
-    armnn::IConnectableLayer *const softmaxLayer = network->AddSoftmaxLayer(descriptor, "softmax");
-    armnn::IConnectableLayer *const outputLayer  = network->AddOutputLayer(0);
+    armnn::IConnectableLayer* const inputLayer   = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const softmaxLayer = network->AddSoftmaxLayer(descriptor, "softmax");
+    armnn::IConnectableLayer* const outputLayer  = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(softmaxLayer->GetInputSlot(0));
     inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
     softmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
     softmaxLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
-    // Serialize
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    const std::string serializerString{stream.str()};
-
-    // Deserialize
-    armnn::INetworkPtr deserializedNetwork =
-        g_Parser->CreateNetworkFromBinary({serializerString.begin(), serializerString.end()});
+    // Serialize & deserialize network
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     BOOST_CHECK(deserializedNetwork);
 
     armnn::IRuntime::CreationOptions options;
-    armnn::IRuntimePtr run = armnn::IRuntime::Create(options);
+    armnn::IRuntimePtr runtime = armnn::IRuntime::Create(options);
 
     armnn::IOptimizedNetworkPtr optimizedNetwork =
-        armnn::Optimize(*network, {armnn::Compute::CpuRef}, run->GetDeviceSpec());
+        armnn::Optimize(*network, {armnn::Compute::CpuRef}, runtime->GetDeviceSpec());
     BOOST_CHECK(optimizedNetwork);
 
     armnn::IOptimizedNetworkPtr deserializedOptimizedNetwork =
-        armnn::Optimize(*deserializedNetwork, {armnn::Compute::CpuRef}, run->GetDeviceSpec());
+        armnn::Optimize(*deserializedNetwork, {armnn::Compute::CpuRef}, runtime->GetDeviceSpec());
     BOOST_CHECK(deserializedOptimizedNetwork);
 
     armnn::NetworkId networkId1;
     armnn::NetworkId networkId2;
 
-    run->LoadNetwork(networkId1, std::move(optimizedNetwork));
-    run->LoadNetwork(networkId2, std::move(deserializedOptimizedNetwork));
+    runtime->LoadNetwork(networkId1, std::move(optimizedNetwork));
+    runtime->LoadNetwork(networkId2, std::move(deserializedOptimizedNetwork));
 
     std::vector<float> inputData(tensorInfo.GetNumElements());
     std::iota(inputData.begin(), inputData.end(), 0);
 
     armnn::InputTensors inputTensors1
     {
-         {0, armnn::ConstTensor(run->GetInputTensorInfo(networkId1, 0), inputData.data())}
+         {0, armnn::ConstTensor(runtime->GetInputTensorInfo(networkId1, 0), inputData.data())}
     };
 
     armnn::InputTensors inputTensors2
     {
-         {0, armnn::ConstTensor(run->GetInputTensorInfo(networkId2, 0), inputData.data())}
+         {0, armnn::ConstTensor(runtime->GetInputTensorInfo(networkId2, 0), inputData.data())}
     };
 
     std::vector<float> outputData1(inputData.size());
@@ -134,19 +148,83 @@ BOOST_AUTO_TEST_CASE(SimpleSoftmaxIntegration)
 
     armnn::OutputTensors outputTensors1
     {
-         {0, armnn::Tensor(run->GetOutputTensorInfo(networkId1, 0), outputData1.data())}
+         {0, armnn::Tensor(runtime->GetOutputTensorInfo(networkId1, 0), outputData1.data())}
     };
 
     armnn::OutputTensors outputTensors2
     {
-         {0, armnn::Tensor(run->GetOutputTensorInfo(networkId2, 0), outputData2.data())}
+         {0, armnn::Tensor(runtime->GetOutputTensorInfo(networkId2, 0), outputData2.data())}
     };
 
-    run->EnqueueWorkload(networkId1, inputTensors1, outputTensors1);
-    run->EnqueueWorkload(networkId2, inputTensors2, outputTensors2);
+    runtime->EnqueueWorkload(networkId1, inputTensors1, outputTensors1);
+    runtime->EnqueueWorkload(networkId2, inputTensors2, outputTensors2);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(outputData1.begin(), outputData1.end(),
                                   outputData2.begin(), outputData2.end());
+}
+
+BOOST_AUTO_TEST_CASE(SimplePooling2dIntegration)
+{
+    armnn::NetworkId networkIdentifier;
+    armnn::IRuntime::CreationOptions options; // default options
+    armnn::IRuntimePtr runtime = armnn::IRuntime::Create(options);
+
+    unsigned int inputShape[]  = {1, 2, 2, 1};
+    unsigned int outputShape[] = {1, 1, 1, 1};
+
+    auto inputTensorInfo  = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    auto outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
+
+    armnn::Pooling2dDescriptor desc;
+    desc.m_DataLayout          = armnn::DataLayout::NHWC;
+    desc.m_PadTop              = 0;
+    desc.m_PadBottom           = 0;
+    desc.m_PadLeft             = 0;
+    desc.m_PadRight            = 0;
+    desc.m_PoolType            = armnn::PoolingAlgorithm::Average;
+    desc.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
+    desc.m_PaddingMethod       = armnn::PaddingMethod::Exclude;
+    desc.m_PoolHeight          = 2;
+    desc.m_PoolWidth           = 2;
+    desc.m_StrideX             = 2;
+    desc.m_StrideY             = 2;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer *const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer *const pooling2dLayer = network->AddPooling2dLayer(desc, "ReshapeLayer");
+    armnn::IConnectableLayer *const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(pooling2dLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    pooling2dLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    pooling2dLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto deserializeNetwork = DeserializeNetwork(SerializeNetwork(*network));
+
+    //Optimize the deserialized network
+    auto deserializedOptimized = Optimize(*deserializeNetwork, {armnn::Compute::CpuRef},
+                                          runtime->GetDeviceSpec());
+
+    // Load graph into runtime
+    runtime->LoadNetwork(networkIdentifier, std::move(deserializedOptimized));
+
+    std::vector<float> input1Data(inputTensorInfo.GetNumElements());
+    std::iota(input1Data.begin(), input1Data.end(), 4);
+
+    armnn::InputTensors inputTensors
+    {
+          {0, armnn::ConstTensor(runtime->GetInputTensorInfo(networkIdentifier, 0), input1Data.data())}
+    };
+
+    std::vector<float> outputData(input1Data.size());
+    armnn::OutputTensors outputTensors
+    {
+           {0, armnn::Tensor(runtime->GetOutputTensorInfo(networkIdentifier, 0), outputData.data())}
+    };
+
+    runtime->EnqueueWorkload(networkIdentifier, inputTensors, outputTensors);
+
+    BOOST_CHECK_EQUAL(outputData[0], 5.5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -60,6 +60,10 @@ public:
                            const armnn::SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;
 
+    void VisitPooling2dLayer(const armnn::IConnectableLayer* layer,
+                             const armnn::Pooling2dDescriptor& pooling2dDescriptor,
+                             const char* name = nullptr) override;
+
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.

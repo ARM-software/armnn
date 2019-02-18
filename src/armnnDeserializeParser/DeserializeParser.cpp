@@ -352,13 +352,6 @@ void IDeserializeParser::Destroy(IDeserializeParser* parser)
     delete parser;
 }
 
-INetworkPtr DeserializeParser::CreateNetworkFromBinaryFile(const char* graphFile)
-{
-    ResetParser();
-    m_Graph = LoadGraphFromFile(graphFile, m_FileContent);
-    return CreateNetworkFromGraph();
-}
-
 INetworkPtr DeserializeParser::CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent)
 {
      ResetParser();
@@ -366,25 +359,11 @@ INetworkPtr DeserializeParser::CreateNetworkFromBinary(const std::vector<uint8_t
      return CreateNetworkFromGraph();
 }
 
-DeserializeParser::GraphPtr DeserializeParser::LoadGraphFromFile(const char* fileName, std::string& fileContent)
+armnn::INetworkPtr DeserializeParser::CreateNetworkFromBinary(std::istream& binaryContent)
 {
-    if (fileName == nullptr)
-    {
-        throw InvalidArgumentException(boost::str(boost::format("Invalid (null) file name %1%") %
-                                                  CHECK_LOCATION().AsString()));
-    }
-    boost::system::error_code errorCode;
-    boost::filesystem::path pathToFile(fileName);
-    if (!boost::filesystem::exists(pathToFile, errorCode))
-    {
-        throw FileNotFoundException(boost::str(boost::format("Cannot find the file (%1%) errorCode: %2% %3%") %
-                                               fileName %
-                                               errorCode %
-                                               CHECK_LOCATION().AsString()));
-    }
-    std::ifstream file(fileName, std::ios::binary);
-    fileContent = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    return LoadGraphFromBinary(reinterpret_cast<const uint8_t*>(fileContent.c_str()), fileContent.size());
+    ResetParser();
+    m_Graph = LoadGraphFromBinary(binaryContent);
+    return CreateNetworkFromGraph();
 }
 
 DeserializeParser::GraphPtr DeserializeParser::LoadGraphFromBinary(const uint8_t* binaryContent, size_t len)
@@ -404,6 +383,12 @@ DeserializeParser::GraphPtr DeserializeParser::LoadGraphFromBinary(const uint8_t
                            CHECK_LOCATION().AsString()));
     }
     return GetSerializedGraph(binaryContent);
+}
+
+DeserializeParser::GraphPtr DeserializeParser::LoadGraphFromBinary(std::istream& binaryContent)
+{
+    std::string content((std::istreambuf_iterator<char>(binaryContent)), std::istreambuf_iterator<char>());
+    return GetSerializedGraph(content.data());
 }
 
 INetworkPtr DeserializeParser::CreateNetworkFromGraph()

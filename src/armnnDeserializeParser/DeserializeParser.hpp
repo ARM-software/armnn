@@ -25,26 +25,25 @@ public:
 
 public:
 
-    /// Create the network from a flatbuffers binary file on disk
-    virtual armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile) override;
+    /// Create an input network from binary file contents
+    armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent) override;
 
-    virtual armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent) override;
+    /// Create an input network from a binary input stream
+    armnn::INetworkPtr CreateNetworkFromBinary(std::istream& binaryContent) override;
 
     /// Retrieve binding info (layer id and tensor info) for the network input identified by the given layer name
-    virtual BindingPointInfo GetNetworkInputBindingInfo(unsigned int layerId,
-                                                        const std::string& name) const override;
+    BindingPointInfo GetNetworkInputBindingInfo(unsigned int layerId, const std::string& name) const override;
 
     /// Retrieve binding info (layer id and tensor info) for the network output identified by the given layer name
-    virtual BindingPointInfo GetNetworkOutputBindingInfo(unsigned int layerId,
-                                                         const std::string& name) const override;
+    BindingPointInfo GetNetworkOutputBindingInfo(unsigned int layerId, const std::string& name) const override;
 
     DeserializeParser();
     ~DeserializeParser() {}
 
 public:
     // testable helpers
-    static GraphPtr LoadGraphFromFile(const char* fileName, std::string& fileContent);
     static GraphPtr LoadGraphFromBinary(const uint8_t* binaryContent, size_t len);
+    static GraphPtr LoadGraphFromBinary(std::istream& binaryContent);
     static TensorRawPtrVector GetInputs(const GraphPtr& graph, unsigned int layerIndex);
     static TensorRawPtrVector GetOutputs(const GraphPtr& graph, unsigned int layerIndex);
     static LayerBaseRawPtrVector GetGraphInputs(const GraphPtr& graphPtr);
@@ -90,10 +89,6 @@ private:
     GraphPtr                              m_Graph;
     std::vector<LayerParsingFunction>     m_ParserFunctions;
     std::string                           m_layerName;
-
-    /// This holds the data of the file that was read in from CreateNetworkFromBinaryFile
-    /// Needed for m_Graph to point to
-    std::string                           m_FileContent;
 
     /// A mapping of an output slot to each of the input slots it should be connected to
     /// The outputSlot is from the layer that creates this tensor as one of its outputs

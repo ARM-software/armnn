@@ -28,12 +28,11 @@ public:
     static IDeserializeParserPtr Create();
     static void Destroy(IDeserializeParser* parser);
 
-    /// Create the network from a flatbuffers binary file on disk
-    virtual armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile) = 0;
-
-    /// Create the network from a flatbuffers binary
+    /// Create an input network from binary file contents
     virtual armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent) = 0;
 
+    /// Create an input network from a binary input stream
+    virtual armnn::INetworkPtr CreateNetworkFromBinary(std::istream& binaryContent) = 0;
 
     /// Retrieve binding info (layer id and tensor info) for the network input identified by
     /// the given layer name and layers id

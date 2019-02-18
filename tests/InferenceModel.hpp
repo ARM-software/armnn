@@ -183,8 +183,20 @@ public:
 
         {
             ARMNN_SCOPED_HEAP_PROFILING("Parsing");
-            const std::string& modelPath = params.m_ModelPath;
-            network = parser->CreateNetworkFromBinaryFile(modelPath.c_str());
+
+            boost::system::error_code errorCode;
+            boost::filesystem::path pathToFile(params.m_ModelPath);
+            if (!boost::filesystem::exists(pathToFile, errorCode))
+            {
+                throw armnn::FileNotFoundException(boost::str(
+                                                   boost::format("Cannot find the file (%1%) errorCode: %2% %3%") %
+                                                   params.m_ModelPath %
+                                                   errorCode %
+                                                   CHECK_LOCATION().AsString()));
+            }
+            std::ifstream file(params.m_ModelPath, std::ios::binary);
+
+            network = parser->CreateNetworkFromBinary(file);
         }
 
         unsigned int subGraphId = boost::numeric_cast<unsigned int>(params.m_SubgraphId);

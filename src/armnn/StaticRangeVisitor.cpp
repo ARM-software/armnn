@@ -234,4 +234,13 @@ void StaticRangeVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
     ForwardParentParameters(layer);
 }
 
+void StaticRangeVisitor::VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
+                                                  const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                                  const char* name)
+{
+    boost::ignore_unused(batchToSpaceNdDescriptor);
+    boost::ignore_unused(name);
+    ForwardParentParameters(layer);
+}
+
 } //namespace armnn

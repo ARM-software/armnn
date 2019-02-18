@@ -95,6 +95,10 @@ public:
                                 const StridedSliceDescriptor& stridedSliceDescriptor,
                                 const char* name = nullptr) override;
 
+    void VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
+                                  const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                  const char* name = nullptr) override;
+
 private:
     /// Set the range for an output slot on a layer
     void SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max);

@@ -104,6 +104,10 @@ public:
                                 const StridedSliceDescriptor& stridedSliceDescriptor,
                                 const char* name = nullptr) override;
 
+    void VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
+                                  const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                  const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

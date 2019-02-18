@@ -1176,10 +1176,42 @@ BOOST_AUTO_TEST_CASE(QuantizeStridedSlice)
     // Add the layer under test
     StridedSliceDescriptor stridedSliceDesc;
     IConnectableLayer* stridedSlice = network->AddStridedSliceLayer(stridedSliceDesc);
+
     CompleteLeakyReluNetwork(network.get(), activation, stridedSlice, info);
 
     auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
     TestStridedSliceQuantization validator;
+    VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeBatchToSpace)
+{
+    class TestBatchToSpaceQuantization : public TestLeakyReLuActivationQuantization
+    {
+    public:
+        void VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
+                                      const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                      const char* name = nullptr) override
+        {
+            CheckForwardedQuantizationSettings(layer);
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+
+    IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
+
+    // Add the layer under test
+    BatchToSpaceNdDescriptor descriptor;
+    IConnectableLayer* batchToSpace = network->AddBatchToSpaceNdLayer(descriptor);
+
+    CompleteLeakyReluNetwork(network.get(), activation, batchToSpace, info);
+
+    auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestBatchToSpaceQuantization validator;
     VisitLayersTopologically(quantizedNetwork.get(), validator);
 }
 

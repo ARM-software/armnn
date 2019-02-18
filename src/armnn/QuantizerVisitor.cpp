@@ -298,4 +298,13 @@ void QuantizerVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
+                                                const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                                const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddBatchToSpaceNdLayer(batchToSpaceNdDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 } //namespace armnn

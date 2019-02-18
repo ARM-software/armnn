@@ -42,6 +42,9 @@ ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta2Uint8, SimpleSoftmaxUint8Test, 2.0f)
 ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
 ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 
+ARMNN_AUTO_TEST_CASE(Logistic, SimpleSigmoidTest)
+ARMNN_AUTO_TEST_CASE(LogisticUint8, SimpleSigmoidUint8Test)
+
 // Batch To Space
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat321, BatchToSpaceNdNhwcFloat32Test1)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat322, BatchToSpaceNdNhwcFloat32Test2)

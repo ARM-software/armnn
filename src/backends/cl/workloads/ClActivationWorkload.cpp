@@ -24,13 +24,6 @@ arm_compute::Status ClActivationWorkloadValidate(const TensorInfo& input,
     const arm_compute::ActivationLayerInfo activationLayerInfo =
         ConvertActivationDescriptorToAclActivationLayerInfo(descriptor);
 
-    if (input.GetDataType() == DataType::QuantisedAsymm8 &&
-        activationLayerInfo.activation() == arm_compute::ActivationLayerInfo::ActivationFunction::LOGISTIC)
-    {
-        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                   "CL: Logistic Activations unsupported with QAsymm8 data type."};
-    }
-
     return arm_compute::CLActivationLayer::validate(&aclInput,
                                                     &aclOutput,
                                                     activationLayerInfo);

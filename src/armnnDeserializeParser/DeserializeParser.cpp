@@ -121,8 +121,22 @@ void CheckTensorPtr(DeserializeParser::TensorRawPtr rawPtr,
     }
 }
 
+void CheckConstTensorPtr(DeserializeParser::ConstTensorRawPtr rawPtr,
+                         const CheckLocation& location)
+{
+    if (rawPtr == nullptr)
+    {
+        throw ParseException(boost::str(boost::format("%1% was called with a null const tensor pointer. at %2%") %
+                                        location.m_Function %
+                                        location.FileLine()));
+    }
+}
+
 #define CHECK_TENSOR_PTR(TENSOR_PTR) \
     CheckTensorPtr(TENSOR_PTR, CHECK_LOCATION())
+
+#define CHECK_CONST_TENSOR_PTR(TENSOR_PTR) \
+    CheckConstTensorPtr(TENSOR_PTR, CHECK_LOCATION())
 
 #define CHECK_LAYERS(GRAPH, LAYERS_INDEX, LAYER_INDEX) \
     CheckLayers(GRAPH, LAYERS_INDEX, LAYER_INDEX, CHECK_LOCATION())
@@ -157,6 +171,7 @@ m_ParserFunctions(Layer_MAX+1, &DeserializeParser::ParseUnsupportedLayer)
 {
     // register supported layers
     m_ParserFunctions[Layer_AdditionLayer]       = &DeserializeParser::ParseAdd;
+    m_ParserFunctions[Layer_Convolution2dLayer]  = &DeserializeParser::ParseConvolution2d;
     m_ParserFunctions[Layer_MultiplicationLayer] = &DeserializeParser::ParseMultiplication;
     m_ParserFunctions[Layer_Pooling2dLayer]      = &DeserializeParser::ParsePooling2d;
     m_ParserFunctions[Layer_ReshapeLayer]        = &DeserializeParser::ParseReshape;
@@ -171,6 +186,8 @@ DeserializeParser::LayerBaseRawPtr DeserializeParser::GetBaseLayer(const GraphPt
     {
         case Layer::Layer_AdditionLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
+        case Layer::Layer_Convolution2dLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_Convolution2dLayer()->base();
         case Layer::Layer_InputLayer:
            return graphPtr->layers()->Get(layerIndex)->layer_as_InputLayer()->base()->base();
         case Layer::Layer_MultiplicationLayer:
@@ -206,6 +223,18 @@ int32_t DeserializeParser::GetBindingLayerInfo(const GraphPtr& graphPtr, unsigne
     return 0;
 }
 
+armnn::DataLayout ToDataLayout(armnn::armnnSerializer::DataLayout dataLayout)
+{
+    switch (dataLayout)
+    {
+        case armnn::armnnSerializer::DataLayout::DataLayout_NHWC:
+            return armnn::DataLayout::NHWC;
+        case armnn::armnnSerializer::DataLayout::DataLayout_NCHW:
+        default:
+            return armnn::DataLayout::NCHW;
+    }
+}
+
 armnn::TensorInfo ToTensorInfo(DeserializeParser::TensorRawPtr tensorPtr)
 {
     armnn::DataType type;
@@ -215,6 +244,9 @@ armnn::TensorInfo ToTensorInfo(DeserializeParser::TensorRawPtr tensorPtr)
     {
         case DataType_QuantisedAsymm8:
             type = armnn::DataType::QuantisedAsymm8;
+            break;
+        case DataType_Signed32:
+            type = armnn::DataType::Signed32;
             break;
         case DataType_Float32:
             type = armnn::DataType::Float32;
@@ -250,6 +282,33 @@ armnn::TensorInfo ToTensorInfo(DeserializeParser::TensorRawPtr tensorPtr)
                              quantizationScale,
                              quantizationOffset);
     return result;
+}
+
+armnn::ConstTensor ToConstTensor(DeserializeParser::ConstTensorRawPtr constTensorPtr)
+{
+    CHECK_CONST_TENSOR_PTR(constTensorPtr);
+    armnn::TensorInfo tensorInfo = ToTensorInfo(constTensorPtr->info());
+
+    switch (constTensorPtr->data_type())
+    {
+        case ConstTensorData_ByteData:
+            return armnn::ConstTensor(tensorInfo, constTensorPtr->data_as_ByteData()->data()->data());
+        case ConstTensorData_ShortData:
+            return armnn::ConstTensor(tensorInfo, constTensorPtr->data_as_ShortData()->data()->data());
+        case ConstTensorData_IntData:
+            return armnn::ConstTensor(tensorInfo, constTensorPtr->data_as_IntData()->data()->data());
+        case ConstTensorData_LongData:
+            return armnn::ConstTensor(tensorInfo, constTensorPtr->data_as_LongData()->data()->data());
+        default:
+        {
+            CheckLocation location = CHECK_LOCATION();
+            throw ParseException(
+                    boost::str(boost::format("Unsupported data type %1% = %2%. %3%") %
+                               constTensorPtr->data_type() %
+                               EnumNameConstTensorData(constTensorPtr->data_type()) %
+                               location.AsString()));
+        }
+    }
 }
 
 DeserializeParser::LayerBaseRawPtrVector DeserializeParser::GetGraphInputs(const GraphPtr& graphPtr)
@@ -596,6 +655,49 @@ void DeserializeParser::ParseAdd(unsigned int layerIndex)
     m_layerName = boost::str(boost::format("Addition:%1%") % layerIndex);
     IConnectableLayer* layer = m_Network->AddAdditionLayer(m_layerName.c_str());
 
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(layerIndex, layer);
+    RegisterOutputSlots(layerIndex, layer);
+}
+
+void DeserializeParser::ParseConvolution2d(unsigned int layerIndex)
+{
+    CHECK_LAYERS(m_Graph, 0, layerIndex);
+    auto inputs = GetInputs(m_Graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = boost::str(boost::format("Convolution2d:%1%") % layerIndex);
+
+    auto serializerLayer = m_Graph->layers()->Get(layerIndex)->layer_as_Convolution2dLayer();
+    auto serializerDescriptor = serializerLayer->descriptor();
+
+    armnn::Convolution2dDescriptor descriptor;
+    descriptor.m_PadLeft = serializerDescriptor->padLeft();
+    descriptor.m_PadRight = serializerDescriptor->padRight();
+    descriptor.m_PadTop = serializerDescriptor->padTop();
+    descriptor.m_PadBottom = serializerDescriptor->padBottom();
+    descriptor.m_StrideX = serializerDescriptor->strideX();
+    descriptor.m_StrideY = serializerDescriptor->strideY();;
+    descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();;
+    descriptor.m_DataLayout = ToDataLayout(serializerDescriptor->dataLayout());
+
+    armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
+    armnn::ConstTensor biases;
+
+    if (descriptor.m_BiasEnabled)
+    {
+        biases = ToConstTensor(serializerLayer->biases());
+    }
+    IConnectableLayer* layer = m_Network->AddConvolution2dLayer(descriptor,
+                                                                weights,
+                                                                biases,
+                                                                layerName.c_str());
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 

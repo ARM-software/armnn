@@ -15,6 +15,7 @@ class DeserializeParser : public IDeserializeParser
 {
 public:
     // Shorthands for deserializer types
+    using ConstTensorRawPtr = const armnn::armnnSerializer::ConstTensor *;
     using GraphPtr = const armnn::armnnSerializer::SerializedGraph *;
     using TensorRawPtr = const armnn::armnnSerializer::TensorInfo *;
     using PoolingDescriptor = const armnn::armnnSerializer::Pooling2dDescriptor *;
@@ -68,6 +69,7 @@ private:
 
     void ParseUnsupportedLayer(unsigned int layerIndex);
     void ParseAdd(unsigned int layerIndex);
+    void ParseConvolution2d(unsigned int layerIndex);
     void ParseMultiplication(unsigned int layerIndex);
     void ParsePooling2d(unsigned int layerIndex);
     void ParseReshape(unsigned int layerIndex);

@@ -45,6 +45,12 @@ public:
     void VisitAdditionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 
+    void VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::Convolution2dDescriptor& descriptor,
+                                 const armnn::ConstTensor& weights,
+                                 const armnn::Optional<armnn::ConstTensor>& biases,
+                                 const char* = nullptr) override;
+
     void VisitInputLayer(const armnn::IConnectableLayer* layer,
                          armnn::LayerBindingId id,
                          const char* name = nullptr) override;
@@ -77,6 +83,13 @@ private:
 
     /// Creates the serializer AnyLayer for the layer and adds it to m_serializedLayers.
     void CreateAnyLayer(const flatbuffers::Offset<void>& layer, const armnn::armnnSerializer::Layer serializerLayer);
+
+    /// Creates the serializer ConstTensor for the armnn ConstTensor.
+    flatbuffers::Offset<armnn::armnnSerializer::ConstTensor> CreateConstTensorInfo(
+            const armnn::ConstTensor& constTensor);
+
+    template <typename T>
+    flatbuffers::Offset<flatbuffers::Vector<T>> CreateDataVector(const void* memory, unsigned int size);
 
     ///Function which maps Guid to an index
     uint32_t GetSerializedId(unsigned int guid);

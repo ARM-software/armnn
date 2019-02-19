@@ -74,7 +74,8 @@ enum LayerType : uint {
     Output = 3,
     Pooling2d = 4,
     Reshape = 5,
-    Softmax = 6
+    Softmax = 6,
+    Convolution2d = 7
 }
 
 // Base layer table to be used as part of other layers
@@ -94,6 +95,24 @@ table BindableLayerBase {
 // Table for each layer defined below
 table AdditionLayer {
     base:LayerBase;
+}
+
+table Convolution2dLayer {
+    base:LayerBase;
+    descriptor:Convolution2dDescriptor;
+    weights:ConstTensor;
+    biases:ConstTensor;
+}
+
+table Convolution2dDescriptor {
+    padLeft:uint;
+    padRight:uint;
+    padTop:uint;
+    padBottom:uint;
+    strideX:uint;
+    strideY:uint;
+    biasEnabled:bool = false;
+    dataLayout:DataLayout = NCHW;
 }
 
 table InputLayer {
@@ -164,6 +183,7 @@ table ReshapeDescriptor {
 
 union Layer {
     AdditionLayer,
+    Convolution2dLayer,
     InputLayer,
     MultiplicationLayer,
     OutputLayer,

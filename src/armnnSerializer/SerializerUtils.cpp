@@ -11,6 +11,23 @@ namespace armnnSerializer
 using namespace armnn;
 namespace serializer = armnn::armnnSerializer;
 
+serializer::ConstTensorData GetFlatBufferConstTensorData(DataType dataType)
+{
+    switch (dataType)
+    {
+        case DataType::Float32:
+        case DataType::Signed32:
+            return serializer::ConstTensorData::ConstTensorData_IntData;
+        case DataType::Float16:
+            return serializer::ConstTensorData::ConstTensorData_ShortData;
+        case DataType::QuantisedAsymm8:
+        case DataType::Boolean:
+            return serializer::ConstTensorData::ConstTensorData_ByteData;
+        default:
+            return serializer::ConstTensorData::ConstTensorData_NONE;
+    }
+}
+
 serializer::DataType GetFlatBufferDataType(DataType dataType)
 {
     switch (dataType)

@@ -11,6 +11,8 @@
 namespace armnnSerializer
 {
 
+armnn::armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType dataType);
+
 armnn::armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType);
 
 armnn::armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout);

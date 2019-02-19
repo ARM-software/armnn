@@ -75,7 +75,8 @@ enum LayerType : uint {
     Pooling2d = 4,
     Reshape = 5,
     Softmax = 6,
-    Convolution2d = 7
+    Convolution2d = 7,
+    DepthwiseConvolution2d = 8
 }
 
 // Base layer table to be used as part of other layers
@@ -168,6 +169,24 @@ table SoftmaxDescriptor {
     beta:float;
 }
 
+table DepthwiseConvolution2dLayer {
+    base:LayerBase;
+    descriptor:DepthwiseConvolution2dDescriptor;
+    weights:ConstTensor;
+    biases:ConstTensor;
+}
+
+table DepthwiseConvolution2dDescriptor {
+    padLeft:uint;
+    padRight:uint;
+    padTop:uint;
+    padBottom:uint;
+    strideX:uint;
+    strideY:uint;
+    biasEnabled:bool = false;
+    dataLayout:DataLayout = NCHW;
+}
+
 table OutputLayer {
     base:BindableLayerBase;
 }
@@ -184,6 +203,7 @@ table ReshapeDescriptor {
 union Layer {
     AdditionLayer,
     Convolution2dLayer,
+    DepthwiseConvolution2dLayer,
     InputLayer,
     MultiplicationLayer,
     OutputLayer,

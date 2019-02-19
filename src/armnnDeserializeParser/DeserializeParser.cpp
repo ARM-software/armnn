@@ -170,12 +170,13 @@ DeserializeParser::DeserializeParser()
 m_ParserFunctions(Layer_MAX+1, &DeserializeParser::ParseUnsupportedLayer)
 {
     // register supported layers
-    m_ParserFunctions[Layer_AdditionLayer]       = &DeserializeParser::ParseAdd;
-    m_ParserFunctions[Layer_Convolution2dLayer]  = &DeserializeParser::ParseConvolution2d;
-    m_ParserFunctions[Layer_MultiplicationLayer] = &DeserializeParser::ParseMultiplication;
-    m_ParserFunctions[Layer_Pooling2dLayer]      = &DeserializeParser::ParsePooling2d;
-    m_ParserFunctions[Layer_ReshapeLayer]        = &DeserializeParser::ParseReshape;
-    m_ParserFunctions[Layer_SoftmaxLayer]        = &DeserializeParser::ParseSoftmax;
+    m_ParserFunctions[Layer_AdditionLayer]               = &DeserializeParser::ParseAdd;
+    m_ParserFunctions[Layer_Convolution2dLayer]          = &DeserializeParser::ParseConvolution2d;
+    m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &DeserializeParser::ParseDepthwiseConvolution2d;
+    m_ParserFunctions[Layer_MultiplicationLayer]         = &DeserializeParser::ParseMultiplication;
+    m_ParserFunctions[Layer_Pooling2dLayer]              = &DeserializeParser::ParsePooling2d;
+    m_ParserFunctions[Layer_ReshapeLayer]                = &DeserializeParser::ParseReshape;
+    m_ParserFunctions[Layer_SoftmaxLayer]                = &DeserializeParser::ParseSoftmax;
 }
 
 DeserializeParser::LayerBaseRawPtr DeserializeParser::GetBaseLayer(const GraphPtr& graphPtr, unsigned int layerIndex)
@@ -188,6 +189,8 @@ DeserializeParser::LayerBaseRawPtr DeserializeParser::GetBaseLayer(const GraphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
         case Layer::Layer_Convolution2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_Convolution2dLayer()->base();
+        case Layer::Layer_DepthwiseConvolution2dLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_DepthwiseConvolution2dLayer()->base();
         case Layer::Layer_InputLayer:
            return graphPtr->layers()->Get(layerIndex)->layer_as_InputLayer()->base()->base();
         case Layer::Layer_MultiplicationLayer:
@@ -698,6 +701,50 @@ void DeserializeParser::ParseConvolution2d(unsigned int layerIndex)
                                                                 weights,
                                                                 biases,
                                                                 layerName.c_str());
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(layerIndex, layer);
+    RegisterOutputSlots(layerIndex, layer);
+}
+
+void DeserializeParser::ParseDepthwiseConvolution2d(unsigned int layerIndex)
+{
+    CHECK_LAYERS(m_Graph, 0, layerIndex);
+    auto inputs = GetInputs(m_Graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = boost::str(boost::format("DepthwiseConvolution2d:%1%") % layerIndex);
+
+    auto serializerLayer = m_Graph->layers()->Get(layerIndex)->layer_as_DepthwiseConvolution2dLayer();
+    auto serializerDescriptor = serializerLayer->descriptor();
+
+    armnn::DepthwiseConvolution2dDescriptor descriptor;
+    descriptor.m_PadLeft     = serializerDescriptor->padLeft();
+    descriptor.m_PadRight    = serializerDescriptor->padRight();
+    descriptor.m_PadTop      = serializerDescriptor->padTop();
+    descriptor.m_PadBottom   = serializerDescriptor->padBottom();
+    descriptor.m_StrideX     = serializerDescriptor->strideX();
+    descriptor.m_StrideY     = serializerDescriptor->strideY();;
+    descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();;
+    descriptor.m_DataLayout  = ToDataLayout(serializerDescriptor->dataLayout());
+
+    armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
+    armnn::ConstTensor biases;
+
+    if (descriptor.m_BiasEnabled)
+    {
+        biases = ToConstTensor(serializerLayer->biases());
+    }
+    IConnectableLayer* layer = m_Network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                                         weights,
+                                                                         biases,
+                                                                         layerName.c_str());
+
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 

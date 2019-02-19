@@ -51,20 +51,22 @@ public:
                                  const armnn::Optional<armnn::ConstTensor>& biases,
                                  const char* = nullptr) override;
 
+    void VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                          const armnn::DepthwiseConvolution2dDescriptor& descriptor,
+                                          const armnn::ConstTensor& weights,
+                                          const armnn::Optional<armnn::ConstTensor>& biases,
+                                          const char* name = nullptr) override;
+
     void VisitInputLayer(const armnn::IConnectableLayer* layer,
                          armnn::LayerBindingId id,
                          const char* name = nullptr) override;
 
-    void VisitOutputLayer(const armnn::IConnectableLayer* layer,
-                          armnn::LayerBindingId id,
-                          const char* name = nullptr) override;
-
     void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,
                                   const char* name = nullptr) override;
 
-    void VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
-                           const armnn::SoftmaxDescriptor& softmaxDescriptor,
-                           const char* name = nullptr) override;
+    void VisitOutputLayer(const armnn::IConnectableLayer* layer,
+                          armnn::LayerBindingId id,
+                          const char* name = nullptr) override;
 
     void VisitPooling2dLayer(const armnn::IConnectableLayer* layer,
                              const armnn::Pooling2dDescriptor& pooling2dDescriptor,
@@ -72,6 +74,10 @@ public:
 
     void VisitReshapeLayer(const armnn::IConnectableLayer* layer,
                            const armnn::ReshapeDescriptor& reshapeDescriptor,
+                           const char* name = nullptr) override;
+
+    void VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                           const armnn::SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;
 
 private:

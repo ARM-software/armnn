@@ -129,6 +129,39 @@ void SerializerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_Convolution2dLayer);
 }
 
+void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
+                                                         const DepthwiseConvolution2dDescriptor& descriptor,
+                                                         const ConstTensor& weights,
+                                                         const Optional<ConstTensor>& biases,
+                                                         const char* name)
+{
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_DepthwiseConvolution2d);
+    auto fbDescriptor = CreateDepthwiseConvolution2dDescriptor(m_flatBufferBuilder,
+                                                               descriptor.m_PadLeft,
+                                                               descriptor.m_PadRight,
+                                                               descriptor.m_PadTop,
+                                                               descriptor.m_PadBottom,
+                                                               descriptor.m_StrideX,
+                                                               descriptor.m_StrideY,
+                                                               descriptor.m_BiasEnabled,
+                                                               GetFlatBufferDataLayout(descriptor.m_DataLayout));
+
+    flatbuffers::Offset<serializer::ConstTensor> fbWeightsConstTensorInfo = CreateConstTensorInfo(weights);
+    flatbuffers::Offset<serializer::ConstTensor> fbBiasesConstTensorInfo;
+    if (biases.has_value())
+    {
+        fbBiasesConstTensorInfo = CreateConstTensorInfo(biases.value());
+    }
+
+    auto flatBufferLayer = CreateDepthwiseConvolution2dLayer(m_flatBufferBuilder,
+                                                             fbBaseLayer,
+                                                             fbDescriptor,
+                                                             fbWeightsConstTensorInfo,
+                                                             fbBiasesConstTensorInfo);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_DepthwiseConvolution2dLayer);
+}
+
 // Build FlatBuffer for Multiplication Layer
 void SerializerVisitor::VisitMultiplicationLayer(const IConnectableLayer* layer, const char* name)
 {

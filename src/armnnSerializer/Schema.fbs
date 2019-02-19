@@ -73,7 +73,8 @@ enum LayerType : uint {
     Multiplication = 2,
     Output = 3,
     Pooling2d = 4,
-    Softmax = 5
+    Reshape = 5,
+    Softmax = 6
 }
 
 // Base layer table to be used as part of other layers
@@ -152,12 +153,22 @@ table OutputLayer {
     base:BindableLayerBase;
 }
 
+table ReshapeLayer {
+    base:LayerBase;
+    descriptor:ReshapeDescriptor;
+}
+
+table ReshapeDescriptor {
+  targetShape:[uint];
+}
+
 union Layer {
     AdditionLayer,
     InputLayer,
     MultiplicationLayer,
     OutputLayer,
     Pooling2dLayer,
+    ReshapeLayer,
     SoftmaxLayer
 }
 

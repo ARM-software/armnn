@@ -8,6 +8,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 
 * Addition
 * Multiplication
+* Reshape
 * Softmax
 * Pooling2d
 

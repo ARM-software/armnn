@@ -49,7 +49,6 @@ void SerializerVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBin
     auto flatBufferInputBindableBaseLayer = serializer::CreateBindableLayerBase(m_flatBufferBuilder,
                                                                                 flatBufferInputBaseLayer,
                                                                                 id);
-
     // Push layer Guid to outputIds.
     m_inputIds.push_back(GetSerializedId(layer->GetGuid()));
 
@@ -104,6 +103,31 @@ void SerializerVisitor::VisitMultiplicationLayer(const IConnectableLayer* layer,
 
     // Add the AnyLayer to the FlatBufferLayers
     CreateAnyLayer(flatBufferMultiplicationLayer.o, serializer::Layer::Layer_MultiplicationLayer);
+}
+
+// Build FlatBuffer for Reshape Layer
+void SerializerVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
+                                          const armnn::ReshapeDescriptor& reshapeDescriptor,
+                                          const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferReshapeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Reshape);
+
+    std::vector<unsigned int> targetShape;
+    for (unsigned int i =0; i < reshapeDescriptor.m_TargetShape.GetNumDimensions(); i++)
+    {
+        targetShape.push_back(reshapeDescriptor.m_TargetShape[i]);
+    }
+
+    auto flatBufferReshapeDesc = serializer::CreateReshapeDescriptor(m_flatBufferBuilder,
+                                                                     m_flatBufferBuilder.CreateVector(targetShape));
+
+    // Create the FlatBuffer ReshapeLayer
+    auto flatBufferReshapeLayer = serializer::CreateReshapeLayer(m_flatBufferBuilder, flatBufferReshapeBaseLayer,
+                                                                 flatBufferReshapeDesc);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferReshapeLayer.o, serializer::Layer::Layer_ReshapeLayer);
 }
 
 // Build FlatBuffer for Softmax Layer

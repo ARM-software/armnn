@@ -53,6 +53,8 @@ public:
     static int32_t GetBindingLayerInfo(const GraphPtr& graphPtr, unsigned int layerIndex);
     armnn::Pooling2dDescriptor GetPoolingDescriptor(PoolingDescriptor pooling2dDescriptor,
                                                     unsigned int layerIndex);
+    static armnn::TensorInfo OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
+                                                  const std::vector<uint32_t> & targetDimsIn);
 
 private:
     // No copying allowed until it is wanted and properly implemented
@@ -69,6 +71,7 @@ private:
     void ParseAdd(unsigned int layerIndex);
     void ParseMultiplication(unsigned int layerIndex);
     void ParsePooling2d(unsigned int layerIndex);
+    void ParseReshape(unsigned int layerIndex);
     void ParseSoftmax(unsigned int layerIndex);
 
     void RegisterOutputSlotOfConnection(uint32_t connectionIndex, armnn::IOutputSlot* slot);

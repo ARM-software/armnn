@@ -557,6 +557,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnDeserializeParser/test/DeserializeAdd.cpp
                 src/armnnDeserializeParser/test/DeserializeMultiplication.cpp
                 src/armnnDeserializeParser/test/DeserializePooling2d.cpp
+                src/armnnDeserializeParser/test/DeserializeReshape.cpp
                 src/armnnDeserializeParser/test/ParserFlatbuffersSerializeFixture.hpp
                 src/armnnDeserializeParser/test/SchemaSerialize.s
                 )

@@ -64,6 +64,10 @@ public:
                              const armnn::Pooling2dDescriptor& pooling2dDescriptor,
                              const char* name = nullptr) override;
 
+    void VisitReshapeLayer(const armnn::IConnectableLayer* layer,
+                           const armnn::ReshapeDescriptor& reshapeDescriptor,
+                           const char* name = nullptr) override;
+
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.

@@ -42,6 +42,10 @@ public:
         return m_serializedLayers;
     }
 
+    void VisitActivationLayer(const armnn::IConnectableLayer* layer,
+                              const armnn::ActivationDescriptor& descriptor,
+                              const char* name = nullptr) override;
+
     void VisitAdditionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 

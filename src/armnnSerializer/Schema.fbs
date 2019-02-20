@@ -9,6 +9,19 @@ file_identifier "ARMN";
 
 file_extension "armnn";
 
+enum ActivationFunction : byte {
+    Sigmoid = 0,
+    TanH = 1,
+    Linear = 2,
+    ReLu = 3,
+    BoundedReLu = 4,
+    SoftReLu = 5,
+    LeakyReLu = 6,
+    Abs = 7,
+    Sqrt = 8,
+    Square = 9
+}
+
 enum DataType : byte {
     Float16 = 0,
     Float32 = 1,
@@ -76,7 +89,8 @@ enum LayerType : uint {
     Reshape = 5,
     Softmax = 6,
     Convolution2d = 7,
-    DepthwiseConvolution2d = 8
+    DepthwiseConvolution2d = 8,
+    Activation = 9
 }
 
 // Base layer table to be used as part of other layers
@@ -94,6 +108,17 @@ table BindableLayerBase {
 }
 
 // Table for each layer defined below
+table ActivationLayer {
+    base:LayerBase;
+    descriptor:ActivationDescriptor;
+}
+
+table ActivationDescriptor {
+    function:ActivationFunction = Sigmoid;
+    a:float;
+    b:float;
+}
+
 table AdditionLayer {
     base:LayerBase;
 }
@@ -201,6 +226,7 @@ table ReshapeDescriptor {
 }
 
 union Layer {
+    ActivationLayer,
     AdditionLayer,
     Convolution2dLayer,
     DepthwiseConvolution2dLayer,

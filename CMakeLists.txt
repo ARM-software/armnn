@@ -553,7 +553,9 @@ if(BUILD_UNIT_TESTS)
         enable_language(ASM)
         list(APPEND unittest_sources
                 src/armnnSerializer/Schema_generated.h
+                src/armnnSerializer/test/ActivationSerializationTests.cpp
                 src/armnnSerializer/test/SerializerTests.cpp
+                src/armnnDeserializer/test/DeserializeActivation.cpp
                 src/armnnDeserializer/test/DeserializeAdd.cpp
                 src/armnnDeserializer/test/DeserializeConvolution2d.cpp
                 src/armnnDeserializer/test/DeserializeMultiplication.cpp

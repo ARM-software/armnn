@@ -170,6 +170,7 @@ Deserializer::Deserializer()
 m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
 {
     // register supported layers
+    m_ParserFunctions[Layer_ActivationLayer]             = &Deserializer::ParseActivation;
     m_ParserFunctions[Layer_AdditionLayer]               = &Deserializer::ParseAdd;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &Deserializer::ParseDepthwiseConvolution2d;
@@ -185,6 +186,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
 
     switch(layerType)
     {
+        case Layer::Layer_ActivationLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ActivationLayer()->base();
         case Layer::Layer_AdditionLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
         case Layer::Layer_Convolution2dLayer:
@@ -235,6 +238,33 @@ armnn::DataLayout ToDataLayout(armnnSerializer::DataLayout dataLayout)
         case armnnSerializer::DataLayout::DataLayout_NCHW:
         default:
             return armnn::DataLayout::NCHW;
+    }
+}
+
+armnn::ActivationFunction ToActivationFunction(armnnSerializer::ActivationFunction function)
+{
+    switch (function)
+    {
+        case armnnSerializer::ActivationFunction_Sigmoid:
+            return armnn::ActivationFunction::Sigmoid;
+        case armnnSerializer::ActivationFunction_TanH:
+            return armnn::ActivationFunction::TanH;
+        case armnnSerializer::ActivationFunction_Linear:
+            return armnn::ActivationFunction::Linear;
+        case armnnSerializer::ActivationFunction_ReLu:
+            return armnn::ActivationFunction::ReLu;
+        case armnnSerializer::ActivationFunction_BoundedReLu:
+            return armnn::ActivationFunction::BoundedReLu;
+        case armnnSerializer::ActivationFunction_LeakyReLu:
+            return armnn::ActivationFunction::LeakyReLu;
+        case armnnSerializer::ActivationFunction_Abs:
+            return armnn::ActivationFunction::Abs;
+        case armnnSerializer::ActivationFunction_Sqrt:
+            return armnn::ActivationFunction::Sqrt;
+        case armnnSerializer::ActivationFunction_Square:
+            return armnn::ActivationFunction::Square;
+        default:
+            return armnn::ActivationFunction::Sigmoid;
     }
 }
 
@@ -643,6 +673,35 @@ void Deserializer::RegisterOutputSlotOfConnection(uint32_t connectionIndex,
     }
 
     slots.outputSlot = slot;
+}
+
+void Deserializer::ParseActivation(unsigned int layerIndex)
+{
+    CHECK_LAYERS(m_Graph, 0, layerIndex);
+    auto inputs = GetInputs(m_Graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = boost::str(boost::format("Activation:%1%") % layerIndex);
+
+    auto serializerLayer = m_Graph->layers()->Get(layerIndex)->layer_as_ActivationLayer();
+    auto serializerDescriptor = serializerLayer->descriptor();
+
+    armnn::ActivationDescriptor descriptor;
+    descriptor.m_Function = ToActivationFunction(serializerDescriptor->function());
+    descriptor.m_A = serializerDescriptor->a();
+    descriptor.m_B = serializerDescriptor->b();
+
+    IConnectableLayer* layer = m_Network->AddActivationLayer(descriptor,
+                                                             layerName.c_str());
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(layerIndex, layer);
+    RegisterOutputSlots(layerIndex, layer);
 }
 
 void Deserializer::ParseAdd(unsigned int layerIndex)

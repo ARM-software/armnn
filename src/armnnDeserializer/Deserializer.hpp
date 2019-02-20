@@ -68,6 +68,7 @@ private:
     using LayerParsingFunction = void(Deserializer::*)(unsigned int layerIndex);
 
     void ParseUnsupportedLayer(unsigned int layerIndex);
+    void ParseActivation(unsigned int layerIndex);
     void ParseAdd(unsigned int layerIndex);
     void ParseConvolution2d(unsigned int layerIndex);
     void ParseDepthwiseConvolution2d(unsigned int layerIndex);

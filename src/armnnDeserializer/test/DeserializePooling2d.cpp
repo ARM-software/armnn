@@ -107,51 +107,51 @@ struct Pooling2dFixture : public ParserFlatbuffersSerializeFixture
     }
 };
 
-struct SimpleAvgPoolingFixture : Pooling2dFixture
+struct SimpleAvgPooling2dFixture : Pooling2dFixture
 {
-    SimpleAvgPoolingFixture() : Pooling2dFixture("[ 1, 2, 2, 1 ]", "[ 1, 1, 1, 1 ]",
-                                              "Float32", "NHWC", "Average") {}
+    SimpleAvgPooling2dFixture() : Pooling2dFixture("[ 1, 2, 2, 1 ]", "[ 1, 1, 1, 1 ]",
+                                                   "Float32", "NHWC", "Average") {}
 };
 
-struct SimpleAvgPoolingFixture2 : Pooling2dFixture
+struct SimpleAvgPooling2dFixture2 : Pooling2dFixture
 {
-    SimpleAvgPoolingFixture2() : Pooling2dFixture("[ 1, 2, 2, 1 ]",
-                                               "[ 1, 1, 1, 1 ]",
-                                                "QuantisedAsymm8", "NHWC", "Average") {}
+    SimpleAvgPooling2dFixture2() : Pooling2dFixture("[ 1, 2, 2, 1 ]",
+                                                    "[ 1, 1, 1, 1 ]",
+                                                    "QuantisedAsymm8", "NHWC", "Average") {}
 };
 
-struct SimpleMaxPoolingFixture : Pooling2dFixture
+struct SimpleMaxPooling2dFixture : Pooling2dFixture
 {
-    SimpleMaxPoolingFixture() : Pooling2dFixture("[ 1, 1, 2, 2 ]",
-                                                 "[ 1, 1, 1, 1 ]",
-                                                 "Float32", "NCHW", "Max") {}
+    SimpleMaxPooling2dFixture() : Pooling2dFixture("[ 1, 1, 2, 2 ]",
+                                                   "[ 1, 1, 1, 1 ]",
+                                                   "Float32", "NCHW", "Max") {}
 };
 
-struct SimpleMaxPoolingFixture2 : Pooling2dFixture
+struct SimpleMaxPooling2dFixture2 : Pooling2dFixture
 {
-    SimpleMaxPoolingFixture2() : Pooling2dFixture("[ 1, 1, 2, 2 ]",
-                                                  "[ 1, 1, 1, 1 ]",
-                                                  "QuantisedAsymm8", "NCHW", "Max") {}
+    SimpleMaxPooling2dFixture2() : Pooling2dFixture("[ 1, 1, 2, 2 ]",
+                                                    "[ 1, 1, 1, 1 ]",
+                                                    "QuantisedAsymm8", "NCHW", "Max") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(PoolingQuantisedAsymm8Avg, SimpleAvgPoolingFixture)
+BOOST_FIXTURE_TEST_CASE(Pooling2dFloat32Avg, SimpleAvgPooling2dFixture)
 {
     RunTest<4, armnn::DataType::Float32>(0, { 2, 3, 5, 2 }, { 3 });
 }
 
-BOOST_FIXTURE_TEST_CASE(PoolingFloat32Avg, SimpleAvgPoolingFixture2)
+BOOST_FIXTURE_TEST_CASE(Pooling2dQuantisedAsymm8Avg, SimpleAvgPooling2dFixture2)
 {
     RunTest<4, armnn::DataType::QuantisedAsymm8>(0,
                                                 { 20, 40, 60, 80 },
                                                 { 50 });
 }
 
-BOOST_FIXTURE_TEST_CASE(PoolingQuantisedAsymm8Max, SimpleMaxPoolingFixture)
+BOOST_FIXTURE_TEST_CASE(Pooling2dFloat32Max, SimpleMaxPooling2dFixture)
 {
     RunTest<4, armnn::DataType::Float32>(0, { 2, 5, 5, 2 }, { 5 });
 }
 
-BOOST_FIXTURE_TEST_CASE(PoolingFloat32Max, SimpleMaxPoolingFixture2)
+BOOST_FIXTURE_TEST_CASE(Pooling2dQuantisedAsymm8Max, SimpleMaxPooling2dFixture2)
 {
     RunTest<4, armnn::DataType::QuantisedAsymm8>(0,
                                                 { 20, 40, 60, 80 },

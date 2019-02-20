@@ -13,20 +13,19 @@
 #include <map>
 #include <vector>
 
-namespace armnnDeserializeParser
+namespace armnnDeserializer
 {
-
 using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
 
-class IDeserializeParser;
-using IDeserializeParserPtr = std::unique_ptr<IDeserializeParser, void(*)(IDeserializeParser* parser)>;
+class IDeserializer;
+using IDeserializerPtr = std::unique_ptr<IDeserializer, void(*)(IDeserializer* parser)>;
 
-class IDeserializeParser
+class IDeserializer
 {
 public:
-    static IDeserializeParser* CreateRaw();
-    static IDeserializeParserPtr Create();
-    static void Destroy(IDeserializeParser* parser);
+    static IDeserializer* CreateRaw();
+    static IDeserializerPtr Create();
+    static void Destroy(IDeserializer* parser);
 
     /// Create an input network from binary file contents
     virtual armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent) = 0;
@@ -45,7 +44,7 @@ public:
                                                          const std::string& name) const = 0;
 
 protected:
-    virtual ~IDeserializeParser() {};
+    virtual ~IDeserializer() {};
 
 };
-}
+} //namespace armnnDeserializer

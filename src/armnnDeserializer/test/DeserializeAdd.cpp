@@ -5,20 +5,20 @@
 
 #include <boost/test/unit_test.hpp>
 #include "ParserFlatbuffersSerializeFixture.hpp"
-#include "../DeserializeParser.hpp"
+#include "../Deserializer.hpp"
 
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_SUITE(DeserializeParser)
+BOOST_AUTO_TEST_SUITE(Deserializer)
 
-struct MultiplicationFixture : public ParserFlatbuffersSerializeFixture
+struct AddFixture : public ParserFlatbuffersSerializeFixture
 {
-    explicit MultiplicationFixture(const std::string & inputShape1,
-                                   const std::string & inputShape2,
-                                   const std::string & outputShape,
-                                   const std::string & dataType,
-                                   const std::string & activation="NONE")
+    explicit AddFixture(const std::string & inputShape1,
+                        const std::string & inputShape2,
+                        const std::string & outputShape,
+                        const std::string & dataType,
+                        const std::string & activation="NONE")
     {
         m_JsonString = R"(
         {
@@ -70,12 +70,12 @@ struct MultiplicationFixture : public ParserFlatbuffersSerializeFixture
                                 },}},
                 },
                 {
-                layer_type: "MultiplicationLayer",
+                layer_type: "AdditionLayer",
                 layer : {
                         base: {
                              index:2,
-                             layerName: "MultiplicationLayer",
-                             layerType: "Multiplication",
+                             layerName: "AdditionLayer",
+                             layerType: "Addition",
                              inputSlots: [
                                             {
                                              index: 0,
@@ -124,38 +124,38 @@ struct MultiplicationFixture : public ParserFlatbuffersSerializeFixture
 };
 
 
-struct SimpleMultiplicationFixture : MultiplicationFixture
+struct SimpleAddFixture : AddFixture
 {
-    SimpleMultiplicationFixture() : MultiplicationFixture("[ 2, 2 ]",
-                                                          "[ 2, 2 ]",
-                                                          "[ 2, 2 ]",
-                                                          "QuantisedAsymm8") {}
+    SimpleAddFixture() : AddFixture("[ 2, 2 ]",
+                                    "[ 2, 2 ]",
+                                    "[ 2, 2 ]",
+                                    "QuantisedAsymm8") {}
 };
 
-struct SimpleMultiplicationFixture2 : MultiplicationFixture
+struct SimpleAddFixture2 : AddFixture
 {
-    SimpleMultiplicationFixture2() : MultiplicationFixture("[ 2, 2, 1, 1 ]",
-                                                           "[ 2, 2, 1, 1 ]",
-                                                           "[ 2, 2, 1, 1 ]",
-                                                           "Float32") {}
+    SimpleAddFixture2() : AddFixture("[ 2, 2, 1, 1 ]",
+                                     "[ 2, 2, 1, 1 ]",
+                                     "[ 2, 2, 1, 1 ]",
+                                     "Float32") {}
 };
 
-BOOST_FIXTURE_TEST_CASE(MultiplicationQuantisedAsymm8, SimpleMultiplicationFixture)
+BOOST_FIXTURE_TEST_CASE(AddQuantisedAsymm8, SimpleAddFixture)
 {
   RunTest<2, armnn::DataType::QuantisedAsymm8>(
       0,
       {{"InputLayer1", { 0, 1, 2, 3 }},
       {"InputLayer2", { 4, 5, 6, 7 }}},
-      {{"OutputLayer", { 0, 5, 12, 21 }}});
+      {{"OutputLayer", { 4, 6, 8, 10 }}});
 }
 
-BOOST_FIXTURE_TEST_CASE(MultiplicationFloat32, SimpleMultiplicationFixture2)
+BOOST_FIXTURE_TEST_CASE(AddFloat32, SimpleAddFixture2)
 {
     RunTest<4, armnn::DataType::Float32>(
     0,
-    {{"InputLayer1", { 100, 40, 226, 9 }},
-    {"InputLayer2", {   5,   8,  1, 12 }}},
-    {{"OutputLayer", { 500, 320, 226, 108 }}});
+    {{"InputLayer1", { 111, 85, 226, 3 }},
+    {"InputLayer2", {   5,   8,  10, 12 }}},
+    {{"OutputLayer", { 116, 93, 236, 15 }}});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

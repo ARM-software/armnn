@@ -6,22 +6,22 @@
 #pragma once
 
 #include "armnn/INetwork.hpp"
-#include "armnnDeserializeParser/IDeserializeParser.hpp"
+#include "armnnDeserializer/IDeserializer.hpp"
 #include <Schema_generated.h>
 
-namespace armnnDeserializeParser
+namespace armnnDeserializer
 {
-class DeserializeParser : public IDeserializeParser
+class Deserializer : public IDeserializer
 {
 public:
     // Shorthands for deserializer types
-    using ConstTensorRawPtr = const armnn::armnnSerializer::ConstTensor *;
-    using GraphPtr = const armnn::armnnSerializer::SerializedGraph *;
-    using TensorRawPtr = const armnn::armnnSerializer::TensorInfo *;
-    using PoolingDescriptor = const armnn::armnnSerializer::Pooling2dDescriptor *;
+    using ConstTensorRawPtr = const armnnSerializer::ConstTensor *;
+    using GraphPtr = const armnnSerializer::SerializedGraph *;
+    using TensorRawPtr = const armnnSerializer::TensorInfo *;
+    using PoolingDescriptor = const armnnSerializer::Pooling2dDescriptor *;
     using TensorRawPtrVector = std::vector<TensorRawPtr>;
-    using LayerRawPtr = const armnn::armnnSerializer::LayerBase *;
-    using LayerBaseRawPtr = const armnn::armnnSerializer::LayerBase *;
+    using LayerRawPtr = const armnnSerializer::LayerBase *;
+    using LayerBaseRawPtr = const armnnSerializer::LayerBase *;
     using LayerBaseRawPtrVector = std::vector<LayerBaseRawPtr>;
 
 public:
@@ -38,8 +38,8 @@ public:
     /// Retrieve binding info (layer id and tensor info) for the network output identified by the given layer name
     BindingPointInfo GetNetworkOutputBindingInfo(unsigned int layerId, const std::string& name) const override;
 
-    DeserializeParser();
-    ~DeserializeParser() {}
+    Deserializer();
+    ~Deserializer() {}
 
 public:
     // testable helpers
@@ -58,14 +58,14 @@ public:
 
 private:
     // No copying allowed until it is wanted and properly implemented
-    DeserializeParser(const DeserializeParser&) = delete;
-    DeserializeParser& operator=(const DeserializeParser&) = delete;
+    Deserializer(const Deserializer&) = delete;
+    Deserializer& operator=(const Deserializer&) = delete;
 
     /// Create the network from an already loaded flatbuffers graph
     armnn::INetworkPtr CreateNetworkFromGraph();
 
     // signature for the parser functions
-    using LayerParsingFunction = void(DeserializeParser::*)(unsigned int layerIndex);
+    using LayerParsingFunction = void(Deserializer::*)(unsigned int layerIndex);
 
     void ParseUnsupportedLayer(unsigned int layerIndex);
     void ParseAdd(unsigned int layerIndex);
@@ -107,4 +107,4 @@ private:
     std::vector<Connection>   m_GraphConnections;
 };
 
-}
+} //namespace armnnDeserializer

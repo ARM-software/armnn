@@ -6,7 +6,7 @@
 #include <armnn/ArmNN.hpp>
 
 #if defined(ARMNN_SERIALIZER)
-#include "armnnDeserializeParser/IDeserializeParser.hpp"
+#include "armnnDeserializer/IDeserializer.hpp"
 #endif
 #if defined(ARMNN_TF_LITE_PARSER)
 #include <armnnTfLiteParser/ITfLiteParser.hpp>
@@ -165,10 +165,10 @@ public:
 
 #if defined(ARMNN_SERIALIZER)
 template <>
-struct CreateNetworkImpl<armnnDeserializeParser::IDeserializeParser>
+struct CreateNetworkImpl<armnnDeserializer::IDeserializer>
 {
 public:
-    using IParser          = armnnDeserializeParser::IDeserializeParser;
+    using IParser          = armnnDeserializer::IDeserializer;
     using Params           = InferenceModelInternal::Params;
     using BindingPointInfo = InferenceModelInternal::BindingPointInfo;
 

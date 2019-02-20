@@ -9,91 +9,90 @@ namespace armnnSerializer
 {
 
 using namespace armnn;
-namespace serializer = armnn::armnnSerializer;
 
-serializer::ConstTensorData GetFlatBufferConstTensorData(DataType dataType)
+armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType dataType)
 {
     switch (dataType)
     {
-        case DataType::Float32:
-        case DataType::Signed32:
-            return serializer::ConstTensorData::ConstTensorData_IntData;
-        case DataType::Float16:
-            return serializer::ConstTensorData::ConstTensorData_ShortData;
-        case DataType::QuantisedAsymm8:
-        case DataType::Boolean:
-            return serializer::ConstTensorData::ConstTensorData_ByteData;
+        case armnn::DataType::Float32:
+        case armnn::DataType::Signed32:
+            return armnnSerializer::ConstTensorData::ConstTensorData_IntData;
+        case armnn::DataType::Float16:
+            return armnnSerializer::ConstTensorData::ConstTensorData_ShortData;
+        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::Boolean:
+            return armnnSerializer::ConstTensorData::ConstTensorData_ByteData;
         default:
-            return serializer::ConstTensorData::ConstTensorData_NONE;
+            return armnnSerializer::ConstTensorData::ConstTensorData_NONE;
     }
 }
 
-serializer::DataType GetFlatBufferDataType(DataType dataType)
+armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType)
 {
     switch (dataType)
     {
-        case DataType::Float32:
-            return serializer::DataType::DataType_Float32;
-        case DataType::Float16:
-            return serializer::DataType::DataType_Float16;
-        case DataType::Signed32:
-            return serializer::DataType::DataType_Signed32;
-        case DataType::QuantisedAsymm8:
-            return serializer::DataType::DataType_QuantisedAsymm8;
-        case DataType::Boolean:
-            return serializer::DataType::DataType_Boolean;
+        case armnn::DataType::Float32:
+            return armnnSerializer::DataType::DataType_Float32;
+        case armnn::DataType::Float16:
+            return armnnSerializer::DataType::DataType_Float16;
+        case armnn::DataType::Signed32:
+            return armnnSerializer::DataType::DataType_Signed32;
+        case armnn::DataType::QuantisedAsymm8:
+            return armnnSerializer::DataType::DataType_QuantisedAsymm8;
+        case armnn::DataType::Boolean:
+            return armnnSerializer::DataType::DataType_Boolean;
         default:
-            return serializer::DataType::DataType_Float16;
+            return armnnSerializer::DataType::DataType_Float16;
     }
 }
 
-serializer::DataLayout GetFlatBufferDataLayout(DataLayout dataLayout)
+armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout)
 {
     switch (dataLayout)
     {
-        case DataLayout::NHWC:
-            return serializer::DataLayout::DataLayout_NHWC;
-        case DataLayout::NCHW:
+        case armnn::DataLayout::NHWC:
+            return armnnSerializer::DataLayout::DataLayout_NHWC;
+        case armnn::DataLayout::NCHW:
         default:
-            return serializer::DataLayout::DataLayout_NCHW;
+            return armnnSerializer::DataLayout::DataLayout_NCHW;
     }
 }
 
-serializer::PoolingAlgorithm GetFlatBufferPoolingAlgorithm(PoolingAlgorithm poolingAlgorithm)
+armnnSerializer::PoolingAlgorithm GetFlatBufferPoolingAlgorithm(armnn::PoolingAlgorithm poolingAlgorithm)
 {
     switch (poolingAlgorithm)
     {
-        case PoolingAlgorithm::Average:
-            return serializer::PoolingAlgorithm::PoolingAlgorithm_Average;
-        case PoolingAlgorithm::L2:
-            return serializer::PoolingAlgorithm::PoolingAlgorithm_L2;
-        case PoolingAlgorithm::Max:
+        case armnn::PoolingAlgorithm::Average:
+            return armnnSerializer::PoolingAlgorithm::PoolingAlgorithm_Average;
+        case armnn::PoolingAlgorithm::L2:
+            return armnnSerializer::PoolingAlgorithm::PoolingAlgorithm_L2;
+        case armnn::PoolingAlgorithm::Max:
         default:
-            return serializer::PoolingAlgorithm::PoolingAlgorithm_Max;
+            return armnnSerializer::PoolingAlgorithm::PoolingAlgorithm_Max;
     }
 }
 
-serializer::OutputShapeRounding GetFlatBufferOutputShapeRounding(OutputShapeRounding outputShapeRounding)
+armnnSerializer::OutputShapeRounding GetFlatBufferOutputShapeRounding(armnn::OutputShapeRounding outputShapeRounding)
 {
     switch (outputShapeRounding)
     {
-        case OutputShapeRounding::Ceiling:
-            return serializer::OutputShapeRounding::OutputShapeRounding_Ceiling;
-        case OutputShapeRounding::Floor:
+        case armnn::OutputShapeRounding::Ceiling:
+            return armnnSerializer::OutputShapeRounding::OutputShapeRounding_Ceiling;
+        case armnn::OutputShapeRounding::Floor:
         default:
-            return serializer::OutputShapeRounding::OutputShapeRounding_Floor;
+            return armnnSerializer::OutputShapeRounding::OutputShapeRounding_Floor;
     }
 }
 
-serializer::PaddingMethod GetFlatBufferPaddingMethod(PaddingMethod paddingMethod)
+armnnSerializer::PaddingMethod GetFlatBufferPaddingMethod(armnn::PaddingMethod paddingMethod)
 {
     switch (paddingMethod)
     {
-        case PaddingMethod::IgnoreValue:
-            return serializer::PaddingMethod::PaddingMethod_IgnoreValue;
-        case PaddingMethod::Exclude:
+        case armnn::PaddingMethod::IgnoreValue:
+            return armnnSerializer::PaddingMethod::PaddingMethod_IgnoreValue;
+        case armnn::PaddingMethod::Exclude:
         default:
-            return serializer::PaddingMethod::PaddingMethod_Exclude;
+            return armnnSerializer::PaddingMethod::PaddingMethod_Exclude;
     }
 }
 

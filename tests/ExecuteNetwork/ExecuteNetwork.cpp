@@ -6,7 +6,7 @@
 #include <armnn/TypesUtils.hpp>
 
 #if defined(ARMNN_SERIALIZER)
-#include "armnnDeserializeParser/IDeserializeParser.hpp"
+#include "armnnDeserializer/IDeserializer.hpp"
 #endif
 #if defined(ARMNN_CAFFE_PARSER)
 #include "armnnCaffeParser/ICaffeParser.hpp"
@@ -367,7 +367,7 @@ int RunTest(const std::string& format,
     if (modelFormat.find("armnn") != std::string::npos)
     {
 #if defined(ARMNN_SERIALIZER)
-    return MainImpl<armnnDeserializeParser::IDeserializeParser, float>(
+    return MainImpl<armnnDeserializer::IDeserializer, float>(
         modelPath.c_str(), isModelBinary, computeDevice,
         inputNamesVector, inputTensorShapes,
         inputTensorDataFilePathsVector, inputTypesVector,

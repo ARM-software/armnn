@@ -37,7 +37,7 @@ public:
         return m_outputIds;
     }
 
-    std::vector<flatbuffers::Offset<armnn::armnnSerializer::AnyLayer>>& GetSerializedLayers()
+    std::vector<flatbuffers::Offset<armnnSerializer::AnyLayer>>& GetSerializedLayers()
     {
         return m_serializedLayers;
     }
@@ -83,15 +83,15 @@ public:
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.
-    flatbuffers::Offset<armnn::armnnSerializer::LayerBase> CreateLayerBase(
+    flatbuffers::Offset<armnnSerializer::LayerBase> CreateLayerBase(
             const armnn::IConnectableLayer* layer,
-            const armnn::armnnSerializer::LayerType layerType);
+            const armnnSerializer::LayerType layerType);
 
     /// Creates the serializer AnyLayer for the layer and adds it to m_serializedLayers.
-    void CreateAnyLayer(const flatbuffers::Offset<void>& layer, const armnn::armnnSerializer::Layer serializerLayer);
+    void CreateAnyLayer(const flatbuffers::Offset<void>& layer, const armnnSerializer::Layer serializerLayer);
 
     /// Creates the serializer ConstTensor for the armnn ConstTensor.
-    flatbuffers::Offset<armnn::armnnSerializer::ConstTensor> CreateConstTensorInfo(
+    flatbuffers::Offset<armnnSerializer::ConstTensor> CreateConstTensorInfo(
             const armnn::ConstTensor& constTensor);
 
     template <typename T>
@@ -101,18 +101,18 @@ private:
     uint32_t GetSerializedId(unsigned int guid);
 
     /// Creates the serializer InputSlots for the layer.
-    std::vector<flatbuffers::Offset<armnn::armnnSerializer::InputSlot>> CreateInputSlots(
+    std::vector<flatbuffers::Offset<armnnSerializer::InputSlot>> CreateInputSlots(
             const armnn::IConnectableLayer* layer);
 
     /// Creates the serializer OutputSlots for the layer.
-    std::vector<flatbuffers::Offset<armnn::armnnSerializer::OutputSlot>> CreateOutputSlots(
+    std::vector<flatbuffers::Offset<armnnSerializer::OutputSlot>> CreateOutputSlots(
             const armnn::IConnectableLayer* layer);
 
     /// FlatBufferBuilder to create our layers' FlatBuffers.
     flatbuffers::FlatBufferBuilder m_flatBufferBuilder;
 
     /// AnyLayers required by the SerializedGraph.
-    std::vector<flatbuffers::Offset<armnn::armnnSerializer::AnyLayer>> m_serializedLayers;
+    std::vector<flatbuffers::Offset<armnnSerializer::AnyLayer>> m_serializedLayers;
 
     /// Guids of all Input Layers required by the SerializedGraph.
     std::vector<unsigned int> m_inputIds;

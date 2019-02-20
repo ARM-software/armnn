@@ -8,7 +8,7 @@
 #include "SchemaSerialize.hpp"
 
 #include <armnn/IRuntime.hpp>
-#include <armnnDeserializeParser/IDeserializeParser.hpp>
+#include <armnnDeserializer/IDeserializer.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
@@ -21,13 +21,13 @@
 
 #include <Schema_generated.h>
 
-using armnnDeserializeParser::IDeserializeParser;
-using TensorRawPtr =  armnn::armnnSerializer::TensorInfo*;
+using armnnDeserializer::IDeserializer;
+using TensorRawPtr =  armnnSerializer::TensorInfo*;
 
 struct ParserFlatbuffersSerializeFixture
 {
     ParserFlatbuffersSerializeFixture() :
-        m_Parser(IDeserializeParser::Create()),
+        m_Parser(IDeserializer::Create()),
         m_Runtime(armnn::IRuntime::Create(armnn::IRuntime::CreationOptions())),
         m_NetworkIdentifier(-1)
     {
@@ -35,7 +35,7 @@ struct ParserFlatbuffersSerializeFixture
 
     std::vector<uint8_t> m_GraphBinary;
     std::string m_JsonString;
-    std::unique_ptr<IDeserializeParser, void (*)(IDeserializeParser* parser)> m_Parser;
+    std::unique_ptr<IDeserializer, void (*)(IDeserializer* parser)> m_Parser;
     armnn::IRuntimePtr m_Runtime;
     armnn::NetworkId m_NetworkIdentifier;
 
@@ -133,7 +133,7 @@ struct ParserFlatbuffersSerializeFixture
                  const std::map<std::string, std::vector<DataType>>& expectedOutputData);
 
     void CheckTensors(const TensorRawPtr& tensors, size_t shapeSize, const std::vector<int32_t>& shape,
-                      armnn::armnnSerializer::TensorInfo tensorType, const std::string& name,
+                      armnnSerializer::TensorInfo tensorType, const std::string& name,
                       const float scale, const int64_t zeroPoint)
     {
         BOOST_CHECK_EQUAL(shapeSize, tensors->dimensions()->size());

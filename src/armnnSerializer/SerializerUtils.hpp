@@ -11,17 +11,17 @@
 namespace armnnSerializer
 {
 
-armnn::armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType dataType);
+armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType dataType);
 
-armnn::armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType);
+armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType);
 
-armnn::armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout);
+armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout);
 
-armnn::armnnSerializer::PoolingAlgorithm GetFlatBufferPoolingAlgorithm(armnn::PoolingAlgorithm poolingAlgorithm);
+armnnSerializer::PoolingAlgorithm GetFlatBufferPoolingAlgorithm(armnn::PoolingAlgorithm poolingAlgorithm);
 
-armnn::armnnSerializer::OutputShapeRounding GetFlatBufferOutputShapeRounding(
+armnnSerializer::OutputShapeRounding GetFlatBufferOutputShapeRounding(
     armnn::OutputShapeRounding outputShapeRounding);
 
-armnn::armnnSerializer::PaddingMethod GetFlatBufferPaddingMethod(armnn::PaddingMethod paddingMethod);
+armnnSerializer::PaddingMethod GetFlatBufferPaddingMethod(armnn::PaddingMethod paddingMethod);
 
 } // namespace armnnSerializer

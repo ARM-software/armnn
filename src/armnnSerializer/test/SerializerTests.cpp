@@ -8,7 +8,7 @@
 
 #include "../Serializer.hpp"
 
-#include <armnnDeserializeParser/IDeserializeParser.hpp>
+#include <armnnDeserializer/IDeserializer.hpp>
 
 #include <random>
 #include <sstream>
@@ -17,7 +17,7 @@
 #include <boost/test/unit_test.hpp>
 #include <flatbuffers/idl.h>
 
-using armnnDeserializeParser::IDeserializeParser;
+using armnnDeserializer::IDeserializer;
 
 namespace
 {
@@ -25,7 +25,7 @@ namespace
 armnn::INetworkPtr DeserializeNetwork(const std::string& serializerString)
 {
     std::vector<std::uint8_t> const serializerVector{serializerString.begin(), serializerString.end()};
-    return armnnDeserializeParser::IDeserializeParser::Create()->CreateNetworkFromBinary(serializerVector);
+    return IDeserializer::Create()->CreateNetworkFromBinary(serializerVector);
 }
 
 std::string SerializeNetwork(const armnn::INetwork& network)

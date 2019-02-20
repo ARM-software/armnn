@@ -17,7 +17,7 @@
 
 using namespace armnn;
 namespace fb = flatbuffers;
-namespace serializer = armnn::armnnSerializer;
+namespace serializer = armnnSerializer;
 
 namespace armnnSerializer
 {
@@ -40,7 +40,7 @@ uint32_t SerializerVisitor::GetSerializedId(unsigned int guid)
 }
 
 // Build FlatBuffer for Input Layer
-void SerializerVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
+void SerializerVisitor::VisitInputLayer(const armnn::IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
     // Create FlatBuffer BaseLayer
     auto flatBufferInputBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Input);
@@ -60,7 +60,7 @@ void SerializerVisitor::VisitInputLayer(const IConnectableLayer* layer, LayerBin
 }
 
 // Build FlatBuffer for Output Layer
-void SerializerVisitor::VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
+void SerializerVisitor::VisitOutputLayer(const armnn::IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
     // Create FlatBuffer BaseLayer
     auto flatBufferOutputBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Output);
@@ -79,7 +79,7 @@ void SerializerVisitor::VisitOutputLayer(const IConnectableLayer* layer, LayerBi
 }
 
 // Build FlatBuffer for Addition Layer
-void SerializerVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
+void SerializerVisitor::VisitAdditionLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     // Create FlatBuffer BaseLayer
     auto flatBufferAdditionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Addition);
@@ -92,10 +92,10 @@ void SerializerVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const
 }
 
 // Build FlatBuffer for Convolution2dLayer
-void SerializerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
-                                                const Convolution2dDescriptor& descriptor,
-                                                const ConstTensor& weights,
-                                                const Optional<ConstTensor>& biases,
+void SerializerVisitor::VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                                const armnn::Convolution2dDescriptor& descriptor,
+                                                const armnn::ConstTensor& weights,
+                                                const armnn::Optional<armnn::ConstTensor>& biases,
                                                 const char* name)
 {
     // Create FlatBuffer BaseLayer
@@ -129,10 +129,10 @@ void SerializerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_Convolution2dLayer);
 }
 
-void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
-                                                         const DepthwiseConvolution2dDescriptor& descriptor,
-                                                         const ConstTensor& weights,
-                                                         const Optional<ConstTensor>& biases,
+void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                                         const armnn::DepthwiseConvolution2dDescriptor& descriptor,
+                                                         const armnn::ConstTensor& weights,
+                                                         const armnn::Optional<armnn::ConstTensor>& biases,
                                                          const char* name)
 {
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_DepthwiseConvolution2d);
@@ -163,7 +163,7 @@ void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer
 }
 
 // Build FlatBuffer for Multiplication Layer
-void SerializerVisitor::VisitMultiplicationLayer(const IConnectableLayer* layer, const char* name)
+void SerializerVisitor::VisitMultiplicationLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     // Create FlatBuffer BaseLayer
     auto flatBufferMultiplicationBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Multiplication);
@@ -177,7 +177,7 @@ void SerializerVisitor::VisitMultiplicationLayer(const IConnectableLayer* layer,
 }
 
 // Build FlatBuffer for Reshape Layer
-void SerializerVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
+void SerializerVisitor::VisitReshapeLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::ReshapeDescriptor& reshapeDescriptor,
                                           const char* name)
 {
@@ -202,8 +202,8 @@ void SerializerVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
 }
 
 // Build FlatBuffer for Softmax Layer
-void SerializerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
-                                          const SoftmaxDescriptor& softmaxDescriptor,
+void SerializerVisitor::VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                                          const armnn::SoftmaxDescriptor& softmaxDescriptor,
                                           const char* name)
 {
     // Create FlatBuffer BaseLayer
@@ -222,8 +222,8 @@ void SerializerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
     CreateAnyLayer(flatBufferSoftmaxLayer.o, serializer::Layer::Layer_SoftmaxLayer);
 }
 
-void SerializerVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
-                                            const Pooling2dDescriptor& pooling2dDescriptor,
+void SerializerVisitor::VisitPooling2dLayer(const armnn::IConnectableLayer* layer,
+                                            const armnn::Pooling2dDescriptor& pooling2dDescriptor,
                                             const char* name)
 {
     auto fbPooling2dBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Pooling2d);
@@ -249,7 +249,7 @@ void SerializerVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
     CreateAnyLayer(fbPooling2dLayer.o, serializer::Layer::Layer_Pooling2dLayer);
 }
 
-fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
+fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const armnn::IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {
     std::vector<fb::Offset<serializer::InputSlot>> inputSlots = CreateInputSlots(layer);
@@ -265,9 +265,7 @@ fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConn
 
 void SerializerVisitor::CreateAnyLayer(const flatbuffers::Offset<void>& layer, const serializer::Layer serializerLayer)
 {
-    auto anyLayer = armnn::armnnSerializer::CreateAnyLayer(m_flatBufferBuilder,
-                                                           serializerLayer,
-                                                           layer);
+    auto anyLayer = armnnSerializer::CreateAnyLayer(m_flatBufferBuilder, serializerLayer, layer);
     m_serializedLayers.push_back(anyLayer);
 }
 
@@ -280,9 +278,10 @@ flatbuffers::Offset<flatbuffers::Vector<T>> SerializerVisitor::CreateDataVector(
     return fbVector;
 }
 
-flatbuffers::Offset<serializer::ConstTensor> SerializerVisitor::CreateConstTensorInfo(const ConstTensor& constTensor)
+flatbuffers::Offset<serializer::ConstTensor>
+    SerializerVisitor::CreateConstTensorInfo(const armnn::ConstTensor& constTensor)
 {
-    TensorInfo tensorInfo = constTensor.GetInfo();
+    armnn::TensorInfo tensorInfo = constTensor.GetInfo();
 
     // Get the dimensions
     std::vector<unsigned int> shape;
@@ -302,8 +301,8 @@ flatbuffers::Offset<serializer::ConstTensor> SerializerVisitor::CreateConstTenso
 
     switch (tensorInfo.GetDataType())
     {
-        case DataType::Float32:
-        case DataType::Signed32:
+        case armnn::DataType::Float32:
+        case armnn::DataType::Signed32:
         {
             auto fbVector = CreateDataVector<int32_t>(constTensor.GetMemoryArea(), constTensor.GetNumBytes());
             flatbuffers::Offset<serializer::IntData> flatBuffersData = serializer::CreateIntData(
@@ -312,7 +311,7 @@ flatbuffers::Offset<serializer::ConstTensor> SerializerVisitor::CreateConstTenso
             fbPayload = flatBuffersData.o;
             break;
         }
-        case DataType::Float16:
+        case armnn::DataType::Float16:
         {
             auto fbVector = CreateDataVector<int16_t>(constTensor.GetMemoryArea(), constTensor.GetNumBytes());
             flatbuffers::Offset<serializer::ShortData> flatBuffersData = serializer::CreateShortData(
@@ -321,8 +320,8 @@ flatbuffers::Offset<serializer::ConstTensor> SerializerVisitor::CreateConstTenso
             fbPayload = flatBuffersData.o;
             break;
         }
-        case DataType::QuantisedAsymm8:
-        case DataType::Boolean:
+        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::Boolean:
         default:
         {
             auto fbVector = CreateDataVector<int8_t>(constTensor.GetMemoryArea(), constTensor.GetNumBytes());
@@ -340,7 +339,8 @@ flatbuffers::Offset<serializer::ConstTensor> SerializerVisitor::CreateConstTenso
     return flatBufferConstTensor;
 }
 
-std::vector<fb::Offset<serializer::InputSlot>> SerializerVisitor::CreateInputSlots(const IConnectableLayer* layer)
+std::vector<fb::Offset<serializer::InputSlot>>
+    SerializerVisitor::CreateInputSlots(const armnn::IConnectableLayer* layer)
 {
     std::vector<fb::Offset<serializer::InputSlot>> inputSlots;
 
@@ -361,7 +361,8 @@ std::vector<fb::Offset<serializer::InputSlot>> SerializerVisitor::CreateInputSlo
     return inputSlots;
 }
 
-std::vector<fb::Offset<serializer::OutputSlot>> SerializerVisitor::CreateOutputSlots(const IConnectableLayer* layer)
+std::vector<fb::Offset<serializer::OutputSlot>>
+    SerializerVisitor::CreateOutputSlots(const armnn::IConnectableLayer* layer)
 {
     std::vector<fb::Offset<serializer::OutputSlot>> outputSlots;
 
@@ -369,7 +370,7 @@ std::vector<fb::Offset<serializer::OutputSlot>> SerializerVisitor::CreateOutputS
     for (unsigned int slotIndex = 0; slotIndex < layer->GetNumOutputSlots(); ++slotIndex)
     {
         const IOutputSlot& outputSlot = layer->GetOutputSlot(slotIndex);
-        const TensorInfo& tensorInfo = outputSlot.GetTensorInfo();
+        const armnn::TensorInfo& tensorInfo = outputSlot.GetTensorInfo();
 
         // Get the dimensions
         std::vector<unsigned int> shape;

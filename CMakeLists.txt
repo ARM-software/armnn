@@ -159,14 +159,14 @@ if(BUILD_ARMNN_SERIALIZER)
     set(armnn_serializer_sources)
     list(APPEND armnn_serializer_sources
         include/armnnSerializer/ISerializer.hpp
-        include/armnnDeserializeParser/IDeserializeParser.hpp
+        include/armnnDeserializer/IDeserializer.hpp
         src/armnnSerializer/Schema_generated.h
         src/armnnSerializer/Serializer.hpp
         src/armnnSerializer/Serializer.cpp
         src/armnnSerializer/SerializerUtils.hpp
         src/armnnSerializer/SerializerUtils.cpp
-        src/armnnDeserializeParser/DeserializeParser.hpp
-        src/armnnDeserializeParser/DeserializeParser.cpp
+        src/armnnDeserializer/Deserializer.hpp
+        src/armnnDeserializer/Deserializer.cpp
         )
 
     add_library_ex(armnnSerializer SHARED ${armnn_serializer_sources})
@@ -554,15 +554,15 @@ if(BUILD_UNIT_TESTS)
         list(APPEND unittest_sources
                 src/armnnSerializer/Schema_generated.h
                 src/armnnSerializer/test/SerializerTests.cpp
-                src/armnnDeserializeParser/test/DeserializeAdd.cpp
-                src/armnnDeserializeParser/test/DeserializeConvolution2d.cpp
-                src/armnnDeserializeParser/test/DeserializeMultiplication.cpp
-                src/armnnDeserializeParser/test/DeserializePooling2d.cpp
-                src/armnnDeserializeParser/test/DeserializeReshape.cpp
-                src/armnnDeserializeParser/test/ParserFlatbuffersSerializeFixture.hpp
-                src/armnnDeserializeParser/test/SchemaSerialize.s
+                src/armnnDeserializer/test/DeserializeAdd.cpp
+                src/armnnDeserializer/test/DeserializeConvolution2d.cpp
+                src/armnnDeserializer/test/DeserializeMultiplication.cpp
+                src/armnnDeserializer/test/DeserializePooling2d.cpp
+                src/armnnDeserializer/test/DeserializeReshape.cpp
+                src/armnnDeserializer/test/ParserFlatbuffersSerializeFixture.hpp
+                src/armnnDeserializer/test/SchemaSerialize.s
                 )
-        set_source_files_properties(src/armnnDeserializeParser/test/SchemaSerialize.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
+        set_source_files_properties(src/armnnDeserializer/test/SchemaSerialize.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
     endif()
 
     if(BUILD_ONNX_PARSER)

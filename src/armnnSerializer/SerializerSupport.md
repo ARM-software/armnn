@@ -7,9 +7,12 @@ This reference guide provides a list of layers which can be serialized currently
 The Arm NN SDK Serializer currently supports the following layers:
 
 * Addition
+* Convolution2d
+* DepthwiseConvolution2d
+* FullyConnected
 * Multiplication
+* Pooling2d
 * Reshape
 * Softmax
-* Pooling2d
 
 More machine learning layers will be supported in future releases.

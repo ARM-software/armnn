@@ -24,12 +24,12 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
      mkdir -p ~/armnn-devenv/toolchains
      cd ~/armnn-devenv/toolchains
      # For Mac OS, change the NDK download link accordingly.
-     wget https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip
-     unzip android-ndk-r16b-linux-x86_64.zip
-     export NDK=~/armnn-devenv/toolchains/android-ndk-r16b
+     wget https://dl.google.com/android/repository/android-ndk-r17b-linux-x86_64.zip
+     unzip android-ndk-r17b-linux-x86_64.zip
+     export NDK=~/armnn-devenv/toolchains/android-ndk-r17b
      ```
 
-	 You may want to append `export NDK=~/armnn-devenv/toolchains/android-ndk-r16b` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
+	 You may want to append `export NDK=~/armnn-devenv/toolchains/android-ndk-r17b` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
 
 * Make a standalone toolchain:
 
@@ -41,11 +41,11 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
        --arch arm64 \
        --api 26 \
        --stl=libc++ \
-       --install-dir=$HOME/armnn-devenv/toolchains/aarch64-android-r16b
-   export PATH=$HOME/armnn-devenv/toolchains/aarch64-android-r16b/bin:$PATH
+       --install-dir=$HOME/armnn-devenv/toolchains/aarch64-android-r17b
+   export PATH=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/bin:$PATH
    ```
 
-	 You may want to append `export PATH=$HOME/armnn-devenv/toolchains/aarch64-android-r16b/bin:$PATH` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
+	 You may want to append `export PATH=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/bin:$PATH` to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
 
 #### <a name="buildBoost">Build the Boost C++ libraries</a>
 
@@ -166,7 +166,7 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	 cmake .. \
       -DCMAKE_SYSTEM_NAME=Android \
       -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
-      -DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$HOME/armnn-devenv/toolchains/aarch64-android-r16b/ \
+      -DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$HOME/armnn-devenv/toolchains/aarch64-android-r17b/ \
       -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
       -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary/ \
       -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \

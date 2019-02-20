@@ -226,6 +226,31 @@ void SerializerVisitor::VisitMultiplicationLayer(const armnn::IConnectableLayer*
     CreateAnyLayer(flatBufferMultiplicationLayer.o, serializer::Layer::Layer_MultiplicationLayer);
 }
 
+void SerializerVisitor::VisitPermuteLayer(const armnn::IConnectableLayer* layer,
+                                          const armnn::PermuteDescriptor& permuteDescriptor,
+                                          const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferPermuteBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Permute);
+
+    std::vector<unsigned int> dimMappings;
+    for (auto& v: permuteDescriptor.m_DimMappings)
+    {
+        dimMappings.push_back(v);
+    }
+
+    auto flatBufferPermuteDesc = serializer::CreatePermuteDescriptor(m_flatBufferBuilder,
+                                                                     m_flatBufferBuilder.CreateVector(dimMappings));
+
+    // Create the FlatBuffer PermuteLayer
+    auto flatBufferPermuteLayer = serializer::CreatePermuteLayer(m_flatBufferBuilder,
+                                                                 flatBufferPermuteBaseLayer,
+                                                                 flatBufferPermuteDesc);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferPermuteLayer.o, serializer::Layer::Layer_PermuteLayer);
+}
+
 // Build FlatBuffer for Reshape Layer
 void SerializerVisitor::VisitReshapeLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::ReshapeDescriptor& reshapeDescriptor,

@@ -175,6 +175,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &Deserializer::ParseDepthwiseConvolution2d;
     m_ParserFunctions[Layer_MultiplicationLayer]         = &Deserializer::ParseMultiplication;
+    m_ParserFunctions[Layer_PermuteLayer]                = &Deserializer::ParsePermute;
     m_ParserFunctions[Layer_Pooling2dLayer]              = &Deserializer::ParsePooling2d;
     m_ParserFunctions[Layer_ReshapeLayer]                = &Deserializer::ParseReshape;
     m_ParserFunctions[Layer_SoftmaxLayer]                = &Deserializer::ParseSoftmax;
@@ -200,6 +201,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_MultiplicationLayer()->base();
         case Layer::Layer_OutputLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_OutputLayer()->base()->base();
+        case Layer::Layer_PermuteLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_PermuteLayer()->base();
         case Layer::Layer_Pooling2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_Pooling2dLayer()->base();
         case Layer::Layer_ReshapeLayer:
@@ -831,8 +834,32 @@ void Deserializer::ParseMultiplication(unsigned int layerIndex)
     RegisterOutputSlots(layerIndex, layer);
 }
 
+void Deserializer::ParsePermute(unsigned int layerIndex)
+{
+    CHECK_LAYERS(m_Graph, 0, layerIndex);
+
+    auto dimsMapping =
+        m_Graph->layers()->Get(layerIndex)->layer_as_PermuteLayer()->descriptor()->dimMappings();
+
+    auto inputs = GetInputs(m_Graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+    auto outputInfo = ToTensorInfo(outputs[0]);
+
+    m_layerName = boost::str(boost::format("Permute:%1%") % layerIndex);
+    const armnn::PermuteDescriptor descriptor(armnn::PermutationVector(dimsMapping->data(), dimsMapping->Length()));
+
+    IConnectableLayer* layer = m_Network->AddPermuteLayer(descriptor, m_layerName.c_str());
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    RegisterInputSlots(layerIndex, layer);
+    RegisterOutputSlots(layerIndex, layer);
+}
+
 armnn::Pooling2dDescriptor Deserializer::GetPoolingDescriptor(Deserializer::PoolingDescriptor pooling2dDesc,
-                                                                   unsigned int layerIndex)
+                                                              unsigned int layerIndex)
 {
     armnn::Pooling2dDescriptor desc;
 

@@ -364,4 +364,34 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializePooling2d)
                                             outputInfo.GetShape());
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializePermute)
+{
+    unsigned int inputShape[]  = { 4, 3, 2, 1 };
+    unsigned int outputShape[] = { 1, 2, 3, 4 };
+    unsigned int dimsMapping[] = { 3, 2, 1, 0 };
+
+    auto inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    auto outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
+
+    armnn::PermuteDescriptor permuteDescriptor(armnn::PermutationVector(dimsMapping, 4));
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer *const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer *const permuteLayer = network->AddPermuteLayer(permuteDescriptor, "PermuteLayer");
+    armnn::IConnectableLayer *const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(permuteLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    permuteLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    permuteLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            inputTensorInfo.GetShape(),
+                                            outputTensorInfo.GetShape());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

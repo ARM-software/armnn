@@ -11,6 +11,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * DepthwiseConvolution2d
 * FullyConnected
 * Multiplication
+* Permute
 * Pooling2d
 * Reshape
 * Softmax

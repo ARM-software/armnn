@@ -24,7 +24,7 @@ See the TensorFlow [identity documentation](https://www.tensorflow.org/api_docs/
 
 **local_response_normalization**
 
-See the TensorFlow [local_response_normalization documentation](https://www.tensorflow.org/api_docs/python/tf/nn/local_response_normalization)  for more information. 
+See the TensorFlow [local_response_normalization documentation](https://www.tensorflow.org/api_docs/python/tf/nn/local_response_normalization)  for more information.
 
 **max_pool**
 
@@ -62,11 +62,31 @@ See the TensorFlow [squeeze documentation](https://www.tensorflow.org/api_docs/p
 
 See the TensorFlow [tanh documentation](https://www.tensorflow.org/api_docs/python/tf/tanh) for more information.
 
+**expand_dims**
+
+See the TensorFlow [expand_dims documentation](https://www.tensorflow.org/api_docs/python/tf/expand_dims) for more information.
+
+**placeholder**
+
+See the TensorFlow [placeholder documentation](https://www.tensorflow.org/api_docs/python/tf/placeholder) for more information.
+
+**minimum**
+
+See the TensorFlow [minimum documentation](https://www.tensorflow.org/api_docs/python/tf/math/minimum) for more information.
+
+**greater**
+
+See the TensorFlow [greater documentation](https://www.tensorflow.org/api_docs/python/tf/math/greater) for more information.
+
 ## Partially supported
 
 **add**
 
 The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [add operator documentation](https://www.tensorflow.org/api_docs/python/tf/add) for more information.
+
+**add_n**
+
+The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [add operator documentation](https://www.tensorflow.org/api_docs/python/tf/add_n) for more information.
 
 **concat**
 
@@ -90,15 +110,11 @@ The parser only supports constant weights in a fully connected layer. See the Te
 
 **multiply**
 
-The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [multiply documentation](https://www.tensorflow.org/api_docs/python/tf/multiply) for more information. 
-
-**placeholder**
-
- The parser only supports the NHWC data format in the input layer. See the TensorFlow [placeholder documentation](https://www.tensorflow.org/api_docs/python/tf/placeholder) for more information.
+The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [multiply documentation](https://www.tensorflow.org/api_docs/python/tf/multiply) for more information.
 
 **realdiv**
 
-The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [realdiv documentation](https://www.tensorflow.org/api_docs/python/tf/realdiv) for more information. 
+The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [realdiv documentation](https://www.tensorflow.org/api_docs/python/tf/realdiv) for more information.
 
 **reshape**
 
@@ -125,7 +141,15 @@ where maximum is used in one of the following ways
 * max(x, mul(a, x))
 * max(x, mul(x, a)
 
-This is interpreted as a ActivationLayer with a LeakyRelu activation function. Any other usage of max will currently cause an unsupported error. See the TensorFlow [maximum documentation](https://www.tensorflow.org/api_docs/python/tf/maximum) for more information.
+This is interpreted as a ActivationLayer with a LeakyRelu activation function. Any other usage of max will result in the insertion of a simple maximum layer. See the TensorFlow [maximum documentation](https://www.tensorflow.org/api_docs/python/tf/maximum) for more information.
+
+**pad**
+
+Only supports tf.pad function with mode = 'CONSTANT' and constant_values = 0. See the TensorFlow [pad documentation](https://www.tensorflow.org/api_docs/python/tf/pad) for more information.
+
+**subtract**
+
+The parser does not support all forms of broadcasting [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [subtract documentation](https://www.tensorflow.org/api_docs/python/tf/math/subtract) for more information.
 
 ## Tested networks
 

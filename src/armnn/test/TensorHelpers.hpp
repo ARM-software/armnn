@@ -198,9 +198,23 @@ boost::multi_array<T, n> MakeTensor(const armnn::TensorInfo& tensorInfo, const s
 
     std::array<unsigned int, n> shape;
 
-    for (unsigned int i = 0; i < n; i++)
+    // NOTE: tensorInfo.GetNumDimensions() might be different from n
+    const unsigned int returnDimensions = static_cast<unsigned int>(n);
+    const unsigned int actualDimensions = tensorInfo.GetNumDimensions();
+
+    const unsigned int paddedDimensions =
+        returnDimensions > actualDimensions ? returnDimensions - actualDimensions : 0u;
+
+    for (unsigned int i = 0u; i < returnDimensions; i++)
     {
-        shape[i] = tensorInfo.GetShape()[i];
+        if (i < paddedDimensions)
+        {
+            shape[i] = 1u;
+        }
+        else
+        {
+            shape[i] = tensorInfo.GetShape()[i - paddedDimensions];
+        }
     }
 
     boost::const_multi_array_ref<T, n> arrayRef(&flat[0], shape);

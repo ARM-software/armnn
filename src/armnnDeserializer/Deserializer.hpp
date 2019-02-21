@@ -72,6 +72,7 @@ private:
     void ParseAdd(unsigned int layerIndex);
     void ParseConvolution2d(unsigned int layerIndex);
     void ParseDepthwiseConvolution2d(unsigned int layerIndex);
+    void ParseFullyConnected(unsigned int layerIndex);
     void ParseMultiplication(unsigned int layerIndex);
     void ParsePermute(unsigned int layerIndex);
     void ParsePooling2d(unsigned int layerIndex);

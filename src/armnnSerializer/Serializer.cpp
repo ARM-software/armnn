@@ -324,7 +324,44 @@ void SerializerVisitor::VisitPooling2dLayer(const armnn::IConnectableLayer* laye
     CreateAnyLayer(fbPooling2dLayer.o, serializer::Layer::Layer_Pooling2dLayer);
 }
 
-fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const armnn::IConnectableLayer* layer,
+// Build FlatBuffer for FullyConnected Layer
+void SerializerVisitor::VisitFullyConnectedLayer(const armnn::IConnectableLayer* layer,
+                                                 const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                                 const armnn::ConstTensor& weights,
+                                                 const armnn::Optional<armnn::ConstTensor>& biases,
+                                                 const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_FullyConnected);
+
+    // Create FlatBuffer FullyConnectedDescriptor
+    auto flatBufferDescriptor =
+        serializer::CreateFullyConnectedDescriptor(m_flatBufferBuilder,
+                                                   fullyConnectedDescriptor.m_BiasEnabled,
+                                                   fullyConnectedDescriptor.m_TransposeWeightMatrix);
+
+    // Create FlatBuffer weights data
+    auto flatBufferWeights = CreateConstTensorInfo(weights);
+
+    // Create FlatBuffer bias data
+    flatbuffers::Offset<serializer::ConstTensor> flatBufferBiases;
+    if (fullyConnectedDescriptor.m_BiasEnabled)
+    {
+        flatBufferBiases = CreateConstTensorInfo(biases.value());
+    }
+
+    // Create FlatBuffer FullyConnectedLayer
+    auto flatBufferLayer = serializer::CreateFullyConnectedLayer(m_flatBufferBuilder,
+                                                                 flatBufferBaseLayer,
+                                                                 flatBufferDescriptor,
+                                                                 flatBufferWeights,
+                                                                 flatBufferBiases);
+
+    // Add created FullyConnectedLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_FullyConnectedLayer);
+}
+
+fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {
     std::vector<fb::Offset<serializer::InputSlot>> inputSlots = CreateInputSlots(layer);

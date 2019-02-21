@@ -590,6 +590,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnDeserializer/test/DeserializeActivation.cpp
                 src/armnnDeserializer/test/DeserializeAdd.cpp
                 src/armnnDeserializer/test/DeserializeConvolution2d.cpp
+                src/armnnDeserializer/test/DeserializeFullyConnected.cpp
                 src/armnnDeserializer/test/DeserializeMultiplication.cpp
                 src/armnnDeserializer/test/DeserializePermute.cpp
                 src/armnnDeserializer/test/DeserializePooling2d.cpp

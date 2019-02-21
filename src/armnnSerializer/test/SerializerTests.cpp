@@ -404,4 +404,45 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializePermute)
                                             outputTensorInfo.GetShape());
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeFullyConnected)
+{
+    armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
+    armnn::TensorInfo outputInfo({ 2, 3 }, armnn::DataType::Float32);
+
+    armnn::TensorInfo weightsInfo({ 5, 3 }, armnn::DataType::Float32);
+    armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
+
+    armnn::FullyConnectedDescriptor descriptor;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_TransposeWeightMatrix = false;
+
+    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
+    std::vector<float> biasesData  = GenerateRandomData<float>(biasesInfo.GetNumElements());
+
+    armnn::ConstTensor weights(weightsInfo, weightsData);
+    armnn::ConstTensor biases(biasesInfo, biasesData);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0, "input");
+    armnn::IConnectableLayer* const fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor,
+                                                                                          weights,
+                                                                                          biases,
+                                                                                          "fully_connected");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0, "output");
+
+    inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+
+    fullyConnectedLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            inputInfo.GetShape(),
+                                            outputInfo.GetShape());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

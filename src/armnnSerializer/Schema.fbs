@@ -91,7 +91,8 @@ enum LayerType : uint {
     Convolution2d = 7,
     DepthwiseConvolution2d = 8,
     Activation = 9,
-    Permute = 10
+    Permute = 10,
+    FullyConnected = 11
 }
 
 // Base layer table to be used as part of other layers
@@ -140,6 +141,18 @@ table Convolution2dDescriptor {
     strideY:uint;
     biasEnabled:bool = false;
     dataLayout:DataLayout = NCHW;
+}
+
+table FullyConnectedLayer {
+    base:LayerBase;
+    descriptor:FullyConnectedDescriptor;
+    weights:ConstTensor;
+    biases:ConstTensor;
+}
+
+table FullyConnectedDescriptor {
+    biasEnabled:bool = false;
+    transposeWeightsMatrix:bool = false;
 }
 
 table InputLayer {
@@ -240,6 +253,7 @@ union Layer {
     AdditionLayer,
     Convolution2dLayer,
     DepthwiseConvolution2dLayer,
+    FullyConnectedLayer,
     InputLayer,
     MultiplicationLayer,
     OutputLayer,

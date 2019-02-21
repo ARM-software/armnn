@@ -174,6 +174,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_AdditionLayer]               = &Deserializer::ParseAdd;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &Deserializer::ParseDepthwiseConvolution2d;
+    m_ParserFunctions[Layer_FullyConnectedLayer]         = &Deserializer::ParseFullyConnected;
     m_ParserFunctions[Layer_MultiplicationLayer]         = &Deserializer::ParseMultiplication;
     m_ParserFunctions[Layer_PermuteLayer]                = &Deserializer::ParsePermute;
     m_ParserFunctions[Layer_Pooling2dLayer]              = &Deserializer::ParsePooling2d;
@@ -195,6 +196,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_Convolution2dLayer()->base();
         case Layer::Layer_DepthwiseConvolution2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_DepthwiseConvolution2dLayer()->base();
+        case Layer::Layer_FullyConnectedLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_FullyConnectedLayer()->base();
         case Layer::Layer_InputLayer:
            return graphPtr->layers()->Get(layerIndex)->layer_as_InputLayer()->base()->base();
         case Layer::Layer_MultiplicationLayer:
@@ -826,6 +829,50 @@ void Deserializer::ParseMultiplication(unsigned int layerIndex)
 
     m_layerName = boost::str(boost::format("Multiplication:%1%") % layerIndex);
     IConnectableLayer* layer = m_Network->AddMultiplicationLayer(m_layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(layerIndex, layer);
+    RegisterOutputSlots(layerIndex, layer);
+}
+
+void Deserializer::ParseFullyConnected(unsigned int layerIndex)
+{
+    CHECK_LAYERS(m_Graph, 0, layerIndex);
+    auto inputs = GetInputs(m_Graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = boost::str(boost::format("FullyConnected:%1%") % layerIndex);
+
+    auto flatBufferLayer = m_Graph->layers()->Get(layerIndex)->layer_as_FullyConnectedLayer();
+    auto flatBufferDescriptor = flatBufferLayer->descriptor();
+
+    armnn::FullyConnectedDescriptor fullyConnectedDescriptor;
+    fullyConnectedDescriptor.m_BiasEnabled = flatBufferDescriptor->biasEnabled();
+    fullyConnectedDescriptor.m_TransposeWeightMatrix = flatBufferDescriptor->transposeWeightsMatrix();
+
+    armnn::ConstTensor weightsTensor = ToConstTensor(flatBufferLayer->weights());
+
+    armnn::IConnectableLayer* layer;
+    if (flatBufferDescriptor->biasEnabled())
+    {
+        armnn::ConstTensor biasTensorData = ToConstTensor(flatBufferLayer->biases());
+        layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
+                                                  weightsTensor,
+                                                  biasTensorData,
+                                                  layerName.c_str());
+    }
+    else
+    {
+        layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
+                                                  weightsTensor,
+                                                  layerName.c_str());
+    }
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

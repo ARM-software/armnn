@@ -8,6 +8,8 @@ The Arm NN SDK TensorFlow Lite parser currently only supports uint8.
 
 The Arm NN SDK TensorFlow Lite parser currently supports the following operators:
 
+* ADD
+
 * AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
 * CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
@@ -18,7 +20,15 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
+* LOGISTIC
+
 * MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+* MEAN
+
+* MUL
+
+* PAD
 
 * RELU
 

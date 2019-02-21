@@ -12,11 +12,19 @@ See the TensorFlow [avg_pool documentation](https://www.tensorflow.org/api_docs/
 
 **bias_add**
 
- See the TensorFlow [bias_add documentation](https://www.tensorflow.org/api_docs/python/tf/nn/bias_add) for more information.
+See the TensorFlow [bias_add documentation](https://www.tensorflow.org/api_docs/python/tf/nn/bias_add) for more information.
 
 **conv2d**
 
- See the TensorFlow [conv2d documentation](https://www.tensorflow.org/api_docs/python/tf/nn/conv2d) for more information.
+See the TensorFlow [conv2d documentation](https://www.tensorflow.org/api_docs/python/tf/nn/conv2d) for more information.
+
+**expand_dims**
+
+See the TensorFlow [expand_dims documentation](https://www.tensorflow.org/api_docs/python/tf/expand_dims) for more information.
+
+**gather**
+
+See the TensorFlow [gather documentation](https://www.tensorflow.org/api_docs/python/tf/gather) for more information.
 
 **identity**
 
@@ -30,25 +38,33 @@ See the TensorFlow [local_response_normalization documentation](https://www.tens
 
 See the TensorFlow [max_pool documentation](https://www.tensorflow.org/api_docs/python/tf/nn/max_pool) for more information.
 
+**placeholder**
+
+See the TensorFlow [placeholder documentation](https://www.tensorflow.org/api_docs/python/tf/placeholder) for more information.
+
 **reduce_mean**
 
 See the TensorFlow [reduce_mean documentation](https://www.tensorflow.org/api_docs/python/tf/reduce_mean) for more information.
 
 **relu**
 
- See the TensorFlow [relu documentation](https://www.tensorflow.org/api_docs/python/tf/nn/relu) for more information.
+See the TensorFlow [relu documentation](https://www.tensorflow.org/api_docs/python/tf/nn/relu) for more information.
 
 **relu6**
 
- See the TensorFlow [relu6 documentation](https://www.tensorflow.org/api_docs/python/tf/nn/relu6) for more information.
+See the TensorFlow [relu6 documentation](https://www.tensorflow.org/api_docs/python/tf/nn/relu6) for more information.
+
+**rsqrt**
+
+See the TensorFlow [rsqrt documentation](https://www.tensorflow.org/api_docs/python/tf/math/rsqrt) for more information.
 
 **shape**
 
- See the TensorFlow [shape documentation](https://www.tensorflow.org/api_docs/python/tf/shape) for more information.
+See the TensorFlow [shape documentation](https://www.tensorflow.org/api_docs/python/tf/shape) for more information.
 
 **sigmoid**
 
- See the TensorFlow [sigmoid documentation](https://www.tensorflow.org/api_docs/python/tf/sigmoid) for more information.
+See the TensorFlow [sigmoid documentation](https://www.tensorflow.org/api_docs/python/tf/sigmoid) for more information.
 
 **softplus**
 
@@ -61,22 +77,6 @@ See the TensorFlow [squeeze documentation](https://www.tensorflow.org/api_docs/p
 **tanh**
 
 See the TensorFlow [tanh documentation](https://www.tensorflow.org/api_docs/python/tf/tanh) for more information.
-
-**expand_dims**
-
-See the TensorFlow [expand_dims documentation](https://www.tensorflow.org/api_docs/python/tf/expand_dims) for more information.
-
-**placeholder**
-
-See the TensorFlow [placeholder documentation](https://www.tensorflow.org/api_docs/python/tf/placeholder) for more information.
-
-**minimum**
-
-See the TensorFlow [minimum documentation](https://www.tensorflow.org/api_docs/python/tf/math/minimum) for more information.
-
-**greater**
-
-See the TensorFlow [greater documentation](https://www.tensorflow.org/api_docs/python/tf/math/greater) for more information.
 
 ## Partially supported
 
@@ -100,17 +100,44 @@ The parser does not support the optional `shape` argument. It always infers the 
 
 The parser only supports a dilation rate of (1,1,1,1). See the TensorFlow [depthwise_conv2d_native documentation](https://www.tensorflow.org/api_docs/python/tf/nn/depthwise_conv2d_native) for more information.
 
+**equal**
+
+The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of 4D and 1D tensors. See the TensorFlow [equal operator documentation](https://www.tensorflow.org/api_docs/python/tf/math/equal) for more information.
+
 **fused_batch_norm**
 
 The parser does not support training outputs. See the TensorFlow [fused_batch_norm documentation](https://www.tensorflow.org/api_docs/python/tf/nn/fused_batch_norm) for more information.
+
+**greater**
+
+The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of 4D and 1D tensors. See the TensorFlow [greater operator documentation](https://www.tensorflow.org/api_docs/python/tf/math/greater) for more information.
 
 **matmul**
 
 The parser only supports constant weights in a fully connected layer. See the TensorFlow [matmul documentation](https://www.tensorflow.org/api_docs/python/tf/matmul) for more information.
 
+**maximum**
+
+where maximum is used in one of the following ways
+
+* max(mul(a, x), x)
+* max(mul(x, a), x)
+* max(x, mul(a, x))
+* max(x, mul(x, a)
+
+This is interpreted as a ActivationLayer with a LeakyRelu activation function. Any other usage of max will result in the insertion of a simple maximum layer. The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting). See the TensorFlow [maximum documentation](https://www.tensorflow.org/api_docs/python/tf/maximum) for more information.
+
+**minimum**
+
+The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of 4D and 1D tensors. See the TensorFlow [minimum operator documentation](https://www.tensorflow.org/api_docs/python/tf/math/minimum) for more information.
+
 **multiply**
 
 The parser does not support all forms of [broadcast composition](https://www.tensorflow.org/performance/xla/broadcasting), only broadcasting of scalars and 1D tensors. See the TensorFlow [multiply documentation](https://www.tensorflow.org/api_docs/python/tf/multiply) for more information.
+
+**pad**
+
+Only supports tf.pad function with mode = 'CONSTANT' and constant_values = 0. See the TensorFlow [pad documentation](https://www.tensorflow.org/api_docs/python/tf/pad) for more information.
 
 **realdiv**
 
@@ -131,21 +158,6 @@ The parser only supports 2D inputs and does not support selecting the `softmax` 
 **split**
 
 Arm NN supports split along the channel dimension for data formats NHWC and NCHW.
-
-**maximum**
-
-where maximum is used in one of the following ways
-
-* max(mul(a, x), x)
-* max(mul(x, a), x)
-* max(x, mul(a, x))
-* max(x, mul(x, a)
-
-This is interpreted as a ActivationLayer with a LeakyRelu activation function. Any other usage of max will result in the insertion of a simple maximum layer. See the TensorFlow [maximum documentation](https://www.tensorflow.org/api_docs/python/tf/maximum) for more information.
-
-**pad**
-
-Only supports tf.pad function with mode = 'CONSTANT' and constant_values = 0. See the TensorFlow [pad documentation](https://www.tensorflow.org/api_docs/python/tf/pad) for more information.
 
 **subtract**
 

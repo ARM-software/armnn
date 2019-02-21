@@ -24,9 +24,11 @@ Arm NN is written using portable C++14 and the build system uses [CMake](https:/
 
 The armnn/tests directory contains tests used during ArmNN development. Many of them depend on third-party IP, model protobufs and image files not distributed with ArmNN. The dependencies of some of the tests are available freely on the Internet, for those who wish to experiment.
 
+The 'armnn/samples' directory contains SimpleSample.cpp. A very basic example of the ArmNN SDK API in use.
+
 The 'ExecuteNetwork' program, in armnn/tests/ExecuteNetwork, has no additional dependencies beyond those required by ArmNN and the model parsers. It takes any model and any input tensor, and simply prints out the output tensor. Run with no arguments to see command-line help.
 
-The 'armnn/samples' directory contains SimpleSample.cpp. A very basic example of the ArmNN SDK API in use.
+The 'ArmnnConverter' program, in armnn/src/ArmnnConverter, has no additional dependencies beyond those required by ArmNN and the model parsers. It takes a model in TensorFlow format and produce a serialized model in ArmNN format. Run with no arguments to see command-line help. Note that this program can only convert models for which all operations are supported by the serialization tool (src/armnnSerializer).
 
 Note that Arm NN needs to be built against a particular version of ARM's Compute Library. The get_compute_library.sh in the scripts subdirectory will clone the compute library from the review.mlplatform.org github repository into a directory alongside armnn named 'clframework' and checkouts the correct revision
 

@@ -116,7 +116,11 @@ The interface functions to be implemented are:
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
     virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
+    virtual SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph, bool& optimizationAttempted) const = 0;
 ```
+
+Note that ```GetOptimizations()``` has been deprecated.
+The method ```OptimizeSubGraph(...)``` should be used instead to specific optimizations to a given sub-graph.
 
 The ArmNN framework then creates instances of the IBackendInternal interface with the help of the
 [BackendRegistry](backendsCommon/BackendRegistry.hpp) singleton.
@@ -186,9 +190,12 @@ mechanism:
 
 ## The Optimizations
 
-The backends may choose to implement backend-specific optimizations. This is supported through the ```GetOptimizations()```
-method of the IBackendInternal interface. This function may return a vector of optimization objects and the optimizer
-runs these after all general optimization is performed on the network.
+The backends may choose to implement backend-specific optimizations.
+This is supported through the method ```OptimizeSubGraph(...)``` to the backend interface
+that allows the backends to apply their specific optimizations to a given sub-grah.
+
+The way backends had to provide a list optimizations to the Optimizer (through the ```GetOptimizations()``` method)
+is still in place for backward compatibility, but it's now considered deprecated and will be remove in a future release.
 
 ## The IBackendContext interface
 

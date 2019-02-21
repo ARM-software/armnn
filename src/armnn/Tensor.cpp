@@ -11,6 +11,8 @@
 #include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <sstream>
+
 namespace armnn
 {
 
@@ -78,6 +80,18 @@ TensorShape& TensorShape::operator =(const TensorShape& other)
     return *this;
 }
 
+unsigned int TensorShape::operator[](unsigned int i) const
+{
+    CheckDimensionIndex(i);
+    return m_Dimensions.at(i);
+}
+
+unsigned int& TensorShape::operator[](unsigned int i)
+{
+    CheckDimensionIndex(i);
+    return m_Dimensions.at(i);
+}
+
 bool TensorShape::operator==(const TensorShape& other) const
 {
     return ((m_NumDimensions == other.m_NumDimensions) &&
@@ -103,6 +117,16 @@ unsigned int TensorShape::GetNumElements() const
     }
 
     return count;
+}
+
+void TensorShape::CheckDimensionIndex(unsigned int i) const
+{
+    if (i >= m_NumDimensions)
+    {
+        std::stringstream errorMessage;
+        errorMessage << "Invalid dimension index: " << i << " (number of dimensions is " << m_NumDimensions << ")";
+        throw InvalidArgumentException(errorMessage.str(), CHECK_LOCATION());
+    }
 }
 
 // ---

@@ -31,15 +31,9 @@ public:
 
     TensorShape& operator=(const TensorShape& other);
 
-    unsigned int operator[](unsigned int i) const
-    {
-        return m_Dimensions.at(i);
-    }
+    unsigned int operator[](unsigned int i) const;
 
-    unsigned int& operator[](unsigned int i)
-    {
-        return m_Dimensions.at(i);
-    }
+    unsigned int& operator[](unsigned int i);
 
     bool operator==(const TensorShape& other) const;
     bool operator!=(const TensorShape& other) const;
@@ -50,6 +44,8 @@ public:
 private:
     std::array<unsigned int, MaxNumOfTensorDimensions> m_Dimensions;
     unsigned int m_NumDimensions;
+
+    void CheckDimensionIndex(unsigned int i) const;
 };
 
 class TensorInfo

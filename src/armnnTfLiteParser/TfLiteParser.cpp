@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <limits>
 #include <numeric>
+#include <flatbuffers/flexbuffers.h>
 
 using namespace armnn;
 using armnn::CheckLocation;
@@ -421,6 +422,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]     =  &TfLiteParser::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]           =  &TfLiteParser::ParseConv2D;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D] =  &TfLiteParser::ParseDepthwiseConv2D;
+    m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]            =  &TfLiteParser::ParseDetectionPostProcess;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]   =  &TfLiteParser::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]          =  &TfLiteParser::ParseLogistic;
     m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]       =  &TfLiteParser::ParseMaxPool2D;
@@ -540,17 +542,6 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
         {
             try
             {
-                if (op->custom_options.size() > 0)
-                {
-                    throw ParseException(
-                            boost::str(
-                                    boost::format("Custom options for op: %1% is not supported. "
-                                                  "It has %2% bytes of custom options. %3%") %
-                                                  op->opcode_index %
-                                                  op->custom_options.size() %
-                                                  CHECK_LOCATION().AsString()));
-                }
-
                 auto const & opCodePtr = m_Model->operator_codes[op->opcode_index];
                 auto builtinCode = opCodePtr->builtin_code;
 
@@ -1453,6 +1444,77 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, fusedActivationLayer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseDetectionPostProcess(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 4);
+
+    // Obtain custom options from flexbuffers
+    auto custom_options = operatorPtr->custom_options;
+    const flexbuffers::Map& m = flexbuffers::GetRoot(custom_options.data(), custom_options.size()).AsMap();
+
+    // Obtain descriptor information from tf lite
+    DetectionPostProcessDescriptor desc;
+    desc.m_MaxDetections           = m["max_detections"].AsUInt32();
+    desc.m_MaxClassesPerDetection  = m["max_classes_per_detection"].AsUInt32();
+    desc.m_NmsScoreThreshold       = m["nms_score_threshold"].AsFloat();
+    desc.m_NmsIouThreshold         = m["nms_iou_threshold"].AsFloat();
+    desc.m_NumClasses              = m["num_classes"].AsUInt32();
+    desc.m_ScaleH                  = m["h_scale"].AsFloat();
+    desc.m_ScaleW                  = m["w_scale"].AsFloat();
+    desc.m_ScaleX                  = m["x_scale"].AsFloat();
+    desc.m_ScaleY                  = m["y_scale"].AsFloat();
+
+    if (!(m["use_regular_non_max_suppression"].IsNull()))
+    {
+        desc.m_UseRegularNms       = m["use_regular_non_max_suppression"].AsBool();
+    }
+    if (!(m["detections_per_class"].IsNull()))
+    {
+        desc.m_DetectionsPerClass  = m["detections_per_class"].AsUInt32();
+    }
+
+    if (desc.m_NmsIouThreshold <= 0.0f || desc.m_NmsIouThreshold > 1.0f)
+    {
+        throw InvalidArgumentException("DetectionPostProcessTFLiteParser: Intersection over union threshold "
+                                       "must be positive and less than or equal to 1.");
+    }
+
+    armnn::TensorInfo anchorTensorInfo = ToTensorInfo(inputs[2]);
+    auto anchorTensorAndData = CreateConstTensor(inputs[2], anchorTensorInfo,
+                                                 armnn::Optional<armnn::PermutationVector&>());
+
+    auto layerName = boost::str(boost::format("DetectionPostProcess:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddDetectionPostProcessLayer(desc, anchorTensorAndData.first,
+                                                                       layerName.c_str());
+
+    BOOST_ASSERT(layer != nullptr);
+
+    // Register outputs
+    for (unsigned int i = 0 ; i < outputs.size() ; ++i)
+    {
+        armnn::TensorInfo detectionBoxOutputTensorInfo = ToTensorInfo(outputs[i]);
+        layer->GetOutputSlot(i).SetTensorInfo(detectionBoxOutputTensorInfo);
+    }
+
+    // Register the input connection slots for the layer, connections are made after all layers have been created
+    // only the tensors for the inputs are relevant, exclude the const tensors
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+
+    // Register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0],
+                                                              outputTensorIndexes[1],
+                                                              outputTensorIndexes[2],
+                                                              outputTensorIndexes[3]});
 }
 
 armnn::IConnectableLayer* TfLiteParser::AddFusedActivationLayer(armnn::IConnectableLayer* prevLayer,

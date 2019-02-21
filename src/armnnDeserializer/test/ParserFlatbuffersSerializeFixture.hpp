@@ -171,7 +171,7 @@ void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
     for (auto&& it : inputData)
     {
         BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(layersId, it.first);
-        armnn::VerifyTensorInfoDataType<ArmnnType>(bindingInfo.second);
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnType);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }
 
@@ -181,7 +181,7 @@ void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
     for (auto&& it : expectedOutputData)
     {
         BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(layersId, it.first);
-        armnn::VerifyTensorInfoDataType<ArmnnType>(bindingInfo.second);
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnType);
         outputStorage.emplace(it.first, MakeTensor<DataType, NumOutputDimensions>(bindingInfo.second));
         outputTensors.push_back(
                 { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });

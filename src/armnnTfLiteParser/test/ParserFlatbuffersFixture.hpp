@@ -116,7 +116,7 @@ struct ParserFlatbuffersFixture
     }
 
     /// Executes the network with the given input tensor and checks the result against the given output tensor.
-    /// This overload assumes the network has a single input and a single output.
+    /// This assumes the network has a single input and a single output.
     template <std::size_t NumOutputDimensions,
               armnn::DataType ArmnnType,
               typename DataType = armnn::ResolveType<ArmnnType>>
@@ -132,6 +132,32 @@ struct ParserFlatbuffersFixture
     void RunTest(size_t subgraphId,
                  const std::map<std::string, std::vector<DataType>>& inputData,
                  const std::map<std::string, std::vector<DataType>>& expectedOutputData);
+
+    /// Multiple Inputs, Multiple Outputs w/ Variable Datatypes and different dimension sizes.
+    /// Executes the network with the given input tensors and checks the results against the given output tensors.
+    /// This overload supports multiple inputs and multiple outputs, identified by name along with the allowance for
+    /// the input datatype to be different to the output
+    template <std::size_t NumOutputDimensions,
+              armnn::DataType ArmnnType1,
+              armnn::DataType ArmnnType2,
+              typename DataType1 = armnn::ResolveType<ArmnnType1>,
+              typename DataType2 = armnn::ResolveType<ArmnnType2>>
+    void RunTest(size_t subgraphId,
+                 const std::map<std::string, std::vector<DataType1>>& inputData,
+                 const std::map<std::string, std::vector<DataType2>>& expectedOutputData);
+
+
+    /// Multiple Inputs, Multiple Outputs w/ Variable Datatypes and different dimension sizes.
+    /// Executes the network with the given input tensors and checks the results against the given output tensors.
+    /// This overload supports multiple inputs and multiple outputs, identified by name along with the allowance for
+    /// the input datatype to be different to the output
+    template<armnn::DataType ArmnnType1,
+             armnn::DataType ArmnnType2,
+             typename DataType1 = armnn::ResolveType<ArmnnType1>,
+             typename DataType2 = armnn::ResolveType<ArmnnType2>>
+    void RunTest(std::size_t subgraphId,
+                 const std::map<std::string, std::vector<DataType1>>& inputData,
+                 const std::map<std::string, std::vector<DataType2>>& expectedOutputData);
 
     void CheckTensors(const TensorRawPtr& tensors, size_t shapeSize, const std::vector<int32_t>& shape,
                       tflite::TensorType tensorType, uint32_t buffer, const std::string& name,
@@ -157,24 +183,46 @@ struct ParserFlatbuffersFixture
     }
 };
 
+/// Single Input, Single Output
+/// Executes the network with the given input tensor and checks the result against the given output tensor.
+/// This overload assumes the network has a single input and a single output.
 template <std::size_t NumOutputDimensions,
-          armnn::DataType ArmnnType,
+          armnn::DataType armnnType,
           typename DataType>
 void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
                                        const std::vector<DataType>& inputData,
                                        const std::vector<DataType>& expectedOutputData)
 {
-    RunTest<NumOutputDimensions, ArmnnType>(subgraphId,
+    RunTest<NumOutputDimensions, armnnType>(subgraphId,
                                             { { m_SingleInputName, inputData } },
                                             { { m_SingleOutputName, expectedOutputData } });
 }
 
+/// Multiple Inputs, Multiple Outputs
+/// Executes the network with the given input tensors and checks the results against the given output tensors.
+/// This overload supports multiple inputs and multiple outputs, identified by name.
 template <std::size_t NumOutputDimensions,
-          armnn::DataType ArmnnType,
+          armnn::DataType armnnType,
           typename DataType>
 void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
                                        const std::map<std::string, std::vector<DataType>>& inputData,
                                        const std::map<std::string, std::vector<DataType>>& expectedOutputData)
+{
+    RunTest<NumOutputDimensions, armnnType, armnnType>(subgraphId, inputData, expectedOutputData);
+}
+
+/// Multiple Inputs, Multiple Outputs w/ Variable Datatypes
+/// Executes the network with the given input tensors and checks the results against the given output tensors.
+/// This overload supports multiple inputs and multiple outputs, identified by name along with the allowance for
+/// the input datatype to be different to the output
+template <std::size_t NumOutputDimensions,
+          armnn::DataType armnnType1,
+          armnn::DataType armnnType2,
+          typename DataType1,
+          typename DataType2>
+void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
+                                       const std::map<std::string, std::vector<DataType1>>& inputData,
+                                       const std::map<std::string, std::vector<DataType2>>& expectedOutputData)
 {
     using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
 
@@ -183,18 +231,18 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     for (auto&& it : inputData)
     {
         BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
-        armnn::VerifyTensorInfoDataType<ArmnnType>(bindingInfo.second);
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType1);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }
 
     // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
-    std::map<std::string, boost::multi_array<DataType, NumOutputDimensions>> outputStorage;
+    std::map<std::string, boost::multi_array<DataType2, NumOutputDimensions>> outputStorage;
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
         BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
-        armnn::VerifyTensorInfoDataType<ArmnnType>(bindingInfo.second);
-        outputStorage.emplace(it.first, MakeTensor<DataType, NumOutputDimensions>(bindingInfo.second));
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType2);
+        outputStorage.emplace(it.first, MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second));
         outputTensors.push_back(
                 { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
     }
@@ -205,7 +253,61 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     for (auto&& it : expectedOutputData)
     {
         BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
-        auto outputExpected = MakeTensor<DataType, NumOutputDimensions>(bindingInfo.second, it.second);
+        auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second);
         BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
+    }
+}
+
+/// Multiple Inputs, Multiple Outputs w/ Variable Datatypes and different dimension sizes.
+/// Executes the network with the given input tensors and checks the results against the given output tensors.
+/// This overload supports multiple inputs and multiple outputs, identified by name along with the allowance for
+/// the input datatype to be different to the output.
+template <armnn::DataType armnnType1,
+          armnn::DataType armnnType2,
+          typename DataType1,
+          typename DataType2>
+void ParserFlatbuffersFixture::RunTest(std::size_t subgraphId,
+                                       const std::map<std::string, std::vector<DataType1>>& inputData,
+                                       const std::map<std::string, std::vector<DataType2>>& expectedOutputData)
+{
+    using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+
+    // Setup the armnn input tensors from the given vectors.
+    armnn::InputTensors inputTensors;
+    for (auto&& it : inputData)
+    {
+        BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType1);
+
+        inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
+    }
+
+    armnn::OutputTensors outputTensors;
+    outputTensors.reserve(expectedOutputData.size());
+    std::map<std::string, std::vector<DataType2>> outputStorage;
+    for (auto&& it : expectedOutputData)
+    {
+        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType2);
+
+        std::vector<DataType2> out(it.second.size());
+        outputStorage.emplace(it.first, out);
+        outputTensors.push_back({ bindingInfo.first,
+                                  armnn::Tensor(bindingInfo.second,
+                                  outputStorage.at(it.first).data()) });
+    }
+
+    m_Runtime->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
+
+    // Checks the results.
+    for (auto&& it : expectedOutputData)
+    {
+        std::vector<DataType2> out = outputStorage.at(it.first);
+        {
+            for (unsigned int i = 0; i < out.size(); ++i)
+            {
+                BOOST_TEST(it.second[i] == out[i], boost::test_tools::tolerance(0.000001f));
+            }
+        }
     }
 }

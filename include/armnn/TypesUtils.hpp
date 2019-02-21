@@ -219,15 +219,14 @@ inline float Dequantize(QuantizedType value, float scale, int32_t offset)
     return dequantized;
 }
 
-template <armnn::DataType DataType>
-void VerifyTensorInfoDataType(const armnn::TensorInfo & info)
+inline void VerifyTensorInfoDataType(const armnn::TensorInfo & info, armnn::DataType dataType)
 {
-    if (info.GetDataType() != DataType)
+    if (info.GetDataType() != dataType)
     {
         std::stringstream ss;
         ss << "Unexpected datatype:" << armnn::GetDataTypeName(info.GetDataType())
-            << " for tensor:" << info.GetShape()
-            << ". The type expected to be: " << armnn::GetDataTypeName(DataType);
+           << " for tensor:" << info.GetShape()
+           << ". The type expected to be: " << armnn::GetDataTypeName(dataType);
         throw armnn::Exception(ss.str());
     }
 }

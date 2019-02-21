@@ -6,6 +6,7 @@ This reference guide provides a list of layers which can be serialized currently
 
 The Arm NN SDK Serializer currently supports the following layers:
 
+* Activation
 * Addition
 * Convolution2d
 * DepthwiseConvolution2d

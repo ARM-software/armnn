@@ -203,14 +203,16 @@ public:
 
         for (const std::string& inputLayerName : params.m_InputBindings)
         {
-            BindingPointInfo inputBinding = parser->GetNetworkInputBindingInfo(subGraphId, inputLayerName);
-            inputBindings.push_back(inputBinding);
+            armnnDeserializer::BindingPointInfo inputBinding =
+                parser->GetNetworkInputBindingInfo(subGraphId, inputLayerName);
+            inputBindings.push_back(std::make_pair(inputBinding.m_BindingId, inputBinding.m_TensorInfo));
         }
 
         for (const std::string& outputLayerName : params.m_OutputBindings)
         {
-            BindingPointInfo outputBinding = parser->GetNetworkOutputBindingInfo(subGraphId, outputLayerName);
-            outputBindings.push_back(outputBinding);
+            armnnDeserializer::BindingPointInfo outputBinding =
+                parser->GetNetworkOutputBindingInfo(subGraphId, outputLayerName);
+            outputBindings.push_back(std::make_pair(outputBinding.m_BindingId, outputBinding.m_TensorInfo));
         }
 
         return network;

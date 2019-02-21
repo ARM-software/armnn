@@ -166,11 +166,16 @@ void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
 {
     using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
 
+    auto ConvertBindingInfo = [](const armnnDeserializer::BindingPointInfo& bindingInfo)
+        {
+            return std::make_pair(bindingInfo.m_BindingId, bindingInfo.m_TensorInfo);
+        };
+
     // Setup the armnn input tensors from the given vectors.
     armnn::InputTensors inputTensors;
     for (auto&& it : inputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(layersId, it.first);
+        BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkInputBindingInfo(layersId, it.first));
         armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnType);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }
@@ -180,7 +185,7 @@ void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(layersId, it.first);
+        BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
         armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnType);
         outputStorage.emplace(it.first, MakeTensor<DataType, NumOutputDimensions>(bindingInfo.second));
         outputTensors.push_back(
@@ -192,7 +197,7 @@ void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
     // Compare each output tensor to the expected values
     for (auto&& it : expectedOutputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(layersId, it.first);
+        BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
         auto outputExpected = MakeTensor<DataType, NumOutputDimensions>(bindingInfo.second, it.second);
         BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
     }

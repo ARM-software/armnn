@@ -15,7 +15,11 @@
 
 namespace armnnDeserializer
 {
-using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+struct BindingPointInfo
+{
+    armnn::LayerBindingId   m_BindingId;
+    armnn::TensorInfo       m_TensorInfo;
+};
 
 class IDeserializer;
 using IDeserializerPtr = std::unique_ptr<IDeserializer, void(*)(IDeserializer* parser)>;

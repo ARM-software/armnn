@@ -44,7 +44,6 @@ public:
 public:
     // testable helpers
     static GraphPtr LoadGraphFromBinary(const uint8_t* binaryContent, size_t len);
-    static GraphPtr LoadGraphFromBinary(std::istream& binaryContent);
     static TensorRawPtrVector GetInputs(const GraphPtr& graph, unsigned int layerIndex);
     static TensorRawPtrVector GetOutputs(const GraphPtr& graph, unsigned int layerIndex);
     static LayerBaseRawPtrVector GetGraphInputs(const GraphPtr& graphPtr);
@@ -62,39 +61,42 @@ private:
     Deserializer& operator=(const Deserializer&) = delete;
 
     /// Create the network from an already loaded flatbuffers graph
-    armnn::INetworkPtr CreateNetworkFromGraph();
+    armnn::INetworkPtr CreateNetworkFromGraph(GraphPtr graph);
 
     // signature for the parser functions
-    using LayerParsingFunction = void(Deserializer::*)(unsigned int layerIndex);
+    using LayerParsingFunction = void(Deserializer::*)(GraphPtr graph, unsigned int layerIndex);
 
-    void ParseUnsupportedLayer(unsigned int layerIndex);
-    void ParseActivation(unsigned int layerIndex);
-    void ParseAdd(unsigned int layerIndex);
-    void ParseConvolution2d(unsigned int layerIndex);
-    void ParseDepthwiseConvolution2d(unsigned int layerIndex);
-    void ParseFullyConnected(unsigned int layerIndex);
-    void ParseMultiplication(unsigned int layerIndex);
-    void ParsePermute(unsigned int layerIndex);
-    void ParsePooling2d(unsigned int layerIndex);
-    void ParseReshape(unsigned int layerIndex);
-    void ParseSoftmax(unsigned int layerIndex);
+    void ParseUnsupportedLayer(GraphPtr graph, unsigned int layerIndex);
+    void ParseActivation(GraphPtr graph, unsigned int layerIndex);
+    void ParseAdd(GraphPtr graph, unsigned int layerIndex);
+    void ParseConvolution2d(GraphPtr graph, unsigned int layerIndex);
+    void ParseDepthwiseConvolution2d(GraphPtr graph, unsigned int layerIndex);
+    void ParseFullyConnected(GraphPtr graph, unsigned int layerIndex);
+    void ParseMultiplication(GraphPtr graph, unsigned int layerIndex);
+    void ParsePermute(GraphPtr graph, unsigned int layerIndex);
+    void ParsePooling2d(GraphPtr graph, unsigned int layerIndex);
+    void ParseReshape(GraphPtr graph, unsigned int layerIndex);
+    void ParseSoftmax(GraphPtr graph, unsigned int layerIndex);
 
     void RegisterOutputSlotOfConnection(uint32_t connectionIndex, armnn::IOutputSlot* slot);
     void RegisterInputSlotOfConnection(uint32_t connectionIndex, armnn::IInputSlot* slot);
-    void RegisterInputSlots(uint32_t layerIndex,
+    void RegisterInputSlots(GraphPtr graph, uint32_t layerIndex,
                             armnn::IConnectableLayer* layer);
-    void RegisterOutputSlots(uint32_t layerIndex,
+    void RegisterOutputSlots(GraphPtr graph, uint32_t layerIndex,
                              armnn::IConnectableLayer* layer);
     void ResetParser();
 
-    void SetupInputLayers();
-    void SetupOutputLayers();
+    void SetupInputLayers(GraphPtr graphPtr);
+    void SetupOutputLayers(GraphPtr graphPtr);
 
     /// The network we're building. Gets cleared after it is passed to the user
     armnn::INetworkPtr                    m_Network;
-    GraphPtr                              m_Graph;
     std::vector<LayerParsingFunction>     m_ParserFunctions;
     std::string                           m_layerName;
+
+    using NameToBindingInfo = std::pair<std::string, BindingPointInfo >;
+    std::vector<NameToBindingInfo>    m_InputBindings;
+    std::vector<NameToBindingInfo>    m_OutputBindings;
 
     /// A mapping of an output slot to each of the input slots it should be connected to
     /// The outputSlot is from the layer that creates this tensor as one of its outputs

@@ -14,6 +14,7 @@
 #include "../NetworkQuantizerUtils.hpp"
 #include "../OverrideInputRangeVisitor.hpp"
 #include "../RangeTracker.hpp"
+#include "../backends/backendsCommon/test/QuantizeHelper.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -1213,6 +1214,34 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchToSpace)
     auto quantizedNetwork = INetworkQuantizer::Create(network.get())->ExportNetwork();
     TestBatchToSpaceQuantization validator;
     VisitLayersTopologically(quantizedNetwork.get(), validator);
+}
+
+std::vector<uint8_t> SetupQuantize(float value)
+{
+    armnn::TensorInfo inputInfo({ 1, 2, 2 }, armnn::DataType::Float32);
+    inputInfo.SetQuantizationScale(1.0f);
+    inputInfo.SetQuantizationOffset(1);
+    std::vector<float> input({
+                                     value, 0.0f,
+                                     0.0f, 1.0f
+                             });
+    const std::vector<float> &inputRef = input;
+
+    auto output = QuantizedVector<uint8_t>(inputInfo.GetQuantizationScale(),
+                                           inputInfo.GetQuantizationOffset(),
+                                           inputRef);
+
+    return output;
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeInf)
+{
+    BOOST_CHECK_EQUAL(SetupQuantize(std::numeric_limits<float>::infinity())[0], 255);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeNegativeInf)
+{
+    BOOST_CHECK_EQUAL(SetupQuantize(-1 * std::numeric_limits<float>::infinity())[0], 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

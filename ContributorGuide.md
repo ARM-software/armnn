@@ -1,12 +1,10 @@
 # Contributor Guide
 
-The ArmNN project is open for external contributors and welcomes contributions. ArmNN is licensed
-under the [MIT license](https://spdx.org/licenses/MIT.html) and all accepted contributions must have
-the same license.
+The Arm NN project is open for external contributors and welcomes contributions. Arm NN is licensed under the [MIT license](https://spdx.org/licenses/MIT.html) and all accepted contributions must have the same license. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website.
 
 ## Developer Certificate of Origin (DCO)
 
-Before the ArmNN project accepts your contribution, you need to certify its origin and give us your permission.  To manage this process we use Developer Certificate of Origin (DCO) V1.1 (https://developercertificate.org/).
+Before the Arm NN project accepts your contribution, you need to certify its origin and give us your permission.  To manage this process we use Developer Certificate of Origin (DCO) V1.1 (https://developercertificate.org/).
 
 To indicate that you agree to the the terms of the DCO, you "sign off" your contribution by adding a line with your name and e-mail address to every git commit message:
 
@@ -16,24 +14,23 @@ You must use your real name, no pseudonyms or anonymous contributions are accept
 
 ## Releases
 
-Official ArmNN releases are published through the official [ArmNN Github repository](https://github.com/ARM-software/armnn).
+Official Arm NN releases are published through the official [Arm NN Github repository](https://github.com/ARM-software/armnn).
 
 ## Development repository
 
-The ArmNN development repository is hosted on the [mlplatform.org git repository](https://git.mlplatform.org/ml/armnn.git/) hosted by [Linaro](https://www.linaro.org/).
+The Arm NN development repository is hosted on the [mlplatform.org git repository](https://git.mlplatform.org/ml/armnn.git/) hosted by [Linaro](https://www.linaro.org/).
 
 ## Code reviews
 
 Contributions must go through code review. Code reviews are performed through the [mlplatform.org Gerrit server](https://review.mlplatform.org). Contributors need to signup to this Gerrit server with their GitHub account
 credentials.
 
-Only reviewed contributions can go to the master branch of ArmNN.
+Only reviewed contributions can go to the master branch of Arm NN.
 
 ## Continuous integration
 
-Contributions to ArmNN go through testing at the Arm CI system. All unit, integration and regression
-tests must pass before a contribution gets merged to the ArmNN master branch.
+Contributions to Arm NN go through testing at the Arm CI system. All unit, integration and regression tests must pass before a contribution gets merged to the Arm NN master branch.
 
 ## Communications
 
-We encourage all ArmNN developer to subscribe to the [ArmNN developer mailing list](https://lists.linaro.org/mailman/listinfo/armnn-dev).
+We encourage all Arm NN developers to subscribe to the [Arm NN developer mailing list](https://lists.linaro.org/mailman/listinfo/armnn-dev).

@@ -1,6 +1,6 @@
 # Arm NN
 
-For more information about Arm NN, see: <https://developer.arm.com/products/processors/machine-learning/arm-nn>
+Arm NN is a key component of the [machine learning platform](https://mlplatform.org/>) which is part of the [Linaro Machine Intelligence Initiative](https://www.linaro.org/news/linaro-announces-launch-of-machine-intelligence-initiative/). For more information on the machine learning platform and Arm NN, see: <https://mlplatform.org/>, also there is further Arm NN information available from <https://developer.arm.com/products/processors/machine-learning/arm-nn>
 
 There is a getting started guide here using TensorFlow: <https://developer.arm.com/technologies/machine-learning-on-arm/developer-material/how-to-guides/configuring-the-arm-nn-sdk-build-environment-for-tensorflow>
 
@@ -16,19 +16,19 @@ There is a guide for backend development: [Backend development guide](src/backen
 
 Arm tests the build system of Arm NN with the following build environments:
 
-* Android NDK: [How to use Android NDK to build ArmNN](BuildGuideAndroidNDK.md)
-* Cross compilation from x86_64 Ubuntu to arm64 Linux: [ArmNN Cross Compilation](BuildGuideCrossCompilation.md)
+* Android NDK: [How to use Android NDK to build Arm NN](BuildGuideAndroidNDK.md)
+* Cross compilation from x86_64 Ubuntu to arm64 Linux: [Arm NN Cross Compilation](BuildGuideCrossCompilation.md)
 * Native compilation under arm64 Debian 9
 
 Arm NN is written using portable C++14 and the build system uses [CMake](https://cmake.org/) so it is possible to build for a wide variety of target platforms, from a wide variety of host environments.
 
-The armnn/tests directory contains tests used during ArmNN development. Many of them depend on third-party IP, model protobufs and image files not distributed with ArmNN. The dependencies of some of the tests are available freely on the Internet, for those who wish to experiment.
+The armnn/tests directory contains tests used during Arm NN development. Many of them depend on third-party IP, model protobufs and image files not distributed with Arm NN. The dependencies of some of the tests are available freely on the Internet, for those who wish to experiment.
 
 The 'armnn/samples' directory contains SimpleSample.cpp. A very basic example of the ArmNN SDK API in use.
 
-The 'ExecuteNetwork' program, in armnn/tests/ExecuteNetwork, has no additional dependencies beyond those required by ArmNN and the model parsers. It takes any model and any input tensor, and simply prints out the output tensor. Run with no arguments to see command-line help.
+The 'ExecuteNetwork' program, in armnn/tests/ExecuteNetwork, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes any model and any input tensor, and simply prints out the output tensor. Run with no arguments to see command-line help.
 
-The 'ArmnnConverter' program, in armnn/src/ArmnnConverter, has no additional dependencies beyond those required by ArmNN and the model parsers. It takes a model in TensorFlow format and produce a serialized model in ArmNN format. Run with no arguments to see command-line help. Note that this program can only convert models for which all operations are supported by the serialization tool (src/armnnSerializer).
+The 'ArmnnConverter' program, in armnn/src/ArmnnConverter, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes a model in TensorFlow format and produces a serialized model in Arm NN format. Run with no arguments to see command-line help. Note that this program can only convert models for which all operations are supported by the serialization tool (src/armnnSerializer).
 
 Note that Arm NN needs to be built against a particular version of ARM's Compute Library. The get_compute_library.sh in the scripts subdirectory will clone the compute library from the review.mlplatform.org github repository into a directory alongside armnn named 'clframework' and checkouts the correct revision
 
@@ -45,5 +45,4 @@ This enables machine processing of license information based on the SPDX License
 
 ### Contributions
 
-The ArmNN project welcomes contributions. Please see the [Contributor Guide](ContributorGuide.md) for
-more details.
+The Arm NN project welcomes contributions. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website, or see the [Contributor Guide](ContributorGuide.md).

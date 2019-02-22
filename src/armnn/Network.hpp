@@ -38,24 +38,39 @@ public:
                                               const char* name = nullptr) override;
 
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                             const ConstTensor& weights,
+                                             const Optional<ConstTensor>& biases,
+                                             const char* name = nullptr) override;
+
+    /// @deprecated
+    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                             const ConstTensor& weights,
+                                             const char* name = nullptr) override;
+
+    /// @deprecated
+    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                             const ConstTensor& weights,
+                                             const ConstTensor& biases,
+                                             const char* name = nullptr) override;
+
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+        const ConstTensor& weights,
+        const Optional<ConstTensor>& biases,
+        const char* name = nullptr) override;
+
+    /// @deprecated
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
         const char* name = nullptr) override;
 
-    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+    /// @deprecated
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
         const ConstTensor& biases,
         const char* name = nullptr) override;
-
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor&                      weights,
-        const char*                             name = nullptr) override;
-
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor&                      weights,
-        const ConstTensor&                      biases,
-        const char*                             name = nullptr) override;
 
     IConnectableLayer* AddDetectionPostProcessLayer(
         const DetectionPostProcessDescriptor& descriptor,
@@ -63,13 +78,20 @@ public:
         const char* name = nullptr) override;
 
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-        const ConstTensor& weights,
-        const char* name = nullptr) override;
+                                              const ConstTensor& weights,
+                                              const Optional<ConstTensor>& biases,
+                                              const char* name = nullptr) override;
 
+    /// @deprecated
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-        const ConstTensor& weights,
-        const ConstTensor& biases,
-        const char* name = nullptr) override;
+                                              const ConstTensor& weights,
+                                              const char* name = nullptr) override;
+
+    /// @deprecated
+    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                              const ConstTensor& weights,
+                                              const ConstTensor& biases,
+                                              const char* name = nullptr) override;
 
     IConnectableLayer* AddGatherLayer(const char* name = nullptr) override;
 
@@ -152,19 +174,19 @@ public:
 
 private:
     IConnectableLayer* AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-        const ConstTensor& weights,
-        const ConstTensor* biases,
-        const char* name);
+                                                  const ConstTensor& weights,
+                                                  const Optional<ConstTensor>& biases,
+                                                  const char* name);
 
     IConnectableLayer* AddConvolution2dLayerImpl(const Convolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const ConstTensor* biases,
-        const char* name);
+                                                 const ConstTensor& weights,
+                                                 const Optional<ConstTensor>& biases,
+                                                 const char* name);
 
     IConnectableLayer* AddDepthwiseConvolution2dLayerImpl(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
-        const ConstTensor* biases,
+        const Optional<ConstTensor>& biases,
         const char* name);
 
     std::unique_ptr<Graph> m_Graph;

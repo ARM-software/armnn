@@ -537,12 +537,12 @@ IConnectableLayer* Network::AddBatchToSpaceNdLayer(const BatchToSpaceNdDescripto
 
 IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                        const ConstTensor& weights,
-                                                       const ConstTensor* biases,
+                                                       const Optional<ConstTensor>& biases,
                                                        const char* name)
 {
-    if (fullyConnectedDescriptor.m_BiasEnabled && (biases == nullptr))
+    if (fullyConnectedDescriptor.m_BiasEnabled && !biases.has_value())
     {
-        throw InvalidArgumentException("AddFullyConnectedLayer: biases cannot be NULL");
+        throw InvalidArgumentException("AddFullyConnectedLayer: biases cannot be empty");
     }
 
     const auto layer = m_Graph->AddLayer<FullyConnectedLayer>(fullyConnectedDescriptor, name);
@@ -551,7 +551,7 @@ IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescr
 
     if (fullyConnectedDescriptor.m_BiasEnabled)
     {
-        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(*biases);
+        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(biases.value());
     }
 
     return layer;
@@ -559,27 +559,39 @@ IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescr
 
 IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                    const ConstTensor& weights,
+                                                   const Optional<ConstTensor>& biases,
                                                    const char* name)
 {
-    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, nullptr, name);
+    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, biases, name);
 }
 
+/// @deprecated
+IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                                   const ConstTensor& weights,
+                                                   const char* name)
+{
+    Optional<ConstTensor> biases = EmptyOptional();
+    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, biases, name);
+}
+
+/// @deprecated
 IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                    const ConstTensor& weights,
                                                    const ConstTensor& biases,
                                                    const char* name)
 {
-    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, &biases, name);
+    Optional<ConstTensor> optionalBiases(biases);
+    return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, optionalBiases, name);
 }
 
 IConnectableLayer* Network::AddConvolution2dLayerImpl(const Convolution2dDescriptor& convolution2dDescriptor,
                                                       const ConstTensor& weights,
-                                                      const ConstTensor* biases,
+                                                      const Optional<ConstTensor>& biases,
                                                       const char* name)
 {
-    if (convolution2dDescriptor.m_BiasEnabled && (biases == nullptr))
+    if (convolution2dDescriptor.m_BiasEnabled && !biases.has_value())
     {
-        throw InvalidArgumentException("AddConvolution2dLayer: biases cannot be NULL");
+        throw InvalidArgumentException("AddConvolution2dLayer: biases cannot be empty");
     }
 
     const auto layer = m_Graph->AddLayer<Convolution2dLayer>(convolution2dDescriptor, name);
@@ -588,7 +600,7 @@ IConnectableLayer* Network::AddConvolution2dLayerImpl(const Convolution2dDescrip
 
     if (convolution2dDescriptor.m_BiasEnabled)
     {
-        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(*biases);
+        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(biases.value());
     }
 
     return layer;
@@ -596,27 +608,40 @@ IConnectableLayer* Network::AddConvolution2dLayerImpl(const Convolution2dDescrip
 
 IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
+                                                  const Optional<ConstTensor>& biases,
                                                   const char* name)
 {
-    return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, nullptr, name);
+    return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
+
+/// @deprecated
+IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                                  const ConstTensor& weights,
+                                                  const char* name)
+{
+    Optional<ConstTensor> biases = EmptyOptional();
+    return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
+}
+
+/// @deprecated
 IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
                                                   const ConstTensor& biases,
                                                   const char* name)
 {
-    return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, &biases, name);
+    Optional<ConstTensor> optionalBiases(biases);
+    return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, optionalBiases, name);
 }
 
 IConnectableLayer* Network::AddDepthwiseConvolution2dLayerImpl(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,
-    const ConstTensor* biases,
+    const Optional<ConstTensor>& biases,
     const char* name)
 {
-    if (convolution2dDescriptor.m_BiasEnabled && (biases == nullptr))
+    if (convolution2dDescriptor.m_BiasEnabled && !biases.has_value())
     {
-        throw InvalidArgumentException("AddDepthwiseConvolution2dLayer: biases cannot be NULL");
+        throw InvalidArgumentException("AddDepthwiseConvolution2dLayer: biases cannot be empty");
     }
 
     const auto layer = m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor, name);
@@ -625,26 +650,40 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayerImpl(
 
     if (convolution2dDescriptor.m_BiasEnabled)
     {
-        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(*biases);
+        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(biases.value());
     }
 
     return layer;
 }
 
 IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+        const ConstTensor& weights,
+        const Optional<ConstTensor>& biases,
+        const char* name)
+{
+    return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
+}
+
+/// @deprecated
+IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,
     const char* name)
 {
-    return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, nullptr, name);
+    Optional<ConstTensor> biases = EmptyOptional();
+    return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
+
+/// @deprecated
 IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,
     const ConstTensor& biases,
     const char* name)
 {
-    return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, &biases, name);
+    Optional<ConstTensor> optionalBiases(biases);
+    return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, optionalBiases, name);
 }
 
 IConnectableLayer* Network::AddDetectionPostProcessLayer(const armnn::DetectionPostProcessDescriptor& descriptor,

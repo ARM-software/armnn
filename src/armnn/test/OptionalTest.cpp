@@ -54,7 +54,6 @@ BOOST_AUTO_TEST_CASE(SimpleStringTests)
     BOOST_TEST(optionalString3.value() == "Hello World");
 }
 
-
 BOOST_AUTO_TEST_CASE(StringRefTests)
 {
     armnn::Optional<std::string&> optionalStringRef{armnn::EmptyOptional()};
@@ -109,6 +108,44 @@ BOOST_AUTO_TEST_CASE(SimpleIntTests)
     otherOptionalInt = optionalInt;
     BOOST_TEST(otherOptionalInt == true);
     BOOST_TEST(otherOptionalInt.value() == intValue);
+}
+
+BOOST_AUTO_TEST_CASE(ObjectConstructedInPlaceTests)
+{
+    struct SimpleObject
+    {
+        public:
+            SimpleObject(const std::string& name, int value)
+                : m_Name(name)
+                , m_Value(value)
+            {}
+
+            bool operator ==(const SimpleObject& other)
+            {
+                return m_Name  == other.m_Name &&
+                       m_Value == other.m_Value;
+            }
+
+        private:
+            std::string m_Name;
+            int         m_Value;
+    };
+
+    std::string objectName("SimpleObject");
+    int objectValue = 1;
+    SimpleObject referenceObject(objectName, objectValue);
+
+    // Use MakeOptional
+    armnn::Optional<SimpleObject> optionalObject1 = armnn::MakeOptional<SimpleObject>(objectName, objectValue);
+    BOOST_CHECK(optionalObject1 == true);
+    BOOST_CHECK(optionalObject1.has_value() == true);
+    BOOST_CHECK(optionalObject1.value() == referenceObject);
+
+    // Call in-place constructor directly
+    armnn::Optional<SimpleObject> optionalObject2(CONSTRUCT_IN_PLACE, objectName, objectValue);
+    BOOST_CHECK(optionalObject1 == true);
+    BOOST_CHECK(optionalObject1.has_value() == true);
+    BOOST_CHECK(optionalObject1.value() == referenceObject);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

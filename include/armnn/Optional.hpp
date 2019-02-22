@@ -30,6 +30,15 @@ namespace armnn
 // to have default value for an Optional in a function declaration.
 struct EmptyOptional {};
 
+// Disambiguation tag that can be passed to the constructor to indicate that
+// the contained object should be constructed in-place
+struct ConstructInPlace
+{
+    explicit ConstructInPlace() = default;
+};
+
+#define CONSTRUCT_IN_PLACE armnn::ConstructInPlace{}
+
 // OptionalBase is the common functionality between reference and non-reference
 // optional types.
 class OptionalBase
@@ -77,6 +86,13 @@ public:
         : Base{}
     {
         Construct(value);
+    }
+
+    template<class... Args>
+    OptionalReferenceSwitch(ConstructInPlace, Args&&... args)
+        : Base{}
+    {
+        Construct(CONSTRUCT_IN_PLACE, std::forward<Args>(args)...);
     }
 
     OptionalReferenceSwitch(const OptionalReferenceSwitch& other)
@@ -152,6 +168,13 @@ private:
         m_HasValue = true;
     }
 
+    template<class... Args>
+    void Construct(ConstructInPlace, Args&&... args)
+    {
+        new (m_Storage) T(std::forward<Args>(args)...);
+        m_HasValue = true;
+    }
+
     alignas(alignof(T)) unsigned char m_Storage[sizeof(T)];
 };
 
@@ -180,6 +203,9 @@ public:
         , m_Storage{&value}
     {
     }
+
+    template<class... Args>
+    OptionalReferenceSwitch(ConstructInPlace, Args&&... args) = delete;
 
     OptionalReferenceSwitch& operator=(const T value)
     {
@@ -247,6 +273,18 @@ public:
     Optional(EmptyOptional empty) : BaseSwitch{empty} {}
     Optional(const Optional& other) : BaseSwitch{other} {}
     Optional(const BaseSwitch& other) : BaseSwitch{other} {}
+
+    template<class... Args>
+    explicit Optional(ConstructInPlace, Args&&... args) :
+        BaseSwitch(CONSTRUCT_IN_PLACE, std::forward<Args>(args)...) {}
 };
+
+// Utility template that constructs an object of type T in-place and wraps
+// it inside an Optional<T> object
+template<typename T, class... Args>
+Optional<T> MakeOptional(Args&&... args)
+{
+    return Optional<T>(CONSTRUCT_IN_PLACE, std::forward<Args>(args)...);
+}
 
 }

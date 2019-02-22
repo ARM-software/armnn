@@ -172,33 +172,15 @@ if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER)
     find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
               HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
 
-    if(NOT FLATBUFFERS_INCLUDE_PATH)
-        message(WARNING
-          "Couldn't find 'flatbuffers/flatbuffers.h' at ${FLATBUFFERS_ROOT}/include. \
-           Disabling Tf Lite and Armnn Serializer support")
-        set(BUILD_TF_LITE_PARSER Off)
-        set(BUILD_ARMNN_SERIALIZER Off)
-    else()
-        message(STATUS "Flatbuffers headers are located at: ${FLATBUFFERS_INCLUDE_PATH}")
-    endif()
+    message(STATUS "Flatbuffers headers are located at: ${FLATBUFFERS_INCLUDE_PATH}")
 
     find_library(FLATBUFFERS_LIBRARY
                  NAMES libflatbuffers.a flatbuffers
                  HINTS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib)
 
-    if(NOT FLATBUFFERS_LIBRARY)
-        message(WARNING
-          "Couldn't find flatbuffers library. Disabling Tf Lite and Armnn Serializer support")
-        set(BUILD_TF_LITE_PARSER Off)
-        set(BUILD_ARMNN_SERIALIZER Off)
-    else()
-        message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
-    endif()
+    message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
 
-    # Setup includes and libs only if we still want Tf Lite or Armnn Serializer
-    if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER)
-        include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
-    endif()
+    include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
 endif()
 
 # Flatbuffers schema support for TF Lite
@@ -207,19 +189,10 @@ if(BUILD_TF_LITE_PARSER)
               schema_generated.h
               HINTS ${TF_LITE_GENERATED_PATH})
 
-    if(NOT TF_LITE_SCHEMA_INCLUDE_PATH)
-        message(WARNING
-                "Couldn't find 'schema_generated.h' at ${TF_LITE_GENERATED_PATH}. Disabling Tf Lite support")
-        set(BUILD_TF_LITE_PARSER Off)
-    else()
-        message(STATUS "Tf Lite generated header found at: ${TF_LITE_SCHEMA_INCLUDE_PATH}")
-    endif()
+    message(STATUS "Tf Lite generated header found at: ${TF_LITE_SCHEMA_INCLUDE_PATH}")
 
-    # Setup includes and libs only if we still want Tf Lite
-    if(BUILD_TF_LITE_PARSER)
-        add_definitions(-DARMNN_TF_LITE_PARSER)
-        add_definitions(-DARMNN_TF_LITE_SCHEMA_PATH="${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs")
-    endif()
+    add_definitions(-DARMNN_TF_LITE_PARSER)
+    add_definitions(-DARMNN_TF_LITE_SCHEMA_PATH="${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs")
 endif()
 
 if(BUILD_ARMNN_SERIALIZER)

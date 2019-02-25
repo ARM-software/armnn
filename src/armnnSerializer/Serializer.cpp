@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-#include <Schema_generated.h>
+#include <ArmnnSchema_generated.h>
 
 #include <flatbuffers/util.h>
 

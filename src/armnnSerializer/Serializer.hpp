@@ -11,7 +11,7 @@
 
 #include <unordered_map>
 
-#include <Schema_generated.h>
+#include <ArmnnSchema_generated.h>
 
 namespace armnnSerializer
 {

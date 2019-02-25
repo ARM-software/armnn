@@ -19,10 +19,10 @@
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"
 
-#include <Schema_generated.h>
+#include <ArmnnSchema_generated.h>
 
 using armnnDeserializer::IDeserializer;
-using TensorRawPtr =  armnnSerializer::TensorInfo*;
+using TensorRawPtr = armnnSerializer::TensorInfo*;
 
 struct ParserFlatbuffersSerializeFixture
 {

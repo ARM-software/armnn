@@ -151,16 +151,16 @@ endif()
 
 if(BUILD_ARMNN_SERIALIZER)
     add_custom_command (
-        OUTPUT  src/armnnSerializer/Schema_generated.h
+        OUTPUT  src/armnnSerializer/ArmnnSchema_generated.h
         COMMAND ${FLATC_DIR}/flatc -o ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer --cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/src/armnnSerializer/Schema.fbs
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/armnnSerializer/ArmnnSchema.fbs
     )
 
     set(armnn_serializer_sources)
     list(APPEND armnn_serializer_sources
         include/armnnSerializer/ISerializer.hpp
         include/armnnDeserializer/IDeserializer.hpp
-        src/armnnSerializer/Schema_generated.h
+        src/armnnSerializer/ArmnnSchema_generated.h
         src/armnnSerializer/Serializer.hpp
         src/armnnSerializer/Serializer.cpp
         src/armnnSerializer/SerializerUtils.hpp
@@ -592,7 +592,7 @@ if(BUILD_UNIT_TESTS)
     if(BUILD_ARMNN_SERIALIZER)
         enable_language(ASM)
         list(APPEND unittest_sources
-                src/armnnSerializer/Schema_generated.h
+                src/armnnSerializer/ArmnnSchema_generated.h
                 src/armnnSerializer/test/ActivationSerializationTests.cpp
                 src/armnnSerializer/test/SerializerTests.cpp
                 src/armnnDeserializer/test/DeserializeActivation.cpp

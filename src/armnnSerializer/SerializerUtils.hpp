@@ -6,7 +6,7 @@
 
 #include <armnn/ArmNN.hpp>
 
-#include <Schema_generated.h>
+#include <ArmnnSchema_generated.h>
 
 namespace armnnSerializer
 {

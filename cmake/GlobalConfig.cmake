@@ -198,7 +198,7 @@ endif()
 if(BUILD_ARMNN_SERIALIZER)
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
     add_definitions(-DARMNN_SERIALIZER)
-    add_definitions(-DARMNN_SERIALIZER_SCHEMA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/src/armnnSerializer/Schema.fbs")
+    add_definitions(-DARMNN_SERIALIZER_SCHEMA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/src/armnnSerializer/ArmnnSchema.fbs")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -7,7 +7,7 @@
 
 #include "armnn/INetwork.hpp"
 #include "armnnDeserializer/IDeserializer.hpp"
-#include <Schema_generated.h>
+#include <ArmnnSchema_generated.h>
 
 namespace armnnDeserializer
 {

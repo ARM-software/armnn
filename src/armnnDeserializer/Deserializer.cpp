@@ -20,7 +20,7 @@
 #include <boost/log/trivial.hpp>
 
 // The generated code based on the Serialize schema:
-#include <Schema_generated.h>
+#include <ArmnnSchema_generated.h>
 
 #include <fstream>
 #include <algorithm>

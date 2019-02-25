@@ -50,6 +50,7 @@ public:
     static LayerBaseRawPtrVector GetGraphOutputs(const GraphPtr& graphPtr);
     static LayerBaseRawPtr GetBaseLayer(const GraphPtr& graphPtr, unsigned int layerIndex);
     static int32_t GetBindingLayerInfo(const GraphPtr& graphPtr, unsigned int layerIndex);
+    static std::string GetLayerName(const GraphPtr& graph, unsigned int index);
     armnn::Pooling2dDescriptor GetPoolingDescriptor(PoolingDescriptor pooling2dDescriptor,
                                                     unsigned int layerIndex);
     static armnn::TensorInfo OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
@@ -92,7 +93,6 @@ private:
     /// The network we're building. Gets cleared after it is passed to the user
     armnn::INetworkPtr                    m_Network;
     std::vector<LayerParsingFunction>     m_ParserFunctions;
-    std::string                           m_layerName;
 
     using NameToBindingInfo = std::pair<std::string, BindingPointInfo >;
     std::vector<NameToBindingInfo>    m_InputBindings;

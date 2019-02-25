@@ -27,14 +27,17 @@ namespace
 struct MobileNetSsdTestCaseData
 {
     MobileNetSsdTestCaseData(
-        std::vector<uint8_t> inputData,
-        std::vector<DetectedObject> expectedOutput)
-        : m_InputData(std::move(inputData))
-        , m_ExpectedOutput(std::move(expectedOutput))
+        const std::vector<uint8_t>& inputData,
+        const std::vector<DetectedObject>& expectedDetectedObject,
+        const std::vector<std::vector<float>>& expectedOutput)
+        : m_InputData(inputData)
+        , m_ExpectedDetectedObject(expectedDetectedObject)
+        , m_ExpectedOutput(expectedOutput)
     {}
 
-    std::vector<uint8_t>        m_InputData;
-    std::vector<DetectedObject> m_ExpectedOutput;
+    std::vector<uint8_t>            m_InputData;
+    std::vector<DetectedObject>     m_ExpectedDetectedObject;
+    std::vector<std::vector<float>> m_ExpectedOutput;
 };
 
 class MobileNetSsdDatabase
@@ -59,7 +62,9 @@ const std::array<ObjectDetectionInput, 1> g_PerTestCaseInput =
     ObjectDetectionInput
     {
         "Cat.jpg",
-        DetectedObject(16, BoundingBox(0.208961248f, 0.0852333307f, 0.92757535f, 0.940263629f), 0.79296875f)
+        {
+          DetectedObject(16.0f, BoundingBox(0.208961248f, 0.0852333307f, 0.92757535f, 0.940263629f), 0.79296875f)
+        }
     }
 };
 
@@ -100,12 +105,33 @@ std::unique_ptr<MobileNetSsdTestCaseData> MobileNetSsdDatabase::GetTestCaseData(
         return nullptr;
     }
 
-    // Prepare test case expected output
-    std::vector<DetectedObject> expectedOutput;
-    expectedOutput.reserve(1);
-    expectedOutput.push_back(testCaseInput.second);
+    std::vector<float> numDetections = { static_cast<float>(testCaseInput.second.size()) };
 
-    return std::make_unique<MobileNetSsdTestCaseData>(std::move(imageData), std::move(expectedOutput));
+    std::vector<float> detectionBoxes;
+    std::vector<float> detectionClasses;
+    std::vector<float> detectionScores;
+
+    for (DetectedObject expectedObject : testCaseInput.second)
+    {
+            detectionBoxes.push_back(expectedObject.m_BoundingBox.m_YMin);
+            detectionBoxes.push_back(expectedObject.m_BoundingBox.m_XMin);
+            detectionBoxes.push_back(expectedObject.m_BoundingBox.m_YMax);
+            detectionBoxes.push_back(expectedObject.m_BoundingBox.m_XMax);
+
+            detectionClasses.push_back(expectedObject.m_Class);
+
+            detectionScores.push_back(expectedObject.m_Confidence);
+    }
+
+    // Prepare test case expected output
+    std::vector<std::vector<float>> expectedOutputs;
+    expectedOutputs.reserve(4);
+    expectedOutputs.push_back(detectionBoxes);
+    expectedOutputs.push_back(detectionClasses);
+    expectedOutputs.push_back(detectionScores);
+    expectedOutputs.push_back(numDetections);
+
+    return std::make_unique<MobileNetSsdTestCaseData>(imageData, testCaseInput.second, expectedOutputs);
 }
 
 } // anonymous namespace

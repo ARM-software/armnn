@@ -31,7 +31,7 @@ struct BoundingBox
 
 struct DetectedObject
 {
-    DetectedObject(unsigned int detectedClass,
+    DetectedObject(float detectedClass,
                    const BoundingBox& boundingBox,
                    float confidence)
         : m_Class(detectedClass)
@@ -39,11 +39,17 @@ struct DetectedObject
         , m_Confidence(confidence)
     {}
 
-    unsigned int m_Class;
+    bool operator<(const DetectedObject& other) const
+    {
+        return m_Confidence < other.m_Confidence ||
+            (m_Confidence == other.m_Confidence && m_Class < other.m_Class);
+    }
+
+    float        m_Class;
     BoundingBox  m_BoundingBox;
     float        m_Confidence;
 };
 
-using ObjectDetectionInput = std::pair<std::string, DetectedObject>;
+using ObjectDetectionInput = std::pair<std::string, std::vector<DetectedObject>>;
 
 } // anonymous namespace

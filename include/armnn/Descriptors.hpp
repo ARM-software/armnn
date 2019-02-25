@@ -332,7 +332,7 @@ struct DetectionPostProcessDescriptor
     DetectionPostProcessDescriptor()
     : m_MaxDetections(0)
     , m_MaxClassesPerDetection(1)
-    , m_DetectionsPerClass(100)
+    , m_DetectionsPerClass(1)
     , m_NmsScoreThreshold(0)
     , m_NmsIouThreshold(0)
     , m_NumClasses(0)

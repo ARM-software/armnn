@@ -76,28 +76,24 @@ struct DetectionPostProcessFixture : ParserFlatbuffersFixture
                             }
                         },
                         {
-                            "shape": [1, 3, 4],
                             "type": "FLOAT32",
                             "buffer": 3,
                             "name": "detection_boxes",
                             "quantization": {}
                         },
                         {
-                            "shape": [1, 3],
                             "type": "FLOAT32",
                             "buffer": 4,
                             "name": "detection_classes",
                             "quantization": {}
                         },
                         {
-                            "shape": [1, 3],
                             "type": "FLOAT32",
                             "buffer": 5,
                             "name": "detection_scores",
                             "quantization": {}
                         },
                         {
-                            "shape": [1],
                             "type": "FLOAT32",
                             "buffer": 6,
                             "name": "num_detections",

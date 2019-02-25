@@ -577,6 +577,13 @@ public:
                               m_OutputBindings[outputIndex].second.GetQuantizationOffset());
     }
 
+    QuantizationParams GetInputQuantizationParams(unsigned int inputIndex = 0u) const
+    {
+        CheckInputIndexIsValid(inputIndex);
+        return std::make_pair(m_InputBindings[inputIndex].second.GetQuantizationScale(),
+                              m_InputBindings[inputIndex].second.GetQuantizationOffset());
+    }
+
     std::vector<QuantizationParams> GetAllQuantizationParams() const
     {
         std::vector<QuantizationParams> quantizationParams;

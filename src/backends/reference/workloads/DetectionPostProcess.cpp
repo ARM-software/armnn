@@ -197,7 +197,7 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
             }
             std::vector<unsigned int> selectedIndices = NonMaxSuppression(numBoxes, boxCorners, classScores,
                                                                           desc.m_NmsScoreThreshold,
-                                                                          desc.m_MaxClassesPerDetection,
+                                                                          desc.m_DetectionsPerClass,
                                                                           desc.m_NmsIouThreshold);
 
             for (unsigned int i = 0; i < selectedIndices.size(); ++i)

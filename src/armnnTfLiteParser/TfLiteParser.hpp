@@ -193,6 +193,10 @@ private:
     /// Connections for tensors in each subgraph
     /// The first index is the subgraph ID, the second index is the tensor ID
     std::vector<TensorConnections> m_SubgraphConnections;
+
+    /// This is used in case that the model does not speciry the output.
+    /// The shape can be calculated from the options.
+    std::vector<std::vector<unsigned int>> m_OverridenOutputShapes;
 };
 
 }

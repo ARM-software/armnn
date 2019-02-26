@@ -49,6 +49,10 @@ public:
     void VisitAdditionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 
+    void VisitConstantLayer(const armnn::IConnectableLayer* layer,
+                            const armnn::ConstTensor& input,
+                            const char* = nullptr) override;
+
     void VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                  const armnn::Convolution2dDescriptor& descriptor,
                                  const armnn::ConstTensor& weights,

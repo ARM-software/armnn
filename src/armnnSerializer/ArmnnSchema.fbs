@@ -92,7 +92,8 @@ enum LayerType : uint {
     DepthwiseConvolution2d = 8,
     Activation = 9,
     Permute = 10,
-    FullyConnected = 11
+    FullyConnected = 11,
+    Constant = 12
 }
 
 // Base layer table to be used as part of other layers
@@ -123,6 +124,11 @@ table ActivationDescriptor {
 
 table AdditionLayer {
     base:LayerBase;
+}
+
+table ConstantLayer {
+    base:LayerBase;
+    input:ConstTensor;
 }
 
 table Convolution2dLayer {
@@ -251,6 +257,7 @@ table PermuteDescriptor {
 union Layer {
     ActivationLayer,
     AdditionLayer,
+    ConstantLayer,
     Convolution2dLayer,
     DepthwiseConvolution2dLayer,
     FullyConnectedLayer,

@@ -141,6 +141,25 @@ void SerializerVisitor::VisitAdditionLayer(const armnn::IConnectableLayer* layer
     CreateAnyLayer(flatBufferAdditionLayer.o, serializer::Layer::Layer_AdditionLayer);
 }
 
+// Build FlatBuffer for Constant Layer
+void SerializerVisitor::VisitConstantLayer(const armnn::IConnectableLayer* layer,
+                                           const armnn::ConstTensor& input,
+                                           const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferConstantBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Constant);
+
+    auto flatBufferConstTensorInfo = CreateConstTensorInfo(input);
+
+    // Create the FlatBuffer ConstantLayer
+    auto flatBufferLayer = CreateConstantLayer(m_flatBufferBuilder,
+                                               flatBufferConstantBaseLayer,
+                                               flatBufferConstTensorInfo);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_ConstantLayer);
+}
+
 // Build FlatBuffer for Convolution2dLayer
 void SerializerVisitor::VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                                 const armnn::Convolution2dDescriptor& descriptor,

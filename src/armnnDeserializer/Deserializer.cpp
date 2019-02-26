@@ -187,6 +187,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     // register supported layers
     m_ParserFunctions[Layer_ActivationLayer]             = &Deserializer::ParseActivation;
     m_ParserFunctions[Layer_AdditionLayer]               = &Deserializer::ParseAdd;
+    m_ParserFunctions[Layer_ConstantLayer]               = &Deserializer::ParseConstant;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &Deserializer::ParseDepthwiseConvolution2d;
     m_ParserFunctions[Layer_FullyConnectedLayer]         = &Deserializer::ParseFullyConnected;
@@ -207,6 +208,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_ActivationLayer()->base();
         case Layer::Layer_AdditionLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
+        case Layer::Layer_ConstantLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ConstantLayer()->base();
         case Layer::Layer_Convolution2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_Convolution2dLayer()->base();
         case Layer::Layer_DepthwiseConvolution2dLayer:
@@ -769,6 +772,29 @@ void Deserializer::ParseAdd(GraphPtr graph, unsigned int layerIndex)
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseConstant(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    CHECK_LOCATION();
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+
+    auto serializerLayer = graph->layers()->Get(layerIndex)->layer_as_ConstantLayer();
+    auto serializerInput = serializerLayer->input();
+
+    armnn::ConstTensor input = ToConstTensor(serializerInput);
+
+    IConnectableLayer* layer = m_Network->AddConstantLayer(input, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
     RegisterOutputSlots(graph, layerIndex, layer);
 }
 

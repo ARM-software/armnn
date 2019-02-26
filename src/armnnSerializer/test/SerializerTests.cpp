@@ -174,6 +174,71 @@ BOOST_AUTO_TEST_CASE(SerializeAddition)
     deserializedNetwork->Accept(nameChecker);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeConstant)
+{
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+
+    armnn::ConstTensor inputTensor;
+
+    armnn::IConnectableLayer* const inputLayer0 = network->AddConstantLayer(inputTensor, "constant");
+    armnn::IConnectableLayer* const outputLayer0 = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(outputLayer0->GetInputSlot(0));
+
+    armnnSerializer::Serializer serializer;
+    serializer.Serialize(*network);
+
+    std::stringstream stream;
+    serializer.SaveSerializedToStream(stream);
+    BOOST_TEST(stream.str().length() > 0);
+    BOOST_TEST(stream.str().find("constant") != stream.str().npos);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeDeserializeConstant)
+{
+    class VerifyConstantName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitConstantLayer(const armnn::IConnectableLayer*, const armnn::ConstTensor&, const char* name) override
+        {
+            BOOST_TEST(name == "constant");
+        }
+    };
+
+    armnn::TensorInfo commonTensorInfo({ 2, 3 }, armnn::DataType::Float32);
+
+    std::vector<float> constantData = GenerateRandomData<float>(commonTensorInfo.GetNumElements());
+    armnn::ConstTensor constTensor(commonTensorInfo, constantData);
+
+    // Builds up the structure of the network.
+    armnn::INetworkPtr net(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* input = net->AddInputLayer(0);
+    armnn::IConnectableLayer* constant = net->AddConstantLayer(constTensor, "constant");
+    armnn::IConnectableLayer* add = net->AddAdditionLayer();
+    armnn::IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(add->GetInputSlot(0));
+    constant->GetOutputSlot(0).Connect(add->GetInputSlot(1));
+    add->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Sets the tensors in the network.
+    input->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
+    constant->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
+    add->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*net));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyConstantName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*net,
+                                            *deserializedNetwork,
+                                            commonTensorInfo.GetShape(),
+                                            commonTensorInfo.GetShape());
+}
+
 BOOST_AUTO_TEST_CASE(SerializeMultiplication)
 {
     class VerifyMultiplicationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>

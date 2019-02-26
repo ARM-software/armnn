@@ -187,6 +187,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     // register supported layers
     m_ParserFunctions[Layer_ActivationLayer]             = &Deserializer::ParseActivation;
     m_ParserFunctions[Layer_AdditionLayer]               = &Deserializer::ParseAdd;
+    m_ParserFunctions[Layer_BatchToSpaceNdLayer]         = &Deserializer::ParseBatchToSpaceNd;
     m_ParserFunctions[Layer_ConstantLayer]               = &Deserializer::ParseConstant;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &Deserializer::ParseDepthwiseConvolution2d;
@@ -209,6 +210,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_ActivationLayer()->base();
         case Layer::Layer_AdditionLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
+        case Layer::Layer_BatchToSpaceNdLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_BatchToSpaceNdLayer()->base();
         case Layer::Layer_ConstantLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ConstantLayer()->base();
         case Layer::Layer_Convolution2dLayer:
@@ -770,6 +773,49 @@ void Deserializer::ParseAdd(GraphPtr graph, unsigned int layerIndex)
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddAdditionLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseBatchToSpaceNd(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_BatchToSpaceNdLayer()->descriptor();
+    auto flatBufferCrops = flatBufferDescriptor->crops();
+    auto flatBufferBlockShape = flatBufferDescriptor->blockShape();
+
+    if (flatBufferCrops->Length() % 2 != 0)
+    {
+        throw ParseException(boost::str(
+            boost::format("The size of crops must be divisible by 2 %1%") % CHECK_LOCATION().AsString()));
+    }
+
+    std::vector<std::pair<unsigned int, unsigned int>> crops;
+    crops.reserve(flatBufferCrops->Length() / 2);
+    for (unsigned int i = 0; i < flatBufferCrops->Length() - 1; i += 2)
+    {
+        crops.emplace_back(flatBufferCrops->Get(i), flatBufferCrops->Get(i+1));
+    }
+
+    armnn::BatchToSpaceNdDescriptor descriptor;
+    descriptor.m_DataLayout = ToDataLayout(flatBufferDescriptor->dataLayout());
+    descriptor.m_BlockShape =
+        std::vector<unsigned int>(flatBufferBlockShape->begin(), flatBufferBlockShape->end());
+    descriptor.m_Crops = crops;
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddBatchToSpaceNdLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

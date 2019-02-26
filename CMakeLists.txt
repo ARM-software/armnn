@@ -597,6 +597,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnSerializer/test/SerializerTests.cpp
                 src/armnnDeserializer/test/DeserializeActivation.cpp
                 src/armnnDeserializer/test/DeserializeAdd.cpp
+                src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp
                 src/armnnDeserializer/test/DeserializeConstant.cpp
                 src/armnnDeserializer/test/DeserializeConvolution2d.cpp
                 src/armnnDeserializer/test/DeserializeFullyConnected.cpp

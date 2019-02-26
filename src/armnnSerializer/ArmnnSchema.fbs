@@ -94,7 +94,8 @@ enum LayerType : uint {
     Permute = 10,
     FullyConnected = 11,
     Constant = 12,
-    SpaceToBatchNd = 13
+    SpaceToBatchNd = 13,
+    BatchToSpaceNd = 14
 }
 
 // Base layer table to be used as part of other layers
@@ -266,9 +267,21 @@ table SpaceToBatchNdDescriptor {
     dataLayout:DataLayout;
 }
 
+table BatchToSpaceNdLayer {
+    base:LayerBase;
+    descriptor:BatchToSpaceNdDescriptor;
+}
+
+table BatchToSpaceNdDescriptor {
+    blockShape:[uint];
+    crops:[uint];
+    dataLayout:DataLayout;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
+    BatchToSpaceNdLayer,
     ConstantLayer,
     Convolution2dLayer,
     DepthwiseConvolution2dLayer,

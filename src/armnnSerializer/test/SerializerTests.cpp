@@ -682,4 +682,50 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeSpaceToBatchNd)
                                             outputTensorInfo.GetShape());
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeBatchToSpaceNd)
+{
+    class VerifyBatchToSpaceNdName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer*,
+                                      const armnn::BatchToSpaceNdDescriptor& descriptor,
+                                      const char* name) override
+        {
+            BOOST_TEST(name == "BatchToSpaceNdLayer");
+        }
+    };
+
+    unsigned int inputShape[] = {4, 1, 2, 2};
+    unsigned int outputShape[] = {1, 1, 4, 4};
+
+    armnn::BatchToSpaceNdDescriptor desc;
+    desc.m_DataLayout = armnn::DataLayout::NCHW;
+    desc.m_BlockShape = {2, 2};
+    desc.m_Crops = {{0, 0}, {0, 0}};
+
+    auto inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    auto outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const batchToSpaceNdLayer = network->AddBatchToSpaceNdLayer(desc, "BatchToSpaceNdLayer");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(batchToSpaceNdLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    batchToSpaceNdLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    batchToSpaceNdLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyBatchToSpaceNdName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            inputTensorInfo.GetShape(),
+                                            outputTensorInfo.GetShape());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

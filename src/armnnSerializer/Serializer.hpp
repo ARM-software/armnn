@@ -49,6 +49,10 @@ public:
     void VisitAdditionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 
+    void VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
+                                  const armnn::BatchToSpaceNdDescriptor& descriptor,
+                                  const char* name = nullptr) override;
+
     void VisitConstantLayer(const armnn::IConnectableLayer* layer,
                             const armnn::ConstTensor& input,
                             const char* = nullptr) override;

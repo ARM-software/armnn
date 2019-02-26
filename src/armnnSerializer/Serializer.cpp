@@ -141,6 +141,35 @@ void SerializerVisitor::VisitAdditionLayer(const armnn::IConnectableLayer* layer
     CreateAnyLayer(flatBufferAdditionLayer.o, serializer::Layer::Layer_AdditionLayer);
 }
 
+// Build FlatBuffer for BatchToSpaceNd Layer
+void SerializerVisitor::VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
+                                                 const armnn::BatchToSpaceNdDescriptor& descriptor,
+                                                 const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_BatchToSpaceNd);
+
+    std::vector<unsigned int> crops;
+    crops.reserve(descriptor.m_Crops.size() * 2);
+    for (auto& crop : descriptor.m_Crops)
+    {
+        crops.push_back(crop.first);
+        crops.push_back(crop.second);
+    }
+
+    auto flatBufferDescriptor =
+        CreateBatchToSpaceNdDescriptor(m_flatBufferBuilder,
+                                       m_flatBufferBuilder.CreateVector(descriptor.m_BlockShape),
+                                       m_flatBufferBuilder.CreateVector(crops),
+                                       GetFlatBufferDataLayout(descriptor.m_DataLayout));
+
+    auto flatBufferLayer = serializer::CreateBatchToSpaceNdLayer(m_flatBufferBuilder,
+                                                                 flatBufferBaseLayer,
+                                                                 flatBufferDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_BatchToSpaceNdLayer);
+}
+
 // Build FlatBuffer for Constant Layer
 void SerializerVisitor::VisitConstantLayer(const armnn::IConnectableLayer* layer,
                                            const armnn::ConstTensor& input,

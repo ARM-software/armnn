@@ -1771,9 +1771,9 @@ void TfLiteParser::ParseDetectionPostProcess(size_t subgraphIndex, size_t operat
     desc.m_ScaleX                  = m["x_scale"].AsFloat();
     desc.m_ScaleY                  = m["y_scale"].AsFloat();
 
-    if (!(m["use_regular_non_max_suppression"].IsNull()))
+    if (!(m["use_regular_nms"].IsNull()))
     {
-        desc.m_UseRegularNms       = m["use_regular_non_max_suppression"].AsBool();
+        desc.m_UseRegularNms       = m["use_regular_nms"].AsBool();
     }
     if (!(m["detections_per_class"].IsNull()))
     {

@@ -54,10 +54,16 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * SUB
 
+## Custom Operator
+
+* TFLite_Detection_PostProcess
+
 ## Tested networks
 
 Arm tested these operators with the following TensorFlow Lite neural network:
 
 * [Quantized MobileNet](http://download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224_quant.tgz)
+
+* [Quantized SSD MobileNet](http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18.tar.gz)
 
 More machine learning operators will be supported in future releases.

@@ -604,6 +604,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnDeserializer/test/DeserializePermute.cpp
                 src/armnnDeserializer/test/DeserializePooling2d.cpp
                 src/armnnDeserializer/test/DeserializeReshape.cpp
+                src/armnnDeserializer/test/DeserializeSpaceToBatchNd.cpp
                 src/armnnDeserializer/test/ParserFlatbuffersSerializeFixture.hpp
                 src/armnnDeserializer/test/SchemaSerialize.s
                 )

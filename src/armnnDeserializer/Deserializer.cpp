@@ -196,6 +196,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_Pooling2dLayer]              = &Deserializer::ParsePooling2d;
     m_ParserFunctions[Layer_ReshapeLayer]                = &Deserializer::ParseReshape;
     m_ParserFunctions[Layer_SoftmaxLayer]                = &Deserializer::ParseSoftmax;
+    m_ParserFunctions[Layer_SpaceToBatchNdLayer]         = &Deserializer::ParseSpaceToBatchNd;
 }
 
 Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPtr, unsigned int layerIndex)
@@ -230,6 +231,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_ReshapeLayer()->base();
         case Layer::Layer_SoftmaxLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SoftmaxLayer()->base();
+        case Layer::Layer_SpaceToBatchNdLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_SpaceToBatchNdLayer()->base();
         case Layer::Layer_NONE:
         default:
             throw ParseException(boost::str(
@@ -1168,6 +1171,49 @@ void Deserializer::ParseSoftmax(GraphPtr graph, unsigned int layerIndex)
     auto layerName = GetLayerName(graph, layerIndex);
 
     IConnectableLayer* layer = m_Network->AddSoftmaxLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseSpaceToBatchNd(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_SpaceToBatchNdLayer()->descriptor();
+    auto flatBufferPadList = flatBufferDescriptor->padList();
+    auto flatBufferBlockShape = flatBufferDescriptor->blockShape();
+
+    if (flatBufferPadList->Length() % 2 != 0)
+    {
+        throw ParseException(boost::str(
+            boost::format("The size of the pad list must be divisible by 2 %1%") % CHECK_LOCATION().AsString()));
+    }
+
+    std::vector<std::pair<unsigned int, unsigned int>> padList;
+    padList.reserve(flatBufferPadList->Length() / 2);
+    for (unsigned int i = 0; i < flatBufferPadList->Length() - 1; i += 2)
+    {
+        padList.emplace_back(flatBufferPadList->Get(i), flatBufferPadList->Get(i+1));
+    }
+
+    armnn::SpaceToBatchNdDescriptor descriptor;
+    descriptor.m_DataLayout = ToDataLayout(flatBufferDescriptor->dataLayout());
+    descriptor.m_BlockShape =
+        std::vector<unsigned int>(flatBufferBlockShape->begin(), flatBufferBlockShape->end());
+    descriptor.m_PadList = padList;
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddSpaceToBatchNdLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

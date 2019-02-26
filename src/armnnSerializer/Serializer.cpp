@@ -380,6 +380,35 @@ void SerializerVisitor::VisitFullyConnectedLayer(const armnn::IConnectableLayer*
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_FullyConnectedLayer);
 }
 
+// Build FlatBuffer for SpaceToBatchNd Layer
+void SerializerVisitor::VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer* layer,
+                                                 const armnn::SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                                 const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_SpaceToBatchNd);
+
+    std::vector<unsigned int> padList;
+    padList.reserve(spaceToBatchNdDescriptor.m_PadList.size()*2);
+    for (auto& pad : spaceToBatchNdDescriptor.m_PadList)
+    {
+        padList.push_back(pad.first);
+        padList.push_back(pad.second);
+    }
+
+    auto flatBufferDescriptor =
+        CreateSpaceToBatchNdDescriptor(m_flatBufferBuilder,
+                                       m_flatBufferBuilder.CreateVector(spaceToBatchNdDescriptor.m_BlockShape),
+                                       m_flatBufferBuilder.CreateVector(padList),
+                                       GetFlatBufferDataLayout(spaceToBatchNdDescriptor.m_DataLayout));
+
+    auto flatBufferLayer = serializer::CreateSpaceToBatchNdLayer(m_flatBufferBuilder,
+                                                                 flatBufferBaseLayer,
+                                                                 flatBufferDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_SpaceToBatchNdLayer);
+}
+
 fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {

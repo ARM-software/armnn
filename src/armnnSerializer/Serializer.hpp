@@ -98,6 +98,10 @@ public:
                            const armnn::SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;
 
+    void VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer* layer,
+                                  const armnn::SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                  const char* name = nullptr) override;
+
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.

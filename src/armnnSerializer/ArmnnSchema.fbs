@@ -93,7 +93,8 @@ enum LayerType : uint {
     Activation = 9,
     Permute = 10,
     FullyConnected = 11,
-    Constant = 12
+    Constant = 12,
+    SpaceToBatchNd = 13
 }
 
 // Base layer table to be used as part of other layers
@@ -254,6 +255,17 @@ table PermuteDescriptor {
     dimMappings:[uint];
 }
 
+table SpaceToBatchNdLayer {
+    base:LayerBase;
+    descriptor:SpaceToBatchNdDescriptor;
+}
+
+table SpaceToBatchNdDescriptor {
+    blockShape:[uint];
+    padList:[uint];
+    dataLayout:DataLayout;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -267,7 +279,8 @@ union Layer {
     PermuteLayer,
     Pooling2dLayer,
     ReshapeLayer,
-    SoftmaxLayer
+    SoftmaxLayer,
+    SpaceToBatchNdLayer
 }
 
 table AnyLayer {

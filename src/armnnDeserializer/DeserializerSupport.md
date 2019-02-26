@@ -17,5 +17,6 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Pooling2d
 * Reshape
 * Softmax
+* SpaceToBatchNd
 
 More machine learning layers will be supported in future releases.

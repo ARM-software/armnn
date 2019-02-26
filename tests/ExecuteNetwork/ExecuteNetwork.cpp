@@ -125,33 +125,51 @@ void CheckOptionDependencies(const po::variables_map& vm)
     CheckOptionDependency(vm, "input-tensor-shape", "model-path");
 }
 
-template<typename T>
-std::vector<T> ParseArray(std::istream& stream);
+template<armnn::DataType NonQuantizedType>
+auto ParseDataArray(std::istream & stream);
+
+template<armnn::DataType QuantizedType>
+auto ParseDataArray(std::istream& stream,
+                    const float& quantizationScale,
+                    const int32_t& quantizationOffset);
 
 template<>
-std::vector<float> ParseArray(std::istream& stream)
+auto ParseDataArray<armnn::DataType::Float32>(std::istream & stream)
 {
     return ParseArrayImpl<float>(stream, [](const std::string& s) { return std::stof(s); });
 }
 
 template<>
+auto ParseDataArray<armnn::DataType::Signed32>(std::istream & stream)
+{
+    return ParseArrayImpl<int>(stream, [](const std::string & s) { return std::stoi(s); });
+}
+
+template<>
+auto ParseDataArray<armnn::DataType::QuantisedAsymm8>(std::istream& stream,
+                                                      const float& quantizationScale,
+                                                      const int32_t& quantizationOffset)
+{
+    return ParseArrayImpl<uint8_t>(stream,
+                                   [&quantizationScale, &quantizationOffset](const std::string & s)
+                                   {
+                                       return boost::numeric_cast<uint8_t>(
+                                           armnn::Quantize<u_int8_t>(std::stof(s),
+                                                                     quantizationScale,
+                                                                     quantizationOffset));
+                                   });
+}
+
 std::vector<unsigned int> ParseArray(std::istream& stream)
 {
     return ParseArrayImpl<unsigned int>(stream,
         [](const std::string& s) { return boost::numeric_cast<unsigned int>(std::stoi(s)); });
 }
 
-template<>
-std::vector<int> ParseArray(std::istream& stream)
-{
-    return ParseArrayImpl<int>(stream, [](const std::string& s) { return std::stoi(s); });
-}
-
-std::vector<std::string> ParseInputString(const std::string& inputString, const char * chars)
+std::vector<std::string> ParseStringList(const std::string & inputString, const char * delimiter)
 {
     std::stringstream stream(inputString);
-
-    return ParseArrayImpl<std::string>(stream, [](const std::string& s) { return boost::trim_copy(s); }, chars);
+    return ParseArrayImpl<std::string>(stream, [](const std::string& s) { return boost::trim_copy(s); }, delimiter);
 }
 
 void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
@@ -183,6 +201,7 @@ int MainImpl(const char* modelPath,
              const std::vector<std::unique_ptr<armnn::TensorShape>>& inputTensorShapes,
              const std::vector<string>& inputTensorDataFilePaths,
              const std::vector<string>& inputTypes,
+             const std::vector<string>& outputTypes,
              const std::vector<string>& outputNames,
              bool enableProfiling,
              const size_t subgraphId,
@@ -191,27 +210,6 @@ int MainImpl(const char* modelPath,
     using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
     std::vector<TContainer> inputDataContainers;
-
-    for(unsigned int i = 0; i < inputTensorDataFilePaths.size(); ++i)
-    {
-        std::ifstream inputTensorFile(inputTensorDataFilePaths[i]);
-
-        if (inputTypes[i].compare("float") == 0)
-        {
-            inputDataContainers.push_back(ParseArray<float>(inputTensorFile));
-        }
-        else if (inputTypes[i].compare("int") == 0)
-        {
-            inputDataContainers.push_back(ParseArray<int>(inputTensorFile));;
-        }
-        else
-        {
-            BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << inputTypes[i] << "\". ";
-            return EXIT_FAILURE;
-        }
-
-        inputTensorFile.close();
-    }
 
     try
     {
@@ -240,12 +238,59 @@ int MainImpl(const char* modelPath,
         params.m_SubgraphId = subgraphId;
         InferenceModel<TParser, TDataType> model(params, runtime);
 
+        for(unsigned int i = 0; i < inputTensorDataFilePaths.size(); ++i)
+        {
+            std::ifstream inputTensorFile(inputTensorDataFilePaths[i]);
+
+            if (inputTypes[i].compare("float") == 0)
+            {
+                inputDataContainers.push_back(
+                    ParseDataArray<armnn::DataType::Float32>(inputTensorFile));
+            }
+            else if (inputTypes[i].compare("int") == 0)
+            {
+                inputDataContainers.push_back(
+                    ParseDataArray<armnn::DataType::Signed32>(inputTensorFile));
+            }
+            else if (inputTypes[i].compare("qasymm8") == 0)
+            {
+                auto inputBinding = model.GetInputBindingInfo();
+                inputDataContainers.push_back(
+                    ParseDataArray<armnn::DataType::QuantisedAsymm8>(inputTensorFile,
+                                                                     inputBinding.second.GetQuantizationScale(),
+                                                                     inputBinding.second.GetQuantizationOffset()));
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << inputTypes[i] << "\". ";
+                return EXIT_FAILURE;
+            }
+
+            inputTensorFile.close();
+        }
+
         const size_t numOutputs = params.m_OutputBindings.size();
         std::vector<TContainer> outputDataContainers;
 
         for (unsigned int i = 0; i < numOutputs; ++i)
         {
-            outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
+            if (outputTypes[i].compare("float") == 0)
+            {
+                outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
+            }
+            else if (outputTypes[i].compare("int") == 0)
+            {
+                outputDataContainers.push_back(std::vector<int>(model.GetOutputSize(i)));
+            }
+            else if (outputTypes[i].compare("qasymm8") == 0)
+            {
+                outputDataContainers.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << outputTypes[i] << "\". ";
+                return EXIT_FAILURE;
+            }
         }
 
         model.Run(inputDataContainers, outputDataContainers);
@@ -282,6 +327,7 @@ int RunTest(const std::string& format,
             const std::string& inputNames,
             const std::string& inputTensorDataFilePaths,
             const std::string& inputTypes,
+            const std::string& outputTypes,
             const std::string& outputNames,
             bool enableProfiling,
             const size_t subgraphId,
@@ -289,11 +335,13 @@ int RunTest(const std::string& format,
 {
     std::string modelFormat = boost::trim_copy(format);
     std::string modelPath = boost::trim_copy(path);
-    std::vector<std::string> inputNamesVector = ParseInputString(inputNames, ",");
-    std::vector<std::string> inputTensorShapesVector = ParseInputString(inputTensorShapesStr, ";");
-    std::vector<std::string> inputTensorDataFilePathsVector = ParseInputString(inputTensorDataFilePaths, ",");
-    std::vector<std::string> outputNamesVector = ParseInputString(outputNames, ",");
-    std::vector<std::string> inputTypesVector = ParseInputString(inputTypes, ",");
+    std::vector<std::string> inputNamesVector = ParseStringList(inputNames, ",");
+    std::vector<std::string> inputTensorShapesVector = ParseStringList(inputTensorShapesStr, ";");
+    std::vector<std::string> inputTensorDataFilePathsVector = ParseStringList(
+        inputTensorDataFilePaths, ",");
+    std::vector<std::string> outputNamesVector = ParseStringList(outputNames, ",");
+    std::vector<std::string> inputTypesVector = ParseStringList(inputTypes, ",");
+    std::vector<std::string> outputTypesVector = ParseStringList(outputTypes, ",");
 
     // Parse model binary flag from the model-format string we got from the command-line
     bool isModelBinary;
@@ -327,10 +375,12 @@ int RunTest(const std::string& format,
     if (inputTypesVector.size() == 0)
     {
         //Defaults the value of all inputs to "float"
-        for(unsigned int i = 0; i < inputNamesVector.size(); ++i)
-        {
-            inputTypesVector.push_back("float");
-        }
+        inputTypesVector.assign(inputNamesVector.size(), "float");
+    }
+    if (outputTypesVector.size() == 0)
+    {
+        //Defaults the value of all outputs to "float"
+        outputTypesVector.assign(outputNamesVector.size(), "float");
     }
     else if ((inputTypesVector.size() != 0) && (inputTypesVector.size() != inputNamesVector.size()))
     {
@@ -348,7 +398,7 @@ int RunTest(const std::string& format,
         for(const std::string& shape : inputTensorShapesVector)
         {
             std::stringstream ss(shape);
-            std::vector<unsigned int> dims = ParseArray<unsigned int>(ss);
+            std::vector<unsigned int> dims = ParseArray(ss);
 
             try
             {
@@ -370,7 +420,7 @@ int RunTest(const std::string& format,
     return MainImpl<armnnDeserializer::IDeserializer, float>(
         modelPath.c_str(), isModelBinary, computeDevice,
         inputNamesVector, inputTensorShapes,
-        inputTensorDataFilePathsVector, inputTypesVector,
+        inputTensorDataFilePathsVector, inputTypesVector, outputTypesVector,
         outputNamesVector, enableProfiling, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with serialization support.";
@@ -383,7 +433,8 @@ int RunTest(const std::string& format,
         return MainImpl<armnnCaffeParser::ICaffeParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
                                                                inputNamesVector, inputTensorShapes,
                                                                inputTensorDataFilePathsVector, inputTypesVector,
-                                                               outputNamesVector, enableProfiling, subgraphId, runtime);
+                                                               outputTypesVector, outputNamesVector, enableProfiling,
+                                                               subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
@@ -395,7 +446,8 @@ int RunTest(const std::string& format,
     return MainImpl<armnnOnnxParser::IOnnxParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
-                                                         outputNamesVector, enableProfiling, subgraphId, runtime);
+                                                         outputTypesVector, outputNamesVector, enableProfiling,
+                                                         subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
     return EXIT_FAILURE;
@@ -407,7 +459,8 @@ int RunTest(const std::string& format,
         return MainImpl<armnnTfParser::ITfParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
-                                                         outputNamesVector, enableProfiling, subgraphId, runtime);
+                                                         outputTypesVector, outputNamesVector, enableProfiling,
+                                                         subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
@@ -425,8 +478,8 @@ int RunTest(const std::string& format,
         return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
                                                                  inputNamesVector, inputTensorShapes,
                                                                  inputTensorDataFilePathsVector, inputTypesVector,
-                                                                 outputNamesVector, enableProfiling, subgraphId,
-                                                                 runtime);
+                                                                 outputTypesVector, outputNamesVector, enableProfiling,
+                                                                 subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
             "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
@@ -451,6 +504,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
     std::string inputTensorDataFilePaths;
     std::string outputNames;
     std::string inputTypes;
+    std::string outputTypes;
 
     size_t subgraphId = 0;
 
@@ -481,7 +535,10 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
          "Several paths can be passed separating them by comma.")
         ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
          "If unset, defaults to \"float\" for all defined inputs. "
-         "Accepted values (float or int).")
+         "Accepted values (float, int or qasymm8).")
+        ("output-type,z",po::value(&outputTypes), "The type of the output tensors in the network separated by comma. "
+         "If unset, defaults to \"float\" for all defined outputs. "
+         "Accepted values (float, int or qasymm8).")
         ("output-name,o", po::value(&outputNames),
          "Identifier of the output tensors in the network separated by comma.");
     }
@@ -534,7 +591,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
     }
 
     return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames, inputTensorDataFilePaths,
-                   inputTypes, outputNames,  enableProfiling, subgraphId);
+                   inputTypes, outputTypes, outputNames,  enableProfiling, subgraphId);
 }
 
 int main(int argc, const char* argv[])
@@ -557,6 +614,7 @@ int main(int argc, const char* argv[])
     std::string inputTensorDataFilePaths;
     std::string outputNames;
     std::string inputTypes;
+    std::string outputTypes;
 
     size_t subgraphId = 0;
 
@@ -593,7 +651,11 @@ int main(int argc, const char* argv[])
              "Several paths can be passed separating them by comma. ")
             ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
              "If unset, defaults to \"float\" for all defined inputs. "
-             "Accepted values (float or int)")
+             "Accepted values (float, int or qasymm8)")
+            ("output-type,z",po::value(&outputTypes),
+             "The type of the output tensors in the network separated by comma. "
+             "If unset, defaults to \"float\" for all defined outputs. "
+             "Accepted values (float, int or qasymm8).")
             ("output-name,o", po::value(&outputNames),
              "Identifier of the output tensors in the network separated by comma.")
             ("event-based-profiling,e", po::bool_switch()->default_value(false),
@@ -737,6 +799,6 @@ int main(int argc, const char* argv[])
         }
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames, inputTensorDataFilePaths,
-                       inputTypes, outputNames,  enableProfiling, subgraphId);
+                       inputTypes, outputTypes, outputNames,  enableProfiling, subgraphId);
     }
 }

@@ -31,17 +31,16 @@ arm_compute::Status ClSpaceToBatchNdWorkloadValidate(const TensorInfo& input,
     int32_t blockHeight = boost::numeric_cast<int32_t>(descriptor.m_BlockShape[0]);
     int32_t blockWidth  = boost::numeric_cast<int32_t>(descriptor.m_BlockShape[1]);
 
-    // ACL expects paddingTopBottom [pad_top, pad_bottom] and paddingLeftRight [pad_left, pad_right]
-    arm_compute::Size2D paddingLeftRight = BuildArmComputeSize2D(
-        descriptor.m_PadList[0].first, descriptor.m_PadList[0].second);
-    arm_compute::Size2D paddingTopBottom  = BuildArmComputeSize2D(
-        descriptor.m_PadList[1].first, descriptor.m_PadList[1].second);
+    arm_compute::Size2D paddingLeftTop = BuildArmComputeSize2D(
+        descriptor.m_PadList[1].first, descriptor.m_PadList[0].first);
+    arm_compute::Size2D paddingRightBottom  = BuildArmComputeSize2D(
+        descriptor.m_PadList[1].second, descriptor.m_PadList[0].second);
 
     return arm_compute::CLSpaceToBatchLayer::validate(&aclInputInfo,
                                                       blockWidth,
                                                       blockHeight,
-                                                      paddingTopBottom,
-                                                      paddingLeftRight,
+                                                      paddingLeftTop,
+                                                      paddingRightBottom,
                                                       &aclOutputInfo);
 }
 
@@ -60,11 +59,10 @@ ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(
     int32_t blockHeight = boost::numeric_cast<int32_t>(m_Data.m_Parameters.m_BlockShape[0]);
     int32_t blockWidth  = boost::numeric_cast<int32_t>(m_Data.m_Parameters.m_BlockShape[1]);
 
-    // ACL expects paddingTopBottom [pad_top, pad_bottom] and paddingLeftRight [pad_left, pad_right]
-    arm_compute::Size2D paddingLeftRight = BuildArmComputeSize2D(
-        m_Data.m_Parameters.m_PadList[0].first, m_Data.m_Parameters.m_PadList[0].second);
-    arm_compute::Size2D paddingTopBottom  = BuildArmComputeSize2D(
-        m_Data.m_Parameters.m_PadList[1].first, m_Data.m_Parameters.m_PadList[1].second);
+    arm_compute::Size2D paddingLeftTop = BuildArmComputeSize2D(
+        m_Data.m_Parameters.m_PadList[1].first, m_Data.m_Parameters.m_PadList[0].first);
+    arm_compute::Size2D paddingRightBottom  = BuildArmComputeSize2D(
+        m_Data.m_Parameters.m_PadList[1].second, m_Data.m_Parameters.m_PadList[0].second);
 
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
@@ -73,8 +71,8 @@ ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(
     m_SpaceToBatchLayer.configure(&input,
                                   blockWidth,
                                   blockHeight,
-                                  paddingTopBottom,
-                                  paddingLeftRight,
+                                  paddingLeftTop,
+                                  paddingRightBottom,
                                   &output);
 }
 

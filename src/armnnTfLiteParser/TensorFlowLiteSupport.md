@@ -12,6 +12,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
+* BATCH_TO_SPACE
+
 * CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
 * CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
@@ -24,7 +26,11 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
+* MAXIMUM
+
 * MEAN
+
+* MINIMUM
 
 * MUL
 
@@ -36,9 +42,17 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * RESHAPE
 
+* RESIZE_BILINEAR
+
 * SOFTMAX
 
+* SPACE_TO_BATCH
+
 * SQUEEZE
+
+* STRIDED_SLICE
+
+* SUB
 
 ## Tested networks
 

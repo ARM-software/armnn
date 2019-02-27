@@ -30,29 +30,29 @@ size_t GetProfilerEventSequenceSize(armnn::Profiler* profiler)
 namespace
 {
 
-void RegisterUnregisterProfilerSingleThreadImpl()
+void RegisterUnregisterProfilerSingleThreadImpl(bool &res)
 {
-    // Important! Regular assertions must be used in this function for testing (rather than
-    // BOOST_TEST macros) otherwise multi-threading tests would randomly fail.
+    // Important! Don't use BOOST_TEST macros in this function as they
+    // seem to have problems when used in threads
 
     // Get a reference to the profiler manager.
     armnn::ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
 
     // Check that there's no profiler registered for this thread.
-    assert(!profilerManager.GetProfiler());
+    res = !profilerManager.GetProfiler();
 
     // Create and register a profiler for this thread.
     std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
     profilerManager.RegisterProfiler(profiler.get());
 
     // Check that on a single thread we get the same profiler we registered.
-    assert(profiler.get() == profilerManager.GetProfiler());
+    res &= profiler.get() == profilerManager.GetProfiler();
 
     // Destroy the profiler.
     profiler.reset();
 
     // Check that the profiler has been un-registered for this thread.
-    assert(!profilerManager.GetProfiler());
+    res &= !profilerManager.GetProfiler();
 }
 
 } // namespace
@@ -81,18 +81,26 @@ BOOST_AUTO_TEST_CASE(EnableDisableProfiling)
 
 BOOST_AUTO_TEST_CASE(RegisterUnregisterProfilerSingleThread)
 {
-    RegisterUnregisterProfilerSingleThreadImpl();
+    bool res = false;
+    RegisterUnregisterProfilerSingleThreadImpl(res);
+    BOOST_TEST(res);
 }
 
 BOOST_AUTO_TEST_CASE(RegisterUnregisterProfilerMultipleThreads)
 {
-    std::thread thread1([]() { RegisterUnregisterProfilerSingleThreadImpl(); });
-    std::thread thread2([]() { RegisterUnregisterProfilerSingleThreadImpl(); });
-    std::thread thread3([]() { RegisterUnregisterProfilerSingleThreadImpl(); });
+    bool res[3] = {false, false, false};
+    std::thread thread1([&res]() { RegisterUnregisterProfilerSingleThreadImpl(res[0]); });
+    std::thread thread2([&res]() { RegisterUnregisterProfilerSingleThreadImpl(res[1]); });
+    std::thread thread3([&res]() { RegisterUnregisterProfilerSingleThreadImpl(res[2]); });
 
     thread1.join();
     thread2.join();
     thread3.join();
+
+    for (int i = 0 ; i < 3 ; i++)
+    {
+        BOOST_TEST(res[i]);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(ProfilingMacros)

@@ -50,8 +50,8 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* src
         // Set the quantization params
         TensorInfo info(newOutputSlot.GetTensorInfo());
         info.SetDataType(DataType::QuantisedAsymm8);
-        info.SetQuantizationOffset(qParams.first);
-        info.SetQuantizationScale(qParams.second);
+        info.SetQuantizationOffset(qParams.second);
+        info.SetQuantizationScale(qParams.first);
         newOutputSlot.SetTensorInfo(info);
     }
 }

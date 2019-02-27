@@ -12,7 +12,7 @@
 namespace armnn
 {
 
-std::pair<int, float> ComputeQAsymmParams(int numBits, double min, double max)
+std::pair<float, int> ComputeQAsymmParams(int numBits, double min, double max)
 {
     BOOST_ASSERT_MSG(min < max, "min >= max will result in invalid quantization.");
     double highest = (1 << numBits) - 1;
@@ -27,7 +27,7 @@ std::pair<int, float> ComputeQAsymmParams(int numBits, double min, double max)
     // Clamp offset [0-highest]
     offset = std::max(0.0, std::min(highest, offset));
 
-    return std::make_pair(static_cast<int>(std::round(offset)), static_cast<float>(scale));
+    return std::make_pair(static_cast<float>(scale), static_cast<int>(std::round(offset)));
 }
 
 ConstTensor CreateQuantizedConst(const ConstTensor& tensor, std::vector<uint8_t>& backing)

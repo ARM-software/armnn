@@ -5993,6 +5993,148 @@ LayerTestResult<uint8_t, 4> ConstantTestUint8(
     return ConstantTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
+LayerTestResult<uint8_t, 3> MergerUint8DifferentQParamsTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int outputWidth = 3;
+    unsigned int outputHeight = 6;
+    unsigned int outputChannels = 3;
+
+    unsigned int inputWidth1 = 3;
+    unsigned int inputHeight1 = 6;
+    unsigned int inputChannels1 = 2;
+
+    unsigned int inputWidth2 = 3;
+    unsigned int inputHeight2 = 6;
+    unsigned int inputChannels2 = 1;
+
+    // Defines the tensor descriptors.
+    armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedAsymm8);
+
+    // Quantized input1 tensor. Range [-3, 1]
+    const float inputScale1 = 0.015686f;
+    const int32_t inputOffset1 = 192;
+
+    auto input1 = MakeTensor<uint8_t, 3>(inputTensorInfo1, std::vector<uint8_t>(
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12,
+        13, 14, 15,
+        16, 17, 18,
+
+        19, 20, 21,
+        22, 23, 24,
+        25, 26, 27,
+        28, 29, 30,
+        31, 32, 33,
+        34, 35, 36,
+    })
+    );
+
+    // Quatized input2 tensor. Range [-1, 4]
+    const float inputScale2 = 0.019608f;
+    const int32_t inputOffset2 = 50;
+
+    auto input2 = MakeTensor<uint8_t, 3>(inputTensorInfo2, std::vector<uint8_t>(
+    {
+        37, 38, 39,
+        40, 41, 42,
+        43, 44, 45,
+        46, 47, 48,
+        49, 50, 51,
+        52, 53, 54,
+    })
+    );
+
+    // Output has the same quantization parameters than input1,
+    // so that only the requantization of input2 is required
+    const float outputScale = 0.015686f;
+    const int32_t outputOffset = 192;
+
+    LayerTestResult<uint8_t, 3> ret(outputTensorInfo);
+
+    ret.outputExpected = MakeTensor<uint8_t, 3>(outputTensorInfo, std::vector<uint8_t>(
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12,
+        13, 14, 15,
+        16, 17, 18,
+
+        19, 20, 21,
+        22, 23, 24,
+        25, 26, 27,
+        28, 29, 30,
+        31, 32, 33,
+        34, 35, 36,
+
+        176, 177, 178,
+        179, 181, 182,
+        183, 184, 186,
+        187, 188, 189,
+        191, 192, 193,
+        195, 196, 197,
+    })
+    );
+
+    outputTensorInfo.SetQuantizationScale(outputScale);
+    outputTensorInfo.SetQuantizationOffset(outputOffset);
+    inputTensorInfo1.SetQuantizationScale(inputScale1);
+    inputTensorInfo1.SetQuantizationOffset(inputOffset1);
+    inputTensorInfo2.SetQuantizationScale(inputScale2);
+    inputTensorInfo2.SetQuantizationOffset(inputOffset2);
+
+    std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
+    armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
+
+    std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
+    armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
+
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    bool subTensorsSupported = workloadFactory.SupportsSubTensors();
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 =
+            subTensorsSupported ?
+            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
+            workloadFactory.CreateTensorHandle(inputTensorInfo1);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle2 =
+            subTensorsSupported ?
+            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
+            workloadFactory.CreateTensorHandle(inputTensorInfo2);
+
+    armnn::MergerQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
+    AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    data.m_ViewOrigins.push_back(window1);
+    data.m_ViewOrigins.push_back(window2);
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(data, info);
+
+    inputHandle1->Allocate();
+    inputHandle2->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
+    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
+
+    return ret;
+}
+
 LayerTestResult<uint8_t, 3> MergerUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

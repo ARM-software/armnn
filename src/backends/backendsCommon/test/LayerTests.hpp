@@ -745,6 +745,10 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+LayerTestResult<uint8_t, 3> MergerUint8DifferentQParamsTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<uint8_t, 4> AdditionUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

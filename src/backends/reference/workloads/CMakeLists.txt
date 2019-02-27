@@ -25,6 +25,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     Gather.hpp
     Maximum.hpp
     Merger.hpp
+    Merger.cpp
     Minimum.hpp
     Pad.cpp
     Pad.hpp

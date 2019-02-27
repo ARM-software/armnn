@@ -997,15 +997,15 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
                                       const OriginsDescriptor& mergerDescriptor,
                                       const char* name = nullptr)
         {
-            std::pair<int, float> expectedValues = ComputeQAsymmParams(8, m_Min, m_Max);
+            std::pair<float, int> expectedValues = ComputeQAsymmParams(8, m_Min, m_Max);
 
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 
             BOOST_TEST((info.GetDataType() == DataType::QuantisedAsymm8));
 
-            BOOST_TEST((info.GetQuantizationOffset() == expectedValues.first));
+            BOOST_TEST((info.GetQuantizationOffset() == expectedValues.second));
 
-            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), expectedValues.second, 0.000001f);
+            BOOST_CHECK_CLOSE(info.GetQuantizationScale(), expectedValues.first, 0.000001f);
         }
 
     private:

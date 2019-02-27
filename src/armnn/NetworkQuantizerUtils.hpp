@@ -17,7 +17,7 @@
 namespace armnn
 {
 
-std::pair<int, float> ComputeQAsymmParams(int numBits, double min, double max);
+std::pair<float, int> ComputeQAsymmParams(int numBits, double min, double max);
 
 template<typename srcType>
 void Quantize(const srcType* src, uint8_t* dst, size_t numElements, float& scale, int& offset)
@@ -34,8 +34,8 @@ void Quantize(const srcType* src, uint8_t* dst, size_t numElements, float& scale
     }
 
     auto qParams = ComputeQAsymmParams(8, min, max);
-    offset = qParams.first;
-    scale = qParams.second;
+    scale = qParams.first;
+    offset = qParams.second;
     for (size_t i = 0; i < numElements; ++i)
     {
         dst[i] = armnn::Quantize<uint8_t>(src[i], scale, offset);

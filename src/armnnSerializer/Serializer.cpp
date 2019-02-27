@@ -260,6 +260,20 @@ void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectab
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_DepthwiseConvolution2dLayer);
 }
 
+// Build FlatBuffer for Division Layer
+void SerializerVisitor::VisitDivisionLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto flatBufferDivisionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Division);
+
+    // Create the FlatBuffer DivisionLayer
+    auto flatBufferDivisionLayer =
+        serializer::CreateDivisionLayer(m_flatBufferBuilder, flatBufferDivisionBaseLayer);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferDivisionLayer.o, serializer::Layer::Layer_DivisionLayer);
+}
+
 // Build FlatBuffer for Multiplication Layer
 void SerializerVisitor::VisitMultiplicationLayer(const armnn::IConnectableLayer* layer, const char* name)
 {

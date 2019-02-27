@@ -600,6 +600,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp
                 src/armnnDeserializer/test/DeserializeConstant.cpp
                 src/armnnDeserializer/test/DeserializeConvolution2d.cpp
+                src/armnnDeserializer/test/DeserializeDivision.cpp
                 src/armnnDeserializer/test/DeserializeFullyConnected.cpp
                 src/armnnDeserializer/test/DeserializeMultiplication.cpp
                 src/armnnDeserializer/test/DeserializePermute.cpp

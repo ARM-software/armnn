@@ -95,7 +95,8 @@ enum LayerType : uint {
     FullyConnected = 11,
     Constant = 12,
     SpaceToBatchNd = 13,
-    BatchToSpaceNd = 14
+    BatchToSpaceNd = 14,
+    Division = 15
 }
 
 // Base layer table to be used as part of other layers
@@ -149,6 +150,10 @@ table Convolution2dDescriptor {
     strideY:uint;
     biasEnabled:bool = false;
     dataLayout:DataLayout = NCHW;
+}
+
+table DivisionLayer {
+    base:LayerBase;
 }
 
 table FullyConnectedLayer {
@@ -293,7 +298,8 @@ union Layer {
     Pooling2dLayer,
     ReshapeLayer,
     SoftmaxLayer,
-    SpaceToBatchNdLayer
+    SpaceToBatchNdLayer,
+    DivisionLayer
 }
 
 table AnyLayer {

@@ -728,4 +728,49 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeBatchToSpaceNd)
                                             outputTensorInfo.GetShape());
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDivision)
+{
+    class VerifyDivisionName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitDivisionLayer(const armnn::IConnectableLayer*, const char* name) override
+        {
+            BOOST_TEST(name == "division");
+        }
+    };
+
+    const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+
+    const char* divLayerName = "division";
+
+    armnn::IConnectableLayer* const divisionLayer = network->AddDivisionLayer(divLayerName);
+    inputLayer0->GetOutputSlot(0).Connect(divisionLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(divisionLayer->GetInputSlot(1));
+
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+    divisionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    divisionLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnnSerializer::Serializer serializer;
+    serializer.Serialize(*network);
+
+    std::stringstream stream;
+    serializer.SaveSerializedToStream(stream);
+    BOOST_TEST(stream.str().length() > 0);
+    BOOST_TEST(stream.str().find(divLayerName) != stream.str().npos);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyDivisionName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

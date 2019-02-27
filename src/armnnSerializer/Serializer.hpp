@@ -69,6 +69,9 @@ public:
                                           const armnn::Optional<armnn::ConstTensor>& biases,
                                           const char* name = nullptr) override;
 
+    void VisitDivisionLayer(const armnn::IConnectableLayer* layer,
+                            const char* name = nullptr) override;
+
     void VisitFullyConnectedLayer(const armnn::IConnectableLayer* layer,
                                   const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
                                   const armnn::ConstTensor& weights,

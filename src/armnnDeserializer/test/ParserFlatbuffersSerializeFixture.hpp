@@ -116,21 +116,39 @@ struct ParserFlatbuffersSerializeFixture
 
     /// Executes the network with the given input tensor and checks the result against the given output tensor.
     /// This overload assumes the network has a single input and a single output.
-    template <std::size_t NumOutputDimensions,
-              armnn::DataType ArmnnType,
-              typename DataType = armnn::ResolveType<ArmnnType>>
+    template<std::size_t NumOutputDimensions,
+             armnn::DataType ArmnnType,
+             typename DataType = armnn::ResolveType<ArmnnType>>
     void RunTest(unsigned int layersId,
                  const std::vector<DataType>& inputData,
                  const std::vector<DataType>& expectedOutputData);
 
+    template<std::size_t NumOutputDimensions,
+             armnn::DataType ArmnnInputType,
+             armnn::DataType ArmnnOutputType,
+             typename InputDataType = armnn::ResolveType<ArmnnInputType>,
+             typename OutputDataType = armnn::ResolveType<ArmnnOutputType>>
+    void RunTest(unsigned int layersId,
+                 const std::vector<InputDataType>& inputData,
+                 const std::vector<OutputDataType>& expectedOutputData);
+
     /// Executes the network with the given input tensors and checks the results against the given output tensors.
     /// This overload supports multiple inputs and multiple outputs, identified by name.
-    template <std::size_t NumOutputDimensions,
-              armnn::DataType ArmnnType,
-              typename DataType = armnn::ResolveType<ArmnnType>>
+    template<std::size_t NumOutputDimensions,
+             armnn::DataType ArmnnType,
+             typename DataType = armnn::ResolveType<ArmnnType>>
     void RunTest(unsigned int layersId,
                  const std::map<std::string, std::vector<DataType>>& inputData,
                  const std::map<std::string, std::vector<DataType>>& expectedOutputData);
+
+    template<std::size_t NumOutputDimensions,
+             armnn::DataType ArmnnInputType,
+             armnn::DataType ArmnnOutputType,
+             typename InputDataType = armnn::ResolveType<ArmnnInputType>,
+             typename OutputDataType = armnn::ResolveType<ArmnnOutputType>>
+    void RunTest(unsigned int layersId,
+                 const std::map<std::string, std::vector<InputDataType>>& inputData,
+                 const std::map<std::string, std::vector<OutputDataType>>& expectedOutputData);
 
     void CheckTensors(const TensorRawPtr& tensors, size_t shapeSize, const std::vector<int32_t>& shape,
                       armnnSerializer::TensorInfo tensorType, const std::string& name,
@@ -145,24 +163,45 @@ struct ParserFlatbuffersSerializeFixture
     }
 };
 
-template <std::size_t NumOutputDimensions,
-          armnn::DataType ArmnnType,
-          typename DataType>
+template<std::size_t NumOutputDimensions, armnn::DataType ArmnnType, typename DataType>
 void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
                                                 const std::vector<DataType>& inputData,
                                                 const std::vector<DataType>& expectedOutputData)
 {
-    RunTest<NumOutputDimensions, ArmnnType>(layersId,
-                                            { { m_SingleInputName, inputData } },
-                                            { { m_SingleOutputName, expectedOutputData } });
+    RunTest<NumOutputDimensions, ArmnnType, ArmnnType, DataType, DataType>(layersId, inputData, expectedOutputData);
 }
 
-template <std::size_t NumOutputDimensions,
-          armnn::DataType ArmnnType,
-          typename DataType>
+template<std::size_t NumOutputDimensions,
+         armnn::DataType ArmnnInputType,
+         armnn::DataType ArmnnOutputType,
+         typename InputDataType,
+         typename OutputDataType>
+void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
+                                                const std::vector<InputDataType>& inputData,
+                                                const std::vector<OutputDataType>& expectedOutputData)
+{
+    RunTest<NumOutputDimensions, ArmnnInputType, ArmnnOutputType>(layersId,
+                                                                  { { m_SingleInputName, inputData } },
+                                                                  { { m_SingleOutputName, expectedOutputData } });
+}
+
+template<std::size_t NumOutputDimensions, armnn::DataType ArmnnType, typename DataType>
 void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
                                                 const std::map<std::string, std::vector<DataType>>& inputData,
                                                 const std::map<std::string, std::vector<DataType>>& expectedOutputData)
+{
+    RunTest<NumOutputDimensions, ArmnnType, ArmnnType, DataType, DataType>(layersId, inputData, expectedOutputData);
+}
+
+template<std::size_t NumOutputDimensions,
+         armnn::DataType ArmnnInputType,
+         armnn::DataType ArmnnOutputType,
+         typename InputDataType,
+         typename OutputDataType>
+void ParserFlatbuffersSerializeFixture::RunTest(
+    unsigned int layersId,
+    const std::map<std::string, std::vector<InputDataType>>& inputData,
+    const std::map<std::string, std::vector<OutputDataType>>& expectedOutputData)
 {
     using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
 
@@ -176,18 +215,18 @@ void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
     for (auto&& it : inputData)
     {
         BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkInputBindingInfo(layersId, it.first));
-        armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnType);
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnInputType);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }
 
     // Allocate storage for the output tensors to be written to and setup the armnn output tensors.
-    std::map<std::string, boost::multi_array<DataType, NumOutputDimensions>> outputStorage;
+    std::map<std::string, boost::multi_array<OutputDataType, NumOutputDimensions>> outputStorage;
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
         BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
-        armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnType);
-        outputStorage.emplace(it.first, MakeTensor<DataType, NumOutputDimensions>(bindingInfo.second));
+        armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnOutputType);
+        outputStorage.emplace(it.first, MakeTensor<OutputDataType, NumOutputDimensions>(bindingInfo.second));
         outputTensors.push_back(
                 { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
     }
@@ -198,7 +237,7 @@ void ParserFlatbuffersSerializeFixture::RunTest(unsigned int layersId,
     for (auto&& it : expectedOutputData)
     {
         BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
-        auto outputExpected = MakeTensor<DataType, NumOutputDimensions>(bindingInfo.second, it.second);
+        auto outputExpected = MakeTensor<OutputDataType, NumOutputDimensions>(bindingInfo.second, it.second);
         BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
     }
 }

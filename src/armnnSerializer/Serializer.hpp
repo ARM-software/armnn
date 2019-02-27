@@ -118,6 +118,9 @@ public:
                                   const armnn::SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                   const char* name = nullptr) override;
 
+    void VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::NormalizationDescriptor& normalizationDescriptor,
+                                 const char* name = nullptr) override;
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.

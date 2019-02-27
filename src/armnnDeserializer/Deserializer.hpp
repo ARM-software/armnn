@@ -19,6 +19,7 @@ public:
     using GraphPtr = const armnnSerializer::SerializedGraph *;
     using TensorRawPtr = const armnnSerializer::TensorInfo *;
     using PoolingDescriptor = const armnnSerializer::Pooling2dDescriptor *;
+    using NormalizationDescriptorPtr = const armnnSerializer::NormalizationDescriptor *;
     using TensorRawPtrVector = std::vector<TensorRawPtr>;
     using LayerRawPtr = const armnnSerializer::LayerBase *;
     using LayerBaseRawPtr = const armnnSerializer::LayerBase *;
@@ -51,8 +52,10 @@ public:
     static LayerBaseRawPtr GetBaseLayer(const GraphPtr& graphPtr, unsigned int layerIndex);
     static int32_t GetBindingLayerInfo(const GraphPtr& graphPtr, unsigned int layerIndex);
     static std::string GetLayerName(const GraphPtr& graph, unsigned int index);
-    armnn::Pooling2dDescriptor GetPoolingDescriptor(PoolingDescriptor pooling2dDescriptor,
-                                                    unsigned int layerIndex);
+    static armnn::Pooling2dDescriptor GetPoolingDescriptor(PoolingDescriptor pooling2dDescriptor,
+                                                           unsigned int layerIndex);
+    static armnn::NormalizationDescriptor GetNormalizationDescriptor(
+        NormalizationDescriptorPtr normalizationDescriptor, unsigned int layerIndex);
     static armnn::TensorInfo OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
                                                   const std::vector<uint32_t> & targetDimsIn);
 
@@ -80,6 +83,7 @@ private:
     void ParseMinimum(GraphPtr graph, unsigned int layerIndex);
     void ParseMaximum(GraphPtr graph, unsigned int layerIndex);
     void ParseMultiplication(GraphPtr graph, unsigned int layerIndex);
+    void ParseNormalization(GraphPtr graph, unsigned int layerIndex);
     void ParsePermute(GraphPtr graph, unsigned int layerIndex);
     void ParsePooling2d(GraphPtr graph, unsigned int layerIndex);
     void ParseReshape(GraphPtr graph, unsigned int layerIndex);

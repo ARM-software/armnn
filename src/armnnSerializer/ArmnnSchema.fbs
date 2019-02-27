@@ -99,7 +99,8 @@ enum LayerType : uint {
     Division = 15,
     Minimum = 16,
     Equal = 17,
-    Maximum = 18
+    Maximum = 18,
+    Normalization = 19
 }
 
 // Base layer table to be used as part of other layers
@@ -298,6 +299,31 @@ table BatchToSpaceNdDescriptor {
     dataLayout:DataLayout;
 }
 
+enum NormalizationAlgorithmChannel : byte {
+    Across = 0,
+    Within = 1
+}
+
+enum NormalizationAlgorithmMethod : byte {
+    LocalBrightness = 0,
+    LocalContrast = 1
+}
+
+table NormalizationLayer {
+    base:LayerBase;
+    descriptor:NormalizationDescriptor;
+}
+
+table NormalizationDescriptor {
+    normChannelType:NormalizationAlgorithmChannel = Across;
+    normMethodType:NormalizationAlgorithmMethod = LocalBrightness;
+    normSize:uint;
+    alpha:float;
+    beta:float;
+    k:float;
+    dataLayout:DataLayout = NCHW;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -317,7 +343,8 @@ union Layer {
     DivisionLayer,
     MinimumLayer,
     EqualLayer,
-    MaximumLayer
+    MaximumLayer,
+    NormalizationLayer
 }
 
 table AnyLayer {

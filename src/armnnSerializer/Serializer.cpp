@@ -470,6 +470,29 @@ void SerializerVisitor::VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer*
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_SpaceToBatchNdLayer);
 }
 
+void SerializerVisitor::VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                                const armnn::NormalizationDescriptor& descriptor,
+                                                const char* name)
+{
+    auto fbNormalizationBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Normalization);
+
+    auto fbNormalizationDescriptor = serializer::CreateNormalizationDescriptor(
+        m_flatBufferBuilder,
+        GetFlatBufferNormalizationAlgorithmChannel(descriptor.m_NormChannelType),
+        GetFlatBufferNormalizationAlgorithmMethod(descriptor.m_NormMethodType),
+        descriptor.m_NormSize,
+        descriptor.m_Alpha,
+        descriptor.m_Beta,
+        descriptor.m_K,
+        GetFlatBufferDataLayout(descriptor.m_DataLayout));
+
+    auto flatBufferLayer = serializer::CreateNormalizationLayer(m_flatBufferBuilder,
+                                                                fbNormalizationBaseLayer,
+                                                                fbNormalizationDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_NormalizationLayer);
+}
+
 fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {

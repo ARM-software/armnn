@@ -197,6 +197,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_MinimumLayer]                = &Deserializer::ParseMinimum;
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
     m_ParserFunctions[Layer_MultiplicationLayer]         = &Deserializer::ParseMultiplication;
+    m_ParserFunctions[Layer_NormalizationLayer]          = &Deserializer::ParseNormalization;
     m_ParserFunctions[Layer_PermuteLayer]                = &Deserializer::ParsePermute;
     m_ParserFunctions[Layer_Pooling2dLayer]              = &Deserializer::ParsePooling2d;
     m_ParserFunctions[Layer_ReshapeLayer]                = &Deserializer::ParseReshape;
@@ -236,6 +237,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_MaximumLayer()->base();
         case Layer::Layer_MultiplicationLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_MultiplicationLayer()->base();
+        case Layer::Layer_NormalizationLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_NormalizationLayer()->base();
         case Layer::Layer_OutputLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_OutputLayer()->base()->base();
         case Layer::Layer_PermuteLayer:
@@ -1355,6 +1358,98 @@ void Deserializer::ParseSpaceToBatchNd(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+armnn::NormalizationDescriptor Deserializer::GetNormalizationDescriptor(
+    Deserializer::NormalizationDescriptorPtr normalizationDescriptor,
+    unsigned int layerIndex)
+{
+    armnn::NormalizationDescriptor desc;
+
+    switch (normalizationDescriptor->normChannelType())
+    {
+        case NormalizationAlgorithmChannel_Across:
+        {
+            desc.m_NormChannelType = armnn::NormalizationAlgorithmChannel::Across;
+            break;
+        }
+        case NormalizationAlgorithmChannel_Within:
+        {
+            desc.m_NormChannelType = armnn::NormalizationAlgorithmChannel::Within;
+            break;
+        }
+        default:
+        {
+            BOOST_ASSERT_MSG(false, "Unsupported normalization channel type");
+        }
+    }
+
+    switch (normalizationDescriptor->normMethodType())
+    {
+        case NormalizationAlgorithmMethod_LocalBrightness:
+        {
+            desc.m_NormMethodType = armnn::NormalizationAlgorithmMethod::LocalBrightness;
+            break;
+        }
+        case NormalizationAlgorithmMethod_LocalContrast:
+        {
+            desc.m_NormMethodType = armnn::NormalizationAlgorithmMethod::LocalContrast;
+            break;
+        }
+        default:
+        {
+            BOOST_ASSERT_MSG(false, "Unsupported normalization method type");
+        }
+    }
+
+    switch (normalizationDescriptor->dataLayout())
+    {
+        case DataLayout_NCHW:
+        {
+            desc.m_DataLayout = armnn::DataLayout::NCHW;
+            break;
+        }
+        case DataLayout_NHWC:
+        {
+            desc.m_DataLayout = armnn::DataLayout::NHWC;
+            break;
+        }
+        default:
+        {
+            BOOST_ASSERT_MSG(false, "Unsupported data layout");
+        }
+    }
+
+    desc.m_Alpha    = normalizationDescriptor->alpha();
+    desc.m_Beta     = normalizationDescriptor->beta();
+    desc.m_K        = normalizationDescriptor->k();
+    desc.m_NormSize = normalizationDescriptor->normSize();
+
+    return desc;
+}
+
+void Deserializer::ParseNormalization(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto normalizationDes = graph->layers()->Get(layerIndex)->layer_as_NormalizationLayer()->descriptor();
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto outputInfo = ToTensorInfo(outputs[0]);
+
+    auto normalizationDescriptor = GetNormalizationDescriptor(normalizationDes, layerIndex);
+    auto layerName = GetLayerName(graph, layerIndex);
+
+    IConnectableLayer* layer = m_Network->AddNormalizationLayer(normalizationDescriptor, layerName.c_str());
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

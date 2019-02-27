@@ -96,4 +96,32 @@ armnnSerializer::PaddingMethod GetFlatBufferPaddingMethod(armnn::PaddingMethod p
     }
 }
 
+armnnSerializer::NormalizationAlgorithmChannel GetFlatBufferNormalizationAlgorithmChannel(
+    armnn::NormalizationAlgorithmChannel normalizationAlgorithmChannel)
+{
+    switch (normalizationAlgorithmChannel)
+    {
+        case armnn::NormalizationAlgorithmChannel::Across:
+            return armnnSerializer::NormalizationAlgorithmChannel::NormalizationAlgorithmChannel_Across;
+        case armnn::NormalizationAlgorithmChannel::Within:
+            return armnnSerializer::NormalizationAlgorithmChannel::NormalizationAlgorithmChannel_Within;
+        default:
+            return armnnSerializer::NormalizationAlgorithmChannel::NormalizationAlgorithmChannel_Across;
+    }
+}
+
+armnnSerializer::NormalizationAlgorithmMethod GetFlatBufferNormalizationAlgorithmMethod(
+    armnn::NormalizationAlgorithmMethod normalizationAlgorithmMethod)
+{
+    switch (normalizationAlgorithmMethod)
+    {
+        case armnn::NormalizationAlgorithmMethod::LocalBrightness:
+            return armnnSerializer::NormalizationAlgorithmMethod::NormalizationAlgorithmMethod_LocalBrightness;
+        case armnn::NormalizationAlgorithmMethod::LocalContrast:
+            return armnnSerializer::NormalizationAlgorithmMethod::NormalizationAlgorithmMethod_LocalContrast;
+        default:
+            return armnnSerializer::NormalizationAlgorithmMethod::NormalizationAlgorithmMethod_LocalBrightness;
+    }
+}
+
 } // namespace armnnSerializer

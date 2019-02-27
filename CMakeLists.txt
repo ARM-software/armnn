@@ -604,6 +604,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnDeserializer/test/DeserializeEqual.cpp
                 src/armnnDeserializer/test/DeserializeFullyConnected.cpp
                 src/armnnDeserializer/test/DeserializeMultiplication.cpp
+                src/armnnDeserializer/test/DeserializeNormalization.cpp
                 src/armnnDeserializer/test/DeserializePermute.cpp
                 src/armnnDeserializer/test/DeserializePooling2d.cpp
                 src/armnnDeserializer/test/DeserializeReshape.cpp

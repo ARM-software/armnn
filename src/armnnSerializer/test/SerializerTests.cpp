@@ -891,6 +891,54 @@ BOOST_AUTO_TEST_CASE(SerializeDivision)
     deserializedNetwork->Accept(nameChecker);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeNormalization)
+{
+    class VerifyNormalizationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+        public:
+        void VisitNormalizationLayer(const armnn::IConnectableLayer*,
+                                     const armnn::NormalizationDescriptor& normalizationDescriptor,
+                                     const char* name) override
+        {
+            BOOST_TEST(name == "NormalizationLayer");
+        }
+    };
+
+    unsigned int inputShape[] = {2, 1, 2, 2};
+    unsigned int outputShape[] = {2, 1, 2, 2};
+
+    armnn::NormalizationDescriptor desc;
+    desc.m_DataLayout = armnn::DataLayout::NCHW;
+    desc.m_NormSize = 3;
+    desc.m_Alpha = 1;
+    desc.m_Beta = 1;
+    desc.m_K = 1;
+
+    auto inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    auto outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const normalizationLayer = network->AddNormalizationLayer(desc, "NormalizationLayer");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(normalizationLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    normalizationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    normalizationLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyNormalizationName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            {inputTensorInfo.GetShape()},
+                                            {outputTensorInfo.GetShape()});
+}
+
 BOOST_AUTO_TEST_CASE(SerializeDeserializeEqual)
 {
     class VerifyEqualName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
@@ -932,5 +980,4 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeEqual)
                                             {outputTensorInfo.GetShape()},
                                             {0, 1});
 }
-
 BOOST_AUTO_TEST_SUITE_END()

@@ -195,6 +195,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_EqualLayer]                  = &Deserializer::ParseEqual;
     m_ParserFunctions[Layer_FullyConnectedLayer]         = &Deserializer::ParseFullyConnected;
     m_ParserFunctions[Layer_MinimumLayer]                = &Deserializer::ParseMinimum;
+    m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
     m_ParserFunctions[Layer_MultiplicationLayer]         = &Deserializer::ParseMultiplication;
     m_ParserFunctions[Layer_PermuteLayer]                = &Deserializer::ParsePermute;
     m_ParserFunctions[Layer_Pooling2dLayer]              = &Deserializer::ParsePooling2d;
@@ -231,6 +232,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_InputLayer()->base()->base();
         case Layer::Layer_MinimumLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_MinimumLayer()->base();
+        case Layer::Layer_MaximumLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_MaximumLayer()->base();
         case Layer::Layer_MultiplicationLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_MultiplicationLayer()->base();
         case Layer::Layer_OutputLayer:
@@ -993,6 +996,26 @@ void Deserializer::ParseMinimum(GraphPtr graph, unsigned int layerIndex)
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddMinimumLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseMaximum(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddMaximumLayer(layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

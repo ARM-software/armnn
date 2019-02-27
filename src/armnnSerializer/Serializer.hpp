@@ -88,6 +88,9 @@ public:
     void VisitMinimumLayer(const armnn::IConnectableLayer* layer,
                            const char* name = nullptr) override;
 
+    void VisitMaximumLayer(const armnn::IConnectableLayer* layer,
+                           const char* name = nullptr) override;
+
     void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,
                                   const char* name = nullptr) override;
 

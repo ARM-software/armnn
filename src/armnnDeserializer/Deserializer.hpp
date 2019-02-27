@@ -78,6 +78,7 @@ private:
     void ParseEqual(GraphPtr graph, unsigned int layerIndex);
     void ParseFullyConnected(GraphPtr graph, unsigned int layerIndex);
     void ParseMinimum(GraphPtr graph, unsigned int layerIndex);
+    void ParseMaximum(GraphPtr graph, unsigned int layerIndex);
     void ParseMultiplication(GraphPtr graph, unsigned int layerIndex);
     void ParsePermute(GraphPtr graph, unsigned int layerIndex);
     void ParsePooling2d(GraphPtr graph, unsigned int layerIndex);

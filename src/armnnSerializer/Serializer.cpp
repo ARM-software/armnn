@@ -268,6 +268,14 @@ void SerializerVisitor::VisitDivisionLayer(const armnn::IConnectableLayer* layer
     CreateAnyLayer(fbDivisionLayer.o, serializer::Layer::Layer_DivisionLayer);
 }
 
+void SerializerVisitor::VisitEqualLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Equal);
+    auto fbEqualLayer = serializer::CreateEqualLayer(m_flatBufferBuilder, fbBaseLayer);
+
+    CreateAnyLayer(fbEqualLayer.o, serializer::Layer::Layer_EqualLayer);
+}
+
 void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbMinimumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Minimum);
@@ -276,14 +284,12 @@ void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(fbMinimumLayer.o, serializer::Layer::Layer_MinimumLayer);
 }
 
-// Build FlatBuffer for Equal Layer
-void SerializerVisitor::VisitEqualLayer(const armnn::IConnectableLayer* layer, const char* name)
+void SerializerVisitor::VisitMaximumLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Equal);
+    auto fbMaximumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Maximum);
+    auto fbMaximumLayer     = serializer::CreateMaximumLayer(m_flatBufferBuilder, fbMaximumBaseLayer);
 
-    auto flatBufferEqualLayer = serializer::CreateEqualLayer(m_flatBufferBuilder, flatBufferBaseLayer);
-
-    CreateAnyLayer(flatBufferEqualLayer.o, serializer::Layer::Layer_EqualLayer);
+    CreateAnyLayer(fbMaximumLayer.o, serializer::Layer::Layer_MaximumLayer);
 }
 
 // Build FlatBuffer for Multiplication Layer

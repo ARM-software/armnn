@@ -98,7 +98,8 @@ enum LayerType : uint {
     BatchToSpaceNd = 14,
     Division = 15,
     Minimum = 16,
-    Equal = 17
+    Equal = 17,
+    Maximum = 18
 }
 
 // Base layer table to be used as part of other layers
@@ -179,6 +180,10 @@ table InputLayer {
 }
 
 table MinimumLayer {
+    base:LayerBase;
+}
+
+table MaximumLayer {
     base:LayerBase;
 }
 
@@ -311,7 +316,8 @@ union Layer {
     SpaceToBatchNdLayer,
     DivisionLayer,
     MinimumLayer,
-    EqualLayer
+    EqualLayer,
+    MaximumLayer
 }
 
 table AnyLayer {

@@ -129,6 +129,8 @@ private:
     template<typename Type>
     bool HasParsedConstTensor(ParsedTfOperation* parsedTfOpPtr) const;
 
+    unsigned int GetConstInputIndex(const std::vector<OutputOfParsedTfOperation>& inputs);
+
     ParsedTfOperationPtr ParseAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseAddN(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);
     ParsedTfOperationPtr ParseBiasAdd(const tensorflow::NodeDef& nodeDef, const tensorflow::GraphDef& graphDef);

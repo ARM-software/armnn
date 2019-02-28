@@ -361,6 +361,39 @@ void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(fbMinimumLayer.o, serializer::Layer::Layer_MinimumLayer);
 }
 
+void SerializerVisitor::VisitMergerLayer(const armnn::IConnectableLayer* layer,
+                                         const armnn::OriginsDescriptor& mergerDescriptor,
+                                         const char* name)
+{
+    auto flatBufferMergerBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Merger);
+
+    std::vector<flatbuffers::Offset<UintVector>> views;
+    for (unsigned int v = 0; v < mergerDescriptor.GetNumViews(); ++v)
+    {
+        const uint32_t* origin = mergerDescriptor.GetViewOrigin(v);
+        std::vector<uint32_t> origins;
+        for (unsigned int d = 0; d < mergerDescriptor.GetNumDimensions(); ++d)
+        {
+            origins.push_back(origin[d]);
+        }
+        auto view = m_flatBufferBuilder.CreateVector(origins);
+        auto uintVector = CreateUintVector(m_flatBufferBuilder, view);
+        views.push_back(uintVector);
+    }
+
+    auto flatBufferMergerDescriptor = CreateOriginsDescriptor(m_flatBufferBuilder,
+                                                              mergerDescriptor.GetConcatAxis(),
+                                                              mergerDescriptor.GetNumViews(),
+                                                              mergerDescriptor.GetNumDimensions(),
+                                                              m_flatBufferBuilder.CreateVector(views));
+
+    auto flatBufferLayer = CreateMergerLayer(m_flatBufferBuilder,
+                                             flatBufferMergerBaseLayer,
+                                             flatBufferMergerDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_MergerLayer);
+}
+
 void SerializerVisitor::VisitMultiplicationLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbMultiplicationBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Multiplication);

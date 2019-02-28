@@ -21,6 +21,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Greater
 * Maximum
 * Mean
+* Merger
 * Minimum
 * Multiplication
 * Normalization

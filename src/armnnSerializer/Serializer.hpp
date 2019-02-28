@@ -112,6 +112,10 @@ public:
     void VisitMaximumLayer(const armnn::IConnectableLayer* layer,
                            const char* name = nullptr) override;
 
+    void VisitMergerLayer(const armnn::IConnectableLayer* layer,
+                          const armnn::OriginsDescriptor& mergerDescriptor,
+                          const char* name = nullptr) override;
+
     void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,
                                   const char* name = nullptr) override;
 

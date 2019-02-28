@@ -150,6 +150,7 @@ if(BUILD_TF_LITE_PARSER)
 endif()
 
 if(BUILD_ARMNN_SERIALIZER)
+    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer/ArmnnSchema_generated.h)
     add_custom_command (
         OUTPUT  src/armnnSerializer/ArmnnSchema_generated.h
         COMMAND ${FLATC_DIR}/flatc -o ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer --cpp

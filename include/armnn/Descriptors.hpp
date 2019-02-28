@@ -69,7 +69,7 @@ struct OriginsDescriptor
 
     /// @Brief Set the view origin coordinates. The arguments are: view, dimension, value.
     /// If the view is greater than or equal to GetNumViews(), then the view argument is out of range.
-    /// If the coord is greater than or equal to GetNumViews(), then the coord argument is out of range.
+    /// If the coord is greater than or equal to GetNumDimensions(), then the coord argument is out of range.
     Status SetViewOriginCoord(uint32_t view, uint32_t coord, uint32_t value);
     /// Get the number of views.
     uint32_t GetNumViews() const;

@@ -188,6 +188,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_ActivationLayer]             = &Deserializer::ParseActivation;
     m_ParserFunctions[Layer_AdditionLayer]               = &Deserializer::ParseAdd;
     m_ParserFunctions[Layer_BatchToSpaceNdLayer]         = &Deserializer::ParseBatchToSpaceNd;
+    m_ParserFunctions[Layer_BatchNormalizationLayer]     = &Deserializer::ParseBatchNormalization;
     m_ParserFunctions[Layer_ConstantLayer]               = &Deserializer::ParseConstant;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &Deserializer::ParseDepthwiseConvolution2d;
@@ -220,6 +221,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
         case Layer::Layer_BatchToSpaceNdLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_BatchToSpaceNdLayer()->base();
+        case Layer::Layer_BatchNormalizationLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_BatchNormalizationLayer()->base();
         case Layer::Layer_ConstantLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ConstantLayer()->base();
         case Layer::Layer_Convolution2dLayer:
@@ -843,6 +846,43 @@ void Deserializer::ParseBatchToSpaceNd(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseBatchNormalization(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+    auto outputInfo = ToTensorInfo(outputs[0]);
+
+    auto layerName = boost::str(boost::format("BatchNormalization:%1%") % layerIndex);
+
+    auto serializerLayer = graph->layers()->Get(layerIndex)->layer_as_BatchNormalizationLayer();
+    auto serializerDescriptor = serializerLayer->descriptor();
+
+    armnn::BatchNormalizationDescriptor descriptor;
+    descriptor.m_Eps = serializerDescriptor->eps();
+    descriptor.m_DataLayout = ToDataLayout(serializerDescriptor->dataLayout());
+
+    armnn::ConstTensor mean     = ToConstTensor(serializerLayer->mean());
+    armnn::ConstTensor variance = ToConstTensor(serializerLayer->variance());
+    armnn::ConstTensor beta     = ToConstTensor(serializerLayer->beta());
+    armnn::ConstTensor gamma    = ToConstTensor(serializerLayer->gamma());
+
+    IConnectableLayer* layer = m_Network->AddBatchNormalizationLayer(descriptor,
+                                                                     mean,
+                                                                     variance,
+                                                                     beta,
+                                                                     gamma,
+                                                                     layerName.c_str());
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

@@ -103,7 +103,8 @@ enum LayerType : uint {
     Normalization = 19,
     Pad = 20,
     Rsqrt = 21,
-    Floor = 22
+    Floor = 22,
+    BatchNormalization = 23
 }
 
 // Base layer table to be used as part of other layers
@@ -340,14 +341,30 @@ table PadDescriptor {
     padList:[uint];
 }
 
+
 table RsqrtLayer {
     base:LayerBase;
+}
+
+table BatchNormalizationLayer {
+    base:LayerBase;
+    descriptor:BatchNormalizationDescriptor;
+    mean:ConstTensor;
+    variance:ConstTensor;
+    beta:ConstTensor;
+    gamma:ConstTensor;
+}
+
+table BatchNormalizationDescriptor {
+    eps:float;
+    dataLayout:DataLayout;
 }
 
 union Layer {
     ActivationLayer,
     AdditionLayer,
     BatchToSpaceNdLayer,
+    BatchNormalizationLayer,
     ConstantLayer,
     Convolution2dLayer,
     DepthwiseConvolution2dLayer,

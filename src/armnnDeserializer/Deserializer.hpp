@@ -74,6 +74,7 @@ private:
     void ParseActivation(GraphPtr graph, unsigned int layerIndex);
     void ParseAdd(GraphPtr graph, unsigned int layerIndex);
     void ParseBatchToSpaceNd(GraphPtr graph, unsigned int layerIndex);
+    void ParseBatchNormalization(GraphPtr graph, unsigned int layerIndex);
     void ParseConstant(GraphPtr graph, unsigned int layerIndex);
     void ParseConvolution2d(GraphPtr graph, unsigned int layerIndex);
     void ParseDepthwiseConvolution2d(GraphPtr graph, unsigned int layerIndex);

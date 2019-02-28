@@ -888,6 +888,74 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeBatchToSpaceNd)
                                             {outputTensorInfo.GetShape()});
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeBatchNormalization)
+{
+    class VerifyBatchNormalizationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitBatchNormalizationLayer(const armnn::IConnectableLayer*,
+                                      const armnn::BatchNormalizationDescriptor&,
+                                      const armnn::ConstTensor&,
+                                      const armnn::ConstTensor&,
+                                      const armnn::ConstTensor&,
+                                      const armnn::ConstTensor&,
+                                      const char* name) override
+        {
+            BOOST_TEST(name == "BatchNormalization:1");
+        }
+    };
+
+    armnn::TensorInfo inputInfo ({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+    armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+
+    armnn::TensorInfo meanInfo({1}, armnn::DataType::Float32);
+    armnn::TensorInfo varianceInfo({1}, armnn::DataType::Float32);
+    armnn::TensorInfo scaleInfo({1}, armnn::DataType::Float32);
+    armnn::TensorInfo offsetInfo({1}, armnn::DataType::Float32);
+
+    armnn::BatchNormalizationDescriptor descriptor;
+    descriptor.m_Eps = 0.0010000000475f;
+    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
+
+    std::vector<float> meanData({5.0});
+    std::vector<float> varianceData({2.0});
+    std::vector<float> scaleData({1.0});
+    std::vector<float> offsetData({0.0});
+
+    armnn::ConstTensor mean(meanInfo, meanData);
+    armnn::ConstTensor variance(varianceInfo, varianceData);
+    armnn::ConstTensor scale(scaleInfo, scaleData);
+    armnn::ConstTensor offset(offsetInfo, offsetData);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const batchNormalizationLayer = network->AddBatchNormalizationLayer(
+                                                                       descriptor,
+                                                                       mean,
+                                                                       variance,
+                                                                       scale,
+                                                                       offset,
+                                                                       "BatchNormalizationLayer");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(batchNormalizationLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+
+    batchNormalizationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    batchNormalizationLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyBatchNormalizationName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            {inputInfo.GetShape()},
+                                            {outputInfo.GetShape()});
+}
+
 BOOST_AUTO_TEST_CASE(SerializeDivision)
 {
     class VerifyDivisionName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>

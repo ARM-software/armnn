@@ -53,6 +53,14 @@ public:
                                   const armnn::BatchToSpaceNdDescriptor& descriptor,
                                   const char* name = nullptr) override;
 
+    void VisitBatchNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::BatchNormalizationDescriptor& BatchNormalizationDescriptor,
+                                      const armnn::ConstTensor& mean,
+                                      const armnn::ConstTensor& variance,
+                                      const armnn::ConstTensor& beta,
+                                      const armnn::ConstTensor& gamma,
+                                      const char* name = nullptr) override;
+
     void VisitConstantLayer(const armnn::IConnectableLayer* layer,
                             const armnn::ConstTensor& input,
                             const char* = nullptr) override;

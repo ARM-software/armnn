@@ -24,6 +24,7 @@ struct LayerSelectionInfo
     : m_Layer{layer}
     , m_SplitId{0}
     , m_IsSelected{selector(*layer)}
+    , m_IsVisited(false)
     {
         // fill topology information by storing direct children
         for (auto&& slot = m_Layer->BeginOutputSlots(); slot != m_Layer->EndOutputSlots(); ++slot)
@@ -40,6 +41,12 @@ struct LayerSelectionInfo
                             uint32_t splitId,
                             bool prevSelected)
     {
+        if (m_IsVisited)
+        {
+            return;
+        }
+        m_IsVisited = true;
+
         if (m_SplitId < splitId)
         {
             m_SplitId = splitId;
@@ -107,6 +114,7 @@ struct LayerSelectionInfo
     Layer* m_Layer;
     uint32_t m_SplitId;
     bool m_IsSelected;
+    bool m_IsVisited;
 };
 
 } // namespace <anonymous>

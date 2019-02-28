@@ -840,4 +840,46 @@ BOOST_AUTO_TEST_CASE(SerializeDivision)
     deserializedNetwork->Accept(nameChecker);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeEqual)
+{
+    class VerifyEqualName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitEqualLayer(const armnn::IConnectableLayer*,
+                             const char* name) override
+        {
+            BOOST_TEST(name == "EqualLayer");
+        }
+    };
+
+    const armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo inputTensorInfo2 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Boolean);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const equalLayer = network->AddEqualLayer("EqualLayer");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer1->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo1);
+    inputLayer2->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(1));
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo2);
+    equalLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    equalLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyEqualName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            {inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()},
+                                            {outputTensorInfo.GetShape()},
+                                            {0, 1});
+}
+
 BOOST_AUTO_TEST_SUITE_END()

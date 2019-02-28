@@ -72,6 +72,9 @@ public:
     void VisitDivisionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 
+    void VisitEqualLayer(const armnn::IConnectableLayer* layer,
+                         const char* name = nullptr) override;
+
     void VisitFullyConnectedLayer(const armnn::IConnectableLayer* layer,
                                   const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
                                   const armnn::ConstTensor& weights,

@@ -13,6 +13,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Convolution2d
 * DepthwiseConvolution2d
 * Division
+* Equal
 * FullyConnected
 * Minimum
 * Multiplication

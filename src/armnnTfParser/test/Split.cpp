@@ -106,7 +106,7 @@ struct SplitFixture : public armnnUtils::ParserPrototxtFixture<armnnTfParser::IT
         }
         m_Prototext += R"(
           attr {
-            key: "num_or_size_splits"
+            key: "num_split"
             value {
               i: 2
             }

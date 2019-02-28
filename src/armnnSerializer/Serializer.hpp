@@ -82,6 +82,9 @@ public:
                          armnn::LayerBindingId id,
                          const char* name = nullptr) override;
 
+    void VisitMinimumLayer(const armnn::IConnectableLayer* layer,
+                           const char* name = nullptr) override;
+
     void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,
                                   const char* name = nullptr) override;
 

@@ -260,18 +260,20 @@ void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectab
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_DepthwiseConvolution2dLayer);
 }
 
-// Build FlatBuffer for Division Layer
 void SerializerVisitor::VisitDivisionLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    // Create FlatBuffer BaseLayer
-    auto flatBufferDivisionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Division);
+    auto fbDivisionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Division);
+    auto fbDivisionLayer     = serializer::CreateDivisionLayer(m_flatBufferBuilder, fbDivisionBaseLayer);
 
-    // Create the FlatBuffer DivisionLayer
-    auto flatBufferDivisionLayer =
-        serializer::CreateDivisionLayer(m_flatBufferBuilder, flatBufferDivisionBaseLayer);
+    CreateAnyLayer(fbDivisionLayer.o, serializer::Layer::Layer_DivisionLayer);
+}
 
-    // Add the AnyLayer to the FlatBufferLayers
-    CreateAnyLayer(flatBufferDivisionLayer.o, serializer::Layer::Layer_DivisionLayer);
+void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    auto fbMinimumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Minimum);
+    auto fbMinimumLayer     = serializer::CreateMinimumLayer(m_flatBufferBuilder, fbMinimumBaseLayer);
+
+    CreateAnyLayer(fbMinimumLayer.o, serializer::Layer::Layer_MinimumLayer);
 }
 
 // Build FlatBuffer for Multiplication Layer

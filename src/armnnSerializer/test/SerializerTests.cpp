@@ -255,6 +255,57 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeConstant)
                                             {commonTensorInfo.GetShape()});
 }
 
+BOOST_AUTO_TEST_CASE(SerializeMinimum)
+{
+    class VerifyMinimumName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        explicit VerifyMinimumName(const std::string& expectedMinimumLayerName)
+            : m_ExpectedMinimumLayerName(expectedMinimumLayerName) {}
+
+        void VisitMinimumLayer(const armnn::IConnectableLayer*, const char* name) override
+        {
+            BOOST_TEST(name == m_ExpectedMinimumLayerName.c_str());
+        }
+
+    private:
+        std::string m_ExpectedMinimumLayerName;
+    };
+
+    const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+
+    const std::string minimumLayerName("minimum");
+
+    armnn::IConnectableLayer* const minimumLayer = network->AddMinimumLayer(minimumLayerName.c_str());
+    inputLayer0->GetOutputSlot(0).Connect(minimumLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(minimumLayer->GetInputSlot(1));
+
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+    minimumLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    minimumLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnnSerializer::Serializer serializer;
+    serializer.Serialize(*network);
+
+    std::stringstream stream;
+    serializer.SaveSerializedToStream(stream);
+    BOOST_TEST(stream.str().length() > 0);
+    BOOST_TEST(stream.str().find(minimumLayerName) != stream.str().npos);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyMinimumName nameChecker(minimumLayerName);
+    deserializedNetwork->Accept(nameChecker);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeMultiplication)
 {
     class VerifyMultiplicationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>

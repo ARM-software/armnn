@@ -96,7 +96,8 @@ enum LayerType : uint {
     Constant = 12,
     SpaceToBatchNd = 13,
     BatchToSpaceNd = 14,
-    Division = 15
+    Division = 15,
+    Minimum = 16
 }
 
 // Base layer table to be used as part of other layers
@@ -170,6 +171,10 @@ table FullyConnectedDescriptor {
 
 table InputLayer {
     base:BindableLayerBase;
+}
+
+table MinimumLayer {
+    base:LayerBase;
 }
 
 table MultiplicationLayer {
@@ -299,7 +304,8 @@ union Layer {
     ReshapeLayer,
     SoftmaxLayer,
     SpaceToBatchNdLayer,
-    DivisionLayer
+    DivisionLayer,
+    MinimumLayer
 }
 
 table AnyLayer {

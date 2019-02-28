@@ -2637,8 +2637,8 @@ ParsedTfOperationPtr TfParser::ParseSplit(const tensorflow::NodeDef& nodeDef,
                     % CHECK_LOCATION().AsString()));
     }
 
-    // As Armnn only supports splitter outputs of the same shape, therefore num_splits will be limited to an integer.
-    uint32_t num_split = ReadMandatoryNodeUint32Attribute(nodeDef, "num_or_size_splits");
+    // As Armnn only supports splitter outputs of the same shape, therefore num_split will be limited to an integer.
+    uint32_t num_split = ReadMandatoryNodeUint32Attribute(nodeDef, "num_split");
 
     IOutputSlot& inputSlot = inputs[1 - index].m_IndexedValue->ResolveArmnnOutputSlot(inputs[1 - index].m_Index);
     TensorInfo inputTensorInfo = inputSlot.GetTensorInfo();

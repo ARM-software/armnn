@@ -980,4 +980,45 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeEqual)
                                             {outputTensorInfo.GetShape()},
                                             {0, 1});
 }
+
+BOOST_AUTO_TEST_CASE(SerializeDeserializePad)
+{
+    class VerifyPadName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitPadLayer(const armnn::IConnectableLayer*,
+                           const armnn::PadDescriptor& descriptor,
+                           const char* name) override
+        {
+            BOOST_TEST(name == "PadLayer");
+        }
+    };
+
+    armnn::PadDescriptor desc({{0, 0}, {1, 0}, {1, 1}, {1, 2}});
+
+    const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({1, 2, 3, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 5, 7}, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const padLayer = network->AddPadLayer(desc, "PadLayer");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(padLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    padLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    padLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyPadName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            {inputTensorInfo.GetShape()},
+                                            {outputTensorInfo.GetShape()});
+}
+
 BOOST_AUTO_TEST_SUITE_END()

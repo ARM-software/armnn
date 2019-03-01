@@ -100,7 +100,8 @@ enum LayerType : uint {
     Minimum = 16,
     Equal = 17,
     Maximum = 18,
-    Normalization = 19
+    Normalization = 19,
+    Pad = 20
 }
 
 // Base layer table to be used as part of other layers
@@ -324,6 +325,15 @@ table NormalizationDescriptor {
     dataLayout:DataLayout = NCHW;
 }
 
+table PadLayer {
+    base:LayerBase;
+    descriptor:PadDescriptor;
+}
+
+table PadDescriptor {
+    padList:[uint];
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -344,7 +354,8 @@ union Layer {
     MinimumLayer,
     EqualLayer,
     MaximumLayer,
-    NormalizationLayer
+    NormalizationLayer,
+    PadLayer
 }
 
 table AnyLayer {

@@ -306,6 +306,29 @@ void SerializerVisitor::VisitMultiplicationLayer(const armnn::IConnectableLayer*
     CreateAnyLayer(flatBufferMultiplicationLayer.o, serializer::Layer::Layer_MultiplicationLayer);
 }
 
+void SerializerVisitor::VisitPadLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::PadDescriptor& padDescriptor,
+                                      const char* name)
+{
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Pad);
+
+    std::vector<unsigned int> padList;
+    for (auto& p: padDescriptor.m_PadList)
+    {
+        padList.push_back(p.first);
+        padList.push_back(p.second);
+    }
+
+    auto flatBufferPadDesc = serializer::CreatePadDescriptor(m_flatBufferBuilder,
+                                                             m_flatBufferBuilder.CreateVector(padList));
+
+    auto flatBufferPadLayer = serializer::CreatePadLayer(m_flatBufferBuilder,
+                                                         flatBufferBaseLayer,
+                                                         flatBufferPadDesc);
+
+    CreateAnyLayer(flatBufferPadLayer.o, serializer::Layer::Layer_PadLayer);
+}
+
 void SerializerVisitor::VisitPermuteLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::PermuteDescriptor& permuteDescriptor,
                                           const char* name)

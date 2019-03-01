@@ -198,6 +198,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
     m_ParserFunctions[Layer_MultiplicationLayer]         = &Deserializer::ParseMultiplication;
     m_ParserFunctions[Layer_NormalizationLayer]          = &Deserializer::ParseNormalization;
+    m_ParserFunctions[Layer_PadLayer]                    = &Deserializer::ParsePad;
     m_ParserFunctions[Layer_PermuteLayer]                = &Deserializer::ParsePermute;
     m_ParserFunctions[Layer_Pooling2dLayer]              = &Deserializer::ParsePooling2d;
     m_ParserFunctions[Layer_ReshapeLayer]                = &Deserializer::ParseReshape;
@@ -241,6 +242,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_NormalizationLayer()->base();
         case Layer::Layer_OutputLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_OutputLayer()->base()->base();
+        case Layer::Layer_PadLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_PadLayer()->base();
         case Layer::Layer_PermuteLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_PermuteLayer()->base();
         case Layer::Layer_Pooling2dLayer:
@@ -1082,6 +1085,44 @@ void Deserializer::ParseFullyConnected(GraphPtr graph, unsigned int layerIndex)
                                                   weightsTensor,
                                                   layerName.c_str());
     }
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParsePad(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_PadLayer()->descriptor();
+    auto flatBufferPadList = flatBufferDescriptor->padList();
+
+    if (flatBufferPadList->Length() % 2 != 0)
+    {
+        throw ParseException(boost::str(
+            boost::format("The size of the pad list must be divisible by 2 %1%") % CHECK_LOCATION().AsString()));
+    }
+
+    std::vector<std::pair<unsigned int, unsigned int>> padList;
+    padList.reserve(flatBufferPadList->Length() / 2);
+    for (unsigned int i = 0; i < flatBufferPadList->Length() - 1; i += 2)
+    {
+        padList.emplace_back(flatBufferPadList->Get(i), flatBufferPadList->Get(i+1));
+    }
+
+    armnn::PadDescriptor descriptor(padList);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddPadLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

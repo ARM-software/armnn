@@ -19,6 +19,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Minimum
 * Multiplication
 * Normalization
+* Pad
 * Permute
 * Pooling2d
 * Reshape

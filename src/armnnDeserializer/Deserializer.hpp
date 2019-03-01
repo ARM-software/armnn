@@ -84,6 +84,7 @@ private:
     void ParseMaximum(GraphPtr graph, unsigned int layerIndex);
     void ParseMultiplication(GraphPtr graph, unsigned int layerIndex);
     void ParseNormalization(GraphPtr graph, unsigned int layerIndex);
+    void ParsePad(GraphPtr graph, unsigned int layerIndex);
     void ParsePermute(GraphPtr graph, unsigned int layerIndex);
     void ParsePooling2d(GraphPtr graph, unsigned int layerIndex);
     void ParseReshape(GraphPtr graph, unsigned int layerIndex);

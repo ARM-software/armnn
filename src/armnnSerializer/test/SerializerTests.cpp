@@ -1021,4 +1021,40 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializePad)
                                             {outputTensorInfo.GetShape()});
 }
 
+BOOST_AUTO_TEST_CASE(SerializeRsqrt)
+{
+    class VerifyRsqrtName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitRsqrtLayer(const armnn::IConnectableLayer*, const char* name) override
+        {
+            BOOST_TEST(name == "rsqrt");
+        }
+    };
+
+    const armnn::TensorInfo tensorInfo({ 3, 1, 2 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const rsqrtLayer  = network->AddRsqrtLayer("rsqrt");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(rsqrtLayer->GetInputSlot(0));
+    rsqrtLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    rsqrtLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyRsqrtName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            {tensorInfo.GetShape()},
+                                            {tensorInfo.GetShape()});
+}
+
 BOOST_AUTO_TEST_SUITE_END()

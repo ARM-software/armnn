@@ -114,6 +114,9 @@ public:
                            const armnn::ReshapeDescriptor& reshapeDescriptor,
                            const char* name = nullptr) override;
 
+    void VisitRsqrtLayer(const armnn::IConnectableLayer* layer,
+                         const char* name = nullptr) override;
+
     void VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
                            const armnn::SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;

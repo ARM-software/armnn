@@ -101,7 +101,8 @@ enum LayerType : uint {
     Equal = 17,
     Maximum = 18,
     Normalization = 19,
-    Pad = 20
+    Pad = 20,
+    Rsqrt = 21
 }
 
 // Base layer table to be used as part of other layers
@@ -334,6 +335,10 @@ table PadDescriptor {
     padList:[uint];
 }
 
+table RsqrtLayer {
+    base:LayerBase;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -355,7 +360,8 @@ union Layer {
     EqualLayer,
     MaximumLayer,
     NormalizationLayer,
-    PadLayer
+    PadLayer,
+    RsqrtLayer
 }
 
 table AnyLayer {

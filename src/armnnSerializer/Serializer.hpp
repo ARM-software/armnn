@@ -146,6 +146,9 @@ public:
     void VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
                                  const armnn::NormalizationDescriptor& normalizationDescriptor,
                                  const char* name = nullptr) override;
+
+    void VisitSubtractionLayer(const armnn::IConnectableLayer* layer,
+                               const char* name = nullptr) override;
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.

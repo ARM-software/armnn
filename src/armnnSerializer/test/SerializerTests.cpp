@@ -1250,4 +1250,44 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeResizeBilinear)
                                             {outputTensorInfo.GetShape()});
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeSubtraction)
+{
+    class VerifySubtractionName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitSubtractionLayer(const armnn::IConnectableLayer*, const char* name) override
+        {
+            BOOST_TEST(name == "subtraction");
+        }
+    };
+
+    const armnn::TensorInfo info = armnn::TensorInfo({ 1, 4 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const subtractionLayer = network->AddSubtractionLayer("subtraction");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(1));
+    subtractionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    subtractionLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifySubtractionName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            {info.GetShape(), info.GetShape()},
+                                            {info.GetShape()},
+                                            {0, 1});
+}
+
 BOOST_AUTO_TEST_SUITE_END()

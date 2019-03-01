@@ -106,7 +106,8 @@ enum LayerType : uint {
     Floor = 22,
     BatchNormalization = 23,
     Greater = 24,
-    ResizeBilinear = 25
+    ResizeBilinear = 25,
+    Subtraction = 26
 }
 
 // Base layer table to be used as part of other layers
@@ -302,6 +303,10 @@ table SpaceToBatchNdDescriptor {
     dataLayout:DataLayout;
 }
 
+table SubtractionLayer {
+    base:LayerBase;
+}
+
 table BatchToSpaceNdLayer {
     base:LayerBase;
     descriptor:BatchToSpaceNdDescriptor;
@@ -402,7 +407,8 @@ union Layer {
     RsqrtLayer,
     FloorLayer,
     GreaterLayer,
-    ResizeBilinearLayer
+    ResizeBilinearLayer,
+    SubtractionLayer
 }
 
 table AnyLayer {

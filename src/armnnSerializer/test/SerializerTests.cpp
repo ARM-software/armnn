@@ -1208,4 +1208,46 @@ BOOST_AUTO_TEST_CASE(SerializeRsqrt)
                                             {tensorInfo.GetShape()});
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeResizeBilinear)
+{
+    class VerifyResizeBilinearName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitResizeBilinearLayer(const armnn::IConnectableLayer*,
+                                      const armnn::ResizeBilinearDescriptor& descriptor,
+                                      const char* name) override
+        {
+            BOOST_TEST(name == "ResizeBilinearLayer");
+        }
+    };
+
+    armnn::ResizeBilinearDescriptor desc;
+    desc.m_TargetWidth = 4;
+    desc.m_TargetHeight = 2;
+
+    const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const resizeLayer = network->AddResizeBilinearLayer(desc, "ResizeBilinearLayer");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(resizeLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    resizeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    resizeLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyResizeBilinearName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            {inputTensorInfo.GetShape()},
+                                            {outputTensorInfo.GetShape()});
+}
+
 BOOST_AUTO_TEST_SUITE_END()

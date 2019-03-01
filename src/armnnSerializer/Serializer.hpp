@@ -128,6 +128,10 @@ public:
                            const armnn::ReshapeDescriptor& reshapeDescriptor,
                            const char* name = nullptr) override;
 
+    void VisitResizeBilinearLayer(const armnn::IConnectableLayer* layer,
+                                  const armnn::ResizeBilinearDescriptor& resizeDescriptor,
+                                  const char* name = nullptr) override;
+
     void VisitRsqrtLayer(const armnn::IConnectableLayer* layer,
                          const char* name = nullptr) override;
 

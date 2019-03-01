@@ -424,6 +424,25 @@ void SerializerVisitor::VisitReshapeLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(flatBufferReshapeLayer.o, serializer::Layer::Layer_ReshapeLayer);
 }
 
+void SerializerVisitor::VisitResizeBilinearLayer(const armnn::IConnectableLayer* layer,
+                                                 const armnn::ResizeBilinearDescriptor& resizeDescriptor,
+                                                 const char* name)
+{
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_ResizeBilinear);
+
+    auto flatBufferDescriptor =
+        CreateResizeBilinearDescriptor(m_flatBufferBuilder,
+                                       resizeDescriptor.m_TargetWidth,
+                                       resizeDescriptor.m_TargetHeight,
+                                       GetFlatBufferDataLayout(resizeDescriptor.m_DataLayout));
+
+    auto flatBufferLayer = serializer::CreateResizeBilinearLayer(m_flatBufferBuilder,
+                                                                 flatBufferBaseLayer,
+                                                                 flatBufferDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_ResizeBilinearLayer);
+}
+
 void SerializerVisitor::VisitRsqrtLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbRsqrtBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Rsqrt);

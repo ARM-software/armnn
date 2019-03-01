@@ -105,7 +105,8 @@ enum LayerType : uint {
     Rsqrt = 21,
     Floor = 22,
     BatchNormalization = 23,
-    Greater = 24
+    Greater = 24,
+    ResizeBilinear = 25
 }
 
 // Base layer table to be used as part of other layers
@@ -364,6 +365,17 @@ table BatchNormalizationDescriptor {
     dataLayout:DataLayout;
 }
 
+table ResizeBilinearLayer {
+    base:LayerBase;
+    descriptor:ResizeBilinearDescriptor;
+}
+
+table ResizeBilinearDescriptor {
+    targetWidth:uint;
+    targetHeight:uint;
+    dataLayout:DataLayout;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -389,7 +401,8 @@ union Layer {
     PadLayer,
     RsqrtLayer,
     FloorLayer,
-    GreaterLayer
+    GreaterLayer,
+    ResizeBilinearLayer
 }
 
 table AnyLayer {

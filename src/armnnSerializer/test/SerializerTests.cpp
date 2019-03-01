@@ -508,6 +508,47 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeConvolution2d)
                                             {outputInfo.GetShape()});
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeGreater)
+{
+    class VerifyGreaterName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitGreaterLayer(const armnn::IConnectableLayer*, const char* name) override
+        {
+            BOOST_TEST(name == "greater");
+        }
+    };
+
+    const armnn::TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, armnn::DataType::Float32);
+    const armnn::TensorInfo inputTensorInfo2({ 1, 2, 2, 2 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo({ 1, 2, 2, 2 }, armnn::DataType::Boolean);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const greaterLayer = network->AddGreaterLayer("greater");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer1->GetOutputSlot(0).Connect(greaterLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo1);
+    inputLayer2->GetOutputSlot(0).Connect(greaterLayer->GetInputSlot(1));
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo2);
+    greaterLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    greaterLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyGreaterName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal(*network,
+                                            *deserializedNetwork,
+                                            {inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()},
+                                            {outputTensorInfo.GetShape()},
+                                            {0, 1});
+}
+
 BOOST_AUTO_TEST_CASE(SerializeDeserializeReshape)
 {
     class VerifyReshapeName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>

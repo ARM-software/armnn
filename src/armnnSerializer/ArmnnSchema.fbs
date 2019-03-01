@@ -104,7 +104,8 @@ enum LayerType : uint {
     Pad = 20,
     Rsqrt = 21,
     Floor = 22,
-    BatchNormalization = 23
+    BatchNormalization = 23,
+    Greater = 24
 }
 
 // Base layer table to be used as part of other layers
@@ -182,6 +183,10 @@ table FullyConnectedLayer {
 table FullyConnectedDescriptor {
     biasEnabled:bool = false;
     transposeWeightsMatrix:bool = false;
+}
+
+table GreaterLayer {
+    base:LayerBase;
 }
 
 table InputLayer {
@@ -341,7 +346,6 @@ table PadDescriptor {
     padList:[uint];
 }
 
-
 table RsqrtLayer {
     base:LayerBase;
 }
@@ -384,7 +388,8 @@ union Layer {
     NormalizationLayer,
     PadLayer,
     RsqrtLayer,
-    FloorLayer
+    FloorLayer,
+    GreaterLayer
 }
 
 table AnyLayer {

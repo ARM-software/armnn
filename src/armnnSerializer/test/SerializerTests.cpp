@@ -255,6 +255,48 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeConstant)
                                             {commonTensorInfo.GetShape()});
 }
 
+BOOST_AUTO_TEST_CASE(SerializeFloor)
+{
+    class VerifyFloorName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        void VisitMultiplicationLayer(const armnn::IConnectableLayer*, const char* name) override
+        {
+            BOOST_TEST(name == "floor");
+        }
+    };
+
+    const armnn::TensorInfo info({4,4}, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(1);
+
+    const char* floorLayerName = "floor";
+
+    armnn::IConnectableLayer* const floorLayer = network->AddFloorLayer(floorLayerName);
+    inputLayer->GetOutputSlot(0).Connect(floorLayer->GetInputSlot(0));
+
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+    floorLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    floorLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnnSerializer::Serializer serializer;
+    serializer.Serialize(*network);
+
+    std::stringstream stream;
+    serializer.SaveSerializedToStream(stream);
+    BOOST_TEST(stream.str().length() > 0);
+    BOOST_TEST(stream.str().find(floorLayerName) != stream.str().npos);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyFloorName nameChecker;
+    deserializedNetwork->Accept(nameChecker);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeMinimum)
 {
     class VerifyMinimumName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>

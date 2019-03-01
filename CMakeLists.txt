@@ -602,6 +602,7 @@ if(BUILD_UNIT_TESTS)
                 src/armnnDeserializer/test/DeserializeConvolution2d.cpp
                 src/armnnDeserializer/test/DeserializeDivision.cpp
                 src/armnnDeserializer/test/DeserializeEqual.cpp
+                src/armnnDeserializer/test/DeserializeFloor.cpp
                 src/armnnDeserializer/test/DeserializeFullyConnected.cpp
                 src/armnnDeserializer/test/DeserializeMultiplication.cpp
                 src/armnnDeserializer/test/DeserializeNormalization.cpp

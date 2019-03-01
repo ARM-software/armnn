@@ -75,6 +75,9 @@ public:
     void VisitEqualLayer(const armnn::IConnectableLayer* layer,
                          const char* name = nullptr) override;
 
+    void VisitFloorLayer(const armnn::IConnectableLayer *layer,
+                         const char *name = nullptr) override;
+
     void VisitFullyConnectedLayer(const armnn::IConnectableLayer* layer,
                                   const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
                                   const armnn::ConstTensor& weights,

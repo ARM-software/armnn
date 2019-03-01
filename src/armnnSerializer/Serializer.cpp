@@ -276,6 +276,14 @@ void SerializerVisitor::VisitEqualLayer(const armnn::IConnectableLayer* layer, c
     CreateAnyLayer(fbEqualLayer.o, serializer::Layer::Layer_EqualLayer);
 }
 
+void SerializerVisitor::VisitFloorLayer(const armnn::IConnectableLayer *layer, const char *name)
+{
+    auto flatBufferFloorBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Floor);
+    auto flatBufferFloorLayer = serializer::CreateFloorLayer(m_flatBufferBuilder, flatBufferFloorBaseLayer);
+
+    CreateAnyLayer(flatBufferFloorLayer.o, serializer::Layer::Layer_FloorLayer);
+}
+
 void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbMinimumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Minimum);

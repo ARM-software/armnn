@@ -877,7 +877,7 @@ void Deserializer::ParseBatchNormalization(GraphPtr graph, unsigned int layerInd
     CHECK_VALID_SIZE(outputs.size(), 1);
     auto outputInfo = ToTensorInfo(outputs[0]);
 
-    auto layerName = boost::str(boost::format("BatchNormalization:%1%") % layerIndex);
+    auto layerName = GetLayerName(graph, layerIndex);
 
     auto serializerLayer = graph->layers()->Get(layerIndex)->layer_as_BatchNormalizationLayer();
     auto serializerDescriptor = serializerLayer->descriptor();

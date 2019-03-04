@@ -943,7 +943,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeBatchNormalization)
                                       const armnn::ConstTensor&,
                                       const char* name) override
         {
-            BOOST_TEST(name == "BatchNormalization:1");
+            BOOST_TEST(name == "BatchNormalizationLayer");
         }
     };
 

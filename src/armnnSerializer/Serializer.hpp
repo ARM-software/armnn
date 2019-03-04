@@ -147,6 +147,10 @@ public:
                                  const armnn::NormalizationDescriptor& normalizationDescriptor,
                                  const char* name = nullptr) override;
 
+    void VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
+                                const char* name = nullptr) override;
+
     void VisitSubtractionLayer(const armnn::IConnectableLayer* layer,
                                const char* name = nullptr) override;
 private:

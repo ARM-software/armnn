@@ -588,6 +588,31 @@ void SerializerVisitor::VisitNormalizationLayer(const armnn::IConnectableLayer* 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_NormalizationLayer);
 }
 
+void SerializerVisitor::VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
+                                               const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
+                                               const char* name)
+{
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_StridedSlice);
+
+    auto flatBufferDescriptor =
+        CreateStridedSliceDescriptor(m_flatBufferBuilder,
+                                     m_flatBufferBuilder.CreateVector(stridedSliceDescriptor.m_Begin),
+                                     m_flatBufferBuilder.CreateVector(stridedSliceDescriptor.m_End),
+                                     m_flatBufferBuilder.CreateVector(stridedSliceDescriptor.m_Stride),
+                                     stridedSliceDescriptor.m_BeginMask,
+                                     stridedSliceDescriptor.m_EndMask,
+                                     stridedSliceDescriptor.m_ShrinkAxisMask,
+                                     stridedSliceDescriptor.m_EllipsisMask,
+                                     stridedSliceDescriptor.m_NewAxisMask,
+                                     GetFlatBufferDataLayout(stridedSliceDescriptor.m_DataLayout));
+
+    auto flatBufferLayer = serializer::CreateStridedSliceLayer(m_flatBufferBuilder,
+                                                               flatBufferBaseLayer,
+                                                               flatBufferDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_StridedSliceLayer);
+}
+
 void SerializerVisitor::VisitSubtractionLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbSubtractionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Subtraction);

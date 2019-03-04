@@ -95,6 +95,7 @@ private:
     void ParseRsqrt(GraphPtr graph, unsigned int layerIndex);
     void ParseSoftmax(GraphPtr graph, unsigned int layerIndex);
     void ParseSpaceToBatchNd(GraphPtr graph, unsigned int layerIndex);
+    void ParseStridedSlice(GraphPtr graph, unsigned int layerIndex);
     void ParseSubtraction(GraphPtr graph, unsigned int layerIndex);
 
     void RegisterOutputSlotOfConnection(uint32_t connectionIndex, armnn::IOutputSlot* slot);

@@ -209,6 +209,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_RsqrtLayer]                  = &Deserializer::ParseRsqrt;
     m_ParserFunctions[Layer_SoftmaxLayer]                = &Deserializer::ParseSoftmax;
     m_ParserFunctions[Layer_SpaceToBatchNdLayer]         = &Deserializer::ParseSpaceToBatchNd;
+    m_ParserFunctions[Layer_StridedSliceLayer]           = &Deserializer::ParseStridedSlice;
     m_ParserFunctions[Layer_SubtractionLayer]            = &Deserializer::ParseSubtraction;
 }
 
@@ -270,6 +271,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_SoftmaxLayer()->base();
         case Layer::Layer_SpaceToBatchNdLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SpaceToBatchNdLayer()->base();
+        case Layer::Layer_StridedSliceLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_StridedSliceLayer()->base();
         case Layer::Layer_SubtractionLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SubtractionLayer()->base();
         case Layer::Layer_NONE:
@@ -1634,6 +1637,51 @@ void Deserializer::ParseRsqrt(GraphPtr graph, unsigned int layerIndex)
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddRsqrtLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseStridedSlice(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_StridedSliceLayer()->descriptor();
+
+    auto flatBufferBegin = flatBufferDescriptor->begin();
+    auto flatBufferEnd = flatBufferDescriptor->end();
+    auto flatBufferStride = flatBufferDescriptor->stride();
+
+    if (!(flatBufferBegin->Length() == flatBufferEnd->Length() &&
+          flatBufferBegin->Length() == flatBufferStride->Length()))
+    {
+        throw ParseException(boost::str(
+            boost::format("The size of the begin, end, and stride must be equal %1%") % CHECK_LOCATION().AsString()));
+    }
+
+    std::vector<int> begin(flatBufferBegin->begin(), flatBufferBegin->end());
+    std::vector<int> end(flatBufferEnd->begin(), flatBufferEnd->end());
+    std::vector<int> stride(flatBufferStride->begin(), flatBufferStride->end());
+
+    armnn::StridedSliceDescriptor descriptor(begin, end, stride);
+    descriptor.m_BeginMask = flatBufferDescriptor->beginMask();
+    descriptor.m_EndMask = flatBufferDescriptor->endMask();
+    descriptor.m_ShrinkAxisMask = flatBufferDescriptor->shrinkAxisMask();
+    descriptor.m_EllipsisMask = flatBufferDescriptor->ellipsisMask();
+    descriptor.m_NewAxisMask = flatBufferDescriptor->newAxisMask();
+    descriptor.m_DataLayout = ToDataLayout(flatBufferDescriptor->dataLayout());
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddStridedSliceLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

@@ -107,7 +107,8 @@ enum LayerType : uint {
     BatchNormalization = 23,
     Greater = 24,
     ResizeBilinear = 25,
-    Subtraction = 26
+    Subtraction = 26,
+    StridedSlice = 27
 }
 
 // Base layer table to be used as part of other layers
@@ -381,6 +382,23 @@ table ResizeBilinearDescriptor {
     dataLayout:DataLayout;
 }
 
+table StridedSliceLayer {
+    base:LayerBase;
+    descriptor:StridedSliceDescriptor;
+}
+
+table StridedSliceDescriptor {
+    begin:[int];
+    end:[int];
+    stride:[int];
+    beginMask:int;
+    endMask:int;
+    shrinkAxisMask:int;
+    ellipsisMask:int;
+    newAxisMask:int;
+    dataLayout:DataLayout;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -408,7 +426,8 @@ union Layer {
     FloorLayer,
     GreaterLayer,
     ResizeBilinearLayer,
-    SubtractionLayer
+    SubtractionLayer,
+    StridedSliceLayer
 }
 
 table AnyLayer {

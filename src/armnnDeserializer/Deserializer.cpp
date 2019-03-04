@@ -196,6 +196,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_EqualLayer]                  = &Deserializer::ParseEqual;
     m_ParserFunctions[Layer_FullyConnectedLayer]         = &Deserializer::ParseFullyConnected;
     m_ParserFunctions[Layer_FloorLayer]                  = &Deserializer::ParseFloor;
+    m_ParserFunctions[Layer_GatherLayer]                 = &Deserializer::ParseGather;
     m_ParserFunctions[Layer_GreaterLayer]                = &Deserializer::ParseGreater;
     m_ParserFunctions[Layer_MinimumLayer]                = &Deserializer::ParseMinimum;
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
@@ -241,6 +242,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_FullyConnectedLayer()->base();
         case Layer::Layer_FloorLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_FloorLayer()->base();
+        case Layer::Layer_GatherLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_GatherLayer()->base();
         case Layer::Layer_GreaterLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_GreaterLayer()->base();
         case Layer::Layer_InputLayer:
@@ -468,7 +471,7 @@ Deserializer::LayerBaseRawPtrVector Deserializer::GetGraphOutputs(const GraphPtr
 }
 
 Deserializer::TensorRawPtrVector Deserializer::GetInputs(const GraphPtr& graphPtr,
-                                                                   unsigned int layerIndex)
+                                                         unsigned int layerIndex)
 {
     CHECK_LAYERS(graphPtr, 0, layerIndex);
     auto layer = GetBaseLayer(graphPtr, layerIndex);
@@ -611,7 +614,7 @@ INetworkPtr Deserializer::CreateNetworkFromGraph(GraphPtr graph)
 }
 
 BindingPointInfo Deserializer::GetNetworkInputBindingInfo(unsigned int layerIndex,
-                                                               const std::string& name) const
+                                                          const std::string& name) const
 {
     for (auto inputBinding : m_InputBindings)
     {
@@ -1708,6 +1711,29 @@ void Deserializer::ParseSubtraction(GraphPtr graph, unsigned int layerIndex)
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseGather(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+
+    IConnectableLayer* layer = m_Network->AddGatherLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+
 }
 
 } // namespace armnnDeserializer

@@ -108,7 +108,8 @@ enum LayerType : uint {
     Greater = 24,
     ResizeBilinear = 25,
     Subtraction = 26,
-    StridedSlice = 27
+    StridedSlice = 27,
+    Gather = 28
 }
 
 // Base layer table to be used as part of other layers
@@ -186,6 +187,10 @@ table FullyConnectedLayer {
 table FullyConnectedDescriptor {
     biasEnabled:bool = false;
     transposeWeightsMatrix:bool = false;
+}
+
+table GatherLayer {
+    base:LayerBase;
 }
 
 table GreaterLayer {
@@ -427,7 +432,8 @@ union Layer {
     GreaterLayer,
     ResizeBilinearLayer,
     SubtractionLayer,
-    StridedSliceLayer
+    StridedSliceLayer,
+    GatherLayer
 }
 
 table AnyLayer {

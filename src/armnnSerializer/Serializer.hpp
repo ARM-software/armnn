@@ -92,6 +92,9 @@ public:
                                   const armnn::Optional<armnn::ConstTensor>& biases,
                                   const char* name = nullptr) override;
 
+    void VisitGatherLayer(const armnn::IConnectableLayer* layer,
+                          const char* name = nullptr) override;
+                          
     void VisitGreaterLayer(const armnn::IConnectableLayer* layer,
                            const char* name = nullptr) override;
 

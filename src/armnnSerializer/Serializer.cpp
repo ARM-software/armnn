@@ -329,6 +329,16 @@ void SerializerVisitor::VisitMaximumLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(fbMaximumLayer.o, serializer::Layer::Layer_MaximumLayer);
 }
 
+void SerializerVisitor::VisitGatherLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Gather);
+
+    auto flatBufferLayer = CreateGatherLayer(m_flatBufferBuilder,
+                                             fbBaseLayer);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_GatherLayer);
+}
+
 void SerializerVisitor::VisitGreaterLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbGreaterBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Greater);

@@ -1724,16 +1724,13 @@ void Deserializer::ParseGather(GraphPtr graph, unsigned int layerIndex)
     CHECK_VALID_SIZE(outputs.size(), 1);
 
     auto layerName = GetLayerName(graph, layerIndex);
-
     IConnectableLayer* layer = m_Network->AddGatherLayer(layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);
-
 }
 
 } // namespace armnnDeserializer

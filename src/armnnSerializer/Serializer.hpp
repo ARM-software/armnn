@@ -19,7 +19,7 @@ namespace armnnSerializer
 class SerializerVisitor : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
 {
 public:
-    SerializerVisitor() : m_layerId(0) {};
+    SerializerVisitor() : m_layerId(0) {}
     ~SerializerVisitor() {}
 
     flatbuffers::FlatBufferBuilder& GetFlatBufferBuilder()
@@ -94,7 +94,7 @@ public:
 
     void VisitGatherLayer(const armnn::IConnectableLayer* layer,
                           const char* name = nullptr) override;
-                          
+
     void VisitGreaterLayer(const armnn::IConnectableLayer* layer,
                            const char* name = nullptr) override;
 

@@ -66,8 +66,8 @@ void CheckDeserializedNetworkAgainstOriginal(const armnn::INetwork& deserialized
                                              const armnn::INetwork& originalNetwork,
                                              const std::vector<armnn::TensorShape>& inputShapes,
                                              const std::vector<armnn::TensorShape>& outputShapes,
-                                             const std::vector<armnn::LayerBindingId>& inputBindingIds={0},
-                                             const std::vector<armnn::LayerBindingId>& outputBindingIds={0})
+                                             const std::vector<armnn::LayerBindingId>& inputBindingIds = {0},
+                                             const std::vector<armnn::LayerBindingId>& outputBindingIds = {0})
 {
     BOOST_CHECK(inputShapes.size() == inputBindingIds.size());
     BOOST_CHECK(outputShapes.size() == outputBindingIds.size());
@@ -227,12 +227,12 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeConstant)
     armnn::ConstTensor constTensor(commonTensorInfo, constantData);
 
     // Builds up the structure of the network.
-    armnn::INetworkPtr net(armnn::INetwork::Create());
+    armnn::INetworkPtr network(armnn::INetwork::Create());
 
-    armnn::IConnectableLayer* input = net->AddInputLayer(0);
-    armnn::IConnectableLayer* constant = net->AddConstantLayer(constTensor, "constant");
-    armnn::IConnectableLayer* add = net->AddAdditionLayer();
-    armnn::IConnectableLayer* output = net->AddOutputLayer(0);
+    armnn::IConnectableLayer* input = network->AddInputLayer(0);
+    armnn::IConnectableLayer* constant = network->AddConstantLayer(constTensor, "constant");
+    armnn::IConnectableLayer* add = network->AddAdditionLayer();
+    armnn::IConnectableLayer* output = network->AddOutputLayer(0);
 
     input->GetOutputSlot(0).Connect(add->GetInputSlot(0));
     constant->GetOutputSlot(0).Connect(add->GetInputSlot(1));
@@ -243,14 +243,14 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeConstant)
     constant->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
     add->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
 
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*net));
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     BOOST_CHECK(deserializedNetwork);
 
     VerifyConstantName nameChecker;
     deserializedNetwork->Accept(nameChecker);
 
     CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *net,
+                                                   *network,
                                                    {commonTensorInfo.GetShape()},
                                                    {commonTensorInfo.GetShape()});
 }
@@ -542,8 +542,8 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeGreater)
     VerifyGreaterName nameChecker;
     deserializedNetwork->Accept(nameChecker);
 
-    CheckDeserializedNetworkAgainstOriginal<float>(*network,
-                                                   *deserializedNetwork,
+    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
+                                                   *network,
                                                    {inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()},
                                                    {outputTensorInfo.GetShape()},
                                                    {0, 1});
@@ -992,8 +992,8 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeBatchNormalization)
     VerifyBatchNormalizationName nameChecker;
     deserializedNetwork->Accept(nameChecker);
 
-    CheckDeserializedNetworkAgainstOriginal<float>(*network,
-                                                   *deserializedNetwork,
+    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
+                                                   *network,
                                                    {inputInfo.GetShape()},
                                                    {outputInfo.GetShape()});
 }
@@ -1127,10 +1127,10 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeEqual)
     deserializedNetwork->Accept(nameChecker);
 
     CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                    *network,
-                                                    {inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()},
-                                                    {outputTensorInfo.GetShape()},
-                                                    {0, 1});
+                                                   *network,
+                                                   {inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()},
+                                                   {outputTensorInfo.GetShape()},
+                                                   {0, 1});
 }
 
 BOOST_AUTO_TEST_CASE(SerializeDeserializePad)
@@ -1168,9 +1168,9 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializePad)
     deserializedNetwork->Accept(nameChecker);
 
     CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                    *network,
-                                                    {inputTensorInfo.GetShape()},
-                                                    {outputTensorInfo.GetShape()});
+                                                   *network,
+                                                   {inputTensorInfo.GetShape()},
+                                                   {outputTensorInfo.GetShape()});
 }
 
 BOOST_AUTO_TEST_CASE(SerializeRsqrt)

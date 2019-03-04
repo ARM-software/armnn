@@ -84,8 +84,9 @@ private:
     void ParseFullyConnected(GraphPtr graph, unsigned int layerIndex);
     void ParseGather(GraphPtr graph, unsigned int layerIndex);
     void ParseGreater(GraphPtr graph, unsigned int layerIndex);
-    void ParseMinimum(GraphPtr graph, unsigned int layerIndex);
     void ParseMaximum(GraphPtr graph, unsigned int layerIndex);
+    void ParseMean(GraphPtr graph, unsigned int layerIndex);
+    void ParseMinimum(GraphPtr graph, unsigned int layerIndex);
     void ParseMultiplication(GraphPtr graph, unsigned int layerIndex);
     void ParseNormalization(GraphPtr graph, unsigned int layerIndex);
     void ParsePad(GraphPtr graph, unsigned int layerIndex);

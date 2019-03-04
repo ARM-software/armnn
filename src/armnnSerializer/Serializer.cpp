@@ -313,22 +313,6 @@ void SerializerVisitor::VisitFloorLayer(const armnn::IConnectableLayer *layer, c
     CreateAnyLayer(flatBufferFloorLayer.o, serializer::Layer::Layer_FloorLayer);
 }
 
-void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer, const char* name)
-{
-    auto fbMinimumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Minimum);
-    auto fbMinimumLayer     = serializer::CreateMinimumLayer(m_flatBufferBuilder, fbMinimumBaseLayer);
-
-    CreateAnyLayer(fbMinimumLayer.o, serializer::Layer::Layer_MinimumLayer);
-}
-
-void SerializerVisitor::VisitMaximumLayer(const armnn::IConnectableLayer* layer, const char* name)
-{
-    auto fbMaximumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Maximum);
-    auto fbMaximumLayer     = serializer::CreateMaximumLayer(m_flatBufferBuilder, fbMaximumBaseLayer);
-
-    CreateAnyLayer(fbMaximumLayer.o, serializer::Layer::Layer_MaximumLayer);
-}
-
 void SerializerVisitor::VisitGatherLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbGatherBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Gather);
@@ -340,23 +324,50 @@ void SerializerVisitor::VisitGatherLayer(const armnn::IConnectableLayer* layer, 
 void SerializerVisitor::VisitGreaterLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbGreaterBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Greater);
-    auto fbGreaterLayer     = serializer::CreateGreaterLayer(m_flatBufferBuilder, fbGreaterBaseLayer);
+    auto fbGreaterLayer = serializer::CreateGreaterLayer(m_flatBufferBuilder, fbGreaterBaseLayer);
 
     CreateAnyLayer(fbGreaterLayer.o, serializer::Layer::Layer_GreaterLayer);
 }
 
-// Build FlatBuffer for Multiplication Layer
+void SerializerVisitor::VisitMaximumLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    auto fbMaximumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Maximum);
+    auto fbMaximumLayer     = serializer::CreateMaximumLayer(m_flatBufferBuilder, fbMaximumBaseLayer);
+
+    CreateAnyLayer(fbMaximumLayer.o, serializer::Layer::Layer_MaximumLayer);
+}
+
+void SerializerVisitor::VisitMeanLayer(const armnn::IConnectableLayer* layer,
+                                       const armnn::MeanDescriptor& descriptor,
+                                       const char* name)
+{
+    auto fbMeanBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Mean);
+    auto fbMeanDescriptor = serializer::CreateMeanDescriptor(m_flatBufferBuilder,
+                                                             m_flatBufferBuilder.CreateVector(descriptor.m_Axis),
+                                                             descriptor.m_KeepDims);
+
+    auto fbMeanLayer = serializer::CreateMeanLayer(m_flatBufferBuilder,
+                                                   fbMeanBaseLayer,
+                                                   fbMeanDescriptor);
+
+    CreateAnyLayer(fbMeanLayer.o, serializer::Layer::Layer_MeanLayer);
+}
+
+void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    auto fbMinimumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Minimum);
+    auto fbMinimumLayer     = serializer::CreateMinimumLayer(m_flatBufferBuilder, fbMinimumBaseLayer);
+
+    CreateAnyLayer(fbMinimumLayer.o, serializer::Layer::Layer_MinimumLayer);
+}
+
 void SerializerVisitor::VisitMultiplicationLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
-    // Create FlatBuffer BaseLayer
-    auto flatBufferMultiplicationBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Multiplication);
+    auto fbMultiplicationBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Multiplication);
+    auto fbMultiplicationLayer     = serializer::CreateMultiplicationLayer(m_flatBufferBuilder,
+                                                                           fbMultiplicationBaseLayer);
 
-    // Create the FlatBuffer MultiplicationLayer
-    auto flatBufferMultiplicationLayer =
-        serializer::CreateMultiplicationLayer(m_flatBufferBuilder, flatBufferMultiplicationBaseLayer);
-
-    // Add the AnyLayer to the FlatBufferLayers
-    CreateAnyLayer(flatBufferMultiplicationLayer.o, serializer::Layer::Layer_MultiplicationLayer);
+    CreateAnyLayer(fbMultiplicationLayer.o, serializer::Layer::Layer_MultiplicationLayer);
 }
 
 void SerializerVisitor::VisitPadLayer(const armnn::IConnectableLayer* layer,

@@ -198,8 +198,9 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_FloorLayer]                  = &Deserializer::ParseFloor;
     m_ParserFunctions[Layer_GatherLayer]                 = &Deserializer::ParseGather;
     m_ParserFunctions[Layer_GreaterLayer]                = &Deserializer::ParseGreater;
-    m_ParserFunctions[Layer_MinimumLayer]                = &Deserializer::ParseMinimum;
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
+    m_ParserFunctions[Layer_MeanLayer]                   = &Deserializer::ParseMean;
+    m_ParserFunctions[Layer_MinimumLayer]                = &Deserializer::ParseMinimum;
     m_ParserFunctions[Layer_MultiplicationLayer]         = &Deserializer::ParseMultiplication;
     m_ParserFunctions[Layer_NormalizationLayer]          = &Deserializer::ParseNormalization;
     m_ParserFunctions[Layer_PadLayer]                    = &Deserializer::ParsePad;
@@ -248,6 +249,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_GreaterLayer()->base();
         case Layer::Layer_InputLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_InputLayer()->base()->base();
+        case Layer::Layer_MeanLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_MeanLayer()->base();
         case Layer::Layer_MinimumLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_MinimumLayer()->base();
         case Layer::Layer_MaximumLayer:
@@ -1725,6 +1728,34 @@ void Deserializer::ParseGather(GraphPtr graph, unsigned int layerIndex)
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddGatherLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseMean(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_MeanLayer()->descriptor();
+    auto flatBufferAxis = flatBufferDescriptor->axis();
+    auto flatBufferKeepDims = flatBufferDescriptor->keepDims();
+
+    armnn::MeanDescriptor descriptor;
+    descriptor.m_Axis = std::vector<unsigned int>(flatBufferAxis->begin(), flatBufferAxis->end());
+    descriptor.m_KeepDims = flatBufferKeepDims;
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddMeanLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

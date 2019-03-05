@@ -1146,7 +1146,7 @@ void Deserializer::ParseFloor(GraphPtr graph, unsigned int layerIndex)
 
     armnn::IConnectableLayer* layer;
 
-    layer = m_Network->AddFloorLayer();
+    layer = m_Network->AddFloorLayer(layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

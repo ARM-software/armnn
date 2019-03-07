@@ -111,7 +111,8 @@ enum LayerType : uint {
     StridedSlice = 27,
     Gather = 28,
     Mean = 29,
-    Merger = 30
+    Merger = 30,
+    L2Normalization = 31
 }
 
 // Base layer table to be used as part of other layers
@@ -201,6 +202,15 @@ table GreaterLayer {
 
 table InputLayer {
     base:BindableLayerBase;
+}
+
+table L2NormalizationLayer {
+    base:LayerBase;
+    descriptor:L2NormalizationDescriptor;
+}
+
+table L2NormalizationDescriptor {
+    dataLayout:DataLayout = NCHW;
 }
 
 table MinimumLayer {
@@ -463,7 +473,8 @@ union Layer {
     StridedSliceLayer,
     GatherLayer,
     MeanLayer,
-    MergerLayer
+    MergerLayer,
+    L2NormalizationLayer
 }
 
 table AnyLayer {

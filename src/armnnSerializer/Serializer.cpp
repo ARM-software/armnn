@@ -329,6 +329,23 @@ void SerializerVisitor::VisitGreaterLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(fbGreaterLayer.o, serializer::Layer::Layer_GreaterLayer);
 }
 
+void SerializerVisitor::VisitL2NormalizationLayer(const armnn::IConnectableLayer* layer,
+                                                  const armnn::L2NormalizationDescriptor& l2NormalizationDescriptor,
+                                                  const char* name)
+{
+    // Create FlatBuffer BaseLayer
+    auto fbBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_L2Normalization);
+
+    // Create the FlatBuffer L2Normalization Descriptor
+    auto fbDescriptor = serializer::CreateL2NormalizationDescriptor(
+            m_flatBufferBuilder, GetFlatBufferDataLayout(l2NormalizationDescriptor.m_DataLayout));
+
+    // Create Flatuffer layer
+    auto fbLayer = serializer::CreateL2NormalizationLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_L2NormalizationLayer);
+}
+
 void SerializerVisitor::VisitMaximumLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbMaximumBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Maximum);

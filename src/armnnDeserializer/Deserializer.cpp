@@ -198,6 +198,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_FloorLayer]                  = &Deserializer::ParseFloor;
     m_ParserFunctions[Layer_GatherLayer]                 = &Deserializer::ParseGather;
     m_ParserFunctions[Layer_GreaterLayer]                = &Deserializer::ParseGreater;
+    m_ParserFunctions[Layer_L2NormalizationLayer]        = &Deserializer::ParseL2Normalization;
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
     m_ParserFunctions[Layer_MeanLayer]                   = &Deserializer::ParseMean;
     m_ParserFunctions[Layer_MinimumLayer]                = &Deserializer::ParseMinimum;
@@ -250,6 +251,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_GreaterLayer()->base();
         case Layer::Layer_InputLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_InputLayer()->base()->base();
+        case Layer::Layer_L2NormalizationLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_L2NormalizationLayer()->base();
         case Layer::Layer_MeanLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_MeanLayer()->base();
         case Layer::Layer_MinimumLayer:
@@ -1069,6 +1072,31 @@ void Deserializer::ParseGreater(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseL2Normalization(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+    auto outputInfo = ToTensorInfo(outputs[0]);
+
+    auto flatBufferLayer = graph->layers()->Get(layerIndex)->layer_as_L2NormalizationLayer();
+    auto flatBufferDescriptor = flatBufferLayer->descriptor();
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    armnn::L2NormalizationDescriptor descriptor;
+    descriptor.m_DataLayout = ToDataLayout(flatBufferDescriptor->dataLayout());
+
+    IConnectableLayer* layer = m_Network->AddL2NormalizationLayer(descriptor, layerName.c_str());
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

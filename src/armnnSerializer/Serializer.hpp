@@ -102,6 +102,10 @@ public:
                          armnn::LayerBindingId id,
                          const char* name = nullptr) override;
 
+    void VisitL2NormalizationLayer(const armnn::IConnectableLayer* layer,
+                                   const armnn::L2NormalizationDescriptor& l2NormalizationDescriptor,
+                                   const char* name = nullptr) override;
+
     void VisitMeanLayer(const armnn::IConnectableLayer* layer,
                         const armnn::MeanDescriptor& descriptor,
                         const char* name) override;

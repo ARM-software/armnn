@@ -422,6 +422,63 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeMaximum)
                                                    {0, 1});
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeL2Normalization)
+{
+    class VerifyL2NormalizationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+    public:
+        explicit VerifyL2NormalizationName(const std::string& expectedL2NormalizationLayerName)
+        : m_ExpectedL2NormalizationLayerName(expectedL2NormalizationLayerName) {}
+
+        void VisitL2NormalizationLayer(const armnn::IConnectableLayer*,
+                                       const armnn::L2NormalizationDescriptor&,
+                                       const char* name) override
+        {
+            BOOST_TEST(name == m_ExpectedL2NormalizationLayerName.c_str());
+        }
+    private:
+        std::string m_ExpectedL2NormalizationLayerName;
+    };
+
+    const armnn::TensorInfo info({ 1, 2, 1, 5 }, armnn::DataType::Float32);
+
+    armnn::L2NormalizationDescriptor desc;
+    desc.m_DataLayout = armnn::DataLayout::NCHW;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+
+    const char* l2NormLayerName = "l2Normalization";
+
+    armnn::IConnectableLayer* const l2NormLayer = network->AddL2NormalizationLayer(desc, l2NormLayerName);
+    inputLayer0->GetOutputSlot(0).Connect(l2NormLayer->GetInputSlot(0));
+
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+        l2NormLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    l2NormLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnnSerializer::Serializer serializer;
+    serializer.Serialize(*network);
+
+    std::stringstream stream;
+    serializer.SaveSerializedToStream(stream);
+    BOOST_TEST(stream.str().length() > 0);
+    BOOST_TEST(stream.str().find(l2NormLayerName) != stream.str().npos);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
+    BOOST_CHECK(deserializedNetwork);
+
+    VerifyL2NormalizationName nameChecker(l2NormLayerName);
+    deserializedNetwork->Accept(nameChecker);
+
+    CheckDeserializedNetworkAgainstOriginal<float>(*network,
+                                                   *deserializedNetwork,
+                                                   { info.GetShape() },
+                                                   { info.GetShape() });
+}
+
 BOOST_AUTO_TEST_CASE(SerializeDeserializeMultiplication)
 {
     class VerifyMultiplicationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>

@@ -179,8 +179,6 @@ if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER)
                  HINTS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib)
 
     message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
-
-    include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
 endif()
 
 # Flatbuffers schema support for TF Lite
@@ -196,7 +194,6 @@ if(BUILD_TF_LITE_PARSER)
 endif()
 
 if(BUILD_ARMNN_SERIALIZER)
-    include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
     add_definitions(-DARMNN_SERIALIZER)
     add_definitions(-DARMNN_SERIALIZER_SCHEMA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/src/armnnSerializer/ArmnnSchema.fbs")
 endif()

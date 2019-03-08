@@ -15,11 +15,13 @@ foreach(cmake_file ${additional_cmake_files})
     include(${cmake_file})
 endforeach()
 
+add_subdirectory(samples)
+add_subdirectory(src/armnnTfLiteParser)
+add_subdirectory(src/armnnSerializer)
+
 if (BUILD_TESTS)
     add_subdirectory(tests)
 endif()
-
-add_subdirectory(samples)
 
 # Include the additional cmake files in their own target so that they will appear nicely in IDEs
 add_custom_target(AdditionalCMakeFiles SOURCES ${additional_cmake_files})
@@ -131,60 +133,9 @@ if(BUILD_TF_PARSER)
     target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
 endif()
 
-if(BUILD_TF_LITE_PARSER)
-    set(armnn_tf_lite_parser_sources)
-    list(APPEND armnn_tf_lite_parser_sources
-        include/armnnTfLiteParser/ITfLiteParser.hpp
-        src/armnnTfLiteParser/TfLiteParser.hpp
-        src/armnnTfLiteParser/TfLiteParser.cpp
-        )
-
-    add_library_ex(armnnTfLiteParser SHARED ${armnn_tf_lite_parser_sources})
-
-    target_include_directories(armnnTfLiteParser PRIVATE src/armnn)
-    target_include_directories(armnnTfLiteParser PRIVATE src/armnnUtils)
-    target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
-
-    target_link_libraries(armnnTfLiteParser ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
-    target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
-endif()
-
-if(BUILD_ARMNN_SERIALIZER)
-    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer/ArmnnSchema_generated.h)
-    add_custom_command (
-        OUTPUT  src/armnnSerializer/ArmnnSchema_generated.h
-        COMMAND ${FLATC_DIR}/flatc -o ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer --cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/src/armnnSerializer/ArmnnSchema.fbs
-    )
-
-    set(armnn_serializer_sources)
-    list(APPEND armnn_serializer_sources
-        include/armnnSerializer/ISerializer.hpp
-        include/armnnDeserializer/IDeserializer.hpp
-        src/armnnSerializer/ArmnnSchema_generated.h
-        src/armnnSerializer/Serializer.hpp
-        src/armnnSerializer/Serializer.cpp
-        src/armnnSerializer/SerializerUtils.hpp
-        src/armnnSerializer/SerializerUtils.cpp
-        src/armnnDeserializer/Deserializer.hpp
-        src/armnnDeserializer/Deserializer.cpp
-        )
-
-    add_library_ex(armnnSerializer SHARED ${armnn_serializer_sources})
-
-    target_include_directories(armnnSerializer PRIVATE src/armnn)
-    target_include_directories(armnnSerializer PRIVATE src/armnnUtils)
-
-    # System include to suppress warnings for flatbuffers generated files
-    target_include_directories(armnnSerializer SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
-
-    target_link_libraries(armnnSerializer armnn ${FLATBUFFERS_LIBRARY})
-endif()
-
 if(BUILD_ARMNN_QUANTIZER)
-
     if(NOT BUILD_ARMNN_SERIALIZER)
-        message(ERROR, "In order to build the ArmNN Quantization Tool you must set BUILD_ARMNN_SERIALZER = YES")
+        message(ERROR, "In order to build the ArmNN Quantization Tool you must set BUILD_ARMNN_SERIALIZER = YES")
     endif()
 
     add_executable_ex(ArmnnQuantizer
@@ -192,7 +143,7 @@ if(BUILD_ARMNN_QUANTIZER)
         src/armnnQuantizer/CommandLineProcessor.cpp
         src/armnnQuantizer/ArmNNQuantizerMain.cpp)
 
-    target_include_directories(ArmnnQuantizer PRIVATE include/armnnDeserializeParser)
+    target_include_directories(ArmnnQuantizer PRIVATE include/armnnDeserializer)
 
     target_link_libraries(ArmnnQuantizer
             ${Boost_SYSTEM_LIBRARY}
@@ -430,12 +381,7 @@ endif()
 if(BUILD_TF_PARSER)
     install(TARGETS armnnTfParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
-if(BUILD_TF_LITE_PARSER)
-    install(TARGETS armnnTfLiteParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-endif()
-if(BUILD_ARMNN_SERIALIZER)
-    install(TARGETS armnnSerializer DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-endif()
+
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 target_link_libraries(armnn ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
@@ -593,36 +539,35 @@ if(BUILD_UNIT_TESTS)
     if(BUILD_ARMNN_SERIALIZER)
         enable_language(ASM)
         list(APPEND unittest_sources
-                src/armnnSerializer/ArmnnSchema_generated.h
-                src/armnnSerializer/test/ActivationSerializationTests.cpp
-                src/armnnSerializer/test/SerializerTests.cpp
-                src/armnnDeserializer/test/DeserializeActivation.cpp
-                src/armnnDeserializer/test/DeserializeAdd.cpp
-                src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp
-                src/armnnDeserializer/test/DeserializeBatchNormalization.cpp
-                src/armnnDeserializer/test/DeserializeConstant.cpp
-                src/armnnDeserializer/test/DeserializeConvolution2d.cpp
-                src/armnnDeserializer/test/DeserializeDivision.cpp
-                src/armnnDeserializer/test/DeserializeEqual.cpp
-                src/armnnDeserializer/test/DeserializeFloor.cpp
-                src/armnnDeserializer/test/DeserializeFullyConnected.cpp
-                src/armnnDeserializer/test/DeserializeGather.cpp
-                src/armnnDeserializer/test/DeserializeGreater.cpp
-                src/armnnDeserializer/test/DeserializeMean.cpp
-                src/armnnDeserializer/test/DeserializeMultiplication.cpp
-                src/armnnDeserializer/test/DeserializeNormalization.cpp
-                src/armnnDeserializer/test/DeserializePad.cpp
-                src/armnnDeserializer/test/DeserializePermute.cpp
-                src/armnnDeserializer/test/DeserializePooling2d.cpp
-                src/armnnDeserializer/test/DeserializeReshape.cpp
-                src/armnnDeserializer/test/DeserializeResizeBilinear.cpp
-                src/armnnDeserializer/test/DeserializeRsqrt.cpp
-                src/armnnDeserializer/test/DeserializeSpaceToBatchNd.cpp
-                src/armnnDeserializer/test/DeserializeStridedSlice.cpp
-                src/armnnDeserializer/test/DeserializeSubtraction.cpp
-                src/armnnDeserializer/test/ParserFlatbuffersSerializeFixture.hpp
-                src/armnnDeserializer/test/SchemaSerialize.s
-                )
+            src/armnnSerializer/test/ActivationSerializationTests.cpp
+            src/armnnSerializer/test/SerializerTests.cpp
+            src/armnnDeserializer/test/DeserializeActivation.cpp
+            src/armnnDeserializer/test/DeserializeAdd.cpp
+            src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp
+            src/armnnDeserializer/test/DeserializeBatchNormalization.cpp
+            src/armnnDeserializer/test/DeserializeConstant.cpp
+            src/armnnDeserializer/test/DeserializeConvolution2d.cpp
+            src/armnnDeserializer/test/DeserializeDivision.cpp
+            src/armnnDeserializer/test/DeserializeEqual.cpp
+            src/armnnDeserializer/test/DeserializeFloor.cpp
+            src/armnnDeserializer/test/DeserializeFullyConnected.cpp
+            src/armnnDeserializer/test/DeserializeGather.cpp
+            src/armnnDeserializer/test/DeserializeGreater.cpp
+            src/armnnDeserializer/test/DeserializeMean.cpp
+            src/armnnDeserializer/test/DeserializeMultiplication.cpp
+            src/armnnDeserializer/test/DeserializeNormalization.cpp
+            src/armnnDeserializer/test/DeserializePad.cpp
+            src/armnnDeserializer/test/DeserializePermute.cpp
+            src/armnnDeserializer/test/DeserializePooling2d.cpp
+            src/armnnDeserializer/test/DeserializeReshape.cpp
+            src/armnnDeserializer/test/DeserializeResizeBilinear.cpp
+            src/armnnDeserializer/test/DeserializeRsqrt.cpp
+            src/armnnDeserializer/test/DeserializeSpaceToBatchNd.cpp
+            src/armnnDeserializer/test/DeserializeStridedSlice.cpp
+            src/armnnDeserializer/test/DeserializeSubtraction.cpp
+            src/armnnDeserializer/test/ParserFlatbuffersSerializeFixture.hpp
+            src/armnnDeserializer/test/SchemaSerialize.s
+            )
         set_source_files_properties(src/armnnDeserializer/test/SchemaSerialize.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
     endif()
 
@@ -654,10 +599,6 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
     target_include_directories(UnitTests PRIVATE src/backends)
 
-    if(BUILD_TF_LITE_PARSER)
-        target_include_directories(UnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
-    endif()
-
     if(VALGRIND_FOUND)
         if(HEAP_PROFILING OR LEAK_CHECKING)
             message("Valgrind is disabled for heap profiling and leak checking builds.")
@@ -677,17 +618,20 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(UnitTests armnnTfParser)
     endif()
 
+    if(BUILD_TF_LITE_PARSER)
+        target_include_directories(UnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
+        target_link_libraries(UnitTests armnnTfLiteParser)
+    endif()
+
     if(BUILD_CAFFE_PARSER)
         target_link_libraries(UnitTests armnnCaffeParser)
     endif()
 
     if(BUILD_ARMNN_SERIALIZER)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
+        target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnSerializer)
-    endif()
-
-    if(BUILD_TF_LITE_PARSER)
-        target_link_libraries(UnitTests armnnTfLiteParser)
     endif()
 
     if(BUILD_ONNX_PARSER)

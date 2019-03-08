@@ -18,6 +18,7 @@
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/polymorphic_cast.hpp>
 
 // The generated code based on the Serialize schema:
 #include <ArmnnSchema_generated.h>
@@ -213,6 +214,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_RsqrtLayer]                  = &Deserializer::ParseRsqrt;
     m_ParserFunctions[Layer_SoftmaxLayer]                = &Deserializer::ParseSoftmax;
     m_ParserFunctions[Layer_SpaceToBatchNdLayer]         = &Deserializer::ParseSpaceToBatchNd;
+    m_ParserFunctions[Layer_SplitterLayer]               = &Deserializer::ParseSplitter;
     m_ParserFunctions[Layer_StridedSliceLayer]           = &Deserializer::ParseStridedSlice;
     m_ParserFunctions[Layer_SubtractionLayer]            = &Deserializer::ParseSubtraction;
 }
@@ -283,6 +285,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_SoftmaxLayer()->base();
         case Layer::Layer_SpaceToBatchNdLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SpaceToBatchNdLayer()->base();
+        case Layer::Layer_SplitterLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_SplitterLayer()->base();
         case Layer::Layer_StridedSliceLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_StridedSliceLayer()->base();
         case Layer::Layer_SubtractionLayer:
@@ -1826,6 +1830,50 @@ void Deserializer::ParseMean(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseSplitter(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+
+    auto flatBufferViewsDescriptor = graph->layers()->Get(layerIndex)->layer_as_SplitterLayer()->descriptor();
+    auto flatBufferViewSizes = flatBufferViewsDescriptor->viewSizes();
+    auto flatBufferOriginsDescriptor = flatBufferViewsDescriptor->origins();
+    auto flatBufferViewOrigins = flatBufferOriginsDescriptor->viewOrigins();
+    uint32_t numViews = flatBufferOriginsDescriptor->numViews();
+    uint32_t numDimensions = flatBufferOriginsDescriptor->numDimensions();
+
+    // Check numViews and numDimensions corresponds to the ones already serialized ...
+    // numViews ==  flatBufferViewSizes.size();
+    // foreach: numDimensions == flatBufferViewSizes[x].size();
+
+    armnn::ViewsDescriptor viewsDescriptor(numViews, numDimensions);
+    for(unsigned int vIdx = 0; vIdx < numViews; ++vIdx)
+    {
+        for (unsigned int dIdx = 0; dIdx < numDimensions; ++dIdx)
+        {
+            viewsDescriptor.SetViewSize(vIdx, dIdx, flatBufferViewSizes->Get(vIdx)->data()->Get(dIdx));
+            viewsDescriptor.SetViewOriginCoord(vIdx, dIdx, flatBufferViewOrigins->Get(vIdx)->data()->Get(dIdx));
+        }
+    }
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddSplitterLayer(viewsDescriptor, layerName.c_str());
+
+    // I could have as many outputs as views ...
+    for(unsigned int vIdx = 0; vIdx < numViews; ++vIdx)
+    {
+        armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[vIdx]);
+        layer->GetOutputSlot(vIdx).SetTensorInfo(outputTensorInfo);
+    }
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

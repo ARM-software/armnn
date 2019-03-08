@@ -290,6 +290,11 @@ const uint32_t* ViewsDescriptor::GetViewSizes(uint32_t idx) const
     return m_ViewSizes ? m_ViewSizes[idx] : nullptr;
 }
 
+const OriginsDescriptor& ViewsDescriptor::GetOrigins() const
+{
+    return m_Origins;
+}
+
 void swap(OriginsDescriptor& first, OriginsDescriptor& second)
 {
     using std::swap;

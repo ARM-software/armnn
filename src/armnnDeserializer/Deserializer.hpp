@@ -101,6 +101,7 @@ private:
     void ParseRsqrt(GraphPtr graph, unsigned int layerIndex);
     void ParseSoftmax(GraphPtr graph, unsigned int layerIndex);
     void ParseSpaceToBatchNd(GraphPtr graph, unsigned int layerIndex);
+    void ParseSplitter(GraphPtr graph, unsigned int layerIndex);
     void ParseStridedSlice(GraphPtr graph, unsigned int layerIndex);
     void ParseSubtraction(GraphPtr graph, unsigned int layerIndex);
 

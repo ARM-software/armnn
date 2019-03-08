@@ -107,14 +107,13 @@ struct ViewsDescriptor
     ~ViewsDescriptor();
 
     ViewsDescriptor& operator=(ViewsDescriptor rhs);
-
     /// @Brief Set the view origin coordinates. The arguments are: view, dimension, value.
     /// If the view is greater than or equal to GetNumViews(), then the view argument is out of range.
-    /// If the coord is greater than or equal to GetNumViews(), then the coord argument is out of range.
+    /// If the coord is greater than or equal to GetNumDimensions(), then the coord argument is out of range.
     Status SetViewOriginCoord(uint32_t view, uint32_t coord, uint32_t value);
     /// @brief Set the size of the views. The arguments are: view, dimension, value.
     /// If the view is greater than or equal to GetNumViews(), then the view argument is out of range.
-    /// If the coord is greater than or equal to GetNumViews(), then the coord argument is out of range.
+    /// If the coord is greater than or equal to GetNumDimensions(), then the coord argument is out of range.
     Status SetViewSize(uint32_t view, uint32_t coord, uint32_t value);
 
     /// Get the number of views.
@@ -125,6 +124,8 @@ struct ViewsDescriptor
     const uint32_t* GetViewOrigin(uint32_t idx) const;
     /// Get the view sizes at the int value idx.
     const uint32_t* GetViewSizes(uint32_t idx) const;
+    /// Get the View Origins
+    const OriginsDescriptor& GetOrigins() const;
 
     /// Swap the ViewsDescriptor value first and second.
     friend void swap(ViewsDescriptor& first, ViewsDescriptor& second);

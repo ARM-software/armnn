@@ -34,6 +34,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Rsqrt
 * Softmax
 * SpaceToBatchNd
+* Splitter
 * StridedSlice
 * Subtraction
 

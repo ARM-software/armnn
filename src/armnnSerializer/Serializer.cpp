@@ -634,6 +634,71 @@ void SerializerVisitor::VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer*
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_SpaceToBatchNdLayer);
 }
 
+// Build FlatBuffer for Splitter Layer
+void SerializerVisitor::VisitSplitterLayer(const armnn::IConnectableLayer* layer,
+                                           const armnn::ViewsDescriptor& viewsDescriptor,
+                                           const char* name)
+{
+    // Create FlatBuffer ViewOrigins
+    std::vector<flatbuffers::Offset<UintVector>> flatBufferViewOrigins;
+    flatBufferViewOrigins.reserve(viewsDescriptor.GetNumViews());
+
+    for(unsigned int vIdx = 0; vIdx < viewsDescriptor.GetNumViews(); ++vIdx)
+    {
+        std::vector<uint32_t> viewOrigin;
+        viewOrigin.reserve(viewsDescriptor.GetNumDimensions());
+
+        // Copy vector
+        for(unsigned int dIdx = 0; dIdx < viewsDescriptor.GetNumDimensions(); ++dIdx)
+        {
+            viewOrigin.push_back(viewsDescriptor.GetViewOrigin(vIdx)[dIdx]);
+        }
+
+        flatBufferViewOrigins.push_back(CreateUintVector(m_flatBufferBuilder,
+                                                         m_flatBufferBuilder.CreateVector(viewOrigin)));
+    }
+
+    // Create FlatBuffer OriginsDescriptor
+    auto flatBufferOriginDescriptor = CreateOriginsDescriptor(m_flatBufferBuilder,
+                                                              viewsDescriptor.GetOrigins().GetConcatAxis(),
+                                                              viewsDescriptor.GetOrigins().GetNumViews(),
+                                                              viewsDescriptor.GetOrigins().GetNumDimensions(),
+                                                              m_flatBufferBuilder.CreateVector(flatBufferViewOrigins));
+
+    // Create FlatBuffer ViewOrigins
+    std::vector<flatbuffers::Offset<UintVector>> flatBufferViewSizes;
+    flatBufferViewSizes.reserve(viewsDescriptor.GetNumViews());
+
+    for(unsigned int vIdx = 0; vIdx < viewsDescriptor.GetNumViews(); ++vIdx)
+    {
+        std::vector<uint32_t> viewSize;
+        viewSize.reserve(viewsDescriptor.GetNumDimensions());
+
+        // Copy vector
+        for(unsigned int dIdx = 0; dIdx < viewsDescriptor.GetNumDimensions(); ++dIdx)
+        {
+            viewSize.push_back(viewsDescriptor.GetViewSizes(vIdx)[dIdx]);
+        }
+
+        flatBufferViewSizes.push_back(CreateUintVector(m_flatBufferBuilder,
+                                                       m_flatBufferBuilder.CreateVector(viewSize)));
+    }
+
+    // Create FlatBuffer ViewsDescriptor
+    auto flatBufferViewsDescriptor = CreateViewsDescriptor(m_flatBufferBuilder,
+                                                           flatBufferOriginDescriptor,
+                                                           m_flatBufferBuilder.CreateVector(flatBufferViewSizes));
+
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Splitter);
+
+    auto flatBufferSplitterLayer = serializer::CreateSplitterLayer(m_flatBufferBuilder,
+                                                                   flatBufferBaseLayer,
+                                                                   flatBufferViewsDescriptor);
+
+    CreateAnyLayer(flatBufferSplitterLayer.o, serializer::Layer::Layer_SplitterLayer);
+}
+
 void SerializerVisitor::VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
                                                 const armnn::NormalizationDescriptor& descriptor,
                                                 const char* name)

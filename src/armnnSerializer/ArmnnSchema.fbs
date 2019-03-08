@@ -112,7 +112,8 @@ enum LayerType : uint {
     Gather = 28,
     Mean = 29,
     Merger = 30,
-    L2Normalization = 31
+    L2Normalization = 31,
+    Splitter = 32
 }
 
 // Base layer table to be used as part of other layers
@@ -442,6 +443,16 @@ table OriginsDescriptor {
    viewOrigins:[UintVector];
 }
 
+table ViewsDescriptor {
+   origins:OriginsDescriptor;
+   viewSizes:[UintVector];
+}
+
+table SplitterLayer {
+   base:LayerBase;
+   descriptor:ViewsDescriptor;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -474,7 +485,8 @@ union Layer {
     GatherLayer,
     MeanLayer,
     MergerLayer,
-    L2NormalizationLayer
+    L2NormalizationLayer,
+    SplitterLayer
 }
 
 table AnyLayer {

@@ -21,7 +21,7 @@ void CopyValue<uint8_t>(const uint8_t& source, const TensorInfo& sourceInfo, uin
     if (sourceInfo.GetQuantizationScale() != destInfo.GetQuantizationScale() ||
         sourceInfo.GetQuantizationOffset() != destInfo.GetQuantizationOffset())
     {
-        // Dequantize value acording to sourceInfo params
+        // Dequantize value according to sourceInfo params
         float dequantizedValue = armnn::Dequantize<uint8_t>(source,
                                                             sourceInfo.GetQuantizationScale(),
                                                             sourceInfo.GetQuantizationOffset());

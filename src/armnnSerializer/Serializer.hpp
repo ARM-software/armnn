@@ -162,6 +162,10 @@ public:
                                  const armnn::NormalizationDescriptor& normalizationDescriptor,
                                  const char* name = nullptr) override;
 
+    void VisitSplitterLayer(const armnn::IConnectableLayer* layer,
+                            const armnn::ViewsDescriptor& viewsDescriptor,
+                            const char* name = nullptr) override;
+
     void VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
                                 const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
                                 const char* name = nullptr) override;

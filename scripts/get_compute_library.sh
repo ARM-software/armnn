@@ -64,12 +64,12 @@ pushd clframework > /dev/null
 # Use the latest pinned version of the CL framework
 
 # For pinnning to a ref use this:
-CLFRAMEWORKREVISION="branches/arm_compute_19_02" # Release 19.02
-git fetch https://review.mlplatform.org/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
+# CLFRAMEWORKREVISION="branches/arm_compute_19_02" # Release 19.02
+# git fetch https://review.mlplatform.org/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
 
 # For pinning to a revision use this:
-# CLFRAMEWORKREVISION="6eb90d7d8ef73decf6e3973a89c2b2badd0b9635" # Master towards 19.02
-# git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
+CLFRAMEWORKREVISION="f00d33264721f0647098051449c6d40bc80a2af7" # commit on CL fix compilation error in bare metal build
+git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode
 
 # Set commit hook so we can submit reviews to gerrit

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NeonMultiplicationFloatWorkload.hpp"
+#include "NeonMultiplicationWorkload.hpp"
 
 #include "NeonWorkloadUtils.hpp"
 
@@ -31,11 +31,11 @@ arm_compute::Status NeonMultiplicationWorkloadValidate(const TensorInfo& input0,
                                                             arm_compute::RoundingPolicy::TO_ZERO);
 }
 
-NeonMultiplicationFloatWorkload::NeonMultiplicationFloatWorkload(const MultiplicationQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info)
-    : FloatWorkload<MultiplicationQueueDescriptor>(descriptor, info)
+NeonMultiplicationWorkload::NeonMultiplicationWorkload(const MultiplicationQueueDescriptor& descriptor,
+                                                       const WorkloadInfo& info)
+    : BaseWorkload<MultiplicationQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("NeonMultiplicationFloatWorkload", 2, 1);
+    m_Data.ValidateInputsOutputs("NeonMultiplicationWorkload", 2, 1);
 
     arm_compute::ITensor& input1 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& input2 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
@@ -54,12 +54,10 @@ NeonMultiplicationFloatWorkload::NeonMultiplicationFloatWorkload(const Multiplic
     m_PixelWiseMultiplication.reset(layer.release());
 }
 
-void NeonMultiplicationFloatWorkload::Execute() const
+void NeonMultiplicationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMultiplicationFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMultiplicationWorkload_Execute");
     m_PixelWiseMultiplication->run();
 }
 
 } //namespace armnn
-
-

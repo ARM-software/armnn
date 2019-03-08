@@ -36,7 +36,7 @@ BACKEND_SOURCES := \
         workloads/NeonMeanWorkload.cpp \
         workloads/NeonMergerWorkload.cpp \
         workloads/NeonMinimumWorkload.cpp \
-        workloads/NeonMultiplicationFloatWorkload.cpp \
+        workloads/NeonMultiplicationWorkload.cpp \
         workloads/NeonNormalizationFloatWorkload.cpp \
         workloads/NeonPadWorkload.cpp \
         workloads/NeonPermuteWorkload.cpp \
@@ -46,7 +46,7 @@ BACKEND_SOURCES := \
         workloads/NeonSoftmaxBaseWorkload.cpp \
         workloads/NeonSoftmaxFloatWorkload.cpp \
         workloads/NeonSoftmaxUint8Workload.cpp \
-        workloads/NeonSubtractionFloatWorkload.cpp
+        workloads/NeonSubtractionWorkload.cpp
 
 else
 

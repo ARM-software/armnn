@@ -28,7 +28,7 @@
 #include "workloads/NeonMeanWorkload.hpp"
 #include "workloads/NeonMergerWorkload.hpp"
 #include "workloads/NeonMinimumWorkload.hpp"
-#include "workloads/NeonMultiplicationFloatWorkload.hpp"
+#include "workloads/NeonMultiplicationWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
 #include "workloads/NeonPadWorkload.hpp"
@@ -36,7 +36,7 @@
 #include "workloads/NeonPooling2dWorkload.hpp"
 #include "workloads/NeonResizeBilinearWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
-#include "workloads/NeonSubtractionFloatWorkload.hpp"
+#include "workloads/NeonSubtractionWorkload.hpp"
 #endif
 
 using namespace boost;

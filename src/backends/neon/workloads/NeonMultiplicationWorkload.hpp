@@ -18,10 +18,10 @@ arm_compute::Status NeonMultiplicationWorkloadValidate(const TensorInfo& input0,
                                                        const TensorInfo& input1,
                                                        const TensorInfo& output);
 
-class NeonMultiplicationFloatWorkload : public FloatWorkload<MultiplicationQueueDescriptor>
+class NeonMultiplicationWorkload : public BaseWorkload<MultiplicationQueueDescriptor>
 {
 public:
-    NeonMultiplicationFloatWorkload(const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonMultiplicationWorkload(const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info);
     virtual void Execute() const override;
 
 private:
@@ -29,7 +29,3 @@ private:
 };
 
 } //namespace armnn
-
-
-
-

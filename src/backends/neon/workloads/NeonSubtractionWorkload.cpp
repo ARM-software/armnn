@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NeonSubtractionFloatWorkload.hpp"
+#include "NeonSubtractionWorkload.hpp"
 
 #include "NeonWorkloadUtils.hpp"
 #include <aclCommon/ArmComputeTensorUtils.hpp>
@@ -28,11 +28,11 @@ arm_compute::Status NeonSubtractionWorkloadValidate(const TensorInfo& input0,
                                                           arm_compute::ConvertPolicy::SATURATE);
 }
 
-NeonSubtractionFloatWorkload::NeonSubtractionFloatWorkload(const SubtractionQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info)
-    : FloatWorkload<SubtractionQueueDescriptor>(descriptor, info)
+NeonSubtractionWorkload::NeonSubtractionWorkload(const SubtractionQueueDescriptor& descriptor,
+                                                 const WorkloadInfo& info)
+    : BaseWorkload<SubtractionQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("NeonSubtractionFloatWorkload", 2, 1);
+    m_Data.ValidateInputsOutputs("NeonSubtractionWorkload", 2, 1);
 
     arm_compute::ITensor& input1 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& input2 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
@@ -43,9 +43,9 @@ NeonSubtractionFloatWorkload::NeonSubtractionFloatWorkload(const SubtractionQueu
     m_SubLayer.reset(layer.release());
 }
 
-void NeonSubtractionFloatWorkload::Execute() const
+void NeonSubtractionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSubtractionFloatWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonSubtractionWorkload_Execute");
     m_SubLayer->run();
 }
 

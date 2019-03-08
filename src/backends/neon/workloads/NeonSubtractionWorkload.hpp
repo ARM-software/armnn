@@ -19,10 +19,10 @@ arm_compute::Status NeonSubtractionWorkloadValidate(const TensorInfo& input0,
                                                     const TensorInfo& input1,
                                                     const TensorInfo& output);
 
-class NeonSubtractionFloatWorkload : public FloatWorkload<SubtractionQueueDescriptor>
+class NeonSubtractionWorkload : public BaseWorkload<SubtractionQueueDescriptor>
 {
 public:
-    NeonSubtractionFloatWorkload(const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonSubtractionWorkload(const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info);
     virtual void Execute() const override;
 
 private:

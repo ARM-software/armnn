@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(CreateAdditionFloatWorkload)
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 {
-    NeonCreateElementwiseWorkloadTest<NeonSubtractionFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
                                       SubtractionLayer,
                                       DataType::Float16>();
@@ -134,16 +134,24 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 {
-    NeonCreateElementwiseWorkloadTest<NeonSubtractionFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
                                       SubtractionLayer,
                                       DataType::Float32>();
 }
 
+BOOST_AUTO_TEST_CASE(CreateSubtractionUint8Workload)
+{
+    NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
+                                      SubtractionQueueDescriptor,
+                                      SubtractionLayer,
+                                      DataType::QuantisedAsymm8>();
+}
+
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
 {
-    NeonCreateElementwiseWorkloadTest<NeonMultiplicationFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
                                       MultiplicationLayer,
                                       DataType::Float16>();
@@ -152,10 +160,18 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationFloat16Workload)
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
 {
-    NeonCreateElementwiseWorkloadTest<NeonMultiplicationFloatWorkload,
+    NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
                                       MultiplicationLayer,
                                       DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
+{
+    NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
+                                      MultiplicationQueueDescriptor,
+                                      MultiplicationLayer,
+                                      DataType::QuantisedAsymm8>();
 }
 
 template <typename BatchNormalizationWorkloadType, typename armnn::DataType DataType>

@@ -641,7 +641,7 @@ if(BUILD_UNIT_TESTS)
     addDllCopyCommands(UnitTests)
 endif()
 
-if (BUILD_ARMNN_SERIALIZER AND BUILD_TF_PARSER)
+if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER OR BUILD_CAFFE_PARSER))
     set(ArmnnConverter_sources
         src/armnnConverter/ArmnnConverter.cpp)
 
@@ -649,7 +649,22 @@ if (BUILD_ARMNN_SERIALIZER AND BUILD_TF_PARSER)
     target_include_directories(ArmnnConverter PRIVATE src/armnn)
     target_include_directories(ArmnnConverter PRIVATE src/armnnUtils)
 
-    target_link_libraries(ArmnnConverter armnnTfParser)
+    if(BUILD_CAFFE_PARSER)
+        target_link_libraries(ArmnnConverter armnnCaffeParser)
+    endif()
+
+    if(BUILD_ONNX_PARSER)
+        target_link_libraries(ArmnnConverter armnnOnnxParser)
+    endif()
+
+    if(BUILD_TF_PARSER)
+        target_link_libraries(ArmnnConverter armnnTfParser)
+    endif()
+
+    if(BUILD_TF_LITE_PARSER)
+        target_link_libraries(ArmnnConverter armnnTfLiteParser)
+    endif()
+
     target_link_libraries(ArmnnConverter armnnSerializer)
 
     target_link_libraries(ArmnnConverter armnn)

@@ -9,6 +9,7 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <reference/RefWorkloadFactory.hpp>
+#include <reference/RefLayerSupport.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
 #include <backendsCommon/test/IsLayerSupportedTestImpl.hpp>
 
@@ -32,6 +33,20 @@ BOOST_AUTO_TEST_CASE(IsLayerSupportedLayerTypeMatches)
 {
     LayerTypeMatchesTest();
 }
+BOOST_AUTO_TEST_CASE(IsLayerSupportedReferenceAddition)
+{
+    armnn::TensorShape shape0 = {1,1,3,4};
+    armnn::TensorShape shape1 = {4};
+    armnn::TensorShape outShape = {1,1,3,4};
+    armnn::TensorInfo in0(shape0, armnn::DataType::Float32);
+    armnn::TensorInfo in1(shape1, armnn::DataType::Float32);
+    armnn::TensorInfo out(outShape, armnn::DataType::Float32);
+
+    armnn::RefLayerSupport supportChecker;
+    std::string reasonNotSupported;
+    BOOST_CHECK(supportChecker.IsAdditionSupported(in0, in1, out, reasonNotSupported));
+}
+
 
 BOOST_AUTO_TEST_CASE(IsLayerSupportedFloat16Reference)
 {

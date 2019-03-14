@@ -8,8 +8,13 @@
 
 int main(int argc, char* argv[])
 {
-    return armnn::test::ClassifierInferenceTestMain<CaffePreprocessor, armnnCaffeParser::ICaffeParser>(
+    using DataType = float;
+    using DatabaseType = CaffePreprocessor;
+    using ParserType = armnnCaffeParser::ICaffeParser;
+    using ModelType = InferenceModel<ParserType, DataType>;
+
+    return armnn::test::ClassifierInferenceTestMain<DatabaseType, ParserType>(
         argc, argv, "squeezenet.caffemodel", true,
-        "data", "output", { 0 },
-        [](const char* dataDir) { return CaffePreprocessor(dataDir); });
+        "input", "prob", { 0 },
+        [](const char* dataDir, const ModelType &) { return CaffePreprocessor(dataDir); });
 }

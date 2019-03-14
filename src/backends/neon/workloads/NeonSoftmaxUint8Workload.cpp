@@ -4,8 +4,9 @@
 //
 
 #include "NeonSoftmaxUint8Workload.hpp"
-
 #include "NeonWorkloadUtils.hpp"
+
+#include <aclCommon/ArmComputeUtils.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NESoftmaxLayer.h>
 
@@ -29,9 +30,10 @@ NeonSoftmaxUint8Workload::NeonSoftmaxUint8Workload(const SoftmaxQueueDescriptor&
         throw InvalidArgumentException(
             "Invalid quantization for output. Only scale = 1.0f / 256.0f and offset = 0 supported");
     }
+    unsigned int aclAxis = ComputeSoftmaxAclAxis(info.m_InputTensorInfos[0]);
 
     auto layer = std::make_unique<arm_compute::NESoftmaxLayer>(memoryManager);
-    layer->configure(&input, &output, descriptor.m_Parameters.m_Beta);
+    layer->configure(&input, &output, descriptor.m_Parameters.m_Beta, aclAxis);
     m_SoftmaxLayer.reset(layer.release());
 }
 

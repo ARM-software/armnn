@@ -4,10 +4,11 @@
 //
 
 #include "ClSoftmaxUint8Workload.hpp"
+#include "ClWorkloadUtils.hpp"
+
+#include <aclCommon/ArmComputeUtils.hpp>
 #include <cl/ClTensorHandle.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-
-#include "ClWorkloadUtils.hpp"
 
 namespace armnn
 {
@@ -30,7 +31,8 @@ ClSoftmaxUint8Workload::ClSoftmaxUint8Workload(const SoftmaxQueueDescriptor& des
             "Invalid quantization for output. Only scale = 1.0f / 256.0f and offset = 0 supported");
     }
 
-    m_SoftmaxLayer.configure(&input, &output, descriptor.m_Parameters.m_Beta);
+    unsigned int aclAxis = ComputeSoftmaxAclAxis(info.m_InputTensorInfos[0]);
+    m_SoftmaxLayer.configure(&input, &output, descriptor.m_Parameters.m_Beta, aclAxis);
 }
 
 void ClSoftmaxUint8Workload::Execute() const

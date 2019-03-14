@@ -275,14 +275,21 @@ ARMNN_AUTO_TEST_CASE(UNSUPPORTED_IgnorePaddingL2Pooling2dSize3Uint8, IgnorePaddi
 // Activation
 ARMNN_AUTO_TEST_CASE(ConstantLinearActivation, ConstantLinearActivationTest)
 
+// ReLu
+ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
+ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
+
+// Softmax
 ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta1, SimpleSoftmaxTest, 1.0f)
 ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta2, SimpleSoftmaxTest, 2.0f)
-
 ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta1Uint8, SimpleSoftmaxUint8Test, 1.0f)
 ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta2Uint8, SimpleSoftmaxUint8Test, 2.0f)
 
-ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
-ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
+ARMNN_AUTO_TEST_CASE(Simple3dSoftmaxBeta1, Simple3dSoftmaxTest, 1.0f)
+ARMNN_AUTO_TEST_CASE(Simple3dSoftmaxBeta1Uint8, Simple3dSoftmaxUint8Test, 1.0f)
+
+ARMNN_AUTO_TEST_CASE(Simple4dSoftmaxBeta1, Simple4dSoftmaxTest, 1.0f)
+ARMNN_AUTO_TEST_CASE(Simple4dSoftmaxBeta1Uint8, Simple4dSoftmaxUint8Test, 1.0f)
 
 // Splitter
 ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)

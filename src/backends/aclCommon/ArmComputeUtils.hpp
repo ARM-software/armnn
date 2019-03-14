@@ -120,4 +120,14 @@ ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(const FullyConnected
     return fc_info;
 }
 
+inline unsigned int ComputeSoftmaxAclAxis(const armnn::TensorInfo& tensor)
+{
+    unsigned int dim = tensor.GetNumDimensions();
+
+    BOOST_ASSERT(dim != 0);
+
+    // Currently ArmNN support axis 1.
+    return dim - 1;
+}
+
 } // namespace armnn

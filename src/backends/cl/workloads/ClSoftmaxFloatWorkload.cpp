@@ -4,10 +4,11 @@
 //
 
 #include "ClSoftmaxFloatWorkload.hpp"
+#include "ClWorkloadUtils.hpp"
+
+#include <aclCommon/ArmComputeUtils.hpp>
 #include <cl/ClTensorHandle.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-
-#include "ClWorkloadUtils.hpp"
 
 namespace armnn
 {
@@ -21,7 +22,9 @@ ClSoftmaxFloatWorkload::ClSoftmaxFloatWorkload(const SoftmaxQueueDescriptor& des
 
     arm_compute::ICLTensor& input  = static_cast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
-    m_SoftmaxLayer.configure(&input, &output, m_Data.m_Parameters.m_Beta);
+
+    unsigned int aclAxis = ComputeSoftmaxAclAxis(info.m_InputTensorInfos[0]);
+    m_SoftmaxLayer.configure(&input, &output, m_Data.m_Parameters.m_Beta, aclAxis);
 }
 
 void ClSoftmaxFloatWorkload::Execute() const

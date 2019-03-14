@@ -19,34 +19,35 @@
 
 #include <algorithm>
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 2> SimpleSoftmaxTestImpl(
+template<armnn::DataType ArmnnType, std::size_t n, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    float beta)
+    float beta,
+    const armnn::TensorShape& inputShape,
+    const std::vector<float>& outputData)
 {
     using std::exp;
+
+    const float qScale = 1.f / 256.f;
+    const int qOffset = 0;
 
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
 
-    unsigned int inputShape[] = { 2, 4 };
-
-    inputTensorInfo = armnn::TensorInfo(2, inputShape, ArmnnType);
-    float qScale = 1.f / 256.f;
-    int qOffset = 0;
+    inputTensorInfo = armnn::TensorInfo(inputShape, ArmnnType);
     inputTensorInfo.SetQuantizationScale(qScale);
     inputTensorInfo.SetQuantizationOffset(qOffset);
 
-    outputTensorInfo = armnn::TensorInfo(2, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(inputShape, ArmnnType);
     outputTensorInfo.SetQuantizationScale(qScale);
     outputTensorInfo.SetQuantizationOffset(qOffset);
 
-    LayerTestResult<T, 2> ret(outputTensorInfo);
+    LayerTestResult<T, n> ret(outputTensorInfo);
 
     // Each row is independently softmax'd.
-    auto input = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(qScale, 0, {
+    auto input = MakeTensor<T, n>(inputTensorInfo, std::vector<T>(
+        QuantizedVector<T>(qScale, qOffset, {
             0.f, 1.f, 0.f, 0.f,
             .5f, 0.f, 0.f, 0.f,
         })));
@@ -65,34 +66,75 @@ LayerTestResult<T, 2> SimpleSoftmaxTestImpl(
 
     inputHandle->Allocate();
     outputHandle->Allocate();
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), input.origin());
+
+    BOOST_ASSERT(workload);
 
     ExecuteWorkload(*workload, memoryManager);
 
-    CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
+    CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
 
-    float x0[4] = { exp((0.f - 1.0f) * beta), exp((1.0f - 1.0f) * beta),
-        exp((0.0f - 1.0f) * beta), exp((0.0f - 1.0f) * beta) };
-    float sum0 = x0[0] + x0[1] + x0[2] + x0[3];
-    float x1[4] = { exp((0.5f - 0.5f) * beta), exp((0.0f - 0.5f) * beta),
-        exp((0.0f - 0.5f) * beta), exp((0.0f - 0.5f) * beta) };
-    float sum1 = x1[0] + x1[1] + x1[2] + x1[3];
-
-    ret.outputExpected = MakeTensor<T, 2>(outputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(qScale, qOffset, {
-        x0[0] / sum0, x0[1] / sum0, x0[2] / sum0, x0[3] / sum0,
-        x1[0] / sum1, x1[1] / sum1, x1[2] / sum1, x1[3] / sum1
-        })));
+    std::vector<T> expectedOutput = std::vector<T>(
+            QuantizedVector<T>(qScale, qOffset, outputData));
+    ret.outputExpected = MakeTensor<T, n>(outputTensorInfo, expectedOutput);
 
     return ret;
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 2> CompareSoftmaxTestImpl(
+LayerTestResult<T, 2> SimpleSoftmaxTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::IWorkloadFactory& refWorkloadFactory,
     float beta)
+{
+    using std::exp;
+    const armnn::TensorShape inputShape{ 2, 4 };
+
+    float x0[4] = { exp((0.f - 1.0f) * beta), exp((1.0f - 1.0f) * beta),
+                    exp((0.0f - 1.0f) * beta), exp((0.0f - 1.0f) * beta) };
+    float sum0 = x0[0] + x0[1] + x0[2] + x0[3];
+    float x1[4] = { exp((0.5f - 0.5f) * beta), exp((0.0f - 0.5f) * beta),
+                    exp((0.0f - 0.5f) * beta), exp((0.0f - 0.5f) * beta) };
+    float sum1 = x1[0] + x1[1] + x1[2] + x1[3];
+
+    const std::vector<float> outputData = { x0[0] / sum0, x0[1] / sum0, x0[2] / sum0, x0[3] / sum0,
+                                            x1[0] / sum1, x1[1] / sum1, x1[2] / sum1, x1[3] / sum1 };
+
+    return SimpleSoftmaxBaseTestImpl<ArmnnType, 2>(workloadFactory, memoryManager, beta, inputShape, outputData);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> Simple3dSoftmaxTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float beta)
+{
+    const armnn::TensorShape inputShape{ 1, 8, 1 };
+    const std::vector<float> outputData = { 0.0964599f, 0.26220518f, 0.0964599f, 0.0964599f,
+                                            0.15903549f, 0.0964599f, 0.0964599f, 0.0964599f };
+
+    return SimpleSoftmaxBaseTestImpl<ArmnnType, 3>(workloadFactory, memoryManager, beta, inputShape, outputData);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> Simple4dSoftmaxTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float beta)
+{
+    const armnn::TensorShape inputShape{ 1, 8, 1, 1 };
+    const std::vector<float> outputData = { 0.0964599f, 0.26220518f, 0.0964599f, 0.0964599f,
+                                            0.15903549f, 0.0964599f, 0.0964599f, 0.0964599f };
+
+    return SimpleSoftmaxBaseTestImpl<ArmnnType, 4>(workloadFactory, memoryManager, beta, inputShape, outputData);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> CompareSoftmaxTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::IWorkloadFactory& refWorkloadFactory,
+        float beta)
 {
 
     const int batchSize = 20;

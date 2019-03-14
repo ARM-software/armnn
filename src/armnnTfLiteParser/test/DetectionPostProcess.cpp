@@ -10,17 +10,19 @@
 
 #include "ParserFlatbuffersFixture.hpp"
 #include "ParserPrototxtFixture.hpp"
+#include "ParserHelper.hpp"
 
 BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
 
 struct DetectionPostProcessFixture : ParserFlatbuffersFixture
 {
-    explicit DetectionPostProcessFixture()
+    explicit DetectionPostProcessFixture(const std::string& custom_options)
     {
         /*
             The following values were used for the custom_options:
             use_regular_nms = true
             max_classes_per_detection = 1
+            detections_per_class = 1
             nms_score_threshold = 0.0
             nms_iou_threshold = 0.5
             max_detections = 3
@@ -107,19 +109,7 @@ struct DetectionPostProcessFixture : ParserFlatbuffersFixture
                         "inputs": [0, 1, 2],
                         "outputs": [3, 4, 5, 6],
                         "builtin_options_type": 0,
-                        "custom_options": [
-                            109, 97, 120, 95, 100, 101, 116, 101, 99, 116, 105, 111, 110, 115, 0, 109, 97, 120,
-                            95, 99, 108, 97, 115, 115, 101, 115, 95, 112, 101, 114, 95, 100, 101, 116, 101, 99,
-                            116, 105, 111, 110, 0, 110, 109, 115, 95, 115, 99, 111, 114, 101, 95, 116, 104, 114,
-                            101, 115, 104, 111, 108, 100, 0, 110, 109, 115, 95, 105, 111, 117, 95, 116, 104, 114,
-                            101, 115, 104, 111, 108, 100, 0, 110, 117, 109, 95, 99, 108, 97, 115, 115, 101, 115,
-                            0, 104, 95, 115, 99, 97, 108, 101, 0, 119, 95, 115, 99, 97, 108, 101, 0, 120, 95, 115,
-                            99, 97, 108, 101, 0, 121, 95, 115, 99, 97, 108, 101, 0, 117, 115, 101, 95, 114, 101,
-                            103, 117, 108, 97, 114, 95, 110, 109, 115, 0, 10, 49, 126, 142, 82, 103, 66, 23, 48,
-                            41, 34, 0, 0, 12, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0, 0, 0, 0, 160, 64, 1, 0, 0, 0, 3, 0,
-                            0, 0, 0, 0, 0, 63, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 160, 64, 0, 0, 32, 65, 0,
-                            0, 32, 65, 14, 6, 6, 14, 14, 6, 106, 14, 14, 14, 50, 38, 1
-                        ],
+                        "custom_options": [)" + custom_options + R"(],
                         "custom_options_format": "FLEXBUFFERS"
                     }]
                 }],
@@ -141,7 +131,35 @@ struct DetectionPostProcessFixture : ParserFlatbuffersFixture
     }
 };
 
-BOOST_FIXTURE_TEST_CASE( ParseDetectionPostProcess, DetectionPostProcessFixture )
+struct ParseDetectionPostProcessCustomOptions : DetectionPostProcessFixture
+{
+private:
+    static armnn::DetectionPostProcessDescriptor GenerateDescriptor()
+    {
+        static armnn::DetectionPostProcessDescriptor descriptor;
+        descriptor.m_UseRegularNms          = true;
+        descriptor.m_MaxDetections          = 3u;
+        descriptor.m_MaxClassesPerDetection = 1u;
+        descriptor.m_DetectionsPerClass     = 1u;
+        descriptor.m_NumClasses             = 2u;
+        descriptor.m_NmsScoreThreshold      = 0.0f;
+        descriptor.m_NmsIouThreshold        = 0.5f;
+        descriptor.m_ScaleH                 = 5.0f;
+        descriptor.m_ScaleW                 = 5.0f;
+        descriptor.m_ScaleX                 = 10.0f;
+        descriptor.m_ScaleY                 = 10.0f;
+
+        return descriptor;
+    }
+
+public:
+    ParseDetectionPostProcessCustomOptions()
+        : DetectionPostProcessFixture(
+            GenerateDetectionPostProcessJsonString(GenerateDescriptor()))
+    {}
+};
+
+BOOST_FIXTURE_TEST_CASE( ParseDetectionPostProcess, ParseDetectionPostProcessCustomOptions )
 {
     Setup();
 
@@ -202,7 +220,7 @@ BOOST_FIXTURE_TEST_CASE( ParseDetectionPostProcess, DetectionPostProcessFixture 
     RunTest<armnn::DataType::QuantisedAsymm8, armnn::DataType::Float32>(0, input, output);
 }
 
-BOOST_FIXTURE_TEST_CASE(DetectionPostProcessGraphStructureTest, DetectionPostProcessFixture)
+BOOST_FIXTURE_TEST_CASE(DetectionPostProcessGraphStructureTest, ParseDetectionPostProcessCustomOptions)
 {
     /*
        Inputs:            box_encodings  scores

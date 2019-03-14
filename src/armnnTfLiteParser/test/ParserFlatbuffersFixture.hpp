@@ -5,13 +5,16 @@
 
 #pragma once
 
+#include <armnn/Descriptors.hpp>
+#include <armnn/IRuntime.hpp>
+#include <armnn/TypesUtils.hpp>
+
 #include "Schema.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <experimental/filesystem>
-#include <armnn/IRuntime.hpp>
-#include <armnn/TypesUtils.hpp>
+
 #include "test/TensorHelpers.hpp"
 
 #include "TypeUtils.hpp"
@@ -21,6 +24,7 @@
 
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"
+#include "flatbuffers/flexbuffers.h"
 
 #include <schema_generated.h>
 #include <iostream>
@@ -158,6 +162,33 @@ struct ParserFlatbuffersFixture
     void RunTest(std::size_t subgraphId,
                  const std::map<std::string, std::vector<DataType1>>& inputData,
                  const std::map<std::string, std::vector<DataType2>>& expectedOutputData);
+
+    static inline std::string GenerateDetectionPostProcessJsonString(
+        const armnn::DetectionPostProcessDescriptor& descriptor)
+    {
+        flexbuffers::Builder detectPostProcess;
+        detectPostProcess.Map([&]() {
+            detectPostProcess.Bool("use_regular_nms", descriptor.m_UseRegularNms);
+            detectPostProcess.Int("max_detections", descriptor.m_MaxDetections);
+            detectPostProcess.Int("max_classes_per_detection", descriptor.m_MaxClassesPerDetection);
+            detectPostProcess.Int("detections_per_class", descriptor.m_DetectionsPerClass);
+            detectPostProcess.Int("num_classes", descriptor.m_NumClasses);
+            detectPostProcess.Float("nms_score_threshold", descriptor.m_NmsScoreThreshold);
+            detectPostProcess.Float("nms_iou_threshold", descriptor.m_NmsIouThreshold);
+            detectPostProcess.Float("h_scale", descriptor.m_ScaleH);
+            detectPostProcess.Float("w_scale", descriptor.m_ScaleW);
+            detectPostProcess.Float("x_scale", descriptor.m_ScaleX);
+            detectPostProcess.Float("y_scale", descriptor.m_ScaleY);
+        });
+        detectPostProcess.Finish();
+
+        // Create JSON string
+        std::stringstream strStream;
+        std::vector<uint8_t> buffer = detectPostProcess.GetBuffer();
+        std::copy(buffer.begin(), buffer.end(),std::ostream_iterator<int>(strStream,","));
+
+        return strStream.str();
+    }
 
     void CheckTensors(const TensorRawPtr& tensors, size_t shapeSize, const std::vector<int32_t>& shape,
                       tflite::TensorType tensorType, uint32_t buffer, const std::string& name,

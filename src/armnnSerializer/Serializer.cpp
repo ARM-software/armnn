@@ -289,6 +289,35 @@ void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectab
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_DepthwiseConvolution2dLayer);
 }
 
+void SerializerVisitor::VisitDetectionPostProcessLayer(const armnn::IConnectableLayer* layer,
+                                                       const armnn::DetectionPostProcessDescriptor& descriptor,
+                                                       const armnn::ConstTensor& anchors,
+                                                       const char* name)
+{
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_DetectionPostProcess);
+    auto fbDescriptor = CreateDetectionPostProcessDescriptor(m_flatBufferBuilder,
+                                                             descriptor.m_MaxDetections,
+                                                             descriptor.m_MaxClassesPerDetection,
+                                                             descriptor.m_DetectionsPerClass,
+                                                             descriptor.m_NmsScoreThreshold,
+                                                             descriptor.m_NmsIouThreshold,
+                                                             descriptor.m_NumClasses,
+                                                             descriptor.m_UseRegularNms,
+                                                             descriptor.m_ScaleX,
+                                                             descriptor.m_ScaleY,
+                                                             descriptor.m_ScaleW,
+                                                             descriptor.m_ScaleH);
+
+    flatbuffers::Offset<serializer::ConstTensor> fbAnchorsConstTensorInfo = CreateConstTensorInfo(anchors);
+
+    auto flatBufferLayer = CreateDetectionPostProcessLayer(m_flatBufferBuilder,
+                                                           fbBaseLayer,
+                                                           fbDescriptor,
+                                                           fbAnchorsConstTensorInfo);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_DetectionPostProcessLayer);
+}
+
 void SerializerVisitor::VisitDivisionLayer(const armnn::IConnectableLayer* layer, const char* name)
 {
     auto fbDivisionBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Division);

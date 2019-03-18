@@ -113,7 +113,8 @@ enum LayerType : uint {
     Mean = 29,
     Merger = 30,
     L2Normalization = 31,
-    Splitter = 32
+    Splitter = 32,
+    DetectionPostProcess = 33
 }
 
 // Base layer table to be used as part of other layers
@@ -453,6 +454,26 @@ table SplitterLayer {
    descriptor:ViewsDescriptor;
 }
 
+table DetectionPostProcessLayer {
+    base:LayerBase;
+    descriptor:DetectionPostProcessDescriptor;
+    anchors:ConstTensor;
+}
+
+table DetectionPostProcessDescriptor {
+    maxDetections:uint;
+    maxClassesPerDetection:uint;
+    detectionsPerClass:uint;
+    nmsScoreThreshold:float;
+    nmsIouThreshold:float;
+    numClasses:uint;
+    useRegularNms:bool;
+    scaleX:float;
+    scaleY:float;
+    scaleW:float;
+    scaleH:float;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -486,7 +507,8 @@ union Layer {
     MeanLayer,
     MergerLayer,
     L2NormalizationLayer,
-    SplitterLayer
+    SplitterLayer,
+    DetectionPostProcessLayer
 }
 
 table AnyLayer {

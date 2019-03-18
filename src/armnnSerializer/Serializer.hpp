@@ -77,6 +77,11 @@ public:
                                           const armnn::Optional<armnn::ConstTensor>& biases,
                                           const char* name = nullptr) override;
 
+    void VisitDetectionPostProcessLayer(const armnn::IConnectableLayer* layer,
+                                        const armnn::DetectionPostProcessDescriptor& descriptor,
+                                        const armnn::ConstTensor& anchors,
+                                        const char* name = nullptr) override;
+
     void VisitDivisionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 

@@ -36,6 +36,12 @@ inline bool CompatibleTypes<uint8_t>(DataType dataType)
 }
 
 template<>
+inline bool CompatibleTypes<int16_t>(DataType dataType)
+{
+    return dataType == DataType::QuantisedSymm16;
+}
+
+template<>
 inline bool CompatibleTypes<int32_t>(DataType dataType)
 {
     return dataType == DataType::Signed32;

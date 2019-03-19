@@ -855,6 +855,15 @@ flatbuffers::Offset<serializer::ConstTensor>
             fbPayload = flatBuffersData.o;
             break;
         }
+        case armnn::DataType::QuantisedSymm16:
+        {
+            auto fbVector = CreateDataVector<int16_t>(constTensor.GetMemoryArea(), constTensor.GetNumBytes());
+            flatbuffers::Offset<serializer::ShortData> flatBuffersData = serializer::CreateShortData(
+                    m_flatBufferBuilder,
+                    fbVector);
+            fbPayload = flatBuffersData.o;
+            break;
+        }
         case armnn::DataType::QuantisedAsymm8:
         case armnn::DataType::Boolean:
         default:

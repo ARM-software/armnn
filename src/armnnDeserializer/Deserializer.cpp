@@ -373,6 +373,9 @@ armnn::TensorInfo ToTensorInfo(Deserializer::TensorRawPtr tensorPtr)
         case DataType_QuantisedAsymm8:
             type = armnn::DataType::QuantisedAsymm8;
             break;
+        case DataType_QuantisedSymm16:
+            type = armnn::DataType::QuantisedSymm16;
+            break;
         case DataType_Signed32:
             type = armnn::DataType::Signed32;
             break;

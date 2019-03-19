@@ -47,10 +47,11 @@ public:
     // the shared_ptr's reference counter
     const std::shared_ptr<Profiler>& GetProfiler() const { return m_Profiler; }
 
-    void AllocateWorkingMemory();
     void FreeWorkingMemory();
 
 private:
+    void AllocateWorkingMemory();
+
     LoadedNetwork(std::unique_ptr<OptimizedNetwork> net);
 
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
@@ -77,9 +78,7 @@ private:
     WorkloadQueue m_OutputQueue;
     std::shared_ptr<Profiler> m_Profiler;
 
-    using UniqueMutexLock = std::unique_lock<std::mutex>;
     mutable std::mutex m_WorkingMemMutex;
-    UniqueMutexLock m_WorkingMemLock;
 
     bool m_IsWorkingMemAllocated=false;
 };

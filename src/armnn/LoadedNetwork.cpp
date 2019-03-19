@@ -73,7 +73,6 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 
 LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
     : m_OptimizedNetwork(std::move(net))
-    , m_WorkingMemLock(m_WorkingMemMutex, std::defer_lock)
 {
     // Create a profiler and register it for the current thread.
     m_Profiler = std::make_shared<Profiler>();
@@ -410,7 +409,6 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
 
 void LoadedNetwork::AllocateWorkingMemory()
 {
-    BOOST_ASSERT_MSG(m_WorkingMemLock.owns_lock(), "Cannot allocate working memory if mutex is not already locked.");
     if (m_IsWorkingMemAllocated)
     {
         return;
@@ -428,7 +426,7 @@ void LoadedNetwork::AllocateWorkingMemory()
 
 void LoadedNetwork::FreeWorkingMemory()
 {
-    std::lock_guard<UniqueMutexLock> lockGuard(m_WorkingMemLock);
+    std::lock_guard<std::mutex> lockGuard(m_WorkingMemMutex);
     if (!m_IsWorkingMemAllocated)
     {
         return;
@@ -457,7 +455,7 @@ bool LoadedNetwork::Execute()
 
     try
     {
-        std::lock_guard<UniqueMutexLock> lockGuard(m_WorkingMemLock);
+        std::lock_guard<std::mutex> lockGuard(m_WorkingMemMutex);
         AllocateWorkingMemory();
 
         for (auto& input : m_InputQueue)

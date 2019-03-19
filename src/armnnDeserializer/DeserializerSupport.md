@@ -21,6 +21,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Gather
 * Greater
 * L2Normalization
+* Lstm
 * Maximum
 * Mean
 * Merger

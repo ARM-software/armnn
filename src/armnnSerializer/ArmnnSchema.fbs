@@ -115,7 +115,8 @@ enum LayerType : uint {
     Merger = 30,
     L2Normalization = 31,
     Splitter = 32,
-    DetectionPostProcess = 33
+    DetectionPostProcess = 33,
+    Lstm = 34
 }
 
 // Base layer table to be used as part of other layers
@@ -475,6 +476,44 @@ table DetectionPostProcessDescriptor {
     scaleH:float;
 }
 
+table LstmInputParams {
+    inputToForgetWeights:ConstTensor;
+    inputToCellWeights:ConstTensor;
+    inputToOutputWeights:ConstTensor;
+    recurrentToForgetWeights:ConstTensor;
+    recurrentToCellWeights:ConstTensor;
+    recurrentToOutputWeights:ConstTensor;
+    forgetGateBias:ConstTensor;
+    cellBias:ConstTensor;
+    outputGateBias:ConstTensor;
+
+    inputToInputWeights:ConstTensor;
+    recurrentToInputWeights:ConstTensor;
+    cellToInputWeights:ConstTensor;
+    inputGateBias:ConstTensor;
+
+    projectionWeights:ConstTensor;
+    projectionBias:ConstTensor;
+
+    cellToForgetWeights:ConstTensor;
+    cellToOutputWeights:ConstTensor;
+}
+
+table LstmDescriptor {
+    activationFunc:uint;
+    clippingThresCell:float;
+    clippingThresProj:float;
+    cifgEnabled:bool = true;
+    peepholeEnabled:bool = false;
+    projectionEnabled:bool = false;
+}
+
+table LstmLayer {
+    base:LayerBase;
+    descriptor:LstmDescriptor;
+    inputParams:LstmInputParams;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -509,7 +548,8 @@ union Layer {
     MergerLayer,
     L2NormalizationLayer,
     SplitterLayer,
-    DetectionPostProcessLayer
+    DetectionPostProcessLayer,
+    LstmLayer
 }
 
 table AnyLayer {

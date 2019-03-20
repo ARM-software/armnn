@@ -70,8 +70,8 @@ struct Rule
     bool m_Res = true;
 };
 
-template<class none = void>
-bool AllTypesAreEqualImpl()
+template<typename T>
+bool AllTypesAreEqualImpl(T t)
 {
     return true;
 }
@@ -81,7 +81,7 @@ bool AllTypesAreEqualImpl(T t1, T t2, Rest... rest)
 {
     static_assert(std::is_same<T, TensorInfo>::value, "Type T must be a TensorInfo");
 
-    return (t1.GetDataType() == t2.GetDataType()) && AllTypesAreEqualImpl(rest...);
+    return (t1.GetDataType() == t2.GetDataType()) && AllTypesAreEqualImpl(t2, rest...);
 }
 
 struct TypesAreEqual : public Rule

@@ -3,24 +3,119 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/ArmNN.hpp>
-#include <armnn/INetwork.hpp>
-
 #include "../Serializer.hpp"
 
+#include <armnn/ArmNN.hpp>
+#include <armnn/INetwork.hpp>
 #include <armnnDeserializer/IDeserializer.hpp>
 
 #include <random>
-#include <sstream>
 #include <vector>
 
 #include <boost/test/unit_test.hpp>
-#include <flatbuffers/idl.h>
 
 using armnnDeserializer::IDeserializer;
 
 namespace
 {
+
+struct DefaultLayerVerifierPolicy
+{
+    static void Apply()
+    {
+        BOOST_TEST_MESSAGE("Unexpected layer found in network");
+        BOOST_TEST(false);
+    }
+};
+
+class LayerVerifierBase : public armnn::LayerVisitorBase<DefaultLayerVerifierPolicy>
+{
+public:
+    LayerVerifierBase(const std::string& layerName,
+                      const std::vector<armnn::TensorInfo>& inputInfos,
+                      const std::vector<armnn::TensorInfo>& outputInfos)
+    : m_LayerName(layerName)
+    , m_InputTensorInfos(inputInfos)
+    , m_OutputTensorInfos(outputInfos) {}
+
+    void VisitInputLayer(const armnn::IConnectableLayer*, armnn::LayerBindingId, const char*) override {}
+
+    void VisitOutputLayer(const armnn::IConnectableLayer*, armnn::LayerBindingId id, const char*) override {}
+
+protected:
+    void VerifyNameAndConnections(const armnn::IConnectableLayer* layer, const char* name)
+    {
+        BOOST_TEST(name == m_LayerName.c_str());
+
+        BOOST_TEST(layer->GetNumInputSlots() == m_InputTensorInfos.size());
+        BOOST_TEST(layer->GetNumOutputSlots() == m_OutputTensorInfos.size());
+
+        for (unsigned int i = 0; i < m_InputTensorInfos.size(); i++)
+        {
+            const armnn::IOutputSlot* connectedOutput = layer->GetInputSlot(i).GetConnection();
+            BOOST_CHECK(connectedOutput);
+
+            const armnn::TensorInfo& connectedInfo = connectedOutput->GetTensorInfo();
+            BOOST_TEST(connectedInfo.GetShape() == m_InputTensorInfos[i].GetShape());
+            BOOST_TEST(
+                GetDataTypeName(connectedInfo.GetDataType()) == GetDataTypeName(m_InputTensorInfos[i].GetDataType()));
+        }
+
+        for (unsigned int i = 0; i < m_OutputTensorInfos.size(); i++)
+        {
+            const armnn::TensorInfo& outputInfo = layer->GetOutputSlot(i).GetTensorInfo();
+            BOOST_TEST(outputInfo.GetShape() == m_OutputTensorInfos[i].GetShape());
+            BOOST_TEST(
+                GetDataTypeName(outputInfo.GetDataType()) == GetDataTypeName(m_OutputTensorInfos[i].GetDataType()));
+        }
+    }
+
+private:
+    std::string m_LayerName;
+    std::vector<armnn::TensorInfo> m_InputTensorInfos;
+    std::vector<armnn::TensorInfo> m_OutputTensorInfos;
+};
+
+template<typename T>
+void CompareConstTensorData(const void* data1, const void* data2, unsigned int numElements)
+{
+    T typedData1 = static_cast<T>(data1);
+    T typedData2 = static_cast<T>(data2);
+    BOOST_CHECK(typedData1);
+    BOOST_CHECK(typedData2);
+
+    for (unsigned int i = 0; i < numElements; i++)
+    {
+        BOOST_TEST(typedData1[i] == typedData2[i]);
+    }
+}
+
+void CompareConstTensor(const armnn::ConstTensor& tensor1, const armnn::ConstTensor& tensor2)
+{
+    BOOST_TEST(tensor1.GetShape() == tensor2.GetShape());
+    BOOST_TEST(GetDataTypeName(tensor1.GetDataType()) == GetDataTypeName(tensor2.GetDataType()));
+
+    switch (tensor1.GetDataType())
+    {
+        case armnn::DataType::Float32:
+            CompareConstTensorData<const float*>(
+                tensor1.GetMemoryArea(), tensor2.GetMemoryArea(), tensor1.GetNumElements());
+            break;
+        case armnn::DataType::QuantisedAsymm8:
+        case armnn::DataType::Boolean:
+            CompareConstTensorData<const uint8_t*>(
+                tensor1.GetMemoryArea(), tensor2.GetMemoryArea(), tensor1.GetNumElements());
+            break;
+        case armnn::DataType::Signed32:
+            CompareConstTensorData<const int32_t*>(
+                tensor1.GetMemoryArea(), tensor2.GetMemoryArea(), tensor1.GetNumElements());
+            break;
+        default:
+            // Note that Float16 is not yet implemented
+            BOOST_TEST_MESSAGE("Unexpected datatype");
+            BOOST_TEST(false);
+    }
+}
 
 armnn::INetworkPtr DeserializeNetwork(const std::string& serializerString)
 {
@@ -61,182 +156,238 @@ static std::vector<DataType> GenerateRandomData(size_t size)
     return randomData;
 }
 
-template<typename T>
-void CheckDeserializedNetworkAgainstOriginal(const armnn::INetwork& deserializedNetwork,
-                                             const armnn::INetwork& originalNetwork,
-                                             const std::vector<armnn::TensorShape>& inputShapes,
-                                             const std::vector<armnn::TensorShape>& outputShapes,
-                                             const std::vector<armnn::LayerBindingId>& inputBindingIds = {0},
-                                             const std::vector<armnn::LayerBindingId>& outputBindingIds = {0})
-{
-    BOOST_CHECK(inputShapes.size() == inputBindingIds.size());
-    BOOST_CHECK(outputShapes.size() == outputBindingIds.size());
-
-    armnn::IRuntime::CreationOptions options;
-    armnn::IRuntimePtr runtime = armnn::IRuntime::Create(options);
-
-    std::vector<armnn::BackendId> preferredBackends = { armnn::BackendId("CpuRef") };
-
-    // Optimize original network
-    armnn::IOptimizedNetworkPtr optimizedOriginalNetwork =
-        armnn::Optimize(originalNetwork, preferredBackends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optimizedOriginalNetwork);
-
-    // Optimize deserialized network
-    armnn::IOptimizedNetworkPtr optimizedDeserializedNetwork =
-        armnn::Optimize(deserializedNetwork, preferredBackends, runtime->GetDeviceSpec());
-    BOOST_CHECK(optimizedDeserializedNetwork);
-
-    armnn::NetworkId networkId1;
-    armnn::NetworkId networkId2;
-
-    // Load original and deserialized network
-    armnn::Status status1 = runtime->LoadNetwork(networkId1, std::move(optimizedOriginalNetwork));
-    BOOST_CHECK(status1 == armnn::Status::Success);
-
-    armnn::Status status2 = runtime->LoadNetwork(networkId2, std::move(optimizedDeserializedNetwork));
-    BOOST_CHECK(status2 == armnn::Status::Success);
-
-    // Generate some input data
-    armnn::InputTensors inputTensors1;
-    armnn::InputTensors inputTensors2;
-    std::vector<std::vector<T>> inputData;
-    inputData.reserve(inputShapes.size());
-
-    for (unsigned int i = 0; i < inputShapes.size(); i++) {
-        inputData.push_back(GenerateRandomData<T>(inputShapes[i].GetNumElements()));
-
-        inputTensors1.emplace_back(
-            i, armnn::ConstTensor(runtime->GetInputTensorInfo(networkId1, inputBindingIds[i]), inputData[i].data()));
-
-        inputTensors2.emplace_back(
-            i, armnn::ConstTensor(runtime->GetInputTensorInfo(networkId2, inputBindingIds[i]), inputData[i].data()));
-    }
-
-    armnn::OutputTensors outputTensors1;
-    armnn::OutputTensors outputTensors2;
-    std::vector<std::vector<T>> outputData1;
-    std::vector<std::vector<T>> outputData2;
-    outputData1.reserve(outputShapes.size());
-    outputData2.reserve(outputShapes.size());
-
-    for (unsigned int i = 0; i < outputShapes.size(); i++)
-    {
-        outputData1.emplace_back(outputShapes[i].GetNumElements());
-        outputData2.emplace_back(outputShapes[i].GetNumElements());
-
-        outputTensors1.emplace_back(
-            i, armnn::Tensor(runtime->GetOutputTensorInfo(networkId1, outputBindingIds[i]), outputData1[i].data()));
-
-        outputTensors2.emplace_back(
-            i, armnn::Tensor(runtime->GetOutputTensorInfo(networkId2, outputBindingIds[i]), outputData2[i].data()));
-    }
-
-    // Run original and deserialized network
-    runtime->EnqueueWorkload(networkId1, inputTensors1, outputTensors1);
-    runtime->EnqueueWorkload(networkId2, inputTensors2, outputTensors2);
-
-    // Compare output data
-    for (unsigned int i = 0; i < outputShapes.size(); i++)
-    {
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-            outputData1[i].begin(), outputData1[i].end(), outputData2[i].begin(), outputData2[i].end());
-    }
-}
-
 } // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(SerializerTests)
 
-BOOST_AUTO_TEST_CASE(SerializeDeserializeAddition)
+BOOST_AUTO_TEST_CASE(SerializeAddition)
 {
-    class VerifyAdditionName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    class AdditionLayerVerifier : public LayerVerifierBase
     {
     public:
-        void VisitAdditionLayer(const armnn::IConnectableLayer*, const char* name) override
+        AdditionLayerVerifier(const std::string& layerName,
+                              const std::vector<armnn::TensorInfo>& inputInfos,
+                              const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitAdditionLayer(const armnn::IConnectableLayer* layer, const char* name) override
         {
-            BOOST_TEST(name == "addition");
+            VerifyNameAndConnections(layer, name);
         }
     };
+
+    const std::string layerName("addition");
+    const armnn::TensorInfo tensorInfo({1, 2, 3}, armnn::DataType::Float32);
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const additionLayer = network->AddAdditionLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
-    armnn::IConnectableLayer* const additionLayer = network->AddAdditionLayer("addition");
     inputLayer0->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(0));
     inputLayer1->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(1));
-
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
     additionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
-    armnn::TensorShape shape{1U};
-    armnn::TensorInfo info(shape, armnn::DataType::Float32);
-    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
-    additionLayer->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    additionLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    BOOST_TEST(stream.str().length() > 0);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     BOOST_CHECK(deserializedNetwork);
 
-    VerifyAdditionName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
+    AdditionLayerVerifier verifier(layerName, {tensorInfo, tensorInfo}, {tensorInfo});
+    deserializedNetwork->Accept(verifier);
+}
 
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {info.GetShape(), info.GetShape()},
-                                                   {info.GetShape()},
-                                                   {0, 1});
+BOOST_AUTO_TEST_CASE(SerializeBatchNormalization)
+{
+    class BatchNormalizationLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        BatchNormalizationLayerVerifier(const std::string& layerName,
+                                        const std::vector<armnn::TensorInfo>& inputInfos,
+                                        const std::vector<armnn::TensorInfo>& outputInfos,
+                                        const armnn::BatchNormalizationDescriptor& descriptor,
+                                        const armnn::ConstTensor& mean,
+                                        const armnn::ConstTensor& variance,
+                                        const armnn::ConstTensor& beta,
+                                        const armnn::ConstTensor& gamma)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor)
+        , m_Mean(mean)
+        , m_Variance(variance)
+        , m_Beta(beta)
+        , m_Gamma(gamma) {}
+
+        void VisitBatchNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                          const armnn::BatchNormalizationDescriptor& descriptor,
+                                          const armnn::ConstTensor& mean,
+                                          const armnn::ConstTensor& variance,
+                                          const armnn::ConstTensor& beta,
+                                          const armnn::ConstTensor& gamma,
+                                          const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+
+            CompareConstTensor(mean, m_Mean);
+            CompareConstTensor(variance, m_Variance);
+            CompareConstTensor(beta, m_Beta);
+            CompareConstTensor(gamma, m_Gamma);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::BatchNormalizationDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_Eps == m_Descriptor.m_Eps);
+            BOOST_TEST(static_cast<int>(descriptor.m_DataLayout) == static_cast<int>(m_Descriptor.m_DataLayout));
+        }
+
+        armnn::BatchNormalizationDescriptor m_Descriptor;
+        armnn::ConstTensor m_Mean;
+        armnn::ConstTensor m_Variance;
+        armnn::ConstTensor m_Beta;
+        armnn::ConstTensor m_Gamma;
+    };
+
+    const std::string layerName("batchNormalization");
+    const armnn::TensorInfo inputInfo ({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+
+    const armnn::TensorInfo meanInfo({1}, armnn::DataType::Float32);
+    const armnn::TensorInfo varianceInfo({1}, armnn::DataType::Float32);
+    const armnn::TensorInfo betaInfo({1}, armnn::DataType::Float32);
+    const armnn::TensorInfo gammaInfo({1}, armnn::DataType::Float32);
+
+    armnn::BatchNormalizationDescriptor descriptor;
+    descriptor.m_Eps = 0.0010000000475f;
+    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
+
+    std::vector<float> meanData({5.0});
+    std::vector<float> varianceData({2.0});
+    std::vector<float> betaData({1.0});
+    std::vector<float> gammaData({0.0});
+
+    armnn::ConstTensor mean(meanInfo, meanData);
+    armnn::ConstTensor variance(varianceInfo, varianceData);
+    armnn::ConstTensor beta(betaInfo, betaData);
+    armnn::ConstTensor gamma(gammaInfo, gammaData);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const batchNormalizationLayer =
+        network->AddBatchNormalizationLayer(descriptor, mean, variance, beta, gamma, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(batchNormalizationLayer->GetInputSlot(0));
+    batchNormalizationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    batchNormalizationLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    BatchNormalizationLayerVerifier verifier(
+        layerName, {inputInfo}, {outputInfo}, descriptor, mean, variance, beta, gamma);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeBatchToSpaceNd)
+{
+    class BatchToSpaceNdLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        BatchToSpaceNdLayerVerifier(const std::string& layerName,
+                                    const std::vector<armnn::TensorInfo>& inputInfos,
+                                    const std::vector<armnn::TensorInfo>& outputInfos,
+                                    const armnn::BatchToSpaceNdDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::BatchToSpaceNdDescriptor& descriptor,
+                                      const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::BatchToSpaceNdDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_Crops == m_Descriptor.m_Crops);
+            BOOST_TEST(descriptor.m_BlockShape == m_Descriptor.m_BlockShape);
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+        }
+
+        armnn::BatchToSpaceNdDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("spaceToBatchNd");
+    const armnn::TensorInfo inputInfo({4, 1, 2, 2}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({1, 1, 4, 4}, armnn::DataType::Float32);
+
+    armnn::BatchToSpaceNdDescriptor desc;
+    desc.m_DataLayout = armnn::DataLayout::NCHW;
+    desc.m_BlockShape = {2, 2};
+    desc.m_Crops = {{0, 0}, {0, 0}};
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const batchToSpaceNdLayer = network->AddBatchToSpaceNdLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(batchToSpaceNdLayer->GetInputSlot(0));
+    batchToSpaceNdLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    batchToSpaceNdLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    BatchToSpaceNdLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    deserializedNetwork->Accept(verifier);
 }
 
 BOOST_AUTO_TEST_CASE(SerializeConstant)
 {
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-
-    armnn::ConstTensor inputTensor;
-
-    armnn::IConnectableLayer* const inputLayer0 = network->AddConstantLayer(inputTensor, "constant");
-    armnn::IConnectableLayer* const outputLayer0 = network->AddOutputLayer(0);
-
-    inputLayer0->GetOutputSlot(0).Connect(outputLayer0->GetInputSlot(0));
-
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    BOOST_TEST(stream.str().length() > 0);
-    BOOST_TEST(stream.str().find("constant") != stream.str().npos);
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeConstant)
-{
-    class VerifyConstantName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    class ConstantLayerVerifier : public LayerVerifierBase
     {
     public:
-        void VisitConstantLayer(const armnn::IConnectableLayer*, const armnn::ConstTensor&, const char* name) override
+        ConstantLayerVerifier(const std::string& layerName,
+                              const std::vector<armnn::TensorInfo>& inputInfos,
+                              const std::vector<armnn::TensorInfo>& outputInfos,
+                              const armnn::ConstTensor& layerInput)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_LayerInput(layerInput) {}
+
+        void VisitConstantLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::ConstTensor& input,
+                                const char* name) override
         {
-            BOOST_TEST(name == "constant");
+            VerifyNameAndConnections(layer, name);
+
+            CompareConstTensor(input, m_LayerInput);
         }
+
+        void VisitAdditionLayer(const armnn::IConnectableLayer* layer, const char* name = nullptr) override {}
+
+    private:
+        armnn::ConstTensor m_LayerInput;
     };
 
-    armnn::TensorInfo commonTensorInfo({ 2, 3 }, armnn::DataType::Float32);
+    const std::string layerName("constant");
+    const armnn::TensorInfo info({ 2, 3 }, armnn::DataType::Float32);
 
-    std::vector<float> constantData = GenerateRandomData<float>(commonTensorInfo.GetNumElements());
-    armnn::ConstTensor constTensor(commonTensorInfo, constantData);
+    std::vector<float> constantData = GenerateRandomData<float>(info.GetNumElements());
+    armnn::ConstTensor constTensor(info, constantData);
 
-    // Builds up the structure of the network.
     armnn::INetworkPtr network(armnn::INetwork::Create());
-
     armnn::IConnectableLayer* input = network->AddInputLayer(0);
-    armnn::IConnectableLayer* constant = network->AddConstantLayer(constTensor, "constant");
+    armnn::IConnectableLayer* constant = network->AddConstantLayer(constTensor, layerName.c_str());
     armnn::IConnectableLayer* add = network->AddAdditionLayer();
     armnn::IConnectableLayer* output = network->AddOutputLayer(0);
 
@@ -244,316 +395,81 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeConstant)
     constant->GetOutputSlot(0).Connect(add->GetInputSlot(1));
     add->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    // Sets the tensors in the network.
-    input->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
-    constant->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
-    add->GetOutputSlot(0).SetTensorInfo(commonTensorInfo);
+    input->GetOutputSlot(0).SetTensorInfo(info);
+    constant->GetOutputSlot(0).SetTensorInfo(info);
+    add->GetOutputSlot(0).SetTensorInfo(info);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     BOOST_CHECK(deserializedNetwork);
 
-    VerifyConstantName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {commonTensorInfo.GetShape()},
-                                                   {commonTensorInfo.GetShape()});
+    ConstantLayerVerifier verifier(layerName, {}, {info}, constTensor);
+    deserializedNetwork->Accept(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDeserializeFloor)
+BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
 {
-    class VerifyFloorName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    class Convolution2dLayerVerifier : public LayerVerifierBase
     {
     public:
-        void VisitMultiplicationLayer(const armnn::IConnectableLayer*, const char* name) override
-        {
-            BOOST_TEST(name == "floor");
-        }
-    };
-
-    const armnn::TensorInfo info({4,4}, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-
-    const char* floorLayerName = "floor";
-
-    armnn::IConnectableLayer* const floorLayer = network->AddFloorLayer(floorLayerName);
-    inputLayer->GetOutputSlot(0).Connect(floorLayer->GetInputSlot(0));
-
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-    floorLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
-    floorLayer->GetOutputSlot(0).SetTensorInfo(info);
-
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    BOOST_TEST(stream.str().length() > 0);
-    BOOST_TEST(stream.str().find(floorLayerName) != stream.str().npos);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyFloorName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {info.GetShape()},
-                                                   {info.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeMinimum)
-{
-    class VerifyMinimumName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        explicit VerifyMinimumName(const std::string& expectedMinimumLayerName)
-            : m_ExpectedMinimumLayerName(expectedMinimumLayerName) {}
-
-        void VisitMinimumLayer(const armnn::IConnectableLayer*, const char* name) override
-        {
-            BOOST_TEST(name == m_ExpectedMinimumLayerName.c_str());
-        }
-
-    private:
-        std::string m_ExpectedMinimumLayerName;
-    };
-
-    const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-
-    const std::string minimumLayerName("minimum");
-
-    armnn::IConnectableLayer* const minimumLayer = network->AddMinimumLayer(minimumLayerName.c_str());
-    inputLayer0->GetOutputSlot(0).Connect(minimumLayer->GetInputSlot(0));
-    inputLayer1->GetOutputSlot(0).Connect(minimumLayer->GetInputSlot(1));
-
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-    minimumLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
-    minimumLayer->GetOutputSlot(0).SetTensorInfo(info);
-
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    BOOST_TEST(stream.str().length() > 0);
-    BOOST_TEST(stream.str().find(minimumLayerName) != stream.str().npos);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyMinimumName nameChecker(minimumLayerName);
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {info.GetShape(), info.GetShape()},
-                                                   {info.GetShape()},
-                                                   {0, 1});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeMaximum)
-{
-    class VerifyMaximumName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        explicit VerifyMaximumName(const std::string& expectedMaximumLayerName)
-            : m_ExpectedMaximumLayerName(expectedMaximumLayerName) {}
-
-        void VisitMaximumLayer(const armnn::IConnectableLayer*, const char* name) override
-        {
-            BOOST_TEST(name == m_ExpectedMaximumLayerName.c_str());
-        }
-
-    private:
-        std::string m_ExpectedMaximumLayerName;
-    };
-
-    const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-
-    const std::string maximumLayerName("maximum");
-
-    armnn::IConnectableLayer* const maximumLayer = network->AddMaximumLayer(maximumLayerName.c_str());
-    inputLayer0->GetOutputSlot(0).Connect(maximumLayer->GetInputSlot(0));
-    inputLayer1->GetOutputSlot(0).Connect(maximumLayer->GetInputSlot(1));
-
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-    maximumLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
-    maximumLayer->GetOutputSlot(0).SetTensorInfo(info);
-
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    BOOST_TEST(stream.str().length() > 0);
-    BOOST_TEST(stream.str().find(maximumLayerName) != stream.str().npos);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyMaximumName nameChecker(maximumLayerName);
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {info.GetShape(), info.GetShape()},
-                                                   {info.GetShape()},
-                                                   {0, 1});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeL2Normalization)
-{
-    class VerifyL2NormalizationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        explicit VerifyL2NormalizationName(const std::string& expectedL2NormalizationLayerName)
-        : m_ExpectedL2NormalizationLayerName(expectedL2NormalizationLayerName) {}
-
-        void VisitL2NormalizationLayer(const armnn::IConnectableLayer*,
-                                       const armnn::L2NormalizationDescriptor&,
-                                       const char* name) override
-        {
-            BOOST_TEST(name == m_ExpectedL2NormalizationLayerName.c_str());
-        }
-    private:
-        std::string m_ExpectedL2NormalizationLayerName;
-    };
-
-    const armnn::TensorInfo info({ 1, 2, 1, 5 }, armnn::DataType::Float32);
-
-    armnn::L2NormalizationDescriptor desc;
-    desc.m_DataLayout = armnn::DataLayout::NCHW;
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
-
-    const char* l2NormLayerName = "l2Normalization";
-
-    armnn::IConnectableLayer* const l2NormLayer = network->AddL2NormalizationLayer(desc, l2NormLayerName);
-    inputLayer0->GetOutputSlot(0).Connect(l2NormLayer->GetInputSlot(0));
-
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-        l2NormLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
-    l2NormLayer->GetOutputSlot(0).SetTensorInfo(info);
-
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    BOOST_TEST(stream.str().length() > 0);
-    BOOST_TEST(stream.str().find(l2NormLayerName) != stream.str().npos);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyL2NormalizationName nameChecker(l2NormLayerName);
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   { info.GetShape() },
-                                                   { info.GetShape() });
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeMultiplication)
-{
-    class VerifyMultiplicationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitMultiplicationLayer(const armnn::IConnectableLayer*, const char* name) override
-        {
-            BOOST_TEST(name == "multiplication");
-        }
-    };
-
-    const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-
-    const char* multLayerName = "multiplication";
-
-    armnn::IConnectableLayer* const multiplicationLayer = network->AddMultiplicationLayer(multLayerName);
-    inputLayer0->GetOutputSlot(0).Connect(multiplicationLayer->GetInputSlot(0));
-    inputLayer1->GetOutputSlot(0).Connect(multiplicationLayer->GetInputSlot(1));
-
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-    multiplicationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
-    multiplicationLayer->GetOutputSlot(0).SetTensorInfo(info);
-
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    BOOST_TEST(stream.str().length() > 0);
-    BOOST_TEST(stream.str().find(multLayerName) != stream.str().npos);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyMultiplicationName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {info.GetShape(), info.GetShape()},
-                                                   {info.GetShape()},
-                                                   {0, 1});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeConvolution2d)
-{
-
-    class VerifyConvolution2dName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitConvolution2dLayer(const armnn::IConnectableLayer*,
-                                     const armnn::Convolution2dDescriptor&,
-                                     const armnn::ConstTensor&,
-                                     const armnn::Optional<armnn::ConstTensor>&,
+        Convolution2dLayerVerifier(const std::string& layerName,
+                                   const std::vector<armnn::TensorInfo>& inputInfos,
+                                   const std::vector<armnn::TensorInfo>& outputInfos,
+                                   const armnn::Convolution2dDescriptor& descriptor,
+                                   const armnn::ConstTensor& weight,
+                                   const armnn::Optional<armnn::ConstTensor>& bias)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor)
+        , m_Weight(weight)
+        , m_Bias(bias) {}
+
+        void VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                     const armnn::Convolution2dDescriptor& descriptor,
+                                     const armnn::ConstTensor& weight,
+                                     const armnn::Optional<armnn::ConstTensor>& bias,
                                      const char* name) override
         {
-            BOOST_TEST(name == "convolution");
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+
+            CompareConstTensor(weight, m_Weight);
+
+            BOOST_TEST(bias.has_value() == m_Bias.has_value());
+            if (bias.has_value() && m_Bias.has_value())
+            {
+                CompareConstTensor(bias.value(), m_Bias.value());
+            }
         }
+
+    private:
+        void VerifyDescriptor(const armnn::Convolution2dDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_PadLeft == m_Descriptor.m_PadLeft);
+            BOOST_TEST(descriptor.m_PadRight == m_Descriptor.m_PadRight);
+            BOOST_TEST(descriptor.m_PadTop == m_Descriptor.m_PadTop);
+            BOOST_TEST(descriptor.m_PadBottom == m_Descriptor.m_PadBottom);
+            BOOST_TEST(descriptor.m_StrideX == m_Descriptor.m_StrideX);
+            BOOST_TEST(descriptor.m_StrideY == m_Descriptor.m_StrideY);
+            BOOST_TEST(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+        }
+
+        armnn::Convolution2dDescriptor m_Descriptor;
+        armnn::ConstTensor m_Weight;
+        armnn::Optional<armnn::ConstTensor> m_Bias;
     };
 
-    armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
-    armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+    const std::string layerName("convolution2d");
+    const armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
 
-    armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
-    armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
 
-    // Construct network
-    armnn::INetworkPtr network = armnn::INetwork::Create();
+    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
+    armnn::ConstTensor weights(weightsInfo, weightsData);
+
+    std::vector<float> biasesData = GenerateRandomData<float>(biasesInfo.GetNumElements());
+    armnn::ConstTensor biases(biasesInfo, biasesData);
 
     armnn::Convolution2dDescriptor descriptor;
     descriptor.m_PadLeft     = 1;
@@ -565,145 +481,83 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeConvolution2d)
     descriptor.m_BiasEnabled = true;
     descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
 
-    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
-    armnn::ConstTensor weights(weightsInfo, weightsData);
-
-    std::vector<float> biasesData = GenerateRandomData<float>(biasesInfo.GetNumElements());
-    armnn::ConstTensor biases(biasesInfo, biasesData);
-
-    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0, "input");
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
     armnn::IConnectableLayer* const convLayer   =
-        network->AddConvolution2dLayer(descriptor, weights, biases, "convolution");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0, "output");
+        network->AddConvolution2dLayer(descriptor, weights, biases, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
-
     convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     BOOST_CHECK(deserializedNetwork);
 
-    VerifyConvolution2dName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputInfo.GetShape()},
-                                                   {outputInfo.GetShape()});
+    Convolution2dLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor, weights, biases);
+    deserializedNetwork->Accept(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeDeserializeGreater)
+BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
 {
-    class VerifyGreaterName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    class DepthwiseConvolution2dLayerVerifier : public LayerVerifierBase
     {
     public:
-        void VisitGreaterLayer(const armnn::IConnectableLayer*, const char* name) override
-        {
-            BOOST_TEST(name == "greater");
-        }
-    };
+        DepthwiseConvolution2dLayerVerifier(const std::string& layerName,
+                                            const std::vector<armnn::TensorInfo>& inputInfos,
+                                            const std::vector<armnn::TensorInfo>& outputInfos,
+                                            const armnn::DepthwiseConvolution2dDescriptor& descriptor,
+                                            const armnn::ConstTensor& weight,
+                                            const armnn::Optional<armnn::ConstTensor>& bias)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor)
+        , m_Weight(weight)
+        , m_Bias(bias) {}
 
-    const armnn::TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, armnn::DataType::Float32);
-    const armnn::TensorInfo inputTensorInfo2({ 1, 2, 2, 2 }, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo({ 1, 2, 2, 2 }, armnn::DataType::Boolean);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
-    armnn::IConnectableLayer* const greaterLayer = network->AddGreaterLayer("greater");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer1->GetOutputSlot(0).Connect(greaterLayer->GetInputSlot(0));
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo1);
-    inputLayer2->GetOutputSlot(0).Connect(greaterLayer->GetInputSlot(1));
-    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo2);
-    greaterLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    greaterLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyGreaterName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()},
-                                                   {outputTensorInfo.GetShape()},
-                                                   {0, 1});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeReshape)
-{
-    class VerifyReshapeName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitReshapeLayer(const armnn::IConnectableLayer*, const armnn::ReshapeDescriptor&, const char* name)
-        {
-            BOOST_TEST(name == "reshape");
-        }
-    };
-
-    unsigned int inputShape[]  = { 1, 9 };
-    unsigned int outputShape[] = { 3, 3 };
-
-    auto inputTensorInfo = armnn::TensorInfo(2, inputShape, armnn::DataType::Float32);
-    auto outputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::DataType::Float32);
-    auto reshapeOutputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::DataType::Float32);
-
-    armnn::ReshapeDescriptor reshapeDescriptor;
-    reshapeDescriptor.m_TargetShape = reshapeOutputTensorInfo.GetShape();
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const reshapeLayer = network->AddReshapeLayer(reshapeDescriptor, "reshape");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(reshapeLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    reshapeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    reshapeLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyReshapeName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeDepthwiseConvolution2d)
-{
-    class VerifyDepthwiseConvolution2dName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer*,
-                                              const armnn::DepthwiseConvolution2dDescriptor&,
-                                              const armnn::ConstTensor&,
-                                              const armnn::Optional<armnn::ConstTensor>&,
+        void VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                              const armnn::DepthwiseConvolution2dDescriptor& descriptor,
+                                              const armnn::ConstTensor& weight,
+                                              const armnn::Optional<armnn::ConstTensor>& bias,
                                               const char* name) override
         {
-            BOOST_TEST(name == "depthwise_convolution");
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+
+            CompareConstTensor(weight, m_Weight);
+
+            BOOST_TEST(bias.has_value() == m_Bias.has_value());
+            if (bias.has_value() && m_Bias.has_value())
+            {
+                CompareConstTensor(bias.value(), m_Bias.value());
+            }
         }
+
+    private:
+        void VerifyDescriptor(const armnn::DepthwiseConvolution2dDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_PadLeft == m_Descriptor.m_PadLeft);
+            BOOST_TEST(descriptor.m_PadRight == m_Descriptor.m_PadRight);
+            BOOST_TEST(descriptor.m_PadTop == m_Descriptor.m_PadTop);
+            BOOST_TEST(descriptor.m_PadBottom == m_Descriptor.m_PadBottom);
+            BOOST_TEST(descriptor.m_StrideX == m_Descriptor.m_StrideX);
+            BOOST_TEST(descriptor.m_StrideY == m_Descriptor.m_StrideY);
+            BOOST_TEST(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+        }
+
+        armnn::DepthwiseConvolution2dDescriptor m_Descriptor;
+        armnn::ConstTensor m_Weight;
+        armnn::Optional<armnn::ConstTensor> m_Bias;
     };
 
-    armnn::TensorInfo inputInfo ({ 1, 5, 5, 3 }, armnn::DataType::Float32);
-    armnn::TensorInfo outputInfo({ 1, 3, 3, 3 }, armnn::DataType::Float32);
+    const std::string layerName("depwiseConvolution2d");
+    const armnn::TensorInfo inputInfo ({ 1, 5, 5, 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, 3, 3, 3 }, armnn::DataType::Float32);
 
-    armnn::TensorInfo weightsInfo({ 1, 3, 3, 3 }, armnn::DataType::Float32);
-    armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
-
-    armnn::DepthwiseConvolution2dDescriptor descriptor;
-    descriptor.m_StrideX     = 1;
-    descriptor.m_StrideY     = 1;
-    descriptor.m_BiasEnabled = true;
-    descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
 
     std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
     armnn::ConstTensor weights(weightsInfo, weightsData);
@@ -711,928 +565,102 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeDepthwiseConvolution2d)
     std::vector<int32_t> biasesData = GenerateRandomData<int32_t>(biasesInfo.GetNumElements());
     armnn::ConstTensor biases(biasesInfo, biasesData);
 
+    armnn::DepthwiseConvolution2dDescriptor descriptor;
+    descriptor.m_StrideX     = 1;
+    descriptor.m_StrideY     = 1;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
     armnn::IConnectableLayer* const depthwiseConvLayer =
-        network->AddDepthwiseConvolution2dLayer(descriptor, weights, biases, "depthwise_convolution");
+        network->AddDepthwiseConvolution2dLayer(descriptor, weights, biases, layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
     depthwiseConvLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
     depthwiseConvLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     BOOST_CHECK(deserializedNetwork);
 
-    VerifyDepthwiseConvolution2dName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputInfo.GetShape()},
-                                                   {outputInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeSoftmax)
-{
-    class VerifySoftmaxName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitSoftmaxLayer(const armnn::IConnectableLayer*, const armnn::SoftmaxDescriptor&, const char* name)
-        {
-            BOOST_TEST(name == "softmax");
-        }
-    };
-
-    armnn::TensorInfo tensorInfo({1, 10}, armnn::DataType::Float32);
-
-    armnn::SoftmaxDescriptor descriptor;
-    descriptor.m_Beta = 1.0f;
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer   = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const softmaxLayer = network->AddSoftmaxLayer(descriptor, "softmax");
-    armnn::IConnectableLayer* const outputLayer  = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(softmaxLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-    softmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    softmaxLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifySoftmaxName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {tensorInfo.GetShape()},
-                                                   {tensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializePooling2d)
-{
-    class VerifyPooling2dName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-        void VisitPooling2dLayer(const armnn::IConnectableLayer*, const armnn::Pooling2dDescriptor&, const char* name)
-        {
-            BOOST_TEST(name == "pooling2d");
-        }
-    };
-
-    unsigned int inputShape[]  = {1, 2, 2, 1};
-    unsigned int outputShape[] = {1, 1, 1, 1};
-
-    auto inputInfo  = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
-    auto outputInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
-
-    armnn::Pooling2dDescriptor desc;
-    desc.m_DataLayout          = armnn::DataLayout::NHWC;
-    desc.m_PadTop              = 0;
-    desc.m_PadBottom           = 0;
-    desc.m_PadLeft             = 0;
-    desc.m_PadRight            = 0;
-    desc.m_PoolType            = armnn::PoolingAlgorithm::Average;
-    desc.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
-    desc.m_PaddingMethod       = armnn::PaddingMethod::Exclude;
-    desc.m_PoolHeight          = 2;
-    desc.m_PoolWidth           = 2;
-    desc.m_StrideX             = 2;
-    desc.m_StrideY             = 2;
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const pooling2dLayer = network->AddPooling2dLayer(desc, "pooling2d");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(pooling2dLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
-    pooling2dLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    pooling2dLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyPooling2dName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputInfo.GetShape()},
-                                                   {outputInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializePermute)
-{
-    class VerifyPermuteName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitPermuteLayer(const armnn::IConnectableLayer*, const armnn::PermuteDescriptor&, const char* name)
-        {
-            BOOST_TEST(name == "permute");
-        }
-    };
-
-    unsigned int inputShape[]  = { 4, 3, 2, 1 };
-    unsigned int outputShape[] = { 1, 2, 3, 4 };
-    unsigned int dimsMapping[] = { 3, 2, 1, 0 };
-
-    auto inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
-    auto outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
-
-    armnn::PermuteDescriptor permuteDescriptor(armnn::PermutationVector(dimsMapping, 4));
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const permuteLayer = network->AddPermuteLayer(permuteDescriptor, "permute");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(permuteLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    permuteLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    permuteLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyPermuteName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeFullyConnected)
-{
-    class VerifyFullyConnectedName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitFullyConnectedLayer(const armnn::IConnectableLayer*,
-                                      const armnn::FullyConnectedDescriptor&,
-                                      const armnn::ConstTensor&,
-                                      const armnn::Optional<armnn::ConstTensor>&,
-                                      const char* name) override
-        {
-            BOOST_TEST(name == "fully_connected");
-        }
-    };
-
-    armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
-    armnn::TensorInfo outputInfo({ 2, 3 }, armnn::DataType::Float32);
-
-    armnn::TensorInfo weightsInfo({ 5, 3 }, armnn::DataType::Float32);
-    armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
-
-    armnn::FullyConnectedDescriptor descriptor;
-    descriptor.m_BiasEnabled = true;
-    descriptor.m_TransposeWeightMatrix = false;
-
-    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
-    std::vector<float> biasesData  = GenerateRandomData<float>(biasesInfo.GetNumElements());
-
-    armnn::ConstTensor weights(weightsInfo, weightsData);
-    armnn::ConstTensor biases(biasesInfo, biasesData);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0, "input");
-    armnn::IConnectableLayer* const fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor,
-                                                                                          weights,
-                                                                                          biases,
-                                                                                          "fully_connected");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0, "output");
-
-    inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
-
-    fullyConnectedLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyFullyConnectedName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputInfo.GetShape()},
-                                                   {outputInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeSpaceToBatchNd)
-{
-    class VerifySpaceToBatchNdName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer*,
-                                      const armnn::SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
-                                      const char* name) override
-        {
-            BOOST_TEST(name == "SpaceToBatchNdLayer");
-        }
-    };
-
-    unsigned int inputShape[] = {2, 1, 2, 4};
-    unsigned int outputShape[] = {8, 1, 1, 3};
-
-    armnn::SpaceToBatchNdDescriptor desc;
-    desc.m_DataLayout = armnn::DataLayout::NCHW;
-    desc.m_BlockShape = {2, 2};
-    desc.m_PadList = {{0, 0}, {2, 0}};
-
-    auto inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
-    auto outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const spaceToBatchNdLayer = network->AddSpaceToBatchNdLayer(desc, "SpaceToBatchNdLayer");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(spaceToBatchNdLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    spaceToBatchNdLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    spaceToBatchNdLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifySpaceToBatchNdName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeGather)
-{
-    class VerifyGatherName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VerifyGatherLayer(const armnn::IConnectableLayer *, const char *name)
-        {
-            BOOST_TEST(name == "gatherLayer");
-        }
-    };
-
-    armnn::TensorInfo paramsInfo({ 8 }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32);
-    armnn::TensorInfo outputInfo({ 3 }, armnn::DataType::QuantisedAsymm8);
-
-    paramsInfo.SetQuantizationScale(1.0f);
-    paramsInfo.SetQuantizationOffset(0);
-    outputInfo.SetQuantizationScale(1.0f);
-    outputInfo.SetQuantizationOffset(0);
-
-    const std::vector<int32_t>& indicesData = {7, 6, 5};
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer *const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer *const constantLayer =
-            network->AddConstantLayer(armnn::ConstTensor(indicesInfo, indicesData));
-    armnn::IConnectableLayer *const gatherLayer = network->AddGatherLayer("gatherLayer");
-    armnn::IConnectableLayer *const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(gatherLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(paramsInfo);
-    constantLayer->GetOutputSlot(0).Connect(gatherLayer->GetInputSlot(1));
-    constantLayer->GetOutputSlot(0).SetTensorInfo(indicesInfo);
-    gatherLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    gatherLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyGatherName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<uint8_t>(*deserializedNetwork,
-                                                     *network,
-                                                     {paramsInfo.GetShape()},
-                                                     {outputInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeBatchNormalization)
-{
-    class VerifyBatchNormalizationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitBatchNormalizationLayer(const armnn::IConnectableLayer*,
-                                      const armnn::BatchNormalizationDescriptor&,
-                                      const armnn::ConstTensor&,
-                                      const armnn::ConstTensor&,
-                                      const armnn::ConstTensor&,
-                                      const armnn::ConstTensor&,
-                                      const char* name) override
-        {
-            BOOST_TEST(name == "BatchNormalizationLayer");
-        }
-    };
-
-    armnn::TensorInfo inputInfo ({ 1, 3, 3, 1 }, armnn::DataType::Float32);
-    armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
-
-    armnn::TensorInfo meanInfo({1}, armnn::DataType::Float32);
-    armnn::TensorInfo varianceInfo({1}, armnn::DataType::Float32);
-    armnn::TensorInfo scaleInfo({1}, armnn::DataType::Float32);
-    armnn::TensorInfo offsetInfo({1}, armnn::DataType::Float32);
-
-    armnn::BatchNormalizationDescriptor descriptor;
-    descriptor.m_Eps = 0.0010000000475f;
-    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
-
-    std::vector<float> meanData({5.0});
-    std::vector<float> varianceData({2.0});
-    std::vector<float> scaleData({1.0});
-    std::vector<float> offsetData({0.0});
-
-    armnn::ConstTensor mean(meanInfo, meanData);
-    armnn::ConstTensor variance(varianceInfo, varianceData);
-    armnn::ConstTensor scale(scaleInfo, scaleData);
-    armnn::ConstTensor offset(offsetInfo, offsetData);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const batchNormalizationLayer = network->AddBatchNormalizationLayer(
-                                                                       descriptor,
-                                                                       mean,
-                                                                       variance,
-                                                                       scale,
-                                                                       offset,
-                                                                       "BatchNormalizationLayer");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(batchNormalizationLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
-
-    batchNormalizationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    batchNormalizationLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyBatchNormalizationName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputInfo.GetShape()},
-                                                   {outputInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeDivision)
-{
-    class VerifyDivisionName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitDivisionLayer(const armnn::IConnectableLayer*, const char* name) override
-        {
-            BOOST_TEST(name == "division");
-        }
-    };
-
-    const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-
-    const char* divLayerName = "division";
-
-    armnn::IConnectableLayer* const divisionLayer = network->AddDivisionLayer(divLayerName);
-    inputLayer0->GetOutputSlot(0).Connect(divisionLayer->GetInputSlot(0));
-    inputLayer1->GetOutputSlot(0).Connect(divisionLayer->GetInputSlot(1));
-
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-    divisionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
-    divisionLayer->GetOutputSlot(0).SetTensorInfo(info);
-
-    armnnSerializer::Serializer serializer;
-    serializer.Serialize(*network);
-
-    std::stringstream stream;
-    serializer.SaveSerializedToStream(stream);
-    BOOST_TEST(stream.str().length() > 0);
-    BOOST_TEST(stream.str().find(divLayerName) != stream.str().npos);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(stream.str());
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyDivisionName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {info.GetShape(), info.GetShape()},
-                                                   {info.GetShape()},
-                                                   {0, 1});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeNormalization)
-{
-    class VerifyNormalizationName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-        public:
-        void VisitNormalizationLayer(const armnn::IConnectableLayer*,
-                                     const armnn::NormalizationDescriptor& normalizationDescriptor,
-                                     const char* name) override
-        {
-            BOOST_TEST(name == "NormalizationLayer");
-        }
-    };
-
-    unsigned int inputShape[] = {2, 1, 2, 2};
-    unsigned int outputShape[] = {2, 1, 2, 2};
-
-    armnn::NormalizationDescriptor desc;
-    desc.m_DataLayout = armnn::DataLayout::NCHW;
-    desc.m_NormSize = 3;
-    desc.m_Alpha = 1;
-    desc.m_Beta = 1;
-    desc.m_K = 1;
-
-    auto inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
-    auto outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const normalizationLayer = network->AddNormalizationLayer(desc, "NormalizationLayer");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(normalizationLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    normalizationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    normalizationLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyNormalizationName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeEqual)
-{
-    class VerifyEqualName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitEqualLayer(const armnn::IConnectableLayer*,
-                             const char* name) override
-        {
-            BOOST_TEST(name == "EqualLayer");
-        }
-    };
-
-    const armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
-    const armnn::TensorInfo inputTensorInfo2 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Boolean);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
-    armnn::IConnectableLayer* const equalLayer = network->AddEqualLayer("EqualLayer");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer1->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(0));
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo1);
-    inputLayer2->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(1));
-    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo2);
-    equalLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    equalLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyEqualName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()},
-                                                   {outputTensorInfo.GetShape()},
-                                                   {0, 1});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializePad)
-{
-    class VerifyPadName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitPadLayer(const armnn::IConnectableLayer*,
-                           const armnn::PadDescriptor& descriptor,
-                           const char* name) override
-        {
-            BOOST_TEST(name == "PadLayer");
-        }
-    };
-
-    armnn::PadDescriptor desc({{0, 0}, {1, 0}, {1, 1}, {1, 2}});
-
-    const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({1, 2, 3, 4}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 5, 7}, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const padLayer = network->AddPadLayer(desc, "PadLayer");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(padLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    padLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    padLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyPadName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeRsqrt)
-{
-    class VerifyRsqrtName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitRsqrtLayer(const armnn::IConnectableLayer*, const char* name) override
-        {
-            BOOST_TEST(name == "rsqrt");
-        }
-    };
-
-    const armnn::TensorInfo tensorInfo({ 3, 1, 2 }, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const rsqrtLayer  = network->AddRsqrtLayer("rsqrt");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(rsqrtLayer->GetInputSlot(0));
-    rsqrtLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-    rsqrtLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyRsqrtName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {tensorInfo.GetShape()},
-                                                   {tensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeResizeBilinear)
-{
-    class VerifyResizeBilinearName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitResizeBilinearLayer(const armnn::IConnectableLayer*,
-                                      const armnn::ResizeBilinearDescriptor& descriptor,
-                                      const char* name) override
-        {
-            BOOST_TEST(name == "ResizeBilinearLayer");
-        }
-    };
-
-    armnn::ResizeBilinearDescriptor desc;
-    desc.m_TargetWidth = 4;
-    desc.m_TargetHeight = 2;
-
-    const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const resizeLayer = network->AddResizeBilinearLayer(desc, "ResizeBilinearLayer");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(resizeLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    resizeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    resizeLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyResizeBilinearName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeSubtraction)
-{
-    class VerifySubtractionName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitSubtractionLayer(const armnn::IConnectableLayer*, const char* name) override
-        {
-            BOOST_TEST(name == "subtraction");
-        }
-    };
-
-    const armnn::TensorInfo info = armnn::TensorInfo({ 1, 4 }, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-    armnn::IConnectableLayer* const subtractionLayer = network->AddSubtractionLayer("subtraction");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer0->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(0));
-    inputLayer1->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(1));
-    subtractionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
-    subtractionLayer->GetOutputSlot(0).SetTensorInfo(info);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifySubtractionName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {info.GetShape(), info.GetShape()},
-                                                   {info.GetShape()},
-                                                   {0, 1});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeStridedSlice)
-{
-    class VerifyStridedSliceName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitStridedSliceLayer(const armnn::IConnectableLayer*,
-                                    const armnn::StridedSliceDescriptor& descriptor,
-                                    const char* name) override
-        {
-            BOOST_TEST(name == "StridedSliceLayer");
-        }
-    };
-
-    armnn::StridedSliceDescriptor desc({0, 0, 1, 0}, {1, 1, 1, 1}, {1, 1, 1, 1});
-    desc.m_EndMask = (1 << 4) - 1;
-    desc.m_ShrinkAxisMask = (1 << 1) | (1 << 2);
-    desc.m_DataLayout = armnn::DataLayout::NCHW;
-
-    const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({3, 2, 3, 1}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({3, 1}, armnn::DataType::Float32);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const stridedSliceLayer = network->AddStridedSliceLayer(desc, "StridedSliceLayer");
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(stridedSliceLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    stridedSliceLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    stridedSliceLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyStridedSliceName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeMean)
-{
-    class VerifyMeanName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitMeanLayer(const armnn::IConnectableLayer*, const armnn::MeanDescriptor&, const char* name)
-        {
-            BOOST_TEST(name == "mean");
-        }
-    };
-
-    armnn::TensorInfo inputTensorInfo({1, 1, 3, 2}, armnn::DataType::Float32);
-    armnn::TensorInfo outputTensorInfo({1, 1, 1, 2}, armnn::DataType::Float32);
-
-    armnn::MeanDescriptor descriptor;
-    descriptor.m_Axis = { 2 };
-    descriptor.m_KeepDims = true;
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer   = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const meanLayer = network->AddMeanLayer(descriptor, "mean");
-    armnn::IConnectableLayer* const outputLayer  = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(meanLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    meanLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    meanLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyMeanName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeMerger)
-{
-    class VerifyMergerName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitMergerLayer(const armnn::IConnectableLayer* layer,
-                              const armnn::OriginsDescriptor& mergerDescriptor,
-                              const char* name = nullptr) override
-        {
-            BOOST_TEST(name == "MergerLayer");
-        }
-    };
-
-    unsigned int inputShapeOne[] = {2, 3, 2, 2};
-    unsigned int inputShapeTwo[] = {2, 3, 2, 2};
-    unsigned int outputShape[] = {4, 3, 2, 2};
-
-    const armnn::TensorInfo inputOneTensorInfo = armnn::TensorInfo(4, inputShapeOne, armnn::DataType::Float32);
-    const armnn::TensorInfo inputTwoTensorInfo = armnn::TensorInfo(4, inputShapeTwo, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
-
-    std::vector<armnn::TensorShape> shapes;
-    shapes.push_back(inputOneTensorInfo.GetShape());
-    shapes.push_back(inputTwoTensorInfo.GetShape());
-
-    armnn::MergerDescriptor descriptor =
-        armnn::CreateMergerDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayerOne = network->AddInputLayer(0);
-    inputLayerOne->GetOutputSlot(0).SetTensorInfo(inputOneTensorInfo);
-    armnn::IConnectableLayer* const inputLayerTwo = network->AddInputLayer(1);
-    inputLayerTwo->GetOutputSlot(0).SetTensorInfo(inputTwoTensorInfo);
-    armnn::IConnectableLayer* const mergerLayer = network->AddMergerLayer(descriptor, "MergerLayer");
-    mergerLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayerOne->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
-    inputLayerTwo->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
-    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifyMergerName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputOneTensorInfo.GetShape(), inputTwoTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape()},
-                                                   {0, 1});
-}
-
-BOOST_AUTO_TEST_CASE(SerializeDeserializeSplitter)
-{
-    class VerifySplitterName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
-    {
-    public:
-        void VisitSplitterLayer(const armnn::IConnectableLayer*,
-                                const armnn::ViewsDescriptor& viewsDescriptor,
-                                const char* name) override
-        {
-            BOOST_TEST(name == "splitter");
-        }
-    };
-
-    unsigned int numViews = 3;
-    unsigned int numDimensions = 4;
-    unsigned int inputShape[] = {1,18, 4, 4};
-    unsigned int outputShape[] = {1, 6, 4, 4};
-
-    auto inputTensorInfo = armnn::TensorInfo(numDimensions, inputShape, armnn::DataType::Float32);
-    auto outputTensorInfo = armnn::TensorInfo(numDimensions, outputShape, armnn::DataType::Float32);
-
-    // This is modelled on how the caffe parser sets up a splitter layer to partition an input
-    // along dimension one.
-    unsigned int splitterDimSizes[4] = {static_cast<unsigned int>(inputShape[0]),
-                                        static_cast<unsigned int>(inputShape[1]),
-                                        static_cast<unsigned int>(inputShape[2]),
-                                        static_cast<unsigned int>(inputShape[3])};
-    splitterDimSizes[1] /= numViews;
-    armnn::ViewsDescriptor desc(numViews, numDimensions);
-
-    for (unsigned int g = 0; g < numViews; ++g)
-    {
-        desc.SetViewOriginCoord(g, 1, splitterDimSizes[1] * g);
-
-        // Set the size of the views.
-        for (unsigned int dimIdx=0; dimIdx < 4; dimIdx++)
-        {
-                desc.SetViewSize(g, dimIdx, splitterDimSizes[dimIdx]);
-        }
-    }
-
-    const char* splitterLayerName = "splitter";
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const splitterLayer = network->AddSplitterLayer(desc, splitterLayerName);
-    armnn::IConnectableLayer* const outputLayer0 = network->AddOutputLayer(0);
-    armnn::IConnectableLayer* const outputLayer1 = network->AddOutputLayer(1);
-    armnn::IConnectableLayer* const outputLayer2 = network->AddOutputLayer(2);
-
-    inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    splitterLayer->GetOutputSlot(0).Connect(outputLayer0->GetInputSlot(0));
-    splitterLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-    splitterLayer->GetOutputSlot(1).Connect(outputLayer1->GetInputSlot(0));
-    splitterLayer->GetOutputSlot(1).SetTensorInfo(outputTensorInfo);
-    splitterLayer->GetOutputSlot(2).Connect(outputLayer2->GetInputSlot(0));
-    splitterLayer->GetOutputSlot(2).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    VerifySplitterName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
-
-    CheckDeserializedNetworkAgainstOriginal<float>(*deserializedNetwork,
-                                                   *network,
-                                                   {inputTensorInfo.GetShape()},
-                                                   {outputTensorInfo.GetShape(),
-                                                    outputTensorInfo.GetShape(),
-                                                    outputTensorInfo.GetShape()},
-                                                   {0},
-                                                   {0, 1, 2});
+    DepthwiseConvolution2dLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor, weights, biases);
+    deserializedNetwork->Accept(verifier);
 }
 
 BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
 {
-    class VerifyDetectionPostProcessName : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    class DetectionPostProcessLayerVerifier : public LayerVerifierBase
     {
     public:
+        DetectionPostProcessLayerVerifier(const std::string& layerName,
+                                          const std::vector<armnn::TensorInfo>& inputInfos,
+                                          const std::vector<armnn::TensorInfo>& outputInfos,
+                                          const armnn::DetectionPostProcessDescriptor& descriptor,
+                                          const armnn::ConstTensor& anchors)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor)
+        , m_Anchors(anchors) {}
+
         void VisitDetectionPostProcessLayer(const armnn::IConnectableLayer* layer,
                                             const armnn::DetectionPostProcessDescriptor& descriptor,
                                             const armnn::ConstTensor& anchors,
                                             const char* name) override
         {
-            BOOST_TEST(name == "DetectionPostProcessLayer");
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+
+            CompareConstTensor(anchors, m_Anchors);
         }
+
+    private:
+        void VerifyDescriptor(const armnn::DetectionPostProcessDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_UseRegularNms == m_Descriptor.m_UseRegularNms);
+            BOOST_TEST(descriptor.m_MaxDetections == m_Descriptor.m_MaxDetections);
+            BOOST_TEST(descriptor.m_MaxClassesPerDetection == m_Descriptor.m_MaxClassesPerDetection);
+            BOOST_TEST(descriptor.m_DetectionsPerClass == m_Descriptor.m_DetectionsPerClass);
+            BOOST_TEST(descriptor.m_NmsScoreThreshold == m_Descriptor.m_NmsScoreThreshold);
+            BOOST_TEST(descriptor.m_NmsIouThreshold == m_Descriptor.m_NmsIouThreshold);
+            BOOST_TEST(descriptor.m_NumClasses == m_Descriptor.m_NumClasses);
+            BOOST_TEST(descriptor.m_ScaleY == m_Descriptor.m_ScaleY);
+            BOOST_TEST(descriptor.m_ScaleX == m_Descriptor.m_ScaleX);
+            BOOST_TEST(descriptor.m_ScaleH == m_Descriptor.m_ScaleH);
+            BOOST_TEST(descriptor.m_ScaleW == m_Descriptor.m_ScaleW);
+        }
+
+        armnn::DetectionPostProcessDescriptor m_Descriptor;
+        armnn::ConstTensor m_Anchors;
     };
 
-    const armnn::TensorInfo inputInfos[] = {
+    const std::string layerName("detectionPostProcess");
+
+    const std::vector<armnn::TensorInfo> inputInfos({
         armnn::TensorInfo({ 1, 6, 4 }, armnn::DataType::Float32),
         armnn::TensorInfo({ 1, 6, 3}, armnn::DataType::Float32)
-    };
+    });
 
-    const armnn::TensorInfo outputInfos[] = {
+    const std::vector<armnn::TensorInfo> outputInfos({
         armnn::TensorInfo({ 1, 3, 4 }, armnn::DataType::Float32),
         armnn::TensorInfo({ 1, 3 }, armnn::DataType::Float32),
         armnn::TensorInfo({ 1, 3 }, armnn::DataType::Float32),
         armnn::TensorInfo({ 1 }, armnn::DataType::Float32)
-    };
+    });
 
-    armnn::DetectionPostProcessDescriptor desc;
-    desc.m_UseRegularNms = true;
-    desc.m_MaxDetections = 3;
-    desc.m_MaxClassesPerDetection = 1;
-    desc.m_DetectionsPerClass =1;
-    desc.m_NmsScoreThreshold = 0.0;
-    desc.m_NmsIouThreshold = 0.5;
-    desc.m_NumClasses = 2;
-    desc.m_ScaleY = 10.0;
-    desc.m_ScaleX = 10.0;
-    desc.m_ScaleH = 5.0;
-    desc.m_ScaleW = 5.0;
+    armnn::DetectionPostProcessDescriptor descriptor;
+    descriptor.m_UseRegularNms = true;
+    descriptor.m_MaxDetections = 3;
+    descriptor.m_MaxClassesPerDetection = 1;
+    descriptor.m_DetectionsPerClass =1;
+    descriptor.m_NmsScoreThreshold = 0.0;
+    descriptor.m_NmsIouThreshold = 0.5;
+    descriptor.m_NumClasses = 2;
+    descriptor.m_ScaleY = 10.0;
+    descriptor.m_ScaleX = 10.0;
+    descriptor.m_ScaleH = 5.0;
+    descriptor.m_ScaleW = 5.0;
 
     const armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
     const std::vector<float> anchorsData({
@@ -1646,9 +674,8 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
     armnn::ConstTensor anchors(anchorsInfo, anchorsData);
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
-
     armnn::IConnectableLayer* const detectionLayer =
-    network->AddDetectionPostProcessLayer(desc, anchors, "DetectionPostProcessLayer");
+        network->AddDetectionPostProcessLayer(descriptor, anchors, layerName.c_str());
 
     for (unsigned int i = 0; i < 2; i++)
     {
@@ -1667,16 +694,1303 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     BOOST_CHECK(deserializedNetwork);
 
-    VerifyDetectionPostProcessName nameChecker;
-    deserializedNetwork->Accept(nameChecker);
+    DetectionPostProcessLayerVerifier verifier(layerName, inputInfos, outputInfos, descriptor, anchors);
+    deserializedNetwork->Accept(verifier);
+}
 
-    CheckDeserializedNetworkAgainstOriginal<float>(
-        *network,
-        *deserializedNetwork,
-        {inputInfos[0].GetShape(), inputInfos[1].GetShape()},
-        {outputInfos[0].GetShape(), outputInfos[1].GetShape(), outputInfos[2].GetShape(), outputInfos[3].GetShape()},
-        {0, 1},
-        {0, 1, 2, 3});
+BOOST_AUTO_TEST_CASE(SerializeDivision)
+{
+    class DivisionLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        DivisionLayerVerifier(const std::string& layerName,
+                              const std::vector<armnn::TensorInfo>& inputInfos,
+                              const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitDivisionLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("division");
+    const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const divisionLayer = network->AddDivisionLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(divisionLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(divisionLayer->GetInputSlot(1));
+    divisionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    divisionLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    DivisionLayerVerifier verifier(layerName, {info, info}, {info});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeEqual)
+{
+    class EqualLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        EqualLayerVerifier(const std::string& layerName,
+                           const std::vector<armnn::TensorInfo>& inputInfos,
+                           const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitEqualLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("equal");
+    const armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo inputTensorInfo2 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Boolean);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const equalLayer = network->AddEqualLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer1->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(0));
+    inputLayer2->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(1));
+    equalLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo1);
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo2);
+    equalLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    EqualLayerVerifier verifier(layerName, {inputTensorInfo1, inputTensorInfo2}, {outputTensorInfo});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeFloor)
+{
+    class FloorLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        FloorLayerVerifier(const std::string& layerName,
+                           const std::vector<armnn::TensorInfo>& inputInfos,
+                           const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitFloorLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("floor");
+    const armnn::TensorInfo info({4,4}, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const floorLayer = network->AddFloorLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(floorLayer->GetInputSlot(0));
+    floorLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    floorLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    FloorLayerVerifier verifier(layerName, {info}, {info});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeFullyConnected)
+{
+    class FullyConnectedLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        FullyConnectedLayerVerifier(const std::string& layerName,
+                                    const std::vector<armnn::TensorInfo>& inputInfos,
+                                    const std::vector<armnn::TensorInfo>& outputInfos,
+                                    const armnn::FullyConnectedDescriptor& descriptor,
+                                    const armnn::ConstTensor& weight,
+                                    const armnn::Optional<armnn::ConstTensor>& bias)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor)
+        , m_Weight(weight)
+        , m_Bias(bias) {}
+
+        void VisitFullyConnectedLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::FullyConnectedDescriptor& descriptor,
+                                      const armnn::ConstTensor& weight,
+                                      const armnn::Optional<armnn::ConstTensor>& bias,
+                                      const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+
+            CompareConstTensor(weight, m_Weight);
+
+            BOOST_TEST(bias.has_value() == m_Bias.has_value());
+            if (bias.has_value() && m_Bias.has_value())
+            {
+                CompareConstTensor(bias.value(), m_Bias.value());
+            }
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::FullyConnectedDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
+            BOOST_TEST(descriptor.m_TransposeWeightMatrix == m_Descriptor.m_TransposeWeightMatrix);
+        }
+
+        armnn::FullyConnectedDescriptor m_Descriptor;
+        armnn::ConstTensor m_Weight;
+        armnn::Optional<armnn::ConstTensor> m_Bias;
+    };
+
+    const std::string layerName("fullyConnected");
+    const armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 2, 3 }, armnn::DataType::Float32);
+
+    const armnn::TensorInfo weightsInfo({ 5, 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
+    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
+    std::vector<float> biasesData  = GenerateRandomData<float>(biasesInfo.GetNumElements());
+    armnn::ConstTensor weights(weightsInfo, weightsData);
+    armnn::ConstTensor biases(biasesInfo, biasesData);
+
+    armnn::FullyConnectedDescriptor descriptor;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_TransposeWeightMatrix = false;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const fullyConnectedLayer =
+        network->AddFullyConnectedLayer(descriptor, weights, biases, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
+    fullyConnectedLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    FullyConnectedLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor, weights, biases);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeGather)
+{
+    class GatherLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        GatherLayerVerifier(const std::string& layerName,
+                            const std::vector<armnn::TensorInfo>& inputInfos,
+                            const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitGatherLayer(const armnn::IConnectableLayer* layer, const char *name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+
+        void VisitConstantLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::ConstTensor& input,
+                                const char *name) override {}
+    };
+
+    const std::string layerName("gather");
+    armnn::TensorInfo paramsInfo({ 8 }, armnn::DataType::QuantisedAsymm8);
+    armnn::TensorInfo outputInfo({ 3 }, armnn::DataType::QuantisedAsymm8);
+    const armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32);
+
+    paramsInfo.SetQuantizationScale(1.0f);
+    paramsInfo.SetQuantizationOffset(0);
+    outputInfo.SetQuantizationScale(1.0f);
+    outputInfo.SetQuantizationOffset(0);
+
+    const std::vector<int32_t>& indicesData = {7, 6, 5};
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer *const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer *const constantLayer =
+            network->AddConstantLayer(armnn::ConstTensor(indicesInfo, indicesData));
+    armnn::IConnectableLayer *const gatherLayer = network->AddGatherLayer(layerName.c_str());
+    armnn::IConnectableLayer *const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(gatherLayer->GetInputSlot(0));
+    constantLayer->GetOutputSlot(0).Connect(gatherLayer->GetInputSlot(1));
+    gatherLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(paramsInfo);
+    constantLayer->GetOutputSlot(0).SetTensorInfo(indicesInfo);
+    gatherLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    GatherLayerVerifier verifier(layerName, {paramsInfo, indicesInfo}, {outputInfo});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeGreater)
+{
+    class GreaterLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        GreaterLayerVerifier(const std::string& layerName,
+                             const std::vector<armnn::TensorInfo>& inputInfos,
+                             const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitGreaterLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("greater");
+    const armnn::TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, armnn::DataType::Float32);
+    const armnn::TensorInfo inputTensorInfo2({ 1, 2, 2, 2 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo({ 1, 2, 2, 2 }, armnn::DataType::Boolean);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const greaterLayer = network->AddGreaterLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer1->GetOutputSlot(0).Connect(greaterLayer->GetInputSlot(0));
+    inputLayer2->GetOutputSlot(0).Connect(greaterLayer->GetInputSlot(1));
+    greaterLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo1);
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo2);
+    greaterLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    GreaterLayerVerifier verifier(layerName, {inputTensorInfo1, inputTensorInfo2}, {outputTensorInfo});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeL2Normalization)
+{
+    class L2NormalizationLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        L2NormalizationLayerVerifier(const std::string& layerName,
+                                     const std::vector<armnn::TensorInfo>& inputInfos,
+                                     const std::vector<armnn::TensorInfo>& outputInfos,
+                                     const armnn::L2NormalizationDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitL2NormalizationLayer(const armnn::IConnectableLayer* layer,
+                                       const armnn::L2NormalizationDescriptor& descriptor,
+                                       const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+    private:
+        void VerifyDescriptor(const armnn::L2NormalizationDescriptor& descriptor)
+        {
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+        }
+
+        armnn::L2NormalizationDescriptor m_Descriptor;
+    };
+
+    const std::string l2NormLayerName("l2Normalization");
+    const armnn::TensorInfo info({1, 2, 1, 5}, armnn::DataType::Float32);
+
+    armnn::L2NormalizationDescriptor desc;
+    desc.m_DataLayout = armnn::DataLayout::NCHW;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const l2NormLayer = network->AddL2NormalizationLayer(desc, l2NormLayerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(l2NormLayer->GetInputSlot(0));
+    l2NormLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    l2NormLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    L2NormalizationLayerVerifier verifier(l2NormLayerName, {info}, {info}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeMaximum)
+{
+    class MaximumLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        MaximumLayerVerifier(const std::string& layerName,
+                             const std::vector<armnn::TensorInfo>& inputInfos,
+                             const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitMaximumLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("maximum");
+    const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const maximumLayer = network->AddMaximumLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(maximumLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(maximumLayer->GetInputSlot(1));
+    maximumLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    maximumLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    MaximumLayerVerifier verifier(layerName, {info, info}, {info});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeMean)
+{
+    class MeanLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        MeanLayerVerifier(const std::string& layerName,
+                          const std::vector<armnn::TensorInfo>& inputInfos,
+                          const std::vector<armnn::TensorInfo>& outputInfos,
+                          const armnn::MeanDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitMeanLayer(const armnn::IConnectableLayer* layer,
+                            const armnn::MeanDescriptor& descriptor,
+                            const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::MeanDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_Axis == m_Descriptor.m_Axis);
+            BOOST_TEST(descriptor.m_KeepDims == m_Descriptor.m_KeepDims);
+        }
+
+        armnn::MeanDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("mean");
+    const armnn::TensorInfo inputInfo({1, 1, 3, 2}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({1, 1, 1, 2}, armnn::DataType::Float32);
+
+    armnn::MeanDescriptor descriptor;
+    descriptor.m_Axis = { 2 };
+    descriptor.m_KeepDims = true;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer   = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const meanLayer = network->AddMeanLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer  = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(meanLayer->GetInputSlot(0));
+    meanLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    meanLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    MeanLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeMerger)
+{
+    class MergerLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        MergerLayerVerifier(const std::string& layerName,
+                            const std::vector<armnn::TensorInfo>& inputInfos,
+                            const std::vector<armnn::TensorInfo>& outputInfos,
+                            const armnn::OriginsDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitMergerLayer(const armnn::IConnectableLayer* layer,
+                            const armnn::OriginsDescriptor& descriptor,
+                            const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::OriginsDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.GetConcatAxis() == m_Descriptor.GetConcatAxis());
+            BOOST_TEST(descriptor.GetNumViews() == m_Descriptor.GetNumViews());
+            BOOST_TEST(descriptor.GetNumDimensions() == m_Descriptor.GetNumDimensions());
+
+            for (uint32_t i = 0; i < descriptor.GetNumViews(); i++)
+            {
+                for (uint32_t j = 0; j < descriptor.GetNumDimensions(); j++)
+                {
+                    BOOST_TEST(descriptor.GetViewOrigin(i)[j] == m_Descriptor.GetViewOrigin(i)[j]);
+                }
+            }
+        }
+
+        armnn::OriginsDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("merger");
+    const armnn::TensorInfo inputInfo = armnn::TensorInfo({2, 3, 2, 2}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({4, 3, 2, 2}, armnn::DataType::Float32);
+
+    const std::vector<armnn::TensorShape> shapes({inputInfo.GetShape(), inputInfo.GetShape()});
+
+    armnn::OriginsDescriptor descriptor =
+        armnn::CreateMergerDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayerOne = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayerTwo = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const mergerLayer = network->AddMergerLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayerOne->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
+    inputLayerTwo->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
+    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayerOne->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    inputLayerTwo->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    mergerLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    MergerLayerVerifier verifier(layerName, {inputInfo, inputInfo}, {outputInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeMinimum)
+{
+    class MinimumLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        MinimumLayerVerifier(const std::string& layerName,
+                             const std::vector<armnn::TensorInfo>& inputInfos,
+                             const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitMinimumLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("minimum");
+    const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const minimumLayer = network->AddMinimumLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(minimumLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(minimumLayer->GetInputSlot(1));
+    minimumLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    minimumLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    MinimumLayerVerifier verifier(layerName, {info, info}, {info});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeMultiplication)
+{
+    class MultiplicationLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        MultiplicationLayerVerifier(const std::string& layerName,
+                                    const std::vector<armnn::TensorInfo>& inputInfos,
+                                    const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("multiplication");
+    const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const multiplicationLayer = network->AddMultiplicationLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(multiplicationLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(multiplicationLayer->GetInputSlot(1));
+    multiplicationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    multiplicationLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    MultiplicationLayerVerifier verifier(layerName, {info, info}, {info});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeNormalization)
+{
+    class NormalizationLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        NormalizationLayerVerifier(const std::string& layerName,
+                                   const std::vector<armnn::TensorInfo>& inputInfos,
+                                   const std::vector<armnn::TensorInfo>& outputInfos,
+                                   const armnn::NormalizationDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                     const armnn::NormalizationDescriptor& descriptor,
+                                     const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::NormalizationDescriptor& descriptor)
+        {
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+            BOOST_TEST(descriptor.m_NormSize == m_Descriptor.m_NormSize);
+            BOOST_TEST(descriptor.m_Alpha == m_Descriptor.m_Alpha);
+            BOOST_TEST(descriptor.m_Beta == m_Descriptor.m_Beta);
+            BOOST_TEST(descriptor.m_K == m_Descriptor.m_K);
+            BOOST_TEST(
+                static_cast<int>(descriptor.m_NormChannelType) == static_cast<int>(m_Descriptor.m_NormChannelType));
+            BOOST_TEST(
+                static_cast<int>(descriptor.m_NormMethodType) == static_cast<int>(m_Descriptor.m_NormMethodType));
+        }
+
+        armnn::NormalizationDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("normalization");
+    const armnn::TensorInfo info({2, 1, 2, 2}, armnn::DataType::Float32);
+
+    armnn::NormalizationDescriptor desc;
+    desc.m_DataLayout = armnn::DataLayout::NCHW;
+    desc.m_NormSize = 3;
+    desc.m_Alpha = 1;
+    desc.m_Beta = 1;
+    desc.m_K = 1;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const normalizationLayer = network->AddNormalizationLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(normalizationLayer->GetInputSlot(0));
+    normalizationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    normalizationLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    NormalizationLayerVerifier verifier(layerName, {info}, {info}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializePad)
+{
+    class PadLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        PadLayerVerifier(const std::string& layerName,
+                         const std::vector<armnn::TensorInfo>& inputInfos,
+                         const std::vector<armnn::TensorInfo>& outputInfos,
+                         const armnn::PadDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitPadLayer(const armnn::IConnectableLayer* layer,
+                           const armnn::PadDescriptor& descriptor,
+                           const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::PadDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_PadList == m_Descriptor.m_PadList);
+        }
+
+        armnn::PadDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("pad");
+    const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({1, 2, 3, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 5, 7}, armnn::DataType::Float32);
+
+    armnn::PadDescriptor desc({{0, 0}, {1, 0}, {1, 1}, {1, 2}});
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const padLayer = network->AddPadLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(padLayer->GetInputSlot(0));
+    padLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    padLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    PadLayerVerifier verifier(layerName, {inputTensorInfo}, {outputTensorInfo}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializePermute)
+{
+    class PermuteLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        PermuteLayerVerifier(const std::string& layerName,
+                             const std::vector<armnn::TensorInfo>& inputInfos,
+                             const std::vector<armnn::TensorInfo>& outputInfos,
+                             const armnn::PermuteDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitPermuteLayer(const armnn::IConnectableLayer* layer,
+                               const armnn::PermuteDescriptor& descriptor,
+                               const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::PermuteDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_DimMappings.IsEqual(m_Descriptor.m_DimMappings));
+        }
+
+        armnn::PermuteDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("permute");
+    const armnn::TensorInfo inputTensorInfo({4, 3, 2, 1}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo({1, 2, 3, 4}, armnn::DataType::Float32);
+
+    armnn::PermuteDescriptor descriptor(armnn::PermutationVector({3, 2, 1, 0}));
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const permuteLayer = network->AddPermuteLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(permuteLayer->GetInputSlot(0));
+    permuteLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    permuteLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    PermuteLayerVerifier verifier(layerName, {inputTensorInfo}, {outputTensorInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializePooling2d)
+{
+    class Pooling2dLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        Pooling2dLayerVerifier(const std::string& layerName,
+                               const std::vector<armnn::TensorInfo>& inputInfos,
+                               const std::vector<armnn::TensorInfo>& outputInfos,
+                               const armnn::Pooling2dDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitPooling2dLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::Pooling2dDescriptor& descriptor,
+                                 const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::Pooling2dDescriptor& descriptor)
+        {
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+            BOOST_TEST(descriptor.m_PadLeft == m_Descriptor.m_PadLeft);
+            BOOST_TEST(descriptor.m_PadRight == m_Descriptor.m_PadRight);
+            BOOST_TEST(descriptor.m_PadTop == m_Descriptor.m_PadTop);
+            BOOST_TEST(descriptor.m_PadBottom == m_Descriptor.m_PadBottom);
+            BOOST_TEST(descriptor.m_PoolWidth == m_Descriptor.m_PoolWidth);
+            BOOST_TEST(descriptor.m_PoolHeight == m_Descriptor.m_PoolHeight);
+            BOOST_TEST(descriptor.m_StrideX == m_Descriptor.m_StrideX);
+            BOOST_TEST(descriptor.m_StrideY == m_Descriptor.m_StrideY);
+
+            BOOST_TEST(
+                static_cast<int>(descriptor.m_PaddingMethod) == static_cast<int>(m_Descriptor.m_PaddingMethod));
+            BOOST_TEST(
+                static_cast<int>(descriptor.m_PoolType) == static_cast<int>(m_Descriptor.m_PoolType));
+            BOOST_TEST(
+                static_cast<int>(descriptor.m_OutputShapeRounding) ==
+                static_cast<int>(m_Descriptor.m_OutputShapeRounding));
+        }
+
+        armnn::Pooling2dDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("pooling2d");
+    const armnn::TensorInfo inputInfo({1, 2, 2, 1}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({1, 1, 1, 1}, armnn::DataType::Float32);
+
+    armnn::Pooling2dDescriptor desc;
+    desc.m_DataLayout          = armnn::DataLayout::NHWC;
+    desc.m_PadTop              = 0;
+    desc.m_PadBottom           = 0;
+    desc.m_PadLeft             = 0;
+    desc.m_PadRight            = 0;
+    desc.m_PoolType            = armnn::PoolingAlgorithm::Average;
+    desc.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
+    desc.m_PaddingMethod       = armnn::PaddingMethod::Exclude;
+    desc.m_PoolHeight          = 2;
+    desc.m_PoolWidth           = 2;
+    desc.m_StrideX             = 2;
+    desc.m_StrideY             = 2;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const pooling2dLayer = network->AddPooling2dLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(pooling2dLayer->GetInputSlot(0));
+    pooling2dLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    pooling2dLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    Pooling2dLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeReshape)
+{
+    class ReshapeLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        ReshapeLayerVerifier(const std::string& layerName,
+                             const std::vector<armnn::TensorInfo>& inputInfos,
+                             const std::vector<armnn::TensorInfo>& outputInfos,
+                             const armnn::ReshapeDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitReshapeLayer(const armnn::IConnectableLayer* layer,
+                               const armnn::ReshapeDescriptor& descriptor,
+                               const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::ReshapeDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_TargetShape == m_Descriptor.m_TargetShape);
+        }
+
+        armnn::ReshapeDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("reshape");
+    const armnn::TensorInfo inputInfo({1, 9}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({3, 3}, armnn::DataType::Float32);
+
+    armnn::ReshapeDescriptor descriptor({3, 3});
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const reshapeLayer = network->AddReshapeLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(reshapeLayer->GetInputSlot(0));
+    reshapeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    reshapeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    ReshapeLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeResizeBilinear)
+{
+    class ResizeBilinearLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        ResizeBilinearLayerVerifier(const std::string& layerName,
+                                    const std::vector<armnn::TensorInfo>& inputInfos,
+                                    const std::vector<armnn::TensorInfo>& outputInfos,
+                                    const armnn::ResizeBilinearDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitResizeBilinearLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::ResizeBilinearDescriptor& descriptor,
+                                      const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::ResizeBilinearDescriptor& descriptor)
+        {
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+            BOOST_TEST(descriptor.m_TargetWidth == m_Descriptor.m_TargetWidth);
+            BOOST_TEST(descriptor.m_TargetHeight == m_Descriptor.m_TargetHeight);
+        }
+
+        armnn::ResizeBilinearDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("resizeBilinear");
+    const armnn::TensorInfo inputInfo = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
+
+    armnn::ResizeBilinearDescriptor desc;
+    desc.m_TargetWidth = 4;
+    desc.m_TargetHeight = 2;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const resizeLayer = network->AddResizeBilinearLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(resizeLayer->GetInputSlot(0));
+    resizeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    resizeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    ResizeBilinearLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeRsqrt)
+{
+    class RsqrtLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        RsqrtLayerVerifier(const std::string& layerName,
+                           const std::vector<armnn::TensorInfo>& inputInfos,
+                           const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitRsqrtLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("rsqrt");
+    const armnn::TensorInfo tensorInfo({ 3, 1, 2 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const rsqrtLayer  = network->AddRsqrtLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(rsqrtLayer->GetInputSlot(0));
+    rsqrtLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    rsqrtLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    RsqrtLayerVerifier verifier(layerName, {tensorInfo}, {tensorInfo});
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeSoftmax)
+{
+    class SoftmaxLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        SoftmaxLayerVerifier(const std::string& layerName,
+                             const std::vector<armnn::TensorInfo>& inputInfos,
+                             const std::vector<armnn::TensorInfo>& outputInfos,
+                             const armnn::SoftmaxDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                               const armnn::SoftmaxDescriptor& descriptor,
+                               const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::SoftmaxDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_Beta == m_Descriptor.m_Beta);
+        }
+
+        armnn::SoftmaxDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("softmax");
+    const armnn::TensorInfo info({1, 10}, armnn::DataType::Float32);
+
+    armnn::SoftmaxDescriptor descriptor;
+    descriptor.m_Beta = 1.0f;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer   = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const softmaxLayer = network->AddSoftmaxLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer  = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(softmaxLayer->GetInputSlot(0));
+    softmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    softmaxLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    SoftmaxLayerVerifier verifier(layerName, {info}, {info}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeSpaceToBatchNd)
+{
+    class SpaceToBatchNdLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        SpaceToBatchNdLayerVerifier(const std::string& layerName,
+                                    const std::vector<armnn::TensorInfo>& inputInfos,
+                                    const std::vector<armnn::TensorInfo>& outputInfos,
+                                    const armnn::SpaceToBatchNdDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer* layer,
+                                      const armnn::SpaceToBatchNdDescriptor& descriptor,
+                                      const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::SpaceToBatchNdDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_PadList == m_Descriptor.m_PadList);
+            BOOST_TEST(descriptor.m_BlockShape == m_Descriptor.m_BlockShape);
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+        }
+
+        armnn::SpaceToBatchNdDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("spaceToBatchNd");
+    const armnn::TensorInfo inputInfo({2, 1, 2, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({8, 1, 1, 3}, armnn::DataType::Float32);
+
+    armnn::SpaceToBatchNdDescriptor desc;
+    desc.m_DataLayout = armnn::DataLayout::NCHW;
+    desc.m_BlockShape = {2, 2};
+    desc.m_PadList = {{0, 0}, {2, 0}};
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const spaceToBatchNdLayer = network->AddSpaceToBatchNdLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(spaceToBatchNdLayer->GetInputSlot(0));
+    spaceToBatchNdLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    spaceToBatchNdLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    SpaceToBatchNdLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeSplitter)
+{
+    class SplitterLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        SplitterLayerVerifier(const std::string& layerName,
+                              const std::vector<armnn::TensorInfo>& inputInfos,
+                              const std::vector<armnn::TensorInfo>& outputInfos,
+                              const armnn::ViewsDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitSplitterLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::ViewsDescriptor& descriptor,
+                                const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::ViewsDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.GetNumViews() == m_Descriptor.GetNumViews());
+            BOOST_TEST(descriptor.GetNumDimensions() == m_Descriptor.GetNumDimensions());
+
+            for (uint32_t i = 0; i < descriptor.GetNumViews(); i++)
+            {
+                for (uint32_t j = 0; j < descriptor.GetNumDimensions(); j++)
+                {
+                    BOOST_TEST(descriptor.GetViewOrigin(i)[j] == m_Descriptor.GetViewOrigin(i)[j]);
+                    BOOST_TEST(descriptor.GetViewSizes(i)[j] == m_Descriptor.GetViewSizes(i)[j]);
+                }
+            }
+        }
+
+        armnn::ViewsDescriptor m_Descriptor;
+    };
+
+    const unsigned int numViews = 3;
+    const unsigned int numDimensions = 4;
+    const unsigned int inputShape[] = {1, 18, 4, 4};
+    const unsigned int outputShape[] = {1, 6, 4, 4};
+
+    // This is modelled on how the caffe parser sets up a splitter layer to partition an input along dimension one.
+    unsigned int splitterDimSizes[4] = {static_cast<unsigned int>(inputShape[0]),
+                                        static_cast<unsigned int>(inputShape[1]),
+                                        static_cast<unsigned int>(inputShape[2]),
+                                        static_cast<unsigned int>(inputShape[3])};
+    splitterDimSizes[1] /= numViews;
+    armnn::ViewsDescriptor desc(numViews, numDimensions);
+
+    for (unsigned int g = 0; g < numViews; ++g)
+    {
+        desc.SetViewOriginCoord(g, 1, splitterDimSizes[1] * g);
+
+        for (unsigned int dimIdx=0; dimIdx < 4; dimIdx++)
+        {
+            desc.SetViewSize(g, dimIdx, splitterDimSizes[dimIdx]);
+        }
+    }
+
+    const std::string layerName("splitter");
+    const armnn::TensorInfo inputInfo(numDimensions, inputShape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo(numDimensions, outputShape, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const splitterLayer = network->AddSplitterLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer0 = network->AddOutputLayer(0);
+    armnn::IConnectableLayer* const outputLayer1 = network->AddOutputLayer(1);
+    armnn::IConnectableLayer* const outputLayer2 = network->AddOutputLayer(2);
+
+    inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(0).Connect(outputLayer0->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(1).Connect(outputLayer1->GetInputSlot(0));
+    splitterLayer->GetOutputSlot(2).Connect(outputLayer2->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    splitterLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+    splitterLayer->GetOutputSlot(1).SetTensorInfo(outputInfo);
+    splitterLayer->GetOutputSlot(2).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    SplitterLayerVerifier verifier(layerName, {inputInfo}, {outputInfo, outputInfo, outputInfo}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeStridedSlice)
+{
+    class StridedSliceLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        StridedSliceLayerVerifier(const std::string& layerName,
+                                  const std::vector<armnn::TensorInfo>& inputInfos,
+                                  const std::vector<armnn::TensorInfo>& outputInfos,
+                                  const armnn::StridedSliceDescriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+        void VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
+                                    const armnn::StridedSliceDescriptor& descriptor,
+                                    const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::StridedSliceDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_Begin == m_Descriptor.m_Begin);
+            BOOST_TEST(descriptor.m_End == m_Descriptor.m_End);
+            BOOST_TEST(descriptor.m_Stride == m_Descriptor.m_Stride);
+            BOOST_TEST(descriptor.m_BeginMask == m_Descriptor.m_BeginMask);
+            BOOST_TEST(descriptor.m_EndMask == m_Descriptor.m_EndMask);
+            BOOST_TEST(descriptor.m_ShrinkAxisMask == m_Descriptor.m_ShrinkAxisMask);
+            BOOST_TEST(descriptor.m_EllipsisMask == m_Descriptor.m_EllipsisMask);
+            BOOST_TEST(descriptor.m_NewAxisMask == m_Descriptor.m_NewAxisMask);
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+        }
+        armnn::StridedSliceDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("stridedSlice");
+    const armnn::TensorInfo inputInfo = armnn::TensorInfo({3, 2, 3, 1}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({3, 1}, armnn::DataType::Float32);
+
+    armnn::StridedSliceDescriptor desc({0, 0, 1, 0}, {1, 1, 1, 1}, {1, 1, 1, 1});
+    desc.m_EndMask = (1 << 4) - 1;
+    desc.m_ShrinkAxisMask = (1 << 1) | (1 << 2);
+    desc.m_DataLayout = armnn::DataLayout::NCHW;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const stridedSliceLayer = network->AddStridedSliceLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(stridedSliceLayer->GetInputSlot(0));
+    stridedSliceLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    stridedSliceLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    StridedSliceLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeSubtraction)
+{
+    class SubtractionLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        SubtractionLayerVerifier(const std::string& layerName,
+                                 const std::vector<armnn::TensorInfo>& inputInfos,
+                                 const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitSubtractionLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("subtraction");
+    const armnn::TensorInfo info({ 1, 4 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const subtractionLayer = network->AddSubtractionLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(1));
+    subtractionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    subtractionLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    SubtractionLayerVerifier verifier(layerName, {info, info}, {info});
+    deserializedNetwork->Accept(verifier);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

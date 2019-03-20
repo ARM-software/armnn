@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "NetworkQuantizationScheme.hpp"
+
 #include <armnn/Tensor.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/ILayerVisitor.hpp>
@@ -17,10 +19,8 @@
 namespace armnn
 {
 
-std::pair<float, int> ComputeQAsymmParams(int numBits, double min, double max);
-
 template<typename srcType>
-void Quantize(const srcType* src, uint8_t* dst, size_t numElements, float& scale, int& offset)
+void QuantizeConstant(const srcType* src, uint8_t* dst, size_t numElements, float& scale, int& offset)
 {
     BOOST_ASSERT(src);
     BOOST_ASSERT(dst);
@@ -33,9 +33,11 @@ void Quantize(const srcType* src, uint8_t* dst, size_t numElements, float& scale
         max = std::max(max, src[i]);
     }
 
-    auto qParams = ComputeQAsymmParams(8, min, max);
+    QAsymm8QuantizationScheme quantizationScheme;
+    OffsetScalePair qParams = quantizationScheme.ComputeScheme(min, max);
     scale = qParams.first;
     offset = qParams.second;
+
     for (size_t i = 0; i < numElements; ++i)
     {
         dst[i] = armnn::Quantize<uint8_t>(src[i], scale, offset);

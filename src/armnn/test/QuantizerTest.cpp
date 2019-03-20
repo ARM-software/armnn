@@ -9,8 +9,9 @@
 #include <armnn/Types.hpp>
 
 #include "armnn/LayerVisitorBase.hpp"
-#include "../Network.hpp"
 #include "../Graph.hpp"
+#include "../Network.hpp"
+#include "../NetworkQuantizationScheme.hpp"
 #include "../NetworkQuantizerUtils.hpp"
 #include "../OverrideInputRangeVisitor.hpp"
 #include "../RangeTracker.hpp"
@@ -997,7 +998,9 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
                                       const OriginsDescriptor& mergerDescriptor,
                                       const char* name = nullptr)
         {
-            std::pair<float, int> expectedValues = ComputeQAsymmParams(8, m_Min, m_Max);
+
+            QAsymm8QuantizationScheme quantizationScheme;
+            OffsetScalePair expectedValues = quantizationScheme.ComputeScheme(m_Min, m_Max);
 
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
 

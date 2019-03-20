@@ -297,6 +297,7 @@ list(APPEND armnn_sources
     src/armnn/LoadedNetwork.hpp
     src/armnn/Network.cpp
     src/armnn/Network.hpp
+    src/armnn/NetworkQuantizationScheme.hpp
     src/armnn/NetworkQuantizer.cpp
     src/armnn/NetworkQuantizer.hpp
     src/armnn/NetworkQuantizerUtils.cpp

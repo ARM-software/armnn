@@ -7,6 +7,7 @@
 
 #include "armnn/LayerVisitorBase.hpp"
 #include "StaticRangeVisitor.hpp"
+#include "NetworkQuantizationScheme.hpp"
 
 #include <armnn/INetwork.hpp>
 #include <armnn/Types.hpp>
@@ -24,7 +25,7 @@ class StaticRangeVisitor;
 class QuantizerVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
 public:
-    QuantizerVisitor(const RangeTracker& rangeTracker);
+    QuantizerVisitor(const RangeTracker& rangeTracker, const IQuantizationScheme* quantizationScheme);
     ~QuantizerVisitor() = default;
 
     /// Functions to quantize the individual layers, overridden from ILayerVisitor
@@ -129,6 +130,8 @@ private:
 
     /// Mapping from guid to layer in quantized network
     std::unordered_map<LayerGuid, IConnectableLayer*> m_QuantizedGuidToLayerMap;
+
+    const IQuantizationScheme* m_QuantizationScheme;
 };
 
 } //namespace armnn

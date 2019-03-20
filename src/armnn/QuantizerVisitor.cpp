@@ -11,9 +11,10 @@
 namespace armnn
 {
 
-QuantizerVisitor::QuantizerVisitor(const RangeTracker& rangeTracker)
+QuantizerVisitor::QuantizerVisitor(const RangeTracker& rangeTracker, const IQuantizationScheme* quantizationScheme)
     : m_Ranges(rangeTracker)
     , m_QuantizedNetwork(INetwork::Create())
+    , m_QuantizationScheme(quantizationScheme)
 {
 }
 
@@ -45,11 +46,11 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* src
 
         // Fetch the min/max ranges that were computed earlier
         auto range = m_Ranges.GetRange(layerToFind.GetGuid(), slotIdx);
-        auto qParams = ComputeQAsymmParams(8, range.first, range.second);
+        OffsetScalePair qParams = m_QuantizationScheme->ComputeScheme(range.first, range.second);
 
         // Set the quantization params
         TensorInfo info(newOutputSlot.GetTensorInfo());
-        info.SetDataType(DataType::QuantisedAsymm8);
+        info.SetDataType(m_QuantizationScheme->GetDataType());
         info.SetQuantizationOffset(qParams.second);
         info.SetQuantizationScale(qParams.first);
         newOutputSlot.SetTensorInfo(info);

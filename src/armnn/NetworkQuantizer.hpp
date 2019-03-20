@@ -17,7 +17,8 @@ namespace armnn
 class NetworkQuantizer : public INetworkQuantizer
 {
 public:
-    NetworkQuantizer(INetwork* inputNetwork) : m_InputNetwork(inputNetwork) {}
+    NetworkQuantizer(INetwork* inputNetwork, const QuantizerOptions& options)
+    : m_InputNetwork(inputNetwork), m_Options(options) {}
 
     void OverrideInputRange(LayerBindingId layerId, float min, float max) override;
     INetworkPtr ExportNetwork() override;
@@ -28,6 +29,9 @@ private:
 
     /// Mapping from Guid to an array of ranges for outputs
     RangeTracker m_Ranges;
+
+    /// Options for the NetworkQuantizer
+    QuantizerOptions m_Options;
 };
 
 } //namespace armnn

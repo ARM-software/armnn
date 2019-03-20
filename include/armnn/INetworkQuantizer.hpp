@@ -6,9 +6,18 @@
 #pragma once
 
 #include <armnn/INetwork.hpp>
+#include <armnn/Types.hpp>
 
 namespace armnn
 {
+
+struct QuantizerOptions
+{
+    QuantizerOptions() : m_ActivationFormat(DataType::QuantisedAsymm8) {}
+    QuantizerOptions(DataType activationFormat) : m_ActivationFormat(activationFormat) {}
+
+    DataType m_ActivationFormat;
+};
 
 using INetworkQuantizerPtr = std::unique_ptr<class INetworkQuantizer, void(*)(INetworkQuantizer* quantizer)>;
 
@@ -16,9 +25,14 @@ using INetworkQuantizerPtr = std::unique_ptr<class INetworkQuantizer, void(*)(IN
 class INetworkQuantizer
 {
 public:
-    static INetworkQuantizer* CreateRaw(INetwork* inputNetwork); ///< Create Quantizer object and return raw pointer
-    static INetworkQuantizerPtr Create(INetwork* inputNetwork);  ///< Create Quantizer object wrapped in unique_ptr
-    static void Destroy(INetworkQuantizer* quantizer);           ///< Destroy Quantizer object
+    /// Create Quantizer object and return raw pointer
+    static INetworkQuantizer* CreateRaw(INetwork* inputNetwork, const QuantizerOptions& options = QuantizerOptions());
+
+    /// Create Quantizer object wrapped in unique_ptr
+    static INetworkQuantizerPtr Create(INetwork* inputNetwork, const QuantizerOptions& options = QuantizerOptions());
+
+    /// Destroy Quantizer object
+    static void Destroy(INetworkQuantizer* quantizer);
 
     /// Overrides the default quantization values for the input layer with the given id
     virtual void OverrideInputRange(LayerBindingId layerId, float min, float max) = 0;

@@ -198,7 +198,8 @@ BOOST_FIXTURE_TEST_CASE(LoadModelFromBinary, LoadModelFixture)
 
 BOOST_FIXTURE_TEST_CASE(LoadModelFromFile, LoadModelFixture)
 {
-    std::string fname = boost::filesystem::temp_directory_path().string() + "/testtflite.tflite";
+    using namespace boost::filesystem;
+    std::string fname = unique_path(temp_directory_path() / "%%%%-%%%%-%%%%.tflite").string();
     bool saved = flatbuffers::SaveFile(fname.c_str(),
                                        reinterpret_cast<char *>(m_GraphBinary.data()),
                                        m_GraphBinary.size(), true);
@@ -213,7 +214,7 @@ BOOST_FIXTURE_TEST_CASE(LoadModelFromFile, LoadModelFixture)
                   tflite::CustomOptionsFormat_FLEXBUFFERS);
     CheckOperator(model->subgraphs[1]->operators[0], 1, { 0, 2 }, { 1 }, tflite::BuiltinOptions_Conv2DOptions,
                   tflite::CustomOptionsFormat_FLEXBUFFERS);
-    remove(fname.c_str());
+    remove(fname);
 }
 
 BOOST_AUTO_TEST_CASE(LoadNullBinary)

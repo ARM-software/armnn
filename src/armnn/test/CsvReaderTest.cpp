@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
 
 using namespace armnnUtils;
 
@@ -28,8 +29,8 @@ struct TestHelper {
 
     std::string CreateTempCsvFile()
     {
-        std::string fileDir = boost::filesystem::temp_directory_path().c_str();
-        boost::filesystem::path p{fileDir + "/sampleFile.csv"};
+        boost::filesystem::path fileDir = boost::filesystem::temp_directory_path();
+        boost::filesystem::path p{fileDir / boost::filesystem::unique_path("%%%%-%%%%-%%%%.csv")};
         try
         {
             boost::filesystem::ofstream ofs{p};
@@ -41,7 +42,9 @@ struct TestHelper {
             std::cerr << "Unable to write to file at location [" << p.c_str() << "] : " << e.what() << std::endl;
             BOOST_TEST(false);
         }
-        return fileDir + "/sampleFile.csv";
+
+        m_CsvFile = p;
+        return p.string();
     }
 
     int CheckStringsMatch(CsvRow &row, unsigned int index, std::string expectedValue)
@@ -56,18 +59,21 @@ struct TestHelper {
 
     void RemoveCsvFile()
     {
-        std::string fileDir = boost::filesystem::temp_directory_path().c_str();
-        std::string filePath = fileDir + "/sampleFile.csv";
-        try
+        if (m_CsvFile)
         {
-            boost::filesystem::remove(filePath);
-        }
-        catch (std::exception &e)
-        {
-            std::cerr << "Unable to delete file [" << filePath << "] : " << e.what() << std::endl;
-            BOOST_TEST(false);
+            try
+            {
+                boost::filesystem::remove(*m_CsvFile);
+            }
+            catch (std::exception &e)
+            {
+                std::cerr << "Unable to delete file [" << *m_CsvFile << "] : " << e.what() << std::endl;
+                BOOST_TEST(false);
+            }
         }
     }
+
+    boost::optional<boost::filesystem::path> m_CsvFile;
 };
 
 BOOST_AUTO_TEST_SUITE(CsvReaderTest)

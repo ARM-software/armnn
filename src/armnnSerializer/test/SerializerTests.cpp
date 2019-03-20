@@ -1993,4 +1993,58 @@ BOOST_AUTO_TEST_CASE(SerializeSubtraction)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDeserializeNonLinearNetwork)
+{
+    class ConstantLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        ConstantLayerVerifier(const std::string& layerName,
+                              const std::vector<armnn::TensorInfo>& inputInfos,
+                              const std::vector<armnn::TensorInfo>& outputInfos,
+                              const armnn::ConstTensor& layerInput)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos)
+            , m_LayerInput(layerInput) {}
+
+        void VisitConstantLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::ConstTensor& input,
+                                const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+
+            CompareConstTensor(input, m_LayerInput);
+        }
+
+        void VisitAdditionLayer(const armnn::IConnectableLayer* layer, const char* name = nullptr) override {}
+
+    private:
+        armnn::ConstTensor m_LayerInput;
+    };
+
+    const std::string layerName("constant");
+    const armnn::TensorInfo info({ 2, 3 }, armnn::DataType::Float32);
+
+    std::vector<float> constantData = GenerateRandomData<float>(info.GetNumElements());
+    armnn::ConstTensor constTensor(info, constantData);
+
+    armnn::INetworkPtr network(armnn::INetwork::Create());
+    armnn::IConnectableLayer* input = network->AddInputLayer(0);
+    armnn::IConnectableLayer* add = network->AddAdditionLayer();
+    armnn::IConnectableLayer* constant = network->AddConstantLayer(constTensor, layerName.c_str());
+    armnn::IConnectableLayer* output = network->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(add->GetInputSlot(0));
+    constant->GetOutputSlot(0).Connect(add->GetInputSlot(1));
+    add->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(info);
+    constant->GetOutputSlot(0).SetTensorInfo(info);
+    add->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    ConstantLayerVerifier verifier(layerName, {}, {info}, constTensor);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

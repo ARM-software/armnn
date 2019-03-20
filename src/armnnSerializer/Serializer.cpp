@@ -787,11 +787,13 @@ void SerializerVisitor::VisitSubtractionLayer(const armnn::IConnectableLayer* la
 fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {
+    uint32_t fbIndex = GetSerializedId(layer->GetGuid());
+
     std::vector<fb::Offset<serializer::InputSlot>> inputSlots = CreateInputSlots(layer);
     std::vector<fb::Offset<serializer::OutputSlot>> outputSlots = CreateOutputSlots(layer);
 
     return serializer::CreateLayerBase(m_flatBufferBuilder,
-                                       GetSerializedId(layer->GetGuid()),
+                                       fbIndex,
                                        m_flatBufferBuilder.CreateString(layer->GetName()),
                                        layerType,
                                        m_flatBufferBuilder.CreateVector(inputSlots),

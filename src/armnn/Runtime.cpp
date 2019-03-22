@@ -231,4 +231,10 @@ Status Runtime::EnqueueWorkload(NetworkId networkId,
     return loadedNetwork->EnqueueWorkload(inputTensors, outputTensors);
 }
 
+void Runtime::RegisterDebugCallback(NetworkId networkId, const DebugCallbackFunction& func)
+{
+    LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
+    loadedNetwork->RegisterDebugCallback(func);
+}
+
 }

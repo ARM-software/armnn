@@ -21,6 +21,8 @@ public:
     virtual ~IWorkload() {}
 
     virtual void Execute() const = 0;
+
+    virtual void RegisterDebugCallback(const DebugCallbackFunction& func) {}
 };
 
 // NullWorkload used to denote an unsupported workload when used by the MakeWorkload<> template

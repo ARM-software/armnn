@@ -49,6 +49,8 @@ public:
 
     void FreeWorkingMemory();
 
+    void RegisterDebugCallback(const DebugCallbackFunction& func);
+
 private:
     void AllocateWorkingMemory();
 

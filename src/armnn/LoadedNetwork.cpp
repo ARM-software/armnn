@@ -485,4 +485,12 @@ bool LoadedNetwork::Execute()
     return success;
 }
 
+void LoadedNetwork::RegisterDebugCallback(const DebugCallbackFunction& func)
+{
+    for (auto&& workloadPtr: m_WorkloadQueue)
+    {
+        workloadPtr.get()->RegisterDebugCallback(func);
+    }
+}
+
 }

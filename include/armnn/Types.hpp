@@ -180,4 +180,9 @@ private:
 /// Define LayerGuid type.
 using LayerGuid = unsigned int;
 
+class ITensorHandle;
+
+/// Define the type of callback for the debug layer to call
+using DebugCallbackFunction = std::function<void(LayerGuid, unsigned int, ITensorHandle*)>;
+
 } // namespace armnn

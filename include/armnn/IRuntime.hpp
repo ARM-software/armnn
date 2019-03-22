@@ -83,6 +83,11 @@ public:
     /// @return A pointer to the requested profiler, or nullptr if not found.
     virtual const std::shared_ptr<IProfiler> GetProfiler(NetworkId networkId) const = 0;
 
+    /// Registers a callback function to debug layers performing custom computations on intermediate tensors.
+    /// @param networkId The id of the network to register the callback.
+    /// @param func callback function to pass to the debug layer.
+    virtual void RegisterDebugCallback(NetworkId networkId, const DebugCallbackFunction& func) = 0;
+
 protected:
     ~IRuntime() {}
 };

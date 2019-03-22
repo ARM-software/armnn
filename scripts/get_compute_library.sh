@@ -68,7 +68,7 @@ pushd clframework > /dev/null
 # git fetch https://review.mlplatform.org/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
 
 # For pinning to a revision use this:
-CLFRAMEWORKREVISION="f00d33264721f0647098051449c6d40bc80a2af7" # commit on CL fix compilation error in bare metal build
+CLFRAMEWORKREVISION="2761c2f0b60175469e959982a25ff0abdca6c9ce" # COMPMID-2075 Segfault in NELSTM
 git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode
 

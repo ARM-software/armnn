@@ -229,6 +229,11 @@ struct PadQueueDescriptor : QueueDescriptorWithParameters<PadDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct QuantizeQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Equal layer workload data
 struct EqualQueueDescriptor : QueueDescriptor
 {

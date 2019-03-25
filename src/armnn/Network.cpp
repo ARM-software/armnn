@@ -930,6 +930,11 @@ IConnectableLayer* Network::AddPadLayer(const PadDescriptor& padDescriptor, cons
     return m_Graph->AddLayer<PadLayer>(padDescriptor,name);
 }
 
+IConnectableLayer *Network::AddQuantizeLayer(const char *name)
+{
+    return m_Graph->AddLayer<QuantizeLayer>(name);
+}
+
 IConnectableLayer* Network::AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
                                                  const char* name)
 {

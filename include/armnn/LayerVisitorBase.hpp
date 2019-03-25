@@ -151,6 +151,9 @@ public:
                        const PadDescriptor&,
                        const char*) override { DefaultPolicy::Apply(); }
 
+    void VisitQuantizeLayer(const IConnectableLayer*,
+                            const char*) override { DefaultPolicy::Apply(); }
+
     void VisitStridedSliceLayer(const IConnectableLayer*,
                                 const StridedSliceDescriptor&,
                                 const char*) override { DefaultPolicy::Apply(); }

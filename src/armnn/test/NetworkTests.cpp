@@ -6,6 +6,7 @@
 #include "GraphUtils.hpp"
 
 #include <armnn/ArmNN.hpp>
+#include <armnn/LayerVisitorBase.hpp>
 #include <Network.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -364,6 +365,56 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterMultiplication)
     BOOST_TEST(layer);
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
+}
+
+BOOST_AUTO_TEST_CASE(Network_AddQuantize)
+{
+    struct Test : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+    {
+        void VisitQuantizeLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            m_Visited = true;
+
+            BOOST_TEST(layer);
+
+            std::string expectedName = std::string("quantize");
+            BOOST_TEST(std::string(layer->GetName()) == expectedName);
+            BOOST_TEST(std::string(name) == expectedName);
+
+            BOOST_TEST(layer->GetNumInputSlots() == 1);
+            BOOST_TEST(layer->GetNumOutputSlots() == 1);
+
+            const armnn::TensorInfo& infoIn = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
+            BOOST_TEST((infoIn.GetDataType() == armnn::DataType::Float32));
+
+            const armnn::TensorInfo& infoOut = layer->GetOutputSlot(0).GetTensorInfo();
+            BOOST_TEST((infoOut.GetDataType() == armnn::DataType::QuantisedAsymm8));
+        }
+
+        bool m_Visited = false;
+    };
+
+
+    auto graph = armnn::INetwork::Create();
+
+    auto input = graph->AddInputLayer(0, "input");
+    auto quantize = graph->AddQuantizeLayer("quantize");
+    auto output = graph->AddOutputLayer(1, "output");
+
+    input->GetOutputSlot(0).Connect(quantize->GetInputSlot(0));
+    quantize->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    armnn::TensorInfo infoIn({3,1}, armnn::DataType::Float32);
+    input->GetOutputSlot(0).SetTensorInfo(infoIn);
+
+    armnn::TensorInfo infoOut({3,1}, armnn::DataType::QuantisedAsymm8);
+    quantize->GetOutputSlot(0).SetTensorInfo(infoOut);
+
+    Test testQuantize;
+    graph->Accept(testQuantize);
+
+    BOOST_TEST(testQuantize.m_Visited == true);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

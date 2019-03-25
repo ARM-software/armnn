@@ -159,6 +159,8 @@ public:
 
     IConnectableLayer* AddPadLayer(const PadDescriptor& padDescriptor, const char* name = nullptr) override;
 
+    IConnectableLayer* AddQuantizeLayer(const char* name = nullptr) override;
+
     IConnectableLayer* AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
                                             const char* name = nullptr) override;
 

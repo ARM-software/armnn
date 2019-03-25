@@ -946,6 +946,24 @@ void PadQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+void QuantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "QuantizeQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "QuantizeQueueDescriptor");
+
+
+    if (workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::Float32)
+    {
+        throw InvalidArgumentException("Quantize only accepts Float32 inputs.");
+    }
+
+    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::QuantisedAsymm8 &&
+        workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::QuantisedSymm16)
+    {
+        throw InvalidArgumentException("Output of quantized layer must be quantized type.");
+    }
+}
+
 void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     ValidateSingleInput(workloadInfo, "BatchToSpaceNdQueueDescriptor");

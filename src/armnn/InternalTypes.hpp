@@ -47,6 +47,7 @@ enum class LayerType
     Permute,
     Pooling2d,
     PreCompiled,
+    Quantize,
     Reshape,
     ResizeBilinear,
     Rsqrt,

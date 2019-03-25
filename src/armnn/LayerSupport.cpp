@@ -406,6 +406,15 @@ bool IsPadSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsPadSupported, input, output, descriptor);
 }
 
+bool IsQuantizeSupported(const BackendId& backend,
+                           const TensorInfo& input,
+                           const TensorInfo& output,
+                           char* reasonIfUnsupported,
+                           size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsQuantizeSupported, input, output);
+}
+
 bool IsPermuteSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,

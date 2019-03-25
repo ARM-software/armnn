@@ -39,6 +39,7 @@
 #include "layers/PermuteLayer.hpp"
 #include "layers/Pooling2dLayer.hpp"
 #include "layers/PreCompiledLayer.hpp"
+#include "layers/QuantizeLayer.hpp"
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeBilinearLayer.hpp"
 #include "layers/RsqrtLayer.hpp"
@@ -108,6 +109,7 @@ DECLARE_LAYER(Pad)
 DECLARE_LAYER(Permute)
 DECLARE_LAYER(Pooling2d)
 DECLARE_LAYER(PreCompiled)
+DECLARE_LAYER(Quantize)
 DECLARE_LAYER(Reshape)
 DECLARE_LAYER(ResizeBilinear)
 DECLARE_LAYER(Rsqrt)

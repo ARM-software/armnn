@@ -19,7 +19,6 @@ namespace
 {
 static const BackendId s_Id{RefBackendId()};
 }
-
 template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>
 std::unique_ptr<IWorkload> RefWorkloadFactory::MakeWorkload(const QueueDescriptorType& descriptor,
     const WorkloadInfo& info) const
@@ -346,6 +345,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompil
                                                                  const WorkloadInfo& info) const
 {
     return nullptr;
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
+{
+    return std::make_unique<RefQuantizeWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,

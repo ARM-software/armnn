@@ -122,6 +122,14 @@ struct ShapesAreSameRank : public Rule
     }
 };
 
+struct ShapesAreSameTotalSize : public Rule
+{
+    ShapesAreSameTotalSize(const TensorInfo& info0, const TensorInfo& info1)
+    {
+        m_Res = info0.GetNumElements() == info1.GetNumElements();
+    }
+};
+
 struct ShapesAreBroadcastCompatible : public Rule
 {
     unsigned int CalcInputSize(const TensorShape& in, const TensorShape& out, unsigned int idx)
@@ -717,6 +725,34 @@ bool RefLayerSupport::IsPooling2dSupported(const TensorInfo& input,
                                      input.GetDataType(),
                                      &TrueFunc<>,
                                      &TrueFunc<>);
+}
+
+bool RefLayerSupport::IsQuantizeSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+   bool supported = true;
+
+    // Define supported output types.
+    std::array<DataType,2> supportedInputTypes = {
+        DataType::Float32,
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
+                                  "Reference quantize: input type not supported.");
+
+    // Define supported output types.
+    std::array<DataType,2> supportedOutputTypes = {
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,
+                                  "Reference quantize: output type not supported.");
+
+    supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
+                                  "Reference quantize: input and output shapes have different num total elements.");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,

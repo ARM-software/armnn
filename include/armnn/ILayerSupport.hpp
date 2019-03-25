@@ -108,6 +108,11 @@ public:
                                            const FullyConnectedDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsGatherSupported(const TensorInfo& input0,
+                                   const TensorInfo& input1,
+                                   const TensorInfo& output,
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsGreaterSupported(const TensorInfo& input0,
                                     const TensorInfo& input1,
                                     const TensorInfo& ouput,
@@ -147,11 +152,6 @@ public:
                                  const TensorInfo* cellToForgetWeights,
                                  const TensorInfo* cellToOutputWeights,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
-    virtual bool IsGatherSupported(const TensorInfo& input0,
-                                   const TensorInfo& input1,
-                                   const TensorInfo& output,
-                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsMaximumSupported(const TensorInfo& input0,
                                     const TensorInfo& input1,
@@ -217,11 +217,6 @@ public:
                                     const ReshapeDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    virtual bool IsSpaceToBatchNdSupported(const TensorInfo& input,
-                                           const TensorInfo& output,
-                                           const SpaceToBatchNdDescriptor& descriptor,
-                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
     virtual bool IsResizeBilinearSupported(const TensorInfo& input,
                                            const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
@@ -234,6 +229,11 @@ public:
                                     const TensorInfo& output,
                                     const SoftmaxDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsSpaceToBatchNdSupported(const TensorInfo& input,
+                                           const TensorInfo& output,
+                                           const SpaceToBatchNdDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsSplitterSupported(const TensorInfo& input,
                                      const ViewsDescriptor& descriptor,

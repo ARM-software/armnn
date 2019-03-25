@@ -20,56 +20,14 @@ template <typename Functor,
           typename ParentDescriptor,
           typename armnn::StringMapping::Id DebugString>
 class RefElementwiseWorkload
-{
-    // Needs specialization. The default is empty on purpose.
-};
-
-template <typename ParentDescriptor, typename Functor>
-class BaseFloat32ElementwiseWorkload : public Float32Workload<ParentDescriptor>
+    : public TypedWorkload<ParentDescriptor, DataType>
 {
 public:
-    using Float32Workload<ParentDescriptor>::Float32Workload;
-    void ExecuteImpl(const char * debugString) const;
-};
 
-template <typename Functor,
-          typename ParentDescriptor,
-          typename armnn::StringMapping::Id DebugString>
-class RefElementwiseWorkload<Functor, armnn::DataType::Float32, ParentDescriptor, DebugString>
-    : public BaseFloat32ElementwiseWorkload<ParentDescriptor, Functor>
-{
-public:
-    using BaseFloat32ElementwiseWorkload<ParentDescriptor, Functor>::BaseFloat32ElementwiseWorkload;
+    using TypedWorkload<ParentDescriptor, DataType>::m_Data;
+    using TypedWorkload<ParentDescriptor, DataType>::TypedWorkload;
 
-    virtual void Execute() const override
-    {
-        using Parent = BaseFloat32ElementwiseWorkload<ParentDescriptor, Functor>;
-        Parent::ExecuteImpl(StringMapping::Instance().Get(DebugString));
-    }
-};
-
-template <typename ParentDescriptor, typename Functor>
-class BaseUint8ElementwiseWorkload : public Uint8Workload<ParentDescriptor>
-{
-public:
-    using Uint8Workload<ParentDescriptor>::Uint8Workload;
-    void ExecuteImpl(const char * debugString) const;
-};
-
-template <typename Functor,
-          typename ParentDescriptor,
-          typename armnn::StringMapping::Id DebugString>
-class RefElementwiseWorkload<Functor, armnn::DataType::QuantisedAsymm8, ParentDescriptor, DebugString>
-    : public BaseUint8ElementwiseWorkload<ParentDescriptor, Functor>
-{
-public:
-    using BaseUint8ElementwiseWorkload<ParentDescriptor, Functor>::BaseUint8ElementwiseWorkload;
-
-    virtual void Execute() const override
-    {
-        using Parent = BaseUint8ElementwiseWorkload<ParentDescriptor, Functor>;
-        Parent::ExecuteImpl(StringMapping::Instance().Get(DebugString));
-    }
+    void Execute() const override;
 };
 
 using RefAdditionFloat32Workload =
@@ -119,7 +77,6 @@ using RefDivisionUint8Workload =
                           DataType::QuantisedAsymm8,
                           DivisionQueueDescriptor,
                           StringMapping::RefDivisionWorkload_Execute>;
-
 
 using RefMaximumFloat32Workload =
     RefElementwiseWorkload<armnn::maximum<float>,

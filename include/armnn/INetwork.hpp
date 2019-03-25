@@ -4,12 +4,11 @@
 //
 #pragma once
 
-#include <armnn/NetworkFwd.hpp>
 #include <armnn/DescriptorsFwd.hpp>
-#include <armnn/TensorFwd.hpp>
-#include <armnn/Optional.hpp>
 #include <armnn/ILayerVisitor.hpp>
-
+#include <armnn/NetworkFwd.hpp>
+#include <armnn/Optional.hpp>
+#include <armnn/TensorFwd.hpp>
 #include <armnn/Types.hpp>
 
 #include <memory>

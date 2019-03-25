@@ -4,13 +4,14 @@
 //
 #pragma once
 
-#include <memory>
 
-#include "Types.hpp"
-#include "Tensor.hpp"
 #include "INetwork.hpp"
 #include "IProfiler.hpp"
+#include "Tensor.hpp"
+#include "Types.hpp"
 #include "TypesUtils.hpp"
+
+#include <memory>
 
 namespace armnn
 {

@@ -5,9 +5,9 @@
 #pragma once
 
 #include <armnn/DescriptorsFwd.hpp>
-#include <armnn/Types.hpp>
-#include <armnn/Tensor.hpp>
 #include <armnn/Optional.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
 
 namespace armnn
 {

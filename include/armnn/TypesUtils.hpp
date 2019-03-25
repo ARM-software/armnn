@@ -4,12 +4,14 @@
 //
 #pragma once
 
-#include "Types.hpp"
 #include "Tensor.hpp"
-#include <cmath>
-#include <ostream>
+#include "Types.hpp"
+
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+
+#include <cmath>
+#include <ostream>
 #include <set>
 
 namespace armnn

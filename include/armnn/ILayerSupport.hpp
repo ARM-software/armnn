@@ -6,9 +6,10 @@
 
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/Optional.hpp>
-#include <vector>
+
 #include <cctype>
 #include <memory>
+#include <vector>
 
 namespace armnn
 {

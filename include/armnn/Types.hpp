@@ -4,11 +4,13 @@
 //
 #pragma once
 
+
+#include "BackendId.hpp"
+#include "Exceptions.hpp"
+
 #include <array>
 #include <functional>
 #include <memory>
-#include "BackendId.hpp"
-#include "Exceptions.hpp"
 
 namespace armnn
 {

@@ -5,8 +5,8 @@
 #pragma once
 #include "TensorFwd.hpp"
 
-#include "Types.hpp"
 #include "Exceptions.hpp"
+#include "Types.hpp"
 
 #include <array>
 #include <initializer_list>

@@ -5,8 +5,9 @@
 #pragma once
 
 #include "Exceptions.hpp"
-#include <type_traits>
+
 #include <cstring>
+#include <type_traits>
 
 // Optional is a drop in replacement for std::optional until we migrate
 // to c++-17. Only a subset of the optional features are implemented that

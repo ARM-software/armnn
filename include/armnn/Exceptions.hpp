@@ -4,9 +4,9 @@
 //
 #pragma once
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
-#include <sstream>
 
 namespace armnn
 {

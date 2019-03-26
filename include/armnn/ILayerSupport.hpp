@@ -67,7 +67,6 @@ public:
 
     virtual bool IsDebugSupported(const TensorInfo& input,
                                   const TensorInfo& output,
-                                  const DebugDescriptor& descriptor,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsDepthwiseConvolutionSupported(

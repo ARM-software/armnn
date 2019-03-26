@@ -4,13 +4,13 @@
 //
 #pragma once
 
-#include "LayerWithParameters.hpp"
+#include "Layer.hpp"
 
 namespace armnn
 {
 
 /// This layer visualizes the data flowing through the network.
-class DebugLayer : public LayerWithParameters<DebugDescriptor>
+class DebugLayer : public Layer
 {
 public:
     /// Makes a workload for the Debug type.
@@ -32,9 +32,8 @@ public:
 
 protected:
     /// Constructor to create a DebugLayer.
-    /// @param [in] param DebugDescriptor to configure the debug layer.
     /// @param [in] name Optional name for the layer.
-    DebugLayer(const DebugDescriptor& param, const char* name);
+    DebugLayer(const char* name);
 
     /// Default destructor
     ~DebugLayer() = default;

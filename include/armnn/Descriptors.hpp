@@ -631,24 +631,6 @@ struct StridedSliceDescriptor
     DataLayout m_DataLayout;
 };
 
-/// A DebugDescriptor for the DebugLayer.
-struct DebugDescriptor
-{
-    DebugDescriptor()
-    : m_SlotIndex(0)
-    {}
-
-    DebugDescriptor(const std::string name, unsigned int index)
-    : m_LayerName(name)
-    , m_SlotIndex(index)
-    {}
-
-    /// The name of the debug layer.
-    std::string m_LayerName;
-    /// The slot index of the debug layer.
-    unsigned int m_SlotIndex;
-};
-
 /// A PreCompiledDescriptor for the PreCompiledLayer.
 struct PreCompiledDescriptor
 {

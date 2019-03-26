@@ -86,15 +86,12 @@ std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer)
     debugLayers.reserve(layer.GetNumOutputSlots());
 
     // Connect a DebugLayer to each output slot of the layer
-    unsigned int outputSlotIndex = 0u;
     for (auto&& outputSlot = layer.BeginOutputSlots(); outputSlot != layer.EndOutputSlots(); ++outputSlot)
     {
-        const std::string layerName(layer.GetName());
-        const std::string debugName = std::string("DebugLayerAfter") + layerName;
+        const std::string debugName = std::string("DebugLayerAfter") + layer.GetNameStr();
 
-        const DebugDescriptor descriptor(layerName, outputSlotIndex++);
         DebugLayer* debugLayer =
-            graph.InsertNewLayer<DebugLayer>(*outputSlot, descriptor, debugName.c_str());
+            graph.InsertNewLayer<DebugLayer>(*outputSlot, debugName.c_str());
 
         // Sets output tensor info for the debug layer.
         TensorInfo debugInfo = debugLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();

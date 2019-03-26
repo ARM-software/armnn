@@ -11,7 +11,6 @@ struct ActivationDescriptor;
 struct BatchNormalizationDescriptor;
 struct BatchToSpaceNdDescriptor;
 struct Convolution2dDescriptor;
-struct DebugDescriptor;
 struct DepthwiseConvolution2dDescriptor;
 struct DetectionPostProcessDescriptor;
 struct FakeQuantizationDescriptor;

@@ -4,7 +4,6 @@
 //
 #pragma once
 
-#include <armnn/Descriptors.hpp>
 #include <armnn/Tensor.hpp>
 
 namespace armnn
@@ -13,8 +12,10 @@ namespace armnn
 template <typename T>
 void Debug(const TensorInfo& inputInfo,
            const TensorInfo& outputInfo,
-           const DebugDescriptor& descriptor,
            const T* inputData,
-           T* outputData);
+           T* outputData,
+           LayerGuid guid,
+           const std::string& layerName,
+           unsigned int slotIndex);
 
 } //namespace armnn

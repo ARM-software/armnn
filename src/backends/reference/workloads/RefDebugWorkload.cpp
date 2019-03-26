@@ -25,7 +25,7 @@ void RefDebugWorkload<DataType>::Execute() const
     const T* inputData = GetInputTensorData<T>(0, m_Data);
     T* outputData = GetOutputTensorData<T>(0, m_Data);
 
-    Debug(inputInfo, outputInfo, m_Data.m_Parameters, inputData, outputData);
+    Debug(inputInfo, outputInfo, inputData, outputData, m_Data.m_Guid, m_Data.m_LayerName, m_Data.m_SlotIndex);
 }
 
 template class RefDebugWorkload<DataType::Float32>;

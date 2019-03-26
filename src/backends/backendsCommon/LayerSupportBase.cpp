@@ -100,7 +100,6 @@ bool LayerSupportBase::IsConvolution2dSupported(const TensorInfo& input,
 
 bool LayerSupportBase::IsDebugSupported(const TensorInfo& input,
                                         const TensorInfo& output,
-                                        const DebugDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);

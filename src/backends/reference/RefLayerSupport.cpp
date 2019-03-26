@@ -354,11 +354,9 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
 
 bool RefLayerSupport::IsDebugSupported(const TensorInfo& input,
                                        const TensorInfo& output,
-                                       const DebugDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
     ignore_unused(output);
-    ignore_unused(descriptor);
     return IsSupportedForDataTypeRef(reasonIfUnsupported,
                                      input.GetDataType(),
                                      &TrueFunc<>,

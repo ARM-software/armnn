@@ -171,11 +171,10 @@ bool IsConvolution2dSupported(const BackendId& backend,
 bool IsDebugSupported(const BackendId& backend,
                       const TensorInfo& input,
                       const TensorInfo& output,
-                      const DebugDescriptor& descriptor,
                       char* reasonIfUnsupported,
                       size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsDebugSupported, input, output, descriptor);
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsDebugSupported, input, output);
 }
 
 bool IsDepthwiseConvolutionSupported(const BackendId& backend,

@@ -82,7 +82,6 @@ bool IsConvolution2dSupported(const BackendId& backend,
 bool IsDebugSupported(const BackendId& backend,
                       const TensorInfo& input,
                       const TensorInfo& output,
-                      const DebugDescriptor& descriptor,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 

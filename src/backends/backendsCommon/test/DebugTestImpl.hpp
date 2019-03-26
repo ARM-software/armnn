@@ -92,8 +92,9 @@ LayerTestResult<T, 4> Debug4DTest(
     unsigned int outputShape[] = {1, 2, 2, 3};
 
     armnn::DebugQueueDescriptor desc;
-    desc.m_Parameters.m_LayerName = "TestOutput";
-    desc.m_Parameters.m_SlotIndex = 1;
+    desc.m_Guid = 1;
+    desc.m_LayerName = "TestOutput";
+    desc.m_SlotIndex = 0;
 
     inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
     outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
@@ -115,8 +116,9 @@ LayerTestResult<T, 4> Debug4DTest(
     });
 
     const std::string expectedStringOutput =
-        "{ \"layer\": \"TestOutput\","
-        " \"outputSlot\": 1,"
+        "{ \"layerGuid\": 1,"
+        " \"layerName\": \"TestOutput\","
+        " \"outputSlot\": 0,"
         " \"shape\": [1, 2, 2, 3],"
         " \"min\": 1, \"max\": 12,"
         " \"data\": [[[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]] }\n";
@@ -143,7 +145,9 @@ LayerTestResult<T, 3> Debug3DTest(
     unsigned int outputShape[] = {3, 3, 1};
 
     armnn::DebugQueueDescriptor desc;
-    desc.m_Parameters.m_LayerName = "TestOutput";
+    desc.m_Guid = 1;
+    desc.m_LayerName = "TestOutput";
+    desc.m_SlotIndex = 0;
 
     inputTensorInfo = armnn::TensorInfo(3, inputShape, ArmnnType);
     outputTensorInfo = armnn::TensorInfo(3, outputShape, ArmnnType);
@@ -163,7 +167,8 @@ LayerTestResult<T, 3> Debug3DTest(
     });
 
     const std::string expectedStringOutput =
-        "{ \"layer\": \"TestOutput\","
+        "{ \"layerGuid\": 1,"
+        " \"layerName\": \"TestOutput\","
         " \"outputSlot\": 0,"
         " \"shape\": [3, 3, 1],"
         " \"min\": 1, \"max\": 9,"
@@ -191,7 +196,9 @@ LayerTestResult<T, 2> Debug2DTest(
     unsigned int outputShape[] = {2, 2};
 
     armnn::DebugQueueDescriptor desc;
-    desc.m_Parameters.m_LayerName = "TestOutput";
+    desc.m_Guid = 1;
+    desc.m_LayerName = "TestOutput";
+    desc.m_SlotIndex = 0;
 
     inputTensorInfo = armnn::TensorInfo(2, inputShape, ArmnnType);
     outputTensorInfo = armnn::TensorInfo(2, outputShape, ArmnnType);
@@ -209,7 +216,8 @@ LayerTestResult<T, 2> Debug2DTest(
     });
 
     const std::string expectedStringOutput =
-        "{ \"layer\": \"TestOutput\","
+        "{ \"layerGuid\": 1,"
+        " \"layerName\": \"TestOutput\","
         " \"outputSlot\": 0,"
         " \"shape\": [2, 2],"
         " \"min\": 1, \"max\": 4,"
@@ -237,7 +245,9 @@ LayerTestResult<T, 1> Debug1DTest(
     unsigned int outputShape[] = {4};
 
     armnn::DebugQueueDescriptor desc;
-    desc.m_Parameters.m_LayerName = "TestOutput";
+    desc.m_Guid = 1;
+    desc.m_LayerName = "TestOutput";
+    desc.m_SlotIndex = 0;
 
     inputTensorInfo = armnn::TensorInfo(1, inputShape, ArmnnType);
     outputTensorInfo = armnn::TensorInfo(1, outputShape, ArmnnType);
@@ -253,7 +263,8 @@ LayerTestResult<T, 1> Debug1DTest(
     });
 
     const std::string expectedStringOutput =
-        "{ \"layer\": \"TestOutput\","
+        "{ \"layerGuid\": 1,"
+        " \"layerName\": \"TestOutput\","
         " \"outputSlot\": 0,"
         " \"shape\": [4],"
         " \"min\": 1, \"max\": 4,"

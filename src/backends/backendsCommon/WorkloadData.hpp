@@ -380,9 +380,13 @@ struct GreaterQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-struct DebugQueueDescriptor : QueueDescriptorWithParameters<DebugDescriptor>
+struct DebugQueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;
+
+    LayerGuid m_Guid;
+    std::string m_LayerName;
+    unsigned int m_SlotIndex;
 };
 
 struct RsqrtQueueDescriptor : QueueDescriptor

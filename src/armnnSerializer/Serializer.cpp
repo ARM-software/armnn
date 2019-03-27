@@ -681,6 +681,14 @@ void SerializerVisitor::VisitPooling2dLayer(const armnn::IConnectableLayer* laye
     CreateAnyLayer(fbPooling2dLayer.o, serializer::Layer::Layer_Pooling2dLayer);
 }
 
+void SerializerVisitor::VisitQuantizeLayer(const armnn::IConnectableLayer *layer, const char *name)
+{
+    auto fbQuantizeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Quantize);
+    auto fbQuantizeLayer = serializer::CreateQuantizeLayer(m_flatBufferBuilder,
+                                                           fbQuantizeBaseLayer);
+    CreateAnyLayer(fbQuantizeLayer.o, serializer::Layer::Layer_QuantizeLayer);
+}
+
 // Build FlatBuffer for FullyConnected Layer
 void SerializerVisitor::VisitFullyConnectedLayer(const armnn::IConnectableLayer* layer,
                                                  const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,

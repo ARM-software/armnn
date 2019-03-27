@@ -1542,6 +1542,42 @@ BOOST_AUTO_TEST_CASE(SerializePooling2d)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeQuantize)
+{
+    class QuantizeLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        QuantizeLayerVerifier(const std::string& layerName,
+                             const std::vector<armnn::TensorInfo>& inputInfos,
+                             const std::vector<armnn::TensorInfo>& outputInfos)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitQuantizeLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("quantize");
+    const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const quantizeLayer = network->AddQuantizeLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(quantizeLayer->GetInputSlot(0));
+    quantizeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    quantizeLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    QuantizeLayerVerifier verifier(layerName, {info}, {info});
+    deserializedNetwork->Accept(verifier);
+}
 BOOST_AUTO_TEST_CASE(SerializeReshape)
 {
     class ReshapeLayerVerifier : public LayerVerifierBase

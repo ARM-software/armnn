@@ -103,6 +103,7 @@ private:
     void ParsePad(GraphPtr graph, unsigned int layerIndex);
     void ParsePermute(GraphPtr graph, unsigned int layerIndex);
     void ParsePooling2d(GraphPtr graph, unsigned int layerIndex);
+    void ParseQuantize(GraphPtr graph, unsigned int layerIndex);
     void ParseReshape(GraphPtr graph, unsigned int layerIndex);
     void ParseResizeBilinear(GraphPtr graph, unsigned int layerIndex);
     void ParseRsqrt(GraphPtr graph, unsigned int layerIndex);

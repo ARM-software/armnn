@@ -116,7 +116,8 @@ enum LayerType : uint {
     L2Normalization = 31,
     Splitter = 32,
     DetectionPostProcess = 33,
-    Lstm = 34
+    Lstm = 34,
+    Quantize = 35
 }
 
 // Base layer table to be used as part of other layers
@@ -263,6 +264,10 @@ table Pooling2dDescriptor {
     outputShapeRounding:OutputShapeRounding;
     paddingMethod:PaddingMethod;
     dataLayout:DataLayout;
+}
+
+table QuantizeLayer {
+    base:LayerBase;
 }
 
 table SoftmaxLayer {
@@ -549,7 +554,8 @@ union Layer {
     L2NormalizationLayer,
     SplitterLayer,
     DetectionPostProcessLayer,
-    LstmLayer
+    LstmLayer,
+    QuantizeLayer
 }
 
 table AnyLayer {

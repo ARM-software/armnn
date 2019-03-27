@@ -16,7 +16,7 @@
 namespace armnnSerializer
 {
 
-class SerializerVisitor : public armnn::LayerVisitorBase<armnn::VisitorNoThrowPolicy>
+class SerializerVisitor : public armnn::ILayerVisitor
 {
 public:
     SerializerVisitor() : m_layerId(0) {}

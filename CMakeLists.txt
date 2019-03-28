@@ -409,6 +409,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/ConstTensorLayerVisitor.cpp
         src/armnn/test/CreateWorkload.hpp
         src/armnn/test/CsvReaderTest.cpp
+        src/armnn/test/DebugCallbackTest.cpp
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp
         src/armnn/test/GraphTests.cpp

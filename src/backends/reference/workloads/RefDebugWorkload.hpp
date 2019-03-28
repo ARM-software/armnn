@@ -16,6 +16,10 @@ template <armnn::DataType DataType>
 class RefDebugWorkload : public TypedWorkload<DebugQueueDescriptor, DataType>
 {
 public:
+    RefDebugWorkload(const DebugQueueDescriptor& descriptor, const WorkloadInfo& info)
+    : TypedWorkload<DebugQueueDescriptor, DataType>(descriptor, info)
+    , m_Callback(nullptr) {}
+
     static const std::string& GetName()
     {
         static const std::string name = std::string("RefDebug") + GetDataTypeName(DataType) + "Workload";
@@ -26,6 +30,11 @@ public:
     using TypedWorkload<DebugQueueDescriptor, DataType>::TypedWorkload;
 
     void Execute() const override;
+
+    void RegisterDebugCallback(const DebugCallbackFunction& func) override;
+
+private:
+    DebugCallbackFunction m_Callback;
 };
 
 using RefDebugFloat32Workload = RefDebugWorkload<DataType::Float32>;

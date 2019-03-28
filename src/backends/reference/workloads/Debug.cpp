@@ -6,7 +6,6 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <cstring>
 #include <algorithm>
 #include <iostream>
 
@@ -15,9 +14,7 @@ namespace armnn
 
 template <typename T>
 void Debug(const TensorInfo& inputInfo,
-           const TensorInfo& outputInfo,
            const T* inputData,
-           T* outputData,
            LayerGuid guid,
            const std::string& layerName,
            unsigned int slotIndex)
@@ -86,22 +83,16 @@ void Debug(const TensorInfo& inputInfo,
     }
 
     std::cout << " }" << std::endl;
-
-    std::memcpy(outputData, inputData, inputInfo.GetNumElements()*sizeof(T));
 }
 
 template void Debug<float>(const TensorInfo& inputInfo,
-                           const TensorInfo& outputInfo,
                            const float* inputData,
-                           float* outputData,
                            LayerGuid guid,
                            const std::string& layerName,
                            unsigned int slotIndex);
 
 template void Debug<uint8_t>(const TensorInfo& inputInfo,
-                             const TensorInfo& outputInfo,
                              const uint8_t* inputData,
-                             uint8_t* outputData,
                              LayerGuid guid,
                              const std::string& layerName,
                              unsigned int slotIndex);

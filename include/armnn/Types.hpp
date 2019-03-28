@@ -183,7 +183,10 @@ using LayerGuid = unsigned int;
 
 class ITensorHandle;
 
-/// Define the type of callback for the debug layer to call
-using DebugCallbackFunction = std::function<void(LayerGuid, unsigned int, ITensorHandle*)>;
+/// Define the type of callback for the Debug layer to call
+/// @param guid - guid of layer connected to the input of the Debug layer
+/// @param slotIndex - index of the output slot connected to the input of the Debug layer
+/// @param tensorHandle - TensorHandle for the input tensor to the Debug layer
+using DebugCallbackFunction = std::function<void(LayerGuid guid, unsigned int slotIndex, ITensorHandle* tensorHandle)>;
 
 } // namespace armnn

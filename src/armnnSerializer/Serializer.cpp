@@ -289,6 +289,15 @@ void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectab
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_DepthwiseConvolution2dLayer);
 }
 
+void SerializerVisitor::VisitDequantizeLayer(const armnn::IConnectableLayer* layer,
+                                             const char* name)
+{
+    auto fbDequantizeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Dequantize);
+    auto fbDequantizeLayer     = serializer::CreateDequantizeLayer(m_flatBufferBuilder, fbDequantizeBaseLayer);
+
+    CreateAnyLayer(fbDequantizeLayer.o, serializer::Layer::Layer_DequantizeLayer);
+}
+
 void SerializerVisitor::VisitDetectionPostProcessLayer(const armnn::IConnectableLayer* layer,
                                                        const armnn::DetectionPostProcessDescriptor& descriptor,
                                                        const armnn::ConstTensor& anchors,

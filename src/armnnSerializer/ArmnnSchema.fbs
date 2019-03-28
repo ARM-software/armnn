@@ -117,7 +117,8 @@ enum LayerType : uint {
     Splitter = 32,
     DetectionPostProcess = 33,
     Lstm = 34,
-    Quantize = 35
+    Quantize = 35,
+    Dequantize = 36
 }
 
 // Base layer table to be used as part of other layers
@@ -519,6 +520,10 @@ table LstmLayer {
     inputParams:LstmInputParams;
 }
 
+table DequantizeLayer {
+    base:LayerBase;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -555,7 +560,8 @@ union Layer {
     SplitterLayer,
     DetectionPostProcessLayer,
     LstmLayer,
-    QuantizeLayer
+    QuantizeLayer,
+    DequantizeLayer
 }
 
 table AnyLayer {

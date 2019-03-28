@@ -1153,6 +1153,23 @@ void DetectionPostProcessQueueDescriptor::Validate(const WorkloadInfo& workloadI
     }
 }
 
+void DequantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateSingleInput(workloadInfo, "DequantizeQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "DequantizeQueueDescriptor");
+
+    if (workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::QuantisedAsymm8 &&
+        workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::QuantisedSymm16)
+    {
+        throw InvalidArgumentException("Input to dequantize layer must be quantized type.");
+    }
+
+    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Float32)
+    {
+        throw InvalidArgumentException("Output of dequantize layer must be Float32 type.");
+    }
+}
+
 void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     // This is internally generated so it should not need validation.

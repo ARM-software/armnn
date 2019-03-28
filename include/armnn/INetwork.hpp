@@ -147,6 +147,10 @@ public:
         const ConstTensor& biases,
         const char* name = nullptr) = 0;
 
+    /// Adds a Dequantize layer to the network.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddDequantizeLayer(const char* name = nullptr) = 0;
+
     /// Adds a Detection PostProcess layer to the network.
     /// @param descriptor - Description of the Detection PostProcess layer.
     /// @param anchors - Tensor for anchors.

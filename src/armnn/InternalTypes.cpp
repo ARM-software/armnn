@@ -24,6 +24,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Convolution2d: return "Convolution2d";
         case LayerType::Debug: return "Debug";
         case LayerType::DepthwiseConvolution2d: return "DepthwiseConvolution2d";
+        case LayerType::Dequantize: return "Dequantize";
         case LayerType::DetectionPostProcess: return "DetectionPostProcess";
         case LayerType::Division: return "Division";
         case LayerType::Equal: return "Equal";

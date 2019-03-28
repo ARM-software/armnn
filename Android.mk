@@ -92,6 +92,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ConvertFp32ToFp16Layer.cpp \
         src/armnn/layers/DebugLayer.cpp \
         src/armnn/layers/DepthwiseConvolution2dLayer.cpp \
+        src/armnn/layers/DequantizeLayer.cpp \
         src/armnn/layers/DetectionPostProcessLayer.cpp \
         src/armnn/layers/DivisionLayer.cpp \
         src/armnn/layers/ElementwiseBaseLayer.cpp \

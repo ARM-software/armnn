@@ -45,6 +45,9 @@ public:
                                           const Optional<ConstTensor>&,
                                           const char*) override { DefaultPolicy::Apply(); }
 
+    void VisitDequantizeLayer(const IConnectableLayer*,
+                              const char*) override { DefaultPolicy::Apply(); }
+
     void VisitDetectionPostProcessLayer(const IConnectableLayer*,
                                         const DetectionPostProcessDescriptor&,
                                         const ConstTensor&,
@@ -175,4 +178,3 @@ public:
 };
 
 } //namespace armnn
-

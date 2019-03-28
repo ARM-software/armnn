@@ -59,6 +59,9 @@ protected:
             BOOST_TEST(connectedInfo.GetShape() == m_InputTensorInfos[i].GetShape());
             BOOST_TEST(
                 GetDataTypeName(connectedInfo.GetDataType()) == GetDataTypeName(m_InputTensorInfos[i].GetDataType()));
+
+            BOOST_TEST(connectedInfo.GetQuantizationScale() == m_InputTensorInfos[i].GetQuantizationScale());
+            BOOST_TEST(connectedInfo.GetQuantizationOffset() == m_InputTensorInfos[i].GetQuantizationOffset());
         }
 
         for (unsigned int i = 0; i < m_OutputTensorInfos.size(); i++)
@@ -67,6 +70,9 @@ protected:
             BOOST_TEST(outputInfo.GetShape() == m_OutputTensorInfos[i].GetShape());
             BOOST_TEST(
                 GetDataTypeName(outputInfo.GetDataType()) == GetDataTypeName(m_OutputTensorInfos[i].GetDataType()));
+
+            BOOST_TEST(outputInfo.GetQuantizationScale() == m_OutputTensorInfos[i].GetQuantizationScale());
+            BOOST_TEST(outputInfo.GetQuantizationOffset() == m_OutputTensorInfos[i].GetQuantizationOffset());
         }
     }
 
@@ -587,6 +593,44 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
     BOOST_CHECK(deserializedNetwork);
 
     DepthwiseConvolution2dLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor, weights, biases);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeDequantize)
+{
+    class DequantizeLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        DequantizeLayerVerifier(const std::string& layerName,
+                                const std::vector<armnn::TensorInfo>& inputInfos,
+                                const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitDequantizeLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("dequantize");
+    const armnn::TensorInfo inputInfo({ 1, 5, 2, 3 }, armnn::DataType::QuantisedAsymm8, 0.5f, 1);
+    const armnn::TensorInfo outputInfo({ 1, 5, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const dequantizeLayer = network->AddDequantizeLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(dequantizeLayer->GetInputSlot(0));
+    dequantizeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    dequantizeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    DequantizeLayerVerifier verifier(layerName, {inputInfo}, {outputInfo});
     deserializedNetwork->Accept(verifier);
 }
 

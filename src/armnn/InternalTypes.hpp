@@ -24,6 +24,7 @@ enum class LayerType
     Convolution2d,
     Debug,
     DepthwiseConvolution2d,
+    Dequantize,
     DetectionPostProcess,
     Division,
     Equal,

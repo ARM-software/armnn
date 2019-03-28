@@ -935,6 +935,11 @@ IConnectableLayer *Network::AddQuantizeLayer(const char *name)
     return m_Graph->AddLayer<QuantizeLayer>(name);
 }
 
+IConnectableLayer* Network::AddDequantizeLayer(const char* name)
+{
+    return m_Graph->AddLayer<DequantizeLayer>(name);
+}
+
 IConnectableLayer* Network::AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
                                                  const char* name)
 {

@@ -115,6 +115,13 @@ bool LayerSupportBase::IsDepthwiseConvolutionSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsDequantizeSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsDetectionPostProcessSupported(const armnn::TensorInfo& input0,
                                                        const armnn::TensorInfo& input1,
                                                        const armnn::DetectionPostProcessDescriptor& descriptor,

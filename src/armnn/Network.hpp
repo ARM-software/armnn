@@ -72,6 +72,8 @@ public:
         const ConstTensor& biases,
         const char* name = nullptr) override;
 
+    IConnectableLayer* AddDequantizeLayer(const char* name = nullptr) override;
+
     IConnectableLayer* AddDetectionPostProcessLayer(
         const DetectionPostProcessDescriptor& descriptor,
         const ConstTensor& anchors,

@@ -77,6 +77,10 @@ public:
                      const Optional<TensorInfo>& biases,
                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsDequantizeSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsDetectionPostProcessSupported(
                      const TensorInfo& input0,
                      const TensorInfo& input1,

@@ -229,6 +229,16 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                      reason);
             break;
         }
+        case LayerType::Dequantize:
+        {
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsDequantizeSupported(OverrideDataType(input, dataType),
+                                                               OverrideDataType(output, DataType::Float32),
+                                                               reason);
+            break;
+        }
         case LayerType::DetectionPostProcess:
         {
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -817,6 +827,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateDebug(const DebugQueueDescrip
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateDequantize(
+    const DequantizeQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

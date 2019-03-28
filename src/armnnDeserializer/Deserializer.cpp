@@ -193,6 +193,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_ConstantLayer]               = &Deserializer::ParseConstant;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &Deserializer::ParseDepthwiseConvolution2d;
+    m_ParserFunctions[Layer_DequantizeLayer]             = &Deserializer::ParseDequantize;
     m_ParserFunctions[Layer_DetectionPostProcessLayer]   = &Deserializer::ParseDetectionPostProcess;
     m_ParserFunctions[Layer_DivisionLayer]               = &Deserializer::ParseDivision;
     m_ParserFunctions[Layer_EqualLayer]                  = &Deserializer::ParseEqual;
@@ -242,6 +243,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_Convolution2dLayer()->base();
         case Layer::Layer_DepthwiseConvolution2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_DepthwiseConvolution2dLayer()->base();
+        case Layer::Layer_DequantizeLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_DequantizeLayer()->base();
         case Layer::Layer_DetectionPostProcessLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_DetectionPostProcessLayer()->base();
         case Layer::Layer_DivisionLayer:
@@ -2057,6 +2060,26 @@ void Deserializer::ParseLstm(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo4 = ToTensorInfo(outputs[3]);
     layer->GetOutputSlot(3).SetTensorInfo(outputTensorInfo4);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseDequantize(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    const std::string layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddDequantizeLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

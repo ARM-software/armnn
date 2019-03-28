@@ -416,4 +416,9 @@ struct PreCompiledQueueDescriptor : QueueDescriptorWithParameters<PreCompiledDes
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct DequantizeQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

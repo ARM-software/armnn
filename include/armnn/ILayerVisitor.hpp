@@ -95,6 +95,13 @@ public:
                                                   const Optional<ConstTensor>& biases,
                                                   const char* name = nullptr) = 0;
 
+    /// Function that a Dequantize layer should call back to when its
+    /// Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param name - Optional name for the layer.
+    virtual void VisitDequantizeLayer(const IConnectableLayer* layer,
+                                      const char* name = nullptr) = 0;
+
     /// Function that a Detection PostProcess layer should call back to when its
     /// Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.

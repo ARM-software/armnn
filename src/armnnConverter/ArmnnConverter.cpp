@@ -28,8 +28,9 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/program_options.hpp>
 
-#include <iostream>
+#include <cstdlib>
 #include <fstream>
+#include <iostream>
 
 namespace
 {
@@ -131,20 +132,20 @@ int ParseCommandLineArgs(int argc, const char* argv[],
 #if defined(ARMNN_ONNX_PARSER)
          ", onnx-binary, onnx-text"
 #endif
-#if defined(ARMNN_TENSORFLOW_PARSER)
+#if defined(ARMNN_TF_PARSER)
          ", tensorflow-binary, tensorflow-text"
 #endif
 #if defined(ARMNN_TF_LITE_PARSER)
          ", tflite-binary"
 #endif
          ".")
-        ("model-path,m", po::value(&modelPath)->required(), "Path to model file")
+        ("model-path,m", po::value(&modelPath)->required(), "Path to model file.")
         ("input-name,i", po::value<std::vector<std::string>>()->multitoken(),
-         "Identifier of the input tensors in the network separated by whitespace")
+         "Identifier of the input tensors in the network, separated by whitespace.")
         ("input-tensor-shape,s", po::value<std::vector<std::string>>()->multitoken(),
-         "The shape of the input tensor in the network as a flat array of integers separated by comma"
-         "Multiple shapes are separated by whitespace"
-         "This parameter is optional, depending on the network.")
+         "The shape of the input tensor in the network as a flat array of integers, separated by comma."
+         " Multiple shapes are separated by whitespace."
+         " This parameter is optional, depending on the network.")
         ("output-name,o", po::value<std::vector<std::string>>()->multitoken(),
          "Identifier of the output tensor in the network.")
         ("output-path,p", po::value(&outputPath)->required(), "Path to serialize the network to.");
@@ -156,10 +157,10 @@ int ParseCommandLineArgs(int argc, const char* argv[],
 
         if (CheckOption(vm, "help") || argc <= 1)
         {
-            std::cout << "Convert a neural network model from provided file to ArmNN format " << std::endl;
+            std::cout << "Convert a neural network model from provided file to ArmNN format." << std::endl;
             std::cout << std::endl;
             std::cout << desc << std::endl;
-            return EXIT_SUCCESS;
+            exit(EXIT_SUCCESS);
         }
         po::notify(vm);
     }
@@ -478,7 +479,7 @@ int main(int argc, const char* argv[])
     }
     else
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat;
+        BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat << "'";
         return EXIT_FAILURE;
     }
 

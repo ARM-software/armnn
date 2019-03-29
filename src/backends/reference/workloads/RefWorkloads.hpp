@@ -63,3 +63,4 @@
 #include "RefDebugWorkload.hpp"
 #include "RefRsqrtFloat32Workload.hpp"
 #include "RefComparisonWorkload.hpp"
+#include "RefDequantizeWorkload.hpp"

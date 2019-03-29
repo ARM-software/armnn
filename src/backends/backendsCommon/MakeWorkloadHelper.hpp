@@ -47,11 +47,6 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
         info.m_InputTensorInfos[0].GetDataType()
         : info.m_OutputTensorInfos[0].GetDataType();
 
-    BOOST_ASSERT(info.m_InputTensorInfos.empty()  ||
-                 info.m_OutputTensorInfos.empty() ||
-                 ((info.m_InputTensorInfos[0].GetDataType() == info.m_OutputTensorInfos[0].GetDataType()) ||
-                   info.m_OutputTensorInfos[0].GetDataType() == armnn::DataType::Boolean));
-
     switch (dataType)
     {
         case DataType::Float16:

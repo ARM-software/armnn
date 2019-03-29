@@ -530,5 +530,7 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsUint8)
     DetectionPostProcessFastNmsUint8Test<armnn::RefWorkloadFactory>();
 }
 
+// Dequantize
+ARMNN_AUTO_TEST_CASE(DequantizeUint8, DequantizeUint8Test)
 
 BOOST_AUTO_TEST_SUITE_END()

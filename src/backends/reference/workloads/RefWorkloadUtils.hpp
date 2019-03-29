@@ -127,6 +127,15 @@ std::vector<float> Dequantize(const T* quant, const TensorInfo& info)
     return ret;
 }
 
+template<typename T>
+inline void Dequantize(const T* inputData, float* outputData, const TensorInfo& info)
+{
+    for (unsigned int i = 0; i < info.GetNumElements(); i++)
+    {
+        outputData[i] = Dequantize<T>(inputData[i], info.GetQuantizationScale(), info.GetQuantizationOffset());
+    }
+}
+
 inline void Quantize(uint8_t* quant, const float* dequant, const TensorInfo& info)
 {
     for (size_t i = 0; i < info.GetNumElements(); i++)

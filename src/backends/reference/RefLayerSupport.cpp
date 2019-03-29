@@ -380,6 +380,16 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &FalseFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool RefLayerSupport::IsDetectionPostProcessSupported(const armnn::TensorInfo& input0,
                                                       const armnn::TensorInfo& input1,
                                                       const armnn::DetectionPostProcessDescriptor& descriptor,

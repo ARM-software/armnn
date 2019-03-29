@@ -43,6 +43,7 @@
 #include "ConvertFp16ToFp32TestImpl.hpp"
 #include "ConvertFp32ToFp16TestImpl.hpp"
 #include "DebugTestImpl.hpp"
+#include "DequantizeTestImpl.hpp"
 
 // 3-channel 16x8 image used as common input data for a number of Conv2d tests.
 static std::vector<float> ConvInput3x8x16({
@@ -8968,4 +8969,11 @@ LayerTestResult<uint8_t, 4> GatherMultiDimParamsMultiDimIndicesUint8Test(
 {
     return GatherMultiDimParamsMultiDimIndicesTestImpl<armnn::DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 4> DequantizeUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return DequantizeSimpleTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
 }

@@ -63,6 +63,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefDepthwiseConvolution2dFloat32Workload.hpp
     RefDepthwiseConvolution2dUint8Workload.cpp
     RefDepthwiseConvolution2dUint8Workload.hpp
+    RefDequantizeWorkload.cpp
+    RefDequantizeWorkload.hpp
     RefDetectionPostProcessUint8Workload.cpp
     RefDetectionPostProcessUint8Workload.hpp
     RefDetectionPostProcessFloat32Workload.cpp

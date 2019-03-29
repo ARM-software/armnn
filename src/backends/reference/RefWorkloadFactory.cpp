@@ -348,4 +348,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompil
     return nullptr;
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
+                                                                const WorkloadInfo& info) const
+{
+    return MakeWorkload<NullWorkload, RefDequantizeWorkload>(descriptor, info);
+}
+
 } // namespace armnn

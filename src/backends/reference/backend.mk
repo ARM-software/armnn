@@ -39,6 +39,7 @@ BACKEND_SOURCES := \
         workloads/RefDebugWorkload.cpp \
         workloads/RefDepthwiseConvolution2dFloat32Workload.cpp \
         workloads/RefDepthwiseConvolution2dUint8Workload.cpp \
+        workloads/RefDequantizeWorkload.cpp \
         workloads/RefDetectionPostProcessFloat32Workload.cpp \
         workloads/RefDetectionPostProcessUint8Workload.cpp \
         workloads/RefElementwiseWorkload.cpp \

@@ -68,7 +68,7 @@ pushd clframework > /dev/null
 # git fetch https://review.mlplatform.org/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
 
 # For pinning to a revision use this:
-CLFRAMEWORKREVISION="2761c2f0b60175469e959982a25ff0abdca6c9ce" # COMPMID-2075 Segfault in NELSTM
+CLFRAMEWORKREVISION="b4a44ff3aa98d2b51f1621a7525db3f81108a1bd" # COMPMID-1995: Removed layout checks from Reduction ops
 git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode
 

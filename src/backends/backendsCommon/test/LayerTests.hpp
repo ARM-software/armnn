@@ -1443,3 +1443,15 @@ LayerTestResult<uint8_t, 4> GatherMultiDimParamsMultiDimIndicesUint8Test(
 LayerTestResult<float, 4> DequantizeUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> QuantizeSimpleUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 4> QuantizeClampUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<int16_t, 4> QuantizeClampInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

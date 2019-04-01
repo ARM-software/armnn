@@ -44,6 +44,7 @@
 #include "ConvertFp32ToFp16TestImpl.hpp"
 #include "DebugTestImpl.hpp"
 #include "DequantizeTestImpl.hpp"
+#include "QuantizeTestImpl.hpp"
 
 // 3-channel 16x8 image used as common input data for a number of Conv2d tests.
 static std::vector<float> ConvInput3x8x16({
@@ -8976,4 +8977,25 @@ LayerTestResult<float, 4> DequantizeUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return DequantizeSimpleTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> QuantizeSimpleUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return QuantizeSimpleTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 4> QuantizeClampUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return QuantizeClampTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> QuantizeClampInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return QuantizeClampTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
 }

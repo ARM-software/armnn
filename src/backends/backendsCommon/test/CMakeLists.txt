@@ -34,6 +34,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     PermuteTestImpl.hpp
     Pooling2dTestImpl.hpp
     QuantizeHelper.hpp
+    QuantizeTestImpl.hpp
     ReshapeTestImpl.hpp
     RuntimeTestImpl.hpp
     SoftmaxTestImpl.hpp

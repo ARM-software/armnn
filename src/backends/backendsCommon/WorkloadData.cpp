@@ -494,7 +494,8 @@ void AdditionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     std::vector<DataType> supportedTypes = {
         DataType::Float32,
         DataType::QuantisedAsymm8,
-        DataType::QuantisedSymm16
+        DataType::QuantisedSymm16,
+        DataType::Float16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
@@ -526,7 +527,8 @@ void MultiplicationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     std::vector<DataType> supportedTypes = {
         DataType::Float32,
         DataType::QuantisedAsymm8,
-        DataType::QuantisedSymm16
+        DataType::QuantisedSymm16,
+        DataType::Float16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
@@ -895,7 +897,8 @@ void DivisionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     std::vector<DataType> supportedTypes = {
         DataType::Float32,
         DataType::QuantisedAsymm8,
-        DataType::QuantisedSymm16
+        DataType::QuantisedSymm16,
+        DataType::Float16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
@@ -926,7 +929,8 @@ void SubtractionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) cons
     std::vector<DataType> supportedTypes = {
         DataType::Float32,
         DataType::QuantisedAsymm8,
-        DataType::QuantisedSymm16
+        DataType::QuantisedSymm16,
+        DataType::Float16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],

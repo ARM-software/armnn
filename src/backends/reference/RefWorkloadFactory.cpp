@@ -27,6 +27,22 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::MakeWorkload(const QueueDescripto
                                                                                                         info);
 }
 
+bool IsFloat16(const WorkloadInfo& info)
+{
+    auto checkFloat16 = [](const TensorInfo& tensorInfo) {return tensorInfo.GetDataType() == DataType::Float16;};
+    auto it = std::find_if(std::begin(info.m_InputTensorInfos), std::end(info.m_InputTensorInfos), checkFloat16);
+    if (it != std::end(info.m_InputTensorInfos))
+    {
+        return true;
+    }
+    it = std::find_if(std::begin(info.m_OutputTensorInfos), std::end(info.m_OutputTensorInfos), checkFloat16);
+    if (it != std::end(info.m_OutputTensorInfos))
+    {
+        return true;
+    }
+    return false;
+}
+
 RefWorkloadFactory::RefWorkloadFactory()
 {
 }
@@ -174,12 +190,20 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateNormalization(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                                      const WorkloadInfo&            info) const
 {
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
     return std::make_unique<RefAdditionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMultiplication(
     const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
     return std::make_unique<RefMultiplicationWorkload>(descriptor, info);
 }
 
@@ -266,12 +290,20 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp32ToFp16(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDivision(
     const DivisionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
     return std::make_unique<RefDivisionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
     const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
     return std::make_unique<RefSubtractionWorkload>(descriptor, info);
 }
 

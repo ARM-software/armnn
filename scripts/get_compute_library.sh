@@ -6,9 +6,22 @@
 
 CMD=$( basename $0 )
 
+# For pinnning to a ref use this:
+# DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_02" # Release 19.02
+#
+# For pinning to a revision use this:
+DEFAULT_CLFRAMEWORKREVISION="a4bba9c594c4022c9f85192bb8fd3593ad1a8d3c" # COMPMID-1995: Fix 32-bit NEDepthwiseConvolution errors.
+
 usage() {
-  echo "Usage: $CMD -g <GITHUB_USERNAME>"
+    echo "Usage: $CMD (Use the default clframework SHA)"
+    echo "Usage: $CMD -s <CLFRAMEWORK_SHA>"
+    echo "Usage: $CMD -p (Print current default clframework SHA)"
   exit 1
+}
+
+PrintDefaultClframeworkSha() {
+  echo $DEFAULT_CLFRAMEWORKREVISION
+  exit 2;
 }
 
 function AssertZeroExitCode {
@@ -21,9 +34,11 @@ function AssertZeroExitCode {
 }
 
 # process the options given
-while getopts "g:h" opt; do
+while getopts "s:phg:" opt; do
   case "$opt" in
-    g) GITHUB_USERNAME="$OPTARG";;
+    s) CLFRAMEWORK_SHA="$OPTARG";;
+    p) PrintDefaultClframeworkSha;;
+    g) DUMMY="$OPTARG";; # continue to accept -g for backward compatibility
     h|\?) usage;;
   esac
 done
@@ -46,36 +61,28 @@ done
 DIR="$( cd -P "$( dirname "$SRC" )" >/dev/null && pwd )"
 pushd ${DIR} > /dev/null
 cd ../..
-if [ -z "$USERNAME" ]; then
-    USERNAME=$USER
-fi
-if [ -z "$GITHUB_USERNAME" ]; then
-    GITHUB_USERNAME=$USERNAME
-    echo "setting GITHUB_USERNAME: ${GITHUB_USERNAME} use -g command line option to change"
-fi
 
 if [ ! -d clframework ]; then
-echo "+++ Cloning clframework"
   git clone https://review.mlplatform.org/ml/ComputeLibrary clframework
   AssertZeroExitCode "Cloning CL Framework failed"
 fi
 pushd clframework > /dev/null
 
-# Use the latest pinned version of the CL framework
+CLFRAMEWORKREVISION=$DEFAULT_CLFRAMEWORKREVISION
+if [ ! -z "$CLFRAMEWORK_SHA" ]; then
+    CLFRAMEWORKREVISION=$CLFRAMEWORK_SHA
+fi
 
-# For pinnning to a ref use this:
-# CLFRAMEWORKREVISION="branches/arm_compute_19_02" # Release 19.02
-# git fetch https://review.mlplatform.org/ml/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
-
-# For pinning to a revision use this:
-CLFRAMEWORKREVISION="b4a44ff3aa98d2b51f1621a7525db3f81108a1bd" # COMPMID-1995: Removed layout checks from Reduction ops
 git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
-AssertZeroExitCode
+AssertZeroExitCode "Fetching and checking out ${CLFRAMEWORKREVISION} failed"
 
 # Set commit hook so we can submit reviews to gerrit
 (curl -Lo `git rev-parse --git-dir`/hooks/commit-msg https://review.mlplatform.org/tools/hooks/commit-msg; chmod +x `git rev-parse --git-dir`/hooks/commit-msg)
-AssertZeroExitCode
+AssertZeroExitCode "Setting commit hooks failed"
 
 popd > /dev/null # out of clframework
 popd > /dev/null # back to wherever we were when called
+# Make sure the SHA of the revision that was checked out is the last line
+# of output from the script... just in case we ever need it.
+echo $CLFRAMEWORKREVISION
 exit 0

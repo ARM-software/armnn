@@ -204,6 +204,7 @@ int MainImpl(const char* modelPath,
              const std::vector<string>& outputTypes,
              const std::vector<string>& outputNames,
              bool enableProfiling,
+             bool enableFp16TurboMode,
              const size_t subgraphId,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
@@ -236,6 +237,7 @@ int MainImpl(const char* modelPath,
 
         params.m_EnableProfiling = enableProfiling;
         params.m_SubgraphId = subgraphId;
+        params.m_EnableFp16TurboMode = enableFp16TurboMode;
         InferenceModel<TParser, TDataType> model(params, runtime);
 
         for(unsigned int i = 0; i < inputTensorDataFilePaths.size(); ++i)
@@ -330,6 +332,7 @@ int RunTest(const std::string& format,
             const std::string& outputTypes,
             const std::string& outputNames,
             bool enableProfiling,
+            bool enableFp16TurboMode,
             const size_t subgraphId,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
@@ -421,7 +424,7 @@ int RunTest(const std::string& format,
         modelPath.c_str(), isModelBinary, computeDevice,
         inputNamesVector, inputTensorShapes,
         inputTensorDataFilePathsVector, inputTypesVector, outputTypesVector,
-        outputNamesVector, enableProfiling, subgraphId, runtime);
+        outputNamesVector, enableProfiling, enableFp16TurboMode, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with serialization support.";
     return EXIT_FAILURE;
@@ -434,7 +437,7 @@ int RunTest(const std::string& format,
                                                                inputNamesVector, inputTensorShapes,
                                                                inputTensorDataFilePathsVector, inputTypesVector,
                                                                outputTypesVector, outputNamesVector, enableProfiling,
-                                                               subgraphId, runtime);
+                                                               enableFp16TurboMode, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
@@ -447,7 +450,7 @@ int RunTest(const std::string& format,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          outputTypesVector, outputNamesVector, enableProfiling,
-                                                         subgraphId, runtime);
+                                                         enableFp16TurboMode, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
     return EXIT_FAILURE;
@@ -460,7 +463,7 @@ int RunTest(const std::string& format,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          outputTypesVector, outputNamesVector, enableProfiling,
-                                                         subgraphId, runtime);
+                                                         enableFp16TurboMode, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
@@ -479,7 +482,7 @@ int RunTest(const std::string& format,
                                                                  inputNamesVector, inputTensorShapes,
                                                                  inputTensorDataFilePathsVector, inputTypesVector,
                                                                  outputTypesVector, outputNamesVector, enableProfiling,
-                                                                 subgraphId, runtime);
+                                                                 enableFp16TurboMode, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
             "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
@@ -494,8 +497,8 @@ int RunTest(const std::string& format,
     }
 }
 
-int RunCsvTest(const armnnUtils::CsvRow &csvRow,
-               const std::shared_ptr<armnn::IRuntime>& runtime, const bool enableProfiling)
+int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IRuntime>& runtime,
+               const bool enableProfiling, const bool enableFp16TurboMode)
 {
     std::string modelFormat;
     std::string modelPath;
@@ -591,7 +594,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow,
     }
 
     return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames, inputTensorDataFilePaths,
-                   inputTypes, outputTypes, outputNames,  enableProfiling, subgraphId);
+                   inputTypes, outputTypes, outputNames, enableProfiling, enableFp16TurboMode, subgraphId);
 }
 
 int main(int argc, const char* argv[])
@@ -659,7 +662,9 @@ int main(int argc, const char* argv[])
             ("output-name,o", po::value(&outputNames),
              "Identifier of the output tensors in the network separated by comma.")
             ("event-based-profiling,e", po::bool_switch()->default_value(false),
-             "Enables built in profiler. If unset, defaults to off.");
+             "Enables built in profiler. If unset, defaults to off.")
+            ("fp16-turbo-mode,h", po::bool_switch()->default_value(false), "If this option is enabled, FP32 layers, "
+             "weights and biases will be converted to FP16 where the backend supports it");
     }
     catch (const std::exception& e)
     {
@@ -698,6 +703,7 @@ int main(int argc, const char* argv[])
     // Get the value of the switch arguments.
     bool concurrent = vm["concurrent"].as<bool>();
     bool enableProfiling = vm["event-based-profiling"].as<bool>();
+    bool enableFp16TurboMode = vm["fp16-turbo-mode"].as<bool>();
 
     // Check whether we have to load test cases from a file.
     if (CheckOption(vm, "test-cases"))
@@ -739,7 +745,7 @@ int main(int argc, const char* argv[])
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
                 results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime),
-                                             enableProfiling));
+                                             enableProfiling, enableFp16TurboMode));
             }
 
             // Check results
@@ -757,7 +763,7 @@ int main(int argc, const char* argv[])
             for (auto&  testCase : testCases)
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
-                if (RunCsvTest(testCase, runtime, enableProfiling) != EXIT_SUCCESS)
+                if (RunCsvTest(testCase, runtime, enableProfiling, enableFp16TurboMode) != EXIT_SUCCESS)
                 {
                     return EXIT_FAILURE;
                 }
@@ -799,6 +805,6 @@ int main(int argc, const char* argv[])
         }
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames, inputTensorDataFilePaths,
-                       inputTypes, outputTypes, outputNames,  enableProfiling, subgraphId);
+                       inputTypes, outputTypes, outputNames,  enableProfiling, enableFp16TurboMode, subgraphId);
     }
 }

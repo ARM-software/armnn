@@ -531,7 +531,9 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsUint8)
 }
 
 // Dequantize
-ARMNN_AUTO_TEST_CASE(DequantizeUint8, DequantizeUint8Test)
+ARMNN_AUTO_TEST_CASE(DequantizeSimpleUint8, DequantizeSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE(DequantizeOffsetUint8, DequantizeOffsetUint8Test)
+ARMNN_AUTO_TEST_CASE(DequantizeSimpleInt16, DequantizeSimpleInt16Test)
 
 // Quantize
 ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)

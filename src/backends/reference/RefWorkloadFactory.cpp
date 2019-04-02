@@ -356,7 +356,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateQuantize(const QuantizeQueu
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, RefDequantizeWorkload>(descriptor, info);
+    return std::make_unique<RefDequantizeWorkload>(descriptor, info);
 }
 
 } // namespace armnn

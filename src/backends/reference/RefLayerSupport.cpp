@@ -392,10 +392,27 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &FalseFunc<>,
-                                     &TrueFunc<>);
+   bool supported = true;
+
+    std::array<DataType,2> supportedInputTypes = {
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
+                                  "Reference dequantize: input type not supported.");
+
+    std::array<DataType,2> supportedOutputTypes = {
+        DataType::Float32,
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,
+                                  "Reference dequantize: output type not supported.");
+
+    supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
+                                  "Reference dequantize: input and output shapes have different num total elements.");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsDetectionPostProcessSupported(const armnn::TensorInfo& input0,

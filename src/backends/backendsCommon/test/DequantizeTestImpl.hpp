@@ -64,6 +64,43 @@ LayerTestResult<float, 4> DequantizeSimpleTest(
 
     armnn::DequantizeQueueDescriptor desc;
 
+    const armnn::TensorInfo inputTensorInfo({1, 2, 2, 3}, ArmnnInputType, 0.5f, 0);
+    const armnn::TensorInfo outputTensorInfo({1, 2, 2, 3}, armnn::DataType::Float32);
+
+    std::vector<T> inputData = std::vector<T>(
+    {
+         2,  4,  6,
+         8, 10, 12,
+        14, 16, 18,
+        20, 22, 24,
+    });
+
+    std::vector<float> expectedOutputData = std::vector<float>(
+    {
+        1.0f,   2.0f,  3.0f,
+        4.0f,   5.0f,  6.0f,
+        7.0f,   8.0f,  9.0f,
+        10.0f, 11.0f, 12.0f,
+    });
+
+    return DequantizeTestImpl<T, 4>(workloadFactory,
+                                    memoryManager,
+                                    inputTensorInfo,
+                                    outputTensorInfo,
+                                    inputData,
+                                    expectedOutputData,
+                                    desc);
+}
+
+template <armnn::DataType ArmnnInputType>
+LayerTestResult<float, 4> DequantizeOffsetTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using T = armnn::ResolveType<ArmnnInputType>;
+
+    armnn::DequantizeQueueDescriptor desc;
+
     const armnn::TensorInfo inputTensorInfo({1, 2, 2, 3}, ArmnnInputType, 0.5f, 1);
     const armnn::TensorInfo outputTensorInfo({1, 2, 2, 3}, armnn::DataType::Float32);
 

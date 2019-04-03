@@ -174,13 +174,13 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateNormalization(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                                      const WorkloadInfo&            info) const
 {
-    return MakeWorkload<RefAdditionFloat32Workload, RefAdditionUint8Workload>(descriptor, info);
+    return std::make_unique<RefAdditionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMultiplication(
     const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefMultiplicationFloat32Workload, RefMultiplicationUint8Workload>(descriptor, info);
+    return std::make_unique<RefMultiplicationWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateBatchNormalization(
@@ -266,19 +266,19 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp32ToFp16(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDivision(
     const DivisionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefDivisionFloat32Workload, RefDivisionUint8Workload>(descriptor, info);
+    return std::make_unique<RefDivisionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
     const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefSubtractionFloat32Workload, RefSubtractionUint8Workload>(descriptor, info);
+    return std::make_unique<RefSubtractionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMaximum(
     const MaximumQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefMaximumFloat32Workload, RefMaximumUint8Workload>(descriptor, info);
+    return std::make_unique<RefMaximumWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
@@ -290,7 +290,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMinimum(
     const MinimumQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefMinimumFloat32Workload, RefMinimumUint8Workload>(descriptor, info);
+    return std::make_unique<RefMinimumWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
@@ -302,7 +302,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescripto
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefEqualFloat32Workload, RefEqualUint8Workload>(descriptor, info);
+    return std::make_unique<RefEqualWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
@@ -320,7 +320,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStridedSlice(const StridedS
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefGreaterFloat32Workload, RefGreaterUint8Workload>(descriptor, info);
+    return std::make_unique<RefGreaterWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,

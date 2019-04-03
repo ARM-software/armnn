@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "BaseIterator.hpp"
 #include <armnn/Tensor.hpp>
 
 #include <functional>
@@ -19,18 +20,22 @@ struct BroadcastLoop
         return static_cast<unsigned int>(m_DimData.size());
     }
 
-    template <typename T0, typename T1, typename U, typename Func>
+    template <typename Func, typename DecoderOp, typename EncoderOp>
     void Unroll(Func operationFunc,
                 unsigned int dimension,
-                const T0* inData0,
-                const T1* inData1,
-                U* outData)
+                DecoderOp& inData0,
+                DecoderOp& inData1,
+                EncoderOp& outData)
     {
         if (dimension >= GetNumDimensions())
         {
-            *outData = operationFunc(*inData0, *inData1);
+            outData.Set(operationFunc(inData0.Get(), inData1.Get()));
             return;
         }
+
+        unsigned int inData0Movement = 0;
+        unsigned int inData1Movement = 0;
+        unsigned int outDataMovement = 0;
 
         for (unsigned int i = 0; i < m_DimData[dimension].m_DimSize; i++)
         {
@@ -39,7 +44,16 @@ struct BroadcastLoop
             inData0 += m_DimData[dimension].m_Stride1;
             inData1 += m_DimData[dimension].m_Stride2;
             outData += m_DimData[dimension].m_StrideOut;
+
+            inData0Movement += m_DimData[dimension].m_Stride1;
+            inData1Movement += m_DimData[dimension].m_Stride2;
+            outDataMovement += m_DimData[dimension].m_StrideOut;
         }
+
+        // move iterator back to the start
+        inData0 -= inData0Movement;
+        inData1 -= inData1Movement;
+        outData -= outDataMovement;
     }
 
 private:

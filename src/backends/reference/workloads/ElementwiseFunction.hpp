@@ -5,20 +5,21 @@
 
 #pragma once
 
+#include "BaseIterator.hpp"
 #include <armnn/Tensor.hpp>
 
 namespace armnn
 {
 
-template <typename Functor, typename dataTypeInput, typename dataTypeOutput>
+template <typename Functor, typename DecoderOp, typename EncoderOp>
 struct ElementwiseFunction
 {
     ElementwiseFunction(const TensorShape& inShape0,
                         const TensorShape& inShape1,
                         const TensorShape& outShape,
-                        const dataTypeInput* inData0,
-                        const dataTypeInput* inData1,
-                        dataTypeOutput* outData);
+                        DecoderOp& inData0,
+                        DecoderOp& inData1,
+                        EncoderOp& outData);
 };
 
 } //namespace armnn

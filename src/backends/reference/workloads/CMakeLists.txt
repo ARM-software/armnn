@@ -6,6 +6,7 @@
 list(APPEND armnnRefBackendWorkloads_sources
     Activation.cpp
     Activation.hpp
+    BaseIterator.hpp
     BatchNormImpl.hpp
     BatchToSpaceNd.cpp
     BatchToSpaceNd.hpp

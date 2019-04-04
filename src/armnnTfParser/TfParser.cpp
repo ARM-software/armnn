@@ -3251,6 +3251,22 @@ void TfParser::LoadGraphDef(const tensorflow::GraphDef& graphDef)
         m_NodesByName[node.name()]      = &node;
     }
 
+    // Checks that the input nodes the user has requested exist.
+    for (const auto& pair : m_InputShapes)
+    {
+        const std::string& requestedInputName = pair.first;
+        auto nodeIt = m_NodesByName.find(requestedInputName);
+        if (nodeIt == m_NodesByName.end())
+        {
+            throw ParseException(
+                    boost::str(
+                            boost::format(
+                            "Couldn't find requested input node '%1%' in graph %2%")
+                            % requestedInputName
+                            % CHECK_LOCATION().AsString()));
+        }
+    }
+
     // Finds the output nodes the user requested.
     std::vector<const tensorflow::NodeDef*> targetNodes;
     for (const std::string& requestedOutputName : m_RequestedOutputs)

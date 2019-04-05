@@ -239,6 +239,8 @@ list(APPEND armnn_sources
     src/armnn/layers/MeanLayer.cpp
     src/armnn/layers/MemCopyLayer.hpp
     src/armnn/layers/MemCopyLayer.cpp
+    src/armnn/layers/MergeLayer.hpp
+    src/armnn/layers/MergeLayer.cpp
     src/armnn/layers/MergerLayer.hpp
     src/armnn/layers/MergerLayer.cpp
     src/armnn/layers/MinimumLayer.cpp

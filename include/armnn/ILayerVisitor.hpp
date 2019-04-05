@@ -199,6 +199,12 @@ public:
                                 const MeanDescriptor& meanDescriptor,
                                 const char* name = nullptr) = 0;
 
+    /// Function that a merge layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param name - Optional name for the layer.
+    virtual void VisitMergeLayer(const IConnectableLayer* layer,
+                                 const char* name = nullptr) = 0;
+
     /// Function that a merger layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param mergerDescriptor - WindowsDescriptor to configure the merging process. Number of Views must be equal to

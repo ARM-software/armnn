@@ -171,6 +171,11 @@ public:
                                     const TensorInfo& output,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsMergeSupported(const TensorInfo& input0,
+                                  const TensorInfo& input1,
+                                  const TensorInfo& output,
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                    const TensorInfo& output,
                                    const OriginsDescriptor& descriptor,

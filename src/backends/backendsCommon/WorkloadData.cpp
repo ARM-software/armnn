@@ -1170,6 +1170,28 @@ void DequantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+void MergeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateTwoInputs(workloadInfo, "MergeQueueDescriptor");
+    ValidateSingleOutput(workloadInfo, "MergeQueueDescriptor");
+
+    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                              workloadInfo.m_InputTensorInfos[1],
+                              "MergeQueueDescriptor",
+                              "input0",
+                              "input1");
+
+    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                              workloadInfo.m_OutputTensorInfos[0],
+                              "MergeQueueDescriptor",
+                              "input0",
+                              "output");
+
+    const DataType dataType = workloadInfo.m_InputTensorInfos[0].GetDataType();
+    ValidateTensorDataType(workloadInfo.m_InputTensorInfos[1], dataType, "MergeQueueDescriptor", "input1");
+    ValidateTensorDataType(workloadInfo.m_OutputTensorInfos[0], dataType, "MergeQueueDescriptor", "output");
+}
+
 void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     // This is internally generated so it should not need validation.

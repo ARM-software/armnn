@@ -174,6 +174,8 @@ public:
 
     IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) override;
 
+    IConnectableLayer* AddMergeLayer(const char* name = nullptr) override;
+
     void Accept(ILayerVisitor& visitor) const override;
 
 private:

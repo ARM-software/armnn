@@ -355,6 +355,16 @@ bool IsMemCopySupported(const BackendId &backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsMemCopySupported, input, output);
 }
 
+bool IsMergeSupported(const BackendId& backend,
+                      const TensorInfo& input0,
+                      const TensorInfo& input1,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergeSupported, input0, input1, output);
+}
+
 bool IsMergerSupported(const BackendId& backend,
                        std::vector<const TensorInfo*> inputs,
                        const TensorInfo& output,

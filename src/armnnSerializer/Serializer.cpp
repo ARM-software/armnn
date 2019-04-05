@@ -500,6 +500,14 @@ void SerializerVisitor::VisitMinimumLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(fbMinimumLayer.o, serializer::Layer::Layer_MinimumLayer);
 }
 
+void SerializerVisitor::VisitMergeLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    auto fbMergeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Merge);
+    auto fbMergeLayer     = serializer::CreateMergeLayer(m_flatBufferBuilder, fbMergeBaseLayer);
+
+    CreateAnyLayer(fbMergeLayer.o, serializer::Layer::Layer_MergeLayer);
+}
+
 void SerializerVisitor::VisitMergerLayer(const armnn::IConnectableLayer* layer,
                                          const armnn::OriginsDescriptor& mergerDescriptor,
                                          const char* name)

@@ -31,6 +31,7 @@
 #include "layers/MaximumLayer.hpp"
 #include "layers/MeanLayer.hpp"
 #include "layers/MemCopyLayer.hpp"
+#include "layers/MergeLayer.hpp"
 #include "layers/MergerLayer.hpp"
 #include "layers/MinimumLayer.hpp"
 #include "layers/MultiplicationLayer.hpp"
@@ -102,6 +103,7 @@ DECLARE_LAYER(Lstm)
 DECLARE_LAYER(Maximum)
 DECLARE_LAYER(Mean)
 DECLARE_LAYER(MemCopy)
+DECLARE_LAYER(Merge)
 DECLARE_LAYER(Merger)
 DECLARE_LAYER(Minimum)
 DECLARE_LAYER(Multiplication)

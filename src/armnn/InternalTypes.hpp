@@ -39,6 +39,7 @@ enum class LayerType
     Maximum,
     Mean,
     MemCopy,
+    Merge,
     Merger,
     Minimum,
     Multiplication,

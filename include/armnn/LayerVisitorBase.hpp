@@ -87,6 +87,9 @@ public:
                             const ViewsDescriptor&,
                             const char*) override { DefaultPolicy::Apply(); }
 
+    void VisitMergeLayer(const IConnectableLayer*,
+                         const char*) override { DefaultPolicy::Apply(); }
+
     void VisitMergerLayer(const IConnectableLayer*,
                           const OriginsDescriptor&,
                           const char*) override { DefaultPolicy::Apply(); }

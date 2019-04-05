@@ -253,6 +253,14 @@ bool LayerSupportBase::IsMemCopySupported(const armnn::TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsMergeSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                          const TensorInfo& output,
                                          const OriginsDescriptor& descriptor,

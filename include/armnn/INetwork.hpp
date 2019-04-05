@@ -235,6 +235,11 @@ public:
     virtual IConnectableLayer* AddSplitterLayer(const ViewsDescriptor& splitterDescriptor
         , const char* name = nullptr) = 0;
 
+    /// Adds a merge layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddMergeLayer(const char* name = nullptr) = 0;
+
     /// Adds a merger layer to the network.
     /// @param mergerDescriptor - WindowsDescriptor to configure the merging process. Number of Views must be equal to
     ///                           the number of inputs, and their order must match - e.g. first view corresponds to

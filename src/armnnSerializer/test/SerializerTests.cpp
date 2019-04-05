@@ -1185,6 +1185,46 @@ BOOST_AUTO_TEST_CASE(SerializeMean)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeMerge)
+{
+    class MergeLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        MergeLayerVerifier(const std::string& layerName,
+                           const std::vector<armnn::TensorInfo>& inputInfos,
+                           const std::vector<armnn::TensorInfo>& outputInfos)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitMergeLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("merge");
+    const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const mergeLayer = network->AddMergeLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(mergeLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(mergeLayer->GetInputSlot(1));
+    mergeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(info);
+    mergeLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    MergeLayerVerifier verifier(layerName, {info, info}, {info});
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeMerger)
 {
     class MergerLayerVerifier : public LayerVerifierBase

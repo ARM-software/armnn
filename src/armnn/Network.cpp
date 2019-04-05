@@ -966,6 +966,11 @@ IConnectableLayer* Network::AddGatherLayer(const char* name)
     return m_Graph->AddLayer<GatherLayer>(name);
 }
 
+IConnectableLayer* Network::AddMergeLayer(const char* name)
+{
+    return m_Graph->AddLayer<MergeLayer>(name);
+}
+
 void Network::Accept(ILayerVisitor& visitor) const
 {
     for (auto layer : GetGraph())

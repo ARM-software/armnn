@@ -121,6 +121,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateMerge(const MergeQueueDescriptor& descriptor,
+                                                    const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateMerger(const MergerQueueDescriptor& descriptor,
                                                     const WorkloadInfo&          info) const;
 

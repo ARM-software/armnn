@@ -204,6 +204,14 @@ bool IsMemCopySupported(const BackendId& backend,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsMergeSupported(const BackendId& backend,
+                      const TensorInfo& input0,
+                      const TensorInfo& input1,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported = nullptr,
+                      size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsMergerSupported(const BackendId& backend,
                        const std::vector<const TensorInfo*> inputs,
                        const TensorInfo& output,

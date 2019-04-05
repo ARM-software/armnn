@@ -206,6 +206,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
     m_ParserFunctions[Layer_MeanLayer]                   = &Deserializer::ParseMean;
     m_ParserFunctions[Layer_MinimumLayer]                = &Deserializer::ParseMinimum;
+    m_ParserFunctions[Layer_MergeLayer]                  = &Deserializer::ParseMerge;
     m_ParserFunctions[Layer_MergerLayer]                 = &Deserializer::ParseMerger;
     m_ParserFunctions[Layer_MultiplicationLayer]         = &Deserializer::ParseMultiplication;
     m_ParserFunctions[Layer_NormalizationLayer]          = &Deserializer::ParseNormalization;
@@ -271,6 +272,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_MinimumLayer()->base();
         case Layer::Layer_MaximumLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_MaximumLayer()->base();
+        case Layer::Layer_MergeLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_MergeLayer()->base();
         case Layer::Layer_MergerLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_MergerLayer()->base();
         case Layer::Layer_MultiplicationLayer:
@@ -2077,6 +2080,26 @@ void Deserializer::ParseDequantize(GraphPtr graph, unsigned int layerIndex)
 
     const std::string layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddDequantizeLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseMerge(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    const std::string layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddMergeLayer(layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

@@ -39,6 +39,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Maximum: return "Maximum";
         case LayerType::Mean: return "Mean";
         case LayerType::MemCopy: return "MemCopy";
+        case LayerType::Merge: return "Merge";
         case LayerType::Merger: return "Merger";
         case LayerType::Minimum: return "Minimum";
         case LayerType::Multiplication: return "Multiplication";

@@ -893,6 +893,14 @@ void SerializerVisitor::VisitSubtractionLayer(const armnn::IConnectableLayer* la
     CreateAnyLayer(fbSubtractionLayer.o, serializer::Layer::Layer_SubtractionLayer);
 }
 
+void SerializerVisitor::VisitSwitchLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    auto fbSwitchBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Switch);
+    auto fbSwitchLayer = serializer::CreateSwitchLayer(m_flatBufferBuilder, fbSwitchBaseLayer);
+
+    CreateAnyLayer(fbSwitchLayer.o, serializer::Layer::Layer_SwitchLayer);
+}
+
 fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {

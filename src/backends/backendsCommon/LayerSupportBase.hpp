@@ -246,6 +246,12 @@ public:
                                 const TensorInfo& input1,
                                 const TensorInfo& output,
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsSwitchSupported(const TensorInfo& input0,
+                           const TensorInfo& input1,
+                           const TensorInfo& output0,
+                           const TensorInfo& output1,
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 };
 
 } // namespace armnn

@@ -114,6 +114,7 @@ private:
     void ParseSplitter(GraphPtr graph, unsigned int layerIndex);
     void ParseStridedSlice(GraphPtr graph, unsigned int layerIndex);
     void ParseSubtraction(GraphPtr graph, unsigned int layerIndex);
+    void ParseSwitch(GraphPtr graph, unsigned int layerIndex);
 
     void RegisterOutputSlotOfConnection(uint32_t sourceLayerIndex, armnn::IOutputSlot* slot);
     void RegisterInputSlotOfConnection(uint32_t sourceLayerIndex, uint32_t outputSlotIndex, armnn::IInputSlot* slot);

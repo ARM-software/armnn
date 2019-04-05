@@ -177,6 +177,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
                                                           const WorkloadInfo& Info) const;
+
+    virtual std::unique_ptr<IWorkload> CreateSwitch(const SwitchQueueDescriptor& descriptor,
+                                                    const WorkloadInfo& Info) const;
 };
 
 } //namespace armnn

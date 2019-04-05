@@ -119,7 +119,8 @@ enum LayerType : uint {
     Lstm = 34,
     Quantize = 35,
     Dequantize = 36,
-    Merge = 37
+    Merge = 37,
+    Switch = 38
 }
 
 // Base layer table to be used as part of other layers
@@ -529,6 +530,10 @@ table MergeLayer {
     base:LayerBase;
 }
 
+table SwitchLayer {
+    base:LayerBase;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -567,7 +572,8 @@ union Layer {
     LstmLayer,
     QuantizeLayer,
     DequantizeLayer,
-    MergeLayer
+    MergeLayer,
+    SwitchLayer
 }
 
 table AnyLayer {

@@ -402,6 +402,8 @@ DECLARE_LAYER_POLICY_2_PARAM(StridedSlice)
 
 DECLARE_LAYER_POLICY_1_PARAM(Subtraction)
 
+DECLARE_LAYER_POLICY_1_PARAM(Switch)
+
 
 // Generic implementation to get the number of input slots for a given layer type;
 template<armnn::LayerType Type>

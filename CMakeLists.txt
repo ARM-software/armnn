@@ -279,6 +279,8 @@ list(APPEND armnn_sources
     src/armnn/layers/StridedSliceLayer.hpp
     src/armnn/layers/SubtractionLayer.cpp
     src/armnn/layers/SubtractionLayer.hpp
+    src/armnn/layers/SwitchLayer.cpp
+    src/armnn/layers/SwitchLayer.hpp
     src/armnn/BackendSettings.hpp
     src/armnn/CompatibleTypes.hpp
     src/armnn/Descriptors.cpp

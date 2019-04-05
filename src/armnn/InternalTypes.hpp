@@ -57,9 +57,10 @@ enum class LayerType
     SpaceToBatchNd,
     Splitter,
     StridedSlice,
+    Subtraction,
     // Last layer goes here.
     LastLayer,
-    Subtraction = LastLayer
+    Switch = LastLayer
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

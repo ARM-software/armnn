@@ -257,6 +257,12 @@ public:
                                         const TensorInfo& input1,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsSwitchSupported(const TensorInfo& input0,
+                                   const TensorInfo& input1,
+                                   const TensorInfo& output0,
+                                   const TensorInfo& output1,
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 }; // class ILayerSupport
 
 using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;

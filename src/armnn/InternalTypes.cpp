@@ -57,6 +57,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Splitter: return "Splitter";
         case LayerType::StridedSlice: return "StridedSlice";
         case LayerType::Subtraction: return "Subtraction";
+        case LayerType::Switch: return "Switch";
         default:
             BOOST_ASSERT_MSG(false, "Unknown layer type");
             return "Unknown";

@@ -426,4 +426,9 @@ struct MergeQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct SwitchQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

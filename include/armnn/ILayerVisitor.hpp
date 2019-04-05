@@ -341,6 +341,12 @@ public:
     virtual void VisitSubtractionLayer(const IConnectableLayer* layer,
                                        const char* name = nullptr) = 0;
 
+    /// Function a switch layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param name - Optional name for the layer.
+    virtual void VisitSwitchLayer(const IConnectableLayer* layer,
+                                  const char* name = nullptr) = 0;
+
 
 };
 } // namespace armnn

@@ -2113,6 +2113,56 @@ BOOST_AUTO_TEST_CASE(SerializeSubtraction)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeSwitch)
+{
+    class SwitchLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        SwitchLayerVerifier(const std::string& layerName,
+                                 const std::vector<armnn::TensorInfo>& inputInfos,
+                                 const std::vector<armnn::TensorInfo>& outputInfos)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitSwitchLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+
+        void VisitConstantLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::ConstTensor& input,
+                                const char *name) override {}
+    };
+
+    const std::string layerName("switch");
+    const armnn::TensorInfo info({ 1, 4 }, armnn::DataType::Float32);
+
+    std::vector<float> constantData = GenerateRandomData<float>(info.GetNumElements());
+    armnn::ConstTensor constTensor(info, constantData);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const constantLayer = network->AddConstantLayer(constTensor, "constant");
+    armnn::IConnectableLayer* const switchLayer = network->AddSwitchLayer(layerName.c_str());
+    armnn::IConnectableLayer* const trueOutputLayer = network->AddOutputLayer(0);
+    armnn::IConnectableLayer* const falseOutputLayer = network->AddOutputLayer(1);
+
+    inputLayer->GetOutputSlot(0).Connect(switchLayer->GetInputSlot(0));
+    constantLayer->GetOutputSlot(0).Connect(switchLayer->GetInputSlot(1));
+    switchLayer->GetOutputSlot(0).Connect(trueOutputLayer->GetInputSlot(0));
+    switchLayer->GetOutputSlot(1).Connect(falseOutputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    constantLayer->GetOutputSlot(0).SetTensorInfo(info);
+    switchLayer->GetOutputSlot(0).SetTensorInfo(info);
+    switchLayer->GetOutputSlot(1).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    SwitchLayerVerifier verifier(layerName, {info, info}, {info, info});
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeDeserializeNonLinearNetwork)
 {
     class ConstantLayerVerifier : public LayerVerifierBase

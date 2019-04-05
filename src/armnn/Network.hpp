@@ -176,6 +176,8 @@ public:
 
     IConnectableLayer* AddMergeLayer(const char* name = nullptr) override;
 
+    IConnectableLayer* AddSwitchLayer(const char* name = nullptr) override;
+
     void Accept(ILayerVisitor& visitor) const override;
 
 private:

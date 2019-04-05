@@ -222,6 +222,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_SplitterLayer]               = &Deserializer::ParseSplitter;
     m_ParserFunctions[Layer_StridedSliceLayer]           = &Deserializer::ParseStridedSlice;
     m_ParserFunctions[Layer_SubtractionLayer]            = &Deserializer::ParseSubtraction;
+    m_ParserFunctions[Layer_SwitchLayer]                 = &Deserializer::ParseSwitch;
 }
 
 Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPtr, unsigned int layerIndex)
@@ -306,6 +307,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_StridedSliceLayer()->base();
         case Layer::Layer_SubtractionLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SubtractionLayer()->base();
+        case Layer::Layer_SwitchLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_SwitchLayer()->base();
         case Layer::Layer_NONE:
         default:
             throw ParseException(boost::str(
@@ -2103,6 +2106,29 @@ void Deserializer::ParseMerge(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseSwitch(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 2);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddSwitchLayer(layerName.c_str());
+
+    armnn::TensorInfo output0TensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(output0TensorInfo);
+
+    armnn::TensorInfo output1TensorInfo = ToTensorInfo(outputs[1]);
+    layer->GetOutputSlot(1).SetTensorInfo(output1TensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

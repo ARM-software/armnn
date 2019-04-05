@@ -50,6 +50,7 @@
 #include "layers/SplitterLayer.hpp"
 #include "layers/StridedSliceLayer.hpp"
 #include "layers/SubtractionLayer.hpp"
+#include "layers/SwitchLayer.hpp"
 
 namespace armnn
 {
@@ -122,5 +123,6 @@ DECLARE_LAYER(SpaceToBatchNd)
 DECLARE_LAYER(Splitter)
 DECLARE_LAYER(StridedSlice)
 DECLARE_LAYER(Subtraction)
+DECLARE_LAYER(Switch)
 
 }

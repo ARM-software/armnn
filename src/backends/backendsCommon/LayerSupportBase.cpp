@@ -397,4 +397,13 @@ bool LayerSupportBase::IsSubtractionSupported(const TensorInfo& input0,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsSwitchSupported(const TensorInfo& input0,
+                                         const TensorInfo& input1,
+                                         const TensorInfo& output0,
+                                         const TensorInfo& output1,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 } // namespace armnn

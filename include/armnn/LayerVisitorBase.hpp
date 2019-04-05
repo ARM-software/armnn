@@ -178,6 +178,9 @@ public:
 
     void VisitGatherLayer(const IConnectableLayer*,
                           const char*) override { DefaultPolicy::Apply(); }
+
+    void VisitSwitchLayer(const IConnectableLayer*,
+                          const char*) override { DefaultPolicy::Apply(); }
 };
 
 } //namespace armnn

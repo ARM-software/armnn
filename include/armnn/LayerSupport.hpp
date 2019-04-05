@@ -338,4 +338,13 @@ bool IsSubtractionSupported(const BackendId& backend,
                             const TensorInfo& output,
                             char* reasonIfUnsupported = nullptr,
                             size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsSwitchSupported(const BackendId& backend,
+                       const TensorInfo& input0,
+                       const TensorInfo& input1,
+                       const TensorInfo& output0,
+                       const TensorInfo& output1,
+                       char* reasonIfUnsupported = nullptr,
+                       size_t reasonIfUnsupportedMaxLength = 1024);
 }

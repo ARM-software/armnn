@@ -729,6 +729,19 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                             reason);
             break;
         }
+        case LayerType::Switch:
+        {
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output0 = layer.GetOutputSlot(0).GetTensorInfo();
+            const TensorInfo& output1 = layer.GetOutputSlot(1).GetTensorInfo();
+            result = layerSupportObject->IsSwitchSupported(OverrideDataType(input0, dataType),
+                                                           OverrideDataType(input1, dataType),
+                                                           OverrideDataType(output0, dataType),
+                                                           OverrideDataType(output1, dataType),
+                                                           reason);
+            break;
+        }
         case LayerType::Mean:
         {
             auto cLayer = boost::polymorphic_downcast<const MeanLayer*>(&layer);
@@ -1037,6 +1050,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateStridedSlice(const StridedSli
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSwitch(const SwitchQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

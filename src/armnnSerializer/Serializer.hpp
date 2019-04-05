@@ -191,6 +191,9 @@ public:
 
     void VisitSubtractionLayer(const armnn::IConnectableLayer* layer,
                                const char* name = nullptr) override;
+
+    void VisitSwitchLayer(const armnn::IConnectableLayer* layer,
+                          const char* name = nullptr) override;
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.

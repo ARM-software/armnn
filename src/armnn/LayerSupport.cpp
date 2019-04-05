@@ -530,4 +530,15 @@ bool IsSubtractionSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsSubtractionSupported, input0, input1, output);
 }
 
+bool IsSwitchSupported(const BackendId& backend,
+                       const TensorInfo& input0,
+                       const TensorInfo& input1,
+                       const TensorInfo& output0,
+                       const TensorInfo& output1,
+                       char* reasonIfUnsupported,
+                       size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsSwitchSupported, input0, input1, output0, output1);
+}
+
 } // namespace armnn

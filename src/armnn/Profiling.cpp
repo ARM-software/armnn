@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 #include "Profiling.hpp"
+
+#include <armnn/BackendId.hpp>
+
 #include "JsonPrinter.hpp"
 
 #if ARMNN_STREAMLINE_ENABLED
@@ -204,7 +207,7 @@ Event* Profiler::BeginEvent(const BackendId& backendId,
     event->Start();
 
 #if ARMNN_STREAMLINE_ENABLED
-    ANNOTATE_CHANNEL_COLOR(m_Parents.size(), GetEventColor(compute), label.c_str());
+    ANNOTATE_CHANNEL_COLOR(uint32_t(m_Parents.size()), GetEventColor(backendId), label.c_str());
 #endif
 
     m_Parents.push(event);
@@ -224,7 +227,7 @@ void Profiler::EndEvent(Event* event)
     BOOST_ASSERT(event->GetParentEvent() == parent);
 
 #if ARMNN_STREAMLINE_ENABLED
-    ANNOTATE_CHANNEL_END(m_Parents.size());
+    ANNOTATE_CHANNEL_END(uint32_t(m_Parents.size()));
 #endif
 }
 
@@ -467,20 +470,21 @@ void Profiler::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
     }
 }
 
-std::uint32_t Profiler::GetEventColor(Compute compute) const
+std::uint32_t Profiler::GetEventColor(const BackendId& backendId) const
 {
-    switch(compute)
-    {
-        case Compute::CpuRef:
+    static BackendId cpuRef("CpuRef");
+    static BackendId cpuAcc("CpuAcc");
+    static BackendId gpuAcc("GpuAcc");
+    if (backendId == cpuRef) {
             // Cyan
             return 0xffff001b;
-        case Compute::CpuAcc:
+    } else if (backendId == cpuAcc) {
             // Green
             return 0x00ff001b;
-        case Compute::GpuAcc:
+    } else if (backendId == gpuAcc) {
             // Purple
             return 0xff007f1b;
-        default:
+    } else {
             // Dark gray
             return 0x5555551b;
     }

@@ -57,7 +57,7 @@ public:
     void Print(std::ostream& outStream) const override;
 
     // Gets the color to render an event with, based on which device it denotes.
-    uint32_t GetEventColor(Compute compute) const;
+    uint32_t GetEventColor(const BackendId& backendId) const;
 
 private:
     using EventPtr = std::unique_ptr<Event>;

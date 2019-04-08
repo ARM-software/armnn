@@ -115,8 +115,8 @@ private:
     void ParseMul(size_t subgraphIndex, size_t operatorIndex);
     void ParseMean(size_t subgraphIndex, size_t operatorIndex);
     void ParsePad(size_t subgraphIndex, size_t operatorIndex);
-
     void ParsePool(size_t subgraphIndex, size_t operatorIndex, armnn::PoolingAlgorithm algorithm);
+    void ParseSplit(size_t subgraphIndex, size_t operatorIndex);
 
     void RegisterProducerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IOutputSlot* slot);
     void RegisterConsumerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IInputSlot* slot);

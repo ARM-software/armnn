@@ -516,9 +516,10 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/ResizeBilinear.cpp
              src/armnnTfLiteParser/test/Softmax.cpp
              src/armnnTfLiteParser/test/SpaceToBatchND.cpp
-             src/armnnTfLiteParser/test/Sub.cpp
+             src/armnnTfLiteParser/test/Split.cpp
              src/armnnTfLiteParser/test/Squeeze.cpp
              src/armnnTfLiteParser/test/StridedSlice.cpp
+             src/armnnTfLiteParser/test/Sub.cpp
              src/armnnTfLiteParser/test/LoadModel.cpp
              src/armnnTfLiteParser/test/GetBuffer.cpp
              src/armnnTfLiteParser/test/OutputShapeOfSqueeze.cpp

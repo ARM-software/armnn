@@ -7,7 +7,7 @@
 #include "StridedSlice.hpp"
 
 #include "RefWorkloadUtils.hpp"
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 
 namespace armnn
 {

@@ -328,6 +328,7 @@ list(APPEND armnn_sources
     src/armnn/Runtime.hpp
     src/armnn/RangeTracker.cpp
     src/armnn/RangeTracker.hpp
+    src/armnn/ResolveType.hpp
     src/armnn/SerializeLayerParameters.cpp
     src/armnn/SerializeLayerParameters.hpp
     src/armnn/StaticRangeVisitor.cpp
@@ -337,7 +338,7 @@ list(APPEND armnn_sources
     src/armnn/SubGraphSelector.cpp
     src/armnn/SubGraphSelector.hpp
     src/armnn/Tensor.cpp
-    src/armnn/TypeUtils.hpp
+    src/armnn/TypesUtils.cpp
     src/armnn/Utils.cpp
     src/armnn/WallClockTimer.cpp
     src/armnn/WallClockTimer.hpp

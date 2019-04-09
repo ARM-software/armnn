@@ -5,7 +5,7 @@
 #pragma once
 
 #include "TensorCopyUtils.hpp"
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 #include "WorkloadTestUtils.hpp"
 
 #include <armnn/Types.hpp>

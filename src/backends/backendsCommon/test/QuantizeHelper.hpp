@@ -10,7 +10,9 @@
 #include <initializer_list>
 #include <iterator>
 #include <vector>
+
 #include <boost/core/ignore_unused.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 template<typename T, bool DoQuantize=true>
 struct SelectiveQuantizer

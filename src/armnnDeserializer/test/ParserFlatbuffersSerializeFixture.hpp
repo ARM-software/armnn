@@ -13,7 +13,7 @@
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 #include "test/TensorHelpers.hpp"
 
 #include "flatbuffers/idl.h"

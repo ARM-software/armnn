@@ -146,6 +146,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Profiling.cpp \
         src/armnn/JsonPrinter.cpp \
         src/armnn/Tensor.cpp \
+        src/armnn/TypesUtils.cpp \
         src/armnn/Utils.cpp \
         src/armnn/LayerSupport.cpp \
         src/armnn/Observable.cpp

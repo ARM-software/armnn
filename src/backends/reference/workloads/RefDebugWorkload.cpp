@@ -7,7 +7,7 @@
 #include "Debug.hpp"
 #include "RefWorkloadUtils.hpp"
 
-#include <TypeUtils.hpp>
+#include <ResolveType.hpp>
 
 #include <cstring>
 

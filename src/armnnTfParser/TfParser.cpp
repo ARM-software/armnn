@@ -20,6 +20,8 @@
 
 #include <boost/format.hpp>
 #include <boost/core/ignore_unused.hpp>
+#include <boost/format.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/polymorphic_cast.hpp>
 
 #include <numeric>

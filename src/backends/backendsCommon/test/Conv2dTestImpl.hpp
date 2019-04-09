@@ -6,7 +6,7 @@
 
 #include "WorkloadTestUtils.hpp"
 #include "TensorUtils.hpp"
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 
 #include <Permute.hpp>
 #include <DataLayoutIndexed.hpp>

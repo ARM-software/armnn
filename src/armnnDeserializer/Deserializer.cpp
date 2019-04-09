@@ -18,6 +18,8 @@
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/format.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/polymorphic_cast.hpp>
 
 // The generated code based on the Serialize schema:

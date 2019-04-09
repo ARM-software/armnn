@@ -7,7 +7,7 @@
 
 #include <armnn/INetwork.hpp>
 #include <backendsCommon/test/CommonTestUtils.hpp>
-#include <TypeUtils.hpp>
+#include <ResolveType.hpp>
 
 namespace{
 

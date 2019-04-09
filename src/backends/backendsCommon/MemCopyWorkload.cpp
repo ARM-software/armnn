@@ -7,7 +7,7 @@
 
 #include "CpuTensorHandle.hpp"
 
-#include <TypeUtils.hpp>
+#include <ResolveType.hpp>
 
 #include <boost/cast.hpp>
 

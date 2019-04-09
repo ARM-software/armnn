@@ -11,8 +11,7 @@
 #include "Profiling.hpp"
 #include "RefWorkloadUtils.hpp"
 #include "StringMapping.hpp"
-#include "TypeUtils.hpp"
-
+#include <ResolveType.hpp>
 #include <vector>
 
 namespace armnn

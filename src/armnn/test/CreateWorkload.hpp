@@ -15,7 +15,7 @@
 #include <Graph.hpp>
 #include <DataLayoutIndexed.hpp>
 #include <Network.hpp>
-#include <TypeUtils.hpp>
+#include <ResolveType.hpp>
 
 #include <utility>
 

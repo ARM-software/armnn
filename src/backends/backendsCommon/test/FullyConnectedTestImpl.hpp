@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 #include "WorkloadTestUtils.hpp"
 
 #include <backendsCommon/IBackendInternal.hpp>

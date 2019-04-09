@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/ArmNN.hpp>
-#include <TypeUtils.hpp>
+#include <ResolveType.hpp>
 
 namespace armnn
 {

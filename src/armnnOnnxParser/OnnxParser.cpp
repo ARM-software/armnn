@@ -8,10 +8,11 @@
 #include <armnn/Utils.hpp>
 #include <VerificationHelpers.hpp>
 
+#include <boost/format.hpp>
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
-
-#include <boost/format.hpp>
 
 #include <numeric>
 

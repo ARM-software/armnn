@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/INetwork.hpp>

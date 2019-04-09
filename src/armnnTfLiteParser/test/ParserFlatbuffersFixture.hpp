@@ -17,7 +17,7 @@
 
 #include "test/TensorHelpers.hpp"
 
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 
 #include <backendsCommon/BackendRegistry.hpp>

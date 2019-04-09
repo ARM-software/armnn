@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <TypeUtils.hpp>
+#include <ResolveType.hpp>
 
 #include <backendsCommon/IBackendInternal.hpp>
 

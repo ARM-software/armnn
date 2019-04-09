@@ -8,7 +8,7 @@
 #include "Gather.hpp"
 #include "Profiling.hpp"
 #include "RefWorkloadUtils.hpp"
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 
 namespace armnn
 {

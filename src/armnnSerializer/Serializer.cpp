@@ -13,6 +13,8 @@
 
 #include <ArmnnSchema_generated.h>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <flatbuffers/util.h>
 
 using namespace armnn;

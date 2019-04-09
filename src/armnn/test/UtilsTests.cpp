@@ -11,7 +11,7 @@
 #include <armnn/Descriptors.hpp>
 #include <GraphTopologicalSort.hpp>
 #include <Graph.hpp>
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 
 BOOST_AUTO_TEST_SUITE(Utils)
 

@@ -5,7 +5,7 @@
 
 #include "ClDepthwiseConvolutionWorkload.hpp"
 
-#include "TypeUtils.hpp"
+#include <ResolveType.hpp>
 #include "ClWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeUtils.hpp>

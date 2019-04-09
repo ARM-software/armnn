@@ -21,6 +21,8 @@
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/format.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <fstream>
 #include <algorithm>

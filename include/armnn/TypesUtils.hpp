@@ -7,9 +7,6 @@
 #include "Tensor.hpp"
 #include "Types.hpp"
 
-#include <boost/assert.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <cmath>
 #include <ostream>
 #include <set>
@@ -191,20 +188,7 @@ inline std::ostream & operator<<(std::ostream & os, const armnn::TensorShape & s
 /// @return - The quantized value calculated as round(value/scale)+offset.
 ///
 template<typename QuantizedType>
-inline QuantizedType Quantize(float value, float scale, int32_t offset)
-{
-    static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
-    constexpr QuantizedType max = std::numeric_limits<QuantizedType>::max();
-    constexpr QuantizedType min = std::numeric_limits<QuantizedType>::lowest();
-    BOOST_ASSERT(scale != 0.f);
-    BOOST_ASSERT(!std::isnan(value));
-
-    float clampedValue = std::min(std::max(static_cast<float>(round(value/scale) + offset), static_cast<float>(min)),
-                                  static_cast<float>(max));
-    auto quantizedBits = static_cast<QuantizedType>(clampedValue);
-
-    return quantizedBits;
-}
+QuantizedType Quantize(float value, float scale, int32_t offset);
 
 /// Dequantize an 8-bit data type into a floating point data type.
 /// @param value - The value to dequantize.
@@ -213,14 +197,7 @@ inline QuantizedType Quantize(float value, float scale, int32_t offset)
 /// @return - The dequantized value calculated as (value-offset)*scale.
 ///
 template <typename QuantizedType>
-inline float Dequantize(QuantizedType value, float scale, int32_t offset)
-{
-    static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
-    BOOST_ASSERT(scale != 0.f);
-    BOOST_ASSERT(!std::isnan(value));
-    float dequantized = boost::numeric_cast<float>(value - offset) * scale;
-    return dequantized;
-}
+float Dequantize(QuantizedType value, float scale, int32_t offset);
 
 inline void VerifyTensorInfoDataType(const armnn::TensorInfo & info, armnn::DataType dataType)
 {

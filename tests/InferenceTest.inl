@@ -162,7 +162,8 @@ void ClassifierTestCaseProvider<TDatabase, InferenceModel>::AddCommandLineOption
 }
 
 template <typename TDatabase, typename InferenceModel>
-bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::ProcessCommandLineOptions()
+bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::ProcessCommandLineOptions(
+        const InferenceTestOptions& commonOptions)
 {
     if (!ValidateDirectory(m_DataDir))
     {
@@ -171,7 +172,7 @@ bool ClassifierTestCaseProvider<TDatabase, InferenceModel>::ProcessCommandLineOp
 
     ReadPredictions();
 
-    m_Model = m_ConstructModel(m_ModelCommandLineOptions);
+    m_Model = m_ConstructModel(commonOptions, m_ModelCommandLineOptions);
     if (!m_Model)
     {
         return false;
@@ -336,7 +337,8 @@ int ClassifierInferenceTestMain(int argc,
 
             return make_unique<TestCaseProvider>(constructDatabase,
                 [&]
-                (typename InferenceModel::CommandLineOptions modelOptions)
+                (const InferenceTestOptions &commonOptions,
+                 typename InferenceModel::CommandLineOptions modelOptions)
                 {
                     if (!ValidateDirectory(modelOptions.m_ModelDir))
                     {
@@ -358,7 +360,7 @@ int ClassifierInferenceTestMain(int argc,
                     modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
                     modelParams.m_EnableFp16TurboMode = modelOptions.m_EnableFp16TurboMode;
 
-                    return std::make_unique<InferenceModel>(modelParams);
+                    return std::make_unique<InferenceModel>(modelParams, commonOptions.m_EnableProfiling);
             });
         });
 }

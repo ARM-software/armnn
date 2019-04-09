@@ -236,10 +236,9 @@ int MainImpl(const char* modelPath,
             params.m_OutputBindings.push_back(outputName);
         }
 
-        params.m_EnableProfiling = enableProfiling;
         params.m_SubgraphId = subgraphId;
         params.m_EnableFp16TurboMode = enableFp16TurboMode;
-        InferenceModel<TParser, TDataType> model(params, runtime);
+        InferenceModel<TParser, TDataType> model(params, enableProfiling, runtime);
 
         for(unsigned int i = 0; i < inputTensorDataFilePaths.size(); ++i)
         {

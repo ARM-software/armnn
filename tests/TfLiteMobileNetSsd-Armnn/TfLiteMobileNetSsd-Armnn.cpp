@@ -40,7 +40,8 @@ int main(int argc, char* argv[])
             {
                 return make_unique<MobileNetSsdTestCaseProvider<Model>>(
                     [&]
-                    (typename Model::CommandLineOptions modelOptions)
+                    (const InferenceTestOptions& commonOptions,
+                     typename Model::CommandLineOptions modelOptions)
                     {
                         if (!ValidateDirectory(modelOptions.m_ModelDir))
                         {
@@ -63,7 +64,7 @@ int main(int argc, char* argv[])
                         modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
                         modelParams.m_EnableFp16TurboMode            = modelOptions.m_EnableFp16TurboMode;
 
-                        return std::make_unique<Model>(modelParams);
+                        return std::make_unique<Model>(modelParams, commonOptions.m_EnableProfiling);
                 });
             });
     }

@@ -22,7 +22,8 @@ int main(int argc, char* argv[])
             {
                 return make_unique<YoloTestCaseProvider<YoloInferenceModel>>(
                     [&]
-                    (typename YoloInferenceModel::CommandLineOptions modelOptions)
+                    (const InferenceTestOptions &commonOptions,
+                     typename YoloInferenceModel::CommandLineOptions modelOptions)
                     {
                         if (!ValidateDirectory(modelOptions.m_ModelDir))
                         {
@@ -39,7 +40,7 @@ int main(int argc, char* argv[])
                         modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
                         modelParams.m_EnableFp16TurboMode = modelOptions.m_EnableFp16TurboMode;
 
-                        return std::make_unique<YoloInferenceModel>(modelParams);
+                        return std::make_unique<YoloInferenceModel>(modelParams, commonOptions.m_EnableProfiling);
                 });
             });
     }

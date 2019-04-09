@@ -91,7 +91,7 @@ public:
     virtual ~IInferenceTestCaseProvider() {}
 
     virtual void AddCommandLineOptions(boost::program_options::options_description& options) {};
-    virtual bool ProcessCommandLineOptions() { return true; };
+    virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions) { return true; };
     virtual std::unique_ptr<IInferenceTestCase> GetTestCase(unsigned int testCaseId) = 0;
     virtual bool OnInferenceTestFinished() { return true; };
 };
@@ -219,7 +219,7 @@ public:
     ClassifierTestCaseProvider(TConstructDatabaseCallable constructDatabase, TConstructModelCallable constructModel);
 
     virtual void AddCommandLineOptions(boost::program_options::options_description& options) override;
-    virtual bool ProcessCommandLineOptions() override;
+    virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions) override;
     virtual std::unique_ptr<IInferenceTestCase> GetTestCase(unsigned int testCaseId) override;
     virtual bool OnInferenceTestFinished() override;
 
@@ -227,7 +227,8 @@ private:
     void ReadPredictions();
 
     typename InferenceModel::CommandLineOptions m_ModelCommandLineOptions;
-    std::function<std::unique_ptr<InferenceModel>(typename InferenceModel::CommandLineOptions)> m_ConstructModel;
+    std::function<std::unique_ptr<InferenceModel>(const InferenceTestOptions& commonOptions,
+                                                  typename InferenceModel::CommandLineOptions)> m_ConstructModel;
     std::unique_ptr<InferenceModel> m_Model;
 
     std::string m_DataDir;

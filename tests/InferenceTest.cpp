@@ -82,7 +82,7 @@ bool ParseCommandLine(int argc, char** argv, IInferenceTestCaseProvider& testCas
         return false;
     }
 
-    if (!testCaseProvider.ProcessCommandLineOptions())
+    if (!testCaseProvider.ProcessCommandLineOptions(outParams))
     {
         return false;
     }

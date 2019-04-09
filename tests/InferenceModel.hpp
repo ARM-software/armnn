@@ -87,7 +87,6 @@ struct Params
     std::vector<armnn::TensorShape> m_InputShapes;
     std::vector<std::string>        m_OutputBindings;
     std::vector<armnn::BackendId>   m_ComputeDevices;
-    bool                            m_EnableProfiling;
     size_t                          m_SubgraphId;
     bool                            m_IsModelBinary;
     bool                            m_VisualizePostOptimizationModel;
@@ -95,7 +94,6 @@ struct Params
 
     Params()
         : m_ComputeDevices{"CpuRef"}
-        , m_EnableProfiling(false)
         , m_SubgraphId(0)
         , m_IsModelBinary(true)
         , m_VisualizePostOptimizationModel(false)
@@ -428,8 +426,10 @@ public:
                 "to FP16 where the backend supports it.");
     }
 
-    InferenceModel(const Params& params, const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
-        : m_EnableProfiling(params.m_EnableProfiling)
+    InferenceModel(const Params& params,
+                   bool enableProfiling,
+                   const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
+        : m_EnableProfiling(enableProfiling)
     {
         if (runtime)
         {

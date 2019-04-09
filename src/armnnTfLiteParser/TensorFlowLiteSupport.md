@@ -56,6 +56,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * SUB
 
+* TANH
+
 ## Custom Operator
 
 * TFLite_Detection_PostProcess

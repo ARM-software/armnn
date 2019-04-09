@@ -93,4 +93,16 @@ BOOST_FIXTURE_TEST_CASE(ParseLogistic, SigmoidFixture)
     RunTest<2, armnn::DataType::Float32>(0, { -1.0f,     -0.5f,      4.0f,       -4.0f,  0.0f,      0.5f,     -0.75f },
                                          {0.268941f, 0.377541f, 0.982013f,  0.0179862f,  0.5f, 0.622459f,  0.320821f });
 }
+
+struct TanHFixture : ActivationFixture
+{
+    TanHFixture() : ActivationFixture("TANH", "FLOAT32") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseTanH, TanHFixture)
+{
+    RunTest<2, armnn::DataType::Float32>(0,
+        { -0.1f,       -0.2f,         -0.3f,       -0.4f,    0.1f,         0.2f,              0.3f },
+        { -0.09966799f, -0.19737528f, -0.29131261f, -0.379949f, 0.09966799f, 0.19737528f, 0.29131261f });
+}
 BOOST_AUTO_TEST_SUITE_END()

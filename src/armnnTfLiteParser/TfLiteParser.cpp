@@ -465,6 +465,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_MEAN]              =  &TfLiteParser::ParseMean;
     m_ParserFunctions[tflite::BuiltinOperator_PAD]               =  &TfLiteParser::ParsePad;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]             =  &TfLiteParser::ParseSplit;
+    m_ParserFunctions[tflite::BuiltinOperator_TANH]              =  &TfLiteParser::ParseTanH;
 }
 
 void TfLiteParser::ResetParser()
@@ -1478,6 +1479,11 @@ void TfLiteParser::ParseLogistic(size_t subgraphIndex, size_t operatorIndex)
     ParseActivation(subgraphIndex,operatorIndex,ActivationFunction::Sigmoid);
 }
 
+void TfLiteParser::ParseTanH(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseActivation(subgraphIndex,operatorIndex,ActivationFunction::TanH);
+}
+
 
 void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, ActivationFunction activationType)
 {
@@ -1512,6 +1518,13 @@ void TfLiteParser::ParseActivation(size_t subgraphIndex, size_t operatorIndex, A
         case ActivationFunction::Sigmoid:
         {
             layerName += str(boost::format("SIGMOID:%1%:%2%") % subgraphIndex % operatorIndex);
+            break;
+        }
+        case ActivationFunction::TanH:
+        {
+            layerName += str(boost::format("TANH:%1%:%2%") % subgraphIndex % operatorIndex);
+            activationDesc.m_A = 1.0f;
+            activationDesc.m_B = 1.0f;
             break;
         }
         default:

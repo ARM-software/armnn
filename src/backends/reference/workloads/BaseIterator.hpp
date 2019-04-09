@@ -25,34 +25,30 @@ public:
     virtual BaseIterator& operator-=(const unsigned int increment) = 0;
 };
 
+template<typename IType>
 class Decoder : public BaseIterator
 {
 public:
-    Decoder() : BaseIterator() {}
+    using InterfaceType = IType;
+
+    Decoder() {}
 
     virtual ~Decoder() {}
 
-    virtual float Get() const = 0;
+    virtual IType Get() const = 0;
 };
 
+template<typename IType>
 class Encoder : public BaseIterator
 {
 public:
-    Encoder() : BaseIterator() {}
+    using InterfaceType = IType;
+
+    Encoder() {}
 
     virtual ~Encoder() {}
 
-    virtual void Set(const float& right) = 0;
-};
-
-class ComparisonEncoder : public BaseIterator
-{
-public:
-    ComparisonEncoder() : BaseIterator() {}
-
-    virtual ~ComparisonEncoder() {}
-
-    virtual void Set(bool right) = 0;
+    virtual void Set(IType right) = 0;
 };
 
 template<typename T, typename Base>
@@ -84,7 +80,7 @@ public:
     T* m_Iterator;
 };
 
-class QASymm8Decoder : public TypedIterator<const uint8_t, Decoder>
+class QASymm8Decoder : public TypedIterator<const uint8_t, Decoder<float>>
 {
 public:
     QASymm8Decoder(const uint8_t* data, const float scale, const int32_t offset)
@@ -100,19 +96,7 @@ private:
     const int32_t m_Offset;
 };
 
-class FloatDecoder : public TypedIterator<const float, Decoder>
-{
-public:
-    FloatDecoder(const float* data)
-        : TypedIterator(data) {}
-
-    float Get() const override
-    {
-        return *m_Iterator;
-    }
-};
-
-class QSymm16Decoder : public TypedIterator<const int16_t, Decoder>
+class QSymm16Decoder : public TypedIterator<const int16_t, Decoder<float>>
 {
 public:
     QSymm16Decoder(const int16_t* data, const float scale, const int32_t offset)
@@ -128,25 +112,25 @@ private:
     const int32_t m_Offset;
 };
 
-class FloatEncoder : public TypedIterator<float, Encoder>
+class FloatDecoder : public TypedIterator<const float, Decoder<float>>
 {
 public:
-    FloatEncoder(float* data)
+    FloatDecoder(const float* data)
         : TypedIterator(data) {}
 
-    void Set(const float& right) override
+    float Get() const override
     {
-        *m_Iterator = right;
+        return *m_Iterator;
     }
 };
 
-class QASymm8Encoder : public TypedIterator<uint8_t, Encoder>
+class QASymm8Encoder : public TypedIterator<uint8_t, Encoder<float>>
 {
 public:
     QASymm8Encoder(uint8_t* data, const float scale, const int32_t offset)
         : TypedIterator(data), m_Scale(scale), m_Offset(offset) {}
 
-    void Set(const float& right) override
+    void Set(float right) override
     {
         *m_Iterator = armnn::Quantize<uint8_t>(right, m_Scale, m_Offset);
     }
@@ -156,7 +140,35 @@ private:
     const int32_t m_Offset;
 };
 
-class BooleanEncoder : public TypedIterator<uint8_t, ComparisonEncoder>
+class QSymm16Encoder : public TypedIterator<int16_t, Encoder<float>>
+{
+public:
+    QSymm16Encoder(int16_t* data, const float scale, const int32_t offset)
+        : TypedIterator(data), m_Scale(scale), m_Offset(offset) {}
+
+    void Set(float right) override
+    {
+        *m_Iterator = armnn::Quantize<int16_t>(right, m_Scale, m_Offset);
+    }
+
+private:
+    const float m_Scale;
+    const int32_t m_Offset;
+};
+
+class FloatEncoder : public TypedIterator<float, Encoder<float>>
+{
+public:
+    FloatEncoder(float* data)
+        : TypedIterator(data) {}
+
+    void Set(float right) override
+    {
+        *m_Iterator = right;
+    }
+};
+
+class BooleanEncoder : public TypedIterator<uint8_t, Encoder<bool>>
 {
 public:
     BooleanEncoder(uint8_t* data)
@@ -168,20 +180,5 @@ public:
     }
 };
 
-class QSymm16Encoder : public TypedIterator<int16_t, Encoder>
-{
-public:
-    QSymm16Encoder(int16_t* data, const float scale, const int32_t offset)
-        : TypedIterator(data), m_Scale(scale), m_Offset(offset) {}
-
-    void Set(const float& right) override
-    {
-        *m_Iterator = armnn::Quantize<int16_t>(right, m_Scale, m_Offset);
-    }
-
-private:
-    const float m_Scale;
-    const int32_t m_Offset;
-};
 
 } //namespace armnn

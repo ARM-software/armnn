@@ -136,6 +136,12 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
 
     // Set up memory.
     m_OptimizedNetwork->GetGraph().AllocateDynamicBuffers();
+
+    // Now that the intermediate tensor memory has been set-up, do any post allocation configuration for each workload.
+    for (auto& workload : m_WorkloadQueue)
+    {
+        workload->PostAllocationConfigure();
+    }
 }
 
 TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const

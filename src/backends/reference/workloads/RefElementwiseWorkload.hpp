@@ -8,6 +8,8 @@
 #include <armnn/Types.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
+#include "BaseIterator.hpp"
+#include "ElementwiseFunction.hpp"
 #include "Maximum.hpp"
 #include "Minimum.hpp"
 #include "StringMapping.hpp"
@@ -19,10 +21,18 @@ template <typename Functor, typename ParentDescriptor, typename armnn::StringMap
 class RefElementwiseWorkload : public BaseWorkload<ParentDescriptor>
 {
 public:
+    using InType = typename ElementwiseFunction<Functor>::InType;
+    using OutType = typename ElementwiseFunction<Functor>::OutType;
     using BaseWorkload<ParentDescriptor>::m_Data;
-    using BaseWorkload<ParentDescriptor>::BaseWorkload;
 
+    RefElementwiseWorkload(const ParentDescriptor& descriptor, const WorkloadInfo& info);
+    void PostAllocationConfigure() override;
     void Execute() const override;
+
+private:
+    std::unique_ptr<Decoder<InType>> m_Input0;
+    std::unique_ptr<Decoder<InType>> m_Input1;
+    std::unique_ptr<Encoder<OutType>> m_Output;
 };
 
 using RefAdditionWorkload =
@@ -54,4 +64,14 @@ using RefMinimumWorkload =
     RefElementwiseWorkload<armnn::minimum<float>,
                           MinimumQueueDescriptor,
                           StringMapping::RefMinimumWorkload_Execute>;
+
+using RefEqualWorkload =
+    RefElementwiseWorkload<std::equal_to<float>,
+                           armnn::EqualQueueDescriptor,
+                           armnn::StringMapping::RefEqualWorkload_Execute>;
+
+using RefGreaterWorkload =
+    RefElementwiseWorkload<std::greater<float>,
+                           armnn::GreaterQueueDescriptor,
+                           armnn::StringMapping::RefGreaterWorkload_Execute>;
 } // armnn

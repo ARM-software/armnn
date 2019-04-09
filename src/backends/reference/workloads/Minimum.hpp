@@ -9,7 +9,7 @@ namespace armnn
 {
 
 template<typename T>
-struct minimum
+struct minimum : public std::binary_function<T, T, T>
 {
     T
     operator()(const T& input1, const T& input2) const

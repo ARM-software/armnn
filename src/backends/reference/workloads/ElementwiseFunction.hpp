@@ -11,15 +11,18 @@
 namespace armnn
 {
 
-template <typename Functor, typename DecoderOp, typename EncoderOp>
+template <typename Functor>
 struct ElementwiseFunction
 {
+    using OutType = typename Functor::result_type;
+    using InType = typename Functor::first_argument_type;
+
     ElementwiseFunction(const TensorShape& inShape0,
                         const TensorShape& inShape1,
                         const TensorShape& outShape,
-                        DecoderOp& inData0,
-                        DecoderOp& inData1,
-                        EncoderOp& outData);
+                        armnn::Decoder<InType>& inData0,
+                        armnn::Decoder<InType>& inData1,
+                        armnn::Encoder<OutType>& outData);
 };
 
 } //namespace armnn

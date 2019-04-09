@@ -1177,6 +1177,7 @@ LayerTestResult<float,3> MergerTest(
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
@@ -1268,6 +1269,7 @@ LayerTestResult<float,4> AdditionTest(
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1346,6 +1348,7 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1419,6 +1422,7 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1533,7 +1537,9 @@ LayerTestResult<float,4> CompareAdditionTest(
     CopyDataToITensorHandle(inputHandle1Ref.get(), &input1[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle2Ref.get(), &input2[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
+    workloadRef->PostAllocationConfigure();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -1598,6 +1604,7 @@ LayerTestResult<T, 4> DivisionTestHelper(
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -1952,6 +1959,7 @@ LayerTestResult<TOutput, 4> ElementwiseTestHelper(
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -2770,6 +2778,7 @@ LayerTestResult<float,4> MultiplicationTestHelper(
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -2923,9 +2932,10 @@ LayerTestResult<float,4> CompareMultiplicationTest(
     CopyDataToITensorHandle(inputHandle0Ref.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1Ref.get(), &input1[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
+    workloadRef->PostAllocationConfigure();
     workloadRef->Execute();
-
     CopyDataFromITensorHandle(&comparisonResult.output[0][0][0][0], outputHandle.get());
     CopyDataFromITensorHandle(&comparisonResult.outputExpected[0][0][0][0], outputHandleRef.get());
 
@@ -3004,7 +3014,9 @@ LayerTestResult<float,4> CompareBatchNormTest(
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
+    workloadRef->PostAllocationConfigure();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
@@ -3049,6 +3061,7 @@ void PermuteTensorData(
 
     CopyDataToITensorHandle(inputHandle.get(), inputData);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     outputData.resize(outputTensorInfo.GetNumElements());
@@ -3381,6 +3394,7 @@ void Concatenate(
         ++nextInputId;
     }
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     if (needPermuteForConcat)
@@ -5002,6 +5016,7 @@ LayerTestResult<float, 4> ResizeBilinearNopTest(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5071,6 +5086,7 @@ LayerTestResult<float, 4> SimpleResizeBilinearTest(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5140,6 +5156,7 @@ LayerTestResult<float, 4> ResizeBilinearSqMinTest(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5207,6 +5224,7 @@ LayerTestResult<float, 4> ResizeBilinearMinTest(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5276,6 +5294,7 @@ LayerTestResult<float, 4> ResizeBilinearMagTest(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5326,6 +5345,7 @@ LayerTestResult<float, 2> FakeQuantizationTest(
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
@@ -5392,6 +5412,7 @@ LayerTestResult<float, 4> L2NormalizationTestImpl(
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -5415,13 +5436,13 @@ LayerTestResult<T, 2> Pad2dTestCommon(
     float qScale,
     int32_t qOffset)
 {
-  const armnn::TensorShape inputShape{ 3, 3 };
-  const armnn::TensorShape outputShape{ 7, 7 };
+    const armnn::TensorShape inputShape{ 3, 3 };
+    const armnn::TensorShape outputShape{ 7, 7 };
 
-  const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
-  const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
+    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
+    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
 
-  std::vector<T> inputValues(
+    std::vector<T> inputValues(
     QuantizedVector<T>(qScale, qOffset,
     {
       // Height (3) x Width (3)
@@ -5430,8 +5451,8 @@ LayerTestResult<T, 2> Pad2dTestCommon(
       3, 2, 4
     }));
 
- std::vector<T> expectedOutputValues(
-  QuantizedVector<T>(qScale, qOffset,
+    std::vector<T> expectedOutputValues(
+    QuantizedVector<T>(qScale, qOffset,
     {
       0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0,
@@ -5442,38 +5463,39 @@ LayerTestResult<T, 2> Pad2dTestCommon(
       0, 0, 0, 0, 0, 0, 0
     }));
 
-  auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
+    auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
 
-  LayerTestResult<T, 2> result(outputTensorInfo);
-  result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, std::vector<T>(expectedOutputValues));
+    LayerTestResult<T, 2> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, std::vector<T>(expectedOutputValues));
 
-  std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-  std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-  armnn::PadQueueDescriptor descriptor;
+    armnn::PadQueueDescriptor descriptor;
 
-  std::vector<std::pair<unsigned int, unsigned int>> PadList;
-  PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
-  PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
+    std::vector<std::pair<unsigned int, unsigned int>> PadList;
+    PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
+    PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
 
-  descriptor.m_Parameters.m_PadList = PadList;
-  armnn::WorkloadInfo info;
+    descriptor.m_Parameters.m_PadList = PadList;
+    armnn::WorkloadInfo info;
 
-  AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
-  AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-  std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePad(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePad(descriptor, info);
 
-  inputHandle->Allocate();
-  outputHandle->Allocate();
+    inputHandle->Allocate();
+    outputHandle->Allocate();
 
-  CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
 
-  workload->Execute();
+    workload->PostAllocationConfigure();
+    workload->Execute();
 
-  CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
+    CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
 
-  return result;
+    return result;
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -5553,6 +5575,7 @@ LayerTestResult<T, 3> Pad3dTestCommon(
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0], outputHandle.get());
@@ -5790,6 +5813,7 @@ LayerTestResult<T, 4> Pad4dTestCommon(
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -6251,6 +6275,7 @@ LayerTestResult<T, 4> ConstantTestImpl(
 
     outputHandle->Allocate();
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -6406,6 +6431,7 @@ LayerTestResult<uint8_t, 3> MergerUint8DifferentQParamsTest(
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
@@ -6541,6 +6567,7 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
     CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
@@ -6610,6 +6637,7 @@ LayerTestResult<T, 4> AdditionQuantizeTestHelper(
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -6739,6 +6767,7 @@ LayerTestResult<T, 4> MultiplicationQuantizeTestHelper(
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -7034,6 +7063,7 @@ LayerTestResult<T, 4> SubtractionTestHelper(
     CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
     CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -7252,6 +7282,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -7311,6 +7342,7 @@ LayerTestResult<uint8_t, 4> SimpleResizeBilinearUint8Test(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -7368,6 +7400,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearSqMinUint8Test(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -7423,6 +7456,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMinUint8Test(
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -7480,6 +7514,7 @@ LayerTestResult<uint8_t, 4> ResizeBilinearMagUint8Test(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
@@ -7516,6 +7551,7 @@ LayerTestResult<float, 2> Rsqrt2dTestCommon(
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
@@ -7593,6 +7629,7 @@ LayerTestResult<float, 3> Rsqrt3dTest(
 
     CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0], outputHandle.get());
@@ -8384,6 +8421,7 @@ LayerTestResult<T, OutputDim> MeanTestHelper(
 
     CopyDataToITensorHandle(inputHandle.get(), input.origin());
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(result.output.origin(), outputHandle.get());
@@ -8660,7 +8698,9 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
     CopyDataToITensorHandle(poolingOutputHandle.get(), &resultMaxPool[0][0][0][0]);
     CopyDataToITensorHandle(addInputHandle.get(), &addInput[0][0][0][0]);
 
+    workload->PostAllocationConfigure();
     workload->Execute();
+    addWorkload->PostAllocationConfigure();
     addWorkload->Execute();
 
     CopyDataFromITensorHandle(&addRet.output[0][0][0][0], addOutputHandle.get());
@@ -8795,7 +8835,7 @@ LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(
     const std::vector<T> &outputData,
     float scale = 1.0f,
     int32_t offset = 0)
-  {
+{
     auto dataType = (std::is_same<T, uint8_t>::value ? armnn::DataType::QuantisedAsymm8 : armnn::DataType::Float32);
 
     armnn::TensorInfo inputTensorInfo(InputDim, inputShape, dataType);
@@ -8830,6 +8870,7 @@ LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(
 
     CopyDataToITensorHandle(inputHandle.get(), input.origin());
 
+    workload->PostAllocationConfigure();
     workload->Execute();
 
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());

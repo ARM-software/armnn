@@ -16,10 +16,12 @@ list(APPEND armnnRefBackendWorkloads_sources
     ConvImpl.hpp
     Debug.cpp
     Debug.hpp
+    Decoders.hpp
     DetectionPostProcess.cpp
     DetectionPostProcess.hpp
     ElementwiseFunction.cpp
     ElementwiseFunction.hpp
+    Encoders.hpp
     FullyConnected.cpp
     FullyConnected.hpp
     Gather.cpp
@@ -44,8 +46,6 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefBatchToSpaceNdFloat32Workload.hpp
     RefBatchToSpaceNdUint8Workload.cpp
     RefBatchToSpaceNdUint8Workload.hpp
-    RefComparisonWorkload.cpp
-    RefComparisonWorkload.hpp
     RefConstantWorkload.cpp
     RefConstantWorkload.hpp
     RefConvertFp16ToFp32Workload.cpp

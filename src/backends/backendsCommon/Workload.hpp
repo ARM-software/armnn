@@ -20,6 +20,7 @@ class IWorkload
 public:
     virtual ~IWorkload() {}
 
+    virtual void PostAllocationConfigure() = 0;
     virtual void Execute() const = 0;
 
     virtual void RegisterDebugCallback(const DebugCallbackFunction& func) {}
@@ -43,6 +44,8 @@ public:
     {
         m_Data.Validate(info);
     }
+
+    void PostAllocationConfigure() override {}
 
     const QueueDescriptor& GetData() const { return m_Data; }
 

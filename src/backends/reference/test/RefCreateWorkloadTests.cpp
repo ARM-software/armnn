@@ -96,6 +96,14 @@ BOOST_AUTO_TEST_CASE(CreateAdditionUint8Workload)
         armnn::DataType::QuantisedAsymm8>();
 }
 
+BOOST_AUTO_TEST_CASE(CreateAdditionInt16Workload)
+{
+    RefCreateElementwiseWorkloadTest<RefAdditionWorkload,
+        AdditionQueueDescriptor,
+        AdditionLayer,
+        armnn::DataType::QuantisedSymm16>();
+}
+
 BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
 {
     RefCreateElementwiseWorkloadTest<RefSubtractionWorkload,
@@ -110,6 +118,14 @@ BOOST_AUTO_TEST_CASE(CreateSubtractionUint8Workload)
         SubtractionQueueDescriptor,
         SubtractionLayer,
         armnn::DataType::QuantisedAsymm8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSubtractionInt16Workload)
+{
+    RefCreateElementwiseWorkloadTest<RefSubtractionWorkload,
+        SubtractionQueueDescriptor,
+        SubtractionLayer,
+        armnn::DataType::QuantisedSymm16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateMultiplicationFloatWorkload)
@@ -128,6 +144,14 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
         armnn::DataType::QuantisedAsymm8>();
 }
 
+BOOST_AUTO_TEST_CASE(CreateMultiplicationInt16Workload)
+{
+    RefCreateElementwiseWorkloadTest<RefMultiplicationWorkload,
+        MultiplicationQueueDescriptor,
+        MultiplicationLayer,
+        armnn::DataType::QuantisedSymm16>();
+}
+
 BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkload)
 {
     RefCreateElementwiseWorkloadTest<RefDivisionWorkload,
@@ -142,6 +166,14 @@ BOOST_AUTO_TEST_CASE(CreateDivisionUint8Workload)
         DivisionQueueDescriptor,
         DivisionLayer,
         armnn::DataType::QuantisedAsymm8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateDivisionInt16Workload)
+{
+    RefCreateElementwiseWorkloadTest<RefDivisionWorkload,
+        DivisionQueueDescriptor,
+        DivisionLayer,
+        armnn::DataType::QuantisedSymm16>();
 }
 
 template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>

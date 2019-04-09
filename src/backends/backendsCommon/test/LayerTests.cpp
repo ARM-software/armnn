@@ -1442,6 +1442,14 @@ LayerTestResult<uint8_t, 4> AdditionBroadcastUint8Test(
         workloadFactory, memoryManager, 2.f, 0);
 }
 
+LayerTestResult<int16_t, 4> AdditionBroadcastInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return AdditionBroadcastTestImpl<armnn::DataType::QuantisedSymm16>(
+        workloadFactory, memoryManager, 2.f, 0);
+}
+
 LayerTestResult<float, 4> AdditionBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -1456,6 +1464,14 @@ LayerTestResult<uint8_t, 4> AdditionBroadcast1ElementUint8Test(
 {
     return AdditionBroadcast1ElementTestImpl<armnn::DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.1333333f, 128);
+}
+
+LayerTestResult<int16_t, 4> AdditionBroadcast1ElementInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return AdditionBroadcast1ElementTestImpl<armnn::DataType::QuantisedSymm16>(
+        workloadFactory, memoryManager, 0.1333333f, 0);
 }
 
 LayerTestResult<float,4> CompareAdditionTest(
@@ -1527,7 +1543,7 @@ LayerTestResult<float,4> CompareAdditionTest(
 }
 
 namespace {
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> DivisionTestHelper(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1544,13 +1560,9 @@ LayerTestResult<T, 4> DivisionTestHelper(
     float outScale,
     int32_t outOffset)
 {
-    auto dataType = (std::is_same<T, uint8_t>::value ?
-                     armnn::DataType::QuantisedAsymm8 :
-                     armnn::DataType::Float32);
-
-    armnn::TensorInfo inputTensorInfo0(4, shape0, dataType);
-    armnn::TensorInfo inputTensorInfo1(4, shape1, dataType);
-    armnn::TensorInfo outputTensorInfo(4, outShape, dataType);
+    armnn::TensorInfo inputTensorInfo0(4, shape0, ArmnnType);
+    armnn::TensorInfo inputTensorInfo1(4, shape1, ArmnnType);
+    armnn::TensorInfo outputTensorInfo(4, outShape, ArmnnType);
 
     inputTensorInfo0.SetQuantizationScale(scale0);
     inputTensorInfo0.SetQuantizationOffset(offset0);
@@ -1617,11 +1629,11 @@ LayerTestResult<float,4> DivisionByZeroTest(
                                INFINITY, INFINITY, -INFINITY, -INFINITY,  NAN, NAN, -NAN, -NAN,
                                -INFINITY, -INFINITY, INFINITY, INFINITY,  1, 1, 1, 1 });
 
-    return DivisionTestHelper<float>(workloadFactory,
-                                     memoryManager,
-                                     shape, input0, 1.0f, 0,
-                                     shape, input1, 1.0f, 0,
-                                     shape, output, 1.0f, 0);
+    return DivisionTestHelper<armnn::DataType::Float32>(workloadFactory,
+                                                        memoryManager,
+                                                        shape, input0, 1.0f, 0,
+                                                        shape, input1, 1.0f, 0,
+                                                        shape, output, 1.0f, 0);
 }
 
 LayerTestResult<float,4> DivisionTest(
@@ -1648,11 +1660,11 @@ LayerTestResult<float,4> DivisionTest(
                                       1, 1, 1, 1,  1.25, 1.25, 1.25, 1.25 });
 
 
-    return DivisionTestHelper<float>(workloadFactory,
-                                     memoryManager,
-                                     shape, input0, 1.0f, 0,
-                                     shape, input1, 1.0f, 0,
-                                     shape, output, 1.0f, 0);
+    return DivisionTestHelper<armnn::DataType::Float32>(workloadFactory,
+                                                        memoryManager,
+                                                        shape, input0, 1.0f, 0,
+                                                        shape, input1, 1.0f, 0,
+                                                        shape, output, 1.0f, 0);
 }
 
 LayerTestResult<float, 4> DivisionBroadcast1ElementTest(
@@ -1668,11 +1680,11 @@ LayerTestResult<float, 4> DivisionBroadcast1ElementTest(
     std::vector<float> output({ 1, 2, 3, 4, 5, 6, 7, 8});
 
 
-    return DivisionTestHelper<float>(workloadFactory,
-                                     memoryManager,
-                                     shape0, input0, 1.0f, 0,
-                                     shape1, input1, 1.0f, 0,
-                                     shape0, output, 1.0f, 0);
+    return DivisionTestHelper<armnn::DataType::Float32>(workloadFactory,
+                                                        memoryManager,
+                                                        shape0, input0, 1.0f, 0,
+                                                        shape1, input1, 1.0f, 0,
+                                                        shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(
@@ -1693,13 +1705,12 @@ LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(
                                       7,   8,      9, 10,     11, 12,
                                       13, 14,     15, 16,     17, 18});
 
-    return DivisionTestHelper<float>(workloadFactory,
-                                     memoryManager,
-                                     shape0, input0, 1.0f, 0,
-                                     shape1, input1, 1.0f, 0,
-                                     shape0, output, 1.0f, 0);
+    return DivisionTestHelper<armnn::DataType::Float32>(workloadFactory,
+                                                        memoryManager,
+                                                        shape0, input0, 1.0f, 0,
+                                                        shape1, input1, 1.0f, 0,
+                                                        shape0, output, 1.0f, 0);
 }
-
 
 LayerTestResult<uint8_t,4> DivisionUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -1722,11 +1733,11 @@ LayerTestResult<uint8_t,4> DivisionUint8Test(
                                  4,  4,  4,  4,    5,  5,  5,  5});
 
 
-    return DivisionTestHelper<uint8_t>(workloadFactory,
-                                       memoryManager,
-                                      shape, input0, 1.0f,  0,
-                                      shape, input1, 1.0f,  0,
-                                      shape, output, 0.25f, 0);
+    return DivisionTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                memoryManager,
+                                                                shape, input0, 1.0f,  0,
+                                                                shape, input1, 1.0f,  0,
+                                                                shape, output, 0.25f, 0);
 }
 
 LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(
@@ -1741,11 +1752,11 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(
 
     std::vector<uint8_t> output({ 1, 2, 3, 4, 5, 6, 7, 8});
 
-    return DivisionTestHelper<uint8_t>(workloadFactory,
-                                       memoryManager,
-                                       shape0, input0, 1.0f, 0,
-                                       shape1, input1, 1.0f, 0,
-                                       shape0, output, 1.0f, 0);
+    return DivisionTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                memoryManager,
+                                                                shape0, input0, 1.0f, 0,
+                                                                shape1, input1, 1.0f, 0,
+                                                                shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(
@@ -1764,11 +1775,76 @@ LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(
                                  7,   8,      9, 10,     11, 12,
                                  13, 14,     15, 16,     17, 18});
 
-    return DivisionTestHelper<uint8_t>(workloadFactory,
-                                       memoryManager,
-                                       shape0, input0, 1.0f, 0,
-                                       shape1, input1, 1.0f, 0,
-                                       shape0, output, 1.0f, 0);
+    return DivisionTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                memoryManager,
+                                                                shape0, input0, 1.0f, 0,
+                                                                shape1, input1, 1.0f, 0,
+                                                                shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<int16_t,4> DivisionInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape[] = { 2, 2, 2, 2 };
+
+    std::vector<int16_t> input0({2,  2,  2,  2,    3,  3,  3,  3,
+                                 4,  4,  4,  4,    5,  5,  5,  5 });
+
+    std::vector<int16_t> input1({1,  1,  1,  1,    2,  2,  2,  2,
+                                 4,  4,  4,  4,    4,  4,  4,  4 });
+
+    std::vector<int16_t> output({8,  8,  8,  8,    6,  6,  6,  6,
+                                 4,  4,  4,  4,    5,  5,  5,  5});
+
+
+    return DivisionTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                memoryManager,
+                                                                shape, input0, 1.0f,  0,
+                                                                shape, input1, 1.0f,  0,
+                                                                shape, output, 0.25f, 0);
+}
+
+LayerTestResult<int16_t, 4> DivisionBroadcast1ElementInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape0[] = { 1, 2, 2, 2 };
+    std::vector<int16_t> input0({ 2, 4, 6, 8, 10, 12, 14, 16});
+
+    unsigned int shape1[] = { 1, 1, 1, 1 };
+    std::vector<int16_t> input1({ 2 });
+
+    std::vector<int16_t> output({ 1, 2, 3, 4, 5, 6, 7, 8});
+
+    return DivisionTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                memoryManager,
+                                                                shape0, input0, 1.0f, 0,
+                                                                shape1, input1, 1.0f, 0,
+                                                                shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<int16_t, 4> DivisionBroadcast1DVectorInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape0[] = { 1, 3, 3, 2 };
+    std::vector<int16_t> input0({1,   4,     3,  8,      5,  12,
+                                 7,   16,    9,  20,     11, 24,
+                                 13,  28,    15, 32,     17, 36});
+
+    unsigned int shape1[] = { 1, 1, 1, 2 };
+    std::vector<int16_t> input1({ 1, 2 });
+
+    std::vector<int16_t> output({1,   2,      3,  4,      5,  6,
+                                 7,   8,      9, 10,     11, 12,
+                                 13, 14,     15, 16,     17, 18});
+
+    return DivisionTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                memoryManager,
+                                                                shape0, input0, 1.0f, 0,
+                                                                shape1, input1, 1.0f, 0,
+                                                                shape0, output, 1.0f, 0);
 }
 
 template<typename DescriptorType>
@@ -2411,6 +2487,90 @@ LayerTestResult<uint8_t, 4> MaximumBroadcast1DVectorUint8Test(
         0);
 }
 
+LayerTestResult<int16_t, 4> MaximumInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape[] = { 2, 2, 2, 2 };
+
+    std::vector<int16_t> input0({ 1, 1, 1, 1, 6, 6, 6, 6,
+                                  3, 3, 3, 3, 4, 4, 4, 4 });
+
+    std::vector<int16_t> input1({ 2, 2, 2, 2, 3, 3, 3, 3,
+                                  4, 4, 4, 4, 5, 5, 5, 5 });
+
+    std::vector<int16_t> output({ 2, 2, 2, 2, 6, 6, 6, 6,
+                                  4, 4, 4, 4, 5, 5, 5, 5 });
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+        workloadFactory,
+        memoryManager,
+        shape,
+        input0,
+        shape,
+        input1,
+        shape,
+        output,
+        1.0f,
+        0);
+}
+
+LayerTestResult<int16_t, 4> MaximumBroadcast1ElementInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<int16_t> input0({ 1, 2, 3, 4,  5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    std::vector<int16_t> input1({2});
+
+    std::vector<int16_t> output({ 2, 2, 3, 4, 5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output,
+        1.0f,
+        0);
+}
+
+LayerTestResult<int16_t, 4> MaximumBroadcast1DVectorInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<int16_t> input0({ 1, 2, 3, 4, 5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    std::vector<int16_t> input1({ 1, 10, 3});
+
+    std::vector<int16_t> output({ 1, 10, 3, 4, 10, 6,
+                                  7, 10, 9, 10, 11, 12 });
+
+    return ElementwiseTestHelper<armnn::MaximumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output,
+        1.0f,
+        0);
+}
+
 LayerTestResult<float, 4> MinimumBroadcast1ElementTest1(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -2474,6 +2634,90 @@ LayerTestResult<uint8_t, 4> MinimumBroadcast1DVectorUint8Test(
                                   1, 1, 2, 1, 2, 3 });
 
     return ElementwiseTestHelper<armnn::MinimumQueueDescriptor, armnn::DataType::QuantisedAsymm8>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output,
+        1.0f,
+        0);
+}
+
+LayerTestResult<int16_t, 4> MinimumInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int shape[] = { 2, 2, 2, 2 };
+
+    std::vector<int16_t> input0({ 1, 1, 1, 1, 6, 6, 6, 6,
+                                  3, 3, 3, 3, 4, 4, 4, 4 });
+
+    std::vector<int16_t> input1({ 2, 2, 2, 2, 3, 3, 3, 3,
+                                  4, 4, 4, 4, 5, 5, 5, 5 });
+
+    std::vector<int16_t> output({ 1, 1, 1, 1, 3, 3, 3, 3,
+                                  3, 3, 3, 3, 4, 4, 4, 4 });
+
+    return ElementwiseTestHelper<armnn::MinimumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+        workloadFactory,
+        memoryManager,
+        shape,
+        input0,
+        shape,
+        input1,
+        shape,
+        output,
+        1.0f,
+        0);
+}
+
+LayerTestResult<int16_t, 4> MinimumBroadcast1ElementInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<int16_t> input0({ 1, 2, 3, 4,  5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    std::vector<int16_t> input1({2});
+
+    std::vector<int16_t> output({ 1, 2, 2, 2, 2, 2,
+                                  2, 2, 2, 2, 2, 2 });
+
+    return ElementwiseTestHelper<armnn::MinimumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output,
+        1.0f,
+        0);
+}
+
+LayerTestResult<int16_t, 4> MinimumBroadcast1DVectorInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<int16_t> input0({ 1, 2, 3, 4, 5, 6,
+                                  7, 8, 9, 10, 11, 12 });
+
+    std::vector<int16_t> input1({ 1, 10, 3});
+
+    std::vector<int16_t> output({ 1, 2, 3, 1, 5, 3,
+                                  1, 8, 3, 1, 10, 3 });
+
+    return ElementwiseTestHelper<armnn::MinimumQueueDescriptor, armnn::DataType::QuantisedSymm16>(
         workloadFactory,
         memoryManager,
         shape0,
@@ -6304,103 +6548,33 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(
     return ret;
 }
 
-LayerTestResult<uint8_t, 4> AdditionUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    unsigned int batchSize = 1;
-    unsigned int channels = 2;
-    unsigned int height = 2;
-    unsigned int width = 3;
-
-    const float scale = 7.0f;
-    const int32_t offset = 3;
-
-    armnn::TensorInfo inputTensorInfo1, inputTensorInfo2;
-    armnn::TensorInfo outputTensorInfo;
-
-    const unsigned int shape[] = { batchSize, channels, height, width };
-    inputTensorInfo1 = armnn::TensorInfo(4, shape, armnn::DataType::QuantisedAsymm8);
-    inputTensorInfo1.SetQuantizationScale(scale);
-    inputTensorInfo1.SetQuantizationOffset(offset);
-
-    inputTensorInfo2 = armnn::TensorInfo(4, shape, armnn::DataType::QuantisedAsymm8);
-    inputTensorInfo2.SetQuantizationScale(scale);
-    inputTensorInfo2.SetQuantizationOffset(offset);
-
-    outputTensorInfo = armnn::TensorInfo(4, shape, armnn::DataType::QuantisedAsymm8);
-    outputTensorInfo.SetQuantizationScale(scale);
-    outputTensorInfo.SetQuantizationOffset(offset);
-
-    // See dequantized values to the right.
-    auto input1 = MakeTensor<uint8_t, 4>(inputTensorInfo1, std::vector<uint8_t>(
-    {
-         63,  35,  77,  70,  56, 112, //  420, 224,  518,  469,  371, 763
-        203,  28, 252, 168, 245,  91  // 1400, 175, 1743, 1155, 1694, 616
-    }));
-
-    // See dequantized values to the right.
-    auto input2 = MakeTensor<uint8_t, 4>(inputTensorInfo1, std::vector<uint8_t>(
-    {
-         21,   7, 175, 231, 175, 210, // 126,   28, 1204, 1596, 1204, 1449
-        126, 161,  63,  21, 105, 126  // 861, 1106,  420,  126,  714,  861
-    }));
-
-    // See dequantized values to the right.
-    LayerTestResult<uint8_t, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<uint8_t, 4>(outputTensorInfo, std::vector<uint8_t>(
-    {
-         81,  39, 249, 255, 228, 255, //  546,  252, 1722, 2065(clamped), 1575, 2212(clamped)
-        255, 186, 255, 186, 255, 214, // 2261(clamped), 1281, 2163(clamped), 1281, 2408(clamped), 1477
-    }));
-
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
-    armnn::AdditionQueueDescriptor data;
-    armnn::WorkloadInfo info;
-    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
-    AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
-    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
-
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateAddition(data, info);
-
-    inputHandle1->Allocate();
-    inputHandle2->Allocate();
-    outputHandle->Allocate();
-
-    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
-    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0]);
-
-    workload->Execute();
-
-    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
-
-    return result;
-}
 
 namespace
 {
-LayerTestResult<uint8_t, 4> MultiplicationUint8TestHelper(
+template <typename T>
+LayerTestResult<T, 4> AdditionQuantizeTestHelper(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const unsigned int shape0[4],
-    const std::vector<uint8_t> & values0,
+    const std::vector<T>& values0,
     float scale0,
     int32_t offset0,
     const unsigned int shape1[4],
-    const std::vector<uint8_t> & values1,
+    const std::vector<T> & values1,
     float scale1,
     int32_t offset1,
     const unsigned int outShape[4],
-    const std::vector<uint8_t> & outValues,
+    const std::vector<T> & outValues,
     float outScale,
     int32_t outOffset)
 {
-    armnn::TensorInfo inputTensorInfo0(4, shape0, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo inputTensorInfo1(4, shape1, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo outputTensorInfo(4, outShape, armnn::DataType::QuantisedAsymm8);
+    auto dataType = (std::is_same<T, uint8_t>::value ?
+                     armnn::DataType::QuantisedAsymm8 :
+                     armnn::DataType::QuantisedSymm16);
+
+    armnn::TensorInfo inputTensorInfo0(4, shape0, dataType);
+    armnn::TensorInfo inputTensorInfo1(4, shape1, dataType);
+    armnn::TensorInfo outputTensorInfo(4, outShape, dataType);
 
     inputTensorInfo0.SetQuantizationScale(scale0);
     inputTensorInfo0.SetQuantizationOffset(offset0);
@@ -6411,11 +6585,140 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8TestHelper(
     outputTensorInfo.SetQuantizationScale(outScale);
     outputTensorInfo.SetQuantizationOffset(outOffset);
 
-    auto input0 = MakeTensor<uint8_t, 4>(inputTensorInfo0, values0);
-    auto input1 = MakeTensor<uint8_t, 4>(inputTensorInfo1, values1);
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, values0);
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, values1);
 
-    LayerTestResult<uint8_t, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<uint8_t, 4>(outputTensorInfo, outValues);
+    LayerTestResult<T, 4> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outValues);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::AdditionQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data,  info, inputTensorInfo0, inputHandle0.get());
+    AddInputToWorkload(data,  info, inputTensorInfo1, inputHandle1.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateAddition(data, info);
+
+    inputHandle0->Allocate();
+    inputHandle1->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
+
+    return result;
+}
+} // anonymous namespace
+
+LayerTestResult<uint8_t, 4> AdditionUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 2, 2, 3 };
+
+    std::vector<uint8_t> input0(
+    {
+        63,  35,  77,  70,  56, 112, //  420, 224,  518,  469,  371, 763
+        203,  28, 252, 168, 245,  91  // 1400, 175, 1743, 1155, 1694, 616
+    });
+
+    std::vector<uint8_t> input1(
+    {
+        21,   7, 175, 231, 175, 210, // 126,   28, 1204, 1596, 1204, 1449
+        126, 161,  63,  21, 105, 126  // 861, 1106,  420,  126,  714,  861
+    });
+
+    std::vector<uint8_t> output(
+    {
+        81,  39, 249, 255, 228, 255, //  546,  252, 1722, 2065(clamped), 1575, 2212(clamped)
+        255, 186, 255, 186, 255, 214, // 2261(clamped), 1281, 2163(clamped), 1281, 2408(clamped), 1477
+    });
+
+    return AdditionQuantizeTestHelper(workloadFactory,
+                                      memoryManager,
+                                      shape0, input0, 7.0f, 3,
+                                      shape1, input1, 7.0f, 3,
+                                      shape0, output, 7.0f, 3);
+}
+
+LayerTestResult<int16_t, 4> AdditionInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 2, 2, 3 };
+
+    std::vector<int16_t> input0(
+        {
+            63,  35,  77,  70,  56, 112, //  441, 245,  539,  490,  392, 184
+            203,  28, 252, 168, 245,  91  // 1421, 196, 1764, 1176, 1715, 637
+        });
+
+    std::vector<int16_t> input1(
+        {
+            21,   7, 175, 231, 175, 210, // 126,   28, 1204, 1596, 1204, 1449
+            126, 161,  63,  21, 105, 126  // 861, 1106,  420,  126,  714,  861
+        });
+
+    std::vector<int16_t> output(
+        {
+            84,  42, 252, 301, 231, 322, //  588,  294, 1764, 2107(clamped), 1617, 2254(clamped)
+            329, 189, 315, 189, 350, 217, // 2303(clamped), 1323, 2205(clamped), 1323, 2450(clamped), 1519
+        });
+
+    return AdditionQuantizeTestHelper(workloadFactory,
+                                      memoryManager,
+                                      shape0, input0, 7.0f, 0,
+                                      shape1, input1, 7.0f, 0,
+                                      shape0, output, 7.0f, 0);
+}
+
+namespace
+{
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> MultiplicationQuantizeTestHelper(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const unsigned int shape0[4],
+    const std::vector<T> & values0,
+    float scale0,
+    int32_t offset0,
+    const unsigned int shape1[4],
+    const std::vector<T> & values1,
+    float scale1,
+    int32_t offset1,
+    const unsigned int outShape[4],
+    const std::vector<T> & outValues,
+    float outScale,
+    int32_t outOffset)
+{
+    armnn::TensorInfo inputTensorInfo0(4, shape0, ArmnnType);
+    armnn::TensorInfo inputTensorInfo1(4, shape1, ArmnnType);
+    armnn::TensorInfo outputTensorInfo(4, outShape, ArmnnType);
+
+    inputTensorInfo0.SetQuantizationScale(scale0);
+    inputTensorInfo0.SetQuantizationOffset(offset0);
+
+    inputTensorInfo1.SetQuantizationScale(scale1);
+    inputTensorInfo1.SetQuantizationOffset(offset1);
+
+    outputTensorInfo.SetQuantizationScale(outScale);
+    outputTensorInfo.SetQuantizationOffset(outOffset);
+
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, values0);
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, values1);
+
+    LayerTestResult<T, 4> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outValues);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
@@ -6473,20 +6776,21 @@ LayerTestResult<uint8_t, 4> MultiplicationUint8Test(
          77,  15,  92,  16,  10,  21, // 112200,  26676,        132192,           29160, 21120,  35640
     });
 
-    return MultiplicationUint8TestHelper(workloadFactory,
-                                         memoryManager,
-                                         shape,
-                                         input0,
-                                         4.0f,
-                                         1,
-                                         shape,
-                                         input1,
-                                         3.0f,
-                                         -2,
-                                         shape,
-                                         output,
-                                         1366.255f, // Scale/offset chosen to have output values out of range.
-                                         -5);
+    // Scale/offset chosen to have output values out of range.
+    return MultiplicationQuantizeTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                              memoryManager,
+                                                                              shape,
+                                                                              input0,
+                                                                              4.0f,
+                                                                              1,
+                                                                              shape,
+                                                                              input1,
+                                                                              3.0f,
+                                                                              -2,
+                                                                              shape,
+                                                                              output,
+                                                                              1366.255f,
+                                                                              -5);
 }
 
 LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(
@@ -6508,20 +6812,20 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(
         14, 16, 18,    20, 22, 24
     });
 
-    return MultiplicationUint8TestHelper(workloadFactory,
-                                         memoryManager,
-                                         shape0,
-                                         input0,
-                                         1.0f,
-                                         0,
-                                         shape1,
-                                         input1,
-                                         1.0f,
-                                         0,
-                                         shape0,
-                                         output,
-                                         1.0f,
-                                         0);
+    return MultiplicationQuantizeTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                              memoryManager,
+                                                                              shape0,
+                                                                              input0,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape1,
+                                                                              input1,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape0,
+                                                                              output,
+                                                                              1.0f,
+                                                                              0);
 }
 
 LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(
@@ -6543,25 +6847,139 @@ LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(
         7, 16,  27,    10, 22, 36
     });
 
-    return MultiplicationUint8TestHelper(workloadFactory,
-                                         memoryManager,
-                                         shape0,
-                                         input0,
-                                         1.0f,
-                                         0,
-                                         shape1,
-                                         input1,
-                                         1.0f,
-                                         0,
-                                         shape0,
-                                         output,
-                                         1.0f,
-                                         0);
+    return MultiplicationQuantizeTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                              memoryManager,
+                                                                              shape0,
+                                                                              input0,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape1,
+                                                                              input1,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape0,
+                                                                              output,
+                                                                              1.0f,
+                                                                              0);
+}
+
+LayerTestResult<int16_t, 4> MultiplicationInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape[] = { 1, 2, 2, 3 };
+
+    std::vector<int16_t> input0(
+    {
+        6,   7,  8,  9, 10, 11,
+        12, 13, 14, 15, 16, 17
+    });
+
+    std::vector<int16_t> input1(
+    {
+        1, 2, 3,  4,  5,  6,
+        7, 8, 9, 10, 11, 12
+    });
+
+    std::vector<int16_t> output(
+    {
+        6,   14,  24,  36,  50,  66,
+        84, 104, 126, 150, 176, 204
+    });
+
+    return MultiplicationQuantizeTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                              memoryManager,
+                                                                              shape,
+                                                                              input0,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape,
+                                                                              input1,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape,
+                                                                              output,
+                                                                              1.0f,
+                                                                              0);
+}
+
+LayerTestResult<int16_t, 4> MultiplicationBroadcast1ElementInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<int16_t> input0(
+    {
+        1, 2, 3,  4,  5,  6,
+        7, 8, 9, 10, 11, 12
+    });
+
+    std::vector<int16_t> input1({2});
+
+    std::vector<int16_t> output(
+    {
+        2,   4,  6,  8, 10, 12,
+        14, 16, 18, 20, 22, 24
+    });
+
+    return MultiplicationQuantizeTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                              memoryManager,
+                                                                              shape0,
+                                                                              input0,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape1,
+                                                                              input1,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape0,
+                                                                              output,
+                                                                              1.0f,
+                                                                              0);
+}
+
+LayerTestResult<int16_t, 4> MultiplicationBroadcast1DVectorInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<int16_t> input0(
+    {
+        1, 2, 3,  4,  5,  6,
+        7, 8, 9, 10, 11, 12
+    });
+
+    std::vector<int16_t> input1({1, 2, 3});
+
+    std::vector<int16_t> output(
+    {
+        1,  4,  9,  4, 10, 18,
+        7, 16, 27, 10, 22, 36
+    });
+
+    return MultiplicationQuantizeTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                              memoryManager,
+                                                                              shape0,
+                                                                              input0,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape1,
+                                                                              input1,
+                                                                              1.0f,
+                                                                              0,
+                                                                              shape0,
+                                                                              output,
+                                                                              1.0f,
+                                                                              0);
 }
 
 namespace
 {
-template <typename T>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SubtractionTestHelper(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -6578,13 +6996,9 @@ LayerTestResult<T, 4> SubtractionTestHelper(
     float outScale,
     int32_t outOffset)
 {
-    auto dataType = (std::is_same<T, uint8_t>::value ?
-                     armnn::DataType::QuantisedAsymm8 :
-                     armnn::DataType::Float32);
-
-    armnn::TensorInfo inputTensorInfo0(4, shape0, dataType);
-    armnn::TensorInfo inputTensorInfo1(4, shape1, dataType);
-    armnn::TensorInfo outputTensorInfo(4, outShape, dataType);
+    armnn::TensorInfo inputTensorInfo0(4, shape0, ArmnnType);
+    armnn::TensorInfo inputTensorInfo1(4, shape1, ArmnnType);
+    armnn::TensorInfo outputTensorInfo(4, outShape, ArmnnType);
 
     inputTensorInfo0.SetQuantizationScale(scale0);
     inputTensorInfo0.SetQuantizationOffset(offset0);
@@ -6639,11 +7053,11 @@ LayerTestResult<uint8_t, 4> SubtractionUint8Test(
     std::vector<uint8_t> input1({ 1, 2, 1, 2 });
     std::vector<uint8_t> output({ 3, 3, 5, 5 });
 
-    return SubtractionTestHelper(workloadFactory,
-                                 memoryManager,
-                                 shape0, input0, 0.5f, 2,
-                                 shape1, input1, 1.0f, 0,
-                                 shape0, output, 1.0f, 0);
+    return SubtractionTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                   memoryManager,
+                                                                   shape0, input0, 0.5f, 2,
+                                                                   shape1, input1, 1.0f, 0,
+                                                                   shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(
@@ -6657,11 +7071,11 @@ LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(
     std::vector<uint8_t> input1({ 2 });
     std::vector<uint8_t> output({ 5, 6, 7, 8 });
 
-    return SubtractionTestHelper(workloadFactory,
-                                 memoryManager,
-                                 shape0, input0, 0.5f, 2,
-                                 shape1, input1, 1.0f, 0,
-                                 shape0, output, 1.0f, 3);
+    return SubtractionTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                   memoryManager,
+                                                                   shape0, input0, 0.5f, 2,
+                                                                   shape1, input1, 1.0f, 0,
+                                                                   shape0, output, 1.0f, 3);
 }
 
 LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(
@@ -6675,11 +7089,11 @@ LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(
     std::vector<uint8_t> input1({ 2, 1 });
     std::vector<uint8_t> output({ 8, 11, 12, 15 });
 
-    return SubtractionTestHelper(workloadFactory,
-                                 memoryManager,
-                                 shape0, input0, 1.0f, 0,
-                                 shape1, input1, 1.0f, 0,
-                                 shape0, output, 1.0f, 0);
+    return SubtractionTestHelper<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                   memoryManager,
+                                                                   shape0, input0, 1.0f, 0,
+                                                                   shape1, input1, 1.0f, 0,
+                                                                   shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<float, 4> SubtractionTest(
@@ -6693,11 +7107,11 @@ LayerTestResult<float, 4> SubtractionTest(
     std::vector<float> input1({ 1, -1, 0, 2 });
     std::vector<float> output({ 0,  3, 3, 2 });
 
-    return SubtractionTestHelper(workloadFactory,
-                                 memoryManager,
-                                 shape0, input0, 1.0f, 0,
-                                 shape1, input1, 1.0f, 0,
-                                 shape0, output, 1.0f, 0);
+    return SubtractionTestHelper<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           shape0, input0, 1.0f, 0,
+                                                           shape1, input1, 1.0f, 0,
+                                                           shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(
@@ -6711,11 +7125,11 @@ LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(
     std::vector<float> input1({ 10 });
     std::vector<float> output({ -9,  -8, -7, -6 });
 
-    return SubtractionTestHelper(workloadFactory,
-                                 memoryManager,
-                                 shape0, input0, 1.0f, 0,
-                                 shape1, input1, 1.0f, 0,
-                                 shape0, output, 1.0f, 0);
+    return SubtractionTestHelper<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           shape0, input0, 1.0f, 0,
+                                                           shape1, input1, 1.0f, 0,
+                                                           shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<float, 4> SubtractionBroadcastTest(
@@ -6729,11 +7143,65 @@ LayerTestResult<float, 4> SubtractionBroadcastTest(
     std::vector<float> input1({ 10, -5 });
     std::vector<float> output({ -9,  7, -7, 9 });
 
-    return SubtractionTestHelper(workloadFactory,
-                                 memoryManager,
-                                 shape0, input0, 1.0f, 0,
-                                 shape1, input1, 1.0f, 0,
-                                 shape0, output, 1.0f, 0);
+    return SubtractionTestHelper<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           shape0, input0, 1.0f, 0,
+                                                           shape1, input1, 1.0f, 0,
+                                                           shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<int16_t, 4> SubtractionInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 2, 2 };
+
+    std::vector<int16_t> input0({ 10, 12, 14, 16 });
+    std::vector<int16_t> input1({ 1, 2, 1, 2 });
+    std::vector<int16_t> output({ 3, 3, 5, 5 });
+
+    return SubtractionTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                   memoryManager,
+                                                                   shape0, input0, 0.5f, 0,
+                                                                   shape1, input1, 1.0f, 0,
+                                                                   shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<int16_t, 4> SubtractionBroadcast1ElementInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<int16_t> input0({ 10, 12, 14, 16 });
+    std::vector<int16_t> input1({ 2 });
+    std::vector<int16_t> output({ 3, 4, 5, 6 });
+
+    return SubtractionTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                   memoryManager,
+                                                                   shape0, input0, 0.5f, 0,
+                                                                   shape1, input1, 1.0f, 0,
+                                                                   shape0, output, 1.0f, 0);
+}
+
+LayerTestResult<int16_t, 4> SubtractionBroadcastInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 2, 1 };
+
+    std::vector<int16_t> input0({ 10, 12, 14, 16 });
+    std::vector<int16_t> input1({ 2, 1 });
+    std::vector<int16_t> output({ 8, 11, 12, 15 });
+
+    return SubtractionTestHelper<armnn::DataType::QuantisedSymm16>(workloadFactory,
+                                                                   memoryManager,
+                                                                   shape0, input0, 1.0f, 0,
+                                                                   shape1, input1, 1.0f, 0,
+                                                                   shape0, output, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> ResizeBilinearNopUint8Test(

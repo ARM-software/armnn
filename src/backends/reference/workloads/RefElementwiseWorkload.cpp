@@ -64,6 +64,28 @@ void RefElementwiseWorkload<Functor, ParentDescriptor, DebugString>::Execute() c
                                                            encodeIterator0);
             break;
         }
+        case armnn::DataType::QuantisedSymm16:
+        {
+            QSymm16Decoder decodeIterator0(GetInputTensorData<int16_t>(0, m_Data),
+                                           inputInfo0.GetQuantizationScale(),
+                                           inputInfo0.GetQuantizationOffset());
+
+            QSymm16Decoder decodeIterator1(GetInputTensorData<int16_t>(1, m_Data),
+                                           inputInfo1.GetQuantizationScale(),
+                                           inputInfo1.GetQuantizationOffset());
+
+            QSymm16Encoder encodeIterator0(GetOutputTensorData<int16_t>(0, m_Data),
+                                           outputInfo.GetQuantizationScale(),
+                                           outputInfo.GetQuantizationOffset());
+
+            ElementwiseFunction<Functor, Decoder, Encoder>(inShape0,
+                                                           inShape1,
+                                                           outShape,
+                                                           decodeIterator0,
+                                                           decodeIterator1,
+                                                           encodeIterator0);
+            break;
+        }
         default:
             BOOST_ASSERT_MSG(false, "RefElementwiseWorkload: Not supported Data Type!");
             break;

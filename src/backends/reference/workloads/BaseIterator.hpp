@@ -112,6 +112,22 @@ public:
     }
 };
 
+class QSymm16Decoder : public TypedIterator<const int16_t, Decoder>
+{
+public:
+    QSymm16Decoder(const int16_t* data, const float scale, const int32_t offset)
+        : TypedIterator(data), m_Scale(scale), m_Offset(offset) {}
+
+    float Get() const override
+    {
+        return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
+    }
+
+private:
+    const float m_Scale;
+    const int32_t m_Offset;
+};
+
 class FloatEncoder : public TypedIterator<float, Encoder>
 {
 public:
@@ -150,6 +166,22 @@ public:
     {
         *m_Iterator = right;
     }
+};
+
+class QSymm16Encoder : public TypedIterator<int16_t, Encoder>
+{
+public:
+    QSymm16Encoder(int16_t* data, const float scale, const int32_t offset)
+        : TypedIterator(data), m_Scale(scale), m_Offset(offset) {}
+
+    void Set(const float& right) override
+    {
+        *m_Iterator = armnn::Quantize<int16_t>(right, m_Scale, m_Offset);
+    }
+
+private:
+    const float m_Scale;
+    const int32_t m_Offset;
 };
 
 } //namespace armnn

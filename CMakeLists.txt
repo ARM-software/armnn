@@ -286,6 +286,8 @@ list(APPEND armnn_sources
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
     src/armnn/Exceptions.cpp
+    src/armnn/ExecutionFrame.cpp
+    src/armnn/ExecutionFrame.hpp
     src/armnn/Graph.cpp
     src/armnn/Graph.hpp
     src/armnn/IGraphObservable.hpp
@@ -417,6 +419,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/CsvReaderTest.cpp
         src/armnn/test/DebugCallbackTest.cpp
         src/armnn/test/EndToEndTest.cpp
+        src/armnn/test/ExecutionFrameTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp
         src/armnn/test/GraphTests.cpp
         src/armnn/test/GraphUtils.cpp

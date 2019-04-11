@@ -16,12 +16,12 @@ usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"
     echo "Usage: $CMD -s <CLFRAMEWORK_SHA>"
     echo "Usage: $CMD -p (Print current default clframework SHA)"
-  exit 1
+  exit 0
 }
 
 PrintDefaultClframeworkSha() {
   echo $DEFAULT_CLFRAMEWORKREVISION
-  exit 2;
+  exit 0;
 }
 
 function AssertZeroExitCode {

@@ -205,6 +205,7 @@ int MainImpl(const char* modelPath,
              const std::vector<string>& outputNames,
              bool enableProfiling,
              bool enableFp16TurboMode,
+             const double& thresholdTime,
              const size_t subgraphId,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
@@ -295,7 +296,8 @@ int MainImpl(const char* modelPath,
             }
         }
 
-        model.Run(inputDataContainers, outputDataContainers);
+        // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
+        auto inference_duration = model.Run(inputDataContainers, outputDataContainers);
 
         // Print output tensors
         for (size_t i = 0; i < numOutputs; i++)
@@ -311,6 +313,27 @@ int MainImpl(const char* modelPath,
                                  },
                                  outputDataContainers[i]);
         }
+
+        BOOST_LOG_TRIVIAL(info) << "\nInference time: " << std::setprecision(2)
+                                << std::fixed << inference_duration.count() << " ms";
+
+        // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
+        if (thresholdTime != 0.0)
+        {
+            BOOST_LOG_TRIVIAL(info) << "Threshold time: " << std::setprecision(2)
+                                    << std::fixed << thresholdTime << " ms";
+            auto thresholdMinusInference = thresholdTime - inference_duration.count();
+            BOOST_LOG_TRIVIAL(info) << "Threshold time - Inference time: " << std::setprecision(2)
+                                    << std::fixed << thresholdMinusInference << " ms" << "\n";
+
+            if (thresholdMinusInference < 0)
+            {
+                BOOST_LOG_TRIVIAL(fatal) << "Elapsed inference time is greater than provided threshold time.\n";
+                return EXIT_FAILURE;
+            }
+        }
+
+
     }
     catch (armnn::Exception const& e)
     {
@@ -333,6 +356,7 @@ int RunTest(const std::string& format,
             const std::string& outputNames,
             bool enableProfiling,
             bool enableFp16TurboMode,
+            const double& thresholdTime,
             const size_t subgraphId,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
@@ -416,6 +440,13 @@ int RunTest(const std::string& format,
         }
     }
 
+    // Check that threshold time is not less than zero
+    if (thresholdTime < 0)
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "Threshold time supplied as a commoand line argument is less than zero.";
+        return EXIT_FAILURE;
+    }
+
     // Forward to implementation based on the parser type
     if (modelFormat.find("armnn") != std::string::npos)
     {
@@ -423,8 +454,9 @@ int RunTest(const std::string& format,
     return MainImpl<armnnDeserializer::IDeserializer, float>(
         modelPath.c_str(), isModelBinary, computeDevice,
         inputNamesVector, inputTensorShapes,
-        inputTensorDataFilePathsVector, inputTypesVector, outputTypesVector,
-        outputNamesVector, enableProfiling, enableFp16TurboMode, subgraphId, runtime);
+        inputTensorDataFilePathsVector, inputTypesVector,
+        outputTypesVector, outputNamesVector, enableProfiling,
+        enableFp16TurboMode, thresholdTime, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with serialization support.";
     return EXIT_FAILURE;
@@ -437,7 +469,7 @@ int RunTest(const std::string& format,
                                                                inputNamesVector, inputTensorShapes,
                                                                inputTensorDataFilePathsVector, inputTypesVector,
                                                                outputTypesVector, outputNamesVector, enableProfiling,
-                                                               enableFp16TurboMode, subgraphId, runtime);
+                                                               enableFp16TurboMode, thresholdTime, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
@@ -450,7 +482,7 @@ int RunTest(const std::string& format,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          outputTypesVector, outputNamesVector, enableProfiling,
-                                                         enableFp16TurboMode, subgraphId, runtime);
+                                                         enableFp16TurboMode, thresholdTime, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
     return EXIT_FAILURE;
@@ -463,7 +495,7 @@ int RunTest(const std::string& format,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          outputTypesVector, outputNamesVector, enableProfiling,
-                                                         enableFp16TurboMode, subgraphId, runtime);
+                                                         enableFp16TurboMode, thresholdTime, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
@@ -482,7 +514,8 @@ int RunTest(const std::string& format,
                                                                  inputNamesVector, inputTensorShapes,
                                                                  inputTensorDataFilePathsVector, inputTypesVector,
                                                                  outputTypesVector, outputNamesVector, enableProfiling,
-                                                                 enableFp16TurboMode, subgraphId, runtime);
+                                                                 enableFp16TurboMode, thresholdTime, subgraphId,
+                                                                 runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
             "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
@@ -498,7 +531,7 @@ int RunTest(const std::string& format,
 }
 
 int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IRuntime>& runtime,
-               const bool enableProfiling, const bool enableFp16TurboMode)
+               const bool enableProfiling, const bool enableFp16TurboMode, const double& thresholdTime)
 {
     std::string modelFormat;
     std::string modelPath;
@@ -593,10 +626,12 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
         return EXIT_FAILURE;
     }
 
-    return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames, inputTensorDataFilePaths,
-                   inputTypes, outputTypes, outputNames, enableProfiling, enableFp16TurboMode, subgraphId);
+    return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames,
+                   inputTensorDataFilePaths, inputTypes, outputTypes, outputNames,
+                   enableProfiling, enableFp16TurboMode, thresholdTime, subgraphId);
 }
 
+// MAIN
 int main(int argc, const char* argv[])
 {
     // Configures logging for both the ARMNN library and this test program.
@@ -618,6 +653,8 @@ int main(int argc, const char* argv[])
     std::string outputNames;
     std::string inputTypes;
     std::string outputTypes;
+
+    double thresholdTime = 0.0;
 
     size_t subgraphId = 0;
 
@@ -664,7 +701,11 @@ int main(int argc, const char* argv[])
             ("event-based-profiling,e", po::bool_switch()->default_value(false),
              "Enables built in profiler. If unset, defaults to off.")
             ("fp16-turbo-mode,h", po::bool_switch()->default_value(false), "If this option is enabled, FP32 layers, "
-             "weights and biases will be converted to FP16 where the backend supports it");
+             "weights and biases will be converted to FP16 where the backend supports it")
+            ("threshold-time,r", po::value<double>(&thresholdTime)->default_value(0.0),
+             "Threshold time is the maximum allowed time for inference measured in milliseconds. If the actual "
+             "inference time is greater than the threshold time, the test will fail. By default, no threshold "
+             "time is used.");
     }
     catch (const std::exception& e)
     {
@@ -745,7 +786,7 @@ int main(int argc, const char* argv[])
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
                 results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime),
-                                             enableProfiling, enableFp16TurboMode));
+                                             enableProfiling, enableFp16TurboMode, thresholdTime));
             }
 
             // Check results
@@ -763,7 +804,7 @@ int main(int argc, const char* argv[])
             for (auto&  testCase : testCases)
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
-                if (RunCsvTest(testCase, runtime, enableProfiling, enableFp16TurboMode) != EXIT_SUCCESS)
+                if (RunCsvTest(testCase, runtime, enableProfiling, enableFp16TurboMode, thresholdTime) != EXIT_SUCCESS)
                 {
                     return EXIT_FAILURE;
                 }
@@ -804,7 +845,8 @@ int main(int argc, const char* argv[])
             return EXIT_FAILURE;
         }
 
-        return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames, inputTensorDataFilePaths,
-                       inputTypes, outputTypes, outputNames,  enableProfiling, enableFp16TurboMode, subgraphId);
+        return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames,
+                       inputTensorDataFilePaths, inputTypes, outputTypes, outputNames,
+                       enableProfiling, enableFp16TurboMode, thresholdTime, subgraphId);
     }
 }

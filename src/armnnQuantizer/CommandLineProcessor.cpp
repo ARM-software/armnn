@@ -42,17 +42,17 @@ bool ValidateOutputDirectory(std::string& dir)
     return true;
 }
 
-bool ValidateInputFile(const std::string& inputFileName)
+bool ValidateProvidedFile(const std::string& inputFileName)
 {
     if (!boost::filesystem::exists(inputFileName))
     {
-        std::cerr << "Input file [" << inputFileName << "] does not exist" << std::endl;
+        std::cerr << "Provided file [" << inputFileName << "] does not exist" << std::endl;
         return false;
     }
 
     if (boost::filesystem::is_directory(inputFileName))
     {
-        std::cerr << "Given input file [" << inputFileName << "] is a directory" << std::endl;
+        std::cerr << "Given file [" << inputFileName << "] is a directory" << std::endl;
         return false;
     }
 
@@ -70,6 +70,8 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
                 ("help,h", "Display help messages")
                 ("infile,f", po::value<std::string>(&m_InputFileName)->required(),
                              "Input file containing float 32 ArmNN Input Graph")
+                ("csvfile,c", po::value<std::string>(&m_CsvFileName)->default_value(""),
+                             "CSV file containing paths for RAW input tensors")
                 ("outdir,d", po::value<std::string>(&m_OutputDirectory)->required(),
                              "Directory that output file will be written to")
                 ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(), "Output file name");
@@ -101,9 +103,22 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
         return false;
     }
 
-    if (!armnnQuantizer::ValidateInputFile(m_InputFileName))
+    if (!armnnQuantizer::ValidateProvidedFile(m_InputFileName))
     {
         return false;
+    }
+
+    if (m_CsvFileName != "")
+    {
+        if (!armnnQuantizer::ValidateProvidedFile(m_CsvFileName))
+        {
+            return false;
+        }
+        else
+        {
+            boost::filesystem::path csvFilePath(m_CsvFileName);
+            m_CsvFileDirectory = csvFilePath.parent_path().c_str();
+        }
     }
 
     if (!armnnQuantizer::ValidateOutputDirectory(m_OutputDirectory))

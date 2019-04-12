@@ -8,8 +8,9 @@
 #include <armnn/INetworkQuantizer.hpp>
 #include <armnnSerializer/ISerializer.hpp>
 
-#include <iostream>
+#include <algorithm>
 #include <fstream>
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
@@ -32,8 +33,36 @@ int main(int argc, char* argv[])
     }
     inputFileStream.close();
     armnn::INetworkPtr network = parser->CreateNetworkFromBinary(binaryContent);
-    armnn::INetworkPtr quantizedNetwork = armnn::INetworkQuantizer::Create(network.get())->ExportNetwork();
+    armnn::INetworkQuantizerPtr quantizer = armnn::INetworkQuantizer::Create(network.get());
 
+    std::string csvFileName = cmdline.GetCsvFileName();
+    if (csvFileName != "")
+    {
+        // Call the Quantizer::Refine() function which will update the min/max ranges for the quantize constants
+        std::ifstream csvFileStream(csvFileName);
+        std::string line;
+        std::string csvDirectory = cmdline.GetCsvFileDirectory();
+        while(getline(csvFileStream, line))
+        {
+            std::istringstream s(line);
+            std::vector<std::string> row;
+            std::string entry;
+            while(getline(s, entry, ','))
+            {
+                entry.erase(std::remove(entry.begin(), entry.end(), ' '), entry.end());
+                entry.erase(std::remove(entry.begin(), entry.end(), '"'), entry.end());
+                row.push_back(entry);
+            }
+            std::string rawFileName = cmdline.GetCsvFileDirectory() + "/" + row[2];
+            // passId: row[0]
+            // bindingId: row[1]
+            // rawFileName: file contains the RAW input tensor data
+            // LATER: Quantizer::Refine() function will be called with those arguments when it is implemented
+        }
+        csvFileStream.close();
+    }
+
+    armnn::INetworkPtr quantizedNetwork = quantizer->ExportNetwork();
     armnnSerializer::ISerializerPtr serializer = armnnSerializer::ISerializer::Create();
     serializer->Serialize(*quantizedNetwork);
 

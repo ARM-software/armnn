@@ -12,6 +12,7 @@ namespace armnnQuantizer
 
 // parses the command line to extract
 // * the input file -f containing the serialized fp32 ArmNN input graph (must exist...and be a input graph file)
+// * the csv file -c <optional> detailing the paths for RAW input tensors to use for refinement
 // * the directory -d to place the output file into (must already exist and be writable)
 // * the name of the file -o the quantized ArmNN input graph will be written to (must not already exist)
 // * LATER: the min and max overrides to be applied to the inputs
@@ -25,10 +26,14 @@ public:
     bool ProcessCommandLine(int argc, char* argv[]);
 
     std::string GetInputFileName() {return m_InputFileName;}
+    std::string GetCsvFileName() {return m_CsvFileName;}
+    std::string GetCsvFileDirectory() {return m_CsvFileDirectory;}
     std::string GetOutputDirectoryName() {return m_OutputDirectory;}
     std::string GetOutputFileName() {return m_OutputFileName;}
 private:
     std::string m_InputFileName;
+    std::string m_CsvFileName;
+    std::string m_CsvFileDirectory;
     std::string m_OutputDirectory;
     std::string m_OutputFileName;
 };

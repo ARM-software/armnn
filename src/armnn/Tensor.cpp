@@ -188,6 +188,20 @@ unsigned int TensorInfo::GetNumBytes() const
     return GetDataTypeSize(m_DataType) * GetNumElements();
 }
 
+bool TensorInfo::IsTypeSpaceMatch(const TensorInfo& other) const
+{
+    bool match = true;
+
+    match &= m_DataType == other.m_DataType;
+
+    if (IsQuantized())
+    {
+        match &= GetQuantizationScale() == other.GetQuantizationScale() &&
+                 GetQuantizationOffset() == other.GetQuantizationOffset();
+    }
+    return match;
+}
+
 // ---
 // --- BaseTensor
 // ---

@@ -9,7 +9,8 @@
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>
-#
+#include <arm_compute/runtime/NEON/functions/NEConcatenateLayer.h>
+
 #include <memory>
 
 namespace armnn
@@ -27,9 +28,7 @@ public:
     void Execute() const override;
 
 private:
-    std::unique_ptr<arm_compute::IFunction> m_Layer;
-    bool m_Execute;
-
+    std::unique_ptr<arm_compute::NEConcatenateLayer> m_Layer;
 };
 
 } //namespace armnn

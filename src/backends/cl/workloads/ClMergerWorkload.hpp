@@ -24,8 +24,7 @@ public:
     void Execute() const override;
 
 private:
-    mutable arm_compute::CLConcatenateLayer m_Layer;
-    bool m_Execute;
+    mutable std::unique_ptr<arm_compute::CLConcatenateLayer> m_Layer;
 };
 
 } //namespace armnn

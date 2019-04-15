@@ -113,6 +113,12 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
         coords.set(i, boost::numeric_cast<int>(subTensorOrigin[revertedIndex]));
     }
 
+    const arm_compute::TensorShape parentShape = armcomputetensorutils::BuildArmComputeTensorShape(parent.GetShape());
+    if (!::arm_compute::error_on_invalid_subtensor(__func__, __FILE__, __LINE__, parentShape, coords, shape))
+    {
+        return nullptr;
+    }
+
     return std::make_unique<ClSubTensorHandle>(
         boost::polymorphic_downcast<IClTensorHandle*>(&parent), shape, coords);
 }

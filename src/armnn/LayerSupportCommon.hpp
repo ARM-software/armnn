@@ -12,6 +12,15 @@
 namespace armnn
 {
 
+template<typename T, typename V>
+void SetValueChecked(Optional<T&> optionalRef, V&& val)
+{
+    if (optionalRef)
+    {
+        optionalRef.value() = val;
+    }
+}
+
 template<typename Float16Func, typename Float32Func, typename Uint8Func, typename Int32Func, typename BooleanFunc,
          typename ... Params>
 bool IsSupportedForDataTypeGeneric(Optional<std::string&> reasonIfUnsupported,
@@ -55,80 +64,56 @@ bool FalseFunc(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 template<typename ... Params>
 bool FalseFuncF16(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
-    if (reasonIfUnsupported)
-    {
-        reasonIfUnsupported.value() = "Layer is not supported with float16 data type";
-    }
+    SetValueChecked(reasonIfUnsupported, "Layer is not supported with float16 data type");
     return false;
 }
 
 template<typename ... Params>
 bool FalseFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
-    if (reasonIfUnsupported)
-    {
-        reasonIfUnsupported.value() = "Layer is not supported with float32 data type";
-    }
+    SetValueChecked(reasonIfUnsupported, "Layer is not supported with float32 data type");
     return false;
 }
 
 template<typename ... Params>
 bool FalseFuncU8(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
-    if (reasonIfUnsupported)
-    {
-        reasonIfUnsupported.value() = "Layer is not supported with 8-bit data type";
-    }
+    SetValueChecked(reasonIfUnsupported, "Layer is not supported with 8-bit data type");
     return false;
 }
 
 template<typename ... Params>
 bool FalseFuncI32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
-    if (reasonIfUnsupported)
-    {
-        reasonIfUnsupported.value() = "Layer is not supported with int32 data type";
-    }
+    SetValueChecked(reasonIfUnsupported, "Layer is not supported with int32 data type");
     return false;
 }
 
 template<typename ... Params>
 bool FalseInputFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
-    if (reasonIfUnsupported)
-    {
-        reasonIfUnsupported.value() = "Layer is not supported with float32 data type input";
-    }
+    SetValueChecked(reasonIfUnsupported, "Layer is not supported with float32 data type input");
     return false;
 }
 
 template<typename ... Params>
 bool FalseInputFuncF16(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
-    if (reasonIfUnsupported)
-    {
-        reasonIfUnsupported.value() = "Layer is not supported with float16 data type input";
-    }
+    SetValueChecked(reasonIfUnsupported, "Layer is not supported with float16 data type input");
     return false;
 }
 
 template<typename ... Params>
 bool FalseOutputFuncF32(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
-    if (reasonIfUnsupported)
-    {
-        reasonIfUnsupported.value() = "Layer is not supported with float32 data type output";
-    }
+    SetValueChecked(reasonIfUnsupported, "Layer is not supported with float32 data type output");
     return false;
 }
 
 template<typename ... Params>
 bool FalseOutputFuncF16(Optional<std::string&> reasonIfUnsupported, Params&&... params)
 {
-    if (reasonIfUnsupported)
-    {
-        reasonIfUnsupported.value() = "Layer is not supported with float16 data type output";
-    }
+    SetValueChecked(reasonIfUnsupported, "Layer is not supported with float16 data type output");
     return false;
 }
 

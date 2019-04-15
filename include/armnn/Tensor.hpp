@@ -80,7 +80,11 @@ public:
     int32_t GetQuantizationOffset() const           { return m_Quantization.m_Offset; }
     void SetQuantizationScale(float scale)          { m_Quantization.m_Scale = scale; }
     void SetQuantizationOffset(int32_t offset)      { m_Quantization.m_Offset = offset; }
-    bool IsQuantized() const                        { return m_DataType == DataType::QuantisedAsymm8; }
+    bool IsQuantized() const                        { return m_DataType == DataType::QuantisedAsymm8 ||
+                                                             m_DataType == DataType::QuantisedSymm16; }
+
+    /// Check that the types are the same and, if quantize, that the quantization parameters are the same.
+    bool IsTypeSpaceMatch(const TensorInfo& other) const;
 
     unsigned int GetNumBytes() const;
 

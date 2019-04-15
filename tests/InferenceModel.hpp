@@ -393,6 +393,7 @@ public:
         std::vector<std::string> m_ComputeDevices;
         bool m_VisualizePostOptimizationModel;
         bool m_EnableFp16TurboMode;
+        std::string m_Labels;
 
         std::vector<armnn::BackendId> GetComputeDevicesAsBackendIds()
         {
@@ -417,6 +418,9 @@ public:
             ("compute,c", po::value<std::vector<std::string>>(&options.m_ComputeDevices)->
                 default_value(defaultComputes, boost::algorithm::join(defaultComputes, ", "))->
                 multitoken(), backendsMessage.c_str())
+            ("labels,l", po::value<std::string>(&options.m_Labels),
+                "Text file containing one image filename - correct label pair per line, "
+                "used to test the accuracy of the network.")
             ("visualize-optimized-model,v",
                 po::value<bool>(&options.m_VisualizePostOptimizationModel)->default_value(false),
              "Produce a dot file useful for visualizing the graph post optimization."

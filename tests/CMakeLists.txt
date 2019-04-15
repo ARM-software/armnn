@@ -201,6 +201,12 @@ if (BUILD_TF_LITE_PARSER)
         ImagePreprocessor.cpp)
     TfLiteParserTest(TfLiteResNetV2-Armnn "${TfLiteResNetV2-Armnn_sources}")
 
+    set(TfLiteResNetV2-50-Quantized-Armnn_sources
+            TfLiteResNetV2-50-Quantized-Armnn/TfLiteResNetV2-50-Quantized-Armnn.cpp
+            ImagePreprocessor.hpp
+            ImagePreprocessor.cpp)
+    TfLiteParserTest(TfLiteResNetV2-50-Quantized-Armnn "${TfLiteResNetV2-50-Quantized-Armnn_sources}")
+
     set(TfLiteMnasNet-Armnn_sources
         TfLiteMnasNet-Armnn/TfLiteMnasNet-Armnn.cpp
         ImagePreprocessor.hpp

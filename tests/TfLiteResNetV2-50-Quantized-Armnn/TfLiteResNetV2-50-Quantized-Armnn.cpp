@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
         };
 
-        armnn::TensorShape inputTensorShape({ 1, 299, 299, 3  });
+        armnn::TensorShape inputTensorShape({ 1, 224, 224, 3  });
 
         using DataType = uint8_t;
         using DatabaseType = ImagePreprocessor<DataType>;
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
         retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType,
                                                           ParserType>(
                      argc, argv,
-                     "quant_resnet_v2_50_model.tflite",          // model name
+                     "resnet_v2_50_default_minmax.tflite",       // model name
                      true,                                       // model is binary
                      "input",                                    // input tensor name
                      "output",                                   // output tensor name
@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
                          auto inputBinding = model.GetInputBindingInfo();
                          return DatabaseType(
                              dataDir,
-                             299,
-                             299,
+                             224,
+                             224,
                              imageSet,
                              inputBinding.second.GetQuantizationScale(),
                              inputBinding.second.GetQuantizationOffset());

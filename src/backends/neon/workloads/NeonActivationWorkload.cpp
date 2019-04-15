@@ -22,13 +22,6 @@ arm_compute::Status NeonActivationWorkloadValidate(const TensorInfo& input,
     const arm_compute::ActivationLayerInfo activationLayerInfo =
         ConvertActivationDescriptorToAclActivationLayerInfo(descriptor);
 
-    if (input.GetDataType() == DataType::QuantisedAsymm8 &&
-        activationLayerInfo.activation() == arm_compute::ActivationLayerInfo::ActivationFunction::LOGISTIC)
-    {
-        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                   "Neon: Logistic Activations unsupported with QAsymm8 data type."};
-    }
-
     return arm_compute::NEActivationLayer::validate(&aclInput,
                                                     &aclOutput,
                                                     activationLayerInfo);

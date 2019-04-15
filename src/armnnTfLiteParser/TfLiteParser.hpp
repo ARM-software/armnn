@@ -91,6 +91,7 @@ private:
 
     void ParseUnsupportedOperator(size_t subgraphIndex, size_t operatorIndex);
     void ParseActivation(size_t subgraphIndex, size_t operatorIndex, armnn::ActivationFunction activationType);
+    void ParseAdd(size_t subgraphIndex, size_t operatorIndex);
     void ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
@@ -101,23 +102,23 @@ private:
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
     void ParseMaxPool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseMaximum(size_t subgraphIndex, size_t operatorIndex);
+    void ParseMean(size_t subgraphIndex, size_t operatorIndex);
     void ParseMinimum(size_t subgraphIndex, size_t operatorIndex);
+    void ParseMul(size_t subgraphIndex, size_t operatorIndex);
+    void ParsePad(size_t subgraphIndex, size_t operatorIndex);
+    void ParsePool(size_t subgraphIndex, size_t operatorIndex, armnn::PoolingAlgorithm algorithm);
     void ParseRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);
     void ParseReshape(size_t subgraphIndex, size_t operatorIndex);
     void ParseResizeBilinear(size_t subgraphIndex, size_t operatorIndex);
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSplit(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
     void ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSub(size_t subgraphIndex, size_t operatorIndex);
-    void ParseAdd(size_t subgraphIndex, size_t operatorIndex);
-    void ParseMul(size_t subgraphIndex, size_t operatorIndex);
-    void ParseMean(size_t subgraphIndex, size_t operatorIndex);
-    void ParsePad(size_t subgraphIndex, size_t operatorIndex);
-    void ParsePool(size_t subgraphIndex, size_t operatorIndex, armnn::PoolingAlgorithm algorithm);
-    void ParseSplit(size_t subgraphIndex, size_t operatorIndex);
     void ParseTanH(size_t subgraphIndex, size_t operatorIndex);
+    void ParseUnpack(size_t subgraphIndex, size_t operatorIndex);
 
     void RegisterProducerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IOutputSlot* slot);
     void RegisterConsumerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IInputSlot* slot);

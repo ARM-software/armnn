@@ -70,20 +70,22 @@ auto ParseDataArray(std::istream& stream,
                     const float& quantizationScale,
                     const int32_t& quantizationOffset);
 
+// NOTE: declaring the template specialisations inline to prevent them
+//       being flagged as unused functions when -Werror=unused-function is in effect
 template<>
-auto ParseDataArray<armnn::DataType::Float32>(std::istream & stream)
+inline auto ParseDataArray<armnn::DataType::Float32>(std::istream & stream)
 {
     return ParseArrayImpl<float>(stream, [](const std::string& s) { return std::stof(s); });
 }
 
 template<>
-auto ParseDataArray<armnn::DataType::Signed32>(std::istream & stream)
+inline auto ParseDataArray<armnn::DataType::Signed32>(std::istream & stream)
 {
     return ParseArrayImpl<int>(stream, [](const std::string & s) { return std::stoi(s); });
 }
 
 template<>
-auto ParseDataArray<armnn::DataType::QuantisedAsymm8>(std::istream& stream,
+inline auto ParseDataArray<armnn::DataType::QuantisedAsymm8>(std::istream& stream,
                                                       const float& quantizationScale,
                                                       const int32_t& quantizationOffset)
 {

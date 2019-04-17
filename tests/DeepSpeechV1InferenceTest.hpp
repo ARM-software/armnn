@@ -124,7 +124,7 @@ public:
         Model::AddCommandLineOptions(options, m_ModelCommandLineOptions);
     }
 
-    virtual bool ProcessCommandLineOptions() override
+    virtual bool ProcessCommandLineOptions(const InferenceTestOptions &commonOptions) override
     {
         if (!ValidateDirectory(m_InputSeqDir))
         {
@@ -156,7 +156,7 @@ public:
             return false;
         }
 
-        m_Model = m_ConstructModel(m_ModelCommandLineOptions);
+        m_Model = m_ConstructModel(commonOptions, m_ModelCommandLineOptions);
         if (!m_Model)
         {
             return false;
@@ -185,7 +185,8 @@ public:
 
 private:
     typename Model::CommandLineOptions m_ModelCommandLineOptions;
-    std::function<std::unique_ptr<Model>(typename Model::CommandLineOptions)> m_ConstructModel;
+    std::function<std::unique_ptr<Model>(const InferenceTestOptions&,
+                                         typename Model::CommandLineOptions)> m_ConstructModel;
     std::unique_ptr<Model> m_Model;
 
     std::string m_InputSeqDir;

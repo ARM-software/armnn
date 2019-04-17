@@ -411,7 +411,7 @@ struct PreCompiledQueueDescriptor : QueueDescriptorWithParameters<PreCompiledDes
     {
     }
 
-    std::shared_ptr<void> m_PreCompiledObject;
+    void* m_PreCompiledObject;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

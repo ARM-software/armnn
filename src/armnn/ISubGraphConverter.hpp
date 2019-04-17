@@ -6,17 +6,21 @@
 #pragma once
 
 #include <memory>
+#include <vector>
+#include <functional>
 
 namespace armnn
 {
 
+using CompiledBlobDeleter = std::function<void(const void*)>;
+using CompiledBlobPtr = std::unique_ptr<void, CompiledBlobDeleter>;
+
 class ISubGraphConverter
 {
 public:
-    virtual ~ISubGraphConverter() {};
+    virtual ~ISubGraphConverter() {}
 
-    virtual std::shared_ptr<void> GetOutput() = 0;
+    virtual std::vector<CompiledBlobPtr> GetOutput() = 0;
 };
 
-}
-
+} // namespace armnn

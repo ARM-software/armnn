@@ -11,9 +11,13 @@
 #include <armnn/Descriptors.hpp>
 
 #include <memory>
+#include <functional>
 
 namespace armnn
 {
+
+using PreCompiledObjectDeleter = std::function<void(const void*)>;
+using PreCompiledObjectPtr = std::unique_ptr<void, PreCompiledObjectDeleter>;
 
 class PreCompiledLayer : public LayerWithParameters<PreCompiledDescriptor>
 {
@@ -28,9 +32,7 @@ public:
 
     void ValidateTensorShapesFromInputs() override;
 
-    std::shared_ptr<void> GetPreCompiledObject() const;
-
-    void SetPreCompiledObject(const std::shared_ptr<void>& preCompiledObject);
+    void SetPreCompiledObject(PreCompiledObjectPtr preCompiledObject);
 
     void Accept(ILayerVisitor& visitor) const override;
 
@@ -38,7 +40,7 @@ private:
     PreCompiledLayer(const PreCompiledLayer& other) = delete;
     PreCompiledLayer& operator=(const PreCompiledLayer& other) = delete;
 
-    std::shared_ptr<void> m_PreCompiledObject;
+    PreCompiledObjectPtr m_PreCompiledObject;
 };
 
 } // namespace armnn

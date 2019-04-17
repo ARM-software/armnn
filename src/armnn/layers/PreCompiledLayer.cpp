@@ -16,7 +16,6 @@ namespace armnn
 
 PreCompiledLayer::PreCompiledLayer(const PreCompiledDescriptor& param, const char* name)
     : LayerWithParameters(param.m_NumInputSlots, param.m_NumOutputSlots, LayerType::PreCompiled, param, name)
-    , m_PreCompiledObject(nullptr)
 {}
 
 PreCompiledLayer::~PreCompiledLayer()
@@ -25,7 +24,7 @@ PreCompiledLayer::~PreCompiledLayer()
 PreCompiledLayer* PreCompiledLayer::Clone(Graph& graph) const
 {
     PreCompiledLayer* clone = CloneBase<PreCompiledLayer>(graph, m_Param, GetName());
-    clone->m_PreCompiledObject = this->m_PreCompiledObject;
+    clone->m_PreCompiledObject.reset(const_cast<PreCompiledLayer*>(this)->m_PreCompiledObject.release());
     return clone;
 }
 
@@ -33,7 +32,7 @@ std::unique_ptr<IWorkload> PreCompiledLayer::CreateWorkload(const armnn::Graph& 
                                                             const armnn::IWorkloadFactory& factory) const
 {
     PreCompiledQueueDescriptor descriptor;
-    descriptor.m_PreCompiledObject = m_PreCompiledObject;
+    descriptor.m_PreCompiledObject = m_PreCompiledObject.get();
     return factory.CreatePreCompiled(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
@@ -43,14 +42,9 @@ void PreCompiledLayer::ValidateTensorShapesFromInputs()
     // we do not need to validate its input shapes
 }
 
-std::shared_ptr<void> PreCompiledLayer::GetPreCompiledObject() const
+void PreCompiledLayer::SetPreCompiledObject(PreCompiledObjectPtr preCompiledObject)
 {
-    return m_PreCompiledObject;
-}
-
-void PreCompiledLayer::SetPreCompiledObject(const std::shared_ptr<void>& preCompiledObject)
-{
-    m_PreCompiledObject = preCompiledObject;
+    m_PreCompiledObject = std::move(preCompiledObject);
 }
 
 void PreCompiledLayer::Accept(ILayerVisitor& visitor) const

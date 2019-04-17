@@ -365,9 +365,15 @@ armnn::TensorInfo ToTensorInfo(TfLiteParser::TensorRawPtr tensorPtr, const std::
         }
     }
 
+    std::vector<unsigned int> safeShape = shapes;
+    if (safeShape.size() == 0)
+    {
+        safeShape.push_back(1);
+    }
+
     // two statements (on purpose) for easier debugging:
-    armnn::TensorInfo result(static_cast<unsigned int>(shapes.size()),
-                             shapes.data(),
+    armnn::TensorInfo result(static_cast<unsigned int>(safeShape.size()),
+                             safeShape.data(),
                              type,
                              quantizationScale,
                              quantizationOffset);

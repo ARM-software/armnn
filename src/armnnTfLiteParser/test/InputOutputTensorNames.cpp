@@ -60,9 +60,19 @@ struct InvalidTensorsFixture : public ParserFlatbuffersFixture
                 "version": 3,
                 "operator_codes": [ ],
                 "subgraphs": [{
-                    "tensors": [ {}, {}, {}, {} ],
-                    "inputs" : [ 0, 1 ],
-                    "outputs" : [ 2, 3 ],
+                    "tensors": [ {
+                        "shape": [ 1, 1, 1, 1, 1 ],
+                        "type": "FLOAT32",
+                        "name": "In",
+                        "buffer": 0
+                    }, {
+                        "shape": [ 1, 1, 1, 1, 1 ],
+                        "type": "FLOAT32",
+                        "name": "Out",
+                        "buffer": 1
+                    }],
+                    "inputs" : [ 0 ],
+                    "outputs" : [ 1 ],
                 }]
             })";
     }
@@ -70,7 +80,7 @@ struct InvalidTensorsFixture : public ParserFlatbuffersFixture
 
 BOOST_FIXTURE_TEST_CASE(InvalidTensorsThrowException, InvalidTensorsFixture)
 {
-    // this throws because it cannot do the input output tensor connections
+    // Tensor numDimensions must be less than or equal to MaxNumOfTensorDimensions
     BOOST_CHECK_THROW(Setup(), armnn::InvalidArgumentException);
 }
 
@@ -133,6 +143,55 @@ BOOST_FIXTURE_TEST_CASE(ThrowIfSubgraphIdInvalidForInOutNames, ValidTensorsFixtu
     // these throw because of the invalid subgraph id
     BOOST_CHECK_THROW(m_Parser->GetSubgraphInputTensorNames(1), armnn::ParseException);
     BOOST_CHECK_THROW(m_Parser->GetSubgraphOutputTensorNames(1), armnn::ParseException);
+}
+
+struct Rank0TensorFixture : public ParserFlatbuffersFixture
+{
+    explicit Rank0TensorFixture()
+    {
+        m_JsonString = R"(
+            {
+                "version": 3,
+                "operator_codes": [ { "builtin_code": "MINIMUM" } ],
+                "subgraphs": [{
+                    "tensors": [ {
+                        "shape": [  ],
+                        "type": "FLOAT32",
+                        "name": "In0",
+                        "buffer": 0,
+                    }, {
+                        "shape": [  ],
+                        "type": "FLOAT32",
+                        "name": "In1",
+                        "buffer": 1,
+                    }, {
+                        "shape": [ ],
+                        "type": "FLOAT32",
+                        "name": "Out",
+                        "buffer": 2,
+                    }],
+                    "inputs" : [ 0, 1 ],
+                    "outputs" : [ 2 ],
+                    "operators": [{
+                        "opcode_index": 0,
+                        "inputs": [ 0, 1 ],
+                        "outputs": [ 2 ],
+                        "custom_options_format": "FLEXBUFFERS"
+                    }]
+                }]
+            }
+        )";
+    }
+};
+
+BOOST_FIXTURE_TEST_CASE(Rank0Tensor, Rank0TensorFixture)
+{
+    Setup();
+    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphInputTensorNames(0).size(), 2u);
+    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphOutputTensorNames(0).size(), 1u);
+    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphInputTensorNames(0)[0], "In0");
+    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphInputTensorNames(0)[1], "In1");
+    BOOST_CHECK_EQUAL(m_Parser->GetSubgraphOutputTensorNames(0)[0], "Out");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

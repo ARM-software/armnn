@@ -173,4 +173,81 @@ BOOST_FIXTURE_TEST_CASE(ParseMinimumBroadcast1D4D, MinimumBroadcastFixture1D4D)
                           5.0f, 6.0f, 7.0f }}});
 }
 
+struct MinimumBroadcastFixture2D0D : public ParserFlatbuffersFixture
+{
+    explicit MinimumBroadcastFixture2D0D()
+    {
+        m_JsonString = R"(
+            {
+                "version": 3,
+                "operator_codes": [ { "builtin_code": "MINIMUM" } ],
+                "subgraphs": [ {
+                    "tensors": [
+                        {
+                            "shape": [ 1, 2 ],
+                            "type": "FLOAT32",
+                            "buffer": 0,
+                            "name": "input0",
+                            "quantization": {
+                                "min": [ 0.0 ],
+                                "max": [ 255.0 ],
+                                "scale": [ 1.0 ],
+                                "zero_point": [ 0 ],
+                            }
+                        },
+                        {
+                            "shape": [ ],
+                            "type": "FLOAT32",
+                            "buffer": 2,
+                            "name": "input1",
+                            "quantization": {
+                                "min": [ 0.0 ],
+                                "max": [ 255.0 ],
+                                "scale": [ 1.0 ],
+                                "zero_point": [ 0 ],
+                            }
+                        },
+                        {
+                            "shape": [ 1, 2 ] ,
+                            "type": "FLOAT32",
+                            "buffer": 1,
+                            "name": "output",
+                            "quantization": {
+                                "min": [ 0.0 ],
+                                "max": [ 255.0 ],
+                                "scale": [ 1.0 ],
+                                "zero_point": [ 0 ],
+                            }
+                        }
+                    ],
+                    "inputs": [ 0 ],
+                    "outputs": [ 2 ],
+                    "operators": [
+                        {
+                            "opcode_index": 0,
+                            "inputs": [ 0, 1 ],
+                            "outputs": [ 2 ],
+                            "custom_options_format": "FLEXBUFFERS"
+                        }
+                    ],
+                } ],
+                "buffers" : [
+                    { },
+                    { },
+                    { "data": [ 0, 0, 0, 64 ] }
+                ]
+            }
+        )";
+        Setup();
+    }
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseMinimumBroadcast2D0D, MinimumBroadcastFixture2D0D)
+{
+    RunTest<2, armnn::DataType::Float32>(
+            0,
+            {{"input0", { 1.0f, 5.0f }}},
+            {{"output", { 1.0f, 2.0f }}});
+}
+
 BOOST_AUTO_TEST_SUITE_END()

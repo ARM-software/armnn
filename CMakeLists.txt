@@ -342,17 +342,18 @@ list(APPEND armnn_sources
     src/armnn/Utils.cpp
     src/armnn/WallClockTimer.cpp
     src/armnn/WallClockTimer.hpp
+    src/armnn/optimizations/AddDebug.hpp
     src/armnn/optimizations/All.hpp
     src/armnn/optimizations/ConvertConstants.hpp
+    src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
+    src/armnn/optimizations/FoldPadIntoConvolution2d.hpp
     src/armnn/optimizations/MovePermuteUp.hpp
     src/armnn/optimizations/Optimization.hpp
     src/armnn/optimizations/OptimizeConsecutiveReshapes.hpp
+    src/armnn/optimizations/OptimizeInverseConversions.hpp
     src/armnn/optimizations/OptimizeInversePermutes.hpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
-    src/armnn/optimizations/OptimizeInverseConversions.hpp
-    src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
-    src/armnn/optimizations/AddDebug.hpp
     third-party/half/half.hpp
     )
 

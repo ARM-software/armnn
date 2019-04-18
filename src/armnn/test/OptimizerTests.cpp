@@ -1085,4 +1085,93 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessValidateTensorShapes)
     BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
 }
 
+BOOST_AUTO_TEST_CASE(FoldPadLayerIntoConvolution2dLayer)
+{
+    Graph graph;
+    const unsigned int inputShape[] = { 1, 2, 2, 3 };
+    const unsigned int paddedShape[] = { 1, 6, 6, 3 };
+    const unsigned int weightsShape[] = { 1, 2, 3, 3 };
+    const unsigned int outputShape[] = { 1, 2, 1, 1 };
+
+
+    armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    armnn::TensorInfo paddedInfo(4, paddedShape, DataType::Float32);
+    armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    PadDescriptor padDescriptor({{ 0, 0 }, { 2, 2 }, { 2, 2 }, { 0, 0 }});
+
+    PadLayer* padLayer = graph.AddLayer<PadLayer>(padDescriptor, "pad");
+    padLayer->GetOutputSlot().SetTensorInfo(paddedInfo);
+
+    Convolution2dDescriptor convolution2dDescriptor;
+    convolution2dDescriptor.m_BiasEnabled = false;
+    convolution2dDescriptor.m_StrideX = 1;
+    convolution2dDescriptor.m_StrideY = 1;
+    convolution2dDescriptor.m_DataLayout = DataLayout::NHWC;
+
+    std::vector<float> weightsVector(18);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32), weightsVector);
+
+    Convolution2dLayer* conv2dLayer = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor,"conv2d");
+    conv2dLayer->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(weights);
+    conv2dLayer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connect up layers - input -> pad -> conv2d -> output
+    input->GetOutputSlot().Connect(padLayer->GetInputSlot(0));
+    padLayer->GetOutputSlot().Connect(conv2dLayer->GetInputSlot(0));
+    conv2dLayer->GetOutputSlot().Connect(output->GetInputSlot(0));
+
+    auto checkSimpleConv2d = [ ](const armnn::Layer* const layer) -> bool
+    {
+        const auto conv2dLayer = static_cast<const armnn::Convolution2dLayer*>(layer);
+        const auto conv2dLayerParams = conv2dLayer->GetParameters();
+        return IsLayerOfType<armnn::Convolution2dLayer>(layer) &&
+            (layer->GetNameStr() == "conv2d") &&
+            (conv2dLayerParams.m_PadLeft == 0) &&
+            (conv2dLayerParams.m_PadRight == 0) &&
+            (conv2dLayerParams.m_PadTop == 0) &&
+            (conv2dLayerParams.m_PadBottom == 0) &&
+            (conv2dLayerParams.m_BiasEnabled == false) &&
+            (conv2dLayerParams.m_StrideX == 1) &&
+            (conv2dLayerParams.m_StrideY == 1) &&
+            (conv2dLayerParams.m_DataLayout == DataLayout::NHWC);
+    };
+
+    BOOST_TEST(CheckSequence(graph.cbegin(),
+        graph.cend(),
+        &IsLayerOfType<armnn::InputLayer>,
+        &IsLayerOfType<armnn::PadLayer>,
+        checkSimpleConv2d,
+        &IsLayerOfType<armnn::OutputLayer>));
+
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FoldPadIntoConvolution2d()));
+
+    auto checkPadFoldedIntoConv2d = [ ](const armnn::Layer* const layer) -> bool
+    {
+        const auto conv2dLayer = static_cast<const armnn::Convolution2dLayer*>(layer);
+        const auto conv2dLayerParams = conv2dLayer->GetParameters();
+        return IsLayerOfType<armnn::Convolution2dLayer>(layer) &&
+               (layer->GetNameStr() == "folded-pad-into-conv2d") &&
+               (conv2dLayerParams.m_PadLeft == 2) &&
+               (conv2dLayerParams.m_PadRight == 2) &&
+               (conv2dLayerParams.m_PadTop == 2) &&
+               (conv2dLayerParams.m_PadBottom == 2) &&
+               (conv2dLayerParams.m_BiasEnabled == false) &&
+               (conv2dLayerParams.m_StrideX == 1) &&
+               (conv2dLayerParams.m_StrideY == 1) &&
+               (conv2dLayerParams.m_DataLayout == DataLayout::NHWC);
+    };
+
+    BOOST_TEST(CheckSequence(graph.cbegin(),
+        graph.cend(),
+        &IsLayerOfType<armnn::InputLayer>,
+        checkPadFoldedIntoConv2d,
+        &IsLayerOfType<armnn::OutputLayer>));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

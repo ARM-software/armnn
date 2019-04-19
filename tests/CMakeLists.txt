@@ -284,3 +284,35 @@ if (BUILD_ARMNN_SERIALIZER OR BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_
         ${Boost_PROGRAM_OPTIONS_LIBRARY})
     addDllCopyCommands(ExecuteNetwork)
 endif()
+
+if(BUILD_ARMNN_QUANTIZER)
+    macro(ImageTensorExecutor executorName)
+        target_link_libraries(${executorName} ${CMAKE_THREAD_LIBS_INIT})
+        if(OPENCL_LIBRARIES)
+            target_link_libraries(${executorName} ${OPENCL_LIBRARIES})
+        endif()
+        target_link_libraries(${executorName}
+                ${Boost_SYSTEM_LIBRARY}
+                ${Boost_FILESYSTEM_LIBRARY}
+                ${Boost_PROGRAM_OPTIONS_LIBRARY})
+        addDllCopyCommands(${executorName})
+    endmacro()
+
+    set(ImageTensorGenerator_sources
+            InferenceTestImage.hpp
+            InferenceTestImage.cpp
+            ImageTensorGenerator/ImageTensorGenerator.cpp)
+
+    add_executable_ex(ImageTensorGenerator ${ImageTensorGenerator_sources})
+    target_include_directories(ImageTensorGenerator PRIVATE ../src/armnn)
+    target_include_directories(ImageTensorGenerator PRIVATE ../src/armnnUtils)
+
+    target_link_libraries(ImageTensorGenerator armnn)
+    ImageTensorExecutor(ImageTensorGenerator)
+
+    set(ImageCSVFileGenerator_sources
+            ImageCSVFileGenerator/ImageCSVFileGenerator.cpp)
+
+    add_executable_ex(ImageCSVFileGenerator ${ImageCSVFileGenerator_sources})
+    ImageTensorExecutor(ImageCSVFileGenerator)
+endif()

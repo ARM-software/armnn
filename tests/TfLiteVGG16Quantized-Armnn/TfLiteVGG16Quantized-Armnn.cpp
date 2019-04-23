@@ -34,10 +34,10 @@ int main(int argc, char* argv[])
         retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType,
                                                           ParserType>(
                      argc, argv,
-                     "vgg_16_u8_batch1.tflite", // model name
+                     "vgg_16_int8.tflite",      // model name
                      true,                      // model is binary
-                     "content_vgg/concat",      // input tensor name
-                     "content_vgg/prob",        // output tensor name
+                     "input",                   // input tensor name
+                     "vgg_16/fc8/squeezed",     // output tensor name
                      { 0, 1, 2 },               // test images to test with as above
                      [&imageSet](const char* dataDir, const ModelType & model) {
                          // we need to get the input quantization parameters from

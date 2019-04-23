@@ -95,17 +95,17 @@ BOOST_FIXTURE_TEST_CASE(ParseReshapeWithReshapeDims, ReshapeFixtureWithReshapeDi
 
 struct ReshapeFixtureWithReshapeDimsFlatten : ReshapeFixture
 {
-    ReshapeFixtureWithReshapeDimsFlatten() : ReshapeFixture("[ 3, 3 ]", "[ 1, 9 ]", "[ -1 ]") {}
+    ReshapeFixtureWithReshapeDimsFlatten() : ReshapeFixture("[ 3, 3 ]", "[ 9 ]", "[ -1 ]") {}
 };
 
 BOOST_FIXTURE_TEST_CASE(ParseReshapeWithReshapeDimsFlatten, ReshapeFixtureWithReshapeDimsFlatten)
 {
     SetupSingleInputSingleOutput("inputTensor", "outputTensor");
-    RunTest<2, armnn::DataType::QuantisedAsymm8>(0,
+    RunTest<1, armnn::DataType::QuantisedAsymm8>(0,
                                                  { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                                                  { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
     BOOST_TEST((m_Parser->GetNetworkOutputBindingInfo(0, "outputTensor").second.GetShape()
-                == armnn::TensorShape({1,9})));
+                == armnn::TensorShape({9})));
 }
 
 struct ReshapeFixtureWithReshapeDimsFlattenTwoDims : ReshapeFixture

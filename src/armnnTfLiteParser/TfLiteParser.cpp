@@ -1888,6 +1888,19 @@ void TfLiteParser::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
     CHECK_VALID_SIZE(inputs.size(), 1);
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+
+    if (unpackAxis >= inputTensorInfo.GetNumDimensions())
+    {
+        throw ParseException(
+                boost::str(
+                        boost::format(
+                                "The unpack axis: %1% cannot be greater than or equal to "
+                                "the number of input dimension %2% %3%")
+                        % unpackAxis
+                        % inputTensorInfo.GetNumDimensions()
+                        % CHECK_LOCATION().AsString()));
+    }
+
     unsigned int unpackNum = CHECKED_NON_NEGATIVE(options->num);
     // If num is not defined, automatically infer from the length of the dimension axis.
     if(unpackNum == 0)
@@ -1935,20 +1948,46 @@ void TfLiteParser::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = boost::str(boost::format("Unpack:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
 
+    TensorShape splitOutShape = TensorShape(static_cast<unsigned int>(unpackDimSizes.size()),
+                                            unpackDimSizes.data());
+
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
-    TensorShape outShape = TensorShape(static_cast<unsigned int>(unpackDimSizes.size()),
-        unpackDimSizes.data());
+    // Reshape to remove unpacked dimension
+    unsigned int reshapedNumDimensions = inputDimSize - 1;
+    std::vector<unsigned int> reshapedDimensions(reshapedNumDimensions);
 
-    for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
+    unsigned int reshapeIndex = 0;
+    for (unsigned int i = 0; i < inputDimSize; ++i)
     {
-        layer->GetOutputSlot(k).SetTensorInfo(armnn::TensorInfo(outShape,
-            inputTensorInfo.GetDataType()));
+        if (i == unpackAxis)
+        {
+            continue;
+        }
+        reshapedDimensions[reshapeIndex++] = unpackDimSizes[i];
     }
 
-    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
+    // Create reshape to remove the unpacked dimension for unpack operator of each output from Splitter.
+    for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
+    {
+        armnn::TensorInfo reshapedTensorInfo = inputTensorInfo;
+        reshapedTensorInfo.SetShape(armnn::TensorShape{ reshapedNumDimensions, reshapedDimensions.data() });
+
+        std::string reshapeLayerName = boost::str(boost::format("Reshape_for:%1%") % layer->GetName());
+        armnn::ReshapeDescriptor desc;
+        desc.m_TargetShape = reshapedTensorInfo.GetShape();
+        armnn::IConnectableLayer* reshapeLayer = m_Network->AddReshapeLayer(desc, layerName.c_str());
+
+        layer->GetOutputSlot(k).SetTensorInfo(armnn::TensorInfo(splitOutShape, inputTensorInfo.GetDataType()));
+        layer->GetOutputSlot(k).Connect(reshapeLayer->GetInputSlot(0));
+
+        reshapeLayer->GetOutputSlot(0).SetTensorInfo(reshapedTensorInfo);
+
+        uint32_t reshapedOutputId = CHECKED_NON_NEGATIVE(operatorPtr->outputs[k]);
+        armnn::IOutputSlot* slot = &(reshapeLayer->GetOutputSlot(0));
+        RegisterProducerOfTensor(subgraphIndex, reshapedOutputId, slot);
+    }
 }
 
 void TfLiteParser::ParseSplit(size_t subgraphIndex, size_t operatorIndex)

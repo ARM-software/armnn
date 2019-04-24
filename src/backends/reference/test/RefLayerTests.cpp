@@ -167,9 +167,10 @@ ARMNN_AUTO_TEST_CASE(L2Pooling2dSize7Uint8, L2Pooling2dSize7Uint8Test)
 ARMNN_AUTO_TEST_CASE(AsymmNonSquarePooling2d, AsymmetricNonSquarePooling2dTest)
 ARMNN_AUTO_TEST_CASE(AsymmNonSquarePooling2dUint8, AsymmetricNonSquarePooling2dUint8Test)
 
-// Activation
+// Linear Activation
 ARMNN_AUTO_TEST_CASE(ConstantLinearActivation, ConstantLinearActivationTest)
 ARMNN_AUTO_TEST_CASE(ConstantLinearActivationUint8, ConstantLinearActivationUint8Test)
+ARMNN_AUTO_TEST_CASE(ConstantLinearActivationInt16, ConstantLinearActivationInt16Test)
 
 // Normalization
 ARMNN_AUTO_TEST_CASE(SimpleNormalizationAcross, SimpleNormalizationAcrossTest)
@@ -188,14 +189,39 @@ ARMNN_AUTO_TEST_CASE(Simple3dSoftmaxUint8, Simple3dSoftmaxUint8Test, 1.0f)
 ARMNN_AUTO_TEST_CASE(Simple4dSoftmax, Simple4dSoftmaxTest, 1.0f)
 ARMNN_AUTO_TEST_CASE(Simple4dSoftmaxUint8, Simple4dSoftmaxUint8Test, 1.0f)
 
-// Sigmoid
+// Sigmoid Activation
 ARMNN_AUTO_TEST_CASE(SimpleSigmoid, SimpleSigmoidTest)
 ARMNN_AUTO_TEST_CASE(SimpleSigmoidUint8, SimpleSigmoidUint8Test)
+ARMNN_AUTO_TEST_CASE(SimpleSigmoidInt16, SimpleSigmoidInt16Test)
 
+// BoundedReLU Activation
 ARMNN_AUTO_TEST_CASE(ReLu1, BoundedReLuUpperAndLowerBoundTest)
 ARMNN_AUTO_TEST_CASE(ReLu6, BoundedReLuUpperBoundOnlyTest)
 ARMNN_AUTO_TEST_CASE(ReLu1Uint8, BoundedReLuUint8UpperAndLowerBoundTest)
 ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
+ARMNN_AUTO_TEST_CASE(BoundedReLuInt16, BoundedReLuInt16Test)
+
+// ReLU Activation
+ARMNN_AUTO_TEST_CASE(ReLuInt16, ReLuInt16Test)
+
+// SoftReLU Activation
+ARMNN_AUTO_TEST_CASE(SoftReLuInt16, SoftReLuInt16Test)
+
+// LeakyReLU Activation
+ARMNN_AUTO_TEST_CASE(LeakyReLuInt16, LeakyReLuInt16Test)
+
+// Abs Activation
+ARMNN_AUTO_TEST_CASE(AbsInt16, AbsInt16Test)
+
+// Sqrt Activation
+ARMNN_AUTO_TEST_CASE(SqrtInt16, SqrtInt16Test)
+
+// Square Activation
+ARMNN_AUTO_TEST_CASE(SquareInt16, SquareInt16Test)
+
+// Tanh Activation
+ARMNN_AUTO_TEST_CASE(TanhInt16, TanhInt16Test)
+
 
 // Fully Conected
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)

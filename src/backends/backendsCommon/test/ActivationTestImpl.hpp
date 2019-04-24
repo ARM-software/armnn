@@ -377,6 +377,14 @@ LayerTestResult<uint8_t, 4> ConstantLinearActivationUint8Test(
         workloadFactory, memoryManager, 4.0f, 3);
 }
 
+LayerTestResult<int16_t, 4> ConstantLinearActivationInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return ConstantLinearActivationTestCommon<armnn::DataType::QuantisedSymm16>(
+            workloadFactory, memoryManager, 0.1f, 0);
+}
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleActivationTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -492,6 +500,342 @@ LayerTestResult<uint8_t, 4> SimpleSigmoidUint8Test(
     return SimpleSigmoidTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.1f, 50);
 }
 
+LayerTestResult<int16_t, 4> SimpleSigmoidInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SimpleSigmoidTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> ReLuTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            -0.1f, -0.2f, -0.3f, -0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            -1.0f, -2.0f, -3.0f, -4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+    // Calculate output values for input.
+    auto f = [](float value)
+    {
+        return std::fmax(0.0f, value);
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::ReLu,
+                                           0.f,
+                                           0.f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           outputExpectedData);
+}
+
+LayerTestResult<int16_t, 4> ReLuInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return ReLuTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> BoundedReLuTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            -0.1f, -0.2f, -0.3f, -0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            -1.0f, -2.0f, -3.0f, -4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+    const float a = 1.0f;
+    const float b = -1.0f;
+    // Calculate output values for input.
+    auto f = [a, b](float value)
+    {
+        return std::min(a, std::max(b, value));
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::BoundedReLu,
+                                           a,
+                                           b,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           outputExpectedData);
+}
+
+LayerTestResult<int16_t, 4> BoundedReLuInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return ReLuTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> SoftReLuTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            -0.1f, -0.2f, -0.3f, -0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            -1.0f, -2.0f, -3.0f, -4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+    // Calculate output values for input.
+    auto f = [](float value)
+    {
+        return std::log(1.0f + std::exp(value));
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::SoftReLu,
+                                           0.f,
+                                           0.f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           outputExpectedData);
+}
+
+LayerTestResult<int16_t, 4> SoftReLuInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SoftReLuTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> LeakyReLuTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            -0.1f, -0.2f, -0.3f, -0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            -1.0f, -2.0f, -3.0f, -4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+    const float a = 0.01f;
+    // Calculate output values for input.
+    auto f = [a](float value)
+    {
+        return value > 0.0f ? value : (value * a);
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::LeakyReLu,
+                                           a,
+                                           0.f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           outputExpectedData);
+}
+
+LayerTestResult<int16_t, 4> LeakyReLuInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return LeakyReLuTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> AbsTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            -0.1f, -0.2f, -0.3f, -0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            -1.0f, -2.0f, -3.0f, -4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+    // Calculate output values for input.
+    auto f = [](float value)
+    {
+        return std::abs(value);
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::Abs,
+                                           0.f,
+                                           0.f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           outputExpectedData);
+}
+
+LayerTestResult<int16_t, 4> AbsInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return AbsTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> SqrtTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            0.1f,  0.2f,  0.3f,  0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            1.0f,  2.0f,  3.0f,  4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+    // Calculate output values for input.
+    auto f = [](float value)
+    {
+        return std::sqrt(value);
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::Sqrt,
+                                           0.f,
+                                           0.f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           outputExpectedData);
+}
+
+LayerTestResult<int16_t, 4> SqrtInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SqrtTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> SquareTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            -0.1f, -0.2f, -0.3f, -0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            -1.0f, -2.0f, -3.0f, -4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+    // Calculate output values for input.
+    auto f = [](float value)
+    {
+        return std::pow(value,2);
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::Square,
+                                           0.f,
+                                           0.f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           outputExpectedData);
+}
+
+LayerTestResult<int16_t, 4> SquareInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SquareTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> TanhTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData = {
+            -0.1f, -0.2f, -0.3f, -0.4f,
+            0.1f,  0.2f,  0.3f,  0.4f,
+            -1.0f, -2.0f, -3.0f, -4.0f,
+            1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+    const float a = 2.0f;
+    const float b = 3.0f;
+    // Calculate output values for input.
+    auto f = [a, b](float value)
+    {
+        return a * tanhf(b * value);
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           armnn::ActivationFunction::TanH,
+                                           a,
+                                           b,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           outputExpectedData);
+}
+
+LayerTestResult<int16_t, 4> TanhInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return TanhTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T,4> CompareActivationTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
@@ -605,4 +949,14 @@ LayerTestResult<uint8_t,4> CompareActivationUint8Test(
 {
     return CompareActivationTestImpl<armnn::DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, refWorkloadFactory, f, 5, 0.1f, 50);
+}
+
+LayerTestResult<int16_t,4> CompareActivationInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::IWorkloadFactory& refWorkloadFactory,
+        armnn::ActivationFunction f)
+{
+    return CompareActivationTestImpl<armnn::DataType::QuantisedSymm16>(
+            workloadFactory, memoryManager, refWorkloadFactory, f, 5, 0.1f, 0);
 }

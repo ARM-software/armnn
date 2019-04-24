@@ -151,4 +151,24 @@ BOOST_FIXTURE_TEST_CASE(ParseFullyConnectedWithBias, FullyConnectedWithBiasFixtu
         { (400+10)/2 });
 }
 
+struct FullyConnectedWithBiasMultipleOutputsFixture : FullyConnectedFixture
+{
+    FullyConnectedWithBiasMultipleOutputsFixture()
+            : FullyConnectedFixture("[ 1, 4, 2, 1 ]",     // inputShape
+                                    "[ 2, 1 ]",           // outputShape
+                                    "[ 1, 4 ]",           // filterShape
+                                    "[ 2, 3, 4, 5 ]",     // filterData
+                                    "[ 1 ]",              // biasShape
+                                    "[ 10, 0, 0, 0 ]" )   // biasData
+    {}
+};
+
+BOOST_FIXTURE_TEST_CASE(FullyConnectedWithBiasMultipleOutputs, FullyConnectedWithBiasMultipleOutputsFixture)
+{
+    RunTest<2, armnn::DataType::QuantisedAsymm8>(
+            0,
+            { 1, 2, 3, 4, 10, 20, 30, 40 },
+            { (40+10)/2, (400+10)/2 });
+}
+
 BOOST_AUTO_TEST_SUITE_END()

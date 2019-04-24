@@ -1780,17 +1780,57 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
     }
     BOOST_ASSERT(layer != nullptr);
 
+    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+
+    if (inputTensorInfo.GetNumDimensions() > 2)
+    {
+        // Add reshape to flatten to 2D [batch_size, input_size],
+        // where "input_size" corresponds to the number of inputs to the layer,
+        // matching the second dimension of weights,
+        // and "batch_size" is calculated by dividing the number of elements by "input_size".
+        std::vector<unsigned int> reshapedDimensions(2);
+        reshapedDimensions[1] = filterTensorInfo.GetShape()[1];
+        reshapedDimensions[0] = inputTensorInfo.GetNumElements() / reshapedDimensions[1];
+
+        if (inputTensorInfo.GetNumElements() % reshapedDimensions[1] != 0)
+        {
+            throw ParseException(
+                    boost::str(
+                            boost::format(
+                                    "Failed to deduce input tensor shape from filter size %1%")
+                            % reshapedDimensions[1]
+                            % CHECK_LOCATION().AsString()));
+        }
+
+        armnn::TensorInfo reshapedTensorInfo = ToTensorInfo(inputs[0]);
+        reshapedTensorInfo.SetShape(armnn::TensorShape{ 2, reshapedDimensions.data() });
+
+        std::string reshapeLayerName = boost::str(boost::format("Reshape_for:%1%") % layer->GetName());
+        armnn::ReshapeDescriptor desc;
+        desc.m_TargetShape = reshapedTensorInfo.GetShape();
+        armnn::IConnectableLayer* reshapeLayer = m_Network->AddReshapeLayer(desc, layerName.c_str());
+
+        reshapeLayer->GetOutputSlot(0).SetTensorInfo(reshapedTensorInfo);
+        reshapeLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
+
+        RegisterInputSlots(subgraphIndex, operatorIndex, reshapeLayer, {inputTensorIndexes[0]});
+    }
+    else
+    {
+        // register the input connection slot for the layer
+        // only the tensors for the inputs are relevant, exclude the const tensors
+        RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+    }
+
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    // register the input connection slot for the layer
-    // only the tensors for the inputs are relevant, exclude the const tensors
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
     // we need to add the activation layer and fortunately we don't need to care about the data layout
     armnn::IConnectableLayer* fusedActivationLayer = AddFusedActivationLayer(layer, 0,
                                                                              options->fused_activation_function);
+
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, fusedActivationLayer, {outputTensorIndexes[0]});

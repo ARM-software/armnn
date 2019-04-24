@@ -34,10 +34,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Pad.hpp
     Pooling2d.cpp
     Pooling2d.hpp
-    RefActivationFloat32Workload.cpp
-    RefActivationFloat32Workload.hpp
-    RefActivationUint8Workload.cpp
-    RefActivationUint8Workload.hpp
+    RefActivationWorkload.cpp
+    RefActivationWorkload.hpp
     RefBatchNormalizationFloat32Workload.cpp
     RefBatchNormalizationFloat32Workload.hpp
     RefBatchNormalizationUint8Workload.cpp

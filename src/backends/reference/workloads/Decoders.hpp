@@ -11,10 +11,10 @@ namespace armnn
 {
 
 template<typename T>
-std::unique_ptr<Decoder<T>> MakeDecoder(const TensorInfo& info, const void* data);
+inline std::unique_ptr<Decoder<T>> MakeDecoder(const TensorInfo& info, const void* data);
 
 template<>
-std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const void* data)
+inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const void* data)
 {
     switch(info.GetDataType())
     {

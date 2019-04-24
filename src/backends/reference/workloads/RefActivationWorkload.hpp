@@ -11,10 +11,10 @@
 namespace armnn
 {
 
-class RefActivationUint8Workload : public Uint8Workload<ActivationQueueDescriptor>
+class RefActivationWorkload : public BaseWorkload<ActivationQueueDescriptor>
 {
 public:
-    using Uint8Workload<ActivationQueueDescriptor>::Uint8Workload;
+    using BaseWorkload<ActivationQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

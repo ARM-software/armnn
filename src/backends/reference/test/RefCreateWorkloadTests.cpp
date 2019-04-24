@@ -55,12 +55,12 @@ static void RefCreateActivationWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateActivationFloat32Workload)
 {
-    RefCreateActivationWorkloadTest<RefActivationFloat32Workload, armnn::DataType::Float32>();
+    RefCreateActivationWorkloadTest<RefActivationWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateActivationUint8Workload)
 {
-    RefCreateActivationWorkloadTest<RefActivationUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    RefCreateActivationWorkloadTest<RefActivationWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
 template <typename WorkloadType,
@@ -527,13 +527,13 @@ static void RefCreateSingleOutputMultipleInputsTest()
 
 BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputsFloat32)
 {
-    RefCreateSingleOutputMultipleInputsTest<RefSplitterFloat32Workload, RefActivationFloat32Workload,
+    RefCreateSingleOutputMultipleInputsTest<RefSplitterFloat32Workload, RefActivationWorkload,
         armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputsUint8)
 {
-    RefCreateSingleOutputMultipleInputsTest<RefSplitterUint8Workload, RefActivationUint8Workload,
+    RefCreateSingleOutputMultipleInputsTest<RefSplitterUint8Workload, RefActivationWorkload,
         armnn::DataType::QuantisedAsymm8>();
 }
 

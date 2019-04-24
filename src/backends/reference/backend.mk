@@ -24,8 +24,7 @@ BACKEND_SOURCES := \
         workloads/Merger.cpp \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
-        workloads/RefActivationFloat32Workload.cpp \
-        workloads/RefActivationUint8Workload.cpp \
+        workloads/RefActivationWorkload.cpp \
         workloads/RefBatchNormalizationFloat32Workload.cpp \
         workloads/RefBatchNormalizationUint8Workload.cpp \
         workloads/RefBatchToSpaceNdFloat32Workload.cpp \

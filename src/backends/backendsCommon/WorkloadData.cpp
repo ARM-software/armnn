@@ -297,6 +297,20 @@ void ActivationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                               "ActivationQueueDescriptor",
                               "input",
                               "output");
+
+    std::vector<DataType> supportedTypes = {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QuantisedAsymm8
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "ActivationQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "ActivationQueueDescriptor");
 }
 
 //---------------------------------------------------------------

@@ -11,10 +11,10 @@ namespace armnn
 {
 
 template<typename T>
-std::unique_ptr<Encoder<T>> MakeEncoder(const TensorInfo& info, void* data);
+inline std::unique_ptr<Encoder<T>> MakeEncoder(const TensorInfo& info, void* data);
 
 template<>
-std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void* data)
+inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void* data)
 {
     switch(info.GetDataType())
     {
@@ -46,7 +46,7 @@ std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void* data)
 }
 
 template<>
-std::unique_ptr<Encoder<bool>> MakeEncoder(const TensorInfo& info, void* data)
+inline std::unique_ptr<Encoder<bool>> MakeEncoder(const TensorInfo& info, void* data)
 {
     switch(info.GetDataType())
     {

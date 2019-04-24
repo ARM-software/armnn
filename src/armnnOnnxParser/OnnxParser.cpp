@@ -419,20 +419,27 @@ std::pair<ConstTensor, std::unique_ptr<float[]>> OnnxParser::CreateConstTensor(c
     onnx::TensorProto onnxTensor = *m_TensorsInfo[name].m_tensor;
 
     auto srcData = onnxTensor.float_data().data();
-    if(tensorInfo.GetNumElements() != static_cast<uint>(onnxTensor.float_data_size()))
+    std::unique_ptr<float[]> tensorData(new float[tensorInfo.GetNumElements()]);
+    const size_t tensorSizeInBytes = tensorInfo.GetNumBytes();
+    // Copy the value list entries into the destination
+    if (!onnxTensor.has_raw_data())
     {
-        throw ParseException(boost::str(
-            boost::format("The number of data provided (%1%) does not match the tensor '%2%' number of elements"
+        if(tensorInfo.GetNumElements() != static_cast<uint>(onnxTensor.float_data_size()))
+        {
+            throw ParseException(boost::str(
+                boost::format("The number of data provided (%1%) does not match the tensor '%2%' number of elements"
                           " (%3%) %4%")
                           % onnxTensor.float_data_size()
                           % name
                           % tensorInfo.GetNumElements()
                           % CHECK_LOCATION().AsString()));
+        }
+        ::memcpy(tensorData.get(), srcData, tensorSizeInBytes);
     }
-    std::unique_ptr<float[]> tensorData(new float[tensorInfo.GetNumElements()]);
-
-    // Copy the value list entries into the destination
-    ::memcpy(tensorData.get(),srcData, tensorInfo.GetNumBytes());
+    else
+    {
+        ::memcpy(tensorData.get(), onnxTensor.raw_data().c_str(), tensorSizeInBytes);
+    }
 
     // Const tensors requires at least a list of values
     if (tensorInfo.GetNumElements() == 0)

@@ -280,6 +280,21 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
 
     m_Runtime->EnqueueWorkload(m_NetworkIdentifier, inputTensors, outputTensors);
 
+    // Check that output tensors have correct number of dimensions (NumOutputDimensions specified in test)
+    // after running the workload
+    for (auto&& it : expectedOutputData)
+    {
+        armnn::LayerBindingId outputBindingId = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first).first;
+        auto outputNumDimensions = m_Runtime->GetOutputTensorInfo(
+            m_NetworkIdentifier, outputBindingId).GetNumDimensions();
+
+        BOOST_CHECK_MESSAGE((outputNumDimensions == NumOutputDimensions),
+            boost::str(boost::format("Number of dimensions expected %1%, but got %2% for output layer %3%")
+                                     % NumOutputDimensions
+                                     % outputNumDimensions
+                                     % it.first));
+    }
+
     // Compare each output tensor to the expected values
     for (auto&& it : expectedOutputData)
     {

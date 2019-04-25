@@ -114,8 +114,8 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
     bool noErrors = true;
     unsigned int numOutputs = layer->GetNumOutputSlots();
     for (unsigned int i = 0; i < numOutputs; i++) {
-        const OutputSlot &outputSlot = layer->GetOutputSlot(i);
-        const TensorInfo &info = outputSlot.GetTensorInfo();
+        OutputSlot& outputSlot = layer->GetOutputSlot(i);
+        TensorInfo info = outputSlot.GetTensorInfo();
         if (DataType::QuantisedAsymm8 == info.GetDataType()) {
             if (0.f == info.GetQuantizationScale()) {
                 noErrors = false;
@@ -124,6 +124,20 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
                    << " (" << layer->GetNameStr() << ") is of type"
                    << " Quantized 8 bit but its scale parameter has not been set";
                 ReportError(ss.str(), errMessages);
+            }
+            // Softmax under QuantisedAsymm8 must always be scale (1.0f/256.0f) and offset 0
+            if ((info.GetQuantizationScale() != (1.0f / 256.0f) ||
+                 info.GetQuantizationOffset() != 0) &&
+                 layer->GetType() == armnn::LayerType::Softmax)
+            {
+                std::stringstream ss;
+                ss << "Quantization parameters for Softmax layer (Scale: " <<
+                info.GetQuantizationScale() << " and Offset: " << info.GetQuantizationOffset() <<
+                ") are incorrect and have been updated to Scale: 0.00390625 and Offset: 0";
+                BOOST_LOG_TRIVIAL(warning) << ss.str();
+                info.SetQuantizationScale((1.0f /256.0f));
+                info.SetQuantizationOffset(0);
+                outputSlot.SetTensorInfo(info);
             }
         }
     }

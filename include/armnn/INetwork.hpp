@@ -219,6 +219,8 @@ public:
         const char* name = nullptr) = 0;
 
     /// Adds a softmax layer to the network.
+    /// If the data type is QAsymm8, then the output quantization parameters
+    /// must have a scale of 1/256 and an offset of 0
     /// @param softmaxDescriptor - SoftmaxDescriptor to configure the softmax.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.

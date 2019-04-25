@@ -115,10 +115,17 @@ public:
         UpdateTunedParameters
     };
 
+    enum class TuningLevel
+    {
+        Rapid = 0,
+        Normal = 1,
+        Exhaustive = 2
+    };
+
     /// Creates an IClTunedParameters with the given mode.
     /// @{
-    static IGpuAccTunedParameters* CreateRaw(Mode mode);
-    static IGpuAccTunedParametersPtr Create(Mode mode);
+    static IGpuAccTunedParameters* CreateRaw(Mode mode, TuningLevel tunerMode);
+    static IGpuAccTunedParametersPtr Create(Mode mode, TuningLevel tunerMode);
     /// @}
     static void Destroy(IGpuAccTunedParameters* params);
 

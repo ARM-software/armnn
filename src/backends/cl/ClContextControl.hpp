@@ -45,12 +45,13 @@ private:
 class ClTunedParameters : public IGpuAccTunedParameters
 {
 public:
-    ClTunedParameters(armnn::IGpuAccTunedParameters::Mode mode);
+    ClTunedParameters(armnn::IGpuAccTunedParameters::Mode mode, armnn::IGpuAccTunedParameters::TuningLevel tuningLevel);
 
     virtual void Load(const char* filename);
     virtual void Save(const char* filename) const;
 
     Mode m_Mode;
+    TuningLevel m_TuningLevel;
 
     arm_compute::CLTuner m_Tuner;
 };

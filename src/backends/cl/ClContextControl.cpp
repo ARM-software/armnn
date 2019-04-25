@@ -162,6 +162,27 @@ void ClContextControl::DoLoadOpenClRuntime(bool useTunedParameters)
     if (useTunedParameters && m_clTunedParameters)
     {
         tuner = &m_clTunedParameters->m_Tuner;
+        auto clTuner = boost::polymorphic_downcast<arm_compute::CLTuner*>(tuner);
+
+        auto ConvertTuningLevel = [](IGpuAccTunedParameters::TuningLevel level)
+        {
+            switch(level)
+            {
+                case IGpuAccTunedParameters::TuningLevel::Rapid:
+                    return arm_compute::CLTunerMode::RAPID;
+                case IGpuAccTunedParameters::TuningLevel::Normal:
+                    return arm_compute::CLTunerMode::NORMAL;
+                case IGpuAccTunedParameters::TuningLevel::Exhaustive:
+                    return arm_compute::CLTunerMode::EXHAUSTIVE;
+                default:
+                {
+                    BOOST_ASSERT_MSG(false, "Tuning level not recognised.");
+                    return arm_compute::CLTunerMode::NORMAL;
+                }
+            }
+        };
+
+        clTuner->set_tuner_mode(ConvertTuningLevel(m_clTunedParameters->m_TuningLevel));
     }
     arm_compute::CLScheduler::get().init(context, commandQueue, device, tuner);
 }
@@ -171,14 +192,16 @@ void ClContextControl::ClearClCache()
     DoLoadOpenClRuntime(true);
 }
 
-armnn::IGpuAccTunedParameters* IGpuAccTunedParameters::CreateRaw(armnn::IGpuAccTunedParameters::Mode mode)
+armnn::IGpuAccTunedParameters* IGpuAccTunedParameters::CreateRaw(armnn::IGpuAccTunedParameters::Mode mode,
+                                                                 armnn::IGpuAccTunedParameters::TuningLevel tuningLevel)
 {
-    return new ClTunedParameters(mode);
+    return new ClTunedParameters(mode, tuningLevel);
 }
 
-armnn::IGpuAccTunedParametersPtr IGpuAccTunedParameters::Create(armnn::IGpuAccTunedParameters::Mode mode)
+armnn::IGpuAccTunedParametersPtr IGpuAccTunedParameters::Create(armnn::IGpuAccTunedParameters::Mode mode,
+                                                                armnn::IGpuAccTunedParameters::TuningLevel tuningLevel)
 {
-    return IGpuAccTunedParametersPtr(CreateRaw(mode), &IGpuAccTunedParameters::Destroy);
+    return IGpuAccTunedParametersPtr(CreateRaw(mode, tuningLevel), &IGpuAccTunedParameters::Destroy);
 }
 
 void IGpuAccTunedParameters::Destroy(IGpuAccTunedParameters* params)
@@ -186,8 +209,10 @@ void IGpuAccTunedParameters::Destroy(IGpuAccTunedParameters* params)
     delete params;
 }
 
-ClTunedParameters::ClTunedParameters(armnn::IGpuAccTunedParameters::Mode mode)
+ClTunedParameters::ClTunedParameters(armnn::IGpuAccTunedParameters::Mode mode,
+                                     armnn::IGpuAccTunedParameters::TuningLevel tuningLevel)
     : m_Mode(mode)
+    , m_TuningLevel(ClTunedParameters::TuningLevel::Rapid)
     , m_Tuner(mode == ClTunedParameters::Mode::UpdateTunedParameters)
 {
 }

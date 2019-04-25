@@ -2,8 +2,6 @@
 
 This reference guide provides a list of TensorFlow Lite operators the Arm NN SDK currently supports.
 
-The Arm NN SDK TensorFlow Lite parser currently only supports uint8.
-
 ## Fully supported
 
 The Arm NN SDK TensorFlow Lite parser currently supports the following operators:

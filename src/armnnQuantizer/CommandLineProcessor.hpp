@@ -6,6 +6,8 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
+#include "QuantizationDataSet.hpp"
 
 namespace armnnQuantizer
 {
@@ -31,13 +33,17 @@ public:
     std::string GetOutputDirectoryName() {return m_OutputDirectory;}
     std::string GetOutputFileName() {return m_OutputFileName;}
     std::string GetQuantizationScheme() {return m_QuantizationScheme;}
-private:
+    QuantizationDataSet GetQuantizationDataSet() {return m_QuantizationDataSet;}
+    bool HasQuantizationData() {return !m_QuantizationDataSet.IsEmpty();}
+
+protected:
     std::string m_InputFileName;
     std::string m_CsvFileName;
     std::string m_CsvFileDirectory;
     std::string m_OutputDirectory;
     std::string m_OutputFileName;
     std::string m_QuantizationScheme;
+    QuantizationDataSet m_QuantizationDataSet;
 };
 
 } // namespace armnnQuantizer

@@ -21,6 +21,7 @@ public:
     : m_InputNetwork(inputNetwork), m_Options(options) {}
 
     void OverrideInputRange(LayerBindingId layerId, float min, float max) override;
+    void Refine(const InputTensors& inputTensors) override;
     INetworkPtr ExportNetwork() override;
 
 private:

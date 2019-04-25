@@ -7,6 +7,7 @@
 
 #include <armnn/INetwork.hpp>
 #include <armnn/Types.hpp>
+#include <armnn/Tensor.hpp>
 
 namespace armnn
 {
@@ -36,6 +37,9 @@ public:
 
     /// Overrides the default quantization values for the input layer with the given id
     virtual void OverrideInputRange(LayerBindingId layerId, float min, float max) = 0;
+
+    /// Refine input network with a set of refinement data for specified LayerBindingId
+    virtual void Refine(const InputTensors& inputTensors) = 0;
 
     /// Extract final quantized network
     virtual INetworkPtr ExportNetwork() = 0;

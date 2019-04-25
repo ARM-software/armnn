@@ -138,12 +138,37 @@ if(BUILD_ARMNN_QUANTIZER)
         message(ERROR, "In order to build the ArmNN Quantization Tool you must set BUILD_ARMNN_SERIALIZER = YES")
     endif()
 
-    add_executable_ex(ArmnnQuantizer
+    set(armnn_quantizer_sources)
+    list(APPEND armnn_quantizer_sources
+        src/armnnQuantizer/QuantizationDataSet.hpp
+        src/armnnQuantizer/QuantizationDataSet.cpp
+        src/armnnQuantizer/QuantizationInput.hpp
+        src/armnnQuantizer/QuantizationInput.cpp
         src/armnnQuantizer/CommandLineProcessor.hpp
         src/armnnQuantizer/CommandLineProcessor.cpp
+        )
+
+    add_library_ex(armnnQuantizer SHARED ${armnn_quantizer_sources})
+
+    target_include_directories(armnnQuantizer PRIVATE include/armnnDeserializer)
+    target_include_directories(armnnQuantizer PRIVATE src/armnnUtils)
+    target_include_directories(armnnQuantizer PRIVATE src/armnn)
+
+    include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
+    set_target_properties(armnnQuantizer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
+    target_link_libraries(armnnQuantizer
+            ${Boost_SYSTEM_LIBRARY}
+            ${Boost_PROGRAM_OPTIONS_LIBRARY}
+            ${Boost_FILESYSTEM_LIBRARY}
+            ${Boost_LOG_LIBRARY}
+            ${Boost_THREAD_LIBRARY} )
+
+    add_executable_ex(ArmnnQuantizer
         src/armnnQuantizer/ArmNNQuantizerMain.cpp)
 
     target_include_directories(ArmnnQuantizer PRIVATE include/armnnDeserializer)
+    target_include_directories(ArmnnQuantizer PRIVATE src/armnn)
 
     target_link_libraries(ArmnnQuantizer
             ${Boost_SYSTEM_LIBRARY}
@@ -153,8 +178,10 @@ if(BUILD_ARMNN_QUANTIZER)
             ${Boost_THREAD_LIBRARY} )
 
     target_link_libraries(ArmnnQuantizer
+            armnnQuantizer
             armnnSerializer
             armnn
+            armnnUtils
             ${FLATBUFFERS_LIBRARY})
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
@@ -554,6 +581,12 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
+    if(BUILD_ARMNN_QUANTIZER)
+        list(APPEND unittest_sources
+             src/armnnQuantizer/test/QuantizationDataSetTests.cpp
+             )
+    endif()
+
     if(BUILD_ARMNN_SERIALIZER)
         enable_language(ASM)
         list(APPEND unittest_sources
@@ -650,6 +683,12 @@ if(BUILD_UNIT_TESTS)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnSerializer)
+    endif()
+
+    if(BUILD_ARMNN_QUANTIZER)
+        target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnQuantizer)
+        target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
+        target_link_libraries(UnitTests armnnQuantizer armnnSerializer)
     endif()
 
     if(BUILD_ONNX_PARSER)

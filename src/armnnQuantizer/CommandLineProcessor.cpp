@@ -149,6 +149,9 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
             boost::filesystem::path csvFilePath(m_CsvFileName);
             m_CsvFileDirectory = csvFilePath.parent_path().c_str();
         }
+
+        // If CSV file is defined, create a QuantizationDataSet for specified CSV file.
+        m_QuantizationDataSet = QuantizationDataSet(m_CsvFileName);
     }
 
     if (!armnnQuantizer::ValidateOutputDirectory(m_OutputDirectory))
@@ -158,7 +161,7 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
 
     std::string output(m_OutputDirectory);
     output.append(m_OutputFileName);
-    
+
     if (boost::filesystem::exists(output))
     {
         std::cerr << "Output file [" << output << "] already exists" << std::endl;

@@ -49,6 +49,11 @@ void NetworkQuantizer::OverrideInputRange(LayerBindingId layerId, float min, flo
     VisitLayers(inputLayers, overrideInputRangeVisitor);
 }
 
+void NetworkQuantizer::Refine(const InputTensors& inputTensors)
+{
+    //Implementation in a following commit
+}
+
 INetworkPtr NetworkQuantizer::ExportNetwork()
 {
     const Graph& graph = boost::polymorphic_downcast<const Network*>(m_InputNetwork)->GetGraph().TopologicalSort();

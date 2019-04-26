@@ -56,6 +56,13 @@ public:
                                          const Optional<TensorInfo>& biases,
                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const DepthwiseConvolution2dDescriptor& descriptor,
+                                                const TensorInfo& weights,
+                                                const Optional<TensorInfo>& biases,
+                                                Optional<std::string&> reason = EmptyOptional()) const override;
+
     bool IsFloorSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

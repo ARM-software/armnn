@@ -52,13 +52,19 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
     }
 
     const arm_compute::PadStrideInfo aclPadStrideInfo = BuildArmComputePadStrideInfo(descriptor);
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(
+            descriptor.m_DilationX,
+            descriptor.m_DilationY);
 
     return arm_compute::CLDepthwiseConvolutionLayer::validate(&aclInputInfo,
                                                               &aclWeightsInfo,
                                                               optionalAclBiasesInfo,
                                                               &aclOutputInfo,
                                                               aclPadStrideInfo,
-                                                              aclDepthMultiplier);
+                                                              aclDepthMultiplier,
+                                                              arm_compute::ActivationLayerInfo(),
+                                                              aclDilationInfo);
+
 }
 
 ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
@@ -85,13 +91,18 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
         BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
     }
 
-    arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
+    const arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
                                              m_Data.m_Parameters.m_StrideY,
                                              m_Data.m_Parameters.m_PadLeft,
                                              m_Data.m_Parameters.m_PadRight,
                                              m_Data.m_Parameters.m_PadTop,
                                              m_Data.m_Parameters.m_PadBottom,
                                              arm_compute::DimensionRoundingType::FLOOR);
+
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(
+                m_Data.m_Parameters.m_DilationX,
+                m_Data.m_Parameters.m_DilationY);
+
 
     std::string name = std::string("ClDepthwiseConvolutionWorkload");
     m_Data.ValidateInputsOutputs(name, 1, 1);
@@ -109,6 +120,7 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     // Get the depth multiplier
     const unsigned int depthMultiplier = weightInfo.GetShape()[0];
 
+
     // Check for optimisation opportunities.
     bool use3x3Optimisation = (weightInfo.GetShape()[2] == 3) && (weightInfo.GetShape()[3] == 3);
     if (use3x3Optimisation)
@@ -120,7 +132,9 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
             m_BiasTensor.get(),
             &output,
             padStrideInfo,
-            depthMultiplier);
+            depthMultiplier,
+            arm_compute::ActivationLayerInfo(),
+            aclDilationInfo);
     }
     else
     {
@@ -131,7 +145,10 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
             m_BiasTensor.get(),
             &output,
             padStrideInfo,
-            depthMultiplier);
+            depthMultiplier,
+            arm_compute::ActivationLayerInfo(),
+            aclDilationInfo);
+
     }
 
     BOOST_ASSERT(m_DepthwiseConvolutionLayer);

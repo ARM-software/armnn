@@ -74,15 +74,16 @@ DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& i
     // Expected filter shape: [ M, I, H, W ] - This shape does NOT depend on the data layout
     // Namely: [ depth multiplier, input channels, filter height, filter width ]
     // Output channels = input channels * depthMultiplier
-
     unsigned int depthMultiplier = filterShape[0];
 
     unsigned int filterHeight = filterShape[2];
-    unsigned int readHeight   = (inputHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - filterHeight;
+    unsigned int dilatedFilterHeight = filterHeight + (m_Param.m_DilationY - 1) * (filterHeight - 1);
+    unsigned int readHeight   = (inputHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - dilatedFilterHeight;
     unsigned int outputHeight = 1 + (readHeight / m_Param.m_StrideY);
 
     unsigned int filterWidth = filterShape[3];
-    unsigned int readWidth   = (inputWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - filterWidth;
+    unsigned int dilatedFilterWidth = filterWidth + (m_Param.m_DilationX - 1) * (filterWidth - 1);
+    unsigned int readWidth   = (inputWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - dilatedFilterWidth;
     unsigned int outputWidth = 1 + (readWidth / m_Param.m_StrideX);
 
     unsigned int outputChannels  = inputChannels * depthMultiplier;

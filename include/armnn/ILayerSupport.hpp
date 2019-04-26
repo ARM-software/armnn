@@ -87,6 +87,14 @@ public:
                      const DetectionPostProcessDescriptor& descriptor,
                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsDilatedDepthwiseConvolutionSupported(
+                    const TensorInfo& input,
+                    const TensorInfo& output,
+                    const DepthwiseConvolution2dDescriptor& descriptor,
+                    const TensorInfo& weights,
+                    const Optional<TensorInfo>& biases,
+                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsDivisionSupported(const TensorInfo& input0,
                                      const TensorInfo& input1,
                                      const TensorInfo& output,

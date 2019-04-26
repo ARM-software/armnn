@@ -246,6 +246,23 @@ bool ClLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                    biases);
 }
 
+bool ClLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,
+                                                            const TensorInfo& output,
+                                                            const DepthwiseConvolution2dDescriptor& descriptor,
+                                                            const TensorInfo& weights,
+                                                            const Optional<TensorInfo>& biases,
+                                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClDepthwiseConvolutionWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor,
+                                   weights,
+                                   biases);
+}
+
+
 bool ClLayerSupport::IsDivisionSupported(const TensorInfo& input0,
                                          const TensorInfo& input1,
                                          const TensorInfo& output,

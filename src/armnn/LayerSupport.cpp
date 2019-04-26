@@ -186,7 +186,28 @@ bool IsDepthwiseConvolutionSupported(const BackendId& backend,
                                      char* reasonIfUnsupported,
                                      size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsDepthwiseConvolutionSupported, input, output, descriptor, weights, biases);
+    if (descriptor.m_DilationX == 1 && descriptor.m_DilationY == 1)
+    {
+        // Pre 19.05 ArmNN did not have the dilation parameters.
+        // This version of IsDepthwiseConvolutionSupported is called for backwards-compatibility
+        FORWARD_LAYER_SUPPORT_FUNC(backend,
+                                   IsDepthwiseConvolutionSupported,
+                                   input,
+                                   output,
+                                   descriptor,
+                                   weights,
+                                   biases);
+    }
+    else
+    {
+        FORWARD_LAYER_SUPPORT_FUNC(backend,
+                                   IsDilatedDepthwiseConvolutionSupported,
+                                   input,
+                                   output,
+                                   descriptor,
+                                   weights,
+                                   biases);
+    }
 }
 
 bool IsDequantizeSupported(const BackendId& backend,

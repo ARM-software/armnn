@@ -52,14 +52,18 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 
-    const arm_compute::PadStrideInfo aclPadStrideInfo = BuildArmComputePadStrideInfo(descriptor);
+    arm_compute::PadStrideInfo aclPadStrideInfo = BuildArmComputePadStrideInfo(descriptor);
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(
+            descriptor.m_DilationX,descriptor.m_DilationY);
 
     return arm_compute::NEDepthwiseConvolutionLayer::validate(&aclInputInfo,
                                                               &aclWeightsInfo,
                                                               optionalAclBiasesInfo,
                                                               &aclOutputInfo,
                                                               aclPadStrideInfo,
-                                                              aclDepthMultiplier);
+                                                              aclDepthMultiplier,
+                                                              arm_compute::ActivationLayerInfo(),
+                                                              aclDilationInfo);
 }
 
 NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
@@ -97,6 +101,10 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
                                              m_Data.m_Parameters.m_PadBottom,
                                              arm_compute::DimensionRoundingType::FLOOR);
 
+
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(
+                m_Data.m_Parameters.m_DilationX, m_Data.m_Parameters.m_DilationY);
+
     m_Data.ValidateInputsOutputs("NeonDepthwiseConvolutionWorkload", 1, 1);
 
     INeonTensorHandle* inputTensorHandle  = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0]);
@@ -109,7 +117,7 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    // Get the depth multiplier
+   // Get the depth multiplier
     const unsigned int depthMultiplier = weightInfo.GetShape()[0];
 
     // Check for optimisation opportunities.
@@ -123,7 +131,9 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
                                                            m_BiasTensor.get(),
                                                            &output,
                                                            padStrideInfo,
-                                                           depthMultiplier);
+                                                           depthMultiplier,
+                                                           arm_compute::ActivationLayerInfo(),
+                                                           aclDilationInfo);
     }
     else
     {
@@ -134,7 +144,9 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
                                                            m_BiasTensor.get(),
                                                            &output,
                                                            padStrideInfo,
-                                                           depthMultiplier);
+                                                           depthMultiplier,
+                                                           arm_compute::ActivationLayerInfo(),
+                                                           aclDilationInfo);
     }
 
     BOOST_ASSERT(m_pDepthwiseConvolutionLayer);

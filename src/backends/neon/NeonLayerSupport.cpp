@@ -203,6 +203,22 @@ bool NeonLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                    biases);
 }
 
+bool NeonLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,
+                                                              const TensorInfo& output,
+                                                              const DepthwiseConvolution2dDescriptor& descriptor,
+                                                              const TensorInfo& weights,
+                                                              const Optional<TensorInfo>& biases,
+                                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDepthwiseConvolutionWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor,
+                                   weights,
+                                   biases);
+}
+
 bool NeonLayerSupport::IsFloorSupported(const TensorInfo& input,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const

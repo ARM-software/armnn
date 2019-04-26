@@ -228,24 +228,6 @@ void CheckBufferSize(TfLiteParser::BufferRawPtr bufferPtr,
 #define CHECK_BUFFER_SIZE(BUFFER_PTR, TENSOR_INFO, BUFFER_ID) \
     CheckBufferSize(BUFFER_PTR, TENSOR_INFO, BUFFER_ID, CHECK_LOCATION())
 
-uint32_t CheckDilation(const int32_t dilationFactor,
-                       size_t operatorIndex,
-                       const CheckLocation& location)
-{
-    if (dilationFactor != 1)
-    {
-        std::stringstream ss;
-        ss << "ArmNN only supports convolution layers with dilations [1,1,1,1] for operator with index "
-           << operatorIndex  << location.AsString();
-        throw ParseException(ss.str());
-    }
-
-    return static_cast<uint32_t>(dilationFactor);
-}
-
-#define CHECK_DILATION(DILATION_FACTOR, OPERATOR_INDEX) \
-    CheckDilation(DILATION_FACTOR, OPERATOR_INDEX, CHECK_LOCATION())
-
 bool IsActivationSupported(tflite::ActivationFunctionType activationType)
 {
     switch(activationType)
@@ -297,6 +279,7 @@ std::vector<unsigned int> AsUnsignedVector(const std::vector<int32_t> & in)
 void CalcPadding(uint32_t inputSize,
                  uint32_t filterSize,
                  uint32_t stride,
+                 uint32_t dilation,
                  uint32_t& paddingFront,
                  uint32_t& paddingBack,
                  tflite::Padding padding)
@@ -306,7 +289,8 @@ void CalcPadding(uint32_t inputSize,
     if (padding == tflite::Padding_SAME)
     {
         uint32_t outputSize = (inputSize + stride - 1) / stride;
-        uint32_t temp = (outputSize - 1) * stride + filterSize;
+        uint32_t dilatedSize = filterSize + (dilation - 1) * (filterSize - 1);
+        uint32_t temp = (outputSize - 1) * stride + dilatedSize;
         if (temp > inputSize)
         {
             paddingFront = (temp - inputSize) / 2;
@@ -722,9 +706,8 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
     desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
     desc.m_DataLayout = armnn::DataLayout::NHWC;
-
-    CHECK_DILATION(options->dilation_h_factor, operatorIndex);
-    CHECK_DILATION(options->dilation_w_factor, operatorIndex);
+    desc.m_DilationX = CHECKED_NON_NEGATIVE(options->dilation_w_factor);
+    desc.m_DilationY = CHECKED_NON_NEGATIVE(options->dilation_h_factor);
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2, 3);
@@ -744,8 +727,10 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     unsigned int filterHeight = filterTensorInfo.GetShape()[1];
     unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
 
-    CalcPadding(inputHeight, filterHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
-    CalcPadding(inputWidth, filterWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
+    CalcPadding(inputHeight, filterHeight, desc.m_StrideY,
+                desc.m_DilationY, desc.m_PadTop, desc.m_PadBottom, options->padding);
+    CalcPadding(inputWidth, filterWidth, desc.m_StrideX,
+                desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
     auto filterTensorAndData = CreateConstTensor(inputs[1],
                                                  filterTensorInfo,
@@ -810,9 +795,8 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     CHECK_VALID_SIZE(inputs.size(), 2, 3);
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
-
-    CHECK_DILATION(options->dilation_h_factor, operatorIndex);
-    CHECK_DILATION(options->dilation_w_factor, operatorIndex);
+    desc.m_DilationX = CHECKED_NON_NEGATIVE(options->dilation_w_factor);
+    desc.m_DilationY = CHECKED_NON_NEGATIVE(options->dilation_h_factor);
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
     armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
@@ -834,8 +818,10 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     // Mappings from TensorflowLite filter tensors to the ArmNN filter tensors (ArmNN weights have to be [M, I, H, W])
     PermutationVector permutationVector{ 2, 3, 1, 0 }; // [H, W, I, M] -> [M, I, H, W]
 
-    CalcPadding(inputHeight, filterHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
-    CalcPadding(inputWidth, filterWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
+    CalcPadding(inputHeight, filterHeight, desc.m_StrideY,
+                desc.m_DilationY, desc.m_PadTop, desc.m_PadBottom, options->padding);
+    CalcPadding(inputWidth, filterWidth, desc.m_StrideX,
+                desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
     auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo, permutationVector);
     armnn::IConnectableLayer* layer;
@@ -1045,8 +1031,10 @@ void TfLiteParser::ParsePool(size_t subgraphIndex,
     unsigned int inputHeight = inputTensorInfo.GetShape()[1];
     unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
 
-    CalcPadding(inputHeight, desc.m_PoolHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, options->padding);
-    CalcPadding(inputWidth, desc.m_PoolWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, options->padding);
+    CalcPadding(inputHeight, desc.m_PoolHeight, desc.m_StrideY, 1u,
+                desc.m_PadTop, desc.m_PadBottom, options->padding);
+    CalcPadding(inputWidth, desc.m_PoolWidth, desc.m_StrideX, 1u,
+                desc.m_PadLeft, desc.m_PadRight, options->padding);
 
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);

@@ -274,6 +274,8 @@ struct Convolution2dDescriptor
     , m_PadBottom(0)
     , m_StrideX(0)
     , m_StrideY(0)
+    , m_DilationX(1)
+    , m_DilationY(1)
     , m_BiasEnabled(false)
     , m_DataLayout(DataLayout::NCHW)
     {}
@@ -290,6 +292,10 @@ struct Convolution2dDescriptor
     uint32_t             m_StrideX;
     /// Stride value when proceeding through input for the height dimension.
     uint32_t             m_StrideY;
+    /// Dilation along x axis
+    uint32_t             m_DilationX;
+    /// Dilation along y axis
+    uint32_t             m_DilationY;
     /// Enable/disable bias.
     bool                 m_BiasEnabled;
     /// The data layout to be used (NCHW, NHWC).
@@ -306,6 +312,8 @@ struct DepthwiseConvolution2dDescriptor
     ,   m_PadBottom(0)
     ,   m_StrideX(0)
     ,   m_StrideY(0)
+    ,   m_DilationX(1)
+    ,   m_DilationY(1)
     ,   m_BiasEnabled(false)
     ,   m_DataLayout(DataLayout::NCHW)
     {}
@@ -322,6 +330,10 @@ struct DepthwiseConvolution2dDescriptor
     uint32_t   m_StrideX;
     /// Stride value when proceeding through input for the height dimension.
     uint32_t   m_StrideY;
+    /// Dilation along x axis
+    uint32_t   m_DilationX;
+    /// Dilation along y axis
+    uint32_t   m_DilationY;
     /// Enable/disable bias.
     bool       m_BiasEnabled;
     /// The data layout to be used (NCHW, NHWC).

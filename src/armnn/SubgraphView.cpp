@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "SubGraph.hpp"
+#include "SubgraphView.hpp"
 #include "Graph.hpp"
 
 #include <boost/numeric/conversion/cast.hpp>
@@ -38,56 +38,59 @@ void AssertIfNullsOrDuplicates(const C& container, const std::string& errorMessa
 
 } // anonymous namespace
 
-SubGraph::SubGraph(Graph& graph)
+SubgraphView::SubgraphView(Graph& graph)
     : m_InputSlots{}
     , m_OutputSlots{}
     , m_Layers(graph.begin(), graph.end())
     , m_ParentGraph(&graph)
 {
-    CheckSubGraph();
+    CheckSubgraph();
 }
 
-SubGraph::SubGraph(Graph* parentGraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers)
+SubgraphView::SubgraphView(Graph* parentGraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers)
     : m_InputSlots{inputs}
     , m_OutputSlots{outputs}
     , m_Layers{layers}
     , m_ParentGraph(parentGraph)
 {
-    CheckSubGraph();
+    CheckSubgraph();
 }
 
-SubGraph::SubGraph(const SubGraph& referenceSubGraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers)
+SubgraphView::SubgraphView(const SubgraphView& referenceSubgraph,
+                           InputSlots&& inputs,
+                           OutputSlots&& outputs,
+                           Layers&& layers)
     : m_InputSlots{inputs}
     , m_OutputSlots{outputs}
     , m_Layers{layers}
-    , m_ParentGraph(referenceSubGraph.m_ParentGraph)
+    , m_ParentGraph(referenceSubgraph.m_ParentGraph)
 {
-    CheckSubGraph();
+    CheckSubgraph();
 }
 
-SubGraph::SubGraph(const SubGraph& subGraph)
-    : m_InputSlots(subGraph.m_InputSlots.begin(), subGraph.m_InputSlots.end())
-    , m_OutputSlots(subGraph.m_OutputSlots.begin(), subGraph.m_OutputSlots.end())
-    , m_Layers(subGraph.m_Layers.begin(), subGraph.m_Layers.end())
-    , m_ParentGraph(subGraph.m_ParentGraph)
+SubgraphView::SubgraphView(const SubgraphView& subgraph)
+    : m_InputSlots(subgraph.m_InputSlots.begin(), subgraph.m_InputSlots.end())
+    , m_OutputSlots(subgraph.m_OutputSlots.begin(), subgraph.m_OutputSlots.end())
+    , m_Layers(subgraph.m_Layers.begin(), subgraph.m_Layers.end())
+    , m_ParentGraph(subgraph.m_ParentGraph)
 {
-    CheckSubGraph();
+    CheckSubgraph();
 }
 
-SubGraph::SubGraph(SubGraph&& subGraph)
-    : m_InputSlots(std::move(subGraph.m_InputSlots))
-    , m_OutputSlots(std::move(subGraph.m_OutputSlots))
-    , m_Layers(std::move(subGraph.m_Layers))
-    , m_ParentGraph(std::exchange(subGraph.m_ParentGraph, nullptr))
+SubgraphView::SubgraphView(SubgraphView&& subgraph)
+    : m_InputSlots(std::move(subgraph.m_InputSlots))
+    , m_OutputSlots(std::move(subgraph.m_OutputSlots))
+    , m_Layers(std::move(subgraph.m_Layers))
+    , m_ParentGraph(std::exchange(subgraph.m_ParentGraph, nullptr))
 {
-    CheckSubGraph();
+    CheckSubgraph();
 }
 
-SubGraph::SubGraph(const SubGraph& referenceSubGraph, IConnectableLayer* layer)
+SubgraphView::SubgraphView(const SubgraphView& referenceSubgraph, IConnectableLayer* layer)
     : m_InputSlots{}
     , m_OutputSlots{}
     , m_Layers{boost::polymorphic_downcast<Layer*>(layer)}
-    , m_ParentGraph(referenceSubGraph.m_ParentGraph)
+    , m_ParentGraph(referenceSubgraph.m_ParentGraph)
 {
     unsigned int numInputSlots = layer->GetNumInputSlots();
     m_InputSlots.resize(numInputSlots);
@@ -103,10 +106,10 @@ SubGraph::SubGraph(const SubGraph& referenceSubGraph, IConnectableLayer* layer)
         m_OutputSlots.at(i) = boost::polymorphic_downcast<OutputSlot*>(&(layer->GetOutputSlot(i)));
     }
 
-    CheckSubGraph();
+    CheckSubgraph();
 }
 
-void SubGraph::CheckSubGraph()
+void SubgraphView::CheckSubgraph()
 {
     // Check that the sub-graph has a valid parent graph
     BOOST_ASSERT_MSG(m_ParentGraph, "Sub-graphs must have a parent graph");
@@ -128,87 +131,87 @@ void SubGraph::CheckSubGraph()
     });
 }
 
-void SubGraph::Update(Graph &graph)
+void SubgraphView::Update(Graph &graph)
 {
     m_InputSlots.clear();
     m_OutputSlots.clear();
     m_Layers.assign(graph.begin(), graph.end());
     m_ParentGraph = &graph;
 
-    CheckSubGraph();
+    CheckSubgraph();
 }
 
-const SubGraph::InputSlots& SubGraph::GetInputSlots() const
+const SubgraphView::InputSlots& SubgraphView::GetInputSlots() const
 {
     return m_InputSlots;
 }
 
-const SubGraph::OutputSlots& SubGraph::GetOutputSlots() const
+const SubgraphView::OutputSlots& SubgraphView::GetOutputSlots() const
 {
     return m_OutputSlots;
 }
 
-const InputSlot* SubGraph::GetInputSlot(unsigned int index) const
+const InputSlot* SubgraphView::GetInputSlot(unsigned int index) const
 {
     return m_InputSlots.at(index);
 }
 
-InputSlot* SubGraph::GetInputSlot(unsigned int index)
+InputSlot* SubgraphView::GetInputSlot(unsigned int index)
 {
     return  m_InputSlots.at(index);
 }
 
-const OutputSlot* SubGraph::GetOutputSlot(unsigned int index) const
+const OutputSlot* SubgraphView::GetOutputSlot(unsigned int index) const
 {
     return m_OutputSlots.at(index);
 }
 
-OutputSlot* SubGraph::GetOutputSlot(unsigned int index)
+OutputSlot* SubgraphView::GetOutputSlot(unsigned int index)
 {
     return m_OutputSlots.at(index);
 }
 
-unsigned int SubGraph::GetNumInputSlots() const
+unsigned int SubgraphView::GetNumInputSlots() const
 {
     return boost::numeric_cast<unsigned int>(m_InputSlots.size());
 }
 
-unsigned int SubGraph::GetNumOutputSlots() const
+unsigned int SubgraphView::GetNumOutputSlots() const
 {
     return boost::numeric_cast<unsigned int>(m_OutputSlots.size());
 }
 
-const SubGraph::Layers & SubGraph::GetLayers() const
+const SubgraphView::Layers & SubgraphView::GetLayers() const
 {
     return m_Layers;
 }
 
-SubGraph::Layers::iterator SubGraph::begin()
+SubgraphView::Layers::iterator SubgraphView::begin()
 {
     return m_Layers.begin();
 }
 
-SubGraph::Iterator SubGraph::end()
+SubgraphView::Iterator SubgraphView::end()
 {
     return m_Layers.end();
 }
 
-SubGraph::ConstIterator SubGraph::begin() const
+SubgraphView::ConstIterator SubgraphView::begin() const
 {
     return m_Layers.begin();
 }
 
-SubGraph::ConstIterator SubGraph::end() const
+SubgraphView::ConstIterator SubgraphView::end() const
 {
     return m_Layers.end();
 }
 
-SubGraph::ConstIterator SubGraph::cbegin() const
+SubgraphView::ConstIterator SubgraphView::cbegin() const
 {
     return begin();
 }
 
-SubGraph::ConstIterator SubGraph::cend() const
+SubgraphView::ConstIterator SubgraphView::cend() const
 {
     return end();
 }

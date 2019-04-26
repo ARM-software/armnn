@@ -15,15 +15,15 @@ namespace armnn
 {
 
 ///
-/// The SubGraph class represents a subgraph of a Graph.
+/// The SubgraphView class represents a subgraph of a Graph.
 /// The data it holds, points to data held by layers of the Graph, so the
-/// the contents of the SubGraph becomes invalid when the Layers are destroyed
+/// the contents of the SubgraphView becomes invalid when the Layers are destroyed
 /// or changed.
 ///
-class SubGraph final
+class SubgraphView final
 {
 public:
-    using SubGraphPtr = std::unique_ptr<SubGraph>;
+    using SubgraphViewPtr = std::unique_ptr<SubgraphView>;
     using InputSlots = std::vector<InputSlot*>;
     using OutputSlots = std::vector<OutputSlot*>;
     using Layers = std::list<Layer*>;
@@ -31,27 +31,27 @@ public:
     using ConstIterator = Layers::const_iterator;
 
     /// Empty subgraphs are not allowed, they must at least have a parent graph.
-    SubGraph() = delete;
+    SubgraphView() = delete;
 
     /// Constructs a sub-graph from the entire given graph.
-    SubGraph(Graph& graph);
+    SubgraphView(Graph& graph);
 
     /// Constructs a sub-graph with the given arguments and binds it to the specified parent graph.
-    SubGraph(Graph* parentGraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
+    SubgraphView(Graph* parentGraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
 
     /// Constructs a sub-graph with the given arguments and uses the specified sub-graph to get a reference
     /// to the parent graph.
-    SubGraph(const SubGraph& referenceSubGraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
+    SubgraphView(const SubgraphView& referenceSubgraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
 
     /// Copy-constructor.
-    SubGraph(const SubGraph& subGraph);
+    SubgraphView(const SubgraphView& subgraph);
 
     /// Move-constructor.
-    SubGraph(SubGraph&& subGraph);
+    SubgraphView(SubgraphView&& subgraph);
 
     /// Constructs a sub-graph with only the given layer and uses the specified sub-graph to get a reference
     /// to the parent graph.
-    SubGraph(const SubGraph& referenceSubGraph, IConnectableLayer* layer);
+    SubgraphView(const SubgraphView& referenceSubgraph, IConnectableLayer* layer);
 
     /// Updates this sub-graph with the contents of the whole given graph.
     void Update(Graph& graph);
@@ -83,7 +83,7 @@ public:
     ConstIterator cend() const;
 
 private:
-    void CheckSubGraph();
+    void CheckSubgraph();
 
     /// The list of pointers to the input slots of the parent graph.
     InputSlots m_InputSlots;
@@ -99,7 +99,7 @@ private:
 };
 
 template <typename LayerT, typename... Args>
-LayerT* SubGraph::AddLayer(Args&&... args) const
+LayerT* SubgraphView::AddLayer(Args&&... args) const
 {
     BOOST_ASSERT(m_ParentGraph);
 

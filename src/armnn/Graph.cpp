@@ -4,7 +4,7 @@
 //
 
 #include "Graph.hpp"
-#include "SubGraph.hpp"
+#include "SubgraphView.hpp"
 #include "LayersFwd.hpp"
 
 #include <armnn/Utils.hpp>
@@ -298,88 +298,88 @@ void Graph::AddCopyLayers()
     }
 }
 
-void Graph::SubstituteSubGraph(std::unique_ptr<SubGraph> subGraph, IConnectableLayer* substituteLayer)
+void Graph::SubstituteSubgraph(std::unique_ptr<SubgraphView> subgraph, IConnectableLayer* substituteLayer)
 {
-    BOOST_ASSERT(subGraph != nullptr);
+    BOOST_ASSERT(subgraph != nullptr);
     BOOST_ASSERT(substituteLayer != nullptr);
 
-    ReplaceSubGraphConnections(*subGraph, substituteLayer);
-    EraseSubGraphLayers(*subGraph);
+    ReplaceSubgraphConnections(*subgraph, substituteLayer);
+    EraseSubgraphLayers(*subgraph);
 }
 
-void Graph::SubstituteSubGraph(std::unique_ptr<SubGraph> subGraph, const SubGraph& substituteSubGraph)
+void Graph::SubstituteSubgraph(std::unique_ptr<SubgraphView> subgraph, const SubgraphView& substituteSubgraph)
 {
-    BOOST_ASSERT(subGraph);
+    BOOST_ASSERT(subgraph);
 
-    ReplaceSubGraphConnections(*subGraph, substituteSubGraph);
-    EraseSubGraphLayers(*subGraph);
+    ReplaceSubgraphConnections(*subgraph, substituteSubgraph);
+    EraseSubgraphLayers(*subgraph);
 }
 
-void Graph::ReplaceSubGraphConnections(const SubGraph& subGraph, IConnectableLayer* substituteLayer)
+void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectableLayer* substituteLayer)
 {
     BOOST_ASSERT(substituteLayer != nullptr);
 
     // Create a new sub-graph with only the given layer, using
     // the given sub-graph as a reference of which parent graph to use
-    SubGraph substituteSubGraph(subGraph, substituteLayer);
-    ReplaceSubGraphConnections(subGraph, substituteSubGraph);
+    SubgraphView substituteSubgraph(subgraph, substituteLayer);
+    ReplaceSubgraphConnections(subgraph, substituteSubgraph);
 }
 
-void Graph::ReplaceSubGraphConnections(const SubGraph& subGraph, const SubGraph& substituteSubGraph)
+void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const SubgraphView& substituteSubgraph)
 {
-    BOOST_ASSERT_MSG(!substituteSubGraph.GetLayers().empty(), "New sub-graph used for substitution must not be empty");
+    BOOST_ASSERT_MSG(!substituteSubgraph.GetLayers().empty(), "New sub-graph used for substitution must not be empty");
 
-    const SubGraph::Layers& substituteSubGraphLayers = substituteSubGraph.GetLayers();
-    std::for_each(substituteSubGraphLayers.begin(), substituteSubGraphLayers.end(), [&](Layer* layer)
+    const SubgraphView::Layers& substituteSubgraphLayers = substituteSubgraph.GetLayers();
+    std::for_each(substituteSubgraphLayers.begin(), substituteSubgraphLayers.end(), [&](Layer* layer)
     {
         BOOST_ASSERT_MSG(std::find(m_Layers.begin(), m_Layers.end(), layer) != m_Layers.end(),
                          "Substitute layer is not a member of graph");
     });
 
-    const SubGraph::InputSlots& subGraphInputSlots = subGraph.GetInputSlots();
-    const SubGraph::OutputSlots& subGraphOutputSlots = subGraph.GetOutputSlots();
+    const SubgraphView::InputSlots& subgraphInputSlots = subgraph.GetInputSlots();
+    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraph.GetOutputSlots();
 
-    unsigned int subGraphNumInputSlots = boost::numeric_cast<unsigned int>(subGraphInputSlots.size());
-    unsigned int subGraphNumOutputSlots = boost::numeric_cast<unsigned int>(subGraphOutputSlots.size());
+    unsigned int subgraphNumInputSlots = boost::numeric_cast<unsigned int>(subgraphInputSlots.size());
+    unsigned int subgraphNumOutputSlots = boost::numeric_cast<unsigned int>(subgraphOutputSlots.size());
 
-    const SubGraph::InputSlots& substituteSubGraphInputSlots = substituteSubGraph.GetInputSlots();
-    const SubGraph::OutputSlots& substituteSubGraphOutputSlots = substituteSubGraph.GetOutputSlots();
+    const SubgraphView::InputSlots& substituteSubgraphInputSlots = substituteSubgraph.GetInputSlots();
+    const SubgraphView::OutputSlots& substituteSubgraphOutputSlots = substituteSubgraph.GetOutputSlots();
 
-    BOOST_ASSERT(subGraphNumInputSlots == substituteSubGraphInputSlots.size());
-    BOOST_ASSERT(subGraphNumOutputSlots == substituteSubGraphOutputSlots.size());
+    BOOST_ASSERT(subgraphNumInputSlots == substituteSubgraphInputSlots.size());
+    BOOST_ASSERT(subgraphNumOutputSlots == substituteSubgraphOutputSlots.size());
 
     // Disconnect the sub-graph and replace it with the substitute sub-graph
 
     // Step 1: process input slots
-    for (unsigned int inputSlotIdx = 0; inputSlotIdx < subGraphNumInputSlots; ++inputSlotIdx)
+    for (unsigned int inputSlotIdx = 0; inputSlotIdx < subgraphNumInputSlots; ++inputSlotIdx)
     {
-        InputSlot* subGraphInputSlot = subGraphInputSlots.at(inputSlotIdx);
-        BOOST_ASSERT(subGraphInputSlot);
+        InputSlot* subgraphInputSlot = subgraphInputSlots.at(inputSlotIdx);
+        BOOST_ASSERT(subgraphInputSlot);
 
-        IOutputSlot* connectedOutputSlot = subGraphInputSlot->GetConnection();
+        IOutputSlot* connectedOutputSlot = subgraphInputSlot->GetConnection();
         BOOST_ASSERT(connectedOutputSlot);
-        connectedOutputSlot->Disconnect(*subGraphInputSlot);
+        connectedOutputSlot->Disconnect(*subgraphInputSlot);
 
-        IInputSlot* substituteInputSlot = substituteSubGraphInputSlots.at(inputSlotIdx);
+        IInputSlot* substituteInputSlot = substituteSubgraphInputSlots.at(inputSlotIdx);
         BOOST_ASSERT(substituteInputSlot);
         connectedOutputSlot->Connect(*substituteInputSlot);
     }
 
     // Step 2: process output slots
-    for(unsigned int outputSlotIdx = 0; outputSlotIdx < subGraphNumOutputSlots; ++outputSlotIdx)
+    for(unsigned int outputSlotIdx = 0; outputSlotIdx < subgraphNumOutputSlots; ++outputSlotIdx)
     {
-        OutputSlot* subGraphOutputSlot = subGraphOutputSlots.at(outputSlotIdx);
-        BOOST_ASSERT(subGraphOutputSlot);
+        OutputSlot* subgraphOutputSlot = subgraphOutputSlots.at(outputSlotIdx);
+        BOOST_ASSERT(subgraphOutputSlot);
 
-        OutputSlot* substituteOutputSlot = substituteSubGraphOutputSlots.at(outputSlotIdx);
+        OutputSlot* substituteOutputSlot = substituteSubgraphOutputSlots.at(outputSlotIdx);
         BOOST_ASSERT(substituteOutputSlot);
-        subGraphOutputSlot->MoveAllConnections(*substituteOutputSlot);
+        subgraphOutputSlot->MoveAllConnections(*substituteOutputSlot);
     }
 }
 
-void Graph::EraseSubGraphLayers(const SubGraph &subGraph)
+void Graph::EraseSubgraphLayers(const SubgraphView &subgraph)
 {
-    for (auto layer : subGraph.GetLayers())
+    for (auto layer : subgraph.GetLayers())
     {
         EraseLayer(layer);
     }

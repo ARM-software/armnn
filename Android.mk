@@ -134,8 +134,8 @@ LOCAL_SRC_FILES := \
         src/armnn/Optimizer.cpp \
         src/armnn/Runtime.cpp \
         src/armnn/SerializeLayerParameters.cpp \
-        src/armnn/SubGraph.cpp \
-        src/armnn/SubGraphSelector.cpp \
+        src/armnn/SubgraphView.cpp \
+        src/armnn/SubgraphViewSelector.cpp \
         src/armnn/InternalTypes.cpp \
         src/armnn/Layer.cpp \
         src/armnn/LoadedNetwork.cpp \
@@ -242,7 +242,7 @@ LOCAL_SRC_FILES := \
         src/armnn/test/GraphTests.cpp \
         src/armnn/test/GraphUtils.cpp \
         src/armnn/test/RuntimeTests.cpp \
-        src/armnn/test/SubGraphTests.cpp \
+        src/armnn/test/SubgraphViewTests.cpp \
         src/armnn/test/TensorTest.cpp \
         src/armnn/test/NetworkTests.cpp \
         src/armnn/test/InstrumentTests.cpp \

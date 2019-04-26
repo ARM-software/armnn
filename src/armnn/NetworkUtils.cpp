@@ -5,7 +5,7 @@
 
 #include "NetworkUtils.hpp"
 
-#include "SubGraphSelector.hpp"
+#include "SubgraphViewSelector.hpp"
 
 #include <armnn/Exceptions.hpp>
 

@@ -294,7 +294,7 @@ list(APPEND armnn_sources
     src/armnn/Instrument.hpp
     src/armnn/InternalTypes.cpp
     src/armnn/InternalTypes.hpp
-    src/armnn/ISubGraphConverter.hpp
+    src/armnn/ISubgraphViewConverter.hpp
     src/armnn/JsonPrinter.cpp
     src/armnn/JsonPrinter.hpp
     src/armnn/Layer.cpp
@@ -335,10 +335,10 @@ list(APPEND armnn_sources
     src/armnn/SerializeLayerParameters.hpp
     src/armnn/StaticRangeVisitor.cpp
     src/armnn/StaticRangeVisitor.hpp
-    src/armnn/SubGraph.cpp
-    src/armnn/SubGraph.hpp
-    src/armnn/SubGraphSelector.cpp
-    src/armnn/SubGraphSelector.hpp
+    src/armnn/SubgraphView.cpp
+    src/armnn/SubgraphView.hpp
+    src/armnn/SubgraphViewSelector.cpp
+    src/armnn/SubgraphViewSelector.hpp
     src/armnn/Tensor.cpp
     src/armnn/TypesUtils.cpp
     src/armnn/Utils.cpp
@@ -435,7 +435,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/QuantizerTest.cpp
         src/armnn/test/RuntimeTests.cpp
         src/armnn/test/RuntimeTests.hpp
-        src/armnn/test/SubGraphTests.cpp
+        src/armnn/test/SubgraphViewTests.cpp
         src/armnn/test/TensorHelpers.hpp
         src/armnn/test/TensorTest.cpp
         src/armnn/test/TestInputOutputLayerVisitor.cpp

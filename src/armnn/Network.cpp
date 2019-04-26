@@ -8,7 +8,7 @@
 #include "Layer.hpp"
 #include "DeviceSpec.hpp"
 #include "Optimizer.hpp"
-#include "SubGraphSelector.hpp"
+#include "SubgraphViewSelector.hpp"
 #include "BackendSettings.hpp"
 #include "optimizations/All.hpp"
 
@@ -311,11 +311,11 @@ OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
 
 OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
                                   BackendSettings& backendSettings,
-                                  SubGraph& subGraph,
+                                  SubgraphView& subgraph,
                                   Optional<std::vector<std::string>&> errMessages)
 {
-    Graph::Iterator firstLayer = subGraph.begin();
-    Graph::Iterator lastLayer  = subGraph.end();
+    Graph::Iterator firstLayer = subgraph.begin();
+    Graph::Iterator lastLayer  = subgraph.end();
     return AssignBackends(optNetObjPtr,
                           backendSettings,
                           firstLayer,
@@ -335,7 +335,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
     Graph& optGraph = optNetObjPtr->GetGraph();
 
     // Get the entire graph as a sub-graph
-    SubGraph mainSubGraph(optGraph);
+    SubgraphView mainSubgraph(optGraph);
 
     // Run backend specific optimizations
     auto const& backendRegistry = BackendRegistryInstance();
@@ -346,8 +346,8 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
         BOOST_ASSERT(backendObjPtr);
 
         // Select sub-graphs based on backend
-        SubGraphSelector::SubGraphs subGraphs =
-                SubGraphSelector::SelectSubGraphs(mainSubGraph,
+        SubgraphViewSelector::Subgraphs subgraphs =
+                SubgraphViewSelector::SelectSubgraphs(mainSubgraph,
                                                   // Select layers assigned to the requested backend
                                                   [&backendObjPtr](const Layer& layer)
                                                   {
@@ -355,18 +355,19 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                                                              layer.GetType() != LayerType::Output &&
                                                              layer.GetBackendId() == backendObjPtr->GetId();
                                                   });
-        if (subGraphs.empty())
+        if (subgraphs.empty())
         {
             // No sub-graphs found, try with next selected backend
             continue;
         }
 
         // Try to optimize each sub-graph
-        for (auto& subGraph : subGraphs)
+        for (auto& subgraph : subgraphs)
         {
             // Try to optimize the current sub-graph
             bool optimizationAttempted = false;
-            SubGraph::SubGraphPtr optSubGraph = backendObjPtr->OptimizeSubGraph(*subGraph, optimizationAttempted);
+            SubgraphView::SubgraphViewPtr optSubgraph = backendObjPtr->OptimizeSubgraphView(*subgraph,
+                                                                                            optimizationAttempted);
 
             // Check if the optimization has been attempted
             if (!optimizationAttempted)
@@ -376,27 +377,27 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
             }
 
             // Optimization attempted, check the resulting optimized sub-graph
-            if (optSubGraph)
+            if (optSubgraph)
             {
                 // Sub-graph optimized, substitute the sub-graph with the new optimized one in the main optimized graph
-                optGraph.SubstituteSubGraph(std::move(subGraph), *optSubGraph);
+                optGraph.SubstituteSubgraph(std::move(subgraph), *optSubgraph);
 
                 // Assign the current backend to the optimized sub-graph
-                std::for_each(optSubGraph->begin(), optSubGraph->end(), [&selectedBackend](Layer* l)
+                std::for_each(optSubgraph->begin(), optSubgraph->end(), [&selectedBackend](Layer* l)
                 {
                     BOOST_ASSERT(l);
                     l->SetBackendId(selectedBackend);
                 });
 
                 // Recreate the sub-graph representing the entire graph
-                mainSubGraph.Update(optGraph);
+                mainSubgraph.Update(optGraph);
             }
             else
             {
                 // An error occurred: the optimization was attempted but not performed, try different backends
                 std::stringstream warningMsg;
                 warningMsg << "Sub-graph failed to get optimized on " << backendObjPtr->GetId() << ". "
-                           << "Re-assigning backends to " << subGraph->GetLayers().size() << " layers inside sub-graph";
+                           << "Re-assigning backends to " << subgraph->GetLayers().size() << " layers inside sub-graph";
                 ReportWarning(warningMsg.str(), errMessages);
 
                 // Failed to optimize the given sub-graph, re-assign the sub-graph layers to other available backends
@@ -407,7 +408,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                 }
                 OptimizationResult reassignmentResult = AssignBackends(optNetObjPtr,
                                                                        backendSettings,
-                                                                       *subGraph,
+                                                                       *subgraph,
                                                                        errMessages);
                 if (reassignmentResult.m_Error)
                 {

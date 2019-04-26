@@ -10,7 +10,7 @@
 
 using armnnTfLiteParser::TfLiteParser;
 using ModelPtr = TfLiteParser::ModelPtr;
-using SubGraphPtr = TfLiteParser::SubGraphPtr;
+using SubgraphPtr = TfLiteParser::SubgraphPtr;
 using OperatorPtr = TfLiteParser::OperatorPtr;
 
 BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
@@ -156,7 +156,7 @@ struct LoadModelFixture : public ParserFlatbuffersFixture
         }
     }
 
-    void CheckSubgraph(const SubGraphPtr& subgraph, size_t tensors, const std::vector<int32_t>& inputs,
+    void CheckSubgraph(const SubgraphPtr& subgraph, size_t tensors, const std::vector<int32_t>& inputs,
                        const std::vector<int32_t>& outputs, size_t operators, const std::string& name)
     {
         BOOST_CHECK(subgraph);

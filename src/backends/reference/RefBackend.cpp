@@ -56,10 +56,10 @@ IBackendInternal::IMemoryManagerUniquePtr RefBackend::CreateMemoryManager() cons
     return IMemoryManagerUniquePtr{};
 }
 
-IBackendInternal::ISubGraphConverterPtr RefBackend::CreateSubGraphConverter(
-    const std::shared_ptr<SubGraph>& subGraph) const
+IBackendInternal::ISubgraphViewConverterPtr RefBackend::CreateSubgraphViewConverter(
+    const std::shared_ptr<SubgraphView>& subgraph) const
 {
-    return ISubGraphConverterPtr{};
+    return ISubgraphViewConverterPtr{};
 }
 
 IBackendInternal::Optimizations RefBackend::GetOptimizations() const
@@ -73,13 +73,13 @@ IBackendInternal::ILayerSupportSharedPtr RefBackend::GetLayerSupport() const
     return layerSupport;
 }
 
-IBackendInternal::SubGraphUniquePtr RefBackend::OptimizeSubGraph(const SubGraph& subGraph,
-                                                                 bool& optimizationAttempted) const
+IBackendInternal::SubgraphViewUniquePtr RefBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
+                                                                         bool& optimizationAttempted) const
 {
     // Not trying to optimize the given sub-graph
     optimizationAttempted = false;
 
-    return SubGraphUniquePtr{};
+    return SubgraphViewUniquePtr{};
 }
 
 } // namespace armnn

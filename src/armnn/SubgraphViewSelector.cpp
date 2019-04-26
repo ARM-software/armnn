@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "SubGraphSelector.hpp"
+#include "SubgraphViewSelector.hpp"
 #include "Graph.hpp"
 #include <boost/assert.hpp>
 #include <algorithm>
@@ -20,7 +20,7 @@ struct LayerSelectionInfo
     using LayerInfoContainer = std::unordered_map<Layer*, LayerSelectionInfo>;
     static constexpr uint32_t InitialSplitId() { return 1; }
 
-    LayerSelectionInfo(Layer* layer, const SubGraphSelector::LayerSelectorFunction& selector)
+    LayerSelectionInfo(Layer* layer, const SubgraphViewSelector::LayerSelectorFunction& selector)
     : m_Layer{layer}
     , m_SplitId{0}
     , m_IsSelected{selector(*layer)}
@@ -76,8 +76,8 @@ struct LayerSelectionInfo
         return m_Layer->GetType() == armnn::LayerType::Input;
     }
 
-    void CollectNonSelectedInputs(SubGraph::InputSlots& inputSlots,
-                                  const SubGraphSelector::LayerSelectorFunction& selector)
+    void CollectNonSelectedInputs(SubgraphView::InputSlots& inputSlots,
+                                  const SubgraphViewSelector::LayerSelectorFunction& selector)
     {
         for (auto&& slot = m_Layer->BeginInputSlots(); slot != m_Layer->EndInputSlots(); ++slot)
         {
@@ -94,8 +94,8 @@ struct LayerSelectionInfo
         }
     }
 
-    void CollectNonSelectedOutputSlots(SubGraph::OutputSlots& outputSlots,
-                                       const SubGraphSelector::LayerSelectorFunction& selector)
+    void CollectNonSelectedOutputSlots(SubgraphView::OutputSlots& outputSlots,
+                                       const SubgraphViewSelector::LayerSelectorFunction& selector)
     {
         for (auto&& slot = m_Layer->BeginOutputSlots(); slot != m_Layer->EndOutputSlots(); ++slot)
         {
@@ -119,19 +119,19 @@ struct LayerSelectionInfo
 
 } // namespace <anonymous>
 
-SubGraphSelector::SubGraphs
-SubGraphSelector::SelectSubGraphs(Graph& graph, const LayerSelectorFunction& selector)
+SubgraphViewSelector::Subgraphs
+SubgraphViewSelector::SelectSubgraphs(Graph& graph, const LayerSelectorFunction& selector)
 {
-    SubGraph subGraph(graph);
-    return SubGraphSelector::SelectSubGraphs(subGraph, selector);
+    SubgraphView subgraph(graph);
+    return SubgraphViewSelector::SelectSubgraphs(subgraph, selector);
 }
 
-SubGraphSelector::SubGraphs
-SubGraphSelector::SelectSubGraphs(SubGraph& subGraph, const LayerSelectorFunction& selector)
+SubgraphViewSelector::Subgraphs
+SubgraphViewSelector::SelectSubgraphs(SubgraphView& subgraph, const LayerSelectorFunction& selector)
 {
     LayerSelectionInfo::LayerInfoContainer layerInfo;
 
-    for (auto& layer : subGraph)
+    for (auto& layer : subgraph)
     {
         layerInfo.emplace(layer, LayerSelectionInfo{layer, selector});
     }
@@ -168,14 +168,14 @@ SubGraphSelector::SelectSubGraphs(SubGraph& subGraph, const LayerSelectorFunctio
     }
 
     // Now each non-empty split id represents a subgraph
-    SubGraphs result;
+    Subgraphs result;
     for (auto& splitGraph : splitMap)
     {
         if (splitGraph.second.empty() == false)
         {
-            SubGraph::InputSlots inputs;
-            SubGraph::OutputSlots outputs;
-            SubGraph::Layers layers;
+            SubgraphView::InputSlots inputs;
+            SubgraphView::OutputSlots outputs;
+            SubgraphView::Layers layers;
             for (auto&& infoPtr : splitGraph.second)
             {
                 infoPtr->CollectNonSelectedInputs(inputs, selector);
@@ -184,10 +184,10 @@ SubGraphSelector::SelectSubGraphs(SubGraph& subGraph, const LayerSelectorFunctio
             }
             // Create a new sub-graph with the new lists of input/output slots and layer, using
             // the given sub-graph as a reference of which parent graph to use
-            result.emplace_back(std::make_unique<SubGraph>(subGraph,
-                                                           std::move(inputs),
-                                                           std::move(outputs),
-                                                           std::move(layers)));
+            result.emplace_back(std::make_unique<SubgraphView>(subgraph,
+                                                               std::move(inputs),
+                                                               std::move(outputs),
+                                                               std::move(layers)));
         }
     }
 

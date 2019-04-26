@@ -135,13 +135,13 @@ BOOST_FIXTURE_TEST_CASE(GetOutputTensorIdsNullModel, GetInputOutputTensorIdsFixt
     BOOST_CHECK_THROW(TfLiteParser::GetOutputTensorIds(nullptr, 0, 0), armnn::ParseException);
 }
 
-BOOST_FIXTURE_TEST_CASE(GetInputTensorIdsInvalidSubGraph, GetInputOutputTensorIdsFixture)
+BOOST_FIXTURE_TEST_CASE(GetInputTensorIdsInvalidSubgraph, GetInputOutputTensorIdsFixture)
 {
     TfLiteParser::ModelPtr model = TfLiteParser::LoadModelFromBinary(m_GraphBinary.data(), m_GraphBinary.size());
     BOOST_CHECK_THROW(TfLiteParser::GetInputTensorIds(model, 1, 0), armnn::ParseException);
 }
 
-BOOST_FIXTURE_TEST_CASE(GetOutputTensorIdsInvalidSubGraph, GetInputOutputTensorIdsFixture)
+BOOST_FIXTURE_TEST_CASE(GetOutputTensorIdsInvalidSubgraph, GetInputOutputTensorIdsFixture)
 {
     TfLiteParser::ModelPtr model = TfLiteParser::LoadModelFromBinary(m_GraphBinary.data(), m_GraphBinary.size());
     BOOST_CHECK_THROW(TfLiteParser::GetOutputTensorIds(model, 1, 0), armnn::ParseException);

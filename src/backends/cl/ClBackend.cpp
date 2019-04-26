@@ -63,10 +63,10 @@ ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const
     return IBackendContextPtr{new ClBackendContext{options}};
 }
 
-IBackendInternal::ISubGraphConverterPtr ClBackend::CreateSubGraphConverter(
-    const std::shared_ptr<SubGraph>& subGraph) const
+IBackendInternal::ISubgraphViewConverterPtr ClBackend::CreateSubgraphViewConverter(
+    const std::shared_ptr<SubgraphView>& subgraph) const
 {
-    return ISubGraphConverterPtr{};
+    return ISubgraphViewConverterPtr{};
 }
 
 IBackendInternal::Optimizations ClBackend::GetOptimizations() const
@@ -80,13 +80,13 @@ IBackendInternal::ILayerSupportSharedPtr ClBackend::GetLayerSupport() const
     return layerSupport;
 }
 
-IBackendInternal::SubGraphUniquePtr ClBackend::OptimizeSubGraph(const SubGraph& subGraph,
-                                                                bool& optimizationAttempted) const
+IBackendInternal::SubgraphViewUniquePtr ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
+                                                                        bool& optimizationAttempted) const
 {
     // Not trying to optimize the given sub-graph
     optimizationAttempted = false;
 
-    return SubGraphUniquePtr{};
+    return SubgraphViewUniquePtr{};
 }
 
 } // namespace armnn

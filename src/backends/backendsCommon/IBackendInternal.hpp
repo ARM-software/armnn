@@ -7,8 +7,8 @@
 #include <armnn/Types.hpp>
 #include <armnn/IRuntime.hpp>
 
-#include <ISubGraphConverter.hpp>
-#include <SubGraph.hpp>
+#include <ISubgraphViewConverter.hpp>
+#include <SubgraphView.hpp>
 
 #include <vector>
 
@@ -41,9 +41,9 @@ public:
     using IMemoryManagerUniquePtr = std::unique_ptr<IMemoryManager>;
     using IMemoryManagerSharedPtr = std::shared_ptr<IMemoryManager>;
 
-    using ISubGraphConverterPtr = std::unique_ptr<ISubGraphConverter>;
+    using ISubgraphViewConverterPtr = std::unique_ptr<ISubgraphViewConverter>;
 
-    using SubGraphUniquePtr = std::unique_ptr<SubGraph>;
+    using SubgraphViewUniquePtr = std::unique_ptr<SubgraphView>;
 
     virtual IMemoryManagerUniquePtr CreateMemoryManager() const = 0;
 
@@ -52,12 +52,14 @@ public:
 
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
 
-    virtual ISubGraphConverterPtr CreateSubGraphConverter(const std::shared_ptr<SubGraph>& subGraph) const = 0;
+    virtual ISubgraphViewConverterPtr CreateSubgraphViewConverter(const std::shared_ptr<SubgraphView>& subgraph)
+        const = 0;
 
     virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 
-    virtual SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph, bool& optimizationAttempted) const = 0;
+    virtual SubgraphViewUniquePtr OptimizeSubgraphView(const SubgraphView& subgraph, bool& optimizationAttempted)
+        const = 0;
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

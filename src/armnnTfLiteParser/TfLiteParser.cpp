@@ -491,15 +491,15 @@ void TfLiteParser::AddBroadcastReshapeLayer(size_t subgraphIndex,
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
     BOOST_ASSERT(layer != nullptr);
 
-    const auto & subGraphPtr = m_Model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subGraphPtr->operators[operatorIndex];
+    const auto & subgraphPtr = m_Model->subgraphs[subgraphIndex];
+    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
 
     BOOST_ASSERT(operatorPtr->inputs.size() > 1);
 
     uint32_t reshapedInputId = CHECKED_NON_NEGATIVE(operatorPtr->inputs[0]);
-    TensorRawPtr tensorPtr = subGraphPtr->tensors[reshapedInputId].get();
+    TensorRawPtr tensorPtr = subgraphPtr->tensors[reshapedInputId].get();
     uint32_t inputId = CHECKED_NON_NEGATIVE(operatorPtr->inputs[1]);
-    TensorRawPtr tensorPtr1 = subGraphPtr->tensors[inputId].get();
+    TensorRawPtr tensorPtr1 = subgraphPtr->tensors[inputId].get();
 
     armnn::TensorInfo reshapedTensorInfo = ToTensorInfo(tensorPtr);
     armnn::TensorInfo inputTensorInfo    = ToTensorInfo(tensorPtr1);
@@ -573,7 +573,7 @@ INetworkPtr TfLiteParser::CreateNetworkFromModel()
     }
 
     size_t subgraphIndex = 0;
-    for (SubGraphPtr const & subgraph : m_Model->subgraphs)
+    for (SubgraphPtr const & subgraph : m_Model->subgraphs)
     {
         m_SubgraphConnections.emplace_back(subgraph->tensors.size());
 
@@ -2237,15 +2237,15 @@ TfLiteParser::TensorRawPtrVector TfLiteParser::GetInputs(const ModelPtr & model,
 {
     CHECK_MODEL(model, subgraphIndex, operatorIndex);
 
-    const auto & subGraphPtr = model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subGraphPtr->operators[operatorIndex];
+    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
 
     size_t inputCount = operatorPtr->inputs.size();
     TensorRawPtrVector result(inputCount);
     for (size_t i=0; i<inputCount; ++i)
     {
         uint32_t inputId = CHECKED_NON_NEGATIVE(operatorPtr->inputs[i]);
-        result[i] = subGraphPtr->tensors[inputId].get();
+        result[i] = subgraphPtr->tensors[inputId].get();
     }
     return result;
 }
@@ -2256,8 +2256,8 @@ TfLiteParser::TensorRawPtrVector TfLiteParser::GetOutputs(const ModelPtr & model
 {
     CHECK_MODEL(model, subgraphIndex, operatorIndex);
 
-    const auto & subGraphPtr = model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subGraphPtr->operators[operatorIndex];
+    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
 
     size_t outputCount = operatorPtr->outputs.size();
     TensorRawPtrVector result(outputCount);
@@ -2265,7 +2265,7 @@ TfLiteParser::TensorRawPtrVector TfLiteParser::GetOutputs(const ModelPtr & model
     {
         uint32_t outputId = CHECKED_NON_NEGATIVE(operatorPtr->outputs[i]);
         CHECK_TENSOR(model, subgraphIndex, outputId);
-        result[i] = subGraphPtr->tensors[outputId].get();
+        result[i] = subgraphPtr->tensors[outputId].get();
     }
     return result;
 }
@@ -2274,15 +2274,15 @@ TfLiteParser::TensorIdRawPtrVector TfLiteParser::GetSubgraphInputs(const ModelPt
                                                                    size_t subgraphIndex)
 {
     CHECK_SUBGRAPH(model, subgraphIndex);
-    const auto & subGraphPtr = model->subgraphs[subgraphIndex];
+    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
 
-    size_t inputCount = subGraphPtr->inputs.size();
+    size_t inputCount = subgraphPtr->inputs.size();
     TensorIdRawPtrVector result(inputCount);
     for (size_t i=0; i<inputCount; ++i)
     {
-        uint32_t inputId = CHECKED_NON_NEGATIVE(subGraphPtr->inputs[i]);
+        uint32_t inputId = CHECKED_NON_NEGATIVE(subgraphPtr->inputs[i]);
         CHECK_TENSOR(model, subgraphIndex, inputId);
-        result[i] = std::make_pair(inputId, subGraphPtr->tensors[inputId].get());
+        result[i] = std::make_pair(inputId, subgraphPtr->tensors[inputId].get());
     }
     return result;
 }
@@ -2291,14 +2291,14 @@ TfLiteParser::TensorIdRawPtrVector TfLiteParser::GetSubgraphOutputs(const ModelP
                                                                     size_t subgraphIndex)
 {
     CHECK_SUBGRAPH(model, subgraphIndex);
-    const auto & subGraphPtr = model->subgraphs[subgraphIndex];
+    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
 
-    size_t outputCount = subGraphPtr->outputs.size();
+    size_t outputCount = subgraphPtr->outputs.size();
     TensorIdRawPtrVector result(outputCount);
     for (size_t i=0; i<outputCount; ++i)
     {
-        uint32_t outputId = CHECKED_NON_NEGATIVE(subGraphPtr->outputs[i]);
-        result[i] = std::make_pair(outputId, subGraphPtr->tensors[outputId].get());
+        uint32_t outputId = CHECKED_NON_NEGATIVE(subgraphPtr->outputs[i]);
+        result[i] = std::make_pair(outputId, subgraphPtr->tensors[outputId].get());
     }
     return result;
 }
@@ -2308,8 +2308,8 @@ std::vector<int32_t>& TfLiteParser::GetInputTensorIds(const ModelPtr& model,
                                                       size_t operatorIndex)
 {
     CHECK_MODEL(model, subgraphIndex, operatorIndex);
-    const auto & subGraphPtr = model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subGraphPtr->operators[operatorIndex];
+    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
     return operatorPtr->inputs;
 }
 
@@ -2318,8 +2318,8 @@ std::vector<int32_t>& TfLiteParser::GetOutputTensorIds(const ModelPtr& model,
                                                        size_t operatorIndex)
 {
     CHECK_MODEL(model, subgraphIndex, operatorIndex);
-    const auto & subGraphPtr = model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subGraphPtr->operators[operatorIndex];
+    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
     return operatorPtr->outputs;
 }
 
@@ -2420,7 +2420,7 @@ void TfLiteParser::SetupConstantLayers(size_t subgraphIndex)
 {
     CHECK_SUBGRAPH(m_Model, subgraphIndex);
 
-    const auto & subGraphPtr = m_Model->subgraphs[subgraphIndex];
+    const auto & subgraphPtr = m_Model->subgraphs[subgraphIndex];
     for (unsigned int subgraphIndex = 0; subgraphIndex < m_SubgraphConnections.size(); ++subgraphIndex)
     {
         for (unsigned int tensorIndex = 0; tensorIndex < m_SubgraphConnections[subgraphIndex].size(); ++tensorIndex)
@@ -2428,7 +2428,7 @@ void TfLiteParser::SetupConstantLayers(size_t subgraphIndex)
             if (m_SubgraphConnections[subgraphIndex][tensorIndex].outputSlot == nullptr &&
                 m_SubgraphConnections[subgraphIndex][tensorIndex].inputSlots.size() > 0)
             {
-                TensorRawPtr tensorPtr = subGraphPtr->tensors[tensorIndex].get();
+                TensorRawPtr tensorPtr = subgraphPtr->tensors[tensorIndex].get();
                 armnn::TensorInfo tensorInfo = ToTensorInfo(tensorPtr);
                 auto tensorAndData = CreateConstTensor(tensorPtr,
                                                        tensorInfo,

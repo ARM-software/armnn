@@ -25,14 +25,14 @@ public:
 
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
 
-    IBackendInternal::ISubGraphConverterPtr CreateSubGraphConverter(
-        const std::shared_ptr<SubGraph>& subGraph) const override;
+    IBackendInternal::ISubgraphViewConverterPtr CreateSubgraphViewConverter(
+        const std::shared_ptr<SubgraphView>& subgraph) const override;
 
     IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
 
-    IBackendInternal::SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph,
-                                                         bool& optimizationAttempted) const override;
+    IBackendInternal::SubgraphViewUniquePtr OptimizeSubgraphView(const SubgraphView& subgraph,
+                                                                 bool& optimizationAttempted) const override;
 };
 
 } // namespace armnn

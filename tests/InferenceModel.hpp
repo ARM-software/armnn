@@ -198,19 +198,19 @@ public:
             network = parser->CreateNetworkFromBinary(file);
         }
 
-        unsigned int subGraphId = boost::numeric_cast<unsigned int>(params.m_SubgraphId);
+        unsigned int subgraphId = boost::numeric_cast<unsigned int>(params.m_SubgraphId);
 
         for (const std::string& inputLayerName : params.m_InputBindings)
         {
             armnnDeserializer::BindingPointInfo inputBinding =
-                parser->GetNetworkInputBindingInfo(subGraphId, inputLayerName);
+                parser->GetNetworkInputBindingInfo(subgraphId, inputLayerName);
             inputBindings.push_back(std::make_pair(inputBinding.m_BindingId, inputBinding.m_TensorInfo));
         }
 
         for (const std::string& outputLayerName : params.m_OutputBindings)
         {
             armnnDeserializer::BindingPointInfo outputBinding =
-                parser->GetNetworkOutputBindingInfo(subGraphId, outputLayerName);
+                parser->GetNetworkOutputBindingInfo(subgraphId, outputLayerName);
             outputBindings.push_back(std::make_pair(outputBinding.m_BindingId, outputBinding.m_TensorInfo));
         }
 

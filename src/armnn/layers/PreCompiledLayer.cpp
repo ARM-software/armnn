@@ -38,7 +38,7 @@ std::unique_ptr<IWorkload> PreCompiledLayer::CreateWorkload(const armnn::Graph& 
 
 void PreCompiledLayer::ValidateTensorShapesFromInputs()
 {
-    // NOTE: since the PreCompiledLayer is an internal layer created from a valid SubGraph,
+    // NOTE: since the PreCompiledLayer is an internal layer created from a valid SubgraphView,
     // we do not need to validate its input shapes
 }
 

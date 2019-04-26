@@ -15,10 +15,10 @@ namespace armnn
 using CompiledBlobDeleter = std::function<void(const void*)>;
 using CompiledBlobPtr = std::unique_ptr<void, CompiledBlobDeleter>;
 
-class ISubGraphConverter
+class ISubgraphViewConverter
 {
 public:
-    virtual ~ISubGraphConverter() {}
+    virtual ~ISubgraphViewConverter() {}
 
     virtual std::vector<CompiledBlobPtr> GetOutput() = 0;
 };

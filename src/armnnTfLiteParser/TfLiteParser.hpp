@@ -20,7 +20,7 @@ class TfLiteParser : public ITfLiteParser
 public:
     // Shorthands for TfLite types
     using ModelPtr = std::unique_ptr<tflite::ModelT>;
-    using SubGraphPtr = std::unique_ptr<tflite::SubGraphT>;
+    using SubgraphPtr = std::unique_ptr<tflite::SubGraphT>;
     using OperatorPtr = std::unique_ptr<tflite::OperatorT>;
     using OperatorCodePtr = std::unique_ptr<tflite::OperatorCodeT>;
     using TensorPtr = std::unique_ptr<tflite::TensorT>;

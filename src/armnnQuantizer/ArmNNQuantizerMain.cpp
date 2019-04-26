@@ -32,8 +32,14 @@ int main(int argc, char* argv[])
         }
     }
     inputFileStream.close();
+
+    armnn::QuantizerOptions quantizerOptions;
+    quantizerOptions.m_ActivationFormat = cmdline.GetQuantizationScheme() == "QSymm16"
+                                          ? armnn::DataType::QuantisedSymm16
+                                          : armnn::DataType::QuantisedAsymm8;
+
     armnn::INetworkPtr network = parser->CreateNetworkFromBinary(binaryContent);
-    armnn::INetworkQuantizerPtr quantizer = armnn::INetworkQuantizer::Create(network.get());
+    armnn::INetworkQuantizerPtr quantizer = armnn::INetworkQuantizer::Create(network.get(), quantizerOptions);
 
     std::string csvFileName = cmdline.GetCsvFileName();
     if (csvFileName != "")

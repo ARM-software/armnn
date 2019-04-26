@@ -59,6 +59,29 @@ bool ValidateProvidedFile(const std::string& inputFileName)
     return true;
 }
 
+bool ValidateQuantizationScheme(const std::string& scheme)
+{
+    if (scheme.empty())
+    {
+        std::cerr << "No Quantization Scheme specified" << std::endl;
+        return false;
+    }
+
+    std::vector<std::string> supportedSchemes = {
+        "QAsymm8",
+        "QSymm16"
+    };
+
+    auto iterator = std::find(supportedSchemes.begin(), supportedSchemes.end(), scheme);
+    if (iterator == supportedSchemes.end())
+    {
+        std::cerr << "Quantization Scheme [" << scheme << "] is not supported" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
 bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
 {
     namespace po = boost::program_options;
@@ -70,6 +93,8 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
                 ("help,h", "Display help messages")
                 ("infile,f", po::value<std::string>(&m_InputFileName)->required(),
                              "Input file containing float 32 ArmNN Input Graph")
+                ("scheme,s", po::value<std::string>(&m_QuantizationScheme)->default_value("QAsymm8"),
+                              "Quantization scheme, \"QAsymm8\" or \"QSymm16\", default value QAsymm8")
                 ("csvfile,c", po::value<std::string>(&m_CsvFileName)->default_value(""),
                              "CSV file containing paths for RAW input tensors")
                 ("outdir,d", po::value<std::string>(&m_OutputDirectory)->required(),
@@ -104,6 +129,11 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
     }
 
     if (!armnnQuantizer::ValidateProvidedFile(m_InputFileName))
+    {
+        return false;
+    }
+
+    if (!ValidateQuantizationScheme(m_QuantizationScheme))
     {
         return false;
     }

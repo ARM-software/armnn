@@ -196,8 +196,12 @@ int ParseCommandLineArgs(int argc, const char* argv[],
         return EXIT_FAILURE;
     }
 
+    if (!vm["input-tensor-shape"].empty())
+    {
+        inputTensorShapeStrs = vm["input-tensor-shape"].as<std::vector<std::string>>();
+    }
+
     inputNames = vm["input-name"].as<std::vector<std::string>>();
-    inputTensorShapeStrs = vm["input-tensor-shape"].as<std::vector<std::string>>();
     outputNames = vm["output-name"].as<std::vector<std::string>>();
 
     return EXIT_SUCCESS;

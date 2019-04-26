@@ -115,30 +115,30 @@ struct DeepSpeechV1TestCaseData
 class DeepSpeechV1Database
 {
 public:
-    explicit DeepSpeechV1Database(const std::string& inputSeqDir, const std::string& prevStateCDir,
-                                  const std::string& prevStateHDir, const std::string& logitsDir,
-                                  const std::string& newStateCDir, const std::string& newStateHDir);
+    explicit DeepSpeechV1Database(const std::string& inputSeqDir, const std::string& prevStateHDir,
+                                  const std::string& prevStateCDir, const std::string& logitsDir,
+                                  const std::string& newStateHDir, const std::string& newStateCDir);
 
     std::unique_ptr<DeepSpeechV1TestCaseData> GetTestCaseData(unsigned int testCaseId);
 
 private:
     std::string m_InputSeqDir;
-    std::string m_PrevStateCDir;
     std::string m_PrevStateHDir;
+    std::string m_PrevStateCDir;
     std::string m_LogitsDir;
-    std::string m_NewStateCDir;
     std::string m_NewStateHDir;
+    std::string m_NewStateCDir;
 };
 
-DeepSpeechV1Database::DeepSpeechV1Database(const std::string& inputSeqDir, const std::string& prevStateCDir,
-                                           const std::string& prevStateHDir, const std::string& logitsDir,
-                                           const std::string& newStateCDir, const std::string& newStateHDir)
+DeepSpeechV1Database::DeepSpeechV1Database(const std::string& inputSeqDir, const std::string& prevStateHDir,
+                                           const std::string& prevStateCDir, const std::string& logitsDir,
+                                           const std::string& newStateHDir, const std::string& newStateCDir)
     : m_InputSeqDir(inputSeqDir)
-    , m_PrevStateCDir(prevStateCDir)
     , m_PrevStateHDir(prevStateHDir)
+    , m_PrevStateCDir(prevStateCDir)
     , m_LogitsDir(logitsDir)
-    , m_NewStateCDir(newStateCDir)
     , m_NewStateHDir(newStateHDir)
+    , m_NewStateCDir(newStateCDir)
 {}
 
 std::unique_ptr<DeepSpeechV1TestCaseData> DeepSpeechV1Database::GetTestCaseData(unsigned int testCaseId)
@@ -194,9 +194,9 @@ std::unique_ptr<DeepSpeechV1TestCaseData> DeepSpeechV1Database::GetTestCaseData(
     }
 
     // use the struct for representing input and output data
-    LstmInput inputDataSingleTest(inputSeqData, prevStateCData, prevStateHData);
+    LstmInput inputDataSingleTest(inputSeqData, prevStateHData, prevStateCData);
 
-    LstmInput expectedOutputsSingleTest(logitsData, expectedNewStateCData, expectedNewStateHData);
+    LstmInput expectedOutputsSingleTest(logitsData, expectedNewStateHData, expectedNewStateCData);
 
     return std::make_unique<DeepSpeechV1TestCaseData>(inputDataSingleTest, expectedOutputsSingleTest);
 }

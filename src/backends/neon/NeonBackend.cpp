@@ -48,7 +48,7 @@ const BackendId& NeonBackend::GetIdStatic()
 IBackendInternal::IMemoryManagerUniquePtr NeonBackend::CreateMemoryManager() const
 {
     return std::make_unique<NeonMemoryManager>(std::make_unique<arm_compute::Allocator>(),
-                                               BaseMemoryManager::MemoryAffinity::Buffer);
+                                               BaseMemoryManager::MemoryAffinity::Offset);
 }
 
 IBackendInternal::IWorkloadFactoryPtr NeonBackend::CreateWorkloadFactory(

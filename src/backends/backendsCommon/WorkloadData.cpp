@@ -634,6 +634,14 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
     ValidatePointer(m_Weight, "DepthwiseConvolution2dQueueDescriptor", "weight");
     ValidateTensorNumDimensions(m_Weight->GetTensorInfo(), "DepthwiseConvolution2dQueueDescriptor", 4, "weight");
 
+    if (m_Parameters.m_DilationX < 1 || m_Parameters.m_DilationY < 1 )
+    {
+        throw InvalidArgumentException(
+            boost::str(boost::format("DepthwiseConvolution2dQueueDescriptor: dilationX (provided %1%) "
+                                     "and dilationY (provided %2%) cannot be smaller than 1.")
+                                     % m_Parameters.m_DilationX % m_Parameters.m_DilationX));
+    }
+
     const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;
 
     // Expected weight shape: [ M, I, H, W ] - This shape does NOT depend on the data layout

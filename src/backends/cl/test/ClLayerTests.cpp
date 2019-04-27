@@ -108,6 +108,8 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8Nhwc,
                      DepthwiseConvolution2dDepthMul1Uint8Test, true, armnn::DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1Uint8Nhwc,
                      DepthwiseConvolution2dDepthMul1Uint8Test, false, armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(SimpleDepthwiseConvolution2d3x3Dilation3x3Nhwc,
+                     SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTest)
 
 
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthNhwc, DepthwiseConvolution2dDepthNhwcTest, false)

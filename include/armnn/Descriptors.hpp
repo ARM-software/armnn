@@ -330,9 +330,9 @@ struct DepthwiseConvolution2dDescriptor
     uint32_t   m_StrideX;
     /// Stride value when proceeding through input for the height dimension.
     uint32_t   m_StrideY;
-    /// Dilation along x axis
+    /// Dilation factor value for width dimension.
     uint32_t   m_DilationX;
-    /// Dilation along y axis
+    /// Dilation factor value for height dimension.
     uint32_t   m_DilationY;
     /// Enable/disable bias.
     bool       m_BiasEnabled;

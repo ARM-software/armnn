@@ -827,7 +827,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
     uint32_t padRight = 0,
     uint32_t padBottom = 0,
     uint32_t strideX = 1,
-    uint32_t strideY = 1)
+    uint32_t strideY = 1,
+    uint32_t dilationX = 1,
+    uint32_t dilationY = 1)
 {
     unsigned int inputNum       = boost::numeric_cast<unsigned int>(input.shape()[0]);
     unsigned int inputChannels  = boost::numeric_cast<unsigned int>(input.shape()[3]);
@@ -894,6 +896,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
     data.m_Parameters.m_PadTop = padTop;
     data.m_Parameters.m_PadBottom = padBottom;
     data.m_Parameters.m_DataLayout = armnn::DataLayout::NHWC;
+    data.m_Parameters.m_DilationX = dilationX;
+    data.m_Parameters.m_DilationY = dilationY;
 
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());

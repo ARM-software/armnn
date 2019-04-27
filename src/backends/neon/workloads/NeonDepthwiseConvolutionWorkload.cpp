@@ -117,7 +117,7 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-   // Get the depth multiplier
+    // Get the depth multiplier
     const unsigned int depthMultiplier = weightInfo.GetShape()[0];
 
     // Check for optimisation opportunities.

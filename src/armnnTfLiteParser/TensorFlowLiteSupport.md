@@ -70,4 +70,6 @@ Arm tested these operators with the following TensorFlow Lite neural network:
 
 * [Quantized SSD MobileNet](http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18.tar.gz)
 
+* DeepSpeech v1 converted from [TensorFlow model](https://github.com/mozilla/DeepSpeech/releases/tag/v0.4.1)
+
 More machine learning operators will be supported in future releases.

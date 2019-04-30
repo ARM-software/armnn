@@ -262,8 +262,17 @@ LayerPriority Layer::GetPriority() const
 
         auto maxPrio = [](const LayerPriority prio, const InputSlot& slot) -> LayerPriority
             {
-                const Layer& input = slot.GetConnectedOutputSlot()->GetOwningLayer();
-                return std::max(prio, input.GetPriority());
+                const OutputSlot *outputSlot = slot.GetConnectedOutputSlot();
+                if (outputSlot)
+                {
+                    const Layer& input = outputSlot->GetOwningLayer();
+                    return std::max(prio, input.GetPriority());
+                }
+                else
+                {
+                    // unconnected input slot
+                    return prio;
+                }
             };
 
         m_Visiting = true;

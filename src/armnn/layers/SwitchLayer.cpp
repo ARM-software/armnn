@@ -39,7 +39,7 @@ void SwitchLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
         GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape() });
 
-    BOOST_ASSERT(inferredShapes.size() == 1);
+    BOOST_ASSERT(inferredShapes.size() == 2);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
         "SwitchLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",

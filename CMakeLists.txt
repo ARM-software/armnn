@@ -421,6 +421,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/ExecutionFrameTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp
+        src/armnn/test/FlowControl.cpp
         src/armnn/test/GraphTests.cpp
         src/armnn/test/GraphUtils.cpp
         src/armnn/test/GraphUtils.hpp

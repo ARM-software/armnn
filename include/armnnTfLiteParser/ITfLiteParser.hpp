@@ -16,8 +16,7 @@
 namespace armnnTfLiteParser
 {
 
-// TODO: revise this: do we really need this for every parser???
-using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+using BindingPointInfo = armnn::BindingPointInfo;
 
 class ITfLiteParser;
 using ITfLiteParserPtr = std::unique_ptr<ITfLiteParser, void(*)(ITfLiteParser* parser)>;

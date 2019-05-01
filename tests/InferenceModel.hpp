@@ -74,9 +74,7 @@ inline bool CheckRequestedBackendsAreValid(const std::vector<armnn::BackendId>& 
 
 namespace InferenceModelInternal
 {
-// This needs to go when the armnnCaffeParser, armnnTfParser and armnnTfLiteParser
-// definitions of BindingPointInfo gets consolidated.
-using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+using BindingPointInfo = armnn::BindingPointInfo;
 
 using QuantizationParams = std::pair<float,int32_t>;
 
@@ -108,11 +106,10 @@ struct CreateNetworkImpl
 {
 public:
     using Params = InferenceModelInternal::Params;
-    using BindingPointInfo = InferenceModelInternal::BindingPointInfo;
 
     static armnn::INetworkPtr Create(const Params& params,
-                                     std::vector<BindingPointInfo>& inputBindings,
-                                     std::vector<BindingPointInfo>& outputBindings)
+                                     std::vector<armnn::BindingPointInfo>& inputBindings,
+                                     std::vector<armnn::BindingPointInfo>& outputBindings)
     {
         const std::string& modelPath = params.m_ModelPath;
 
@@ -169,11 +166,10 @@ struct CreateNetworkImpl<armnnDeserializer::IDeserializer>
 public:
     using IParser          = armnnDeserializer::IDeserializer;
     using Params           = InferenceModelInternal::Params;
-    using BindingPointInfo = InferenceModelInternal::BindingPointInfo;
 
     static armnn::INetworkPtr Create(const Params& params,
-                                     std::vector<BindingPointInfo>& inputBindings,
-                                     std::vector<BindingPointInfo>& outputBindings)
+                                     std::vector<armnn::BindingPointInfo>& inputBindings,
+                                     std::vector<armnn::BindingPointInfo>& outputBindings)
     {
         auto parser(IParser::Create());
         BOOST_ASSERT(parser);
@@ -226,11 +222,10 @@ struct CreateNetworkImpl<armnnTfLiteParser::ITfLiteParser>
 public:
     using IParser = armnnTfLiteParser::ITfLiteParser;
     using Params = InferenceModelInternal::Params;
-    using BindingPointInfo = InferenceModelInternal::BindingPointInfo;
 
     static armnn::INetworkPtr Create(const Params& params,
-                                     std::vector<BindingPointInfo>& inputBindings,
-                                     std::vector<BindingPointInfo>& outputBindings)
+                                     std::vector<armnn::BindingPointInfo>& inputBindings,
+                                     std::vector<armnn::BindingPointInfo>& outputBindings)
     {
         const std::string& modelPath = params.m_ModelPath;
 
@@ -246,14 +241,14 @@ public:
 
         for (const std::string& inputLayerName : params.m_InputBindings)
         {
-            BindingPointInfo inputBinding =
+            armnn::BindingPointInfo inputBinding =
                 parser->GetNetworkInputBindingInfo(params.m_SubgraphId, inputLayerName);
             inputBindings.push_back(inputBinding);
         }
 
         for (const std::string& outputLayerName : params.m_OutputBindings)
         {
-            BindingPointInfo outputBinding =
+            armnn::BindingPointInfo outputBinding =
                 parser->GetNetworkOutputBindingInfo(params.m_SubgraphId, outputLayerName);
             outputBindings.push_back(outputBinding);
         }
@@ -309,7 +304,7 @@ public:
 
 template<typename TContainer>
 inline armnn::InputTensors MakeInputTensors(
-    const std::vector<InferenceModelInternal::BindingPointInfo>& inputBindings,
+    const std::vector<armnn::BindingPointInfo>& inputBindings,
     const std::vector<TContainer>& inputDataContainers)
 {
     armnn::InputTensors inputTensors;
@@ -323,7 +318,7 @@ inline armnn::InputTensors MakeInputTensors(
 
     for (size_t i = 0; i < numInputs; i++)
     {
-        const InferenceModelInternal::BindingPointInfo& inputBinding = inputBindings[i];
+        const armnn::BindingPointInfo& inputBinding = inputBindings[i];
         const TContainer& inputData = inputDataContainers[i];
 
         boost::apply_visitor([&](auto&& value)
@@ -344,7 +339,7 @@ inline armnn::InputTensors MakeInputTensors(
 
 template<typename TContainer>
 inline armnn::OutputTensors MakeOutputTensors(
-    const std::vector<InferenceModelInternal::BindingPointInfo>& outputBindings,
+    const std::vector<armnn::BindingPointInfo>& outputBindings,
     std::vector<TContainer>& outputDataContainers)
 {
     armnn::OutputTensors outputTensors;
@@ -358,7 +353,7 @@ inline armnn::OutputTensors MakeOutputTensors(
 
     for (size_t i = 0; i < numOutputs; i++)
     {
-        const InferenceModelInternal::BindingPointInfo& outputBinding = outputBindings[i];
+        const armnn::BindingPointInfo& outputBinding = outputBindings[i];
         TContainer& outputData = outputDataContainers[i];
 
         boost::apply_visitor([&](auto&& value)
@@ -383,7 +378,6 @@ class InferenceModel
 public:
     using DataType           = TDataType;
     using Params             = InferenceModelInternal::Params;
-    using BindingPointInfo   = InferenceModelInternal::BindingPointInfo;
     using QuantizationParams = InferenceModelInternal::QuantizationParams;
     using TContainer         = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
 
@@ -564,24 +558,24 @@ public:
         }
     }
 
-    const BindingPointInfo& GetInputBindingInfo(unsigned int inputIndex = 0u) const
+    const armnn::BindingPointInfo& GetInputBindingInfo(unsigned int inputIndex = 0u) const
     {
         CheckInputIndexIsValid(inputIndex);
         return m_InputBindings[inputIndex];
     }
 
-    const std::vector<BindingPointInfo>& GetInputBindingInfos() const
+    const std::vector<armnn::BindingPointInfo>& GetInputBindingInfos() const
     {
         return m_InputBindings;
     }
 
-    const BindingPointInfo& GetOutputBindingInfo(unsigned int outputIndex = 0u) const
+    const armnn::BindingPointInfo& GetOutputBindingInfo(unsigned int outputIndex = 0u) const
     {
         CheckOutputIndexIsValid(outputIndex);
         return m_OutputBindings[outputIndex];
     }
 
-    const std::vector<BindingPointInfo>& GetOutputBindingInfos() const
+    const std::vector<armnn::BindingPointInfo>& GetOutputBindingInfos() const
     {
         return m_OutputBindings;
     }
@@ -614,8 +608,8 @@ private:
     armnn::NetworkId m_NetworkIdentifier;
     std::shared_ptr<armnn::IRuntime> m_Runtime;
 
-    std::vector<InferenceModelInternal::BindingPointInfo> m_InputBindings;
-    std::vector<InferenceModelInternal::BindingPointInfo> m_OutputBindings;
+    std::vector<armnn::BindingPointInfo> m_InputBindings;
+    std::vector<armnn::BindingPointInfo> m_OutputBindings;
     bool m_EnableProfiling;
 
     template<typename TContainer>

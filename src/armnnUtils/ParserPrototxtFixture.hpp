@@ -187,13 +187,11 @@ template <std::size_t NumOutputDimensions, typename T>
 void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::vector<float>>& inputData,
     const std::map<std::string, std::vector<T>>& expectedOutputData)
 {
-    using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
-
     // Sets up the armnn input tensors from the given vectors.
     armnn::InputTensors inputTensors;
     for (auto&& it : inputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(it.first);
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(it.first);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }
 
@@ -202,7 +200,7 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
         outputStorage.emplace(it.first, MakeTensor<T, NumOutputDimensions>(bindingInfo.second));
         outputTensors.push_back(
             { bindingInfo.first, armnn::Tensor(bindingInfo.second, outputStorage.at(it.first).data()) });
@@ -213,7 +211,7 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
     // Compares each output tensor to the expected values.
     for (auto&& it : expectedOutputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(it.first);
         if (bindingInfo.second.GetNumElements() != it.second.size())
         {
             throw armnn::Exception(

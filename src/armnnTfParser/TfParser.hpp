@@ -31,8 +31,6 @@ class NodeDef;
 namespace armnnTfParser
 {
 
-using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
-
 class ParsedTfOperation;
 using ParsedTfOperationPtr = std::unique_ptr<ParsedTfOperation>;
 

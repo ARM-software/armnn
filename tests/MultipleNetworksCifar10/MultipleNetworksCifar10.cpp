@@ -186,9 +186,8 @@ int main(int argc, char* argv[])
 
             for (unsigned int k = 0; k < networksCount; ++k)
             {
-                using BindingPointInfo = InferenceModelInternal::BindingPointInfo;
-                std::vector<BindingPointInfo> inputBindings  = { networks[k].m_InputBindingInfo  };
-                std::vector<BindingPointInfo> outputBindings = { networks[k].m_OutputBindingInfo };
+                std::vector<armnn::BindingPointInfo> inputBindings  = { networks[k].m_InputBindingInfo  };
+                std::vector<armnn::BindingPointInfo> outputBindings = { networks[k].m_OutputBindingInfo };
 
                 std::vector<TContainer> inputDataContainers = { testCaseData->m_InputImage };
                 std::vector<TContainer> outputDataContainers = { outputs[k] };

@@ -16,7 +16,7 @@
 namespace armnnTfParser
 {
 
-using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+using BindingPointInfo = armnn::BindingPointInfo;
 
 class ITfParser;
 using ITfParserPtr = std::unique_ptr<ITfParser, void(*)(ITfParser* parser)>;

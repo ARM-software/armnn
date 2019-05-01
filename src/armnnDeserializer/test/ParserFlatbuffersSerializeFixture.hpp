@@ -203,8 +203,6 @@ void ParserFlatbuffersSerializeFixture::RunTest(
     const std::map<std::string, std::vector<InputDataType>>& inputData,
     const std::map<std::string, std::vector<OutputDataType>>& expectedOutputData)
 {
-    using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
-
     auto ConvertBindingInfo = [](const armnnDeserializer::BindingPointInfo& bindingInfo)
         {
             return std::make_pair(bindingInfo.m_BindingId, bindingInfo.m_TensorInfo);
@@ -214,7 +212,8 @@ void ParserFlatbuffersSerializeFixture::RunTest(
     armnn::InputTensors inputTensors;
     for (auto&& it : inputData)
     {
-        BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkInputBindingInfo(layersId, it.first));
+        armnn::BindingPointInfo bindingInfo = ConvertBindingInfo(
+            m_Parser->GetNetworkInputBindingInfo(layersId, it.first));
         armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnInputType);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }
@@ -224,7 +223,8 @@ void ParserFlatbuffersSerializeFixture::RunTest(
     armnn::OutputTensors outputTensors;
     for (auto&& it : expectedOutputData)
     {
-        BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
+        armnn::BindingPointInfo bindingInfo = ConvertBindingInfo(
+            m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
         armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnOutputType);
         outputStorage.emplace(it.first, MakeTensor<OutputDataType, NumOutputDimensions>(bindingInfo.second));
         outputTensors.push_back(
@@ -236,7 +236,8 @@ void ParserFlatbuffersSerializeFixture::RunTest(
     // Compare each output tensor to the expected values
     for (auto&& it : expectedOutputData)
     {
-        BindingPointInfo bindingInfo = ConvertBindingInfo(m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
+        armnn::BindingPointInfo bindingInfo = ConvertBindingInfo(
+            m_Parser->GetNetworkOutputBindingInfo(layersId, it.first));
         auto outputExpected = MakeTensor<OutputDataType, NumOutputDimensions>(bindingInfo.second, it.second);
         BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
     }

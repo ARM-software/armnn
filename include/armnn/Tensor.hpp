@@ -101,6 +101,8 @@ private:
     } m_Quantization;
 };
 
+using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+
 template<typename MemoryType>
 class BaseTensor
 {

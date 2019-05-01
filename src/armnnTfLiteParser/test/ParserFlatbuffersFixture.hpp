@@ -255,13 +255,11 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
                                        const std::map<std::string, std::vector<DataType1>>& inputData,
                                        const std::map<std::string, std::vector<DataType2>>& expectedOutputData)
 {
-    using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
-
     // Setup the armnn input tensors from the given vectors.
     armnn::InputTensors inputTensors;
     for (auto&& it : inputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
         armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType1);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }
@@ -293,7 +291,7 @@ void ParserFlatbuffersFixture::RunTest(size_t subgraphId,
     // Compare each output tensor to the expected values
     for (auto&& it : expectedOutputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
         auto outputExpected = MakeTensor<DataType2, NumOutputDimensions>(bindingInfo.second, it.second);
         BOOST_TEST(CompareTensors(outputExpected, outputStorage[it.first]));
     }
@@ -311,13 +309,11 @@ void ParserFlatbuffersFixture::RunTest(std::size_t subgraphId,
                                        const std::map<std::string, std::vector<DataType1>>& inputData,
                                        const std::map<std::string, std::vector<DataType2>>& expectedOutputData)
 {
-    using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
-
     // Setup the armnn input tensors from the given vectors.
     armnn::InputTensors inputTensors;
     for (auto&& it : inputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
         armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType1);
 
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
@@ -328,7 +324,7 @@ void ParserFlatbuffersFixture::RunTest(std::size_t subgraphId,
     std::map<std::string, std::vector<DataType2>> outputStorage;
     for (auto&& it : expectedOutputData)
     {
-        BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
+        armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkOutputBindingInfo(subgraphId, it.first);
         armnn::VerifyTensorInfoDataType(bindingInfo.second, armnnType2);
 
         std::vector<DataType2> out(it.second.size());

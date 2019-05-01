@@ -14,7 +14,7 @@
 namespace armnnOnnxParser
 {
 
-using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+using BindingPointInfo = armnn::BindingPointInfo;
 
 class IOnnxParser;
 using IOnnxParserPtr = std::unique_ptr<IOnnxParser, void(*)(IOnnxParser* parser)>;

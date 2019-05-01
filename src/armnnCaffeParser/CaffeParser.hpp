@@ -23,8 +23,6 @@ class NetParameter;
 namespace armnnCaffeParser
 {
 
-using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
-
 class CaffeParserBase:  public ICaffeParser
 {
 public:

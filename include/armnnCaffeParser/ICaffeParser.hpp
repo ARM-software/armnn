@@ -16,7 +16,7 @@
 namespace armnnCaffeParser
 {
 
-using BindingPointInfo = std::pair<armnn::LayerBindingId, armnn::TensorInfo>;
+using BindingPointInfo = armnn::BindingPointInfo;
 
 class ICaffeParser;
 using ICaffeParserPtr = std::unique_ptr<ICaffeParser, void(*)(ICaffeParser* parser)>;

@@ -1203,7 +1203,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
             preCompiledLayer = layer;
         }
     }
-    BOOST_TEST(preCompiledLayer);
+    BOOST_CHECK(preCompiledLayer != nullptr);
 
     // Create the TensorHandles.
     CreateTensorHandles(optimisedGraph, factory);

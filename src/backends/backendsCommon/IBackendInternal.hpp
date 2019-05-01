@@ -43,6 +43,7 @@ public:
 
     using ISubgraphViewConverterPtr = std::unique_ptr<ISubgraphViewConverter>;
 
+    using GraphUniquePtr = std::unique_ptr<Graph>;
     using SubgraphViewUniquePtr = std::unique_ptr<SubgraphView>;
 
     virtual IMemoryManagerUniquePtr CreateMemoryManager() const = 0;

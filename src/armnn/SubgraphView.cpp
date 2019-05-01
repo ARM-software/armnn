@@ -42,28 +42,14 @@ SubgraphView::SubgraphView(Graph& graph)
     : m_InputSlots{}
     , m_OutputSlots{}
     , m_Layers(graph.begin(), graph.end())
-    , m_ParentGraph(&graph)
 {
     CheckSubgraph();
 }
 
-SubgraphView::SubgraphView(Graph* parentGraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers)
+SubgraphView::SubgraphView(InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers)
     : m_InputSlots{inputs}
     , m_OutputSlots{outputs}
     , m_Layers{layers}
-    , m_ParentGraph(parentGraph)
-{
-    CheckSubgraph();
-}
-
-SubgraphView::SubgraphView(const SubgraphView& referenceSubgraph,
-                           InputSlots&& inputs,
-                           OutputSlots&& outputs,
-                           Layers&& layers)
-    : m_InputSlots{inputs}
-    , m_OutputSlots{outputs}
-    , m_Layers{layers}
-    , m_ParentGraph(referenceSubgraph.m_ParentGraph)
 {
     CheckSubgraph();
 }
@@ -72,7 +58,6 @@ SubgraphView::SubgraphView(const SubgraphView& subgraph)
     : m_InputSlots(subgraph.m_InputSlots.begin(), subgraph.m_InputSlots.end())
     , m_OutputSlots(subgraph.m_OutputSlots.begin(), subgraph.m_OutputSlots.end())
     , m_Layers(subgraph.m_Layers.begin(), subgraph.m_Layers.end())
-    , m_ParentGraph(subgraph.m_ParentGraph)
 {
     CheckSubgraph();
 }
@@ -81,16 +66,14 @@ SubgraphView::SubgraphView(SubgraphView&& subgraph)
     : m_InputSlots(std::move(subgraph.m_InputSlots))
     , m_OutputSlots(std::move(subgraph.m_OutputSlots))
     , m_Layers(std::move(subgraph.m_Layers))
-    , m_ParentGraph(std::exchange(subgraph.m_ParentGraph, nullptr))
 {
     CheckSubgraph();
 }
 
-SubgraphView::SubgraphView(const SubgraphView& referenceSubgraph, IConnectableLayer* layer)
+SubgraphView::SubgraphView(IConnectableLayer* layer)
     : m_InputSlots{}
     , m_OutputSlots{}
     , m_Layers{boost::polymorphic_downcast<Layer*>(layer)}
-    , m_ParentGraph(referenceSubgraph.m_ParentGraph)
 {
     unsigned int numInputSlots = layer->GetNumInputSlots();
     m_InputSlots.resize(numInputSlots);
@@ -111,9 +94,6 @@ SubgraphView::SubgraphView(const SubgraphView& referenceSubgraph, IConnectableLa
 
 void SubgraphView::CheckSubgraph()
 {
-    // Check that the sub-graph has a valid parent graph
-    BOOST_ASSERT_MSG(m_ParentGraph, "Sub-graphs must have a parent graph");
-
     // Check for invalid or duplicate input slots
     AssertIfNullsOrDuplicates(m_InputSlots, "Sub-graphs cannot contain null or duplicate input slots");
 
@@ -122,23 +102,6 @@ void SubgraphView::CheckSubgraph()
 
     // Check for invalid or duplicate layers
     AssertIfNullsOrDuplicates(m_Layers, "Sub-graphs cannot contain null or duplicate layers");
-
-    // Check that all the layers of the sub-graph belong to the parent graph
-    std::for_each(m_Layers.begin(), m_Layers.end(), [&](const Layer* l)
-    {
-        BOOST_ASSERT_MSG(std::find(m_ParentGraph->begin(), m_ParentGraph->end(), l) != m_ParentGraph->end(),
-                         "Sub-graph layer is not a member of the parent graph");
-    });
-}
-
-void SubgraphView::Update(Graph &graph)
-{
-    m_InputSlots.clear();
-    m_OutputSlots.clear();
-    m_Layers.assign(graph.begin(), graph.end());
-    m_ParentGraph = &graph;
-
-    CheckSubgraph();
 }
 
 const SubgraphView::InputSlots& SubgraphView::GetInputSlots() const
@@ -158,7 +121,7 @@ const InputSlot* SubgraphView::GetInputSlot(unsigned int index) const
 
 InputSlot* SubgraphView::GetInputSlot(unsigned int index)
 {
-    return  m_InputSlots.at(index);
+    return m_InputSlots.at(index);
 }
 
 const OutputSlot* SubgraphView::GetOutputSlot(unsigned int index) const
@@ -181,12 +144,12 @@ unsigned int SubgraphView::GetNumOutputSlots() const
     return boost::numeric_cast<unsigned int>(m_OutputSlots.size());
 }
 
-const SubgraphView::Layers & SubgraphView::GetLayers() const
+const SubgraphView::Layers& SubgraphView::GetLayers() const
 {
     return m_Layers;
 }
 
-SubgraphView::Layers::iterator SubgraphView::begin()
+SubgraphView::Iterator SubgraphView::begin()
 {
     return m_Layers.begin();
 }

@@ -321,7 +321,7 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectabl
 
     // Create a new sub-graph with only the given layer, using
     // the given sub-graph as a reference of which parent graph to use
-    SubgraphView substituteSubgraph(subgraph, substituteLayer);
+    SubgraphView substituteSubgraph(substituteLayer);
     ReplaceSubgraphConnections(subgraph, substituteSubgraph);
 }
 

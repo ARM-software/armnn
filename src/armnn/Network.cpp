@@ -348,13 +348,13 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
         // Select sub-graphs based on backend
         SubgraphViewSelector::Subgraphs subgraphs =
                 SubgraphViewSelector::SelectSubgraphs(mainSubgraph,
-                                                  // Select layers assigned to the requested backend
-                                                  [&backendObjPtr](const Layer& layer)
-                                                  {
-                                                      return layer.GetType() != LayerType::Input &&
-                                                             layer.GetType() != LayerType::Output &&
-                                                             layer.GetBackendId() == backendObjPtr->GetId();
-                                                  });
+                                                      // Select layers assigned to the requested backend
+                                                      [&backendObjPtr](const Layer& layer)
+                                                      {
+                                                          return layer.GetType() != LayerType::Input &&
+                                                                 layer.GetType() != LayerType::Output &&
+                                                                 layer.GetBackendId() == backendObjPtr->GetId();
+                                                      });
         if (subgraphs.empty())
         {
             // No sub-graphs found, try with next selected backend
@@ -388,9 +388,6 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                     BOOST_ASSERT(l);
                     l->SetBackendId(selectedBackend);
                 });
-
-                // Recreate the sub-graph representing the entire graph
-                mainSubgraph.Update(optGraph);
             }
             else
             {

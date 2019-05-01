@@ -182,10 +182,8 @@ SubgraphViewSelector::SelectSubgraphs(SubgraphView& subgraph, const LayerSelecto
                 infoPtr->CollectNonSelectedOutputSlots(outputs, selector);
                 layers.push_back(infoPtr->m_Layer);
             }
-            // Create a new sub-graph with the new lists of input/output slots and layer, using
-            // the given sub-graph as a reference of which parent graph to use
-            result.emplace_back(std::make_unique<SubgraphView>(subgraph,
-                                                               std::move(inputs),
+            // Create a new sub-graph with the new lists of input/output slots and layer
+            result.emplace_back(std::make_unique<SubgraphView>(std::move(inputs),
                                                                std::move(outputs),
                                                                std::move(layers)));
         }

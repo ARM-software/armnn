@@ -17,7 +17,7 @@ namespace armnn
 ///
 /// The SubgraphView class represents a subgraph of a Graph.
 /// The data it holds, points to data held by layers of the Graph, so the
-/// the contents of the SubgraphView becomes invalid when the Layers are destroyed
+/// the contents of the SubgraphView become invalid when the Layers are destroyed
 /// or changed.
 ///
 class SubgraphView final
@@ -30,18 +30,11 @@ public:
     using Iterator = Layers::iterator;
     using ConstIterator = Layers::const_iterator;
 
-    /// Empty subgraphs are not allowed, they must at least have a parent graph.
-    SubgraphView() = delete;
-
     /// Constructs a sub-graph from the entire given graph.
     SubgraphView(Graph& graph);
 
-    /// Constructs a sub-graph with the given arguments and binds it to the specified parent graph.
-    SubgraphView(Graph* parentGraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
-
-    /// Constructs a sub-graph with the given arguments and uses the specified sub-graph to get a reference
-    /// to the parent graph.
-    SubgraphView(const SubgraphView& referenceSubgraph, InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
+    /// Constructs a sub-graph with the given arguments.
+    SubgraphView(InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
 
     /// Copy-constructor.
     SubgraphView(const SubgraphView& subgraph);
@@ -49,16 +42,8 @@ public:
     /// Move-constructor.
     SubgraphView(SubgraphView&& subgraph);
 
-    /// Constructs a sub-graph with only the given layer and uses the specified sub-graph to get a reference
-    /// to the parent graph.
-    SubgraphView(const SubgraphView& referenceSubgraph, IConnectableLayer* layer);
-
-    /// Updates this sub-graph with the contents of the whole given graph.
-    void Update(Graph& graph);
-
-    /// Adds a new layer, of type LayerType, to the parent graph of this sub-graph.
-    template <typename LayerT, typename... Args>
-    LayerT* AddLayer(Args&&... args) const;
+    /// Constructs a sub-graph with only the given layer.
+    SubgraphView(IConnectableLayer* layer);
 
     const InputSlots& GetInputSlots() const;
     const OutputSlots& GetOutputSlots() const;
@@ -93,17 +78,6 @@ private:
 
     /// The list of pointers to the layers of the parent graph.
     Layers m_Layers;
-
-    /// Pointer to the graph this sub-graph is a view of.
-    Graph* m_ParentGraph;
 };
-
-template <typename LayerT, typename... Args>
-LayerT* SubgraphView::AddLayer(Args&&... args) const
-{
-    BOOST_ASSERT(m_ParentGraph);
-
-    return m_ParentGraph->AddLayer<LayerT>(args...);
-}
 
 } // namespace armnn

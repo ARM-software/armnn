@@ -65,14 +65,13 @@ SubgraphView::OutputSlots CreateOutputsFrom(const std::vector<Layer*>& layers)
 
 //
 // this takes the inputs, outputs and layers as a copy and the move these copies into the
-// resulting subgraph, so the pass bay value is intentional
+// resulting subgraph, so the pass by value is intentional
 //
-SubgraphViewSelector::SubgraphViewPtr CreateSubgraphViewFrom(Graph& graph,
-                                                             SubgraphView::InputSlots&& inputs,
+SubgraphViewSelector::SubgraphViewPtr CreateSubgraphViewFrom(SubgraphView::InputSlots&& inputs,
                                                              SubgraphView::OutputSlots&& outputs,
                                                              SubgraphView::Layers&& layers)
 {
-    return std::make_unique<SubgraphView>(&graph, std::move(inputs), std::move(outputs), std::move(layers));
+    return std::make_unique<SubgraphView>(std::move(inputs), std::move(outputs), std::move(layers));
 }
 
 template <typename T, typename Iterator>
@@ -147,8 +146,7 @@ BOOST_AUTO_TEST_CASE(SingleInputSingleOutput)
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(graph,
-                                                                            CreateInputsFrom({convLayer1}),
+    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
                                                                             CreateOutputsFrom({convLayer2}),
                                                                             {});
 
@@ -195,8 +193,7 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
     mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(graph,
-                                                                            CreateInputsFrom({convLayer1, convLayer2}),
+    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}),
                                                                             CreateOutputsFrom({mergerLayer}),
                                                                             {});
 
@@ -245,8 +242,7 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(graph,
-                                                                            CreateInputsFrom({splitterLayer}),
+    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({splitterLayer}),
                                                                             CreateOutputsFrom({convLayer1, convLayer2}),
                                                                             {});
 
@@ -297,8 +293,7 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(graph,
-                                                                            CreateInputsFrom({convLayer1, convLayer2}),
+    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}),
                                                                             CreateOutputsFrom({convLayer1, convLayer2}),
                                                                             {});
 
@@ -344,8 +339,7 @@ BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
     graph.AddLayer<OutputLayer>(0, "output");
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(graph,
-                                                                            {},
+    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom({},
                                                                             {},
                                                                             {splitterLayer,
                                                                              convLayer1,
@@ -433,8 +427,7 @@ BOOST_AUTO_TEST_CASE(OneSubgraphsSelectedASingleMatch)
     BOOST_TEST(subgraphs.size() == 1);
     if (subgraphs.size() == 1)
     {
-        auto expected = CreateSubgraphViewFrom(graph,
-                                               CreateInputsFrom({output}),
+        auto expected = CreateSubgraphViewFrom(CreateInputsFrom({output}),
                                                // outputs of 'output' will be empty
                                                CreateOutputsFrom({output}),
                                                {output});
@@ -469,8 +462,7 @@ BOOST_AUTO_TEST_CASE(MultipleLayersSelectedInTheMiddle)
     BOOST_TEST(subgraphs.size() == 1);
     if (subgraphs.size() == 1)
     {
-        auto expected = CreateSubgraphViewFrom(graph,
-                                               CreateInputsFrom({mid1}),
+        auto expected = CreateSubgraphViewFrom(CreateInputsFrom({mid1}),
                                                CreateOutputsFrom({mid0}),
                                                {mid1, mid0});
 
@@ -541,13 +533,11 @@ BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
             });
 
     // expected results to test against
-    auto largerSubgraph = CreateSubgraphViewFrom(graph,
-                                                 CreateInputsFrom({m1, m4}),
+    auto largerSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({m1, m4}),
                                                  CreateOutputsFrom({m3, m4}),
                                                  {m1, m4, m2, m3});
 
-    auto smallerSubgraph = CreateSubgraphViewFrom(graph,
-                                                  CreateInputsFrom({m5}),
+    auto smallerSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({m5}),
                                                   CreateOutputsFrom({m5}),
                                                   {m5});
 
@@ -619,13 +609,11 @@ BOOST_AUTO_TEST_CASE(MultipleSimpleSubgraphs)
             });
 
     // expected results to test against
-    auto largerSubgraph = CreateSubgraphViewFrom(graph,
-                                                 CreateInputsFrom({m1}),
+    auto largerSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({m1}),
                                                  CreateOutputsFrom({m2}),
                                                  {m1, m2});
 
-    auto smallerSubgraph = CreateSubgraphViewFrom(graph,
-                                                  CreateInputsFrom({m3}),
+    auto smallerSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({m3}),
                                                   CreateOutputsFrom({m3}),
                                                   {m3});
 
@@ -693,8 +681,7 @@ BOOST_AUTO_TEST_CASE(SimpleLinearTest)
     BOOST_CHECK(subgraphs.size() == 1);
     if(subgraphs.size() == 1)
     {
-        auto expected = CreateSubgraphViewFrom(graph,
-                                               CreateInputsFrom({layerM1}),
+        auto expected = CreateSubgraphViewFrom(CreateInputsFrom({layerM1}),
                                                CreateOutputsFrom({layerM2}),
                                                {layerM1, layerM2});
 
@@ -749,8 +736,7 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
     BOOST_CHECK(subgraphs.size() == 1);
     if (subgraphs.size() == 1)
     {
-        auto expected = CreateSubgraphViewFrom(graph,
-                                               CreateInputsFrom({layerM1, layerM2}),
+        auto expected = CreateSubgraphViewFrom(CreateInputsFrom({layerM1, layerM2}),
                                                CreateOutputsFrom({layerM3}),
                                                {layerM1, layerM2, layerM3});
 
@@ -806,8 +792,7 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     BOOST_CHECK(subgraphs.size() == 1);
     if(subgraphs.size() == 1)
     {
-        auto expected = CreateSubgraphViewFrom(graph,
-                                               CreateInputsFrom({layerM1}),
+        auto expected = CreateSubgraphViewFrom(CreateInputsFrom({layerM1}),
                                                CreateOutputsFrom({layerM2, layerM3}),
                                                {layerM1, layerM2, layerM3});
 
@@ -871,8 +856,7 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     BOOST_CHECK(subgraphs.size() == 1);
     if (subgraphs.size() == 1)
     {
-        auto expected = CreateSubgraphViewFrom(graph,
-                                               CreateInputsFrom({m1, m2}),
+        auto expected = CreateSubgraphViewFrom(CreateInputsFrom({m1, m2}),
                                                CreateOutputsFrom({m4, m5}),
                                                {m1, m2, m3, m4, m5});
 

@@ -56,12 +56,6 @@ IBackendInternal::IMemoryManagerUniquePtr RefBackend::CreateMemoryManager() cons
     return IMemoryManagerUniquePtr{};
 }
 
-IBackendInternal::ISubgraphViewConverterPtr RefBackend::CreateSubgraphViewConverter(
-    const std::shared_ptr<SubgraphView>& subgraph) const
-{
-    return ISubgraphViewConverterPtr{};
-}
-
 IBackendInternal::Optimizations RefBackend::GetOptimizations() const
 {
     return Optimizations{};

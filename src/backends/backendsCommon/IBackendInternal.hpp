@@ -41,8 +41,6 @@ public:
     using IMemoryManagerUniquePtr = std::unique_ptr<IMemoryManager>;
     using IMemoryManagerSharedPtr = std::shared_ptr<IMemoryManager>;
 
-    using ISubgraphViewConverterPtr = std::unique_ptr<ISubgraphViewConverter>;
-
     using GraphUniquePtr = std::unique_ptr<Graph>;
     using SubgraphViewUniquePtr = std::unique_ptr<SubgraphView>;
 
@@ -52,9 +50,6 @@ public:
         const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
 
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
-
-    virtual ISubgraphViewConverterPtr CreateSubgraphViewConverter(const std::shared_ptr<SubgraphView>& subgraph)
-        const = 0;
 
     virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;

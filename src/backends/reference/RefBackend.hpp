@@ -25,9 +25,6 @@ public:
 
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
 
-    IBackendInternal::ISubgraphViewConverterPtr CreateSubgraphViewConverter(
-        const std::shared_ptr<SubgraphView>& subgraph) const override;
-
     IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
 

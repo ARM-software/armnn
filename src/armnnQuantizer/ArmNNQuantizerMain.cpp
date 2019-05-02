@@ -5,7 +5,7 @@
 
 #include "CommandLineProcessor.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
-#include <armnn/INetworkQuantizer.hpp>
+#include <armnnQuantizer/INetworkQuantizer.hpp>
 #include <armnnSerializer/ISerializer.hpp>
 #include "QuantizationDataSet.hpp"
 #include "QuantizationInput.hpp"
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
             armnnQuantizer::InputLayerVisitor inputLayerVisitor;
             network->Accept(inputLayerVisitor);
 
-            for(armnnQuantizer::QuantizationInput quantizationInput : dataSet)
+            for (armnnQuantizer::QuantizationInput quantizationInput : dataSet)
             {
                 armnn::InputTensors inputTensors;
                 std::vector<std::vector<float>> inputData(quantizationInput.GetNumberOfInputs());

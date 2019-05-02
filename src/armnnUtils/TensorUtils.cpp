@@ -4,6 +4,7 @@
 //
 
 #include "TensorUtils.hpp"
+#include <backendsCommon/ITensorHandle.hpp>
 
 namespace armnnUtils
 {
@@ -45,6 +46,33 @@ armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
                                                   + std::to_string(static_cast<int>(dataLayout)) +
                                                   "]", CHECK_LOCATION());
     }
+}
+
+std::pair<float, float> FindMinMax(armnn::ITensorHandle* tensorHandle)
+{
+    auto tensor_data = static_cast<const float *>(tensorHandle->Map(true));
+    auto tensor_size = tensorHandle->GetShape().GetNumElements();
+
+    // Set min/max initially to first value in tensor
+    float min = tensor_data[0];
+    float max = tensor_data[0];
+
+    // Loop over rest of tensor and update min/max if necessary
+    for (unsigned int val = 1; val < tensor_size; val++)
+    {
+        if (tensor_data[val] < min)
+        {
+            min = tensor_data[val];
+        }
+        else if (tensor_data[val] > max)
+        {
+            max = tensor_data[val];
+        }
+    }
+
+    tensorHandle->Unmap();
+
+    return std::make_pair(min, max);
 }
 
 }

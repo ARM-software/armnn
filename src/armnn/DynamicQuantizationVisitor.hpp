@@ -7,20 +7,20 @@
 
 #include "armnn/LayerVisitorBase.hpp"
 #include "RangeTracker.hpp"
+#include "layers/DebugLayer.hpp"
 
 #include <armnn/INetwork.hpp>
 #include <armnnQuantizer/INetworkQuantizer.hpp>
-
 
 namespace armnn
 {
 
 /// Visitor class to establish min/max ranges based on the type of the layer
-class StaticRangeVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
+class DynamicQuantizationVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
 public:
-    StaticRangeVisitor(RangeTracker& rangeTracker);
-    ~StaticRangeVisitor() = default;
+    DynamicQuantizationVisitor(RangeTracker& rangeTracker, Graph& graph);
+    ~DynamicQuantizationVisitor() = default;
 
     /// Functions to set the Range on a per-layer-type basis
     void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
@@ -99,6 +99,19 @@ public:
                                   const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                   const char* name = nullptr) override;
 
+    void VisitInputLayer(const IConnectableLayer* layer,
+                         LayerBindingId id,
+                         const char* name = nullptr) override;
+
+    void VisitOutputLayer(const IConnectableLayer* layer,
+                          LayerBindingId id,
+                          const char* name = nullptr) override;
+
+    void FinishVisit() override;
+    void VisitNonCalibratedLayers();
+
+    const std::vector<armnn::LayerBindingId>& GetOutputLayers();
+
 private:
     /// Set the range for an output slot on a layer
     void SetRange(const IConnectableLayer* layer, unsigned int outputIdx, float min, float max);
@@ -107,6 +120,18 @@ private:
 
     /// Mapping from a layer Guid to an array of ranges for outputs
     RangeTracker& m_RangeTracker;
+
+    Graph& m_Graph;
+
+    std::vector<const IConnectableLayer*> m_LayersToCalibrate;
+    std::vector<const IConnectableLayer*> m_LayersNotToCalibrate;
+    std::vector<DebugLayer*> m_DebugLayers;
+
+    std::vector<armnn::LayerBindingId> m_OutputLayers;
+
+    void AddToCalibratedLayers(const IConnectableLayer* layer);
+    void AddToNonCalibratedLayers(const IConnectableLayer* layer);
+    void RemoveDebugLayers();
 };
 
 } //namespace armnn

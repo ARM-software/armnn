@@ -22,4 +22,6 @@ armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
                                 const armnn::DataLayout dataLayout,
                                 const armnn::DataType dataType);
 
+std::pair<float, float> FindMinMax(armnn::ITensorHandle* tensorHandle);
+
 } // namespace armnnUtils

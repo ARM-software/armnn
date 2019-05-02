@@ -49,10 +49,12 @@ ConstTensor CreateQuantizedConst(const ConstTensor& tensor, std::vector<uint8_t>
 template <typename LayerContainer>
 void VisitLayers(const LayerContainer& layerContainer, ILayerVisitor& visitor)
 {
+    visitor.StartVisit();
     for (auto layer : layerContainer)
     {
         layer->Accept(visitor);
     }
+    visitor.FinishVisit();
 }
 
 } // namespace armnn

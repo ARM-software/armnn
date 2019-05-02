@@ -347,6 +347,8 @@ public:
     virtual void VisitSwitchLayer(const IConnectableLayer* layer,
                                   const char* name = nullptr) = 0;
 
+    virtual void StartVisit() {}
+    virtual void FinishVisit() {}
 
 };
 } // namespace armnn

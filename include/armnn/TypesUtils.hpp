@@ -4,8 +4,8 @@
 //
 #pragma once
 
-#include "Tensor.hpp"
-#include "Types.hpp"
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
 
 #include <cmath>
 #include <ostream>

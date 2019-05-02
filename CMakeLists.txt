@@ -61,6 +61,7 @@ list(APPEND armnnUtils_sources
     )
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
+target_include_directories(armnnUtils PRIVATE src/backends)
 
 if(BUILD_CAFFE_PARSER)
     # ArmNN Parser source files required for all build options
@@ -203,7 +204,6 @@ list(APPEND armnn_sources
     include/armnn/ILayerSupport.hpp
     include/armnn/ILayerVisitor.hpp
     include/armnn/INetwork.hpp
-    include/armnn/INetworkQuantizer.hpp
     include/armnn/IProfiler.hpp
     include/armnn/IRuntime.hpp
     include/armnn/LayerSupport.hpp
@@ -315,6 +315,8 @@ list(APPEND armnn_sources
     src/armnn/CompatibleTypes.hpp
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
+    src/armnn/DynamicQuantizationVisitor.cpp
+    src/armnn/DynamicQuantizationVisitor.hpp
     src/armnn/Exceptions.cpp
     src/armnn/ExecutionFrame.cpp
     src/armnn/ExecutionFrame.hpp

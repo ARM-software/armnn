@@ -31,6 +31,21 @@ public:
     /// Query that there is an entry for a layer
     bool HasRanges(LayerGuid guid) const { return m_GuidToRangesMap.find(guid) != m_GuidToRangesMap.end(); }
 
+    /// Update min in RangeTracker with new_min if it is lower than current value
+    void RefineMin(LayerGuid guid, unsigned int slotIndex, float newMin);
+
+    /// Update max in RangeTracker with new_max if it is greater than current value
+    void RefineMax(LayerGuid guid, unsigned int slotIndex, float newMax);
+
+    /// Overwrite min and max in RangeTracker with newMin and newMax
+    void ResetMinMax(LayerGuid guid, unsigned int idx, float newMin, float newMax);
+
+    void Reset();
+
+    void SetDynamicMode(bool flag) { m_DynamicMode = flag; }
+
+    bool IsInDynamicMode() const { return m_DynamicMode; }
+
 private:
     using MinMaxRanges = std::vector<MinMaxRange>;
 
@@ -39,6 +54,8 @@ private:
 
     /// Mapping from a layer Guid to an array of ranges for outputs
     std::unordered_map<LayerGuid, MinMaxRanges> m_GuidToRangesMap;
+
+    bool m_DynamicMode = false;
 };
 
 } //namespace armnn

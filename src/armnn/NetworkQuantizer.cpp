@@ -7,6 +7,8 @@
 #include <armnn/INetwork.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
+#include <TensorUtils.hpp>
+#include <TensorIOUtils.hpp>
 
 #include "Graph.hpp"
 #include "Layer.hpp"
@@ -14,6 +16,7 @@
 #include "NetworkQuantizer.hpp"
 #include "NetworkQuantizerUtils.hpp"
 
+#include "DynamicQuantizationVisitor.hpp"
 #include "StaticRangeVisitor.hpp"
 #include "QuantizerVisitor.hpp"
 #include "OverrideInputRangeVisitor.hpp"
@@ -21,8 +24,14 @@
 #include <vector>
 #include <cmath>
 
+#include <boost/variant.hpp>
+
+
 namespace armnn
 {
+
+using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+
 
 INetworkQuantizer* INetworkQuantizer::CreateRaw(INetwork* inputNetwork, const QuantizerOptions& options)
 {
@@ -51,16 +60,102 @@ void NetworkQuantizer::OverrideInputRange(LayerBindingId layerId, float min, flo
 
 void NetworkQuantizer::Refine(const InputTensors& inputTensors)
 {
-    //Implementation in a following commit
+    // The first time Refine is called the m_Runtime and the DynamicQuantizationVisitor
+    // will not have been created. Need to get the environment set up, Runtime loaded,
+    // DynamicQuantizationVisitor created and run over the network to initialise itself
+    // and the RangeTracker the Debug callback registered and an initial inference
+    // done to set up the first min/max values
+    if (!m_Runtime)
+    {
+        m_RefineCount = 0;
+        m_Ranges.SetDynamicMode(true);
+        const Graph& cGraph = boost::polymorphic_downcast<const Network*>(m_InputNetwork)->GetGraph().TopologicalSort();
+
+        // need to insert Debug layers in the DynamicQuantizationVisitor
+        Graph& graph = const_cast<Graph&>(cGraph);
+
+        // Initialize RangeTracker to the default values for each layer.
+        // The default values are overwritten by the min/max that is
+        // recorded during the first dataset min/max calibration. This
+        // initialisation is only required for the first call of Refine().
+        m_DynamicQuantizationVisitor = DynamicQuantizationVisitor(m_Ranges, graph);
+        VisitLayers(cGraph, m_DynamicQuantizationVisitor.value());
+
+        IRuntime::CreationOptions options;
+        m_Runtime = IRuntime::Create(options);
+
+        // Optimize network - debug already enabled for layers that require quantization
+        OptimizerOptions optimizerOptions(false, false);
+        std::vector<BackendId> backends = {"CpuRef"};
+        IOptimizedNetworkPtr optimizedNet = Optimize(*m_InputNetwork,
+                                                     backends,
+                                                     m_Runtime->GetDeviceSpec(),
+                                                     optimizerOptions);
+
+        m_Runtime->LoadNetwork(m_NetworkId, std::move(optimizedNet));
+
+        // Debug callback function to refine min/max in RangeTracker
+        auto rangeTrackerCallback = [&](LayerGuid guid, unsigned int slotIndex, ITensorHandle *tensorHandle) {
+            // Get min/max pair from tensor data
+            std::pair<float, float> minMax = armnnUtils::FindMinMax(tensorHandle);
+
+            // For first calibration dataset, set min/max range in RangeTracker to
+            // min/max ranges gathered during inference
+            if (m_RefineCount == 0)
+            {
+                m_Ranges.ResetMinMax(guid, slotIndex, minMax.first, minMax.second);
+            }
+            else
+            {
+                // For every other calibration dataset, only set min/max range if the
+                // values gathered are less than / greater than originally recorded.
+                m_Ranges.RefineMin(guid, slotIndex, minMax.first);
+                m_Ranges.RefineMax(guid, slotIndex, minMax.second);
+            }
+        };
+
+        m_Runtime->RegisterDebugCallback(m_NetworkId, rangeTrackerCallback);
+    }
+
+    // Create output tensor for EnqueueWorkload
+    std::vector<armnn::BindingPointInfo> outputBindings;
+    auto outputLayers = m_DynamicQuantizationVisitor.value().GetOutputLayers();
+    std::vector<TContainer> outputVectors;
+    for (auto outputLayerBindingId : outputLayers)
+    {
+        auto outputTensorInfo = m_Runtime->GetOutputTensorInfo(m_NetworkId, outputLayerBindingId);
+        outputBindings.push_back(std::make_pair(outputLayerBindingId, outputTensorInfo));
+        outputVectors.push_back(std::vector<float>(outputTensorInfo.GetNumElements(), 0));
+    }
+    OutputTensors outputTensors = armnnUtils::MakeOutputTensors<TContainer>(outputBindings, outputVectors);
+
+    // Execute EnqueueWorkload with calibration image
+    m_Runtime->EnqueueWorkload(m_NetworkId, inputTensors, outputTensors);
+    ++m_RefineCount;
 }
 
 INetworkPtr NetworkQuantizer::ExportNetwork()
 {
     const Graph& graph = boost::polymorphic_downcast<const Network*>(m_InputNetwork)->GetGraph().TopologicalSort();
 
-    // Step 1) Walk the graph and register min/max values for intermediate tensors
-    StaticRangeVisitor rangeVisitor(m_Ranges);
-    VisitLayers(graph, rangeVisitor);
+    // Step 1) Walk the graph and populate default min/max values for
+    // intermediate tensors, only if Runtime does not exist (created
+    // if Refine has been called)
+    if (!m_Runtime)
+    {
+        m_Ranges.SetDynamicMode(false);
+        StaticRangeVisitor rangeVisitor(m_Ranges);
+        VisitLayers(graph, rangeVisitor);
+    }
+    else
+    {
+        // Set min/max range of non-calibrated layers to parent layer's range
+        m_DynamicQuantizationVisitor.value().VisitNonCalibratedLayers();
+        // now tear down the runtime and the dynamic visitor.
+        m_Runtime.reset(nullptr);
+        m_DynamicQuantizationVisitor = EmptyOptional();
+        m_RefineCount = 0;
+    }
 
     // Step 2) Convert input InputNetwork to Quantized InputNetwork
     std::unique_ptr<IQuantizationScheme> quantizationScheme;
@@ -78,6 +173,9 @@ INetworkPtr NetworkQuantizer::ExportNetwork()
 
     QuantizerVisitor quantizerVisitor(m_Ranges, quantizationScheme.get());
     VisitLayers(graph, quantizerVisitor);
+
+    // clear the ranges
+    m_Ranges.Reset();
 
     return quantizerVisitor.RetrieveFinalNetwork();
 }

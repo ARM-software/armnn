@@ -7,7 +7,7 @@
 
 #include <map>
 #include <armnn/Types.hpp>
-#include <armnn/INetworkQuantizer.hpp>
+#include <armnnQuantizer/INetworkQuantizer.hpp>
 
 namespace armnnQuantizer
 {

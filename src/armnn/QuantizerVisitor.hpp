@@ -11,7 +11,7 @@
 
 #include <armnn/INetwork.hpp>
 #include <armnn/Types.hpp>
-#include <armnn/INetworkQuantizer.hpp>
+#include <armnnQuantizer/INetworkQuantizer.hpp>
 
 #include <unordered_map>
 

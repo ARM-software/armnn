@@ -5,7 +5,7 @@
 
 #include <armnn/INetwork.hpp>
 #include <armnn/Tensor.hpp>
-#include <armnn/INetworkQuantizer.hpp>
+#include <armnnQuantizer/INetworkQuantizer.hpp>
 #include <armnn/Types.hpp>
 
 #include "armnn/LayerVisitorBase.hpp"
@@ -15,6 +15,7 @@
 #include "../OverrideInputRangeVisitor.hpp"
 #include "../RangeTracker.hpp"
 #include "../backends/backendsCommon/test/QuantizeHelper.hpp"
+#include "../../armnnQuantizer/CommandLineProcessor.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -205,6 +206,95 @@ INetworkPtr CreateNetworkWithActivationLayer(const ActivationDescriptor& descrip
     activation->GetOutputSlot(0).SetTensorInfo(info);
 
     return network;
+}
+
+INetworkPtr CreateNetworkWithInputOutputLayers()
+{
+    INetworkPtr network = INetwork::Create();
+
+    // Add input/output layers
+    IConnectableLayer* inputLayer = network->AddInputLayer(0);
+    IConnectableLayer* output = network->AddOutputLayer(1);
+
+    // Establish connections
+    inputLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Set TensorInfo
+    TensorShape shape{8U};
+    TensorInfo info(shape, DataType::Float32);
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    return network;
+}
+
+TensorInfo GetInputTensorInfo(const Network* network)
+{
+    for (auto&& inputLayer : network->GetGraph().GetInputLayers())
+    {
+        BOOST_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
+        return inputLayer->GetOutputSlot(0).GetTensorInfo();
+    }
+    throw InvalidArgumentException("Network has no input layers");
+}
+
+BOOST_AUTO_TEST_CASE(InputOutputLayerDynamicQuant)
+{
+    INetworkPtr network = CreateNetworkWithInputOutputLayers();
+
+    armnn::TensorInfo tensorInfo = GetInputTensorInfo(boost::polymorphic_downcast<const Network*>(network.get()));
+
+    // Outliers -56 and 98
+    std::vector<float> inputData({0, 0, 0, -56, 98, 0, 0, 0});
+    armnn::ConstTensor inputTensor(tensorInfo, inputData.data());
+
+    InputTensors inputTensors;
+    inputTensors.push_back(std::make_pair(0, inputTensor));
+
+    armnn::INetworkQuantizerPtr quantizer = armnn::INetworkQuantizer::Create(network.get());
+
+    quantizer->Refine(inputTensors);
+
+    // Outliers -77 and 65
+    std::vector<float> inputData2({0, -77, 0, -56, 65, 0, 0, 0});
+    armnn::ConstTensor inputTensor2(tensorInfo, inputData2.data());
+    InputTensors inputTensors2;
+    inputTensors2.push_back(std::make_pair(0, inputTensor2));
+
+    quantizer->Refine(inputTensors2);
+
+    INetworkPtr quantizedNetwork = quantizer->ExportNetwork();
+    // Output Layer should be quantized for a min max of -77 and 98
+    // according to QAsymm8 Quantization Scheme
+    std::unique_ptr<IQuantizationScheme> quantizationScheme = std::make_unique<QAsymm8QuantizationScheme>();
+    OffsetScalePair qParams = quantizationScheme->ComputeScheme(-77.0, 98.0);
+
+    class TestOutputLayerVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
+    {
+    public:
+        TestOutputLayerVisitor(const OffsetScalePair& offsetScalePair, const DataType& dataType) :
+            m_OffsetScalePair(offsetScalePair), m_DataType(dataType) {}
+
+        void VisitOutputLayer(const IConnectableLayer* layer,
+                                      LayerBindingId id,
+                                      const char* name = nullptr) override
+        {
+            const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
+            BOOST_CHECK_MESSAGE(info.GetDataType() == m_DataType,
+                                std::string(armnn::GetDataTypeName(info.GetDataType()))
+                                        .append(" == ").append(armnn::GetDataTypeName(m_DataType)));
+            // int_32t
+            BOOST_CHECK(info.GetQuantizationOffset() == m_OffsetScalePair.second);
+            // float
+            BOOST_TEST(info.GetQuantizationScale() == m_OffsetScalePair.first, boost::test_tools::tolerance(0.001));
+        }
+
+    private:
+        const OffsetScalePair m_OffsetScalePair;
+        const DataType m_DataType;
+    };
+
+    TestOutputLayerVisitor visitor(qParams, quantizationScheme->GetDataType());
+    quantizedNetwork->Accept(visitor);
 }
 
 BOOST_AUTO_TEST_CASE(QuantizeAbsActivation)

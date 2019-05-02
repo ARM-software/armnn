@@ -1,8 +1,6 @@
 # UnitTests
 include(CheckIncludeFiles)
 
-include_directories(SYSTEM "${THIRD_PARTY_INCLUDE_DIRS}")
-
 # Setup the inference test framework
 set(inference_test_sources
     ClassifierTestCaseData.hpp
@@ -12,9 +10,11 @@ set(inference_test_sources
     InferenceTest.cpp
     InferenceTestImage.hpp
     InferenceTestImage.cpp)
+
 add_library_ex(inferenceTest STATIC ${inference_test_sources})
 target_include_directories(inferenceTest PRIVATE ../src/armnnUtils)
 target_include_directories(inferenceTest PRIVATE ../src/backends)
+target_include_directories(inferenceTest PRIVATE ../third-party/stb)
 
 if(BUILD_CAFFE_PARSER)
     macro(CaffeParserTest testName sources)

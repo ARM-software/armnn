@@ -118,6 +118,8 @@ class IDeviceSpec
 protected:
     IDeviceSpec() {}
     virtual ~IDeviceSpec() {}
+public:
+    virtual const BackendIdSet& GetSupportedBackends() const = 0;
 };
 
 /// Type of identifiers for bindable layers (inputs, outputs).

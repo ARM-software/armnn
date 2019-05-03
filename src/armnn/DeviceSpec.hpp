@@ -19,7 +19,7 @@ public:
 
     virtual ~DeviceSpec() {}
 
-    virtual const BackendIdSet& GetSupportedBackends() const
+    virtual const BackendIdSet& GetSupportedBackends() const override
     {
         return m_SupportedBackends;
     }

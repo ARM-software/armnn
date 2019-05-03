@@ -1028,4 +1028,91 @@ BOOST_AUTO_TEST_CASE(MultipleSubgraphs)
     }
 }
 
+BOOST_AUTO_TEST_CASE(SubgraphCycles)
+{
+    // This case represent the scenario when a naive split could lead to a cyclic dependency between two subgraphs
+    //
+    // X0 -> M0 -> X1 -> M2 -> X2
+    // X0 -> M0 -> M1 -> M2 -> X2
+    //
+    /*
+          X0
+          |
+          |
+          M0
+         / |
+        /  |
+       X1  M1
+        \ /
+        M2
+        |
+        X2
+    */
+    // The expected result for this is that M0,M1 will be part of one subgraph and M2 in another and the
+    // input and output slots in the subgraphs will be set accordingly.
+    //
+    Graph graph;
+
+    OriginsDescriptor mergerDescriptor(2);
+    auto x0 = graph.AddLayer<InputLayer>(0, "x0");
+    auto m0 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "m0");
+    auto x1 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "x1");
+    auto m1 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "m1");
+    auto m2 = graph.AddLayer<AdditionLayer>("m2");
+    auto x2 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "x2");
+
+    x0->GetOutputSlot(0).Connect(m0->GetInputSlot(0));
+    m0->GetOutputSlot(0).Connect(x1->GetInputSlot(0));
+    m0->GetOutputSlot(0).Connect(m1->GetInputSlot(0));
+    x1->GetOutputSlot(0).Connect(m2->GetInputSlot(0));
+    m1->GetOutputSlot(0).Connect(m2->GetInputSlot(1));
+    m2->GetOutputSlot(0).Connect(x2->GetInputSlot(0));
+
+    // All selected 'M*' layers will be have 'm' in the name
+    SubgraphViewSelector::Subgraphs subgraphs =
+        SubgraphViewSelector::SelectSubgraphs(
+            graph,
+            // select the middle layers only
+            [](const Layer & l)
+                {
+                    bool toSelect = (l.GetNameStr().find('m') != std::string::npos);
+                    return toSelect;
+                });
+
+    // expected results to test against
+    auto inputSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({m0}),
+                                                CreateOutputsFrom({m0, m1}),
+                                                {m0, m1});
+
+    auto outputSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({m2}),
+                                                 CreateOutputsFrom({m2}),
+                                                 {m2});
+
+    BOOST_TEST(subgraphs.size() == 2);
+    if (subgraphs.size() == 2)
+    {
+        // we need to have valid subgraph pointers here
+        BOOST_TEST((subgraphs[0] != nullptr));
+        BOOST_TEST((subgraphs[1] != nullptr));
+
+        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
+        {
+            // sort the subgraphs by layer size, so it is simpler to test
+            std::sort(subgraphs.begin(), subgraphs.end(),
+                      [](SubgraphViewSelector::SubgraphViewPtr & lhs, SubgraphViewSelector::SubgraphViewPtr & rhs)
+                          {
+                              return (lhs->GetLayers().size() < rhs->GetLayers().size());
+                          }
+            );
+
+            // one subgraph needs to be size=1 and the other one is 4
+            BOOST_TEST(subgraphs[0]->GetLayers().size() == 1);
+            BOOST_TEST(subgraphs[1]->GetLayers().size() == 2);
+
+            CompareSubgraphViews(subgraphs[0], outputSubgraph);
+            CompareSubgraphViews(subgraphs[1], inputSubgraph);
+        }
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

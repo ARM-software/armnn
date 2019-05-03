@@ -53,6 +53,7 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/ParserPrototxtFixture.hpp
     src/armnnUtils/PrototxtConversions.hpp
     src/armnnUtils/PrototxtConversions.cpp
+    src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.hpp
     src/armnnUtils/TensorUtils.cpp
     )

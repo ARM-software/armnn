@@ -168,8 +168,6 @@ int main(int argc, char* argv[])
         }
         Cifar10Database cifar10(dataDir);
 
-        using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
-
         for (unsigned int i = 0; i < 3; ++i)
         {
             // Loads test case data (including image data).
@@ -193,8 +191,8 @@ int main(int argc, char* argv[])
                 std::vector<TContainer> outputDataContainers = { outputs[k] };
 
                 status = runtime->EnqueueWorkload(networks[k].m_Network,
-                    MakeInputTensors(inputBindings, inputDataContainers),
-                    MakeOutputTensors(outputBindings, outputDataContainers));
+                    armnnUtils::MakeInputTensors(inputBindings, inputDataContainers),
+                    armnnUtils::MakeOutputTensors(outputBindings, outputDataContainers));
                 if (status == armnn::Status::Failure)
                 {
                     BOOST_LOG_TRIVIAL(fatal) << "armnn::IRuntime: Failed to enqueue workload";

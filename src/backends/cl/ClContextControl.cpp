@@ -212,7 +212,7 @@ void IGpuAccTunedParameters::Destroy(IGpuAccTunedParameters* params)
 ClTunedParameters::ClTunedParameters(armnn::IGpuAccTunedParameters::Mode mode,
                                      armnn::IGpuAccTunedParameters::TuningLevel tuningLevel)
     : m_Mode(mode)
-    , m_TuningLevel(ClTunedParameters::TuningLevel::Rapid)
+    , m_TuningLevel(tuningLevel)
     , m_Tuner(mode == ClTunedParameters::Mode::UpdateTunedParameters)
 {
 }

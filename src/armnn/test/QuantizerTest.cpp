@@ -35,20 +35,24 @@ BOOST_AUTO_TEST_SUITE(Quantizer)
 class TestQuantization : public LayerVisitorBase<VisitorThrowingPolicy>
 {
 public:
-    TestQuantization()
+    TestQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
     : LayerVisitorBase<VisitorThrowingPolicy>()
-    , m_QuantizerOptions(QuantizerOptions()) {}
+    , m_QuantizerOptions(QuantizerOptions())
+    , m_InputShape(inputShape)
+    , m_OutputShape(outputShape) {}
 
-    TestQuantization(const QuantizerOptions& options)
+    TestQuantization(const QuantizerOptions& options, const TensorShape& inputShape, const TensorShape& outputShape)
     : LayerVisitorBase<VisitorThrowingPolicy>()
-    , m_QuantizerOptions(options) {}
+    , m_QuantizerOptions(options)
+    , m_InputShape(inputShape)
+    , m_OutputShape(outputShape) {}
 
     void VisitInputLayer(const IConnectableLayer* layer,
                          LayerBindingId id,
                          const char* name = nullptr) override
     {
-        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
+        const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
+        BOOST_TEST(m_InputShape == info.GetShape());
         // Based off current default [-15.0f, 15.0f]
         TestQuantizationParams(info, {30.0f / g_Asymm8QuantizationBase, 128}, {15.0f / g_Symm16QuantizationBase, 0});
     }
@@ -56,7 +60,10 @@ public:
     void VisitOutputLayer(const IConnectableLayer* layer,
                           LayerBindingId id,
                           const char* name = nullptr) override
-    {}
+    {
+        const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
+        BOOST_TEST(m_OutputShape == info.GetShape());
+    }
 
 protected:
     void TestQuantizationParams(const TensorInfo& info,
@@ -92,6 +99,8 @@ private:
     }
 
     QuantizerOptions m_QuantizerOptions;
+    TensorShape m_InputShape;
+    TensorShape m_OutputShape;
 };
 
 void VisitLayersTopologically(const INetwork* inputNetwork, ILayerVisitor& visitor)
@@ -105,11 +114,13 @@ void VisitLayersTopologically(const INetwork* inputNetwork, ILayerVisitor& visit
 class TestAdditionQuantization : public TestQuantization
 {
 public:
-    TestAdditionQuantization()
-    : TestQuantization() {}
+    TestAdditionQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+    : TestQuantization(inputShape, outputShape) {}
 
-    TestAdditionQuantization(const QuantizerOptions& options)
-    : TestQuantization(options) {}
+    TestAdditionQuantization(const QuantizerOptions& options,
+                             const TensorShape& inputShape,
+                             const TensorShape& outputShape)
+    : TestQuantization(options, inputShape, outputShape) {}
 
     void VisitAdditionLayer(const IConnectableLayer* layer,
                             const char* name = nullptr) override
@@ -137,30 +148,32 @@ BOOST_AUTO_TEST_CASE(QuantizeAddition)
     addition->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     // Set TensorInfo
-    TensorShape shape{1U};
+    const TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
     input0->GetOutputSlot(0).SetTensorInfo(info);
     input1->GetOutputSlot(0).SetTensorInfo(info);
     addition->GetOutputSlot(0).SetTensorInfo(info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestAdditionQuantization validatorQAsymm8;
+    TestAdditionQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestAdditionQuantization validatorQSymm16(options);
+    TestAdditionQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
 class TestActivationQuantization : public TestQuantization
 {
 public:
-    TestActivationQuantization()
-    : TestQuantization() {}
+    TestActivationQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+    : TestQuantization(inputShape, outputShape) {}
 
-    TestActivationQuantization(const QuantizerOptions& options)
-    : TestQuantization(options) {}
+    TestActivationQuantization(const QuantizerOptions& options,
+                               const TensorShape& inputShape,
+                               const TensorShape& outputShape)
+    : TestQuantization(options, inputShape, outputShape) {}
 
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& descriptor,
@@ -173,7 +186,7 @@ public:
     }
 };
 
-INetworkPtr CreateNetworkWithActivationLayer(const ActivationDescriptor& descriptor)
+INetworkPtr CreateNetworkWithActivationLayer(const ActivationDescriptor& descriptor, const TensorShape& shape)
 {
     INetworkPtr network = INetwork::Create();
 
@@ -187,7 +200,6 @@ INetworkPtr CreateNetworkWithActivationLayer(const ActivationDescriptor& descrip
     activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     // Set TensorInfo
-    TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
     input0->GetOutputSlot(0).SetTensorInfo(info);
     activation->GetOutputSlot(0).SetTensorInfo(info);
@@ -202,15 +214,16 @@ BOOST_AUTO_TEST_CASE(QuantizeAbsActivation)
     descriptor.m_A        = 3.5f;
     descriptor.m_B        = -10.0f;
 
-    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor);
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestActivationQuantization validatorQAsymm8;
+    TestActivationQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestActivationQuantization validatorQSymm16(options);
+    TestActivationQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -221,15 +234,16 @@ BOOST_AUTO_TEST_CASE(QuantizeLinearActivation)
     descriptor.m_A        = 3.5f;
     descriptor.m_B        = -10.0f;
 
-    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor);
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestActivationQuantization validatorQAsymm8;
+    TestActivationQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestActivationQuantization validatorQSymm16(options);
+    TestActivationQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -240,15 +254,16 @@ BOOST_AUTO_TEST_CASE(QuantizeReLuActivation)
     descriptor.m_A        = 3.5f;
     descriptor.m_B        = -10.0f;
 
-    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor);
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestActivationQuantization validatorQAsymm8;
+    TestActivationQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestActivationQuantization validatorQSymm16(options);
+    TestActivationQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -259,15 +274,16 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftReLuActivation)
     descriptor.m_A        = 3.5f;
     descriptor.m_B        = -10.0f;
 
-    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor);
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestActivationQuantization validatorQAsymm8;
+    TestActivationQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestActivationQuantization validatorQSymm16(options);
+    TestActivationQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -276,11 +292,13 @@ BOOST_AUTO_TEST_CASE(QuantizeBoundedReluActivation)
     class TestBoundedReluActivationQuantization : public TestQuantization
     {
     public:
-        TestBoundedReluActivationQuantization()
-        : TestQuantization() {}
+        TestBoundedReluActivationQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
 
-        TestBoundedReluActivationQuantization(const QuantizerOptions& options)
-        : TestQuantization(options) {}
+        TestBoundedReluActivationQuantization(const QuantizerOptions& options,
+                                              const TensorShape& inputShape,
+                                              const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
 
         void VisitActivationLayer(const IConnectableLayer* layer,
                                   const ActivationDescriptor& descriptor,
@@ -298,15 +316,16 @@ BOOST_AUTO_TEST_CASE(QuantizeBoundedReluActivation)
     descriptor.m_A        = 3.5f;
     descriptor.m_B        = -10.0f;
 
-    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor);
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestBoundedReluActivationQuantization validatorQAsymm8;
+    TestBoundedReluActivationQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestBoundedReluActivationQuantization validatorQSymm16(options);
+    TestBoundedReluActivationQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -315,11 +334,13 @@ BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
     class TestTanHActivationQuantization : public TestQuantization
     {
     public:
-        TestTanHActivationQuantization()
-        : TestQuantization() {}
+        TestTanHActivationQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
 
-        TestTanHActivationQuantization(const QuantizerOptions& options)
-        : TestQuantization(options) {}
+        TestTanHActivationQuantization(const QuantizerOptions& options,
+                                       const TensorShape& inputShape,
+                                       const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
 
         void VisitActivationLayer(const IConnectableLayer* layer,
                                   const ActivationDescriptor& descriptor,
@@ -338,26 +359,29 @@ BOOST_AUTO_TEST_CASE(QuantizeTanHActivation)
     descriptor.m_A        = 3.5f;
     descriptor.m_B        = -10.0f;
 
-    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor);
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestTanHActivationQuantization validatorQAsymm8;
+    TestTanHActivationQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestTanHActivationQuantization validatorQSymm16(options);
+    TestTanHActivationQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
 class TestLeakyReLuActivationQuantization : public TestQuantization
 {
 public:
-    TestLeakyReLuActivationQuantization()
-    : TestQuantization() {}
+    TestLeakyReLuActivationQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+    : TestQuantization(inputShape, outputShape) {}
 
-    TestLeakyReLuActivationQuantization(const QuantizerOptions& options)
-    : TestQuantization(options) {}
+    TestLeakyReLuActivationQuantization(const QuantizerOptions& options,
+                                        const TensorShape& inputShape,
+                                        const TensorShape& outputShape)
+    : TestQuantization(options, inputShape, outputShape) {}
 
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& descriptor,
@@ -386,15 +410,16 @@ BOOST_AUTO_TEST_CASE(QuantizeLeakyReLuActivation)
     descriptor.m_A        = 3.5f;
     descriptor.m_B        = -10.0f;
 
-    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor);
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithActivationLayer(descriptor, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestLeakyReLuActivationQuantization validatorQAsymm8;
+    TestLeakyReLuActivationQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestLeakyReLuActivationQuantization validatorQSymm16(options);
+    TestLeakyReLuActivationQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -403,11 +428,13 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
     class TestBatchNormalizationQuantization : public TestQuantization
     {
     public:
-        TestBatchNormalizationQuantization()
-        : TestQuantization() {}
+        TestBatchNormalizationQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
 
-        TestBatchNormalizationQuantization(const QuantizerOptions& options)
-        : TestQuantization(options) {}
+        TestBatchNormalizationQuantization(const QuantizerOptions& options,
+                                           const TensorShape& inputShape,
+                                           const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
 
         void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                           const BatchNormalizationDescriptor& desc,
@@ -433,7 +460,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
 
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{3U};
+    const TensorShape shape{3U};
     TensorInfo info(shape, DataType::Float32);
 
     std::vector<float> meanData{-1.0f, 1.5f, 2.0f};
@@ -462,12 +489,12 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
     batchNorm->GetOutputSlot(0).SetTensorInfo(info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestBatchNormalizationQuantization validatorQAsymm8;
+    TestBatchNormalizationQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestBatchNormalizationQuantization validatorQSymm16(options);
+    TestBatchNormalizationQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -551,14 +578,16 @@ BOOST_AUTO_TEST_CASE(OverrideInputRangeInputLayers)
     BOOST_CHECK(ranges.GetRange(input1->GetGuid(), 0) == minMaxRange);
 }
 
-INetworkPtr CreateNetworkWithFullyConnectedLayer(const bool biasEnabled)
+INetworkPtr CreateNetworkWithFullyConnectedLayer(const bool biasEnabled,
+                                                 const TensorShape& inputShape,
+                                                 const TensorShape& outputShape)
 {
     FullyConnectedDescriptor desc;
     desc.m_BiasEnabled = biasEnabled;
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{3U};
-    TensorInfo info(shape, DataType::Float32);
+    const TensorInfo info(inputShape, DataType::Float32);
+    const TensorInfo outputInfo(outputShape, DataType::Float32);
 
     std::vector<float> weightsData{-1.0f, 1.5f, 2.0f};
     ConstTensor weights(info, weightsData);
@@ -584,7 +613,7 @@ INetworkPtr CreateNetworkWithFullyConnectedLayer(const bool biasEnabled)
 
     // Set TensorInfo
     input0->GetOutputSlot(0).SetTensorInfo(info);
-    fullyConnected->GetOutputSlot(0).SetTensorInfo(info);
+    fullyConnected->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     return network;
 }
@@ -594,11 +623,13 @@ void ValidateFullyConnectedLayer(const bool biasEnabled)
     class TestFullyConnectedQuantization : public TestQuantization
     {
     public:
-        TestFullyConnectedQuantization()
-        : TestQuantization() {}
+        TestFullyConnectedQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
 
-        TestFullyConnectedQuantization(const QuantizerOptions& options)
-        : TestQuantization(options) {}
+        TestFullyConnectedQuantization(const QuantizerOptions& options,
+                                       const TensorShape& inputShape,
+                                       const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
 
         void VisitFullyConnectedLayer(const IConnectableLayer* layer,
                                       const FullyConnectedDescriptor& desc,
@@ -621,15 +652,16 @@ void ValidateFullyConnectedLayer(const bool biasEnabled)
         }
     };
 
-    INetworkPtr network = CreateNetworkWithFullyConnectedLayer(biasEnabled);
+    const TensorShape shape{3U};
+    INetworkPtr network = CreateNetworkWithFullyConnectedLayer(biasEnabled, shape, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestFullyConnectedQuantization validatorQAsymm8;
+    TestFullyConnectedQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestFullyConnectedQuantization validatorQSymm16(options);
+    TestFullyConnectedQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -648,11 +680,13 @@ void TestQuantizeConvolution2d(bool useBiases)
     class TestConv2dQuantization : public TestQuantization
     {
     public:
-        TestConv2dQuantization()
-        : TestQuantization() {}
+        TestConv2dQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
 
-        TestConv2dQuantization(const QuantizerOptions& options)
-        : TestQuantization(options) {}
+        TestConv2dQuantization(const QuantizerOptions& options,
+                               const TensorShape& inputShape,
+                               const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
 
         void VisitConvolution2dLayer(const IConnectableLayer *layer,
                                      const Convolution2dDescriptor& convolution2dDescriptor,
@@ -710,12 +744,12 @@ void TestQuantizeConvolution2d(bool useBiases)
     conv2d->GetOutputSlot(0).SetTensorInfo(info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestConv2dQuantization validatorQAsymm8;
+    TestConv2dQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestConv2dQuantization validatorQSymm16(options);
+    TestConv2dQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -734,11 +768,13 @@ void TestQuantizeDepthwiseConvolution2d(bool useBiases)
     class TestDepthwiseConv2dQuantization : public TestQuantization
     {
     public:
-        TestDepthwiseConv2dQuantization()
-        : TestQuantization() {}
+        TestDepthwiseConv2dQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
 
-        TestDepthwiseConv2dQuantization(const QuantizerOptions& options)
-        : TestQuantization(options) {}
+        TestDepthwiseConv2dQuantization(const QuantizerOptions& options,
+                                        const TensorShape& inputShape,
+                                        const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
 
         void VisitDepthwiseConvolution2dLayer(const IConnectableLayer *layer,
                                               const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
@@ -796,12 +832,12 @@ void TestQuantizeDepthwiseConvolution2d(bool useBiases)
     depthwiseConv2d->GetOutputSlot(0).SetTensorInfo(info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestDepthwiseConv2dQuantization validatorQAsymm8;
+    TestDepthwiseConv2dQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestDepthwiseConv2dQuantization validatorQSymm16(options);
+    TestDepthwiseConv2dQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -815,7 +851,7 @@ BOOST_AUTO_TEST_CASE(QuantizeDepthwiseConvolution2dWithBiases)
     TestQuantizeDepthwiseConvolution2d(true);
 }
 
-INetworkPtr CreateNetworkWithSoftmaxLayer(const SoftmaxDescriptor& descriptor)
+INetworkPtr CreateNetworkWithSoftmaxLayer(const SoftmaxDescriptor& descriptor, const TensorShape& shape)
 {
     INetworkPtr network = INetwork::Create();
 
@@ -829,7 +865,6 @@ INetworkPtr CreateNetworkWithSoftmaxLayer(const SoftmaxDescriptor& descriptor)
     softmax->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     // Set TensorInfo
-    TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
     input0->GetOutputSlot(0).SetTensorInfo(info);
     softmax->GetOutputSlot(0).SetTensorInfo(info);
@@ -842,11 +877,13 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftmax)
     class TestSoftmaxQuantization : public TestQuantization
     {
     public:
-        TestSoftmaxQuantization()
-        : TestQuantization() {}
+        TestSoftmaxQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
 
-        TestSoftmaxQuantization(const QuantizerOptions& options)
-        : TestQuantization(options) {}
+        TestSoftmaxQuantization(const QuantizerOptions& options,
+                                const TensorShape& inputShape,
+                                const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
 
         void VisitSoftmaxLayer(const IConnectableLayer* layer,
                                const SoftmaxDescriptor& descriptor,
@@ -862,15 +899,16 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftmax)
     SoftmaxDescriptor descriptor;
     descriptor.m_Beta = 1.0f;
 
-    INetworkPtr network = CreateNetworkWithSoftmaxLayer(descriptor);
+    const TensorShape shape{1U};
+    INetworkPtr network = CreateNetworkWithSoftmaxLayer(descriptor, shape);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestSoftmaxQuantization validatorQAsymm8;
+    TestSoftmaxQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestSoftmaxQuantization validatorQSymm16(options);
+    TestSoftmaxQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -916,11 +954,13 @@ BOOST_AUTO_TEST_CASE(QuantizePermute)
     class TestPermuteQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        TestPermuteQuantization()
-        : TestLeakyReLuActivationQuantization() {}
+        TestPermuteQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
 
-        TestPermuteQuantization(const QuantizerOptions& options)
-        : TestLeakyReLuActivationQuantization(options) {}
+        TestPermuteQuantization(const QuantizerOptions& options,
+                                const TensorShape& inputShape,
+                                const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
 
         void VisitPermuteLayer(const IConnectableLayer* layer,
                                const PermuteDescriptor& desc,
@@ -932,7 +972,7 @@ BOOST_AUTO_TEST_CASE(QuantizePermute)
 
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{1U};
+    const TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
 
     IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
@@ -944,12 +984,12 @@ BOOST_AUTO_TEST_CASE(QuantizePermute)
     CompleteLeakyReluNetwork(network.get(), activation, permute, info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestPermuteQuantization validatorQAsymm8;
+    TestPermuteQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestPermuteQuantization validatorQSymm16(options);
+    TestPermuteQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -958,11 +998,13 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
     class TestSpaceToBatchQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        TestSpaceToBatchQuantization()
-        : TestLeakyReLuActivationQuantization() {}
+        TestSpaceToBatchQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
 
-        TestSpaceToBatchQuantization(const QuantizerOptions& options)
-        : TestLeakyReLuActivationQuantization(options) {}
+        TestSpaceToBatchQuantization(const QuantizerOptions& options,
+                                     const TensorShape& inputShape,
+                                     const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
 
         void VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
                                       const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
@@ -974,7 +1016,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
 
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{1U};
+    const TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
 
     IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
@@ -986,12 +1028,12 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
     CompleteLeakyReluNetwork(network.get(), activation, spaceToBatch, info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestSpaceToBatchQuantization validatorQAsymm8;
+    TestSpaceToBatchQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestSpaceToBatchQuantization validatorQSymm16(options);
+    TestSpaceToBatchQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -1000,11 +1042,13 @@ BOOST_AUTO_TEST_CASE(QuantizePooling2d)
     class TestPooling2dQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        TestPooling2dQuantization()
-        : TestLeakyReLuActivationQuantization() {}
+        TestPooling2dQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
 
-        TestPooling2dQuantization(const QuantizerOptions& options)
-        : TestLeakyReLuActivationQuantization(options) {}
+        TestPooling2dQuantization(const QuantizerOptions& options,
+                                  const TensorShape& inputShape,
+                                  const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
 
         void VisitPooling2dLayer(const IConnectableLayer* layer,
                                  const Pooling2dDescriptor& desc,
@@ -1042,12 +1086,12 @@ BOOST_AUTO_TEST_CASE(QuantizePooling2d)
     pooling2d->GetOutputSlot(0).SetTensorInfo(info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestPooling2dQuantization validatorQAsymm8;
+    TestPooling2dQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestPooling2dQuantization validatorQSymm16(options);
+    TestPooling2dQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -1056,11 +1100,13 @@ BOOST_AUTO_TEST_CASE(QuantizeConstant)
     class TestConstantQuantization : public TestAdditionQuantization
     {
     public:
-        TestConstantQuantization()
-        : TestAdditionQuantization() {}
+        TestConstantQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestAdditionQuantization(inputShape, outputShape) {}
 
-        TestConstantQuantization(const QuantizerOptions& options)
-        : TestAdditionQuantization(options) {}
+        TestConstantQuantization(const QuantizerOptions& options,
+                                 const TensorShape& inputShape,
+                                 const TensorShape& outputShape)
+        : TestAdditionQuantization(options, inputShape, outputShape) {}
 
         void VisitConstantLayer(const IConnectableLayer* layer,
                                 const ConstTensor& input,
@@ -1077,8 +1123,8 @@ BOOST_AUTO_TEST_CASE(QuantizeConstant)
 
     // Constant layer data
     std::vector<float> data = {-2.0f, -1.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
-    std::vector<unsigned int> dimensions = {1, 1, 3, 3};
-    TensorInfo tensorInfo(4, dimensions.data(), DataType::Float32);
+    const TensorShape shape{1U, 1U, 3U, 3U};
+    TensorInfo tensorInfo(shape, DataType::Float32);
     ConstTensor constantTensor(tensorInfo, data);
 
     // Add the layers
@@ -1095,14 +1141,15 @@ BOOST_AUTO_TEST_CASE(QuantizeConstant)
     // Set TensorInfo in the remaining layers
     input->GetOutputSlot(0).SetTensorInfo(tensorInfo);
     addition->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    constant->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestConstantQuantization validatorQAsymm8;
+    TestConstantQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestConstantQuantization validatorQSymm16(options);
+    TestConstantQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -1111,11 +1158,13 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
     class TestMergerQuantization : public TestQuantization
     {
     public:
-        TestMergerQuantization()
-        : TestQuantization() {}
+        TestMergerQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestQuantization(inputShape, outputShape) {}
 
-        TestMergerQuantization(const QuantizerOptions& options)
-        : TestQuantization(options) {}
+        TestMergerQuantization(const QuantizerOptions& options,
+                               const TensorShape& inputShape,
+                               const TensorShape& outputShape)
+        : TestQuantization(options, inputShape, outputShape) {}
 
         void VisitInputLayer(const IConnectableLayer* layer,
                              LayerBindingId id,
@@ -1154,7 +1203,7 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
     merger->GetOutputSlot(0).Connect(output0->GetInputSlot(0));
 
     // Set TensorInfo
-    TensorShape shape{1U};
+    const TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
 
     input0->GetOutputSlot(0).SetTensorInfo(info);
@@ -1178,11 +1227,11 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
     quantizerPtrQSymm16->OverrideInputRange(2, min, (max - 7.8f));
 
     INetworkPtr quantizedNetworkQAsymm8 = quantizerPtrQAsymm8->ExportNetwork();
-    TestMergerQuantization validatorQAsymm8;
+    TestMergerQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     INetworkPtr quantizedNetworkQSymm16 = quantizerPtrQSymm16->ExportNetwork();
-    TestMergerQuantization validatorQSymm16(options);
+    TestMergerQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -1191,11 +1240,13 @@ BOOST_AUTO_TEST_CASE(QuantizeReshape)
     class TestReshapeQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        TestReshapeQuantization()
-        : TestLeakyReLuActivationQuantization() {}
+        TestReshapeQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
 
-        TestReshapeQuantization(const QuantizerOptions& options)
-        : TestLeakyReLuActivationQuantization(options) {}
+        TestReshapeQuantization(const QuantizerOptions& options,
+                                const TensorShape& inputShape,
+                                const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
 
         virtual void VisitReshapeLayer(const IConnectableLayer* layer,
                                        const ReshapeDescriptor& reshapeDescriptor,
@@ -1207,7 +1258,7 @@ BOOST_AUTO_TEST_CASE(QuantizeReshape)
 
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{1U};
+    const TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
 
     IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
@@ -1219,12 +1270,12 @@ BOOST_AUTO_TEST_CASE(QuantizeReshape)
     CompleteLeakyReluNetwork(network.get(), activation, reshape, info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestReshapeQuantization validatorQAsymm8;
+    TestReshapeQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestReshapeQuantization validatorQSymm16(options);
+    TestReshapeQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -1233,11 +1284,13 @@ BOOST_AUTO_TEST_CASE(QuantizeSplitter)
     class TestSplitterQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        TestSplitterQuantization()
-        : TestLeakyReLuActivationQuantization() {}
+        TestSplitterQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
 
-        TestSplitterQuantization(const QuantizerOptions& options)
-        : TestLeakyReLuActivationQuantization(options) {}
+        TestSplitterQuantization(const QuantizerOptions& options,
+                                 const TensorShape& inputShape,
+                                 const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
 
         virtual void VisitSplitterLayer(const IConnectableLayer* layer,
                                         const SplitterDescriptor& desc,
@@ -1249,7 +1302,7 @@ BOOST_AUTO_TEST_CASE(QuantizeSplitter)
 
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{3U};
+    const TensorShape shape{3U};
     TensorInfo info(shape, DataType::Float32);
 
     IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
@@ -1260,12 +1313,12 @@ BOOST_AUTO_TEST_CASE(QuantizeSplitter)
     CompleteLeakyReluNetwork(network.get(), activation, splitter, info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestSplitterQuantization validatorQAsymm8;
+    TestSplitterQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestSplitterQuantization validatorQSymm16(options);
+    TestSplitterQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -1274,11 +1327,13 @@ BOOST_AUTO_TEST_CASE(QuantizeResizeBilinear)
     class TestResizeBilinearQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        TestResizeBilinearQuantization()
-        : TestLeakyReLuActivationQuantization() {}
+        TestResizeBilinearQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
 
-        TestResizeBilinearQuantization(const QuantizerOptions& options)
-        : TestLeakyReLuActivationQuantization(options) {}
+        TestResizeBilinearQuantization(const QuantizerOptions& options,
+                                       const TensorShape& inputShape,
+                                       const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
 
         void VisitResizeBilinearLayer(const IConnectableLayer* layer,
                                       const ResizeBilinearDescriptor& resizeDescriptor,
@@ -1290,7 +1345,7 @@ BOOST_AUTO_TEST_CASE(QuantizeResizeBilinear)
 
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{1U};
+    const TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
 
     IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
@@ -1304,12 +1359,12 @@ BOOST_AUTO_TEST_CASE(QuantizeResizeBilinear)
     CompleteLeakyReluNetwork(network.get(), activation, spaceToBatch, info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestResizeBilinearQuantization validatorQAsymm8;
+    TestResizeBilinearQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestResizeBilinearQuantization validatorQSymm16(options);
+    TestResizeBilinearQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -1318,11 +1373,13 @@ BOOST_AUTO_TEST_CASE(QuantizeStridedSlice)
     class TestStridedSliceQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        TestStridedSliceQuantization()
-        : TestLeakyReLuActivationQuantization() {}
+        TestStridedSliceQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
 
-        TestStridedSliceQuantization(const QuantizerOptions& options)
-        : TestLeakyReLuActivationQuantization(options) {}
+        TestStridedSliceQuantization(const QuantizerOptions& options,
+                                     const TensorShape& inputShape,
+                                     const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
 
         virtual void VisitStridedSliceLayer(const IConnectableLayer* layer,
                                             const StridedSliceDescriptor& desc,
@@ -1334,7 +1391,7 @@ BOOST_AUTO_TEST_CASE(QuantizeStridedSlice)
 
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{3U};
+    const TensorShape shape{3U};
     TensorInfo info(shape, DataType::Float32);
 
     IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
@@ -1346,12 +1403,12 @@ BOOST_AUTO_TEST_CASE(QuantizeStridedSlice)
     CompleteLeakyReluNetwork(network.get(), activation, stridedSlice, info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestStridedSliceQuantization validatorQAsymm8;
+    TestStridedSliceQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestStridedSliceQuantization validatorQSymm16(options);
+    TestStridedSliceQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
@@ -1360,11 +1417,13 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchToSpace)
     class TestBatchToSpaceQuantization : public TestLeakyReLuActivationQuantization
     {
     public:
-        TestBatchToSpaceQuantization()
-        : TestLeakyReLuActivationQuantization() {}
+        TestBatchToSpaceQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
 
-        TestBatchToSpaceQuantization(const QuantizerOptions& options)
-        : TestLeakyReLuActivationQuantization(options) {}
+        TestBatchToSpaceQuantization(const QuantizerOptions& options,
+                                     const TensorShape& inputShape,
+                                     const TensorShape& outputShape)
+        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
 
         void VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
                                       const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
@@ -1376,7 +1435,7 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchToSpace)
 
     INetworkPtr network = INetwork::Create();
 
-    TensorShape shape{1U};
+    const TensorShape shape{1U};
     TensorInfo info(shape, DataType::Float32);
 
     IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
@@ -1388,12 +1447,12 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchToSpace)
     CompleteLeakyReluNetwork(network.get(), activation, batchToSpace, info);
 
     INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestBatchToSpaceQuantization validatorQAsymm8;
+    TestBatchToSpaceQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestBatchToSpaceQuantization validatorQSymm16(options);
+    TestBatchToSpaceQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 

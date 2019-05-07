@@ -49,7 +49,7 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* src
         OffsetScalePair qParams = m_QuantizationScheme->ComputeScheme(range.first, range.second);
 
         // Set the quantization params
-        TensorInfo info(newOutputSlot.GetTensorInfo());
+        TensorInfo info(outputSlot->GetTensorInfo());
         info.SetDataType(m_QuantizationScheme->GetDataType());
         info.SetQuantizationOffset(qParams.second);
         info.SetQuantizationScale(qParams.first);

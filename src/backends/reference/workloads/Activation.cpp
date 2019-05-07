@@ -88,26 +88,16 @@ void Activation(Decoder<float>& in,
                 float a,
                 float b)
 {
-    for (size_t i = 0; i<tensorInfo.GetNumElements(); i++)
+    unsigned int numElements = tensorInfo.GetNumElements();
+
+    for (unsigned int i = 0; i < numElements; i++)
     {
         out.Set(Activation(in.Get(), function, a, b));
-
         ++in;
         ++out;
     }
-}
-
-void Activation(const float* in,
-               float* out,
-               const TensorInfo& tensorInfo,
-               ActivationFunction function,
-               float a,
-               float b)
-{
-    for (size_t i = 0; i<tensorInfo.GetNumElements(); i++)
-    {
-        out[i] = Activation(in[i], function, a, b);
-    }
+    in -= numElements;
+    out -= numElements;
 }
 
 } //namespace armnn

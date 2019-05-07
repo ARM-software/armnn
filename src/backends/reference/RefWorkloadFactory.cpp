@@ -274,7 +274,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFloor(const FloorQueueDescr
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefLstmFloat32Workload, NullWorkload>(descriptor, info);
+    return std::make_unique<RefLstmWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp16ToFp32(

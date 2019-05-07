@@ -29,8 +29,6 @@ template<typename IType>
 class Decoder : public BaseIterator
 {
 public:
-    using InterfaceType = IType;
-
     Decoder() {}
 
     virtual ~Decoder() {}
@@ -42,13 +40,13 @@ template<typename IType>
 class Encoder : public BaseIterator
 {
 public:
-    using InterfaceType = IType;
-
     Encoder() {}
 
     virtual ~Encoder() {}
 
     virtual void Set(IType right) = 0;
+
+    virtual IType Get() const = 0;
 };
 
 template<typename T, typename Base>
@@ -77,6 +75,7 @@ public:
         return *this;
     }
 
+protected:
     T* m_Iterator;
 };
 
@@ -135,6 +134,11 @@ public:
         *m_Iterator = armnn::Quantize<uint8_t>(right, m_Scale, m_Offset);
     }
 
+    float Get() const override
+    {
+        return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
+    }
+
 private:
     const float m_Scale;
     const int32_t m_Offset;
@@ -149,6 +153,11 @@ public:
     void Set(float right) override
     {
         *m_Iterator = armnn::Quantize<int16_t>(right, m_Scale, m_Offset);
+    }
+
+    float Get() const override
+    {
+        return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
 
 private:
@@ -166,6 +175,11 @@ public:
     {
         *m_Iterator = right;
     }
+
+    float Get() const override
+    {
+        return *m_Iterator;
+    }
 };
 
 class BooleanEncoder : public TypedIterator<uint8_t, Encoder<bool>>
@@ -178,7 +192,11 @@ public:
     {
         *m_Iterator = right;
     }
-};
 
+    bool Get() const override
+    {
+        return *m_Iterator;
+    }
+};
 
 } //namespace armnn

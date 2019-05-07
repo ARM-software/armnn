@@ -594,12 +594,6 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
                                       const TensorInfo* cellToOutputWeights,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(outputStateIn);
-    ignore_unused(cellStateIn);
-    ignore_unused(scratchBuffer);
-    ignore_unused(outputStateOut);
-    ignore_unused(cellStateOut);
-    ignore_unused(output);
     ignore_unused(descriptor);
     ignore_unused(inputToForgetWeights);
     ignore_unused(inputToCellWeights);
@@ -618,10 +612,35 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
     ignore_unused(projectionBias);
     ignore_unused(cellToForgetWeights);
     ignore_unused(cellToOutputWeights);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &FalseFuncU8<>);
+
+    bool supported = true;
+
+    std::array<DataType,2> supportedTypes = {
+        DataType::Float32
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Lstm: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, outputStateIn), reasonIfUnsupported,
+                                  "Reference Lstm: input and outputStateIn types are mismatched");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, cellStateIn), reasonIfUnsupported,
+                                  "Reference Lstm: input and cellStateIn types are mismatched");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, scratchBuffer), reasonIfUnsupported,
+                                  "Reference Lstm: input and scratchBuffer types are mismatched");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, outputStateOut), reasonIfUnsupported,
+                                  "Reference Lstm: input and outputStateOut types are mismatched");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, cellStateOut), reasonIfUnsupported,
+                                  "Reference Lstm: input and cellStateOut types are mismatched");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Lstm: input and output types are mismatched");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsMaximumSupported(const TensorInfo& input0,

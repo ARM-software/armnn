@@ -22,11 +22,4 @@ void Activation(Decoder<float>& in,
                 float a,
                 float b);
 
-// This is still used by Reference LSTM implementation
-void Activation(const float* in,
-                float* out,
-                const TensorInfo& tensorInfo,
-                ActivationFunction function,
-                float a,
-                float b);
 } //namespace armnn

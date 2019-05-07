@@ -26,6 +26,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     FullyConnected.hpp
     Gather.cpp
     Gather.hpp
+    LstmUtils.hpp
     Maximum.hpp
     Merger.hpp
     Merger.cpp
@@ -80,8 +81,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefGatherWorkload.hpp
     RefL2NormalizationFloat32Workload.cpp
     RefL2NormalizationFloat32Workload.hpp
-    RefLstmFloat32Workload.cpp
-    RefLstmFloat32Workload.hpp
+    RefLstmWorkload.cpp
+    RefLstmWorkload.hpp
     RefMergerFloat32Workload.cpp
     RefMergerFloat32Workload.hpp
     RefMergerUint8Workload.cpp

@@ -13,10 +13,10 @@
 namespace armnn
 {
 
-class RefLstmFloat32Workload : public Float32Workload<LstmQueueDescriptor>
+class RefLstmWorkload : public BaseWorkload<LstmQueueDescriptor>
 {
 public:
-    explicit RefLstmFloat32Workload(const LstmQueueDescriptor& descriptor, const WorkloadInfo& info);
+    explicit RefLstmWorkload(const LstmQueueDescriptor& descriptor, const WorkloadInfo& info);
 
     virtual void Execute() const override;
 

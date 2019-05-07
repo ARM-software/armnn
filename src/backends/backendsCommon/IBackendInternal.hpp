@@ -65,7 +65,7 @@ public:
 
     // Default implementation of OptimizeSubgraphView for backward compatibility with old API.
     // Override this method with a custom optimization implementation.
-    virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph)
+    virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const
     {
         bool attempted=false;
         SubgraphViewUniquePtr optSubgraph = OptimizeSubgraphView(subgraph, attempted);

@@ -298,6 +298,7 @@ public:
 
     const std::list<std::string>& GetRelatedLayerNames() { return m_RelatedLayerNames; }
 
+    virtual void Reparent(Graph& dest, std::list<Layer*>::const_iterator iterator) = 0;
 protected:
     // Graph needs access to the virtual destructor.
     friend class Graph;

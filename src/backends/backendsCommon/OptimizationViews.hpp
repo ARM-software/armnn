@@ -45,9 +45,13 @@ public:
     Subgraphs GetUntouchedSubgraphs() const { return m_UntouchedSubgraphs; }
     bool Validate(const SubgraphView& originalSubgraph) const;
 
+    Graph& GetGraph() { return m_Graph; };
+
 private:
     Substitutions m_SuccesfulOptimizations;     ///< Proposed substitutions from successful optimizations
     Subgraphs m_FailedOptimizations;            ///< Subgraphs from the original subgraph which cannot be supported
     Subgraphs m_UntouchedSubgraphs;             ///< Subgraphs from the original subgraph which remain unmodified
+
+    Graph m_Graph;
 };
 } //namespace armnn

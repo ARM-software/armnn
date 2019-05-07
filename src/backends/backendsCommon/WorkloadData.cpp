@@ -862,7 +862,9 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "LstmQueueDescriptor", 2, "output");
 
     std::vector<DataType> supportedTypes = {
+        DataType::Float16,
         DataType::Float32,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],

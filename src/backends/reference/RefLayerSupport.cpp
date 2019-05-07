@@ -616,7 +616,8 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
     bool supported = true;
 
     std::array<DataType,2> supportedTypes = {
-        DataType::Float32
+        DataType::Float32,
+        DataType::QuantisedSymm16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,

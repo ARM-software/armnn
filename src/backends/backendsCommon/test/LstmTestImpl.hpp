@@ -16,11 +16,16 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2>
+LstmNoCifgNoPeepholeNoProjectionTestImpl(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const boost::multi_array<float, 2>& input,
-        const boost::multi_array<float, 2>& outputExpected)
+        const boost::multi_array<T, 2>& input,
+        const boost::multi_array<T, 2>& outputExpected,
+        float qScale = 0.0f,
+        int32_t qOffset = 0,
+        armnn::DataType constantDataType = armnn::DataType::Float32)
 {
     unsigned int batchSize = boost::numeric_cast<unsigned int>(input.shape()[0]);
     unsigned int inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
@@ -28,19 +33,16 @@ LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(
     // cellSize and outputSize have the same size when there is no projection.
     unsigned numUnits = outputSize;
 
+    armnn::TensorInfo inputTensorInfo({batchSize , inputSize}, ArmnnType,  qScale, qOffset );
+    armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, ArmnnType, qScale, qOffset);
 
-    armnn::TensorInfo inputTensorInfo({batchSize , inputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, armnn::DataType::Float32);
-    armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo scratchBufferTensorInfo({batchSize, numUnits * 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, numUnits}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
 
-
-    armnn::TensorInfo scratchBufferTensorInfo({batchSize, numUnits * 4}, armnn::DataType::Float32);
-    armnn::TensorInfo cellStateOutTensorInfo({batchSize, numUnits}, armnn::DataType::Float32);
-    armnn::TensorInfo outputStateOutTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo outputTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-
-
-    LayerTestResult<float, 2> ret(outputTensorInfo);
+    LayerTestResult<T, 2> ret(outputTensorInfo);
 
     std::vector<float> inputVector;
     inputVector.assign(input.data(), input.data() + (batchSize * inputSize));
@@ -91,9 +93,9 @@ LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(
     AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    armnn::TensorInfo tensorInfo4({numUnits}, armnn::DataType::Float32);
-    armnn::TensorInfo tensorInfo8({numUnits, 2}, armnn::DataType::Float32);
-    armnn::TensorInfo tensorInfo16({numUnits, 4}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo4({numUnits}, constantDataType , qScale, qOffset);
+    armnn::TensorInfo tensorInfo8({numUnits, 2}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo16({numUnits, 4}, constantDataType, qScale, qOffset);
 
     auto inputToInputWeights = MakeTensor<float, 2>(tensorInfo8, {-0.45018822f, -0.02338299f, -0.0870589f,
                                                                   -0.34550029f, 0.04266912f, -0.15680569f,
@@ -191,13 +193,11 @@ LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(
     data.m_CellBias = &cellBiasTensor;
     data.m_OutputGateBias = &outputGateBiasTensor;
 
-
     // Flags to set test configuration
     data.m_Parameters.m_ActivationFunc = 4;
     data.m_Parameters.m_CifgEnabled = false;
     data.m_Parameters.m_PeepholeEnabled = false;
     data.m_Parameters.m_ProjectionEnabled = false;
-
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateLstm(data, info);
     inputHandle->Allocate();
@@ -220,29 +220,32 @@ LayerTestResult<float, 2> LstmNoCifgNoPeepholeNoProjectionTestImpl(
     return ret;
 }
 
-
-LayerTestResult<float, 2>
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2>
 LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workloadFactory,
                                                   const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-                                                  const boost::multi_array<float, 2>& input,
-                                                  const boost::multi_array<float, 2>& outputExpected)
+                                                  const boost::multi_array<T, 2>& input,
+                                                  const boost::multi_array<T, 2>& outputExpected,
+                                                  float qScale = 0.0f,
+                                                  int32_t qOffset = 0,
+                                                  armnn::DataType constantDataType = armnn::DataType::Float32)
 {
     unsigned int batchSize = 2;
     unsigned int outputSize = 16;
     unsigned int inputSize = 5;
     unsigned numUnits = 20;
 
-    armnn::TensorInfo inputTensorInfo({batchSize , inputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, armnn::DataType::Float32);
-    armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo inputTensorInfo({batchSize , inputSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, ArmnnType, qScale, qOffset);
 
     // Scratch buffer size without CIFG [batchSize, numUnits * 4]
-    armnn::TensorInfo scratchBufferTensorInfo({batchSize, numUnits * 4}, armnn::DataType::Float32);
-    armnn::TensorInfo cellStateOutTensorInfo({batchSize, numUnits}, armnn::DataType::Float32);
-    armnn::TensorInfo outputStateOutTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo outputTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo scratchBufferTensorInfo({batchSize, numUnits * 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, numUnits}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
 
-    LayerTestResult<float, 2> ret(outputTensorInfo);
+    LayerTestResult<T, 2> ret(outputTensorInfo);
 
     std::vector<float> inputVector;
     inputVector.assign(input.data(), input.data() + (batchSize * inputSize));
@@ -292,11 +295,11 @@ LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workl
     AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32);
-    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16({outputSize}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo20({numUnits}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, constantDataType, qScale, qOffset);
 
     auto inputToInputWeights =
             MakeTensor<float, 2>(tensorInfo20x5, {0.021393683f,0.06124551f,  0.046905167f,-0.014657677f,-0.03149463f,
@@ -931,12 +934,15 @@ LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workl
 
 }
 
-
-LayerTestResult<float, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const boost::multi_array<float, 2>& input,
-        const boost::multi_array<float, 2>& outputExpected)
+        const boost::multi_array<T, 2>& input,
+        const boost::multi_array<T, 2>& outputExpected,
+        float qScale = 0.0f,
+        int32_t qOffset = 0,
+        armnn::DataType constantDataType = armnn::DataType::Float32)
 {
     bool cifgEnabled = true;
     bool peepholeEnabled = true;
@@ -950,15 +956,15 @@ LayerTestResult<float, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
     const unsigned int cellSize = outputSize;
 
     // Decide the shape of all input tensors
-    armnn::TensorInfo inputTensorInfo({batchSize , inputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo outputStateInTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo cellStateInTensorInfo({batchSize, cellSize}, armnn::DataType::Float32);
+    armnn::TensorInfo inputTensorInfo({batchSize , inputSize}, ArmnnType, qScale, qOffset); // change to ArmnnType
+    armnn::TensorInfo outputStateInTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateInTensorInfo({batchSize, cellSize}, ArmnnType, qScale, qOffset);
 
     unsigned int scratchBufferSize = cifgEnabled ? cellSize * 3 : cellSize * 4;
-    armnn::TensorInfo scratchBufferTensorInfo({batchSize, scratchBufferSize}, armnn::DataType::Float32);
-    armnn::TensorInfo outputStateOutTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo cellStateOutTensorInfo({batchSize, cellSize}, armnn::DataType::Float32);
-    armnn::TensorInfo outputTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo scratchBufferTensorInfo({batchSize, scratchBufferSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, cellSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
 
     // List of inputs
     std::vector<float> inputData;
@@ -974,9 +980,9 @@ LayerTestResult<float, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
 
     // Prepare all the weights in the descriptor for LSTM
     armnn::LstmQueueDescriptor data;
-    armnn::TensorInfo tensorInfoInput({cellSize, inputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo tensorInfoOutput({cellSize, outputSize}, armnn::DataType::Float32);
-    armnn::TensorInfo tensorInfoNumUnits({cellSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfoInput({cellSize, inputSize}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfoOutput({cellSize, outputSize}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfoNumUnits({cellSize}, constantDataType, qScale, qOffset);
 
     auto inputToCellWeights = MakeTensor<float, 2>(tensorInfoInput,
                                                      {-0.49770179f, -0.27711356f, -0.09624726f, 0.05100781f,
@@ -1074,24 +1080,24 @@ LayerTestResult<float, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
     // List of outputs
     std::vector<float> scratchBufferVector(batchSize * scratchBufferSize, 0.f);
     auto scratchBufferTensor = MakeTensor<float,2>(scratchBufferTensorInfo, scratchBufferVector);
-    LayerTestResult<float, 2> ret0(scratchBufferTensorInfo);
+    LayerTestResult<T, 2> ret0(scratchBufferTensorInfo);
 
     // Output state for a certain time step
     std::vector<float> outputStateOutVector(batchSize * outputSize, 0.f);
     auto outputStateOutTensor = MakeTensor<float,2>(outputStateOutTensorInfo, outputStateOutVector);
-    LayerTestResult<float, 2> ret1(outputStateOutTensorInfo);
+    LayerTestResult<T, 2> ret1(outputStateOutTensorInfo);
 
     // Cell state for a certain time step
     std::vector<float> cellStateOutVector(batchSize * cellSize, 0.f);
     auto cellStateOutTensor = MakeTensor<float,2>(cellStateOutTensorInfo, cellStateOutVector);
-    LayerTestResult<float, 2> ret2(cellStateOutTensorInfo);
+    LayerTestResult<T, 2> ret2(cellStateOutTensorInfo);
 
     // Output for a certain time step
     std::vector<float> outputVector(batchSize * outputSize, 0.f);
     auto outputTensor = MakeTensor<float, 2>(outputTensorInfo, outputVector);
     std::vector<float> outputData;
     outputData.assign(outputExpected.data(), outputExpected.data() + batchSize*outputSize);
-    LayerTestResult<float, 2> ret3(outputTensorInfo);
+    LayerTestResult<T, 2> ret3(outputTensorInfo);
     ret3.outputExpected = MakeTensor<float, 2>(outputTensorInfo, outputData);
 
     // Prepare the inputs and outputs for the workload

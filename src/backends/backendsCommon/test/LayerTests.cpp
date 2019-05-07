@@ -1019,13 +1019,13 @@ LayerTestResult<float, 2> LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest(
     boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(outputDesc, std::vector<float>(
             {-0.36444446f, -0.00352185f, 0.12886585f, -0.05163646f,
              -0.42734814f, -0.00478661f,  0.13455015f, -0.03560682f}));
-    return LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
+    return LstmLayerWithCifgWithPeepholeNoProjectionTestImpl<armnn::DataType::Float32>(
         workloadFactory, memoryManager, input, expectedOutput);
 }
 
 LayerTestResult<float, 2> LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     armnn::TensorInfo inputDesc({ 2, 5 }, armnn::DataType::Float32);
     boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
@@ -1041,7 +1041,8 @@ LayerTestResult<float, 2> LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest(
              -0.0186926f,   0.0193662f,   -0.0115437f,  0.00422612f,  -0.0345232f,
              0.00223253f,   -0.00957321f, 0.0210624f,   0.013331f,    0.0150954f,
              0.02168f}));
-    return LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(workloadFactory, memoryManager, input, expectedOutput);
+    return LstmLayerNoCifgWithPeepholeWithProjectionTestImpl<armnn::DataType::Float32>(
+        workloadFactory, memoryManager, input, expectedOutput);
 }
 
 LayerTestResult<float, 2> LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(
@@ -1058,8 +1059,108 @@ LayerTestResult<float, 2> LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(
             {{-0.02973187f, 0.1229473f,   0.20885126f, -0.15358765f,
               -0.0185422f,   0.11281417f,  0.24466537f, -0.1826292f}}));
 
-    return LstmNoCifgNoPeepholeNoProjectionTestImpl(
+    return LstmNoCifgNoPeepholeNoProjectionTestImpl<armnn::DataType::Float32>(
         workloadFactory, memoryManager, input, expectedOutput);
+}
+
+LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgNoPeepholeNoProjectionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const float qScale = 1.0f;
+    const int32_t qOffset = 0;
+
+    const armnn::DataType datatype = armnn::DataType::QuantisedSymm16;
+    const armnn::DataType constantDatatype = armnn::DataType::QuantisedAsymm8;
+
+    armnn::TensorInfo inputDesc({2, 2}, datatype);
+    boost::multi_array<int16_t , 2> input = MakeTensor<int16_t , 2>(inputDesc, QuantizedVector<int16_t>(qScale, qOffset,
+            std::vector<float>{2., 3., 3., 4.}));
+
+    armnn::TensorInfo outputDesc({2, 4}, datatype);
+    boost::multi_array<int16_t, 2> expectedOutput = MakeTensor<int16_t, 2>(outputDesc, QuantizedVector<int16_t>(qScale,
+            qOffset, std::vector<float>({{-0.02973187f, 0.1229473f,   0.20885126f, -0.15358765f,
+                                          -0.0185422f,  0.11281417f,  0.24466537f, -0.1826292f}})));
+
+    return LstmNoCifgNoPeepholeNoProjectionTestImpl<datatype>(
+        workloadFactory, memoryManager, input, expectedOutput, qScale, qOffset, constantDatatype);
+
+}
+
+LayerTestResult<int16_t, 2> LstmLayerInt16WithCifgWithPeepholeNoProjectionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const float qScale = 1.0f;
+    const int32_t qOffset = 0;
+
+    const armnn::DataType datatype = armnn::DataType::QuantisedSymm16;
+    const armnn::DataType constantDatatype = armnn::DataType::QuantisedAsymm8;
+
+    armnn::TensorInfo inputDesc({ 2, 2 }, datatype);
+    boost::multi_array<int16_t, 2> input = MakeTensor<int16_t, 2>(inputDesc, QuantizedVector<int16_t>(qScale, qOffset,
+            std::vector<float>({ 2., 3., 3., 4. })));
+
+    armnn::TensorInfo outputDesc({ 2, 4 }, datatype);
+    boost::multi_array<int16_t, 2> expectedOutput = MakeTensor<int16_t, 2>(outputDesc, QuantizedVector<int16_t>(qScale,
+            qOffset, std::vector<float>(
+            {-0.36444446f, -0.00352185f, 0.12886585f, -0.05163646f,
+             -0.42734814f, -0.00478661f, 0.13455015f, -0.03560682f})));
+
+    return LstmLayerWithCifgWithPeepholeNoProjectionTestImpl<datatype>(
+        workloadFactory, memoryManager, input, expectedOutput, qScale, qOffset, constantDatatype);
+}
+
+LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgWithPeepholeWithProjectionTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const float qScale = 2.0f;
+    const int32_t qOffset = 0;
+
+    const armnn::DataType datatype = armnn::DataType::QuantisedSymm16;
+    const armnn::DataType constantDatatype = armnn::DataType::QuantisedAsymm8;
+
+    armnn::TensorInfo inputDesc({ 2, 5 }, datatype);
+    boost::multi_array<int16_t, 2> input = MakeTensor<int16_t, 2>(inputDesc, QuantizedVector<int16_t>(qScale,
+            qOffset, std::vector<float>(
+            {0.787926f, 0.151646f, 0.071352f, 0.118426f, 0.458058f,
+             0.295743f, 0.544053f, 0.690064f, 0.858138f, 0.497181f})));
+
+    armnn::TensorInfo outputDesc({ 2, 16 }, datatype);
+    boost::multi_array<int16_t, 2> expectedOutput = MakeTensor<int16_t, 2>(outputDesc, QuantizedVector<int16_t>(qScale,
+            qOffset, std::vector<float>(
+            {-0.00396806f,  0.029352f,   -0.00279226f, 0.0159977f,  -0.00835576f,
+             -0.0211779f,   0.0283512f,  -0.0114597f,  0.00907307f, -0.0244004f,
+             -0.0152191f,  -0.0259063f,   0.00914318f, 0.00415118f,  0.017147f,
+              0.0134203f,  -0.013869f,    0.0287268f, -0.00334693f,  0.00733398f, -0.0287926f,
+             -0.0186926f,   0.0193662f,  -0.0115437f,  0.00422612f, -0.0345232f,
+              0.00223253f, -0.00957321f,  0.0210624f,  0.013331f,    0.0150954f,   0.02168f})));
+
+    return LstmLayerNoCifgWithPeepholeWithProjectionTestImpl<datatype>(
+        workloadFactory, memoryManager, input, expectedOutput, qScale, qOffset, constantDatatype);
+}
+
+LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgNoPeepholeNoProjectionInt16ConstantTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const float qScale = 1.0f;
+    const int32_t qOffset = 0;
+
+    const armnn::DataType datatype = armnn::DataType::QuantisedSymm16; // datatype & constants set to QSymm16
+
+    armnn::TensorInfo inputDesc({2, 2}, datatype);
+    boost::multi_array<int16_t , 2> input = MakeTensor<int16_t , 2>(inputDesc, QuantizedVector<int16_t>(qScale,
+            qOffset, std::vector<float>{2., 3., 3., 4.}));
+
+    armnn::TensorInfo outputDesc({2, 4}, datatype);
+    boost::multi_array<int16_t, 2> expectedOutput = MakeTensor<int16_t, 2>(outputDesc, QuantizedVector<int16_t>(qScale,
+            qOffset, std::vector<float>({{-0.02973187f, 0.1229473f,   0.20885126f, -0.15358765f,
+                                          -0.0185422f,  0.11281417f,  0.24466537f, -0.1826292f}})));
+
+    return LstmNoCifgNoPeepholeNoProjectionTestImpl<datatype>(
+        workloadFactory, memoryManager, input, expectedOutput, qScale, qOffset, datatype);
 }
 
 LayerTestResult<float,3> MergerTest(

@@ -92,6 +92,12 @@ bool ParseCommandLine(int argc, char** argv, IInferenceTestCaseProvider& testCas
 
 bool ValidateDirectory(std::string& dir)
 {
+    if (dir.empty())
+    {
+        std::cerr << "No directory specified" << std::endl;
+        return false;
+    }
+
     if (dir[dir.length() - 1] != '/')
     {
         dir += "/";
@@ -100,6 +106,12 @@ bool ValidateDirectory(std::string& dir)
     if (!boost::filesystem::exists(dir))
     {
         std::cerr << "Given directory " << dir << " does not exist" << std::endl;
+        return false;
+    }
+
+    if (!boost::filesystem::is_directory(dir))
+    {
+        std::cerr << "Given directory [" << dir << "] is not a directory" << std::endl;
         return false;
     }
 

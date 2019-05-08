@@ -291,6 +291,32 @@ if (BUILD_ARMNN_SERIALIZER OR BUILD_CAFFE_PARSER OR BUILD_TF_PARSER OR BUILD_TF_
     addDllCopyCommands(ExecuteNetwork)
 endif()
 
+if(BUILD_ACCURACY_TOOL)
+    macro(AccuracyTool executorName)
+        target_link_libraries(${executorName} ${CMAKE_THREAD_LIBS_INIT})
+        if(OPENCL_LIBRARIES)
+            target_link_libraries(${executorName} ${OPENCL_LIBRARIES})
+        endif()
+        target_link_libraries(${executorName}
+                ${Boost_SYSTEM_LIBRARY}
+                ${Boost_FILESYSTEM_LIBRARY}
+                ${Boost_PROGRAM_OPTIONS_LIBRARY})
+        addDllCopyCommands(${executorName})
+    endmacro()
+
+    set(ModelAccuracyTool-Armnn_sources
+            ModelAccuracyTool-Armnn/ModelAccuracyTool-Armnn.cpp)
+
+    add_executable_ex(ModelAccuracyTool ${ModelAccuracyTool-Armnn_sources})
+    target_include_directories(ModelAccuracyTool PRIVATE ../src/armnn)
+    target_include_directories(ModelAccuracyTool PRIVATE ../src/armnnUtils)
+    target_include_directories(ModelAccuracyTool PRIVATE ../src/backends)
+    target_link_libraries(ModelAccuracyTool inferenceTest)
+    target_link_libraries(ModelAccuracyTool armnn)
+    target_link_libraries(ModelAccuracyTool armnnSerializer)
+    AccuracyTool(ModelAccuracyTool)
+endif()
+
 if(BUILD_ARMNN_QUANTIZER)
     macro(ImageTensorExecutor executorName)
         target_link_libraries(${executorName} ${CMAKE_THREAD_LIBS_INIT})

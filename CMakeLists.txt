@@ -42,6 +42,8 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/HeapProfiling.hpp
     src/armnnUtils/LeakChecking.cpp
     src/armnnUtils/LeakChecking.hpp
+    src/armnnUtils/ModelAccuracyChecker.cpp
+    src/armnnUtils/ModelAccuracyChecker.hpp
     src/armnnUtils/CsvReader.cpp
     src/armnnUtils/CsvReader.hpp
     src/armnnUtils/FloatingPointConverter.cpp
@@ -455,6 +457,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/LayerValidateOutputTest.cpp
+        src/armnn/test/ModelAccuracyCheckerTest.cpp
         src/armnn/test/NetworkTests.cpp
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptimizerTests.cpp

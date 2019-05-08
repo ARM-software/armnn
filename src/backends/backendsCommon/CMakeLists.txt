@@ -18,6 +18,8 @@ list(APPEND armnnBackendsCommon_sources
     MakeWorkloadHelper.hpp
     MemCopyWorkload.cpp
     MemCopyWorkload.hpp
+    OptimizationViews.cpp
+    OptimizationViews.hpp
     OutputHandler.cpp
     OutputHandler.hpp
     WorkloadDataCollector.hpp

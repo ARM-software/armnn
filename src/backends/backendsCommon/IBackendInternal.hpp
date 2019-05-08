@@ -10,6 +10,8 @@
 #include <ISubgraphViewConverter.hpp>
 #include <SubgraphView.hpp>
 
+#include "OptimizationViews.hpp"
+
 #include <vector>
 
 namespace armnn
@@ -54,8 +56,38 @@ public:
     virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 
-    virtual SubgraphViewUniquePtr OptimizeSubgraphView(const SubgraphView& subgraph, bool& optimizationAttempted)
-        const = 0;
+    // @deprecated Use "OptimizationViews OptimizeSubgraphView(const SubgraphView&);" instead.
+    virtual SubgraphViewUniquePtr OptimizeSubgraphView(const SubgraphView& subgraph, bool& optimizationAttempted) const
+    {
+        optimizationAttempted=false;
+        return nullptr;
+    }
+
+    // Default implementation of OptimizeSubgraphView for backward compatibility with old API.
+    // Override this method with a custom optimization implementation.
+    virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph)
+    {
+        bool attempted=false;
+        SubgraphViewUniquePtr optSubgraph = OptimizeSubgraphView(subgraph, attempted);
+
+        OptimizationViews result;
+        if (!attempted)
+        {
+            result.AddUntouchedSubgraph(SubgraphView(subgraph));
+        }
+        else
+        {
+            if (optSubgraph)
+            {
+                result.AddSubstituion({*optSubgraph.get(), subgraph});
+            }
+            else
+            {
+                result.AddFailedSubgraph(SubgraphView(subgraph));
+            }
+        }
+        return result;
+    }
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

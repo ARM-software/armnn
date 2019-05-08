@@ -26,6 +26,14 @@ struct BackendSettings
         Initialize(preferredBackends, deviceSpec);
     }
 
+    BackendSettings(const BackendSettings& other)
+        : m_PreferredBackends(other.m_PreferredBackends)
+        , m_SupportedBackends(other.m_SupportedBackends)
+        , m_SelectedBackends(other.m_SelectedBackends)
+        , m_IgnoredBackends(other.m_IgnoredBackends)
+    {
+    }
+
     bool IsBackendPreferred(const BackendId& backend) const
     {
         return IsBackendInCollection(backend, m_PreferredBackends);

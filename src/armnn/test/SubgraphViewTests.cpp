@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(SingleInputSingleOutput)
     Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
 
     // Substitute sub-graph with pre-compiled layer
-    graph.SubstituteSubgraph(std::move(subgraph), preCompiledLayer);
+    graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that connections are correct after substitution
     BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn);
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
     Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
 
     // Substitute sub-graph with pre-compiled layer
-    graph.SubstituteSubgraph(std::move(subgraph), preCompiledLayer);
+    graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that connections are correct after substitution
     BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
 
     // Substitute sub-graph with pre-compiled layer
-    graph.SubstituteSubgraph(std::move(subgraph), preCompiledLayer);
+    graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that connections are correct after substitution
     BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
 
     // Substitute sub-graph with pre-compiled layer
-    graph.SubstituteSubgraph(std::move(subgraph), preCompiledLayer);
+    graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that connections are correct after substitution
     BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
@@ -354,7 +354,7 @@ BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
     const SubgraphView::Layers subgraphLayers = subgraph->GetLayers();
 
     // Substitute sub-graph with pre-compiled layer
-    graph.SubstituteSubgraph(std::move(subgraph), preCompiledLayer);
+    graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
 
     // Check that the layers belonging to the sub-graph have been erased from the graph after substitution
     BOOST_CHECK(!AreAnySubgraphLayersPresentInGraph(subgraphLayers, graph));
@@ -923,7 +923,7 @@ BOOST_AUTO_TEST_CASE(SingleSubgraph)
             Layer* const preCompiledLayer = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
 
             // Substitute sub-graph with pre-compiled layer
-            graph.SubstituteSubgraph((std::move(subgraphs[0])), preCompiledLayer);
+            graph.SubstituteSubgraph(*subgraphs[0], preCompiledLayer);
 
             // Check that connections are correct after substitution
             BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn1);
@@ -1013,8 +1013,8 @@ BOOST_AUTO_TEST_CASE(MultipleSubgraphs)
             Layer* const preCompiledLayer2 = graph.AddLayer<PreCompiledLayer>(preCompiledDescriptor2, "pre-compiled2");
 
             // Substitute sub-graph with pre-compiled layer
-            graph.SubstituteSubgraph((std::move(subgraphs[0])), preCompiledLayer1);
-            graph.SubstituteSubgraph((std::move(subgraphs[1])), preCompiledLayer2);
+            graph.SubstituteSubgraph(*subgraphs[0], preCompiledLayer1);
+            graph.SubstituteSubgraph(*subgraphs[1], preCompiledLayer2);
 
             // Check that connections are correct after substitution
             BOOST_CHECK_EQUAL(preCompiledLayer1->GetInputSlot(0).GetConnection(), subgraph1InputConn);

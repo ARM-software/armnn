@@ -31,7 +31,7 @@ public:
     using ConstIterator = Layers::const_iterator;
 
     /// Constructs a sub-graph from the entire given graph.
-    SubgraphView(Graph& graph);
+    explicit SubgraphView(Graph& graph);
 
     /// Constructs a sub-graph with the given arguments.
     SubgraphView(InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
@@ -44,6 +44,9 @@ public:
 
     /// Constructs a sub-graph with only the given layer.
     SubgraphView(IConnectableLayer* layer);
+
+    /// Move-assignment operator.
+    SubgraphView& operator=(SubgraphView&& other);
 
     const InputSlots& GetInputSlots() const;
     const OutputSlots& GetOutputSlots() const;
@@ -66,6 +69,8 @@ public:
 
     ConstIterator cbegin() const;
     ConstIterator cend() const;
+
+    void Clear();
 
 private:
     void CheckSubgraph();

@@ -298,21 +298,18 @@ void Graph::AddCopyLayers()
     }
 }
 
-void Graph::SubstituteSubgraph(std::unique_ptr<SubgraphView> subgraph, IConnectableLayer* substituteLayer)
+void Graph::SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer)
 {
-    BOOST_ASSERT(subgraph != nullptr);
     BOOST_ASSERT(substituteLayer != nullptr);
 
-    ReplaceSubgraphConnections(*subgraph, substituteLayer);
-    EraseSubgraphLayers(*subgraph);
+    ReplaceSubgraphConnections(subgraph, substituteLayer);
+    EraseSubgraphLayers(subgraph);
 }
 
-void Graph::SubstituteSubgraph(std::unique_ptr<SubgraphView> subgraph, const SubgraphView& substituteSubgraph)
+void Graph::SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& substituteSubgraph)
 {
-    BOOST_ASSERT(subgraph);
-
-    ReplaceSubgraphConnections(*subgraph, substituteSubgraph);
-    EraseSubgraphLayers(*subgraph);
+    ReplaceSubgraphConnections(subgraph, substituteSubgraph);
+    EraseSubgraphLayers(subgraph);
 }
 
 void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectableLayer* substituteLayer)
@@ -377,12 +374,13 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     }
 }
 
-void Graph::EraseSubgraphLayers(const SubgraphView &subgraph)
+void Graph::EraseSubgraphLayers(SubgraphView &subgraph)
 {
     for (auto layer : subgraph.GetLayers())
     {
         EraseLayer(layer);
     }
+    subgraph.Clear();
 }
 
 void Graph::InferTensorInfos()

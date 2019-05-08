@@ -163,8 +163,8 @@ public:
 
     /// Substitutes the given sub-graph with either a new layer or a new sub-graph.
     /// In either case, the given layer or all the layers in the given sub-graph must belong to this graph.
-    void SubstituteSubgraph(std::unique_ptr<SubgraphView> subgraph, IConnectableLayer* substituteLayer);
-    void SubstituteSubgraph(std::unique_ptr<SubgraphView> subgraph, const SubgraphView& substituteSubgraph);
+    void SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer);
+    void SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& substituteSubgraph);
 
     void InferTensorInfos();
 
@@ -219,7 +219,7 @@ private:
 
     void ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectableLayer* substituteLayer);
     void ReplaceSubgraphConnections(const SubgraphView& subgraph, const SubgraphView& substituteSubgraph);
-    void EraseSubgraphLayers(const SubgraphView &subgraph);
+    void EraseSubgraphLayers(SubgraphView &subgraph);
 
     /// Mutable to allow sorting on const object.
     mutable LayerList m_Layers;

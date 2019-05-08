@@ -365,53 +365,57 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
         for (auto& subgraph : subgraphs)
         {
             // Try to optimize the current sub-graph
-            bool optimizationAttempted = false;
-            SubgraphView::SubgraphViewPtr optSubgraph = backendObjPtr->OptimizeSubgraphView(*subgraph,
-                                                                                            optimizationAttempted);
-
-            // Check if the optimization has been attempted
-            if (!optimizationAttempted)
-            {
-                // No optimization attempted, keep the current sub-graph as it is and move to the next one
-                continue;
-            }
+            OptimizationViews optViews = backendObjPtr->OptimizeSubgraphView(*subgraph);
+            BOOST_ASSERT(optViews.Validate(*subgraph));
 
             // Optimization attempted, check the resulting optimized sub-graph
-            if (optSubgraph)
+            for (auto& substitution : optViews.GetSubstitutions())
             {
                 // Sub-graph optimized, substitute the sub-graph with the new optimized one in the main optimized graph
-                optGraph.SubstituteSubgraph(std::move(subgraph), *optSubgraph);
+                SubgraphView& optSubgraph = substitution.m_ReplacementSubgraph;
+                optGraph.SubstituteSubgraph(substitution.m_SubstitutableSubgraph, optSubgraph);
 
                 // Assign the current backend to the optimized sub-graph
-                std::for_each(optSubgraph->begin(), optSubgraph->end(), [&selectedBackend](Layer* l)
-                {
-                    BOOST_ASSERT(l);
-                    l->SetBackendId(selectedBackend);
-                });
+                std::for_each(optSubgraph.begin(), optSubgraph.end(), [&selectedBackend](Layer* l)
+                    {
+                        BOOST_ASSERT(l);
+                        l->SetBackendId(selectedBackend);
+                    });
             }
-            else
+
+            if (!optViews.GetFailedSubgraphs().empty())
             {
-                // An error occurred: the optimization was attempted but not performed, try different backends
                 std::stringstream warningMsg;
-                warningMsg << "Sub-graph failed to get optimized on " << backendObjPtr->GetId() << ". "
-                           << "Re-assigning backends to " << subgraph->GetLayers().size() << " layers inside sub-graph";
+                warningMsg << "Some sub-graph(s) failed to optimized on " << backendObjPtr->GetId() << " backend.";
                 ReportWarning(warningMsg.str(), errMessages);
 
                 // Failed to optimize the given sub-graph, re-assign the sub-graph layers to other available backends
+                BackendSettings settingsCopy(backendSettings);
                 if (!backendObjPtr->GetId().IsCpuRef())
                 {
                     // Add the current backend to the list of backends to ignore
-                    backendSettings.m_IgnoredBackends.insert(backendObjPtr->GetId());
+                    settingsCopy.m_IgnoredBackends.insert(backendObjPtr->GetId());
                 }
-                OptimizationResult reassignmentResult = AssignBackends(optNetObjPtr,
-                                                                       backendSettings,
-                                                                       *subgraph,
-                                                                       errMessages);
-                if (reassignmentResult.m_Error)
+
+                int count=0;
+                for (auto& failedSubgraph : optViews.GetFailedSubgraphs())
                 {
-                    // Failed to re-assign one of the remaining backends to each layer of the sub-graph
-                    result.m_Error = true;
-                    return result;
+                    // An error occurred: the optimization was attempted but not performed, try different backends
+                    std::stringstream subgraphMsg;
+                    subgraphMsg << "Re-assigning backends to " << failedSubgraph.GetLayers().size()
+                                << " layers inside sub-graph " << count++;
+                    ReportWarning(warningMsg.str(), errMessages);
+
+                    OptimizationResult reassignmentResult = AssignBackends(optNetObjPtr,
+                                                                           settingsCopy,
+                                                                           *subgraph,
+                                                                           errMessages);
+                    if (reassignmentResult.m_Error)
+                    {
+                        // Failed to re-assign one of the remaining backends to each layer of the sub-graph
+                        result.m_Error = true;
+                        return result;
+                    }
                 }
             }
         }

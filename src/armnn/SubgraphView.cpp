@@ -92,6 +92,17 @@ SubgraphView::SubgraphView(IConnectableLayer* layer)
     CheckSubgraph();
 }
 
+SubgraphView& SubgraphView::operator=(SubgraphView&& other)
+{
+    m_InputSlots = std::move(other.m_InputSlots);
+    m_OutputSlots = std::move(other.m_OutputSlots);
+    m_Layers = std::move(other.m_Layers);
+
+    CheckSubgraph();
+
+    return *this;
+}
+
 void SubgraphView::CheckSubgraph()
 {
     // Check for invalid or duplicate input slots
@@ -177,6 +188,13 @@ SubgraphView::ConstIterator SubgraphView::cbegin() const
 SubgraphView::ConstIterator SubgraphView::cend() const
 {
     return end();
+}
+
+void SubgraphView::Clear()
+{
+    m_InputSlots.clear();
+    m_OutputSlots.clear();
+    m_Layers.clear();
 }
 
 } // namespace armnn

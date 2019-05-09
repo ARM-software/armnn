@@ -32,7 +32,9 @@ void Optimizer::Pass(Graph& graph, const Optimizations& optimizations)
 
             if ((*it)->IsOutputUnconnected())
             {
-                it = graph.EraseLayer(it);
+                auto next = std::next(graph.GetPosInGraph(**it));
+                graph.EraseLayer(it);
+                it = next;
                 graphNeedsSorting = true;
             }
 

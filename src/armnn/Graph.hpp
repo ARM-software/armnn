@@ -35,6 +35,17 @@ public:
         return boost::polymorphic_downcast<LayerType*>(layer);
     }
 
+    template <typename Func>
+    void ForEachLayerInGraph(Func func)
+    {
+        for (auto it = m_Layers.begin(); it != m_Layers.end(); )
+        {
+             auto next = std::next(it);
+             func(*it);
+             it = next;
+        }
+    }
+
     using LayerList = std::list<Layer*>;
     using Iterator = LayerList::const_iterator; // Const so pointers in the list can't be modified externally.
     using IteratorDifference = Iterator::difference_type;
@@ -87,15 +98,35 @@ public:
 
     Graph& operator=(const Graph& other) = delete;
 
-    Graph(Graph&&) = default;
-    Graph& operator=(Graph&&) = default;
+    Graph(Graph&& other)
+    {
+        *this = std::move(other);
+    }
+
+    Graph& operator=(Graph&& other)
+    {
+        m_InputIds      = std::move(other.m_InputIds);
+        m_OutputIds     = std::move(other.m_OutputIds);
+        m_LayersInOrder = std::move(other.m_LayersInOrder);
+        m_Views         = std::move(other.m_Views);
+
+        other.ForEachLayerInGraph([this](Layer* otherLayer)
+        {
+            otherLayer->Reparent(*this, m_Layers.end());
+        });
+
+        BOOST_ASSERT(other.m_PosInGraphMap.empty());
+        BOOST_ASSERT(other.m_Layers.empty());
+
+        return *this;
+    }
 
     ~Graph()
     {
-        for (auto&& layer : m_Layers)
+        ForEachLayerInGraph([](Layer* layer)
         {
             delete layer;
-        }
+        });
     }
 
     Status Print() const;
@@ -115,15 +146,13 @@ public:
     template <typename LayerT, typename... Args>
     LayerT* InsertNewLayer(OutputSlot& insertAfter, Args&&... args);
 
-    /// Deletes the layer at the specified position and returns an iterator pointing
-    /// to the next element after the one being deleted.
-    Iterator EraseLayer(Iterator pos);
+    /// Deletes the layer at the specified position.
+    void EraseLayer(Iterator pos);
 
-    /// Deletes the layer and returns an iterator pointing to the next layer in the graph
-    /// (next in the list, after the one being deleted). Sets @a layer to nullptr on return.
+    /// Deletes the layer. Sets @a layer to nullptr on return.
     /// Templated to support pointers to any layer type.
     template <typename LayerT>
-    Iterator EraseLayer(LayerT*& layer);
+    void EraseLayer(LayerT*& layer);
 
     /// Returns iterator pointing to the beginning of the list. Lowercase for range-based for loops.
     Iterator begin() { return m_Layers.begin(); }
@@ -179,6 +208,9 @@ public:
         m_Views[notifyOnEvent].remove(observable);
     }
 
+    /// Gets the position of a layer in the graph.
+    Iterator GetPosInGraph(Layer& layer);
+
 private:
     template <typename LayerT>
     class LayerInGraphBase;
@@ -203,9 +235,6 @@ private:
         }
         return it;
     }
-
-    /// Gets the position of a layer in the graph.
-    Iterator GetPosInGraph(Layer& layer);
 
     void NotifyObservables(GraphEvent event, Layer* graphState)
     {
@@ -251,7 +280,6 @@ protected:
     {
         Insert(destGraph, insertBefore);
         Remove(*m_Graph);
-        m_Graph->m_Layers.erase(m_Graph->GetPosInGraph(*this));
 
         m_Graph = &destGraph;
     }
@@ -264,6 +292,9 @@ private:
 
     void Remove(Graph& graph)
     {
+        auto layerIt = graph.GetPosInGraph(*this);
+        graph.m_Layers.erase(layerIt);
+
         const size_t numErased = graph.m_PosInGraphMap.erase(this);
         boost::ignore_unused(numErased);
         BOOST_ASSERT(numErased == 1);
@@ -271,7 +302,6 @@ private:
 
 protected:
     Graph* m_Graph;
-
 };
 
 /// Input/Output layers specialize this template.
@@ -408,21 +438,19 @@ inline LayerT* Graph::InsertNewLayer(OutputSlot& insertAfter, Args&&... args)
     return layer;
 }
 
-inline Graph::Iterator Graph::EraseLayer(Iterator pos)
+inline void Graph::EraseLayer(Iterator pos)
 {
     NotifyObservables(GraphEvent::LayerErased, *pos);
 
     delete *pos;
-    return m_Layers.erase(pos);
 }
 
 template <typename LayerT>
-inline Graph::Iterator Graph::EraseLayer(LayerT*& layer)
+inline void Graph::EraseLayer(LayerT*& layer)
 {
     BOOST_ASSERT(layer != nullptr);
-    Iterator next = EraseLayer(GetPosInGraph(*layer));
+    EraseLayer(GetPosInGraph(*layer));
     layer = nullptr;
-    return next;
 }
 
 } // namespace armnn

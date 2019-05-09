@@ -20,7 +20,7 @@ class ISubgraphViewConverter
 public:
     virtual ~ISubgraphViewConverter() {}
 
-    virtual std::vector<CompiledBlobPtr> GetOutput() = 0;
+    virtual std::vector<CompiledBlobPtr> CompileNetwork() = 0;
 };
 
 } // namespace armnn

@@ -59,7 +59,7 @@ public:
     // @deprecated Use "OptimizationViews OptimizeSubgraphView(const SubgraphView&);" instead.
     virtual SubgraphViewUniquePtr OptimizeSubgraphView(const SubgraphView& subgraph, bool& optimizationAttempted) const
     {
-        optimizationAttempted=false;
+        optimizationAttempted = false;
         return nullptr;
     }
 
@@ -67,11 +67,11 @@ public:
     // Override this method with a custom optimization implementation.
     virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const
     {
-        bool attempted=false;
-        SubgraphViewUniquePtr optSubgraph = OptimizeSubgraphView(subgraph, attempted);
+        bool optimizationAttempted = false;
+        SubgraphViewUniquePtr optSubgraph = OptimizeSubgraphView(subgraph, optimizationAttempted);
 
         OptimizationViews result;
-        if (!attempted)
+        if (!optimizationAttempted)
         {
             result.AddUntouchedSubgraph(SubgraphView(subgraph));
         }
@@ -79,7 +79,7 @@ public:
         {
             if (optSubgraph)
             {
-                result.AddSubstituion({*optSubgraph.get(), subgraph});
+                result.AddSubstituion({subgraph, SubgraphView(*optSubgraph.get())});
             }
             else
             {

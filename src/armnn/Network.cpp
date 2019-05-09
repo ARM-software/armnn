@@ -365,25 +365,26 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
         for (auto& subgraph : subgraphs)
         {
             // Try to optimize the current sub-graph
-            OptimizationViews optViews = backendObjPtr->OptimizeSubgraphView(*subgraph);
-            BOOST_ASSERT(optViews.Validate(*subgraph));
+            OptimizationViews optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraph);
+            BOOST_ASSERT(optimizationViews.Validate(*subgraph));
 
             // Optimization attempted, check the resulting optimized sub-graph
-            for (auto& substitution : optViews.GetSubstitutions())
+            for (auto& substitution : optimizationViews.GetSubstitutions())
             {
                 // Sub-graph optimized, substitute the sub-graph with the new optimized one in the main optimized graph
-                SubgraphView& optSubgraph = substitution.m_ReplacementSubgraph;
-                optGraph.SubstituteSubgraph(substitution.m_SubstitutableSubgraph, optSubgraph);
+                SubgraphView& replacementSubgraph   = substitution.m_ReplacementSubgraph;
+                SubgraphView& substitutableSubgraph = substitution.m_SubstitutableSubgraph;
+                optGraph.SubstituteSubgraph(substitutableSubgraph, replacementSubgraph);
 
                 // Assign the current backend to the optimized sub-graph
-                std::for_each(optSubgraph.begin(), optSubgraph.end(), [&selectedBackend](Layer* l)
+                std::for_each(replacementSubgraph.begin(), replacementSubgraph.end(), [&selectedBackend](Layer* l)
                     {
                         BOOST_ASSERT(l);
                         l->SetBackendId(selectedBackend);
                     });
             }
 
-            if (!optViews.GetFailedSubgraphs().empty())
+            if (!optimizationViews.GetFailedSubgraphs().empty())
             {
                 std::stringstream warningMsg;
                 warningMsg << "Some sub-graph(s) failed to optimized on " << backendObjPtr->GetId() << " backend.";
@@ -398,7 +399,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                 }
 
                 int count=0;
-                for (auto& failedSubgraph : optViews.GetFailedSubgraphs())
+                for (auto& failedSubgraph : optimizationViews.GetFailedSubgraphs())
                 {
                     // An error occurred: the optimization was attempted but not performed, try different backends
                     std::stringstream subgraphMsg;

@@ -12,6 +12,10 @@ class OptimizationViews
 {
 public:
     OptimizationViews() = default;
+    OptimizationViews(const OptimizationViews&) = delete;
+    OptimizationViews& operator=(const OptimizationViews&) = delete;
+    OptimizationViews(OptimizationViews&&) = default;
+    OptimizationViews& operator=(OptimizationViews&&) = default;
 
     struct SubstitutionPair
     {

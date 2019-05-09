@@ -87,6 +87,9 @@ public:
 
     Graph& operator=(const Graph& other) = delete;
 
+    Graph(Graph&&) = default;
+    Graph& operator=(Graph&&) = default;
+
     ~Graph()
     {
         for (auto&& layer : m_Layers)

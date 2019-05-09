@@ -171,7 +171,7 @@ INetworkPtr NetworkQuantizer::ExportNetwork()
             throw InvalidArgumentException("Unsupported quantization target");
     }
 
-    QuantizerVisitor quantizerVisitor(m_Ranges, quantizationScheme.get());
+    QuantizerVisitor quantizerVisitor(m_Ranges, quantizationScheme.get(), m_Options.m_PreserveType);
     VisitLayers(graph, quantizerVisitor);
 
     // clear the ranges

@@ -14,10 +14,16 @@ namespace armnn
 
 struct QuantizerOptions
 {
-    QuantizerOptions() : m_ActivationFormat(DataType::QuantisedAsymm8) {}
-    QuantizerOptions(DataType activationFormat) : m_ActivationFormat(activationFormat) {}
+    QuantizerOptions() : QuantizerOptions(DataType::QuantisedAsymm8, false) {}
+
+    QuantizerOptions(DataType activationFormat) : QuantizerOptions(activationFormat, false) {}
+
+    QuantizerOptions(DataType activationFormat, bool preserveType)
+    : m_ActivationFormat(activationFormat)
+    , m_PreserveType(preserveType) {}
 
     DataType m_ActivationFormat;
+    bool m_PreserveType;
 };
 
 using INetworkQuantizerPtr = std::unique_ptr<class INetworkQuantizer, void(*)(INetworkQuantizer* quantizer)>;

@@ -25,7 +25,10 @@ class StaticRangeVisitor;
 class QuantizerVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
 {
 public:
-    QuantizerVisitor(const RangeTracker& rangeTracker, const IQuantizationScheme* quantizationScheme);
+    QuantizerVisitor(const RangeTracker& rangeTracker,
+                     const IQuantizationScheme* quantizationScheme,
+                     bool preserveType = false);
+
     ~QuantizerVisitor() = default;
 
     /// Functions to quantize the individual layers, overridden from ILayerVisitor
@@ -132,6 +135,8 @@ private:
     std::unordered_map<LayerGuid, IConnectableLayer*> m_QuantizedGuidToLayerMap;
 
     const IQuantizationScheme* m_QuantizationScheme;
+
+    const bool m_PreserveType;
 };
 
 } //namespace armnn

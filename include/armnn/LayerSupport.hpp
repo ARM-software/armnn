@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <armnn/Deprecated.hpp>
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/Tensor.hpp>
@@ -47,6 +48,14 @@ bool IsBatchToSpaceNdSupported(const BackendId& backend,
                                const BatchToSpaceNdDescriptor& descriptor,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsConcatSupported(const BackendId& backend,
+                       const std::vector<const TensorInfo*> inputs,
+                       const TensorInfo& output,
+                       const OriginsDescriptor& descriptor,
+                       char* reasonIfUnsupported = nullptr,
+                       size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsConstantSupported(const BackendId& backend,
@@ -212,6 +221,7 @@ bool IsMergeSupported(const BackendId& backend,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
 bool IsMergerSupported(const BackendId& backend,
                        const std::vector<const TensorInfo*> inputs,
                        const TensorInfo& output,

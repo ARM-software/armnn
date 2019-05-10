@@ -31,6 +31,11 @@ public:
                                        const BatchNormalizationDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsConcatSupported(const std::vector<const TensorInfo*> inputs,
+                           const TensorInfo& output,
+                           const OriginsDescriptor& descriptor,
+                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsConstantSupported(const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
@@ -101,6 +106,7 @@ public:
                             const TensorInfo& output,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
     bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
                            const OriginsDescriptor& descriptor,

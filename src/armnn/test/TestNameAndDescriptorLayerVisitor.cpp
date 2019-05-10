@@ -239,7 +239,9 @@ BOOST_AUTO_TEST_CASE(CheckMergerLayerVisitorNameAndDescriptor)
     TestMergerLayerVisitor visitor(descriptor, layerName);
     Network net;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer *const layer = net.AddMergerLayer(descriptor, layerName);
+    ARMNN_NO_DEPRECATE_WARN_END
     layer->Accept(visitor);
 }
 
@@ -251,7 +253,9 @@ BOOST_AUTO_TEST_CASE(CheckMergerLayerVisitorNameNullAndDescriptor)
     TestMergerLayerVisitor visitor(descriptor);
     Network net;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer *const layer = net.AddMergerLayer(descriptor);
+    ARMNN_NO_DEPRECATE_WARN_END
     layer->Accept(visitor);
 }
 

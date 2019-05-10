@@ -68,6 +68,16 @@ bool LayerSupportBase::IsBatchToSpaceNdSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
+                                         const TensorInfo& output,
+                                         const OriginsDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
+    return IsMergerSupported(inputs, output, descriptor, reasonIfUnsupported);
+    ARMNN_NO_DEPRECATE_WARN_END
+}
+
 bool LayerSupportBase::IsConstantSupported(const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported) const
 {

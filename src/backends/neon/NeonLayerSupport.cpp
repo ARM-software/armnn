@@ -142,6 +142,16 @@ bool NeonLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                    descriptor);
 }
 
+bool NeonLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
+                                         const TensorInfo& output,
+                                         const OriginsDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+     ARMNN_NO_DEPRECATE_WARN_BEGIN
+     return IsMergerSupported(inputs, output, descriptor, reasonIfUnsupported);
+     ARMNN_NO_DEPRECATE_WARN_END
+}
+
 bool NeonLayerSupport::IsConstantSupported(const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported) const
 {

@@ -82,6 +82,7 @@ private:
     void ParseAdd(GraphPtr graph, unsigned int layerIndex);
     void ParseBatchToSpaceNd(GraphPtr graph, unsigned int layerIndex);
     void ParseBatchNormalization(GraphPtr graph, unsigned int layerIndex);
+    void ParseConcat(GraphPtr graph, unsigned int layerIndex);
     void ParseConstant(GraphPtr graph, unsigned int layerIndex);
     void ParseConvolution2d(GraphPtr graph, unsigned int layerIndex);
     void ParseDepthwiseConvolution2d(GraphPtr graph, unsigned int layerIndex);
@@ -98,7 +99,6 @@ private:
     void ParseMean(GraphPtr graph, unsigned int layerIndex);
     void ParseMinimum(GraphPtr graph, unsigned int layerIndex);
     void ParseMerge(GraphPtr graph, unsigned int layerIndex);
-    void ParseMerger(GraphPtr graph, unsigned int layerIndex);
     void ParseMultiplication(GraphPtr graph, unsigned int layerIndex);
     void ParseNormalization(GraphPtr graph, unsigned int layerIndex);
     void ParseLstm(GraphPtr graph, unsigned int layerIndex);

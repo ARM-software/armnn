@@ -58,6 +58,20 @@ public:
                                           const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                           const char* name = nullptr) = 0;
 
+    /// Function that a concat layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param mergerDescriptor - WindowsDescriptor to configure the concatenation process. Number of Views must be
+    ///                           equal to the number of inputs, and their order must match - e.g. first view
+    ///                           corresponds to the first input, second view to the second input, etc....
+    /// @param name - Optional name for the layer.
+    virtual void VisitConcatLayer(const IConnectableLayer* layer,
+                                  const OriginsDescriptor& mergerDescriptor,
+                                  const char* name = nullptr)
+    {
+        // default implementation to ease transition while MergerLayer is being deprecated
+        VisitMergerLayer(layer, mergerDescriptor, name);
+    }
+
     /// Function a layer with no inputs and a single output, which always corresponds to
     /// the passed in constant tensor should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
@@ -211,6 +225,7 @@ public:
     ///                           the number of inputs, and their order must match - e.g. first view corresponds to
     ///                           the first input, second view to the second input, etc....
     /// @param name - Optional name for the layer.
+    // NOTE: this method will be deprecated and replaced by VisitConcatLayer
     virtual void VisitMergerLayer(const IConnectableLayer* layer,
                                   const OriginsDescriptor& mergerDescriptor,
                                   const char* name = nullptr) = 0;

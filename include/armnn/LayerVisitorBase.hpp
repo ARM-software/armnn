@@ -33,6 +33,10 @@ public:
                          LayerBindingId,
                          const char*) override { DefaultPolicy::Apply(); }
 
+    void VisitConcatLayer(const IConnectableLayer*,
+                          const OriginsDescriptor&,
+                          const char*) override { DefaultPolicy::Apply(); }
+
     void VisitConvolution2dLayer(const IConnectableLayer*,
                                  const Convolution2dDescriptor&,
                                  const ConstTensor&,

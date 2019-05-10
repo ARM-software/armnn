@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <armnn/Deprecated.hpp>
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/ILayerVisitor.hpp>
 #include <armnn/NetworkFwd.hpp>
@@ -99,6 +100,15 @@ public:
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name = nullptr) = 0;
+
+    /// Adds a concatenation layer to the network.
+    /// @param mergerDescriptor - WindowsDescriptor to configure the concatenation process. Number of Views must
+    ///                           be equal to the number of inputs, and their order must match - e.g. first view
+    ///                           corresponds to the first input, second view to the second input, etc....
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddConcatLayer(const OriginsDescriptor& mergerDescriptor,
+                                              const char* name = nullptr) = 0;
 
     /// Adds a 2D convolution layer to the network.
     /// @param convolution2dDescriptor - Description of the 2D convolution layer.
@@ -248,6 +258,7 @@ public:
     ///                           the first input, second view to the second input, etc....
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddConcatLayer instead")
     virtual IConnectableLayer* AddMergerLayer(const OriginsDescriptor& mergerDescriptor,
         const char* name = nullptr) = 0;
 

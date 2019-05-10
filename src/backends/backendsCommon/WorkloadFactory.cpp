@@ -554,7 +554,9 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             result = layerSupportObject->IsMergerSupported(inputPtrs, output, cLayer->GetParameters(), reason);
+            ARMNN_NO_DEPRECATE_WARN_END
             break;
         }
         case LayerType::Multiplication:

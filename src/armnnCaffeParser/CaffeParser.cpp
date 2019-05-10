@@ -589,7 +589,7 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
     outputShape.set_dim(1, mergeDimSizes[1]);
 
     // Finally add the merge layer
-    IConnectableLayer* mergerLayer = m_Network->AddMergerLayer(mergeDesc, layerParam.name().c_str());
+    IConnectableLayer* mergerLayer = m_Network->AddConcatLayer(mergeDesc, layerParam.name().c_str());
 
     if (!mergerLayer)
     {
@@ -1325,7 +1325,7 @@ void CaffeParserBase::ParseConcatLayer(const LayerParameter& layerParam)
     }
     mergeDimSizes[concatDim] = mergeDim;
 
-    armnn::IConnectableLayer* concatlayer = m_Network->AddMergerLayer(concatDescriptor, layerParam.name().c_str());
+    armnn::IConnectableLayer* concatlayer = m_Network->AddConcatLayer(concatDescriptor, layerParam.name().c_str());
     for (unsigned int i = 0; i < numInputs; ++i)
     {
         armnn::IOutputSlot& outputSlot = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(boost::numeric_cast<int>(i)));

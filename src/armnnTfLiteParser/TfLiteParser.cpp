@@ -1692,7 +1692,7 @@ void TfLiteParser::ParseConcatenation(size_t subgraphIndex, size_t operatorIndex
     }
 
     auto layerName = boost::str(boost::format("Concatenation:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* layer = m_Network->AddMergerLayer(concatDescriptor, layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddConcatLayer(concatDescriptor, layerName.c_str());
 
     BOOST_ASSERT(layer != nullptr);
 

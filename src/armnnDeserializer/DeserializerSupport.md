@@ -10,6 +10,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Addition
 * BatchToSpaceNd
 * BatchNormalization
+* Concat
 * Constant
 * Convolution2d
 * DepthwiseConvolution2d
@@ -26,7 +27,6 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Maximum
 * Mean
 * Merge
-* Merger
 * Minimum
 * Multiplication
 * Normalization

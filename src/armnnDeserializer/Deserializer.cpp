@@ -209,7 +209,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_MeanLayer]                   = &Deserializer::ParseMean;
     m_ParserFunctions[Layer_MinimumLayer]                = &Deserializer::ParseMinimum;
     m_ParserFunctions[Layer_MergeLayer]                  = &Deserializer::ParseMerge;
-    m_ParserFunctions[Layer_MergerLayer]                 = &Deserializer::ParseMerger;
+    m_ParserFunctions[Layer_MergerLayer]                 = &Deserializer::ParseConcat;
     m_ParserFunctions[Layer_MultiplicationLayer]         = &Deserializer::ParseMultiplication;
     m_ParserFunctions[Layer_NormalizationLayer]          = &Deserializer::ParseNormalization;
     m_ParserFunctions[Layer_PadLayer]                    = &Deserializer::ParsePad;
@@ -1213,7 +1213,7 @@ void Deserializer::ParseMaximum(GraphPtr graph, unsigned int layerIndex)
     RegisterOutputSlots(graph, layerIndex, layer);
 }
 
-void Deserializer::ParseMerger(GraphPtr graph, unsigned int layerIndex)
+void Deserializer::ParseConcat(GraphPtr graph, unsigned int layerIndex)
 {
     CHECK_LAYERS(graph, 0, layerIndex);
     CHECK_LOCATION();
@@ -1244,7 +1244,7 @@ void Deserializer::ParseMerger(GraphPtr graph, unsigned int layerIndex)
     }
     descriptor.SetConcatAxis(mergerDescriptor->concatAxis());
 
-    IConnectableLayer* layer = m_Network->AddMergerLayer(descriptor, layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddConcatLayer(descriptor, layerName.c_str());
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 

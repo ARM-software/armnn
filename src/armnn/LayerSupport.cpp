@@ -130,6 +130,18 @@ bool IsBatchToSpaceNdSupported(const BackendId& backend,
                                descriptor);
 }
 
+bool IsConcatSupported(const BackendId& backend,
+                       std::vector<const TensorInfo*> inputs,
+                       const TensorInfo& output,
+                       const OriginsDescriptor& descriptor,
+                       char* reasonIfUnsupported,
+                       size_t reasonIfUnsupportedMaxLength)
+{
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
+    return IsMergerSupported(backend, inputs, output, descriptor, reasonIfUnsupported, reasonIfUnsupportedMaxLength);
+    ARMNN_NO_DEPRECATE_WARN_END
+}
+
 bool IsConstantSupported(const BackendId& backend,
                          const TensorInfo& output,
                          char* reasonIfUnsupported,
@@ -386,6 +398,7 @@ bool IsMergeSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergeSupported, input0, input1, output);
 }
 
+ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
 bool IsMergerSupported(const BackendId& backend,
                        std::vector<const TensorInfo*> inputs,
                        const TensorInfo& output,
@@ -394,7 +407,10 @@ bool IsMergerSupported(const BackendId& backend,
                        size_t reasonIfUnsupportedMaxLength)
 {
     BOOST_ASSERT(inputs.size() > 0);
+
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergerSupported, inputs, output, descriptor);
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 bool IsMinimumSupported(const BackendId& backend,

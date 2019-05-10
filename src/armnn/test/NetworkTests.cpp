@@ -254,7 +254,9 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterMerger)
     // Adds a merger layer.
     armnn::OriginsDescriptor mergerDesc(2, 4);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* mergerLayer = net.AddMergerLayer(mergerDesc, "merger layer");
+    ARMNN_NO_DEPRECATE_WARN_END
     BOOST_TEST(mergerLayer);
 
     softmaxLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));

@@ -1276,7 +1276,9 @@ BOOST_AUTO_TEST_CASE(SerializeMerger)
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayerOne = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayerTwo = network->AddInputLayer(1);
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const mergerLayer = network->AddMergerLayer(descriptor, layerName.c_str());
+    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayerOne->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));

@@ -2120,7 +2120,7 @@ ParsedTfOperationPtr TfParser::ParseConcat(const tensorflow::NodeDef& nodeDef,
 
     // Update the output shape
     mergeDims[concatDim] = mergeDim;
-    armnn::IConnectableLayer *layer = m_Network->AddMergerLayer(concatDescriptor, nodeDef.name().c_str());
+    armnn::IConnectableLayer *layer = m_Network->AddConcatLayer(concatDescriptor, nodeDef.name().c_str());
 
     layer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(mergeDims, DataType::Float32));
 

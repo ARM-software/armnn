@@ -1283,7 +1283,9 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
     IConnectableLayer* input2 = network->AddInputLayer(2);
 
     OriginsDescriptor descriptor(3, 1);
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* merger = network->AddMergerLayer(descriptor);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     IConnectableLayer* output0 = network->AddOutputLayer(3);
 

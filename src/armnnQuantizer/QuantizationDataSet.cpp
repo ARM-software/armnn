@@ -51,7 +51,7 @@ void InputLayerVisitor::VisitInputLayer(const armnn::IConnectableLayer* layer,
                                         armnn::LayerBindingId id,
                                         const char* name)
 {
-    m_TensorInfos.emplace(id, layer->GetInputSlot(0).GetConnection()->GetTensorInfo());
+    m_TensorInfos.emplace(id, layer->GetOutputSlot(0).GetTensorInfo());
 }
 
 armnn::TensorInfo InputLayerVisitor::GetTensorInfo(armnn::LayerBindingId layerBindingId)

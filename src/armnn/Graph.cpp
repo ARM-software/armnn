@@ -308,6 +308,17 @@ void Graph::SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substi
 
 void Graph::SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& substituteSubgraph)
 {
+    // Look through each layer in the new subgraph and add any that are not already a member of this graph
+    substituteSubgraph.ForEachLayer([this](Layer* layer)
+    {
+        if (std::find(std::begin(m_Layers), std::end(m_Layers), layer) == std::end(m_Layers))
+        {
+            layer->Reparent(*this, m_Layers.end());
+            m_LayersInOrder = false;
+        }
+    });
+
+    TopologicalSort();
     ReplaceSubgraphConnections(subgraph, substituteSubgraph);
     EraseSubgraphLayers(subgraph);
 }

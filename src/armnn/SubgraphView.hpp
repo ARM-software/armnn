@@ -23,6 +23,17 @@ namespace armnn
 class SubgraphView final
 {
 public:
+    template <typename Func>
+    void ForEachLayer(Func func) const
+    {
+        for (auto it = m_Layers.begin(); it != m_Layers.end(); )
+        {
+             auto next = std::next(it);
+             func(*it);
+             it = next;
+        }
+    }
+
     using SubgraphViewPtr = std::unique_ptr<SubgraphView>;
     using InputSlots = std::vector<InputSlot*>;
     using OutputSlots = std::vector<OutputSlot*>;

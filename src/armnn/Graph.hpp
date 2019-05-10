@@ -36,7 +36,7 @@ public:
     }
 
     template <typename Func>
-    void ForEachLayerInGraph(Func func)
+    void ForEachLayer(Func func) const
     {
         for (auto it = m_Layers.begin(); it != m_Layers.end(); )
         {
@@ -110,7 +110,7 @@ public:
         m_LayersInOrder = std::move(other.m_LayersInOrder);
         m_Views         = std::move(other.m_Views);
 
-        other.ForEachLayerInGraph([this](Layer* otherLayer)
+        other.ForEachLayer([this](Layer* otherLayer)
         {
             otherLayer->Reparent(*this, m_Layers.end());
         });
@@ -123,7 +123,7 @@ public:
 
     ~Graph()
     {
-        ForEachLayerInGraph([](Layer* layer)
+        ForEachLayer([](Layer* layer)
         {
             delete layer;
         });

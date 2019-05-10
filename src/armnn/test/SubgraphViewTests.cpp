@@ -166,6 +166,49 @@ BOOST_AUTO_TEST_CASE(SingleInputSingleOutput)
     BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn);
 }
 
+BOOST_AUTO_TEST_CASE(SingleInputSingleOutputSubstituteGraph)
+{
+    // Construct graph
+    Graph graph;
+
+    Layer* const inputLayer = graph.AddLayer<InputLayer>(0, "input");
+
+    Convolution2dDescriptor convDescriptor;
+    Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
+    Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+
+    Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    // Construct sub-graph
+    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+                                                                            CreateOutputsFrom({convLayer2}),
+                                                                            {});
+
+    // Save sub-graph connections for comparison after substitution
+    IOutputSlot* subgraphInputConn = subgraph->GetInputSlot(0)->GetConnection();
+    IInputSlot* subgraphOutputConn = subgraph->GetOutputSlot(0)->GetConnection(0);
+
+    // Construct second graph with a single pre-compiled layer
+    Graph substituteGraph;
+    PreCompiledDescriptor preCompiledDescriptor(1, 1);
+    Layer* const preCompiledLayer = substituteGraph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+
+    SubgraphViewSelector::SubgraphViewPtr substituteSubgraph =
+                                          CreateSubgraphViewFrom(CreateInputsFrom({preCompiledLayer}),
+                                                                 CreateOutputsFrom({preCompiledLayer}),
+                                                                 {preCompiledLayer});
+    // Substitute subgraph with pre-compiled layer
+    graph.SubstituteSubgraph(*subgraph, *substituteSubgraph);
+
+    // Check that connections are correct after substitution
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetInputSlot(0).GetConnection(), subgraphInputConn);
+    BOOST_CHECK_EQUAL(preCompiledLayer->GetOutputSlot(0).GetConnection(0), subgraphOutputConn);
+}
+
 BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
 {
     // Construct graph

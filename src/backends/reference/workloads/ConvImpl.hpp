@@ -97,6 +97,8 @@ static void ConvImpl(ConvData data,
     unsigned int paddingLeft = data.m_Parameters.m_PadLeft;
     unsigned int xStride     = data.m_Parameters.m_StrideX;
     unsigned int yStride     = data.m_Parameters.m_StrideY;
+    unsigned int xDilation   = data.m_Parameters.m_DilationX;
+    unsigned int yDilation   = data.m_Parameters.m_DilationY;
 
     // The world's least efficient convolution.
     for (unsigned int batchIdx = 0; batchIdx < batchSize; batchIdx++)
@@ -158,8 +160,8 @@ static void ConvImpl(ConvData data,
                                 AccumulatorType filterValue = filterData[filterIndex] -
                                     boost::numeric_cast<AccumulatorType>(filterOffset);
 
-                                unsigned int yInput = yOutput * yStride + yFilter;
-                                unsigned int xInput = xOutput * xStride + xFilter;
+                                unsigned int yInput = yOutput * yStride + yFilter * yDilation;
+                                unsigned int xInput = xOutput * xStride + xFilter * xDilation;
 
                                 AccumulatorType inputValue;
 

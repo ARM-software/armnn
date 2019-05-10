@@ -97,6 +97,8 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
                               "Quantization scheme, \"QAsymm8\" or \"QSymm16\", default value QAsymm8")
                 ("csvfile,c", po::value<std::string>(&m_CsvFileName)->default_value(""),
                              "CSV file containing paths for RAW input tensors")
+                ("preserve-data-type,p", po::bool_switch(&m_PreserveDataType)->default_value(false),
+                              "Preserve the input and output data types")
                 ("outdir,d", po::value<std::string>(&m_OutputDirectory)->required(),
                              "Directory that output file will be written to")
                 ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(), "Output file name");

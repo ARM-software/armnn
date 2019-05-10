@@ -34,6 +34,7 @@ public:
     std::string GetOutputFileName() {return m_OutputFileName;}
     std::string GetQuantizationScheme() {return m_QuantizationScheme;}
     QuantizationDataSet GetQuantizationDataSet() {return m_QuantizationDataSet;}
+    bool HasPreservedDataType() {return m_PreserveDataType;}
     bool HasQuantizationData() {return !m_QuantizationDataSet.IsEmpty();}
 
 protected:
@@ -44,6 +45,7 @@ protected:
     std::string m_OutputFileName;
     std::string m_QuantizationScheme;
     QuantizationDataSet m_QuantizationDataSet;
+    bool m_PreserveDataType;
 };
 
 } // namespace armnnQuantizer

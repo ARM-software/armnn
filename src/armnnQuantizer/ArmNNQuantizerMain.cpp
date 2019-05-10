@@ -40,6 +40,8 @@ int main(int argc, char* argv[])
                                           ? armnn::DataType::QuantisedSymm16
                                           : armnn::DataType::QuantisedAsymm8;
 
+    quantizerOptions.m_PreserveType = cmdline.HasPreservedDataType();
+
     armnn::INetworkPtr network = parser->CreateNetworkFromBinary(binaryContent);
     armnn::INetworkQuantizerPtr quantizer = armnn::INetworkQuantizer::Create(network.get(), quantizerOptions);
 

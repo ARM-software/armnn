@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
         {
             // Adds generic options needed to run Accuracy Tool.
             desc.add_options()
-                ("help", "Display help messages")
+                ("help,h", "Display help messages")
                 ("model-path,m", po::value<std::string>(&modelPath)->required(), "Path to armnn format model file")
                 ("compute,c", po::value<std::vector<armnn::BackendId>>(&computeDevice)->default_value(defaultBackends),
                  backendsMessage.c_str())

@@ -237,6 +237,8 @@ void SerializerVisitor::VisitConvolution2dLayer(const armnn::IConnectableLayer* 
                                                               descriptor.m_PadBottom,
                                                               descriptor.m_StrideX,
                                                               descriptor.m_StrideY,
+                                                              descriptor.m_DilationX,
+                                                              descriptor.m_DilationY,
                                                               descriptor.m_BiasEnabled,
                                                               GetFlatBufferDataLayout(descriptor.m_DataLayout));
     auto flatBufferWeightsConstTensorInfo = CreateConstTensorInfo(weights);
@@ -272,6 +274,8 @@ void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectab
                                                                descriptor.m_PadBottom,
                                                                descriptor.m_StrideX,
                                                                descriptor.m_StrideY,
+                                                               descriptor.m_DilationX,
+                                                               descriptor.m_DilationY,
                                                                descriptor.m_BiasEnabled,
                                                                GetFlatBufferDataLayout(descriptor.m_DataLayout));
 

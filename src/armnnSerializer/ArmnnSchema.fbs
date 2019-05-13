@@ -172,6 +172,8 @@ table Convolution2dDescriptor {
     padBottom:uint;
     strideX:uint;
     strideY:uint;
+    dilationX:uint = 1;
+    dilationY:uint = 1;
     biasEnabled:bool = false;
     dataLayout:DataLayout = NCHW;
 }
@@ -296,6 +298,8 @@ table DepthwiseConvolution2dDescriptor {
     padBottom:uint;
     strideX:uint;
     strideY:uint;
+    dilationX:uint = 1;
+    dilationY:uint = 1;
     biasEnabled:bool = false;
     dataLayout:DataLayout = NCHW;
 }

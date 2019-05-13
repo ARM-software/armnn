@@ -59,6 +59,17 @@ public:
                                                                          name.c_str());
         newConv2dLayer.GetOutputHandler().SetTensorInfo(outInfo);
 
+        // Copy weights and bias to the new convolution layer
+        BOOST_ASSERT_MSG(convolution2dLayer->m_Weight != nullptr,
+                         "FoldPadIntoConvolution2d: Weights data should not be null.");
+        newConv2dLayer.m_Weight = std::move(convolution2dLayer->m_Weight);
+        if (descriptor.m_BiasEnabled)
+        {
+            BOOST_ASSERT_MSG(convolution2dLayer->m_Bias != nullptr,
+                             "FoldPadIntoConvolution2d: Bias data should not be null if bias is enabled.");
+            newConv2dLayer.m_Bias = std::move(convolution2dLayer->m_Bias);
+        }
+
         // Reconnects with original parent.
         newConv2dLayer.GetOutputSlot().MoveAllConnections(*parentOut);
         // Parent is now the new convolution2d layer.

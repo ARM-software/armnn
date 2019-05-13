@@ -164,7 +164,7 @@ void QuantizerVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* lay
     ConstTensor qBeta = CreateQuantizedConst(beta, betaBacking);
 
     std::vector<uint8_t> gammaBacking;
-    ConstTensor qGamma = CreateQuantizedConst(variance, gammaBacking);
+    ConstTensor qGamma = CreateQuantizedConst(gamma, gammaBacking);
 
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddBatchNormalizationLayer(desc,
                                                                                  qMean,

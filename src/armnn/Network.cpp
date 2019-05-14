@@ -583,16 +583,14 @@ IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescripto
     return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, biases, name);
 }
 
-/// @deprecated
 IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                    const ConstTensor& weights,
                                                    const char* name)
 {
-    Optional<ConstTensor> biases = EmptyOptional();
+    Optional<ConstTensor> biases;
     return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, biases, name);
 }
 
-/// @deprecated
 IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                    const ConstTensor& weights,
                                                    const ConstTensor& biases,
@@ -640,16 +638,14 @@ IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor&
     return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-/// @deprecated
 IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
                                                   const char* name)
 {
-    Optional<ConstTensor> biases = EmptyOptional();
+    Optional<ConstTensor> biases;
     return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-/// @deprecated
 IConnectableLayer* Network::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                                   const ConstTensor& weights,
                                                   const ConstTensor& biases,
@@ -691,17 +687,15 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-/// @deprecated
 IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,
     const char* name)
 {
-    Optional<ConstTensor> biases = EmptyOptional();
+    Optional<ConstTensor> biases;
     return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-/// @deprecated
 IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,

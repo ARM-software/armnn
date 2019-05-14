@@ -988,13 +988,15 @@ void Deserializer::ParseConvolution2d(GraphPtr graph, unsigned int layerIndex)
     armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
     armnn::ConstTensor biases;
 
+    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
     if (descriptor.m_BiasEnabled)
     {
         biases = ToConstTensor(serializerLayer->biases());
+        optionalBiases = armnn::Optional<armnn::ConstTensor>(biases);
     }
     IConnectableLayer* layer = m_Network->AddConvolution2dLayer(descriptor,
                                                                 weights,
-                                                                biases,
+                                                                optionalBiases,
                                                                 layerName.c_str());
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1030,13 +1032,15 @@ void Deserializer::ParseDepthwiseConvolution2d(GraphPtr graph, unsigned int laye
     armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
     armnn::ConstTensor biases;
 
+    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
     if (descriptor.m_BiasEnabled)
     {
         biases = ToConstTensor(serializerLayer->biases());
+        optionalBiases = armnn::Optional<armnn::ConstTensor>(biases);
     }
     IConnectableLayer* layer = m_Network->AddDepthwiseConvolution2dLayer(descriptor,
                                                                          weights,
-                                                                         biases,
+                                                                         optionalBiases,
                                                                          layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
@@ -1317,20 +1321,16 @@ void Deserializer::ParseFullyConnected(GraphPtr graph, unsigned int layerIndex)
     armnn::ConstTensor weightsTensor = ToConstTensor(flatBufferLayer->weights());
 
     armnn::IConnectableLayer* layer;
+    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
     if (flatBufferDescriptor->biasEnabled())
     {
         armnn::ConstTensor biasTensorData = ToConstTensor(flatBufferLayer->biases());
-        layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
-                                                  weightsTensor,
-                                                  biasTensorData,
-                                                  layerName.c_str());
+        optionalBiases = armnn::Optional<armnn::ConstTensor>(biasTensorData);
     }
-    else
-    {
-        layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
-                                                  weightsTensor,
-                                                  layerName.c_str());
-    }
+    layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor,
+                                              weightsTensor,
+                                              optionalBiases,
+                                              layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

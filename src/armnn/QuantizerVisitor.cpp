@@ -90,18 +90,19 @@ void QuantizerVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
 {
     std::vector<uint8_t> weightsBacking;
     ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
+    Optional<ConstTensor> optionalQBiases;
+    std::vector<uint8_t> biasesBacking;
 
-    IConnectableLayer* newLayer;
     if (biases.has_value())
     {
-        std::vector<uint8_t> biasBacking;
-        ConstTensor qBias = CreateQuantizedConst(biases.value(), biasBacking);
-        newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc, qWeights, qBias, name);
+        ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+        optionalQBiases = Optional<ConstTensor>(qBiases);
     }
-    else
-    {
-        newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc, qWeights, name);
-    }
+
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc,
+                                                                             qWeights,
+                                                                             optionalQBiases,
+                                                                             name);
 
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
@@ -185,22 +186,19 @@ void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
 {
     std::vector<uint8_t> weightsBacking;
     ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
+    Optional<ConstTensor> optionalQBiases;
+    std::vector<uint8_t> biasesBacking;
 
-    IConnectableLayer* newLayer;
     if (biases.has_value())
     {
-        std::vector<uint8_t> biasesBacking;
         ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+        optionalQBiases = Optional<ConstTensor>(qBiases);
+    }
 
-        newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor,
-                                                             qWeights,
-                                                             qBiases,
-                                                             name);
-    }
-    else
-    {
-        newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor, qWeights, name);
-    }
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConvolution2dLayer(convolution2dDescriptor,
+                                                                            qWeights,
+                                                                            optionalQBiases,
+                                                                            name);
 
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
@@ -214,22 +212,19 @@ void QuantizerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer*
 {
     std::vector<uint8_t> weightsBacking;
     ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
+    Optional<ConstTensor> optionalQBiases;
+    std::vector<uint8_t> biasesBacking;
 
-    IConnectableLayer* newLayer;
     if (biases.has_value())
     {
-        std::vector<uint8_t> biasesBacking;
         ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+        optionalQBiases = Optional<ConstTensor>(qBiases);
+    }
 
-        newLayer = m_QuantizedNetwork->AddDepthwiseConvolution2dLayer(desc,
-                                                                      qWeights,
-                                                                      qBiases,
-                                                                      name);
-    }
-    else
-    {
-        newLayer = m_QuantizedNetwork->AddDepthwiseConvolution2dLayer(desc, qWeights, name);
-    }
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddDepthwiseConvolution2dLayer(desc,
+                                                                                     qWeights,
+                                                                                     optionalQBiases,
+                                                                                     name);
 
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);

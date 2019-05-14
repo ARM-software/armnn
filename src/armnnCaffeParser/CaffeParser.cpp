@@ -543,19 +543,17 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
                             weightData.data() + numWeightsPerGroup * g);
 
         IConnectableLayer* convLayer = nullptr;
+        Optional<ConstTensor> optionalBiases;
         if (desc.m_BiasEnabled)
         {
             // Pulls out the biases for this group from that loaded from the model file earlier.
             ConstTensor biases(biasInfo, biasData.data() + numBiasesPerGroup * g);
-
-            convLayer =
-                m_Network->AddConvolution2dLayer(desc, weights, biases, convLayerNames[g].c_str());
+            optionalBiases = Optional<ConstTensor>(biases);
         }
-        else
-        {
-            convLayer =
-                m_Network->AddConvolution2dLayer(desc, weights, convLayerNames[g].c_str());
-        }
+        convLayer = m_Network->AddConvolution2dLayer(desc,
+                                                     weights,
+                                                     optionalBiases,
+                                                     convLayerNames[g].c_str());
         convLayers[g] = convLayer;
 
         // If we have more than one group then the input to the nth convolution the splitter layer's nth output,
@@ -665,11 +663,11 @@ void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter&
 
     armnn::IConnectableLayer* returnLayer = nullptr;
     ConstTensor weights(TensorInfo(4, weightDimSizes, DataType::Float32), weightData.data());
-
+    Optional<ConstTensor> optionalBiases;
+    vector<float> biasData;
     if (desc.m_BiasEnabled)
     {
         TensorInfo biasInfo;
-        vector<float> biasData;
 
         biasData.resize(boost::numeric_cast<size_t>(outputShape.dim(1)), 1.f);
         GetDataFromBlob(layerParam, biasData, 1);
@@ -678,12 +676,12 @@ void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter&
         biasInfo = TensorInfo(1, biasDimSizes, DataType::Float32);
 
         ConstTensor biases(biasInfo, biasData.data());
-        returnLayer = m_Network->AddDepthwiseConvolution2dLayer(desc, weights, biases, layerParam.name().c_str());
+        optionalBiases = Optional<ConstTensor>(biases);
     }
-    else
-    {
-        returnLayer = m_Network->AddDepthwiseConvolution2dLayer(desc, weights, layerParam.name().c_str());
-    }
+    returnLayer = m_Network->AddDepthwiseConvolution2dLayer(desc,
+                                                            weights,
+                                                            optionalBiases,
+                                                            layerParam.name().c_str());
 
     if (!returnLayer)
     {
@@ -843,11 +841,11 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
 
     // Pull out the weights for this group from that loaded from the model file earlier
     ConstTensor weights(TensorInfo(4, weightDimSizes, DataType::Float32), weightData.data());
-
+    Optional<ConstTensor> optionalBiases;
+    vector<float> biasData;
     if (convolution2dDescriptor.m_BiasEnabled)
     {
         TensorInfo biasInfo;
-        vector<float> biasData;
 
         biasData.resize(boost::numeric_cast<size_t>(outputShape.dim(1)), 1.f);
         GetDataFromBlob(layerParam, biasData, 1);
@@ -857,14 +855,12 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
 
         // Pull out the biases for this group from that loaded from the model file earlier
         ConstTensor biases(biasInfo, biasData.data());
-
-        returnLayer =
-            m_Network->AddConvolution2dLayer(convolution2dDescriptor, weights, biases, layerParam.name().c_str());
+        optionalBiases = Optional<ConstTensor>(biases);
     }
-    else
-    {
-        returnLayer = m_Network->AddConvolution2dLayer(convolution2dDescriptor, weights, layerParam.name().c_str());
-    }
+    returnLayer = m_Network->AddConvolution2dLayer(convolution2dDescriptor,
+                                                   weights,
+                                                   optionalBiases,
+                                                   layerParam.name().c_str());
 
     armnn::IOutputSlot& inputConnection = GetArmnnOutputSlotForCaffeTop(layerParam.bottom(0));
     inputConnection.Connect(returnLayer->GetInputSlot(0));
@@ -1192,13 +1188,17 @@ void CaffeParserBase::ParseInnerProductLayer(const LayerParameter& layerParam)
 
         ConstTensor biases(TensorInfo(1, sbTD, DataType::Float32), biasDataPtr);
 
-        fullyConnectedLayer = m_Network->AddFullyConnectedLayer(tensorFullyConnectedDescriptor, weights, biases,
-            layerParam.name().c_str());
+        fullyConnectedLayer = m_Network->AddFullyConnectedLayer(tensorFullyConnectedDescriptor,
+                                                                weights,
+                                                                Optional<ConstTensor>(biases),
+                                                                layerParam.name().c_str());
     }
     else
     {
-        fullyConnectedLayer = m_Network->AddFullyConnectedLayer(tensorFullyConnectedDescriptor, weights,
-            layerParam.name().c_str());
+        fullyConnectedLayer = m_Network->AddFullyConnectedLayer(tensorFullyConnectedDescriptor,
+                                                                weights,
+                                                                EmptyOptional(),
+                                                                layerParam.name().c_str());
     }
 
     TensorInfo outputInfo({ inputInfo.GetShape()[0], outputSize }, DataType::Float32);

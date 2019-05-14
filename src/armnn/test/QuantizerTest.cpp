@@ -686,16 +686,14 @@ INetworkPtr CreateNetworkWithFullyConnectedLayer(const bool biasEnabled,
     // Add the layers
     IConnectableLayer* input0 = network->AddInputLayer(0);
     IConnectableLayer* fullyConnected;
+    Optional<ConstTensor> optionalBias;
+    std::vector<float> biasData{10.0f, 20.0f, 30.0f};
     if (desc.m_BiasEnabled)
     {
-        std::vector<float> biasData{10.0f, 20.0f, 30.0f};
         ConstTensor bias(info, biasData);
-        fullyConnected = network->AddFullyConnectedLayer(desc, weights, bias);
+        optionalBias = Optional<ConstTensor>(bias);
     }
-    else
-    {
-        fullyConnected = network->AddFullyConnectedLayer(desc, weights);
-    }
+    fullyConnected = network->AddFullyConnectedLayer(desc, weights, optionalBias);
     IConnectableLayer* output = network->AddOutputLayer(1);
 
     // Establish connections
@@ -814,16 +812,14 @@ void TestQuantizeConvolution2d(bool useBiases)
     // Add the layers
     IConnectableLayer* input0 = network->AddInputLayer(0);
     IConnectableLayer* conv2d;
+    Optional<ConstTensor> optionalBiases;
+    std::vector<float> biasesData{-1.0f, 1.5f, 2.0f};
     if (useBiases)
     {
-        std::vector<float> biasesData{-1.0f, 1.5f, 2.0f};
         ConstTensor biases(info, biasesData);
-        conv2d = network->AddConvolution2dLayer(descriptor, weights, biases);
+        optionalBiases = Optional<ConstTensor>(biases);
     }
-    else
-    {
-        conv2d = network->AddConvolution2dLayer(descriptor, weights);
-    }
+    conv2d = network->AddConvolution2dLayer(descriptor, weights, optionalBiases);
     IConnectableLayer* output = network->AddOutputLayer(1);
 
     // Establish connections
@@ -902,16 +898,14 @@ void TestQuantizeDepthwiseConvolution2d(bool useBiases)
     // Add the layers
     IConnectableLayer* input0 = network->AddInputLayer(0);
     IConnectableLayer* depthwiseConv2d;
+    Optional<ConstTensor> optionalBiases;
+    std::vector<float> biasesData{-1.0f, 1.5f, 2.0f};
     if (useBiases)
     {
-        std::vector<float> biasesData{-1.0f, 1.5f, 2.0f};
         ConstTensor biases(info, biasesData);
-        depthwiseConv2d = network->AddDepthwiseConvolution2dLayer(descriptor, weights, biases);
+        optionalBiases = Optional<ConstTensor>(biases);
     }
-    else
-    {
-        depthwiseConv2d = network->AddDepthwiseConvolution2dLayer(descriptor, weights);
-    }
+    depthwiseConv2d = network->AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBiases);
     IConnectableLayer* output = network->AddOutputLayer(1);
 
     // Establish connections

@@ -1148,12 +1148,18 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
         armnn::ConstTensor biases(biasTensorInfo, biasData);
 
         // Create convolution layer with biases
-        convLayer = net.AddConvolution2dLayer(convDesc2d, weights, biases, convLayerName.c_str());
+        convLayer = net.AddConvolution2dLayer(convDesc2d,
+                                              weights,
+                                              Optional<ConstTensor>(biases),
+                                              convLayerName.c_str());
     }
     else
     {
         // Create convolution layer without biases
-        convLayer = net.AddConvolution2dLayer(convDesc2d, weights, convLayerName.c_str());
+        convLayer = net.AddConvolution2dLayer(convDesc2d,
+                                              weights,
+                                              EmptyOptional(),
+                                              convLayerName.c_str());
     }
 
     BOOST_TEST(convLayer);

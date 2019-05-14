@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(CheckConvolution2dLayer)
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights);
+    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, EmptyOptional());
     layer->Accept(visitor);
 }
 
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayer)
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, layerName);
+    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, EmptyOptional(), layerName);
     layer->Accept(visitor);
 }
 
@@ -175,12 +175,13 @@ BOOST_AUTO_TEST_CASE(CheckConvolution2dLayerWithBiases)
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
+    Optional<ConstTensor> optionalBiases(biases);
 
-    TestConvolution2dLayerVisitor visitor(descriptor, weights, Optional<ConstTensor>(biases));
+    TestConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases);
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, biases);
+    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, optionalBiases);
     layer->Accept(visitor);
 }
 
@@ -204,12 +205,13 @@ BOOST_AUTO_TEST_CASE(CheckNamedConvolution2dLayerWithBiases)
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
+    Optional<ConstTensor> optionalBiases(biases);
 
-    TestConvolution2dLayerVisitor visitor(descriptor, weights, Optional<ConstTensor>(biases), layerName);
+    TestConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases, layerName);
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, biases, layerName);
+    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, optionalBiases, layerName);
     layer->Accept(visitor);
 }
 
@@ -232,7 +234,7 @@ BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayer)
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights);
+    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, EmptyOptional());
     layer->Accept(visitor);
 }
 
@@ -256,7 +258,10 @@ BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayer)
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, layerName);
+    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor,
+                                                                        weights,
+                                                                        EmptyOptional(),
+                                                                        layerName);
     layer->Accept(visitor);
 }
 
@@ -279,12 +284,13 @@ BOOST_AUTO_TEST_CASE(CheckDepthwiseConvolution2dLayerWithBiases)
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
+    Optional<ConstTensor> optionalBiases(biases);
 
-    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, Optional<ConstTensor>(biases));
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases);
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, biases);
+    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBiases);
     layer->Accept(visitor);
 }
 
@@ -308,12 +314,13 @@ BOOST_AUTO_TEST_CASE(CheckNamedDepthwiseConvolution2dLayerWithBiases)
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
+    Optional<ConstTensor> optionalBiases(biases);
 
-    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, Optional<ConstTensor>(biases), layerName);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases, layerName);
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, biases, layerName);
+    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBiases, layerName);
     layer->Accept(visitor);
 }
 
@@ -330,7 +337,7 @@ BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayer)
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights);
+    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, EmptyOptional());
     layer->Accept(visitor);
 }
 
@@ -348,7 +355,7 @@ BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayer)
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, layerName);
+    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, EmptyOptional(), layerName);
     layer->Accept(visitor);
 }
 
@@ -365,12 +372,13 @@ BOOST_AUTO_TEST_CASE(CheckFullyConnectedLayerWithBiases)
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
+    Optional<ConstTensor> optionalBiases(biases);
 
-    TestFullyConnectedLayerVistor visitor(descriptor, weights, Optional<ConstTensor>(biases));
+    TestFullyConnectedLayerVistor visitor(descriptor, weights, optionalBiases);
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, biases);
+    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, optionalBiases);
     layer->Accept(visitor);
 }
 
@@ -388,12 +396,13 @@ BOOST_AUTO_TEST_CASE(CheckNamedFullyConnectedLayerWithBiases)
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32), biasData);
+    Optional<ConstTensor> optionalBiases(biases);
 
-    TestFullyConnectedLayerVistor visitor(descriptor, weights, Optional<ConstTensor>(biases), layerName);
+    TestFullyConnectedLayerVistor visitor(descriptor, weights, optionalBiases, layerName);
 
     Network net;
 
-    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, biases, layerName);
+    IConnectableLayer* const layer = net.AddFullyConnectedLayer(descriptor, weights, optionalBiases, layerName);
     layer->Accept(visitor);
 }
 

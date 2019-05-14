@@ -809,7 +809,7 @@ void OnnxParser::AddFullyConnected(const onnx::NodeProto& matmulNode, const onnx
         }
         layer = m_Network->AddFullyConnectedLayer(desc,
                                                   CreateConstTensor(weightName).first,
-                                                  CreateConstTensor(biasName).first,
+                                                  Optional<ConstTensor>(CreateConstTensor(biasName).first),
                                                   matmulNode.name().c_str());
         BOOST_ASSERT(layer != nullptr);
 
@@ -824,7 +824,10 @@ void OnnxParser::AddFullyConnected(const onnx::NodeProto& matmulNode, const onnx
     }
     else
     {
-        layer = m_Network->AddFullyConnectedLayer(desc, CreateConstTensor(weightName).first, matmulNode.name().c_str());
+        layer = m_Network->AddFullyConnectedLayer(desc,
+                                                  CreateConstTensor(weightName).first,
+                                                  EmptyOptional(),
+                                                  matmulNode.name().c_str());
         BOOST_ASSERT(layer != nullptr);
 
         auto outputInfo = ComputeOutputInfo({matmulNode.output(0)}, layer,
@@ -1120,13 +1123,14 @@ void OnnxParser::AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, cons
         auto biasTensor = CreateConstTensor(node.input(2));
         layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
                                                           weightTensor.first,
-                                                          biasTensor.first,
+                                                          Optional<ConstTensor>(biasTensor.first),
                                                           node.name().c_str());
     }
     else
     {
         layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
                                                           weightTensor.first,
+                                                          EmptyOptional(),
                                                           node.name().c_str());
     }
     BOOST_ASSERT(layer != nullptr);
@@ -1319,13 +1323,14 @@ void OnnxParser::ParseConv(const onnx::NodeProto& node)
         auto biasTensor = CreateConstTensor(node.input(2));
         layer = m_Network->AddConvolution2dLayer(desc,
                                                  weightTensor.first,
-                                                 biasTensor.first,
+                                                 Optional<ConstTensor>(biasTensor.first),
                                                  node.name().c_str());
     }
     else
     {
         layer = m_Network->AddConvolution2dLayer(desc,
                                                  weightTensor.first,
+                                                 EmptyOptional(),
                                                  node.name().c_str());
     }
     BOOST_ASSERT(layer != nullptr);

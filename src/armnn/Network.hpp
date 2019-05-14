@@ -45,12 +45,12 @@ public:
                                              const Optional<ConstTensor>& biases,
                                              const char* name = nullptr) override;
 
-    /// @deprecated
+    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const char* name = nullptr) override;
 
-    /// @deprecated
+    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const ConstTensor& biases,
@@ -62,13 +62,13 @@ public:
         const Optional<ConstTensor>& biases,
         const char* name = nullptr) override;
 
-    /// @deprecated
+    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
     IConnectableLayer* AddDepthwiseConvolution2dLayer(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
         const char* name = nullptr) override;
 
-    /// @deprecated
+    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
     IConnectableLayer* AddDepthwiseConvolution2dLayer(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
@@ -87,12 +87,12 @@ public:
                                               const Optional<ConstTensor>& biases,
                                               const char* name = nullptr) override;
 
-    /// @deprecated
+    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const ConstTensor& weights,
                                               const char* name = nullptr) override;
 
-    /// @deprecated
+    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const ConstTensor& weights,
                                               const ConstTensor& biases,

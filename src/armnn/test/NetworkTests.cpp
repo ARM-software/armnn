@@ -78,7 +78,10 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
     armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32), convWeightsData);
 
     armnn::Convolution2dDescriptor convDesc2d;
-    armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d, weights, "conv layer");
+    armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d,
+                                                                          weights,
+                                                                          armnn::EmptyOptional(),
+                                                                          "conv layer");
     BOOST_TEST(convLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
@@ -86,6 +89,7 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
     armnn::FullyConnectedDescriptor fullyConnectedDesc;
     armnn::IConnectableLayer* const fullyConnectedLayer = net.AddFullyConnectedLayer(fullyConnectedDesc,
                                                                                      weights,
+                                                                                     armnn::EmptyOptional(),
                                                                                      "fully connected");
     BOOST_TEST(fullyConnectedLayer);
 

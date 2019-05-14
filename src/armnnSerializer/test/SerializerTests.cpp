@@ -490,7 +490,10 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
     armnn::IConnectableLayer* const convLayer   =
-        network->AddConvolution2dLayer(descriptor, weights, biases, layerName.c_str());
+            network->AddConvolution2dLayer(descriptor,
+                                           weights,
+                                           armnn::Optional<armnn::ConstTensor>(biases),
+                                           layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
@@ -580,7 +583,10 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
     armnn::IConnectableLayer* const depthwiseConvLayer =
-        network->AddDepthwiseConvolution2dLayer(descriptor, weights, biases, layerName.c_str());
+        network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                weights,
+                                                armnn::Optional<armnn::ConstTensor>(biases),
+                                                layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(0));
@@ -925,7 +931,10 @@ BOOST_AUTO_TEST_CASE(SerializeFullyConnected)
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
     armnn::IConnectableLayer* const fullyConnectedLayer =
-        network->AddFullyConnectedLayer(descriptor, weights, biases, layerName.c_str());
+        network->AddFullyConnectedLayer(descriptor,
+                                        weights,
+                                        armnn::Optional<armnn::ConstTensor>(biases),
+                                        layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));

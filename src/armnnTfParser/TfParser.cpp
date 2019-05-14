@@ -1308,7 +1308,10 @@ ParsedTfOperationPtr TfParser::ParseConv2D(const tensorflow::NodeDef& nodeDef,
     CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, padding);
     CalcPadding(inputWidth, weightWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, padding);
 
-    IConnectableLayer* layer = m_Network->AddConvolution2dLayer(desc, weightTensor, nodeDef.name().c_str());
+    IConnectableLayer* layer = m_Network->AddConvolution2dLayer(desc,
+                                                                weightTensor,
+                                                                EmptyOptional(),
+                                                                nodeDef.name().c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     inputSlot.Connect(layer->GetInputSlot(0));
 
@@ -1426,7 +1429,10 @@ ParsedTfOperationPtr TfParser::ParseDepthwiseConv2D(const tensorflow::NodeDef& n
     CalcPadding(inputHeight, weightHeight, desc.m_StrideY, desc.m_PadTop, desc.m_PadBottom, padding);
     CalcPadding(inputWidth, weightWidth, desc.m_StrideX, desc.m_PadLeft, desc.m_PadRight, padding);
 
-    IConnectableLayer* layer = m_Network->AddDepthwiseConvolution2dLayer(desc, weightTensor, nodeDef.name().c_str());
+    IConnectableLayer* layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
+                                                                         weightTensor,
+                                                                         EmptyOptional(),
+                                                                         nodeDef.name().c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     inputSlot.Connect(layer->GetInputSlot(0));
 
@@ -3127,10 +3133,11 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
     desc.m_BiasEnabled = addNodeDef != nullptr;
 
     IConnectableLayer* layer = nullptr;
+    Optional<ConstTensor> optionalBiases;
+    std::vector<float> biasTensorData;
     // Makes the layer.
     if (addNodeDef != nullptr)
     {
-        std::vector<float> biasTensorData;
         ConstTensor biases = biasNode->GetConstTensor(biasTensorData);
 
         if (weights.GetShape()[1] != biases.GetShape()[0])
@@ -3145,12 +3152,9 @@ IConnectableLayer* TfParser::AddFullyConnectedLayer(const tensorflow::NodeDef& m
                         % CHECK_LOCATION().AsString()));
         }
 
-        layer = m_Network->AddFullyConnectedLayer(desc, weights, biases, armnnLayerName);
+        optionalBiases = Optional<ConstTensor>(biases);
     }
-    else
-    {
-        layer = m_Network->AddFullyConnectedLayer(desc, weights, armnnLayerName);
-    }
+    layer = m_Network->AddFullyConnectedLayer(desc, weights, optionalBiases, armnnLayerName);
 
     BOOST_ASSERT(layer != nullptr);
 

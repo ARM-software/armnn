@@ -23,7 +23,9 @@ int main()
     float weightsData[] = {1.0f}; // Identity
     TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32);
     armnn::ConstTensor weights(weightsInfo, weightsData);
-    IConnectableLayer *fullyConnected = myNetwork->AddFullyConnectedLayer(fullyConnectedDesc, weights,
+    IConnectableLayer *fullyConnected = myNetwork->AddFullyConnectedLayer(fullyConnectedDesc,
+                                                                          weights,
+                                                                          EmptyOptional(),
                                                                           "fully connected");
 
     IConnectableLayer *InputLayer = myNetwork->AddInputLayer(0);

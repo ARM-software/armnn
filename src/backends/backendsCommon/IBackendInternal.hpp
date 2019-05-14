@@ -6,6 +6,7 @@
 
 #include <armnn/Types.hpp>
 #include <armnn/IRuntime.hpp>
+#include <armnn/Deprecated.hpp>
 
 #include <ISubgraphViewConverter.hpp>
 #include <SubgraphView.hpp>
@@ -56,7 +57,7 @@ public:
     virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 
-    // @deprecated Use "OptimizationViews OptimizeSubgraphView(const SubgraphView&);" instead.
+    ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
     virtual SubgraphViewUniquePtr OptimizeSubgraphView(const SubgraphView& subgraph, bool& optimizationAttempted) const
     {
         optimizationAttempted = false;
@@ -68,7 +69,10 @@ public:
     virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const
     {
         bool optimizationAttempted = false;
+
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         SubgraphViewUniquePtr optSubgraph = OptimizeSubgraphView(subgraph, optimizationAttempted);
+        ARMNN_NO_DEPRECATE_WARN_END
 
         OptimizationViews result;
         if (!optimizationAttempted)

@@ -748,13 +748,14 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
                                                    armnn::Optional<armnn::PermutationVector&>());
         layer = m_Network->AddConvolution2dLayer(desc,
                                                  filterTensorAndData.first,
-                                                 biasTensorAndData.first,
+                                                 Optional<ConstTensor>(biasTensorAndData.first),
                                                  layerName.c_str());
     }
     else
     {
         layer = m_Network->AddConvolution2dLayer(desc,
                                                  filterTensorAndData.first,
+                                                 EmptyOptional(),
                                                  layerName.c_str());
     }
 
@@ -836,13 +837,14 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
                                                    armnn::Optional<armnn::PermutationVector&>());
         layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
                                                           filterTensorAndData.first,
-                                                          biasTensorAndData.first,
+                                                          Optional<ConstTensor>(biasTensorAndData.first),
                                                           layerName.c_str());
     }
     else
     {
         layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
                                                           filterTensorAndData.first,
+                                                          EmptyOptional(),
                                                           layerName.c_str());
     }
     BOOST_ASSERT(layer != nullptr);
@@ -1757,13 +1759,14 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
                                                    armnn::Optional<armnn::PermutationVector&>());
         layer = m_Network->AddFullyConnectedLayer(desc,
                                                   filterTensorAndData.first,
-                                                  biasTensorAndData.first,
+                                                  Optional<ConstTensor>(biasTensorAndData.first),
                                                   layerName.c_str());
     }
     else
     {
         layer = m_Network->AddFullyConnectedLayer(desc,
                                                   filterTensorAndData.first,
+                                                  EmptyOptional(),
                                                   layerName.c_str());
     }
     BOOST_ASSERT(layer != nullptr);

@@ -191,6 +191,57 @@ void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
                          computeDevices.end());
 }
 
+struct TensorPrinter : public boost::static_visitor<>
+{
+    TensorPrinter(const std::string& binding, const armnn::TensorInfo& info)
+        : m_OutputBinding(binding)
+        , m_Scale(info.GetQuantizationScale())
+        , m_Offset(info.GetQuantizationOffset())
+    {}
+
+    void operator()(const std::vector<float>& values)
+    {
+        ForEachValue(values, [](float value){
+                printf("%f ", value);
+            });
+    }
+
+    void operator()(const std::vector<uint8_t>& values)
+    {
+        auto& scale = m_Scale;
+        auto& offset = m_Offset;
+        ForEachValue(values, [&scale, &offset](uint8_t value)
+            {
+                printf("%f ", armnn::Dequantize(value, scale, offset));
+            });
+    }
+
+    void operator()(const std::vector<int>& values)
+    {
+        ForEachValue(values, [](int value)
+            {
+                printf("%d ", value);
+            });
+    }
+
+private:
+    template<typename Container, typename Delegate>
+    void ForEachValue(const Container& c, Delegate delegate)
+    {
+        std::cout << m_OutputBinding << ": ";
+        for (const auto& value : c)
+        {
+            delegate(value);
+        }
+        printf("\n");
+    }
+
+    std::string m_OutputBinding;
+    float m_Scale=0.0f;
+    int m_Offset=0;
+};
+
+
 } // namespace
 
 template<typename TParser, typename TDataType>
@@ -299,18 +350,12 @@ int MainImpl(const char* modelPath,
         auto inference_duration = model.Run(inputDataContainers, outputDataContainers);
 
         // Print output tensors
+        const auto& infosOut = model.GetOutputBindingInfos();
         for (size_t i = 0; i < numOutputs; i++)
         {
-            boost::apply_visitor([&](auto&& value)
-                                 {
-                                     std::cout << params.m_OutputBindings[i] << ": ";
-                                     for (size_t i = 0; i < value.size(); ++i)
-                                     {
-                                         printf("%f ", static_cast<float>(value[i]));
-                                     }
-                                     printf("\n");
-                                 },
-                                 outputDataContainers[i]);
+            const armnn::TensorInfo& infoOut = infosOut[i].second;
+            TensorPrinter printer(params.m_OutputBindings[i], infoOut);
+            boost::apply_visitor(printer, outputDataContainers[i]);
         }
 
         BOOST_LOG_TRIVIAL(info) << "\nInference time: " << std::setprecision(2)

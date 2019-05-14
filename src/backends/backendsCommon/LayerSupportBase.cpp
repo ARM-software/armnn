@@ -130,6 +130,16 @@ bool LayerSupportBase::IsDetectionPostProcessSupported(const armnn::TensorInfo& 
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,
+                                                              const TensorInfo& output,
+                                                              const DepthwiseConvolution2dDescriptor& descriptor,
+                                                              const TensorInfo& weights,
+                                                              const Optional<TensorInfo>& biases,
+                                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsDivisionSupported(const TensorInfo& input0,
                                            const TensorInfo& input1,
                                            const TensorInfo& output,

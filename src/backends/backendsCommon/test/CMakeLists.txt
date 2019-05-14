@@ -36,6 +36,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     MockBackendId.hpp
     OptimizedNetworkTests.cpp
     OptimizeSubgraphViewTests.cpp
+    OptimizationViewsTests.cpp
     PermuteTestImpl.hpp
     Pooling2dTestImpl.hpp
     QuantizeHelper.hpp

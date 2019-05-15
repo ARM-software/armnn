@@ -30,7 +30,12 @@ ARMNN_BACKEND_MAKEFILE_DIRS := $(subst /backend.mk,,$(ARMNN_BACKEND_MAKEFILE_PAT
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libarmnn
+ifeq ($(PLATFORM_VERSION),Q)
+# "eng" is deprecated in Android Q
+LOCAL_MODULE_TAGS := optional
+else
 LOCAL_MODULE_TAGS := eng optional
+endif
 LOCAL_ARM_MODE := arm
 LOCAL_PROPRIETARY_MODULE := true
 
@@ -184,7 +189,12 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := armnn-tests
+ifeq ($(PLATFORM_VERSION),Q)
+# "eng" is deprecated in Android Q
+LOCAL_MODULE_TAGS := optional
+else
 LOCAL_MODULE_TAGS := eng optional
+endif
 LOCAL_ARM_MODE := arm
 LOCAL_PROPRIETARY_MODULE := true
 
@@ -269,7 +279,11 @@ LOCAL_SHARED_LIBRARIES := \
         libutils \
         android.hardware.neuralnetworks@1.0 \
         android.hidl.allocator@1.0 \
-        android.hidl.memory@1.0 \
+        android.hidl.memory@1.0
+
+ifneq ($(PLATFORM_VERSION),Q)
+LOCAL_SHARED_LIBRARIES += \
         libOpenCL
+endif
 
 include $(BUILD_EXECUTABLE)

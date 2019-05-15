@@ -50,8 +50,7 @@ BACKEND_SOURCES := \
         workloads/RefLstmWorkload.cpp \
         workloads/RefMeanFloat32Workload.cpp \
         workloads/RefMeanUint8Workload.cpp \
-        workloads/RefMergerFloat32Workload.cpp \
-        workloads/RefMergerUint8Workload.cpp \
+        workloads/RefMergerWorkload.cpp \
         workloads/RefNormalizationFloat32Workload.cpp \
         workloads/RefPadWorkload.cpp \
         workloads/RefPermuteWorkload.cpp \

@@ -3601,13 +3601,13 @@ LayerTestResult<T, 1> Concatenation1dTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo inputTensorInfo({ 3 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo({ 3 }, ArmnnType, qScale, qOffset);
 
     auto input0 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, { 1.0f, 2.0f, 3.0f }));
     auto input1 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, { 4.0f, 5.0f, 6.0f }));
     auto input2 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, { 7.0f, 8.0f, 9.0f }));
 
-    armnn::TensorInfo outputTensorInfo({ 9 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 9 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 1> result(outputTensorInfo);
 
@@ -3645,7 +3645,7 @@ LayerTestResult<T, 2> Concatenation2dTestImpl(
     const float qScale,
     const int32_t qOffset)
 {
-    armnn::TensorInfo inputTensorInfo({ 2, 3 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
 
     auto input0 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0
@@ -3694,7 +3694,7 @@ LayerTestResult<T, 2> Concatenation2dDim0TestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 2> result = Concatenation2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 0, qScale, qOffset);
@@ -3736,7 +3736,7 @@ LayerTestResult<T, 2> Concatenation2dDim1TestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 2> result = Concatenation2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 1, qScale, qOffset);
@@ -3766,7 +3766,7 @@ LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType);
+    armnn::TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
     auto input0 = MakeTensor<T, 2>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0
         1.0f, 2.0f, 3.0f,
@@ -3775,7 +3775,7 @@ LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(
         10.0f, 11.0f, 12.0f,
     }));
 
-    armnn::TensorInfo input1TensorInfo({ 3, 3 }, ArmnnType);
+    armnn::TensorInfo input1TensorInfo({ 3, 3 }, ArmnnType, qScale, qOffset);
     auto input1 = MakeTensor<T, 2>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0
         4.0f, 5.0f, 6.0f,
@@ -3787,13 +3787,13 @@ LayerTestResult<T, 2> Concatenation2dDim0DiffInputDimsTestImpl(
         7.0f, 8.0f, 9.0f,
     }));
 
-    armnn::TensorInfo input2TensorInfo({ 1, 3 }, ArmnnType);
+    armnn::TensorInfo input2TensorInfo({ 1, 3 }, ArmnnType, qScale, qOffset);
     auto input2 = MakeTensor<T, 2>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 1
         16.0f, 17.0f, 18.0f,
     }));
 
-    armnn::TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 2> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -3845,7 +3845,7 @@ LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType);
+    armnn::TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
     auto input0 = MakeTensor<T, 2>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0
         1.0f, 2.0f, 3.0f,
@@ -3854,7 +3854,7 @@ LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(
         10.0f, 11.0f, 12.0f,
     }));
 
-    armnn::TensorInfo input1TensorInfo({ 2, 5 }, ArmnnType);
+    armnn::TensorInfo input1TensorInfo({ 2, 5 }, ArmnnType, qScale, qOffset);
     auto input1 = MakeTensor<T, 2>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0
         4.0f, 5.0f, 6.0f, 7.0f, 8.0f,
@@ -3863,7 +3863,7 @@ LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(
         13.0f, 14.0f, 15.0f, 16.0f, 17.0f,
     }));
 
-    armnn::TensorInfo input2TensorInfo({ 2, 1 }, ArmnnType);
+    armnn::TensorInfo input2TensorInfo({ 2, 1 }, ArmnnType, qScale, qOffset);
     auto input2 = MakeTensor<T, 2>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0
         9.0f,
@@ -3872,7 +3872,7 @@ LayerTestResult<T, 2> Concatenation2dDim1DiffInputDimsTestImpl(
         18.0f
     }));
 
-    armnn::TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 2> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -3915,7 +3915,7 @@ LayerTestResult<T, 3> Concatenation3dTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo inputTensorInfo({ 2, 3, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
 
     auto input0 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
@@ -4000,7 +4000,7 @@ LayerTestResult<T, 3> Concatenation3dDim0TestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 6, 3, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 6, 3, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 3> result = Concatenation3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 0, true, qScale, qOffset);
@@ -4078,7 +4078,7 @@ LayerTestResult<T, 3> Concatenation3dDim1TestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 2, 9, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 2, 9, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 3> result = Concatenation3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 1, true, qScale, qOffset);
@@ -4157,7 +4157,7 @@ LayerTestResult<T, 3> Concatenation3dDim2TestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 3> result = Concatenation3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 2, useSubtensor, qScale, qOffset);
@@ -4352,7 +4352,7 @@ LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType);
+    armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
     auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         1.0f, 2.0f,
@@ -4373,7 +4373,7 @@ LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(
         23.0f, 24.0f
     }));
 
-    armnn::TensorInfo input1TensorInfo({ 2, 4, 2 }, ArmnnType);
+    armnn::TensorInfo input1TensorInfo({ 2, 4, 2 }, ArmnnType, qScale, qOffset);
     auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         7.0f, 8.0f,
@@ -4400,7 +4400,7 @@ LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(
         15.0f, 16.0f,
     }));
 
-    armnn::TensorInfo input2TensorInfo({ 2, 1, 2 }, ArmnnType);
+    armnn::TensorInfo input2TensorInfo({ 2, 1, 2 }, ArmnnType, qScale, qOffset);
     auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         17.0f, 18.0f,
@@ -4409,7 +4409,7 @@ LayerTestResult<T, 3> Concatenation3dDim1DiffInputDimsTestImpl(
         31.0f, 32.0f,
     }));
 
-    armnn::TensorInfo outputTensorInfo({ 2, 8, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 2, 8, 2 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 3> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -4492,7 +4492,7 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType);
+    armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
     auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         1.0f, 2.0f,
@@ -4513,7 +4513,7 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(
         23.0f, 24.0f
     }));
 
-    armnn::TensorInfo input1TensorInfo({ 2, 3, 1 }, ArmnnType);
+    armnn::TensorInfo input1TensorInfo({ 2, 3, 1 }, ArmnnType, qScale, qOffset);
     auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         7.0f,
@@ -4534,7 +4534,7 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(
         29.0f
     }));
 
-    armnn::TensorInfo input2TensorInfo({ 2, 3, 3 }, ArmnnType);
+    armnn::TensorInfo input2TensorInfo({ 2, 3, 3 }, ArmnnType, qScale, qOffset);
     auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
         // Batch 0, Channel 0
         13.0f, 14.0f, 50.0f,
@@ -4555,7 +4555,7 @@ LayerTestResult<T, 3> Concatenation3dDim2DiffInputDimsTestImpl(
         35.0f, 36.0f, 55.0f,
     }));
 
-    armnn::TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 3> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -4611,7 +4611,7 @@ LayerTestResult<T, 4> Concatenation4dTestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo inputTensorInfo({ 1, 3, 2, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     auto input0 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
         1.0f, 2.0f,
@@ -4665,7 +4665,7 @@ LayerTestResult<T, 4> Concatenation4dDim0TestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result = Concatenation4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 0, true, qScale, qOffset);
@@ -4709,7 +4709,7 @@ LayerTestResult<T, 4> Concatenation4dDim1TestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 1, 9, 2, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 9, 2, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result = Concatenation4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 1, true, qScale, qOffset);
@@ -4754,7 +4754,7 @@ LayerTestResult<T, 4> Concatenation4dDim2TestImpl(
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 6, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 6, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result = Concatenation4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 2, true, qScale, qOffset);
@@ -4800,7 +4800,7 @@ LayerTestResult<T, 4> Concatenation4dDim3TestImpl(
     int32_t qOffset,
     bool useSubtensor)
 {
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 2, 6 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 2, 6 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result = Concatenation4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 3, useSubtensor, qScale, qOffset);
@@ -4848,7 +4848,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim0TestImpl(
     int32_t qOffset)
 {
     unsigned int dimension = 0;
-    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
         1.0f, 2.0f,
@@ -4859,7 +4859,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim0TestImpl(
         11.0f, 12.0f
     }));
 
-    armnn::TensorInfo inputTensorInfo1({ 2, 3, 2, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo1({ 2, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
         11.0f, 12.0f,
@@ -4878,7 +4878,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim0TestImpl(
 
     }));
 
-    armnn::TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -4936,7 +4936,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim1TestImpl(
     int32_t qOffset)
 {
     unsigned int dimension = 1;
-    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
         1.0f, 2.0f,
@@ -4947,7 +4947,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim1TestImpl(
         11.0f, 12.0f
     }));
 
-    armnn::TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, ArmnnType, qScale, qOffset);
 
     auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
         11.0f, 12.0f,
@@ -4957,7 +4957,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim1TestImpl(
 
     }));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 5, 2, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 5, 2, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -5005,7 +5005,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim2TestImpl(
     int32_t qOffset)
 {
     unsigned int dimension = 2;
-    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
         1.0f, 2.0f,
@@ -5016,7 +5016,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim2TestImpl(
         11.0f, 12.0f
     }));
 
-    armnn::TensorInfo inputTensorInfo1({ 1, 3, 3, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo1({ 1, 3, 3, 2 }, ArmnnType, qScale, qOffset);
 
     auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
         11.0f, 12.0f,
@@ -5030,7 +5030,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim2TestImpl(
         27.0f, 28.0f
     }));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 5, 2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 5, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -5086,7 +5086,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim3TestImpl(
     bool useSubtensor)
 {
     unsigned int dimension = 3;
-    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
         1.0f, 2.0f,
@@ -5097,7 +5097,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim3TestImpl(
         11.0f, 12.0f
     }));
 
-    armnn::TensorInfo inputTensorInfo1({ 1, 3, 2, 3 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo1({ 1, 3, 2, 3 }, ArmnnType, qScale, qOffset);
 
     auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
         11.0f, 12.0f, 13.0f,
@@ -5110,7 +5110,7 @@ LayerTestResult<T, 4> Concatenation4dDiffShapeDim3TestImpl(
         26.0f, 27.0f, 28.0f
     }));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 2, 5 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 2, 5 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -6757,6 +6757,138 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(
     return ret;
 }
 
+LayerTestResult<uint16_t, 3> MergerUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int outputWidth = 3;
+    unsigned int outputHeight = 6;
+    unsigned int outputChannels = 3;
+
+    unsigned int inputWidth1 = 3;
+    unsigned int inputHeight1 = 6;
+    unsigned int inputChannels1 = 2;
+
+    unsigned int inputWidth2 = 3;
+    unsigned int inputHeight2 = 6;
+    unsigned int inputChannels2 = 1;
+
+    // Defines the tensor descriptors.
+    armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::QuantisedSymm16);
+    armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedSymm16);
+    armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedSymm16);
+
+    // Arbitrary scale and offsets. They don't really matter as the merger operator doesn't dequantize/quantize them.
+    const float scale = 0.13497836f;
+    const int32_t offset = -7;
+
+    outputTensorInfo.SetQuantizationScale(scale);
+    outputTensorInfo.SetQuantizationOffset(offset);
+    inputTensorInfo1.SetQuantizationScale(scale);
+    inputTensorInfo1.SetQuantizationOffset(offset);
+    inputTensorInfo2.SetQuantizationScale(scale);
+    inputTensorInfo2.SetQuantizationOffset(offset);
+
+    LayerTestResult<uint16_t, 3> ret(outputTensorInfo);
+
+    ret.outputExpected = MakeTensor<uint16_t, 3>(outputTensorInfo, std::vector<uint16_t>(
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12,
+        13, 14, 15,
+        16, 17, 18,
+
+        19, 20, 21,
+        22, 23, 24,
+        25, 26, 27,
+        28, 29, 30,
+        31, 32, 33,
+        34, 35, 36,
+
+        37, 38, 39,
+        40, 41, 42,
+        43, 44, 45,
+        46, 47, 48,
+        49, 50, 51,
+        52, 53, 54,
+    }));
+
+    auto input1 = MakeTensor<uint16_t, 3>(inputTensorInfo1, std::vector<uint16_t>(
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12,
+        13, 14, 15,
+        16, 17, 18,
+
+        19, 20, 21,
+        22, 23, 24,
+        25, 26, 27,
+        28, 29, 30,
+        31, 32, 33,
+        34, 35, 36,
+    }));
+
+    auto input2 = MakeTensor<uint16_t, 3>(inputTensorInfo2, std::vector<uint16_t>(
+    {
+        37, 38, 39,
+        40, 41, 42,
+        43, 44, 45,
+        46, 47, 48,
+        49, 50, 51,
+        52, 53, 54,
+    }));
+
+    std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
+    armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
+
+    std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
+    armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
+
+
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    bool subTensorsSupported = workloadFactory.SupportsSubTensors();
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 =
+            subTensorsSupported ?
+            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
+            workloadFactory.CreateTensorHandle(inputTensorInfo1);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle2 =
+            subTensorsSupported ?
+            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
+            workloadFactory.CreateTensorHandle(inputTensorInfo2);
+
+
+    armnn::MergerQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
+    AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    data.m_ViewOrigins.push_back(window1);
+    data.m_ViewOrigins.push_back(window2);
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(data, info);
+
+    inputHandle1->Allocate();
+    inputHandle2->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
+    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
+
+    workload->PostAllocationConfigure();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
+
+    return ret;
+}
 
 namespace
 {

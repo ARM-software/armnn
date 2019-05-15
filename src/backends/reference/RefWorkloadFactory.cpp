@@ -135,7 +135,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSplitter(const SplitterQueu
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
                                                                    const WorkloadInfo&          info) const
 {
-    return MakeWorkload<RefMergerFloat32Workload, RefMergerUint8Workload>(descriptor, info);
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    return std::make_unique<RefMergerWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(

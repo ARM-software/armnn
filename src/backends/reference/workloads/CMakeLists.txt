@@ -83,10 +83,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefL2NormalizationFloat32Workload.hpp
     RefLstmWorkload.cpp
     RefLstmWorkload.hpp
-    RefMergerFloat32Workload.cpp
-    RefMergerFloat32Workload.hpp
-    RefMergerUint8Workload.cpp
-    RefMergerUint8Workload.hpp
+    RefMergerWorkload.cpp
+    RefMergerWorkload.hpp
     RefNormalizationFloat32Workload.cpp
     RefNormalizationFloat32Workload.hpp
     RefPadWorkload.cpp

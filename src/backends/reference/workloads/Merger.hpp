@@ -10,11 +10,5 @@
 
 namespace armnn
 {
-
-template <typename DataType>
-void CopyValue(const DataType& source, const TensorInfo& sourceInfo, DataType& dest, const TensorInfo& destInfo);
-
-template <typename DataType>
 void Merger(const MergerQueueDescriptor& data);
-
 } //namespace armnn

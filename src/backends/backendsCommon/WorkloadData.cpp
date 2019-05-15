@@ -445,6 +445,27 @@ void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             }
         }
     }
+
+    // Check the supported data types
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::Float16,
+            DataType::Boolean,
+            DataType::Signed32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    for (unsigned long i = 0; i < workloadInfo.m_InputTensorInfos.size(); ++i)
+    {
+        ValidateDataTypes(workloadInfo.m_InputTensorInfos[i],
+                          supportedTypes,
+                          "MergerQueueDescriptor");
+    }
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "MergerQueueDescriptor");
 }
 
 //---------------------------------------------------------------

@@ -269,14 +269,14 @@ BOOST_AUTO_TEST_CASE(MergerQueueDescriptor_Validate_WrongWindow)
 
     BOOST_TEST_INFO("Invalid argument exception is expected, because merge window dimensionality does not "
         "match input.");
-    BOOST_CHECK_THROW(RefMergerFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefMergerWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 
     // Invalid, since window extends past the boundary of output tensor.
     std::vector<unsigned int> wOrigin3 = {0, 0, 15, 0};
     armnn::MergerQueueDescriptor::ViewOrigin window3(wOrigin3);
     invalidData.m_ViewOrigins[0] = window3;
     BOOST_TEST_INFO("Invalid argument exception is expected (wOrigin3[2]+ inputHeight > outputHeight");
-    BOOST_CHECK_THROW(RefMergerFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefMergerWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 
 
     std::vector<unsigned int> wOrigin4 = {0, 0, 0, 0};
@@ -288,7 +288,7 @@ BOOST_AUTO_TEST_CASE(MergerQueueDescriptor_Validate_WrongWindow)
     invalidData.m_ViewOrigins.push_back(window5);
 
     BOOST_TEST_INFO("Invalid exception due to number of merge windows not matching number of inputs.");
-    BOOST_CHECK_THROW(RefMergerFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefMergerWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_CASE(AdditionQueueDescriptor_Validate_InputNumbers)

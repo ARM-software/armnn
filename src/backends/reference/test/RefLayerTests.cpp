@@ -246,6 +246,7 @@ ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
 ARMNN_AUTO_TEST_CASE(SimpleMerger, MergerTest)
 ARMNN_AUTO_TEST_CASE(MergerUint8, MergerUint8Test)
 ARMNN_AUTO_TEST_CASE(MergerUint8DifferentQParams, MergerUint8DifferentQParamsTest)
+ARMNN_AUTO_TEST_CASE(MergerUint16, MergerUint16Test)
 
 // Add
 ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)

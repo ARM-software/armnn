@@ -729,11 +729,27 @@ bool RefLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inp
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     ignore_unused(descriptor);
-    ignore_unused(output);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     inputs[0]->GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+
+    bool supported = true;
+    std::array<DataType,3> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference concatenation: output type not supported");
+    for (const TensorInfo* input : inputs)
+    {
+        supported &= CheckSupportRule(TypeAnyOf(*input, supportedTypes), reasonIfUnsupported,
+            "Reference concatenation: input type not supported");
+
+        supported &= CheckSupportRule(TypesAreEqual(*input, output), reasonIfUnsupported,
+            "Reference concatenation: input and output types mismatched.");
+    }
+
+    return supported;
 }
 
 bool RefLayerSupport::IsMemCopySupported(const TensorInfo &input,

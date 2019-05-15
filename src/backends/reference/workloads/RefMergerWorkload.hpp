@@ -11,10 +11,10 @@
 namespace armnn
 {
 
-class RefMergerFloat32Workload : public Float32Workload<MergerQueueDescriptor>
+class RefMergerWorkload : public BaseWorkload<MergerQueueDescriptor>
 {
 public:
-    using Float32Workload<MergerQueueDescriptor>::Float32Workload;
+    using BaseWorkload<MergerQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

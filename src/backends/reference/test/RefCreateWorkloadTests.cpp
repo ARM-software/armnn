@@ -479,12 +479,12 @@ static void RefCreateSplitterMergerWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloat32)
 {
-    RefCreateSplitterMergerWorkloadTest<RefSplitterFloat32Workload, RefMergerFloat32Workload, DataType::Float32>();
+    RefCreateSplitterMergerWorkloadTest<RefSplitterFloat32Workload, RefMergerWorkload, DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterMergerUint8)
 {
-    RefCreateSplitterMergerWorkloadTest<RefSplitterUint8Workload, RefMergerUint8Workload, DataType::QuantisedAsymm8>();
+    RefCreateSplitterMergerWorkloadTest<RefSplitterUint8Workload, RefMergerWorkload, DataType::QuantisedAsymm8>();
 }
 
 template <typename SplitterWorkloadType, typename ActivationWorkloadType, armnn::DataType DataType>
@@ -658,42 +658,47 @@ static void RefCreateMergerWorkloadTest(const armnn::TensorShape& outputShape,
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim0Float32Workload)
 {
-    RefCreateMergerWorkloadTest<RefMergerFloat32Workload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim0Uint8Workload)
 {
-    RefCreateMergerWorkloadTest<RefMergerUint8Workload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
+}
+
+BOOST_AUTO_TEST_CASE(CreateMergerDim0Uint16Workload)
+{
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::QuantisedSymm16>({ 4, 3, 2, 5 }, 0);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim1Float32Workload)
 {
-    RefCreateMergerWorkloadTest<RefMergerFloat32Workload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim1Uint8Workload)
 {
-    RefCreateMergerWorkloadTest<RefMergerUint8Workload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim2Float32Workload)
 {
-    RefCreateMergerWorkloadTest<RefMergerFloat32Workload, armnn::DataType::Float32>({ 2, 3, 4, 5 }, 2);
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::Float32>({ 2, 3, 4, 5 }, 2);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim2Uint8Workload)
 {
-    RefCreateMergerWorkloadTest<RefMergerUint8Workload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 4, 5 }, 2);
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 4, 5 }, 2);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim3Float32Workload)
 {
-    RefCreateMergerWorkloadTest<RefMergerFloat32Workload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim3Uint8Workload)
 {
-    RefCreateMergerWorkloadTest<RefMergerUint8Workload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
+    RefCreateMergerWorkloadTest<RefMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

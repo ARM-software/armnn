@@ -475,37 +475,6 @@ armnn::ConstTensor ToConstTensor(Deserializer::ConstTensorRawPtr constTensorPtr)
     }
 }
 
-Deserializer::LayerBaseRawPtrVector Deserializer::GetGraphInputs(const GraphPtr& graphPtr)
-{
-
-    CHECK_GRAPH(graphPtr, 0);
-    const auto& numInputs = graphPtr->inputIds()->size();
-
-    LayerBaseRawPtrVector result(numInputs);
-
-    for (unsigned int i=0; i<numInputs; ++i)
-    {
-        uint32_t inputId = graphPtr->inputIds()->Get(i);
-        result[i] = GetBaseLayer(graphPtr, static_cast<uint32_t>(inputId));
-    }
-    return result;
-}
-
-Deserializer::LayerBaseRawPtrVector Deserializer::GetGraphOutputs(const GraphPtr& graphPtr)
-{
-    CHECK_GRAPH(graphPtr, 0);
-    const auto& numOutputs = graphPtr->outputIds()->size();
-    LayerBaseRawPtrVector result(numOutputs);
-
-    for (unsigned int i=0; i<numOutputs; ++i)
-    {
-        uint32_t outputId = graphPtr->outputIds()->Get(i);
-
-        result[i] = GetBaseLayer(graphPtr, static_cast<uint32_t>(outputId));
-    }
-    return result;
-}
-
 Deserializer::TensorRawPtrVector Deserializer::GetInputs(const GraphPtr& graphPtr,
                                                          unsigned int layerIndex)
 {
@@ -615,7 +584,6 @@ INetworkPtr Deserializer::CreateNetworkFromGraph(GraphPtr graph)
     m_Network = INetwork::Create();
     BOOST_ASSERT(graph != nullptr);
     unsigned int layerIndex = 0;
-    m_GraphConnections.emplace_back(graph->layers()->size());
     for (AnyLayer const* layer : *graph->layers())
     {
         if (layer->layer_type() != Layer_InputLayer &&
@@ -632,16 +600,18 @@ INetworkPtr Deserializer::CreateNetworkFromGraph(GraphPtr graph)
     SetupOutputLayers(graph);
 
     // establish the connections from the layer outputs to the inputs of the subsequent layers
-    for (size_t connectionsIndex = 0; connectionsIndex < m_GraphConnections[0].size(); ++connectionsIndex)
+    for (auto&& graphIt : m_GraphConnections)
     {
-        SlotsMap& slotsMap = m_GraphConnections[0][connectionsIndex];
-        for (unsigned int outputSlotIndex = 0; outputSlotIndex < slotsMap.outputSlots.size(); outputSlotIndex++)
+        Connections& connections = graphIt.second;
+        for (auto&& outputIt : connections.outputSlots)
         {
-            if (slotsMap.inputSlots.find(outputSlotIndex) != slotsMap.inputSlots.end())
+            const unsigned int outputSlotIndex = outputIt.first;
+            IOutputSlot* outputSlot = outputIt.second;
+            if (connections.inputSlots.find(outputSlotIndex) != connections.inputSlots.end())
             {
-                for (armnn::IInputSlot* inputSlot : slotsMap.inputSlots[outputSlotIndex])
+                for (IInputSlot* inputSlot : connections.inputSlots[outputSlotIndex])
                 {
-                    slotsMap.outputSlots[outputSlotIndex]->Connect(*inputSlot);
+                    outputSlot->Connect(*inputSlot);
                 }
             }
         }
@@ -684,51 +654,77 @@ BindingPointInfo Deserializer::GetNetworkOutputBindingInfo(unsigned int layerInd
             CHECK_LOCATION().AsString()));
 }
 
+unsigned int Deserializer::GetLayerIndexInVector(GraphPtr graph, unsigned int targetIndex)
+{
+    for (unsigned int i = 0; i < graph->layers()->size(); i++)
+    {
+        LayerBaseRawPtr layer = GetBaseLayer(graph, i);
+        if (layer->index() == targetIndex)
+        {
+            return i;
+        }
+    }
+    throw ParseException("Layer with given index not found");
+}
+
 void Deserializer::SetupInputLayers(GraphPtr graph)
 {
     CHECK_GRAPH(graph, 0);
-    auto inputs = GetGraphInputs(graph);
+    const unsigned int numInputs = graph->inputIds()->size();
     m_InputBindings.clear();
-    m_InputBindings.reserve(inputs.size());
-    for (auto const& input : inputs)
+    m_InputBindings.reserve(numInputs);
+
+    for (unsigned int i = 0; i < numInputs; i++)
     {
-        LayerBindingId bindingId = GetBindingLayerInfo(graph, input->index());
-        IConnectableLayer* layer =
-            m_Network->AddInputLayer(bindingId, input->layerName()->c_str());
+        const unsigned int inputId = graph->inputIds()->Get(i);
+        const unsigned int inputLayerIndex = GetLayerIndexInVector(graph, inputId);
+        LayerBaseRawPtr baseLayer = GetBaseLayer(graph, inputLayerIndex);
 
-        auto tensorInfo = ToTensorInfo(input->outputSlots()->Get(0)->tensorInfo());
-        layer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+        // GetBindingLayerInfo expect the index to be index in the vector not index property on each layer base
+        LayerBindingId bindingId = GetBindingLayerInfo(graph, inputLayerIndex);
+        BOOST_ASSERT_MSG(baseLayer->layerName()->c_str(), "Input has no name.");
 
-        RegisterOutputSlots(graph, input->index(), layer);
+        IConnectableLayer* inputLayer =
+            m_Network->AddInputLayer(bindingId, baseLayer->layerName()->c_str());
 
-        BOOST_ASSERT_MSG(input->layerName()->c_str(), "Input has no name.");
+        const armnn::TensorInfo& tensorInfo = ToTensorInfo(baseLayer->outputSlots()->Get(0)->tensorInfo());
+        inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+        RegisterOutputSlots(graph, inputLayerIndex, inputLayer);
+
         BindingPointInfo bindingInfo = {bindingId, tensorInfo};
-        m_InputBindings.push_back(std::make_pair(input->layerName()->c_str(), bindingInfo));
+        m_InputBindings.push_back(std::make_pair(baseLayer->layerName()->c_str(), bindingInfo));
     }
 }
 
 void Deserializer::SetupOutputLayers(GraphPtr graph)
 {
     CHECK_GRAPH(graph, 0);
-    auto outputs = GetGraphOutputs(graph);
+    const unsigned int numOutputs = graph->outputIds()->size();
     m_OutputBindings.clear();
-    m_OutputBindings.reserve(outputs.size());
-    for (auto const& output : outputs)
+    m_OutputBindings.reserve(numOutputs);
+
+    for (unsigned int i = 0; i < numOutputs; i++)
     {
-        LayerBindingId bindingId = GetBindingLayerInfo(graph, output->index());
-        IConnectableLayer* layer =
-            m_Network->AddOutputLayer(bindingId, output->layerName()->c_str());
+        const unsigned int outputId = graph->outputIds()->Get(i);
+        const unsigned int outputLayerIndex = GetLayerIndexInVector(graph, outputId);
+        LayerBaseRawPtr baseLayer = GetBaseLayer(graph, outputLayerIndex);
 
-        RegisterInputSlots(graph, output->index(), layer);
+        // GetBindingLayerInfo expect the index to be index in the vector not index property on each layer base
+        LayerBindingId bindingId = GetBindingLayerInfo(graph, outputLayerIndex);
+        BOOST_ASSERT_MSG(baseLayer->layerName()->c_str(), "Input has no name.");
 
-        auto baseLayer = GetBaseLayer(graph, output->index());
-        auto sourceLayerIndex = baseLayer->inputSlots()->Get(0)->connection()->sourceLayerIndex();
-        auto sourceLayer = GetBaseLayer(graph, sourceLayerIndex);
-        auto tensorInfo = ToTensorInfo(sourceLayer->outputSlots()->Get(0)->tensorInfo());
+        IConnectableLayer* outputLayer =
+            m_Network->AddOutputLayer(bindingId, baseLayer->layerName()->c_str());
 
-        BOOST_ASSERT_MSG(output->layerName()->c_str(), "Output has no name.");
+        RegisterInputSlots(graph, outputLayerIndex, outputLayer);
+
+        unsigned int sourceLayerIndex =
+            GetLayerIndexInVector(graph, baseLayer->inputSlots()->Get(0)->connection()->sourceLayerIndex());
+        LayerBaseRawPtr sourceBaseLayer = GetBaseLayer(graph, sourceLayerIndex);
+        const armnn::TensorInfo& tensorInfo = ToTensorInfo(sourceBaseLayer->outputSlots()->Get(0)->tensorInfo());
+
         BindingPointInfo bindingInfo = {bindingId, tensorInfo};
-        m_OutputBindings.push_back(std::make_pair(output->layerName()->c_str(), bindingInfo));
+        m_OutputBindings.push_back(std::make_pair(baseLayer->layerName()->c_str(), bindingInfo));
     }
 }
 
@@ -738,22 +734,24 @@ void Deserializer::RegisterOutputSlots(GraphPtr graph,
 {
     CHECK_LAYERS(graph, 0, layerIndex);
     BOOST_ASSERT(layer != nullptr);
-    auto parsedLayer = GetBaseLayer(graph, layerIndex);
-    if (parsedLayer->outputSlots()->size() != layer->GetNumOutputSlots())
+    LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
+    if (baseLayer->outputSlots()->size() != layer->GetNumOutputSlots())
     {
         throw ParseException(
             boost::str(boost::format("The number of outputslots (%1%) does not match the number expected (%2%)"
                                      " for layer index: %3% %4%") %
-                       parsedLayer->outputSlots()->size() %
+                       baseLayer->outputSlots()->size() %
                        layer->GetNumOutputSlots() %
                        layerIndex %
                        CHECK_LOCATION().AsString()));
     }
 
-    for (unsigned int slotIndex = 0; slotIndex < layer->GetNumOutputSlots(); ++slotIndex)
+    for (unsigned int i = 0; i < layer->GetNumOutputSlots(); ++i)
     {
-        armnn::IOutputSlot* slot = &(layer->GetOutputSlot(slotIndex));
-        RegisterOutputSlotOfConnection(layerIndex, slot);
+        const unsigned int slotIndex = baseLayer->outputSlots()->Get(i)->index();
+        armnn::IOutputSlot* outputSlot = &(layer->GetOutputSlot(slotIndex));
+        // layerIndex is not necessarily the same as baseLayer->index(). The latter is needed here
+        RegisterOutputSlotOfConnection(baseLayer->index(), slotIndex, outputSlot);
     }
 }
 
@@ -763,49 +761,63 @@ void Deserializer::RegisterInputSlots(GraphPtr graph,
 {
     CHECK_LAYERS(graph, 0, layerIndex);
     BOOST_ASSERT(layer != nullptr);
-    auto parsedLayer = GetBaseLayer(graph, layerIndex);
-    if (parsedLayer->inputSlots()->size() != layer->GetNumInputSlots())
+    LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
+    if (baseLayer->inputSlots()->size() != layer->GetNumInputSlots())
     {
         throw ParseException(
             boost::str(boost::format("The number of inputslots (%1%) does not match the number expected (%2%)"
                                      " for layer index:%3% %4%") %
-                       parsedLayer->inputSlots()->size() %
+                       baseLayer->inputSlots()->size() %
                        layer->GetNumInputSlots() %
                        layerIndex %
                        CHECK_LOCATION().AsString()));
     }
 
-    for (unsigned int slotIndex = 0; slotIndex < layer->GetNumInputSlots(); ++slotIndex)
+    for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)
     {
-        auto fbConnection = parsedLayer->inputSlots()->Get(slotIndex)->connection();
-        armnn::IInputSlot* slot = &(layer->GetInputSlot(slotIndex));
-
-        RegisterInputSlotOfConnection(fbConnection->sourceLayerIndex(), fbConnection->outputSlotIndex(), slot);
+        auto fbInputSlot = baseLayer->inputSlots()->Get(i);
+        auto fbConnection = fbInputSlot->connection();
+        armnn::IInputSlot* inputSlot = &(layer->GetInputSlot(fbInputSlot->index()));
+        RegisterInputSlotOfConnection(fbConnection->sourceLayerIndex(), fbConnection->outputSlotIndex(), inputSlot);
     }
 }
 
 void Deserializer::RegisterInputSlotOfConnection(uint32_t sourceLayerIndex,
                                                  uint32_t outputSlotIndex,
-                                                 armnn::IInputSlot* slot)
+                                                 armnn::IInputSlot* inputSlot)
 {
-    BOOST_ASSERT(m_GraphConnections[0].size() > sourceLayerIndex);
-
-    SlotsMap& slotsMap = m_GraphConnections[0][sourceLayerIndex];
-    if (slotsMap.inputSlots.find(outputSlotIndex) == slotsMap.inputSlots.end())
+    if (m_GraphConnections.find(sourceLayerIndex) == m_GraphConnections.end())
     {
-        slotsMap.inputSlots[outputSlotIndex] = {slot};
+        m_GraphConnections[sourceLayerIndex] = Connections();
+    }
+
+    Connections& connections = m_GraphConnections[sourceLayerIndex];
+    if (connections.inputSlots.find(outputSlotIndex) == connections.inputSlots.end())
+    {
+        connections.inputSlots[outputSlotIndex] = {inputSlot};
     }
     else
     {
-        slotsMap.inputSlots[outputSlotIndex].push_back(slot);
+        connections.inputSlots[outputSlotIndex].push_back(inputSlot);
     }
 }
 
 void Deserializer::RegisterOutputSlotOfConnection(uint32_t sourceLayerIndex,
-                                                  armnn::IOutputSlot* slot)
+                                                  uint32_t outputSlotIndex,
+                                                  armnn::IOutputSlot* outputSlot)
 {
-    BOOST_ASSERT(m_GraphConnections[0].size() > sourceLayerIndex);
-    m_GraphConnections[0][sourceLayerIndex].outputSlots.push_back(slot);
+    if (m_GraphConnections.find(sourceLayerIndex) == m_GraphConnections.end())
+    {
+        m_GraphConnections[sourceLayerIndex] = Connections();
+    }
+
+    Connections& connections = m_GraphConnections[sourceLayerIndex];
+    if (connections.outputSlots.find(outputSlotIndex) != connections.outputSlots.end())
+    {
+        throw ParseException("Same output slot index processed twice");
+    }
+
+    connections.outputSlots[outputSlotIndex] = outputSlot;
 }
 
 void Deserializer::ParseActivation(GraphPtr graph, unsigned int layerIndex)

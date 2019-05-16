@@ -701,4 +701,37 @@ BOOST_AUTO_TEST_CASE(CreateMergerDim3Uint8Workload)
     RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
 }
 
+template <typename ConstantWorkloadType, armnn::DataType DataType>
+static void RefCreateConstantWorkloadTest(const armnn::TensorShape& outputShape)
+{
+    armnn::Graph graph;
+    RefWorkloadFactory factory;
+    auto workload = CreateConstantWorkloadTest<ConstantWorkloadType, DataType>(factory, graph, outputShape);
+
+    // Check output is as expected
+    auto queueDescriptor = workload->GetData();
+    auto outputHandle = boost::polymorphic_downcast<CpuTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    BOOST_TEST((outputHandle->GetTensorInfo() == TensorInfo(outputShape, DataType)));
+}
+
+BOOST_AUTO_TEST_CASE(CreateConstantUint8Workload)
+{
+    RefCreateConstantWorkloadTest<RefConstantWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 });
+}
+
+BOOST_AUTO_TEST_CASE(CreateConstantInt16Workload)
+{
+    RefCreateConstantWorkloadTest<RefConstantWorkload, armnn::DataType::QuantisedSymm16>({ 2, 3, 2, 10 });
+}
+
+BOOST_AUTO_TEST_CASE(CreateConstantFloat32Workload)
+{
+    RefCreateConstantWorkloadTest<RefConstantWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 });
+}
+
+BOOST_AUTO_TEST_CASE(CreateConstantSigned32Workload)
+{
+    RefCreateConstantWorkloadTest<RefConstantWorkload, armnn::DataType::Signed32>({ 2, 3, 2, 10 });
+}
+
 BOOST_AUTO_TEST_SUITE_END()

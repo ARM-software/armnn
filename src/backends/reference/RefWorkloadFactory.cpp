@@ -253,8 +253,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2Nor
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NullWorkload, RefConstantFloat32Workload, RefConstantUint8Workload,
-        RefConstantInt32Workload, NullWorkload>(descriptor, info);
+    return std::make_unique<RefConstantWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,

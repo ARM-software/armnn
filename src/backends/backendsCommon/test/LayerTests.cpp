@@ -6387,9 +6387,11 @@ LayerTestResult<T, 4> ConstantTestImpl(
     constexpr unsigned int outputChannels = inputChannels;
     constexpr unsigned int outputBatchSize = inputBatchSize;
 
-    armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth },
+                                        ArmnnType, qScale, qOffset);
 
-    armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth },
+                                         ArmnnType, qScale, qOffset);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -6471,7 +6473,14 @@ LayerTestResult<float, 4> ConstantTest(
     return ConstantTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
-LayerTestResult<uint8_t, 4> ConstantTestUint8(
+LayerTestResult<int16_t, 4> ConstantInt16SimpleQuantizationScaleNoOffsetTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return ConstantTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
+}
+
+LayerTestResult<uint8_t, 4> ConstantUint8SimpleQuantizationScaleNoOffsetTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -8173,11 +8182,18 @@ LayerTestResult<uint8_t, 4> BatchNormUint8NhwcTest(
          1.f/20.f, 50, armnn::DataLayout::NHWC);
 }
 
-LayerTestResult<uint8_t, 4> ConstantUint8Test(
+LayerTestResult<uint8_t, 4> ConstantUint8CustomQuantizationScaleAndOffsetTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return ConstantTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 2e-6f, 1);
+}
+
+LayerTestResult<int16_t, 4> ConstantInt16CustomQuantizationScaleAndOffsetTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return ConstantTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 2e-6f, 1);
 }
 
 LayerTestResult<uint8_t, 1> Concatenation1dUint8Test(

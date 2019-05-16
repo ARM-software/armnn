@@ -187,7 +187,6 @@ private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>
     std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor, const WorkloadInfo& info) const;
-
 };
 
 } // namespace armnn

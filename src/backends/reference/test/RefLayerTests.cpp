@@ -385,7 +385,8 @@ ARMNN_AUTO_TEST_CASE(PadUint84d, PadUint84dTest)
 
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
-ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8Test)
+ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8CustomQuantizationScaleAndOffsetTest)
+ARMNN_AUTO_TEST_CASE(ConstantInt16, ConstantInt16CustomQuantizationScaleAndOffsetTest)
 
 // Concat
 ARMNN_AUTO_TEST_CASE(Concatenation1d, Concatenation1dTest)

@@ -344,7 +344,7 @@ ARMNN_AUTO_TEST_CASE(BatchNormNhwc, BatchNormNhwcTest)
 
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
-ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantTestUint8)
+ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8SimpleQuantizationScaleNoOffsetTest)
 
 // Concatenation
 ARMNN_AUTO_TEST_CASE(Concatenation1d, Concatenation1dTest)

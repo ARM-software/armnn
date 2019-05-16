@@ -1227,4 +1227,30 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     return std::make_pair(std::move(optimizedNet), std::move(workload));
 }
 
+template<typename ConstantWorkload, armnn::DataType DataType>
+std::unique_ptr<ConstantWorkload> CreateConstantWorkloadTest(armnn::IWorkloadFactory& factory,
+                                                             armnn::Graph& graph,
+                                                             const armnn::TensorShape& outputShape)
+{
+    armnn::TensorInfo outputTensorInfo(outputShape, DataType);
+
+    auto constant = graph.AddLayer<ConstantLayer>("constant");
+    constant->m_LayerOutput = std::make_unique<ScopedCpuTensorHandle>(outputTensorInfo);
+    BOOST_TEST_CHECKPOINT("created constant layer");
+
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Adds connections.
+    Connect(constant, output, outputTensorInfo, 0, 0);
+    BOOST_TEST_CHECKPOINT("connect constant to output");
+
+    CreateTensorHandles(graph, factory);
+    BOOST_TEST_CHECKPOINT("created tensor handles");
+
+    auto workloadConstant = MakeAndCheckWorkload<ConstantWorkload>(*constant, graph, factory);
+    BOOST_TEST_CHECKPOINT("created Constant workload");
+
+    return std::move(workloadConstant);
+}
+
 }

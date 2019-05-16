@@ -306,13 +306,15 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
 bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeGeneric(reasonIfUnsupported,
-                                         output.GetDataType(),
-                                         &FalseFunc<>,
-                                         &TrueFunc<>,
-                                         &TrueFunc<>,
-                                         &TrueFunc<>,
-                                         &FalseFunc<>);
+    std::array<DataType,4> supportedTypes = {
+        DataType::Float32,
+        DataType::Signed32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    return CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference constant: output is not a supported type.");
 }
 
 bool RefLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,

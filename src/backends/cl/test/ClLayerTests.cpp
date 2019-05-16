@@ -260,7 +260,7 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwc, ResizeBilinearMagTest, armnn::DataLa
 
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
-ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantTestUint8)
+ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8SimpleQuantizationScaleNoOffsetTest)
 
 // Concat
 ARMNN_AUTO_TEST_CASE(Concatenation1d, Concatenation1dTest)

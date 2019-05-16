@@ -812,6 +812,18 @@ void ConstantQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         "ConstantQueueDescriptor",
         "constant",
         "output");
+
+    // Check the supported data types
+    std::vector<DataType> supportedTypes =
+                              {
+                                  DataType::Float32,
+                                  DataType::Float16,
+                                  DataType::Signed32,
+                                  DataType::QuantisedAsymm8,
+                                  DataType::QuantisedSymm16
+                              };
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0], supportedTypes, "ConstantQueueDescriptor");
 }
 
 void ReshapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

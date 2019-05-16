@@ -441,6 +441,26 @@ LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
+LayerTestResult<int16_t, 4> SimpleConvolution2d3x5QSymm16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout)
+{
+return SimpleConvolution2d3x5TestCommon<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+        workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
+}
+
+LayerTestResult<int16_t, 4> SimpleConvolution2d3x3QSymm16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout)
+{
+    return SimpleConvolution2d3x3TestCommon<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+            workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
+}
+
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType,
          typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon(

@@ -944,6 +944,18 @@ LayerTestResult<uint8_t, 4> SimpleConvolution2d3x3Uint8Test(
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+LayerTestResult<int16_t, 4> SimpleConvolution2d3x5QSymm16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout);
+
+LayerTestResult<int16_t, 4> SimpleConvolution2d3x3QSymm16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout);
+
 LayerTestResult<uint8_t, 4> DepthwiseConvolution2dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

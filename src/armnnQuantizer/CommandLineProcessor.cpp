@@ -101,7 +101,7 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
                               "Preserve the input and output data types")
                 ("outdir,d", po::value<std::string>(&m_OutputDirectory)->required(),
                              "Directory that output file will be written to")
-                ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(), "Output file name");
+                ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(), "ArmNN output file name");
     }
     catch (const std::exception& e)
     {
@@ -115,8 +115,10 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char* argv[])
     {
         po::store(po::parse_command_line(argc, argv, desc), vm);
 
-        if (vm.count("help"))
+        if (vm.count("help") || argc <= 1)
         {
+            std::cout << "Convert a Fp32 ArmNN model to a quantized ArmNN model."  << std::endl;
+            std::cout << std::endl;
             std::cout << desc << std::endl;
             return false;
         }

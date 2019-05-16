@@ -136,53 +136,6 @@ private:
     std::vector<TContainer> m_Outputs;
 };
 
-template <typename TDataType>
-struct ToFloat { }; // nothing defined for the generic case
-
-template <>
-struct ToFloat<float>
-{
-    static inline float Convert(float value, const InferenceModelInternal::QuantizationParams &)
-    {
-        // assuming that float models are not quantized
-        return value;
-    }
-
-    static inline float Convert(int value, const InferenceModelInternal::QuantizationParams &)
-    {
-        // assuming that float models are not quantized
-        return static_cast<float>(value);
-    }
-};
-
-template <>
-struct ToFloat<uint8_t>
-{
-    static inline float Convert(uint8_t value,
-                                const InferenceModelInternal::QuantizationParams & quantizationParams)
-    {
-        return armnn::Dequantize<uint8_t>(value,
-                                          quantizationParams.first,
-                                          quantizationParams.second);
-    }
-
-    static inline float Convert(int value,
-                                const InferenceModelInternal::QuantizationParams & quantizationParams)
-    {
-        return armnn::Dequantize<uint8_t>(static_cast<uint8_t>(value),
-                                          quantizationParams.first,
-                                          quantizationParams.second);
-    }
-
-    static inline float Convert(float value,
-                                const InferenceModelInternal::QuantizationParams & quantizationParams)
-    {
-        return armnn::Dequantize<uint8_t>(static_cast<uint8_t>(value),
-                                          quantizationParams.first,
-                                          quantizationParams.second);
-    }
-};
-
 template <typename TTestCaseDatabase, typename TModel>
 class ClassifierTestCase : public InferenceModelTestCase<TModel>
 {

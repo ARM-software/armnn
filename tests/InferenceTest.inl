@@ -51,46 +51,83 @@ ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
 {
 }
 
+struct ClassifierResultProcessor : public boost::static_visitor<>
+{
+    using ResultMap = std::map<float,int>;
+
+    ClassifierResultProcessor(float scale, int offset)
+        : m_Scale(scale)
+        , m_Offset(offset)
+    {}
+
+    void operator()(const std::vector<float>& values)
+    {
+        SortPredictions(values, [](float value)
+                                {
+                                    return value;
+                                });
+    }
+
+    void operator()(const std::vector<uint8_t>& values)
+    {
+        auto& scale = m_Scale;
+        auto& offset = m_Offset;
+        SortPredictions(values, [&scale, &offset](uint8_t value)
+                                {
+                                    return armnn::Dequantize(value, scale, offset);
+                                });
+    }
+
+    void operator()(const std::vector<int>& values)
+    {
+        BOOST_ASSERT_MSG(false, "Non-float predictions output not supported.");
+    }
+
+    ResultMap& GetResultMap() { return m_ResultMap; }
+
+private:
+    template<typename Container, typename Delegate>
+    void SortPredictions(const Container& c, Delegate delegate)
+    {
+        int index = 0;
+        for (const auto& value : c)
+        {
+            int classification = index++;
+            // Take the first class with each probability
+            // This avoids strange results when looping over batched results produced
+            // with identical test data.
+            ResultMap::iterator lb = m_ResultMap.lower_bound(value);
+
+            if (lb == m_ResultMap.end() || !m_ResultMap.key_comp()(value, lb->first))
+            {
+                // If the key is not already in the map, insert it.
+                m_ResultMap.insert(lb, ResultMap::value_type(delegate(value), classification));
+            }
+        }
+    }
+
+    ResultMap m_ResultMap;
+
+    float m_Scale=0.0f;
+    int m_Offset=0;
+};
+
 template <typename TTestCaseDatabase, typename TModel>
 TestCaseResult ClassifierTestCase<TTestCaseDatabase, TModel>::ProcessResult(const InferenceTestOptions& params)
 {
     auto& output = this->GetOutputs()[0];
     const auto testCaseId = this->GetTestCaseId();
 
-    std::map<float,int> resultMap;
+    ClassifierResultProcessor resultProcessor(m_QuantizationParams.first, m_QuantizationParams.second);
+    boost::apply_visitor(resultProcessor, output);
+
+    BOOST_LOG_TRIVIAL(info) << "= Prediction values for test #" << testCaseId;
+    auto it = resultProcessor.GetResultMap().rbegin();
+    for (int i=0; i<5 && it != resultProcessor.GetResultMap().rend(); ++i)
     {
-        int index = 0;
-
-        boost::apply_visitor([&](auto&& value)
-                             {
-                                 for (const auto & o : value)
-                                 {
-                                     float prob = ToFloat<typename TModel::DataType>::Convert(o, m_QuantizationParams);
-                                     int classification = index++;
-
-                                     // Take the first class with each probability
-                                     // This avoids strange results when looping over batched results produced
-                                     // with identical test data.
-                                     std::map<float, int>::iterator lb = resultMap.lower_bound(prob);
-                                     if (lb == resultMap.end() ||
-                                         !resultMap.key_comp()(prob, lb->first)) {
-                                         // If the key is not already in the map, insert it.
-                                         resultMap.insert(lb, std::map<float, int>::value_type(prob, classification));
-                                     }
-                                 }
-                             },
-                             output);
-    }
-
-    {
-        BOOST_LOG_TRIVIAL(info) << "= Prediction values for test #" << testCaseId;
-        auto it = resultMap.rbegin();
-        for (int i=0; i<5 && it != resultMap.rend(); ++i)
-        {
-            BOOST_LOG_TRIVIAL(info) << "Top(" << (i+1) << ") prediction is " << it->second <<
-              " with confidence: " << 100.0*(it->first) << "%";
-            ++it;
-        }
+        BOOST_LOG_TRIVIAL(info) << "Top(" << (i+1) << ") prediction is " << it->second <<
+          " with value: " << (it->first);
+        ++it;
     }
 
     unsigned int prediction = 0;

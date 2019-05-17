@@ -26,7 +26,7 @@
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonMaximumWorkload.hpp"
 #include "workloads/NeonMeanWorkload.hpp"
-#include "workloads/NeonMergerWorkload.hpp"
+#include "workloads/NeonConcatWorkload.hpp"
 #include "workloads/NeonMinimumWorkload.hpp"
 #include "workloads/NeonMultiplicationWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
@@ -336,7 +336,7 @@ bool NeonLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> in
     unsigned int concatInnerAxis = (descriptor.GetNumDimensions() - descriptor.GetConcatAxis()) - 1;
     if(concatInnerAxis < 3) // Width, height, or channels
     {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonMergerWorkloadValidate,
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConcatWorkloadValidate,
                                        reasonIfUnsupported,
                                        inputs,
                                        output,

@@ -517,7 +517,7 @@ BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
 
     auto workloads =
-        CreateSplitterMergerWorkloadTest<NeonSplitterWorkload, NeonMergerWorkload,
+        CreateSplitterMergerWorkloadTest<NeonSplitterWorkload, NeonConcatWorkload,
             DataType::Float32>(factory, graph);
 
     auto wlSplitter = std::move(workloads.first);
@@ -654,32 +654,32 @@ static void NeonCreateMergerWorkloadTest(std::initializer_list<unsigned int> out
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim0Float32Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
+    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim1Float32Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
+    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim3Float32Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
+    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim0Uint8Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
+    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim1Uint8Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
+    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
 }
 
 BOOST_AUTO_TEST_CASE(CreateMergerDim3Uint8Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonMergerWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
+    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

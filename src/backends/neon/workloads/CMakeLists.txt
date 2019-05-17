@@ -10,6 +10,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonAdditionWorkload.hpp
     NeonBatchNormalizationWorkload.cpp
     NeonBatchNormalizationWorkload.hpp
+    NeonConcatWorkload.cpp
+    NeonConcatWorkload.hpp
     NeonConstantWorkload.cpp
     NeonConstantWorkload.hpp
     NeonConvertFp16ToFp32Workload.cpp
@@ -34,8 +36,6 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonMaximumWorkload.hpp
     NeonMeanWorkload.cpp
     NeonMeanWorkload.hpp
-    NeonMergerWorkload.cpp
-    NeonMergerWorkload.hpp
     NeonMinimumWorkload.cpp
     NeonMinimumWorkload.hpp
     NeonMultiplicationWorkload.cpp

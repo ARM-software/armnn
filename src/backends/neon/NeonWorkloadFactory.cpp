@@ -123,7 +123,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSplitter(const SplitterQue
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&          info) const
 {
-    return std::make_unique<NeonMergerWorkload>(descriptor, info);
+    return std::make_unique<NeonConcatWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateFullyConnected(

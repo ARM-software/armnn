@@ -19,7 +19,7 @@
 #include "NeonLstmFloatWorkload.hpp"
 #include "NeonMaximumWorkload.hpp"
 #include "NeonMeanWorkload.hpp"
-#include "NeonMergerWorkload.hpp"
+#include "NeonConcatWorkload.hpp"
 #include "NeonMinimumWorkload.hpp"
 #include "NeonMultiplicationWorkload.hpp"
 #include "NeonNormalizationFloatWorkload.hpp"

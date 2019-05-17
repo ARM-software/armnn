@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NeonMergerWorkload.hpp"
+#include "NeonConcatWorkload.hpp"
 
 #include "NeonWorkloadUtils.hpp"
 
@@ -25,7 +25,7 @@ size_t CalcAxis(const armnn::MergerDescriptor& desc)
 }
 } //namespace
 
-arm_compute::Status NeonMergerWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
+arm_compute::Status NeonConcatWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
                                                const TensorInfo& output,
                                                const MergerDescriptor& descriptor)
 
@@ -47,7 +47,7 @@ arm_compute::Status NeonMergerWorkloadValidate(const std::vector<const TensorInf
     return arm_compute::NEConcatenateLayer::validate(aclInputPtrs, &aclOutputInfo, aclAxis);
 }
 
-NeonMergerWorkload::NeonMergerWorkload(
+NeonConcatWorkload::NeonConcatWorkload(
 const MergerQueueDescriptor& descriptor, const WorkloadInfo& info)
         : BaseWorkload<MergerQueueDescriptor>(descriptor, info)
 {
@@ -90,11 +90,11 @@ const MergerQueueDescriptor& descriptor, const WorkloadInfo& info)
     m_Layer->prepare();
 }
 
-void NeonMergerWorkload::Execute() const
+void NeonConcatWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonMergerWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonConcatWorkload_Execute");
         m_Layer->run();
     }
 }

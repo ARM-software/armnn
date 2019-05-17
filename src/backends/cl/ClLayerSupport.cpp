@@ -30,7 +30,7 @@
 #include "workloads/ClLstmFloatWorkload.hpp"
 #include "workloads/ClMaximumWorkload.hpp"
 #include "workloads/ClMeanWorkload.hpp"
-#include "workloads/ClMergerWorkload.hpp"
+#include "workloads/ClConcatWorkload.hpp"
 #include "workloads/ClMinimumWorkload.hpp"
 #include "workloads/ClMultiplicationWorkload.hpp"
 #include "workloads/ClNormalizationFloatWorkload.hpp"
@@ -452,7 +452,7 @@ bool ClLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inpu
     unsigned int concatInnerAxis = (descriptor.GetNumDimensions() - descriptor.GetConcatAxis()) - 1;
     if(concatInnerAxis < 3) // Width, height, or channels
     {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(ClMergerWorkloadValidate,
+        FORWARD_WORKLOAD_VALIDATE_FUNC(ClConcatWorkloadValidate,
                                        reasonIfUnsupported,
                                        inputs,
                                        output,

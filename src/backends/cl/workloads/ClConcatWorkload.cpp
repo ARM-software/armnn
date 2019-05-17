@@ -2,7 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "ClMergerWorkload.hpp"
+#include "ClConcatWorkload.hpp"
 #include "ClWorkloadUtils.hpp"
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -25,7 +25,7 @@ size_t CalcAxis(const MergerDescriptor& desc)
 }
 } //namespace
 
-arm_compute::Status ClMergerWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
+arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
                                              const TensorInfo& output,
                                              const MergerDescriptor& descriptor)
 {
@@ -46,7 +46,7 @@ arm_compute::Status ClMergerWorkloadValidate(const std::vector<const TensorInfo*
     return arm_compute::CLConcatenateLayer::validate(aclInputPtrs, &aclOutputInfo, aclAxis);
 }
 
-ClMergerWorkload::ClMergerWorkload(const MergerQueueDescriptor& descriptor, const WorkloadInfo& info)
+ClConcatWorkload::ClConcatWorkload(const MergerQueueDescriptor& descriptor, const WorkloadInfo& info)
 : BaseWorkload<MergerQueueDescriptor>(descriptor, info)
 {
     bool allInputsAreSubtensors = true;
@@ -88,11 +88,11 @@ ClMergerWorkload::ClMergerWorkload(const MergerQueueDescriptor& descriptor, cons
     m_Layer->prepare();
 }
 
-void ClMergerWorkload::Execute() const
+void ClConcatWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL("ClMergerWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_CL("ClConcatWorkload_Execute");
         m_Layer->run();
     }
 }

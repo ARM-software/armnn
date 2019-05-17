@@ -17,7 +17,7 @@
 #include "ClGreaterWorkload.hpp"
 #include "ClL2NormalizationFloatWorkload.hpp"
 #include "ClLstmFloatWorkload.hpp"
-#include "ClMergerWorkload.hpp"
+#include "ClConcatWorkload.hpp"
 #include "ClMaximumWorkload.hpp"
 #include "ClMeanWorkload.hpp"
 #include "ClMinimumWorkload.hpp"

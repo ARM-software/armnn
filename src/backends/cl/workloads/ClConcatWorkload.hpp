@@ -12,14 +12,14 @@
 namespace armnn
 {
 
-arm_compute::Status ClMergerWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
+arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
                                              const TensorInfo& output,
                                              const MergerDescriptor& descriptor);
 
-class ClMergerWorkload : public BaseWorkload<MergerQueueDescriptor>
+class ClConcatWorkload : public BaseWorkload<MergerQueueDescriptor>
 {
 public:
-    ClMergerWorkload(const MergerQueueDescriptor& descriptor, const WorkloadInfo& info);
+    ClConcatWorkload(const MergerQueueDescriptor& descriptor, const WorkloadInfo& info);
 
     void Execute() const override;
 

@@ -12,6 +12,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClBatchNormalizationFloatWorkload.hpp
     ClBatchToSpaceNdWorkload.cpp
     ClBatchToSpaceNdWorkload.hpp
+    ClConcatWorkload.cpp
+    ClConcatWorkload.hpp
     ClConstantWorkload.cpp
     ClConstantWorkload.hpp
     ClConvertFp16ToFp32Workload.cpp
@@ -38,8 +40,6 @@ list(APPEND armnnClBackendWorkloads_sources
     ClMaximumWorkload.hpp
     ClMeanWorkload.cpp
     ClMeanWorkload.hpp
-    ClMergerWorkload.cpp
-    ClMergerWorkload.hpp
     ClMinimumWorkload.cpp
     ClMinimumWorkload.hpp
     ClMultiplicationWorkload.cpp

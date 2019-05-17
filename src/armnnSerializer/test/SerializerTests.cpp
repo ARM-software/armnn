@@ -21,7 +21,7 @@ namespace
 
 struct DefaultLayerVerifierPolicy
 {
-    static void Apply()
+    static void Apply(const std::string s = "")
     {
         BOOST_TEST_MESSAGE("Unexpected layer found in network");
         BOOST_TEST(false);

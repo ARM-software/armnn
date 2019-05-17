@@ -12,12 +12,12 @@ namespace armnn
 
 struct VisitorThrowingPolicy
 {
-    static void Apply() { throw UnimplementedException(); }
+    static void Apply(const std::string& errorMessage = "") { throw UnimplementedException(errorMessage); }
 };
 
 struct VisitorNoThrowPolicy
 {
-    static void Apply() {}
+    static void Apply(const std::string& unusedMessage = "") {}
 };
 
 // Visitor base class with empty implementations.
@@ -29,80 +29,13 @@ protected:
     virtual ~LayerVisitorBase() {}
 
 public:
-    void VisitInputLayer(const IConnectableLayer*,
-                         LayerBindingId,
-                         const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitConcatLayer(const IConnectableLayer*,
-                          const OriginsDescriptor&,
-                          const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitConvolution2dLayer(const IConnectableLayer*,
-                                 const Convolution2dDescriptor&,
-                                 const ConstTensor&,
-                                 const Optional<ConstTensor>&,
-                                 const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitDepthwiseConvolution2dLayer(const IConnectableLayer*,
-                                          const DepthwiseConvolution2dDescriptor&,
-                                          const ConstTensor&,
-                                          const Optional<ConstTensor>&,
-                                          const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitDequantizeLayer(const IConnectableLayer*,
-                              const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitDetectionPostProcessLayer(const IConnectableLayer*,
-                                        const DetectionPostProcessDescriptor&,
-                                        const ConstTensor&,
-                                        const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitFullyConnectedLayer(const IConnectableLayer*,
-                                  const FullyConnectedDescriptor&,
-                                  const ConstTensor&,
-                                  const Optional<ConstTensor>&,
-                                  const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitPermuteLayer(const IConnectableLayer*,
-                           const PermuteDescriptor&,
-                           const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitBatchToSpaceNdLayer(const IConnectableLayer*,
-                                  const BatchToSpaceNdDescriptor&,
-                                  const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitPooling2dLayer(const IConnectableLayer*,
-                             const Pooling2dDescriptor&,
-                             const char*) override { DefaultPolicy::Apply(); }
 
     void VisitActivationLayer(const IConnectableLayer*,
                               const ActivationDescriptor&,
-                              const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitNormalizationLayer(const IConnectableLayer*,
-                                 const NormalizationDescriptor&,
-                                 const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitSoftmaxLayer(const IConnectableLayer*,
-                           const SoftmaxDescriptor&,
-                           const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitSplitterLayer(const IConnectableLayer*,
-                            const ViewsDescriptor&,
-                            const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitMergeLayer(const IConnectableLayer*,
-                         const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitMergerLayer(const IConnectableLayer*,
-                          const OriginsDescriptor&,
-                          const char*) override { DefaultPolicy::Apply(); }
+                              const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitAdditionLayer(const IConnectableLayer*,
-                            const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitMultiplicationLayer(const IConnectableLayer*,
-                                  const char*) override { DefaultPolicy::Apply(); }
+                            const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitBatchNormalizationLayer(const IConnectableLayer*,
                                       const BatchNormalizationDescriptor&,
@@ -110,81 +43,149 @@ public:
                                       const ConstTensor&,
                                       const ConstTensor&,
                                       const ConstTensor&,
-                                      const char*) override { DefaultPolicy::Apply(); }
+                                      const char*) override { DefaultPolicy::Apply(__func__); }
 
-    void VisitResizeBilinearLayer(const IConnectableLayer*,
-                                  const ResizeBilinearDescriptor&,
-                                  const char*) override { DefaultPolicy::Apply(); }
+    void VisitBatchToSpaceNdLayer(const IConnectableLayer*,
+                                  const BatchToSpaceNdDescriptor&,
+                                  const char*) override { DefaultPolicy::Apply(__func__); }
 
-    void VisitL2NormalizationLayer(const IConnectableLayer*,
-                                   const L2NormalizationDescriptor&,
-                                   const char*) override { DefaultPolicy::Apply(); }
+    void VisitConcatLayer(const IConnectableLayer*,
+                          const OriginsDescriptor&,
+                          const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitConstantLayer(const IConnectableLayer*,
                             const ConstTensor&,
-                            const char*) override { DefaultPolicy::Apply(); }
+                            const char*) override { DefaultPolicy::Apply(__func__); }
 
-    void VisitReshapeLayer(const IConnectableLayer*,
-                           const ReshapeDescriptor&,
-                           const char*) override { DefaultPolicy::Apply(); }
+    void VisitConvolution2dLayer(const IConnectableLayer*,
+                                 const Convolution2dDescriptor&,
+                                 const ConstTensor&,
+                                 const Optional<ConstTensor>&,
+                                 const char*) override { DefaultPolicy::Apply(__func__); }
 
-    void VisitSpaceToBatchNdLayer(const IConnectableLayer*,
-                                  const SpaceToBatchNdDescriptor&,
-                                  const char*) override { DefaultPolicy::Apply(); }
+    void VisitDepthwiseConvolution2dLayer(const IConnectableLayer*,
+                                          const DepthwiseConvolution2dDescriptor&,
+                                          const ConstTensor&,
+                                          const Optional<ConstTensor>&,
+                                          const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitDequantizeLayer(const IConnectableLayer*,
+                              const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitDetectionPostProcessLayer(const IConnectableLayer*,
+                                        const DetectionPostProcessDescriptor&,
+                                        const ConstTensor&,
+                                        const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitDivisionLayer(const IConnectableLayer*,
+                            const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitEqualLayer(const IConnectableLayer*,
+                         const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitFloorLayer(const IConnectableLayer*,
-                         const char*) override { DefaultPolicy::Apply(); }
+                         const char*) override { DefaultPolicy::Apply(__func__); }
 
-    void VisitOutputLayer(const IConnectableLayer*,
-                          LayerBindingId id,
-                          const char*) override { DefaultPolicy::Apply(); }
+    void VisitFullyConnectedLayer(const IConnectableLayer*,
+                                  const FullyConnectedDescriptor&,
+                                  const ConstTensor&,
+                                  const Optional<ConstTensor>&,
+                                  const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitGatherLayer(const IConnectableLayer*,
+                          const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitGreaterLayer(const IConnectableLayer*,
+                           const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitInputLayer(const IConnectableLayer*,
+                         LayerBindingId,
+                         const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitL2NormalizationLayer(const IConnectableLayer*,
+                                   const L2NormalizationDescriptor&,
+                                   const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitLstmLayer(const IConnectableLayer*,
                         const LstmDescriptor&,
                         const LstmInputParams&,
-                        const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitDivisionLayer(const IConnectableLayer*,
-                            const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitSubtractionLayer(const IConnectableLayer*,
-                               const char*) override { DefaultPolicy::Apply(); }
+                        const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitMaximumLayer(const IConnectableLayer*,
-                           const char*) override { DefaultPolicy::Apply(); }
+                           const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitMeanLayer(const IConnectableLayer*,
                         const MeanDescriptor&,
-                        const char*) override { DefaultPolicy::Apply(); }
+                        const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitMergeLayer(const IConnectableLayer*,
+                         const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitMergerLayer(const IConnectableLayer*,
+                          const OriginsDescriptor&,
+                          const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitMinimumLayer(const IConnectableLayer*,
+                           const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitMultiplicationLayer(const IConnectableLayer*,
+                                  const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitNormalizationLayer(const IConnectableLayer*,
+                                 const NormalizationDescriptor&,
+                                 const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitOutputLayer(const IConnectableLayer*,
+                          LayerBindingId id,
+                          const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitPadLayer(const IConnectableLayer*,
                        const PadDescriptor&,
-                       const char*) override { DefaultPolicy::Apply(); }
+                       const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitPermuteLayer(const IConnectableLayer*,
+                           const PermuteDescriptor&,
+                           const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitPooling2dLayer(const IConnectableLayer*,
+                             const Pooling2dDescriptor&,
+                             const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitQuantizeLayer(const IConnectableLayer*,
-                            const char*) override { DefaultPolicy::Apply(); }
+                            const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitReshapeLayer(const IConnectableLayer*,
+                           const ReshapeDescriptor&,
+                           const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitResizeBilinearLayer(const IConnectableLayer*,
+                                  const ResizeBilinearDescriptor&,
+                                  const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitRsqrtLayer(const IConnectableLayer*,
+                         const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitSoftmaxLayer(const IConnectableLayer*,
+                           const SoftmaxDescriptor&,
+                           const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitSpaceToBatchNdLayer(const IConnectableLayer*,
+                                  const SpaceToBatchNdDescriptor&,
+                                  const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitSplitterLayer(const IConnectableLayer*,
+                            const ViewsDescriptor&,
+                            const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitStridedSliceLayer(const IConnectableLayer*,
                                 const StridedSliceDescriptor&,
-                                const char*) override { DefaultPolicy::Apply(); }
+                                const char*) override { DefaultPolicy::Apply(__func__); }
 
-    void VisitMinimumLayer(const IConnectableLayer*,
-                           const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitGreaterLayer(const IConnectableLayer*,
-                           const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitEqualLayer(const IConnectableLayer*,
-                         const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitRsqrtLayer(const IConnectableLayer*,
-                         const char*) override { DefaultPolicy::Apply(); }
-
-    void VisitGatherLayer(const IConnectableLayer*,
-                          const char*) override { DefaultPolicy::Apply(); }
+    void VisitSubtractionLayer(const IConnectableLayer*,
+                               const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitSwitchLayer(const IConnectableLayer*,
-                          const char*) override { DefaultPolicy::Apply(); }
+                          const char*) override { DefaultPolicy::Apply(__func__); }
 };
 
 } //namespace armnn

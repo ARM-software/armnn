@@ -22,7 +22,7 @@ namespace armnn
 class StaticRangeVisitor;
 
 /// Visitor object for quantizing layers in a network
-class QuantizerVisitor : public LayerVisitorBase<VisitorNoThrowPolicy>
+class QuantizerVisitor : public LayerVisitorBase<VisitorThrowingPolicy>
 {
 public:
     QuantizerVisitor(const RangeTracker& rangeTracker,
@@ -32,15 +32,11 @@ public:
     ~QuantizerVisitor() = default;
 
     /// Functions to quantize the individual layers, overridden from ILayerVisitor
-    void VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override;
-
-    void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
-
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& activationDescriptor,
                               const char* name = nullptr) override;
 
-    void VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr)  override;
+    void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
 
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& desc,
@@ -50,11 +46,13 @@ public:
                                       const ConstTensor& gamma,
                                       const char* name = nullptr) override;
 
-    void VisitFullyConnectedLayer(const IConnectableLayer *layer,
-                                  const FullyConnectedDescriptor& desc,
-                                  const ConstTensor& weights,
-                                  const Optional<ConstTensor>& biases,
-                                  const char *name = nullptr)  override;
+    void VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
+                                  const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                  const char* name = nullptr) override;
+
+    void VisitConstantLayer(const IConnectableLayer* layer,
+                            const ConstTensor& input,
+                            const char* name = nullptr) override;
 
     void VisitConvolution2dLayer(const IConnectableLayer* layer,
                                  const Convolution2dDescriptor& convolution2dDescriptor,
@@ -68,12 +66,52 @@ public:
                                           const Optional<ConstTensor>& biases,
                                           const char* name = nullptr) override;
 
-    void VisitSoftmaxLayer(const IConnectableLayer* layer,
-                           const SoftmaxDescriptor& softmaxDescriptor,
-                           const char* name = nullptr) override;
+    void VisitFullyConnectedLayer(const IConnectableLayer *layer,
+                                  const FullyConnectedDescriptor& desc,
+                                  const ConstTensor& weights,
+                                  const Optional<ConstTensor>& biases,
+                                  const char *name = nullptr)  override;
+
+    void VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override;
+
+    void VisitMeanLayer(const IConnectableLayer* layer,
+                          const MeanDescriptor& meanDescriptor,
+                          const char* name = nullptr) override;
+
+    void VisitMergerLayer(const IConnectableLayer* layer,
+                          const OriginsDescriptor& mergerDescriptor,
+                          const char* name = nullptr) override;
+
+    void VisitMultiplicationLayer(const IConnectableLayer* layer,
+                                  const char* name = nullptr) override;
+
+    void VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr)  override;
+
+    void VisitPadLayer(const IConnectableLayer*,
+                       const PadDescriptor&,
+                       const char* name = nullptr) override;
 
     void VisitPermuteLayer(const IConnectableLayer* layer,
                            const PermuteDescriptor& permuteDescriptor,
+                           const char* name = nullptr) override;
+
+    void VisitPooling2dLayer(const IConnectableLayer* layer,
+                             const Pooling2dDescriptor& pooling2dDescriptor,
+                             const char* name = nullptr) override;
+
+    void VisitReshapeLayer(const IConnectableLayer* layer,
+                           const ReshapeDescriptor& reshapeDescriptor,
+                           const char* name = nullptr) override;
+
+    void VisitResizeBilinearLayer(const IConnectableLayer* layer,
+                                  const ResizeBilinearDescriptor& resizeDesc,
+                                  const char* name = nullptr) override;
+
+    void VisitRsqrtLayer(const IConnectableLayer*,
+                         const char* name = nullptr) override;
+
+    void VisitSoftmaxLayer(const IConnectableLayer* layer,
+                           const SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;
 
     void VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
@@ -84,33 +122,12 @@ public:
                             const SplitterDescriptor& splitterDescriptor,
                             const char* name = nullptr) override;
 
-    void VisitPooling2dLayer(const IConnectableLayer* layer,
-                             const Pooling2dDescriptor& pooling2dDescriptor,
-                             const char* name = nullptr) override;
-
-    void VisitConstantLayer(const IConnectableLayer* layer,
-                            const ConstTensor& input,
-                            const char* name = nullptr) override;
-
-    void VisitMergerLayer(const IConnectableLayer* layer,
-                          const OriginsDescriptor& mergerDescriptor,
-                          const char* name = nullptr) override;
-
-    void VisitReshapeLayer(const IConnectableLayer* layer,
-                           const ReshapeDescriptor& reshapeDescriptor,
-                           const char* name = nullptr) override;
-
-    void VisitResizeBilinearLayer(const IConnectableLayer* layer,
-                                  const ResizeBilinearDescriptor& resizeDesc,
-                                  const char* name = nullptr) override;
-
     void VisitStridedSliceLayer(const IConnectableLayer* layer,
                                 const StridedSliceDescriptor& stridedSliceDescriptor,
                                 const char* name = nullptr) override;
 
-    void VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
-                                  const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
-                                  const char* name = nullptr) override;
+    void VisitSubtractionLayer(const IConnectableLayer* layer,
+                               const char* name = nullptr) override;
 
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }

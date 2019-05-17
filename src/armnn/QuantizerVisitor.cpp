@@ -66,13 +66,6 @@ void QuantizerVisitor::RecordLayer(const IConnectableLayer* srcLayer, IConnectab
     m_QuantizedGuidToLayerMap[quantizedLayer->GetGuid()] = quantizedLayer;
 }
 
-void QuantizerVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
-{
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddAdditionLayer(name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
-}
-
 void QuantizerVisitor::VisitActivationLayer(const IConnectableLayer* layer,
                                             const ActivationDescriptor& activationDescriptor,
                                             const char* name)
@@ -82,69 +75,11 @@ void QuantizerVisitor::VisitActivationLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-void QuantizerVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
-                                                const FullyConnectedDescriptor& desc,
-                                                const ConstTensor& weights,
-                                                const Optional<ConstTensor>& biases,
-                                                const char *name)
+void QuantizerVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const char* name)
 {
-    std::vector<uint8_t> weightsBacking;
-    ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
-    Optional<ConstTensor> optionalQBiases;
-    std::vector<uint8_t> biasesBacking;
-
-    if (biases.has_value())
-    {
-        ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
-        optionalQBiases = Optional<ConstTensor>(qBiases);
-    }
-
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc,
-                                                                             qWeights,
-                                                                             optionalQBiases,
-                                                                             name);
-
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddAdditionLayer(name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
-}
-
-void QuantizerVisitor::VisitInputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name)
-{
-    const DataType dataType = layer->GetOutputSlot(0).GetTensorInfo().GetDataType();
-    IConnectableLayer* inputLayer = m_QuantizedNetwork->AddInputLayer(id, name);
-
-    if (m_PreserveType && (dataType == DataType::Float32 || dataType == DataType::Float16))
-    {
-        IConnectableLayer* quantizeLayer = m_QuantizedNetwork->AddQuantizeLayer();
-        inputLayer->GetOutputSlot(0).Connect(quantizeLayer->GetInputSlot(0));
-        inputLayer->GetOutputSlot(0).SetTensorInfo(layer->GetOutputSlot(0).GetTensorInfo());
-        RecordLayer(layer, quantizeLayer);
-    }
-    else
-    {
-        RecordLayer(layer, inputLayer);
-    }
-}
-
-void QuantizerVisitor::VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
-{
-    const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
-    const DataType& dataType = info.GetDataType();
-    IConnectableLayer* outputLayer = m_QuantizedNetwork->AddOutputLayer(id, name);
-
-    if (m_PreserveType  && (dataType == DataType::Float32 || dataType == DataType::Float16))
-    {
-        IConnectableLayer* dequantizeLayer = m_QuantizedNetwork->AddDequantizeLayer();
-        RecordLayer(layer, dequantizeLayer);
-        SetQuantizedInputConnections(layer, dequantizeLayer);
-        dequantizeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-        dequantizeLayer->GetOutputSlot(0).SetTensorInfo(info);
-    }
-    else
-    {
-        RecordLayer(layer, outputLayer);
-        SetQuantizedInputConnections(layer, outputLayer);
-    }
 }
 
 void QuantizerVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* layer,
@@ -176,6 +111,26 @@ void QuantizerVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* lay
 
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
+                                                const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+                                                const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddBatchToSpaceNdLayer(batchToSpaceNdDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitConstantLayer(const IConnectableLayer* layer,
+                                          const ConstTensor& input,
+                                          const char* name)
+{
+    std::vector<uint8_t> inputBacking;
+    ConstTensor qInput = CreateQuantizedConst(input, inputBacking);
+
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConstantLayer(qInput, name);
+    RecordLayer(layer, newLayer);
 }
 
 void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
@@ -230,30 +185,55 @@ void QuantizerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer*
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-
-void QuantizerVisitor::VisitPermuteLayer(const IConnectableLayer* layer,
-                                         const PermuteDescriptor& permuteDescriptor,
-                                         const char* name)
+void QuantizerVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
+                                                const FullyConnectedDescriptor& desc,
+                                                const ConstTensor& weights,
+                                                const Optional<ConstTensor>& biases,
+                                                const char *name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddPermuteLayer(permuteDescriptor, name);
+    std::vector<uint8_t> weightsBacking;
+    ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
+    Optional<ConstTensor> optionalQBiases;
+    std::vector<uint8_t> biasesBacking;
+
+    if (biases.has_value())
+    {
+        ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+        optionalQBiases = Optional<ConstTensor>(qBiases);
+    }
+
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddFullyConnectedLayer(desc,
+                                                                             qWeights,
+                                                                             optionalQBiases,
+                                                                             name);
+
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-void QuantizerVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
-                                                const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
-                                                const char* name)
+void QuantizerVisitor::VisitInputLayer(const IConnectableLayer *layer, LayerBindingId id, const char *name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSpaceToBatchNdLayer(spaceToBatchNdDescriptor, name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
+    const DataType dataType = layer->GetOutputSlot(0).GetTensorInfo().GetDataType();
+    IConnectableLayer* inputLayer = m_QuantizedNetwork->AddInputLayer(id, name);
+
+    if (m_PreserveType && (dataType == DataType::Float32 || dataType == DataType::Float16))
+    {
+        IConnectableLayer* quantizeLayer = m_QuantizedNetwork->AddQuantizeLayer();
+        inputLayer->GetOutputSlot(0).Connect(quantizeLayer->GetInputSlot(0));
+        inputLayer->GetOutputSlot(0).SetTensorInfo(layer->GetOutputSlot(0).GetTensorInfo());
+        RecordLayer(layer, quantizeLayer);
+    }
+    else
+    {
+        RecordLayer(layer, inputLayer);
+    }
 }
 
-void QuantizerVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
-                                           const Pooling2dDescriptor& pooling2dDescriptor,
-                                           const char* name)
+void QuantizerVisitor::VisitMeanLayer(const IConnectableLayer* layer,
+                                        const MeanDescriptor& meanDescriptor,
+                                        const char* name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddPooling2dLayer(pooling2dDescriptor, name);
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddMeanLayer(meanDescriptor, name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
@@ -267,31 +247,58 @@ void QuantizerVisitor::VisitMergerLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
-                                         const SoftmaxDescriptor& softmaxDescriptor,
-                                         const char* name)
+void QuantizerVisitor::VisitMultiplicationLayer(const IConnectableLayer* layer,
+                                                const char* name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSoftmaxLayer(softmaxDescriptor, name);
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddMultiplicationLayer(name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-void QuantizerVisitor::VisitConstantLayer(const IConnectableLayer* layer,
-                                          const ConstTensor& input,
-                                          const char* name)
+void QuantizerVisitor::VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
-    std::vector<uint8_t> inputBacking;
-    ConstTensor qInput = CreateQuantizedConst(input, inputBacking);
+    const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
+    const DataType& dataType = info.GetDataType();
+    IConnectableLayer* outputLayer = m_QuantizedNetwork->AddOutputLayer(id, name);
 
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConstantLayer(qInput, name);
-    RecordLayer(layer, newLayer);
+    if (m_PreserveType  && (dataType == DataType::Float32 || dataType == DataType::Float16))
+    {
+        IConnectableLayer* dequantizeLayer = m_QuantizedNetwork->AddDequantizeLayer();
+        RecordLayer(layer, dequantizeLayer);
+        SetQuantizedInputConnections(layer, dequantizeLayer);
+        dequantizeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+        dequantizeLayer->GetOutputSlot(0).SetTensorInfo(info);
+    }
+    else
+    {
+        RecordLayer(layer, outputLayer);
+        SetQuantizedInputConnections(layer, outputLayer);
+    }
 }
 
-void QuantizerVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
-                                          const SplitterDescriptor& splitterDescriptor,
-                                          const char* name)
+void QuantizerVisitor::VisitPadLayer(const IConnectableLayer* layer,
+                                     const PadDescriptor& padDescriptor,
+                                     const char* name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSplitterLayer(splitterDescriptor, name);
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddPadLayer(padDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitPermuteLayer(const IConnectableLayer* layer,
+                                         const PermuteDescriptor& permuteDescriptor,
+                                         const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddPermuteLayer(permuteDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
+                                           const Pooling2dDescriptor& pooling2dDescriptor,
+                                           const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddPooling2dLayer(pooling2dDescriptor, name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }
@@ -314,6 +321,41 @@ void QuantizerVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitRsqrtLayer(const IConnectableLayer* layer,
+                                       const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddRsqrtLayer(name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
+                                                const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
+                                                const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSpaceToBatchNdLayer(spaceToBatchNdDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
+                                          const SplitterDescriptor& splitterDescriptor,
+                                          const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSplitterLayer(splitterDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
+void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
+                                         const SoftmaxDescriptor& softmaxDescriptor,
+                                         const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSoftmaxLayer(softmaxDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
                                               const StridedSliceDescriptor& stridedSliceDescriptor,
                                               const char* name)
@@ -323,11 +365,10 @@ void QuantizerVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
-void QuantizerVisitor::VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
-                                                const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
+void QuantizerVisitor::VisitSubtractionLayer(const IConnectableLayer* layer,
                                                 const char* name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddBatchToSpaceNdLayer(batchToSpaceNdDescriptor, name);
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSubtractionLayer(name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }

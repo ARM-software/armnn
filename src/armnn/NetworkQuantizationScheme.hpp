@@ -30,9 +30,9 @@ struct QAsymm8QuantizationScheme : IQuantizationScheme
 {
     OffsetScalePair ComputeScheme(double min, double max) const override
     {
-        if (min >= max)
+        if (min > max)
         {
-            throw InvalidArgumentException("min >= max will result in invalid quantization.");
+            throw InvalidArgumentException("min > max will result in invalid quantization.");
         }
 
         double highest = (1 << NumBits()) - 1;
@@ -59,9 +59,9 @@ struct QSymm16QuantizationScheme : IQuantizationScheme
 {
     OffsetScalePair ComputeScheme(double min, double max) const override
     {
-        if (min >= max)
+        if (min > max)
         {
-            throw InvalidArgumentException("min >= max will result in invalid quantization.");
+            throw InvalidArgumentException("min > max will result in invalid quantization.");
         }
 
         double highest = (1 << (NumBits()-1)) - 1; // (numbits-1) accounts for the sign bit

@@ -30,7 +30,7 @@ public:
     using Subgraphs = std::vector<SubgraphView>;
     using Substitutions = std::vector<SubstitutionPair>;
 
-    void AddSubstituion(SubstitutionPair&& substitution)
+    void AddSubstitution(SubstitutionPair&& substitution)
     {
         m_SuccesfulOptimizations.emplace_back(substitution);
     }

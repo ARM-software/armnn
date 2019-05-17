@@ -30,6 +30,9 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     LstmTestImpl.hpp
     NormTestImpl.hpp
     MergerTestImpl.hpp
+    MockBackend.cpp
+    MockBackend.hpp
+    MockBackendId.hpp
     OptimizedNetworkTests.cpp
     PermuteTestImpl.hpp
     Pooling2dTestImpl.hpp

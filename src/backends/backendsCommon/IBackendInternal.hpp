@@ -83,7 +83,7 @@ public:
         {
             if (optSubgraph)
             {
-                result.AddSubstituion({subgraph, SubgraphView(*optSubgraph.get())});
+                result.AddSubstitution({subgraph, SubgraphView(*optSubgraph.get())});
             }
             else
             {

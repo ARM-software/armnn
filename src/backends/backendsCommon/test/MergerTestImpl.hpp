@@ -4,11 +4,11 @@
 //
 #pragma once
 
+#include "CommonTestUtils.hpp"
+
 #include <ResolveType.hpp>
 
 #include <armnn/INetwork.hpp>
-
-#include <backendsCommon/test/CommonTestUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
 

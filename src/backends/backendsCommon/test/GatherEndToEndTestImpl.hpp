@@ -5,8 +5,9 @@
 
 #pragma once
 
+#include "CommonTestUtils.hpp"
+
 #include <armnn/INetwork.hpp>
-#include <backendsCommon/test/CommonTestUtils.hpp>
 #include <ResolveType.hpp>
 
 namespace{

@@ -11,7 +11,7 @@
 namespace armnn
 {
 
-class RefMergerWorkload : public BaseWorkload<MergerQueueDescriptor>
+class RefConcatWorkload : public BaseWorkload<MergerQueueDescriptor>
 {
 public:
     using BaseWorkload<MergerQueueDescriptor>::BaseWorkload;

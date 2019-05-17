@@ -16,7 +16,7 @@
 #include "RefActivationWorkload.hpp"
 #include "RefPooling2dFloat32Workload.hpp"
 #include "RefWorkloadUtils.hpp"
-#include "RefMergerWorkload.hpp"
+#include "RefConcatWorkload.hpp"
 #include "RefFullyConnectedFloat32Workload.hpp"
 #include "RefGatherWorkload.hpp"
 #include "Softmax.hpp"

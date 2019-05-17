@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "RefMergerWorkload.hpp"
+#include "RefConcatWorkload.hpp"
 
 #include "Merger.hpp"
 
@@ -12,9 +12,9 @@
 namespace armnn
 {
 
-void RefMergerWorkload::Execute() const
+void RefConcatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefMergerWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConcatWorkload_Execute");
     Merger(m_Data);
 }
 

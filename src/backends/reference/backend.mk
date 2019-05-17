@@ -29,6 +29,7 @@ BACKEND_SOURCES := \
         workloads/RefBatchNormalizationUint8Workload.cpp \
         workloads/RefBatchToSpaceNdFloat32Workload.cpp \
         workloads/RefBatchToSpaceNdUint8Workload.cpp \
+        workloads/RefConcatWorkload.cpp \
         workloads/RefConstantWorkload.cpp \
         workloads/RefConvertFp16ToFp32Workload.cpp \
         workloads/RefConvertFp32ToFp16Workload.cpp \
@@ -50,7 +51,6 @@ BACKEND_SOURCES := \
         workloads/RefLstmWorkload.cpp \
         workloads/RefMeanFloat32Workload.cpp \
         workloads/RefMeanUint8Workload.cpp \
-        workloads/RefMergerWorkload.cpp \
         workloads/RefNormalizationFloat32Workload.cpp \
         workloads/RefPadWorkload.cpp \
         workloads/RefPermuteWorkload.cpp \

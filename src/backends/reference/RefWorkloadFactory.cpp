@@ -139,7 +139,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMerger(const MergerQ
     {
         return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
     }
-    return std::make_unique<RefMergerWorkload>(descriptor, info);
+    return std::make_unique<RefConcatWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(

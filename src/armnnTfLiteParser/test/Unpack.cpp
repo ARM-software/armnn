@@ -116,4 +116,25 @@ BOOST_FIXTURE_TEST_CASE(UnpackAxisZeroNumIsDefaultNotSpecified, DefaultUnpackAxi
           {"outputTensor4", { 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f }} });
 }
 
+struct DefaultUnpackLastAxisFixture : UnpackFixture
+{
+    DefaultUnpackLastAxisFixture() : UnpackFixture("[ 4, 1, 6 ]", 6, "[ 4, 1 ]", "2", "6") {}
+};
+
+BOOST_FIXTURE_TEST_CASE(UnpackLastAxisNumSix, DefaultUnpackLastAxisFixture)
+{
+    RunTest<2, armnn::DataType::Float32>(
+        0,
+        { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+                            7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+                            13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f,
+                            19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f } } },
+        { {"outputTensor1", { 1.0f, 7.0f, 13.0f, 19.0f }},
+          {"outputTensor2", { 2.0f, 8.0f, 14.0f, 20.0f }},
+          {"outputTensor3", { 3.0f, 9.0f, 15.0f, 21.0f }},
+          {"outputTensor4", { 4.0f, 10.0f, 16.0f, 22.0f }},
+          {"outputTensor5", { 5.0f, 11.0f, 17.0f, 23.0f }},
+          {"outputTensor6", { 6.0f, 12.0f, 18.0f, 24.0f }} });
+}
+
 BOOST_AUTO_TEST_SUITE_END()

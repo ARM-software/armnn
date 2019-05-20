@@ -607,6 +607,19 @@ bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                     &TrueFunc<>);
 }
 
+bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
+                                         const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+                                         const ViewsDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+    ignore_unused(outputs);
+    return IsSupportedForDataTypeCl(reasonIfUnsupported,
+                                    input.GetDataType(),
+                                    &TrueFunc<>,
+                                    &TrueFunc<>);
+}
+
 bool ClLayerSupport::IsStridedSliceSupported(const TensorInfo& input,
                                              const TensorInfo& output,
                                              const StridedSliceDescriptor& descriptor,

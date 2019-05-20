@@ -200,7 +200,13 @@ public:
                                    const SpaceToBatchNdDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
     bool IsSplitterSupported(const TensorInfo& input,
+                             const ViewsDescriptor& descriptor,
+                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsSplitterSupported(const TensorInfo& input,
+                             const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
                              const ViewsDescriptor& descriptor,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 

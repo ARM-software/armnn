@@ -9,6 +9,7 @@
 #include <armnn/Optional.hpp>
 
 #include <cctype>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -259,7 +260,13 @@ public:
                                            const SpaceToBatchNdDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
     virtual bool IsSplitterSupported(const TensorInfo& input,
+                                     const ViewsDescriptor& descriptor,
+                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsSplitterSupported(const TensorInfo& input,
+                                     const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
                                      const ViewsDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 

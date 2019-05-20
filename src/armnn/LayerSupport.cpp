@@ -538,13 +538,26 @@ bool IsSpaceToBatchNdSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsSpaceToBatchNdSupported, input, output, descriptor);
 }
 
+ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
 bool IsSplitterSupported(const BackendId& backend,
                          const TensorInfo& input,
                          const ViewsDescriptor& descriptor,
                          char* reasonIfUnsupported,
                          size_t reasonIfUnsupportedMaxLength)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsSplitterSupported, input, descriptor);
+    ARMNN_NO_DEPRECATE_WARN_END
+}
+
+bool IsSplitterSupported(const BackendId& backend,
+                         const TensorInfo& input,
+                         const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+                         const ViewsDescriptor& descriptor,
+                         char* reasonIfUnsupported,
+                         size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsSplitterSupported, input, outputs, descriptor);
 }
 
 bool IsStridedSliceSupported(const BackendId& backend,

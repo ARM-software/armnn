@@ -36,20 +36,57 @@ void SplitterLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& fa
 {
     //If sub tensors are supported than all the "splitter" need to do is to
     //set the outputs to be appropriate sub tensors of the input.
-    if (factory.SupportsSubTensors())
+    bool useSubTensors = factory.SupportsSubTensors();
+
+    if (useSubTensors)
     {
         const OutputHandler& outputHandler = GetInputSlots()[0].GetConnectedOutputSlot()->GetOutputHandler();
 
+        const TensorInfo& parentInfo = outputHandler.GetTensorInfo();
+
         ITensorHandle* inputData = outputHandler.GetData();
+
+        std::vector<std::unique_ptr<ITensorHandle>> subTensors;
+
         //Creates the outputs as subtensors of the input.
         for (unsigned int i = 0; i < m_Param.GetNumViews(); ++i)
         {
-            m_OutputHandlers[i].SetData(factory.CreateSubTensorHandle(*inputData,
-                                                                      m_OutputHandlers[i].GetTensorInfo().GetShape(),
-                                                                      m_Param.GetViewOrigin(i)));
+            const TensorInfo& info = m_OutputHandlers[i].GetTensorInfo();
+
+            auto CreateSubTensor = [&]()
+            {
+                // Make sure quantization parameters are in the same space
+                if (parentInfo.IsTypeSpaceMatch(info))
+                {
+                    return factory.CreateSubTensorHandle(*inputData,
+                                                         info.GetShape(),
+                                                         this->m_Param.GetViewOrigin(i));
+                }
+                return std::unique_ptr<ITensorHandle>();
+            };
+
+            auto subTensor = CreateSubTensor();
+            if (!subTensor)
+            {
+                useSubTensors = false;
+                break; //Failed to create a valid sub-tensor, so stop trying with the rest of the views.
+            }
+            subTensors.push_back(std::move(subTensor));
+        }
+
+        if (useSubTensors)
+        {
+            unsigned int i = 0;
+            for (auto& subTensor : subTensors)
+            {
+                m_OutputHandlers[i].SetData(std::move(subTensor));
+                ++i;
+            }
+
         }
     }
-    else
+
+    if (!useSubTensors)
     {
         for (unsigned int i = 0; i < m_Param.GetNumViews(); ++i)
         {

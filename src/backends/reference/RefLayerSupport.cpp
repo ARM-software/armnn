@@ -998,6 +998,19 @@ bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                      &TrueFunc<>);
 }
 
+bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
+                                          const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+                                          const ViewsDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+    ignore_unused(outputs);
+    return IsSupportedForDataTypeRef(reasonIfUnsupported,
+                                     input.GetDataType(),
+                                     &TrueFunc<>,
+                                     &TrueFunc<>);
+}
+
 bool RefLayerSupport::IsStridedSliceSupported(const TensorInfo& input,
                                               const TensorInfo& output,
                                               const StridedSliceDescriptor& descriptor,

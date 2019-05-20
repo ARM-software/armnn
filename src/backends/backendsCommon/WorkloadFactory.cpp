@@ -703,7 +703,20 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
         {
             auto cLayer = boost::polymorphic_downcast<const SplitterLayer*>(&layer);
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+
+            // Get vector of all outputs.
+            auto getTensorInfo = [&dataType](const OutputSlot& slot)
+            {
+                return OverrideDataType(slot.GetTensorInfo(), dataType);
+            };
+            auto beginI = boost::make_transform_iterator(layer.GetOutputSlots().begin(), getTensorInfo);
+            auto endI = boost::make_transform_iterator(layer.GetOutputSlots().end(), getTensorInfo);
+            std::vector<TensorInfo> outputs(beginI, endI);
+
+            const std::vector<std::reference_wrapper<TensorInfo>> outputPtrs(outputs.begin(), outputs.end());
+
             result = layerSupportObject->IsSplitterSupported(OverrideDataType(input, dataType),
+                                                             outputPtrs,
                                                              cLayer->GetParameters(),
                                                              reason);
             break;

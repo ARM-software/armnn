@@ -58,6 +58,7 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonSoftmaxFloatWorkload.hpp
     NeonSoftmaxUint8Workload.cpp
     NeonSoftmaxUint8Workload.hpp
+    NeonSplitterWorkload.cpp
     NeonSplitterWorkload.hpp
     NeonSubtractionWorkload.cpp
     NeonSubtractionWorkload.hpp

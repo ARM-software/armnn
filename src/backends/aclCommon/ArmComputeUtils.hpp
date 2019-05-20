@@ -9,6 +9,8 @@
 
 #include <arm_compute/core/Types.h>
 
+#include <boost/assert.hpp>
+
 namespace armnn
 {
 
@@ -128,6 +130,25 @@ inline unsigned int ComputeSoftmaxAclAxis(const armnn::TensorInfo& tensor)
 
     // Currently ArmNN support axis 1.
     return dim - 1;
+}
+
+inline std::set<unsigned int> ComputeSplitAxis(const armnn::SplitterDescriptor& desc, const TensorShape& input)
+{
+    unsigned int numSplit = desc.GetNumViews();
+    unsigned int numDimensions = desc.GetNumDimensions();
+    std::set<unsigned int> splitAxis;
+
+    for (unsigned int i = 0; i < numSplit; ++i)
+    {
+        for (unsigned int dimIdx = 0; dimIdx < numDimensions; ++dimIdx)
+        {
+            if (desc.GetViewSizes(i)[dimIdx] != input[dimIdx])
+            {
+                splitAxis.insert(dimIdx);
+            }
+        }
+    }
+    return splitAxis;
 }
 
 } // namespace armnn

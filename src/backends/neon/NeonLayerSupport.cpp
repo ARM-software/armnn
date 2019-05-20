@@ -17,6 +17,7 @@
 #include <boost/core/ignore_unused.hpp>
 
 #if defined(ARMCOMPUTENEON_ENABLED)
+#include <aclCommon/ArmComputeUtils.hpp>
 #include "workloads/NeonAdditionWorkload.hpp"
 #include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
@@ -36,6 +37,7 @@
 #include "workloads/NeonPooling2dWorkload.hpp"
 #include "workloads/NeonResizeBilinearWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
+#include "workloads/NeonSplitterWorkload.hpp"
 #include "workloads/NeonSubtractionWorkload.hpp"
 #endif
 
@@ -476,6 +478,38 @@ bool NeonLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                       input.GetDataType(),
                                       &TrueFunc<>,
                                       &TrueFunc<>);
+}
+
+bool NeonLayerSupport::IsSplitterSupported(const TensorInfo& input,
+                                           const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+                                           const ViewsDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+#if defined(ARMCOMPUTENEON_ENABLED)
+    // Split along the last dimension, cannot use sub-tensors
+    // as width and height of the sub-tensors do not match
+    // the width and height of the parent tensor
+    // in case of input with more than 2D.
+    std::set<unsigned int> splitAxis = ComputeSplitAxis(descriptor, input.GetShape());
+    if (descriptor.GetNumDimensions() > 2 && splitAxis.size() == 1 &&
+        *splitAxis.begin() == descriptor.GetNumDimensions() - 1 )
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSplitterWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       outputs,
+                                       *splitAxis.begin());
+    }
+#endif
+    for (auto output : outputs)
+    {
+        if (!input.IsTypeSpaceMatch(output)) // Cannot use sub-tensors if the types are not same space
+        {
+            SetValueChecked(reasonIfUnsupported, "Neon Splitter: Types and quantization parameters must match.");
+            return false;
+        }
+    }
+    return true;
 }
 
 bool NeonLayerSupport::IsSubtractionSupported(const TensorInfo& input0,

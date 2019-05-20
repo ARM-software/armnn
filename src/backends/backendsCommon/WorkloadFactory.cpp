@@ -822,6 +822,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchToSpaceNd(const BatchToS
     return std::unique_ptr<IWorkload>();
 }
 
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConcat(const MergerQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {

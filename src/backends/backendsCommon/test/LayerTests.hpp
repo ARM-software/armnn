@@ -540,7 +540,7 @@ LayerTestResult<float, 3> CopyViaSplitterTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 3> MergerTest(
+LayerTestResult<float, 3> ConcatTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -806,15 +806,15 @@ LayerTestResult<uint8_t, 3> CopyViaSplitterUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<uint8_t, 3> MergerUint8Test(
+LayerTestResult<uint8_t, 3> ConcatUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<uint16_t, 3> MergerUint16Test(
+LayerTestResult<uint16_t, 3> ConcatUint16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<uint8_t, 3> MergerUint8DifferentQParamsTest(
+LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

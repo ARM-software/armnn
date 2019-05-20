@@ -135,11 +135,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSplitter(const SplitterQueu
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
                                                                    const WorkloadInfo&          info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
-    return std::make_unique<RefConcatWorkload>(descriptor, info);
+    return CreateConcat(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(
@@ -248,6 +244,16 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2Nor
     const WorkloadInfo& info) const
 {
     return MakeWorkload<RefL2NormalizationFloat32Workload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateConcat(const MergerQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo&          info) const
+{
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    return std::make_unique<RefConcatWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,

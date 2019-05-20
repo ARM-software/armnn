@@ -158,7 +158,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSplitter(const SplitterQueue
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
                                                                   const WorkloadInfo&          info) const
 {
-    return MakeWorkload<ClConcatWorkload>(descriptor, info);
+    return CreateConcat(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateFullyConnected(
@@ -263,6 +263,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateL2Normalization(const L2Norm
     const WorkloadInfo& info) const
 {
     return MakeWorkload<ClL2NormalizationFloatWorkload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConcat(const MergerQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo&          info) const
+{
+    return MakeWorkload<ClConcatWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,

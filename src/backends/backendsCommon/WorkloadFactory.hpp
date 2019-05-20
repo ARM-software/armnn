@@ -61,6 +61,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& Info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateConcat(const MergerQueueDescriptor& descriptor,
+                                                    const WorkloadInfo&          info) const;
+
     virtual std::unique_ptr<IWorkload> CreateConstant(const ConstantQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const;
 
@@ -124,6 +127,7 @@ public:
     virtual std::unique_ptr<IWorkload> CreateMerge(const MergeQueueDescriptor& descriptor,
                                                     const WorkloadInfo& info) const;
 
+    ARMNN_DEPRECATED_MSG("Use CreateConcat instead")
     virtual std::unique_ptr<IWorkload> CreateMerger(const MergerQueueDescriptor& descriptor,
                                                     const WorkloadInfo&          info) const;
 

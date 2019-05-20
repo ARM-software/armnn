@@ -242,11 +242,11 @@ ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)
 ARMNN_AUTO_TEST_CASE(CopyViaSplitter, CopyViaSplitterTest)
 ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
 
-// Merger
-ARMNN_AUTO_TEST_CASE(SimpleMerger, MergerTest)
-ARMNN_AUTO_TEST_CASE(MergerUint8, MergerUint8Test)
-ARMNN_AUTO_TEST_CASE(MergerUint8DifferentQParams, MergerUint8DifferentQParamsTest)
-ARMNN_AUTO_TEST_CASE(MergerUint16, MergerUint16Test)
+// Concat
+ARMNN_AUTO_TEST_CASE(SimpleConcat, ConcatTest)
+ARMNN_AUTO_TEST_CASE(ConcatUint8, ConcatUint8Test)
+ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentQParams, ConcatUint8DifferentQParamsTest)
+ARMNN_AUTO_TEST_CASE(ConcatUint16, ConcatUint16Test)
 
 // Add
 ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)

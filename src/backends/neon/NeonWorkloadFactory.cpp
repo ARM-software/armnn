@@ -123,7 +123,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSplitter(const SplitterQue
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&          info) const
 {
-    return std::make_unique<NeonConcatWorkload>(descriptor, info);
+    return CreateConcat(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateFullyConnected(
@@ -231,6 +231,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateL2Normalization(const L2No
 {
     return MakeWorkloadHelper<NeonL2NormalizationFloatWorkload, NullWorkload>(descriptor, info,
         m_MemoryManager->GetIntraLayerManager());
+}
+
+std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConcat(const MergerQueueDescriptor& descriptor,
+                                                                    const WorkloadInfo&          info) const
+{
+    return std::make_unique<NeonConcatWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,

@@ -304,9 +304,9 @@ ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)
 ARMNN_AUTO_TEST_CASE(CopyViaSplitter, CopyViaSplitterTest)
 ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
 
-// Merger
-ARMNN_AUTO_TEST_CASE(SimpleMerger, MergerTest)
-ARMNN_AUTO_TEST_CASE(MergerUint8, MergerUint8Test)
+// Concat
+ARMNN_AUTO_TEST_CASE(SimpleConcat, ConcatTest)
+ARMNN_AUTO_TEST_CASE(ConcatUint8, ConcatUint8Test)
 
 // Fully Connected
 ARMNN_AUTO_TEST_CASE(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)

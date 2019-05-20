@@ -1244,7 +1244,7 @@ LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgNoPeepholeNoProjectionInt16Const
         workloadFactory, memoryManager, input, expectedOutput, qScale, qOffset, datatype);
 }
 
-LayerTestResult<float,3> MergerTest(
+LayerTestResult<float,3> ConcatTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -1350,7 +1350,7 @@ LayerTestResult<float,3> MergerTest(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -3560,7 +3560,7 @@ void Concatenate(
 
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(queueDescriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(queueDescriptor, workloadInfo);
 
     for (auto& inputHandle : inputHandles)
     {
@@ -6487,7 +6487,7 @@ LayerTestResult<uint8_t, 4> ConstantUint8SimpleQuantizationScaleNoOffsetTest(
     return ConstantTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
-LayerTestResult<uint8_t, 3> MergerUint8DifferentQParamsTest(
+LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -6613,7 +6613,7 @@ LayerTestResult<uint8_t, 3> MergerUint8DifferentQParamsTest(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -6630,7 +6630,7 @@ LayerTestResult<uint8_t, 3> MergerUint8DifferentQParamsTest(
     return ret;
 }
 
-LayerTestResult<uint8_t, 3> MergerUint8Test(
+LayerTestResult<uint8_t, 3> ConcatUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -6651,7 +6651,7 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(
     armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedAsymm8);
     armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedAsymm8);
 
-    // Arbitrary scale and offsets. They don't really matter as the merger operator doesn't dequantize/quantize them.
+    // Arbitrary scale and offsets. They don't really matter as the Concat operator doesn't dequantize/quantize them.
     const float scale = 0.13497836f;
     const int32_t offset = -7;
 
@@ -6749,7 +6749,7 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -6766,7 +6766,7 @@ LayerTestResult<uint8_t, 3> MergerUint8Test(
     return ret;
 }
 
-LayerTestResult<uint16_t, 3> MergerUint16Test(
+LayerTestResult<uint16_t, 3> ConcatUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -6787,7 +6787,7 @@ LayerTestResult<uint16_t, 3> MergerUint16Test(
     armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedSymm16);
     armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedSymm16);
 
-    // Arbitrary scale and offsets. They don't really matter as the merger operator doesn't dequantize/quantize them.
+    // Arbitrary scale and offsets. They don't really matter as the Concat operator doesn't dequantize/quantize them.
     const float scale = 0.13497836f;
     const int32_t offset = -7;
 
@@ -6882,7 +6882,7 @@ LayerTestResult<uint16_t, 3> MergerUint16Test(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMerger(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();

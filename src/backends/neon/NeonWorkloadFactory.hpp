@@ -52,6 +52,7 @@ public:
     std::unique_ptr<IWorkload> CreateSplitter(const SplitterQueueDescriptor& descriptor,
                                               const WorkloadInfo& info) const override;
 
+    ARMNN_DEPRECATED_MSG("Use CreateConcat instead")
     std::unique_ptr<IWorkload> CreateMerger(const MergerQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
 
@@ -96,6 +97,9 @@ public:
 
     std::unique_ptr<IWorkload> CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const override;
+
+    std::unique_ptr<IWorkload> CreateConcat(const MergerQueueDescriptor& descriptor,
+                                            const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateConstant(const ConstantQueueDescriptor& descriptor,
                                               const WorkloadInfo& info) const override;

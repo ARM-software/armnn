@@ -31,7 +31,7 @@ std::unique_ptr<IWorkload> MergerLayer::CreateWorkload(const Graph& graph, const
             std::vector<unsigned int>(m_Param.GetViewOrigin(i), m_Param.GetViewOrigin(i) + m_Param.GetNumDimensions()));
     }
 
-    return factory.CreateMerger(descriptor, PrepInfoAndDesc(descriptor, graph));
+    return factory.CreateConcat(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
 void MergerLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory)

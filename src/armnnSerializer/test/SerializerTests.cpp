@@ -1280,7 +1280,7 @@ BOOST_AUTO_TEST_CASE(SerializeMerger)
     const std::vector<armnn::TensorShape> shapes({inputInfo.GetShape(), inputInfo.GetShape()});
 
     armnn::OriginsDescriptor descriptor =
-        armnn::CreateMergerDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
+        armnn::CreateDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayerOne = network->AddInputLayer(0);
@@ -1375,7 +1375,7 @@ BOOST_AUTO_TEST_CASE(EnsureMergerLayerBackwardCompatibility)
     const std::vector<armnn::TensorShape> shapes({inputInfo.GetShape(), inputInfo.GetShape()});
 
     armnn::OriginsDescriptor descriptor =
-            armnn::CreateMergerDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
+            armnn::CreateDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
 
     MergerLayerVerifier verifier(layerName, {inputInfo, inputInfo}, {outputInfo}, descriptor);
     deserializedNetwork->Accept(verifier);

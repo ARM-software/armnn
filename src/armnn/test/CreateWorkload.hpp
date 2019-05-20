@@ -1069,9 +1069,9 @@ std::unique_ptr<MergerWorkload> CreateMergerWorkloadTest(armnn::IWorkloadFactory
 
     std::vector<armnn::TensorShape> inputShapes{{ 2, 3, 2, 5 }, { 2, 3, 2, 5 }};
 
-    descriptor = CreateMergerDescriptorForConcatenation(inputShapes.begin(),
-                                                        inputShapes.end(),
-                                                        concatAxis);
+    descriptor = CreateDescriptorForConcatenation(inputShapes.begin(),
+                                                  inputShapes.end(),
+                                                  concatAxis);
 
     Layer* const merger = graph.AddLayer<MergerLayer>(descriptor, "merger");
     BOOST_TEST_CHECKPOINT("created merger layer");

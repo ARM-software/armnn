@@ -30,9 +30,9 @@ INetworkPtr CreateMergerNetwork(const std::vector<TensorShape>& inputShapes,
 
     OriginsDescriptor descriptor;
 
-    descriptor = CreateMergerDescriptorForConcatenation(inputShapes.begin(),
-                                                        inputShapes.end(),
-                                                        concatAxis);
+    descriptor = CreateDescriptorForConcatenation(inputShapes.begin(),
+                                                  inputShapes.end(),
+                                                  concatAxis);
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* merger = net->AddMergerLayer(descriptor, "merger");
     ARMNN_NO_DEPRECATE_WARN_END

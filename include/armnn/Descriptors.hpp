@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include "Deprecated.hpp"
 #include "DescriptorsFwd.hpp"
 
 #include <cstdint>
@@ -134,11 +135,21 @@ private:
     uint32_t**        m_ViewSizes;
 };
 
+template <typename TensorShapeIt>
+ARMNN_DEPRECATED_MSG("Use CreateDescriptorForConcatenation instead")
+OriginsDescriptor CreateMergerDescriptorForConcatenation(TensorShapeIt first,
+                                                         TensorShapeIt last,
+                                                         unsigned int concatenationDimension)
+{
+    return CreateDescriptorForConcatenation(first, last, concatenationDimension);
+}
+
 /// @brief Convenience template to create an OriginsDescriptor to use when creating a MergerLayer for performing
 /// concatenation of a number of input tensors.
 template <typename TensorShapeIt>
-OriginsDescriptor CreateMergerDescriptorForConcatenation(TensorShapeIt first, TensorShapeIt last,
-    unsigned int concatenationDimension)
+OriginsDescriptor CreateDescriptorForConcatenation(TensorShapeIt first,
+                                                         TensorShapeIt last,
+                                                         unsigned int concatenationDimension)
 {
     auto numInputs = std::distance(first, last);
 

@@ -3251,7 +3251,7 @@ void PermuteTensorData(
     inputTensorInfo = outputTensorInfo;
 }
 
-armnn::OriginsDescriptor CreateMergerDescriptorForConcatenation(
+armnn::OriginsDescriptor CreateDescriptorForConcatenation(
         const std::vector<armnn::TensorInfo> & inputTensorInfos,
         unsigned int concatDim)
 {
@@ -3262,9 +3262,9 @@ armnn::OriginsDescriptor CreateMergerDescriptorForConcatenation(
         shapes.push_back(it.GetShape());
     }
 
-    return armnn::CreateMergerDescriptorForConcatenation(shapes.begin(),
-                                                         shapes.end(),
-                                                         concatDim);
+    return armnn::CreateDescriptorForConcatenation(shapes.begin(),
+                                                   shapes.end(),
+                                                   concatDim);
 }
 
 //
@@ -3515,7 +3515,7 @@ void Concatenate(
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::MergerQueueDescriptor queueDescriptor;
-    armnn::OriginsDescriptor viewsDescriptor = CreateMergerDescriptorForConcatenation(inputTensorInfos, concatDim);
+    armnn::OriginsDescriptor viewsDescriptor = CreateDescriptorForConcatenation(inputTensorInfos, concatDim);
     queueDescriptor.m_Parameters = viewsDescriptor;
 
     if (useSubtensor)

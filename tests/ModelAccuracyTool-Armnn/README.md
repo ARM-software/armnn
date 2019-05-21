@@ -11,7 +11,7 @@ images to this format.
 | ---|---|---|
 | -h | --help                   | Display help messages |
 | -m | --model-path             | Path to armnn format model file |
-| -c | --compute                | Which device to run layers on by default. Possible choices: CpuRef, CpuAcc, GpuAcc |
+| -c | --compute                | Which device to run layers on by default. Possible choices: CpuRef, CpuAcc, GpuAcc. Default: CpuAcc, CpuRef |
 | -d | --data-dir               | Path to directory containing the ImageNet test data |
 | -i | --input-name             | Identifier of the input tensors in the network separated by comma |
 | -o | --output-name            | Identifier of the output tensors in the network separated by comma |

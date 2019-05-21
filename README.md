@@ -28,7 +28,10 @@ The 'armnn/samples' directory contains SimpleSample.cpp. A very basic example of
 
 The 'ExecuteNetwork' program, in armnn/tests/ExecuteNetwork, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes any model and any input tensor, and simply prints out the output tensor. Run with no arguments to see command-line help.
 
-The 'ArmnnConverter' program, in armnn/src/ArmnnConverter, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes a model in TensorFlow format and produces a serialized model in Arm NN format. Run with no arguments to see command-line help. Note that this program can only convert models for which all operations are supported by the serialization tool (src/armnnSerializer).
+The 'ArmnnConverter' program, in armnn/src/armnnConverter, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes a model in TensorFlow format and produces a serialized model in Arm NN format. Run with no arguments to see command-line help. Note that this program can only convert models for which all operations are supported by the serialization tool (src/armnnSerializer).
+
+The 'ArmnnQuantizer' program, in armnn/src/armnnQuantizer, has no additional dependencies beyond those required by Arm NN and the model parsers. It takes a 32-bit float network and converts it into a quantized asymmetric 8-bit or quantized symmetric 16-bit network.
+Static quantization is supported by default but dynamic quantization can be enabled if CSV file of raw input tensors is specified. Run with no arguments to see command-line help.
 
 Note that Arm NN needs to be built against a particular version of ARM's Compute Library. The get_compute_library.sh in the scripts subdirectory will clone the compute library from the review.mlplatform.org github repository into a directory alongside armnn named 'clframework' and checkouts the correct revision
 

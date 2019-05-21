@@ -59,7 +59,12 @@ struct LayerSelectionInfo
                 if (parentInfo == layerInfos.end() ||
                         m_SplitId != parentInfo->second.m_SplitId)
                 {
-                    inputSlots.push_back(&(*slot));
+                    // Avoid collecting duplicate input slots
+                    InputSlot* inputSlot = &(*slot);
+                    if (std::find(inputSlots.begin(), inputSlots.end(), inputSlot) == inputSlots.end())
+                    {
+                        inputSlots.push_back(inputSlot);
+                    }
                 }
             }
         }
@@ -77,7 +82,12 @@ struct LayerSelectionInfo
                 if (childInfo == layerInfos.end() ||
                         m_SplitId != childInfo->second.m_SplitId)
                 {
-                    outputSlots.push_back(&(*slot));
+                    // Avoid collecting duplicate output slots
+                    OutputSlot* outputSlot = &(*slot);
+                    if (std::find(outputSlots.begin(), outputSlots.end(), outputSlot) == outputSlots.end())
+                    {
+                        outputSlots.push_back(outputSlot);
+                    }
                 }
             }
         }

@@ -6,7 +6,6 @@
 *  [Cross-compiling ToolChain](#installCCT)
 *  [Build Boost library for arm64](#installBaarch)
 *  [Build Compute Library](#buildCL)
-*  [Build Compute Library](#buildCL)
 *  [Build ArmNN](#buildANN)
 *  [Run Unit Tests](#unittests)
 *  [Troubleshooting and Errors](#troubleshooting)

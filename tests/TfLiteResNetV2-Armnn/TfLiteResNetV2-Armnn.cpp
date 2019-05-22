@@ -28,7 +28,6 @@ int main(int argc, char* argv[])
         using DatabaseType = ImagePreprocessor<DataType>;
         using ParserType = armnnTfLiteParser::ITfLiteParser;
         using ModelType = InferenceModel<ParserType, DataType>;
-
         // Coverity fix: ClassifierInferenceTestMain() may throw uncaught exceptions.
         retVal = armnn::test::ClassifierInferenceTestMain<DatabaseType,
                                                           ParserType>(
@@ -43,7 +42,9 @@ int main(int argc, char* argv[])
                              dataDir,
                              299,
                              299,
-                             imageSet);
+                             imageSet,
+                             127.5f,
+                             {0.5f,0.5f,0.5f});
                      },
                      &inputTensorShape);
     }

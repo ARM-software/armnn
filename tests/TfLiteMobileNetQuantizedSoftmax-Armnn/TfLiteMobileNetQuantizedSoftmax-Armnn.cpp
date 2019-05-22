@@ -40,14 +40,12 @@ int main(int argc, char* argv[])
                 [&imageSet](const char* dataDir, const ModelType & model) {
                     // we need to get the input quantization parameters from
                     // the parsed model
-                    auto inputBinding = model.GetInputBindingInfo();
                     return DatabaseType(
                             dataDir,
                             128,
                             128,
                             imageSet,
-                            inputBinding.second.GetQuantizationScale(),
-                            inputBinding.second.GetQuantizationOffset(),
+                            1,
                             {{0, 0, 0}},
                             {{1, 1, 1}},
                             DatabaseType::DataFormat::NCHW,

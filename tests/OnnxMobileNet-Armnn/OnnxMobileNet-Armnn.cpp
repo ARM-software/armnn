@@ -40,8 +40,7 @@ int main(int argc, char* argv[])
                              224,
                              224,
                              imageSet,
-                             1.0,                             // scale
-                             0,                               // offset
+                             255.0,                           // scale
                              {{0.485f, 0.456f, 0.406f}},      // mean
                              {{0.229f, 0.224f, 0.225f}},      // stddev
                              DatabaseType::DataFormat::NCHW); // format

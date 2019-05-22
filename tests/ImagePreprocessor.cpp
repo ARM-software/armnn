@@ -31,7 +31,7 @@ unsigned int ImagePreprocessor<TDataType>::GetLabelAndResizedImageAsFloat(unsign
 
     result = image.Resize(m_Width, m_Height, CHECK_LOCATION(),
                           InferenceTestImage::ResizingMethods::BilinearAndNormalized,
-                          m_Mean, m_Stddev);
+                          m_Mean, m_Stddev, m_Scale);
 
     // duplicate data across the batch
     for (unsigned int i = 1; i < m_BatchSize; i++)
@@ -72,9 +72,8 @@ ImagePreprocessor<uint8_t>::GetTestCaseData(unsigned int testCaseId)
 
     for (size_t i=0; i<resizedSize; ++i)
     {
-        quantized[i] = armnn::Quantize<uint8_t>(resized[i],
-                                                m_Scale,
-                                                m_Offset);
+        quantized[i] = static_cast<uint8_t>(resized[i]);
     }
+
     return std::make_unique<TTestCaseData>(label, std::move(quantized));
 }

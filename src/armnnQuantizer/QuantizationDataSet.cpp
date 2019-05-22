@@ -75,7 +75,7 @@ unsigned int GetPassIdFromCsvRow(std::vector<armnnUtils::CsvRow> csvRows, unsign
     {
         passId = static_cast<unsigned int>(std::stoi(csvRows[rowIndex].values[0]));
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument&)
     {
         throw armnn::ParseException("Pass ID [" + csvRows[rowIndex].values[0] + "]" +
                                     " is not correct format on CSV row " + std::to_string(rowIndex));
@@ -90,7 +90,7 @@ armnn::LayerBindingId GetBindingIdFromCsvRow(std::vector<armnnUtils::CsvRow> csv
     {
         bindingId = std::stoi(csvRows[rowIndex].values[1]);
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument&)
     {
         throw armnn::ParseException("Binding ID [" + csvRows[rowIndex].values[0] + "]" +
                                     " is not correct format on CSV row " + std::to_string(rowIndex));

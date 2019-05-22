@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn/Deprecated.hpp>
+
 #include <memory>
 #include <vector>
 #include <functional>
@@ -22,5 +24,10 @@ public:
 
     virtual std::vector<CompiledBlobPtr> CompileNetwork() = 0;
 };
+
+///
+/// Old ISubGraphConverter definition kept for backward compatibility only.
+///
+using ISubGraphConverter ARMNN_DEPRECATED_MSG("This type is no longer supported") = ISubgraphViewConverter;
 
 } // namespace armnn

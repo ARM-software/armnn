@@ -67,13 +67,13 @@ IBackendInternal::ILayerSupportSharedPtr RefBackend::GetLayerSupport() const
     return layerSupport;
 }
 
-IBackendInternal::SubgraphViewUniquePtr RefBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
-                                                                         bool& optimizationAttempted) const
+OptimizationViews RefBackend::OptimizeSubgraphView(const SubgraphView& subgraph) const
 {
-    // Not trying to optimize the given sub-graph
-    optimizationAttempted = false;
+    OptimizationViews optimizationViews;
 
-    return SubgraphViewUniquePtr{};
+    optimizationViews.AddUntouchedSubgraph(SubgraphView(subgraph));
+
+    return optimizationViews;
 }
 
 } // namespace armnn

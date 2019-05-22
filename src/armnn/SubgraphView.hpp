@@ -96,4 +96,9 @@ private:
     Layers m_Layers;
 };
 
+///
+/// Old SubGraph definition kept for backward compatibility only.
+///
+using SubGraph ARMNN_DEPRECATED_MSG("SubGraph is deprecated, use SubgraphView instead") = SubgraphView;
+
 } // namespace armnn

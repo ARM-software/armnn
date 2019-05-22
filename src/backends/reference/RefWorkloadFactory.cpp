@@ -160,7 +160,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePooling2d(const Pool
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefConvolution2dFloat32Workload, RefConvolution2dUint8Workload>(descriptor, info);
+    return std::make_unique<RefConvolution2dWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDepthwiseConvolution2d(

@@ -36,6 +36,12 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         {
             return std::make_unique<FloatDecoder>(static_cast<const float*>(data));
         }
+        case armnn::DataType::Signed32:
+        {
+            return std::make_unique<ScaledInt32Decoder>(
+                    static_cast<const int32_t*>(data),
+                    info.GetQuantizationScale());
+        }
         default:
         {
             BOOST_ASSERT_MSG(false, "Not supported Data Type!");

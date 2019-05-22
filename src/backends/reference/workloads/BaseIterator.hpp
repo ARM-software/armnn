@@ -123,6 +123,21 @@ public:
     }
 };
 
+class ScaledInt32Decoder : public TypedIterator<const int32_t, Decoder<float>>
+{
+public:
+    ScaledInt32Decoder(const int32_t* data, const float scale)
+        : TypedIterator(data), m_Scale(scale) {}
+
+    float Get() const override
+    {
+        return static_cast<float>(*m_Iterator) * m_Scale;
+    }
+
+private:
+    const float m_Scale;
+};
+
 class QASymm8Encoder : public TypedIterator<uint8_t, Encoder<float>>
 {
 public:

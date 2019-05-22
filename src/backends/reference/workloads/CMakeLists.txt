@@ -51,10 +51,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefConvertFp16ToFp32Workload.hpp
     RefConvertFp32ToFp16Workload.cpp
     RefConvertFp32ToFp16Workload.hpp
-    RefConvolution2dFloat32Workload.cpp
-    RefConvolution2dFloat32Workload.hpp
-    RefConvolution2dUint8Workload.cpp
-    RefConvolution2dUint8Workload.hpp
+    RefConvolution2dWorkload.cpp
+    RefConvolution2dWorkload.hpp
     RefElementwiseWorkload.cpp
     RefElementwiseWorkload.hpp
     RefDebugWorkload.cpp

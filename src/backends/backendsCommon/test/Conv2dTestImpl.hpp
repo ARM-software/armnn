@@ -1125,6 +1125,7 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
 
     ExecuteWorkload(*workload, memoryManager);
 
+    workloadRef->PostAllocationConfigure();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());

@@ -7,6 +7,9 @@
 
 #include "RefWorkloadUtils.hpp"
 #include "TensorBufferArrayView.hpp"
+#include "BaseIterator.hpp"
+#include "Decoders.hpp"
+#include "Encoders.hpp"
 
 #include <armnn/Tensor.hpp>
 
@@ -224,4 +227,20 @@ static void ConvImpl(ConvData data,
     }
 }
 
+void Convolve(const TensorShape& rInputShape,
+              Decoder<float>& rInputDecoder,
+              const TensorShape& rOutputShape,
+              Encoder<float>& rOutputEncoder,
+              const TensorShape& rFilterShape,
+              Decoder<float>& rFilterDecoder,
+              bool biasEnabled,
+              Decoder<float>* pBiasDecoder,
+              DataLayout dataLayout,
+              unsigned int paddingTop,
+              unsigned int paddingLeft,
+              unsigned int xStride,
+              unsigned int yStride,
+              unsigned int xDilation,
+              unsigned int yDilation,
+              bool depthwise = false);
 } //namespace armnn

@@ -73,6 +73,9 @@ inline void ExecuteWorkload(armnn::IWorkload& workload,
         memoryManager->Acquire();
     }
 
+    // Perform PostAllocationConfiguration
+    workload.PostAllocationConfigure();
+
     // Execute the workload
     workload.Execute();
 

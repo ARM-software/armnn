@@ -254,7 +254,7 @@ static void RefCreateConvolution2dWorkloadTest(DataLayout dataLayout = DataLayou
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateConvolution2dWorkloadTest<RefConvolution2dFloat32Workload, DataType::Float32>
+    auto workload = CreateConvolution2dWorkloadTest<RefConvolution2dWorkload, DataType::Float32>
                     (factory, graph, dataLayout);
 
     std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW) ?

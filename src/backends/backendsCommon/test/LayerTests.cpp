@@ -79,12 +79,12 @@ static std::vector<float> Bias2({0, 2});
 
 // Helper function that returns either Bias2 or an empty vector depending on whether bias is enabled.
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-boost::multi_array<T, 1> GetBias2(bool biasEnabled, float qScale, int32_t qOffset)
+boost::multi_array<T, 1> GetBias2(bool biasEnabled, float qScale)
 {
     if(biasEnabled)
     {
         armnn::TensorInfo biasDesc({static_cast<unsigned int>(Bias2.size())}, ArmnnType);
-        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(qScale, qOffset, Bias2));
+        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(qScale, 0.0f, Bias2));
         return bias;
     }
     else
@@ -170,7 +170,7 @@ LayerTestResult<T, 4> SimpleConvolution2d3x5TestCommon(
         memoryManager,
         input,
         kernel,
-        GetBias2<ArmnnBType>(biasEnabled, qScale, qOffset),
+        GetBias2<ArmnnBType>(biasEnabled, qScale * qScale),
         expectedOutput,
         qScale,
         qOffset,
@@ -247,7 +247,7 @@ LayerTestResult<T, 4> SimpleConvolution2d3x3TestCommon(
         memoryManager,
         input,
         kernel,
-        GetBias2<ArmnnBType>(biasEnabled, qScale, qOffset),
+        GetBias2<ArmnnBType>(biasEnabled, qScale * qScale),
         expectedOutput,
         qScale,
         qOffset,
@@ -494,7 +494,7 @@ LayerTestResult<T, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest
         memoryManager,
         input,
         kernel,
-        GetBias2<ArmnnBType>(false, qScale, qOffset),
+        GetBias2<ArmnnBType>(false, qScale * qScale),
         expectedOutput,
         qScale,
         qOffset,
@@ -552,7 +552,7 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(
         memoryManager,
         input,
         kernel,
-        GetBias2<ArmnnBType>(false, qScale, qOffset),
+        GetBias2<ArmnnBType>(false, qScale * qScale),
         expectedOutput,
         qScale,
         qOffset,
@@ -627,7 +627,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(
         memoryManager,
         input,
         kernel,
-        GetBias2<ArmnnBType>(biasEnabled, qScale, qOffset),
+        GetBias2<ArmnnBType>(biasEnabled, qScale * qScale),
         expectedOutput,
         qScale,
         qOffset,
@@ -736,7 +736,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(
         memoryManager,
         input,
         kernel,
-        GetBias2<ArmnnBType>(biasEnabled, qScale, qOffset),
+        GetBias2<ArmnnBType>(biasEnabled, qScale * qScale),
         expectedOutput,
         qScale,
         qOffset,
@@ -802,7 +802,7 @@ LayerTestResult<T, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon(
         memoryManager,
         input,
         kernel,
-        GetBias2<ArmnnBType>(biasEnabled, qScale, qOffset),
+        GetBias2<ArmnnBType>(biasEnabled, qScale * qScale),
         expectedOutput,
         qScale,
         qOffset,

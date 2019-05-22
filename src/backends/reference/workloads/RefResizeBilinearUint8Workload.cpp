@@ -25,7 +25,7 @@ void RefResizeBilinearUint8Workload::Execute() const
     auto dequant = Dequantize(GetInputTensorDataU8(0, m_Data), inputInfo);
 
     std::vector<float> results(outputInfo.GetNumElements());
-    ResizeBilinear(dequant.data(), inputInfo, results.data(), outputInfo);
+    ResizeBilinear(dequant.data(), inputInfo, results.data(), outputInfo, m_Data.m_Parameters.m_DataLayout);
 
     Quantize(GetOutputTensorDataU8(0, m_Data), results.data(), outputInfo);
 }

@@ -55,6 +55,7 @@ inline void PutData(std::vector<float> & data,
 std::vector<float> ResizeBilinearAndNormalize(const InferenceTestImage & image,
                                               const unsigned int outputWidth,
                                               const unsigned int outputHeight,
+                                              const float scale,
                                               const std::array<float, 3>& mean,
                                               const std::array<float, 3>& stddev)
 {
@@ -114,7 +115,7 @@ std::vector<float> ResizeBilinearAndNormalize(const InferenceTestImage & image,
                 const float ly0 = Lerp(float(rgb_x0y0[c]), float(rgb_x1y0[c]), xw);
                 const float ly1 = Lerp(float(rgb_x0y1[c]), float(rgb_x1y1[c]), xw);
                 const float l = Lerp(ly0, ly1, yw);
-                PutData(out, outputWidth, x, y, c, ((l/255.0f) - mean[c])/stddev[c]);
+                PutData(out, outputWidth, x, y, c, ((l / scale) - mean[c]) / stddev[c]);
             }
         }
     }
@@ -210,7 +211,8 @@ std::vector<float> InferenceTestImage::Resize(unsigned int newWidth,
                                               const armnn::CheckLocation& location,
                                               const ResizingMethods meth,
                                               const std::array<float, 3>& mean,
-                                              const std::array<float, 3>& stddev)
+                                              const std::array<float, 3>& stddev,
+                                              const float scale)
 {
     std::vector<float> out;
     if (newWidth == 0 || newHeight == 0)
@@ -227,7 +229,7 @@ std::vector<float> InferenceTestImage::Resize(unsigned int newWidth,
         }
         case ResizingMethods::BilinearAndNormalized:
         {
-            out = ResizeBilinearAndNormalize(*this, newWidth, newHeight, mean, stddev);
+            out = ResizeBilinearAndNormalize(*this, newWidth, newHeight, scale, mean, stddev);
             break;
         }
         default:

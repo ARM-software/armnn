@@ -33,8 +33,7 @@ public:
         unsigned int width,
         unsigned int height,
         const std::vector<ImageSet>& imageSet,
-        float scale=1.0,
-        int32_t offset=0,
+        float scale=255.0f,
         const std::array<float, 3> mean={{0, 0, 0}},
         const std::array<float, 3> stddev={{1, 1, 1}},
         DataFormat dataFormat=DataFormat::NHWC,
@@ -44,7 +43,6 @@ public:
     , m_Width(width)
     , m_BatchSize(batchSize)
     , m_Scale(scale)
-    , m_Offset(offset)
     , m_ImageSet(imageSet)
     , m_Mean(mean)
     , m_Stddev(stddev)
@@ -66,7 +64,6 @@ private:
     unsigned int m_BatchSize;
     // Quantization parameters
     float m_Scale;
-    int32_t m_Offset;
     const std::vector<ImageSet> m_ImageSet;
 
     const std::array<float, 3> m_Mean;

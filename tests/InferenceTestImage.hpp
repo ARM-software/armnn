@@ -92,7 +92,8 @@ public:
                               const armnn::CheckLocation& location,
                               const ResizingMethods meth = ResizingMethods::STB,
                               const std::array<float, 3>& mean = {{0.0, 0.0, 0.0}},
-                              const std::array<float, 3>& stddev = {{1.0, 1.0, 1.0}});
+                              const std::array<float, 3>& stddev = {{1.0, 1.0, 1.0}},
+                              const float scale = 255.0f);
 
     void Write(WriteFormat format, const char* filePath) const;
 

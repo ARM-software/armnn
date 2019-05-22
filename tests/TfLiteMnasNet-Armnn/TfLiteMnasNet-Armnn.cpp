@@ -42,7 +42,9 @@ int main(int argc, char* argv[])
                              dataDir,
                              224,
                              224,
-                             imageSet);
+                             imageSet,
+                             127.5f,
+                             {0.5f,0.5f,0.5f});
                      },
                      &inputTensorShape);
     }

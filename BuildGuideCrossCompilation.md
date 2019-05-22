@@ -1,9 +1,9 @@
 # How to Cross-Compile ArmNN on x86_64 for arm64
 
 *  [Introduction](#introduction)
+*  [Cross-compiling ToolChain](#installCCT)
 *  [Build and install Google's Protobuf library](#buildProtobuf)
 *  [Build Caffe for x86_64](#buildCaffe)
-*  [Cross-compiling ToolChain](#installCCT)
 *  [Build Boost library for arm64](#installBaarch)
 *  [Build Compute Library](#buildCL)
 *  [Build ArmNN](#buildANN)
@@ -14,6 +14,12 @@
 #### <a name="introduction">Introduction</a>
 These are the step by step instructions on Cross-Compiling ArmNN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 16.04.
 The instructions show how to build the ArmNN core library and the Boost, Protobuf, Caffe and Compute Libraries necessary for compilation.
+
+#### <a name="installCCT">Cross-compiling ToolChain</a>
+* Install the standard cross-compilation libraries for arm64:
+    ```
+    sudo apt install crossbuild-essential-arm64
+    ```
 
 #### <a name="buildProtobuf">Build and install Google's Protobuf library</a>
 
@@ -84,11 +90,6 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     These should all run without errors
 * caffe.pb.h and caffe.pb.cc will be needed when building ArmNN's Caffe Parser
 
-#### <a name="installCCT">Cross-compiling ToolChain</a>
-* Install the standard cross-compilation libraries for arm64:
-    ```
-    sudo apt install crossbuild-essential-arm64
-    ```
 #### <a name="installBaarch">Build Boost library for arm64</a>
 * Build Boost library for arm64
     Download Boost version 1.64 from http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html

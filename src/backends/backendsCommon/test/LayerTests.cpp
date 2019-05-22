@@ -1362,10 +1362,10 @@ LayerTestResult<float,3> ConcatTest(
     );
 
     std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //Extent of the window is defined by size of input[0].
-    armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
+    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = {2, 0, 0}; //Extent of the window is defined by size of input[1].
-    armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
+    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
@@ -1381,7 +1381,7 @@ LayerTestResult<float,3> ConcatTest(
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
-    armnn::MergerQueueDescriptor data;
+    armnn::ConcatQueueDescriptor data;
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
@@ -3554,7 +3554,7 @@ void Concatenate(
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::MergerQueueDescriptor queueDescriptor;
+    armnn::ConcatQueueDescriptor queueDescriptor;
     armnn::OriginsDescriptor viewsDescriptor = CreateDescriptorForConcatenation(inputTensorInfos, concatDim);
     queueDescriptor.m_Parameters = viewsDescriptor;
 
@@ -6625,10 +6625,10 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     inputTensorInfo2.SetQuantizationOffset(inputOffset2);
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
-    armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
+    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
-    armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
+    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
@@ -6644,7 +6644,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
-    armnn::MergerQueueDescriptor data;
+    armnn::ConcatQueueDescriptor data;
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
@@ -6759,10 +6759,10 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     );
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
-    armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
+    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
-    armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
+    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -6780,7 +6780,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
 
-    armnn::MergerQueueDescriptor data;
+    armnn::ConcatQueueDescriptor data;
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
@@ -6892,10 +6892,10 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     }));
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
-    armnn::MergerQueueDescriptor::ViewOrigin window1(wOrigin1);
+    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
-    armnn::MergerQueueDescriptor::ViewOrigin window2(wOrigin2);
+    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
 
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -6913,7 +6913,7 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
 
-    armnn::MergerQueueDescriptor data;
+    armnn::ConcatQueueDescriptor data;
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());

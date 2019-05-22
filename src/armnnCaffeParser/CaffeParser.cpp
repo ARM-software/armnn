@@ -564,37 +564,37 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
         convLayer->GetOutputSlot(0).SetTensorInfo(BlobShapeToTensorInfo(outputShape));
     }
 
-    // If the convolution was performed in chunks, add a layer to merge the results
+    // If the convolution was performed in chunks, add a layer to concatenate the results
 
     // The merge input shape matches that of the convolution output
-    unsigned int mergeDimSizes[4] = {static_cast<unsigned int>(outputShape.dim(0)),
-                                        static_cast<unsigned int>(outputShape.dim(1)),
-                                        static_cast<unsigned int>(outputShape.dim(2)),
-                                        static_cast<unsigned int>(outputShape.dim(3))};
+    unsigned int concatDimSizes[4] = {static_cast<unsigned int>(outputShape.dim(0)),
+                                      static_cast<unsigned int>(outputShape.dim(1)),
+                                      static_cast<unsigned int>(outputShape.dim(2)),
+                                      static_cast<unsigned int>(outputShape.dim(3))};
 
-    // This is used to describe how the input is to be merged
-    OriginsDescriptor mergeDesc(numGroups);
+    // This is used to describe how the input is to be concatenated
+    OriginsDescriptor concatDesc(numGroups);
 
     // Now create an input node for each group, using the name from
     // the output of the corresponding convolution
     for (unsigned int g = 0; g < numGroups; ++g)
     {
-        mergeDesc.SetViewOriginCoord(g, 1, mergeDimSizes[1] * g);
+        concatDesc.SetViewOriginCoord(g, 1, concatDimSizes[1] * g);
     }
 
-    // Make sure the output from the merge is the correct size to hold the data for all groups
-    mergeDimSizes[1] *= numGroups;
-    outputShape.set_dim(1, mergeDimSizes[1]);
+    // Make sure the output from the concat is the correct size to hold the data for all groups
+    concatDimSizes[1] *= numGroups;
+    outputShape.set_dim(1, concatDimSizes[1]);
 
-    // Finally add the merge layer
-    IConnectableLayer* mergerLayer = m_Network->AddConcatLayer(mergeDesc, layerParam.name().c_str());
+    // Finally add the concat layer
+    IConnectableLayer* concatLayer = m_Network->AddConcatLayer(concatDesc, layerParam.name().c_str());
 
-    if (!mergerLayer)
+    if (!concatLayer)
     {
         throw ParseException(
             boost::str(
                 boost::format(
-                    "Failed to create final merger layer for Split+Convolution+Merger. "
+                    "Failed to create final concat layer for Split+Convolution+Concat. "
                     "Layer=%1% #groups=%2% #filters=%3% %4%") %
                     layerParam.name() %
                     numGroups %
@@ -604,10 +604,10 @@ void CaffeParserBase::AddConvLayerWithSplits(const caffe::LayerParameter& layerP
 
     for (unsigned int g = 0; g < numGroups; ++g)
     {
-        convLayers[g]->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(g));
+        convLayers[g]->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(g));
     }
-    mergerLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(4, mergeDimSizes, DataType::Float32));
-    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), mergerLayer->GetOutputSlot(0));
+    concatLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(4, concatDimSizes, DataType::Float32));
+    SetArmnnOutputSlotForCaffeTop(layerParam.top(0), concatLayer->GetOutputSlot(0));
 }
 
 void CaffeParserBase::AddConvLayerWithDepthwiseConv(const caffe::LayerParameter& layerParam,
@@ -798,7 +798,7 @@ void CaffeParserBase::ParseConvLayer(const LayerParameter& layerParam)
         else
         {
             // we split the input by channels into channels/groups separate convolutions
-            // and merger the results afterwards
+            // and concatenate the results afterwards
             AddConvLayerWithSplits(layerParam, convolution2dDescriptor, kernelW, kernelH);
             return;
         }

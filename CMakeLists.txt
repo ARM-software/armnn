@@ -227,6 +227,8 @@ list(APPEND armnn_sources
     src/armnn/layers/BatchNormalizationLayer.cpp
     src/armnn/layers/BatchToSpaceNdLayer.hpp
     src/armnn/layers/BatchToSpaceNdLayer.cpp
+    src/armnn/layers/ConcatLayer.hpp
+    src/armnn/layers/ConcatLayer.cpp
     src/armnn/layers/ConstantLayer.hpp
     src/armnn/layers/ConstantLayer.cpp
     src/armnn/layers/Convolution2dLayer.hpp
@@ -271,8 +273,6 @@ list(APPEND armnn_sources
     src/armnn/layers/MemCopyLayer.cpp
     src/armnn/layers/MergeLayer.hpp
     src/armnn/layers/MergeLayer.cpp
-    src/armnn/layers/MergerLayer.hpp
-    src/armnn/layers/MergerLayer.cpp
     src/armnn/layers/MinimumLayer.cpp
     src/armnn/layers/MinimumLayer.hpp
     src/armnn/layers/MultiplicationLayer.hpp

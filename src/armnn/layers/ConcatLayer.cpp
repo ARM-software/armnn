@@ -2,7 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "MergerLayer.hpp"
+#include "ConcatLayer.hpp"
 #include "LayerCloneBase.hpp"
 
 #include <armnn/TypesUtils.hpp>
@@ -14,14 +14,14 @@
 namespace armnn
 {
 
-MergerLayer::MergerLayer(const OriginsDescriptor& param, const char* name)
-    : LayerWithParameters(param.GetNumViews(), 1, LayerType::Merger, param, name)
+ConcatLayer::ConcatLayer(const OriginsDescriptor& param, const char* name)
+    : LayerWithParameters(param.GetNumViews(), 1, LayerType::Concat, param, name)
 {
 }
 
-std::unique_ptr<IWorkload> MergerLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
+std::unique_ptr<IWorkload> ConcatLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const
 {
-    MergerQueueDescriptor descriptor;
+    ConcatQueueDescriptor descriptor;
 
     // Copies the view origins to the descriptor.
     descriptor.m_ViewOrigins.reserve(m_Param.GetNumViews());
@@ -34,24 +34,24 @@ std::unique_ptr<IWorkload> MergerLayer::CreateWorkload(const Graph& graph, const
     return factory.CreateConcat(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
-void MergerLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory)
+void ConcatLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory)
 {
-    //If sub tensors are supported then the merger
+    //If sub tensors are supported then the concat
     //just needs to make sure that the outputs of the prev layer
-    //are made subtensors of the output of the merger layer.
+    //are made subtensors of the output of the concat layer.
     m_OutputHandlers[0].CreateTensorHandles(factory);
 
     if (factory.SupportsSubTensors())
     {
-        std::queue<MergerLayer*> m_MergerLayers;
+        std::queue<ConcatLayer*> m_ConcatLayers;
 
-        m_MergerLayers.push(this);
-        while (!m_MergerLayers.empty())
+        m_ConcatLayers.push(this);
+        while (!m_ConcatLayers.empty())
         {
-            MergerLayer* currentLayer = m_MergerLayers.front();
+            ConcatLayer* currentLayer = m_ConcatLayers.front();
             ITensorHandle* parentTensor = currentLayer->GetOutputHandler(0).GetData();
             const TensorInfo& parentInfo = currentLayer->GetOutputHandler(0).GetTensorInfo();
-            m_MergerLayers.pop();
+            m_ConcatLayers.pop();
 
             const unsigned int numInputSlots = currentLayer->GetNumInputSlots();
 
@@ -99,14 +99,14 @@ void MergerLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& fact
                 OutputSlot* slot = currentLayer->GetInputSlot(i).GetConnectedOutputSlot();
                 OutputHandler& outputHandler = slot->GetOutputHandler();
 
-                BOOST_ASSERT_MSG(subTensor, "MergerLayer: Expected a valid sub-tensor for substitution.");
+                BOOST_ASSERT_MSG(subTensor, "ConcatLayer: Expected a valid sub-tensor for substitution.");
                 outputHandler.SetData(std::move(subTensor));
 
                 Layer& inputLayer = slot->GetOwningLayer();
-                if (inputLayer.GetType() == LayerType::Merger)
+                if (inputLayer.GetType() == LayerType::Concat)
                 {
-                    // Continue with the substitution if the connected inputs are also merger layers
-                    m_MergerLayers.push(boost::polymorphic_downcast<MergerLayer*>(&inputLayer));
+                    // Continue with the substitution if the connected inputs are also concat layers
+                    m_ConcatLayers.push(boost::polymorphic_downcast<ConcatLayer*>(&inputLayer));
                 }
                 ++i;
             }
@@ -114,12 +114,12 @@ void MergerLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& fact
     }
 }
 
-MergerLayer* MergerLayer::Clone(Graph& graph) const
+ConcatLayer* ConcatLayer::Clone(Graph& graph) const
 {
-    return CloneBase<MergerLayer>(graph, m_Param, GetName());
+    return CloneBase<ConcatLayer>(graph, m_Param, GetName());
 }
 
-std::vector<TensorShape> MergerLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
+std::vector<TensorShape> ConcatLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
     BOOST_ASSERT(inputShapes.size() == m_Param.GetNumViews());
 
@@ -129,7 +129,7 @@ std::vector<TensorShape> MergerLayer::InferOutputShapes(const std::vector<Tensor
         auto& inputShape = inputShapes[i];
 
         ConditionalThrowIfNotEqual<LayerValidationException>(
-            "MergerLayer: Num Dimensions must match all inputs.",
+            "ConcatLayer: Num Dimensions must match all inputs.",
             numDims,
             inputShape.GetNumDimensions());
     }
@@ -151,7 +151,7 @@ std::vector<TensorShape> MergerLayer::InferOutputShapes(const std::vector<Tensor
     // Checks that the bounding box starts at the origin.
     if (!std::all_of(extentMin.begin(), extentMin.end(), [](unsigned int s) { return s == 0; }))
     {
-        throw LayerValidationException("MergerLayer: there is no view that starts at the origin");
+        throw LayerValidationException("ConcatLayer: there is no view that starts at the origin");
     }
 
     // Checks that there are no overlaps of views (this would lead to undefined output at those locations).
@@ -182,7 +182,7 @@ std::vector<TensorShape> MergerLayer::InferOutputShapes(const std::vector<Tensor
             }
             if (allAxesOverlap)
             {
-                throw LayerValidationException("MergerLayer: Some views overlap.");
+                throw LayerValidationException("ConcatLayer: Some views overlap.");
             }
         }
     }
@@ -202,18 +202,18 @@ std::vector<TensorShape> MergerLayer::InferOutputShapes(const std::vector<Tensor
     }
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
-        "MergerLayer: there are some gaps between views",
+        "ConcatLayer: there are some gaps between views",
         totalViewsVolume,
         outputVolume);
 
     return std::vector<TensorShape>({ TensorShape({numDims, extentMax.data()}) });
 }
 
-void MergerLayer::ValidateTensorShapesFromInputs()
+void ConcatLayer::ValidateTensorShapesFromInputs()
 {
-    // Validates Merger layer.
+    // Validates Concat layer.
     ConditionalThrowIfNotEqual<LayerValidationException>(
-        "MergerLayer: Num Inputs must match num views.",
+        "ConcatLayer: Num Inputs must match num views.",
         m_Param.GetNumViews(),
         GetNumInputSlots());
 
@@ -230,14 +230,14 @@ void MergerLayer::ValidateTensorShapesFromInputs()
     BOOST_ASSERT(inferredShapes.size() == 1);
 
     ConditionalThrowIfNotEqual<LayerValidationException>(
-        "MergerLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
+        "ConcatLayer: TensorShape set on OutputSlot[0] does not match the inferred shape.",
         GetOutputSlot(0).GetTensorInfo().GetShape(),
         inferredShapes[0]);
 }
 
-void MergerLayer::Accept(ILayerVisitor& visitor) const
+void ConcatLayer::Accept(ILayerVisitor& visitor) const
 {
-    visitor.VisitMergerLayer(this, GetParameters(), GetName());
+    visitor.VisitConcatLayer(this, GetParameters(), GetName());
 }
 
 } // namespace armnn armnn

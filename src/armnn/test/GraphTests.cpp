@@ -454,18 +454,18 @@ struct CopyLayersFixture
 
         convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
 
-        armnn::OriginsDescriptor mergerDefaults(2);
-        Layer* const mergerLayer = AddLayer<MergerLayer>(mergerDefaults, "merger");
-        mergerLayer->SetBackendId(armnn::Compute::CpuRef);
+        armnn::OriginsDescriptor concatDefaults(2);
+        Layer* const concatLayer = AddLayer<ConcatLayer>(concatDefaults, "concat");
+        concatLayer->SetBackendId(armnn::Compute::CpuRef);
 
-        convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
-        convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
+        convLayer1->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(0));
+        convLayer2->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(1));
 
         armnn::ActivationDescriptor activationDefaults;
         Layer* const actLayer = AddLayer<ActivationLayer>(activationDefaults, "act");
         actLayer->SetBackendId(armnn::Compute::CpuRef);
 
-        mergerLayer->GetOutputSlot(0).Connect(actLayer->GetInputSlot(0));
+        concatLayer->GetOutputSlot(0).Connect(actLayer->GetInputSlot(0));
 
         armnn::SoftmaxDescriptor softmaxDefaults;
         Layer* const softmaxLayer = AddLayer<SoftmaxLayer>(softmaxDefaults, "softmax");

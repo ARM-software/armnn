@@ -33,7 +33,7 @@ public:
 
     bool IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
-                           const OriginsDescriptor& descriptor,
+                           const ConcatDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsConstantSupported(const TensorInfo& output,
@@ -109,7 +109,7 @@ public:
     ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
     bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
-                           const OriginsDescriptor& descriptor,
+                           const MergerDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsMinimumSupported(const TensorInfo& input0,

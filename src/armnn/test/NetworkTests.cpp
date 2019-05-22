@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(NetworkModification)
     checkOneOutputToOneInputConnection(multiplicationLayer, outputLayer, 2, 0);
 }
 
-BOOST_AUTO_TEST_CASE(NetworkModification_SplitterMerger)
+BOOST_AUTO_TEST_CASE(NetworkModification_SplitterConcat)
 {
     armnn::Network net;
 
@@ -255,22 +255,20 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterMerger)
 
     splitterLayer->GetOutputSlot(1).Connect(softmaxLayer2->GetInputSlot(0));
 
-    // Adds a merger layer.
-    armnn::OriginsDescriptor mergerDesc(2, 4);
+    // Adds a concat layer.
+    armnn::OriginsDescriptor concatDesc(2, 4);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* mergerLayer = net.AddMergerLayer(mergerDesc, "merger layer");
-    ARMNN_NO_DEPRECATE_WARN_END
-    BOOST_TEST(mergerLayer);
+    armnn::IConnectableLayer* concatLayer = net.AddConcatLayer(concatDesc, "concat layer");
+    BOOST_TEST(concatLayer);
 
-    softmaxLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
-    softmaxLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
+    softmaxLayer1->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(0));
+    softmaxLayer2->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(1));
 
     // Adds an output layer.
     armnn::IConnectableLayer* outputLayer = net.AddOutputLayer(0, "output layer");
     BOOST_TEST(outputLayer);
 
-    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     BOOST_TEST(splitterLayer->GetNumOutputSlots() == 2);
     BOOST_TEST(splitterLayer->GetOutputSlot(0).GetConnection(0) == &softmaxLayer1->GetInputSlot(0));
@@ -278,11 +276,11 @@ BOOST_AUTO_TEST_CASE(NetworkModification_SplitterMerger)
     BOOST_TEST(splitterLayer->GetOutputSlot(1).GetConnection(0) == &softmaxLayer2->GetInputSlot(0));
     BOOST_TEST(&splitterLayer->GetOutputSlot(1) == softmaxLayer2->GetInputSlot(0).GetConnection());
 
-    BOOST_TEST(mergerLayer->GetNumInputSlots() == 2);
-    BOOST_TEST(softmaxLayer1->GetOutputSlot(0).GetConnection(0) == &mergerLayer->GetInputSlot(0));
-    BOOST_TEST(&softmaxLayer1->GetOutputSlot(0) == mergerLayer->GetInputSlot(0).GetConnection());
-    BOOST_TEST(softmaxLayer2->GetOutputSlot(0).GetConnection(0) == &mergerLayer->GetInputSlot(1));
-    BOOST_TEST(&softmaxLayer2->GetOutputSlot(0) == mergerLayer->GetInputSlot(1).GetConnection());
+    BOOST_TEST(concatLayer->GetNumInputSlots() == 2);
+    BOOST_TEST(softmaxLayer1->GetOutputSlot(0).GetConnection(0) == &concatLayer->GetInputSlot(0));
+    BOOST_TEST(&softmaxLayer1->GetOutputSlot(0) == concatLayer->GetInputSlot(0).GetConnection());
+    BOOST_TEST(softmaxLayer2->GetOutputSlot(0).GetConnection(0) == &concatLayer->GetInputSlot(1));
+    BOOST_TEST(&softmaxLayer2->GetOutputSlot(0) == concatLayer->GetInputSlot(1).GetConnection());
 }
 
 BOOST_AUTO_TEST_CASE(NetworkModification_SplitterAddition)

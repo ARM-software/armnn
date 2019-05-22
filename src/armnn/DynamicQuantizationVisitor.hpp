@@ -71,13 +71,13 @@ public:
                            const SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;
 
+    void VisitConcatLayer(const IConnectableLayer* layer,
+                          const ConcatDescriptor& originsDescriptor,
+                          const char* name = nullptr) override;
+
     void VisitConstantLayer(const IConnectableLayer* layer,
                             const ConstTensor& input,
                             const char* name = nullptr) override;
-
-    void VisitMergerLayer(const IConnectableLayer* layer,
-                          const OriginsDescriptor& mergerDescriptor,
-                          const char* name = nullptr) override;
 
     void VisitReshapeLayer(const IConnectableLayer* layer,
                            const ReshapeDescriptor& reshapeDescriptor,

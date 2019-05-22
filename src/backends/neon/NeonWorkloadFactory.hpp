@@ -98,7 +98,7 @@ public:
     std::unique_ptr<IWorkload> CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const override;
 
-    std::unique_ptr<IWorkload> CreateConcat(const MergerQueueDescriptor& descriptor,
+    std::unique_ptr<IWorkload> CreateConcat(const ConcatQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateConstant(const ConstantQueueDescriptor& descriptor,

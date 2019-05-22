@@ -20,7 +20,7 @@ void Set2dDataValues(SplitterDescriptor descriptor, u_int32_t value)
     }
 }
 
-void Set2dDataValues(MergerDescriptor descriptor, u_int32_t value)
+void Set2dDataValues(OriginsDescriptor& descriptor, u_int32_t value)
 {
     for (unsigned int i = 0; i < descriptor.GetNumViews(); ++i)
     {
@@ -230,32 +230,28 @@ BOOST_AUTO_TEST_CASE(CheckSplitterLayerVisitorNameNullAndDescriptor)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckMergerLayerVisitorNameAndDescriptor)
+BOOST_AUTO_TEST_CASE(CheckConcatLayerVisitorNameAndDescriptor)
 {
-    const char* layerName = "MergerLayer";
-    MergerDescriptor descriptor(2, 2);
+    const char* layerName = "ConcatLayer";
+    OriginsDescriptor descriptor(2, 2);
     Set2dDataValues(descriptor, 1);
     descriptor.SetConcatAxis(1);
-    TestMergerLayerVisitor visitor(descriptor, layerName);
+    TestConcatLayerVisitor visitor(descriptor, layerName);
     Network net;
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer *const layer = net.AddMergerLayer(descriptor, layerName);
-    ARMNN_NO_DEPRECATE_WARN_END
+    IConnectableLayer *const layer = net.AddConcatLayer(descriptor, layerName);
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckMergerLayerVisitorNameNullAndDescriptor)
+BOOST_AUTO_TEST_CASE(CheckConcatLayerVisitorNameNullAndDescriptor)
 {
-    MergerDescriptor descriptor(2, 2);
+    OriginsDescriptor descriptor(2, 2);
     Set2dDataValues(descriptor, 1);
     descriptor.SetConcatAxis(1);
-    TestMergerLayerVisitor visitor(descriptor);
+    TestConcatLayerVisitor visitor(descriptor);
     Network net;
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer *const layer = net.AddMergerLayer(descriptor);
-    ARMNN_NO_DEPRECATE_WARN_END
+    IConnectableLayer *const layer = net.AddConcatLayer(descriptor);
     layer->Accept(visitor);
 }
 

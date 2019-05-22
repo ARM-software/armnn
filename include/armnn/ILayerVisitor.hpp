@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include <armnn/Deprecated.hpp>
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/NetworkFwd.hpp>
 #include <armnn/Optional.hpp>
@@ -60,16 +61,19 @@ public:
 
     /// Function that a concat layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param mergerDescriptor - WindowsDescriptor to configure the concatenation process. Number of Views must be
-    ///                           equal to the number of inputs, and their order must match - e.g. first view
-    ///                           corresponds to the first input, second view to the second input, etc....
+    /// @param concatDescriptor - ConcatDescriptor (synonym for OriginsDescriptor) to configure the concatenation
+    ///                           process. Number of Views must be equal to the number of inputs, and their order
+    ///                           must match - e.g. first view corresponds to the first input, second view to the
+    ///                           second input, etc....
     /// @param name - Optional name for the layer.
     virtual void VisitConcatLayer(const IConnectableLayer* layer,
-                                  const OriginsDescriptor& mergerDescriptor,
+                                  const OriginsDescriptor& concatDescriptor,
                                   const char* name = nullptr)
     {
         // default implementation to ease transition while MergerLayer is being deprecated
-        VisitMergerLayer(layer, mergerDescriptor, name);
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
+        VisitMergerLayer(layer, concatDescriptor, name);
+        ARMNN_NO_DEPRECATE_WARN_END
     }
 
     /// Function a layer with no inputs and a single output, which always corresponds to
@@ -221,13 +225,14 @@ public:
 
     /// Function that a merger layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param mergerDescriptor - WindowsDescriptor to configure the merging process. Number of Views must be equal to
-    ///                           the number of inputs, and their order must match - e.g. first view corresponds to
-    ///                           the first input, second view to the second input, etc....
+    /// @param mergerDescriptor - MergerDescriptor (synonym for OriginsDescriptor) to configure the concatenation
+    ///                           process. Number of Views must be equal to the number of inputs, and their order
+    ///                           must match - e.g. first view corresponds to the first input, second view to the
+    ///                           second input, etc....
     /// @param name - Optional name for the layer.
-    // NOTE: this method will be deprecated and replaced by VisitConcatLayer
+    ARMNN_DEPRECATED_MSG("Use VisitConcatLayer instead")
     virtual void VisitMergerLayer(const IConnectableLayer* layer,
-                                  const OriginsDescriptor& mergerDescriptor,
+                                  const MergerDescriptor& mergerDescriptor,
                                   const char* name = nullptr) = 0;
 
     /// Function a Minimum layer should call back to when its Accept(ILayerVisitor&) function is invoked.
@@ -333,7 +338,7 @@ public:
 
     /// Function that a splitter layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param splitterDescriptor - WindowsDescriptor to configure the splitting process.
+    /// @param splitterDescriptor - ViewsDescriptor to configure the splitting process.
     ///                             Number of Views must be equal to the number of outputs,
     ///                             and their order must match - e.g. first view corresponds to
     ///                             the first output, second view to the second output, etc....

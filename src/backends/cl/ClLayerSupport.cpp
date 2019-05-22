@@ -189,12 +189,43 @@ bool ClLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
 
 bool ClLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                                        const TensorInfo& output,
-                                       const OriginsDescriptor& descriptor,
+                                       const ConcatDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    return IsMergerSupported(inputs, output, descriptor, reasonIfUnsupported);
-    ARMNN_NO_DEPRECATE_WARN_END
+    if (descriptor.GetNumDimensions() <= descriptor.GetConcatAxis())
+    {
+        SetValueChecked(reasonIfUnsupported, "Cl Concat: Concat axis > Number of dimensions.");
+        return false;
+    }
+
+    unsigned int concatInnerAxis = (descriptor.GetNumDimensions() - descriptor.GetConcatAxis()) - 1;
+    if(concatInnerAxis < 3) // Width, height, or channels
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(ClConcatWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       inputs,
+                                       output,
+                                       descriptor);
+    }
+    else if (concatInnerAxis == 3)
+    {
+        // We rely on the sub-tensor optimization to handle the batch dimension for 4D tensors. If we can't use
+        // sub-tensors for this then we can't support it. Here is where we check that the sub-tensors will work.
+        for (auto& input : inputs)
+        {
+            if (input && !output.IsTypeSpaceMatch(*input)) // Cannot use sub-tensors if the types are not same space
+            {
+                SetValueChecked(reasonIfUnsupported, "Cl Concat: Types and quantization parameters must match.");
+                return false;
+            }
+        }
+        return true; // Sub-tensors support concat along batch
+    }
+    else // > 4 dimensions not supported.
+    {
+        SetValueChecked(reasonIfUnsupported, "Cl Concat: Maximum of 4 dimensions supported.");
+        return false;
+    }
 }
 
 bool ClLayerSupport::IsConstantSupported(const TensorInfo& output,
@@ -442,43 +473,10 @@ bool ClLayerSupport::IsMemCopySupported(const TensorInfo &input,
 
 bool ClLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                        const TensorInfo& output,
-                                       const OriginsDescriptor& descriptor,
+                                       const MergerDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    if (descriptor.GetNumDimensions() <= descriptor.GetConcatAxis())
-    {
-        SetValueChecked(reasonIfUnsupported, "Cl Merger: Concat axis > Number of dimensions.");
-        return false;
-    }
-
-    unsigned int concatInnerAxis = (descriptor.GetNumDimensions() - descriptor.GetConcatAxis()) - 1;
-    if(concatInnerAxis < 3) // Width, height, or channels
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(ClConcatWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       inputs,
-                                       output,
-                                       descriptor);
-    }
-    else if (concatInnerAxis == 3)
-    {
-        // We rely on the sub-tensor optimization to handle the batch dimension for 4D tensors. If we can't use
-        // sub-tensors for this then we can't support it. Here is where we check that the sub-tensors will work.
-        for (auto& input : inputs)
-        {
-            if (input && !output.IsTypeSpaceMatch(*input)) // Cannot use sub-tensors if the types are not same space
-            {
-                SetValueChecked(reasonIfUnsupported, "Cl Merger: Types and quantization parameters must match.");
-                return false;
-            }
-        }
-        return true; // Sub-tensors support concat along batch
-    }
-    else // > 4 dimensions not supported.
-    {
-        SetValueChecked(reasonIfUnsupported, "Cl Merger: Maximum of 4 dimensions supported.");
-        return false;
-    }
+    return IsConcatSupported(inputs, output, descriptor, reasonIfUnsupported);
 }
 
 bool ClLayerSupport::IsMinimumSupported(const TensorInfo& input0,

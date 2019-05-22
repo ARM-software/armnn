@@ -19,7 +19,7 @@ using namespace armcomputetensorutils;
 
 namespace
 {
-size_t CalcAxis(const MergerDescriptor& desc)
+size_t CalcAxis(const OriginsDescriptor& desc)
 {
     return (desc.GetNumDimensions() - desc.GetConcatAxis()) - 1;
 }
@@ -27,7 +27,7 @@ size_t CalcAxis(const MergerDescriptor& desc)
 
 arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
                                              const TensorInfo& output,
-                                             const MergerDescriptor& descriptor)
+                                             const OriginsDescriptor& descriptor)
 {
     std::vector<arm_compute::TensorInfo> aclInputs;
     for (const TensorInfo* input : inputs)
@@ -46,8 +46,8 @@ arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*
     return arm_compute::CLConcatenateLayer::validate(aclInputPtrs, &aclOutputInfo, aclAxis);
 }
 
-ClConcatWorkload::ClConcatWorkload(const MergerQueueDescriptor& descriptor, const WorkloadInfo& info)
-: BaseWorkload<MergerQueueDescriptor>(descriptor, info)
+ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info)
+: BaseWorkload<ConcatQueueDescriptor>(descriptor, info)
 {
     bool allInputsAreSubtensors = true;
 
@@ -56,7 +56,7 @@ ClConcatWorkload::ClConcatWorkload(const MergerQueueDescriptor& descriptor, cons
     {
         if (!input->GetParent())
         {
-            // Non sub-tensor input found so we need to execute the merger function
+            // Non sub-tensor input found so we need to execute the concat function
             allInputsAreSubtensors = false;
             break;
         }
@@ -64,7 +64,7 @@ ClConcatWorkload::ClConcatWorkload(const MergerQueueDescriptor& descriptor, cons
 
     if (allInputsAreSubtensors)
     {
-        // Can skip configuring the merger function since it's not executed
+        // Can skip configuring the concat function since it's not executed
         return;
     }
 

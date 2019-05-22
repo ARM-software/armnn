@@ -512,9 +512,9 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                           reason);
             break;
         }
-        case LayerType::Merger:
+        case LayerType::Concat:
         {
-            auto cLayer = boost::polymorphic_downcast<const MergerLayer*>(&layer);
+            auto cLayer = boost::polymorphic_downcast<const ConcatLayer*>(&layer);
 
             // Get vector of all inputs.
             auto getTensorInfo = [&dataType](const InputSlot& slot)
@@ -535,9 +535,9 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
-            ARMNN_NO_DEPRECATE_WARN_BEGIN
-            result = layerSupportObject->IsMergerSupported(inputPtrs, output, cLayer->GetParameters(), reason);
-            ARMNN_NO_DEPRECATE_WARN_END
+            result = layerSupportObject->IsConcatSupported(inputPtrs, output, cLayer->GetParameters(), reason);
+
+
             break;
         }
         case LayerType::Multiplication:
@@ -816,7 +816,7 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchToSpaceNd(const BatchToS
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateConcat(const MergerQueueDescriptor& descriptor,
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();

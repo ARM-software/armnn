@@ -54,8 +54,8 @@ struct SoftmaxDescriptor
     float              m_Beta;
 };
 
-/// @brief An OriginsDescriptor for the MergerLayer.
-/// Descriptor to configure the merging process. Number of views must be equal to the number of inputs, and
+/// @brief An OriginsDescriptor for the ConcatLayer.
+/// Descriptor to configure the concatenation process. Number of views must be equal to the number of inputs, and
 /// their order must match - e.g. first view corresponds to the first input, second view to the second input, etc.
 struct OriginsDescriptor
 {
@@ -144,12 +144,12 @@ OriginsDescriptor CreateMergerDescriptorForConcatenation(TensorShapeIt first,
     return CreateDescriptorForConcatenation(first, last, concatenationDimension);
 }
 
-/// @brief Convenience template to create an OriginsDescriptor to use when creating a MergerLayer for performing
+/// @brief Convenience template to create an OriginsDescriptor to use when creating a ConcatLayer for performing
 /// concatenation of a number of input tensors.
 template <typename TensorShapeIt>
 OriginsDescriptor CreateDescriptorForConcatenation(TensorShapeIt first,
-                                                         TensorShapeIt last,
-                                                         unsigned int concatenationDimension)
+                                                   TensorShapeIt last,
+                                                   unsigned int concatenationDimension)
 {
     auto numInputs = std::distance(first, last);
 

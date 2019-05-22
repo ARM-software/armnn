@@ -18,8 +18,8 @@ namespace
 {
 
 template<typename armnn::DataType DataType>
-INetworkPtr CreateMergerNetwork(const std::vector<TensorShape>& inputShapes,
-                                const TensorShape& outputShape,
+INetworkPtr CreateConcatNetwork(const std::vector<TensorShape>& inputShapes,
+                                const TensorShape &outputShape,
                                 unsigned int concatAxis,
                                 const float qScale = 1.0f,
                                 const int32_t qOffset = 0)
@@ -33,26 +33,24 @@ INetworkPtr CreateMergerNetwork(const std::vector<TensorShape>& inputShapes,
     descriptor = CreateDescriptorForConcatenation(inputShapes.begin(),
                                                   inputShapes.end(),
                                                   concatAxis);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer* merger = net->AddMergerLayer(descriptor, "merger");
-    ARMNN_NO_DEPRECATE_WARN_END
+    IConnectableLayer* concat = net->AddConcatLayer(descriptor, "concat");
 
     for (unsigned int i = 0; i < inputShapes.size(); ++i)
     {
         TensorInfo inputTensorInfo(inputShapes[i], DataType, qScale, qOffset);
         IConnectableLayer* input = net->AddInputLayer(boost::numeric_cast<LayerBindingId>(i));
-        Connect(input, merger, inputTensorInfo, 0, i);
+        Connect(input, concat, inputTensorInfo, 0, i);
     }
 
     TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset);
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
-    Connect(merger, output, outputTensorInfo, 0, 0);
+    Connect(concat, output, outputTensorInfo, 0, 0);
 
     return net;
 }
 
 template<armnn::DataType ArmnnType>
-void MergerDim0EndToEnd(const std::vector<BackendId>& backends)
+void ConcatDim0EndToEnd(const std::vector<BackendId>& backends)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -62,7 +60,7 @@ void MergerDim0EndToEnd(const std::vector<BackendId>& backends)
     const TensorShape& outputShape = { 4, 3, 2, 2 };
 
     // Builds up the structure of the network
-    INetworkPtr net = CreateMergerNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
+    INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
 
     BOOST_TEST_CHECKPOINT("create a network");
 
@@ -116,7 +114,7 @@ void MergerDim0EndToEnd(const std::vector<BackendId>& backends)
 }
 
 template<armnn::DataType ArmnnType>
-void MergerDim1EndToEnd(const std::vector<BackendId>& backends)
+void ConcatDim1EndToEnd(const std::vector<BackendId>& backends)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -126,7 +124,7 @@ void MergerDim1EndToEnd(const std::vector<BackendId>& backends)
     const TensorShape& outputShape = { 2, 6, 2, 2 };
 
     // Builds up the structure of the network
-    INetworkPtr net = CreateMergerNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
+    INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
 
     BOOST_TEST_CHECKPOINT("create a network");
 
@@ -180,7 +178,7 @@ void MergerDim1EndToEnd(const std::vector<BackendId>& backends)
 }
 
 template<armnn::DataType ArmnnType>
-void MergerDim2EndToEnd(const std::vector<BackendId>& backends)
+void ConcatDim2EndToEnd(const std::vector<BackendId>& backends)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -190,7 +188,7 @@ void MergerDim2EndToEnd(const std::vector<BackendId>& backends)
     const TensorShape& outputShape = { 2, 3, 4, 2 };
 
     // Builds up the structure of the network
-    INetworkPtr net = CreateMergerNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
+    INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
 
     BOOST_TEST_CHECKPOINT("create a network");
 
@@ -244,7 +242,7 @@ void MergerDim2EndToEnd(const std::vector<BackendId>& backends)
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-void MergerDim3EndToEnd(const std::vector<BackendId>& backends)
+void ConcatDim3EndToEnd(const std::vector<BackendId>& backends)
 {
     using namespace armnn;
 
@@ -253,7 +251,7 @@ void MergerDim3EndToEnd(const std::vector<BackendId>& backends)
     const TensorShape& outputShape = { 2, 3, 2, 4 };
 
     // Builds up the structure of the network
-    INetworkPtr net = CreateMergerNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
+    INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
 
     BOOST_TEST_CHECKPOINT("create a network");
 

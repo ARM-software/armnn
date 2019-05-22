@@ -28,8 +28,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Gather.hpp
     LstmUtils.hpp
     Maximum.hpp
-    Merger.hpp
-    Merger.cpp
+    Concatenate.hpp
+    Concatenate.cpp
     Minimum.hpp
     Pad.cpp
     Pad.hpp

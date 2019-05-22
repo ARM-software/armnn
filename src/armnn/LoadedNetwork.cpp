@@ -82,7 +82,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
     //First create tensor handlers, backends and workload factories.
     //Handlers are created before workloads are.
     //Because workload creation can modify some of the handlers,
-    //(for example the splitter and merger layers).
+    //(for example the splitter and concat layers).
     for (auto&& layer : order)
     {
         auto const& backend = layer->GetBackendId();

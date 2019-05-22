@@ -10,5 +10,5 @@
 
 namespace armnn
 {
-void Merger(const MergerQueueDescriptor& data);
+void Concatenate(const ConcatQueueDescriptor &data);
 } //namespace armnn

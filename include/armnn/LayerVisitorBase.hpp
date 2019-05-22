@@ -50,7 +50,7 @@ public:
                                   const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitConcatLayer(const IConnectableLayer*,
-                          const OriginsDescriptor&,
+                          const ConcatDescriptor&,
                           const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitConstantLayer(const IConnectableLayer*,
@@ -122,7 +122,7 @@ public:
                          const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitMergerLayer(const IConnectableLayer*,
-                          const OriginsDescriptor&,
+                          const MergerDescriptor&,
                           const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitMinimumLayer(const IConnectableLayer*,

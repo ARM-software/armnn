@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(SplitterQueueDescriptor_Validate_WrongWindow)
 }
 
 
-BOOST_AUTO_TEST_CASE(MergerQueueDescriptor_Validate_WrongWindow)
+BOOST_AUTO_TEST_CASE(ConcatQueueDescriptor_Validate_WrongWindow)
 {
     constexpr unsigned int inputNum = 1;
     constexpr unsigned int inputChannels = 3;
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE(MergerQueueDescriptor_Validate_WrongWindow)
     inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
     outputTensorInfo = armnn::TensorInfo(4, outputShape, armnn::DataType::Float32);
 
-    MergerQueueDescriptor invalidData;
+    ConcatQueueDescriptor invalidData;
     WorkloadInfo          invalidInfo;
 
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE(MergerQueueDescriptor_Validate_WrongWindow)
 
     // Invalid, since it has only 3 dimensions while the input tensor is 4d.
     std::vector<unsigned int> wOrigin = {0, 0, 0};
-    armnn::MergerQueueDescriptor::ViewOrigin window(wOrigin);
+    armnn::ConcatQueueDescriptor::ViewOrigin window(wOrigin);
     invalidData.m_ViewOrigins.push_back(window);
 
     BOOST_TEST_INFO("Invalid argument exception is expected, because merge window dimensionality does not "
@@ -273,18 +273,18 @@ BOOST_AUTO_TEST_CASE(MergerQueueDescriptor_Validate_WrongWindow)
 
     // Invalid, since window extends past the boundary of output tensor.
     std::vector<unsigned int> wOrigin3 = {0, 0, 15, 0};
-    armnn::MergerQueueDescriptor::ViewOrigin window3(wOrigin3);
+    armnn::ConcatQueueDescriptor::ViewOrigin window3(wOrigin3);
     invalidData.m_ViewOrigins[0] = window3;
     BOOST_TEST_INFO("Invalid argument exception is expected (wOrigin3[2]+ inputHeight > outputHeight");
     BOOST_CHECK_THROW(RefConcatWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 
 
     std::vector<unsigned int> wOrigin4 = {0, 0, 0, 0};
-    armnn::MergerQueueDescriptor::ViewOrigin window4(wOrigin4);
+    armnn::ConcatQueueDescriptor::ViewOrigin window4(wOrigin4);
     invalidData.m_ViewOrigins[0] = window4;
 
     std::vector<unsigned int> wOrigin5 = {1, 16, 20, 2};
-    armnn::MergerQueueDescriptor::ViewOrigin window5(wOrigin4);
+    armnn::ConcatQueueDescriptor::ViewOrigin window5(wOrigin4);
     invalidData.m_ViewOrigins.push_back(window5);
 
     BOOST_TEST_INFO("Invalid exception due to number of merge windows not matching number of inputs.");

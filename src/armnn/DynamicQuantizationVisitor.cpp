@@ -242,8 +242,8 @@ void DynamicQuantizationVisitor::VisitConstantLayer(const IConnectableLayer* lay
     SetRange(layer, 0, min, max);
 }
 
-void DynamicQuantizationVisitor::VisitMergerLayer(const IConnectableLayer* layer,
-                                                  const OriginsDescriptor& mergerDescriptor,
+void DynamicQuantizationVisitor::VisitConcatLayer(const IConnectableLayer* layer,
+                                                  const ConcatDescriptor& originsDescriptor,
                                                   const char* name)
 {
     float min = std::numeric_limits<float>::max();

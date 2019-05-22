@@ -1238,15 +1238,15 @@ BOOST_AUTO_TEST_CASE(QuantizeConstant)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
-BOOST_AUTO_TEST_CASE(QuantizeMerger)
+BOOST_AUTO_TEST_CASE(QuantizeConcat)
 {
-    class TestMergerQuantization : public TestQuantization
+    class TestConcatQuantization : public TestQuantization
     {
     public:
-        TestMergerQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+        TestConcatQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
         : TestQuantization(inputShape, outputShape) {}
 
-        TestMergerQuantization(const QuantizerOptions& options,
+        TestConcatQuantization(const QuantizerOptions& options,
                                const TensorShape& inputShape,
                                const TensorShape& outputShape)
         : TestQuantization(options, inputShape, outputShape) {}
@@ -1259,8 +1259,8 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
                               LayerBindingId id,
                               const char* name = nullptr) override
         {}
-        void VisitMergerLayer(const IConnectableLayer* layer,
-                              const OriginsDescriptor& mergerDescriptor,
+        void VisitConcatLayer(const IConnectableLayer* layer,
+                              const OriginsDescriptor& originsDescriptor,
                               const char* name = nullptr) override
         {
             TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
@@ -1277,17 +1277,15 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
     IConnectableLayer* input2 = network->AddInputLayer(2);
 
     OriginsDescriptor descriptor(3, 1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer* merger = network->AddMergerLayer(descriptor);
-    ARMNN_NO_DEPRECATE_WARN_END
+    IConnectableLayer* concatLayer = network->AddConcatLayer(descriptor);
 
     IConnectableLayer* output0 = network->AddOutputLayer(3);
 
     // Establish connections
-    input0->GetOutputSlot(0).Connect(merger->GetInputSlot(0));
-    input1->GetOutputSlot(0).Connect(merger->GetInputSlot(1));
-    input2->GetOutputSlot(0).Connect(merger->GetInputSlot(2));
-    merger->GetOutputSlot(0).Connect(output0->GetInputSlot(0));
+    input0->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(1));
+    input2->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(2));
+    concatLayer->GetOutputSlot(0).Connect(output0->GetInputSlot(0));
 
     // Set TensorInfo
     const TensorShape shape{1U};
@@ -1296,7 +1294,7 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
     input0->GetOutputSlot(0).SetTensorInfo(info);
     input1->GetOutputSlot(0).SetTensorInfo(info);
     input2->GetOutputSlot(0).SetTensorInfo(info);
-    merger->GetOutputSlot(0).SetTensorInfo(info);
+    concatLayer->GetOutputSlot(0).SetTensorInfo(info);
 
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkQuantizerPtr quantizerPtrQAsymm8 =  INetworkQuantizer::Create(network.get());
@@ -1314,11 +1312,11 @@ BOOST_AUTO_TEST_CASE(QuantizeMerger)
     quantizerPtrQSymm16->OverrideInputRange(2, min, (max - 7.8f));
 
     INetworkPtr quantizedNetworkQAsymm8 = quantizerPtrQAsymm8->ExportNetwork();
-    TestMergerQuantization validatorQAsymm8(shape, shape);
+    TestConcatQuantization validatorQAsymm8(shape, shape);
     VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
 
     INetworkPtr quantizedNetworkQSymm16 = quantizerPtrQSymm16->ExportNetwork();
-    TestMergerQuantization validatorQSymm16(options, shape, shape);
+    TestConcatQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 

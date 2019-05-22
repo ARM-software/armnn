@@ -316,18 +316,38 @@ bool RefLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
 
 bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                                         const TensorInfo& output,
-                                        const OriginsDescriptor& descriptor,
+                                        const ConcatDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    return IsMergerSupported(inputs, output, descriptor, reasonIfUnsupported);
-    ARMNN_NO_DEPRECATE_WARN_END
+    ignore_unused(descriptor);
+
+    bool supported = true;
+    std::array<DataType,3> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference concatenation: output type not supported");
+    for (const TensorInfo* input : inputs)
+    {
+        supported &= CheckSupportRule(TypeAnyOf(*input, supportedTypes), reasonIfUnsupported,
+            "Reference concatenation: input type not supported");
+
+        supported &= CheckSupportRule(TypesAreEqual(*input, output), reasonIfUnsupported,
+            "Reference concatenation: input and output types mismatched.");
+    }
+
+    return supported;
 }
 
 bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    std::array<DataType,4> supportedTypes = {
+    std::array<DataType,4> supportedTypes =
+    {
         DataType::Float32,
         DataType::Signed32,
         DataType::QuantisedAsymm8,
@@ -815,31 +835,10 @@ bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
 
 bool RefLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                         const TensorInfo& output,
-                                        const OriginsDescriptor& descriptor,
+                                        const MergerDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(descriptor);
-
-    bool supported = true;
-    std::array<DataType,3> supportedTypes =
-    {
-            DataType::Float32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
-    };
-
-    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
-                                  "Reference concatenation: output type not supported");
-    for (const TensorInfo* input : inputs)
-    {
-        supported &= CheckSupportRule(TypeAnyOf(*input, supportedTypes), reasonIfUnsupported,
-            "Reference concatenation: input type not supported");
-
-        supported &= CheckSupportRule(TypesAreEqual(*input, output), reasonIfUnsupported,
-            "Reference concatenation: input and output types mismatched.");
-    }
-
-    return supported;
+    return IsConcatSupported(inputs, output, descriptor, reasonIfUnsupported);
 }
 
 bool RefLayerSupport::IsMemCopySupported(const TensorInfo &input,

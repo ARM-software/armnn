@@ -103,12 +103,13 @@ public:
     virtual IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name = nullptr) = 0;
 
     /// Adds a concatenation layer to the network.
-    /// @param mergerDescriptor - WindowsDescriptor to configure the concatenation process. Number of Views must
-    ///                           be equal to the number of inputs, and their order must match - e.g. first view
-    ///                           corresponds to the first input, second view to the second input, etc....
+    /// @param concatDescriptor - ConcatDescriptor (synonym for OriginsDescriptor) to configure the concatenation
+    ///                           process. Number of Views must be equal to the number of inputs, and their order
+    ///                           must match - e.g. first view corresponds to the first input, second view to the
+    ///                           second input, etc....
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddConcatLayer(const OriginsDescriptor& mergerDescriptor,
+    virtual IConnectableLayer* AddConcatLayer(const ConcatDescriptor& concatDescriptor,
                                               const char* name = nullptr) = 0;
 
     /// Adds a 2D convolution layer to the network.
@@ -239,7 +240,7 @@ public:
         const char* name = nullptr) = 0;
 
     /// Adds a splitter layer to the network.
-    /// @param splitterDescriptor - WindowsDescriptor to configure the splitting process.
+    /// @param splitterDescriptor - ViewsDescriptor to configure the splitting process.
     ///                             Number of Views must be equal to the number of outputs,
     ///                             and their order must match - e.g. first view corresponds to
     ///                             the first output, second view to the second output, etc....
@@ -253,14 +254,15 @@ public:
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddMergeLayer(const char* name = nullptr) = 0;
 
-    /// Adds a merger layer to the network.
-    /// @param mergerDescriptor - WindowsDescriptor to configure the merging process. Number of Views must be equal to
-    ///                           the number of inputs, and their order must match - e.g. first view corresponds to
-    ///                           the first input, second view to the second input, etc....
+    /// Adds a concat layer to the network.
+    /// @param mergerDescriptor - MergerDescriptor (synonym for OriginsDescriptor) to configure the concatenation
+    ///                           process. Number of Views must be equal to the number of inputs, and their order
+    ///                           must match - e.g. first view corresponds to the first input, second view to the
+    ///                           second input, etc....
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     ARMNN_DEPRECATED_MSG("Use AddConcatLayer instead")
-    virtual IConnectableLayer* AddMergerLayer(const OriginsDescriptor& mergerDescriptor,
+    virtual IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
         const char* name = nullptr) = 0;
 
     /// Adds an addition layer to the network.

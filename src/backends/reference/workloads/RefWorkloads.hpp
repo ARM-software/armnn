@@ -38,7 +38,7 @@
 #include "RefPooling2dUint8Workload.hpp"
 #include "BatchNormImpl.hpp"
 #include "Activation.hpp"
-#include "Merger.hpp"
+#include "Concatenate.hpp"
 #include "RefSpaceToBatchNdWorkload.hpp"
 #include "RefSplitterFloat32Workload.hpp"
 #include "RefStridedSliceWorkload.hpp"

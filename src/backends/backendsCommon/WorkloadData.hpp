@@ -9,6 +9,7 @@
 
 #include <InternalTypes.hpp>
 
+#include <armnn/Deprecated.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
 #include <armnn/Types.hpp>
@@ -87,8 +88,8 @@ struct SplitterQueueDescriptor : QueueDescriptorWithParameters<ViewsDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-// Merger layer workload data.
-struct MergerQueueDescriptor : QueueDescriptorWithParameters<OriginsDescriptor>
+// Concat layer workload data.
+struct ConcatQueueDescriptor : QueueDescriptorWithParameters<OriginsDescriptor>
 {
     struct ViewOrigin
     {
@@ -105,6 +106,9 @@ struct MergerQueueDescriptor : QueueDescriptorWithParameters<OriginsDescriptor>
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
+
+// Deprecated. Use ConcatQueueDescriptor instead
+using MergerQueueDescriptor = ConcatQueueDescriptor;
 
 // Activation layer workload data.
 struct ActivationQueueDescriptor : QueueDescriptorWithParameters<ActivationDescriptor>

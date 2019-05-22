@@ -7,7 +7,7 @@
 
 #include <backendsCommon/test/DetectionPostProcessTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
-#include <backendsCommon/test/MergerTestImpl.hpp>
+#include <backendsCommon/test/ConcatTestImpl.hpp>
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 
@@ -396,44 +396,44 @@ BOOST_AUTO_TEST_CASE(RefGreaterBroadcastEndToEndUint8Test)
                                                                                             expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim0Test)
+BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim0Test)
 {
-    MergerDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim0Uint8Test)
+BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim0Uint8Test)
 {
-    MergerDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    ConcatDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim1Test)
+BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim1Test)
 {
-    MergerDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim1Uint8Test)
+BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim1Uint8Test)
 {
-    MergerDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    ConcatDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim2Test)
+BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim2Test)
 {
-    MergerDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim2Uint8Test)
+BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim2Uint8Test)
 {
-    MergerDim2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    ConcatDim2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim3Test)
+BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim3Test)
 {
-    MergerDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(RefMergerEndToEndDim3Uint8Test)
+BOOST_AUTO_TEST_CASE(RefConcatEndToEndDim3Uint8Test)
 {
-    MergerDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    ConcatDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefGatherFloatTest)

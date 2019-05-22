@@ -122,6 +122,15 @@ void QuantizerVisitor::VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitConcatLayer(const IConnectableLayer* layer,
+                                        const OriginsDescriptor& originsDescriptor,
+                                        const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConcatLayer(originsDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitConstantLayer(const IConnectableLayer* layer,
                                           const ConstTensor& input,
                                           const char* name)
@@ -234,15 +243,6 @@ void QuantizerVisitor::VisitMeanLayer(const IConnectableLayer* layer,
                                         const char* name)
 {
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddMeanLayer(meanDescriptor, name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
-}
-
-void QuantizerVisitor::VisitMergerLayer(const IConnectableLayer* layer,
-                                        const OriginsDescriptor& mergerDescriptor,
-                                        const char* name)
-{
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddConcatLayer(mergerDescriptor, name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }

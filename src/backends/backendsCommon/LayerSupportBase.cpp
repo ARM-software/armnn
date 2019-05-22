@@ -73,9 +73,7 @@ bool LayerSupportBase::IsConcatSupported(const std::vector<const TensorInfo*> in
                                          const OriginsDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    return IsMergerSupported(inputs, output, descriptor, reasonIfUnsupported);
-    ARMNN_NO_DEPRECATE_WARN_END
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
 bool LayerSupportBase::IsConstantSupported(const TensorInfo& output,
@@ -286,7 +284,7 @@ bool LayerSupportBase::IsMergerSupported(const std::vector<const TensorInfo*> in
                                          const OriginsDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+    return IsConcatSupported(inputs, output, descriptor, reasonIfUnsupported);
 }
 
 bool LayerSupportBase::IsMinimumSupported(const TensorInfo& input0,

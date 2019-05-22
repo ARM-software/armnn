@@ -4,7 +4,7 @@
 //
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
-#include <backendsCommon/test/MergerTestImpl.hpp>
+#include <backendsCommon/test/ConcatTestImpl.hpp>
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 
@@ -93,34 +93,34 @@ BOOST_AUTO_TEST_CASE(NeonGreaterBroadcastEndToEndUint8Test)
                                                                                             expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim0Test)
+BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim0Test)
 {
-    MergerDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim0Uint8Test)
+BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim0Uint8Test)
 {
-    MergerDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    ConcatDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim1Test)
+BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim1Test)
 {
-    MergerDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim1Uint8Test)
+BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim1Uint8Test)
 {
-    MergerDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    ConcatDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim3Test)
+BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim3Test)
 {
-    MergerDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    ConcatDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim3Uint8Test)
+BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim3Uint8Test)
 {
-    MergerDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    ConcatDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonSplitDim0EndToEndTest)

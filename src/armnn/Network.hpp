@@ -37,7 +37,7 @@ public:
     IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                               const char* name = nullptr) override;
 
-    IConnectableLayer* AddConcatLayer(const OriginsDescriptor& mergerDescriptor,
+    IConnectableLayer* AddConcatLayer(const ConcatDescriptor& concatDescriptor,
                                       const char* name = nullptr) override;
 
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
@@ -119,7 +119,7 @@ public:
         const char* name = nullptr) override;
 
     ARMNN_DEPRECATED_MSG("Use AddConcatLayer instead")
-    IConnectableLayer* AddMergerLayer(const OriginsDescriptor& mergerDescriptor,
+    IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
                                       const char* name = nullptr) override;
 
     IConnectableLayer* AddAdditionLayer(const char* name = nullptr) override;

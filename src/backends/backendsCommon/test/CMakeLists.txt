@@ -30,7 +30,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     LayerTests.hpp
     LstmTestImpl.hpp
     NormTestImpl.hpp
-    MergerTestImpl.hpp
+    ConcatTestImpl.hpp
     MockBackend.cpp
     MockBackend.hpp
     MockBackendId.hpp

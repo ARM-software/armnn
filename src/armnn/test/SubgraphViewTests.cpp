@@ -223,21 +223,21 @@ BOOST_AUTO_TEST_CASE(MultiInputSingleOutput)
     Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
 
-    OriginsDescriptor mergerDescriptor(2);
-    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+    OriginsDescriptor concatDescriptor(2);
+    Layer* const concatLayer = graph.AddLayer<ConcatLayer>(concatDescriptor, "concat");
 
     Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
 
     inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
     splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
     splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
-    convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
-    convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
-    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(1));
+    concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
     SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}),
-                                                                            CreateOutputsFrom({mergerLayer}),
+                                                                            CreateOutputsFrom({concatLayer}),
                                                                             {});
 
     // Save sub-graph connections for comparison after substitution
@@ -270,8 +270,8 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     Convolution2dDescriptor convDescriptor;
     Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
-    OriginsDescriptor mergerDescriptor(2);
-    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+    OriginsDescriptor concatDescriptor(2);
+    Layer* const concatLayer = graph.AddLayer<ConcatLayer>(concatDescriptor, "concat");
     Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
 
     ViewsDescriptor splitterDescriptor(2);
@@ -280,9 +280,9 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
     splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
     splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
-    convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
-    convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
-    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(1));
+    concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
     SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({splitterLayer}),
@@ -323,17 +323,17 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
 
-    OriginsDescriptor mergerDescriptor(2);
-    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+    OriginsDescriptor concatDescriptor(2);
+    Layer* const concatLayer = graph.AddLayer<ConcatLayer>(concatDescriptor, "concat");
 
     Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
 
     inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
     splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
     splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
-    convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
-    convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
-    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(1));
+    concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
     SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}),
@@ -376,8 +376,8 @@ BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
     Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
 
-    OriginsDescriptor mergerDescriptor(2);
-    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
+    OriginsDescriptor concatDescriptor(2);
+    Layer* const concatLayer = graph.AddLayer<ConcatLayer>(concatDescriptor, "concat");
 
     graph.AddLayer<OutputLayer>(0, "output");
 
@@ -387,7 +387,7 @@ BOOST_AUTO_TEST_CASE(EraseReplacedLayers)
                                                                             {splitterLayer,
                                                                              convLayer1,
                                                                              convLayer2,
-                                                                             mergerLayer});
+                                                                             concatLayer});
 
     // Construct dummy pre-compiled layer
     PreCompiledDescriptor preCompiledDescriptor(0, 0);
@@ -538,8 +538,8 @@ BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
     //
     Graph graph;
 
-    OriginsDescriptor mergerDescriptor(2);
-    auto x2 = graph.AddLayer<MergerLayer>(mergerDescriptor, "x2");
+    OriginsDescriptor concatDescriptor(2);
+    auto x2 = graph.AddLayer<ConcatLayer>(concatDescriptor, "x2");
     auto m3 = graph.InsertNewLayer<ActivationLayer>(x2->GetInputSlot(0),
                                                     ActivationDescriptor{},
                                                     "m3");
@@ -856,14 +856,14 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     Graph graph;
 
     ActivationDescriptor activationDefaults;
-    OriginsDescriptor mergerDescriptor(2);
+    OriginsDescriptor concatDescriptor(2);
 
     auto x1 = graph.AddLayer<InputLayer>(0, "x1");
     auto x2 = graph.AddLayer<InputLayer>(1, "x2");
 
     auto m1 = graph.AddLayer<ActivationLayer>(activationDefaults, "m1");
     auto m2 = graph.AddLayer<ActivationLayer>(activationDefaults, "m2");
-    auto m3 = graph.AddLayer<MergerLayer>(mergerDescriptor, "m3");
+    auto m3 = graph.AddLayer<ConcatLayer>(concatDescriptor, "m3");
 
     auto m4 = graph.AddLayer<ActivationLayer>(activationDefaults, "m4");
     auto m5 = graph.AddLayer<ActivationLayer>(activationDefaults, "m5");
@@ -887,11 +887,11 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
     SubgraphViewSelector::Subgraphs subgraphs =
         SubgraphViewSelector::SelectSubgraphs(
             graph,
-            // select Activation and Merger Layers M1, M2, M3, M4, M5
+            // select Activation and Concat Layers M1, M2, M3, M4, M5
             [](const Layer & l)
             {
                 bool toSelect = (l.GetType() == LayerType::Activation
-                                 || l.GetType() == LayerType::Merger);
+                                 || l.GetType() == LayerType::Concat);
                 return toSelect;
             });
 
@@ -994,18 +994,18 @@ BOOST_AUTO_TEST_CASE(MultipleSubgraphs)
     Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
 
-    OriginsDescriptor mergerDescriptor(2);
-    Layer* const mergerLayer = graph.AddLayer<MergerLayer>(mergerDescriptor, "merger");
-    mergerLayer->SetBackendId(Compute::CpuAcc);
+    OriginsDescriptor concatDescriptor(2);
+    Layer* const pConcatLayer = graph.AddLayer<ConcatLayer>(concatDescriptor, "concat");
+    pConcatLayer->SetBackendId(Compute::CpuAcc);
 
     Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
 
     inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
     splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
     splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
-    convLayer1->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
-    convLayer2->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
-    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    convLayer1->GetOutputSlot(0).Connect(pConcatLayer->GetInputSlot(0));
+    convLayer2->GetOutputSlot(0).Connect(pConcatLayer->GetInputSlot(1));
+    pConcatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // CpuAcc sub graph selector
     SubgraphViewSelector::Subgraphs subgraphs =
@@ -1096,7 +1096,7 @@ BOOST_AUTO_TEST_CASE(SubgraphCycles)
     //
     Graph graph;
 
-    OriginsDescriptor mergerDescriptor(2);
+    OriginsDescriptor originsDescriptor(2);
     auto x0 = graph.AddLayer<InputLayer>(0, "x0");
     auto m0 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "m0");
     auto x1 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "x1");

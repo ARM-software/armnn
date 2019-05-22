@@ -31,6 +31,8 @@ struct SpaceToBatchNdDescriptor;
 struct StridedSliceDescriptor;
 struct ViewsDescriptor;
 
+// MergerDescriptor is deprecated use ConcatDescriptor instead
 using MergerDescriptor = OriginsDescriptor;
+using ConcatDescriptor = OriginsDescriptor;
 using SplitterDescriptor = ViewsDescriptor;
 }

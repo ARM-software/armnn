@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "Merger.hpp"
+#include "Concatenate.hpp"
 #include "RefWorkloadUtils.hpp"
 #include "Decoders.hpp"
 #include "Encoders.hpp"
@@ -11,7 +11,7 @@
 namespace armnn
 {
 
-void Merger(const MergerQueueDescriptor& data)
+void Concatenate(const ConcatQueueDescriptor &data)
 {
     const TensorInfo& outputInfo0 = GetTensorInfo(data.m_Outputs[0]);
 
@@ -34,7 +34,7 @@ void Merger(const MergerQueueDescriptor& data)
 
         for (unsigned int viewIdx = 0; viewIdx < data.m_ViewOrigins.size(); ++viewIdx)
         {
-            MergerQueueDescriptor::ViewOrigin const& view = data.m_ViewOrigins[viewIdx];
+            ConcatQueueDescriptor::ViewOrigin const& view = data.m_ViewOrigins[viewIdx];
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& inputInfo = GetTensorInfo(data.m_Inputs[viewIdx]);

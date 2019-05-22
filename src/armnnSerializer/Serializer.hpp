@@ -61,6 +61,10 @@ public:
                                       const armnn::ConstTensor& gamma,
                                       const char* name = nullptr) override;
 
+    void VisitConcatLayer(const armnn::IConnectableLayer* layer,
+                          const armnn::ConcatDescriptor& concatDescriptor,
+                          const char* name = nullptr) override;
+
     void VisitConstantLayer(const armnn::IConnectableLayer* layer,
                             const armnn::ConstTensor& input,
                             const char* = nullptr) override;
@@ -132,8 +136,9 @@ public:
     void VisitMergeLayer(const armnn::IConnectableLayer* layer,
                          const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use VisitConcatLayer instead")
     void VisitMergerLayer(const armnn::IConnectableLayer* layer,
-                          const armnn::OriginsDescriptor& mergerDescriptor,
+                          const armnn::MergerDescriptor& mergerDescriptor,
                           const char* name = nullptr) override;
 
     void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer,

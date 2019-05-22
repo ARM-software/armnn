@@ -10,6 +10,7 @@
 #include "layers/AdditionLayer.hpp"
 #include "layers/BatchNormalizationLayer.hpp"
 #include "layers/BatchToSpaceNdLayer.hpp"
+#include "layers/ConcatLayer.hpp"
 #include "layers/ConstantLayer.hpp"
 #include "layers/ConvertFp16ToFp32Layer.hpp"
 #include "layers/ConvertFp32ToFp16Layer.hpp"
@@ -32,7 +33,6 @@
 #include "layers/MeanLayer.hpp"
 #include "layers/MemCopyLayer.hpp"
 #include "layers/MergeLayer.hpp"
-#include "layers/MergerLayer.hpp"
 #include "layers/MinimumLayer.hpp"
 #include "layers/MultiplicationLayer.hpp"
 #include "layers/NormalizationLayer.hpp"
@@ -83,6 +83,7 @@ DECLARE_LAYER(Activation)
 DECLARE_LAYER(Addition)
 DECLARE_LAYER(BatchNormalization)
 DECLARE_LAYER(BatchToSpaceNd)
+DECLARE_LAYER(Concat)
 DECLARE_LAYER(Constant)
 DECLARE_LAYER(ConvertFp16ToFp32)
 DECLARE_LAYER(ConvertFp32ToFp16)
@@ -105,7 +106,6 @@ DECLARE_LAYER(Maximum)
 DECLARE_LAYER(Mean)
 DECLARE_LAYER(MemCopy)
 DECLARE_LAYER(Merge)
-DECLARE_LAYER(Merger)
 DECLARE_LAYER(Minimum)
 DECLARE_LAYER(Multiplication)
 DECLARE_LAYER(Normalization)

@@ -245,7 +245,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2Nor
     return MakeWorkload<RefL2NormalizationFloat32Workload, NullWorkload>(descriptor, info);
 }
 
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateConcat(const MergerQueueDescriptor& descriptor,
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                                    const WorkloadInfo&          info) const
 {
     if (IsFloat16(info))

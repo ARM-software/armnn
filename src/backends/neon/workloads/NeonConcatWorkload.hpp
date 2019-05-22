@@ -17,14 +17,14 @@ namespace armnn
 {
 arm_compute::Status NeonConcatWorkloadValidate(const std::vector<const TensorInfo*>& inputs,
                                                const TensorInfo& output,
-                                               const MergerDescriptor& descriptor);
+                                               const OriginsDescriptor& descriptor);
 
-class NeonConcatWorkload : public BaseWorkload<MergerQueueDescriptor>
+class NeonConcatWorkload : public BaseWorkload<ConcatQueueDescriptor>
 {
 public:
-    NeonConcatWorkload(const MergerQueueDescriptor& descriptor, const WorkloadInfo& info);
+    NeonConcatWorkload(const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info);
 
-    using BaseWorkload<MergerQueueDescriptor>::BaseWorkload;
+    using BaseWorkload<ConcatQueueDescriptor>::BaseWorkload;
     void Execute() const override;
 
 private:

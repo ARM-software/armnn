@@ -135,19 +135,19 @@ struct DummyLayer<armnn::InputLayer, armnn::LayerBindingId>
 };
 
 template<>
-struct DummyLayer<armnn::MergerLayer>
+struct DummyLayer<armnn::ConcatLayer>
 {
     DummyLayer()
     {
         armnn::OriginsDescriptor desc(2);
-        m_Layer = dummyGraph.AddLayer<armnn::MergerLayer>(desc, "");
+        m_Layer = dummyGraph.AddLayer<armnn::ConcatLayer>(desc, "");
 
     }
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
-    armnn::MergerLayer* m_Layer;
+    armnn::ConcatLayer* m_Layer;
 };
 
 template<>
@@ -322,6 +322,8 @@ DECLARE_LAYER_POLICY_2_PARAM(BatchNormalization)
 
 DECLARE_LAYER_POLICY_2_PARAM(BatchToSpaceNd)
 
+DECLARE_LAYER_POLICY_2_PARAM(Concat)
+
 DECLARE_LAYER_POLICY_1_PARAM(Constant)
 
 DECLARE_LAYER_POLICY_1_PARAM(ConvertFp16ToFp32)
@@ -363,10 +365,6 @@ DECLARE_LAYER_POLICY_1_PARAM(Maximum)
 DECLARE_LAYER_POLICY_2_PARAM(Mean)
 
 DECLARE_LAYER_POLICY_1_PARAM(Merge)
-
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-DECLARE_LAYER_POLICY_2_PARAM(Merger)
-ARMNN_NO_DEPRECATE_WARN_END
 
 DECLARE_LAYER_POLICY_1_PARAM(Minimum)
 
@@ -422,7 +420,7 @@ unsigned int GetNumOutputs(const armnn::Layer& layer)
 }
 
 template<>
-unsigned int GetNumInputs<armnn::LayerType::Merger>(const armnn::Layer& layer)
+unsigned int GetNumInputs<armnn::LayerType::Concat>(const armnn::Layer& layer)
 {
     boost::ignore_unused(layer);
     return 2;

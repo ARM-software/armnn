@@ -11,10 +11,10 @@
 namespace armnn
 {
 
-class RefConcatWorkload : public BaseWorkload<MergerQueueDescriptor>
+class RefConcatWorkload : public BaseWorkload<ConcatQueueDescriptor>
 {
 public:
-    using BaseWorkload<MergerQueueDescriptor>::BaseWorkload;
+    using BaseWorkload<ConcatQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

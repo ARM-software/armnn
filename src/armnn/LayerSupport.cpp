@@ -137,9 +137,9 @@ bool IsConcatSupported(const BackendId& backend,
                        char* reasonIfUnsupported,
                        size_t reasonIfUnsupportedMaxLength)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    return IsMergerSupported(backend, inputs, output, descriptor, reasonIfUnsupported, reasonIfUnsupportedMaxLength);
-    ARMNN_NO_DEPRECATE_WARN_END
+    BOOST_ASSERT(inputs.size() > 0);
+
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsConcatSupported, inputs, output, descriptor);
 }
 
 bool IsConstantSupported(const BackendId& backend,

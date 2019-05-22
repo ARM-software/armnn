@@ -504,30 +504,30 @@ BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
     BOOST_TEST(TestNeonTensorHandleInfo(outputHandle2, TensorInfo({2, 7, 7}, DataType::Float32)));
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterMerger)
+BOOST_AUTO_TEST_CASE(CreateSplitterConcat)
 {
     // Tests that it is possible to decide which output of the splitter layer
-    // should be lined to which input of the merger layer.
+    // should be lined to which input of the concat layer.
     // We tested that is is possible to specify 0th output
-    // of the splitter to be the 1st input to the merger, and the 1st output of the splitter to be 0th input
-    // of the merger.
+    // of the splitter to be the 1st input to the concat, and the 1st output of the splitter to be 0th input
+    // of the concat.
 
     Graph graph;
     NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
 
     auto workloads =
-        CreateSplitterMergerWorkloadTest<NeonSplitterWorkload, NeonConcatWorkload,
+        CreateSplitterConcatWorkloadTest<NeonSplitterWorkload, NeonConcatWorkload,
             DataType::Float32>(factory, graph);
 
     auto wlSplitter = std::move(workloads.first);
-    auto wlMerger = std::move(workloads.second);
+    auto wlConcat = std::move(workloads.second);
 
     //Checks that the index of inputs/outputs matches what we declared on InputDescriptor construction.
     armnn::INeonTensorHandle* sOut0 = dynamic_cast<armnn::INeonTensorHandle*>(wlSplitter->GetData().m_Outputs[0]);
     armnn::INeonTensorHandle* sOut1 = dynamic_cast<armnn::INeonTensorHandle*>(wlSplitter->GetData().m_Outputs[1]);
-    armnn::INeonTensorHandle* mIn0 = dynamic_cast<armnn::INeonTensorHandle*>(wlMerger->GetData().m_Inputs[0]);
-    armnn::INeonTensorHandle* mIn1 = dynamic_cast<armnn::INeonTensorHandle*>(wlMerger->GetData().m_Inputs[1]);
+    armnn::INeonTensorHandle* mIn0 = dynamic_cast<armnn::INeonTensorHandle*>(wlConcat->GetData().m_Inputs[0]);
+    armnn::INeonTensorHandle* mIn1 = dynamic_cast<armnn::INeonTensorHandle*>(wlConcat->GetData().m_Inputs[1]);
 
     BOOST_TEST(sOut0);
     BOOST_TEST(sOut1);
@@ -632,17 +632,17 @@ BOOST_AUTO_TEST_CASE(CreateL2NormalizationNhwcWorkload)
     NeonCreateL2NormalizationWorkloadTest<NeonL2NormalizationFloatWorkload, DataType::Float32>(DataLayout::NHWC);
 }
 
-template <typename MergerWorkloadType, armnn::DataType DataType>
-static void NeonCreateMergerWorkloadTest(std::initializer_list<unsigned int> outputShape,
+template <typename ConcatWorkloadType, armnn::DataType DataType>
+static void NeonCreateConcatWorkloadTest(std::initializer_list<unsigned int> outputShape,
                                          unsigned int concatAxis)
 {
     Graph graph;
     NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
 
-    auto workload = CreateMergerWorkloadTest<MergerWorkloadType, DataType>(factory, graph, outputShape, concatAxis);
+    auto workload = CreateConcatWorkloadTest<ConcatWorkloadType, DataType>(factory, graph, outputShape, concatAxis);
 
-    MergerQueueDescriptor queueDescriptor = workload->GetData();
+    ConcatQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle0 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto inputHandle1 = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[1]);
     auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -652,34 +652,34 @@ static void NeonCreateMergerWorkloadTest(std::initializer_list<unsigned int> out
     BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim0Float32Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim0Float32Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim1Float32Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim1Float32Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim3Float32Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim3Float32Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim0Uint8Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim0Uint8Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim1Uint8Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim1Uint8Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim3Uint8Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim3Uint8Workload)
 {
-    NeonCreateMergerWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
+    NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

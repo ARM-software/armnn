@@ -12,7 +12,7 @@ template <typename LayerDescriptor>
 struct QueueDescriptorWithParameters;
 struct SoftmaxQueueDescriptor;
 struct SplitterQueueDescriptor;
-struct MergerQueueDescriptor;
+struct ConcatQueueDescriptor;
 struct ActivationQueueDescriptor;
 struct FullyConnectedQueueDescriptor;
 struct PermuteQueueDescriptor;

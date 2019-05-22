@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
+
 #include "TensorFwd.hpp"
 
 #include "Exceptions.hpp"

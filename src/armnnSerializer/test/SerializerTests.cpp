@@ -1248,6 +1248,13 @@ public:
                           const armnn::OriginsDescriptor& descriptor,
                           const char* name) override
     {
+        throw armnn::Exception("MergerLayer should have translated to ConcatLayer");
+    }
+
+    void VisitConcatLayer(const armnn::IConnectableLayer* layer,
+                          const armnn::OriginsDescriptor& descriptor,
+                          const char* name) override
+    {
         VerifyNameAndConnections(layer, name);
         VerifyDescriptor(descriptor);
     }
@@ -1271,6 +1278,9 @@ private:
     armnn::OriginsDescriptor m_Descriptor;
 };
 
+// NOTE: until the deprecated AddMergerLayer disappears this test checks that calling
+//       AddMergerLayer places a ConcatLayer into the serialized format and that
+//       when this deserialises we have a ConcatLayer
 BOOST_AUTO_TEST_CASE(SerializeMerger)
 {
     const std::string layerName("merger");
@@ -1309,17 +1319,10 @@ BOOST_AUTO_TEST_CASE(SerializeMerger)
 BOOST_AUTO_TEST_CASE(EnsureMergerLayerBackwardCompatibility)
 {
     // The hex array below is a flat buffer containing a simple network with two inputs
-    // a merger layer (soon to be a thing of the past) and an output layer with dimensions
-    // as per the tensor infos below.
-    // The intention is that this test will be repurposed as soon as the MergerLayer
-    // is replaced by a ConcatLayer to verify that we can still read back these old style
+    // a merger layer (now deprecated) and an output layer with dimensions as per the tensor infos below.
+    //
+    // This test verifies that we can still read back these old style
     // models replacing the MergerLayers with ConcatLayers with the same parameters.
-    // To do this the MergerLayerVerifier will be changed to have a VisitConcatLayer
-    // which will do the work that the VisitMergerLayer currently does and the VisitMergerLayer
-    // so long as it remains (public API will drop Merger Layer at some future point)
-    // will throw an error if invoked because none of the graphs we create should contain
-    // Merger layers now regardless of whether we attempt to insert the Merger layer via
-    // the INetwork.AddMergerLayer call or by deserializing an old style flatbuffer file.
     unsigned int size = 760;
     const unsigned char mergerModel[] = {
             0x10,0x00,0x00,0x00,0x00,0x00,0x0A,0x00,0x10,0x00,0x04,0x00,0x08,0x00,0x0C,0x00,0x0A,0x00,0x00,0x00,
@@ -1377,6 +1380,41 @@ BOOST_AUTO_TEST_CASE(EnsureMergerLayerBackwardCompatibility)
     armnn::OriginsDescriptor descriptor =
             armnn::CreateDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
 
+    MergerLayerVerifier verifier(layerName, {inputInfo, inputInfo}, {outputInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeConcat)
+{
+    const std::string layerName("concat");
+    const armnn::TensorInfo inputInfo = armnn::TensorInfo({2, 3, 2, 2}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({4, 3, 2, 2}, armnn::DataType::Float32);
+
+    const std::vector<armnn::TensorShape> shapes({inputInfo.GetShape(), inputInfo.GetShape()});
+
+    armnn::OriginsDescriptor descriptor =
+        armnn::CreateDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayerOne = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayerTwo = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const concatLayer = network->AddConcatLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayerOne->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(0));
+    inputLayerTwo->GetOutputSlot(0).Connect(concatLayer->GetInputSlot(1));
+    concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayerOne->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    inputLayerTwo->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    concatLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    std::string concatLayerNetwork = SerializeNetwork(*network);
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(concatLayerNetwork);
+    BOOST_CHECK(deserializedNetwork);
+
+    // NOTE: using the MergerLayerVerifier to ensure that it is a concat layer and not a
+    //       merger layer that gets placed into the graph.
     MergerLayerVerifier verifier(layerName, {inputInfo, inputInfo}, {outputInfo}, descriptor);
     deserializedNetwork->Accept(verifier);
 }

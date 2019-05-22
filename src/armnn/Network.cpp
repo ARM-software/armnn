@@ -603,12 +603,10 @@ IConnectableLayer* Network::AddFullyConnectedLayer(const FullyConnectedDescripto
     return AddFullyConnectedLayerImpl(fullyConnectedDescriptor, weights, optionalBiases, name);
 }
 
-IConnectableLayer* Network::AddConcatLayer(const OriginsDescriptor& mergerDescriptor,
+IConnectableLayer* Network::AddConcatLayer(const ConcatDescriptor& concatDescriptor,
                                            const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    return AddMergerLayer(mergerDescriptor, name);
-    ARMNN_NO_DEPRECATE_WARN_END
+    return m_Graph->AddLayer<ConcatLayer>(concatDescriptor, name);
 }
 
 IConnectableLayer* Network::AddConvolution2dLayerImpl(const Convolution2dDescriptor& convolution2dDescriptor,
@@ -766,10 +764,10 @@ IConnectableLayer* Network::AddMinimumLayer(const char* name)
     return m_Graph->AddLayer<MinimumLayer>(name);
 }
 
-IConnectableLayer* Network::AddMergerLayer(const OriginsDescriptor& mergerDescriptor,
+IConnectableLayer* Network::AddMergerLayer(const MergerDescriptor& mergerDescriptor,
                                            const char* name)
 {
-    return m_Graph->AddLayer<MergerLayer>(mergerDescriptor, name);
+    return AddConcatLayer(mergerDescriptor, name);
 }
 
 IConnectableLayer* Network::AddAdditionLayer(const char* name)

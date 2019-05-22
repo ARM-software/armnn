@@ -1294,7 +1294,7 @@ void OnnxParser::ParseConv(const onnx::NodeProto& node)
         else
         {
             // TODO: split the input by channels into channels/groups separate convolutions
-            //  and merger the results afterwards
+            //  and concatenate the results afterwards
             throw ParseException(boost::str(
                 boost::format("Error parsing Convolution node: %1%. "
                 "The 'group'=%2% parameter should be 1 or be equal to the "

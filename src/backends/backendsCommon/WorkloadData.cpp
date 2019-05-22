@@ -378,26 +378,26 @@ void SplitterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 }
 
 //---------------------------------------------------------------
-void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+void ConcatQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumOutputs(workloadInfo, "MergerQueueDescriptor", 1);
+    ValidateNumOutputs(workloadInfo, "ConcatQueueDescriptor", 1);
 
     if (m_Inputs.size() <= 0)
     {
-        throw InvalidArgumentException("MergerQueueDescriptor: At least one input needs to be provided.");
+        throw InvalidArgumentException("ConcatQueueDescriptor: At least one input needs to be provided.");
     }
     if (m_Outputs.size() <= 0)
     {
-        throw InvalidArgumentException("MergerQueueDescriptor: At least one output needs to be provided.");
+        throw InvalidArgumentException("ConcatQueueDescriptor: At least one output needs to be provided.");
     }
 
     if (workloadInfo.m_InputTensorInfos.size() <= 0)
     {
-        throw InvalidArgumentException("MergerQueueDescriptor: At least one TensorInfo input needs to be provided.");
+        throw InvalidArgumentException("ConcatQueueDescriptor: At least one TensorInfo input needs to be provided.");
     }
     if (workloadInfo.m_OutputTensorInfos.size() <= 0)
     {
-        throw InvalidArgumentException("MergerQueueDescriptor: At least one TensorInfo output needs to be provided.");
+        throw InvalidArgumentException("ConcatQueueDescriptor: At least one TensorInfo output needs to be provided.");
     }
 
     if(m_Parameters.GetConcatAxis() > workloadInfo.m_InputTensorInfos[0].GetShape().GetNumDimensions())
@@ -413,7 +413,7 @@ void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     if (workloadInfo.m_InputTensorInfos.size() != m_ViewOrigins.size())
     {
         throw InvalidArgumentException(
-            "MergerQueueDescriptor: Number of split windows "
+            "ConcatQueueDescriptor: Number of split windows "
             "has to match number of workloadInfo.m_InputTensorInfos. "
             "Number of windows: " +
             to_string(m_ViewOrigins.size()) +
@@ -428,7 +428,7 @@ void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         ViewOrigin const& e = m_ViewOrigins[w];
         if (e.m_Origin.size() != outputDims)
         {
-            throw InvalidArgumentException("MergerQueueDescriptor: Window origin have to "
+            throw InvalidArgumentException("ConcatQueueDescriptor: Window origin have to "
                                            "have the same dimensionality as the output tensor. "
                                            "Window origin (index: " +
                                            to_string(w) + ") has " + to_string(e.m_Origin.size()) +
@@ -442,7 +442,7 @@ void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             if (e.m_Origin[i] + workloadInfo.m_InputTensorInfos[w].GetShape()[i]
                 > workloadInfo.m_OutputTensorInfos[0].GetShape()[i])
             {
-                throw InvalidArgumentException("MergerQueueDescriptor: Window extent coordinates have to "
+                throw InvalidArgumentException("ConcatQueueDescriptor: Window extent coordinates have to "
                                                "be smaller or equal than the size of the output in that coord.");
             }
         }
@@ -463,11 +463,11 @@ void MergerQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         ValidateDataTypes(workloadInfo.m_InputTensorInfos[i],
                           supportedTypes,
-                          "MergerQueueDescriptor");
+                          "ConcatQueueDescriptor");
     }
     ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
                       {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "MergerQueueDescriptor");
+                      "ConcatQueueDescriptor");
 }
 
 //---------------------------------------------------------------

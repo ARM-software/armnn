@@ -265,7 +265,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateL2Normalization(const L2Norm
     return MakeWorkload<ClL2NormalizationFloatWorkload, NullWorkload>(descriptor, info);
 }
 
-std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConcat(const MergerQueueDescriptor& descriptor,
+std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                                   const WorkloadInfo&          info) const
 {
     return MakeWorkload<ClConcatWorkload>(descriptor, info);

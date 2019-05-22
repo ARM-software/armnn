@@ -5,7 +5,7 @@
 
 #include "RefConcatWorkload.hpp"
 
-#include "Merger.hpp"
+#include "Concatenate.hpp"
 
 #include "Profiling.hpp"
 
@@ -15,7 +15,7 @@ namespace armnn
 void RefConcatWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConcatWorkload_Execute");
-    Merger(m_Data);
+    Concatenate(m_Data);
 }
 
 } //namespace armnn

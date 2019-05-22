@@ -146,12 +146,41 @@ bool NeonLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
 
 bool NeonLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                                          const TensorInfo& output,
-                                         const OriginsDescriptor& descriptor,
+                                         const ConcatDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-     ARMNN_NO_DEPRECATE_WARN_BEGIN
-     return IsMergerSupported(inputs, output, descriptor, reasonIfUnsupported);
-     ARMNN_NO_DEPRECATE_WARN_END
+    if (descriptor.GetNumDimensions() <= descriptor.GetConcatAxis())
+    {
+        SetValueChecked(reasonIfUnsupported, "Neon Concat: Concat axis > Number of dimensions.");
+        return false;
+    }
+
+    unsigned int concatInnerAxis = (descriptor.GetNumDimensions() - descriptor.GetConcatAxis()) - 1;
+    if(concatInnerAxis < 3) // Width, height, or channels
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConcatWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       inputs,
+                                       output,
+                                       descriptor);
+    }
+    else if (concatInnerAxis == 3)
+    {
+        for (auto& input : inputs)
+        {
+            if (input && !output.IsTypeSpaceMatch(*input)) // Cannot use sub-tensors if the types are not same space
+            {
+                SetValueChecked(reasonIfUnsupported, "Neon Concat: Types and quantization parameters must match.");
+                return false;
+            }
+        }
+        return true; // Sub-tensors support concat along batch
+    }
+    else // > 4 dimensions not supported.
+    {
+        SetValueChecked(reasonIfUnsupported, "Neon Concat: Maximum of 4 dimensions supported.");
+        return false;
+    }
 }
 
 bool NeonLayerSupport::IsConstantSupported(const TensorInfo& output,
@@ -326,41 +355,10 @@ bool NeonLayerSupport::IsMemCopySupported(const TensorInfo &input,
 
 bool NeonLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                          const TensorInfo& output,
-                                         const OriginsDescriptor& descriptor,
+                                         const MergerDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    if (descriptor.GetNumDimensions() <= descriptor.GetConcatAxis())
-    {
-        SetValueChecked(reasonIfUnsupported, "Neon Merger: Concat axis > Number of dimensions.");
-        return false;
-    }
-
-    unsigned int concatInnerAxis = (descriptor.GetNumDimensions() - descriptor.GetConcatAxis()) - 1;
-    if(concatInnerAxis < 3) // Width, height, or channels
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConcatWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       inputs,
-                                       output,
-                                       descriptor);
-    }
-    else if (concatInnerAxis == 3)
-    {
-        for (auto& input : inputs)
-        {
-            if (input && !output.IsTypeSpaceMatch(*input)) // Cannot use sub-tensors if the types are not same space
-            {
-                SetValueChecked(reasonIfUnsupported, "Neon Merger: Types and quantization parameters must match.");
-                return false;
-            }
-        }
-        return true; // Sub-tensors support concat along batch
-    }
-    else // > 4 dimensions not supported.
-    {
-        SetValueChecked(reasonIfUnsupported, "Neon Merger: Maximum of 4 dimensions supported.");
-        return false;
-    }
+     return IsConcatSupported(inputs, output, descriptor, reasonIfUnsupported);
 }
 
 bool NeonLayerSupport::IsMinimumSupported(const TensorInfo& input0,

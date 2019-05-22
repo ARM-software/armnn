@@ -473,28 +473,28 @@ BOOST_AUTO_TEST_CASE(CreateSplitterUint8Workload)
     RefCreateSplitterWorkloadTest<RefSplitterUint8Workload, armnn::DataType::QuantisedAsymm8>();
 }
 
-template <typename SplitterWorkloadType, typename MergerWorkloadType, armnn::DataType DataType>
-static void RefCreateSplitterMergerWorkloadTest()
+template <typename SplitterWorkloadType, typename ConcatWorkloadType, armnn::DataType DataType>
+static void RefCreateSplitterConcatWorkloadTest()
 {
     // Tests that it is possible to decide which output of the splitter layer
-    // should be lined to which input of the merger layer.
+    // should be lined to which input of the concat layer.
     // We tested that is is possible to specify 0th output
-    // of the splitter to be the 1st input to the merger and the 1st output of the splitter to be 0th input
-    // of the merger.
+    // of the splitter to be the 1st input to the concat and the 1st output of the splitter to be 0th input
+    // of the concat.
 
     Graph graph;
     RefWorkloadFactory factory;
-    auto workloads = CreateSplitterMergerWorkloadTest<SplitterWorkloadType, MergerWorkloadType, DataType>
-        (factory, graph);
+    auto workloads = CreateSplitterConcatWorkloadTest<SplitterWorkloadType, ConcatWorkloadType, DataType>
+            (factory, graph);
 
     auto wlSplitter = std::move(workloads.first);
-    auto wlMerger = std::move(workloads.second);
+    auto wlConcat = std::move(workloads.second);
 
     //Checks that the index of inputs/outputs matches what we declared on InputDescriptor construction.
     armnn::CpuTensorHandle* sOut0 = dynamic_cast<armnn::CpuTensorHandle*>(wlSplitter->GetData().m_Outputs[0]);
     armnn::CpuTensorHandle* sOut1 = dynamic_cast<armnn::CpuTensorHandle*>(wlSplitter->GetData().m_Outputs[1]);
-    armnn::CpuTensorHandle* mIn0 = dynamic_cast<armnn::CpuTensorHandle*>(wlMerger->GetData().m_Inputs[0]);
-    armnn::CpuTensorHandle* mIn1 = dynamic_cast<armnn::CpuTensorHandle*>(wlMerger->GetData().m_Inputs[1]);
+    armnn::CpuTensorHandle* mIn0 = dynamic_cast<armnn::CpuTensorHandle*>(wlConcat->GetData().m_Inputs[0]);
+    armnn::CpuTensorHandle* mIn1 = dynamic_cast<armnn::CpuTensorHandle*>(wlConcat->GetData().m_Inputs[1]);
 
     BOOST_TEST(sOut0);
     BOOST_TEST(sOut1);
@@ -506,14 +506,14 @@ static void RefCreateSplitterMergerWorkloadTest()
     BOOST_TEST(validDataPointers);
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterMergerFloat32)
+BOOST_AUTO_TEST_CASE(CreateSplitterConcatFloat32)
 {
-    RefCreateSplitterMergerWorkloadTest<RefSplitterFloat32Workload, RefConcatWorkload, DataType::Float32>();
+    RefCreateSplitterConcatWorkloadTest<RefSplitterFloat32Workload, RefConcatWorkload, DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSplitterMergerUint8)
+BOOST_AUTO_TEST_CASE(CreateSplitterConcatUint8)
 {
-    RefCreateSplitterMergerWorkloadTest<RefSplitterUint8Workload, RefConcatWorkload, DataType::QuantisedAsymm8>();
+    RefCreateSplitterConcatWorkloadTest<RefSplitterUint8Workload, RefConcatWorkload, DataType::QuantisedAsymm8>();
 }
 
 template <typename SplitterWorkloadType, typename ActivationWorkloadType, armnn::DataType DataType>
@@ -671,13 +671,13 @@ BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
     RefCreateReshapeWorkloadTest<RefReshapeWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
-template <typename MergerWorkloadType, armnn::DataType DataType>
-static void RefCreateMergerWorkloadTest(const armnn::TensorShape& outputShape,
+template <typename ConcatWorkloadType, armnn::DataType DataType>
+static void RefCreateConcatWorkloadTest(const armnn::TensorShape& outputShape,
                                         unsigned int concatAxis)
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload = CreateMergerWorkloadTest<MergerWorkloadType, DataType>(factory, graph, outputShape, concatAxis);
+    auto workload = CreateConcatWorkloadTest<ConcatWorkloadType, DataType>(factory, graph, outputShape, concatAxis);
 
     CheckInputsOutput(std::move(workload),
                       TensorInfo({ 2, 3, 2, 5 }, DataType),
@@ -685,49 +685,49 @@ static void RefCreateMergerWorkloadTest(const armnn::TensorShape& outputShape,
                       TensorInfo(outputShape, DataType));
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim0Float32Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim0Float32Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim0Uint8Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim0Uint8Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim0Uint16Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim0Uint16Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedSymm16>({ 4, 3, 2, 5 }, 0);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedSymm16>({ 4, 3, 2, 5 }, 0);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim1Float32Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim1Float32Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 2, 6, 2, 5 }, 1);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim1Uint8Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim1Uint8Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 6, 2, 5 }, 1);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim2Float32Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim2Float32Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 2, 3, 4, 5 }, 2);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 2, 3, 4, 5 }, 2);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim2Uint8Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim2Uint8Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 4, 5 }, 2);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 4, 5 }, 2);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim3Float32Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim3Float32Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 2, 3, 2, 10 }, 3);
 }
 
-BOOST_AUTO_TEST_CASE(CreateMergerDim3Uint8Workload)
+BOOST_AUTO_TEST_CASE(CreateConcatDim3Uint8Workload)
 {
-    RefCreateMergerWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
 }
 
 template <typename ConstantWorkloadType, armnn::DataType DataType>

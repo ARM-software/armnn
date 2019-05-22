@@ -21,7 +21,7 @@ BACKEND_SOURCES := \
         workloads/FullyConnected.cpp \
         workloads/Gather.cpp \
         workloads/Mean.cpp \
-        workloads/Merger.cpp \
+        workloads/Concatenate.cpp \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
         workloads/RefActivationWorkload.cpp \

@@ -120,7 +120,8 @@ enum LayerType : uint {
     Quantize = 35,
     Dequantize = 36,
     Merge = 37,
-    Switch = 38
+    Switch = 38,
+    Concat = 39
 }
 
 // Base layer table to be used as part of other layers
@@ -442,6 +443,11 @@ table StridedSliceDescriptor {
     dataLayout:DataLayout;
 }
 
+table ConcatLayer {
+    base:LayerBase;
+    descriptor:OriginsDescriptor;
+}
+
 table MergerLayer {
     base:LayerBase;
     descriptor:OriginsDescriptor;
@@ -577,7 +583,8 @@ union Layer {
     QuantizeLayer,
     DequantizeLayer,
     MergeLayer,
-    SwitchLayer
+    SwitchLayer,
+    ConcatLayer
 }
 
 table AnyLayer {

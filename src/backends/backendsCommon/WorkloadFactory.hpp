@@ -61,7 +61,7 @@ public:
     virtual std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& Info) const;
 
-    virtual std::unique_ptr<IWorkload> CreateConcat(const MergerQueueDescriptor& descriptor,
+    virtual std::unique_ptr<IWorkload> CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                     const WorkloadInfo&          info) const;
 
     virtual std::unique_ptr<IWorkload> CreateConstant(const ConstantQueueDescriptor& descriptor,

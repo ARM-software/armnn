@@ -317,70 +317,70 @@ public:
     };
 };
 
-class TestMergerLayerVisitor : public TestLayerVisitor
+class TestConcatLayerVisitor : public TestLayerVisitor
 {
 private:
     OriginsDescriptor m_VisitorDescriptor;
 
 public:
-    explicit TestMergerLayerVisitor(const OriginsDescriptor& mergerDescriptor, const char* name = nullptr)
+    explicit TestConcatLayerVisitor(const OriginsDescriptor& concatDescriptor, const char* name = nullptr)
         : TestLayerVisitor(name)
-        , m_VisitorDescriptor(mergerDescriptor.GetNumViews(), mergerDescriptor.GetNumDimensions())
+        , m_VisitorDescriptor(concatDescriptor.GetNumViews(), concatDescriptor.GetNumDimensions())
     {
-        m_VisitorDescriptor.SetConcatAxis(mergerDescriptor.GetConcatAxis());
+        m_VisitorDescriptor.SetConcatAxis(concatDescriptor.GetConcatAxis());
 
-        if (mergerDescriptor.GetNumViews() != m_VisitorDescriptor.GetNumViews())
+        if (concatDescriptor.GetNumViews() != m_VisitorDescriptor.GetNumViews())
         {
             BOOST_ERROR("Unequal number of views in splitter descriptor.");
         }
-        else if (mergerDescriptor.GetNumDimensions() != m_VisitorDescriptor.GetNumDimensions())
+        else if (concatDescriptor.GetNumDimensions() != m_VisitorDescriptor.GetNumDimensions())
         {
             BOOST_ERROR("Unequal number of dimensions in splitter descriptor.");
         }
         else
         {
-            for (unsigned int i = 0; i < mergerDescriptor.GetNumViews(); ++i)
+            for (unsigned int i = 0; i < concatDescriptor.GetNumViews(); ++i)
             {
-                for (unsigned int j = 0; j < mergerDescriptor.GetNumDimensions(); ++j)
+                for (unsigned int j = 0; j < concatDescriptor.GetNumDimensions(); ++j)
                 {
-                    m_VisitorDescriptor.SetViewOriginCoord(i, j, mergerDescriptor.GetViewOrigin(i)[j]);
+                    m_VisitorDescriptor.SetViewOriginCoord(i, j, concatDescriptor.GetViewOrigin(i)[j]);
                 }
             }
         }
     };
 
-    void CheckDescriptor(const OriginsDescriptor& mergerDescriptor)
+    void CheckDescriptor(const OriginsDescriptor& concatDescriptor)
     {
-        BOOST_CHECK_EQUAL(mergerDescriptor.GetNumViews(), m_VisitorDescriptor.GetNumViews());
-        BOOST_CHECK_EQUAL(mergerDescriptor.GetNumDimensions(), m_VisitorDescriptor.GetNumDimensions());
-        BOOST_CHECK_EQUAL(mergerDescriptor.GetConcatAxis(), m_VisitorDescriptor.GetConcatAxis());
+        BOOST_CHECK_EQUAL(concatDescriptor.GetNumViews(), m_VisitorDescriptor.GetNumViews());
+        BOOST_CHECK_EQUAL(concatDescriptor.GetNumDimensions(), m_VisitorDescriptor.GetNumDimensions());
+        BOOST_CHECK_EQUAL(concatDescriptor.GetConcatAxis(), m_VisitorDescriptor.GetConcatAxis());
 
-        if (mergerDescriptor.GetNumViews() != m_VisitorDescriptor.GetNumViews())
+        if (concatDescriptor.GetNumViews() != m_VisitorDescriptor.GetNumViews())
         {
             BOOST_ERROR("Unequal number of views in splitter descriptor.");
         }
-        else if (mergerDescriptor.GetNumDimensions() != m_VisitorDescriptor.GetNumDimensions())
+        else if (concatDescriptor.GetNumDimensions() != m_VisitorDescriptor.GetNumDimensions())
         {
             BOOST_ERROR("Unequal number of dimensions in splitter descriptor.");
         }
         else
         {
-            for (unsigned int i = 0; i < mergerDescriptor.GetNumViews(); ++i)
+            for (unsigned int i = 0; i < concatDescriptor.GetNumViews(); ++i)
             {
-                for (unsigned int j = 0; j < mergerDescriptor.GetNumDimensions(); ++j)
+                for (unsigned int j = 0; j < concatDescriptor.GetNumDimensions(); ++j)
                 {
-                    BOOST_CHECK_EQUAL(mergerDescriptor.GetViewOrigin(i)[j], m_VisitorDescriptor.GetViewOrigin(i)[j]);
+                    BOOST_CHECK_EQUAL(concatDescriptor.GetViewOrigin(i)[j], m_VisitorDescriptor.GetViewOrigin(i)[j]);
                 }
             }
         }
     }
 
-    void VisitMergerLayer(const IConnectableLayer* layer,
-                          const OriginsDescriptor& mergerDescriptor,
+    void VisitConcatLayer(const IConnectableLayer* layer,
+                          const OriginsDescriptor& concatDescriptor,
                           const char* name = nullptr) override
     {
         CheckLayerPointer(layer);
-        CheckDescriptor(mergerDescriptor);
+        CheckDescriptor(concatDescriptor);
         CheckLayerName(name);
     };
 };

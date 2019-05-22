@@ -233,7 +233,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateL2Normalization(const L2No
         m_MemoryManager->GetIntraLayerManager());
 }
 
-std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConcat(const MergerQueueDescriptor& descriptor,
+std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&          info) const
 {
     return std::make_unique<NeonConcatWorkload>(descriptor, info);

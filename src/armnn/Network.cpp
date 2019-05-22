@@ -523,7 +523,10 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         auto backendPtr = factoryFun();
         BOOST_ASSERT(backendPtr.get() != nullptr);
 
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         auto backendSpecificOptimizations = backendPtr->GetOptimizations();
+        ARMNN_NO_DEPRECATE_WARN_END
+
         if (!backendSpecificOptimizations.empty())
         {
             Optimizer::Pass(optNetObjPtr->GetGraph(), backendSpecificOptimizations);

@@ -114,13 +114,16 @@ The interface functions to be implemented are:
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
             const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
-    virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
-    virtual SubgraphUniquePtr OptimizeSubgraph(const SubgraphView& subgraph, bool& optimizationAttempted) const = 0;
+    virtual Optimizations GetOptimizations() const = 0;
+    virtual SubgraphUniquePtr OptimizeSubgraph(const SubgraphView& subgraph, bool& optimizationAttempted) const;
+    virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const;
 ```
 
-Note that ```GetOptimizations()``` has been deprecated.
-The method ```OptimizeSubgraph(...)``` should be used instead to specific optimizations to a given sub-graph.
+Note that ```GetOptimizations()``` and ```SubgraphViewUniquePtr OptimizeSubgraphView(const SubgraphView& subgraph, bool& optimizationAttempted)```
+have been deprecated.
+The method ```OptimizationViews OptimizeSubgraph(const SubgraphView& subgraph)``` should be used instead to
+apply specific optimizations to a given sub-graph.
 
 The ArmNN framework then creates instances of the IBackendInternal interface with the help of the
 [BackendRegistry](backendsCommon/BackendRegistry.hpp) singleton.
@@ -136,10 +139,11 @@ The ArmNN framework creates the backend interfaces dynamically when
 it sees fit and it keeps these objects for a short period of time. Examples:
 
 * During optimization ArmNN needs to decide which layers are supported by the backend.
-   To do this, it creates a backends and calls the ```GetLayerSupport()``` function and creates
-   an ```ILayerSupport``` object to help deciding this.
-* During optimization ArmNN can run backend-specific optimizations. It creates backend objects
-  and calls the ```GetOptimizations()``` function and it runs them on the network.
+  To do this, it creates a backends and calls the ```GetLayerSupport()``` function and creates
+  an ```ILayerSupport``` object to help deciding this.
+* During optimization ArmNN can run backend-specific optimizations. After splitting the graph into
+  sub-graphs based on backends, it calls the ```OptimizeSubgraphView()``` function on each of them and, if possible,
+  substitutes the corresponding sub-graph in the original graph with its optimized version.
 * When the Runtime is initialized it creates an optional ```IBackendContext``` object and keeps this context alive
   for the Runtime's lifetime. It notifies this context object before and after a network is loaded or unloaded.
 * When the LoadedNetwork creates the backend-specific workloads for the layers, it creates a backend
@@ -191,10 +195,19 @@ mechanism:
 ## The Optimizations
 
 The backends may choose to implement backend-specific optimizations.
-This is supported through the method ```OptimizeSubgraph(...)``` to the backend interface
-that allows the backends to apply their specific optimizations to a given sub-grah.
+This is supported through the method ```OptimizationViews OptimizeSubgraph(const SubgraphView& subgraph)``` of
+the backend interface that allows the backends to apply their specific optimizations to a given sub-graph.
 
-The way backends had to provide a list optimizations to the Optimizer (through the ```GetOptimizations()``` method)
+The ```OptimizeSubgraph(...)``` method returns an OptimizationViews object containing three lists:
+* A list of the sub-graph substitutions: a "substitution" is a pair of sub-graphs, the first is the "substitutable" sub-graph,
+  representing the part of the original graph that has been optimized by the backend, while the second is the "replacement" sub-graph,
+  containing the actual optimized layers that will be replaced in the original graph correspondingly to the "substitutable" sub-graph
+* A list of the failed sub-graphs: these are the parts of the original sub-graph that are not supported by the backend,
+  thus have been rejected. ArmNN will try to re-allocate these parts on other backends if available.
+* A list of the untouched sub-graphs: these are the parts of the original sub-graph that have not been optimized,
+  but that can run (unoptimized) on the backend.
+
+The previous way backends had to provide a list optimizations to the Optimizer (through the ```GetOptimizations()``` method)
 is still in place for backward compatibility, but it's now considered deprecated and will be remove in a future release.
 
 ## The IBackendContext interface

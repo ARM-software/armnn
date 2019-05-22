@@ -54,8 +54,10 @@ public:
 
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
 
-    virtual Optimizations GetOptimizations() const = 0;
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
+
+    ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
+    virtual Optimizations GetOptimizations() const = 0;
 
     ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
     virtual SubgraphViewUniquePtr OptimizeSubgraphView(const SubgraphView& subgraph, bool& optimizationAttempted) const

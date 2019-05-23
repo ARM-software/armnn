@@ -318,9 +318,9 @@ void Graph::SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& subst
         }
     });
 
-    TopologicalSort();
     ReplaceSubgraphConnections(subgraph, substituteSubgraph);
     EraseSubgraphLayers(subgraph);
+    TopologicalSort();
 }
 
 void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectableLayer* substituteLayer)

@@ -57,10 +57,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefElementwiseWorkload.hpp
     RefDebugWorkload.cpp
     RefDebugWorkload.hpp
-    RefDepthwiseConvolution2dFloat32Workload.cpp
-    RefDepthwiseConvolution2dFloat32Workload.hpp
-    RefDepthwiseConvolution2dUint8Workload.cpp
-    RefDepthwiseConvolution2dUint8Workload.hpp
+    RefDepthwiseConvolution2dWorkload.cpp
+    RefDepthwiseConvolution2dWorkload.hpp
     RefDequantizeWorkload.cpp
     RefDequantizeWorkload.hpp
     RefDetectionPostProcessUint8Workload.cpp
@@ -81,8 +79,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefL2NormalizationFloat32Workload.hpp
     RefLstmWorkload.cpp
     RefLstmWorkload.hpp
-        RefConcatWorkload.cpp
-        RefConcatWorkload.hpp
+    RefConcatWorkload.cpp
+    RefConcatWorkload.hpp
     RefNormalizationFloat32Workload.cpp
     RefNormalizationFloat32Workload.hpp
     RefPadWorkload.cpp

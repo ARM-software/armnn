@@ -163,11 +163,10 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateConvolution2d(
     return std::make_unique<RefConvolution2dWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDepthwiseConvolution2d(
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefDepthwiseConvolution2dFloat32Workload,
-        RefDepthwiseConvolution2dUint8Workload>(descriptor, info);
+    return std::make_unique<RefDepthwiseConvolution2dWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDetectionPostProcess(

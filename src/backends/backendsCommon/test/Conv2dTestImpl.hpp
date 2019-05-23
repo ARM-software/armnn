@@ -456,7 +456,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
 
     CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
 
-    workload->Execute();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -601,7 +601,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workload->Execute();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -804,7 +804,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
 
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
 
-    workload->Execute();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -910,7 +910,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestImpl(
 
     CopyDataToITensorHandle(inputHandle.get(), &batchedInput[0][0][0][0]);
 
-    workload->Execute();
+    ExecuteWorkload(*workload, memoryManager);
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
 
@@ -1246,8 +1246,9 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
     CopyDataToITensorHandle(inputHandleRef.get(), &input[0][0][0][0]);
 
-    workload->Execute();
+    ExecuteWorkload(*workload, memoryManager);
 
+    workloadRef->PostAllocationConfigure();
     workloadRef->Execute();
 
     CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());

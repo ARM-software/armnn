@@ -278,6 +278,30 @@ BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNhwcWorkload)
     RefCreateConvolution2dWorkloadTest(DataLayout::NHWC);
 }
 
+static void RefCreateDepthwiseConvolutionWorkloadTest(DataLayout dataLayout)
+{
+    Graph graph;
+    RefWorkloadFactory factory;
+    auto workload = CreateDepthwiseConvolution2dWorkloadTest<RefDepthwiseConvolution2dWorkload, DataType::Float32>
+            (factory, graph, dataLayout);
+
+    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW)
+                                                      ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+                                                      : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW)
+                                                      ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+                                                      : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    // Checks that inputs/outputs are as we expect them (see definition of CreateDepthwiseConvolution2dWorkloadTest).
+    CheckInputOutput(std::move(workload),
+                     TensorInfo(inputShape, DataType::Float32),
+                     TensorInfo(outputShape, DataType::Float32));
+}
+
+BOOST_AUTO_TEST_CASE(CreateDepthwiseConvolutionFloat32NhwcWorkload)
+{
+    RefCreateDepthwiseConvolutionWorkloadTest(DataLayout::NHWC);
+}
+
 template <typename FullyConnectedWorkloadType, armnn::DataType DataType>
 static void RefCreateFullyConnectedWorkloadTest()
 {

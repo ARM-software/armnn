@@ -32,6 +32,8 @@ DataType GetBiasDataType(DataType inputDataType)
             return DataType::Float32;
         case DataType::QuantisedAsymm8:
             return DataType::Signed32;
+        case DataType::QuantisedSymm16:
+            return DataType::Signed32;
         default:
             BOOST_ASSERT_MSG(false, "Invalid input data type");
             return DataType::Float32;
@@ -693,6 +695,22 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
 
     ValidateTensorQuantizationMultiplier(workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(),
         workloadInfo.m_OutputTensorInfos[0], "DepthwiseConvolution2dQueueDescriptor", "input", "weights", "output");
+
+    // Check the supported data types
+    std::vector<DataType> supportedTypes = {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16,
+        DataType::Float16
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "DepthwiseConvolution2dQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "DepthwiseConvolution2dQueueDescriptor");
 }
 
 void PermuteQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

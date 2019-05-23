@@ -71,6 +71,7 @@ ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dUint8,
                      DepthwiseConvolution2dUint8Test,
                      false,
                      armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dQSymm16, DepthwiseConvolution2dInt16Test, true, armnn::DataLayout::NCHW)
 
 // NHWC Depthwise Convolution
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dNhwc, DepthwiseConvolution2dTest, true, armnn::DataLayout::NHWC)
@@ -89,6 +90,8 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1,
                      DepthwiseConvolution2dDepthMul1Test, true, armnn::DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Uint8,
                      DepthwiseConvolution2dDepthMul1Uint8Test, true, armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1Int16,
+                     DepthwiseConvolution2dDepthMul1Int16Test, true, armnn::DataLayout::NCHW)
 
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dDepthMul1,
                      DepthwiseConvolution2dDepthMul1Test, false, armnn::DataLayout::NCHW)

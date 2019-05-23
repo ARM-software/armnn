@@ -908,6 +908,26 @@ LayerTestResult<float, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTest(
         false);
 }
 
+LayerTestResult<int16_t, 4> DepthwiseConvolution2dInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout)
+{
+    return DepthwiseConvolution2dTestImpl<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+        workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
+}
+
+LayerTestResult<int16_t, 4> DepthwiseConvolution2dDepthMul1Int16Test(
+                armnn::IWorkloadFactory& workloadFactory,
+                const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                bool biasEnabled,
+                const armnn::DataLayout layout)
+{
+    return DepthwiseConvolution2dDepthMul1TestImpl<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+        workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
+}
+
 LayerTestResult<float, 4> Convolution1dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

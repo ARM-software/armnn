@@ -956,6 +956,18 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dDepthMul1Uint8Test(
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+LayerTestResult<int16_t, 4> DepthwiseConvolution2dInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
+LayerTestResult<int16_t, 4> DepthwiseConvolution2dDepthMul1Int16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
 LayerTestResult<uint8_t, 4> ConstantLinearActivationUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

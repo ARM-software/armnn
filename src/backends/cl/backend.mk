@@ -50,6 +50,7 @@ BACKEND_SOURCES := \
         workloads/ClSoftmaxFloatWorkload.cpp \
         workloads/ClSoftmaxUint8Workload.cpp \
         workloads/ClSpaceToBatchNdWorkload.cpp \
+        workloads/ClSplitterWorkload.cpp \
         workloads/ClStridedSliceWorkload.cpp \
         workloads/ClSubtractionWorkload.cpp
 else

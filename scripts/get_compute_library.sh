@@ -73,7 +73,7 @@ if [ ! -z "$CLFRAMEWORK_SHA" ]; then
     CLFRAMEWORKREVISION=$CLFRAMEWORK_SHA
 fi
 
-git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
+git fetch && git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
 AssertZeroExitCode "Fetching and checking out ${CLFRAMEWORKREVISION} failed"
 
 # Set commit hook so we can submit reviews to gerrit

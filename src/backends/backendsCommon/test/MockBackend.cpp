@@ -109,7 +109,8 @@ IBackendInternal::Optimizations MockBackend::GetOptimizations() const
 
 IBackendInternal::ILayerSupportSharedPtr MockBackend::GetLayerSupport() const
 {
-    return ILayerSupportSharedPtr{};
+    static ILayerSupportSharedPtr layerSupport{new MockLayerSupport};
+    return layerSupport;
 }
 
 OptimizationViews MockBackend::OptimizeSubgraphView(const SubgraphView& subgraph) const

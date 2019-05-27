@@ -40,8 +40,8 @@ BOOST_AUTO_TEST_CASE(NeonTimerMeasure)
     NeonWorkloadFactory workloadFactory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
 
-    unsigned int inputWidth = 4000u;
-    unsigned int inputHeight = 5000u;
+    unsigned int inputWidth = 2000u;
+    unsigned int inputHeight = 2000u;
     unsigned int inputChannels = 1u;
     unsigned int inputBatchSize = 1u;
 

@@ -12,8 +12,46 @@
 #include <Network.hpp>
 
 #include "CommonTestUtils.hpp"
+#include "MockBackend.hpp"
 
 using namespace armnn;
+
+void CheckLayers(Graph& graph)
+{
+    unsigned int m_inputLayerCount = 0, m_outputLayerCount = 0, m_addLayerCount = 0;
+    for(auto layer : graph)
+    {
+        switch(layer->GetType())
+        {
+            case LayerType::Input:
+                ++m_inputLayerCount;
+                if (layer->GetGuid() == 0)
+                {
+                    BOOST_TEST(layer->GetName() == "inLayer0");
+                }
+                else if (layer->GetGuid() == 1)
+                {
+                    BOOST_TEST(layer->GetName() == "inLayer1");
+                }
+                break;
+            // The Addition layer should become a PreCompiled Layer after Optimisation
+            case LayerType::PreCompiled:
+                ++m_addLayerCount;
+                BOOST_TEST(layer->GetName() == "pre-compiled");
+                break;
+            case LayerType::Output:
+                ++m_outputLayerCount;
+                BOOST_TEST(layer->GetName() == "outLayer");
+                break;
+            default:
+                //Fail for anything else
+                BOOST_TEST(false);
+        }
+    }
+    BOOST_TEST(m_inputLayerCount == 2);
+    BOOST_TEST(m_outputLayerCount == 1);
+    BOOST_TEST(m_addLayerCount == 1);
+}
 
 BOOST_AUTO_TEST_SUITE(OptimizationViewsTestSuite)
 
@@ -146,6 +184,38 @@ BOOST_AUTO_TEST_CASE(OptimizedViewsSubgraphLayerCountFailValidate)
 
     // Validate should fail as convLayer1 is not counted
     BOOST_CHECK(!view.Validate(*originalSubgraph));
+}
+
+BOOST_AUTO_TEST_CASE(OptimizeViewsValidateDeviceMockBackend)
+{
+    // build up the structure of the network
+    armnn::INetworkPtr net(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* input = net->AddInputLayer(0, "inLayer0");
+    armnn::IConnectableLayer* input1 = net->AddInputLayer(1, "inLayer1");
+
+    armnn::IConnectableLayer* addition = net->AddAdditionLayer("addLayer");
+
+    armnn::IConnectableLayer* output = net->AddOutputLayer(0, "outLayer");
+
+    input->GetOutputSlot(0).Connect(addition->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(addition->GetInputSlot(1));
+    addition->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({ 1, 1, 4, 4 }, armnn::DataType::Float32));
+    input1->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({ 1, 1, 4, 4 }, armnn::DataType::Float32));
+    addition->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({ 1, 1, 4, 4 }, armnn::DataType::Float32));
+
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    std::vector<armnn::BackendId> backends = { MockBackend().GetIdStatic() };
+    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec());
+    BOOST_CHECK(optNet);
+
+    // Check the optimised graph
+    OptimizedNetwork* optNetObjPtr = boost::polymorphic_downcast<OptimizedNetwork*>(optNet.get());
+    CheckLayers(optNetObjPtr->GetGraph());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

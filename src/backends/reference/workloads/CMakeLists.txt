@@ -69,10 +69,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefFakeQuantizationFloat32Workload.hpp
     RefFloorFloat32Workload.cpp
     RefFloorFloat32Workload.hpp
-    RefFullyConnectedFloat32Workload.cpp
-    RefFullyConnectedFloat32Workload.hpp
-    RefFullyConnectedUint8Workload.cpp
-    RefFullyConnectedUint8Workload.hpp
+    RefFullyConnectedWorkload.cpp
+    RefFullyConnectedWorkload.hpp
     RefGatherWorkload.cpp
     RefGatherWorkload.hpp
     RefL2NormalizationFloat32Workload.cpp

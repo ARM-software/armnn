@@ -141,7 +141,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMerger(const MergerQ
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefFullyConnectedFloat32Workload, RefFullyConnectedUint8Workload>(descriptor, info);
+    return std::make_unique<RefFullyConnectedWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,

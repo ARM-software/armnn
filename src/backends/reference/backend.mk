@@ -42,8 +42,7 @@ BACKEND_SOURCES := \
         workloads/RefElementwiseWorkload.cpp \
         workloads/RefFakeQuantizationFloat32Workload.cpp \
         workloads/RefFloorFloat32Workload.cpp \
-        workloads/RefFullyConnectedFloat32Workload.cpp \
-        workloads/RefFullyConnectedUint8Workload.cpp \
+        workloads/RefFullyConnectedWorkload.cpp \
         workloads/RefGatherWorkload.cpp \
         workloads/RefL2NormalizationFloat32Workload.cpp \
         workloads/RefLstmWorkload.cpp \

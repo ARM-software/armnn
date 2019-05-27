@@ -317,14 +317,14 @@ static void RefCreateFullyConnectedWorkloadTest()
         TensorInfo({ 3, 7 }, DataType, outputQScale));
 }
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkloadFloat32)
 {
-    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedFloat32Workload, armnn::DataType::Float32>();
+    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedWorkload, armnn::DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedUint8Workload)
+BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkloadQuantisedAsymm8)
 {
-    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
 template <typename NormalizationWorkloadType, armnn::DataType DataType>

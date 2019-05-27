@@ -100,7 +100,7 @@ public:
     virtual std::unique_ptr<IWorkload> CreateFloor(const FloorQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const;
 
-     virtual std::unique_ptr<IWorkload> CreateFullyConnected(const FullyConnectedQueueDescriptor& descriptor,
+    virtual std::unique_ptr<IWorkload> CreateFullyConnected(const FullyConnectedQueueDescriptor& descriptor,
                                                             const WorkloadInfo&                  info) const;
 
     virtual std::unique_ptr<IWorkload> CreateGather(const GatherQueueDescriptor& descriptor,

@@ -49,6 +49,12 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
 
     ExecuteWorkload(*workload, memoryManager);
 
+    if (workloadFactory.GetBackendId() == armnn::Compute::CpuRef)
+    {
+        workload->PostAllocationConfigure();
+        workload->Execute();
+    }
+
     CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
 
     return result;

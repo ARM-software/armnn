@@ -23,6 +23,8 @@ public:
     virtual BaseIterator& operator+=(const unsigned int increment) = 0;
 
     virtual BaseIterator& operator-=(const unsigned int increment) = 0;
+
+    virtual BaseIterator& operator[](const unsigned int index) = 0;
 };
 
 template<typename IType>
@@ -54,7 +56,7 @@ class TypedIterator : public Base
 {
 public:
     TypedIterator(T* data)
-        : m_Iterator(data)
+        : m_Iterator(data), m_Start(data)
     {}
 
     TypedIterator& operator++() override
@@ -75,8 +77,15 @@ public:
         return *this;
     }
 
+    TypedIterator& operator[](const unsigned int index) override
+    {
+        m_Iterator = m_Start + index;
+        return *this;
+    }
+
 protected:
     T* m_Iterator;
+    T* m_Start;
 };
 
 class QASymm8Decoder : public TypedIterator<const uint8_t, Decoder<float>>

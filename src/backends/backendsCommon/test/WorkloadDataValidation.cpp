@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(FullyConnectedQueueDescriptor_Validate_RequiredDataMissing)
 
     //Invalid argument exception is expected, because not all required fields have been provided.
     //In particular inputsData[0], outputsData[0] and weightsData can not be null.
-    BOOST_CHECK_THROW(RefFullyConnectedFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefFullyConnectedWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
 

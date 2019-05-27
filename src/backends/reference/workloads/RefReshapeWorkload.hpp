@@ -1,4 +1,4 @@
-﻿//
+//
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
@@ -11,10 +11,10 @@
 namespace armnn
 {
 
-class RefReshapeFloat32Workload : public Float32Workload<ReshapeQueueDescriptor>
+class RefReshapeWorkload : public BaseWorkload<ReshapeQueueDescriptor>
 {
 public:
-    using Float32Workload<ReshapeQueueDescriptor>::Float32Workload;
+    using BaseWorkload<ReshapeQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

@@ -91,10 +91,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefPooling2dUint8Workload.hpp
     RefQuantizeWorkload.cpp
     RefQuantizeWorkload.hpp
-    RefReshapeFloat32Workload.cpp
-    RefReshapeFloat32Workload.hpp
-    RefReshapeUint8Workload.cpp
-    RefReshapeUint8Workload.hpp
+    RefReshapeWorkload.cpp
+    RefReshapeWorkload.hpp
     RefResizeBilinearFloat32Workload.cpp
     RefResizeBilinearFloat32Workload.hpp
     RefResizeBilinearUint8Workload.cpp

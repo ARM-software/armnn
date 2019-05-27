@@ -850,13 +850,13 @@ void ConstantQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     // Check the supported data types
     std::vector<DataType> supportedTypes =
-                              {
-                                  DataType::Float32,
-                                  DataType::Float16,
-                                  DataType::Signed32,
-                                  DataType::QuantisedAsymm8,
-                                  DataType::QuantisedSymm16
-                              };
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::Signed32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
 
     ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0], supportedTypes, "ConstantQueueDescriptor");
 }
@@ -872,6 +872,17 @@ void ReshapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             to_string(workloadInfo.m_InputTensorInfos[0].GetNumElements()) + " but output tensor has " +
             to_string(workloadInfo.m_OutputTensorInfos[0].GetNumElements()) + " elements.");
     }
+
+    // Check the supported data types
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QuantisedAsymm8
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0], supportedTypes, "ReshapeQueueDescriptor");
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0], supportedTypes, "ReshapeQueueDescriptor");
 }
 
 void SpaceToBatchNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

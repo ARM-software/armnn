@@ -663,12 +663,12 @@ static void RefCreateReshapeWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateReshapeFloat32Workload)
 {
-    RefCreateReshapeWorkloadTest<RefReshapeFloat32Workload, armnn::DataType::Float32>();
+    RefCreateReshapeWorkloadTest<RefReshapeWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
 {
-    RefCreateReshapeWorkloadTest<RefReshapeUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    RefCreateReshapeWorkloadTest<RefReshapeWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
 template <typename MergerWorkloadType, armnn::DataType DataType>

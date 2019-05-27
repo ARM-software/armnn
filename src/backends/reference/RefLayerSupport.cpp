@@ -1021,10 +1021,15 @@ bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
     ignore_unused(descriptor);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+    // Define supported output types.
+    std::array<DataType,3> supportedOutputTypes =
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QuantisedAsymm8
+    };
+    return CheckSupportRule(TypeAnyOf(input, supportedOutputTypes), reasonIfUnsupported,
+        "Reference reshape: input type not supported.");
 }
 
 bool RefLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,

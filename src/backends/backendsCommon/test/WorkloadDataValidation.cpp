@@ -447,7 +447,7 @@ BOOST_AUTO_TEST_CASE(ReshapeQueueDescriptor_Validate_MismatchingNumElements)
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
 
     // InvalidArgumentException is expected, because the number of elements don't match.
-    BOOST_CHECK_THROW(RefReshapeFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefReshapeWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
 

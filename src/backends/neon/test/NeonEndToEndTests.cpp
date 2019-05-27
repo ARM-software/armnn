@@ -6,6 +6,7 @@
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 #include <backendsCommon/test/MergerTestImpl.hpp>
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
+#include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -120,6 +121,46 @@ BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim3Test)
 BOOST_AUTO_TEST_CASE(NeonMergerEndToEndDim3Uint8Test)
 {
     MergerDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitDim0EndToEndTest)
+{
+    SplitterDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitDim1EndToEndTest)
+{
+    SplitterDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitDim2EndToEndTest)
+{
+    SplitterDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitDim3EndToEndTest)
+{
+    SplitterDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitDim0EndToEndUint8Test)
+{
+    SplitterDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitDim1EndToEndUint8Test)
+{
+    SplitterDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitDim2EndToEndUint8Test)
+{
+    SplitterDim2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitDim3EndToEndUint8Test)
+{
+    SplitterDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

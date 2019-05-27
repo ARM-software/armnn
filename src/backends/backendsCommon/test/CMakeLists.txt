@@ -44,6 +44,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ReshapeTestImpl.hpp
     RuntimeTestImpl.hpp
     SoftmaxTestImpl.hpp
+    SplitterEndToEndTestImpl.hpp
     SplitterTestImpl.hpp
     StridedSliceTestImpl.hpp
     TensorCopyUtils.cpp

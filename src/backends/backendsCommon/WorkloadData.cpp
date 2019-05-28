@@ -350,6 +350,27 @@ void SplitterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     ValidateNumInputs(workloadInfo, "SplitterQueueDescriptor", 1);
 
+    // Check the supported data types
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::Float16,
+            DataType::Boolean,
+            DataType::Signed32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    for (unsigned long i = 0; i < workloadInfo.m_OutputTensorInfos.size(); ++i)
+    {
+        ValidateDataTypes(workloadInfo.m_OutputTensorInfos[i],
+                          supportedTypes,
+                          "SplitterQueueDescriptor");
+    }
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "SplitterQueueDescriptor");
+
     if (workloadInfo.m_OutputTensorInfos.size() <= 0)
     {
         throw InvalidArgumentException("SplitterQueueDescriptor: At least one output needs to be provided.");

@@ -7,14 +7,16 @@
 
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
+#include "Decoders.hpp"
+#include "Encoders.hpp"
 
 namespace armnn
 {
 
-class RefSplitterFloat32Workload : public Float32Workload<SplitterQueueDescriptor>
+class RefSplitterWorkload : public BaseWorkload<SplitterQueueDescriptor>
 {
 public:
-    using Float32Workload<SplitterQueueDescriptor>::Float32Workload;
+    using BaseWorkload<SplitterQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

@@ -61,14 +61,14 @@ BACKEND_SOURCES := \
         workloads/RefSoftmaxWorkload.cpp \
         workloads/RefSpaceToBatchNdWorkload.cpp \
         workloads/RefStridedSliceWorkload.cpp \
-        workloads/RefSplitterFloat32Workload.cpp \
-        workloads/RefSplitterUint8Workload.cpp \
+        workloads/RefSplitterWorkload.cpp \
         workloads/ResizeBilinear.cpp \
         workloads/Rsqrt.cpp \
         workloads/SpaceToBatchNd.cpp \
         workloads/StridedSlice.cpp \
         workloads/StringMapping.cpp \
-        workloads/Softmax.cpp
+        workloads/Softmax.cpp \
+        workloads/Splitter.cpp
 
 # BACKEND_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked

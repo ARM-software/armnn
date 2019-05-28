@@ -211,14 +211,14 @@ BOOST_AUTO_TEST_CASE(SplitterQueueDescriptor_Validate_WrongWindow)
 
     BOOST_TEST_INFO("Invalid argument exception is expected, because split window dimensionality does not "
         "match input.");
-    BOOST_CHECK_THROW(RefSplitterFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefSplitterWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 
     // Invalid, since window extends past the boundary of input tensor.
     std::vector<unsigned int> wOrigin3 = {0, 0, 15, 0};
     armnn::SplitterQueueDescriptor::ViewOrigin window3(wOrigin3);
     invalidData.m_ViewOrigins[0] = window3;
     BOOST_TEST_INFO("Invalid argument exception is expected (wOrigin3[2]+ outputHeight > inputHeight");
-    BOOST_CHECK_THROW(RefSplitterFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefSplitterWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 
 
     std::vector<unsigned int> wOrigin4 = {0, 0, 0, 0};
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(SplitterQueueDescriptor_Validate_WrongWindow)
     invalidData.m_ViewOrigins.push_back(window5);
 
     BOOST_TEST_INFO("Invalid exception due to number of split windows not matching number of outputs.");
-    BOOST_CHECK_THROW(RefSplitterFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefSplitterWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
 

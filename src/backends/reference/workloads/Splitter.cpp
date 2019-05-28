@@ -1,33 +1,42 @@
-﻿//
+//
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#pragma once
-
 #include "RefWorkloadUtils.hpp"
 #include <backendsCommon/WorkloadData.hpp>
 #include <armnn/Tensor.hpp>
+
 #include <boost/assert.hpp>
+#include "Splitter.hpp"
+
+#include <cmath>
+#include <limits>
+
+#include "Decoders.hpp"
+#include "Encoders.hpp"
 
 namespace armnn
 {
 
-template <typename DataType>
-void Splitter(const SplitterQueueDescriptor& data)
+void Split(const SplitterQueueDescriptor& data)
 {
-    const TensorInfo& inputInfo0 = GetTensorInfo(data.m_Inputs[0]);
+    const TensorInfo& inputInfo = GetTensorInfo(data.m_Inputs[0]);
 
-    for (unsigned int index = 0; index < inputInfo0.GetNumElements(); ++index)
+    std::unique_ptr<Decoder<float>> decoderPtr =
+        MakeDecoder<float>(inputInfo, data.m_Inputs[0]->Map());
+    Decoder<float>& decoder = *decoderPtr;
+
+    for (unsigned int index = 0; index < inputInfo.GetNumElements(); ++index)
     {
         unsigned int indices[MaxNumOfTensorDimensions] = { 0 };
 
         unsigned int indexRemainder = index;
-        unsigned int dimensionStride = inputInfo0.GetNumElements();
+        unsigned int dimensionStride = inputInfo.GetNumElements();
 
-        for (unsigned int i = 0; i<inputInfo0.GetNumDimensions(); i++)
+        for (unsigned int i = 0; i<inputInfo.GetNumDimensions(); i++)
         {
-            dimensionStride /= inputInfo0.GetShape()[i];
+            dimensionStride /= inputInfo.GetShape()[i];
             indices[i] = indexRemainder / dimensionStride; // Use integer division to round down.
             indexRemainder -= indices[i] * dimensionStride;
         }
@@ -38,7 +47,7 @@ void Splitter(const SplitterQueueDescriptor& data)
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& outputInfo = GetTensorInfo(data.m_Outputs[viewIdx]);
-            BOOST_ASSERT(outputInfo.GetNumDimensions() == inputInfo0.GetNumDimensions());
+            BOOST_ASSERT(outputInfo.GetNumDimensions() == inputInfo.GetNumDimensions());
 
             // Check all dimensions to see if this element is inside the given input view.
             bool insideView = true;
@@ -56,8 +65,13 @@ void Splitter(const SplitterQueueDescriptor& data)
 
             if (insideView)
             {
+                std::unique_ptr<Encoder<float>> encoderPtr =
+                    MakeEncoder<float>(outputInfo, data.m_Outputs[viewIdx]->Map());
+                Encoder<float>& encoder = *encoderPtr;
+
                 unsigned int outIndex = 0;
                 unsigned int dimensionStride = 1;
+                float inputValue = 0.f;
 
                 for (unsigned int i = outputInfo.GetNumDimensions(); i-- > 0;)
                 {
@@ -65,18 +79,16 @@ void Splitter(const SplitterQueueDescriptor& data)
                     dimensionStride *= outputInfo.GetShape()[i];
                 }
 
-                //We are within the view, to copy input data to the output corresponding to this view.
-                DataType* outputData = GetOutputTensorData<DataType>(viewIdx, data);
-                BOOST_ASSERT(outputData);
+                decoder += index;
+                inputValue = decoder.Get();
+                decoder -= index;
 
-                const DataType* inputData = GetInputTensorData<DataType>(0, data);
-                BOOST_ASSERT(inputData);
-
-                outputData[outIndex] = inputData[index];
+                encoder += outIndex;
+                encoder.Set(inputValue);
+                break;
             }
         }
     }
 }
 
-void Split(const SplitterQueueDescriptor& data);
-} //namespace armnn
+}

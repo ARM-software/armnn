@@ -470,12 +470,12 @@ static void RefCreateSplitterWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateSplitterFloat32Workload)
 {
-    RefCreateSplitterWorkloadTest<RefSplitterFloat32Workload, armnn::DataType::Float32>();
+    RefCreateSplitterWorkloadTest<RefSplitterWorkload, armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterUint8Workload)
 {
-    RefCreateSplitterWorkloadTest<RefSplitterUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    RefCreateSplitterWorkloadTest<RefSplitterWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
 template <typename SplitterWorkloadType, typename ConcatWorkloadType, armnn::DataType DataType>
@@ -513,12 +513,12 @@ static void RefCreateSplitterConcatWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateSplitterConcatFloat32)
 {
-    RefCreateSplitterConcatWorkloadTest<RefSplitterFloat32Workload, RefConcatWorkload, DataType::Float32>();
+    RefCreateSplitterConcatWorkloadTest<RefSplitterWorkload, RefConcatWorkload, DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterConcatUint8)
 {
-    RefCreateSplitterConcatWorkloadTest<RefSplitterUint8Workload, RefConcatWorkload, DataType::QuantisedAsymm8>();
+    RefCreateSplitterConcatWorkloadTest<RefSplitterWorkload, RefConcatWorkload, DataType::QuantisedAsymm8>();
 }
 
 template <typename SplitterWorkloadType, typename ActivationWorkloadType, armnn::DataType DataType>
@@ -561,13 +561,13 @@ static void RefCreateSingleOutputMultipleInputsTest()
 
 BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputsFloat32)
 {
-    RefCreateSingleOutputMultipleInputsTest<RefSplitterFloat32Workload, RefActivationWorkload,
+    RefCreateSingleOutputMultipleInputsTest<RefSplitterWorkload, RefActivationWorkload,
         armnn::DataType::Float32>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputsUint8)
 {
-    RefCreateSingleOutputMultipleInputsTest<RefSplitterUint8Workload, RefActivationWorkload,
+    RefCreateSingleOutputMultipleInputsTest<RefSplitterWorkload, RefActivationWorkload,
         armnn::DataType::QuantisedAsymm8>();
 }
 

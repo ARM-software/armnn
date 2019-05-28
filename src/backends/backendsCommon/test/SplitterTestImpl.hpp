@@ -46,15 +46,15 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
 
 
     // Define the tensor descriptors.
-    armnn::TensorInfo inputTensorInfo({ inputChannels, inputHeight, inputWidth }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo({ inputChannels, inputHeight, inputWidth }, ArmnnType, qScale, qOffset);
 
     // Outputs of the original split.
-    armnn::TensorInfo outputTensorInfo1({ outputChannels1, outputHeight1, outputWidth1 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo2({ outputChannels2, outputHeight2, outputWidth2 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo1({ outputChannels1, outputHeight1, outputWidth1 }, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputTensorInfo2({ outputChannels2, outputHeight2, outputWidth2 }, ArmnnType, qScale, qOffset);
 
     // Outputs of the subsequent subtensor split.
-    armnn::TensorInfo outputTensorInfo3({ outputChannels1, outputHeight1, outputWidth1 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo4({ outputChannels1, outputHeight1, outputWidth1 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo3({ outputChannels1, outputHeight1, outputWidth1 }, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputTensorInfo4({ outputChannels1, outputHeight1, outputWidth1 }, ArmnnType, qScale, qOffset);
 
     // Set quantization parameters if the requested type is a quantized type.
     // The quantization doesn't really matter as the splitter operator doesn't dequantize/quantize.
@@ -251,7 +251,7 @@ LayerTestResult<T, 3> CopyViaSplitterTestImpl(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale, int32_t qOffset)
 {
-    const armnn::TensorInfo tensorInfo({ 3, 6, 5 }, ArmnnType);
+    const armnn::TensorInfo tensorInfo({ 3, 6, 5 }, ArmnnType, qScale, qOffset);
     auto input = MakeTensor<T, 3>(tensorInfo, QuantizedVector<T>(qScale, qOffset,
                                                                  {
                                                                      1.0f, 2.0f, 3.0f, 4.0f, 5.0f,

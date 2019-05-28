@@ -1138,6 +1138,13 @@ std::vector<LayerTestResult<uint8_t,3>> SplitterUint8Test(
     return SplitterTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
+std::vector<LayerTestResult<int16_t,3>> SplitterInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SplitterTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
+}
+
 LayerTestResult<float, 3> CopyViaSplitterTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -1150,6 +1157,13 @@ LayerTestResult<uint8_t, 3> CopyViaSplitterUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return CopyViaSplitterTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+}
+
+LayerTestResult<int16_t, 3> CopyViaSplitterInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return CopyViaSplitterTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<float, 2> LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest(

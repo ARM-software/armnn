@@ -8,9 +8,15 @@
 #include <armnn/Tensor.hpp>
 
 #include <Half.hpp>
+#include "TensorCopyUtils.hpp"
+#include "WorkloadTestUtils.hpp"
 
+#include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/IMemoryManager.hpp>
+#include <reference/workloads/Decoders.hpp>
+#include <reference/workloads/Encoders.hpp>
+#include <test/TensorHelpers.hpp>
 
 #include <boost/multi_array.hpp>
 #include <boost/assert.hpp>
@@ -793,7 +799,8 @@ LayerTestResult<uint8_t, 4> BoundedReLuUint8Test(
     float upperBound,
     float lowerBound);
 
-LayerTestResult<uint8_t, 2> FullyConnectedUint8Test(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> FullyConnectedTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled);
@@ -1638,3 +1645,139 @@ LayerTestResult<uint8_t, 4> QuantizeClampUint8Test(
 LayerTestResult<int16_t, 4> QuantizeClampInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template<typename T, typename B>
+LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::TensorInfo inputTensorInfo,
+        armnn::TensorInfo outputTensorInfo,
+        armnn::TensorInfo weightsDesc,
+        armnn::TensorInfo biasesDesc,
+        boost::multi_array<T, 2>& weights,
+        boost::multi_array<B, 1>& bias,
+        boost::multi_array<T, 4>& input,
+        bool biasEnabled,
+        bool transposeWeights)
+{
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::FullyConnectedQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    armnn::ScopedCpuTensorHandle weightsTensor(weightsDesc);
+    armnn::ScopedCpuTensorHandle biasTensor(biasesDesc);
+
+    AllocateAndCopyDataToITensorHandle(&weightsTensor, &weights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&biasTensor, &bias[0]);
+
+    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+    data.m_Weight = &weightsTensor;
+    data.m_Bias = &biasTensor;
+    data.m_Parameters.m_BiasEnabled = biasEnabled;
+    data.m_Parameters.m_TransposeWeightMatrix = transposeWeights;
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateFullyConnected(data, info);
+    LayerTestResult<T, 2> result(outputTensorInfo);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+
+    ExecuteWorkload(*workload, memoryManager);
+
+    CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
+
+    return result;
+}
+
+template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+std::vector<T> ConvertToDataType(const std::vector<float>& input,
+                                 const armnn::TensorInfo& inputTensorInfo)
+{
+    std::vector<T> output(input.size());
+    auto outputTensorInfo = inputTensorInfo;
+    outputTensorInfo.SetDataType(ArmnnType);
+
+    std::unique_ptr<armnn::Encoder<float>> pOutputEncoder = armnn::MakeEncoder<float>(outputTensorInfo, output.data());
+    armnn::Encoder<float>& rOutputEncoder = *pOutputEncoder;
+
+    for (auto it = input.begin(); it != input.end(); ++it)
+    {
+        rOutputEncoder.Set(*it);
+        ++rOutputEncoder;
+    }
+    return output;
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 2> FullyConnectedTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled)
+{
+    constexpr static unsigned int inputWidth = 3u;
+    constexpr static unsigned int inputHeight = 2u;
+    constexpr static unsigned int inputChannels = 1u;
+
+    constexpr static unsigned int inputSize = inputWidth * inputHeight * inputChannels;
+
+    constexpr static unsigned int outputChannels = 2u;
+
+    armnn::TensorInfo inputTensorInfo({ 1, inputChannels, inputHeight, inputWidth }, ArmnnType);
+    inputTensorInfo.SetQuantizationScale(0.1f);
+    inputTensorInfo.SetQuantizationOffset(63);
+
+    armnn::TensorInfo outputTensorInfo({ 1, outputChannels }, ArmnnType);
+    outputTensorInfo.SetQuantizationScale(5.f);
+    outputTensorInfo.SetQuantizationOffset(biasEnabled ? -50 : 10);
+
+    armnn::TensorInfo weightsDesc({ outputChannels, inputSize }, ArmnnType);
+    weightsDesc.SetQuantizationScale(0.2f);
+    weightsDesc.SetQuantizationOffset(93);
+
+    armnn::TensorInfo biasesDesc({ outputChannels }, GetBiasTypeFromWeightsType(weightsDesc.GetDataType()).value());
+    biasesDesc.SetQuantizationScale(inputTensorInfo.GetQuantizationScale() * weightsDesc.GetQuantizationScale());
+    biasesDesc.SetQuantizationOffset(0);
+
+    LayerTestResult<T, 2> result(outputTensorInfo);
+
+    auto input = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(
+        {
+            -1.2f, 6.1f, -3.5f,
+            18.8f, -5.5f, 2.9f
+        },
+        inputTensorInfo));
+
+    auto weights = MakeTensor<T, 2>(weightsDesc, ConvertToDataType<ArmnnType>(
+        {
+            -8.4f, 20.0f, -10.4f, -8, 16.4f, -11.8f,
+            23.4f, 10.4f, -14.0f, -3.8f, -11.8f, 11.4f
+        },
+        weightsDesc));
+
+    auto bias = MakeTensor<int32_t, 1>(biasesDesc, std::vector<int32_t>{9250, 67500});
+
+    result = SimpleFullyConnectedTestImpl<T>(
+            workloadFactory,
+            memoryManager,
+            inputTensorInfo, outputTensorInfo,
+            weightsDesc, biasesDesc,
+            weights, bias, input,
+            biasEnabled, true
+    );
+
+    if (biasEnabled)
+    {
+        result.outputExpected = MakeTensor<T, 2>(outputTensorInfo,
+                                                 ConvertToDataType<ArmnnType>({80.f, 1460.f}, outputTensorInfo));
+    }
+    else
+    {
+        result.outputExpected = MakeTensor<T, 2>(outputTensorInfo,
+                                                 ConvertToDataType<ArmnnType>({-107.04f, 110.f}, outputTensorInfo));
+    }
+
+    return result;
+}

@@ -86,4 +86,26 @@ inline void ExecuteWorkload(armnn::IWorkload& workload,
     }
 }
 
+inline armnn::Optional<armnn::DataType> GetBiasTypeFromWeightsType(armnn::Optional<armnn::DataType> weightsType)
+{
+    if (!weightsType)
+    {
+        return weightsType;
+    }
+
+    switch(weightsType.value())
+    {
+        case armnn::DataType::Float16:
+        case armnn::DataType::Float32:
+            return weightsType;
+        case armnn::DataType::QuantisedAsymm8:
+            return armnn::DataType::Signed32;
+        case armnn::DataType::QuantisedSymm16:
+            return armnn::DataType::Signed32;
+        default:
+            BOOST_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
+    }
+    return armnn::EmptyOptional();
+}
+
 } // anonymous namespace

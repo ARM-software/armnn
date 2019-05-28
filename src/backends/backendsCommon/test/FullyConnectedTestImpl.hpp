@@ -5,60 +5,7 @@
 
 #include <ResolveType.hpp>
 #include "WorkloadTestUtils.hpp"
-
 #include <backendsCommon/IBackendInternal.hpp>
-
-template<typename T, typename B>
-LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::TensorInfo inputTensorInfo,
-    armnn::TensorInfo outputTensorInfo,
-    armnn::TensorInfo weightsDesc,
-    armnn::TensorInfo biasesDesc,
-    boost::multi_array<T, 2>& weights,
-    boost::multi_array<B, 1>& bias,
-    boost::multi_array<T, 4>& input,
-    bool biasEnabled,
-    bool transposeWeights)
-{
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
-
-    armnn::FullyConnectedQueueDescriptor data;
-    armnn::WorkloadInfo info;
-    armnn::ScopedCpuTensorHandle weightsTensor(weightsDesc);
-    armnn::ScopedCpuTensorHandle biasTensor(biasesDesc);
-
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, &weights[0][0]);
-    AllocateAndCopyDataToITensorHandle(&biasTensor, &bias[0]);
-
-    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor;
-    data.m_Parameters.m_BiasEnabled = biasEnabled;
-    data.m_Parameters.m_TransposeWeightMatrix = transposeWeights;
-
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateFullyConnected(data, info);
-    LayerTestResult<T, 2> result(outputTensorInfo);
-
-    inputHandle->Allocate();
-    outputHandle->Allocate();
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
-
-    ExecuteWorkload(*workload, memoryManager);
-
-    if (workloadFactory.GetBackendId() == armnn::Compute::CpuRef)
-    {
-        workload->PostAllocationConfigure();
-        workload->Execute();
-    }
-
-    CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
-
-    return result;
-}
 
 LayerTestResult<float, 2> FullyConnectedFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -154,72 +101,6 @@ LayerTestResult<float, 2> FullyConnectedFloat32Test(
 
     return result;
 }
-
-LayerTestResult<uint8_t, 2> FullyConnectedUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    bool biasEnabled)
-{
-    constexpr static unsigned int inputWidth = 3u;
-    constexpr static unsigned int inputHeight = 2u;
-    constexpr static unsigned int inputChannels = 1u;
-
-    constexpr static unsigned int inputSize = inputWidth * inputHeight * inputChannels;
-
-    constexpr static unsigned int outputChannels = 2u;
-
-    armnn::TensorInfo inputTensorInfo({ 1, inputChannels, inputHeight, inputWidth }, armnn::DataType::QuantisedAsymm8);
-    inputTensorInfo.SetQuantizationScale(0.1f);
-    inputTensorInfo.SetQuantizationOffset(63);
-
-    armnn::TensorInfo outputTensorInfo({ 1, outputChannels }, armnn::DataType::QuantisedAsymm8);
-    outputTensorInfo.SetQuantizationScale(5.f);
-    outputTensorInfo.SetQuantizationOffset(biasEnabled ? -50 : 10);
-
-    armnn::TensorInfo weightsDesc({ outputChannels, inputSize }, armnn::DataType::QuantisedAsymm8);
-    weightsDesc.SetQuantizationScale(0.2f);
-    weightsDesc.SetQuantizationOffset(93);
-
-    armnn::TensorInfo biasesDesc({ outputChannels }, armnn::DataType::Signed32);
-    biasesDesc.SetQuantizationScale(inputTensorInfo.GetQuantizationScale() * weightsDesc.GetQuantizationScale());
-    biasesDesc.SetQuantizationOffset(0);
-
-    LayerTestResult<uint8_t, 2> result(outputTensorInfo);
-
-    auto input = MakeTensor<uint8_t, 4>(inputTensorInfo, std::vector<uint8_t>{51, 124, 28,
-        251, 8, 92});
-
-    auto weights = MakeTensor<uint8_t, 2>(weightsDesc, std::vector<uint8_t>{51, 193, 42, 53, 175, 34,
-        210, 145, 23, 74, 34, 150});
-
-        // scale = 0.02
-        // offset = 0
-    auto bias = MakeTensor<int32_t, 1>(biasesDesc, std::vector<int32_t>{9250, 67500});
-
-    result = SimpleFullyConnectedTestImpl<uint8_t>(
-        workloadFactory,
-        memoryManager,
-        inputTensorInfo, outputTensorInfo,
-        weightsDesc, biasesDesc,
-        weights, bias, input,
-        biasEnabled, true
-    );
-
-    // Manually calculated.
-    // Note one of these values has been clamped to 0.
-    if (biasEnabled)
-    {
-        result.outputExpected = MakeTensor<uint8_t, 2>(outputTensorInfo, std::vector<uint8_t>{0, 242});
-    }
-    else
-    {
-        result.outputExpected = MakeTensor<uint8_t, 2>(outputTensorInfo, std::vector<uint8_t>{0, 32});
-    }
-
-    return result;
-}
-
-
 
 //
 // ArmNN variant of the AndroidNN fully_connected_float_large test.

@@ -327,6 +327,11 @@ BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkloadQuantisedAsymm8)
     RefCreateFullyConnectedWorkloadTest<RefFullyConnectedWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
+BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkloadQuantisedAsymm16)
+{
+    RefCreateFullyConnectedWorkloadTest<RefFullyConnectedWorkload, armnn::DataType::QuantisedSymm16>();
+}
+
 template <typename NormalizationWorkloadType, armnn::DataType DataType>
 static void RefCreateNormalizationWorkloadTest(DataLayout dataLayout)
 {

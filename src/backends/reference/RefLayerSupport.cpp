@@ -12,6 +12,7 @@
 #include <armnn/Descriptors.hpp>
 
 #include <backendsCommon/BackendRegistry.hpp>
+#include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 
@@ -108,9 +109,29 @@ struct TypeAnyOf : public Rule
     TypeAnyOf(const TensorInfo& info, const Container& c)
     {
         m_Res = std::any_of(c.begin(), c.end(), [&info](DataType dt)
-            {
-                return dt == info.GetDataType();
-            });
+        {
+            return dt == info.GetDataType();
+        });
+    }
+};
+
+struct BiasAndWeightsTypesMatch : public Rule
+{
+    BiasAndWeightsTypesMatch(const TensorInfo& biases, const TensorInfo& weights)
+    {
+        m_Res = biases.GetDataType() == GetBiasTypeFromWeightsType(weights.GetDataType()).value();
+    }
+};
+
+struct BiasAndWeightsTypesCompatible : public Rule
+{
+    template<typename Container>
+    BiasAndWeightsTypesCompatible(const TensorInfo& info, const Container& c)
+    {
+        m_Res = std::any_of(c.begin(), c.end(), [&info](DataType dt)
+        {
+            return dt ==  GetBiasTypeFromWeightsType(info.GetDataType()).value();
+        });
     }
 };
 
@@ -569,14 +590,53 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                                 const FullyConnectedDescriptor& descriptor,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
-    ignore_unused(weights);
-    ignore_unused(biases);
-    ignore_unused(descriptor);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+    bool supported = true;
+
+    // Define supported types.
+    std::array<DataType,3> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Fully Connected: input type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Fully Connected: output type not supported.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Fully Connected: input and output types mismatched.");
+
+    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+                                  "Reference Fully Connected: weights type not supported.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
+                                  "Reference Fully Connected: input and weight types mismatched.");
+
+    if (descriptor.m_BiasEnabled)
+    {
+        // Defined supported types for bias
+        std::array<DataType, 2>
+        supportedBiasTypes =
+        {
+            DataType::Float32,
+            DataType::Signed32
+        };
+
+        supported &= CheckSupportRule(TypeAnyOf(biases, supportedBiasTypes), reasonIfUnsupported,
+                                      "Reference Fully Connected: bias type not supported.");
+
+        supported &= CheckSupportRule(BiasAndWeightsTypesMatch(biases, weights), reasonIfUnsupported,
+                                      "Reference Fully Connected: bias and weight types mismatch.");
+
+        supported &= CheckSupportRule(BiasAndWeightsTypesCompatible(weights, supportedBiasTypes), reasonIfUnsupported,
+                                      "Reference Fully Connected: bias type inferred from weights is incompatible.");
+
+    }
+
+    return supported;
 }
 
 bool RefLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,

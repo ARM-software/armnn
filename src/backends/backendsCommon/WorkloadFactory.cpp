@@ -17,6 +17,7 @@
 #include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
+#include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <boost/cast.hpp>
 #include <boost/iterator/transform_iterator.hpp>
@@ -38,26 +39,6 @@ const TensorInfo OverrideDataType(const TensorInfo& info, Optional<DataType> typ
     }
 
     return TensorInfo(info.GetShape(), type.value(), info.GetQuantizationScale(), info.GetQuantizationOffset());
-}
-
-Optional<DataType> GetBiasTypeFromWeightsType(Optional<DataType> weightsType)
-{
-    if (!weightsType)
-    {
-        return weightsType;
-    }
-
-    switch(weightsType.value())
-    {
-        case DataType::Float16:
-        case DataType::Float32:
-            return weightsType;
-        case DataType::QuantisedAsymm8:
-            return DataType::Signed32;
-        default:
-            BOOST_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
-    }
-    return EmptyOptional();
 }
 
 } // anonymous namespace

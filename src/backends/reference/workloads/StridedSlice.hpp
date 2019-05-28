@@ -11,11 +11,10 @@
 namespace armnn
 {
 
-template <typename T>
 void StridedSlice(const TensorInfo& inputInfo,
-                  const TensorInfo& outputInfo,
                   const StridedSliceDescriptor& params,
-                  const T* inputData,
-                  T* outputData);
+                  const void* inputData,
+                  void* outputData,
+                  unsigned int dataTypeSize);
 
-} //namespace armnn
+} // namespace armnn

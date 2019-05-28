@@ -4,31 +4,37 @@
 //
 
 #include "RefStridedSliceWorkload.hpp"
+#include "RefWorkloadUtils.hpp"
 #include "StridedSlice.hpp"
 
-#include "RefWorkloadUtils.hpp"
-#include <ResolveType.hpp>
+#include <boost/format.hpp>
 
 namespace armnn
 {
 
-template<armnn::DataType DataType>
-void RefStridedSliceWorkload<DataType>::Execute() const
+RefStridedSliceWorkload::RefStridedSliceWorkload(const StridedSliceQueueDescriptor& descriptor,
+                                                 const WorkloadInfo& info)
+    : BaseWorkload(descriptor, info)
+{}
+
+void RefStridedSliceWorkload::Execute() const
 {
-    using T = ResolveType<DataType>;
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefStridedSliceWorkload_Execute");
 
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, GetName() + "_Execute");
-
-    const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
+    const TensorInfo& inputInfo  = GetTensorInfo(m_Data.m_Inputs[0]);
     const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
 
-    const T* inputData = GetInputTensorData<T>(0, m_Data);
-    T* outputData = GetOutputTensorData<T>(0, m_Data);
+    DataType inputDataType  = inputInfo.GetDataType();
+    DataType outputDataType = outputInfo.GetDataType();
 
-    StridedSlice(inputInfo, outputInfo, m_Data.m_Parameters, inputData, outputData);
+    BOOST_ASSERT(inputDataType == outputDataType);
+    boost::ignore_unused(outputDataType);
+
+    StridedSlice(inputInfo,
+                 m_Data.m_Parameters,
+                 m_Data.m_Inputs[0]->Map(),
+                 m_Data.m_Outputs[0]->Map(),
+                 GetDataTypeSize(inputDataType));
 }
 
-template class RefStridedSliceWorkload<DataType::Float32>;
-template class RefStridedSliceWorkload<DataType::QuantisedAsymm8>;
-
-} //namespace armnn
+} // namespace armnn

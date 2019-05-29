@@ -9790,6 +9790,69 @@ LayerTestResult<uint8_t, 2> StridedSlice2DReverseUint8Test(
     return StridedSlice2DReverseTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
 }
 
+LayerTestResult<int16_t, 4> StridedSlice4DInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice4DTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> StridedSlice4DReverseInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice4DReverseTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> StridedSliceSimpleStrideInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceSimpleStrideTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> StridedSliceSimpleRangeMaskInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceSimpleRangeMaskTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 2> StridedSliceShrinkAxisMaskInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 3> StridedSlice3DInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice3DTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 3> StridedSlice3DReverseInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice3DReverseTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 2> StridedSlice2DInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice2DTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 2> StridedSlice2DReverseInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSlice2DReverseTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
 LayerTestResult<float, 4> Debug4DFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

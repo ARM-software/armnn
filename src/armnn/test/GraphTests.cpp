@@ -545,7 +545,7 @@ BOOST_AUTO_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames)
     graph.AddCopyLayers();
 
     std::vector<Edge> edges = GetEdgeList(graph);
-    BOOST_CHECK(edges.size() == 7u);
+    BOOST_CHECK(edges.size() == 6u);
     std::sort(edges.begin(), edges.end());
     auto last = std::unique(edges.begin(), edges.end());
     BOOST_CHECK_MESSAGE(last == edges.end(), "Found duplicated edges after AddCopyLayers()");

@@ -263,7 +263,10 @@ void Graph::AddCopyLayers()
             // All layers should have been associated with a valid compute device at this point.
             BOOST_ASSERT(layer.GetBackendId() != Compute::Undefined);
             // Does not need another copy layer if a copy layer is already present.
-            return layer.GetType() != LayerType::MemCopy;
+            return layer.GetType() != LayerType::MemCopy &&
+                   // Input and Output layers can perform their own copies internally.
+                   layer.GetType() != LayerType::Input &&
+                   layer.GetType() != LayerType::Output;
         };
 
     for (auto&& srcLayer : m_Layers)

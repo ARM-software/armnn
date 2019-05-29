@@ -10,6 +10,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Addition
 * BatchToSpaceNd
 * BatchNormalization
+* Concat
 * Constant
 * Convolution2d
 * DepthwiseConvolution2d
@@ -26,7 +27,6 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Maximum
 * Mean
 * Merge
-* Concat
 * Minimum
 * Multiplication
 * Normalization
@@ -45,3 +45,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Switch
 
 More machine learning layers will be supported in future releases.
+
+Note: Merger layer has been renamed Concat. Serializations of the old
+      format with Merger layers will deserialize to Concat layers to
+      maintain backward compatibility.

@@ -373,11 +373,8 @@ LayerTestResult<float, 4> SimpleSigmoidTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 4> SimpleReshapeFloat32Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> SimpleReshapeUint8Test(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> SimpleReshapeTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -1711,6 +1708,42 @@ std::vector<T> ConvertToDataType(const std::vector<float>& input,
     return output;
 }
 
+template<typename T>
+LayerTestResult<T, 4> SimpleReshapeTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::TensorInfo inputTensorInfo,
+    armnn::TensorInfo outputTensorInfo,
+    const std::vector<T>& inputData,
+    const std::vector<T>& outputExpectedData)
+{
+    auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
+
+    LayerTestResult<T, 4> ret(outputTensorInfo);
+    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputExpectedData);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::ReshapeQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateReshape(data, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+
+    return ret;
+}
+
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 2> FullyConnectedTest(
         armnn::IWorkloadFactory& workloadFactory,
@@ -1780,4 +1813,57 @@ LayerTestResult<T, 2> FullyConnectedTest(
     }
 
     return result;
+}
+
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 4> SimpleReshapeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[] = { 2, 2, 3, 3 };
+    unsigned int outputShape[] = { 2, 2, 9, 1 };
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    inputTensorInfo.SetQuantizationScale(1.0f);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
+    outputTensorInfo.SetQuantizationScale(1.0f);
+
+    auto input = ConvertToDataType<ArmnnType>(
+        {
+            0.0f, 1.0f, 2.0f,
+            3.0f, 4.0f, 5.0f,
+            6.0f, 7.0f, 8.0f,
+
+            9.0f, 10.0f, 11.0f,
+            12.0f, 13.0f, 14.0f,
+            15.0f, 16.0f, 17.0f,
+
+            18.0f, 19.0f, 20.0f,
+            21.0f, 22.0f, 23.0f,
+            24.0f, 25.0f, 26.0f,
+
+            27.0f, 28.0f, 29.0f,
+            30.0f, 31.0f, 32.0f,
+            33.0f, 34.0f, 35.0f,
+        },
+        inputTensorInfo);
+
+    auto outputExpected = ConvertToDataType<ArmnnType>(
+        {
+            0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f,
+
+            9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f,
+
+            18.0f, 19.0f, 20.0f, 21.0f, 22.0f, 23.0f, 24.0f, 25.0f, 26.0f,
+
+            27.0f, 28.0f, 29.0f, 30.0f, 31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
+        },
+        outputTensorInfo);
+
+    return SimpleReshapeTestImpl<T>(
+        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected);
 }

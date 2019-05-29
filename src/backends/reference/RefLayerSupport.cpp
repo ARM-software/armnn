@@ -1021,11 +1021,12 @@ bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
 {
     ignore_unused(descriptor);
     // Define supported output types.
-    std::array<DataType,3> supportedOutputTypes =
+    std::array<DataType,4> supportedOutputTypes =
     {
         DataType::Float32,
         DataType::Float16,
-        DataType::QuantisedAsymm8
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
     return CheckSupportRule(TypeAnyOf(input, supportedOutputTypes), reasonIfUnsupported,
         "Reference reshape: input type not supported.");

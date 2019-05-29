@@ -878,7 +878,8 @@ void ReshapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         DataType::Float32,
         DataType::Float16,
-        DataType::QuantisedAsymm8
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0], supportedTypes, "ReshapeQueueDescriptor");

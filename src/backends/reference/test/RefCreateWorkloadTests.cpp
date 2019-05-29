@@ -661,14 +661,19 @@ static void RefCreateReshapeWorkloadTest()
         TensorInfo({ 1, 4 }, DataType));
 }
 
-BOOST_AUTO_TEST_CASE(CreateReshapeFloat32Workload)
+BOOST_AUTO_TEST_CASE(CreateReshapeWorkloadFloat32)
 {
     RefCreateReshapeWorkloadTest<RefReshapeWorkload, armnn::DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
+BOOST_AUTO_TEST_CASE(CreateReshapeWorkloadQuantisedAsymm8)
 {
     RefCreateReshapeWorkloadTest<RefReshapeWorkload, armnn::DataType::QuantisedAsymm8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateReshapeWorkloadQuantisedSymm16)
+{
+    RefCreateReshapeWorkloadTest<RefReshapeWorkload, armnn::DataType::QuantisedSymm16>();
 }
 
 template <typename ConcatWorkloadType, armnn::DataType DataType>

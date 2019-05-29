@@ -436,6 +436,13 @@ ARMNN_AUTO_TEST_CASE(StridedSlice2DReverseUint8, StridedSlice2DReverseUint8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeClampUint8, QuantizeClampUint8Test)
 
+// Dequantize
+// NOTE: current clframework (46a49a0a8206f0efa7afd514940e180a88ffd732)
+//       CLDequantizationLayerKernel accepts DataType::QASYMM8 input
+//       and can output DataType::F16 or DataType::F32
+ARMNN_AUTO_TEST_CASE(DequantizeSimpleUint8, DequantizeSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE(DequantizeOffsetUint8, DequantizeOffsetUint8Test)
+
 // ============================================================================
 // COMPARE tests
 

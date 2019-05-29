@@ -59,6 +59,10 @@ public:
                                   const Optional<TensorInfo>& biases,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsDequantizeSupported(const TensorInfo& input,
+                               const TensorInfo& output,
+                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const DepthwiseConvolution2dDescriptor& descriptor,

@@ -24,6 +24,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClConvolution2dWorkload.hpp
     ClDepthwiseConvolutionWorkload.cpp
     ClDepthwiseConvolutionWorkload.hpp
+    ClDequantizeWorkload.cpp
+    ClDequantizeWorkload.hpp
     ClDivisionFloatWorkload.cpp
     ClDivisionFloatWorkload.hpp
     ClFloorFloatWorkload.cpp

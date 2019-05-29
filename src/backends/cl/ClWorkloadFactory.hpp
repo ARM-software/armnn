@@ -73,6 +73,9 @@ public:
     std::unique_ptr<IWorkload> CreateDetectionPostProcess(const DetectionPostProcessQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateDequantize(const DequantizeQueueDescriptor& descriptor,
+                                                const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateNormalization(const NormalizationQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 

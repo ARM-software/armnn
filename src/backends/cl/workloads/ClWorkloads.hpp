@@ -11,6 +11,7 @@
 #include "ClBatchToSpaceNdWorkload.hpp"
 #include "ClConvolution2dWorkload.hpp"
 #include "ClDepthwiseConvolutionWorkload.hpp"
+#include "ClDequantizeWorkload.hpp"
 #include "ClDivisionFloatWorkload.hpp"
 #include "ClFloorFloatWorkload.hpp"
 #include "ClFullyConnectedWorkload.hpp"

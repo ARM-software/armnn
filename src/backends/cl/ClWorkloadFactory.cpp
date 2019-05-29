@@ -198,6 +198,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDetectionPostProcess(
     return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
+{
+    return std::make_unique<ClDequantizeWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
                                                                          const WorkloadInfo&                 info) const
 {

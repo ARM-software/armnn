@@ -433,12 +433,12 @@ static void RefCreateSoftmaxWorkloadTest()
 
 BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat32Workload)
 {
-    RefCreateSoftmaxWorkloadTest<RefSoftmaxFloat32Workload, armnn::DataType::Float32>();
+    RefCreateSoftmaxWorkloadTest<RefSoftmaxWorkload, armnn::DataType::Float32>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSoftmaxUint8Workload)
+BOOST_AUTO_TEST_CASE(CreateSoftmaxQuantisedAsymm8Workload)
 {
-    RefCreateSoftmaxWorkloadTest<RefSoftmaxUint8Workload, armnn::DataType::QuantisedAsymm8>();
+    RefCreateSoftmaxWorkloadTest<RefSoftmaxWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
 template <typename SplitterWorkloadType, armnn::DataType DataType>

@@ -11,10 +11,10 @@
 namespace armnn
 {
 
-class RefSoftmaxFloat32Workload : public Float32Workload<SoftmaxQueueDescriptor>
+class RefSoftmaxWorkload : public BaseWorkload<SoftmaxQueueDescriptor>
 {
 public:
-    using Float32Workload<SoftmaxQueueDescriptor>::Float32Workload;
+    using BaseWorkload<SoftmaxQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

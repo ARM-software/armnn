@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(SoftmaxQueueDescriptor_Validate_WrongInputHeight)
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
 
     //Invalid argument exception is expected, because height != 1.
-    BOOST_CHECK_THROW(RefSoftmaxFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefSoftmaxWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_CASE(FullyConnectedQueueDescriptor_Validate_RequiredDataMissing)

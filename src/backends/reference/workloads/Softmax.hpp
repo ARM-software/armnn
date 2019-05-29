@@ -5,12 +5,13 @@
 
 #pragma once
 
+#include "BaseIterator.hpp"
 #include <armnn/Tensor.hpp>
 
 namespace armnn
 {
 
 /// Computes the softmax function on some inputs, into outputs, with a shape given by tensorInfo.
-void Softmax(const float* in, float* out, const TensorInfo& tensorInfo, float beta);
+void Softmax(Decoder<float>& in, Encoder<float>& out, const TensorInfo& inputTensorInfo, float beta);
 
 } //namespace armnn

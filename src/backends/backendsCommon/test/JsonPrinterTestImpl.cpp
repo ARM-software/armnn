@@ -244,6 +244,7 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
     std::string result = GetSoftmaxProfilerJson(backends);
 
     std::string backend = "Ref";
+    std::string testName = "SoftmaxWorkload_Execute";
     std::string changeLine31 = "\n},\n\"CopyMemGeneric_Execute\": {";
     std::string changeLine39 = "us\"";
     std::string changeLine40;
@@ -253,6 +254,7 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
     if (firstBackend == armnn::Compute::GpuAcc)
     {
         backend = "Cl";
+        testName = "SoftmaxUintWorkload_Execute";
         changeLine31 = ",\n\"OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]\": {";
         changeLine39 = R"(us"
 },
@@ -278,6 +280,7 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
     else if (firstBackend == armnn::Compute::CpuAcc)
     {
         backend = "Neon";
+        testName = "SoftmaxUintWorkload_Execute";
         changeLine31 = ",\n\"NeonKernelTimer/: NEFillBorderKernel\": {";
         changeLine39 = R"(us"
 },
@@ -332,7 +335,7 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
 ],
 "unit": "us"
 },
-")" + backend + R"(SoftmaxUintWorkload_Execute": {
+")" + backend + testName + R"(": {
 "raw": [
 ,
 ,

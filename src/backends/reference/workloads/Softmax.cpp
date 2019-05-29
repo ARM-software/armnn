@@ -12,16 +12,19 @@ namespace armnn
 {
 
 /// Computes the softmax function on some inputs, into outputs, with a shape given by tensorInfo.
-void Softmax(const float* in, float* out, const TensorInfo& tensorInfo, float beta)
+void Softmax(Decoder<float>& in, Encoder<float>& out, const TensorInfo& inputTensorInfo, float beta)
 {
-    unsigned int numChannels = tensorInfo.GetShape()[1];
-    for (unsigned int n = 0; n < tensorInfo.GetShape()[0]; n++)
+    unsigned int numChannels = inputTensorInfo.GetShape()[1];
+
+    for (unsigned int n = 0; n < inputTensorInfo.GetShape()[0]; n++)
     {
         // Find maximum channel.
-        float max = in[n * numChannels];
+        in[n * numChannels];
+        float max = in.Get();
         for (unsigned int c = 1; c < numChannels; c++)
         {
-            float val = in[n * numChannels + c];
+            in[n * numChannels + c];
+            float val = in.Get();
             if (val > max)
             {
                 max = val;
@@ -33,7 +36,8 @@ void Softmax(const float* in, float* out, const TensorInfo& tensorInfo, float be
         float              sum = 0.0f;
         for (unsigned int c = 0; c < numChannels; c++)
         {
-            float val       = in[n * numChannels + c];
+            in[n * numChannels + c];
+            float val = in.Get();
             exponentials[c] = expf((val - max) * beta);
             sum += exponentials[c];
         }
@@ -41,7 +45,8 @@ void Softmax(const float* in, float* out, const TensorInfo& tensorInfo, float be
         // Divide exponentials by sum to give outputs.
         for (unsigned int c = 0; c < numChannels; c++)
         {
-            out[n * numChannels + c] = exponentials[c] / sum;
+            out[n * numChannels + c];
+            out.Set(exponentials[c] / sum);
         }
     }
 }

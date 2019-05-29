@@ -327,6 +327,22 @@ void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                               "SoftmaxQueueDescriptor",
                               "input",
                               "output");
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float16,
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "SoftmaxQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "SoftmaxQueueDescriptor");
 }
 
 //---------------------------------------------------------------

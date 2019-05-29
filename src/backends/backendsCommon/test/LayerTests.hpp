@@ -369,6 +369,21 @@ LayerTestResult<uint8_t,4> Simple4dSoftmaxUint8Test(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         float beta);
 
+LayerTestResult<int16_t,2> SimpleSoftmaxUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta);
+
+LayerTestResult<int16_t,3> Simple3dSoftmaxUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta);
+
+LayerTestResult<int16_t,4> Simple4dSoftmaxUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta);
+
 LayerTestResult<float, 4> SimpleSigmoidTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

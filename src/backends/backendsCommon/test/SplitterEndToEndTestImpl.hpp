@@ -45,7 +45,7 @@ INetworkPtr CreateSplitterNetwork(const TensorShape& inputShape,
     }
     splitterDimSizes[splitAxis] /= numSplit;
 
-    SplitterDescriptor splitDesc(numSplit);
+    SplitterDescriptor splitDesc(numSplit, inputShape.GetNumDimensions());
     for (unsigned int g = 0; g < numSplit; ++g)
     {
         // Set the size of the views.
@@ -71,7 +71,244 @@ INetworkPtr CreateSplitterNetwork(const TensorShape& inputShape,
 }
 
 template<armnn::DataType ArmnnType>
-void SplitterDim0EndToEnd(const std::vector<BackendId>& backends)
+void Splitter1dEndToEnd(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    unsigned int splitAxis = 0;
+    unsigned int numSplit = 2;
+    const TensorShape& inputShape = { 4 };
+    const std::vector<TensorShape> outputShapes{{ 2 }, { 2 }};
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
+
+    BOOST_TEST_CHECKPOINT("create a network");
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{ 1, 2, 3, 4 };
+
+    std::vector<T> expectedOutput0{ 1, 2 };
+    std::vector<T> expectedOutput1{ 3, 4 };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 }, {1, expectedOutput1} };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType>
+void Splitter2dDim0EndToEnd(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    unsigned int splitAxis = 0;
+    unsigned int numSplit = 2;
+    const TensorShape& inputShape = { 4, 3 };
+    const std::vector<TensorShape> outputShapes{{ 2, 3 }, { 2, 3 }};
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
+
+    BOOST_TEST_CHECKPOINT("create a network");
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{
+            1, 2,
+            3, 4,
+            5, 6,
+            7, 8,
+            9, 10,
+            11, 12
+    };
+
+    std::vector<T> expectedOutput0{ 1, 2, 3, 4, 5, 6 };
+    std::vector<T> expectedOutput1{ 7, 8, 9, 10, 11, 12 };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 }, {1, expectedOutput1} };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType>
+void Splitter2dDim1EndToEnd(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    unsigned int splitAxis = 1;
+    unsigned int numSplit = 3;
+    const TensorShape& inputShape = { 4, 3 };
+    const std::vector<TensorShape> outputShapes{{ 4, 1 }, { 4, 1 }, { 4, 1 }};
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
+
+    BOOST_TEST_CHECKPOINT("create a network");
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{
+            1, 2,
+            3, 4,
+            5, 6,
+            7, 8,
+            9, 10,
+            11, 12
+    };
+
+    std::vector<T> expectedOutput0{ 1, 4, 7, 10 };
+    std::vector<T> expectedOutput1{ 2, 5, 8, 11 };
+    std::vector<T> expectedOutput2{ 3, 6, 9, 12 };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 },
+                                                         { 1, expectedOutput1 },
+                                                         { 2, expectedOutput2 } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType>
+void Splitter3dDim0EndToEnd(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    unsigned int splitAxis = 0;
+    unsigned int numSplit = 2;
+    const TensorShape& inputShape = { 2, 4, 3 };
+    const std::vector<TensorShape> outputShapes{{ 1, 4, 3 }, { 1, 4, 3 }};
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
+
+    BOOST_TEST_CHECKPOINT("create a network");
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12,
+            13, 14, 15,
+            16, 17, 18,
+            19, 20, 21,
+            22, 23, 24
+    };
+
+    std::vector<T> expectedOutput0{
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12
+    };
+    std::vector<T> expectedOutput1{
+            13, 14, 15,
+            16, 17, 18,
+            19, 20, 21,
+            22, 23, 24
+    };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 },
+                                                         { 1, expectedOutput1 } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType>
+void Splitter3dDim1EndToEnd(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    unsigned int splitAxis = 1;
+    unsigned int numSplit = 2;
+    const TensorShape& inputShape = { 2, 4, 3 };
+    const std::vector<TensorShape> outputShapes{{ 2, 2, 3 }, { 2, 2, 3 }};
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
+
+    BOOST_TEST_CHECKPOINT("create a network");
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12,
+            13, 14, 15,
+            16, 17, 18,
+            19, 20, 21,
+            22, 23, 24
+    };
+
+    std::vector<T> expectedOutput0{
+            1, 2, 3,
+            4, 5, 6,
+            13, 14, 15,
+            16, 17, 18
+    };
+    std::vector<T> expectedOutput1{
+            7, 8, 9,
+            10, 11, 12,
+            19, 20, 21,
+            22, 23, 24
+    };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 },
+                                                         { 1, expectedOutput1 } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType>
+void Splitter3dDim2EndToEnd(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    unsigned int splitAxis = 2;
+    unsigned int numSplit = 3;
+    const TensorShape& inputShape = { 2, 4, 3 };
+    const std::vector<TensorShape> outputShapes{{ 2, 4, 1 }, { 2, 4, 1 }, { 2, 4, 1 }};
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateSplitterNetwork<ArmnnType>(inputShape, outputShapes, splitAxis, numSplit);
+
+    BOOST_TEST_CHECKPOINT("create a network");
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{
+            1, 2, 3,
+            4, 5, 6,
+            7, 8, 9,
+            10, 11, 12,
+            13, 14, 15,
+            16, 17, 18,
+            19, 20, 21,
+            22, 23, 24
+    };
+
+    std::vector<T> expectedOutput0{ 1, 4, 7, 10, 13, 16, 19, 22 };
+    std::vector<T> expectedOutput1{ 2, 5, 8, 11, 14, 17, 20, 23 };
+    std::vector<T> expectedOutput2{ 3, 6, 9, 12, 15, 18, 21, 24 };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 },
+                                                         { 1, expectedOutput1 },
+                                                         { 2, expectedOutput2 } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType>
+void Splitter4dDim0EndToEnd(const std::vector<BackendId>& backends)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -151,7 +388,7 @@ void SplitterDim0EndToEnd(const std::vector<BackendId>& backends)
 }
 
 template<armnn::DataType ArmnnType>
-void SplitterDim1EndToEnd(const std::vector<BackendId>& backends)
+void Splitter4dDim1EndToEnd(const std::vector<BackendId>& backends)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -231,7 +468,7 @@ void SplitterDim1EndToEnd(const std::vector<BackendId>& backends)
 }
 
 template<armnn::DataType ArmnnType>
-void SplitterDim2EndToEnd(const std::vector<BackendId>& backends)
+void Splitter4dDim2EndToEnd(const std::vector<BackendId>& backends)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -311,7 +548,7 @@ void SplitterDim2EndToEnd(const std::vector<BackendId>& backends)
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-void SplitterDim3EndToEnd(const std::vector<BackendId>& backends)
+void Splitter4dDim3EndToEnd(const std::vector<BackendId>& backends)
 {
     using namespace armnn;
 

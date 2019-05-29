@@ -123,44 +123,104 @@ BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim3Uint8Test)
     ConcatDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitDim0EndToEndTest)
+BOOST_AUTO_TEST_CASE(NeonSplitter1dEndToEndTest)
 {
-    SplitterDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter1dEndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitDim1EndToEndTest)
+BOOST_AUTO_TEST_CASE(NeonSplitter1dEndToEndUint8Test)
 {
-    SplitterDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter1dEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitDim2EndToEndTest)
+BOOST_AUTO_TEST_CASE(NeonSplitter2dDim0EndToEndTest)
 {
-    SplitterDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter2dDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitDim3EndToEndTest)
+BOOST_AUTO_TEST_CASE(NeonSplitter2dDim1EndToEndTest)
 {
-    SplitterDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+    Splitter2dDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitDim0EndToEndUint8Test)
+BOOST_AUTO_TEST_CASE(NeonSplitter2dDim0EndToEndUint8Test)
 {
-    SplitterDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    Splitter2dDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitDim1EndToEndUint8Test)
+BOOST_AUTO_TEST_CASE(NeonSplitter2dDim1EndToEndUint8Test)
 {
-    SplitterDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    Splitter2dDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitDim2EndToEndUint8Test)
+BOOST_AUTO_TEST_CASE(NeonSplitter3dDim0EndToEndTest)
 {
-    SplitterDim2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    Splitter3dDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonSplitDim3EndToEndUint8Test)
+BOOST_AUTO_TEST_CASE(NeonSplitter3dDim1EndToEndTest)
 {
-    SplitterDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+    Splitter3dDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter3dDim2EndToEndTest)
+{
+    Splitter3dDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter3dDim0EndToEndUint8Test)
+{
+    Splitter3dDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter3dDim1EndToEndUint8Test)
+{
+    Splitter3dDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter3dDim2EndToEndUint8Test)
+{
+    Splitter3dDim2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter4dDim0EndToEndTest)
+{
+    Splitter4dDim0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter4dDim1EndToEndTest)
+{
+    Splitter4dDim1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter4dDim2EndToEndTest)
+{
+    Splitter4dDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter4dDim3EndToEndTest)
+{
+    Splitter4dDim3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter4dDim0EndToEndUint8Test)
+{
+    Splitter4dDim0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter4dDim1EndToEndUint8Test)
+{
+    Splitter4dDim1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter4dDim2EndToEndUint8Test)
+{
+    Splitter4dDim2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonSplitter4dDim3EndToEndUint8Test)
+{
+    Splitter4dDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

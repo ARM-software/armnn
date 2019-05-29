@@ -16,11 +16,11 @@ int main(int argc, char* argv[])
         // Coverity fix: The following code may throw an exception of type std::length_error.
         std::vector<ImageSet> imageSet =
         {
-            // The model we are using incorrectly classifies everything as class 699
+            // The model we are using incorrectly classifies the images
             // But can still be used for benchmarking the layers.
-            {"Dog.jpg", 669},
-            {"Cat.jpg", 669},
-            {"shark.jpg", 669},
+            {"Dog.jpg", 178},
+            {"Cat.jpg", 39},
+            {"shark.jpg", 598},
         };
 
         armnn::TensorShape inputTensorShape({ 1, 224, 224, 3 });

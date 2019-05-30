@@ -12,6 +12,7 @@
 #include "NeonConvertFp32ToFp16Workload.hpp"
 #include "NeonConvolution2dWorkload.hpp"
 #include "NeonDepthwiseConvolutionWorkload.hpp"
+#include "NeonDequantizeWorkload.hpp"
 #include "NeonFloorFloatWorkload.hpp"
 #include "NeonFullyConnectedWorkload.hpp"
 #include "NeonGreaterWorkload.hpp"

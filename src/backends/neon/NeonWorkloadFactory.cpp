@@ -158,6 +158,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(
     return std::make_unique<NeonDepthwiseConvolutionWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
+                                                                 const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonDequantizeWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDetectionPostProcess(
     const armnn::DetectionPostProcessQueueDescriptor& descriptor, const armnn::WorkloadInfo& info) const
 {

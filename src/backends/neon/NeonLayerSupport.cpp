@@ -23,6 +23,7 @@
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
+#include "workloads/NeonDequantizeWorkload.hpp"
 #include "workloads/NeonGreaterWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonMaximumWorkload.hpp"
@@ -243,6 +244,16 @@ bool NeonLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                    descriptor,
                                    weights,
                                    biases);
+}
+
+bool NeonLayerSupport::IsDequantizeSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDequantizeWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool NeonLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,

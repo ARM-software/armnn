@@ -22,6 +22,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonConvolution2dWorkload.hpp
     NeonDepthwiseConvolutionWorkload.cpp
     NeonDepthwiseConvolutionWorkload.hpp
+    NeonDequantizeWorkload.cpp
+    NeonDequantizeWorkload.hpp
     NeonFloorFloatWorkload.cpp
     NeonFloorFloatWorkload.hpp
     NeonFullyConnectedWorkload.cpp

@@ -1024,12 +1024,22 @@ void SpaceToBatchNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
 
 void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "FloorQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "FlootQueueDescriptor", 1);
+    const std::string floorQueueDescString = "FloorQueueDescriptor";
+
+    ValidateNumInputs(workloadInfo,  floorQueueDescString, 1);
+    ValidateNumOutputs(workloadInfo, floorQueueDescString, 1);
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float32
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],  supportedTypes, floorQueueDescString);
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0], supportedTypes, floorQueueDescString);
 
     if (workloadInfo.m_InputTensorInfos[0] != workloadInfo.m_OutputTensorInfos[0])
     {
-        throw InvalidArgumentException("FloorQueueDescriptor: Input and output tensor infos do not match.");
+        throw InvalidArgumentException(floorQueueDescString + ": Input and output tensor infos do not match.");
     }
 }
 

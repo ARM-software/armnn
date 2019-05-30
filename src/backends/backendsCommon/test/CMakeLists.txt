@@ -41,7 +41,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     Pooling2dTestImpl.hpp
     QuantizeHelper.hpp
     QuantizeTestImpl.hpp
-    FloorTestImpl.hpp
     RuntimeTestImpl.hpp
     SoftmaxTestImpl.hpp
     SplitterEndToEndTestImpl.hpp

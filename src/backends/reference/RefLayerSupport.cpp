@@ -597,10 +597,20 @@ bool RefLayerSupport::IsFloorSupported(const TensorInfo& input,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
     ignore_unused(output);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &FalseFuncU8<>);
+    bool supported = true;
+
+    std::array<DataType,1> supportedTypes =
+    {
+        DataType::Float32
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Floor: input type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Floor: output type not supported.");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,

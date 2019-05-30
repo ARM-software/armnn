@@ -30,7 +30,6 @@
 #include "BatchNormTestImpl.hpp"
 #include "ActivationTestImpl.hpp"
 #include "Pooling2dTestImpl.hpp"
-#include "FloorTestImpl.hpp"
 #include "FullyConnectedTestImpl.hpp"
 #include "GatherTestImpl.hpp"
 #include "SpaceToBatchNdTestImpl.hpp"

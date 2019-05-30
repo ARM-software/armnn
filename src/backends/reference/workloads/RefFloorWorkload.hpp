@@ -11,10 +11,10 @@
 namespace armnn
 {
 
-class RefFloorFloat32Workload : public Float32Workload<FloorQueueDescriptor>
+class RefFloorWorkload : public BaseWorkload<FloorQueueDescriptor>
 {
 public:
-    using Float32Workload<FloorQueueDescriptor>::Float32Workload;
+    using BaseWorkload<FloorQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

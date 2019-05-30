@@ -26,7 +26,7 @@
 #include "RefDepthwiseConvolution2dWorkload.hpp"
 #include "FullyConnected.hpp"
 #include "Gather.hpp"
-#include "RefFloorFloat32Workload.hpp"
+#include "RefFloorWorkload.hpp"
 #include "RefSoftmaxWorkload.hpp"
 #include "RefResizeBilinearFloat32Workload.hpp"
 #include "RefBatchNormalizationUint8Workload.hpp"

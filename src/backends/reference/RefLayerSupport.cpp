@@ -415,19 +415,19 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference addition: input is not a supported type.");
+                                  "Reference convolution2d: input is not a supported type.");
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
-                                  "Reference addition: output is not a supported type.");
+                                  "Reference convolution2d: output is not a supported type.");
 
     supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
-                                  "Reference addition: weights is not a supported type.");
+                                  "Reference convolution2d: weights is not a supported type.");
 
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
-                                  "Reference activation: input and output types mismatched.");
+                                  "Reference convolution2d: input and output types mismatched.");
 
     supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
-                                  "Reference activation: input and weights types mismatched.");
+                                  "Reference convolution2d: input and weights types mismatched.");
 
     if (biases.has_value())
     {
@@ -436,7 +436,7 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                 DataType::Signed32
         };
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
-                                      "Reference addition: biases is not a supported type.");
+                                      "Reference convolution2d: biases is not a supported type.");
     }
     ignore_unused(descriptor);
 

@@ -5,17 +5,20 @@
 
 #pragma once
 
+#include "BaseIterator.hpp"
+#include "Decoders.hpp"
+#include "Encoders.hpp"
+
 #include <armnn/Descriptors.hpp>
 #include "armnn/Tensor.hpp"
 
 namespace armnn
 {
 
-template <typename T>
 void SpaceToBatchNd(const TensorInfo& inputInfo,
                     const TensorInfo& outputInfo,
                     const SpaceToBatchNdDescriptor& params,
-                    const T* inputData,
-                    T* outputData);
+                    Decoder<float>& inputData,
+                    Encoder<float>& outputData);
 
 } //namespace armnn

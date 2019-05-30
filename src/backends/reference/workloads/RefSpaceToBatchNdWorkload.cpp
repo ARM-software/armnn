@@ -12,23 +12,17 @@
 namespace armnn
 {
 
-template<armnn::DataType DataType>
-void RefSpaceToBatchNdWorkload<DataType>::Execute() const
+void RefSpaceToBatchNdWorkload::Execute() const
 {
-    using T = ResolveType<DataType>;
-
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, GetName() + "_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefSpaceToBatchNdWorkload_Execute");
 
     const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
+    std::unique_ptr<Decoder<float>> decoder = MakeDecoder<float>(inputInfo, m_Data.m_Inputs[0]->Map());
+
     const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
+    std::unique_ptr<Encoder<float>> encoder = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
 
-    const T* inputData = GetInputTensorData<T>(0, m_Data);
-    T* outputData = GetOutputTensorData<T>(0, m_Data);
-
-    SpaceToBatchNd(inputInfo, outputInfo, m_Data.m_Parameters, inputData, outputData);
+    SpaceToBatchNd(inputInfo, outputInfo, m_Data.m_Parameters, *decoder, *encoder);
 }
-
-template class RefSpaceToBatchNdWorkload<DataType::Float32>;
-template class RefSpaceToBatchNdWorkload<DataType::QuantisedAsymm8>;
 
 } //namespace armnn

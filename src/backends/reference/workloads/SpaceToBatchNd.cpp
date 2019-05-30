@@ -31,12 +31,11 @@ unsigned int GetOffset(const TensorShape& shape,
     }
 }
 
-template<typename T>
 void SpaceToBatchNd(const TensorInfo& inputInfo,
                     const TensorInfo& outputInfo,
                     const SpaceToBatchNdDescriptor& params,
-                    const T* inputData,
-                    T* outputData)
+                    Decoder<float>& inputData,
+                    Encoder<float>& outputData)
 {
     DataLayoutIndexed dataLayout = params.m_DataLayout;
 
@@ -83,7 +82,9 @@ void SpaceToBatchNd(const TensorInfo& inputInfo,
                                                            outW,
                                                            c,
                                                            dataLayout);
-                        outputData[outOffset] = 0;
+                        outputData += outOffset;
+                        outputData.Set(0);
+                        outputData -= outOffset;
                     }
                 }
                 else
@@ -104,7 +105,11 @@ void SpaceToBatchNd(const TensorInfo& inputInfo,
                                                            c,
                                                            dataLayout);
 
-                        outputData[outOffset] = inputData[inOffset];
+                        outputData += outOffset;
+                        inputData += inOffset;
+                        outputData.Set(inputData.Get());
+                        inputData -= inOffset;
+                        outputData -= outOffset;
                     }
                 }
             }
@@ -112,16 +117,10 @@ void SpaceToBatchNd(const TensorInfo& inputInfo,
     }
 }
 
-template void SpaceToBatchNd<float>(const TensorInfo& inputInfo,
-                                    const TensorInfo& outputInfo,
-                                    const SpaceToBatchNdDescriptor& params,
-                                    const float* inputData,
-                                    float* outData);
-
-template void SpaceToBatchNd<uint8_t>(const TensorInfo& inputInfo,
-                                      const TensorInfo& outputInfo,
-                                      const SpaceToBatchNdDescriptor& params,
-                                      const uint8_t* inputData,
-                                      uint8_t* outData);
+void SpaceToBatchNd(const TensorInfo& inputInfo,
+                    const TensorInfo& outputInfo,
+                    const SpaceToBatchNdDescriptor& params,
+                    Decoder<float>& inputData,
+                    Encoder<float>& outData);
 
 } //namespace armnn

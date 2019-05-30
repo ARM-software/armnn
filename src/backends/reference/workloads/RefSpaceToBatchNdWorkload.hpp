@@ -11,23 +11,11 @@
 namespace armnn
 {
 
-template <armnn::DataType DataType>
-class RefSpaceToBatchNdWorkload : public TypedWorkload<SpaceToBatchNdQueueDescriptor, DataType>
+class RefSpaceToBatchNdWorkload : public BaseWorkload<SpaceToBatchNdQueueDescriptor>
 {
 public:
-    static const std::string& GetName()
-    {
-        static const std::string name = std::string("RefSpaceToBatchNd") + GetDataTypeName(DataType) + "Workload";
-        return name;
-    }
-
-    using TypedWorkload<SpaceToBatchNdQueueDescriptor, DataType>::m_Data;
-    using TypedWorkload<SpaceToBatchNdQueueDescriptor, DataType>::TypedWorkload;
-
+    using BaseWorkload<SpaceToBatchNdQueueDescriptor>::BaseWorkload;
     void Execute() const override;
 };
-
-using RefSpaceToBatchNdFloat32Workload = RefSpaceToBatchNdWorkload<DataType::Float32>;
-using RefSpaceToBatchNdUint8Workload = RefSpaceToBatchNdWorkload<DataType::QuantisedAsymm8>;
 
 } //namespace armnn

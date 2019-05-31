@@ -16,6 +16,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ConvertFp32ToFp16TestImpl.hpp
     DebugTestImpl.hpp
     DequantizeTestImpl.hpp
+    DequantizeEndToEndTestImpl.hpp
     DetectionPostProcessLayerTestImpl.hpp
     DetectionPostProcessTestImpl.hpp
     EndToEndTestImpl.hpp

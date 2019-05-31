@@ -4,8 +4,10 @@
 //
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
-#include <backendsCommon/test/ConcatTestImpl.hpp>
+
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
+#include <backendsCommon/test/ConcatTestImpl.hpp>
+#include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -121,6 +123,16 @@ BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim3Test)
 BOOST_AUTO_TEST_CASE(NeonConcatEndToEndDim3Uint8Test)
 {
     ConcatDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(DequantizeEndToEndSimpleTest)
+{
+    DequantizeEndToEndSimple<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetTest)
+{
+    DequantizeEndToEndOffset<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonSplitter1dEndToEndTest)

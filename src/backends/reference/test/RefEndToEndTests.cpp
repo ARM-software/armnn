@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
+#include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatTestImpl.hpp>
@@ -454,6 +455,16 @@ BOOST_AUTO_TEST_CASE(RefGatherMultiDimFloatTest)
 BOOST_AUTO_TEST_CASE(RefGatherMultiDimUint8Test)
 {
     GatherMultiDimEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(DequantizeEndToEndSimpleTest)
+{
+    DequantizeEndToEndSimple<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetTest)
+{
+    DequantizeEndToEndOffset<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefDetectionPostProcessRegularNmsTest)

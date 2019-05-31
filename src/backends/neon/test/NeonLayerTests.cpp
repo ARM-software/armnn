@@ -486,6 +486,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinNhwc, ResizeBilinearSqMinTest, armnn::Da
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMinNhwc, ResizeBilinearMinTest, armnn::DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwc, ResizeBilinearMagTest, armnn::DataLayout::NHWC)
 
+// Quantize
+ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE(QuantizeClampUint8, QuantizeClampUint8Test)
+
 // ============================================================================
 // COMPARE tests
 

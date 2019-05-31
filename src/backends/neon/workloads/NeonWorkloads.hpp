@@ -26,6 +26,7 @@
 #include "NeonPadWorkload.hpp"
 #include "NeonPermuteWorkload.hpp"
 #include "NeonPooling2dWorkload.hpp"
+#include "NeonQuantizeWorkload.hpp"
 #include "NeonReshapeWorkload.hpp"
 #include "NeonResizeBilinearWorkload.hpp"
 #include "NeonSoftmaxFloatWorkload.hpp"

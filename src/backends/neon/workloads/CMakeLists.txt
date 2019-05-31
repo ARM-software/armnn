@@ -48,6 +48,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonPermuteWorkload.hpp
     NeonPooling2dWorkload.cpp
     NeonPooling2dWorkload.hpp
+    NeonQuantizeWorkload.cpp
+    NeonQuantizeWorkload.hpp
     NeonReshapeWorkload.cpp
     NeonReshapeWorkload.hpp
     NeonResizeBilinearWorkload.cpp

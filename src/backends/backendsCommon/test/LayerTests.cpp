@@ -9228,6 +9228,62 @@ LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNHWCUint8Test(
     return SpaceToBatchNdPaddingNHWCTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
 }
 
+LayerTestResult<int16_t, 4> SpaceToBatchNdSimpleUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdSimpleTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> SpaceToBatchNdMultiChannelsUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> SpaceToBatchNdMultiBlockUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdMultiBlockTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> SpaceToBatchNdPaddingUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdPaddingTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> SpaceToBatchNdSimpleNHWCUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdSimpleNHWCTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> SpaceToBatchNdMultiChannelsNHWCUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdMultiChannelsNHWCTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> SpaceToBatchNdMultiBlockNHWCUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdMultiBlockNHWCTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<int16_t, 4> SpaceToBatchNdPaddingNHWCUint16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdPaddingNHWCTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
 namespace {
 
 template<typename T, std::size_t InputDim, std::size_t OutputDim>

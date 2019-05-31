@@ -1004,6 +1004,22 @@ void SpaceToBatchNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
         throw InvalidArgumentException(
             "Input shape after padding must be divisible by Block Shape in all spatial dimensions");
     }
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float16,
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "SpaceToBatchNdQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "SpaceToBatchNdQueueDescriptor");
 }
 
 void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

@@ -252,6 +252,13 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateResizeBilinear(
     return MakeWorkload<ClResizeBilinearFloatWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFakeQuantization(
+    const FakeQuantizationQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return nullptr;
+}
+
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                                                     const WorkloadInfo& info) const
 {

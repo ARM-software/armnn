@@ -22,9 +22,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/polymorphic_cast.hpp>
 
-// The generated code based on the Serialize schema:
-#include <ArmnnSchema_generated.h>
-
 #include <fstream>
 #include <algorithm>
 #include <limits>

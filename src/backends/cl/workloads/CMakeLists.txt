@@ -52,6 +52,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClPermuteWorkload.hpp
     ClPooling2dWorkload.cpp
     ClPooling2dWorkload.hpp
+    ClQuantizeWorkload.cpp
+    ClQuantizeWorkload.hpp
     ClReshapeWorkload.cpp
     ClReshapeWorkload.hpp
     ClResizeBilinearFloatWorkload.cpp

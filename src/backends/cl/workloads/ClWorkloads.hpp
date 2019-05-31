@@ -26,6 +26,7 @@
 #include "ClPermuteWorkload.hpp"
 #include "ClPadWorkload.hpp"
 #include "ClPooling2dWorkload.hpp"
+#include "ClQuantizeWorkload.hpp"
 #include "ClReshapeWorkload.hpp"
 #include "ClResizeBilinearFloatWorkload.hpp"
 #include "ClSoftmaxFloatWorkload.hpp"

@@ -432,6 +432,10 @@ ARMNN_AUTO_TEST_CASE(StridedSlice3DReverseUint8, StridedSlice3DReverseUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice2DUint8, StridedSlice2DUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice2DReverseUint8, StridedSlice2DReverseUint8Test)
 
+// Quantize
+ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
+ARMNN_AUTO_TEST_CASE(QuantizeClampUint8, QuantizeClampUint8Test)
+
 // ============================================================================
 // COMPARE tests
 

@@ -38,6 +38,7 @@
 #include "workloads/ClPadWorkload.hpp"
 #include "workloads/ClPermuteWorkload.hpp"
 #include "workloads/ClPooling2dWorkload.hpp"
+#include "workloads/ClQuantizeWorkload.hpp"
 #include "workloads/ClSoftmaxBaseWorkload.hpp"
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
 #include "workloads/ClSplitterWorkload.hpp"
@@ -552,6 +553,16 @@ bool ClLayerSupport::IsPooling2dSupported(const TensorInfo& input,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClPooling2dWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
+}
+
+bool ClLayerSupport::IsQuantizeSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClQuantizeWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool ClLayerSupport::IsReshapeSupported(const TensorInfo& input,

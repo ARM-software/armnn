@@ -91,8 +91,8 @@ public:
     std::unique_ptr<IWorkload> CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
                                                     const WorkloadInfo& info) const override;
 
-    std::unique_ptr<IWorkload> CreateFakeQuantization(const FakeQuantizationQueueDescriptor& descriptor,
-                                                      const WorkloadInfo& info) const override;
+    std::unique_ptr<IWorkload> CreateQuantize(const QuantizeQueueDescriptor& descriptor,
+                                              const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const override;

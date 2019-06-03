@@ -11,11 +11,11 @@
 namespace armnn
 {
 
-class RefBatchNormalizationUint8Workload : public Uint8Workload<BatchNormalizationQueueDescriptor>
+class RefBatchNormalizationWorkload : public BaseWorkload<BatchNormalizationQueueDescriptor>
 {
 public:
-    explicit RefBatchNormalizationUint8Workload(const BatchNormalizationQueueDescriptor& descriptor,
-                                          const WorkloadInfo& info);
+    explicit RefBatchNormalizationWorkload(const BatchNormalizationQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info);
     virtual void Execute() const override;
 
 private:

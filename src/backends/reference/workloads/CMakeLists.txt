@@ -7,6 +7,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     Activation.cpp
     Activation.hpp
     BaseIterator.hpp
+    BatchNormImpl.cpp
     BatchNormImpl.hpp
     BatchToSpaceNd.cpp
     BatchToSpaceNd.hpp
@@ -37,10 +38,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Pooling2d.hpp
     RefActivationWorkload.cpp
     RefActivationWorkload.hpp
-    RefBatchNormalizationFloat32Workload.cpp
-    RefBatchNormalizationFloat32Workload.hpp
-    RefBatchNormalizationUint8Workload.cpp
-    RefBatchNormalizationUint8Workload.hpp
+    RefBatchNormalizationWorkload.cpp
+    RefBatchNormalizationWorkload.hpp
     RefBatchToSpaceNdFloat32Workload.cpp
     RefBatchToSpaceNdFloat32Workload.hpp
     RefBatchToSpaceNdUint8Workload.cpp

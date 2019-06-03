@@ -7,6 +7,8 @@
 
 #include "BaseIterator.hpp"
 
+#include <boost/assert.hpp>
+
 namespace armnn
 {
 

@@ -12,6 +12,7 @@ BACKEND_SOURCES := \
         RefLayerSupport.cpp \
         RefWorkloadFactory.cpp \
         workloads/Activation.cpp \
+        workloads/BatchNormImpl.cpp \
         workloads/BatchToSpaceNd.cpp \
         workloads/Broadcast.cpp \
         workloads/ConvImpl.cpp \
@@ -25,8 +26,7 @@ BACKEND_SOURCES := \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
         workloads/RefActivationWorkload.cpp \
-        workloads/RefBatchNormalizationFloat32Workload.cpp \
-        workloads/RefBatchNormalizationUint8Workload.cpp \
+        workloads/RefBatchNormalizationWorkload.cpp \
         workloads/RefBatchToSpaceNdFloat32Workload.cpp \
         workloads/RefBatchToSpaceNdUint8Workload.cpp \
         workloads/RefConcatWorkload.cpp \

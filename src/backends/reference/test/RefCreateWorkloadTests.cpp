@@ -181,8 +181,9 @@ static void RefCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     RefWorkloadFactory factory;
-    auto workload =
-            CreateBatchNormalizationWorkloadTest<BatchNormalizationWorkloadType, DataType>(factory, graph, dataLayout);
+    auto workload = CreateBatchNormalizationWorkloadTest<BatchNormalizationWorkloadType, DataType>(factory,
+                                                                                                   graph,
+                                                                                                   dataLayout);
 
     TensorShape inputShape;
     TensorShape outputShape;
@@ -206,25 +207,25 @@ static void RefCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat32Workload)
 {
-    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationFloat32Workload,armnn::DataType::Float32>
+    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload,armnn::DataType::Float32>
             (DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat32WorkloadNhwc)
 {
-    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationFloat32Workload, armnn::DataType::Float32>
+    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload, armnn::DataType::Float32>
             (DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationUint8Workload)
 {
-    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationUint8Workload, armnn::DataType::QuantisedAsymm8>
+    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload, armnn::DataType::QuantisedAsymm8>
             (DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationUint8WorkloadNhwc)
 {
-    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationUint8Workload, armnn::DataType::QuantisedAsymm8>
+    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload, armnn::DataType::QuantisedAsymm8>
             (DataLayout::NHWC);
 }
 

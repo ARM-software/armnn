@@ -280,22 +280,44 @@ bool RefLayerSupport::IsAdditionSupported(const TensorInfo& input0,
 bool RefLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     const TensorInfo& mean,
-                                                    const TensorInfo& var,
+                                                    const TensorInfo& variance,
                                                     const TensorInfo& beta,
                                                     const TensorInfo& gamma,
                                                     const BatchNormalizationDescriptor& descriptor,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
-    ignore_unused(mean);
-    ignore_unused(var);
-    ignore_unused(beta);
-    ignore_unused(gamma);
     ignore_unused(descriptor);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+
+    std::array<DataType, 2> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8
+    };
+
+    bool supported = true;
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch normalization: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch normalization: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference batch normalization: input and output types are mismatched");
+
+    supported &= CheckSupportRule(TypeAnyOf(mean, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch normalization: mean is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(variance, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch normalization: variance is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(beta, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch normalization: beta is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(gamma, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch normalization: gamma is not a supported type.");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,

@@ -134,11 +134,10 @@ std::unique_ptr<WorkloadType> CreateElementwiseWorkloadTest(armnn::IWorkloadFact
     return workload;
 }
 
-template <typename BatchNormalizationFloat32Workload, armnn::DataType DataType>
-std::unique_ptr<BatchNormalizationFloat32Workload> CreateBatchNormalizationWorkloadTest(
+template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>
+std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWorkloadTest(
     armnn::IWorkloadFactory& factory, armnn::Graph& graph, DataLayout dataLayout = DataLayout::NCHW)
 {
-
     TensorShape tensorShape;
     switch (dataLayout)
     {
@@ -171,14 +170,14 @@ std::unique_ptr<BatchNormalizationFloat32Workload> CreateBatchNormalizationWorkl
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
-    //Connects up.
+    // Connects up.
     armnn::TensorInfo tensorInfo(tensorShape, DataType);
     Connect(input, layer, tensorInfo);
     Connect(layer, output, tensorInfo);
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
-    auto workload = MakeAndCheckWorkload<BatchNormalizationFloat32Workload>(*layer, graph, factory);
+    auto workload = MakeAndCheckWorkload<BatchNormalizationWorkloadType>(*layer, graph, factory);
     BatchNormalizationQueueDescriptor queueDescriptor = workload->GetData();
     BOOST_TEST(queueDescriptor.m_Parameters.m_Eps == 0.05f);
     BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);

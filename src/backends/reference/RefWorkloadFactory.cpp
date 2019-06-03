@@ -220,7 +220,7 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMultiplication(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateBatchNormalization(
     const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefBatchNormalizationFloat32Workload, RefBatchNormalizationUint8Workload>(descriptor, info);
+    return std::make_unique<RefBatchNormalizationWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,

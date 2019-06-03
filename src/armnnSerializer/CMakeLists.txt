@@ -34,4 +34,7 @@ if(BUILD_ARMNN_SERIALIZER)
     target_include_directories(armnnSerializer SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
     target_link_libraries(armnnSerializer armnn ${FLATBUFFERS_LIBRARY})
+
+    install(TARGETS armnnSerializer
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()

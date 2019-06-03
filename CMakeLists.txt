@@ -15,6 +15,8 @@ foreach(cmake_file ${additional_cmake_files})
     include(${cmake_file})
 endforeach()
 
+include(GNUInstallDirs)
+
 add_subdirectory(samples)
 add_subdirectory(src/armnnTfLiteParser)
 add_subdirectory(src/armnnSerializer)
@@ -416,18 +418,22 @@ target_link_libraries(armnn armnnUtils)
 
 target_link_libraries(armnn ${CMAKE_DL_LIBS})
 
-install(TARGETS armnn DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS armnn
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 if(BUILD_CAFFE_PARSER)
-    install(TARGETS armnnCaffeParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+    install(TARGETS armnnCaffeParser
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 if(BUILD_ONNX_PARSER)
-    install(TARGETS armnnOnnxParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+    install(TARGETS armnnOnnxParser
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 if(BUILD_TF_PARSER)
-    install(TARGETS armnnTfParser DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+    install(TARGETS armnnTfParser
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 target_link_libraries(armnn ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 

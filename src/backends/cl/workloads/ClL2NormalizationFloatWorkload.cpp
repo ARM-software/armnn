@@ -21,7 +21,7 @@ arm_compute::Status ClL2NormalizationWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclInput  = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
-    unsigned int axis = (descriptor.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
+    int axis = (descriptor.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
 
     return arm_compute::CLL2NormalizeLayer::validate(&aclInput, &aclOutput, axis);
 }
@@ -39,7 +39,7 @@ ClL2NormalizationFloatWorkload::ClL2NormalizationFloatWorkload(const L2Normaliza
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    unsigned int axis = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
+    int axis = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
 
     m_Layer.configure(&input, &output, axis);
 }

@@ -11,11 +11,11 @@
 namespace armnn
 {
 
-class RefDetectionPostProcessUint8Workload : public Uint8ToFloat32Workload<DetectionPostProcessQueueDescriptor>
+class RefDetectionPostProcessWorkload : public BaseWorkload<DetectionPostProcessQueueDescriptor>
 {
 public:
-    explicit RefDetectionPostProcessUint8Workload(const DetectionPostProcessQueueDescriptor& descriptor,
-                                                  const WorkloadInfo& info);
+    explicit RefDetectionPostProcessWorkload(const DetectionPostProcessQueueDescriptor& descriptor,
+                                             const WorkloadInfo& info);
     virtual void Execute() const override;
 
 private:

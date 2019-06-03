@@ -624,11 +624,23 @@ BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsFloat)
 }
 BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsUint8)
 {
-    DetectionPostProcessRegularNmsUint8Test<armnn::RefWorkloadFactory>();
+    DetectionPostProcessRegularNmsQuantizedTest<
+        armnn::RefWorkloadFactory, armnn::DataType::QuantisedAsymm8>();
 }
 BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsUint8)
 {
-    DetectionPostProcessFastNmsUint8Test<armnn::RefWorkloadFactory>();
+    DetectionPostProcessRegularNmsQuantizedTest<
+        armnn::RefWorkloadFactory, armnn::DataType::QuantisedAsymm8>();
+}
+BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsInt16)
+{
+    DetectionPostProcessRegularNmsQuantizedTest<
+        armnn::RefWorkloadFactory, armnn::DataType::QuantisedSymm16>();
+}
+BOOST_AUTO_TEST_CASE(DetectionPostProcessFastNmsInt16)
+{
+    DetectionPostProcessFastNmsQuantizedTest<
+        armnn::RefWorkloadFactory, armnn::DataType::QuantisedSymm16>();
 }
 
 // Dequantize

@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <numeric>
 
-namespace
+namespace armnn
 {
 
 std::vector<unsigned int> GenerateRangeK(unsigned int k)
@@ -48,9 +48,12 @@ float IntersectionOverUnion(const float* boxI, const float* boxJ)
     return areaIntersection / areaUnion;
 }
 
-std::vector<unsigned int> NonMaxSuppression(unsigned int numBoxes, const std::vector<float>& boxCorners,
-                                            const std::vector<float>& scores, float nmsScoreThreshold,
-                                            unsigned int maxDetection, float nmsIouThreshold)
+std::vector<unsigned int> NonMaxSuppression(unsigned int numBoxes,
+                                            const std::vector<float>& boxCorners,
+                                            const std::vector<float>& scores,
+                                            float nmsScoreThreshold,
+                                            unsigned int maxDetection,
+                                            float nmsIouThreshold)
 {
     // Select boxes that have scores above a given threshold.
     std::vector<float> scoresAboveThreshold;
@@ -67,7 +70,7 @@ std::vector<unsigned int> NonMaxSuppression(unsigned int numBoxes, const std::ve
     // Sort the indices based on scores.
     unsigned int numAboveThreshold = boost::numeric_cast<unsigned int>(scoresAboveThreshold.size());
     std::vector<unsigned int> sortedIndices = GenerateRangeK(numAboveThreshold);
-    TopKSort(numAboveThreshold,sortedIndices.data(), scoresAboveThreshold.data(), numAboveThreshold);
+    TopKSort(numAboveThreshold, sortedIndices.data(), scoresAboveThreshold.data(), numAboveThreshold);
 
     // Number of output cannot be more than max detections specified in the option.
     unsigned int numOutput = std::min(maxDetection, numAboveThreshold);
@@ -98,10 +101,17 @@ std::vector<unsigned int> NonMaxSuppression(unsigned int numBoxes, const std::ve
     return outputIndices;
 }
 
-void AllocateOutputData(unsigned int numOutput, unsigned int numSelected, const std::vector<float>& boxCorners,
-                        const std::vector<unsigned int>& outputIndices, const std::vector<unsigned int>& selectedBoxes,
-                        const std::vector<unsigned int>& selectedClasses, const std::vector<float>& selectedScores,
-                        float* detectionBoxes, float* detectionScores, float* detectionClasses, float* numDetections)
+void AllocateOutputData(unsigned int numOutput,
+                        unsigned int numSelected,
+                        const std::vector<float>& boxCorners,
+                        const std::vector<unsigned int>& outputIndices,
+                        const std::vector<unsigned int>& selectedBoxes,
+                        const std::vector<unsigned int>& selectedClasses,
+                        const std::vector<float>& selectedScores,
+                        float* detectionBoxes,
+                        float* detectionScores,
+                        float* detectionClasses,
+                        float* numDetections)
 {
     for (unsigned int i = 0; i < numOutput; ++i)
         {
@@ -129,11 +139,6 @@ void AllocateOutputData(unsigned int numOutput, unsigned int numSelected, const 
         numDetections[0] = boost::numeric_cast<float>(numSelected);
 }
 
-} // anonymous namespace
-
-namespace armnn
-{
-
 void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
                           const TensorInfo& scoresInfo,
                           const TensorInfo& anchorsInfo,
@@ -142,9 +147,9 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
                           const TensorInfo& detectionScoresInfo,
                           const TensorInfo& numDetectionsInfo,
                           const DetectionPostProcessDescriptor& desc,
-                          const float* boxEncodings,
-                          const float* scores,
-                          const float* anchors,
+                          Decoder<float>& boxEncodings,
+                          Decoder<float>& scores,
+                          Decoder<float>& anchors,
                           float* detectionBoxes,
                           float* detectionClasses,
                           float* detectionScores,
@@ -153,17 +158,51 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
     // Transform center-size format which is (ycenter, xcenter, height, width) to box-corner format,
     // which represents the lower left corner and the upper right corner (ymin, xmin, ymax, xmax)
     std::vector<float> boxCorners(boxEncodingsInfo.GetNumElements());
-    unsigned int numBoxes = boxEncodingsInfo.GetShape()[1];
+
+    const unsigned int numBoxes  = boxEncodingsInfo.GetShape()[1];
+    const unsigned int numScores = scoresInfo.GetNumElements();
+
     for (unsigned int i = 0; i < numBoxes; ++i)
     {
+        // Y
+        float boxEncodingY = boxEncodings.Get();
+        float anchorY      = anchors.Get();
+
+        ++boxEncodings;
+        ++anchors;
+
+        // X
+        float boxEncodingX = boxEncodings.Get();
+        float anchorX      = anchors.Get();
+
+        ++boxEncodings;
+        ++anchors;
+
+        // H
+        float boxEncodingH = boxEncodings.Get();
+        float anchorH      = anchors.Get();
+
+        ++boxEncodings;
+        ++anchors;
+
+        // W
+        float boxEncodingW = boxEncodings.Get();
+        float anchorW      = anchors.Get();
+
+        ++boxEncodings;
+        ++anchors;
+
+        float yCentre = boxEncodingY / desc.m_ScaleY * anchorH + anchorY;
+        float xCentre = boxEncodingX / desc.m_ScaleX * anchorW + anchorX;
+
+        float halfH = 0.5f * expf(boxEncodingH / desc.m_ScaleH) * anchorH;
+        float halfW = 0.5f * expf(boxEncodingW / desc.m_ScaleW) * anchorW;
+
         unsigned int indexY = i * 4;
         unsigned int indexX = indexY + 1;
         unsigned int indexH = indexX + 1;
         unsigned int indexW = indexH + 1;
-        float yCentre = boxEncodings[indexY] / desc.m_ScaleY * anchors[indexH] + anchors[indexY];
-        float xCentre = boxEncodings[indexX] / desc.m_ScaleX * anchors[indexW] + anchors[indexX];
-        float halfH = 0.5f * expf(boxEncodings[indexH] / desc.m_ScaleH) * anchors[indexH];
-        float halfW = 0.5f * expf(boxEncodings[indexW] / desc.m_ScaleW) * anchors[indexW];
+
         // ymin
         boxCorners[indexY] = yCentre - halfH;
         // xmin
@@ -179,14 +218,29 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
 
     unsigned int numClassesWithBg = desc.m_NumClasses + 1;
 
+    // Decode scores
+    std::vector<float> decodedScores;
+    decodedScores.reserve(numScores);
+
+    for (unsigned int i = 0u; i < numScores; ++i)
+    {
+        decodedScores.emplace_back(scores.Get());
+        ++scores;
+    }
+
     // Perform Non Max Suppression.
     if (desc.m_UseRegularNms)
     {
         // Perform Regular NMS.
         // For each class, perform NMS and select max detection numbers of the highest score across all classes.
         std::vector<float> classScores(numBoxes);
-        std::vector<unsigned int>selectedBoxesAfterNms;
+
+        std::vector<unsigned int> selectedBoxesAfterNms;
+        selectedBoxesAfterNms.reserve(numBoxes);
+
         std::vector<float> selectedScoresAfterNms;
+        selectedBoxesAfterNms.reserve(numScores);
+
         std::vector<unsigned int> selectedClasses;
 
         for (unsigned int c = 0; c < desc.m_NumClasses; ++c)
@@ -194,9 +248,11 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
             // For each boxes, get scores of the boxes for the class c.
             for (unsigned int i = 0; i < numBoxes; ++i)
             {
-                classScores[i] = scores[i * numClassesWithBg + c + 1];
+                classScores[i] = decodedScores[i * numClassesWithBg + c + 1];
             }
-            std::vector<unsigned int> selectedIndices = NonMaxSuppression(numBoxes, boxCorners, classScores,
+            std::vector<unsigned int> selectedIndices = NonMaxSuppression(numBoxes,
+                                                                          boxCorners,
+                                                                          classScores,
                                                                           desc.m_NmsScoreThreshold,
                                                                           desc.m_DetectionsPerClass,
                                                                           desc.m_NmsIouThreshold);
@@ -237,11 +293,12 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
 
             // Get the max scores of the box.
             std::vector<unsigned int> maxScoreIndices = GenerateRangeK(desc.m_NumClasses);
-            TopKSort(numClassesPerBox, maxScoreIndices.data(), scores + scoreIndex, desc.m_NumClasses);
+            TopKSort(numClassesPerBox, maxScoreIndices.data(),
+                decodedScores.data() + scoreIndex, desc.m_NumClasses);
 
             for (unsigned int i = 0; i < numClassesPerBox; ++i)
             {
-                maxScores.push_back(scores[scoreIndex + maxScoreIndices[i]]);
+                maxScores.push_back(decodedScores[scoreIndex + maxScoreIndices[i]]);
                 maxScoreClasses.push_back(maxScoreIndices[i]);
                 boxIndices.push_back(box);
             }

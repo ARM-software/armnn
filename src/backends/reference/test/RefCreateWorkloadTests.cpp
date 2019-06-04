@@ -614,6 +614,26 @@ BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32Nhwc)
     RefCreateResizeBilinearTest<RefResizeBilinearFloat32Workload, armnn::DataType::Float32>(DataLayout::NHWC);
 }
 
+template <typename RsqrtWorkloadType, armnn::DataType DataType>
+static void RefCreateRsqrtTest()
+{
+    Graph graph;
+    RefWorkloadFactory factory;
+
+    auto workload = CreateRsqrtWorkloadTest<RsqrtWorkloadType, DataType>(factory, graph);
+
+    // Checks that outputs are as we expect them (see definition of CreateRsqrtWorkloadTest).
+    CheckInputOutput(std::move(workload),
+                     TensorInfo({ 1, 1 }, DataType),
+                     TensorInfo({ 1, 1 }, DataType));
+
+}
+
+BOOST_AUTO_TEST_CASE(CreateRsqrtFloat32)
+{
+    RefCreateRsqrtTest<RefRsqrtFloat32Workload, armnn::DataType::Float32>();
+}
+
 template <typename L2NormalizationWorkloadType, armnn::DataType DataType>
 static void RefCreateL2NormalizationTest(DataLayout dataLayout)
 {

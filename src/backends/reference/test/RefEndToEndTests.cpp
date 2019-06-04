@@ -467,6 +467,16 @@ BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetTest)
     DequantizeEndToEndOffset<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(DequantizeEndToEndSimpleInt16Test)
+{
+    DequantizeEndToEndSimple<armnn::DataType::QuantisedSymm16>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetInt16Test)
+{
+    DequantizeEndToEndOffset<armnn::DataType::QuantisedSymm16>(defaultBackends);
+}
+
 BOOST_AUTO_TEST_CASE(RefDetectionPostProcessRegularNmsTest)
 {
     std::vector<float> boxEncodings({

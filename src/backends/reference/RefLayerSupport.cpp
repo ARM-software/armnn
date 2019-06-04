@@ -701,10 +701,7 @@ bool RefLayerSupport::IsGreaterSupported(const TensorInfo& input0,
 bool RefLayerSupport::IsInputSupported(const TensorInfo& input,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+    return true;
 }
 
 bool RefLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
@@ -950,13 +947,7 @@ bool RefLayerSupport::IsNormalizationSupported(const TensorInfo& input,
 bool RefLayerSupport::IsOutputSupported(const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeGeneric(reasonIfUnsupported,
-                                         output.GetDataType(),
-                                         &TrueFunc<>,
-                                         &TrueFunc<>,
-                                         &TrueFunc<>,
-                                         &FalseFuncI32<>,
-                                         &TrueFunc<>);
+    return true;
 }
 
 bool RefLayerSupport::IsPadSupported(const TensorInfo& input,

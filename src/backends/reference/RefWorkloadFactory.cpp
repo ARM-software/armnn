@@ -87,7 +87,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInput(const InputQueueDescr
         throw InvalidArgumentException("RefWorkloadFactory::CreateInput: data input and output differ in byte count.");
     }
 
-    return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
+    return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
@@ -106,8 +106,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateOutput(const OutputQueueDes
         throw InvalidArgumentException("RefWorkloadFactory::CreateOutput: data input and output differ in byte count.");
     }
 
-    return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload,
-                              CopyMemGenericWorkload, NullWorkload, CopyMemGenericWorkload>(descriptor, info);
+    return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,

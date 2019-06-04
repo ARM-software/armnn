@@ -1031,7 +1031,8 @@ void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32
+            DataType::Float32,
+            DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],  supportedTypes, floorQueueDescString);

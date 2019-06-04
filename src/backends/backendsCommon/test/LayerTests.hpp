@@ -1963,8 +1963,11 @@ LayerTestResult<T, 4> SimpleFloorTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    const armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, ArmnnType);
-    const armnn::TensorInfo outputTensorInfo(inputTensorInfo);
+    armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, ArmnnType);
+    inputTensorInfo.SetQuantizationScale(0.1f);
+
+    armnn::TensorInfo outputTensorInfo(inputTensorInfo);
+    outputTensorInfo.SetQuantizationScale(0.1f);
 
     auto input = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(
         { -37.5f, -15.2f, -8.76f, -2.0f, -1.5f, -1.3f, -0.5f, -0.4f, 0.0f,

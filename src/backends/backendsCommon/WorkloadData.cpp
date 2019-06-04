@@ -692,7 +692,8 @@ void BatchNormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInf
     {
         DataType::Float16,
         DataType::Float32,
-        DataType::QuantisedAsymm8
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(input,  supportedTypes, "BatchNormalizationQueueDescriptor");

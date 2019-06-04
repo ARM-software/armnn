@@ -357,6 +357,8 @@ ARMNN_AUTO_TEST_CASE(BatchNorm, BatchNormTest)
 ARMNN_AUTO_TEST_CASE(BatchNormNhwc, BatchNormNhwcTest)
 ARMNN_AUTO_TEST_CASE(BatchNormUint8, BatchNormUint8Test)
 ARMNN_AUTO_TEST_CASE(BatchNormUint8Nhwc, BatchNormUint8NhwcTest)
+ARMNN_AUTO_TEST_CASE(BatchNormInt16, BatchNormInt16Test)
+ARMNN_AUTO_TEST_CASE(BatchNormInt16Nhwc, BatchNormInt16NhwcTest)
 
 // Resize Bilinear - NCHW
 ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear, SimpleResizeBilinearTest, armnn::DataLayout::NCHW)

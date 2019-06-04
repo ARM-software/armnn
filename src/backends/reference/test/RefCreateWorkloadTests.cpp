@@ -229,6 +229,18 @@ BOOST_AUTO_TEST_CASE(CreateBatchNormalizationUint8WorkloadNhwc)
             (DataLayout::NHWC);
 }
 
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationInt16Workload)
+{
+    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload, armnn::DataType::QuantisedSymm16>
+            (DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationInt16WorkloadNhwc)
+{
+    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload, armnn::DataType::QuantisedSymm16>
+            (DataLayout::NHWC);
+}
+
 BOOST_AUTO_TEST_CASE(CreateConvertFp16ToFp32Float32Workload)
 {
     Graph                graph;

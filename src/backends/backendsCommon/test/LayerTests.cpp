@@ -8259,6 +8259,92 @@ LayerTestResult<uint8_t, 4> BatchNormUint8NhwcTest(
          1.f/20.f, 50, armnn::DataLayout::NHWC);
 }
 
+LayerTestResult<int16_t, 4> BatchNormInt16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    // BatchSize: 1
+    // Channels: 2
+    // Height: 3
+    // Width: 2
+
+    const armnn::TensorShape inputOutputShape{ 1, 2, 3, 2 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Channel 0, Height (3) x Width (2)
+         1.f, 4.f,
+         4.f, 2.f,
+         1.f, 6.f,
+
+        // Batch 0, Channel 1, Height (3) x Width (2)
+         1.f, 1.f,
+         4.f, 1.f,
+        -2.f, 4.f
+    };
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Channel 0, Height (3) x Width (2)
+        1.f, 4.f,
+        4.f, 2.f,
+        1.f, 6.f,
+
+        // Batch 0, Channel 1, Height (3) x Width (2)
+        3.f, 3.f,
+        4.f, 3.f,
+        2.f, 4.f
+    };
+
+    return BatchNormTestImpl<armnn::DataType::QuantisedSymm16>(
+        workloadFactory, memoryManager,
+        inputOutputShape, inputValues, expectedOutputValues,
+        1.f/20.f, 50, armnn::DataLayout::NCHW);
+}
+
+LayerTestResult<int16_t, 4> BatchNormInt16NhwcTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    // BatchSize: 1
+    // Height: 3
+    // Width: 2
+    // Channels: 2
+
+    const armnn::TensorShape inputOutputShape{ 1, 3, 2, 2 };
+    std::vector<float> inputValues
+    {
+        // Batch 0, Height 0, Width (2) x Channel (2)
+        1.f,  1.f,
+        4.f,  1.f,
+
+        // Batch 0, Height 1, Width (2) x Channel (2)
+        4.f,  4.f,
+        2.f,  1.f,
+
+        // Batch 0, Height 2, Width (2) x Channel (2)
+        1.f, -2.f,
+        6.f,  4.f
+    };
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Height 0, Width (2) x Channel (2)
+        1.f, 3.f,
+        4.f, 3.f,
+
+        // Batch 0, Height 1, Width (2) x Channel (2)
+        4.f, 4.f,
+        2.f, 3.f,
+
+        // Batch 0, Height 2, Width (2) x Channel (2)
+        1.f, 2.f,
+        6.f, 4.f
+    };
+
+    return BatchNormTestImpl<armnn::DataType::QuantisedSymm16>
+        (workloadFactory, memoryManager,
+         inputOutputShape, inputValues, expectedOutputValues,
+         1.f/20.f, 50, armnn::DataLayout::NHWC);
+}
+
 LayerTestResult<uint8_t, 4> ConstantUint8CustomQuantizationScaleAndOffsetTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

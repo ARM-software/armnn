@@ -53,23 +53,7 @@ void BatchNormImpl(const BatchNormalizationQueueDescriptor& data,
             {
                 for (unsigned int w = 0; w < inputWidth; w++)
                 {
-                    unsigned int index = 0;
-
-                    if (dataLayout == DataLayout::NHWC)
-                    {
-                        index = n * inputHeight * inputWidth * inputChannels +
-                                h * inputWidth * inputChannels +
-                                w * inputChannels +
-                                c;
-                    }
-                    else // dataLayout == DataLayout::NCHW
-                    {
-                        index = n * inputHeight * inputWidth * inputChannels +
-                                c * inputHeight * inputWidth +
-                                h * inputWidth +
-                                w;
-                    }
-
+                    unsigned int index = dataLayout.GetIndex(inputShape, n, c, h, w);
                     inputDecoder[index];
                     outputEncoder[index];
                     outputEncoder.Set(mult * inputDecoder.Get() + add);

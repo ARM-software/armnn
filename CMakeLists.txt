@@ -164,6 +164,7 @@ if(BUILD_ARMNN_QUANTIZER)
     set_target_properties(armnnQuantizer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
     target_link_libraries(armnnQuantizer
+            armnn
             ${Boost_SYSTEM_LIBRARY}
             ${Boost_PROGRAM_OPTIONS_LIBRARY}
             ${Boost_FILESYSTEM_LIBRARY}

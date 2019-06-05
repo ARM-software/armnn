@@ -30,34 +30,7 @@ public:
 
     DataType& Get(unsigned int b, unsigned int c, unsigned int h, unsigned int w) const
     {
-        BOOST_ASSERT( b < m_Shape[0] || ( m_Shape[0]   == 0 && b == 0 ) );
-        BOOST_ASSERT( c < m_Shape[m_DataLayout.GetChannelsIndex()] ||
-            ( m_Shape[m_DataLayout.GetChannelsIndex()] == 0 && c == 0) );
-        BOOST_ASSERT( h < m_Shape[m_DataLayout.GetHeightIndex()] ||
-            ( m_Shape[m_DataLayout.GetHeightIndex()]   == 0 && h == 0) );
-        BOOST_ASSERT( w < m_Shape[m_DataLayout.GetWidthIndex()] ||
-            ( m_Shape[m_DataLayout.GetWidthIndex()]    == 0 && w == 0) );
-
-        // Offset the given indices appropriately depending on the data layout.
-        switch (m_DataLayout.GetDataLayout())
-        {
-        case DataLayout::NHWC:
-            b *= m_Shape[1] * m_Shape[2] * m_Shape[3]; // b *= height_index * width_index * channel_index;
-            h *= m_Shape[m_DataLayout.GetWidthIndex()] * m_Shape[m_DataLayout.GetChannelsIndex()];
-            w *= m_Shape[m_DataLayout.GetChannelsIndex()];
-            // c stays unchanged
-            break;
-        case DataLayout::NCHW:
-        default:
-            b *= m_Shape[1] * m_Shape[2] * m_Shape[3]; // b *= height_index * width_index * channel_index;
-            c *= m_Shape[m_DataLayout.GetHeightIndex()] * m_Shape[m_DataLayout.GetWidthIndex()];
-            h *= m_Shape[m_DataLayout.GetWidthIndex()];
-            // w stays unchanged
-            break;
-        }
-
-        // Get the value using the correct offset.
-        return m_Data[b + c + h + w];
+        return m_Data[m_DataLayout.GetIndex(m_Shape, b, c, h, w)];
     }
 
 private:

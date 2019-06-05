@@ -2,8 +2,11 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
+
 #include <armnn/Types.hpp>
+#include <armnn/Tensor.hpp>
 
 namespace armnnUtils
 {
@@ -18,6 +21,9 @@ public:
     unsigned int      GetChannelsIndex() const { return m_ChannelsIndex; }
     unsigned int      GetHeightIndex()   const { return m_HeightIndex; }
     unsigned int      GetWidthIndex()    const { return m_WidthIndex; }
+    unsigned int      GetIndex(const armnn::TensorShape& shape,
+                               unsigned int batchIndex, unsigned int channelIndex,
+                               unsigned int heightIndex, unsigned int widthIndex) const;
 
 private:
     armnn::DataLayout m_DataLayout;

@@ -463,10 +463,10 @@ ARMNN_AUTO_TEST_CASE(SimpleReshapeQuantisedAsymm8, SimpleReshapeTest<armnn::Data
 ARMNN_AUTO_TEST_CASE(SimpleReshapeQuantisedSymm16, SimpleReshapeTest<armnn::DataType::QuantisedSymm16>)
 
 // Rsqrt
-ARMNN_AUTO_TEST_CASE(Rsqrt2d, Rsqrt2dTest)
-ARMNN_AUTO_TEST_CASE(Rsqrt3d, Rsqrt3dTest)
-ARMNN_AUTO_TEST_CASE(RsqrtZero, RsqrtZeroTest)
-ARMNN_AUTO_TEST_CASE(RsqrtNegative, RsqrtNegativeTest)
+ARMNN_AUTO_TEST_CASE(Rsqrt2d, Rsqrt2dTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Rsqrt3d, Rsqrt3dTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(RsqrtZero, RsqrtZeroTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(RsqrtNegative, RsqrtNegativeTest<armnn::DataType::Float32>)
 
 // Permute
 ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteFloat32Test)

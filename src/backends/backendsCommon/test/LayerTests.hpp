@@ -732,27 +732,32 @@ LayerTestResult<float, 4> ResizeBilinearMagTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout  dataLayout);
 
-LayerTestResult<float, 2> Rsqrt2dTestCommon(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> Rsqrt2dTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::TensorInfo inputTensorInfo,
         const armnn::TensorInfo outputTensorInfo,
-        std::vector<float> inputValues,
-        std::vector<float> expectedOutputValues);
+        std::vector<T> inputValues,
+        std::vector<T> expectedOutputValues);
 
-LayerTestResult<float, 2> Rsqrt2dTest(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> Rsqrt2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 3> Rsqrt3dTest(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> Rsqrt3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 2> RsqrtZeroTest(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> RsqrtZeroTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 2> RsqrtNegativeTest(
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> RsqrtNegativeTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -1805,6 +1810,178 @@ std::vector<T> ConvertToDataType(const std::vector<float>& input,
         ++rOutputEncoder;
     }
     return output;
+}
+
+template<typename T>
+LayerTestResult<T, 2> Rsqrt2dTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::TensorInfo inputTensorInfo,
+        const armnn::TensorInfo outputTensorInfo,
+        std::vector<T> inputValues,
+        std::vector<T> expectedOutputValues)
+{
+    auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
+
+    LayerTestResult<T, 2> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, std::vector<T>(expectedOutputValues));
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::RsqrtQueueDescriptor descriptor;
+
+    armnn::WorkloadInfo info;
+
+    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateRsqrt(descriptor, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
+
+    workload->PostAllocationConfigure();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0], outputHandle.get());
+
+    return result;
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 2> Rsqrt2dTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 2, 2 };
+    const armnn::TensorShape outputShape{ 2, 2 };
+
+    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
+    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
+
+    std::vector<T> inputValues
+            {
+                    1.f, 4.f,
+                    16.f, 25.f
+            };
+
+    std::vector<T> expectedOutputValues
+            {
+                    1.f, 0.5f,
+                    0.25f, 0.2f
+            };
+
+    return Rsqrt2dTestCommon<T>(workloadFactory, memoryManager,
+                                inputTensorInfo, outputTensorInfo,
+                                inputValues, expectedOutputValues);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 3> Rsqrt3dTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 3, 1, 2 };
+    const armnn::TensorShape outputShape{ 3, 1, 2 };
+
+    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
+    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
+
+    std::vector<T> inputValues
+            {
+                    1.f, 4.f, 16.f,
+                    25.f, 64.f, 100.f
+            };
+
+    std::vector<T> expectedOutputValues
+            {
+                    1.f, 0.5f, 0.25f,
+                    0.2f, 0.125f, 0.1f
+            };
+
+    auto inputTensor = MakeTensor<T, 3>(inputTensorInfo, std::vector<T>(inputValues));
+
+    LayerTestResult<T, 3> result(outputTensorInfo);
+    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, std::vector<T>(expectedOutputValues));
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::RsqrtQueueDescriptor descriptor;
+
+    armnn::WorkloadInfo info;
+
+    AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateRsqrt(descriptor, info);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0][0]);
+
+    workload->PostAllocationConfigure();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0][0], outputHandle.get());
+
+    return result;
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 2> RsqrtZeroTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 1, 2 };
+    const armnn::TensorShape outputShape{ 1, 2 };
+
+    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
+    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
+
+    std::vector<T> inputValues
+            {
+                    0.f, -0.f
+            };
+
+    std::vector<T> expectedOutputValues
+            {
+                    INFINITY, -INFINITY
+            };
+
+    return Rsqrt2dTestCommon<T>(workloadFactory, memoryManager,
+                                inputTensorInfo, outputTensorInfo,
+                                inputValues, expectedOutputValues);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 2> RsqrtNegativeTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 1, 2 };
+    const armnn::TensorShape outputShape{ 1, 2 };
+
+    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
+    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
+
+    std::vector<T> inputValues
+            {
+                    -25.f, -16.f
+            };
+
+    std::vector<T> expectedOutputValues
+            {
+                    -NAN, -NAN
+            };
+
+    return Rsqrt2dTestCommon<T>(workloadFactory, memoryManager,
+                                inputTensorInfo, outputTensorInfo,
+                                inputValues, expectedOutputValues);
 }
 
 template<typename T>

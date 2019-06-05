@@ -614,7 +614,8 @@ void NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
     {
         DataType::Float16,
         DataType::Float32,
-        DataType::QuantisedAsymm8
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],

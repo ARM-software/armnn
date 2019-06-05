@@ -392,6 +392,16 @@ BOOST_AUTO_TEST_CASE(CreateRefNormalizationUint8NhwcWorkload)
     RefCreateNormalizationWorkloadTest<RefNormalizationWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
+BOOST_AUTO_TEST_CASE(CreateRefNormalizationInt16NchwWorkload)
+{
+    RefCreateNormalizationWorkloadTest<RefNormalizationWorkload, armnn::DataType::QuantisedSymm16>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateRefNormalizationInt16NhwcWorkload)
+{
+    RefCreateNormalizationWorkloadTest<RefNormalizationWorkload, armnn::DataType::QuantisedSymm16>(DataLayout::NHWC);
+}
+
 template <typename Pooling2dWorkloadType, armnn::DataType DataType>
 static void RefCreatePooling2dWorkloadTest(DataLayout dataLayout)
 {

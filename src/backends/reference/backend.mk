@@ -47,7 +47,7 @@ BACKEND_SOURCES := \
         workloads/RefLstmWorkload.cpp \
         workloads/RefMeanFloat32Workload.cpp \
         workloads/RefMeanUint8Workload.cpp \
-        workloads/RefNormalizationFloat32Workload.cpp \
+        workloads/RefNormalizationWorkload.cpp \
         workloads/RefPadWorkload.cpp \
         workloads/RefPermuteWorkload.cpp \
         workloads/RefPooling2dWorkload.cpp \

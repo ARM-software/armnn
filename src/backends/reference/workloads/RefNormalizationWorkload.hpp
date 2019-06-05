@@ -11,11 +11,13 @@
 namespace armnn
 {
 
-class RefNormalizationFloat32Workload : public Float32Workload<NormalizationQueueDescriptor>
+class RefNormalizationWorkload : public BaseWorkload<NormalizationQueueDescriptor>
 {
 public:
-    using Float32Workload<NormalizationQueueDescriptor>::Float32Workload;
+    explicit RefNormalizationWorkload(const NormalizationQueueDescriptor& descriptor,
+                                      const WorkloadInfo& info);
+
     virtual void Execute() const override;
 };
 
-} //namespace armnn
+} // namespace armnn

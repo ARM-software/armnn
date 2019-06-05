@@ -189,7 +189,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDetectionPostProcess(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateNormalization(
     const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefNormalizationFloat32Workload, NullWorkload>(descriptor, info);
+    return std::make_unique<RefNormalizationWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,

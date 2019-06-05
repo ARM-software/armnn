@@ -608,6 +608,23 @@ void NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
 {
     ValidateNumInputs(workloadInfo, "NormalizationQueueDescriptor", 1);
     ValidateNumOutputs(workloadInfo, "NormalizationQueueDescriptor", 1);
+
+    // Check the supported data types
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "NormalizationQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      { workloadInfo.m_InputTensorInfos[0].GetDataType() },
+                      "NormalizationQueueDescriptor");
+
     ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
                               workloadInfo.m_OutputTensorInfos[0],
                               "NormalizationQueueDescriptor",

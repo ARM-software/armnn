@@ -959,12 +959,29 @@ bool RefLayerSupport::IsNormalizationSupported(const TensorInfo& input,
                                                const NormalizationDescriptor& descriptor,
                                                Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
     ignore_unused(descriptor);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &FalseFuncU8<>);
+
+    // Define supported types
+    std::array<DataType, 3> supportedTypes =
+    {
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8
+    };
+
+    bool supported = true;
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference normalization: input type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference normalization: output type not supported.");
+
+    supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
+                                  "Reference normalization: input and output shapes have different "
+                                  "num total elements.");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsOutputSupported(const TensorInfo& output,

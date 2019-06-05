@@ -30,7 +30,7 @@
 #include "RefSoftmaxWorkload.hpp"
 #include "RefResizeBilinearFloat32Workload.hpp"
 #include "ResizeBilinear.hpp"
-#include "RefNormalizationFloat32Workload.hpp"
+#include "RefNormalizationWorkload.hpp"
 #include "RefDetectionPostProcessWorkload.hpp"
 #include "BatchNormImpl.hpp"
 #include "Activation.hpp"

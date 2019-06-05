@@ -372,14 +372,24 @@ static void RefCreateNormalizationWorkloadTest(DataLayout dataLayout)
     CheckInputOutput(std::move(workload), TensorInfo(inputShape, DataType), TensorInfo(outputShape, DataType));
 }
 
-BOOST_AUTO_TEST_CASE(CreateRefNormalizationNchwWorkload)
+BOOST_AUTO_TEST_CASE(CreateRefNormalizationFloat32NchwWorkload)
 {
-    RefCreateNormalizationWorkloadTest<RefNormalizationFloat32Workload, armnn::DataType::Float32>(DataLayout::NCHW);
+    RefCreateNormalizationWorkloadTest<RefNormalizationWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateRefNormalizationNhwcWorkload)
+BOOST_AUTO_TEST_CASE(CreateRefNormalizationFloat32NhwcWorkload)
 {
-    RefCreateNormalizationWorkloadTest<RefNormalizationFloat32Workload, armnn::DataType::Float32>(DataLayout::NHWC);
+    RefCreateNormalizationWorkloadTest<RefNormalizationWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateRefNormalizationUint8NchwWorkload)
+{
+    RefCreateNormalizationWorkloadTest<RefNormalizationWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateRefNormalizationUint8NhwcWorkload)
+{
+    RefCreateNormalizationWorkloadTest<RefNormalizationWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
 template <typename Pooling2dWorkloadType, armnn::DataType DataType>

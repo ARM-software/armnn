@@ -76,8 +76,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefLstmWorkload.hpp
     RefConcatWorkload.cpp
     RefConcatWorkload.hpp
-    RefNormalizationFloat32Workload.cpp
-    RefNormalizationFloat32Workload.hpp
+    RefNormalizationWorkload.cpp
+    RefNormalizationWorkload.hpp
     RefPadWorkload.cpp
     RefPadWorkload.hpp
     RefPermuteWorkload.cpp

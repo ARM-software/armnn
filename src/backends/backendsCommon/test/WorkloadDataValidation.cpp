@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(NormalizationQueueDescriptor_Validate_WrongInputHeight)
     invalidData.m_Parameters.m_K               = kappa;
 
     //Invalid argument exception is expected, because input height != output height.
-    BOOST_CHECK_THROW(RefNormalizationFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefNormalizationWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_CASE(SplitterQueueDescriptor_Validate_WrongWindow)

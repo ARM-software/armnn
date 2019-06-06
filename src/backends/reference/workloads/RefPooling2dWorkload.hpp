@@ -8,14 +8,16 @@
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
+#include "Decoders.hpp"
+#include "Encoders.hpp"
+
 namespace armnn
 {
-
-class RefPooling2dUint8Workload : public Uint8Workload<Pooling2dQueueDescriptor>
+class RefPooling2dWorkload : public BaseWorkload<Pooling2dQueueDescriptor>
 {
 public:
-    using Uint8Workload<Pooling2dQueueDescriptor>::Uint8Workload;
+    using BaseWorkload<Pooling2dQueueDescriptor>::BaseWorkload;
+
     virtual void Execute() const override;
 };
-
 } //namespace armnn

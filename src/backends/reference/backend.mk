@@ -50,8 +50,7 @@ BACKEND_SOURCES := \
         workloads/RefNormalizationFloat32Workload.cpp \
         workloads/RefPadWorkload.cpp \
         workloads/RefPermuteWorkload.cpp \
-        workloads/RefPooling2dFloat32Workload.cpp \
-        workloads/RefPooling2dUint8Workload.cpp \
+        workloads/RefPooling2dWorkload.cpp \
         workloads/RefQuantizeWorkload.cpp \
         workloads/RefReshapeWorkload.cpp \
         workloads/RefResizeBilinearFloat32Workload.cpp \

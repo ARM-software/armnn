@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(RefPooling2dFloat32Workload_Validate_WrongDimTensor)
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
 
     // Invalid argument exception is expected, input tensor has to be 4D.
-    BOOST_CHECK_THROW(RefPooling2dFloat32Workload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(RefPooling2dWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_CASE(SoftmaxQueueDescriptor_Validate_WrongInputHeight)

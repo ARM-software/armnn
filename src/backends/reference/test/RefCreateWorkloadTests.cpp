@@ -412,22 +412,22 @@ static void RefCreatePooling2dWorkloadTest(DataLayout dataLayout)
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat32Workload)
 {
-    RefCreatePooling2dWorkloadTest<RefPooling2dFloat32Workload, armnn::DataType::Float32>(DataLayout::NCHW);
+    RefCreatePooling2dWorkloadTest<RefPooling2dWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloat32NhwcWorkload)
 {
-    RefCreatePooling2dWorkloadTest<RefPooling2dFloat32Workload, armnn::DataType::Float32>(DataLayout::NHWC);
+    RefCreatePooling2dWorkloadTest<RefPooling2dWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8Workload)
 {
-    RefCreatePooling2dWorkloadTest<RefPooling2dUint8Workload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
+    RefCreatePooling2dWorkloadTest<RefPooling2dWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NhwcWorkload)
 {
-    RefCreatePooling2dWorkloadTest<RefPooling2dUint8Workload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
+    RefCreatePooling2dWorkloadTest<RefPooling2dWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
 template <typename SoftmaxWorkloadType, armnn::DataType DataType>

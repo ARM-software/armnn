@@ -526,11 +526,22 @@ bool RefLayerSupport::IsDetectionPostProcessSupported(const armnn::TensorInfo& i
                                                       const armnn::DetectionPostProcessDescriptor& descriptor,
                                                       armnn::Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(input1);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input0.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+    bool supported = true;
+
+    std::vector<DataType> supportedInputTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input0, supportedInputTypes), reasonIfUnsupported,
+                                  "Reference DetectionPostProcess: input 0 is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(input1, supportedInputTypes), reasonIfUnsupported,
+                                  "Reference DetectionPostProcess: input 1 is not a supported type.");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,

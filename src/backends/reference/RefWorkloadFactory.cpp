@@ -43,6 +43,22 @@ bool IsFloat16(const WorkloadInfo& info)
     return false;
 }
 
+bool IsUint8(const WorkloadInfo& info)
+{
+    auto checkUint8 = [](const TensorInfo& tensorInfo) {return tensorInfo.GetDataType() == DataType::QuantisedAsymm8;};
+    auto it = std::find_if(std::begin(info.m_InputTensorInfos), std::end(info.m_InputTensorInfos), checkUint8);
+    if (it != std::end(info.m_InputTensorInfos))
+    {
+        return true;
+    }
+    it = std::find_if(std::begin(info.m_OutputTensorInfos), std::end(info.m_OutputTensorInfos), checkUint8);
+    if (it != std::end(info.m_OutputTensorInfos))
+    {
+        return true;
+    }
+    return false;
+}
+
 RefWorkloadFactory::RefWorkloadFactory()
 {
 }
@@ -382,7 +398,15 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescr
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefRsqrtFloat32Workload, NullWorkload>(descriptor, info);
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    else if(IsUint8(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    return std::make_unique<RefRsqrtWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const armnn::GatherQueueDescriptor& descriptor,

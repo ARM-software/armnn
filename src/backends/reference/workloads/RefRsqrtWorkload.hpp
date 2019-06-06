@@ -11,10 +11,10 @@
 namespace armnn
 {
 
-class RefRsqrtFloat32Workload : public Float32Workload<RsqrtQueueDescriptor>
+class RefRsqrtWorkload : public BaseWorkload<RsqrtQueueDescriptor>
 {
 public:
-    using Float32Workload<RsqrtQueueDescriptor>::Float32Workload;
+    using BaseWorkload<RsqrtQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

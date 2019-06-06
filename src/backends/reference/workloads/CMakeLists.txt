@@ -92,8 +92,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefResizeBilinearFloat32Workload.hpp
     RefResizeBilinearUint8Workload.cpp
     RefResizeBilinearUint8Workload.hpp
-    RefRsqrtFloat32Workload.cpp
-    RefRsqrtFloat32Workload.hpp
+    RefRsqrtWorkload.cpp
+    RefRsqrtWorkload.hpp
     RefSoftmaxWorkload.cpp
     RefSoftmaxWorkload.hpp
     RefSpaceToBatchNdWorkload.cpp

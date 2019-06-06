@@ -49,7 +49,7 @@
 #include "RefBatchToSpaceNdUint8Workload.hpp"
 #include "RefBatchToSpaceNdFloat32Workload.hpp"
 #include "RefDebugWorkload.hpp"
-#include "RefRsqrtFloat32Workload.hpp"
+#include "RefRsqrtWorkload.hpp"
 #include "RefDequantizeWorkload.hpp"
 #include "RefQuantizeWorkload.hpp"
 #include "RefReshapeWorkload.hpp"

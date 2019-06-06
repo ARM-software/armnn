@@ -674,7 +674,7 @@ static void RefCreateRsqrtTest()
 
 BOOST_AUTO_TEST_CASE(CreateRsqrtFloat32)
 {
-    RefCreateRsqrtTest<RefRsqrtFloat32Workload, armnn::DataType::Float32>();
+    RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::Float32>();
 }
 
 template <typename L2NormalizationWorkloadType, armnn::DataType DataType>

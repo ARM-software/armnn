@@ -242,24 +242,39 @@ ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 ARMNN_AUTO_TEST_CASE(BoundedReLuInt16, BoundedReLuInt16Test)
 
 // ReLU Activation
+ARMNN_AUTO_TEST_CASE(ReLu, ReLuTest)
+ARMNN_AUTO_TEST_CASE(ReLuUint8, ReLuUint8Test)
 ARMNN_AUTO_TEST_CASE(ReLuInt16, ReLuInt16Test)
 
 // SoftReLU Activation
+ARMNN_AUTO_TEST_CASE(SoftReLu, SoftReLuTest)
+ARMNN_AUTO_TEST_CASE(SoftReLuUint8, SoftReLuUint8Test)
 ARMNN_AUTO_TEST_CASE(SoftReLuInt16, SoftReLuInt16Test)
 
+
 // LeakyReLU Activation
+ARMNN_AUTO_TEST_CASE(LeakyReLu, LeakyReLuTest)
+ARMNN_AUTO_TEST_CASE(LeakyReLuUint8, LeakyReLuUint8Test)
 ARMNN_AUTO_TEST_CASE(LeakyReLuInt16, LeakyReLuInt16Test)
 
 // Abs Activation
+ARMNN_AUTO_TEST_CASE(Abs, AbsTest)
+ARMNN_AUTO_TEST_CASE(AbsUint8, AbsUint8Test)
 ARMNN_AUTO_TEST_CASE(AbsInt16, AbsInt16Test)
 
 // Sqrt Activation
+ARMNN_AUTO_TEST_CASE(Sqrt, SqrtTest)
+ARMNN_AUTO_TEST_CASE(SqrtUint8, SqrtUint8Test)
 ARMNN_AUTO_TEST_CASE(SqrtInt16, SqrtInt16Test)
 
 // Square Activation
+ARMNN_AUTO_TEST_CASE(Square, SquareTest)
+ARMNN_AUTO_TEST_CASE(SquareUint8, SquareUint8Test)
 ARMNN_AUTO_TEST_CASE(SquareInt16, SquareInt16Test)
 
 // Tanh Activation
+ARMNN_AUTO_TEST_CASE(Tanh, TanhTest)
+ARMNN_AUTO_TEST_CASE(TanhUint8, TanhUint8Test)
 ARMNN_AUTO_TEST_CASE(TanhInt16, TanhInt16Test)
 
 

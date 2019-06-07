@@ -548,6 +548,21 @@ LayerTestResult<int16_t, 4> ReLuInt16Test(
 }
 
 
+LayerTestResult<uint8_t, 4> ReLuUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return ReLuTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<float, 4> ReLuTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return ReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> BoundedReLuTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
@@ -624,6 +639,20 @@ LayerTestResult<T, 4> SoftReLuTestCommon(
                                            outputExpectedData);
 }
 
+LayerTestResult<float, 4> SoftReLuTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SoftReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> SoftReLuUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SoftReLuTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.0625f, 64);
+}
+
 LayerTestResult<int16_t, 4> SoftReLuInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -663,6 +692,20 @@ LayerTestResult<T, 4> LeakyReLuTestCommon(
                                            qOffset,
                                            inputData,
                                            outputExpectedData);
+}
+
+LayerTestResult<float, 4> LeakyReLuTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return LeakyReLuTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> LeakyReLuUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return LeakyReLuTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.0625f, 64);
 }
 
 LayerTestResult<int16_t, 4> LeakyReLuInt16Test(
@@ -705,6 +748,20 @@ LayerTestResult<T, 4> AbsTestCommon(
                                            outputExpectedData);
 }
 
+LayerTestResult<float, 4> AbsTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return AbsTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> AbsUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return AbsTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.0625f, 64);
+}
+
 LayerTestResult<int16_t, 4> AbsInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -743,6 +800,20 @@ LayerTestResult<T, 4> SqrtTestCommon(
                                            qOffset,
                                            inputData,
                                            outputExpectedData);
+}
+
+LayerTestResult<float, 4> SqrtTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SqrtTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> SqrtUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SqrtTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.0625f, 64);
 }
 
 LayerTestResult<int16_t, 4> SqrtInt16Test(
@@ -785,6 +856,20 @@ LayerTestResult<T, 4> SquareTestCommon(
                                            outputExpectedData);
 }
 
+LayerTestResult<float, 4> SquareTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SquareTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> SquareUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SquareTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.0625f, 64);
+}
+
 LayerTestResult<int16_t, 4> SquareInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -825,6 +910,20 @@ LayerTestResult<T, 4> TanhTestCommon(
                                            qOffset,
                                            inputData,
                                            outputExpectedData);
+}
+
+LayerTestResult<float, 4> TanhTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return TanhTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> TanhUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return TanhTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.1f, 64);
 }
 
 LayerTestResult<int16_t, 4> TanhInt16Test(

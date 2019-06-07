@@ -86,9 +86,52 @@ protected:
         }
     }
 
-    void TestConstantQuantizationParams(const TensorInfo& info, const OffsetScalePair& params)
+    void TestConstantQuantizationParams(const TensorInfo& info,
+                                        const OffsetScalePair& params,
+                                        DataType dataType = DataType::QuantisedAsymm8)
     {
         TestQuantizationParamsImpl(info, DataType::QuantisedAsymm8, params.first, params.second);
+    }
+
+    void TestBiasQuantizationParams(const TensorInfo& info,
+                                    const OffsetScalePair& qAsymm8Params,
+                                    const OffsetScalePair& qSymm16Params,
+                                    DataType dataType = DataType::QuantisedAsymm8)
+    {
+        switch (m_QuantizerOptions.m_ActivationFormat)
+        {
+            case DataType::QuantisedAsymm8:
+                TestQuantizationParamsImpl(info, dataType, qAsymm8Params.first, qAsymm8Params.second);
+                break;
+            case DataType::QuantisedSymm16:
+                TestQuantizationParamsImpl(info, dataType, qSymm16Params.first, qSymm16Params.second);
+                break;
+            default:
+                throw InvalidArgumentException("Unsupported quantization target");
+        }
+    }
+
+    void TestQuantizationOnLayersWithBiases(const IConnectableLayer* layer,
+                                            const ConstTensor& weights,
+                                            const Optional<ConstTensor>& biases)
+    {
+        TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+        float inputScaleQAsymm8 = 30.0f / g_Asymm8QuantizationBase;
+        float inputScaleQSymm16 = 15.0f / g_Symm16QuantizationBase;
+        float weightsScale = 3.0f / g_Asymm8QuantizationBase;
+
+        // Based off default static range [-15.0f, 15.0f]
+        TestQuantizationParams(info, {inputScaleQAsymm8, 128}, {inputScaleQSymm16, 0});
+
+        TestConstantQuantizationParams(weights.GetInfo(), {weightsScale, 85});
+
+        if (biases.has_value())
+        {
+            TestBiasQuantizationParams(biases.value().GetInfo(),
+                                       {inputScaleQAsymm8 * weightsScale, 0},
+                                       {inputScaleQSymm16 * weightsScale, 0},
+                                       DataType::Signed32);
+        }
     }
 
     TensorShape m_InputShape;
@@ -726,18 +769,7 @@ void ValidateFullyConnectedLayer(const bool biasEnabled)
                                       const Optional<ConstTensor>& biases,
                                       const char* name = nullptr) override
         {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-            // Based off default static range [-15.0f, 15.0f]
-            TestQuantizationParams(
-                info, {30.0f / g_Asymm8QuantizationBase, 128}, {15.0f / g_Symm16QuantizationBase, 0});
-
-            TestConstantQuantizationParams(weights.GetInfo(), {3.0f / g_Asymm8QuantizationBase, 85});
-
-            if (biases.has_value())
-            {
-                TestConstantQuantizationParams(biases.value().GetInfo(), {30.0f / g_Asymm8QuantizationBase, 0});
-            }
+            TestQuantizationOnLayersWithBiases(layer, weights, biases);
         }
     };
 
@@ -783,18 +815,7 @@ void TestQuantizeConvolution2d(bool useBiases)
                                      const Optional<ConstTensor>& biases,
                                      const char *name = nullptr) override
         {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-            // Based off default static range [-15.0f, 15.0f]
-            TestQuantizationParams(
-                info, {30.0f / g_Asymm8QuantizationBase, 128}, {15.0f / g_Symm16QuantizationBase, 0});
-
-            TestConstantQuantizationParams(weights.GetInfo(), {3.0f / g_Asymm8QuantizationBase, 85});
-
-            if (biases.has_value())
-            {
-                TestConstantQuantizationParams(biases.value().GetInfo(), {3.0f / g_Asymm8QuantizationBase, 85});
-            }
+            TestQuantizationOnLayersWithBiases(layer, weights, biases);
         }
     };
 
@@ -869,18 +890,7 @@ void TestQuantizeDepthwiseConvolution2d(bool useBiases)
                                               const Optional<ConstTensor>& biases,
                                               const char *name = nullptr) override
         {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
-
-            // Based off default static range [-15.0f, 15.0f]
-            TestQuantizationParams(
-                info, {30.0f / g_Asymm8QuantizationBase, 128}, {15.0f / g_Symm16QuantizationBase, 0});
-
-            TestConstantQuantizationParams(weights.GetInfo(), {3.0f / g_Asymm8QuantizationBase, 85});
-
-            if (biases.has_value())
-            {
-                TestConstantQuantizationParams(biases.value().GetInfo(), {3.0f / g_Asymm8QuantizationBase, 85});
-            }
+            TestQuantizationOnLayersWithBiases(layer, weights, biases);
         }
     };
 

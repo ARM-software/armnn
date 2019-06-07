@@ -24,12 +24,15 @@ QuantizerVisitor::QuantizerVisitor(const RangeTracker& rangeTracker,
 void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* srcLayer,
                                                     IConnectableLayer* quantizedLayer)
 {
+    BOOST_ASSERT(srcLayer);
     for (unsigned int i = 0; i < srcLayer->GetNumInputSlots(); i++)
     {
         const IInputSlot& srcInputSlot = srcLayer->GetInputSlot(i);
         const InputSlot* inputSlot = boost::polymorphic_downcast<const InputSlot*>(&srcInputSlot);
+        BOOST_ASSERT(inputSlot);
         const OutputSlot* outputSlot = inputSlot->GetConnectedOutputSlot();
 
+        BOOST_ASSERT(outputSlot);
         unsigned int slotIdx = outputSlot->CalculateIndexOnOwner();
         Layer& layerToFind = outputSlot->GetOwningLayer();
 
@@ -58,6 +61,50 @@ void QuantizerVisitor::SetQuantizedInputConnections(const IConnectableLayer* src
         info.SetQuantizationScale(qParams.first);
         newOutputSlot.SetTensorInfo(info);
     }
+}
+
+ConstTensor QuantizerVisitor::CreateQuantizedBias(const IConnectableLayer* srcLayer,
+                                                  const ConstTensor& weights,
+                                                  const Optional<ConstTensor>& biases,
+                                                  std::vector<int32_t>& backing)
+{
+    BOOST_ASSERT(srcLayer);
+    const IInputSlot& srcInputSlot = srcLayer->GetInputSlot(0);
+    auto inputSlot = boost::polymorphic_downcast<const InputSlot*>(&srcInputSlot);
+    BOOST_ASSERT(inputSlot);
+    const OutputSlot* outputSlot = inputSlot->GetConnectedOutputSlot();
+
+    BOOST_ASSERT(outputSlot);
+    unsigned int slotIdx = outputSlot->CalculateIndexOnOwner();
+    Layer& layerToFind = outputSlot->GetOwningLayer();
+
+    auto found = m_OriginalToQuantizedGuidMap.find(layerToFind.GetGuid());
+    if (found == m_OriginalToQuantizedGuidMap.end())
+    {
+        // Error in graph traversal order
+        BOOST_ASSERT_MSG(false, "Error in graph traversal");
+        return biases.value();
+    }
+
+    // Fetch the min/max ranges that were computed earlier
+    auto range = m_Ranges.GetRange(layerToFind.GetGuid(), slotIdx);
+    OffsetScalePair qParams = m_QuantizationScheme->ComputeScheme(range.first, range.second);
+
+    // Get the quantization scale based on input and weight scale
+    float scale = qParams.first * weights.GetInfo().GetQuantizationScale();
+
+    // Set up quantized bias tensor info and allocate space
+    TensorInfo qInfo(biases.value().GetInfo().GetShape(), DataType::Signed32, scale, 0);
+    backing.resize(biases.value().GetInfo().GetNumElements());
+
+    // Convert values to int32
+    for (size_t i = 0; i < backing.size(); ++i)
+    {
+        float fp32Value = static_cast<const float*>(biases.value().GetMemoryArea())[i];
+        backing[i] = boost::numeric_cast<int32_t>(fp32Value * ( 1 / scale ));
+    }
+
+    return ConstTensor(qInfo, backing);
 }
 
 void QuantizerVisitor::RecordLayer(const IConnectableLayer* srcLayer, IConnectableLayer* quantizedLayer)
@@ -151,11 +198,11 @@ void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
     std::vector<uint8_t> weightsBacking;
     ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
     Optional<ConstTensor> optionalQBiases;
-    std::vector<uint8_t> biasesBacking;
+    std::vector<int32_t> biasesBacking;
 
     if (biases.has_value())
     {
-        ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+        ConstTensor qBiases = CreateQuantizedBias(layer, qWeights, biases, biasesBacking);
         optionalQBiases = Optional<ConstTensor>(qBiases);
     }
 
@@ -177,11 +224,11 @@ void QuantizerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer*
     std::vector<uint8_t> weightsBacking;
     ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
     Optional<ConstTensor> optionalQBiases;
-    std::vector<uint8_t> biasesBacking;
+    std::vector<int32_t> biasesBacking;
 
     if (biases.has_value())
     {
-        ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+        ConstTensor qBiases = CreateQuantizedBias(layer, qWeights, biases, biasesBacking);
         optionalQBiases = Optional<ConstTensor>(qBiases);
     }
 
@@ -203,11 +250,11 @@ void QuantizerVisitor::VisitFullyConnectedLayer(const IConnectableLayer *layer,
     std::vector<uint8_t> weightsBacking;
     ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
     Optional<ConstTensor> optionalQBiases;
-    std::vector<uint8_t> biasesBacking;
+    std::vector<int32_t> biasesBacking;
 
     if (biases.has_value())
     {
-        ConstTensor qBiases = CreateQuantizedConst(biases.value(), biasesBacking);
+        ConstTensor qBiases = CreateQuantizedBias(layer, qWeights, biases, biasesBacking);
         optionalQBiases = Optional<ConstTensor>(qBiases);
     }
 

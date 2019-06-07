@@ -139,6 +139,12 @@ private:
     /// Record the guids so we can easily find the layers later
     void RecordLayer(const IConnectableLayer* srcLayer, IConnectableLayer* qLayer);
 
+    /// Sets the bias quantization scale based on input and weight scales
+    ConstTensor CreateQuantizedBias(const IConnectableLayer* srcLayer,
+                                    const ConstTensor& weights,
+                                    const Optional<ConstTensor>& biases,
+                                    std::vector<int32_t>& weightsBacking);
+
     /// Reference to the static range visitor used to retrieve the quantization ranges
     const RangeTracker& m_Ranges;
 

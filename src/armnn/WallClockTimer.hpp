@@ -11,25 +11,27 @@
 namespace armnn
 {
 
-// Clock class that uses the same timestamp function as the Mali DDK where possible.
-class monotonic_clock_raw {
-public:
-    using duration = std::chrono::nanoseconds;
-    using time_point = std::chrono::time_point<monotonic_clock_raw, duration>;
+#if defined(CLOCK_MONOTONIC_RAW) && defined(__unix__)
+#define USE_CLOCK_MONOTONIC_RAW 1
+#else
+#define USE_CLOCK_MONOTONIC_RAW 0
+#endif
 
-    static std::chrono::time_point<monotonic_clock_raw, std::chrono::nanoseconds> now() noexcept
+#if USE_CLOCK_MONOTONIC_RAW
+class MonotonicClockRaw
+{
+public:
+    using duration   = std::chrono::nanoseconds;
+    using time_point = std::chrono::time_point<MonotonicClockRaw, duration>;
+
+    static std::chrono::time_point<MonotonicClockRaw, std::chrono::nanoseconds> now() noexcept
     {
-#if defined(__unix__)
         timespec ts;
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
         return time_point(std::chrono::nanoseconds(ts.tv_sec * 1000000000 + ts.tv_nsec));
-#else
-        // On other platforms we have to make do with the standard C++ API, which may not exactly match
-        // the Mali DDK.
-        return std::chrono::time_point<monotonic_clock_raw, std::chrono::nanoseconds>();
-#endif
     }
 };
+#endif
 
 // Implementation of an instrument to measure elapsed wall-clock time in microseconds.
 class WallClockTimer : public Instrument
@@ -51,8 +53,8 @@ public:
     // Get the recorded measurements
     std::vector<Measurement> GetMeasurements() const override;
 
-#if defined(CLOCK_MONOTONIC_RAW)
-    using clock = monotonic_clock_raw;
+#if USE_CLOCK_MONOTONIC_RAW
+    using clock = MonotonicClockRaw;
 #else
     using clock = std::chrono::steady_clock;
 #endif

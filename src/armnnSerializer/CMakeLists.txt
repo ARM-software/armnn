@@ -3,10 +3,17 @@
 # SPDX-License-Identifier: MIT
 #
 if(BUILD_ARMNN_SERIALIZER)
+    find_program(FLATC flatc
+                 HINTS ${FLATC_DIR}
+                 DOC "Path to 'flatc', the flatbuffers compiler")
+    if (NOT FLATC)
+        message(SEND_ERROR "flatc not found. Specify the full path of the flatc executable with -DFLATC=<flatc path>")
+    endif()
+
     add_custom_command(
         # Generate an ArmnnSchema_generated.h file if it doesn't exist, or update it when necessary otherwise
         OUTPUT ArmnnSchema_generated.h DEPENDS ArmnnSchema.fbs
-        COMMAND ${FLATC_DIR}/flatc -o ${CMAKE_CURRENT_BINARY_DIR} --cpp ${CMAKE_CURRENT_SOURCE_DIR}/ArmnnSchema.fbs
+        COMMAND ${FLATC} -o ${CMAKE_CURRENT_BINARY_DIR} --cpp ${CMAKE_CURRENT_SOURCE_DIR}/ArmnnSchema.fbs
     )
 
     set(armnn_serializer_sources)

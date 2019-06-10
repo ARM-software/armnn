@@ -8,15 +8,17 @@
 #include "backendsCommon/Workload.hpp"
 #include "backendsCommon/WorkloadData.hpp"
 
+#include "Decoders.hpp"
+#include "Encoders.hpp"
+
 namespace armnn
 {
 
-
-class RefMeanFloat32Workload : public Float32Workload<MeanQueueDescriptor>
+class RefMeanWorkload : public BaseWorkload<MeanQueueDescriptor>
 {
 public:
-    explicit RefMeanFloat32Workload (const MeanQueueDescriptor& descriptor, const WorkloadInfo& info);
+    explicit RefMeanWorkload (const MeanQueueDescriptor& descriptor, const WorkloadInfo& info);
     virtual void Execute() const override;
 };
 
-}//namespace armnn
+} //namespace armnn

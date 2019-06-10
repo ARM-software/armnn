@@ -119,10 +119,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     TensorBufferArrayView.hpp
     Mean.cpp
     Mean.hpp
-    RefMeanFloat32Workload.cpp
-    RefMeanFloat32Workload.hpp
-    RefMeanUint8Workload.cpp
-    RefMeanUint8Workload.hpp
+    RefMeanWorkload.cpp
+    RefMeanWorkload.hpp
 )
 
 add_library(armnnRefBackendWorkloads OBJECT ${armnnRefBackendWorkloads_sources})

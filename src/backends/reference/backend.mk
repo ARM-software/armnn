@@ -45,8 +45,7 @@ BACKEND_SOURCES := \
         workloads/RefGatherWorkload.cpp \
         workloads/RefL2NormalizationWorkload.cpp \
         workloads/RefLstmWorkload.cpp \
-        workloads/RefMeanFloat32Workload.cpp \
-        workloads/RefMeanUint8Workload.cpp \
+        workloads/RefMeanWorkload.cpp \
         workloads/RefNormalizationWorkload.cpp \
         workloads/RefPadWorkload.cpp \
         workloads/RefPermuteWorkload.cpp \

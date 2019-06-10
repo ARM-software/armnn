@@ -36,10 +36,13 @@ bool NextIndex(const unsigned int numDims, const armnn::TensorShape& dims, std::
     return (carry == 0);
 }
 
-std::size_t ReducedOutputOffset(const unsigned int numDims, const armnn::TensorShape& dims,
-                                std::vector<unsigned int>& index, const unsigned int numAxis,
-                                const std::vector<unsigned int>& axis) {
-    std::size_t offset = 0;
+unsigned int ReducedOutputOffset(const unsigned int numDims,
+                                 const armnn::TensorShape& dims,
+                                 std::vector<unsigned int>& index,
+                                 const unsigned int numAxis,
+                                 const std::vector<unsigned int>& axis)
+{
+    unsigned int offset = 0;
     for (unsigned int idx = 0; idx < numDims; ++idx)
     {
         bool isAxis = false;
@@ -56,7 +59,7 @@ std::size_t ReducedOutputOffset(const unsigned int numDims, const armnn::TensorS
         }
         if (!isAxis)
         {
-            offset = offset * boost::numeric_cast<size_t>(dims[idx]) + boost::numeric_cast<size_t>(index[idx]);
+            offset = offset * dims[idx] + index[idx];
         }
     }
     return offset;
@@ -68,8 +71,9 @@ namespace armnn
 void Mean(const armnn::TensorInfo& inputInfo,
           const armnn::TensorInfo& outputInfo,
           const std::vector<unsigned int>& axis,
-          const float* inputData,
-          float* outputData) {
+          Decoder<float>& input,
+          Encoder<float>& output)
+{
 
     unsigned int inputNumDims = inputInfo.GetNumDimensions();
     unsigned int outputNumDims = outputInfo.GetNumDimensions();
@@ -78,16 +82,17 @@ void Mean(const armnn::TensorInfo& inputInfo,
     armnn::TensorShape inputDims = inputInfo.GetShape();
 
     // Initialise output data.
-    size_t numOutputs = 1;
+    unsigned int numOutputs = 1;
     for (unsigned int idx = 0; idx < outputNumDims; ++idx)
     {
-        numOutputs *= boost::numeric_cast<size_t>(outputDims[idx]);
+        numOutputs *= outputDims[idx];
     }
 
     std::vector<float> tempSum(numOutputs);
-    for (size_t idx = 0; idx < numOutputs; ++idx)
+    for (unsigned int idx = 0; idx < numOutputs; ++idx)
     {
-        outputData[idx] = 0.0f;
+        output[idx];
+        output.Set(0.0f);
         tempSum[idx] = 0.0f;
     }
 
@@ -106,30 +111,32 @@ void Mean(const armnn::TensorInfo& inputInfo,
           resolvedAxis.push_back(idx);
       }
     }
-    unsigned int numResolvedAxis = boost::numeric_cast<unsigned int>(resolvedAxis.size());
+    auto numResolvedAxis = boost::numeric_cast<unsigned int>(resolvedAxis.size());
 
     // Iterates through input_data and sum up the reduced axis.
     for (bool hasNext = true; hasNext; hasNext = NextIndex(inputNumDims, inputDims, tempIndex))
     {
-        size_t inputOffset = ReducedOutputOffset(inputNumDims, inputDims, tempIndex, 0, {});
-        size_t outputOffset = ReducedOutputOffset(inputNumDims, inputDims, tempIndex,
-                                                  numResolvedAxis, resolvedAxis);
-        tempSum[outputOffset] += inputData[inputOffset];
+        unsigned int inputOffset = ReducedOutputOffset(inputNumDims, inputDims, tempIndex, 0, {});
+        unsigned int outputOffset = ReducedOutputOffset(inputNumDims, inputDims, tempIndex,
+                                                        numResolvedAxis, resolvedAxis);
+        input[inputOffset];
+        tempSum[outputOffset] += input.Get();
     }
 
     // Takes average by num of elements added to get mean.
     size_t numElementsInAxis = 1;
     for (unsigned int idx = 0; idx < numResolvedAxis; ++idx)
     {
-        size_t current = boost::numeric_cast<size_t>(inputDims[resolvedAxis[idx]]);
+        unsigned int current = inputDims[resolvedAxis[idx]];
         BOOST_ASSERT(boost::numeric_cast<float>(current) <
               (std::numeric_limits<float>::max() / boost::numeric_cast<float>(numElementsInAxis)));
         numElementsInAxis *= current;
     }
     if (numElementsInAxis > 0) {
-        for (size_t idx = 0; idx < numOutputs; ++idx)
+        for (unsigned int idx = 0; idx < numOutputs; ++idx)
         {
-            outputData[idx] = tempSum[idx] / boost::numeric_cast<float>(numElementsInAxis);
+            output[idx];
+            output.Set(tempSum[idx] / boost::numeric_cast<float>(numElementsInAxis));
         }
     }
 }

@@ -14,6 +14,7 @@
 #include <backendsCommon/test/IsLayerSupportedTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include <string>
 
@@ -128,6 +129,30 @@ BOOST_AUTO_TEST_CASE(IsConvertFp32ToFp16SupportedFp32OutputReference)
 
     BOOST_CHECK(!result);
     BOOST_CHECK_EQUAL(reasonIfUnsupported, "Layer is not supported with float32 data type output");
+}
+
+BOOST_AUTO_TEST_CASE(IsLayerSupportedMeanDimensionsReference)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsMeanLayerSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::Float32, armnn::DataType::Float32>(reasonIfUnsupported);
+
+    BOOST_CHECK(result);
+}
+
+BOOST_AUTO_TEST_CASE(IsLayerNotSupportedMeanDimensionsReference)
+{
+    std::string reasonIfUnsupported;
+
+    bool result = IsMeanLayerNotSupportedTests<armnn::RefWorkloadFactory,
+            armnn::DataType::Float32, armnn::DataType::Float32>(reasonIfUnsupported);
+
+    BOOST_CHECK(!result);
+
+    boost::algorithm::trim(reasonIfUnsupported);
+    BOOST_CHECK_EQUAL(reasonIfUnsupported,
+                      "Reference Mean: Expected 4 dimensions but got 2 dimensions instead, for the 'output' tensor.");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

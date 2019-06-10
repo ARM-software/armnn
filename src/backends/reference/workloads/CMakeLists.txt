@@ -70,8 +70,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefFullyConnectedWorkload.hpp
     RefGatherWorkload.cpp
     RefGatherWorkload.hpp
-    RefL2NormalizationFloat32Workload.cpp
-    RefL2NormalizationFloat32Workload.hpp
+    RefL2NormalizationWorkload.cpp
+    RefL2NormalizationWorkload.hpp
     RefLstmWorkload.cpp
     RefLstmWorkload.hpp
     RefConcatWorkload.cpp

@@ -1,4 +1,4 @@
-﻿//
+//
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
@@ -11,10 +11,11 @@
 namespace armnn
 {
 
-class RefL2NormalizationFloat32Workload : public Float32Workload<L2NormalizationQueueDescriptor>
+class RefL2NormalizationWorkload : public BaseWorkload<L2NormalizationQueueDescriptor>
 {
 public:
-    using Float32Workload<L2NormalizationQueueDescriptor>::Float32Workload;
+    explicit RefL2NormalizationWorkload(const L2NormalizationQueueDescriptor& descriptor,
+                                        const WorkloadInfo& info);
 
     void Execute() const override;
 };

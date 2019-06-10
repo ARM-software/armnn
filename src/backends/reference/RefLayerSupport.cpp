@@ -743,12 +743,30 @@ bool RefLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                                  const L2NormalizationDescriptor& descriptor,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
     ignore_unused(descriptor);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &FalseFuncU8<>);
+    // Define supported types
+    std::array<DataType, 2> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedSymm16
+    };
+
+    bool supported = true;
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference L2normalization: input type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference L2normalization: output type not supported.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference L2normalization: input and output types mismatched.");
+
+    supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
+                                  "Reference L2normalization: input and output shapes have different "
+                                  "num total elements.");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,

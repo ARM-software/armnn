@@ -12,7 +12,7 @@
 #include "RefConvolution2dWorkload.hpp"
 #include "RefSplitterWorkload.hpp"
 #include "RefResizeBilinearUint8Workload.hpp"
-#include "RefL2NormalizationFloat32Workload.hpp"
+#include "RefL2NormalizationWorkload.hpp"
 #include "RefActivationWorkload.hpp"
 #include "RefPooling2dWorkload.hpp"
 #include "RefWorkloadUtils.hpp"

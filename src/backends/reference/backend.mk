@@ -43,7 +43,7 @@ BACKEND_SOURCES := \
         workloads/RefFloorWorkload.cpp \
         workloads/RefFullyConnectedWorkload.cpp \
         workloads/RefGatherWorkload.cpp \
-        workloads/RefL2NormalizationFloat32Workload.cpp \
+        workloads/RefL2NormalizationWorkload.cpp \
         workloads/RefLstmWorkload.cpp \
         workloads/RefMeanFloat32Workload.cpp \
         workloads/RefMeanUint8Workload.cpp \

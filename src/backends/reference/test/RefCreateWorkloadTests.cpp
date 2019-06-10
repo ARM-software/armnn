@@ -712,12 +712,22 @@ static void RefCreateL2NormalizationTest(DataLayout dataLayout)
 
 BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloat32)
 {
-    RefCreateL2NormalizationTest<RefL2NormalizationFloat32Workload, armnn::DataType::Float32>(DataLayout::NCHW);
+    RefCreateL2NormalizationTest<RefL2NormalizationWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloat32Nhwc)
 {
-    RefCreateL2NormalizationTest<RefL2NormalizationFloat32Workload, armnn::DataType::Float32>(DataLayout::NHWC);
+    RefCreateL2NormalizationTest<RefL2NormalizationWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateL2NormalizationInt16)
+{
+    RefCreateL2NormalizationTest<RefL2NormalizationWorkload, armnn::DataType::QuantisedSymm16>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateL2NormalizationInt16Nhwc)
+{
+    RefCreateL2NormalizationTest<RefL2NormalizationWorkload, armnn::DataType::QuantisedSymm16>(DataLayout::NHWC);
 }
 
 template <typename ReshapeWorkloadType, armnn::DataType DataType>

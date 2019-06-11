@@ -300,6 +300,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ReshapeLayer.cpp
     src/armnn/layers/SpaceToBatchNdLayer.hpp
     src/armnn/layers/SpaceToBatchNdLayer.cpp
+    src/armnn/layers/SpaceToDepthLayer.hpp
+    src/armnn/layers/SpaceToDepthLayer.cpp
     src/armnn/layers/ResizeBilinearLayer.hpp
     src/armnn/layers/ResizeBilinearLayer.cpp
     src/armnn/layers/RsqrtLayer.cpp

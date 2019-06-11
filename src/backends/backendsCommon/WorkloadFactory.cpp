@@ -680,6 +680,19 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                                    reason);
             break;
         }
+        case LayerType::SpaceToDepth:
+        {
+            auto cLayer = boost::polymorphic_downcast<const SpaceToDepthLayer*>(&layer);
+
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsSpaceToDepthSupported(OverrideDataType(input, dataType),
+                                                                 OverrideDataType(output, dataType),
+                                                                 cLayer->GetParameters(),
+                                                                 reason);
+            break;
+        }
         case LayerType::Splitter:
         {
             auto cLayer = boost::polymorphic_downcast<const SplitterLayer*>(&layer);
@@ -1040,6 +1053,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateSplitter(const SplitterQueueD
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
                                                                   const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
+                                                                const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

@@ -55,6 +55,7 @@ enum class LayerType
     Rsqrt,
     Softmax,
     SpaceToBatchNd,
+    SpaceToDepth,
     Splitter,
     StridedSlice,
     Subtraction,
@@ -66,6 +67,6 @@ enum class LayerType
 const char* GetLayerTypeAsCString(LayerType type);
 
 using Coordinates = std::array<unsigned int, MaxNumOfTensorDimensions>;
-using Dimensions = std::array<unsigned int, MaxNumOfTensorDimensions>;
+using Dimensions  = std::array<unsigned int, MaxNumOfTensorDimensions>;
 
 }

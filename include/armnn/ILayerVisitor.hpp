@@ -336,6 +336,14 @@ public:
                                           const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                           const char* name = nullptr) = 0;
 
+    /// Function a space to depth layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param spaceToDepthDescriptor - Parameters for the space to depth operation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitSpaceToDepthLayer(const IConnectableLayer* layer,
+                                        const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                        const char* name = nullptr) = 0;
+
     /// Function that a splitter layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param splitterDescriptor - ViewsDescriptor to configure the splitting process.

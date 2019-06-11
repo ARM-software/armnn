@@ -540,6 +540,20 @@ struct SpaceToBatchNdDescriptor
     DataLayout m_DataLayout;
 };
 
+/// A SpaceToDepthDescriptor for the SpaceToDepthLayer
+struct SpaceToDepthDescriptor
+{
+    SpaceToDepthDescriptor()
+    : m_BlockSize(1u)
+    , m_DataLayout(DataLayout::NHWC)
+    {}
+
+    /// Scalar specifying the input block size. It must be >= 1
+    unsigned int m_BlockSize;
+    /// The data layout to be used (NCHW, NHWC).
+    DataLayout m_DataLayout;
+};
+
 /// An LstmDescriptor for the LstmLayer.
 struct LstmDescriptor
 {
@@ -667,4 +681,4 @@ struct PreCompiledDescriptor
     unsigned int m_NumOutputSlots;
 };
 
-}
+} // namespace armnn

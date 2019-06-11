@@ -47,6 +47,7 @@
 #include "layers/RsqrtLayer.hpp"
 #include "layers/SoftmaxLayer.hpp"
 #include "layers/SpaceToBatchNdLayer.hpp"
+#include "layers/SpaceToDepthLayer.hpp"
 #include "layers/SplitterLayer.hpp"
 #include "layers/StridedSliceLayer.hpp"
 #include "layers/SubtractionLayer.hpp"
@@ -120,6 +121,7 @@ DECLARE_LAYER(ResizeBilinear)
 DECLARE_LAYER(Rsqrt)
 DECLARE_LAYER(Softmax)
 DECLARE_LAYER(SpaceToBatchNd)
+DECLARE_LAYER(SpaceToDepth)
 DECLARE_LAYER(Splitter)
 DECLARE_LAYER(StridedSlice)
 DECLARE_LAYER(Subtraction)

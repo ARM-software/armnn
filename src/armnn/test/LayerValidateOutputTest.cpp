@@ -4,11 +4,12 @@
 //
 #include <armnn/ArmNN.hpp>
 
+#include <Graph.hpp>
+#include <layers/BatchToSpaceNdLayer.hpp>
+#include <layers/SpaceToDepthLayer.hpp>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
-#include <layers/BatchToSpaceNdLayer.hpp>
-#include <Graph.hpp>
-
 
 BOOST_AUTO_TEST_SUITE(LayerValidateOutput)
 
@@ -33,6 +34,28 @@ BOOST_AUTO_TEST_CASE(TestBatchToSpaceInferOutputShape)
     armnn::TensorShape expectedShape(4, expectedDimSizes.data());
 
     BOOST_CHECK(expectedShape == batchToSpaceLayer->InferOutputShapes(shapes).at(0));
+}
+
+BOOST_AUTO_TEST_CASE(TestSpaceToDepthInferOutputShape)
+{
+    armnn::Graph graph;
+
+    armnn::SpaceToDepthDescriptor descriptor;
+    descriptor.m_BlockSize  = 2;
+    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
+
+    armnn::SpaceToDepthLayer* const spaceToDepthLayer =
+        graph.AddLayer<armnn::SpaceToDepthLayer>(descriptor, "spaceToDepth");
+
+    std::vector<armnn::TensorShape> shapes;
+    const std::vector<unsigned int> dimSizes{ 1, 16, 8, 3 };
+    armnn::TensorShape shape(4, dimSizes.data());
+    shapes.push_back(shape);
+
+    const std::vector<unsigned int> expectedDimSizes{ 1, 8, 4, 12 };
+    armnn::TensorShape expectedShape(4, expectedDimSizes.data());
+
+    BOOST_CHECK(expectedShape == spaceToDepthLayer->InferOutputShapes(shapes).at(0));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

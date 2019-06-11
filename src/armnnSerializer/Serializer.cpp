@@ -783,6 +783,14 @@ void SerializerVisitor::VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer*
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_SpaceToBatchNdLayer);
 }
 
+// Build FlatBuffer for SpaceToDepthLayer
+void SerializerVisitor::VisitSpaceToDepthLayer(const armnn::IConnectableLayer* layer,
+                                               const armnn::SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                               const char* name)
+{
+    throw armnn::Exception("SerializerVisitor::VisitSpaceToDepthLayer is not yet implemented");
+}
+
 // Build FlatBuffer for Splitter Layer
 void SerializerVisitor::VisitSplitterLayer(const armnn::IConnectableLayer* layer,
                                            const armnn::ViewsDescriptor& viewsDescriptor,

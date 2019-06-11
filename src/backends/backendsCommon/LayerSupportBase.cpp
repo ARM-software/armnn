@@ -392,6 +392,14 @@ bool LayerSupportBase::IsSpaceToBatchNdSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsSpaceToDepthSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const SpaceToDepthDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsSplitterSupported(const TensorInfo& input,
                                            const ViewsDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported) const

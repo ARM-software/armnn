@@ -173,6 +173,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const;
 

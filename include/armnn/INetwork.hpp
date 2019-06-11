@@ -328,6 +328,13 @@ public:
     virtual IConnectableLayer* AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                                       const char* name = nullptr) = 0;
 
+    /// Adds a space to depth layer to the network.
+    /// @param spaceToDepthDescriptor - Parameters for the space to depth operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddSpaceToDepthLayer(const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                                    const char* name = nullptr) = 0;
+
     /// Adds a floor layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.

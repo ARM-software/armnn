@@ -28,6 +28,7 @@ struct ReshapeDescriptor;
 struct ResizeBilinearDescriptor;
 struct SoftmaxDescriptor;
 struct SpaceToBatchNdDescriptor;
+struct SpaceToDepthDescriptor;
 struct StridedSliceDescriptor;
 struct ViewsDescriptor;
 

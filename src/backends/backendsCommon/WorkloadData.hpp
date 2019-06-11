@@ -309,6 +309,11 @@ struct SpaceToBatchNdQueueDescriptor : QueueDescriptorWithParameters<SpaceToBatc
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct SpaceToDepthQueueDescriptor : QueueDescriptorWithParameters<SpaceToDepthDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct FloorQueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

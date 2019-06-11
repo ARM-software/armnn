@@ -173,6 +173,10 @@ public:
                                   const SpaceToBatchNdDescriptor&,
                                   const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitSpaceToDepthLayer(const IConnectableLayer*,
+                                const SpaceToDepthDescriptor&,
+                                const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitSplitterLayer(const IConnectableLayer*,
                             const ViewsDescriptor&,
                             const char*) override { DefaultPolicy::Apply(__func__); }

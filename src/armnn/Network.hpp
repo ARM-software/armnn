@@ -147,6 +147,9 @@ public:
     IConnectableLayer* AddSpaceToBatchNdLayer(const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                               const char* name = nullptr) override;
 
+    IConnectableLayer* AddSpaceToDepthLayer(const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                            const char* name = nullptr) override;
+
     IConnectableLayer* AddFloorLayer(const char* name = nullptr) override;
 
     IConnectableLayer* AddOutputLayer(LayerBindingId id, const char* name = nullptr) override;

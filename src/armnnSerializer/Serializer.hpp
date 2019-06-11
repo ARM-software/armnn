@@ -182,6 +182,10 @@ public:
                                   const armnn::SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                   const char* name = nullptr) override;
 
+    void VisitSpaceToDepthLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                const char* name = nullptr) override;
+
     void VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
                                  const armnn::NormalizationDescriptor& normalizationDescriptor,
                                  const char* name = nullptr) override;

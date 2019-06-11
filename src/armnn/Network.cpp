@@ -835,6 +835,12 @@ IConnectableLayer* Network::AddSpaceToBatchNdLayer(const SpaceToBatchNdDescripto
     return m_Graph->AddLayer<SpaceToBatchNdLayer>(spaceToBatchNdDescriptor, name);
 }
 
+IConnectableLayer* Network::AddSpaceToDepthLayer(const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                                 const char* name)
+{
+    return m_Graph->AddLayer<SpaceToDepthLayer>(spaceToDepthDescriptor, name);
+}
+
 IConnectableLayer* Network::AddFloorLayer(const char* name)
 {
     return m_Graph->AddLayer<FloorLayer>(name);

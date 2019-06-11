@@ -260,6 +260,11 @@ public:
                                            const SpaceToBatchNdDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsSpaceToDepthSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const SpaceToDepthDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
     virtual bool IsSplitterSupported(const TensorInfo& input,
                                      const ViewsDescriptor& descriptor,

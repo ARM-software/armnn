@@ -326,6 +326,14 @@ bool IsSpaceToBatchNdSupported(const BackendId& backend,
                                char* reasonIfUnsupported = nullptr,
                                size_t reasonIfUnsupportedMaxLength = 1024);
 
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsSpaceToDepthSupported(const BackendId& backend,
+                             const TensorInfo& input,
+                             const TensorInfo& output,
+                             const SpaceToDepthDescriptor& descriptor,
+                             char* reasonIfUnsupported = nullptr,
+                             size_t reasonIfUnsupportedMaxLength = 1024);
+
 ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
 bool IsSplitterSupported(const BackendId& backend,
                          const TensorInfo& input,

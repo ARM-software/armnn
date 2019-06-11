@@ -788,7 +788,17 @@ void SerializerVisitor::VisitSpaceToDepthLayer(const armnn::IConnectableLayer* l
                                                const armnn::SpaceToDepthDescriptor& spaceToDepthDescriptor,
                                                const char* name)
 {
-    throw armnn::Exception("SerializerVisitor::VisitSpaceToDepthLayer is not yet implemented");
+    auto flatBufferBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_SpaceToDepth);
+    auto flatBufferDescriptor =
+        CreateSpaceToDepthDescriptor(m_flatBufferBuilder,
+                                     spaceToDepthDescriptor.m_BlockSize,
+                                     GetFlatBufferDataLayout(spaceToDepthDescriptor.m_DataLayout));
+
+    auto flatBufferLayer = serializer::CreateSpaceToDepthLayer(m_flatBufferBuilder,
+                                                               flatBufferBaseLayer,
+                                                               flatBufferDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_SpaceToDepthLayer);
 }
 
 // Build FlatBuffer for Splitter Layer

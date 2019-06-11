@@ -121,7 +121,8 @@ enum LayerType : uint {
     Dequantize = 36,
     Merge = 37,
     Switch = 38,
-    Concat = 39
+    Concat = 39,
+    SpaceToDepth = 40
 }
 
 // Base layer table to be used as part of other layers
@@ -335,6 +336,16 @@ table SpaceToBatchNdLayer {
 table SpaceToBatchNdDescriptor {
     blockShape:[uint];
     padList:[uint];
+    dataLayout:DataLayout;
+}
+
+table SpaceToDepthLayer {
+    base:LayerBase;
+    descriptor:SpaceToDepthDescriptor;
+}
+
+table SpaceToDepthDescriptor {
+    blockSize:uint;
     dataLayout:DataLayout;
 }
 
@@ -584,7 +595,8 @@ union Layer {
     DequantizeLayer,
     MergeLayer,
     SwitchLayer,
-    ConcatLayer
+    ConcatLayer,
+    SpaceToDepthLayer
 }
 
 table AnyLayer {

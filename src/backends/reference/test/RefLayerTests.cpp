@@ -623,6 +623,14 @@ ARMNN_AUTO_TEST_CASE(MeanVts1QuantisedAsymm8, MeanVts1Test<armnn::DataType::Quan
 ARMNN_AUTO_TEST_CASE(MeanVts2QuantisedAsymm8, MeanVts2Test<armnn::DataType::QuantisedAsymm8>)
 ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedAsymm8, MeanVts3Test<armnn::DataType::QuantisedAsymm8>)
 
+ARMNN_AUTO_TEST_CASE(MeanSimpleQuantisedSymm16, MeanSimpleTest<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(MeanSimpleAxisQuantisedSymm16, MeanSimpleAxisTest<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(MeanKeepDimsQuantisedSymm16, MeanKeepDimsTest<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(MeanMultipleDimsQuantisedSymm16, MeanMultipleDimsTest<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(MeanVts1QuantisedSymm16, MeanVts1Test<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(MeanVts2QuantisedSymm16, MeanVts2Test<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedSymm16, MeanVts3Test<armnn::DataType::QuantisedSymm16>)
+
 ARMNN_AUTO_TEST_CASE(AdditionAfterMaxPool, AdditionAfterMaxPoolTest)
 
 // Space To Batch Nd

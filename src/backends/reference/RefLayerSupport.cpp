@@ -902,10 +902,11 @@ bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
     std::string meanLayerStr = "Mean";
     std::string outputTensorStr = "output";
 
-    std::array<DataType,2> supportedTypes =
+    std::array<DataType,3> supportedTypes =
     {
         DataType::Float32,
-        DataType::QuantisedAsymm8
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,

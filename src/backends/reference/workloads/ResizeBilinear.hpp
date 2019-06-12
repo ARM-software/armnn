@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "BaseIterator.hpp"
 #include <armnn/Tensor.hpp>
 
 #include <DataLayoutIndexed.hpp>
@@ -12,9 +13,9 @@
 namespace armnn
 {
 
-void ResizeBilinear(const float*                  in,
+void ResizeBilinear(Decoder<float>&               in,
                     const TensorInfo&             inputInfo,
-                    float*                        out,
+                    Encoder<float>&               out,
                     const TensorInfo&             outputInfo,
                     armnnUtils::DataLayoutIndexed dataLayout = DataLayout::NCHW);
 

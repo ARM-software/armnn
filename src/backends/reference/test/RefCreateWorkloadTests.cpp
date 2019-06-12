@@ -643,17 +643,17 @@ static void RefCreateResizeBilinearTest(DataLayout dataLayout)
 
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32)
 {
-    RefCreateResizeBilinearTest<RefResizeBilinearFloat32Workload, armnn::DataType::Float32>(DataLayout::NCHW);
+    RefCreateResizeBilinearTest<RefResizeBilinearWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearUint8)
 {
-    RefCreateResizeBilinearTest<RefResizeBilinearUint8Workload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
+    RefCreateResizeBilinearTest<RefResizeBilinearWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
 }
 
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32Nhwc)
 {
-    RefCreateResizeBilinearTest<RefResizeBilinearFloat32Workload, armnn::DataType::Float32>(DataLayout::NHWC);
+    RefCreateResizeBilinearTest<RefResizeBilinearWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
 }
 
 template <typename RsqrtWorkloadType, armnn::DataType DataType>

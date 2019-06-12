@@ -11,10 +11,10 @@
 namespace armnn
 {
 
-class RefResizeBilinearUint8Workload : public Uint8Workload<ResizeBilinearQueueDescriptor>
+class RefResizeBilinearWorkload : public BaseWorkload<ResizeBilinearQueueDescriptor>
 {
 public:
-    using Uint8Workload<ResizeBilinearQueueDescriptor>::Uint8Workload;
+    using BaseWorkload<ResizeBilinearQueueDescriptor>::BaseWorkload;
     virtual void Execute() const override;
 };
 

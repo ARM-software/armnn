@@ -1003,6 +1003,11 @@ IConnectableLayer* Network::AddSwitchLayer(const char* name)
     return m_Graph->AddLayer<SwitchLayer>(name);
 }
 
+IConnectableLayer* Network::AddPreluLayer(const char* name)
+{
+    return m_Graph->AddLayer<PreluLayer>(name);
+}
+
 void Network::Accept(ILayerVisitor& visitor) const
 {
     for (auto layer : GetGraph())

@@ -348,6 +348,14 @@ bool LayerSupportBase::IsPreCompiledSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsPreluSupported(const TensorInfo& input,
+                                        const TensorInfo& alpha,
+                                        const TensorInfo& output,
+                                        Optional<std::string &> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsQuantizeSupported(const armnn::TensorInfo& input,
                                            const armnn::TensorInfo& output,
                                            armnn::Optional<std::string&> reasonIfUnsupported) const

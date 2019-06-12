@@ -155,6 +155,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const;
 
+    virtual std::unique_ptr<IWorkload> CreatePrelu(const PreluQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                                       const WorkloadInfo& Info) const;
 

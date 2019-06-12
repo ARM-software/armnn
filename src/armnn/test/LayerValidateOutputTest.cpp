@@ -58,4 +58,27 @@ BOOST_AUTO_TEST_CASE(TestSpaceToDepthInferOutputShape)
     BOOST_CHECK(expectedShape == spaceToDepthLayer->InferOutputShapes(shapes).at(0));
 }
 
+BOOST_AUTO_TEST_CASE(TestPreluInferOutputShape)
+{
+    armnn::Graph graph;
+
+    armnn::PreluLayer* const preluLayer = graph.AddLayer<armnn::PreluLayer>("prelu");
+
+    std::vector<armnn::TensorShape> inputShapes
+    {
+        { 4, 1, 2 },  // Input shape
+        { 5, 4, 3, 1} // Alpha shape
+    };
+
+    const std::vector<armnn::TensorShape> expectedOutputShapes
+    {
+        { 5, 4, 3, 2 } // Output shape
+    };
+
+    const std::vector<armnn::TensorShape> outputShapes = preluLayer->InferOutputShapes(inputShapes);
+
+    BOOST_CHECK(outputShapes.size() == 1);
+    BOOST_CHECK(outputShapes[0] == expectedOutputShapes[0]);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

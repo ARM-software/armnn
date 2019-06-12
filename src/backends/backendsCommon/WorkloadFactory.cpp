@@ -785,6 +785,17 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                             reason);
             break;
         }
+        case LayerType::Prelu:
+        {
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& alpha  = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsPreluSupported(OverrideDataType(input,  dataType),
+                                                          OverrideDataType(alpha,  dataType),
+                                                          OverrideDataType(output, dataType),
+                                                          reason);
+            break;
+        }
         default:
         {
             BOOST_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");
@@ -1011,6 +1022,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreatePooling2d(const Pooling2dQueu
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreatePrelu(const PreluQueueDescriptor &descriptor,
+                                                         const WorkloadInfo &info) const
 {
     return std::unique_ptr<IWorkload>();
 }

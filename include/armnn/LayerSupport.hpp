@@ -282,6 +282,14 @@ bool IsPreCompiledSupported(const BackendId& backend,
                             size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsPreluSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      const TensorInfo& alpha,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported = nullptr,
+                      size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsPooling2dSupported(const BackendId& backend,
                           const TensorInfo& input,
                           const TensorInfo& output,

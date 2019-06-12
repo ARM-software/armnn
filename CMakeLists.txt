@@ -296,18 +296,20 @@ list(APPEND armnn_sources
     src/armnn/layers/DivisionLayer.hpp
     src/armnn/layers/PreCompiledLayer.hpp
     src/armnn/layers/PreCompiledLayer.cpp
+    src/armnn/layers/PreluLayer.hpp
+    src/armnn/layers/PreluLayer.cpp
     src/armnn/layers/ReshapeLayer.hpp
     src/armnn/layers/ReshapeLayer.cpp
-    src/armnn/layers/SpaceToBatchNdLayer.hpp
-    src/armnn/layers/SpaceToBatchNdLayer.cpp
-    src/armnn/layers/SpaceToDepthLayer.hpp
-    src/armnn/layers/SpaceToDepthLayer.cpp
     src/armnn/layers/ResizeBilinearLayer.hpp
     src/armnn/layers/ResizeBilinearLayer.cpp
     src/armnn/layers/RsqrtLayer.cpp
     src/armnn/layers/RsqrtLayer.hpp
     src/armnn/layers/SoftmaxLayer.hpp
     src/armnn/layers/SoftmaxLayer.cpp
+    src/armnn/layers/SpaceToBatchNdLayer.hpp
+    src/armnn/layers/SpaceToBatchNdLayer.cpp
+    src/armnn/layers/SpaceToDepthLayer.hpp
+    src/armnn/layers/SpaceToDepthLayer.cpp
     src/armnn/layers/SplitterLayer.hpp
     src/armnn/layers/SplitterLayer.cpp
     src/armnn/layers/StridedSliceLayer.cpp

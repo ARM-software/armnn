@@ -160,6 +160,9 @@ public:
                              const armnn::Pooling2dDescriptor& pooling2dDescriptor,
                              const char* name = nullptr) override;
 
+    void VisitPreluLayer(const armnn::IConnectableLayer* layer,
+                         const char* name = nullptr) override;
+
     void VisitQuantizeLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 

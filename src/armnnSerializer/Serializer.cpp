@@ -709,6 +709,12 @@ void SerializerVisitor::VisitPooling2dLayer(const armnn::IConnectableLayer* laye
     CreateAnyLayer(fbPooling2dLayer.o, serializer::Layer::Layer_Pooling2dLayer);
 }
 
+void SerializerVisitor::VisitPreluLayer(const armnn::IConnectableLayer* layer,
+                                        const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::VisitPreluLayer not yet implemented");
+}
+
 void SerializerVisitor::VisitQuantizeLayer(const armnn::IConnectableLayer *layer, const char *name)
 {
     auto fbQuantizeBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Quantize);

@@ -221,6 +221,11 @@ public:
                                 const PreCompiledDescriptor& descriptor,
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsPreluSupported(const TensorInfo& input,
+                          const TensorInfo& alpha,
+                          const TensorInfo& output,
+                          Optional<std::string &> reasonIfUnsupported) const override;
+
     bool IsQuantizeSupported(const TensorInfo& input,
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

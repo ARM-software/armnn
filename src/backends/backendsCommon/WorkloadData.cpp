@@ -1711,4 +1711,44 @@ void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) cons
     // This is internally generated so it should not need validation.
 }
 
+void PreluQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateNumInputs(workloadInfo, "PreluQueueDescriptor", 2);
+    ValidateNumOutputs(workloadInfo, "PreluQueueDescriptor", 1);
+
+    std::vector<DataType> supportedTypes
+    {
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "PreluQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
+                      supportedTypes,
+                      "PreluQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      supportedTypes,
+                      "PreluQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      { workloadInfo.m_InputTensorInfos[1].GetDataType() },
+                      "PreluQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      { workloadInfo.m_OutputTensorInfos[0].GetDataType() },
+                      "PreluQueueDescriptor");
+
+    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
+                                       workloadInfo.m_InputTensorInfos[1],
+                                       workloadInfo.m_OutputTensorInfos[0],
+                                       "PreluQueueDescriptor",
+                                       "input",
+                                       "alpha");
+}
+
 } //namespace armnn

@@ -123,6 +123,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/PermuteLayer.cpp \
         src/armnn/layers/Pooling2dLayer.cpp \
         src/armnn/layers/PreCompiledLayer.cpp \
+        src/armnn/layers/PreluLayer.cpp \
         src/armnn/layers/QuantizeLayer.cpp \
         src/armnn/layers/ReshapeLayer.cpp \
         src/armnn/layers/ResizeBilinearLayer.cpp \

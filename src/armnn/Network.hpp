@@ -185,6 +185,8 @@ public:
 
     IConnectableLayer* AddSwitchLayer(const char* name = nullptr) override;
 
+    IConnectableLayer* AddPreluLayer(const char* name = nullptr) override;
+
     void Accept(ILayerVisitor& visitor) const override;
 
 private:

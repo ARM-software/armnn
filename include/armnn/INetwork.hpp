@@ -427,6 +427,11 @@ public:
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddSwitchLayer(const char* name = nullptr) = 0;
 
+    /// Adds a PReLU layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddPreluLayer(const char* name = nullptr) = 0;
+
     virtual void Accept(ILayerVisitor& visitor) const = 0;
 
 protected:

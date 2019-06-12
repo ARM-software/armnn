@@ -290,6 +290,12 @@ public:
                                      const Pooling2dDescriptor& pooling2dDescriptor,
                                      const char* name = nullptr) = 0;
 
+    /// Function that a PReLU activation layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param name - Optional name for the layer.
+    virtual void VisitPreluLayer(const IConnectableLayer* layer,
+                                 const char* name = nullptr) = 0;
+
     /// Function a quantize layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param name - Optional name for the layer.

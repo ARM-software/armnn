@@ -151,6 +151,9 @@ public:
                              const Pooling2dDescriptor&,
                              const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitPreluLayer(const IConnectableLayer*,
+                         const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitQuantizeLayer(const IConnectableLayer*,
                             const char*) override { DefaultPolicy::Apply(__func__); }
 

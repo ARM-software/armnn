@@ -385,6 +385,15 @@ void QuantizerVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitSpaceToDepthLayer(const IConnectableLayer* layer,
+                                              const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                              const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSpaceToDepthLayer(spaceToDepthDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
                                           const SplitterDescriptor& splitterDescriptor,
                                           const char* name)

@@ -118,6 +118,10 @@ public:
                                   const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                   const char* name = nullptr) override;
 
+    void VisitSpaceToDepthLayer(const IConnectableLayer* layer,
+                                const SpaceToDepthDescriptor& spaceToDepthDescriptor,
+                                const char* name = nullptr) override;
+
     void VisitSplitterLayer(const IConnectableLayer* layer,
                             const SplitterDescriptor& splitterDescriptor,
                             const char* name = nullptr) override;

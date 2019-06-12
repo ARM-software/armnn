@@ -1132,6 +1132,52 @@ BOOST_AUTO_TEST_CASE(QuantizeSpaceToBatch)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeSpaceToDepth)
+{
+    class TestSpaceToDepthQuantization : public TestLeakyReLuActivationQuantization
+    {
+    public:
+        TestSpaceToDepthQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+            : TestLeakyReLuActivationQuantization(inputShape, outputShape)
+        {}
+
+        TestSpaceToDepthQuantization(const QuantizerOptions& options,
+                                     const TensorShape& inputShape,
+                                     const TensorShape& outputShape)
+            : TestLeakyReLuActivationQuantization(options, inputShape, outputShape)
+        {}
+
+        void VisitSpaceToDepthLayer(const IConnectableLayer* layer,
+                                    const SpaceToDepthDescriptor&,
+                                    const char* = nullptr) override
+        {
+            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+            TestQuantizationParams(info,
+                                  { 30.0f / g_Asymm8QuantizationBase, 128 },
+                                  { 15.0f / g_Symm16QuantizationBase, 0   });
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    const TensorShape shape{ 1u };
+    TensorInfo info(shape, DataType::Float32);
+
+    IConnectableLayer* activation   = CreateStartOfLeakyReluNetwork(network.get(), info);
+    IConnectableLayer* spaceToDepth = network->AddSpaceToDepthLayer(SpaceToDepthDescriptor());
+
+    CompleteLeakyReluNetwork(network.get(), activation, spaceToDepth, info);
+
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestSpaceToDepthQuantization validatorQAsymm8(shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestSpaceToDepthQuantization validatorQSymm16(options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 BOOST_AUTO_TEST_CASE(QuantizePooling2d)
 {
     class TestPooling2dQuantization : public TestLeakyReLuActivationQuantization
@@ -1556,10 +1602,7 @@ std::vector<uint8_t> SetupQuantize(float value)
     armnn::TensorInfo inputInfo({ 1, 2, 2 }, armnn::DataType::Float32);
     inputInfo.SetQuantizationScale(1.0f);
     inputInfo.SetQuantizationOffset(1);
-    std::vector<float> input({
-                                     value, 0.0f,
-                                     0.0f, 1.0f
-                             });
+    std::vector<float> input({ value, 0.0f, 0.0f, 1.0f });
     const std::vector<float> &inputRef = input;
 
     auto output = QuantizedVector<uint8_t>(inputInfo.GetQuantizationScale(),

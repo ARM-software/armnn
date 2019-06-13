@@ -4,6 +4,7 @@
 #
 
 list(APPEND armnnAclCommon_sources
+    ArmComputeTensorHandle.hpp
     ArmComputeTensorUtils.hpp
     ArmComputeTensorUtils.cpp
     ArmComputeUtils.hpp

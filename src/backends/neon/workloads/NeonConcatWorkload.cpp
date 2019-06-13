@@ -73,10 +73,10 @@ const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info)
     std::vector<arm_compute::ITensor *> aclInputs;
     for (auto input : m_Data.m_Inputs)
     {
-        arm_compute::ITensor& aclInput  = boost::polymorphic_pointer_downcast<INeonTensorHandle>(input)->GetTensor();
+        arm_compute::ITensor& aclInput  = boost::polymorphic_pointer_downcast<IAclTensorHandle>(input)->GetTensor();
         aclInputs.emplace_back(&aclInput);
     }
-    arm_compute::ITensor& output = boost::polymorphic_pointer_downcast<INeonTensorHandle>(
+    arm_compute::ITensor& output = boost::polymorphic_pointer_downcast<IAclTensorHandle>(
         m_Data.m_Outputs[0])->GetTensor();
 
     // Create the layer function

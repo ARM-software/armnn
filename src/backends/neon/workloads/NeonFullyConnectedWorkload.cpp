@@ -51,8 +51,8 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
 {
     m_Data.ValidateInputsOutputs("NeonFullyConnectedWorkload", 1, 1);
 
-    arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     m_WeightsTensor = std::make_unique<arm_compute::Tensor>();
     BuildArmComputeTensor(*m_WeightsTensor, m_Data.m_Weight->GetTensorInfo());

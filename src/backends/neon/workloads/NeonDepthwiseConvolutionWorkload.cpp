@@ -107,8 +107,8 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
 
     m_Data.ValidateInputsOutputs("NeonDepthwiseConvolutionWorkload", 1, 1);
 
-    INeonTensorHandle* inputTensorHandle  = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0]);
-    INeonTensorHandle* outputTensorHandle = static_cast<INeonTensorHandle*>(m_Data.m_Outputs[0]);
+    IAclTensorHandle* inputTensorHandle  = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0]);
+    IAclTensorHandle* outputTensorHandle = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[0]);
 
     arm_compute::ITensor& input  = inputTensorHandle->GetTensor();
     arm_compute::ITensor& output = outputTensorHandle->GetTensor();

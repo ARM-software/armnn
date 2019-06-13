@@ -30,8 +30,8 @@ NeonDequantizeWorkload::NeonDequantizeWorkload(const DequantizeQueueDescriptor& 
 {
     m_Data.ValidateInputsOutputs("NeonDequantizeWorkload", 1, 1);
 
-    arm_compute::ITensor& input = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     m_Layer.reset(new arm_compute::NEDequantizationLayer());
     m_Layer->configure(&input, &output);

@@ -34,9 +34,9 @@ NeonSubtractionWorkload::NeonSubtractionWorkload(const SubtractionQueueDescripto
 {
     m_Data.ValidateInputsOutputs("NeonSubtractionWorkload", 2, 1);
 
-    arm_compute::ITensor& input1 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& input2 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input1 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& input2 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     auto layer = std::make_unique<arm_compute::NEArithmeticSubtraction>();
     layer->configure(&input1, &input2, &output, arm_compute::ConvertPolicy::SATURATE);

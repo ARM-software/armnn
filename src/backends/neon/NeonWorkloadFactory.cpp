@@ -68,7 +68,7 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITenso
     }
 
     return std::make_unique<NeonSubTensorHandle>(
-        boost::polymorphic_downcast<INeonTensorHandle*>(&parent), shape, coords);
+        boost::polymorphic_downcast<IAclTensorHandle*>(&parent), shape, coords);
 }
 
 std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const

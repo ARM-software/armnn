@@ -28,9 +28,9 @@ NeonQuantizeWorkload::NeonQuantizeWorkload(const QuantizeQueueDescriptor& descri
      const WorkloadInfo& workloadInfo)
      : BaseWorkload<QuantizeQueueDescriptor>(descriptor, workloadInfo)
 {
-    arm_compute::ITensor& input = boost::polymorphic_pointer_downcast<INeonTensorHandle>(
+    arm_compute::ITensor& input = boost::polymorphic_pointer_downcast<IAclTensorHandle>(
                                                                       m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_pointer_downcast<INeonTensorHandle>(
+    arm_compute::ITensor& output = boost::polymorphic_pointer_downcast<IAclTensorHandle>(
                                                                        m_Data.m_Outputs[0])->GetTensor();
 
     m_Layer.reset(new arm_compute::NEQuantizationLayer());

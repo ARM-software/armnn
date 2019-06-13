@@ -34,8 +34,8 @@ NeonMeanWorkload::NeonMeanWorkload(const MeanQueueDescriptor& descriptor, const 
 {
     m_Data.ValidateInputsOutputs("NeonMeanWorkload", 1, 1);
 
-    arm_compute::ITensor& input  = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = static_cast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input  = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     arm_compute::Coordinates coords = BuildArmComputeReductionCoordinates(input.info()->num_dimensions(),
                                                                           info.m_InputTensorInfos[0].GetNumDimensions(),

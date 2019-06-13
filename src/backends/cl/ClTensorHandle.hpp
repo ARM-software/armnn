@@ -5,6 +5,7 @@
 #pragma once
 
 #include <backendsCommon/OutputHandler.hpp>
+#include <aclCommon/ArmComputeTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <Half.hpp>
@@ -22,7 +23,7 @@ namespace armnn
 {
 
 
-class IClTensorHandle : public ITensorHandle
+class IClTensorHandle : public IAclTensorHandle
 {
 public:
     virtual arm_compute::ICLTensor& GetTensor() = 0;

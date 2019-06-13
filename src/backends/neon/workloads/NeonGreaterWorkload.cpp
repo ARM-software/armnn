@@ -29,9 +29,9 @@ NeonGreaterWorkload<T>::NeonGreaterWorkload(const GreaterQueueDescriptor& descri
 {
     m_Data.ValidateInputsOutputs("NeonGreaterWorkload", 2, 1);
 
-    arm_compute::ITensor& input0 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& input1 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input0 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& input1 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     m_GreaterLayer.configure(&input0, &input1, &output);
 }

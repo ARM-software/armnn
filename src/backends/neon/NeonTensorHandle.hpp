@@ -5,6 +5,7 @@
 #pragma once
 
 #include <backendsCommon/OutputHandler.hpp>
+#include <aclCommon/ArmComputeTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <arm_compute/runtime/MemoryGroup.h>
@@ -19,16 +20,7 @@
 namespace armnn
 {
 
-class INeonTensorHandle : public ITensorHandle
-{
-public:
-    virtual arm_compute::ITensor& GetTensor() = 0;
-    virtual arm_compute::ITensor const& GetTensor() const = 0;
-    virtual arm_compute::DataType GetDataType() const = 0;
-    virtual void SetMemoryGroup(const std::shared_ptr<arm_compute::IMemoryGroup>& memoryGroup) = 0;
-};
-
-class NeonTensorHandle : public INeonTensorHandle
+class NeonTensorHandle : public IAclTensorHandle
 {
 public:
     NeonTensorHandle(const TensorInfo& tensorInfo)
@@ -131,10 +123,10 @@ private:
     std::shared_ptr<arm_compute::MemoryGroup> m_MemoryGroup;
 };
 
-class NeonSubTensorHandle : public INeonTensorHandle
+class NeonSubTensorHandle : public IAclTensorHandle
 {
 public:
-    NeonSubTensorHandle(INeonTensorHandle* parent,
+    NeonSubTensorHandle(IAclTensorHandle* parent,
                         const arm_compute::TensorShape& shape,
                         const arm_compute::Coordinates& coords)
      : m_Tensor(&parent->GetTensor(), shape, coords)

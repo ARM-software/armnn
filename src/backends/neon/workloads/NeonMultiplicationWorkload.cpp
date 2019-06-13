@@ -37,9 +37,9 @@ NeonMultiplicationWorkload::NeonMultiplicationWorkload(const MultiplicationQueue
 {
     m_Data.ValidateInputsOutputs("NeonMultiplicationWorkload", 2, 1);
 
-    arm_compute::ITensor& input1 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& input2 = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ITensor& output = boost::polymorphic_downcast<INeonTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& input1 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& input2 = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     // At the time of writing, configure() will fail if a rounding policy other than TO_ZERO is supplied to it,
     // when providing a scale of 1.0 for F32 tensors, even though the provided rounding policy appears to be

@@ -97,13 +97,13 @@ NeonLstmFloatWorkload::NeonLstmFloatWorkload(const LstmQueueDescriptor &descript
         lstm_param.set_peephole_params(m_CellToForgetWeightsTensor.get(), m_CellToOutputWeightsTensor.get());
     }
 
-    const arm_compute::ITensor& input           = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    const arm_compute::ITensor& output_state_in = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    const arm_compute::ITensor& cell_state_in   = static_cast<INeonTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+    const arm_compute::ITensor& input           = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    const arm_compute::ITensor& output_state_in = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    const arm_compute::ITensor& cell_state_in   = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
 
-    arm_compute::ITensor& output_state_out      = static_cast<INeonTensorHandle*>(m_Data.m_Outputs[1])->GetTensor();
-    arm_compute::ITensor& cell_state_out        = static_cast<INeonTensorHandle*>(m_Data.m_Outputs[2])->GetTensor();
-    arm_compute::ITensor& output                = static_cast<INeonTensorHandle*>(m_Data.m_Outputs[3])->GetTensor();
+    arm_compute::ITensor& output_state_out      = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[1])->GetTensor();
+    arm_compute::ITensor& cell_state_out        = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[2])->GetTensor();
+    arm_compute::ITensor& output                = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[3])->GetTensor();
 
     // Get the batch_size and the num_units from the cellStateIn dimensions
     const TensorInfo& inputTensorInfo = info.m_InputTensorInfos[2];

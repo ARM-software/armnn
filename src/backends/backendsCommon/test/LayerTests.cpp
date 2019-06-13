@@ -5287,15 +5287,17 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2NormalizationTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    float qScale,
-    int32_t qOffset,
     const armnn::TensorShape& inputOutputTensorShape,
+    float scale,
+    int32_t offset,
     const std::vector<float>& inputValues,
+    float outScale,
+    int32_t outOffset,
     const std::vector<float>& expectedOutputValues,
     const armnn::DataLayout layout)
 {
-    const armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, ArmnnType, qScale, qOffset);
-    const armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, ArmnnType, qScale, qOffset);
+    const armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, ArmnnType, scale, offset);
+    const armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, ArmnnType, outScale, outOffset);
 
     // at this point if we require it permute the input data
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
@@ -5799,8 +5801,10 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization1dTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        float qScale,
-        int32_t qOffset,
+        float scale,
+        int32_t offset,
+        float outScale,
+        int32_t outOffset,
         const armnn::DataLayout layout)
 {
     // Width: 1
@@ -5864,8 +5868,8 @@ LayerTestResult<T, 4> L2Normalization1dTestCommon(
     };
 
 
-    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, qScale, qOffset, inputOutputShape,
-                                              inputValues, expectedOutputValues, layout);
+    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, inputOutputShape, scale, offset,
+                                              inputValues, outScale, outOffset, expectedOutputValues, layout);
 }
 
 
@@ -5874,7 +5878,7 @@ LayerTestResult<float, 4> L2Normalization1dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, layout);
+    return L2Normalization1dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, 0.f, 0,layout);
 }
 
 LayerTestResult<int16_t, 4> L2Normalization1dInt16Test(
@@ -5882,16 +5886,27 @@ LayerTestResult<int16_t, 4> L2Normalization1dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.f, 0,
+    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.f, 0, 1.f, 0,
                                                                          layout);
+}
+
+LayerTestResult<uint8_t, 4> L2Normalization1dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout)
+{
+    return L2Normalization1dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.f, 0,
+                                                                         1.f/128, 128, layout);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    float qScale,
-    int32_t qOffset,
+    float scale,
+    int32_t offset,
+    float outScale,
+    int32_t outOffset,
     const armnn::DataLayout layout)
 {
     // Width: 5
@@ -5930,8 +5945,8 @@ LayerTestResult<T, 4> L2Normalization2dTestCommon(
         10.0f * CalcInvL2Norm({ 9.0f, 10.0f })
     };
 
-    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, qScale, qOffset, inputOutputShape,
-                                              inputValues, expectedOutputValues, layout);
+    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, inputOutputShape, scale, offset,
+                                              inputValues, outScale, outOffset, expectedOutputValues, layout);
 }
 
 LayerTestResult<float, 4> L2Normalization2dTest(
@@ -5939,7 +5954,8 @@ LayerTestResult<float, 4> L2Normalization2dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, layout);
+    return L2Normalization2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, 0.f, 0,
+                                                                 layout);
 }
 
 LayerTestResult<int16_t, 4> L2Normalization2dInt16Test(
@@ -5947,16 +5963,27 @@ LayerTestResult<int16_t, 4> L2Normalization2dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.f, 0,
+    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.f, 0, 1.f, 0,
                                                                          layout);
+}
+
+LayerTestResult<uint8_t, 4> L2Normalization2dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout)
+{
+    return L2Normalization1dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.f, 0,
+                                                                         1.f/128, 128, layout);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    float qScale,
-    int32_t qOffset,
+    float scale,
+    int32_t offset,
+    float outScale,
+    int32_t outOffset,
     const armnn::DataLayout layout)
 {
     // Width: 3
@@ -6015,8 +6042,8 @@ LayerTestResult<T, 4> L2Normalization3dTestCommon(
         161.0f * CalcInvL2Norm({ 220.0f, 161.0f })
     };
 
-    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, qScale, qOffset, inputOutputShape,
-                                              inputValues, expectedOutputValues, layout);
+    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, inputOutputShape, scale, offset,
+                                              inputValues, outScale, outOffset, expectedOutputValues, layout);
 }
 
 LayerTestResult<float, 4> L2Normalization3dTest(
@@ -6024,7 +6051,8 @@ LayerTestResult<float, 4> L2Normalization3dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization3dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, layout);
+    return L2Normalization3dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, 0.f, 0,
+                                                                 layout);
 }
 
 LayerTestResult<int16_t, 4> L2Normalization3dInt16Test(
@@ -6032,16 +6060,27 @@ LayerTestResult<int16_t, 4> L2Normalization3dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.f, 0,
+    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.f, 0, 1.f, 0,
                                                                          layout);
+}
+
+LayerTestResult<uint8_t, 4> L2Normalization3dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout)
+{
+    return L2Normalization1dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.f, 0,
+                                                                         1.f/128, 128, layout);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization4dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    float qScale,
-    int32_t qOffset,
+    float scale,
+    int32_t offset,
+    float outScale,
+    int32_t outOffset,
     const armnn::DataLayout layout)
 {
     // Width: 3
@@ -6180,8 +6219,8 @@ LayerTestResult<T, 4> L2Normalization4dTestCommon(
         88.0f * CalcInvL2Norm({ 189.0f,  21.0f,  88.0f })
     };
 
-    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, qScale, qOffset, inputOutputShape,
-                                              inputValues, expectedOutputValues, layout);
+    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, inputOutputShape, scale, offset,
+                                              inputValues, outScale, outOffset, expectedOutputValues, layout);
 }
 
 LayerTestResult<float, 4> L2Normalization4dTest(
@@ -6189,7 +6228,8 @@ LayerTestResult<float, 4> L2Normalization4dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization4dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, layout);
+    return L2Normalization4dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, 0.f, 0,
+                                                                 layout);
 }
 
 LayerTestResult<int16_t, 4> L2Normalization4dInt16Test(
@@ -6197,8 +6237,17 @@ LayerTestResult<int16_t, 4> L2Normalization4dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout)
 {
-    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.f, 0,
+    return L2Normalization1dTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.f, 0, 1.f, 0,
                                                                          layout);
+}
+
+LayerTestResult<uint8_t, 4> L2Normalization4dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout)
+{
+    return L2Normalization1dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.f, 0,
+                                                                         1.f/128, 128, layout);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

@@ -730,6 +730,16 @@ BOOST_AUTO_TEST_CASE(CreateL2NormalizationInt16Nhwc)
     RefCreateL2NormalizationTest<RefL2NormalizationWorkload, armnn::DataType::QuantisedSymm16>(DataLayout::NHWC);
 }
 
+BOOST_AUTO_TEST_CASE(CreateL2NormalizationUint8)
+{
+    RefCreateL2NormalizationTest<RefL2NormalizationWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateL2NormalizationUint8Nhwc)
+{
+    RefCreateL2NormalizationTest<RefL2NormalizationWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
+}
+
 template <typename ReshapeWorkloadType, armnn::DataType DataType>
 static void RefCreateReshapeWorkloadTest()
 {

@@ -745,9 +745,10 @@ bool RefLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
 {
     ignore_unused(descriptor);
     // Define supported types
-    std::array<DataType, 2> supportedTypes =
+    std::array<DataType, 3> supportedTypes =
     {
         DataType::Float32,
+        DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
 

@@ -932,6 +932,11 @@ LayerTestResult<int16_t, 4> L2Normalization1dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout);
 
+LayerTestResult<uint8_t, 4> L2Normalization1dUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout);
+
 LayerTestResult<float, 4> L2Normalization2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -941,6 +946,11 @@ LayerTestResult<int16_t, 4> L2Normalization2dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout);
+
+LayerTestResult<uint8_t, 4> L2Normalization2dUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> L2Normalization3dTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -952,6 +962,11 @@ LayerTestResult<int16_t, 4> L2Normalization3dInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout);
 
+LayerTestResult<uint8_t, 4> L2Normalization3dUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout);
+
 LayerTestResult<float, 4> L2Normalization4dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -961,6 +976,11 @@ LayerTestResult<int16_t, 4> L2Normalization4dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::DataLayout layout);
+
+LayerTestResult<uint8_t, 4> L2Normalization4dUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> ConstantTest(
     armnn::IWorkloadFactory& workloadFactory,

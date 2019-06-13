@@ -255,7 +255,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    if (IsFloat16(info) || IsUint8(info))
+    if (IsFloat16(info))
     {
         return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
     }

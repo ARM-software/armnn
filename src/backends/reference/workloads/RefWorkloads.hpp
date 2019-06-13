@@ -51,3 +51,4 @@
 #include "RefDequantizeWorkload.hpp"
 #include "RefQuantizeWorkload.hpp"
 #include "RefReshapeWorkload.hpp"
+#include "RefPreluWorkload.hpp"

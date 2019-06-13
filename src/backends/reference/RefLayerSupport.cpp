@@ -1353,4 +1353,36 @@ bool RefLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
     return supported;
 }
 
+bool RefLayerSupport::IsPreluSupported(const TensorInfo& input,
+                                       const TensorInfo& alpha,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+
+    std::array<DataType, 3> supportedTypes
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "PReLU: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(alpha, supportedTypes), reasonIfUnsupported,
+                                  "PReLU: alpha is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "PReLU: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, alpha, output), reasonIfUnsupported,
+                                  "PReLU: input, alpha and output types are mismatched");
+
+    supported &= CheckSupportRule(ShapesAreBroadcastCompatible(input, alpha, output), reasonIfUnsupported,
+                                  "PReLU: shapes are not suitable for implicit broadcast");
+
+    return supported;
+}
+
 } // namespace armnn

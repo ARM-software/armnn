@@ -436,4 +436,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDequantize(const Dequantize
     return std::make_unique<RefDequantizeWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePrelu(const PreluQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    return std::make_unique<RefPreluWorkload>(descriptor, info);
+}
+
 } // namespace armnn

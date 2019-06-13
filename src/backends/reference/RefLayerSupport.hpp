@@ -255,6 +255,11 @@ public:
                                 const TensorInfo& input1,
                                 const TensorInfo& output,
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsPreluSupported(const TensorInfo& input,
+                          const TensorInfo& alpha,
+                          const TensorInfo& output,
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 };
 
 } // namespace armnn

@@ -187,6 +187,9 @@ public:
     std::unique_ptr<IWorkload> CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                               const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreatePrelu(const PreluQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info) const override;
+
 private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>

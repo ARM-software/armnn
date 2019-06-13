@@ -25,6 +25,7 @@ BACKEND_SOURCES := \
         workloads/Concatenate.cpp \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
+        workloads/PreluImpl.cpp \
         workloads/RefActivationWorkload.cpp \
         workloads/RefBatchNormalizationWorkload.cpp \
         workloads/RefBatchToSpaceNdFloat32Workload.cpp \
@@ -50,6 +51,7 @@ BACKEND_SOURCES := \
         workloads/RefPadWorkload.cpp \
         workloads/RefPermuteWorkload.cpp \
         workloads/RefPooling2dWorkload.cpp \
+        workloads/RefPreluWorkload.cpp \
         workloads/RefQuantizeWorkload.cpp \
         workloads/RefReshapeWorkload.cpp \
         workloads/RefResizeBilinearWorkload.cpp \

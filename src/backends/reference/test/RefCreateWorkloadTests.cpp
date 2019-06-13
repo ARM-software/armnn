@@ -870,4 +870,32 @@ BOOST_AUTO_TEST_CASE(CreateConstantSigned32Workload)
     RefCreateConstantWorkloadTest<RefConstantWorkload, armnn::DataType::Signed32>({ 2, 3, 2, 10 });
 }
 
+template <typename armnn::DataType DataType>
+static void RefCreatePreluWorkloadTest(const armnn::TensorShape& outputShape)
+{
+    armnn::Graph graph;
+    RefWorkloadFactory factory;
+    auto workload = CreatePreluWorkloadTest<RefPreluWorkload, DataType>(factory, graph, outputShape);
+
+    // Check output is as expected
+    auto queueDescriptor = workload->GetData();
+    auto outputHandle = boost::polymorphic_downcast<CpuTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    BOOST_TEST((outputHandle->GetTensorInfo() == TensorInfo(outputShape, DataType)));
+}
+
+BOOST_AUTO_TEST_CASE(CreatePreluFloat32Workload)
+{
+    RefCreatePreluWorkloadTest<armnn::DataType::Float32>({ 5, 4, 3, 2 });
+}
+
+BOOST_AUTO_TEST_CASE(CreatePreluUint8Workload)
+{
+    RefCreatePreluWorkloadTest<armnn::DataType::QuantisedAsymm8>({ 5, 4, 3, 2 });
+}
+
+BOOST_AUTO_TEST_CASE(CreatePreluInt16Workload)
+{
+    RefCreatePreluWorkloadTest<armnn::DataType::QuantisedSymm16>({ 5, 4, 3, 2 });
+}
+
 BOOST_AUTO_TEST_SUITE_END()

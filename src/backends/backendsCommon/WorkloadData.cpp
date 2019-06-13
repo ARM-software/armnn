@@ -1720,7 +1720,8 @@ void PreluQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         DataType::Float16,
         DataType::Float32,
-        DataType::QuantisedAsymm8
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],

@@ -1280,4 +1280,37 @@ std::unique_ptr<ConstantWorkload> CreateConstantWorkloadTest(armnn::IWorkloadFac
     return workloadConstant;
 }
 
+template <typename PreluWorkload, armnn::DataType DataType>
+std::unique_ptr<PreluWorkload> CreatePreluWorkloadTest(armnn::IWorkloadFactory& factory,
+                                                       armnn::Graph& graph,
+                                                       const armnn::TensorShape& outputShape)
+{
+    // Creates the PReLU layer
+    Layer* const layer = graph.AddLayer<PreluLayer>("prelu");
+
+    // Creates extra layers
+    Layer* const input  = graph.AddLayer<InputLayer> (0, "input");
+    Layer* const alpha  = graph.AddLayer<InputLayer> (1, "alpha");
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connects up
+    armnn::TensorInfo inputTensorInfo ({ 1, 4, 1, 2 }, DataType);
+    armnn::TensorInfo alphaTensorInfo ({ 5, 4, 3, 1 }, DataType);
+    armnn::TensorInfo outputTensorInfo(outputShape,    DataType);
+    Connect(input, layer,  inputTensorInfo,  0, 0);
+    Connect(alpha, layer,  alphaTensorInfo,  0, 1);
+    Connect(layer, output, outputTensorInfo, 0, 0);
+    CreateTensorHandles(graph, factory);
+
+    // Makes the workload and checks it
+    auto workload = MakeAndCheckWorkload<PreluWorkload>(*layer, graph, factory);
+
+    PreluQueueDescriptor queueDescriptor = workload->GetData();
+    BOOST_TEST(queueDescriptor.m_Inputs.size() == 2);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+
+    // Returns so we can do extra, backend-specific tests.
+    return workload;
 }
+
+} // Anonymous namespace

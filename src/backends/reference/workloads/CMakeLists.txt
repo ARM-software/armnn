@@ -36,6 +36,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Pad.hpp
     Pooling2d.cpp
     Pooling2d.hpp
+    PreluImpl.cpp
+    PreluImpl.hpp
     RefActivationWorkload.cpp
     RefActivationWorkload.hpp
     RefBatchNormalizationWorkload.cpp
@@ -84,6 +86,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefPermuteWorkload.hpp
     RefPooling2dWorkload.cpp
     RefPooling2dWorkload.hpp
+    RefPreluWorkload.cpp
+    RefPreluWorkload.hpp
     RefQuantizeWorkload.cpp
     RefQuantizeWorkload.hpp
     RefReshapeWorkload.cpp

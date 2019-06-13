@@ -22,11 +22,12 @@ public:
 
     /// Set the outputs to be appropriate sub tensors of the input if sub tensors are supported
     /// otherwise creates tensor handlers by default. Ignores parameters for Output type.
-    /// @param [in] graph The graph where this layer can be found.
+    /// @param [in] registry Contains all the registered tensor handle factories available for use.
     /// @param [in] factory The workload factory which will create the workload.
-    virtual void CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory) override
+    virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
+                                     const IWorkloadFactory& factory) override
     {
-        boost::ignore_unused(graph, factory);
+        boost::ignore_unused(registry, factory);
     }
 
     /// Creates a dynamically-allocated copy of this layer.

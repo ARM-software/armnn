@@ -10,10 +10,12 @@
 COMMON_SOURCES := \
     BackendRegistry.cpp \
     CpuTensorHandle.cpp \
+    ITensorHandleFactory.cpp \
     LayerSupportBase.cpp \
     MemCopyWorkload.cpp \
     OptimizationViews.cpp \
     OutputHandler.cpp \
+    TensorHandleFactoryRegistry.cpp \
     WorkloadData.cpp \
     WorkloadFactory.cpp \
     WorkloadUtils.cpp

@@ -13,6 +13,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <memory>
 
 #include "Layer.hpp"
@@ -228,5 +229,28 @@ public:
 private:
     std::unique_ptr<Graph> m_Graph;
 };
+
+
+
+struct OptimizationResult
+{
+    bool m_Warning;
+    bool m_Error;
+
+    OptimizationResult()
+        : m_Warning(false)
+        , m_Error(false)
+    {}
+};
+
+using BackendsMap = std::map<BackendId, std::unique_ptr<class IBackendInternal>>;
+
+BackendsMap CreateSupportedBackends(TensorHandleFactoryRegistry& handleFactoryRegistry,
+                                    struct BackendSettings& backendSettings);
+
+OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
+                                              BackendsMap& backends,
+                                              TensorHandleFactoryRegistry& registry,
+                                              Optional<std::vector<std::string>&> errMessages);
 
 } // namespace armnn

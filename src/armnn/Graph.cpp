@@ -7,6 +7,9 @@
 #include "SubgraphView.hpp"
 #include "LayersFwd.hpp"
 
+#include <backendsCommon/IBackendInternal.hpp>
+
+#include <armnn/BackendId.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/TypesUtils.hpp>
 
@@ -252,53 +255,96 @@ const Graph& Graph::TopologicalSort() const
     return *this;
 }
 
-void Graph::AddCopyLayers()
+void Graph::AddCopyLayers(std::map<BackendId, std::unique_ptr<IBackendInternal>>& backends,
+                          TensorHandleFactoryRegistry& registry)
 {
     // Returns true if the given layer could potentially need an intermediate copy layer (depending on its
     // connections to other layers). At the time of writing, copy layers will be inserted in the following situations:
     // CPU -> CL (and viceversa)
     // CPU -> Neon (and viceversa)
     auto MayNeedCopyLayer = [](const Layer& layer)
-        {
-            // All layers should have been associated with a valid compute device at this point.
-            BOOST_ASSERT(layer.GetBackendId() != Compute::Undefined);
-            // Does not need another copy layer if a copy layer is already present.
-            return layer.GetType() != LayerType::MemCopy &&
-                   // Input and Output layers can perform their own copies internally.
-                   layer.GetType() != LayerType::Input &&
-                   layer.GetType() != LayerType::Output;
-        };
-
-    for (auto&& srcLayer : m_Layers)
     {
-        if (MayNeedCopyLayer(*srcLayer))
-        {
-            unsigned int srcOutputIndex = 0;
-            for (auto&& srcOutput : srcLayer->GetOutputSlots())
-            {
-                std::vector<InputSlot*> connectionCopy = srcOutput.GetConnections();
-                for (auto&& dstInput : connectionCopy)
-                {
-                    Layer& dstLayer = dstInput->GetOwningLayer();
-                    if (MayNeedCopyLayer(dstLayer) && (dstLayer.GetBackendId() != srcLayer->GetBackendId()))
-                    {
-                        // A copy layer is needed in between the source and destination layers.
-                        // Record the operation rather than attempting to modify the graph as we go.
-                        // (invalidating iterators)
-                        const std::string copyLayerName = boost::str(boost::format("[ %1% (%2%) -> %3% (%4%) ]")
-                                                                     % srcLayer->GetName()
-                                                                     % srcOutputIndex
-                                                                     % dstLayer.GetName()
-                                                                     % dstInput->GetSlotIndex());
+        // All layers should have been associated with a valid compute device at this point.
+        BOOST_ASSERT(layer.GetBackendId() != Compute::Undefined);
+        // Does not need another copy layer if a copy layer is already present.
+        return layer.GetType() != LayerType::MemCopy;
+    };
 
-                        MemCopyLayer* const copyLayer = InsertNewLayer<MemCopyLayer>(*dstInput, copyLayerName.c_str());
-                        copyLayer->SetBackendId(dstLayer.GetBackendId());
+    ForEachLayer([this, &backends, &registry, MayNeedCopyLayer](Layer* srcLayer)
+    {
+        BOOST_ASSERT(srcLayer);
+
+        if (!MayNeedCopyLayer(*srcLayer))
+        {
+            // The current layer does not need copy layers, move to the next one
+            return;
+        }
+
+        const std::vector<OutputSlot>& srcOutputSlots = srcLayer->GetOutputSlots();
+        for (unsigned int srcOutputIndex = 0; srcOutputIndex < srcOutputSlots.size(); srcOutputIndex++)
+        {
+            OutputSlot& srcOutputSlot = srcLayer->GetOutputSlot(srcOutputIndex);
+            const std::vector<InputSlot*> srcConnections = srcOutputSlot.GetConnections();
+            for (unsigned int srcConnectionIndex = 0; srcConnectionIndex < srcConnections.size(); srcConnectionIndex++)
+            {
+                InputSlot* dstInputSlot = srcConnections[srcConnectionIndex];
+                BOOST_ASSERT(dstInputSlot);
+
+                auto strategy = srcOutputSlot.GetMemoryStrategyForConnection(srcConnectionIndex);
+                BOOST_ASSERT_MSG(strategy != MemoryStrategy::Undefined,
+                                 "Undefined memory strategy found while adding copy layers for compatibility");
+
+                const Layer& dstLayer = dstInputSlot->GetOwningLayer();
+                if (MayNeedCopyLayer(dstLayer) &&
+                    strategy == MemoryStrategy::CopyToTarget)
+                {
+                    // A copy layer is needed in between the source and destination layers.
+                    // Record the operation rather than attempting to modify the graph as we go.
+                    // (invalidating iterators)
+                    const std::string copyLayerName = boost::str(boost::format("[ %1% (%2%) -> %3% (%4%) ]")
+                                                                 % srcLayer->GetName()
+                                                                 % srcOutputIndex
+                                                                 % dstLayer.GetName()
+                                                                 % dstInputSlot->GetSlotIndex());
+
+                    MemCopyLayer* const copyLayer = InsertNewLayer<MemCopyLayer>(*dstInputSlot, copyLayerName.c_str());
+                    copyLayer->SetBackendId(dstLayer.GetBackendId());
+
+                    OutputSlot& copyOutputSlot = copyLayer->GetOutputSlot(0);
+                    auto backendIt = backends.find(dstLayer.GetBackendId());
+                    if (backendIt != backends.end() &&
+                        backendIt->second &&
+                        backendIt->second->SupportsTensorAllocatorAPI())
+                    {
+                        auto backend = backendIt->second.get();
+                        auto tensorHandleFactoryIds = backend->GetHandleFactoryPreferences();
+                        bool found = false;
+                        boost::ignore_unused(found);
+
+                        for (auto preference : tensorHandleFactoryIds)
+                        {
+                            auto factory = registry.GetFactory(preference);
+                            if (factory && factory->SupportsMapUnmap())
+                            {
+                                copyOutputSlot.SetTensorHandleFactory(preference);
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        BOOST_ASSERT_MSG(found, "Could not find a mappable TensorHandle for copy layer");
                     }
+                    else
+                    {
+                        copyOutputSlot.SetTensorHandleFactory(ITensorHandleFactory::LegacyFactoryId);
+                    }
+
+                    copyOutputSlot.SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+                    srcOutputSlot.SetMemoryStrategy(srcConnectionIndex, MemoryStrategy::DirectCompatibility);
                 }
-                ++srcOutputIndex;
             }
         }
-    }
+    });
 }
 
 void Graph::SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer)

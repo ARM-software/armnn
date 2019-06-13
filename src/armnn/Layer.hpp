@@ -6,7 +6,9 @@
 
 #include "LayerFwd.hpp"
 
+#include <backendsCommon/ITensorHandleFactory.hpp>
 #include <backendsCommon/OutputHandler.hpp>
+#include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <backendsCommon/WorkloadDataCollector.hpp>
 #include <backendsCommon/WorkloadInfo.hpp>
 #include "InternalTypes.hpp"
@@ -84,7 +86,14 @@ public:
     explicit OutputSlot(Layer& owner, OutputHandler& outputHandler)
     : m_OwningLayer(owner)
     , m_OutputHandler(outputHandler)
+    , m_TensorHandleFactoryId(ITensorHandleFactory::LegacyFactoryId)
     {}
+
+    OutputSlot(const OutputSlot&) = delete;
+    OutputSlot& operator=(const OutputSlot&) = delete;
+
+    OutputSlot(OutputSlot&&) = default;
+    OutputSlot& operator=(OutputSlot&&) = default;
 
     ~OutputSlot()
     {
@@ -147,12 +156,21 @@ public:
 
     bool operator==(const OutputSlot& other) const;
 
+    void SetTensorHandleFactory(const ITensorHandleFactory::FactoryId& id);
+    ITensorHandleFactory::FactoryId GetTensorHandleFactoryId() const;
+
+    void SetMemoryStrategy(unsigned int connectionIndex, MemoryStrategy strategy);
+    MemoryStrategy GetMemoryStrategyForConnection(unsigned int connectionIdx) const;
+
 private:
     void ValidateConnectionIndex(unsigned int index) const;
 
     Layer& m_OwningLayer;
     OutputHandler& m_OutputHandler;
     std::vector<InputSlot*> m_Connections;
+
+    ITensorHandleFactory::FactoryId m_TensorHandleFactoryId;
+    std::vector<MemoryStrategy> m_MemoryStrategies;
 };
 
 // InputSlot inlines that need OutputSlot declaration.
@@ -248,7 +266,7 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const = 0;
 
-    virtual void CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory);
+    virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry, const IWorkloadFactory& factory);
 
     /// Creates a dynamically-allocated copy of this layer.
     /// @param graph - The Graph into which this Layer is being cloned.

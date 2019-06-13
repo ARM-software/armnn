@@ -85,19 +85,37 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
     //(for example the splitter and concat layers).
     for (auto&& layer : order)
     {
-        auto const& backend = layer->GetBackendId();
-        if (m_Backends.count(backend) == 0)
+        auto const& backendId = layer->GetBackendId();
+        if (m_Backends.count(backendId) == 0)
         {
-            auto createBackend = BackendRegistryInstance().GetFactory(backend);
-            auto it = m_Backends.emplace(std::make_pair(backend, createBackend()));
+            auto createBackend = BackendRegistryInstance().GetFactory(backendId);
+            auto it = m_Backends.emplace(std::make_pair(backendId, createBackend()));
 
-            IBackendInternal::IMemoryManagerSharedPtr memoryManager = it.first->second->CreateMemoryManager();
-            auto workloadFactory = it.first->second->CreateWorkloadFactory(memoryManager);
+            IBackendInternal* backend = it.first->second.get();
 
-            m_WorkloadFactories.emplace(std::make_pair(backend,
-                std::make_pair(std::move(workloadFactory), memoryManager)));
+            if (backend->SupportsTensorAllocatorAPI())
+            {
+                backend->RegisterTensorHandleFactories(m_TensorHandleFactoryRegistry);
+
+                auto workloadFactory = backend->CreateWorkloadFactory();
+                m_WorkloadFactories.emplace(
+                    std::make_pair(backendId, std::make_pair(std::move(workloadFactory), nullptr)));
+            }
+            else
+            {
+                IBackendInternal::IMemoryManagerSharedPtr memoryManager = backend->CreateMemoryManager();
+                auto workloadFactory = backend->CreateWorkloadFactory(memoryManager);
+
+                m_WorkloadFactories.emplace(
+                    std::make_pair(backendId, std::make_pair(std::move(workloadFactory), memoryManager)));
+            }
         }
-        layer->CreateTensorHandles(m_OptimizedNetwork->GetGraph(), GetWorkloadFactory(*layer));
+    }
+
+    for (auto&& layer : order)
+    {
+        auto& workloadFacory = GetWorkloadFactory(*layer);
+        layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFacory);
     }
 
     //Then create workloads.

@@ -34,7 +34,8 @@ std::unique_ptr<IWorkload> ConcatLayer::CreateWorkload(const Graph& graph, const
     return factory.CreateConcat(descriptor, PrepInfoAndDesc(descriptor, graph));
 }
 
-void ConcatLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory)
+template<typename FactoryType>
+void ConcatLayer::CreateTensors(const FactoryType& factory)
 {
     //If sub tensors are supported then the concat
     //just needs to make sure that the outputs of the prev layer
@@ -43,6 +44,8 @@ void ConcatLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& fact
 
     if (factory.SupportsSubTensors())
     {
+        ITensorHandleFactory::FactoryId factoryId = GetOutputSlot(0).GetTensorHandleFactoryId();
+
         std::queue<ConcatLayer*> m_ConcatLayers;
 
         m_ConcatLayers.push(this);
@@ -66,7 +69,8 @@ void ConcatLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& fact
                 auto CreateSubTensor = [&]()
                 {
                     // Make sure quantization parameters are in the same space
-                    if (parentInfo.IsTypeSpaceMatch(info))
+                    if (parentInfo.IsTypeSpaceMatch(info) &&
+                        factoryId == slot->GetTensorHandleFactoryId())
                     {
                         return factory.CreateSubTensorHandle(*parentTensor,
                                                              info.GetShape(),
@@ -111,6 +115,24 @@ void ConcatLayer::CreateTensorHandles(Graph& graph, const IWorkloadFactory& fact
                 ++i;
             }
         }
+    }
+}
+
+void ConcatLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
+                                      const IWorkloadFactory& workloadFactory)
+{
+    OutputSlot& slot = GetOutputSlot(0);
+    ITensorHandleFactory::FactoryId factoryId = slot.GetTensorHandleFactoryId();
+
+    if (factoryId == ITensorHandleFactory::LegacyFactoryId)
+    {
+        CreateTensors(workloadFactory);
+    }
+    else
+    {
+        ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
+        BOOST_ASSERT(handleFactory);
+        CreateTensors(*handleFactory);
     }
 }
 

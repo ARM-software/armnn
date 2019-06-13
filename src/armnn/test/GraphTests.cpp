@@ -14,6 +14,8 @@
 #include <Layer.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/IBackendInternal.hpp>
+#include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
 
 /// Checks that first comes before second in the order.
@@ -477,10 +479,21 @@ struct CopyLayersFixture
         outputLayer->SetBackendId(armnn::Compute::CpuRef);
 
         softmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+        // Set the memory strategies
+        inputLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+        convLayer1->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+        convLayer1->GetOutputSlot(0).SetMemoryStrategy(1, MemoryStrategy::DirectCompatibility);
+        convLayer2->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+        concatLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+        actLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+        softmaxLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
     }
 
     armnn::TensorInfo m_TensorDesc;
     armnn::Graph m_Graph;
+    std::map<armnn::BackendId, std::unique_ptr<armnn::IBackendInternal>> m_Backends;
+    armnn::TensorHandleFactoryRegistry m_FactoryRegistry;
 
 private:
 
@@ -501,26 +514,26 @@ private:
 BOOST_FIXTURE_TEST_CASE(AddCopyLayers, CopyLayersFixture)
 {
     const armnn::Graph origGraph(m_Graph);
-    m_Graph.AddCopyLayers();
+    m_Graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
 
     TestGraphAfterAddingCopyLayers(m_Graph, origGraph);
 }
 
 BOOST_FIXTURE_TEST_CASE(AddCopyLayersSeveralTimes, CopyLayersFixture)
 {
-    m_Graph.AddCopyLayers();
+    m_Graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
 
     // Calling AddCopyLayers() several times should not change the connections.
     const std::vector<Edge> edges = GetEdgeList(m_Graph);
     for (int i = 0; i < 4; ++i)
     {
-        m_Graph.AddCopyLayers();
+        m_Graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
         const std::vector<Edge> otherEdges = GetEdgeList(m_Graph);
         BOOST_TEST((edges == otherEdges));
     }
 }
 
-BOOST_AUTO_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames)
+BOOST_FIXTURE_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames, CopyLayersFixture)
 {
     armnn::Graph graph;
 
@@ -542,7 +555,12 @@ BOOST_AUTO_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames)
     splitterLayer->GetOutputSlot(1).Connect(additionLayer->GetInputSlot(1));
     additionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
-    graph.AddCopyLayers();
+    inputLayer->GetOutputSlot(0).SetMemoryStrategy(0, armnn::MemoryStrategy::DirectCompatibility);
+    splitterLayer->GetOutputSlot(0).SetMemoryStrategy(0, armnn::MemoryStrategy::CopyToTarget);
+    splitterLayer->GetOutputSlot(1).SetMemoryStrategy(0, armnn::MemoryStrategy::CopyToTarget);
+    additionLayer->GetOutputSlot(0).SetMemoryStrategy(0, armnn::MemoryStrategy::DirectCompatibility);
+
+    graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
 
     std::vector<Edge> edges = GetEdgeList(graph);
     BOOST_CHECK(edges.size() == 6u);

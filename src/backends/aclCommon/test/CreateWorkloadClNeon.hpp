@@ -62,6 +62,7 @@ boost::test_tools::predicate_result CompareTensorHandleShape(IComputeTensorHandl
 template<typename IComputeTensorHandle>
 void CreateMemCopyWorkloads(IWorkloadFactory& factory)
 {
+    TensorHandleFactoryRegistry registry;
     Graph graph;
     RefWorkloadFactory refFactory;
 
@@ -79,10 +80,10 @@ void CreateMemCopyWorkloads(IWorkloadFactory& factory)
     Connect(layer1, layer2, tensorInfo);
     Connect(layer2, output, tensorInfo);
 
-    input->CreateTensorHandles(graph, refFactory);
-    layer1->CreateTensorHandles(graph, factory);
-    layer2->CreateTensorHandles(graph, refFactory);
-    output->CreateTensorHandles(graph, refFactory);
+    input->CreateTensorHandles(registry, refFactory);
+    layer1->CreateTensorHandles(registry, factory);
+    layer2->CreateTensorHandles(registry, refFactory);
+    output->CreateTensorHandles(registry, refFactory);
 
     // make the workloads and check them
     auto workload1 = MakeAndCheckWorkload<CopyMemGenericWorkload>(*layer1, graph, factory);

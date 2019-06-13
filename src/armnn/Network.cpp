@@ -16,6 +16,7 @@
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
+#include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Utils.hpp>
@@ -74,16 +75,7 @@ Status OptimizedNetwork::SerializeToDot(std::ostream& stream) const
     return m_Graph->SerializeToDot(stream);
 }
 
-struct OptimizationResult
-{
-    bool m_Warning;
-    bool m_Error;
 
-    OptimizationResult()
-        : m_Warning(false)
-        , m_Error(false)
-    {}
-};
 
 void ReportError(const std::string& errorMessage,
                  Optional<std::vector<std::string>&> errorMessages)
@@ -323,8 +315,28 @@ OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
                           errMessages);
 }
 
+BackendsMap CreateSupportedBackends(TensorHandleFactoryRegistry& handleFactoryRegistry,
+                                    BackendSettings& backendSettings)
+{
+    BackendsMap backends;
+    auto const& backendRegistry = BackendRegistryInstance();
+    for (auto&& selectedBackend : backendSettings.m_SupportedBackends)
+    {
+        auto backendFactory = backendRegistry.GetFactory(selectedBackend);
+        auto backendObjPtr = backendFactory();
+        BOOST_ASSERT(backendObjPtr);
+
+        backendObjPtr->RegisterTensorHandleFactories(handleFactoryRegistry);
+
+        backends[backendObjPtr->GetId()] = std::move(backendObjPtr);
+    }
+
+    return backends;
+}
+
 OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                                              BackendSettings& backendSettings,
+                                             BackendsMap& backends,
                                              Optional<std::vector<std::string>&> errMessages)
 {
     BOOST_ASSERT(optNetObjPtr);
@@ -338,11 +350,9 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
     SubgraphView mainSubgraph(optGraph);
 
     // Run backend specific optimizations
-    auto const& backendRegistry = BackendRegistryInstance();
     for (auto&& selectedBackend : backendSettings.m_SelectedBackends)
     {
-        auto backendFactory = backendRegistry.GetFactory(selectedBackend);
-        auto backendObjPtr  = backendFactory();
+        auto backendObjPtr = backends.find(selectedBackend)->second.get();
         BOOST_ASSERT(backendObjPtr);
 
         // Select sub-graphs based on backend
@@ -425,6 +435,359 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
     return result;
 }
 
+bool RequiresCopy(ITensorHandleFactory::FactoryId src,
+                  ITensorHandleFactory::FactoryId dst,
+                  TensorHandleFactoryRegistry& registry)
+{
+    if (src != dst)
+    {
+        ITensorHandleFactory* srcFactory = registry.GetFactory(src);
+        ITensorHandleFactory* dstFactory = registry.GetFactory(dst);
+
+        if (srcFactory->SupportsExport() && dstFactory->SupportsImport())
+        {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+// Find the handle factory for the input layer which results in fewest required copies.
+ITensorHandleFactory::FactoryId CalculateSlotOptionForInput(BackendsMap& backends,
+                                                            OutputSlot& slot,
+                                                            TensorHandleFactoryRegistry& registry)
+{
+    Layer& layer = slot.GetOwningLayer();
+    BOOST_ASSERT(layer.GetType() == LayerType::Input);
+
+    // Explicitly select the tensorhandle factory for InputLayer because the rules for it are slightly different. It
+    // doesn't matter which backend it is assigned to because they all use the same implementation, which
+    // requires Map/Unmap support. This means that, so long as the handle type supports map/unmap semantics, we can
+    // select a factory with maximum compatibility with the layers connected to the InputLayer.
+
+    // First ensure the from backends can support the TensorHandeAPI
+    auto frmBackend = backends.find(layer.GetBackendId());
+    if (frmBackend == backends.end() ||
+        !frmBackend->second->SupportsTensorAllocatorAPI())
+    {
+        return ITensorHandleFactory::LegacyFactoryId;
+    }
+
+    // Go through all connections to the output slot and determine the TensorHandleFactory which results in the
+    // fewest copies.
+    std::map<ITensorHandleFactory::FactoryId, int> factoryScores;
+    int topScore = 0;
+    ITensorHandleFactory::FactoryId topChoice = ITensorHandleFactory::LegacyFactoryId;
+
+    for (auto&& connection : slot.GetConnections())
+    {
+        const Layer& connectedLayer = connection->GetOwningLayer();
+
+        auto toBackend = backends.find(connectedLayer.GetBackendId());
+        BOOST_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+
+        if (!toBackend->second.get()->SupportsTensorAllocatorAPI())
+        {
+            // The destination backend does not support the tensor allocator API, move to the next one
+            continue;
+        }
+
+        auto dstPrefs = toBackend->second.get()->GetHandleFactoryPreferences();
+        for (auto&& dst : dstPrefs)
+        {
+            // Input layers use the mem copy workload, so the selected factory must support map/unmap API
+            ITensorHandleFactory* factory = registry.GetFactory(dst);
+            if (!factory->SupportsMapUnmap())
+            {
+                // The current tensor handle factory does not support the map/unmap strategy, move to the next one
+                continue;
+            }
+
+            auto it = factoryScores.find(dst);
+            if (it == factoryScores.end())
+            {
+                // Add new score to the table
+                factoryScores[dst] = 0;
+                if (topChoice == ITensorHandleFactory::LegacyFactoryId)
+                {
+                    topChoice = dst;
+                }
+            }
+            else
+            {
+                // Increase the score
+                factoryScores[dst]++;
+
+                // Track the best option
+                if (factoryScores[dst] > topScore)
+                {
+                    topScore = factoryScores[dst];
+                    topChoice = dst;
+                }
+            }
+        }
+    }
+
+    return topChoice;
+}
+
+// Find the handle factory for the output layer which results in fewest required copies.
+ITensorHandleFactory::FactoryId CalculateSlotOptionForOutput(BackendsMap& backends,
+                                                            OutputSlot& slot,
+                                                            TensorHandleFactoryRegistry& registry)
+{
+   return ITensorHandleFactory::DeferredFactoryId;
+}
+
+// For all handle factories supported on the source backend, we wish to find the one which requires the fewest copies
+// when considering all connections.
+ITensorHandleFactory::FactoryId CalculateSlotOption(BackendsMap& backends,
+                                                    OutputSlot& outputSlot,
+                                                    TensorHandleFactoryRegistry& registry)
+{
+    // First ensure the from backends can support the TensorHandeAPI
+    Layer& layer = outputSlot.GetOwningLayer();
+    auto frmBackend = backends.find(layer.GetBackendId());
+    if (frmBackend == backends.end() ||
+        !frmBackend->second->SupportsTensorAllocatorAPI())
+    {
+        return ITensorHandleFactory::LegacyFactoryId;
+    }
+
+    // Connections to Output Layers requires support for map/unmap on the TensorHandle.
+    bool requiresMapUnmap = false;
+    for (auto&& connection : outputSlot.GetConnections())
+    {
+        const Layer& connectedLayer = connection->GetOwningLayer();
+        if (connectedLayer.GetType() == LayerType::Output)
+        {
+            requiresMapUnmap = true;
+        }
+    }
+
+    IBackendInternal* srcBackend = frmBackend->second.get();
+    auto srcPrefs = srcBackend->GetHandleFactoryPreferences();
+
+    // Initialize the scores
+    std::map<ITensorHandleFactory::FactoryId, int> factoryScores;
+    for (auto&& pref : srcPrefs)
+    {
+        if (requiresMapUnmap) // Only consider factories that support map/unmap if required
+        {
+            ITensorHandleFactory* factory = registry.GetFactory(pref);
+            if (!factory->SupportsMapUnmap())
+            {
+                // The current tensor handle factory does not support the map/unmap strategy, move to the next one
+                continue;
+            }
+        }
+
+        auto it = factoryScores.find(pref);
+        if (it == factoryScores.end())
+        {
+            // Add new score to the table
+            factoryScores[pref] = 0;
+        }
+    }
+
+    // Score each handle factory based on how many times it requires copies on the slot connections
+    for (auto&& connection : outputSlot.GetConnections())
+    {
+        const Layer& connectedLayer = connection->GetOwningLayer();
+
+        auto toBackend = backends.find(connectedLayer.GetBackendId());
+        BOOST_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+
+        auto dstPrefs = toBackend->second.get()->GetHandleFactoryPreferences();
+        for (auto&& src : srcPrefs)
+        {
+            if (factoryScores.find(src) == factoryScores.end()) // Don't consider excluded factories
+            {
+                continue;
+            }
+
+            for (auto&& dst : dstPrefs)
+            {
+                if (RequiresCopy(src, dst, registry))
+                {
+                    // Copy avoided, increase the score
+                    factoryScores[src]++;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Find the lowest score
+    int minScore = std::numeric_limits<int>::max();
+    for (auto it : factoryScores)
+    {
+        minScore = std::min(minScore, it.second);
+    }
+
+    // Collect factories matching the best(lowest) score
+    std::vector<ITensorHandleFactory::FactoryId> optimalFactories;
+    for (auto it : factoryScores)
+    {
+        if (it.second == minScore)
+        {
+            optimalFactories.push_back(it.first);
+        }
+    }
+
+    // For all compatible Factories matching the best score, find the preferred one for the current layer.
+    for (auto&& srcPref : srcPrefs)
+    {
+        for (auto&& comp : optimalFactories)
+        {
+            if (comp == srcPref)
+            {
+                return comp;
+            }
+        }
+    }
+
+    return ITensorHandleFactory::LegacyFactoryId;
+}
+
+MemoryStrategy CalculateStrategy(BackendsMap& backends,
+                                 ITensorHandleFactory::FactoryId srcFactoryId,
+                                 const Layer& layer,
+                                 const Layer& connectedLayer,
+                                 TensorHandleFactoryRegistry& registry)
+{
+    auto toBackend = backends.find(connectedLayer.GetBackendId());
+    BOOST_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+
+    auto dstPrefs = toBackend->second.get()->GetHandleFactoryPreferences();
+
+    // Legacy API check for backward compatibility
+    if (srcFactoryId == ITensorHandleFactory::LegacyFactoryId || dstPrefs.empty())
+    {
+        if (layer.GetBackendId() != connectedLayer.GetBackendId())
+        {
+            return MemoryStrategy::CopyToTarget;
+        }
+        else
+        {
+            return MemoryStrategy::DirectCompatibility;
+        }
+    }
+
+    // TensorHandleFactory API present, so perform more sophisticated strategies.
+    // Dst Output layers don't require copy because they use map/unmap
+    if (connectedLayer.GetType() == LayerType::Output)
+    {
+        return MemoryStrategy::DirectCompatibility;
+    }
+
+    // Search for direct match in prefs
+    for (auto&& pref : dstPrefs)
+    {
+        if (pref == srcFactoryId)
+        {
+            return MemoryStrategy::DirectCompatibility;
+        }
+    }
+
+    // Search for export/import options
+    ITensorHandleFactory* srcFactory = registry.GetFactory(srcFactoryId);
+    if (srcFactory->SupportsExport())
+    {
+        for (auto&& pref : dstPrefs)
+        {
+            ITensorHandleFactory* dstFactory = registry.GetFactory(pref);
+            if (dstFactory->SupportsImport())
+            {
+                return MemoryStrategy::ExportToTarget;
+            }
+        }
+    }
+
+    // Search for copy options via map/unmap
+    if (srcFactory->SupportsMapUnmap())
+    {
+        for (auto&& pref : dstPrefs)
+        {
+            ITensorHandleFactory* dstFactory = registry.GetFactory(pref);
+            if (dstFactory->SupportsMapUnmap())
+            {
+                return MemoryStrategy::CopyToTarget;
+            }
+        }
+    }
+
+    return MemoryStrategy::Undefined;
+}
+
+// Select the TensorHandleFactories and the corresponding memory strategy
+OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
+                                              BackendsMap& backends,
+                                              TensorHandleFactoryRegistry& registry,
+                                              Optional<std::vector<std::string>&> errMessages)
+{
+    OptimizationResult result;
+
+    optGraph.ForEachLayer([&backends, &registry, &result, &errMessages](Layer* layer)
+    {
+        BOOST_ASSERT(layer);
+
+        // Lets make sure the backend is in our list of supported backends. Something went wrong during backend
+        // assignment if this check fails
+        BOOST_ASSERT(backends.find(layer->GetBackendId()) != backends.end());
+
+        // Check each output separately
+        for (unsigned int slotIdx = 0; slotIdx < layer->GetNumOutputSlots(); slotIdx++)
+        {
+            OutputSlot& outputSlot = layer->GetOutputSlot(slotIdx);
+
+            ITensorHandleFactory::FactoryId slotOption = ITensorHandleFactory::LegacyFactoryId;
+
+            // Calculate the factory to use which results in the fewest copies being made.
+            switch(layer->GetType())
+            {
+                case LayerType::Input:
+                    slotOption = CalculateSlotOptionForInput(backends, outputSlot, registry);
+                    break;
+                case LayerType::Output:
+                    slotOption = CalculateSlotOptionForOutput(backends, outputSlot, registry);
+                    break;
+                default:
+                    slotOption = CalculateSlotOption(backends, outputSlot, registry);
+                    break;
+            }
+            outputSlot.SetTensorHandleFactory(slotOption);
+
+            // Now determine the "best" memory strategy for each connection given the slotOption.
+            unsigned int connectionIdx = 0;
+            for (auto&& connection : outputSlot.GetConnections())
+            {
+                const Layer& connectedLayer = connection->GetOwningLayer();
+
+                MemoryStrategy strategy = CalculateStrategy(backends, slotOption, *layer, connectedLayer, registry);
+
+                if (strategy == MemoryStrategy::Undefined)
+                {
+                    result.m_Error = true;
+                    if (errMessages)
+                    {
+                        errMessages.value().emplace_back("Could not find valid strategy required for compatibility"
+                                                         " between backends.");
+                    }
+                    return;
+                }
+
+                outputSlot.SetMemoryStrategy(connectionIdx, strategy);
+
+                connectionIdx++;
+            }
+        }
+    });
+
+    return result;
+}
+
 IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                               const std::vector<BackendId>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
@@ -476,15 +839,19 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
     }
 
+    // Create a map to temporarily hold initialized backend objects
+    TensorHandleFactoryRegistry tensorHandleFactoryRegistry;
+    BackendsMap backends = CreateSupportedBackends(tensorHandleFactoryRegistry, backendSettings);
+
     // Assign an available backend to each layer
     Graph::Iterator firstLayer = optGraph.begin();
     Graph::Iterator lastLayer  = optGraph.end();
-    OptimizationResult assigBackendsResult = AssignBackends(optNetObjPtr,
-                                                            backendSettings,
-                                                            firstLayer,
-                                                            lastLayer,
-                                                            errMessages);
-    if (assigBackendsResult.m_Error)
+    OptimizationResult assignBackendsResult = AssignBackends(optNetObjPtr,
+                                                             backendSettings,
+                                                             firstLayer,
+                                                             lastLayer,
+                                                             errMessages);
+    if (assignBackendsResult.m_Error)
     {
         // Failed to assign a backend to each layer
         return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
@@ -496,6 +863,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     // Apply the backend-specific optimizations
     OptimizationResult backendOptimizationResult = ApplyBackendOptimizations(optNetObjPtr,
                                                                              backendSettings,
+                                                                             backends,
                                                                              errMessages);
     if (backendOptimizationResult.m_Error)
     {
@@ -510,13 +878,25 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         Optimizer::Pass(optGraph, MakeOptimizations(InsertDebugLayer()));
     }
 
-    optGraph.AddCopyLayers();
+    // Calculate the compatibility strategies for tensor handles
+    OptimizationResult strategyResult = SelectTensorHandleStrategy(optGraph,
+                                                                   backends,
+                                                                   tensorHandleFactoryRegistry,
+                                                                   errMessages);
+    if (strategyResult.m_Error)
+    {
+        // Failed to apply the backend-specific optimizations
+        return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
+    }
+
+    // Based on the tensor handle strategy determined above, insert copy layers where required.
+    optGraph.AddCopyLayers(backends, tensorHandleFactoryRegistry);
 
     // Convert constants
     Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
     Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsHalfToFloat()));
 
-    // Run backend specific optimizations
+    // Run backend specific optimizations (deprecated)
     for (auto&& chosenBackend : backendSettings.m_SelectedBackends)
     {
         auto factoryFun = BackendRegistryInstance().GetFactory(chosenBackend);

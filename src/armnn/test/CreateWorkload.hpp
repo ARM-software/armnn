@@ -41,11 +41,13 @@ std::unique_ptr<Workload> MakeAndCheckWorkload(Layer& layer, Graph& graph, const
 }
 
 // Helper function to create tensor handlers for workloads, assuming they all use the same factory.
-void CreateTensorHandles(armnn::Graph& graph, armnn::IWorkloadFactory& factory)
+void CreateTensorHandles(armnn::Graph& graph,
+                         armnn::IWorkloadFactory& factory)
 {
+    TensorHandleFactoryRegistry tmpRegistry;
     for (auto&& layer : graph.TopologicalSort())
     {
-        layer->CreateTensorHandles(graph, factory);
+        layer->CreateTensorHandles(tmpRegistry, factory);
     }
 }
 

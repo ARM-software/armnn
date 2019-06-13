@@ -484,6 +484,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/RuntimeTests.cpp
         src/armnn/test/RuntimeTests.hpp
         src/armnn/test/SubgraphViewTests.cpp
+        src/armnn/test/TensorHandleStrategyTest.cpp
         src/armnn/test/TensorHelpers.hpp
         src/armnn/test/TensorTest.cpp
         src/armnn/test/TestInputOutputLayerVisitor.cpp

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ITensorHandle.hpp"
+#include "ITensorHandleFactory.hpp"
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/INetwork.hpp>
@@ -35,14 +36,10 @@ public:
     /// @param tensorInfo - TensorInfo for the output.
     void SetTensorInfo(const TensorInfo& tensorInfo);
 
-    /// @brief - Creates tensor handlers used by the intermediate tensors. Does not allocate memory.
+    /// @brief - Creates tensor handles used by the intermediate tensors. Does not allocate memory.
     /// @param factory - Factory to be used for handler creation.
     void CreateTensorHandles(const IWorkloadFactory& factory);
-
-    /// @brief - Creates tensor handlers used by the intermediate tensors. Does not allocate memory.
-    /// @param factory - Factory to be used for handler creation.
-    /// @param dataLayout - Data Layout to be used for handler creation.
-    void CreateTensorHandles(const IWorkloadFactory& factory, DataLayout dataLayout);
+    void CreateTensorHandles(const ITensorHandleFactory& factory);
 
     /// @brief - Gets the matching TensorInfo for the output.
     /// @return - References to the output TensorInfo.

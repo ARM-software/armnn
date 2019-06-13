@@ -10,7 +10,11 @@
 
 #include <ISubgraphViewConverter.hpp>
 #include <SubgraphView.hpp>
+#include <optimizations/Optimization.hpp>
 
+#include "IBackendContext.hpp"
+#include "IMemoryManager.hpp"
+#include "ITensorHandleFactory.hpp"
 #include "OptimizationViews.hpp"
 
 #include <vector>
@@ -18,9 +22,7 @@
 namespace armnn
 {
 class IWorkloadFactory;
-class IBackendContext;
 class IMemoryManager;
-class Optimization;
 class ILayerSupport;
 
 class IBackendInternal : public IBackend
@@ -60,7 +62,10 @@ public:
     }
 
     ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
-    virtual Optimizations GetOptimizations() const = 0;
+    virtual Optimizations GetOptimizations() const
+    {
+        return Optimizations{};
+    }
 
     ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
     virtual SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph, bool& optimizationAttempted) const
@@ -70,12 +75,19 @@ public:
     }
     ARMNN_NO_DEPRECATE_WARN_END
 
-    virtual IMemoryManagerUniquePtr CreateMemoryManager() const = 0;
+
+    virtual IMemoryManagerUniquePtr CreateMemoryManager() const
+    {
+        return IMemoryManagerUniquePtr();
+    };
 
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
         const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
 
-    virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const = 0;
+    virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const
+    {
+        return IBackendContextPtr{};
+    }
 
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 
@@ -107,6 +119,29 @@ public:
         }
         return result;
     }
+
+    bool SupportsTensorAllocatorAPI() const { return GetHandleFactoryPreferences().empty() == false; }
+
+    ITensorHandleFactory::FactoryId GetBackwardCompatibleFavoriteHandleFactory()
+    {
+        auto favorites = GetHandleFactoryPreferences();
+        if (favorites.empty())
+        {
+            return ITensorHandleFactory::LegacyFactoryId;
+        }
+        return favorites[0];
+    }
+
+    /// (Optional) Returns a vector of supported TensorHandleFactory ids in preference order.
+    virtual std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const
+    {
+        return std::vector<ITensorHandleFactory::FactoryId>();
+    }
+
+    /// (Optional) Register TensorHandleFactories
+    /// Either this method or CreateMemoryManager() and
+    /// IWorkloadFactory::CreateTensor()/IWorkloadFactory::CreateSubtensor() methods must be implemented.
+    virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) {}
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

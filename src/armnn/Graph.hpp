@@ -191,7 +191,8 @@ public:
 
     /// Modifies the graph in-place, removing edges connecting layers using different compute devices,
     /// and relinking them via an intermediary copy layers.
-    void AddCopyLayers();
+    void AddCopyLayers(std::map<BackendId, std::unique_ptr<class IBackendInternal>>& backends,
+                       TensorHandleFactoryRegistry& registry);
 
     /// Substitutes the given sub-graph with either a new layer or a new sub-graph.
     /// In either case, the given layer or all the layers in the given sub-graph must belong to this graph.

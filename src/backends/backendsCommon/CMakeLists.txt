@@ -11,6 +11,8 @@ list(APPEND armnnBackendsCommon_sources
     CpuTensorHandle.hpp
     IBackendInternal.hpp
     IBackendContext.hpp
+    ITensorHandleFactory.cpp
+    ITensorHandleFactory.hpp
     LayerSupportBase.cpp
     LayerSupportBase.hpp
     IMemoryManager.hpp
@@ -22,6 +24,8 @@ list(APPEND armnnBackendsCommon_sources
     OptimizationViews.hpp
     OutputHandler.cpp
     OutputHandler.hpp
+    TensorHandleFactoryRegistry.cpp
+    TensorHandleFactoryRegistry.hpp
     WorkloadDataCollector.hpp
     WorkloadData.cpp
     WorkloadDataFwd.hpp

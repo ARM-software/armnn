@@ -27,9 +27,9 @@ void OutputHandler::CreateTensorHandles(const IWorkloadFactory& factory)
     m_TensorHandle = factory.CreateTensorHandle(m_TensorInfo);
 }
 
-void OutputHandler::CreateTensorHandles(const IWorkloadFactory& factory, DataLayout dataLayout)
+void OutputHandler::CreateTensorHandles(const ITensorHandleFactory& factory)
 {
-    m_TensorHandle = factory.CreateTensorHandle(m_TensorInfo, dataLayout);
+    m_TensorHandle = factory.CreateTensorHandle(m_TensorInfo);
 }
 
 void OutputHandler::CollectWorkloadOutputs(WorkloadDataCollector& dataCollector) const

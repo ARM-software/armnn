@@ -263,7 +263,8 @@ LOCAL_SRC_FILES := \
         src/armnn/test/ProfilingEventTest.cpp \
         src/armnn/test/ObservableTest.cpp \
         src/armnn/test/OptionalTest.cpp \
-        src/armnn/test/TestUtils.cpp
+        src/armnn/test/TestUtils.cpp \
+        src/armnn/test/TensorHandleStrategyTest.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         libneuralnetworks_common \

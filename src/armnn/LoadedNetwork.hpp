@@ -12,6 +12,7 @@
 #include "Profiling.hpp"
 
 #include <backendsCommon/IBackendInternal.hpp>
+#include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -83,6 +84,8 @@ private:
     mutable std::mutex m_WorkingMemMutex;
 
     bool m_IsWorkingMemAllocated=false;
+
+    TensorHandleFactoryRegistry m_TensorHandleFactoryRegistry;
 };
 
 }

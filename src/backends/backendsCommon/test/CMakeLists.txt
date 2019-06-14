@@ -44,6 +44,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     QuantizeTestImpl.hpp
     RuntimeTestImpl.hpp
     SoftmaxTestImpl.hpp
+    SpaceToDepthTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
     SplitterTestImpl.hpp
     StridedSliceTestImpl.hpp

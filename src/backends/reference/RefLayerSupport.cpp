@@ -1282,6 +1282,33 @@ bool RefLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
+                             const TensorInfo& output,
+                             const SpaceToDepthDescriptor& descriptor,
+                             Optional<std::string&> reasonIfUnsupported) const
+{
+
+    ignore_unused(descriptor);
+    bool supported = true;
+
+    std::array<DataType,2> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+        "Reference SpaceToDepth: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+        "Reference SpaceToDepth: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+        "Reference SpaceToDepth: input and output types are mismatched");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                           const ViewsDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const

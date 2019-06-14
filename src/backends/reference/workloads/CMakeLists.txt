@@ -100,6 +100,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefSoftmaxWorkload.hpp
     RefSpaceToBatchNdWorkload.cpp
     RefSpaceToBatchNdWorkload.hpp
+    RefSpaceToDepthWorkload.cpp
+    RefSpaceToDepthWorkload.hpp
     RefSplitterWorkload.cpp
     RefSplitterWorkload.hpp
     RefStridedSliceWorkload.cpp
@@ -114,6 +116,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Softmax.hpp
     SpaceToBatchNd.hpp
     SpaceToBatchNd.cpp
+    SpaceToDepth.hpp
+    SpaceToDepth.cpp
     Splitter.hpp
     Splitter.cpp
     StridedSlice.hpp

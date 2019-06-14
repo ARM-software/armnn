@@ -58,11 +58,13 @@ BACKEND_SOURCES := \
         workloads/RefRsqrtWorkload.cpp \
         workloads/RefSoftmaxWorkload.cpp \
         workloads/RefSpaceToBatchNdWorkload.cpp \
+        workloads/RefSpaceToDepthWorkload.cpp \
         workloads/RefStridedSliceWorkload.cpp \
         workloads/RefSplitterWorkload.cpp \
         workloads/ResizeBilinear.cpp \
         workloads/Rsqrt.cpp \
         workloads/SpaceToBatchNd.cpp \
+        workloads/SpaceToDepth.cpp \
         workloads/StridedSlice.cpp \
         workloads/StringMapping.cpp \
         workloads/Softmax.cpp \

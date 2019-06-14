@@ -769,6 +769,12 @@ ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint2, BatchToSpaceNdNchwUintTest2)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint3, BatchToSpaceNdNchwUintTest3)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint4, BatchToSpaceNdNchwUintTest4)
 
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNCHWAsymmQ8, SpaceToDepthNCHWAsymmQ8Test)
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNHWCAsymmQ8, SpaceToDepthNHWCAsymmQ8Test)
+
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNHWCFloat32, SpaceToDepthNHWCFloat32Test)
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNCHWFloat32, SpaceToDepthNCHWFloat32Test)
+
 // Strided Slice
 ARMNN_AUTO_TEST_CASE(StridedSlice4DFloat32, StridedSlice4DFloat32Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice4DReverseFloat32, StridedSlice4DReverseFloat32Test)

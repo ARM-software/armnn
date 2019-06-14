@@ -551,22 +551,10 @@ bool RefLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& i
                                                              const Optional<TensorInfo>& biases,
                                                              Optional<std::string&> reasonIfUnsupported) const
 {
-    if (descriptor.m_DilationY == 1 && descriptor.m_DilationY == 1)
-    {
-        return IsDepthwiseConvolutionSupported(input, output, descriptor, weights, biases, reasonIfUnsupported);
-    }
-    else
-    {
-        if (reasonIfUnsupported)
-        {
-            reasonIfUnsupported.value() = "Reference Depthwise Convolution: Dilation parameters must be 1";
-        }
-        return false;
-    }
+    return IsDepthwiseConvolutionSupported(input, output, descriptor, weights, biases, reasonIfUnsupported);
 }
 
-
-    bool RefLayerSupport::IsDivisionSupported(const TensorInfo& input0,
+bool RefLayerSupport::IsDivisionSupported(const TensorInfo& input0,
                                           const TensorInfo& input1,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const

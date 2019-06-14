@@ -275,12 +275,10 @@ static void NeonCreateDepthWiseConvolutionWorkloadTest(DataLayout dataLayout)
     auto inputHandle  = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<INeonTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW)
-            ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
-            : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
-    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW)
-            ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
-            : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+                                                               : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+                                                               : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
 
     BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
     BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));

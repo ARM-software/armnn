@@ -1119,7 +1119,7 @@ std::unique_ptr<ConcatWorkload> CreateConcatWorkloadTest(armnn::IWorkloadFactory
     auto workloadConcat = MakeAndCheckWorkload<ConcatWorkload>(*concat, graph, factory);
     BOOST_TEST_CHECKPOINT("created concat workload");
 
-    return std::move(workloadConcat);
+    return workloadConcat;
 }
 
 template <typename PreCompiledWorkload, armnn::DataType dataType>
@@ -1277,7 +1277,7 @@ std::unique_ptr<ConstantWorkload> CreateConstantWorkloadTest(armnn::IWorkloadFac
     auto workloadConstant = MakeAndCheckWorkload<ConstantWorkload>(*constant, graph, factory);
     BOOST_TEST_CHECKPOINT("created Constant workload");
 
-    return std::move(workloadConstant);
+    return workloadConstant;
 }
 
 }

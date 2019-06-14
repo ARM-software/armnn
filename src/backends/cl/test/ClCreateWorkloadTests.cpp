@@ -243,17 +243,17 @@ static void ClConvolution2dWorkloadTest(DataLayout dataLayout)
                                                                                        graph,
                                                                                        dataLayout);
 
-    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW) ?
-            std::initializer_list<unsigned int>({2, 3, 8, 16}) : std::initializer_list<unsigned int>({2, 8, 16, 3});
-    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW) ?
-            std::initializer_list<unsigned int>({2, 2, 2, 10}) : std::initializer_list<unsigned int>({2, 2, 10, 2});
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({2, 3, 8, 16})
+                                                               : std::initializer_list<unsigned int>({2, 8, 16, 3});
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({2, 2, 2, 10})
+                                                               : std::initializer_list<unsigned int>({2, 2, 10, 2});
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
     Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, inputShape));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, outputShape));
+    BOOST_TEST((inputHandle->GetShape() == inputShape));
+    BOOST_TEST((outputHandle->GetShape() == outputShape));
 }
 
 BOOST_AUTO_TEST_CASE(CreateConvolution2dFloatNchwWorkload)
@@ -291,15 +291,13 @@ static void ClDepthwiseConvolutionWorkloadTest(DataLayout dataLayout)
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW)
-            ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
-            : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
-    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW)
-            ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
-            : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+                                                               : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+                                                               : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, inputShape));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, outputShape));
+    BOOST_TEST((inputHandle->GetShape() == inputShape));
+    BOOST_TEST((outputHandle->GetShape() == outputShape));
 }
 
 BOOST_AUTO_TEST_CASE(CreateDepthwiseConvolutionFloat32NhwcWorkload)
@@ -382,13 +380,13 @@ static void ClNormalizationWorkloadTest(DataLayout dataLayout)
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW) ?
-            std::initializer_list<unsigned int>({3, 5, 5, 1}) : std::initializer_list<unsigned int>({3, 1, 5, 5});
-    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW) ?
-            std::initializer_list<unsigned int>({3, 5, 5, 1}) : std::initializer_list<unsigned int>({3, 1, 5, 5});
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({3, 5, 5, 1})
+                                                               : std::initializer_list<unsigned int>({3, 1, 5, 5});
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({3, 5, 5, 1})
+                                                               : std::initializer_list<unsigned int>({3, 1, 5, 5});
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, inputShape));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, outputShape));
+    BOOST_TEST((inputHandle->GetShape() == inputShape));
+    BOOST_TEST((outputHandle->GetShape() == outputShape));
 }
 
 BOOST_AUTO_TEST_CASE(CreateNormalizationFloat32NchwWorkload)
@@ -420,18 +418,18 @@ static void ClPooling2dWorkloadTest(DataLayout dataLayout)
 
     auto workload = CreatePooling2dWorkloadTest<ClPooling2dWorkload, DataType>(factory, graph, dataLayout);
 
-    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW) ?
-            std::initializer_list<unsigned int>({3, 2, 5, 5}) : std::initializer_list<unsigned int>({3, 5, 5, 2});
-    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW) ?
-            std::initializer_list<unsigned int>({3, 2, 2, 4}) : std::initializer_list<unsigned int>({3, 2, 4, 2});
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({3, 2, 5, 5})
+                                                               : std::initializer_list<unsigned int>({3, 5, 5, 2});
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({3, 2, 2, 4})
+                                                               : std::initializer_list<unsigned int>({3, 2, 4, 2});
 
     // Check that inputs/outputs are as we expect them (see definition of CreatePooling2dWorkloadTest).
     Pooling2dQueueDescriptor queueDescriptor = workload->GetData();
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, inputShape));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, outputShape));
+    BOOST_TEST((inputHandle->GetShape() == inputShape));
+    BOOST_TEST((outputHandle->GetShape() == outputShape));
 }
 
 BOOST_AUTO_TEST_CASE(CreatePooling2dFloatNchwWorkload)
@@ -668,15 +666,13 @@ static void ClL2NormalizationWorkloadTest(DataLayout dataLayout)
     auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
-    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW)
-            ? std::initializer_list<unsigned int>({ 5, 20, 50, 67 })
-            : std::initializer_list<unsigned int>({ 5, 50, 67, 20 });
-    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW)
-            ? std::initializer_list<unsigned int>({ 5, 20, 50, 67 })
-            : std::initializer_list<unsigned int>({ 5, 50, 67, 20 });
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 5, 20, 50, 67 })
+                                                               : std::initializer_list<unsigned int>({ 5, 50, 67, 20 });
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 5, 20, 50, 67 })
+                                                               : std::initializer_list<unsigned int>({ 5, 50, 67, 20 });
 
-    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, inputShape));
-    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, outputShape));
+    BOOST_TEST((inputHandle->GetShape() == inputShape));
+    BOOST_TEST((outputHandle->GetShape() == outputShape));
 }
 
 BOOST_AUTO_TEST_CASE(CreateL2NormalizationFloatNchwWorkload)

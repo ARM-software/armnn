@@ -270,10 +270,10 @@ static void RefCreateConvolution2dWorkloadTest(DataLayout dataLayout = DataLayou
     auto workload = CreateConvolution2dWorkloadTest<RefConvolution2dWorkload, DataType::Float32>
                     (factory, graph, dataLayout);
 
-    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW) ?
-        std::initializer_list<unsigned int>({2, 3, 8, 16}) : std::initializer_list<unsigned int>({2, 8, 16, 3});
-    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW) ?
-        std::initializer_list<unsigned int>({2, 2, 2, 10}) : std::initializer_list<unsigned int>({2, 2, 10, 2});
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({2, 3, 8, 16})
+                                                               : std::initializer_list<unsigned int>({2, 8, 16, 3});
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({2, 2, 2, 10})
+                                                               : std::initializer_list<unsigned int>({2, 2, 10, 2});
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
     CheckInputOutput(std::move(workload),
@@ -298,12 +298,11 @@ static void RefCreateDepthwiseConvolutionWorkloadTest(DataLayout dataLayout)
     auto workload = CreateDepthwiseConvolution2dWorkloadTest<RefDepthwiseConvolution2dWorkload, DataType::Float32>
             (factory, graph, dataLayout);
 
-    std::initializer_list<unsigned int> inputShape  = (dataLayout == DataLayout::NCHW)
-                                                      ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
-                                                      : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
-    std::initializer_list<unsigned int> outputShape = (dataLayout == DataLayout::NCHW)
-                                                      ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
-                                                      : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+                                                               : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? std::initializer_list<unsigned int>({ 2, 2, 5, 5 })
+                                                               : std::initializer_list<unsigned int>({ 2, 5, 5, 2 });
+
     // Checks that inputs/outputs are as we expect them (see definition of CreateDepthwiseConvolution2dWorkloadTest).
     CheckInputOutput(std::move(workload),
                      TensorInfo(inputShape, DataType::Float32),

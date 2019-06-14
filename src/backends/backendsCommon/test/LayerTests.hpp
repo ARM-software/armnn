@@ -87,16 +87,15 @@ LayerTestResult<float, 4> SimpleConvolution2d3x3NhwcTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled);
 
-LayerTestResult<float, 4>
-Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(
+LayerTestResult<float, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayout layout);
+    armnn::DataLayout layout);
 
 LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayout layout);
+    armnn::DataLayout layout);
 
 LayerTestResult<float,   4> Convolution1dTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -109,6 +108,20 @@ LayerTestResult<uint8_t, 4> Convolution1dUint8Test(
     bool biasEnabled);
 
 LayerTestResult<float, 4> DepthwiseConvolution2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> Convolution2d3x3Dilation3x3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> Convolution2d2x3x3Dilation3x3Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,

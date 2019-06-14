@@ -88,7 +88,9 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     uint32_t padRight = 0,
     uint32_t padBottom = 0,
     uint32_t strideX = 1,
-    uint32_t strideY = 1)
+    uint32_t strideY = 1,
+    uint32_t dilationX = 1,
+    uint32_t dilationY = 1)
 {
     unsigned int inputHeight   = boost::numeric_cast<unsigned int>(originalInput.shape()[2]);
     unsigned int inputWidth    = boost::numeric_cast<unsigned int>(originalInput.shape()[3]);
@@ -218,6 +220,8 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     data.m_Parameters.m_PadBottom = padBottom;
     data.m_Parameters.m_BiasEnabled = biasEnabled;
     data.m_Parameters.m_DataLayout = layout;
+    data.m_Parameters.m_DilationX = dilationX;
+    data.m_Parameters.m_DilationY = dilationY;
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvolution2d(data, info);
     inputHandle->Allocate();

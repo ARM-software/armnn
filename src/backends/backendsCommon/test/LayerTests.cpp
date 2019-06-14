@@ -582,6 +582,309 @@ LayerTestResult<T, 4> SimpleConvolution2dAsymmetricPaddingTestCommon(
         2); // Padding bottom.
 }
 
+LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::DataLayout layout)
+{
+    return SimpleConvolution2dAsymmetricPaddingTestCommon<armnn::DataType::Float32, armnn::DataType::Float32>(
+            workloadFactory, memoryManager, layout, 0.0f, 0);
+}
+
+LayerTestResult<float, 4> Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::DataLayout layout)
+{
+    return Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon
+            <armnn::DataType::Float32, armnn::DataType::Float32>(
+            workloadFactory, memoryManager, layout, 0.0f, 0);
+}
+
+LayerTestResult<float, 4> Convolution1dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled)
+{
+    return Convolution1dTestImpl<armnn::DataType::Float32, armnn::DataType::Float32>(
+            workloadFactory, memoryManager, 0.0f, 0, biasEnabled);
+}
+
+LayerTestResult<uint8_t, 4> Convolution1dUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled)
+{
+    return Convolution1dTestImpl<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+            workloadFactory, memoryManager, 0.1f, 128, biasEnabled);
+}
+
+LayerTestResult<float,4> CompareConvolution2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    armnn::IWorkloadFactory& refWorkloadFactory)
+{
+    return CompareConvolution2dTestImpl<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, refWorkloadFactory);
+}
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> Convolution2d3x3DilationTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const std::vector<float>& inputNoQuantizedValues,
+    armnn::TensorInfo& inputTensorInfo,
+    const std::vector<float>& kernelNoQuantizedValues,
+    armnn::TensorInfo& kernelTensorInfo,
+    const std::vector<float>& outputExpectedNoQuantizedValues,
+    armnn::TensorInfo& outputTensorInfo,
+    uint32_t dilationX,
+    uint32_t dilationY,
+    armnn::DataLayout layout = armnn::DataLayout::NCHW,
+    bool biasEnabled = false
+)
+{
+    float qScale;
+    int32_t qOffset;
+    switch (ArmnnType)
+    {
+        case armnn::DataType::QuantisedAsymm8:
+        {
+            qScale = 0.1f;
+            qOffset = 128;
+            break;
+        }
+        case armnn::DataType::QuantisedSymm16:
+        {
+            qScale = 0.1f;
+            qOffset = 0;
+            break;
+        }
+        case armnn::DataType::Float32:
+        default:
+        {
+            qScale = 0.f;
+            qOffset = 0;
+            break;
+        }
+    }
+
+    inputTensorInfo.SetQuantizationScale(qScale);
+    inputTensorInfo.SetQuantizationOffset(qOffset);
+    kernelTensorInfo.SetQuantizationScale(qScale);
+    kernelTensorInfo.SetQuantizationOffset(qOffset);
+    outputTensorInfo.SetQuantizationScale(qScale);
+    outputTensorInfo.SetQuantizationOffset(qOffset);
+
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  std::vector<T>(QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
+                                                                    inputTensorInfo.GetQuantizationOffset(),
+                                                                    inputNoQuantizedValues)));
+    auto kernel = MakeTensor<T, 4>(kernelTensorInfo,
+                                  std::vector<T>(QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(),
+                                                                    kernelTensorInfo.GetQuantizationOffset(),
+                                                                    kernelNoQuantizedValues)));
+    auto expectedOutput = MakeTensor<T, 4>(outputTensorInfo,
+                                           std::vector<T>(QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
+                                                                             outputTensorInfo.GetQuantizationOffset(),
+                                                                             outputExpectedNoQuantizedValues)));
+
+    uint32_t padLeft = 0;
+    uint32_t padTop = 0;
+    uint32_t padRight = 0;
+    uint32_t padBottom = 0;
+    uint32_t strideX  = 1;
+    uint32_t strideY  = 1;
+
+    return SimpleConvolution2dTestImpl<ArmnnType, ArmnnBType>(
+            workloadFactory,
+            memoryManager,
+            input,
+            kernel,
+            GetBias2<ArmnnBType>(biasEnabled, qScale * qScale),
+            expectedOutput,
+            qScale,
+            qOffset,
+            layout,
+            padLeft,
+            padTop,
+            padRight,
+            padBottom,
+            strideX,
+            strideY,
+            dilationX,
+            dilationY);
+}
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T>
+LayerTestResult<T, 4> Convolution2d3x3Dilation3x3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout)
+{
+    armnn::TensorInfo inputTensorInfo({1, 1, 10, 10}, ArmnnType);
+    std::vector<float> inputNoQuantizedValues =
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+
+    armnn::TensorInfo kernelTensorInfo({ 1, 1, 3, 3}, ArmnnType);
+    std::vector<float> kernelNoQuantizedValues =
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9
+    };
+
+    // Since the dilation rate is 3 this will dilate the kernel to be like 7x7,
+    // therefore the output will be 4x4: (I−K+2P)/S +1 => (10-7 +0)/1 +1
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4}, ArmnnType);
+    std::vector<float> outputExpectedNoQuantizedValues =
+    {
+        6., 5., 5., 5.,
+        6., 5., 5., 5.,
+        6., 5., 5., 5.,
+        3., 2., 2., 2.
+    };
+
+    return Convolution2d3x3DilationTestCommon<ArmnnType, ArmnnBType>(
+            workloadFactory,
+            memoryManager,
+            inputNoQuantizedValues,
+            inputTensorInfo,
+            kernelNoQuantizedValues,
+            kernelTensorInfo,
+            outputExpectedNoQuantizedValues,
+            outputTensorInfo,
+            3,
+            3,
+            layout,
+            biasEnabled);
+}
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T>
+LayerTestResult<T, 4> Convolution2d2x3x3Dilation3x3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout)
+{
+    armnn::TensorInfo inputTensorInfo({1, 2, 10, 10}, ArmnnType);
+    std::vector<float> inputNoQuantizedValues =
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+
+    armnn::TensorInfo kernelTensorInfo({ 1, 2, 3, 3}, ArmnnType);
+    std::vector<float> kernelNoQuantizedValues =
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9
+    };
+
+    // Since the dilation rate is 3 this will dilate the kernel to be like 7x7,
+    // therefore the output will be 4x4: (I−K+2P)/S +1 => (10-7 +0)/1 +1
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4}, ArmnnType);
+    std::vector<float> outputExpectedNoQuantizedValues =
+    {
+        12., 10., 10., 10.,
+        12., 10., 10., 10.,
+        12., 10., 10., 10.,
+        6.,  4.,  4.,  4.
+    };
+
+    return Convolution2d3x3DilationTestCommon<ArmnnType, ArmnnBType>(
+            workloadFactory,
+            memoryManager,
+            inputNoQuantizedValues,
+            inputTensorInfo,
+            kernelNoQuantizedValues,
+            kernelTensorInfo,
+            outputExpectedNoQuantizedValues,
+            outputTensorInfo,
+            3,
+            3,
+            layout,
+            biasEnabled);
+}
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+Convolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    bool,
+    armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
+Convolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    bool,
+    armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
+Convolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    bool,
+    armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+Convolution2d2x3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    bool,
+    armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
+Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    bool,
+    armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
+Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+    armnn::IWorkloadFactory&,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+    bool,
+    armnn::DataLayout);
+
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType,
          typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(
@@ -833,27 +1136,6 @@ LayerTestResult<T, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon(
         strideY,
         dilationX,
         dilationY);
-
-}
-
-LayerTestResult<float, 4>
-Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayout layout)
-{
-    return Convolution2dAsymmetricPaddingLargerThanHalfKernelSizeTestCommon
-        <armnn::DataType::Float32, armnn::DataType::Float32>(
-            workloadFactory, memoryManager, layout, 0.0f, 0);
-}
-
-LayerTestResult<float, 4> Convolution2dAsymmetricPaddingTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::DataLayout layout)
-{
-    return SimpleConvolution2dAsymmetricPaddingTestCommon<armnn::DataType::Float32, armnn::DataType::Float32>(
-        workloadFactory, memoryManager, layout, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> DepthwiseConvolution2dTest(
@@ -945,33 +1227,6 @@ LayerTestResult<int16_t, 4> DepthwiseConvolution2dDepthMul1Int16Test(
 {
     return DepthwiseConvolution2dDepthMul1TestImpl<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
-}
-
-LayerTestResult<float, 4> Convolution1dTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    bool biasEnabled)
-{
-    return Convolution1dTestImpl<armnn::DataType::Float32, armnn::DataType::Float32>(
-        workloadFactory, memoryManager, 0.0f, 0, biasEnabled);
-}
-
-LayerTestResult<uint8_t, 4> Convolution1dUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    bool biasEnabled)
-{
-    return Convolution1dTestImpl<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
-        workloadFactory, memoryManager, 0.1f, 128, biasEnabled);
-}
-
-LayerTestResult<float,4> CompareConvolution2dTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::IWorkloadFactory& refWorkloadFactory)
-{
-    return CompareConvolution2dTestImpl<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, refWorkloadFactory);
 }
 
 LayerTestResult<float, 4> CompareDepthwiseConvolution2dFloatTest(

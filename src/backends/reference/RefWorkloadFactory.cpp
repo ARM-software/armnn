@@ -402,10 +402,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescr
     {
         return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
     }
-    else if(IsUint8(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefRsqrtWorkload>(descriptor, info);
 }
 

@@ -677,6 +677,11 @@ BOOST_AUTO_TEST_CASE(CreateRsqrtFloat32)
     RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::Float32>();
 }
 
+BOOST_AUTO_TEST_CASE(CreateRsqrtUint8)
+{
+    RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::QuantisedAsymm8>();
+}
+
 template <typename L2NormalizationWorkloadType, armnn::DataType DataType>
 static void RefCreateL2NormalizationTest(DataLayout dataLayout)
 {

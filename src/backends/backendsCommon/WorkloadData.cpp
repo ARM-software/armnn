@@ -1468,6 +1468,21 @@ void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                               "RsqrtQueueDescriptor",
                               "input",
                               "output");
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float16,
+            DataType::Float32,
+            DataType::QuantisedAsymm8
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "RsqrtQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "RsqrtQueueDescriptor");
 }
 
 void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

@@ -1116,11 +1116,26 @@ bool RefLayerSupport::IsRsqrtSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &FalseFuncU8<>);
+    bool supported = true;
+    std::array<DataType,2> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::QuantisedAsymm8
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference rsqrt: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference rsqrt: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference rsqrt: input and output types not matching");
+
+    supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
+                                  "Reference Rsqrt: input and output shapes have different number of total elements");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

@@ -61,7 +61,9 @@ RefL2NormalizationWorkload::RefL2NormalizationWorkload(
 
                         unsigned int index = dataLayout.GetIndex(inputInfo.GetShape(), n, c, h, w);
 
-                        const float scale = 1.0f / sqrtf(reduction);
+                        float maximum = reduction < m_Data.m_Parameters.m_Eps ? m_Data.m_Parameters.m_Eps : reduction;
+
+                        const float scale = 1.0f / sqrtf(maximum);
 
                         (*inputDecoder)[index];
                         (*outputEncoder)[index];

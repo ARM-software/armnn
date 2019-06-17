@@ -922,6 +922,16 @@ LayerTestResult<float, 2> FakeQuantizationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+LayerTestResult<float, 4> L2NormalizationDefaultEpsilonTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout);
+
+LayerTestResult<float, 4> L2NormalizationNonDefaultEpsilonTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout);
+
 LayerTestResult<float, 4> L2Normalization1dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

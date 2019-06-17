@@ -424,9 +424,12 @@ struct NormalizationDescriptor
 struct L2NormalizationDescriptor
 {
     L2NormalizationDescriptor()
-        : m_DataLayout(DataLayout::NCHW)
+    : m_Eps(1e-12f)
+    , m_DataLayout(DataLayout::NCHW)
     {}
 
+    /// Used to avoid dividing by zero.
+    float m_Eps;
     /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };

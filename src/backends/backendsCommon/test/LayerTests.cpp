@@ -5294,7 +5294,8 @@ LayerTestResult<T, 4> L2NormalizationTestImpl(
     float outScale,
     int32_t outOffset,
     const std::vector<float>& expectedOutputValues,
-    const armnn::DataLayout layout)
+    const armnn::DataLayout layout,
+    float epsilon = 1e-12f)
 {
     const armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, ArmnnType, scale, offset);
     const armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, ArmnnType, outScale, outOffset);
@@ -5333,6 +5334,7 @@ LayerTestResult<T, 4> L2NormalizationTestImpl(
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::L2NormalizationQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_Eps = epsilon;
     descriptor.m_Parameters.m_DataLayout = layout;
     armnn::WorkloadInfo info;
 
@@ -5798,6 +5800,57 @@ LayerTestResult<float, 4> PadFloat324dTest(
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> L2NormalizationEpsilonTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float scale,
+        int32_t offset,
+        float outScale,
+        int32_t outOffset,
+        const armnn::DataLayout layout,
+        float epsilon)
+{
+    // Width: 1
+    // Height: 1
+    // Channels: 3
+    // BatchSize: 1
+    unsigned int numberOfBatches = 1;
+    unsigned int numberOfChannels = 3;
+    unsigned int height = 1;
+    unsigned int width = 1;
+
+    const armnn::TensorShape inputOutputShape = armnnUtils::GetTensorShape(
+            numberOfBatches, numberOfChannels, height, width, layout);
+
+    // 0.0000001^2 + 0.00000002^2 + 0.00000003^2 < 1e-12
+    std::vector<float> inputValues
+    {
+        // Batch 0, Channel 0, Height (1) x Width (1)
+        0.00000001f,
+
+        // Batch 0, Channel 1, Height (1) x Width (1)
+        0.00000002f,
+
+        // Batch 0, Channel 2, Height (1) x Width (1)
+        0.00000003f,
+    };
+
+    const float approxInvL2Norm = 1.f / sqrtf(epsilon);
+    std::vector<float> expectedOutputValues
+    {
+        // Batch 0, Channel 0, Height (1) x Width (1)
+        0.00000001f * approxInvL2Norm,
+        0.00000002f * approxInvL2Norm,
+        0.00000003f * approxInvL2Norm,
+    };
+
+    return L2NormalizationTestImpl<ArmnnType>(workloadFactory, memoryManager, inputOutputShape, scale, offset,
+                                              inputValues, outScale, outOffset, expectedOutputValues, layout,
+                                              epsilon);
+}
+
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> L2Normalization1dTestCommon(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -5872,6 +5925,26 @@ LayerTestResult<T, 4> L2Normalization1dTestCommon(
                                               inputValues, outScale, outOffset, expectedOutputValues, layout);
 }
 
+LayerTestResult<float, 4> L2NormalizationDefaultEpsilonTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout)
+{
+    // Dummy descriptor to get the default value of epsilon.
+    armnn::L2NormalizationDescriptor descriptor;
+
+    return L2NormalizationEpsilonTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, 0.f, 0,
+                                                                      layout, descriptor.m_Eps);
+}
+
+LayerTestResult<float, 4> L2NormalizationNonDefaultEpsilonTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout)
+{
+    return L2NormalizationEpsilonTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.f, 0, 0.f, 0,
+                                                                      layout, 1e-9f);
+}
 
 LayerTestResult<float, 4> L2Normalization1dTest(
     armnn::IWorkloadFactory& workloadFactory,

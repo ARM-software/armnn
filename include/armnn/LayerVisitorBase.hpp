@@ -17,7 +17,7 @@ struct VisitorThrowingPolicy
 
 struct VisitorNoThrowPolicy
 {
-    static void Apply(const std::string& unusedMessage = "") {}
+    static void Apply(const std::string&) {}
 };
 
 // Visitor base class with empty implementations.
@@ -136,7 +136,7 @@ public:
                                  const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitOutputLayer(const IConnectableLayer*,
-                          LayerBindingId id,
+                          LayerBindingId,
                           const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitPadLayer(const IConnectableLayer*,

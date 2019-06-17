@@ -354,6 +354,10 @@ ARMNN_AUTO_TEST_CASE(SimpleConcat, ConcatTest)
 ARMNN_AUTO_TEST_CASE(ConcatUint8, ConcatUint8Test)
 ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentQParams, ConcatUint8DifferentQParamsTest)
 ARMNN_AUTO_TEST_CASE(ConcatUint16, ConcatUint16Test)
+ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentInputOutputQParam,
+                     ConcatDifferentInputOutputQParamTest<armnn::DataType::QuantisedAsymm8>, true)
+ARMNN_AUTO_TEST_CASE(ConcatInt16DifferentInputOutputQParam,
+                     ConcatDifferentInputOutputQParamTest<armnn::DataType::QuantisedSymm16>, true)
 
 // Add
 ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)

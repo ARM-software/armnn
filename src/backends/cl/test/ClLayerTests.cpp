@@ -133,6 +133,8 @@ ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
 // Concat
 ARMNN_AUTO_TEST_CASE(SimpleConcat, ConcatTest)
 ARMNN_AUTO_TEST_CASE(ConcatUint8, ConcatUint8Test)
+ARMNN_AUTO_TEST_CASE(ConcatUint8DifferentInputOutputQParam,
+                     ConcatDifferentInputOutputQParamTest<armnn::DataType::QuantisedAsymm8>, false)
 
 // Normalization
 ARMNN_AUTO_TEST_CASE(SimpleNormalizationAcross, SimpleNormalizationAcrossTest)

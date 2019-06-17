@@ -3023,3 +3023,138 @@ LayerTestResult<T, 3> MeanVts3Test(
     return MeanTestHelper<ArmnnType, T, 4, 3>(
             workloadFactory, memoryManager, inputShape, input, { 2 }, false, outputShape, output);
 }
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool useSubtensor)
+{
+    // Defines the tensor descriptors.
+    armnn::TensorInfo outputTensorInfo({ 3, 6, 3 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo1({ 3, 6, 2 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo2({ 3, 6, 1 }, ArmnnType);
+
+    std::vector<armnn::TensorShape> inputTensorShapes({inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()});
+
+    // Quantized input1 tensor.
+    const float inputScale1 = 0.5f;
+    const int32_t inputOffset1 = 5;
+
+    auto input1 = MakeTensor<T, 3>(inputTensorInfo1, std::vector<T>(
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12,
+        13, 14, 15,
+        16, 17, 18,
+
+        19, 20, 21,
+        22, 23, 24,
+        25, 26, 27,
+        28, 29, 30,
+        31, 32, 33,
+        34, 35, 36
+    }));
+
+    // Quatized input2 tensor.
+    const float inputScale2 = 0.2f;
+    const int32_t inputOffset2 = 10;
+
+    auto input2 = MakeTensor<T, 3>(inputTensorInfo2, std::vector<T>(
+    {
+        37, 38, 39,
+        40, 41, 42,
+        43, 44, 45,
+        46, 47, 48,
+        49, 50, 51,
+        52, 53, 54
+    }));
+
+    // Quantized output tensor.
+    const float outputScale = 0.1f;
+    const int32_t outputOffset = 20;
+
+    LayerTestResult<T, 3> ret(outputTensorInfo);
+
+    ret.outputExpected = MakeTensor<T, 3>(outputTensorInfo, std::vector<T>(
+    {
+        0,   5,  74,
+        10,  15,  76,
+        20,  25,  78,
+        30,  35,  80,
+        40,  45,  82,
+        50,  55,  84,
+
+        60,  65,  86,
+        70,  75,  88,
+        80,  85,  90,
+        90,  95,  92,
+        100, 105,  94,
+        110, 115,  96,
+
+        120, 125,  98,
+        130, 135, 100,
+        140, 145, 102,
+        150, 155, 104,
+        160, 165, 106,
+        170, 175, 108
+    }));
+
+    outputTensorInfo.SetQuantizationScale(outputScale);
+    outputTensorInfo.SetQuantizationOffset(outputOffset);
+    inputTensorInfo1.SetQuantizationScale(inputScale1);
+    inputTensorInfo1.SetQuantizationOffset(inputOffset1);
+    inputTensorInfo2.SetQuantizationScale(inputScale2);
+    inputTensorInfo2.SetQuantizationOffset(inputOffset2);
+
+    std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
+    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
+
+    std::vector<unsigned int> wOrigin2 = { 0, 0, 2 }; //Extent of the window is defined by size of input[1].
+    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
+
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    bool subTensorsSupported = useSubtensor && workloadFactory.SupportsSubTensors();
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 =
+            subTensorsSupported ?
+            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
+            workloadFactory.CreateTensorHandle(inputTensorInfo1);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle2 =
+            subTensorsSupported ?
+            workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
+            workloadFactory.CreateTensorHandle(inputTensorInfo2);
+
+    armnn::ConcatQueueDescriptor data;
+    armnn::OriginsDescriptor desc = armnn::CreateDescriptorForConcatenation(
+            inputTensorShapes.begin(),inputTensorShapes.end(), 2);
+    data.m_Parameters = desc;
+
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
+    AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    data.m_ViewOrigins.push_back(window1);
+    data.m_ViewOrigins.push_back(window2);
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
+
+    inputHandle1->Allocate();
+    inputHandle2->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0]);
+    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0]);
+
+    workload->PostAllocationConfigure();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0][0], outputHandle.get());
+
+    return ret;
+}

@@ -914,6 +914,22 @@ void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "ResizeBilinearQueueDescriptor", 4, "input");
     ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "ResizeBilinearQueueDescriptor", 4, "output");
 
+    std::vector<DataType> supportedTypes =
+            {
+                    DataType::Float16,
+                    DataType::Float32,
+                    DataType::QuantisedAsymm8,
+                    DataType::QuantisedSymm16
+            };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "ResizeBilinearQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "ResizeBilinearQueueDescriptor");
+
     // Resizes bilinear only changes width and height: batch and channel count must match.
     {
         const unsigned int inputBatchSize = workloadInfo.m_InputTensorInfos[0].GetShape()[0];

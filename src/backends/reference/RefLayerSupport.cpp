@@ -1183,11 +1183,24 @@ bool RefLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
                                                 const TensorInfo& output,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+    bool supported = true;
+    std::array<DataType,3> supportedTypes =
+            {
+                    DataType::Float32,
+                    DataType::QuantisedAsymm8,
+                    DataType::QuantisedSymm16
+            };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference ResizeBilinear: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference ResizeBilinear: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference ResizeBilinear: input and output types not matching");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsRsqrtSupported(const TensorInfo& input,

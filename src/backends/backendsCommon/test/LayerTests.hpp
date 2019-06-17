@@ -2443,18 +2443,6 @@ LayerTestResult<T, 4> ResizeBilinearNopTest(
     return result;
 }
 
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::Float32>, 4>
-ResizeBilinearNopTest<armnn::DataType::Float32>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
-
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeBilinearNopTest<armnn::DataType::QuantisedAsymm8>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
-
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> SimpleResizeBilinearTest(
         armnn::IWorkloadFactory& workloadFactory,
@@ -2552,18 +2540,6 @@ LayerTestResult<T, 4> SimpleResizeBilinearTest(
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
     return result;
 }
-
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::Float32>, 4>
-SimpleResizeBilinearTest<armnn::DataType::Float32>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
-
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-SimpleResizeBilinearTest<armnn::DataType::QuantisedAsymm8>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
 
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> ResizeBilinearSqMinTest(
@@ -2666,18 +2642,6 @@ LayerTestResult<T, 4> ResizeBilinearSqMinTest(
     return result;
 }
 
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::Float32>, 4>
-ResizeBilinearSqMinTest<armnn::DataType::Float32>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
-
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeBilinearSqMinTest<armnn::DataType::QuantisedAsymm8>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
-
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> ResizeBilinearMinTest(
         armnn::IWorkloadFactory& workloadFactory,
@@ -2773,18 +2737,6 @@ LayerTestResult<T, 4> ResizeBilinearMinTest(
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
     return result;
 }
-
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::Float32>, 4>
-ResizeBilinearMinTest<armnn::DataType::Float32>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
-
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeBilinearMinTest<armnn::DataType::QuantisedAsymm8>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
 
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> ResizeBilinearMagTest(
@@ -2888,18 +2840,6 @@ LayerTestResult<T, 4> ResizeBilinearMagTest(
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
     return result;
 }
-
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::Float32>, 4>
-ResizeBilinearMagTest<armnn::DataType::Float32>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
-
-template LayerTestResult<typename armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
-ResizeBilinearMagTest<armnn::DataType::QuantisedAsymm8>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout);
 
 template<armnn::DataType ArmnnType, typename T, std::size_t InputDim, std::size_t OutputDim>
 LayerTestResult<T, OutputDim> MeanTestHelper(

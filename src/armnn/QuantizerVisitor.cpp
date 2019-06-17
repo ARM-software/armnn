@@ -302,6 +302,15 @@ void QuantizerVisitor::VisitMultiplicationLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                               const armnn::NormalizationDescriptor& normalizationDescriptor,
+                                               const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddNormalizationLayer(normalizationDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name)
 {
     const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -376,6 +385,15 @@ void QuantizerVisitor::VisitRsqrtLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
+                                         const SoftmaxDescriptor& softmaxDescriptor,
+                                         const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSoftmaxLayer(softmaxDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitSpaceToBatchNdLayer(const IConnectableLayer* layer,
                                                 const SpaceToBatchNdDescriptor& spaceToBatchNdDescriptor,
                                                 const char* name)
@@ -399,15 +417,6 @@ void QuantizerVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
                                           const char* name)
 {
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddSplitterLayer(splitterDescriptor, name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
-}
-
-void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
-                                         const SoftmaxDescriptor& softmaxDescriptor,
-                                         const char* name)
-{
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSoftmaxLayer(softmaxDescriptor, name);
     RecordLayer(layer, newLayer);
     SetQuantizedInputConnections(layer, newLayer);
 }

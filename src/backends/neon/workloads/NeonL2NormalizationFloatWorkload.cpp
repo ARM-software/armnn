@@ -24,7 +24,7 @@ arm_compute::Status NeonL2NormalizationWorkloadValidate(const TensorInfo& input,
 
     int axis = (descriptor.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
 
-    return arm_compute::NEL2NormalizeLayer::validate(&aclInput, &aclOutput, axis);
+    return arm_compute::NEL2NormalizeLayer::validate(&aclInput, &aclOutput, axis, descriptor.m_Eps);
 }
 
 NeonL2NormalizationFloatWorkload::NeonL2NormalizationFloatWorkload(const L2NormalizationQueueDescriptor& descriptor,
@@ -43,7 +43,7 @@ NeonL2NormalizationFloatWorkload::NeonL2NormalizationFloatWorkload(const L2Norma
     int axis = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
 
     auto layer = std::make_unique<arm_compute::NEL2NormalizeLayer>(memoryManager);
-    layer->configure(&input, &output, axis);
+    layer->configure(&input, &output, axis, m_Data.m_Parameters.m_Eps);
     m_Layer.reset(layer.release());
 }
 

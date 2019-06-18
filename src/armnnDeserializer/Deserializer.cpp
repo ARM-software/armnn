@@ -1187,6 +1187,7 @@ void Deserializer::ParseL2Normalization(GraphPtr graph, unsigned int layerIndex)
     auto layerName = GetLayerName(graph, layerIndex);
     armnn::L2NormalizationDescriptor descriptor;
     descriptor.m_DataLayout = ToDataLayout(flatBufferDescriptor->dataLayout());
+    descriptor.m_Eps = flatBufferDescriptor->eps();
 
     IConnectableLayer* layer = m_Network->AddL2NormalizationLayer(descriptor, layerName.c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);

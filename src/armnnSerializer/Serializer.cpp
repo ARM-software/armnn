@@ -380,9 +380,11 @@ void SerializerVisitor::VisitL2NormalizationLayer(const armnn::IConnectableLayer
 
     // Create the FlatBuffer L2Normalization Descriptor
     auto fbDescriptor = serializer::CreateL2NormalizationDescriptor(
-            m_flatBufferBuilder, GetFlatBufferDataLayout(l2NormalizationDescriptor.m_DataLayout));
+            m_flatBufferBuilder,
+            GetFlatBufferDataLayout(l2NormalizationDescriptor.m_DataLayout),
+            l2NormalizationDescriptor.m_Eps);
 
-    // Create Flatuffer layer
+    // Create FlatBuffer layer
     auto fbLayer = serializer::CreateL2NormalizationLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
 
     CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_L2NormalizationLayer);

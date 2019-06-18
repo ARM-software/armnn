@@ -224,6 +224,7 @@ table L2NormalizationLayer {
 
 table L2NormalizationDescriptor {
     dataLayout:DataLayout = NCHW;
+    eps:float = 1e-12;
 }
 
 table MinimumLayer {

@@ -24,7 +24,7 @@ void RefDetectionPostProcessWorkload::Execute() const
 
     const TensorInfo& boxEncodingsInfo = GetTensorInfo(m_Data.m_Inputs[0]);
     const TensorInfo& scoresInfo       = GetTensorInfo(m_Data.m_Inputs[1]);
-    const TensorInfo& anchorsInfo      = GetTensorInfo(m_Anchors.get());
+    const TensorInfo& anchorsInfo      = m_Anchors->GetTensorInfo();
 
     const TensorInfo& detectionBoxesInfo   = GetTensorInfo(m_Data.m_Outputs[0]);
     const TensorInfo& detectionClassesInfo = GetTensorInfo(m_Data.m_Outputs[1]);

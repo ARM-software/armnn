@@ -2,13 +2,14 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+#include <Layer.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
 #include "RefWorkloadFactory.hpp"
 #include "RefBackendId.hpp"
 #include "workloads/RefWorkloads.hpp"
-#include "Layer.hpp"
+#include "RefTensorHandle.hpp"
 
 #include <boost/log/trivial.hpp>
 
@@ -72,13 +73,13 @@ bool RefWorkloadFactory::IsLayerSupported(const Layer& layer,
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
 {
-    return std::make_unique<ScopedCpuTensorHandle>(tensorInfo);
+    return std::make_unique<RefTensorHandle>(tensorInfo);
 }
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                       DataLayout dataLayout) const
 {
-    return std::make_unique<ScopedCpuTensorHandle>(tensorInfo);
+    return std::make_unique<RefTensorHandle>(tensorInfo);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,

@@ -17,14 +17,14 @@ RefFullyConnectedWorkload::RefFullyConnectedWorkload(
         : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info),
           m_Weight(std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Weight)))
 {
-    const TensorInfo& rWeightInfo = GetTensorInfo(m_Weight.get());
+    const TensorInfo& rWeightInfo = m_Weight->GetTensorInfo();
     m_WeightShape = rWeightInfo.GetShape();
     m_WeightDecoder = MakeDecoder<float>(rWeightInfo, m_Weight->Map(true));
 
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
         m_Bias = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias));
-        const TensorInfo& biasInfo = GetTensorInfo(m_Bias.get());
+        const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
         m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias->Map(true));
     }
 }

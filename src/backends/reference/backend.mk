@@ -10,6 +10,7 @@
 BACKEND_SOURCES := \
         RefBackend.cpp \
         RefLayerSupport.cpp \
+        RefTensorHandle.cpp \
         RefWorkloadFactory.cpp \
         workloads/Activation.cpp \
         workloads/BatchNormImpl.cpp \
@@ -78,6 +79,7 @@ BACKEND_SOURCES := \
 
 BACKEND_TEST_SOURCES := \
         test/RefCreateWorkloadTests.cpp \
+        test/RefDetectionPostProcessTests.cpp \
         test/RefEndToEndTests.cpp \
         test/RefJsonPrinterTests.cpp \
         test/RefLayerSupportTests.cpp \

@@ -11,6 +11,22 @@
 namespace armnn
 {
 
+TensorShape GetUnpaddedTensorStrides(const TensorInfo& tensorInfo)
+{
+    TensorShape shape(tensorInfo.GetShape());
+    auto size = GetDataTypeSize(tensorInfo.GetDataType());
+    auto runningSize = size;
+    std::vector<unsigned int> strides(shape.GetNumDimensions());
+    auto lastIdx = shape.GetNumDimensions()-1;
+    for (unsigned int i=0; i < lastIdx ; i++)
+    {
+        strides[lastIdx-i] = runningSize;
+        runningSize *= shape[lastIdx-i];
+    }
+    strides[0] = runningSize;
+    return TensorShape(shape.GetNumDimensions(), strides.data());
+}
+
 ConstCpuTensorHandle::ConstCpuTensorHandle(const TensorInfo& tensorInfo)
 : m_TensorInfo(tensorInfo)
 , m_Memory(nullptr)

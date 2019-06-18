@@ -20,15 +20,15 @@ RefDepthwiseConvolution2dWorkload::RefDepthwiseConvolution2dWorkload(
         : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
     m_Weight = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Weight));
-    const TensorInfo& rFilterInfo = GetTensorInfo(m_Weight.get());
+    const TensorInfo& rFilterInfo = m_Weight->GetTensorInfo();
     m_FilterShape = rFilterInfo.GetShape();
-    m_FilterDecoder = MakeDecoder<float>(rFilterInfo, m_Weight.get()->Map(true));
+    m_FilterDecoder = MakeDecoder<float>(rFilterInfo, m_Weight->Map(true));
 
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
         m_Bias = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias));
-        const TensorInfo& biasInfo = GetTensorInfo(m_Bias.get());
-        m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias.get()->Map(true));
+        const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
+        m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias->Map(true));
     }
 }
 

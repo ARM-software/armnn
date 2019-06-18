@@ -86,6 +86,11 @@ protected:
         }
     }
 
+    void TestDifferentQuantizationScale(const TensorInfo& info0, const TensorInfo& info1)
+    {
+        BOOST_TEST(info0.GetQuantizationScale() != info1.GetQuantizationScale());
+    }
+
     void TestConstantQuantizationParams(const TensorInfo& info,
                                         const OffsetScalePair& params,
                                         DataType dataType = DataType::QuantisedAsymm8)
@@ -1319,10 +1324,19 @@ BOOST_AUTO_TEST_CASE(QuantizeConcat)
                               const OriginsDescriptor& originsDescriptor,
                               const char* name = nullptr) override
         {
-            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+            TensorInfo outputInfo = layer->GetOutputSlot(0).GetTensorInfo();
 
             TestQuantizationParams(
-                info, {60.8f / g_Asymm8QuantizationBase, 65}, {45.3f / g_Symm16QuantizationBase, 0});
+                outputInfo, {60.8f / g_Asymm8QuantizationBase, 65}, {45.3f / g_Symm16QuantizationBase, 0});
+
+            TensorInfo inputInfo0 = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
+            TensorInfo inputInfo1 = layer->GetInputSlot(1).GetConnection()->GetTensorInfo();
+            TensorInfo inputInfo2 = layer->GetInputSlot(2).GetConnection()->GetTensorInfo();
+
+            TestDifferentQuantizationScale(inputInfo0, inputInfo1);
+            TestDifferentQuantizationScale(inputInfo0, inputInfo2);
+            TestDifferentQuantizationScale(inputInfo1, inputInfo2);
+            TestDifferentQuantizationScale(inputInfo0, outputInfo);
         }
     };
 

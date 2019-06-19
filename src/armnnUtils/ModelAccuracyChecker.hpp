@@ -70,13 +70,16 @@ public:
         unsigned int index = 1;
         for (std::pair<int, float> element : setOfPredictions)
         {
-            if(element.first == value)
+            if (index >= m_TopK.size())
+            {
+                break;
+            }
+            if (element.first == value)
             {
                 ++m_TopK[index];
-            } else
-            {
-                ++index;
+                break;
             }
+            ++index;
         }
     }
 

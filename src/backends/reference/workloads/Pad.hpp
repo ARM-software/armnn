@@ -15,7 +15,8 @@ namespace armnn
 template <typename T>
 void Pad(const TensorInfo& inputInfo,
          const TensorInfo& outputInfo,
-         std::vector<std::pair<unsigned int, unsigned int>> m_PadList,
+         std::vector<std::pair<unsigned int, unsigned int>> m_padList,
          const T* inputData,
-         T* outData);
+         T* outData,
+         const float padValue);
 } //namespace armnn

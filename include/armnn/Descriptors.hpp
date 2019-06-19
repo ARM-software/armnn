@@ -606,11 +606,11 @@ struct MeanDescriptor
 /// A PadDescriptor for the PadLayer.
 struct PadDescriptor
 {
-    PadDescriptor()
+    PadDescriptor() : m_padValue(0)
     {}
 
-    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList)
-    : m_PadList(padList)
+    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList, const float& padValue = 0)
+    : m_PadList(padList), m_padValue(padValue)
     {}
 
     /// @brief Specifies the padding for input dimension.
@@ -618,6 +618,9 @@ struct PadDescriptor
     /// Second is the number of values to add after the tensor in the dimension.
     /// The number of pairs should match the number of dimensions in the input tensor.
     std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
+
+    /// Optional value to use for padding, defaults to 0
+    float m_padValue;
 };
 
 /// A StridedSliceDescriptor for the StridedSliceLayer.

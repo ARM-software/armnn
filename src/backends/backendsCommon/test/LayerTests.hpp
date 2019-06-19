@@ -1382,6 +1382,10 @@ LayerTestResult<uint8_t, 2> PadUint82dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+LayerTestResult<uint8_t, 2> PadUint82dCustomPaddingTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<uint8_t, 3> PadUint83dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
@@ -1391,6 +1395,10 @@ LayerTestResult<uint8_t, 4> PadUint84dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 2> PadFloat322dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 2> PadFloat322dCustomPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -2020,6 +2028,18 @@ std::vector<T> ConvertToDataType(const std::vector<float>& input,
         ++rOutputEncoder;
     }
     return output;
+}
+
+// Utility method to convert a single value to the correct type
+template <typename T>
+T ConvertToDataType(const float& value,
+                    const armnn::TensorInfo& tensorInfo)
+{
+    std::vector<T> output(1);
+    std::unique_ptr<armnn::Encoder<float>> pEncoder = armnn::MakeEncoder<float>(tensorInfo, output.data());
+    armnn::Encoder<float>& rEncoder = *pEncoder;
+    rEncoder.Set(value);
+    return output[0];
 }
 
 template<armnn::DataType ArmnnType, typename T>

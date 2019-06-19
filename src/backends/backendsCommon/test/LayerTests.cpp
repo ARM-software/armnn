@@ -5869,13 +5869,14 @@ LayerTestResult<T, 2> Pad2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
-    int32_t qOffset)
+    int32_t qOffset,
+    const float customPaddingValue = 0)
 {
     const armnn::TensorShape inputShape{ 3, 3 };
     const armnn::TensorShape outputShape{ 7, 7 };
 
-    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
-    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
+    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType, qScale, qOffset);
+    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType, qScale, qOffset);
 
     std::vector<T> inputValues(
     QuantizedVector<T>(qScale, qOffset,
@@ -5886,17 +5887,38 @@ LayerTestResult<T, 2> Pad2dTestCommon(
       3, 2, 4
     }));
 
-    std::vector<T> expectedOutputValues(
-    QuantizedVector<T>(qScale, qOffset,
+    const T padValue = ConvertToDataType<T>(customPaddingValue, inputTensorInfo);
+
+    std::vector<T> expectedOutputValues;
+    if (padValue == 0)
     {
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 4, 8, 6, 0, 0,
-      0, 0, 7, 4, 4, 0, 0,
-      0, 0, 3, 2, 4, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0
-    }));
+        expectedOutputValues = (
+        QuantizedVector<T>(qScale, qOffset,
+        {
+          0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0,
+          0, 0, 4, 8, 6, 0, 0,
+          0, 0, 7, 4, 4, 0, 0,
+          0, 0, 3, 2, 4, 0, 0,
+          0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0
+        }));
+    }
+    else
+    {
+        expectedOutputValues = (
+        QuantizedVector<T>(qScale, qOffset,
+        {
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 4, 8, 6, 1, 1,
+          1, 1, 7, 4, 4, 1, 1,
+          1, 1, 3, 2, 4, 1, 1,
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1
+        }));
+    }
+
 
     auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
 
@@ -5943,8 +5965,8 @@ LayerTestResult<T, 3> Pad3dTestCommon(
     const armnn::TensorShape inputShape{ 2, 2, 2 };
     const armnn::TensorShape outputShape{ 3, 5, 6 };
 
-    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
-    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
+    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType, qScale, qOffset);
+    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType, qScale, qOffset);
 
     std::vector<T> inputValues(
       QuantizedVector<T>(qScale,qOffset,
@@ -6028,8 +6050,8 @@ LayerTestResult<T, 4> Pad4dTestCommon(
     const armnn::TensorShape inputShape{ 2, 2, 3, 2 };
     const armnn::TensorShape outputShape{ 4, 5, 7, 4 };
 
-    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
-    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType);
+    const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType, qScale, qOffset);
+    const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType, qScale, qOffset);
 
     std::vector<T> inputValues(
       QuantizedVector<T>(qScale,qOffset,
@@ -6263,6 +6285,13 @@ LayerTestResult<uint8_t, 2> PadUint82dTest(
   return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
+LayerTestResult<uint8_t, 2> PadUint82dCustomPaddingTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+}
+
 LayerTestResult<uint8_t, 3> PadUint83dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -6282,6 +6311,13 @@ LayerTestResult<float, 2> PadFloat322dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
   return Pad2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
+LayerTestResult<float, 2> PadFloat322dCustomPaddingTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Pad2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 3> PadFloat323dTest(

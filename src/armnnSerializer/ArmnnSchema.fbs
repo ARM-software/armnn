@@ -409,6 +409,7 @@ table PadLayer {
 
 table PadDescriptor {
     padList:[uint];
+    padValue:float = 0;
 }
 
 table RsqrtLayer {

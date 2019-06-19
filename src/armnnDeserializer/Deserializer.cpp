@@ -1390,6 +1390,7 @@ void Deserializer::ParsePad(GraphPtr graph, unsigned int layerIndex)
 
     auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_PadLayer()->descriptor();
     auto flatBufferPadList = flatBufferDescriptor->padList();
+    float padValue = flatBufferDescriptor->padValue();
 
     if (flatBufferPadList->Length() % 2 != 0)
     {
@@ -1404,7 +1405,7 @@ void Deserializer::ParsePad(GraphPtr graph, unsigned int layerIndex)
         padList.emplace_back(flatBufferPadList->Get(i), flatBufferPadList->Get(i+1));
     }
 
-    armnn::PadDescriptor descriptor(padList);
+    armnn::PadDescriptor descriptor(padList, padValue);
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddPadLayer(descriptor, layerName.c_str());

@@ -826,7 +826,7 @@ LayerTestResult<T, 4> Convolution2d2x3x3Dilation3x3Test(
         12., 10., 10., 10.,
         12., 10., 10., 10.,
         12., 10., 10., 10.,
-        6.,  4.,  4.,  4.
+         6.,  4.,  4.,  4.
     };
 
     return Convolution2d3x3DilationTestCommon<ArmnnType, ArmnnBType>(
@@ -899,7 +899,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(
     // Use a single-batch 2-channel 5x5 image as input.
     armnn::TensorInfo inputTensorInfo({ 1, 2, 5, 5 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
+        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(),
+        {
              0,  1,  2,  3,  4,
              5,  6,  7,  8,  9,
             10, 11, 12, 13, 14,
@@ -916,7 +917,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(
     // Use a depth multiplier of 1 on a 2-channel 4x4 kernel.
     armnn::TensorInfo kernelTensorInfo({ 1, 2, 4, 4 }, ArmnnType);
     auto kernel = MakeTensor<T, 4>(kernelTensorInfo, std::vector<T>(
-        QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(), {
+        QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(),
+        {
             32, 31, 30, 29,
             28, 27, 26, 25,
             24, 23, 22, 21,
@@ -932,12 +934,14 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestCommon(
     // Calculated using the python tensorflow library with strideX=1, strideY=1.
     armnn::TensorInfo outputTensorInfo({ 1, 2, 5, 5 }, ArmnnType);
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(), {
+        QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(),
+        {
             1062, 1580, 1850, 1530, 1117,
             2140, 3108, 3500, 2842, 2042,
             3580, 5068, 5460, 4342, 3062,
             3618, 5072, 5390, 4248, 2971,
             3074, 4282, 4510, 3533, 2457,
+
             1550, 2284, 2362, 1955, 1428,
             2910, 4206, 4342, 3528, 2536,
             3390, 4886, 5022, 4068, 2916,
@@ -972,43 +976,29 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(
     int32_t qOffset,
     bool biasEnabled)
 {
-    armnn::TensorInfo inputTensorInfo({ 1, 5, 5, 2}, ArmnnType);
+    auto layout = armnn::DataLayout::NHWC;
+
+    armnn::TensorInfo inputTensorInfo({ 1, 2, 5, 5}, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
-            0, 25,
-            1, 26,
-            2, 27,
-            3, 28,
-            4, 29,
+        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(),
+        {
+             0,  1,  2,  3,  4,
+             5,  6,  7,  8,  9,
+            10, 11, 12, 13, 14,
+            15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24,
 
-            5, 30,
-            6, 31,
-            7, 32,
-            8, 33,
-            9, 34,
-
-            10, 35,
-            11, 36,
-            12, 37,
-            13, 38,
-            14, 39,
-
-            15, 40,
-            16, 41,
-            17, 42,
-            18, 43,
-            19, 44,
-
-            20, 45,
-            21, 46,
-            22, 47,
-            23, 48,
-            24, 49
+            25, 26, 27, 28, 29,
+            30, 31, 32, 33, 34,
+            35, 36, 37, 38, 39,
+            40, 41, 42, 43, 44,
+            45, 46, 47, 48, 49
         })));
 
     armnn::TensorInfo kernelTensorInfo({ 1, 2, 4, 4 }, ArmnnType);
     auto kernel = MakeTensor<T, 4>(kernelTensorInfo, std::vector<T>(
-        QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(), {
+        QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(),
+        {
              32, 31, 30, 29,
              28, 27, 26, 25,
              24, 23, 22, 21,
@@ -1020,41 +1010,24 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(
               4,  3,  2,  1
         })));
 
-    armnn::TensorInfo outputTensorInfo({ 1, 5, 5, 2}, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 2, 5, 5}, ArmnnType);
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(), {
-        1062, 1550,
-        1580, 2284,
-        1850, 2362,
-        1530, 1955,
-        1117, 1428,
+        QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(),
+        {
+            1062, 1580, 1850, 1530, 1117,
+            2140, 3108, 3500, 2842, 2042,
+            3580, 5068, 5460, 4342, 3062,
+            3618, 5072, 5390, 4248, 2971,
+            3074, 4282, 4510, 3533, 2457,
 
-        2140, 2910,
-        3108, 4206,
-        3500, 4342,
-        2842, 3528,
-        2042, 2536,
-
-        3580, 3390,
-        5068, 4886,
-        5460, 5022,
-        4342, 4068,
-        3062, 2916,
-
-        3618, 3566,
-        5072, 5056,
-        5390, 5182,
-        4248, 4133,
-        2971, 2922,
-
-        3074, 3100,
-        4282, 4352,
-        4510, 4452,
-        3533, 3517,
-        2457, 2465
+            1550, 2284, 2362, 1955, 1428,
+            2910, 4206, 4342, 3528, 2536,
+            3390, 4886, 5022, 4068, 2916,
+            3566, 5056, 5182, 4133, 2922,
+            3100, 4352, 4452, 3517, 2465
         })));
 
-    return DepthwiseConvolution2dNhwcTestImpl<ArmnnType, ArmnnBType>(
+    return DepthwiseConvolution2dTestImpl<ArmnnType, ArmnnBType>(
         workloadFactory,
         memoryManager,
         input,
@@ -1063,6 +1036,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dNhwcTestCommon(
         expectedOutput,
         qScale,
         qOffset,
+        layout,
         1,  // Padding left.
         1,  // Padding top.
         2,  // Padding right.
@@ -1080,9 +1054,12 @@ LayerTestResult<T, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon(
     int32_t qOffset,
     bool biasEnabled)
 {
-    armnn::TensorInfo inputTensorInfo({ 1, 9, 9, 1}, ArmnnType);
+    auto layout = armnn::DataLayout::NHWC;
+
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9}, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(), {
+        QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(), inputTensorInfo.GetQuantizationOffset(),
+        {
              0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1096,7 +1073,8 @@ LayerTestResult<T, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon(
 
     armnn::TensorInfo kernelTensorInfo({ 1, 1, 3, 3}, ArmnnType);
     auto kernel = MakeTensor<T, 4>(kernelTensorInfo, std::vector<T>(
-        QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(), {
+        QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(), kernelTensorInfo.GetQuantizationOffset(),
+        {
              1, 2, 3,
              4, 5, 6,
              7, 8, 9
@@ -1112,15 +1090,16 @@ LayerTestResult<T, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon(
     uint32_t dilationY  = 3;
 
     // Since the dilation rate is 3 this will reduce the size of the output from 9x9 to 3x3 of all 5s.
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 3, 1}, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3}, ArmnnType);
     boost::multi_array<T, 4> expectedOutput = MakeTensor<T, 4>(outputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(), {
+        QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(), outputTensorInfo.GetQuantizationOffset(),
+        {
              5, 5, 5,
              5, 5, 5,
              5, 5, 5
         })));
 
-    return DepthwiseConvolution2dNhwcTestImpl<ArmnnType, ArmnnBType>(
+    return DepthwiseConvolution2dTestImpl<ArmnnType, ArmnnBType>(
         workloadFactory,
         memoryManager,
         input,
@@ -1129,6 +1108,7 @@ LayerTestResult<T, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon(
         expectedOutput,
         qScale,
         qOffset,
+        layout,
         padLeft,
         padTop,
         padRight,
@@ -1138,6 +1118,269 @@ LayerTestResult<T, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon(
         dilationX,
         dilationY);
 }
+
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> DepthwiseConvolution2d3x3DilationTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const std::vector<float>& inputNoQuantizedValues,
+        armnn::TensorInfo& inputTensorInfo,
+        const std::vector<float>& kernelNoQuantizedValues,
+        armnn::TensorInfo& kernelTensorInfo,
+        const std::vector<float>& outputExpectedNoQuantizedValues,
+        armnn::TensorInfo& outputTensorInfo,
+        uint32_t dilationX,
+        uint32_t dilationY,
+        armnn::DataLayout layout = armnn::DataLayout::NCHW,
+        bool biasEnabled = false)
+{
+    float qScale;
+    int32_t qOffset;
+    switch (ArmnnType)
+    {
+        case armnn::DataType::QuantisedAsymm8:
+        {
+            qScale = 0.1f;
+            qOffset = 128;
+            break;
+        }
+        case armnn::DataType::QuantisedSymm16:
+        {
+            qScale = 0.1f;
+            qOffset = 0;
+            break;
+        }
+        case armnn::DataType::Float32:
+        default:
+        {
+            qScale = 0.f;
+            qOffset = 0;
+            break;
+        }
+    }
+
+    inputTensorInfo.SetQuantizationScale(qScale);
+    inputTensorInfo.SetQuantizationOffset(qOffset);
+    kernelTensorInfo.SetQuantizationScale(qScale);
+    kernelTensorInfo.SetQuantizationOffset(qOffset);
+    outputTensorInfo.SetQuantizationScale(qScale);
+    outputTensorInfo.SetQuantizationOffset(qOffset);
+
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  std::vector<T>(QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
+                                                                    inputTensorInfo.GetQuantizationOffset(),
+                                                                    inputNoQuantizedValues)));
+    auto kernel = MakeTensor<T, 4>(kernelTensorInfo,
+                                   std::vector<T>(QuantizedVector<T>(kernelTensorInfo.GetQuantizationScale(),
+                                                                     kernelTensorInfo.GetQuantizationOffset(),
+                                                                     kernelNoQuantizedValues)));
+    auto expectedOutput = MakeTensor<T, 4>(outputTensorInfo,
+                                           std::vector<T>(QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
+                                                                             outputTensorInfo.GetQuantizationOffset(),
+                                                                             outputExpectedNoQuantizedValues)));
+
+    uint32_t padLeft = 0;
+    uint32_t padTop = 0;
+    uint32_t padRight = 0;
+    uint32_t padBottom = 0;
+    uint32_t strideX  = 1;
+    uint32_t strideY  = 1;
+
+    return DepthwiseConvolution2dTestImpl<ArmnnType, ArmnnBType>(
+            workloadFactory,
+            memoryManager,
+            input,
+            kernel,
+            GetBias2<ArmnnBType>(biasEnabled, qScale * qScale),
+            expectedOutput,
+            qScale,
+            qOffset,
+            layout,
+            padLeft,
+            padTop,
+            padRight,
+            padBottom,
+            strideX,
+            strideY,
+            dilationX,
+            dilationY);
+}
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T>
+LayerTestResult<T, 4> DepthwiseConvolution2d3x3Dilation3x3Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout)
+{
+    armnn::TensorInfo inputTensorInfo({1, 1, 10, 10}, ArmnnType);
+    std::vector<float> inputNoQuantizedValues =
+            {
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            };
+
+    armnn::TensorInfo kernelTensorInfo({ 1, 1, 3, 3}, ArmnnType);
+    std::vector<float> kernelNoQuantizedValues =
+            {
+                    1, 2, 3,
+                    4, 5, 6,
+                    7, 8, 9
+            };
+
+    // Since the dilation rate is 3 this will dilate the kernel to be like 7x7,
+    // therefore the output will be 4x4: (I−K+2P)/S +1 => (10-7 +0)/1 +1
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4}, ArmnnType);
+    std::vector<float> outputExpectedNoQuantizedValues =
+            {
+                    6., 5., 5., 5.,
+                    6., 5., 5., 5.,
+                    6., 5., 5., 5.,
+                    3., 2., 2., 2.
+            };
+
+    return DepthwiseConvolution2d3x3DilationTestCommon<ArmnnType, ArmnnBType>(
+            workloadFactory,
+            memoryManager,
+            inputNoQuantizedValues,
+            inputTensorInfo,
+            kernelNoQuantizedValues,
+            kernelTensorInfo,
+            outputExpectedNoQuantizedValues,
+            outputTensorInfo,
+            3,
+            3,
+            layout,
+            biasEnabled);
+}
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T>
+LayerTestResult<T, 4> DepthwiseConvolution2d2x3x3Dilation3x3Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout)
+{
+    armnn::TensorInfo inputTensorInfo({1, 2, 10, 10}, ArmnnType);
+    std::vector<float> inputNoQuantizedValues =
+            {
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            };
+
+    armnn::TensorInfo kernelTensorInfo({ 1, 2, 3, 3}, ArmnnType);
+    std::vector<float> kernelNoQuantizedValues =
+            {
+                    1, 2, 3,
+                    4, 5, 6,
+                    7, 8, 9,
+
+                    1, 2, 3,
+                    4, 5, 6,
+                    7, 8, 9
+            };
+
+    // Since the dilation rate is 3 this will dilate the kernel to be like 7x7,
+    // therefore the output will be 2x4x4: (I−K+2P)/S +1 => (10-7 +0)/1 +1
+    armnn::TensorInfo outputTensorInfo({ 1, 2, 4, 4}, ArmnnType);
+    std::vector<float> outputExpectedNoQuantizedValues =
+            {
+                    6., 5., 5., 5.,
+                    6., 5., 5., 5.,
+                    6., 5., 5., 5.,
+                    3., 2., 2., 2.,
+
+                    6., 5., 5., 5.,
+                    6., 5., 5., 5.,
+                    6., 5., 5., 5.,
+                    3., 2., 2., 2.
+            };
+
+    return DepthwiseConvolution2d3x3DilationTestCommon<ArmnnType, ArmnnBType>(
+            workloadFactory,
+            memoryManager,
+            inputNoQuantizedValues,
+            inputTensorInfo,
+            kernelNoQuantizedValues,
+            kernelTensorInfo,
+            outputExpectedNoQuantizedValues,
+            outputTensorInfo,
+            3,
+            3,
+            layout,
+            biasEnabled);
+}
+
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>(
+        armnn::IWorkloadFactory&,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+        bool,
+        armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
+DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory&,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+        bool,
+        armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
+DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory&,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+        bool,
+        armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>(
+        armnn::IWorkloadFactory&,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+        bool,
+        armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 4>
+DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory&,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+        bool,
+        armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
+DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory&,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
+        bool,
+        armnn::DataLayout);
 
 LayerTestResult<float, 4> DepthwiseConvolution2dTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -1203,11 +1446,11 @@ LayerTestResult<float, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTest(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTestCommon<armnn::DataType::Float32, armnn::DataType::Float32>(
-        workloadFactory,
-        memoryManager,
-        0.f,
-        0,
-        false);
+            workloadFactory,
+            memoryManager,
+            0.f,
+            0,
+            false);
 }
 
 LayerTestResult<int16_t, 4> DepthwiseConvolution2dInt16Test(

@@ -127,6 +127,20 @@ LayerTestResult<T, 4> Convolution2d2x3x3Dilation3x3Test(
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> DepthwiseConvolution2d3x3Dilation3x3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> DepthwiseConvolution2d2x3x3Dilation3x3Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
 LayerTestResult<float, 4> DepthwiseConvolution2dDepthNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -144,8 +158,9 @@ LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(
     bool biasEnabled,
     const armnn::DataLayout layout);
 
-LayerTestResult<float, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTest(armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+LayerTestResult<float, 4> SimpleDepthwiseConvolution2d3x3Dilation3x3NhwcTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 4> CompareDepthwiseConvolution2dFloatTest(
     armnn::IWorkloadFactory& workloadFactory,

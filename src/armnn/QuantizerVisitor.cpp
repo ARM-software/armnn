@@ -359,6 +359,14 @@ void QuantizerVisitor::VisitPooling2dLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitPreluLayer(const IConnectableLayer* layer,
+                                       const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddPreluLayer(name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
                                          const ReshapeDescriptor& reshapeDescriptor,
                                          const char* name)

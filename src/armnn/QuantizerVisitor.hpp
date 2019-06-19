@@ -103,6 +103,9 @@ public:
                              const Pooling2dDescriptor& pooling2dDescriptor,
                              const char* name = nullptr) override;
 
+    void VisitPreluLayer(const IConnectableLayer* layer,
+                         const char* name = nullptr) override;
+
     void VisitReshapeLayer(const IConnectableLayer* layer,
                            const ReshapeDescriptor& reshapeDescriptor,
                            const char* name = nullptr) override;

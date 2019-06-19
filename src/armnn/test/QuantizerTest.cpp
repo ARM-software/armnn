@@ -1611,6 +1611,110 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchToSpace)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizePrelu)
+{
+    class TestPreluQuantization : public TestQuantization
+    {
+    public:
+        TestPreluQuantization(const TensorShape& inputShape,
+                              const TensorShape& alphaShape,
+                              const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape)
+            , m_AlphaShape(alphaShape)
+        {}
+
+        TestPreluQuantization(const QuantizerOptions& options,
+                              const TensorShape& inputShape,
+                              const TensorShape& alphaShape,
+                              const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape)
+            , m_AlphaShape(alphaShape)
+        {}
+
+        void VisitInputLayer(const IConnectableLayer* layer,
+                             LayerBindingId id,
+                             const char* name = nullptr) override
+        {
+            const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            switch (id)
+            {
+            case 0: // Input
+                BOOST_TEST(m_InputShape == info.GetShape());
+                break;
+            case 1: // Alpha
+                BOOST_TEST(m_AlphaShape == info.GetShape());
+                break;
+            default:
+                throw InvalidArgumentException("Invalid layer binding id for PReLU layer");
+            }
+
+            // Based off current default [-15.0f, 15.0f]
+            TestQuantizationParams(info,
+                                   { 30.0f / g_Asymm8QuantizationBase, 128 }, // QASymm8
+                                   { 15.0f / g_Symm16QuantizationBase, 0 });  // QSymm16
+        }
+
+        void VisitOutputLayer(const IConnectableLayer* layer,
+                              LayerBindingId id,
+                              const char* name = nullptr) override
+        {
+            const TensorInfo& info = layer->GetInputSlot(0).GetConnection()->GetTensorInfo();
+            BOOST_TEST(m_OutputShape == info.GetShape());
+        }
+
+        void VisitPreluLayer(const IConnectableLayer* layer,
+                             const char* name = nullptr) override
+        {
+            const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
+            TestQuantizationParams(info,
+                                   { 30.0f / g_Asymm8QuantizationBase, 128 }, // QASymm8
+                                   { 15.0f / g_Symm16QuantizationBase, 0 });  // QSymm16
+        }
+
+    private:
+        TensorShape m_AlphaShape;
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    const TensorShape inputShape{ 4, 1, 2 };
+    const TensorShape alphaShape{ 5, 4, 3, 1 };
+    const TensorShape outputShape{ 5, 4, 3, 2 };
+    TensorInfo inputInfo(inputShape, DataType::Float32);
+    TensorInfo alphaInfo(alphaShape, DataType::Float32);
+    TensorInfo outputInfo(outputShape, DataType::Float32);
+
+    // Add the input layers
+    IConnectableLayer* input = network->AddInputLayer(0);
+    IConnectableLayer* alpha = network->AddInputLayer(1);
+
+    // Add the layer under test
+    IConnectableLayer* prelu = network->AddPreluLayer("prelu");
+
+    // Add the output layers
+    IConnectableLayer* output = network->AddOutputLayer(0);
+
+    // Establish connections
+    input->GetOutputSlot(0).Connect(prelu->GetInputSlot(0));
+    alpha->GetOutputSlot(0).Connect(prelu->GetInputSlot(1));
+    prelu->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Set tensor info
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    alpha->GetOutputSlot(0).SetTensorInfo(alphaInfo);
+    prelu->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestPreluQuantization validatorQAsymm8(inputShape, alphaShape, outputShape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestPreluQuantization validatorQSymm16(options, inputShape, alphaShape, outputShape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 std::vector<uint8_t> SetupQuantize(float value)
 {
     armnn::TensorInfo inputInfo({ 1, 2, 2 }, armnn::DataType::Float32);

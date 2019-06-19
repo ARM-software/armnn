@@ -1499,6 +1499,49 @@ BOOST_AUTO_TEST_CASE(SerializeMultiplication)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializePrelu)
+{
+    class PreluLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        PreluLayerVerifier(const std::string& layerName,
+                           const std::vector<armnn::TensorInfo>& inputInfos,
+                           const std::vector<armnn::TensorInfo>& outputInfos)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitPreluLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("prelu");
+
+    armnn::TensorInfo inputTensorInfo ({ 4, 1, 2 }, armnn::DataType::Float32);
+    armnn::TensorInfo alphaTensorInfo ({ 5, 4, 3, 1 }, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensorInfo({ 5, 4, 3, 2 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const alphaLayer = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const preluLayer = network->AddPreluLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(preluLayer->GetInputSlot(0));
+    alphaLayer->GetOutputSlot(0).Connect(preluLayer->GetInputSlot(1));
+    preluLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    alphaLayer->GetOutputSlot(0).SetTensorInfo(alphaTensorInfo);
+    preluLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    PreluLayerVerifier verifier(layerName, {inputTensorInfo, alphaTensorInfo}, {outputTensorInfo});
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeNormalization)
 {
     class NormalizationLayerVerifier : public LayerVerifierBase

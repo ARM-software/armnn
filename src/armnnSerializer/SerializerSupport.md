@@ -33,6 +33,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Pad
 * Permute
 * Pooling2d
+* Prelu
 * Quantize
 * Reshape
 * ResizeBilinear

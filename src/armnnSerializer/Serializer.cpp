@@ -712,7 +712,14 @@ void SerializerVisitor::VisitPooling2dLayer(const armnn::IConnectableLayer* laye
 void SerializerVisitor::VisitPreluLayer(const armnn::IConnectableLayer* layer,
                                         const char* name)
 {
-    throw UnimplementedException("SerializerVisitor::VisitPreluLayer not yet implemented");
+    // Create FlatBuffer BaseLayer
+    auto flatBufferPreluBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Prelu);
+
+    // Create the FlatBuffer AdditionLayer
+    auto flatBufferPreluLayer = serializer::CreatePreluLayer(m_flatBufferBuilder, flatBufferPreluBaseLayer);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferPreluLayer.o, serializer::Layer::Layer_PreluLayer);
 }
 
 void SerializerVisitor::VisitQuantizeLayer(const armnn::IConnectableLayer *layer, const char *name)

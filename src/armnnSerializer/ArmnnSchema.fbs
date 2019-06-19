@@ -122,7 +122,8 @@ enum LayerType : uint {
     Merge = 37,
     Switch = 38,
     Concat = 39,
-    SpaceToDepth = 40
+    SpaceToDepth = 40,
+    Prelu = 41
 }
 
 // Base layer table to be used as part of other layers
@@ -555,6 +556,10 @@ table SwitchLayer {
     base:LayerBase;
 }
 
+table PreluLayer {
+    base:LayerBase;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -596,7 +601,8 @@ union Layer {
     MergeLayer,
     SwitchLayer,
     ConcatLayer,
-    SpaceToDepthLayer
+    SpaceToDepthLayer,
+    PreluLayer
 }
 
 table AnyLayer {

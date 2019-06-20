@@ -432,6 +432,17 @@ public:
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddPreluLayer(const char* name = nullptr) = 0;
 
+    /// Adds a 2D transpose convolution layer to the network.
+    /// @param descriptor - Description of the 2D transpose convolution layer.
+    /// @param weights - Tensor for the weights data.
+    /// @param biases - Optional tensor for the bias data.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
+                                                              const ConstTensor& weights,
+                                                              const Optional<ConstTensor>& biases,
+                                                              const char* name = nullptr) = 0;
+
     virtual void Accept(ILayerVisitor& visitor) const = 0;
 
 protected:

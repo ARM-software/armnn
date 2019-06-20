@@ -30,6 +30,7 @@ struct SoftmaxDescriptor;
 struct SpaceToBatchNdDescriptor;
 struct SpaceToDepthDescriptor;
 struct StridedSliceDescriptor;
+struct TransposeConvolution2dDescriptor;
 struct ViewsDescriptor;
 
 // MergerDescriptor is deprecated use ConcatDescriptor instead

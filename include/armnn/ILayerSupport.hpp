@@ -295,6 +295,15 @@ public:
                                    const TensorInfo& output0,
                                    const TensorInfo& output1,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsTransposeConvolution2dSupported(
+        const TensorInfo& input,
+        const TensorInfo& output,
+        const TransposeConvolution2dDescriptor& descriptor,
+        const TensorInfo& weights,
+        const Optional<TensorInfo>& biases,
+        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
 }; // class ILayerSupport
 
 using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;

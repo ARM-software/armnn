@@ -282,6 +282,14 @@ public:
                            const TensorInfo& output0,
                            const TensorInfo& output1,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsTransposeConvolution2dSupported(
+        const TensorInfo& input,
+        const TensorInfo& output,
+        const TransposeConvolution2dDescriptor& descriptor,
+        const TensorInfo& weights,
+        const Optional<TensorInfo>& biases,
+        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 };
 
 } // namespace armnn

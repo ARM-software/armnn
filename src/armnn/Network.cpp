@@ -1008,6 +1008,28 @@ IConnectableLayer* Network::AddPreluLayer(const char* name)
     return m_Graph->AddLayer<PreluLayer>(name);
 }
 
+IConnectableLayer* Network::AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
+                                                           const ConstTensor& weights,
+                                                           const Optional<ConstTensor>& biases,
+                                                           const char* name)
+{
+    if (descriptor.m_BiasEnabled && !biases.has_value())
+    {
+        throw InvalidArgumentException("AddTransposeConvolution2dLayer: Biases cannot be empty");
+    }
+
+    const auto layer = m_Graph->AddLayer<TransposeConvolution2dLayer>(descriptor, name);
+
+    layer->m_Weight = std::make_unique<ScopedCpuTensorHandle>(weights);
+
+    if (descriptor.m_BiasEnabled)
+    {
+        layer->m_Bias = std::make_unique<ScopedCpuTensorHandle>(biases.value());
+    }
+
+    return layer;
+}
+
 void Network::Accept(ILayerVisitor& visitor) const
 {
     for (auto layer : GetGraph())

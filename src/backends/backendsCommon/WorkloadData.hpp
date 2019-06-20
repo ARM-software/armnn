@@ -445,4 +445,17 @@ struct PreluQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct TransposeConvolution2dQueueDescriptor : QueueDescriptorWithParameters<TransposeConvolution2dDescriptor>
+{
+    TransposeConvolution2dQueueDescriptor() :
+        m_Weight(nullptr),
+        m_Bias(nullptr)
+    {}
+
+    const ConstCpuTensorHandle* m_Weight;
+    const ConstCpuTensorHandle* m_Bias;
+
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

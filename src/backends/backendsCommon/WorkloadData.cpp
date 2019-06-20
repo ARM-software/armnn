@@ -1800,4 +1800,45 @@ void PreluQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                        "alpha");
 }
 
+void TransposeConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"TransposeConvolution2dQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], descriptorName, 4, "input");
+    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], descriptorName, 4, "output");
+
+    ValidatePointer(m_Weight, descriptorName, "weight");
+    ValidateTensorNumDimensions(m_Weight->GetTensorInfo(), descriptorName, 4, "weight");
+
+    ValidateTensorDataType(m_Weight->GetTensorInfo(),
+                           workloadInfo.m_InputTensorInfos[0].GetDataType(),
+                           descriptorName,
+                           "weight");
+
+    if (m_Parameters.m_BiasEnabled)
+    {
+        ValidateTensorNumDimensions(m_Bias->GetTensorInfo(), descriptorName, 1, "bias");
+
+        ValidateTensorDataType(m_Bias->GetTensorInfo(),
+                               GetBiasDataType(workloadInfo.m_InputTensorInfos[0].GetDataType()),
+                               descriptorName, "bias");
+
+        ValidateBiasTensorQuantization(m_Bias->GetTensorInfo(),
+                                       workloadInfo.m_InputTensorInfos[0],
+                                       m_Weight->GetTensorInfo(),
+                                       descriptorName);
+    }
+
+    ValidateTensorQuantizationMultiplier(workloadInfo.m_InputTensorInfos[0],
+                                         m_Weight->GetTensorInfo(),
+                                         workloadInfo.m_OutputTensorInfos[0],
+                                         descriptorName,
+                                         "input",
+                                         "weights",
+                                         "output");
+}
+
 } //namespace armnn

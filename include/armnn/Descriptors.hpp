@@ -684,4 +684,36 @@ struct PreCompiledDescriptor
     unsigned int m_NumOutputSlots;
 };
 
+/// A TransposeConvolution2dDescriptor for the TransposeConvolution2dLayer.
+struct TransposeConvolution2dDescriptor
+{
+    TransposeConvolution2dDescriptor() :
+        m_PadLeft(0),
+        m_PadRight(0),
+        m_PadTop(0),
+        m_PadBottom(0),
+        m_StrideX(0),
+        m_StrideY(0),
+        m_BiasEnabled(false),
+        m_DataLayout(DataLayout::NCHW)
+    {}
+
+    /// Padding left value in the width dimension.
+    uint32_t   m_PadLeft;
+    /// Padding right value in the width dimension.
+    uint32_t   m_PadRight;
+    /// Padding top value in the height dimension.
+    uint32_t   m_PadTop;
+    /// Padding bottom value in the height dimension.
+    uint32_t   m_PadBottom;
+    /// Stride value when proceeding through input for the width dimension.
+    uint32_t   m_StrideX;
+    /// Stride value when proceeding through input for the height dimension.
+    uint32_t   m_StrideY;
+    /// Enable/disable bias.
+    bool       m_BiasEnabled;
+    /// The data layout to be used (NCHW, NHWC).
+    DataLayout m_DataLayout;
+};
+
 } // namespace armnn

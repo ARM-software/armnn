@@ -135,6 +135,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/StridedSliceLayer.cpp \
         src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/layers/SwitchLayer.cpp \
+        src/armnn/layers/TransposeConvolution2dLayer.cpp \
         src/armnn/Descriptors.cpp \
         src/armnn/Exceptions.cpp \
         src/armnn/Graph.cpp \

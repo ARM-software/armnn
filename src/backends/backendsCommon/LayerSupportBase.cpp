@@ -448,4 +448,14 @@ bool LayerSupportBase::IsSwitchSupported(const TensorInfo& input0,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsTransposeConvolution2dSupported(const TensorInfo& input,
+                                                         const TensorInfo& output,
+                                                         const TransposeConvolution2dDescriptor& descriptor,
+                                                         const TensorInfo& weights,
+                                                         const Optional<TensorInfo>& biases,
+                                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 } // namespace armnn

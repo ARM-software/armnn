@@ -60,9 +60,10 @@ enum class LayerType
     Splitter,
     StridedSlice,
     Subtraction,
+    Switch,
     // Last layer goes here.
     LastLayer,
-    Switch = LastLayer
+    TransposeConvolution2d = LastLayer
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

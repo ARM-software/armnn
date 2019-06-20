@@ -943,6 +943,16 @@ void SerializerVisitor::VisitSwitchLayer(const armnn::IConnectableLayer* layer, 
     CreateAnyLayer(fbSwitchLayer.o, serializer::Layer::Layer_SwitchLayer);
 }
 
+void SerializerVisitor::VisitTransposeConvolution2dLayer(
+    const armnn::IConnectableLayer* layer,
+    const armnn::TransposeConvolution2dDescriptor& descriptor,
+    const armnn::ConstTensor& weights,
+    const armnn::Optional<armnn::ConstTensor>& biases,
+    const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::VisitTransposeConvolution2dLayer is not implemented");
+}
+
 fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {

@@ -187,6 +187,11 @@ public:
 
     IConnectableLayer* AddPreluLayer(const char* name = nullptr) override;
 
+    IConnectableLayer* AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
+                                                      const ConstTensor& weights,
+                                                      const Optional<ConstTensor>& biases,
+                                                      const char* name = nullptr) override;
+
     void Accept(ILayerVisitor& visitor) const override;
 
 private:

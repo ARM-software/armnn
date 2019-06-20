@@ -206,6 +206,13 @@ public:
 
     void VisitSwitchLayer(const armnn::IConnectableLayer* layer,
                           const char* name = nullptr) override;
+
+    void VisitTransposeConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                          const armnn::TransposeConvolution2dDescriptor& descriptor,
+                                          const armnn::ConstTensor& weights,
+                                          const armnn::Optional<armnn::ConstTensor>& biases,
+                                          const char* = nullptr) override;
+
 private:
 
     /// Creates the Input Slots and Output Slots and LayerBase for the layer.

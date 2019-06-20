@@ -212,6 +212,12 @@ struct DummyLayer<armnn::DepthwiseConvolution2dLayer>
 {
 };
 
+template<>
+struct DummyLayer<armnn::TransposeConvolution2dLayer>
+    : public DummyConvolutionLayer<armnn::TransposeConvolution2dLayer>
+{
+};
+
 template <typename LstmLayerType>
 struct DummyLstmLayer
 {
@@ -407,6 +413,8 @@ DECLARE_LAYER_POLICY_2_PARAM(StridedSlice)
 DECLARE_LAYER_POLICY_1_PARAM(Subtraction)
 
 DECLARE_LAYER_POLICY_1_PARAM(Switch)
+
+DECLARE_LAYER_POLICY_2_PARAM(TransposeConvolution2d)
 
 
 // Generic implementation to get the number of input slots for a given layer type;

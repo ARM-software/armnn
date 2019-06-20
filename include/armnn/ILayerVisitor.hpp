@@ -363,7 +363,7 @@ public:
 
     /// Function a strided slice layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param StridedSliceDescriptor - Parameters for the strided slice operation.
+    /// @param stridedSliceDescriptor - Parameters for the strided slice operation.
     /// @param name - Optional name for the layer.
     virtual void VisitStridedSliceLayer(const IConnectableLayer* layer,
                                         const StridedSliceDescriptor& stridedSliceDescriptor,
@@ -380,6 +380,19 @@ public:
     /// @param name - Optional name for the layer.
     virtual void VisitSwitchLayer(const IConnectableLayer* layer,
                                   const char* name = nullptr) = 0;
+
+    /// Function that a 2D transpose convolution layer should call back to when its Accept(ILayerVisitor&)
+    /// function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param descriptor - Description of the 2D transpose convolution layer.
+    /// @param weights - Tensor for the weights data.
+    /// @param biases - Optional tensor for the bias data.
+    /// @param name - Optional name for the layer.
+    virtual void VisitTransposeConvolution2dLayer(const IConnectableLayer* layer,
+                                                  const TransposeConvolution2dDescriptor& descriptor,
+                                                  const ConstTensor& weights,
+                                                  const Optional<ConstTensor>& biases,
+                                                  const char* name = nullptr) = 0;
 
     virtual void StartVisit() {}
     virtual void FinishVisit() {}

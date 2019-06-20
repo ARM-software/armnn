@@ -193,6 +193,13 @@ public:
 
     void VisitSwitchLayer(const IConnectableLayer*,
                           const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitTransposeConvolution2dLayer(const IConnectableLayer*,
+                                          const TransposeConvolution2dDescriptor&,
+                                          const ConstTensor&,
+                                          const Optional<ConstTensor>&,
+                                          const char*) override { DefaultPolicy::Apply(__func__); }
+
 };
 
-} //namespace armnn
+} // namespace armnn

@@ -381,4 +381,14 @@ bool IsSwitchSupported(const BackendId& backend,
                        const TensorInfo& output1,
                        char* reasonIfUnsupported = nullptr,
                        size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsTransposeConvolution2dSupported(const BackendId& backend,
+                                       const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const TransposeConvolution2dDescriptor& descriptor,
+                                       const TensorInfo& weights,
+                                       const Optional<TensorInfo>& biases,
+                                       char* reasonIfUnsupported = nullptr,
+                                       size_t reasonIfUnsupportedMaxLength = 1024);
 }

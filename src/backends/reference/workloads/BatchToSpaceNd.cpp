@@ -37,8 +37,8 @@ void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
                     const TensorInfo& outputTensorInfo,
                     const std::vector<unsigned int>& blockShape,
                     const std::vector<std::pair<unsigned int, unsigned int>>& cropsData,
-                    const float* inputData,
-                    float* outputData)
+                    Decoder<float>& inputDecoder,
+                    Encoder<float>& outputEncoder)
 {
     TensorShape inputShape = inputTensorInfo.GetShape();
 
@@ -90,7 +90,10 @@ void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
                 {
                     unsigned int outOffset = Offset(outputShape, outBatch, outH, outW, c, dataLayout);
                     unsigned int inOffset = Offset(inputShape, inBatch, inH, inW, c, dataLayout);
-                    outputData[outOffset] = inputData[inOffset];
+
+                    outputEncoder[outOffset];
+                    inputDecoder[inOffset];
+                    outputEncoder.Set(inputDecoder.Get());
                 }
             }
         }

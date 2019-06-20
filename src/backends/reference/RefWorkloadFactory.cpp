@@ -391,7 +391,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescr
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                                     const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefBatchToSpaceNdFloat32Workload, RefBatchToSpaceNdUint8Workload>(descriptor, info);
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    return std::make_unique<RefBatchToSpaceNdWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,

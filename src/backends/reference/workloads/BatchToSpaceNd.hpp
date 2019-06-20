@@ -9,6 +9,9 @@
 
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
+#include "BaseIterator.hpp"
+#include "Decoders.hpp"
+#include "Encoders.hpp"
 
 #include <DataLayoutIndexed.hpp>
 
@@ -20,6 +23,6 @@ void BatchToSpaceNd(const armnnUtils::DataLayoutIndexed& dataLayout,
                     const TensorInfo& outputTensorInfo,
                     const std::vector<unsigned int>& blockShape,
                     const std::vector<std::pair<unsigned int, unsigned int>>& cropsData,
-                    const float* inputData,
-                    float* outputData);
+                    Decoder<float>& inputDecoder,
+                    Encoder<float>& outputEncoder);
 } // namespace armnn

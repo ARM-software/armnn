@@ -8,14 +8,13 @@
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
-namespace armnn
-{
+namespace armnn {
 
-class RefBatchToSpaceNdUint8Workload : public Uint8Workload<BatchToSpaceNdQueueDescriptor>
+class RefBatchToSpaceNdWorkload : public BaseWorkload<BatchToSpaceNdQueueDescriptor>
 {
 
 public:
-    using Uint8Workload<BatchToSpaceNdQueueDescriptor>::Uint8Workload;
+    using BaseWorkload<BatchToSpaceNdQueueDescriptor>::BaseWorkload;
 
     virtual void Execute() const override;
 };

@@ -26,20 +26,20 @@ void RefBatchNormalizationWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefBatchNormalizationWorkload_Execute");
 
-    std::unique_ptr<Decoder<float>> meanDecoder = MakeDecoder<float>(GetTensorInfo(m_Mean.get()),
-                                                                     m_Mean.get()->Map(true));
-    std::unique_ptr<Decoder<float>> varianceDecoder = MakeDecoder<float>(GetTensorInfo(m_Variance.get()),
-                                                                         m_Variance.get()->Map(true));
-    std::unique_ptr<Decoder<float>> gammaDecoder = MakeDecoder<float>(GetTensorInfo(m_Gamma.get()),
-                                                                      m_Gamma.get()->Map(true));
-    std::unique_ptr<Decoder<float>> betaDecoder = MakeDecoder<float>(GetTensorInfo(m_Beta.get()),
-                                                                     m_Beta.get()->Map(true));
-    std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(m_Data.m_Inputs[0]),
-                                                                      m_Data.m_Inputs[0]->Map());
-    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(m_Data.m_Outputs[0]),
-                                                                       m_Data.m_Outputs[0]->Map());
+    std::unique_ptr<Decoder<float>> meanDecoder     = MakeDecoder<float>(m_Mean->GetTensorInfo(),
+                                                                         m_Mean->Map(true));
+    std::unique_ptr<Decoder<float>> varianceDecoder = MakeDecoder<float>(m_Variance->GetTensorInfo(),
+                                                                         m_Variance->Map(true));
+    std::unique_ptr<Decoder<float>> gammaDecoder    = MakeDecoder<float>(m_Gamma->GetTensorInfo(),
+                                                                         m_Gamma->Map(true));
+    std::unique_ptr<Decoder<float>> betaDecoder     = MakeDecoder<float>(m_Beta->GetTensorInfo(),
+                                                                         m_Beta->Map(true));
+    std::unique_ptr<Decoder<float>> inputDecoder    = MakeDecoder<float>(GetTensorInfo(m_Data.m_Inputs[0]),
+                                                                         m_Data.m_Inputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder   = MakeEncoder<float>(GetTensorInfo(m_Data.m_Outputs[0]),
+                                                                         m_Data.m_Outputs[0]->Map());
 
     BatchNormImpl(m_Data, *meanDecoder, *varianceDecoder, *betaDecoder, *gammaDecoder, *inputDecoder, *outputEncoder);
 }
 
-} //namespace armnn
+} // namespace armnn

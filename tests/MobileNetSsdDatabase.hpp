@@ -63,7 +63,7 @@ const std::array<ObjectDetectionInput, 1> g_PerTestCaseInput =
     {
         "Cat.jpg",
         {
-          DetectedObject(16.0f, BoundingBox(0.208961248f, 0.0852333307f, 0.92757535f, 0.940263629f), 0.79296875f)
+          DetectedObject(16.0f, BoundingBox(0.216785252f, 0.079726994f, 0.927124202f, 0.939067304f), 0.79296875f)
         }
     }
 };

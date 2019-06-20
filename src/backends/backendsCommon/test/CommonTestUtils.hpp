@@ -12,11 +12,9 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
 
-#include <algorithm>
+#include <test/TestUtils.hpp>
 
-// Connects two layers
-void Connect(armnn::IConnectableLayer* from, armnn::IConnectableLayer* to, const armnn::TensorInfo& tensorInfo,
-             unsigned int fromIndex = 0, unsigned int toIndex = 0);
+#include <algorithm>
 
 // Checks that two collections have the exact same contents (in any order)
 // The given collections do not have to contain duplicates

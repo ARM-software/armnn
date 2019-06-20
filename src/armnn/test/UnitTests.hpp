@@ -73,6 +73,12 @@ void RunTestFunction(const char* testName, TFuncPtr testFunction, Args... args)
     CompareTestResultIfSupported(testName, testResult);
 }
 
+#define ARMNN_SIMPLE_TEST_CASE(TestName, TestFunction) \
+    BOOST_AUTO_TEST_CASE(TestName) \
+    { \
+        TestFunction(); \
+    }
+
 #define ARMNN_AUTO_TEST_CASE(TestName, TestFunction, ...) \
     BOOST_AUTO_TEST_CASE(TestName) \
     { \

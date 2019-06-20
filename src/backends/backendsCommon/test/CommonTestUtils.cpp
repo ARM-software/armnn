@@ -9,13 +9,6 @@
 
 using namespace armnn;
 
-void Connect(armnn::IConnectableLayer* from, armnn::IConnectableLayer* to, const armnn::TensorInfo& tensorInfo,
-             unsigned int fromIndex, unsigned int toIndex)
-{
-    from->GetOutputSlot(fromIndex).Connect(to->GetInputSlot(toIndex));
-    from->GetOutputSlot(fromIndex).SetTensorInfo(tensorInfo);
-}
-
 SubgraphView::InputSlots CreateInputsFrom(const std::vector<Layer*>& layers)
 {
     SubgraphView::InputSlots result;

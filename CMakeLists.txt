@@ -471,7 +471,8 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/GraphUtils.cpp
         src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
-        src/armnn/test/LayerValidateOutputTest.cpp
+        src/armnn/test/InferOutputTests.cpp
+        src/armnn/test/InferOutputTests.hpp
         src/armnn/test/ModelAccuracyCheckerTest.cpp
         src/armnn/test/NetworkTests.cpp
         src/armnn/test/ObservableTest.cpp
@@ -493,6 +494,8 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/TestNameOnlyLayerVisitor.hpp
         src/armnn/test/TestNameAndDescriptorLayerVisitor.hpp
         src/armnn/test/TestNameAndDescriptorLayerVisitor.cpp
+        src/armnn/test/TestUtils.cpp
+        src/armnn/test/TestUtils.hpp
         src/armnn/test/UnitTests.cpp
         src/armnn/test/UnitTests.hpp
         src/armnn/test/UtilsTests.cpp

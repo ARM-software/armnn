@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "CommonTestUtils.hpp"
+
 #include <Graph.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
@@ -15,13 +17,6 @@
 
 using namespace armnn;
 using namespace std;
-
-// connects two layers
-void Connect(Layer* from, Layer* to, const TensorInfo& tensorInfo, unsigned int fromIndex = 0, unsigned int toIndex = 0)
-{
-    from->GetOutputSlot(fromIndex).Connect(to->GetInputSlot(toIndex));
-    from->GetOutputHandler(fromIndex).SetTensorInfo(tensorInfo);
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // The following test are created specifically to test ReleaseConstantData() method in the Layer

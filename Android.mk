@@ -254,6 +254,7 @@ LOCAL_SRC_FILES := \
         src/armnn/test/UtilsTests.cpp \
         src/armnn/test/GraphTests.cpp \
         src/armnn/test/GraphUtils.cpp \
+        src/armnn/test/InferOutputTests.cpp \
         src/armnn/test/RuntimeTests.cpp \
         src/armnn/test/SubgraphViewTests.cpp \
         src/armnn/test/TensorTest.cpp \
@@ -261,7 +262,8 @@ LOCAL_SRC_FILES := \
         src/armnn/test/InstrumentTests.cpp \
         src/armnn/test/ProfilingEventTest.cpp \
         src/armnn/test/ObservableTest.cpp \
-        src/armnn/test/OptionalTest.cpp
+        src/armnn/test/OptionalTest.cpp \
+        src/armnn/test/TestUtils.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         libneuralnetworks_common \

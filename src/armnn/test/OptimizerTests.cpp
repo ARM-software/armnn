@@ -2,13 +2,18 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <boost/test/unit_test.hpp>
+
+#include "TestUtils.hpp"
 
 #include <armnn/ArmNN.hpp>
 #include <Graph.hpp>
 #include <Optimizer.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <FloatingPointConverter.hpp>
+
+#include <boost/test/unit_test.hpp>
+
+using namespace armnn;
 
 namespace
 {
@@ -50,14 +55,6 @@ bool CheckRelatedLayers(armnn::Graph& graph, const std::list<std::string>& testR
     }
 
     return true;
-}
-
-// connects two layers
-using namespace armnn;
-void Connect(Layer* from, Layer* to, const TensorInfo& tensorInfo, unsigned int fromIndex = 0, unsigned int toIndex = 0)
-{
-    from->GetOutputSlot(fromIndex).Connect(to->GetInputSlot(toIndex));
-    from->GetOutputHandler(fromIndex).SetTensorInfo(tensorInfo);
 }
 
 void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)

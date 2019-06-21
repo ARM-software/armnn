@@ -3,14 +3,16 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "../ImageTensorGenerator/ImageTensorGenerator.hpp"
+#include "../InferenceTest.hpp"
 #include "ModelAccuracyChecker.hpp"
-#include "../ImagePreprocessor.hpp"
 #include "armnnDeserializer/IDeserializer.hpp"
-#include "../NetworkExecutionUtils/NetworkExecutionUtils.hpp"
 
 #include <boost/filesystem.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include <boost/range/iterator_range.hpp>
+
+#include <map>
 
 using namespace armnn::test;
 
@@ -31,9 +33,10 @@ int main(int argc, char* argv[])
         std::vector<armnn::BackendId> computeDevice;
         std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuAcc, armnn::Compute::CpuRef};
         std::string modelPath;
+        std::string modelFormat;
         std::string dataDir;
-        std::string inputType = "float";
         std::string inputName;
+        std::string inputLayout;
         std::string outputName;
         std::string validationLabelPath;
 
@@ -47,19 +50,20 @@ int main(int argc, char* argv[])
             desc.add_options()
                 ("help,h", "Display help messages")
                 ("model-path,m", po::value<std::string>(&modelPath)->required(), "Path to armnn format model file")
-                ("compute,c", po::value<std::vector<armnn::BackendId>>(&computeDevice)->default_value(defaultBackends),
-                 backendsMessage.c_str())
-                ("data-dir,d", po::value<std::string>(&dataDir)->required(),
-                 "Path to directory containing the ImageNet test data")
-                ("input-type,y", po::value(&inputType), "The data type of the input tensors."
-                 "If unset, defaults to \"float\" for all defined inputs. "
-                 "Accepted values (float, int or qasymm8)")
+                ("model-format,f", po::value<std::string>(&modelFormat)->required(),
+                 "The model format. Supported values: caffe, tensorflow, tflite")
                 ("input-name,i", po::value<std::string>(&inputName)->required(),
                  "Identifier of the input tensors in the network separated by comma.")
                 ("output-name,o", po::value<std::string>(&outputName)->required(),
                  "Identifier of the output tensors in the network separated by comma.")
+                ("data-dir,d", po::value<std::string>(&dataDir)->required(),
+                 "Path to directory containing the ImageNet test data")
                 ("validation-labels-path,v", po::value<std::string>(&validationLabelPath)->required(),
-                 "Path to ImageNet Validation Label file");
+                 "Path to ImageNet Validation Label file")
+                ("data-layout,l", po::value<std::string>(&inputLayout)->default_value("NHWC"),
+                 "Data layout. Supported value: NHWC, NCHW. Default: NHCW")
+                ("compute,c", po::value<std::vector<armnn::BackendId>>(&computeDevice)->default_value(defaultBackends),
+                 backendsMessage.c_str());
         }
         catch (const std::exception& e)
         {
@@ -157,51 +161,98 @@ int main(int argc, char* argv[])
         armnnUtils::ModelAccuracyChecker checker(validationLabels);
         using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<uint8_t>>;
 
-        if(ValidateDirectory(dataDir))
+        if (ValidateDirectory(dataDir))
         {
             InferenceModel<armnnDeserializer::IDeserializer, float>::Params params;
-            params.m_ModelPath = modelPath;
-            params.m_IsModelBinary = true;
+            params.m_ModelPath      = modelPath;
+            params.m_IsModelBinary  = true;
             params.m_ComputeDevices = computeDevice;
             params.m_InputBindings.push_back(inputName);
             params.m_OutputBindings.push_back(outputName);
 
             using TParser = armnnDeserializer::IDeserializer;
             InferenceModel<TParser, float> model(params, false);
-            for (auto & imageEntry : boost::make_iterator_range(directory_iterator(pathToDataDir), {}))
+            // Get input tensor information
+            const armnn::TensorInfo& inputTensorInfo   = model.GetInputBindingInfo().second;
+            const armnn::TensorShape& inputTensorShape = inputTensorInfo.GetShape();
+            const armnn::DataType& inputTensorDataType = inputTensorInfo.GetDataType();
+            armnn::DataLayout inputTensorDataLayout;
+            if (inputLayout == "NCHW")
+            {
+                inputTensorDataLayout = armnn::DataLayout::NCHW;
+            }
+            else if (inputLayout == "NHWC")
+            {
+                inputTensorDataLayout = armnn::DataLayout::NHWC;
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(fatal) << "Invalid Data layout: " << inputLayout;
+                return 1;
+            }
+            const unsigned int inputTensorWidth =
+                inputTensorDataLayout == armnn::DataLayout::NCHW ? inputTensorShape[3] : inputTensorShape[2];
+            const unsigned int inputTensorHeight =
+                inputTensorDataLayout == armnn::DataLayout::NCHW ? inputTensorShape[2] : inputTensorShape[1];
+            const unsigned int batchSize = 1;
+            // Get normalisation parameters
+            SupportedFrontend modelFrontend;
+            if (modelFormat == "caffe")
+            {
+                modelFrontend = SupportedFrontend::Caffe;
+            }
+            else if (modelFormat == "tensorflow")
+            {
+                modelFrontend = SupportedFrontend::TensorFlow;
+            }
+            else if (modelFormat == "tflite")
+            {
+                modelFrontend = SupportedFrontend::TFLite;
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(fatal) << "Unsupported frontend: " << modelFormat;
+                return 1;
+            }
+            const NormalizationParameters& normParams = GetNormalizationParameters(modelFrontend, inputTensorDataType);
+            for (auto& imageEntry : boost::make_iterator_range(directory_iterator(pathToDataDir), {}))
             {
                 cout << "Processing image: " << imageEntry << "\n";
 
-                std::ifstream inputTensorFile(imageEntry.path().string());
                 vector<TContainer> inputDataContainers;
                 vector<TContainer> outputDataContainers;
 
-                if (inputType.compare("float") == 0)
+                const string& imagePath = imageEntry.path().string();
+                switch (inputTensorDataType)
                 {
-                    inputDataContainers.push_back(
-                            ParseDataArray<armnn::DataType::Float32>(inputTensorFile));
-                    outputDataContainers = {vector<float>(1001)};
-                }
-                else if (inputType.compare("int") == 0)
-                {
-                    inputDataContainers.push_back(
-                            ParseDataArray<armnn::DataType::Signed32>(inputTensorFile));
-                    outputDataContainers = {vector<int>(1001)};
-                }
-                else if (inputType.compare("qasymm8") == 0)
-                {
-                    auto inputBinding = model.GetInputBindingInfo();
-                    inputDataContainers.push_back(
-                            ParseDataArray<armnn::DataType::QuantisedAsymm8>(
-                                    inputTensorFile,
-                                    inputBinding.second.GetQuantizationScale(),
-                                    inputBinding.second.GetQuantizationOffset()));
-                    outputDataContainers = {vector<uint8_t >(1001)};
-                }
-                else
-                {
-                    BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << inputType << "\". ";
-                    return EXIT_FAILURE;
+                    case armnn::DataType::Signed32:
+                        inputDataContainers.push_back(
+                            PrepareImageTensor<int>(imagePath,
+                            inputTensorWidth, inputTensorHeight,
+                            normParams,
+                            batchSize,
+                            inputTensorDataLayout));
+                        outputDataContainers = {vector<int>(1001)};
+                        break;
+                    case armnn::DataType::QuantisedAsymm8:
+                        inputDataContainers.push_back(
+                            PrepareImageTensor<uint8_t>(imagePath,
+                            inputTensorWidth, inputTensorHeight,
+                            normParams,
+                            batchSize,
+                            inputTensorDataLayout));
+                        outputDataContainers = {vector<uint8_t>(1001)};
+                        break;
+                    case armnn::DataType::Float32:
+                    default:
+                        inputDataContainers.push_back(
+                            PrepareImageTensor<float>(imagePath,
+                            inputTensorWidth, inputTensorHeight,
+                            normParams,
+                            batchSize,
+                            inputTensorDataLayout));
+                        outputDataContainers = {vector<float>(1001)};
+                        break;
                 }
 
                 status = runtime->EnqueueWorkload(networkId,

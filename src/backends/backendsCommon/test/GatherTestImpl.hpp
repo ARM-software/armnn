@@ -63,6 +63,13 @@ LayerTestResult<T, 1> Gather1DParamsTestImpl(armnn::IWorkloadFactory& workloadFa
     armnn::TensorInfo indicesInfo({ 4 }, armnn::DataType::Signed32);
     armnn::TensorInfo outputInfo({ 4 }, ArmnnType);
 
+    if (armnn::IsQuantizedType<T>())
+    {
+        paramsInfo.SetQuantizationScale(1.0f);
+        paramsInfo.SetQuantizationOffset(1);
+        outputInfo.SetQuantizationScale(1.0f);
+        outputInfo.SetQuantizationOffset(1);
+    }
     const std::vector<T> params = std::vector<T>({ 1, 2, 3, 4, 5, 6, 7, 8 });
     const std::vector<int32_t> indices = std::vector<int32_t>({ 0, 2, 1, 5 });
     const std::vector<T> expectedOutput = std::vector<T>({ 1, 3, 2, 6 });
@@ -80,6 +87,14 @@ LayerTestResult<T, 2> GatherMultiDimParamsTestImpl(
     armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32);
     armnn::TensorInfo outputInfo({ 3, 2 }, ArmnnType);
 
+    if (armnn::IsQuantizedType<T>())
+    {
+        paramsInfo.SetQuantizationScale(1.0f);
+        paramsInfo.SetQuantizationOffset(1);
+        outputInfo.SetQuantizationScale(1.0f);
+        outputInfo.SetQuantizationOffset(1);
+    }
+
     const std::vector<T> params = std::vector<T>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
     const std::vector<int32_t> indices = std::vector<int32_t>({ 1, 3, 4 });
     const std::vector<T> expectedOutput = std::vector<T>({ 3, 4, 7, 8, 9, 10 });
@@ -96,6 +111,14 @@ LayerTestResult<T, 4> GatherMultiDimParamsMultiDimIndicesTestImpl(
     armnn::TensorInfo paramsInfo({ 3, 2, 3}, ArmnnType);
     armnn::TensorInfo indicesInfo({ 2, 3 }, armnn::DataType::Signed32);
     armnn::TensorInfo outputInfo({ 2, 3, 2, 3 }, ArmnnType);
+
+    if (armnn::IsQuantizedType<T>())
+    {
+        paramsInfo.SetQuantizationScale(1.0f);
+        paramsInfo.SetQuantizationOffset(1);
+        outputInfo.SetQuantizationScale(1.0f);
+        outputInfo.SetQuantizationOffset(1);
+    }
 
     const std::vector<T> params = std::vector<T>({
          1,  2,  3,

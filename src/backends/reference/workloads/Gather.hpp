@@ -7,15 +7,18 @@
 
 #include "armnn/Tensor.hpp"
 
+#include "BaseIterator.hpp"
+#include "Decoders.hpp"
+#include "Encoders.hpp"
+
 namespace armnn
 {
 
-template <typename T>
 void Gather(const TensorInfo& paramsInfo,
             const TensorInfo& indicesInfo,
             const TensorInfo& outputInfo,
-            const T* params,
+            Decoder<float>& params,
             const int32_t* indices,
-            T* output);
+            Encoder<float>& output);
 
 } //namespace armnn

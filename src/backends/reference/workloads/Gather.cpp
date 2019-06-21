@@ -14,13 +14,12 @@
 namespace armnn
 {
 
-template <typename T>
 void Gather(const TensorInfo& paramsInfo,
             const TensorInfo& indicesInfo,
             const TensorInfo& outputInfo,
-            const T* params,
+            Decoder<float>& params,
             const int32_t* indices,
-            T* output)
+            Encoder<float>& output)
 {
     const TensorShape& paramsShape = paramsInfo.GetShape();
 
@@ -39,28 +38,18 @@ void Gather(const TensorInfo& paramsInfo,
 
         unsigned int startOffset = indx * paramsProduct;
         unsigned int endOffset = startOffset + paramsProduct;
+
         for (unsigned int j = startOffset; j < endOffset; ++j)
         {
-            output[outIndex] = params[j];
+            params[j];
+            float outputValue = params.Get();
+            output[outIndex];
+            output.Set(outputValue);
             ++outIndex;
         }
     }
 
     BOOST_ASSERT(outIndex == outputInfo.GetNumElements());
 }
-
-template void Gather<float>(const TensorInfo& paramsInfo,
-                            const TensorInfo& indicesInfo,
-                            const TensorInfo& outputInfo,
-                            const float* params,
-                            const int32_t* indices,
-                            float* output);
-
-template void Gather<uint8_t>(const TensorInfo& paramsInfo,
-                              const TensorInfo& indicesInfo,
-                              const TensorInfo& outputInfo,
-                              const uint8_t* params,
-                              const int32_t* indices,
-                              uint8_t* output);
 
 } //namespace armnn

@@ -1046,7 +1046,9 @@ void Deserializer::ParseDepthwiseConvolution2d(GraphPtr graph, unsigned int laye
     descriptor.m_PadTop      = serializerDescriptor->padTop();
     descriptor.m_PadBottom   = serializerDescriptor->padBottom();
     descriptor.m_StrideX     = serializerDescriptor->strideX();
-    descriptor.m_StrideY     = serializerDescriptor->strideY();;
+    descriptor.m_StrideY     = serializerDescriptor->strideY();
+    descriptor.m_DilationX   = serializerDescriptor->dilationX();
+    descriptor.m_DilationY   = serializerDescriptor->dilationY();
     descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();;
     descriptor.m_DataLayout  = ToDataLayout(serializerDescriptor->dataLayout());
 

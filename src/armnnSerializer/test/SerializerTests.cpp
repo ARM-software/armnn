@@ -421,47 +421,56 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
                                    const std::vector<armnn::TensorInfo>& inputInfos,
                                    const std::vector<armnn::TensorInfo>& outputInfos,
                                    const armnn::Convolution2dDescriptor& descriptor,
-                                   const armnn::ConstTensor& weight,
-                                   const armnn::Optional<armnn::ConstTensor>& bias)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor)
-        , m_Weight(weight)
-        , m_Bias(bias) {}
+                                   const armnn::ConstTensor& weights,
+                                   const armnn::Optional<armnn::ConstTensor>& biases) :
+            LayerVerifierBase(layerName, inputInfos, outputInfos),
+            m_Descriptor(descriptor),
+            m_Weights(weights),
+            m_Biases(biases)
+        {}
 
         void VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                      const armnn::Convolution2dDescriptor& descriptor,
-                                     const armnn::ConstTensor& weight,
-                                     const armnn::Optional<armnn::ConstTensor>& bias,
+                                     const armnn::ConstTensor& weights,
+                                     const armnn::Optional<armnn::ConstTensor>& biases,
                                      const char* name) override
         {
             VerifyNameAndConnections(layer, name);
             VerifyDescriptor(descriptor);
 
-            CompareConstTensor(weight, m_Weight);
+            // check weights
+            CompareConstTensor(weights, m_Weights);
 
-            BOOST_TEST(bias.has_value() == m_Bias.has_value());
-            if (bias.has_value() && m_Bias.has_value())
+            // check biases
+            BOOST_CHECK(biases.has_value()   == descriptor.m_BiasEnabled);
+            BOOST_CHECK(m_Biases.has_value() == m_Descriptor.m_BiasEnabled);
+
+            BOOST_CHECK(biases.has_value() == m_Biases.has_value());
+
+            if (biases.has_value() && m_Biases.has_value())
             {
-                CompareConstTensor(bias.value(), m_Bias.value());
+                CompareConstTensor(biases.value(), m_Biases.value());
             }
         }
 
     private:
         void VerifyDescriptor(const armnn::Convolution2dDescriptor& descriptor)
         {
-            BOOST_TEST(descriptor.m_PadLeft == m_Descriptor.m_PadLeft);
-            BOOST_TEST(descriptor.m_PadRight == m_Descriptor.m_PadRight);
-            BOOST_TEST(descriptor.m_PadTop == m_Descriptor.m_PadTop);
-            BOOST_TEST(descriptor.m_PadBottom == m_Descriptor.m_PadBottom);
-            BOOST_TEST(descriptor.m_StrideX == m_Descriptor.m_StrideX);
-            BOOST_TEST(descriptor.m_StrideY == m_Descriptor.m_StrideY);
-            BOOST_TEST(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+            BOOST_CHECK(descriptor.m_PadLeft     == m_Descriptor.m_PadLeft);
+            BOOST_CHECK(descriptor.m_PadRight    == m_Descriptor.m_PadRight);
+            BOOST_CHECK(descriptor.m_PadTop      == m_Descriptor.m_PadTop);
+            BOOST_CHECK(descriptor.m_PadBottom   == m_Descriptor.m_PadBottom);
+            BOOST_CHECK(descriptor.m_StrideX     == m_Descriptor.m_StrideX);
+            BOOST_CHECK(descriptor.m_StrideY     == m_Descriptor.m_StrideY);
+            BOOST_CHECK(descriptor.m_DilationX   == m_Descriptor.m_DilationX);
+            BOOST_CHECK(descriptor.m_DilationY   == m_Descriptor.m_DilationY);
+            BOOST_CHECK(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
+            BOOST_CHECK(descriptor.m_DataLayout  == m_Descriptor.m_DataLayout);
         }
 
-        armnn::Convolution2dDescriptor m_Descriptor;
-        armnn::ConstTensor m_Weight;
-        armnn::Optional<armnn::ConstTensor> m_Bias;
+        armnn::Convolution2dDescriptor      m_Descriptor;
+        armnn::ConstTensor                  m_Weights;
+        armnn::Optional<armnn::ConstTensor> m_Biases;
     };
 
     const std::string layerName("convolution2d");
@@ -484,6 +493,8 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
     descriptor.m_PadBottom   = 1;
     descriptor.m_StrideX     = 2;
     descriptor.m_StrideY     = 2;
+    descriptor.m_DilationX   = 2;
+    descriptor.m_DilationY   = 2;
     descriptor.m_BiasEnabled = true;
     descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
 
@@ -518,47 +529,56 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
                                             const std::vector<armnn::TensorInfo>& inputInfos,
                                             const std::vector<armnn::TensorInfo>& outputInfos,
                                             const armnn::DepthwiseConvolution2dDescriptor& descriptor,
-                                            const armnn::ConstTensor& weight,
-                                            const armnn::Optional<armnn::ConstTensor>& bias)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor)
-        , m_Weight(weight)
-        , m_Bias(bias) {}
+                                            const armnn::ConstTensor& weights,
+                                            const armnn::Optional<armnn::ConstTensor>& biases) :
+            LayerVerifierBase(layerName, inputInfos, outputInfos),
+            m_Descriptor(descriptor),
+            m_Weights(weights),
+            m_Biases(biases)
+        {}
 
         void VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                               const armnn::DepthwiseConvolution2dDescriptor& descriptor,
-                                              const armnn::ConstTensor& weight,
-                                              const armnn::Optional<armnn::ConstTensor>& bias,
+                                              const armnn::ConstTensor& weights,
+                                              const armnn::Optional<armnn::ConstTensor>& biases,
                                               const char* name) override
         {
             VerifyNameAndConnections(layer, name);
             VerifyDescriptor(descriptor);
 
-            CompareConstTensor(weight, m_Weight);
+            // check weights
+            CompareConstTensor(weights, m_Weights);
 
-            BOOST_TEST(bias.has_value() == m_Bias.has_value());
-            if (bias.has_value() && m_Bias.has_value())
+            // check biases
+            BOOST_CHECK(biases.has_value()   == descriptor.m_BiasEnabled);
+            BOOST_CHECK(m_Biases.has_value() == m_Descriptor.m_BiasEnabled);
+
+            BOOST_CHECK(biases.has_value() == m_Biases.has_value());
+
+            if (biases.has_value() && m_Biases.has_value())
             {
-                CompareConstTensor(bias.value(), m_Bias.value());
+                CompareConstTensor(biases.value(), m_Biases.value());
             }
         }
 
     private:
         void VerifyDescriptor(const armnn::DepthwiseConvolution2dDescriptor& descriptor)
         {
-            BOOST_TEST(descriptor.m_PadLeft == m_Descriptor.m_PadLeft);
-            BOOST_TEST(descriptor.m_PadRight == m_Descriptor.m_PadRight);
-            BOOST_TEST(descriptor.m_PadTop == m_Descriptor.m_PadTop);
-            BOOST_TEST(descriptor.m_PadBottom == m_Descriptor.m_PadBottom);
-            BOOST_TEST(descriptor.m_StrideX == m_Descriptor.m_StrideX);
-            BOOST_TEST(descriptor.m_StrideY == m_Descriptor.m_StrideY);
-            BOOST_TEST(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+            BOOST_CHECK(descriptor.m_PadLeft     == m_Descriptor.m_PadLeft);
+            BOOST_CHECK(descriptor.m_PadRight    == m_Descriptor.m_PadRight);
+            BOOST_CHECK(descriptor.m_PadTop      == m_Descriptor.m_PadTop);
+            BOOST_CHECK(descriptor.m_PadBottom   == m_Descriptor.m_PadBottom);
+            BOOST_CHECK(descriptor.m_StrideX     == m_Descriptor.m_StrideX);
+            BOOST_CHECK(descriptor.m_StrideY     == m_Descriptor.m_StrideY);
+            BOOST_CHECK(descriptor.m_DilationX   == m_Descriptor.m_DilationX);
+            BOOST_CHECK(descriptor.m_DilationY   == m_Descriptor.m_DilationY);
+            BOOST_CHECK(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
+            BOOST_CHECK(descriptor.m_DataLayout  == m_Descriptor.m_DataLayout);
         }
 
         armnn::DepthwiseConvolution2dDescriptor m_Descriptor;
-        armnn::ConstTensor m_Weight;
-        armnn::Optional<armnn::ConstTensor> m_Bias;
+        armnn::ConstTensor                      m_Weights;
+        armnn::Optional<armnn::ConstTensor>     m_Biases;
     };
 
     const std::string layerName("depwiseConvolution2d");
@@ -575,8 +595,14 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
     armnn::ConstTensor biases(biasesInfo, biasesData);
 
     armnn::DepthwiseConvolution2dDescriptor descriptor;
-    descriptor.m_StrideX     = 1;
-    descriptor.m_StrideY     = 1;
+    descriptor.m_PadLeft     = 1;
+    descriptor.m_PadRight    = 1;
+    descriptor.m_PadTop      = 1;
+    descriptor.m_PadBottom   = 1;
+    descriptor.m_StrideX     = 2;
+    descriptor.m_StrideY     = 2;
+    descriptor.m_DilationX   = 2;
+    descriptor.m_DilationY   = 2;
     descriptor.m_BiasEnabled = true;
     descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
 

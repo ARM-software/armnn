@@ -15,6 +15,7 @@
 #include <Optimizer.hpp>
 
 #include <boost/cast.hpp>
+#include <boost/polymorphic_pointer_cast.hpp>
 
 namespace armnn
 {
@@ -43,7 +44,7 @@ const BackendId& RefBackend::GetIdStatic()
 IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
 {
-    return std::make_unique<RefWorkloadFactory>();
+    return std::make_unique<RefWorkloadFactory>(boost::polymorphic_pointer_downcast<RefMemoryManager>(memoryManager));
 }
 
 IBackendInternal::IBackendContextPtr RefBackend::CreateBackendContext(const IRuntime::CreationOptions&) const
@@ -53,7 +54,7 @@ IBackendInternal::IBackendContextPtr RefBackend::CreateBackendContext(const IRun
 
 IBackendInternal::IMemoryManagerUniquePtr RefBackend::CreateMemoryManager() const
 {
-    return IMemoryManagerUniquePtr{};
+    return std::make_unique<RefMemoryManager>();
 }
 
 IBackendInternal::Optimizations RefBackend::GetOptimizations() const

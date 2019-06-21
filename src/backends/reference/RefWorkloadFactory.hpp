@@ -8,6 +8,8 @@
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/OutputHandler.hpp>
 
+#include "RefMemoryManager.hpp"
+
 #include <boost/core/ignore_unused.hpp>
 
 
@@ -30,7 +32,9 @@ constexpr bool IsOperationQueueDescriptor(const PermuteQueueDescriptor&) { retur
 class RefWorkloadFactory : public IWorkloadFactory
 {
 public:
-    explicit RefWorkloadFactory();
+    explicit RefWorkloadFactory(const std::shared_ptr<RefMemoryManager>& memoryManager);
+    RefWorkloadFactory();
+
     ~RefWorkloadFactory() {}
 
     const BackendId& GetBackendId() const override;
@@ -203,6 +207,8 @@ private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>
     std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor, const WorkloadInfo& info) const;
+
+    mutable std::shared_ptr<RefMemoryManager> m_MemoryManager;
 };
 
 } // namespace armnn

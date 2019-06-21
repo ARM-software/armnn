@@ -11,6 +11,8 @@ list(APPEND armnnRefBackend_sources
     RefTensorHandle.cpp
     RefLayerSupport.cpp
     RefLayerSupport.hpp
+    RefMemoryManager.hpp
+    RefMemoryManager.cpp
     RefWorkloadFactory.cpp
     RefWorkloadFactory.hpp
 )

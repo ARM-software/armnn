@@ -60,6 +60,7 @@ public:
         const_cast<arm_compute::CLTensor*>(&m_Tensor)->map(blocking);
         return static_cast<const void*>(m_Tensor.buffer() + m_Tensor.info()->offset_first_element_in_bytes());
     }
+
     virtual void Unmap() const override { const_cast<arm_compute::CLTensor*>(&m_Tensor)->unmap(); }
 
     virtual ITensorHandle* GetParent() const override { return nullptr; }

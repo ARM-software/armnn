@@ -10,6 +10,7 @@
 BACKEND_SOURCES := \
         RefBackend.cpp \
         RefLayerSupport.cpp \
+        RefMemoryManager.cpp \
         RefTensorHandle.cpp \
         RefWorkloadFactory.cpp \
         workloads/Activation.cpp \
@@ -85,5 +86,6 @@ BACKEND_TEST_SOURCES := \
         test/RefJsonPrinterTests.cpp \
         test/RefLayerSupportTests.cpp \
         test/RefLayerTests.cpp \
+        test/RefMemoryManagerTests.cpp \
         test/RefOptimizedNetworkTests.cpp \
         test/RefRuntimeTests.cpp

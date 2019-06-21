@@ -36,7 +36,6 @@ void RefDebugWorkload<DataType>::Execute() const
     }
 
     std::memcpy(outputData, inputData, inputInfo.GetNumElements()*sizeof(T));
-
 }
 
 template<armnn::DataType DataType>

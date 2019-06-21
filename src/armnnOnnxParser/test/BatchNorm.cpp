@@ -334,7 +334,7 @@ struct BatchNormalizationBisFixture : public armnnUtils::ParserPrototxtFixture<a
 
 BOOST_FIXTURE_TEST_CASE(ValidBatchNormalizationBisTest, BatchNormalizationBisFixture)
 {
-    RunTest<4>({{"Input", {-1, 0.0, 1, 2, 3.0, 4.0}}},             // Input data.
+    RunTest<4>({{"Input", {-1, 0.0, 1, 2, 3.0, 4.0}}},           // Input data.
                {{"Output", {-0.999995f, 0.0, 0.999995f,
                             -0.22474074f, 1.0f, 2.2247407f}}});  // Expected output data.
 }

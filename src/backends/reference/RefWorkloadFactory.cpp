@@ -55,7 +55,13 @@ bool IsUint8(const WorkloadInfo& info)
     return IsDataType<DataType::QuantisedAsymm8>(info);
 }
 
+RefWorkloadFactory::RefWorkloadFactory(const std::shared_ptr<RefMemoryManager>& memoryManager)
+    : m_MemoryManager(memoryManager)
+{
+}
+
 RefWorkloadFactory::RefWorkloadFactory()
+    : m_MemoryManager(new RefMemoryManager())
 {
 }
 
@@ -73,13 +79,13 @@ bool RefWorkloadFactory::IsLayerSupported(const Layer& layer,
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
 {
-    return std::make_unique<RefTensorHandle>(tensorInfo);
+    return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                       DataLayout dataLayout) const
 {
-    return std::make_unique<RefTensorHandle>(tensorInfo);
+    return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,

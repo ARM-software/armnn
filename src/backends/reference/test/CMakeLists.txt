@@ -10,8 +10,10 @@ list(APPEND armnnRefBackendUnitTests_sources
     RefJsonPrinterTests.cpp
     RefLayerSupportTests.cpp
     RefLayerTests.cpp
+    RefMemoryManagerTests.cpp
     RefOptimizedNetworkTests.cpp
     RefRuntimeTests.cpp
+    RefTensorHandleTests.cpp
     RefWorkloadFactoryHelper.hpp
 )
 

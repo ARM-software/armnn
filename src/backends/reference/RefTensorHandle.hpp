@@ -6,6 +6,8 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
+#include "RefMemoryManager.hpp"
+
 namespace armnn
 {
 
@@ -13,27 +15,24 @@ namespace armnn
 class RefTensorHandle : public ITensorHandle
 {
 public:
-    RefTensorHandle(const TensorInfo& tensorInfo);
+    RefTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<RefMemoryManager> &memoryManager);
 
     ~RefTensorHandle();
 
-    virtual void Manage() override
-    {}
+    virtual void Manage() override;
+
+    virtual void Allocate() override;
 
     virtual ITensorHandle* GetParent() const override
     {
         return nullptr;
     }
 
-    virtual const void* Map(bool /* blocking = true */) const override
-    {
-        return m_Memory;
-    }
+    virtual const void* Map(bool /* blocking = true */) const override;
+    using ITensorHandle::Map;
 
     virtual void Unmap() const override
     {}
-
-    virtual void Allocate() override;
 
     TensorShape GetStrides() const override
     {
@@ -55,12 +54,16 @@ private:
     void CopyOutTo(void*) const override;
     void CopyInFrom(const void*) override;
 
-    RefTensorHandle(const RefTensorHandle& other) = delete;
+    void* GetPointer() const;
 
-    RefTensorHandle& operator=(const RefTensorHandle& other) = delete;
+    RefTensorHandle(const RefTensorHandle& other) = delete; // noncopyable
+    RefTensorHandle& operator=(const RefTensorHandle& other) = delete; //noncopyable
 
     TensorInfo m_TensorInfo;
-    void* m_Memory;
+
+    std::shared_ptr<RefMemoryManager> m_MemoryManager;
+    RefMemoryManager::Pool* m_Pool;
+    mutable void *m_UnmanagedMemory;
 };
 
 }

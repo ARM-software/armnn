@@ -123,7 +123,8 @@ enum LayerType : uint {
     Switch = 38,
     Concat = 39,
     SpaceToDepth = 40,
-    Prelu = 41
+    Prelu = 41,
+    TransposeConvolution2d = 42
 }
 
 // Base layer table to be used as part of other layers
@@ -561,6 +562,24 @@ table PreluLayer {
     base:LayerBase;
 }
 
+table TransposeConvolution2dLayer {
+    base:LayerBase;
+    descriptor:TransposeConvolution2dDescriptor;
+    weights:ConstTensor;
+    biases:ConstTensor;
+}
+
+table TransposeConvolution2dDescriptor {
+    padLeft:uint;
+    padRight:uint;
+    padTop:uint;
+    padBottom:uint;
+    strideX:uint;
+    strideY:uint;
+    biasEnabled:bool = false;
+    dataLayout:DataLayout = NCHW;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -603,7 +622,8 @@ union Layer {
     SwitchLayer,
     ConcatLayer,
     SpaceToDepthLayer,
-    PreluLayer
+    PreluLayer,
+    TransposeConvolution2dLayer
 }
 
 table AnyLayer {

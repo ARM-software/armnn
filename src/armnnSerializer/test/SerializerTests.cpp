@@ -2446,6 +2446,110 @@ BOOST_AUTO_TEST_CASE(SerializeSwitch)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeTransposeConvolution2d)
+{
+    class TransposeConvolution2dLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        TransposeConvolution2dLayerVerifier(const std::string& layerName,
+                                            const std::vector<armnn::TensorInfo>& inputInfos,
+                                            const std::vector<armnn::TensorInfo>& outputInfos,
+                                            const armnn::TransposeConvolution2dDescriptor& descriptor,
+                                            const armnn::ConstTensor& weights,
+                                            const armnn::Optional<armnn::ConstTensor>& biases) :
+            LayerVerifierBase(layerName, inputInfos, outputInfos),
+            m_Descriptor(descriptor),
+            m_Weights(weights),
+            m_Biases(biases)
+        {}
+
+        void VisitTransposeConvolution2dLayer(const armnn::IConnectableLayer* layer,
+                                              const armnn::TransposeConvolution2dDescriptor& descriptor,
+                                              const armnn::ConstTensor& weights,
+                                              const armnn::Optional<armnn::ConstTensor>& biases,
+                                              const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+
+            // check weights
+            CompareConstTensor(weights, m_Weights);
+
+            // check biases
+            BOOST_CHECK(biases.has_value()   == descriptor.m_BiasEnabled);
+            BOOST_CHECK(m_Biases.has_value() == m_Descriptor.m_BiasEnabled);
+
+            BOOST_CHECK(biases.has_value() == m_Biases.has_value());
+
+            if (biases.has_value() && m_Biases.has_value())
+            {
+                CompareConstTensor(biases.value(), m_Biases.value());
+            }
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::TransposeConvolution2dDescriptor& descriptor)
+        {
+            BOOST_CHECK(descriptor.m_PadLeft     == m_Descriptor.m_PadLeft);
+            BOOST_CHECK(descriptor.m_PadRight    == m_Descriptor.m_PadRight);
+            BOOST_CHECK(descriptor.m_PadTop      == m_Descriptor.m_PadTop);
+            BOOST_CHECK(descriptor.m_PadBottom   == m_Descriptor.m_PadBottom);
+            BOOST_CHECK(descriptor.m_StrideX     == m_Descriptor.m_StrideX);
+            BOOST_CHECK(descriptor.m_StrideY     == m_Descriptor.m_StrideY);
+            BOOST_CHECK(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
+            BOOST_CHECK(descriptor.m_DataLayout  == m_Descriptor.m_DataLayout);
+        }
+
+        armnn::TransposeConvolution2dDescriptor m_Descriptor;
+        armnn::ConstTensor                      m_Weights;
+        armnn::Optional<armnn::ConstTensor>     m_Biases;
+    };
+
+    const std::string layerName("transposeConvolution2d");
+    const armnn::TensorInfo inputInfo ({ 1, 7, 7, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, 9, 9, 1 }, armnn::DataType::Float32);
+
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+
+    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
+    armnn::ConstTensor weights(weightsInfo, weightsData);
+
+    std::vector<float> biasesData = GenerateRandomData<float>(biasesInfo.GetNumElements());
+    armnn::ConstTensor biases(biasesInfo, biasesData);
+
+    armnn::TransposeConvolution2dDescriptor descriptor;
+    descriptor.m_PadLeft     = 1;
+    descriptor.m_PadRight    = 1;
+    descriptor.m_PadTop      = 1;
+    descriptor.m_PadBottom   = 1;
+    descriptor.m_StrideX     = 1;
+    descriptor.m_StrideY     = 1;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const convLayer   =
+            network->AddTransposeConvolution2dLayer(descriptor,
+                                                    weights,
+                                                    armnn::Optional<armnn::ConstTensor>(biases),
+                                                    layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    TransposeConvolution2dLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor, weights, biases);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeDeserializeNonLinearNetwork)
 {
     class ConstantLayerVerifier : public LayerVerifierBase

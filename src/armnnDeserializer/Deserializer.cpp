@@ -225,6 +225,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_StridedSliceLayer]           = &Deserializer::ParseStridedSlice;
     m_ParserFunctions[Layer_SubtractionLayer]            = &Deserializer::ParseSubtraction;
     m_ParserFunctions[Layer_SwitchLayer]                 = &Deserializer::ParseSwitch;
+    m_ParserFunctions[Layer_TransposeConvolution2dLayer] = &Deserializer::ParseTransposeConvolution2d;
 }
 
 Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPtr, unsigned int layerIndex)
@@ -317,6 +318,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_SubtractionLayer()->base();
         case Layer::Layer_SwitchLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SwitchLayer()->base();
+        case Layer::Layer_TransposeConvolution2dLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_TransposeConvolution2dLayer()->base();
         case Layer::Layer_NONE:
         default:
             throw ParseException(boost::str(
@@ -2210,6 +2213,51 @@ void Deserializer::ParsePrelu(GraphPtr graph, unsigned int layerIndex)
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddPreluLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseTransposeConvolution2d(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto serializerLayer = graph->layers()->Get(layerIndex)->layer_as_TransposeConvolution2dLayer();
+    auto layerName = GetLayerName(graph, layerIndex);
+    auto serializerDescriptor = serializerLayer->descriptor();
+
+    armnn::TransposeConvolution2dDescriptor descriptor;
+    descriptor.m_PadLeft     = serializerDescriptor->padLeft();
+    descriptor.m_PadRight    = serializerDescriptor->padRight();
+    descriptor.m_PadTop      = serializerDescriptor->padTop();
+    descriptor.m_PadBottom   = serializerDescriptor->padBottom();
+    descriptor.m_StrideX     = serializerDescriptor->strideX();
+    descriptor.m_StrideY     = serializerDescriptor->strideY();;
+    descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();;
+    descriptor.m_DataLayout  = ToDataLayout(serializerDescriptor->dataLayout());
+
+    // weights & biases
+    armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
+    armnn::Optional<armnn::ConstTensor> optionalBiases;
+    if (descriptor.m_BiasEnabled)
+    {
+        armnn::ConstTensor biases = ToConstTensor(serializerLayer->biases());
+        optionalBiases = armnn::MakeOptional<armnn::ConstTensor>(biases);
+    }
+
+    IConnectableLayer* layer = m_Network->AddTransposeConvolution2dLayer(descriptor,
+                                                                         weights,
+                                                                         optionalBiases,
+                                                                         layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

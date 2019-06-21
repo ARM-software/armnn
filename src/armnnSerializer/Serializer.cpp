@@ -952,7 +952,32 @@ void SerializerVisitor::VisitTransposeConvolution2dLayer(
     const armnn::Optional<armnn::ConstTensor>& biases,
     const char* name)
 {
-    throw UnimplementedException("SerializerVisitor::VisitTransposeConvolution2dLayer is not implemented");
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Convolution2d);
+    auto fbDescriptor = CreateTransposeConvolution2dDescriptor(m_flatBufferBuilder,
+                                                               descriptor.m_PadLeft,
+                                                               descriptor.m_PadRight,
+                                                               descriptor.m_PadTop,
+                                                               descriptor.m_PadBottom,
+                                                               descriptor.m_StrideX,
+                                                               descriptor.m_StrideY,
+                                                               descriptor.m_BiasEnabled,
+                                                               GetFlatBufferDataLayout(descriptor.m_DataLayout));
+
+    // weights & biases
+    auto fbWeightsConstTensorInfo = CreateConstTensorInfo(weights);
+    flatbuffers::Offset<serializer::ConstTensor> fbBiasesConstTensorInfo;
+    if (biases.has_value())
+    {
+        fbBiasesConstTensorInfo = CreateConstTensorInfo(biases.value());
+    }
+
+    auto fbLayer = CreateTransposeConvolution2dLayer(m_flatBufferBuilder,
+                                                     fbBaseLayer,
+                                                     fbDescriptor,
+                                                     fbWeightsConstTensorInfo,
+                                                     fbBiasesConstTensorInfo);
+
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_TransposeConvolution2dLayer);
 }
 
 fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,

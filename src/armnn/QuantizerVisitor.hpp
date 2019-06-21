@@ -140,6 +140,12 @@ public:
     void VisitSubtractionLayer(const IConnectableLayer* layer,
                                const char* name = nullptr) override;
 
+    void VisitTransposeConvolution2dLayer(const IConnectableLayer* layer,
+                                          const TransposeConvolution2dDescriptor& descriptor,
+                                          const ConstTensor& weights,
+                                          const Optional<ConstTensor>& biases,
+                                          const char* name = nullptr) override;
+
     /// Extract the quantized network
     INetworkPtr RetrieveFinalNetwork() { return std::move(m_QuantizedNetwork); }
 

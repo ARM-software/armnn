@@ -1715,6 +1715,83 @@ BOOST_AUTO_TEST_CASE(QuantizePrelu)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+void TestQuantizeTransposeConvolution2d(bool useBiases)
+{
+    class TestTransposeConvolution2dQuantization : public TestQuantization
+    {
+    public:
+        TestTransposeConvolution2dQuantization(const TensorShape& inputShape, const TensorShape& outputShape) :
+            TestQuantization(inputShape, outputShape)
+        {}
+
+        TestTransposeConvolution2dQuantization(const QuantizerOptions& options,
+                                               const TensorShape& inputShape,
+                                               const TensorShape& outputShape) :
+            TestQuantization(options, inputShape, outputShape)
+        {}
+
+        void VisitTransposeConvolution2dLayer(const IConnectableLayer *layer,
+                                              const TransposeConvolution2dDescriptor& descriptor,
+                                              const ConstTensor& weights,
+                                              const Optional<ConstTensor>& biases,
+                                              const char *name = nullptr) override
+        {
+            TestQuantizationOnLayersWithBiases(layer, weights, biases);
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    TensorShape shape{ 3 };
+    TensorInfo info(shape, DataType::Float32);
+
+    std::initializer_list<float> floatData{ -1.0f, 1.5f, 2.0f };
+    std::vector<float> weightsData(floatData);
+    ConstTensor weights(info, weightsData);
+
+    TransposeConvolution2dDescriptor descriptor;
+    descriptor.m_BiasEnabled = useBiases;
+
+    // construct network
+    IConnectableLayer* input = network->AddInputLayer(0);
+    Optional<ConstTensor> optionalBiases;
+    std::vector<float> biasesData(floatData);
+    if (useBiases)
+    {
+        ConstTensor biases(info, biasesData);
+        optionalBiases = Optional<ConstTensor>(biases);
+    }
+    IConnectableLayer* transposeConv2d = network->AddTransposeConvolution2dLayer(descriptor, weights, optionalBiases);
+    IConnectableLayer* output = network->AddOutputLayer(1);
+
+    input->GetOutputSlot(0).Connect(transposeConv2d->GetInputSlot(0));
+    transposeConv2d->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(info);
+    transposeConv2d->GetOutputSlot(0).SetTensorInfo(info);
+
+    // test QAsymm8 quantization
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestTransposeConvolution2dQuantization validatorQAsymm8(shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    // test QSymm16 quantization
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestTransposeConvolution2dQuantization validatorQSymm16(options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeTransposeConvolution2d)
+{
+    TestQuantizeTransposeConvolution2d(false);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeTransposeConvolution2dWithBiases)
+{
+    TestQuantizeTransposeConvolution2d(true);
+}
+
 std::vector<uint8_t> SetupQuantize(float value)
 {
     armnn::TensorInfo inputInfo({ 1, 2, 2 }, armnn::DataType::Float32);

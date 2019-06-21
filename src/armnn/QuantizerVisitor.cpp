@@ -446,4 +446,32 @@ void QuantizerVisitor::VisitSubtractionLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitTransposeConvolution2dLayer(const IConnectableLayer* layer,
+                                                        const TransposeConvolution2dDescriptor& descriptor,
+                                                        const ConstTensor& weights,
+                                                        const Optional<ConstTensor>& biases,
+                                                        const char* name)
+{
+    // quantize weights
+    std::vector<uint8_t> weightsBacking;
+    ConstTensor qWeights = CreateQuantizedConst(weights, weightsBacking);
+
+    // quantize biases
+    std::vector<int32_t> biasesBacking;
+    Optional<ConstTensor> optionalQBiases;
+    if (biases.has_value())
+    {
+        ConstTensor qBiases = CreateQuantizedBias(layer, qWeights, biases, biasesBacking);
+        optionalQBiases = Optional<ConstTensor>(qBiases);
+    }
+
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddTransposeConvolution2dLayer(descriptor,
+                                                                                     qWeights,
+                                                                                     optionalQBiases,
+                                                                                     name);
+
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 } //namespace armnn

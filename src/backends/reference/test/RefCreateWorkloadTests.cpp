@@ -691,6 +691,29 @@ BOOST_AUTO_TEST_CASE(CreateRsqrtQsymm16)
     RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::QuantisedSymm16>();
 }
 
+template <typename BatchToSpaceNdWorkloadType, armnn::DataType DataType>
+static void RefCreateBatchToSpaceNdTest()
+{
+    Graph graph;
+    RefWorkloadFactory factory;
+
+    auto workload = CreateBatchToSpaceNdWorkloadTest<BatchToSpaceNdWorkloadType, DataType>(factory, graph);
+
+    CheckInputOutput(std::move(workload),
+                     TensorInfo({ 1, 1 }, DataType),
+                     TensorInfo({ 1, 1 }, DataType));
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdFloat32)
+{
+    RefCreateBatchToSpaceNdTest<RefBatchToSpaceNdWorkload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdUint8)
+{
+    RefCreateBatchToSpaceNdTest<RefBatchToSpaceNdWorkload, armnn::DataType::QuantisedAsymm8>();
+}
+
 template <typename L2NormalizationWorkloadType, armnn::DataType DataType>
 static void RefCreateL2NormalizationTest(DataLayout dataLayout)
 {

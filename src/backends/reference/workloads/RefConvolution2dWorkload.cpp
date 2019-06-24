@@ -34,15 +34,18 @@ void RefConvolution2dWorkload::PostAllocationConfigure()
 {
     const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
     m_InputShape = inputInfo.GetShape();
-    m_InputDecoder = MakeDecoder<float>(inputInfo, m_Data.m_Inputs[0]->Map());
+    m_InputDecoder = MakeDecoder<float>(inputInfo);
 
     const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
     m_OutputShape = outputInfo.GetShape();
-    m_OutputEncoder = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
+    m_OutputEncoder = MakeEncoder<float>(outputInfo);
 }
 
 void RefConvolution2dWorkload::Execute() const {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConvolution2dWorkload_Execute");
+
+    m_InputDecoder->Reset(m_Data.m_Inputs[0]->Map());
+    m_OutputEncoder->Reset(m_Data.m_Outputs[0]->Map());
 
     Convolve(m_InputShape, *m_InputDecoder, m_OutputShape, *m_OutputEncoder, m_FilterShape,
              *m_FilterDecoder, m_Data.m_Parameters.m_BiasEnabled, m_BiasDecoder.get(),

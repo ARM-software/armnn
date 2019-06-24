@@ -13,7 +13,7 @@ namespace armnn
 {
 
 template<typename T>
-inline std::unique_ptr<Encoder<T>> MakeEncoder(const TensorInfo& info, void* data);
+inline std::unique_ptr<Encoder<T>> MakeEncoder(const TensorInfo& info, void* data = nullptr);
 
 template<>
 inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void* data)

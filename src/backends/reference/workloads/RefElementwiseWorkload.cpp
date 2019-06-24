@@ -32,9 +32,9 @@ void RefElementwiseWorkload<Functor, ParentDescriptor, DebugString>::PostAllocat
     const TensorInfo& inputInfo1 = GetTensorInfo(m_Data.m_Inputs[1]);
     const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
 
-    m_Input0 = MakeDecoder<InType>(inputInfo0, m_Data.m_Inputs[0]->Map());
-    m_Input1 = MakeDecoder<InType>(inputInfo1, m_Data.m_Inputs[1]->Map());
-    m_Output = MakeEncoder<OutType>(outputInfo, m_Data.m_Outputs[0]->Map());
+    m_Input0 = MakeDecoder<InType>(inputInfo0);
+    m_Input1 = MakeDecoder<InType>(inputInfo1);
+    m_Output = MakeEncoder<OutType>(outputInfo);
 }
 
 template <typename Functor, typename ParentDescriptor, typename armnn::StringMapping::Id DebugString>
@@ -48,6 +48,10 @@ void RefElementwiseWorkload<Functor, ParentDescriptor, DebugString>::Execute() c
     const TensorShape& inShape0 = inputInfo0.GetShape();
     const TensorShape& inShape1 = inputInfo1.GetShape();
     const TensorShape& outShape = outputInfo.GetShape();
+
+    m_Input0->Reset(m_Data.m_Inputs[0]->Map());
+    m_Input1->Reset(m_Data.m_Inputs[1]->Map());
+    m_Output->Reset(m_Data.m_Outputs[0]->Map());
 
     ElementwiseFunction<Functor>(inShape0,
                                  inShape1,

@@ -130,6 +130,14 @@ struct TypeAnyOf : public Rule
     }
 };
 
+struct TypeIs : public Rule
+{
+    TypeIs(const TensorInfo& info, DataType dt)
+    {
+        m_Res = dt == info.GetDataType();
+    }
+};
+
 struct BiasAndWeightsTypesMatch : public Rule
 {
     BiasAndWeightsTypesMatch(const TensorInfo& biases, const TensorInfo& weights)
@@ -721,12 +729,27 @@ bool RefLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,
                                         const armnn::TensorInfo& output,
                                         armnn::Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(input1);
-    ignore_unused(output);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input0.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+    bool supported = true;
+    std::array<DataType,3> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input0, supportedTypes), reasonIfUnsupported,
+                                  "Reference Gather: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Gather: output type not supported");
+
+    supported &= CheckSupportRule(TypeIs(input1, DataType::Signed32), reasonIfUnsupported,
+                                  "Reference Gather: indices (input1) type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input0, output), reasonIfUnsupported,
+                                  "Reference Gather: input and output types not matching");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsGreaterSupported(const TensorInfo& input0,

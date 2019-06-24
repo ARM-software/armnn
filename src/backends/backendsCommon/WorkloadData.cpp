@@ -1597,15 +1597,33 @@ void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
 void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "GatherQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "GatherQueueDescriptor", 1);
+    const std::string GatherQueueDescriptorStr = "GatherQueueDescriptor";
+
+    ValidateNumInputs(workloadInfo, GatherQueueDescriptorStr, 2);
+    ValidateNumOutputs(workloadInfo, GatherQueueDescriptorStr, 1);
 
     const TensorInfo& indices = workloadInfo.m_InputTensorInfos[1];
 
     if (indices.GetDataType() != DataType::Signed32)
     {
-        throw InvalidArgumentException("GatherQueueDescriptor: Indices tensor type must be int32.");
+        throw InvalidArgumentException(GatherQueueDescriptorStr + ": Indices tensor type must be int32.");
     }
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float16,
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      GatherQueueDescriptorStr);
+
+    ValidateTensorDataTypesMatch(workloadInfo.m_InputTensorInfos[0],
+                      workloadInfo.m_OutputTensorInfos[0],
+                      GatherQueueDescriptorStr, "Input", "Output");
 
     const TensorInfo& params = workloadInfo.m_InputTensorInfos[0];
     const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
@@ -1613,7 +1631,7 @@ void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     unsigned int indicesDim = indices.GetNumDimensions();
     unsigned int outputDim = paramsDim - 1 + indicesDim;
 
-    ValidateTensorNumDimensions(output, "GatherQueueDescriptor", outputDim, "output");
+    ValidateTensorNumDimensions(output, GatherQueueDescriptorStr, outputDim, "output");
 }
 
 void DetectionPostProcessQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

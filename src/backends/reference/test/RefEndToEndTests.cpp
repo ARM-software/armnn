@@ -448,6 +448,11 @@ BOOST_AUTO_TEST_CASE(RefGatherUint8Test)
     GatherEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(RefGatherInt16Test)
+{
+    GatherEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends);
+}
+
 BOOST_AUTO_TEST_CASE(RefGatherMultiDimFloatTest)
 {
     GatherMultiDimEndToEnd<armnn::DataType::Float32>(defaultBackends);
@@ -456,6 +461,11 @@ BOOST_AUTO_TEST_CASE(RefGatherMultiDimFloatTest)
 BOOST_AUTO_TEST_CASE(RefGatherMultiDimUint8Test)
 {
     GatherMultiDimEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefGatherMultiDimInt16Test)
+{
+    GatherMultiDimEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(DequantizeEndToEndSimpleTest)

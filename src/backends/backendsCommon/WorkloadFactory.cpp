@@ -323,7 +323,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsGatherSupported(OverrideDataType(input0, dataType),
-                                                           OverrideDataType(input1, dataType),
+                                                           input1,
                                                            OverrideDataType(output, dataType),
                                                            reason);
             break;

@@ -392,9 +392,11 @@ LayerTestResult<T, 4> SimpleActivationTest(
     armnn::ActivationFunction activationFunction,
     float activationParameterA,
     float activationParameterB,
-    float qScale,
-    int32_t qOffset,
+    float scale,
+    int32_t offset,
     const std::vector<float>& inputData,
+    float outScale,
+    int32_t outOffset,
     const std::vector<float>& outputExpectedData)
 {
     constexpr static unsigned int inputWidth = 16u;
@@ -413,15 +415,15 @@ LayerTestResult<T, 4> SimpleActivationTest(
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
     {
-        inputTensorInfo.SetQuantizationScale(qScale);
-        inputTensorInfo.SetQuantizationOffset(qOffset);
-        outputTensorInfo.SetQuantizationScale(qScale);
-        outputTensorInfo.SetQuantizationOffset(qOffset);
+        inputTensorInfo.SetQuantizationScale(scale);
+        inputTensorInfo.SetQuantizationOffset(offset);
+        outputTensorInfo.SetQuantizationScale(outScale);
+        outputTensorInfo.SetQuantizationOffset(outOffset);
     }
 
     LayerTestResult<T, 4> result(inputTensorInfo);
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(scale, offset, inputData));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -448,7 +450,8 @@ LayerTestResult<T, 4> SimpleActivationTest(
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
 
     // Calculated manually.
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, outputExpectedData));
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(outScale, outOffset,
+                                                                                  outputExpectedData));
 
     return result;
 }
@@ -483,6 +486,8 @@ LayerTestResult<T, 4> SimpleSigmoidTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           1.f / 256.f,
+                                           0,
                                            outputExpectedData);
 }
 
@@ -537,6 +542,8 @@ LayerTestResult<T, 4> ReLuTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           qScale,
+                                           qOffset,
                                            outputExpectedData);
 }
 
@@ -594,6 +601,8 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           qScale,
+                                           qOffset,
                                            outputExpectedData);
 }
 
@@ -636,6 +645,8 @@ LayerTestResult<T, 4> SoftReLuTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           qScale,
+                                           qOffset,
                                            outputExpectedData);
 }
 
@@ -691,6 +702,8 @@ LayerTestResult<T, 4> LeakyReLuTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           qScale,
+                                           qOffset,
                                            outputExpectedData);
 }
 
@@ -745,6 +758,8 @@ LayerTestResult<T, 4> AbsTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           qScale,
+                                           qOffset,
                                            outputExpectedData);
 }
 
@@ -799,6 +814,8 @@ LayerTestResult<T, 4> SqrtTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           qScale,
+                                           qOffset,
                                            outputExpectedData);
 }
 
@@ -853,6 +870,8 @@ LayerTestResult<T, 4> SquareTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           qScale,
+                                           qOffset,
                                            outputExpectedData);
 }
 
@@ -909,6 +928,8 @@ LayerTestResult<T, 4> TanhTestCommon(
                                            qScale,
                                            qOffset,
                                            inputData,
+                                           qScale,
+                                           qOffset,
                                            outputExpectedData);
 }
 

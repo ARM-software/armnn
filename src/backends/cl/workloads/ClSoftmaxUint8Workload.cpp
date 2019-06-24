@@ -25,7 +25,10 @@ ClSoftmaxUint8Workload::ClSoftmaxUint8Workload(const SoftmaxQueueDescriptor& des
 
     const auto outputQuantization = output.info()->quantization_info();
 
-    if ((outputQuantization.scale != (1.0f / 256.0f)) || (outputQuantization.offset != 0))
+    if (((!outputQuantization.scale.empty()) && (outputQuantization.scale[0] != (1.0f / 256.0f))) ||
+        ((!outputQuantization.offset.empty()) && (outputQuantization.offset[0] != 0)) ||
+        (outputQuantization.scale.empty()) ||
+        (outputQuantization.offset.empty()))
     {
         throw InvalidArgumentException(
             "Invalid quantization for output. Only scale = 1.0f / 256.0f and offset = 0 supported");

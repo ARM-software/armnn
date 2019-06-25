@@ -359,14 +359,45 @@ bool RefLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
                                                 Optional<std::string&> reasonIfUnsupported) const
 {
     ignore_unused(descriptor);
-    return (IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                      input.GetDataType(),
-                                      &TrueFunc<>,
-                                      &TrueFunc<>) &&
-            IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                      output.GetDataType(),
-                                      &TrueFunc<>,
-                                      &TrueFunc<>));
+
+    bool supported = true;
+
+    std::string batchToSpaceNdLayerStr = "batchToSpaceNd";
+    std::string inputTensorStr = "input";
+    std::string outputTensorStr = "output";
+
+    // Define supported types.
+    std::array<DataType,3> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference BatchToSpaceNd: input type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference BatchToSpaceNd: output type not supported.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference BatchToSpaceNd: input and output types mismatched.");
+
+    supported &= CheckSupportRule(TensorNumDimensionsAreCorrect(output, 4),
+                                  reasonIfUnsupported,
+                                  CreateIncorrectDimensionsErrorMsg(4,
+                                                                    output.GetNumDimensions(),
+                                                                    batchToSpaceNdLayerStr,
+                                                                    outputTensorStr).data());
+
+    supported &= CheckSupportRule(TensorNumDimensionsAreCorrect(input, 4),
+                                  reasonIfUnsupported,
+                                  CreateIncorrectDimensionsErrorMsg(4,
+                                                                    input.GetNumDimensions(),
+                                                                    batchToSpaceNdLayerStr,
+                                                                    inputTensorStr).data());
+
+    return supported;
 }
 
 bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,

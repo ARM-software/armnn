@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkloadQuantisedAsymm8)
     RefCreateFullyConnectedWorkloadTest<RefFullyConnectedWorkload, armnn::DataType::QuantisedAsymm8>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkloadQuantisedAsymm16)
+BOOST_AUTO_TEST_CASE(CreateFullyConnectedWorkloadQuantisedSymm16)
 {
     RefCreateFullyConnectedWorkloadTest<RefFullyConnectedWorkload, armnn::DataType::QuantisedSymm16>();
 }
@@ -700,8 +700,8 @@ static void RefCreateBatchToSpaceNdTest()
     auto workload = CreateBatchToSpaceNdWorkloadTest<BatchToSpaceNdWorkloadType, DataType>(factory, graph);
 
     CheckInputOutput(std::move(workload),
-                     TensorInfo({ 1, 1 }, DataType),
-                     TensorInfo({ 1, 1 }, DataType));
+                     TensorInfo({ 1, 1, 1, 1 }, DataType),
+                     TensorInfo({ 1, 1, 1, 1 }, DataType));
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdFloat32)
@@ -712,6 +712,11 @@ BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdFloat32)
 BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdUint8)
 {
     RefCreateBatchToSpaceNdTest<RefBatchToSpaceNdWorkload, armnn::DataType::QuantisedAsymm8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdQSymm16)
+{
+    RefCreateBatchToSpaceNdTest<RefBatchToSpaceNdWorkload, armnn::DataType::QuantisedSymm16>();
 }
 
 template <typename L2NormalizationWorkloadType, armnn::DataType DataType>

@@ -828,6 +828,14 @@ ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint5,  BatchToSpaceNdNhwcTest5<armnn::Da
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint6,  BatchToSpaceNdNhwcTest6<armnn::DataType::QuantisedAsymm8>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcUint7,  BatchToSpaceNdNhwcTest7<armnn::DataType::QuantisedAsymm8>)
 
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_1,  BatchToSpaceNdNhwcTest1<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_2,  BatchToSpaceNdNhwcTest2<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_3,  BatchToSpaceNdNhwcTest3<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_4,  BatchToSpaceNdNhwcTest4<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_5,  BatchToSpaceNdNhwcTest5<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_6,  BatchToSpaceNdNhwcTest6<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcQsymm16_7,  BatchToSpaceNdNhwcTest7<armnn::DataType::QuantisedSymm16>)
+
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat1, BatchToSpaceNdNchwTest1<armnn::DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat2, BatchToSpaceNdNchwTest2<armnn::DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwFloat3, BatchToSpaceNdNchwTest3<armnn::DataType::Float32>)
@@ -843,6 +851,15 @@ ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint4,  BatchToSpaceNdNchwTest4<armnn::Da
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint5,  BatchToSpaceNdNchwTest5<armnn::DataType::QuantisedAsymm8>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint6,  BatchToSpaceNdNchwTest6<armnn::DataType::QuantisedAsymm8>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwUint7,  BatchToSpaceNdNchwTest7<armnn::DataType::QuantisedAsymm8>)
+
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_1,  BatchToSpaceNdNchwTest1<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_2,  BatchToSpaceNdNchwTest2<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_3,  BatchToSpaceNdNchwTest3<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_4,  BatchToSpaceNdNchwTest4<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_5,  BatchToSpaceNdNchwTest5<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_6,  BatchToSpaceNdNchwTest6<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNchwQsymm16_7,  BatchToSpaceNdNchwTest7<armnn::DataType::QuantisedSymm16>)
+
 
 // SpaceToDepth
 ARMNN_AUTO_TEST_CASE(SpaceToDepthNCHWAsymmQ8, SpaceToDepthNCHWAsymmQ8Test)

@@ -3324,7 +3324,7 @@ LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(
 
     outputTensorInfo.SetQuantizationScale(scale);
     outputTensorInfo.SetQuantizationOffset(offset);
-;
+
     auto input = MakeTensor<T, InputDim>(inputTensorInfo, ConvertToDataType<ArmnnType>(inputData, inputTensorInfo));
 
     LayerTestResult<T, OutputDim> result(outputTensorInfo);

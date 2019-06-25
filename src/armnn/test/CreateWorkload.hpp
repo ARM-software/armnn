@@ -926,7 +926,7 @@ std::unique_ptr<BatchToSpaceNdWorkload> CreateBatchToSpaceNdWorkloadTest(armnn::
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
     // Connects up.
-    armnn::TensorInfo tensorInfo({1, 1}, DataType);
+    armnn::TensorInfo tensorInfo({1, 1, 1, 1}, DataType);
 
     Connect(input, layer, tensorInfo);
     Connect(layer, output, tensorInfo);

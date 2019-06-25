@@ -1431,8 +1431,26 @@ void QuantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
 void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "BatchToSpaceNdQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "BatchToSpaceNdQueueDescriptor", 1);
+    const std::string batchToSpaceNdQueueDescriptorStr = "BatchToSpaceNdQueueDescriptor";
+
+    ValidateNumInputs(workloadInfo, batchToSpaceNdQueueDescriptorStr, 1);
+    ValidateNumOutputs(workloadInfo, batchToSpaceNdQueueDescriptorStr, 1);
+
+    const TensorInfo& input  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      batchToSpaceNdQueueDescriptorStr);
+
+    ValidateTensorDataTypesMatch(input, output, batchToSpaceNdQueueDescriptorStr, "input", "output");
 }
 
 void StridedSliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

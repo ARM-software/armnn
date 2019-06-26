@@ -66,6 +66,10 @@ int main(int argc, const char* argv[])
             ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
              "If unset, defaults to \"float\" for all defined inputs. "
              "Accepted values (float, int or qasymm8)")
+            ("quantize-input,q",po::bool_switch()->default_value(false),
+             "If this option is enabled, all float inputs will be quantized to qasymm8. "
+             "If unset, default to not quantized. "
+             "Accepted values (true or false)")
             ("output-type,z",po::value(&outputTypes),
              "The type of the output tensors in the network separated by comma. "
              "If unset, defaults to \"float\" for all defined outputs. "
@@ -119,6 +123,7 @@ int main(int argc, const char* argv[])
     bool concurrent = vm["concurrent"].as<bool>();
     bool enableProfiling = vm["event-based-profiling"].as<bool>();
     bool enableFp16TurboMode = vm["fp16-turbo-mode"].as<bool>();
+    bool quantizeInput = vm["quantize-input"].as<bool>();
 
     // Check whether we have to load test cases from a file.
     if (CheckOption(vm, "test-cases"))
@@ -220,7 +225,7 @@ int main(int argc, const char* argv[])
         }
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames,
-                       inputTensorDataFilePaths, inputTypes, outputTypes, outputNames,
+                       inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
                        enableProfiling, enableFp16TurboMode, thresholdTime, subgraphId);
     }
 }

@@ -522,6 +522,43 @@ BOOST_AUTO_TEST_CASE(CreateSoftmaxFloatWorkload)
     NeonCreateSoftmaxWorkloadTest<NeonSoftmaxFloatWorkload, DataType::Float32>();
 }
 
+template <typename SpaceToDepthWorkloadType, typename armnn::DataType DataType>
+static void NeonSpaceToDepthWorkloadTest()
+{
+    Graph graph;
+    NeonWorkloadFactory factory =
+            NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateSpaceToDepthWorkloadTest<SpaceToDepthWorkloadType, DataType>(factory, graph);
+
+    SpaceToDepthQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({ 1, 2, 2, 1 }, DataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({ 1, 1, 1, 4 }, DataType)));
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthFloat32Workload)
+{
+    NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthFloat16Workload)
+{
+    NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::Float16>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthQAsymm8Workload)
+{
+    NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::QuantisedAsymm8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthQSymm16Workload)
+{
+    NeonSpaceToDepthWorkloadTest<NeonSpaceToDepthWorkload, armnn::DataType::QuantisedSymm16>();
+}
+
 BOOST_AUTO_TEST_CASE(CreateSplitterWorkload)
 {
     Graph graph;

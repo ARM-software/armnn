@@ -33,5 +33,6 @@
 #include "NeonResizeBilinearWorkload.hpp"
 #include "NeonSoftmaxFloatWorkload.hpp"
 #include "NeonSoftmaxUint8Workload.hpp"
+#include "NeonSpaceToDepthWorkload.hpp"
 #include "NeonSplitterWorkload.hpp"
 #include "NeonSubtractionWorkload.hpp"

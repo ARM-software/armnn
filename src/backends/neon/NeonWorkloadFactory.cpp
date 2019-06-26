@@ -294,6 +294,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToBatchNd(const Space
     return nullptr;
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSpaceToDepth(const armnn::SpaceToDepthQueueDescriptor& descriptor,
+                                                                  const armnn::WorkloadInfo& info) const
+{
+    return std::make_unique<NeonSpaceToDepthWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {

@@ -302,6 +302,19 @@ ARMNN_AUTO_TEST_CASE(Simple3dSoftmaxBeta1Uint8, Simple3dSoftmaxUint8Test, 1.0f)
 ARMNN_AUTO_TEST_CASE(Simple4dSoftmaxBeta1, Simple4dSoftmaxTest, 1.0f)
 ARMNN_AUTO_TEST_CASE(Simple4dSoftmaxBeta1Uint8, Simple4dSoftmaxUint8Test, 1.0f)
 
+// SpaceToDepth
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNCHWAsymmQ8, SpaceToDepthNCHWAsymmQ8Test)
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNHWCAsymmQ8, SpaceToDepthNHWCAsymmQ8Test)
+
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNHWC1Float32, SpaceToDepthNHWCFloat32Test1)
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNCHW1Float32, SpaceToDepthNCHWFloat32Test1)
+
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNHWC2Float32, SpaceToDepthNHWCFloat32Test2)
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNCHW2Float32, SpaceToDepthNCHWFloat32Test2)
+
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNHWCQSymm16, SpaceToDepthNHWCQSymm16Test)
+ARMNN_AUTO_TEST_CASE(SpaceToDepthNCHWQSymm16, SpaceToDepthNCHWQSymm16Test)
+
 // Splitter
 ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)
 ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)

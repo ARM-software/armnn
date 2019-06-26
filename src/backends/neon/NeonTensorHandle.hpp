@@ -91,6 +91,11 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<uint8_t*>(memory));
                 break;
+            case arm_compute::DataType::S16:
+            case arm_compute::DataType::QSYMM16:
+                armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
+                                                                 static_cast<int16_t*>(memory));
+                break;
             default:
             {
                 throw armnn::UnimplementedException();
@@ -110,6 +115,11 @@ private:
             case arm_compute::DataType::U8:
             case arm_compute::DataType::QASYMM8:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const uint8_t*>(memory),
+                                                                 this->GetTensor());
+                break;
+            case arm_compute::DataType::S16:
+            case arm_compute::DataType::QSYMM16:
+                armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int16_t*>(memory),
                                                                  this->GetTensor());
                 break;
             default:
@@ -180,6 +190,11 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<uint8_t*>(memory));
                 break;
+            case arm_compute::DataType::S16:
+            case arm_compute::DataType::QSYMM16:
+                armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
+                                                                 static_cast<int16_t*>(memory));
+                break;
             default:
             {
                 throw armnn::UnimplementedException();
@@ -199,6 +214,11 @@ private:
             case arm_compute::DataType::U8:
             case arm_compute::DataType::QASYMM8:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const uint8_t*>(memory),
+                                                                 this->GetTensor());
+                break;
+            case arm_compute::DataType::S16:
+            case arm_compute::DataType::QSYMM16:
+                armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int16_t*>(memory),
                                                                  this->GetTensor());
                 break;
             default:

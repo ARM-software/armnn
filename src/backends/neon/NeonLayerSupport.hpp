@@ -177,6 +177,11 @@ public:
                             const SoftmaxDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsSpaceToDepthSupported(const TensorInfo& input,
+                                 const TensorInfo& output,
+                                 const SpaceToDepthDescriptor& descriptor,
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
     bool IsSplitterSupported(const TensorInfo& input,
                              const ViewsDescriptor& descriptor,

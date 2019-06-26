@@ -29,6 +29,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Gather.hpp
     LstmUtils.hpp
     Maximum.hpp
+    Mean.cpp
+    Mean.hpp
     Concatenate.hpp
     Concatenate.cpp
     Minimum.hpp
@@ -44,6 +46,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefBatchNormalizationWorkload.hpp
     RefBatchToSpaceNdWorkload.cpp
     RefBatchToSpaceNdWorkload.hpp
+    RefConcatWorkload.cpp
+    RefConcatWorkload.hpp
     RefConstantWorkload.cpp
     RefConstantWorkload.hpp
     RefConvertFp16ToFp32Workload.cpp
@@ -74,8 +78,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefL2NormalizationWorkload.hpp
     RefLstmWorkload.cpp
     RefLstmWorkload.hpp
-    RefConcatWorkload.cpp
-    RefConcatWorkload.hpp
+    RefMeanWorkload.cpp
+    RefMeanWorkload.hpp
     RefNormalizationWorkload.cpp
     RefNormalizationWorkload.hpp
     RefPadWorkload.cpp
@@ -104,6 +108,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefSplitterWorkload.hpp
     RefStridedSliceWorkload.cpp
     RefStridedSliceWorkload.hpp
+    RefTransposeConvolution2dWorkload.cpp
+    RefTransposeConvolution2dWorkload.hpp
     RefWorkloads.hpp
     RefWorkloadUtils.hpp
     ResizeBilinear.cpp
@@ -123,10 +129,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     StringMapping.cpp
     StringMapping.hpp
     TensorBufferArrayView.hpp
-    Mean.cpp
-    Mean.hpp
-    RefMeanWorkload.cpp
-    RefMeanWorkload.hpp
+    TransposeConvolution2d.cpp
+    TransposeConvolution2d.hpp
 )
 
 add_library(armnnRefBackendWorkloads OBJECT ${armnnRefBackendWorkloads_sources})

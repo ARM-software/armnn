@@ -47,6 +47,7 @@
 #include "RefSpaceToBatchNdWorkload.hpp"
 #include "RefStridedSliceWorkload.hpp"
 #include "RefSpaceToDepthWorkload.hpp"
+#include "RefTransposeConvolution2dWorkload.hpp"
 #include "RefWorkloadUtils.hpp"
 #include "ResizeBilinear.hpp"
 #include "Softmax.hpp"

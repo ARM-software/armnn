@@ -68,3 +68,9 @@ armnn::SubgraphView::SubgraphViewPtr CreateSubgraphViewFrom(armnn::SubgraphView:
                                                             armnn::SubgraphView::Layers&& layers);
 
 armnn::IBackendInternalUniquePtr CreateBackendObject(const armnn::BackendId& backendId);
+
+armnn::TensorShape MakeTensorShape(unsigned int batches,
+                                   unsigned int channels,
+                                   unsigned int height,
+                                   unsigned int width,
+                                   armnn::DataLayout layout);

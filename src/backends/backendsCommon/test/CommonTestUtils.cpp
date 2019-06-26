@@ -50,3 +50,21 @@ armnn::IBackendInternalUniquePtr CreateBackendObject(const armnn::BackendId& bac
 
     return backendObjPtr;
 }
+
+armnn::TensorShape MakeTensorShape(unsigned int batches,
+                                   unsigned int channels,
+                                   unsigned int height,
+                                   unsigned int width,
+                                   armnn::DataLayout layout)
+{
+    using namespace armnn;
+    switch (layout)
+    {
+        case DataLayout::NCHW:
+            return TensorShape{ batches, channels, height, width };
+        case DataLayout::NHWC:
+            return TensorShape{ batches, height, width, channels };
+        default:
+            throw InvalidArgumentException(std::string("Unsupported data layout: ") + GetDataLayoutName(layout));
+    }
+}

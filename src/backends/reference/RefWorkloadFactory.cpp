@@ -464,4 +464,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePrelu(const PreluQueueDescr
     return std::make_unique<RefPreluWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
+    const TransposeConvolution2dQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefTransposeConvolution2dWorkload>(descriptor, info);
+}
+
 } // namespace armnn

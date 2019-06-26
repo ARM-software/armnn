@@ -60,6 +60,7 @@ BACKEND_SOURCES := \
         workloads/RefSpaceToDepthWorkload.cpp \
         workloads/RefStridedSliceWorkload.cpp \
         workloads/RefSplitterWorkload.cpp \
+        workloads/RefTransposeConvolution2dWorkload.cpp \
         workloads/ResizeBilinear.cpp \
         workloads/Rsqrt.cpp \
         workloads/SpaceToBatchNd.cpp \
@@ -67,7 +68,8 @@ BACKEND_SOURCES := \
         workloads/StridedSlice.cpp \
         workloads/StringMapping.cpp \
         workloads/Softmax.cpp \
-        workloads/Splitter.cpp
+        workloads/Splitter.cpp \
+        workloads/TransposeConvolution2d.cpp
 
 # BACKEND_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked

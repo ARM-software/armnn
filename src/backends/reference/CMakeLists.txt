@@ -11,7 +11,6 @@ list(APPEND armnnRefBackend_sources
     RefLayerSupport.hpp
     RefWorkloadFactory.cpp
     RefWorkloadFactory.hpp
-
 )
 
 add_library(armnnRefBackend OBJECT ${armnnRefBackend_sources})

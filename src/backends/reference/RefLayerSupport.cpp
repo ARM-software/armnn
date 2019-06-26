@@ -1466,4 +1466,50 @@ bool RefLayerSupport::IsPreluSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
+                                                        const TensorInfo& output,
+                                                        const TransposeConvolution2dDescriptor& descriptor,
+                                                        const TensorInfo& weights,
+                                                        const Optional<TensorInfo>& biases,
+                                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+
+    bool supported = true;
+
+    std::array<DataType,3> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference TransposeConvolution2d: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference TransposeConvolution2d: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+                                  "Reference TransposeConvolution2d: weights is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference TransposeConvolution2d: input and output types mismatched.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
+                                  "Reference TransposeConvolution2d: input and weights types mismatched.");
+
+    if (biases.has_value())
+    {
+        std::array<DataType,3> biasesSupportedTypes = {
+                DataType::Float32,
+                DataType::Signed32
+        };
+        supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
+                                      "Reference TransposeConvolution2d: biases is not a supported type.");
+    }
+
+    return supported;
+}
+
 } // namespace armnn

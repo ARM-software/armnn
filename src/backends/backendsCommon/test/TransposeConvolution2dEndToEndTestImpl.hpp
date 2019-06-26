@@ -1,0 +1,153 @@
+//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+#pragma once
+
+#include "QuantizeHelper.hpp"
+
+#include <armnn/ArmNN.hpp>
+
+#include <Permute.hpp>
+#include <ResolveType.hpp>
+
+#include <backendsCommon/test/CommonTestUtils.hpp>
+
+#include <boost/test/unit_test.hpp>
+
+#include <map>
+#include <vector>
+
+namespace
+{
+
+INetworkPtr CreateTransposeConvolution2dNetwork(const armnn::TransposeConvolution2dDescriptor& descriptor,
+                                                const armnn::TensorInfo& inputInfo,
+                                                const armnn::TensorInfo& outputInfo,
+                                                const armnn::ConstTensor& weights,
+                                                const armnn::Optional<armnn::ConstTensor>& biases)
+{
+    using namespace armnn;
+
+    INetworkPtr network(INetwork::Create());
+    IConnectableLayer* input = network->AddInputLayer(0, "input");
+    IConnectableLayer* transposeConvolution2d =
+        network->AddTransposeConvolution2dLayer(descriptor, weights, biases, "transposeConvolution2d");
+    IConnectableLayer* output = network->AddOutputLayer(0, "output");
+
+    Connect(input, transposeConvolution2d, inputInfo, 0, 0);
+    Connect(transposeConvolution2d, output, outputInfo, 0, 0);
+
+    return network;
+}
+
+} // anonymous namespace
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType>
+void TransposeConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
+                                    armnn::DataLayout dataLayout)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    constexpr unsigned int batches  = 1u;
+    constexpr unsigned int channels = 1u;
+
+    constexpr unsigned int wInput = 3u;
+    constexpr unsigned int hInput = wInput;
+
+    constexpr unsigned int wOutput = 5u;
+    constexpr unsigned int hOutput = wOutput;
+
+    constexpr unsigned int wWeights = 3u;
+    constexpr unsigned int hWeights = wWeights;
+
+    TensorShape inputShape   = MakeTensorShape(batches, channels, hInput, wInput, dataLayout);
+    TensorShape outputShape  = MakeTensorShape(batches, channels, hOutput, wOutput, dataLayout);
+    TensorShape weightsShape = MakeTensorShape(batches, channels, hWeights, wWeights, dataLayout);
+
+    const float   qScale  = IsQuantizedType<T>() ? 0.25f : 1.0f;
+    const int32_t qOffset = IsQuantizedType<T>() ? 50    : 0;
+
+    TensorInfo inputInfo(inputShape, ArmnnType, qScale, qOffset);
+    TensorInfo outputInfo(outputShape, ArmnnType, qScale, qOffset);
+    TensorInfo weightsInfo(weightsShape, ArmnnType, qScale, qOffset);
+    TensorInfo biasesInfo({ channels }, ArmnnBType, qScale * qScale, 0);
+
+    std::vector<float> inputData =
+    {
+       1.f, 1.f, 1.f,
+       1.f, 1.f, 1.f,
+       1.f, 1.f, 1.f
+    };
+
+    std::vector<float> weightsData =
+    {
+        1.f, 2.f, 3.f,
+        4.f, 5.f, 6.f,
+        7.f, 8.f, 9.f
+    };
+
+    std::vector<float> biasesData = { 1.f };
+
+    std::vector<float> expectedOutputData =
+    {
+         6.f, 11.f,  6.f, 11.f,  6.f,
+        11.f, 21.f, 11.f, 21.f, 11.f,
+         6.f, 11.f,  6.f, 11.f,  6.f,
+        11.f, 21.f, 11.f, 21.f, 11.f,
+         6.f, 11.f,  6.f, 11.f,  6.f
+    };
+
+    TransposeConvolution2dDescriptor descriptor;
+    descriptor.m_PadLeft     = 1;
+    descriptor.m_PadRight    = 1;
+    descriptor.m_PadTop      = 1;
+    descriptor.m_PadBottom   = 1;
+    descriptor.m_StrideX     = 2;
+    descriptor.m_StrideY     = 2;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = dataLayout;
+
+    // swizzle data if needed
+    if (dataLayout == armnn::DataLayout::NHWC)
+    {
+        constexpr size_t dataTypeSize = sizeof(float);
+        const armnn::PermutationVector nchwToNhwc = { 0, 3, 1, 2 };
+
+        std::vector<float> tmp(inputData.size());
+        armnnUtils::Permute(inputInfo.GetShape(), nchwToNhwc, inputData.data(), tmp.data(), dataTypeSize);
+        inputData = tmp;
+
+        tmp.resize(weightsData.size());
+        armnnUtils::Permute(weightsInfo.GetShape(), nchwToNhwc, weightsData.data(), tmp.data(), dataTypeSize);
+        weightsData = tmp;
+
+        tmp.resize(expectedOutputData.size());
+        armnnUtils::Permute(outputInfo.GetShape(), nchwToNhwc, expectedOutputData.data(), tmp.data(), dataTypeSize);
+        expectedOutputData = tmp;
+    }
+
+    // quantize data
+    std::vector<T> qInputData          = QuantizedVector<T>(qScale, qOffset, inputData);
+    std::vector<T> qWeightsData        = QuantizedVector<T>(qScale, qOffset, weightsData);
+    std::vector<T> qExpectedOutputData = QuantizedVector<T>(qScale, qOffset, expectedOutputData);
+
+    using BT = ResolveType<ArmnnBType>;
+    std::vector<BT> qBiasesData  = QuantizedVector<BT>(qScale * qScale, 0, biasesData);
+
+    ConstTensor weights(weightsInfo, qWeightsData);
+    ConstTensor biases(biasesInfo, qBiasesData);
+
+    INetworkPtr network = CreateTransposeConvolution2dNetwork(descriptor,
+                                                              inputInfo,
+                                                              outputInfo,
+                                                              weights,
+                                                              Optional<ConstTensor>(biases));
+
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
+                                                { { 0, qInputData } },
+                                                { { 0, qExpectedOutputData } },
+                                                backends);
+}

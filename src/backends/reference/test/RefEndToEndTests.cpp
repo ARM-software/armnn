@@ -13,6 +13,7 @@
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
+#include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
@@ -928,6 +929,43 @@ BOOST_AUTO_TEST_CASE(RefSplitter4dDim2EndToEndUint8Test)
 BOOST_AUTO_TEST_CASE(RefSplitter4dDim3EndToEndUint8Test)
 {
     Splitter4dDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+// TransposeConvolution2d
+BOOST_AUTO_TEST_CASE(RefTransposeConvolution2dEndToEndFloatNchwTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
+        defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefTransposeConvolution2dEndToEndUint8NchwTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+        defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefTransposeConvolution2dEndToEndInt16NchwTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+        defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefTransposeConvolution2dEndToEndFloatNhwcTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
+        defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(RefTransposeConvolution2dEndToEndUint8NhwcTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+        defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(RefTransposeConvolution2dEndToEndInt16NhwcTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
+        defaultBackends, armnn::DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

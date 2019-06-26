@@ -468,6 +468,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
     const TransposeConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
     return std::make_unique<RefTransposeConvolution2dWorkload>(descriptor, info);
 }
 

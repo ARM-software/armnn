@@ -66,26 +66,27 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
 
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
-    unsigned int inBatchSize = inputShape[0];
-    unsigned int inWidth     = inputShape[dataLayoutIndex.GetWidthIndex()];
-    unsigned int inHeight    = inputShape[dataLayoutIndex.GetHeightIndex()];
-    unsigned int inChannels  = inputShape[dataLayoutIndex.GetChannelsIndex()];
+    const unsigned int batches  = inputShape[0];
+    const unsigned int channels = inputShape[dataLayoutIndex.GetChannelsIndex()];
 
-    unsigned int kernelWidth  = kernelShape[dataLayoutIndex.GetWidthIndex()];
-    unsigned int kernelHeight = kernelShape[dataLayoutIndex.GetHeightIndex()];
+    const unsigned int wInput = inputShape[dataLayoutIndex.GetWidthIndex()];
+    const unsigned int hInput = inputShape[dataLayoutIndex.GetHeightIndex()];
 
-    unsigned int totalPaddingX = m_Param.m_PadLeft + m_Param.m_PadRight;
-    unsigned int totalPaddingY = m_Param.m_PadTop + m_Param.m_PadBottom;
+    const unsigned int wKernel = kernelShape[dataLayoutIndex.GetWidthIndex()];
+    const unsigned int hKernel = kernelShape[dataLayoutIndex.GetHeightIndex()];
 
-    unsigned int outWidth  = m_Param.m_StrideX * (inWidth  + 1) - totalPaddingX + kernelWidth;
-    unsigned int outHeight = m_Param.m_StrideY * (inHeight + 1) - totalPaddingY + kernelHeight;
+    const unsigned int wStridedInput = 1u + m_Param.m_StrideX * (wInput - 1);
+    const unsigned int hStridedInput = 1u + m_Param.m_StrideY * (hInput - 1);
 
-    unsigned int outChannels  = inChannels;
-    unsigned int outBatchSize = inBatchSize;
+    const unsigned int wPaddedOutput = wStridedInput + wKernel - (wKernel % 2);
+    const unsigned int hPaddedOutput = hStridedInput + hKernel - (hKernel % 2);
+
+    unsigned int wOutput = wPaddedOutput - (m_Param.m_PadLeft + m_Param.m_PadRight);
+    unsigned int hOutput = hPaddedOutput - (m_Param.m_PadTop + m_Param.m_PadBottom);
 
     TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NHWC ?
-         TensorShape( { outBatchSize, outHeight, outWidth, outChannels } ) :
-         TensorShape( { outBatchSize, outChannels, outHeight, outWidth });
+         TensorShape( { batches, hOutput, wOutput, channels } ) :
+         TensorShape( { batches, channels, hOutput, wOutput });
 
     return std::vector<TensorShape>({ tensorShape });
 }

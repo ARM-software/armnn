@@ -30,7 +30,7 @@ ARMNN_BACKEND_MAKEFILE_DIRS := $(subst /backend.mk,,$(ARMNN_BACKEND_MAKEFILE_PAT
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libarmnn
-ifeq ($(PLATFORM_VERSION),Q)
+ifeq ($(Q_OR_LATER),1)
 # "eng" is deprecated in Android Q
 LOCAL_MODULE_TAGS := optional
 else
@@ -169,7 +169,7 @@ LOCAL_SHARED_LIBRARIES := \
         liblog
 
 LOCAL_CFLAGS := \
-        -std=c++14 \
+        -std=$(CPP_VERSION) \
         -fexceptions \
         -Wno-unused-parameter \
         -frtti
@@ -184,6 +184,11 @@ LOCAL_CFLAGS += \
         -DARMCOMPUTENEON_ENABLED
 endif # ARMNN_COMPUTE_NEON_ENABLED == 1
 
+ifeq ($(Q_OR_LATER),1)
+LOCAL_CFLAGS += \
+        -DBOOST_NO_AUTO_PTR
+endif # PLATFORM_VERSION == Q or later
+
 include $(BUILD_STATIC_LIBRARY)
 
 ###############
@@ -192,7 +197,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := armnn-tests
-ifeq ($(PLATFORM_VERSION),Q)
+ifeq ($(Q_OR_LATER),1)
 # "eng" is deprecated in Android Q
 LOCAL_MODULE_TAGS := optional
 else
@@ -232,7 +237,7 @@ LOCAL_C_INCLUDES := \
         $(ARMNN_BACKENDS_HEADER_PATH)
 
 LOCAL_CFLAGS := \
-        -std=c++14 \
+        -std=$(CPP_VERSION) \
         -fexceptions \
         -frtti \
         -isystem vendor/arm/android-nn-driver/boost_1_64_0
@@ -246,6 +251,11 @@ ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 LOCAL_CFLAGS += \
         -DARMCOMPUTENEON_ENABLED
 endif # ARMNN_COMPUTE_NEON_ENABLED == 1
+
+ifeq ($(Q_OR_LATER),1)
+LOCAL_CFLAGS += \
+        -DBOOST_NO_AUTO_PTR
+endif # PLATFORM_VERSION == Q or later
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_TEST_SOURCES) \
@@ -287,7 +297,7 @@ LOCAL_SHARED_LIBRARIES := \
         android.hidl.allocator@1.0 \
         android.hidl.memory@1.0
 
-ifneq ($(PLATFORM_VERSION),Q)
+ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 LOCAL_SHARED_LIBRARIES += \
         libOpenCL
 endif

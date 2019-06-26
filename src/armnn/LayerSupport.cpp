@@ -535,6 +535,16 @@ bool IsSpaceToBatchNdSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsSpaceToBatchNdSupported, input, output, descriptor);
 }
 
+bool IsSpaceToDepthSupported(const BackendId& backend,
+                               const TensorInfo& input,
+                               const TensorInfo& output,
+                               const SpaceToDepthDescriptor& descriptor,
+                               char* reasonIfUnsupported,
+                               size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsSpaceToDepthSupported, input, output, descriptor);
+}
+
 ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
 bool IsSplitterSupported(const BackendId& backend,
                          const TensorInfo& input,

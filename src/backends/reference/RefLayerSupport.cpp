@@ -1337,9 +1337,9 @@ bool RefLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
 }
 
 bool RefLayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
-                             const TensorInfo& output,
-                             const SpaceToDepthDescriptor& descriptor,
-                             Optional<std::string&> reasonIfUnsupported) const
+                                              const TensorInfo& output,
+                                              const SpaceToDepthDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
 {
 
     ignore_unused(descriptor);

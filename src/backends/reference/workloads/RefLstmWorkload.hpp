@@ -38,6 +38,12 @@ private:
     std::unique_ptr<ScopedCpuTensorHandle> m_OutputGateBiasTensor;
     std::unique_ptr<ScopedCpuTensorHandle> m_ProjectionWeightsTensor;
     std::unique_ptr<ScopedCpuTensorHandle> m_ProjectionBiasTensor;
+    std::unique_ptr<ScopedCpuTensorHandle> m_InputLayerNormWeights;
+    std::unique_ptr<ScopedCpuTensorHandle> m_ForgetLayerNormWeights;
+    std::unique_ptr<ScopedCpuTensorHandle> m_CellLayerNormWeights;
+    std::unique_ptr<ScopedCpuTensorHandle> m_OutputLayerNormWeights;
+
+    float m_LayerNormEpsilon = static_cast<float>(1e-8);
 };
 
 } //namespace armnn

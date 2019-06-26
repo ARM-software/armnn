@@ -28,6 +28,7 @@ list(APPEND armnnRefBackendWorkloads_sources
     Gather.cpp
     Gather.hpp
     LstmUtils.hpp
+    LstmUtils.cpp
     Maximum.hpp
     Mean.cpp
     Mean.hpp

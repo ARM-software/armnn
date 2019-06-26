@@ -589,6 +589,7 @@ struct LstmDescriptor
     , m_CifgEnabled(true)
     , m_PeepholeEnabled(false)
     , m_ProjectionEnabled(false)
+    , m_LayerNormEnabled(false)
     {}
 
     /// @brief The activation function to use.
@@ -604,6 +605,8 @@ struct LstmDescriptor
     bool m_PeepholeEnabled;
     /// Enable/disable the projection layer.
     bool m_ProjectionEnabled;
+    /// Enable/disable layer normalization
+    bool m_LayerNormEnabled;
 };
 
 /// A MeanDescriptor for the MeanLayer.

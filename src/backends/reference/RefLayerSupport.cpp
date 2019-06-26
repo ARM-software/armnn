@@ -861,7 +861,11 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
                                       const TensorInfo* projectionBias,
                                       const TensorInfo* cellToForgetWeights,
                                       const TensorInfo* cellToOutputWeights,
-                                      Optional<std::string&> reasonIfUnsupported) const
+                                      Optional<std::string&> reasonIfUnsupported,
+                                      const TensorInfo* inputLayerNormWeights,
+                                      const TensorInfo* forgetLayerNormWeights,
+                                      const TensorInfo* cellLayerNormWeights,
+                                      const TensorInfo* outputLayerNormWeights) const
 {
     ignore_unused(descriptor);
     ignore_unused(inputToForgetWeights);
@@ -881,6 +885,10 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
     ignore_unused(projectionBias);
     ignore_unused(cellToForgetWeights);
     ignore_unused(cellToOutputWeights);
+    ignore_unused(inputLayerNormWeights);
+    ignore_unused(forgetLayerNormWeights);
+    ignore_unused(cellLayerNormWeights);
+    ignore_unused(outputLayerNormWeights);
 
     bool supported = true;
 

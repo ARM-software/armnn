@@ -243,7 +243,11 @@ bool LayerSupportBase::IsLstmSupported(const TensorInfo& input,
                                        const TensorInfo* projectionBias,
                                        const TensorInfo* cellToForgetWeights,
                                        const TensorInfo* cellToOutputWeights,
-                                       Optional<std::string&> reasonIfUnsupported) const
+                                       Optional<std::string&> reasonIfUnsupported,
+                                       const TensorInfo* inputLayerNormWeights,
+                                       const TensorInfo* forgetLayerNormWeights,
+                                       const TensorInfo* cellLayerNormWeights,
+                                       const TensorInfo* outputLayerNormWeights) const
 {
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }

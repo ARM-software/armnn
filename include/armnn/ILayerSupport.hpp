@@ -170,7 +170,11 @@ public:
                                  const TensorInfo* projectionBias,
                                  const TensorInfo* cellToForgetWeights,
                                  const TensorInfo* cellToOutputWeights,
-                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional(),
+                                 const TensorInfo* inputLayerNormWeights = nullptr,
+                                 const TensorInfo* forgetLayerNormWeights = nullptr,
+                                 const TensorInfo* cellLayerNormWeights = nullptr,
+                                 const TensorInfo* outputLayerNormWeights = nullptr) const = 0;
 
     virtual bool IsMaximumSupported(const TensorInfo& input0,
                                     const TensorInfo& input1,

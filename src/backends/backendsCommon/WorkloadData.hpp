@@ -344,6 +344,10 @@ struct LstmQueueDescriptor : QueueDescriptorWithParameters<LstmDescriptor>
         , m_OutputGateBias(nullptr)
         , m_ProjectionWeights(nullptr)
         , m_ProjectionBias(nullptr)
+        , m_InputLayerNormWeights(nullptr)
+        , m_ForgetLayerNormWeights(nullptr)
+        , m_CellLayerNormWeights(nullptr)
+        , m_OutputLayerNormWeights(nullptr)
     {
     }
 
@@ -364,6 +368,10 @@ struct LstmQueueDescriptor : QueueDescriptorWithParameters<LstmDescriptor>
     const ConstCpuTensorHandle* m_OutputGateBias;
     const ConstCpuTensorHandle* m_ProjectionWeights;
     const ConstCpuTensorHandle* m_ProjectionBias;
+    const ConstCpuTensorHandle* m_InputLayerNormWeights;
+    const ConstCpuTensorHandle* m_ForgetLayerNormWeights;
+    const ConstCpuTensorHandle* m_CellLayerNormWeights;
+    const ConstCpuTensorHandle* m_OutputLayerNormWeights;
 
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

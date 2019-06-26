@@ -1665,6 +1665,153 @@ LayerTestResult<int16_t, 3> CopyViaSplitterInt16Test(
     return CopyViaSplitterTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
+void LstmUtilsZeroVectorTest()
+{
+    armnn::TensorInfo inputDesc({4}, armnn::DataType::Float32);
+    boost::multi_array<float, 1> input = MakeTensor<float, 1>(inputDesc, std::vector<float>(
+            {2., 3., 3., 4.}));
+
+    boost::multi_array<float, 1> expectedOutput = MakeTensor<float, 1>(inputDesc, std::vector<float>(
+            {0., 0., 0., 0.}));
+
+    return LstmUtilsZeroVectorTestImpl<armnn::DataType::Float32>(input, 4, expectedOutput);
+}
+
+void LstmUtilsMeanStddevNormalizationNoneZeroInputTest()
+{
+    uint32_t batchSize = 2;
+    uint32_t vecSize = 4;
+    armnn::TensorInfo inputDesc({batchSize, vecSize}, armnn::DataType::Float32);
+    boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            { 0.1f, 0.2f, 0.3f, 0.4f,      //batch 0
+              0.9f, 1.0f, 1.1f, 1.2f }));  //batch 1
+
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            { -1.34164071f, -0.447213531f, 0.44721365f,  1.34164071f,      //batch 0
+              -1.34163153f, -0.447210163f, 0.447211236f, 1.3416326f  }));  //batch 1
+
+    return LstmUtilsMeanStddevNormalizationTestImpl<armnn::DataType::Float32>(input,
+            vecSize, batchSize, expectedOutput);
+}
+
+void LstmUtilsMeanStddevNormalizationAllZeroInputTest()
+{
+    uint32_t batchSize = 2;
+    uint32_t vecSize = 4;
+    armnn::TensorInfo inputDesc({batchSize, vecSize}, armnn::DataType::Float32);
+    boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            { 0.0f, 0.0f, 0.0f, 0.0f,      //batch 0
+              0.0f, 0.0f, 0.0f, 0.0f }));  //batch 1
+
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            { 0.0f, 0.0f, 0.0f, 0.0f,      //batch 0
+              0.0f, 0.0f, 0.0f, 0.0f }));  //batch 1
+
+    return LstmUtilsMeanStddevNormalizationTestImpl<armnn::DataType::Float32>(input,
+            vecSize, batchSize, expectedOutput);
+}
+
+void LstmUtilsMeanStddevNormalizationMixedZeroInputTest()
+{
+    uint32_t batchSize = 2;
+    uint32_t vecSize = 4;
+    armnn::TensorInfo inputDesc({batchSize, vecSize}, armnn::DataType::Float32);
+    boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            { 0.0f, 0.0f, 0.0f, 0.0f,      //batch 0
+              0.1f, 0.2f, 0.3f, 0.4f }));  //batch 1
+
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            {         0.0f,          0.0f,        0.0f,        0.0f,      //batch 0
+              -1.34164071f, -0.447213531f, 0.44721365f, 1.34164071f }));  //batch 1
+
+    return LstmUtilsMeanStddevNormalizationTestImpl<armnn::DataType::Float32>(input,
+            vecSize, batchSize, expectedOutput);
+}
+
+
+void LstmUtilsVectorBatchVectorCwiseProductTest()
+{
+    uint32_t batchSize = 4;
+    uint32_t vecSize = 29;
+    armnn::TensorInfo vecDesc({vecSize}, armnn::DataType::Float32);
+    boost::multi_array<float, 1> vector = MakeTensor<float, 1>(vecDesc, std::vector<float>(
+            {   1.1f,   2.2f,   3.3f,   4.4f,   5.5f,   6.6f,   7.7f,   8.8f,   9.9f, 10.1f,
+              11.11f, 12.12f, 13.13f, 14.14f, 15.15f, 16.16f, 17.17f, 18.18f, 19.19f, 20.2f,
+              21.21f, 22.22f, 23.23f, 24.24f, 25.25f, 26.26f, 27.27f, 28.28f,     0.0f}));
+
+    armnn::TensorInfo batchVecDesc({batchSize, vecSize}, armnn::DataType::Float32);
+    boost::multi_array<float, 2> batchVector = MakeTensor<float, 2>(batchVecDesc, std::vector<float>(
+            { /* batch 0 */
+                1.1f,   2.2f,   3.3f,   4.4f,   5.5f,   6.6f,   7.7f,   8.8f,   9.9f,  10.1f,
+              11.11f, 12.12f, 13.13f, 14.14f, 15.15f, 16.16f, 17.17f, 18.18f, 19.19f,  20.2f,
+              21.21f, 22.22f, 23.23f, 24.24f, 25.25f, 26.26f, 27.27f, 28.28f,   0.0f,
+              /* batch 1 */
+                -1.1f,   -2.2f,   -3.3f,   -4.4f,   -5.5f,   -6.6f,   -7.7f,   -8.8f,   -9.9f, -10.1f,
+              -11.11f, -12.12f, -13.13f, -14.14f, -15.15f, -16.16f, -17.17f, -18.18f, -19.19f, -20.2f,
+              -21.21f, -22.22f, -23.23f, -24.24f, -25.25f, -26.26f, -27.27f, -28.28f,    0.0f,
+              /* batch 2 */
+                1.1f,   -2.2f,   3.3f,   -4.4f,   5.5f,   -6.6f,   7.7f,   -8.8f,   9.9f, -10.1f,
+              11.11f, -12.12f, 13.13f, -14.14f, 15.15f, -16.16f, 17.17f, -18.18f, 19.19f, -20.2f,
+              21.21f, -22.22f, 23.23f, -24.24f, 25.25f, -26.26f, 27.27f, -28.28f,   0.0f,
+              /* batch 3 */
+                -1.1f,   2.2f,   -3.3f,   4.4f,   -5.5f,   6.6f,   -7.7f,   8.8f,   -9.9f, 10.1f,
+              -11.11f, 12.12f, -13.13f, 14.14f, -15.15f, 16.16f, -17.17f, 18.18f, -19.19f, 20.2f,
+              -21.21f, 22.22f, -23.23f, 24.24f, -25.25f, 26.26f, -27.27f, 28.28f,    0.0f}));
+
+    // Expect output = input * output + output.
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(batchVecDesc, std::vector<float>(
+            { /* batch 0 */
+                 1.210000f,    4.840000f,   10.889999f,   19.360001f,   30.250000f,   43.559998f,
+                59.289997f,   77.440002f,   98.009995f,  102.010010f,  123.432091f,  146.894394f,
+               172.396896f,  199.939606f,  229.522491f,  261.145599f,  294.808899f,  330.512421f,
+               368.256134f,  408.040039f,  449.864075f,  493.728363f,  539.632874f,  587.577576f,
+               637.562500f,  689.587585f,  743.652954f,  799.758423f,    0.000000f,
+              /* batch 1 */
+                -1.210000f,   -4.840000f,  -10.889999f,  -19.360001f,  -30.250000f,  -43.559998f,
+               -59.289997f,  -77.440002f,  -98.009995f, -102.010010f, -123.432091f, -146.894394f,
+              -172.396896f, -199.939606f, -229.522491f, -261.145599f, -294.808899f, -330.512421f,
+              -368.256134f, -408.040039f, -449.864075f, -493.728363f, -539.632874f, -587.577576f,
+              -637.562500f, -689.587585f, -743.652954f, -799.758423f,    0.000000f,
+              /* batch 2 */
+                 1.210000f,   -4.840000f,  10.889999f,   -19.360001f,   30.250000f,  -43.559998f,
+                59.289997f,  -77.440002f,  98.009995f,  -102.010010f,  123.432091f, -146.894394f,
+               172.396896f, -199.939606f, 229.522491f,  -261.145599f,  294.808899f, -330.512421f,
+               368.256134f, -408.040039f, 449.864075f,  -493.728363f,  539.632874f, -587.577576f,
+               637.562500f, -689.587585f, 743.652954f,  -799.758423f,    0.000000f,
+              /* batch 3 */
+                -1.210000f,    4.840000f,  -10.889999f,   19.360001f,  -30.250000f,   43.559998f,
+               -59.289997f,   77.440002f,  -98.009995f,  102.010010f, -123.432091f,  146.894394f,
+              -172.396896f,  199.939606f, -229.522491f,  261.145599f, -294.808899f,  330.512421f,
+              -368.256134f,  408.040039f, -449.864075f,  493.728363f, -539.632874f,  587.577576f,
+              -637.562500f,  689.587585f, -743.652954f,  799.758423f,    0.000000f}));
+
+    return LstmUtilsVectorBatchVectorCwiseProductTestImpl<armnn::DataType::Float32>(vector, batchVector,
+            vecSize, batchSize, expectedOutput);
+}
+
+
+void LstmUtilsVectorBatchVectorAddTest()
+{
+    uint32_t batchSize = 2;
+    uint32_t vecSize = 3;
+    armnn::TensorInfo vecDesc({vecSize}, armnn::DataType::Float32);
+    boost::multi_array<float, 1> vector = MakeTensor<float, 1>(vecDesc, std::vector<float>(
+            { 0.0f, -0.5f, 1.0f}));
+
+    armnn::TensorInfo batchVecDesc({batchSize, vecSize}, armnn::DataType::Float32);
+    boost::multi_array<float, 2> batchVector = MakeTensor<float, 2>(batchVecDesc, std::vector<float>(
+            { 1.0f, 2.0f, 3.0f,    //batch 0
+              4.0f, 5.0f, 6.0f})); //batch 1
+
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(batchVecDesc, std::vector<float>(
+            { 1.0f, 1.5f, 4.0f,
+              4.0f, 4.5f, 7.0f}));
+
+    return LstmUtilsVectorBatchVectorAddTestImpl<armnn::DataType::Float32>(vector, batchVector,
+            vecSize, batchSize, expectedOutput);
+}
+
+
 LayerTestResult<float, 2> LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -1720,6 +1867,25 @@ LayerTestResult<float, 2> LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest(
     return LstmNoCifgNoPeepholeNoProjectionTestImpl<armnn::DataType::Float32>(
         workloadFactory, memoryManager, input, expectedOutput);
 }
+
+
+LayerTestResult<float, 2> LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNormTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputDesc({ 2, 5 }, armnn::DataType::Float32);
+    boost::multi_array<float, 2> input = MakeTensor<float, 2>(inputDesc, std::vector<float>(
+            {0.7f, 0.8f, 0.1f, 0.2f, 0.3f,     //batch 0
+             0.3f, 0.2f, 0.9f, 0.8f, 0.1f}));  //batch 1
+
+    armnn::TensorInfo outputDesc({ 2, 3 }, armnn::DataType::Float32);
+    boost::multi_array<float, 2> expectedOutput = MakeTensor<float, 2>(outputDesc, std::vector<float>(
+            {  0.0244077f,  0.128027f, -0.00170918f,    //batch 0
+             -0.00692428f, 0.0848741f,    0.063445f})); //batch 1
+    return LstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTestImpl<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, input, expectedOutput);
+}
+
 
 LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgNoPeepholeNoProjectionTest(
     armnn::IWorkloadFactory& workloadFactory,

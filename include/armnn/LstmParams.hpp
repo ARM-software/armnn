@@ -29,6 +29,10 @@ struct LstmInputParams
         , m_OutputGateBias(nullptr)
         , m_ProjectionWeights(nullptr)
         , m_ProjectionBias(nullptr)
+        , m_InputLayerNormWeights(nullptr)
+        , m_ForgetLayerNormWeights(nullptr)
+        , m_CellLayerNormWeights(nullptr)
+        , m_OutputLayerNormWeights(nullptr)
     {
     }
 
@@ -49,6 +53,10 @@ struct LstmInputParams
     const ConstTensor* m_OutputGateBias;
     const ConstTensor* m_ProjectionWeights;
     const ConstTensor* m_ProjectionBias;
+    const ConstTensor* m_InputLayerNormWeights;
+    const ConstTensor* m_ForgetLayerNormWeights;
+    const ConstTensor* m_CellLayerNormWeights;
+    const ConstTensor* m_OutputLayerNormWeights;
 };
 
 } // namespace armnn

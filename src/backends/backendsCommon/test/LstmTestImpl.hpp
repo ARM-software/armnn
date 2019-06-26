@@ -16,6 +16,119 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
+#include "reference/workloads/LstmUtils.hpp"
+
+//LstmUtils Tests
+// TODO: Add tests for the remaining functions in LstmUtils.hpp
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void LstmUtilsVectorBatchVectorAddTestImpl(
+        boost::multi_array<float, 1>& vec,
+        boost::multi_array<float, 2>& batchVec,
+        uint32_t vSize,
+        uint32_t nBatch,
+        boost::multi_array<float, 2>& expectedOutput )
+{
+    float qScale = 0.0f;
+    int32_t qOffset = 0;
+    armnn::TensorInfo tensorInfo({nBatch, vSize}, ArmnnType,  qScale, qOffset );
+
+    // Make encoder and decoder
+    std::unique_ptr<armnn::Decoder<float>> vecDecoder = armnn::MakeDecoder<float>(tensorInfo, vec.data());
+    std::unique_ptr<armnn::Decoder<float>> batchVecDecoder = armnn::MakeDecoder<float>(tensorInfo, batchVec.data());
+    std::unique_ptr<armnn::Encoder<float>> batchVecEncoder = armnn::MakeEncoder<float>(tensorInfo, batchVec.data());
+
+    VectorBatchVectorAdd(*vecDecoder, vSize, *batchVecDecoder, nBatch, *batchVecEncoder);
+
+    // check shape and compare values
+    BOOST_TEST(CompareTensors(batchVec, expectedOutput));
+
+    // check if iterator is back at start position
+    batchVecEncoder->Set(1.0f);
+    BOOST_TEST(batchVec[0][0] == 1.0f);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void LstmUtilsZeroVectorTestImpl(
+        boost::multi_array<float, 1>& input,
+        uint32_t vSize,
+        boost::multi_array<float, 1>& expectedOutput) {
+
+    float qScale = 0.0f;
+    int32_t qOffset = 0;
+
+    armnn::TensorInfo tensorInfo({vSize}, ArmnnType,  qScale, qOffset );
+
+    // Make encoder for input
+    std::unique_ptr<armnn::Encoder<float>> outputEncoder = armnn::MakeEncoder<float>(tensorInfo, input.data());
+
+    // call ZeroVector
+    ZeroVector(*outputEncoder, vSize);
+
+    // check shape and compare values
+    BOOST_TEST(CompareTensors(input, expectedOutput));
+
+    // check if iterator is back at start position
+    outputEncoder->Set(1.0f);
+    BOOST_TEST(input[0] == 1.0f);
+
+}
+
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void LstmUtilsMeanStddevNormalizationTestImpl(
+        boost::multi_array<float, 2>& input,
+        uint32_t vSize,
+        uint32_t nBatch,
+        boost::multi_array<float, 2>& expectedOutput)
+{
+    float qScale = 0.0f;
+    int32_t qOffset = 0;
+    armnn::TensorInfo tensorInfo({nBatch, vSize}, ArmnnType,  qScale, qOffset );
+
+    // Make encoder and decoder for input
+    std::unique_ptr<armnn::Decoder<float>> inputDecoder = armnn::MakeDecoder<float>(tensorInfo, input.data());
+    std::unique_ptr<armnn::Encoder<float>> outputEncoder = armnn::MakeEncoder<float>(tensorInfo, input.data());
+
+    MeanStddevNormalization(*inputDecoder, *outputEncoder, vSize, nBatch, 1e-8f);
+
+    // check shape and compare values
+    BOOST_TEST(CompareTensors(input, expectedOutput));
+
+    // check if iterator is back at start position
+    outputEncoder->Set(1.0f);
+    BOOST_TEST(input[0][0] == 1.0f);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void LstmUtilsVectorBatchVectorCwiseProductTestImpl(
+        boost::multi_array<float, 1>& vec,
+        boost::multi_array<float, 2>& batchVec,
+        uint32_t vSize,
+        uint32_t nBatch,
+        boost::multi_array<float, 2>& expectedOutput)
+{
+    float qScale = 0.0f;
+    int32_t qOffset = 0;
+    armnn::TensorInfo tensorInfo({nBatch, vSize}, ArmnnType,  qScale, qOffset );
+
+    // Make encoder and decoder
+    std::unique_ptr<armnn::Decoder<float>> vecDecoder = armnn::MakeDecoder<float>(tensorInfo, vec.data());
+    std::unique_ptr<armnn::Decoder<float>> batchVecDecoder = armnn::MakeDecoder<float>(tensorInfo, batchVec.data());
+    std::unique_ptr<armnn::Encoder<float>> batchVecEncoder = armnn::MakeEncoder<float>(tensorInfo, batchVec.data());
+
+    VectorBatchVectorCwiseProduct(*vecDecoder, vSize, *batchVecDecoder, nBatch, *batchVecEncoder);
+
+    // check shape and compare values
+    BOOST_TEST(CompareTensors(batchVec, expectedOutput));
+
+    // check if iterator is back at start position
+    batchVecEncoder->Set(1.0f);
+    BOOST_TEST(batchVec[0][0] == 1.0f);
+}
+
+// Lstm Layer tests:
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 2>
 LstmNoCifgNoPeepholeNoProjectionTestImpl(
@@ -187,7 +300,6 @@ LstmNoCifgNoPeepholeNoProjectionTestImpl(
     data.m_RecurrentToForgetWeights = &recurrentToForgetWeightsTensor;
     data.m_RecurrentToCellWeights = &recurrentToCellWeightsTensor;
     data.m_RecurrentToOutputWeights = &recurrentToOutputWeightsTensor;
-    data.m_CellToInputWeights = &cellToInputWeightsTensor;
     data.m_InputGateBias = &inputGateBiasTensor;
     data.m_ForgetGateBias = &forgetGateBiasTensor;
     data.m_CellBias = &cellBiasTensor;
@@ -1156,4 +1268,276 @@ LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
     CopyDataFromITensorHandle(&ret3.output[0][0], outputHandle.get());
 
     return ret3;
+}
+
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2>
+LstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTestImpl(armnn::IWorkloadFactory& workloadFactory,
+                                                  const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                                                  const boost::multi_array<T, 2>& input,
+                                                  const boost::multi_array<T, 2>& outputExpected,
+                                                  float qScale = 0.0f,
+                                                  int32_t qOffset = 0,
+                                                  armnn::DataType constantDataType = armnn::DataType::Float32)
+{
+    unsigned int batchSize = 2;
+    unsigned int outputSize = 3;
+    unsigned int inputSize = 5;
+    unsigned numUnits = 4;
+
+    armnn::TensorInfo inputTensorInfo({batchSize , inputSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, ArmnnType, qScale, qOffset);
+
+    // Scratch buffer size without CIFG [batchSize, numUnits * 4]
+    armnn::TensorInfo scratchBufferTensorInfo({batchSize, numUnits * 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, numUnits}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
+
+    LayerTestResult<T, 2> ret(outputTensorInfo);
+
+    std::vector<float> inputVector;
+    inputVector.assign(input.data(), input.data() + (batchSize * inputSize));
+    auto inputTensor = MakeTensor<float,2>(inputTensorInfo, inputVector);
+
+    std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
+    auto cellStateInTensor = MakeTensor<float,2>(cellStateInTensorInfo, cellStateInVector);
+
+    std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
+    auto outputStateInTensor = MakeTensor<float,2>(outputStateInTensorInfo, outputStateInVector);
+
+    std::vector<float> scratchBufferVector(batchSize * numUnits * 4, 0.f);
+    auto scratchBufferTensor = MakeTensor<float,2>(scratchBufferTensorInfo, scratchBufferVector);
+
+    std::vector<float> outputStateOutVector(batchSize * outputSize, 0.f);
+    auto outputStateOutTensor = MakeTensor<float,2>(outputStateOutTensorInfo, outputStateOutVector);
+
+    std::vector<float> cellStateOutVector(batchSize * numUnits, 0.f);
+    auto cellStateOutTensor = MakeTensor<float,2>(cellStateOutTensorInfo, cellStateOutVector);
+
+    std::vector<float> outputVector;
+    outputVector.assign(outputExpected.data(), outputExpected.data() + (batchSize * outputSize));
+    ret.outputExpected = MakeTensor<float, 2>(outputTensorInfo, outputVector);
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
+            workloadFactory.CreateTensorHandle(cellStateInTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
+            workloadFactory.CreateTensorHandle(outputStateInTensorInfo);
+
+    std::unique_ptr<armnn::ITensorHandle> scratchHandle = workloadFactory.CreateTensorHandle(scratchBufferTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+            workloadFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+            workloadFactory.CreateTensorHandle(cellStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::LstmQueueDescriptor data;
+    armnn::WorkloadInfo info;
+
+    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
+    AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
+
+    AddOutputToWorkload(data, info, scratchBufferTensorInfo, scratchHandle.get());
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    armnn::TensorInfo tensorInfo3({outputSize}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo4({numUnits}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo4x5({numUnits, inputSize}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo4x3({numUnits, outputSize}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo3x4({outputSize, numUnits}, constantDataType, qScale, qOffset);
+
+    auto inputToInputWeights =
+            MakeTensor<float, 2>(tensorInfo4x5, { 0.5f,  0.6f,  0.7f, -0.8f, -0.9f,
+                                                  0.1f,  0.2f,  0.3f, -0.4f,  0.5f,
+                                                 -0.8f,  0.7f, -0.6f,  0.5f, -0.4f,
+                                                 -0.5f, -0.4f, -0.3f, -0.2f, -0.1f});  //{numUnits, inputSize}
+
+    auto inputToForgetWeights =
+            MakeTensor<float, 2>(tensorInfo4x5, {-0.6f, -0.1f,  0.3f,  0.2f,  0.9f,
+                                                 -0.5f, -0.2f, -0.4f,  0.3f, -0.8f,
+                                                 -0.4f,  0.3f, -0.5f, -0.4f, -0.6f,
+                                                  0.3f, -0.4f, -0.6f, -0.5f, -0.5f});  //{numUnits, inputSize}
+
+    auto inputToCellWeights =
+            MakeTensor<float, 2>(tensorInfo4x5, {-0.4f, -0.3f, -0.2f, -0.1f, -0.5f,
+                                                  0.5f, -0.2f, -0.3f, -0.2f, -0.6f,
+                                                  0.6f, -0.1f, -0.4f, -0.3f, -0.7f,
+                                                  0.7f, -0.9f, -0.5f,  0.8f,  0.6f});  //{numUnits, inputSize}
+
+    auto inputToOutputWeights =
+            MakeTensor<float, 2>(tensorInfo4x5, {-0.8f, -0.4f, -0.2f, -0.9f, -0.1f,
+                                                 -0.7f,  0.3f, -0.3f, -0.8f, -0.2f,
+                                                  0.6f, -0.2f,  0.4f, -0.7f, -0.3f,
+                                                 -0.5f,  0.1f,  0.5f, -0.6f, -0.4f}); //{numUnits, inputSize}
+
+    auto inputGateBias =
+            MakeTensor<float, 1>(tensorInfo4, {0.03f, 0.15f, 0.22f, 0.38f});  //{numUnits}
+
+    auto forgetGateBias =
+            MakeTensor<float, 1>(tensorInfo4, {0.1f, -0.3f, -0.2f, 0.1f});    //{numUnits}
+
+    auto cellBias =
+            MakeTensor<float, 1>(tensorInfo4, {-0.05f, 0.72f, 0.25f, 0.08f}); //{numUnits}
+
+    auto outputGateBias =
+            MakeTensor<float, 1>(tensorInfo4, {0.05f, -0.01f, 0.2f, 0.1f});   //{numUnits}
+
+    auto recurrentToInputWeights =
+            MakeTensor<float, 2>(tensorInfo4x3, {-0.2f, -0.3f,  0.4f,
+                                                  0.1f, -0.5f,  0.9f,
+                                                 -0.2f, -0.3f, -0.7f,
+                                                 0.05f, -0.2f, -0.6f});  //{numUnits, outputSize}
+
+    auto recurrentToCellWeights =
+            MakeTensor<float, 2>(tensorInfo4x3, {-0.3f,  0.2f,   0.1f,
+                                                 -0.3f,  0.8f, -0.08f,
+                                                 -0.2f,  0.3f,   0.8f,
+                                                 -0.6f, -0.1f,   0.2f}); //{numUnits, outputSize}
+
+    auto recurrentToForgetWeights =
+            MakeTensor<float, 2>(tensorInfo4x3, {-0.5f, -0.3f, -0.5f,
+                                                 -0.2f,  0.6f,  0.4f,
+                                                  0.9f,  0.3f, -0.1f,
+                                                  0.2f,  0.5f,  0.2f});  //{numUnits, outputSize}
+
+    auto recurrentToOutputWeights =
+            MakeTensor<float, 2>(tensorInfo4x3, { 0.3f, -0.1f,  0.1f,
+                                                 -0.2f, -0.5f, -0.7f,
+                                                 -0.2f, -0.6f, -0.1f,
+                                                 -0.4f, -0.7f, -0.2f});  //{numUnits, outputSize}
+
+    auto cellToInputWeights =
+            MakeTensor<float, 1>(tensorInfo4, {0.05f, 0.1f, 0.25f, 0.15f});      //{numUnits}
+
+    auto cellToForgetWeights =
+            MakeTensor<float, 1>(tensorInfo4, {-0.02f, -0.15f, -0.25f, -0.03f}); //{numUnits}
+
+    auto cellToOutputWeights =
+            MakeTensor<float, 1>(tensorInfo4, {0.1f, -0.1f, -0.5f, 0.05f});      //{numUnits}
+
+    auto projectionWeights =
+            MakeTensor<float, 2>(tensorInfo3x4,
+                                 {-0.1f, 0.2f, 0.01f, -0.2f,
+                                   0.1f, 0.5f,  0.3f, 0.08f,
+                                  0.07f, 0.2f, -0.4f,  0.2f}); //{outputSize, numUnits}
+
+    std::vector<float> projectionBiasVector(outputSize, 0.f);
+    auto projectionBias = MakeTensor<float,1>(tensorInfo3, projectionBiasVector); //{outputSize}
+
+    auto inputLayerNormWeights =
+            MakeTensor<float, 1>(tensorInfo4, {0.1f, 0.2f, 0.3f, 0.5f}); //{numUnits}
+
+    auto forgetLayerNormWeights =
+            MakeTensor<float, 1>(tensorInfo4, {0.2f, 0.2f, 0.4f, 0.3f}); //{numUnits}
+
+    auto cellLayerNormWeights =
+            MakeTensor<float, 1>(tensorInfo4, {0.7f, 0.2f, 0.3f, 0.8f}); //{numUnits}
+
+    auto outputLayerNormWeights =
+            MakeTensor<float, 1>(tensorInfo4, {0.6f, 0.2f, 0.2f, 0.5f}); //{numUnits}
+
+
+    armnn::ScopedCpuTensorHandle inputToInputWeightsTensor(tensorInfo4x5);
+    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(tensorInfo4x5);
+    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(tensorInfo4x5);
+    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(tensorInfo4x5);
+    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(tensorInfo4x3);
+    armnn::ScopedCpuTensorHandle recurrentToInputWeightsTensor(tensorInfo4x3);
+    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(tensorInfo4x3);
+    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(tensorInfo4x3);
+    armnn::ScopedCpuTensorHandle cellToInputWeightsTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle inputGateBiasTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle cellBiasTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle outputGateBiasTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle cellToForgetWeightsTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle cellToOutputWeightsTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle projectionWeightsTensor(tensorInfo3x4);
+    armnn::ScopedCpuTensorHandle projectionBiasTensor(tensorInfo3);
+
+    armnn::ScopedCpuTensorHandle inputLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle forgetLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle cellLayerNormWeightsTensor(tensorInfo4);
+    armnn::ScopedCpuTensorHandle outputLayerNormWeightsTensor(tensorInfo4);
+
+    AllocateAndCopyDataToITensorHandle(&inputToInputWeightsTensor, &inputToInputWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, &inputToForgetWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&inputToCellWeightsTensor, &inputToCellWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&inputToOutputWeightsTensor, &inputToOutputWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&recurrentToInputWeightsTensor, &recurrentToInputWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&recurrentToForgetWeightsTensor, &recurrentToForgetWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&recurrentToCellWeightsTensor, &recurrentToCellWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&recurrentToOutputWeightsTensor, &recurrentToOutputWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&cellToInputWeightsTensor, &cellToInputWeights[0]);
+    AllocateAndCopyDataToITensorHandle(&inputGateBiasTensor, &inputGateBias[0]);
+    AllocateAndCopyDataToITensorHandle(&forgetGateBiasTensor, &forgetGateBias[0]);
+    AllocateAndCopyDataToITensorHandle(&cellBiasTensor, &cellBias[0]);
+    AllocateAndCopyDataToITensorHandle(&outputGateBiasTensor, &outputGateBias[0]);
+    AllocateAndCopyDataToITensorHandle(&cellToForgetWeightsTensor, &cellToForgetWeights[0]);
+    AllocateAndCopyDataToITensorHandle(&cellToOutputWeightsTensor, &cellToOutputWeights[0]);
+    AllocateAndCopyDataToITensorHandle(&projectionWeightsTensor, &projectionWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&projectionBiasTensor, &projectionBias[0]);
+
+    AllocateAndCopyDataToITensorHandle(&inputLayerNormWeightsTensor, &inputLayerNormWeights[0]);
+    AllocateAndCopyDataToITensorHandle(&forgetLayerNormWeightsTensor, &forgetLayerNormWeights[0]);
+    AllocateAndCopyDataToITensorHandle(&cellLayerNormWeightsTensor, &cellLayerNormWeights[0]);
+    AllocateAndCopyDataToITensorHandle(&outputLayerNormWeightsTensor, &outputLayerNormWeights[0]);
+
+    data.m_InputToInputWeights = &inputToInputWeightsTensor;
+    data.m_InputToForgetWeights = &inputToForgetWeightsTensor;
+    data.m_InputToCellWeights = &inputToCellWeightsTensor;
+    data.m_InputToOutputWeights = &inputToOutputWeightsTensor;
+    data.m_RecurrentToInputWeights = &recurrentToInputWeightsTensor;
+    data.m_RecurrentToForgetWeights = &recurrentToForgetWeightsTensor;
+    data.m_RecurrentToCellWeights = &recurrentToCellWeightsTensor;
+    data.m_RecurrentToOutputWeights = &recurrentToOutputWeightsTensor;
+    data.m_CellToInputWeights = &cellToInputWeightsTensor;
+    data.m_InputGateBias = &inputGateBiasTensor;
+    data.m_ForgetGateBias = &forgetGateBiasTensor;
+    data.m_CellBias = &cellBiasTensor;
+    data.m_OutputGateBias = &outputGateBiasTensor;
+    data.m_CellToForgetWeights = &cellToForgetWeightsTensor;
+    data.m_CellToOutputWeights = &cellToOutputWeightsTensor;
+    data.m_ProjectionWeights = &projectionWeightsTensor;
+    data.m_ProjectionBias = &projectionBiasTensor;
+
+    data.m_InputLayerNormWeights = &inputLayerNormWeightsTensor;
+    data.m_ForgetLayerNormWeights = &forgetLayerNormWeightsTensor;
+    data.m_CellLayerNormWeights = &cellLayerNormWeightsTensor;
+    data.m_OutputLayerNormWeights = &outputLayerNormWeightsTensor;
+
+    // Flags to set test configuration
+    data.m_Parameters.m_ActivationFunc = 4;
+    data.m_Parameters.m_CifgEnabled = false;
+    data.m_Parameters.m_PeepholeEnabled = true;
+    data.m_Parameters.m_ProjectionEnabled = true;
+    data.m_Parameters.m_LayerNormEnabled = true;
+
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateLstm(data, info);
+    inputHandle->Allocate();
+    outputStateInHandle->Allocate();
+    cellStateInHandle->Allocate();
+
+    scratchHandle->Allocate();
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
+    CopyDataToITensorHandle(outputStateInHandle.get(), &outputStateInTensor[0][0]);
+    CopyDataToITensorHandle(cellStateInHandle.get(), &cellStateInTensor[0][0]);
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
+
+    return ret;
+
 }

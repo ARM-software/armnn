@@ -420,7 +420,11 @@ bool ClLayerSupport::IsLstmSupported(const TensorInfo& input,
                                      const TensorInfo* projectionBias,
                                      const TensorInfo* cellToForgetWeights,
                                      const TensorInfo* cellToOutputWeights,
-                                     Optional<std::string&> reasonIfUnsupported) const
+                                     Optional<std::string&> reasonIfUnsupported,
+                                     const TensorInfo* inputLayerNormWeights,
+                                     const TensorInfo* forgetLayerNormWeights,
+                                     const TensorInfo* cellLayerNormWeights,
+                                     const TensorInfo* outputLayerNormWeights) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClLstmFloatWorkloadValidate,
                                    reasonIfUnsupported,

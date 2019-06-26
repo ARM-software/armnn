@@ -827,12 +827,26 @@ ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2, PermuteFloat32ValueSet2Test)
 ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3, PermuteFloat32ValueSet3Test)
 
 // Lstm
+BOOST_AUTO_TEST_CASE(LstmUtilsZeroVector) {
+                     LstmUtilsZeroVectorTest(); }
+BOOST_AUTO_TEST_CASE(LstmUtilsMeanStddevNormalization) {
+                     LstmUtilsMeanStddevNormalizationNoneZeroInputTest();
+                     LstmUtilsMeanStddevNormalizationAllZeroInputTest();
+                     LstmUtilsMeanStddevNormalizationMixedZeroInputTest(); }
+BOOST_AUTO_TEST_CASE(LstmUtilsVectorBatchVectorCwiseProduct) {
+                     LstmUtilsVectorBatchVectorCwiseProductTest(); }
+BOOST_AUTO_TEST_CASE(LstmUtilsVectorBatchVectorAdd) {
+                     LstmUtilsVectorBatchVectorAddTest(); }
+
 ARMNN_AUTO_TEST_CASE(LstmLayerFloat32WithCifgWithPeepholeNoProjection,
                      LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest)
 ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgNoPeepholeNoProjection,
                      LstmLayerFloat32NoCifgNoPeepholeNoProjectionTest)
 ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjection,
                      LstmLayerFloat32NoCifgWithPeepholeWithProjectionTest)
+
+ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNorm,
+                     LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNormTest)
 
 ARMNN_AUTO_TEST_CASE(LstmLayerInt16NoCifgNoPeepholeNoProjection,
                      LstmLayerInt16NoCifgNoPeepholeNoProjectionTest)

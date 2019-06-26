@@ -22,6 +22,7 @@ BACKEND_SOURCES := \
         workloads/ElementwiseFunction.cpp \
         workloads/FullyConnected.cpp \
         workloads/Gather.cpp \
+        workloads/LstmUtils.cpp \
         workloads/Mean.cpp \
         workloads/Concatenate.cpp \
         workloads/Pad.cpp \

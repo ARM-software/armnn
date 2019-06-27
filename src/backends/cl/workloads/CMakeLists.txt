@@ -74,6 +74,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClStridedSliceWorkload.hpp
     ClSubtractionWorkload.cpp
     ClSubtractionWorkload.hpp
+    ClTransposeConvolution2dWorkload.cpp
+    ClTransposeConvolution2dWorkload.hpp
     ClWorkloads.hpp
     ClWorkloadUtils.hpp
 )

@@ -399,4 +399,11 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGather(const armnn::GatherQu
     return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateTransposeConvolution2d(
+    const TransposeConvolution2dQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClTransposeConvolution2dWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
+}
+
 } // namespace armnn

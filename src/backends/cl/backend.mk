@@ -54,7 +54,8 @@ BACKEND_SOURCES := \
         workloads/ClSpaceToBatchNdWorkload.cpp \
         workloads/ClSplitterWorkload.cpp \
         workloads/ClStridedSliceWorkload.cpp \
-        workloads/ClSubtractionWorkload.cpp
+        workloads/ClSubtractionWorkload.cpp \
+        workloads/ClTransposeConvolution2dWorkload.cpp
 else
 
 # ARMNN_COMPUTE_CL_ENABLED == 0

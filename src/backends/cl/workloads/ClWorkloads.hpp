@@ -38,3 +38,4 @@
 #include "ClSubtractionWorkload.hpp"
 #include "ClConvertFp16ToFp32Workload.hpp"
 #include "ClConvertFp32ToFp16Workload.hpp"
+#include "ClTransposeConvolution2dWorkload.hpp"

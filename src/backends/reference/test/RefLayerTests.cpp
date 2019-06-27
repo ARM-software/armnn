@@ -9,8 +9,8 @@
 #include <test/UnitTests.hpp>
 
 #include <reference/RefWorkloadFactory.hpp>
+
 #include <backendsCommon/test/DetectionPostProcessLayerTestImpl.hpp>
-#include <backendsCommon/test/TransposeConvolution2dTestImpl.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
 
 #include <boost/test/unit_test.hpp>

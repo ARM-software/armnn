@@ -488,6 +488,16 @@ bool IsPooling2dSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsPooling2dSupported, input, output, descriptor);
 }
 
+bool IsPreluSupported(const BackendId& backend,
+                      const TensorInfo& input,
+                      const TensorInfo& alpha,
+                      const TensorInfo& output,
+                      char* reasonIfUnsupported,
+                      size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsPreluSupported, input, alpha, output);
+}
+
 bool IsReshapeSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const ReshapeDescriptor& descriptor,

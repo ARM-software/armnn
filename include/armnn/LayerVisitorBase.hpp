@@ -165,6 +165,10 @@ public:
                                   const ResizeBilinearDescriptor&,
                                   const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitResizeLayer(const IConnectableLayer*,
+                          const ResizeDescriptor&,
+                          const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitRsqrtLayer(const IConnectableLayer*,
                          const char*) override { DefaultPolicy::Apply(__func__); }
 

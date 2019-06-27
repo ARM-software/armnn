@@ -167,6 +167,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateResize(const ResizeQueueDescriptor& descriptor,
+                                                    const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const;
 

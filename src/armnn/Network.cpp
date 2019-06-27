@@ -1188,6 +1188,12 @@ resizeDescriptor, const char* name)
     return m_Graph->AddLayer<ResizeBilinearLayer>(resizeDescriptor,name);
 }
 
+IConnectableLayer* Network::AddResizeLayer(const ResizeDescriptor&
+resizeDescriptor, const char* name)
+{
+    return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor,name);
+}
+
 IConnectableLayer* Network::AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
                                                     const char* name)
 {

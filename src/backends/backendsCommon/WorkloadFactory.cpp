@@ -640,6 +640,17 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                             reason);
             break;
         }
+        case LayerType::Resize:
+        {
+            auto cLayer = boost::polymorphic_downcast<const ResizeLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsResizeSupported(OverrideDataType(input, dataType),
+                                                           OverrideDataType(output, dataType),
+                                                           cLayer->GetParameters(),
+                                                           reason);
+            break;
+        }
         case LayerType::ResizeBilinear:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -1076,6 +1087,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateReshape(const ReshapeQueueDes
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
                                                                   const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

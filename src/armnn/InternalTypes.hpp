@@ -53,6 +53,7 @@ enum class LayerType
     Quantize,
     Reshape,
     ResizeBilinear,
+    Resize,
     Rsqrt,
     Softmax,
     SpaceToBatchNd,

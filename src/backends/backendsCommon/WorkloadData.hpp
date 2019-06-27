@@ -268,6 +268,11 @@ struct ResizeBilinearQueueDescriptor : QueueDescriptorWithParameters<ResizeBilin
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ResizeQueueDescriptor : QueueDescriptorWithParameters<ResizeDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct FakeQuantizationQueueDescriptor : QueueDescriptorWithParameters<FakeQuantizationDescriptor>
 {
     FakeQuantizationQueueDescriptor()

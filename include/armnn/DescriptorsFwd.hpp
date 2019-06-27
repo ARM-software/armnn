@@ -26,6 +26,7 @@ struct Pooling2dDescriptor;
 struct PreCompiledDescriptor;
 struct ReshapeDescriptor;
 struct ResizeBilinearDescriptor;
+struct ResizeDescriptor;
 struct SoftmaxDescriptor;
 struct SpaceToBatchNdDescriptor;
 struct SpaceToDepthDescriptor;

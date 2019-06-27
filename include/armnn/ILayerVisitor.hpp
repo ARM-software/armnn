@@ -318,6 +318,14 @@ public:
                                           const ResizeBilinearDescriptor& resizeDesc,
                                           const char* name = nullptr) = 0;
 
+    /// Function that a resize layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param resizeDescriptor - Parameters for the resize operation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitResizeLayer(const IConnectableLayer* layer,
+                                  const ResizeDescriptor& resizeDescriptor,
+                                  const char* name = nullptr) = 0;
+
     /// Function a Reciprocal of square root layer should call back to when its Accept(ILayerVisitor&)
     /// function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.

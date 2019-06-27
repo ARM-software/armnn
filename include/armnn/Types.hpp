@@ -61,6 +61,12 @@ enum class PoolingAlgorithm
     L2      = 2
 };
 
+enum class ResizeMethod
+{
+    Bilinear        = 0,
+    NearestNeighbor = 1
+};
+
 ///
 /// The padding method modifies the output of pooling layers.
 /// In both supported methods, the values are ignored (they are

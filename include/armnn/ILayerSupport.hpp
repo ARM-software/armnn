@@ -251,6 +251,11 @@ public:
                                            const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsResizeSupported(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const ResizeDescriptor& descriptor,
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsRsqrtSupported(const TensorInfo& input,
                                   const TensorInfo& output,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;

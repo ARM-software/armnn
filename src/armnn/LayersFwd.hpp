@@ -45,6 +45,7 @@
 #include "layers/QuantizeLayer.hpp"
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeBilinearLayer.hpp"
+#include "layers/ResizeLayer.hpp"
 #include "layers/RsqrtLayer.hpp"
 #include "layers/SoftmaxLayer.hpp"
 #include "layers/SpaceToBatchNdLayer.hpp"
@@ -120,6 +121,7 @@ DECLARE_LAYER(PreCompiled)
 DECLARE_LAYER(Prelu)
 DECLARE_LAYER(Quantize)
 DECLARE_LAYER(Reshape)
+DECLARE_LAYER(Resize)
 DECLARE_LAYER(ResizeBilinear)
 DECLARE_LAYER(Rsqrt)
 DECLARE_LAYER(Softmax)

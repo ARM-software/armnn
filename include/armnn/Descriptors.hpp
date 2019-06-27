@@ -503,6 +503,28 @@ struct ResizeBilinearDescriptor
     DataLayout m_DataLayout;
 };
 
+/// A ResizeDescriptor for the ResizeLayer.
+struct ResizeDescriptor
+{
+    ResizeDescriptor()
+            : m_TargetWidth(0)
+            , m_TargetHeight(0)
+            , m_Method(ResizeMethod::NearestNeighbor)
+            , m_DataLayout(DataLayout::NCHW)
+    {}
+
+    /// Target width value.
+    uint32_t          m_TargetWidth;
+    /// Target height value.
+    uint32_t          m_TargetHeight;
+    /// The Interpolation method to use
+    /// (Bilinear, NearestNeighbor).
+    ResizeMethod m_Method;
+    /// The data layout to be used (NCHW, NHWC).
+    DataLayout m_DataLayout;
+};
+
+
 /// A ReshapeDescriptor for the ReshapeLayer.
 struct ReshapeDescriptor
 {

@@ -30,4 +30,6 @@ armnnSerializer::NormalizationAlgorithmChannel GetFlatBufferNormalizationAlgorit
 armnnSerializer::NormalizationAlgorithmMethod GetFlatBufferNormalizationAlgorithmMethod(
     armnn::NormalizationAlgorithmMethod normalizationAlgorithmMethod);
 
+armnnSerializer::ResizeMethod GetFlatBufferResizeMethod(armnn::ResizeMethod method);
+
 } // namespace armnnSerializer

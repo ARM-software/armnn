@@ -36,6 +36,11 @@ enum DataLayout : byte {
     NCHW = 1
 }
 
+enum ResizeMethod: byte {
+    NearestNeighbor = 0,
+    Bilinear = 1,
+}
+
 table TensorInfo {
     dimensions:[uint];
     dataType:DataType;
@@ -124,7 +129,8 @@ enum LayerType : uint {
     Concat = 39,
     SpaceToDepth = 40,
     Prelu = 41,
-    TransposeConvolution2d = 42
+    TransposeConvolution2d = 42,
+    Resize = 43
 }
 
 // Base layer table to be used as part of other layers
@@ -581,6 +587,18 @@ table TransposeConvolution2dDescriptor {
     dataLayout:DataLayout = NCHW;
 }
 
+table ResizeLayer {
+    base:LayerBase;
+    descriptor:ResizeDescriptor;
+}
+
+table ResizeDescriptor {
+    targetHeight:uint;
+    targetWidth:uint;
+    method:ResizeMethod = NearestNeighbor;
+    dataLayout:DataLayout;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -624,7 +642,8 @@ union Layer {
     ConcatLayer,
     SpaceToDepthLayer,
     PreluLayer,
-    TransposeConvolution2dLayer
+    TransposeConvolution2dLayer,
+    ResizeLayer
 }
 
 table AnyLayer {

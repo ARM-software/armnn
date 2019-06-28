@@ -124,4 +124,17 @@ armnnSerializer::NormalizationAlgorithmMethod GetFlatBufferNormalizationAlgorith
     }
 }
 
+armnnSerializer::ResizeMethod GetFlatBufferResizeMethod(armnn::ResizeMethod method)
+{
+    switch (method)
+    {
+        case armnn::ResizeMethod::NearestNeighbor:
+            return armnnSerializer::ResizeMethod_NearestNeighbor;
+        case armnn::ResizeMethod::Bilinear:
+            return armnnSerializer::ResizeMethod_Bilinear;
+        default:
+            return armnnSerializer::ResizeMethod_NearestNeighbor;
+    }
+}
+
 } // namespace armnnSerializer

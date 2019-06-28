@@ -660,7 +660,20 @@ void SerializerVisitor::VisitResizeLayer(const armnn::IConnectableLayer* layer,
                                          const armnn::ResizeDescriptor& resizeDescriptor,
                                          const char* name)
 {
-    throw armnn::Exception("SerializerVisitor::VisitResizeLayer is not yet implemented");
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Resize);
+
+    auto flatBufferDescriptor =
+            CreateResizeDescriptor(m_flatBufferBuilder,
+                                   resizeDescriptor.m_TargetHeight,
+                                   resizeDescriptor.m_TargetWidth,
+                                   GetFlatBufferResizeMethod(resizeDescriptor.m_Method),
+                                   GetFlatBufferDataLayout(resizeDescriptor.m_DataLayout));
+
+    auto flatBufferLayer = serializer::CreateResizeLayer(m_flatBufferBuilder,
+                                                         flatBufferBaseLayer,
+                                                         flatBufferDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_ResizeLayer);
 }
 
 void SerializerVisitor::VisitRsqrtLayer(const armnn::IConnectableLayer* layer, const char* name)

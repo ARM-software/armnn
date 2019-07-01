@@ -70,6 +70,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClSoftmaxUint8Workload.hpp
     ClSpaceToBatchNdWorkload.hpp
     ClSpaceToBatchNdWorkload.cpp
+    ClSpaceToDepthWorkload.cpp
+    ClSpaceToDepthWorkload.hpp
     ClSplitterWorkload.cpp
     ClSplitterWorkload.hpp
     ClStridedSliceWorkload.cpp

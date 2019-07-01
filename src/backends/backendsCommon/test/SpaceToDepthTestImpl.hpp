@@ -81,7 +81,7 @@ LayerTestResult<T, 4> SpaceToDepthTestImpl(
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 4> SpaceToDepthSimpleTest(
+LayerTestResult<T, 4> SpaceToDepthSimpleTest1(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout = armnn::DataLayout::NHWC)
@@ -114,7 +114,7 @@ LayerTestResult<T, 4> SpaceToDepthSimpleTest(
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 4> SpaceToDepthFloatTest(
+LayerTestResult<T, 4> SpaceToDepthSimpleTest2(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::DataLayout dataLayout = armnn::DataLayout::NHWC)

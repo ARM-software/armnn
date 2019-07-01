@@ -431,4 +431,10 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateTransposeConvolution2
     return MakeWorkload<ClTransposeConvolution2dWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
+                                                                 const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClSpaceToDepthWorkload>(descriptor, info);
+}
+
 } // namespace armnn

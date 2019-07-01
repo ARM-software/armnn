@@ -179,6 +179,9 @@ public:
     std::unique_ptr<IWorkload> CreateTransposeConvolution2d(const TransposeConvolution2dQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
+                                                  const WorkloadInfo& info) const override;
+
 private:
     template<typename FloatWorkload, typename Uint8Workload, typename QueueDescriptorType, typename... Args>
     static std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor,

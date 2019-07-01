@@ -9421,7 +9421,7 @@ LayerTestResult<uint8_t, 4> SpaceToDepthNHWCAsymmQ8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToDepthSimpleTest<armnn::DataType::QuantisedAsymm8>(
+    return SpaceToDepthSimpleTest1<armnn::DataType::QuantisedAsymm8>(
         workloadFactory,
         memoryManager);
 }
@@ -9430,26 +9430,64 @@ LayerTestResult<uint8_t, 4> SpaceToDepthNCHWAsymmQ8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToDepthSimpleTest<armnn::DataType::QuantisedAsymm8>(
+    return SpaceToDepthSimpleTest1<armnn::DataType::QuantisedAsymm8>(
         workloadFactory,
         memoryManager,
         armnn::DataLayout::NCHW);
 }
 
-LayerTestResult<float, 4> SpaceToDepthNHWCFloat32Test(
+LayerTestResult<float, 4> SpaceToDepthNHWCFloat32Test1(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToDepthFloatTest<armnn::DataType::Float32>(
+    return SpaceToDepthSimpleTest1<armnn::DataType::Float32>(
         workloadFactory,
         memoryManager);
 }
 
-LayerTestResult<float, 4> SpaceToDepthNCHWFloat32Test(
+LayerTestResult<float, 4> SpaceToDepthNCHWFloat32Test1(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return SpaceToDepthFloatTest<armnn::DataType::Float32>(
+    return SpaceToDepthSimpleTest1<armnn::DataType::Float32>(
+        workloadFactory,
+        memoryManager,
+        armnn::DataLayout::NCHW);
+}
+
+LayerTestResult<float, 4> SpaceToDepthNHWCFloat32Test2(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::Float32>(
+        workloadFactory,
+        memoryManager);
+}
+
+LayerTestResult<float, 4> SpaceToDepthNCHWFloat32Test2(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::Float32>(
+        workloadFactory,
+        memoryManager,
+        armnn::DataLayout::NCHW);
+}
+
+LayerTestResult<int16_t, 4> SpaceToDepthNHWCQSymm16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::QuantisedSymm16>(
+        workloadFactory,
+        memoryManager);
+}
+
+LayerTestResult<int16_t, 4> SpaceToDepthNCHWQSymm16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::QuantisedSymm16>(
         workloadFactory,
         memoryManager,
         armnn::DataLayout::NCHW);

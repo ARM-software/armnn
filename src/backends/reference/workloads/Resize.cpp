@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ResizeBilinear.hpp"
+#include "Resize.hpp"
 
 #include "TensorBufferArrayView.hpp"
 
@@ -25,13 +25,14 @@ inline float Lerp(float a, float b, float w)
     return w * b + (1.f - w) * a;
 }
 
-}
+}// anonymous namespace
 
-void ResizeBilinear(Decoder<float>&   in,
-                    const TensorInfo& inputInfo,
-                    Encoder<float>&   out,
-                    const TensorInfo& outputInfo,
-                    DataLayoutIndexed dataLayout)
+void Resize(Decoder<float>&   in,
+            const TensorInfo& inputInfo,
+            Encoder<float>&   out,
+            const TensorInfo& outputInfo,
+            DataLayoutIndexed dataLayout,
+            armnn::ResizeMethod resizeMethod)
 {
     // We follow the definition of TensorFlow and AndroidNN: the top-left corner of a texel in the output
     // image is projected into the input image to figure out the interpolants and weights. Note that this
@@ -83,22 +84,43 @@ void ResizeBilinear(Decoder<float>&   in,
                     const unsigned int x1 = std::min(x0 + 1, inputWidth - 1u);
                     const unsigned int y1 = std::min(y0 + 1, inputHeight - 1u);
 
-                    // Interpolation
-                    in[dataLayout.GetIndex(inputShape, n, c, y0, x0)];
-                    float input1 = in.Get();
-                    in[dataLayout.GetIndex(inputShape, n, c, y0, x1)];
-                    float input2 = in.Get();
-                    in[dataLayout.GetIndex(inputShape, n, c, y1, x0)];
-                    float input3 = in.Get();
-                    in[dataLayout.GetIndex(inputShape, n, c, y1, x1)];
-                    float input4 = in.Get();
+                    float interpolatedValue;
+                    switch (resizeMethod)
+                    {
+                        case armnn::ResizeMethod::Bilinear:
+                        {
+                            in[dataLayout.GetIndex(inputShape, n, c, y0, x0)];
+                            float input1 = in.Get();
+                            in[dataLayout.GetIndex(inputShape, n, c, y0, x1)];
+                            float input2 = in.Get();
+                            in[dataLayout.GetIndex(inputShape, n, c, y1, x0)];
+                            float input3 = in.Get();
+                            in[dataLayout.GetIndex(inputShape, n, c, y1, x1)];
+                            float input4 = in.Get();
 
-                    const float ly0 = Lerp(input1, input2, xw); // lerp along row y0.
-                    const float ly1 = Lerp(input3, input4, xw); // lerp along row y1.
-                    const float l = Lerp(ly0, ly1, yw);
+                            const float ly0 = Lerp(input1, input2, xw); // lerp along row y0.
+                            const float ly1 = Lerp(input3, input4, xw); // lerp along row y1.
+                            interpolatedValue = Lerp(ly0, ly1, yw);
+                            break;
+                        }
+                        case armnn::ResizeMethod::NearestNeighbor:
+                        default:
+                        {
+                            auto distance0 = std::sqrt(pow(fix - boost::numeric_cast<float>(x0), 2) + 
+                                                       pow(fiy - boost::numeric_cast<float>(y0), 2));
+                            auto distance1 = std::sqrt(pow(fix - boost::numeric_cast<float>(x1), 2) +
+                                                       pow(fiy - boost::numeric_cast<float>(y1), 2));
 
+                            unsigned int xNearest = distance0 <= distance1? x0 : x1;
+                            unsigned int yNearest = distance0 <= distance1? y0 : y1;
+
+                            in[dataLayout.GetIndex(inputShape, n, c, yNearest, xNearest)];
+                            interpolatedValue = in.Get();
+                            break;
+                        }
+                    }
                     out[dataLayout.GetIndex(outputShape, n, c, y, x)];
-                    out.Set(l);
+                    out.Set(interpolatedValue);
                 }
             }
         }

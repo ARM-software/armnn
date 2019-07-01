@@ -915,12 +915,12 @@ void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "ResizeBilinearQueueDescriptor", 4, "output");
 
     std::vector<DataType> supportedTypes =
-            {
-                    DataType::Float16,
-                    DataType::Float32,
-                    DataType::QuantisedAsymm8,
-                    DataType::QuantisedSymm16
-            };
+    {
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
                       supportedTypes,
@@ -931,29 +931,72 @@ void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
                       "ResizeBilinearQueueDescriptor");
 
     // Resizes bilinear only changes width and height: batch and channel count must match.
+    const unsigned int inputBatchSize = workloadInfo.m_InputTensorInfos[0].GetShape()[0];
+    const unsigned int outputBatchSize = workloadInfo.m_OutputTensorInfos[0].GetShape()[0];
+    if (inputBatchSize != outputBatchSize)
     {
-        const unsigned int inputBatchSize = workloadInfo.m_InputTensorInfos[0].GetShape()[0];
-        const unsigned int outputBatchSize = workloadInfo.m_OutputTensorInfos[0].GetShape()[0];
-        if (inputBatchSize != outputBatchSize)
-        {
-            throw InvalidArgumentException(
-                boost::str(boost::format("ResizeBilinearQueueDescriptor: Input batch size (%1%) "
-                    "does not match output batch size (%2%)") % inputBatchSize % outputBatchSize));
-        }
+        throw InvalidArgumentException(
+            boost::str(boost::format("ResizeBilinearQueueDescriptor: Input batch size (%1%) "
+                "does not match output batch size (%2%)") % inputBatchSize % outputBatchSize));
     }
 
+    DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
+    const unsigned int inputChannelCount =
+        workloadInfo.m_InputTensorInfos[0].GetShape()[dimensionIndices.GetChannelsIndex()];
+    const unsigned int outputChannelCount =
+        workloadInfo.m_OutputTensorInfos[0].GetShape()[dimensionIndices.GetChannelsIndex()];
+    if (inputChannelCount != outputChannelCount)
     {
-        DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
-        const unsigned int inputChannelCount =
+        throw InvalidArgumentException(
+            boost::str(boost::format("ResizeBilinearQueueDescriptor: Input channel count (%1%) "
+                "does not match output channel count (%2%)") % inputChannelCount % outputChannelCount));
+    }
+}
+
+void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    ValidateNumInputs(workloadInfo, "ResizeQueueDescriptor", 1);
+    ValidateNumOutputs(workloadInfo, "ResizeQueueDescriptor", 1);
+
+    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "ResizeQueueDescriptor", 4, "input");
+    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "ResizeQueueDescriptor", 4, "output");
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
+                      supportedTypes,
+                      "ResizeQueueDescriptor");
+
+    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
+                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
+                      "ResizeQueueDescriptor");
+
+    // Resizes  only changes width and height: batch and channel count must match.
+    const unsigned int inputBatchSize = workloadInfo.m_InputTensorInfos[0].GetShape()[0];
+    const unsigned int outputBatchSize = workloadInfo.m_OutputTensorInfos[0].GetShape()[0];
+    if (inputBatchSize != outputBatchSize)
+    {
+        throw InvalidArgumentException(
+                boost::str(boost::format("ResizeQueueDescriptor: Input batch size (%1%) "
+                           "does not match output batch size (%2%)") % inputBatchSize % outputBatchSize));
+    }
+
+    DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
+    const unsigned int inputChannelCount =
             workloadInfo.m_InputTensorInfos[0].GetShape()[dimensionIndices.GetChannelsIndex()];
-        const unsigned int outputChannelCount =
+    const unsigned int outputChannelCount =
             workloadInfo.m_OutputTensorInfos[0].GetShape()[dimensionIndices.GetChannelsIndex()];
-        if (inputChannelCount != outputChannelCount)
-        {
-            throw InvalidArgumentException(
-                boost::str(boost::format("ResizeBilinearQueueDescriptor: Input channel count (%1%) "
-                    "does not match output channel count (%2%)") % inputChannelCount % outputChannelCount));
-        }
+    if (inputChannelCount != outputChannelCount)
+    {
+        throw InvalidArgumentException(
+                boost::str(boost::format("ResizeQueueDescriptor: Input channel count (%1%) "
+                           "does not match output channel count (%2%)") % inputChannelCount % outputChannelCount));
     }
 }
 

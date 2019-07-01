@@ -96,6 +96,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefReshapeWorkload.hpp
     RefResizeBilinearWorkload.cpp
     RefResizeBilinearWorkload.hpp
+    RefResizeWorkload.cpp
+    RefResizeWorkload.hpp
     RefRsqrtWorkload.cpp
     RefRsqrtWorkload.hpp
     RefSoftmaxWorkload.cpp
@@ -112,8 +114,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefTransposeConvolution2dWorkload.hpp
     RefWorkloads.hpp
     RefWorkloadUtils.hpp
-    ResizeBilinear.cpp
-    ResizeBilinear.hpp
+    Resize.cpp
+    Resize.hpp
     Rsqrt.cpp
     Rsqrt.hpp
     Softmax.cpp

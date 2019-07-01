@@ -1239,11 +1239,11 @@ bool RefLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
 {
     bool supported = true;
     std::array<DataType,3> supportedTypes =
-            {
-                    DataType::Float32,
-                    DataType::QuantisedAsymm8,
-                    DataType::QuantisedSymm16
-            };
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
                                   "Reference ResizeBilinear: input type not supported");
@@ -1253,6 +1253,31 @@ bool RefLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
 
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                   "Reference ResizeBilinear: input and output types not matching");
+
+    return supported;
+}
+
+bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        const ResizeDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+    std::array<DataType,3> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Resize: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Resize: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Resize: input and output types not matching");
 
     return supported;
 }

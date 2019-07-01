@@ -239,6 +239,16 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMemCopy(const MemCop
     return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    return std::make_unique<RefResizeWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
                                                                     const WorkloadInfo& info) const
 {

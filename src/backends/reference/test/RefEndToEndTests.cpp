@@ -5,12 +5,13 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
+#include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ConcatTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
-#include <backendsCommon/test/ConcatTestImpl.hpp>
-#include <backendsCommon/test/ArithmeticTestImpl.hpp>
+#include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
@@ -966,6 +967,68 @@ BOOST_AUTO_TEST_CASE(RefTransposeConvolution2dEndToEndInt16NhwcTest)
 {
     TransposeConvolution2dEndToEnd<armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>(
         defaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Resize Bilinear
+BOOST_AUTO_TEST_CASE(RefResizeBilinearEndToEndFloatNchwTest)
+{
+    ResizeBilinearEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeBilinearEndToEndUint8NchwTest)
+{
+    ResizeBilinearEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeBilinearEndToEndInt16NchwTest)
+{
+    ResizeBilinearEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeBilinearEndToEndFloatNhwcTest)
+{
+    ResizeBilinearEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeBilinearEndToEndUint8NhwcTest)
+{
+    ResizeBilinearEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeBilinearEndToEndInt16NhwcTest)
+{
+    ResizeBilinearEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Resize NearestNeighbor
+BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndFloatNchwTest)
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndUint8NchwTest)
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndInt16NchwTest)
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndFloatNhwcTest)
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndUint8NhwcTest)
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndInt16NhwcTest)
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends, armnn::DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

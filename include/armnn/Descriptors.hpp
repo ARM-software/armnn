@@ -514,9 +514,9 @@ struct ResizeDescriptor
     {}
 
     /// Target width value.
-    uint32_t          m_TargetWidth;
+    uint32_t m_TargetWidth;
     /// Target height value.
-    uint32_t          m_TargetHeight;
+    uint32_t m_TargetHeight;
     /// The Interpolation method to use
     /// (Bilinear, NearestNeighbor).
     ResizeMethod m_Method;

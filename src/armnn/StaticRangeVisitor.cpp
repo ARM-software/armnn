@@ -225,6 +225,15 @@ void StaticRangeVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer
     ForwardParentParameters(layer);
 }
 
+void StaticRangeVisitor::VisitResizeLayer(const IConnectableLayer* layer,
+                                          const ResizeDescriptor& resizeDescriptor,
+                                          const char* name)
+{
+    boost::ignore_unused(resizeDescriptor);
+    boost::ignore_unused(name);
+    ForwardParentParameters(layer);
+}
+
 void StaticRangeVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
                                                 const StridedSliceDescriptor& stridedSliceDescriptor,
                                                 const char* name)

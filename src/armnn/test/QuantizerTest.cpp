@@ -1523,6 +1523,54 @@ BOOST_AUTO_TEST_CASE(QuantizeResizeBilinear)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeResize)
+{
+    class TestResizeQuantization : public TestLeakyReLuActivationQuantization
+    {
+    public:
+        TestResizeQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+                : TestLeakyReLuActivationQuantization(inputShape, outputShape)
+        {}
+
+        TestResizeQuantization(const QuantizerOptions& options,
+                                       const TensorShape& inputShape,
+                                       const TensorShape& outputShape)
+                : TestLeakyReLuActivationQuantization(options, inputShape, outputShape)
+        {}
+
+        void VisitResizeLayer(const IConnectableLayer* layer,
+                                      const ResizeDescriptor& resizeDescriptor,
+                                      const char* name = nullptr) override
+        {
+            CheckForwardedQuantizationSettings(layer);
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    const TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+
+    IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
+
+    // Add the layer under test
+    ResizeDescriptor descriptor;
+    descriptor.m_TargetHeight = 3;
+    descriptor.m_TargetWidth = 3;
+    IConnectableLayer* resizeLayer = network->AddResizeLayer(descriptor);
+
+    CompleteLeakyReluNetwork(network.get(), activation, resizeLayer, info);
+
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestResizeQuantization validatorQAsymm8(shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestResizeQuantization validatorQSymm16(options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 BOOST_AUTO_TEST_CASE(QuantizeStridedSlice)
 {
     class TestStridedSliceQuantization : public TestLeakyReLuActivationQuantization

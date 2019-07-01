@@ -91,6 +91,10 @@ public:
                                   const ResizeBilinearDescriptor& resizeDesc,
                                   const char* name = nullptr) override;
 
+    void VisitResizeLayer(const IConnectableLayer* layer,
+                          const ResizeDescriptor& resizeDescriptor,
+                          const char* name = nullptr) override;
+
     void VisitStridedSliceLayer(const IConnectableLayer* layer,
                                 const StridedSliceDescriptor& stridedSliceDescriptor,
                                 const char* name = nullptr) override;

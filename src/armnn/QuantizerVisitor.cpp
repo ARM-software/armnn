@@ -385,6 +385,15 @@ void QuantizerVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitResizeLayer(const IConnectableLayer* layer,
+                                        const ResizeDescriptor& resizeDescriptor,
+                                        const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddResizeLayer(resizeDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitRsqrtLayer(const IConnectableLayer* layer,
                                        const char* name)
 {

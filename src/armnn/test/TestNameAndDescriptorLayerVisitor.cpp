@@ -255,30 +255,30 @@ BOOST_AUTO_TEST_CASE(CheckConcatLayerVisitorNameNullAndDescriptor)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckResizeBilinearLayerVisitorNameAndDescriptor)
+BOOST_AUTO_TEST_CASE(CheckResizeLayerVisitorNameAndDescriptor)
 {
-    const char* layerName = "ResizeBilinearLayer";
-    ResizeBilinearDescriptor descriptor;
+    const char* layerName = "ResizeLayer";
+    ResizeDescriptor descriptor;
     descriptor.m_TargetHeight = 1;
     descriptor.m_TargetWidth  = 1;
     descriptor.m_DataLayout   = DataLayout::NHWC;
-    TestResizeBilinearLayerVisitor visitor(descriptor, layerName);
+    TestResizeLayerVisitor visitor(descriptor, layerName);
     Network net;
 
-    IConnectableLayer *const layer = net.AddResizeBilinearLayer(descriptor, layerName);
+    IConnectableLayer *const layer = net.AddResizeLayer(descriptor, layerName);
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckResizeBilinearLayerVisitorNameNullAndDescriptor)
+BOOST_AUTO_TEST_CASE(CheckResizeLayerVisitorNameNullAndDescriptor)
 {
-    ResizeBilinearDescriptor descriptor;
+    ResizeDescriptor descriptor;
     descriptor.m_TargetHeight = 1;
     descriptor.m_TargetWidth  = 1;
     descriptor.m_DataLayout   = DataLayout::NHWC;
-    TestResizeBilinearLayerVisitor visitor(descriptor);
+    TestResizeLayerVisitor visitor(descriptor);
     Network net;
 
-    IConnectableLayer *const layer = net.AddResizeBilinearLayer(descriptor);
+    IConnectableLayer *const layer = net.AddResizeLayer(descriptor);
     layer->Accept(visitor);
 }
 

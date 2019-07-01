@@ -953,18 +953,19 @@ BOOST_AUTO_TEST_CASE(Pooling2dValidateTensorShapesFromInputsNhwc)
 void CreateResizeBilinearGraph(Graph &graph, const unsigned int* inputShape,  const unsigned int* outputShape,
                                DataLayout dataLayout = DataLayout::NCHW)
 {
-    armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
-    armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+    TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    TensorInfo outputInfo(4, outputShape, DataType::Float32);
 
-    ResizeBilinearDescriptor desc;
+    ResizeDescriptor desc;
+    desc.m_Method       = ResizeMethod::Bilinear;
     desc.m_TargetHeight = 3;
-    desc.m_TargetWidth = 4;
-    desc.m_DataLayout = dataLayout;
+    desc.m_TargetWidth  = 4;
+    desc.m_DataLayout   = dataLayout;
 
     Layer* input = graph.AddLayer<InputLayer>(0, "input");
     input->GetOutputSlot().SetTensorInfo(inputInfo);
 
-    ResizeBilinearLayer* layer = graph.AddLayer<ResizeBilinearLayer>(desc, "resizeBilinear");
+    ResizeLayer* layer = graph.AddLayer<ResizeLayer>(desc, "resizeBilinear");
     layer->GetOutputSlot().SetTensorInfo(outputInfo);
 
     Layer* output = graph.AddLayer<OutputLayer>(0, "output");

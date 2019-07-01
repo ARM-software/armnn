@@ -591,6 +591,24 @@ bool ClLayerSupport::IsReshapeSupported(const TensorInfo& input,
     return true;
 }
 
+bool ClLayerSupport::IsResizeSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const ResizeDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(output);
+
+    if (descriptor.m_Method == ResizeMethod::Bilinear)
+    {
+        return IsSupportedForDataTypeCl(reasonIfUnsupported,
+                                        input.GetDataType(),
+                                        &TrueFunc<>,
+                                        &FalseFuncU8<>);
+    }
+
+    return false;
+}
+
 bool ClLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
                                                const TensorInfo& output,
                                                Optional<std::string&> reasonIfUnsupported) const

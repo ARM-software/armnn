@@ -1477,52 +1477,6 @@ BOOST_AUTO_TEST_CASE(QuantizeSplitter)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
-BOOST_AUTO_TEST_CASE(QuantizeResizeBilinear)
-{
-    class TestResizeBilinearQuantization : public TestLeakyReLuActivationQuantization
-    {
-    public:
-        TestResizeBilinearQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
-        : TestLeakyReLuActivationQuantization(inputShape, outputShape) {}
-
-        TestResizeBilinearQuantization(const QuantizerOptions& options,
-                                       const TensorShape& inputShape,
-                                       const TensorShape& outputShape)
-        : TestLeakyReLuActivationQuantization(options, inputShape, outputShape) {}
-
-        void VisitResizeBilinearLayer(const IConnectableLayer* layer,
-                                      const ResizeBilinearDescriptor& resizeDescriptor,
-                                      const char* name = nullptr) override
-        {
-            CheckForwardedQuantizationSettings(layer);
-        }
-    };
-
-    INetworkPtr network = INetwork::Create();
-
-    const TensorShape shape{1U};
-    TensorInfo info(shape, DataType::Float32);
-
-    IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
-
-    // Add the layer under test
-    ResizeBilinearDescriptor descriptor;
-    descriptor.m_TargetHeight = 3;
-    descriptor.m_TargetWidth = 3;
-    IConnectableLayer* spaceToBatch = network->AddResizeBilinearLayer(descriptor);
-
-    CompleteLeakyReluNetwork(network.get(), activation, spaceToBatch, info);
-
-    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
-    TestResizeBilinearQuantization validatorQAsymm8(shape, shape);
-    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
-
-    const QuantizerOptions options(DataType::QuantisedSymm16);
-    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
-    TestResizeBilinearQuantization validatorQSymm16(options, shape, shape);
-    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
-}
-
 BOOST_AUTO_TEST_CASE(QuantizeResize)
 {
     class TestResizeQuantization : public TestLeakyReLuActivationQuantization
@@ -1556,7 +1510,7 @@ BOOST_AUTO_TEST_CASE(QuantizeResize)
     // Add the layer under test
     ResizeDescriptor descriptor;
     descriptor.m_TargetHeight = 3;
-    descriptor.m_TargetWidth = 3;
+    descriptor.m_TargetWidth  = 3;
     IConnectableLayer* resizeLayer = network->AddResizeLayer(descriptor);
 
     CompleteLeakyReluNetwork(network.get(), activation, resizeLayer, info);

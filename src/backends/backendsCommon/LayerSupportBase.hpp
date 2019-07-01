@@ -238,14 +238,15 @@ public:
                             const ReshapeDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsResizeBilinearSupported(const TensorInfo& input,
-                                   const TensorInfo& output,
-                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
     bool IsResizeSupported(const TensorInfo& input,
                            const TensorInfo& output,
                            const ResizeDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    ARMNN_DEPRECATED_MSG("Use IsResizeSupported instead")
+    bool IsResizeBilinearSupported(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsRsqrtSupported(const TensorInfo& input,
                           const TensorInfo& output,

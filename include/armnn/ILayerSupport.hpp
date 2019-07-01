@@ -251,6 +251,7 @@ public:
                                     const ReshapeDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    ARMNN_DEPRECATED_MSG("Use IsResizeSupported instead")
     virtual bool IsResizeBilinearSupported(const TensorInfo& input,
                                            const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;

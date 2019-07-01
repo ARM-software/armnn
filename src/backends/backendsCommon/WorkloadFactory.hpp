@@ -164,11 +164,12 @@ public:
     virtual std::unique_ptr<IWorkload> CreateReshape(const ReshapeQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const;
 
-    virtual std::unique_ptr<IWorkload> CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const;
-
     virtual std::unique_ptr<IWorkload> CreateResize(const ResizeQueueDescriptor& descriptor,
                                                     const WorkloadInfo& info) const;
+
+    ARMNN_DEPRECATED_MSG("Use CreateResize instead")
+    virtual std::unique_ptr<IWorkload> CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const;
 
     virtual std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const;

@@ -377,12 +377,16 @@ void QuantizerVisitor::VisitReshapeLayer(const IConnectableLayer* layer,
 }
 
 void QuantizerVisitor::VisitResizeBilinearLayer(const IConnectableLayer* layer,
-                                                const ResizeBilinearDescriptor& resizeDesc,
+                                                const ResizeBilinearDescriptor& resizeBilinearDescriptor,
                                                 const char* name)
 {
-    IConnectableLayer* newLayer = m_QuantizedNetwork->AddResizeBilinearLayer(resizeDesc, name);
-    RecordLayer(layer, newLayer);
-    SetQuantizedInputConnections(layer, newLayer);
+    ResizeDescriptor resizeDescriptor;
+    resizeDescriptor.m_Method       = ResizeMethod::Bilinear;
+    resizeDescriptor.m_TargetWidth  = resizeBilinearDescriptor.m_TargetWidth;
+    resizeDescriptor.m_TargetHeight = resizeBilinearDescriptor.m_TargetHeight;
+    resizeDescriptor.m_DataLayout   = resizeBilinearDescriptor.m_DataLayout;
+
+    VisitResizeLayer(layer, resizeDescriptor, name);
 }
 
 void QuantizerVisitor::VisitResizeLayer(const IConnectableLayer* layer,

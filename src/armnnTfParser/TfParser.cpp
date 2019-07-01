@@ -2255,12 +2255,13 @@ ParsedTfOperationPtr TfParser::ParseResizeBilinear(const tensorflow::NodeDef& no
     ConstTensor sizeTensor = sizeNode->GetConstTensor(sizeTensorData);
 
     // The descriptor only has target height and width attributes, which we get from the size tensor.
-    ResizeBilinearDescriptor desc;
+    ResizeDescriptor desc;
+    desc.m_Method       = armnn::ResizeMethod::Bilinear;
     desc.m_TargetHeight = static_cast<uint32_t> (sizeTensorData[0]);
-    desc.m_TargetWidth = static_cast<uint32_t> (sizeTensorData[1]);
-    desc.m_DataLayout = armnn::DataLayout::NHWC;
+    desc.m_TargetWidth  = static_cast<uint32_t> (sizeTensorData[1]);
+    desc.m_DataLayout   = armnn::DataLayout::NHWC;
 
-    IConnectableLayer* layer = m_Network->AddResizeBilinearLayer(desc, nodeDef.name().c_str());
+    IConnectableLayer* layer = m_Network->AddResizeLayer(desc, nodeDef.name().c_str());
 
     IOutputSlot& inputSlot = inputs[0].m_IndexedValue->ResolveArmnnOutputSlot(inputs[0].m_Index);
     TensorInfo inputTensorInfo = inputSlot.GetTensorInfo();

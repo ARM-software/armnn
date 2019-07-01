@@ -1699,13 +1699,14 @@ void Deserializer::ParseResizeBilinear(GraphPtr graph, unsigned int layerIndex)
 
     auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_ResizeBilinearLayer()->descriptor();
 
-    armnn::ResizeBilinearDescriptor descriptor;
-    descriptor.m_TargetWidth = flatBufferDescriptor->targetWidth();
+    armnn::ResizeDescriptor descriptor;
+    descriptor.m_TargetWidth  = flatBufferDescriptor->targetWidth();
     descriptor.m_TargetHeight = flatBufferDescriptor->targetHeight();
-    descriptor.m_DataLayout = ToDataLayout(flatBufferDescriptor->dataLayout());
+    descriptor.m_Method       = armnn::ResizeMethod::Bilinear;
+    descriptor.m_DataLayout   = ToDataLayout(flatBufferDescriptor->dataLayout());
 
     auto layerName = GetLayerName(graph, layerIndex);
-    IConnectableLayer* layer = m_Network->AddResizeBilinearLayer(descriptor, layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddResizeLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

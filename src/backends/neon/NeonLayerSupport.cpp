@@ -471,6 +471,22 @@ bool NeonLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                       &TrueFunc<>);
 }
 
+bool NeonLayerSupport::IsResizeSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const ResizeDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    if (descriptor.m_Method == ResizeMethod::Bilinear)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonResizeBilinearWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       output);
+    }
+
+    return false;
+}
+
 bool NeonLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
                                                  const TensorInfo& output,
                                                  Optional<std::string&> reasonIfUnsupported) const

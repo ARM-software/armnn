@@ -253,11 +253,13 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResize(const ResizeQueueDes
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
                                                                     const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
-    return std::make_unique<RefResizeBilinearWorkload>(descriptor, info);
+    ResizeQueueDescriptor resizeDescriptor;
+    resizeDescriptor.m_Parameters.m_Method       = ResizeMethod::Bilinear;
+    resizeDescriptor.m_Parameters.m_DataLayout   = descriptor.m_Parameters.m_DataLayout;
+    resizeDescriptor.m_Parameters.m_TargetWidth  = descriptor.m_Parameters.m_TargetWidth;
+    resizeDescriptor.m_Parameters.m_TargetHeight = descriptor.m_Parameters.m_TargetHeight;
+
+    return CreateResize(resizeDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(

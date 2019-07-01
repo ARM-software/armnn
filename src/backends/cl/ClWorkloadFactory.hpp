@@ -91,6 +91,10 @@ public:
     std::unique_ptr<IWorkload> CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateResize(const ResizeQueueDescriptor& descriptor,
+                                            const WorkloadInfo& info) const override;
+
+    ARMNN_DEPRECATED_MSG("Use CreateResize instead")
     std::unique_ptr<IWorkload> CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
                                                     const WorkloadInfo& info) const override;
 

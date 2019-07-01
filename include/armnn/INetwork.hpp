@@ -293,6 +293,7 @@ public:
     /// @param resizeDesc - Parameters for the resize operation.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddResizeLayer instead")
     virtual IConnectableLayer* AddResizeBilinearLayer(const ResizeBilinearDescriptor& resizeDesc,
                                                       const char* name = nullptr) = 0;
 

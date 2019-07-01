@@ -110,13 +110,14 @@ public:
                            const ReshapeDescriptor& reshapeDescriptor,
                            const char* name = nullptr) override;
 
-    void VisitResizeBilinearLayer(const IConnectableLayer* layer,
-                                  const ResizeBilinearDescriptor& resizeDesc,
-                                  const char* name = nullptr) override;
-
     void VisitResizeLayer(const IConnectableLayer* layer,
                           const ResizeDescriptor& resizeDescriptor,
                           const char* name = nullptr) override;
+
+    ARMNN_DEPRECATED_MSG("Use VisitResizeLayer instead")
+    void VisitResizeBilinearLayer(const IConnectableLayer* layer,
+                                  const ResizeBilinearDescriptor& resizeDesc,
+                                  const char* name = nullptr) override;
 
     void VisitRsqrtLayer(const IConnectableLayer*,
                          const char* name = nullptr) override;

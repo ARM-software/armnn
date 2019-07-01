@@ -218,6 +218,25 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMemCopy(const MemCo
     return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
+{
+    if (descriptor.m_Parameters.m_Method == ResizeMethod::Bilinear)
+    {
+        ResizeBilinearQueueDescriptor resizeBilinearDescriptor;
+        resizeBilinearDescriptor.m_Inputs  = descriptor.m_Inputs;
+        resizeBilinearDescriptor.m_Outputs = descriptor.m_Outputs;
+
+        resizeBilinearDescriptor.m_Parameters.m_DataLayout   = descriptor.m_Parameters.m_DataLayout;
+        resizeBilinearDescriptor.m_Parameters.m_TargetWidth  = descriptor.m_Parameters.m_TargetWidth;
+        resizeBilinearDescriptor.m_Parameters.m_TargetHeight = descriptor.m_Parameters.m_TargetHeight;
+
+        return std::make_unique<NeonResizeBilinearWorkload>(resizeBilinearDescriptor, info);
+    }
+
+    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateResizeBilinear(
     const ResizeBilinearQueueDescriptor& descriptor,
     const WorkloadInfo& info) const

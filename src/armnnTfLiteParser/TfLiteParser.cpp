@@ -1642,13 +1642,14 @@ void TfLiteParser::ParseResizeBilinear(size_t subgraphIndex, size_t operatorInde
     BufferRawPtr sizeBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
     ::memcpy(sizeTensorData.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
 
-    ResizeBilinearDescriptor desc;
+    ResizeDescriptor desc;
+    desc.m_Method       = armnn::ResizeMethod::Bilinear;
     desc.m_TargetHeight = static_cast<uint32_t> (sizeTensorData[0]);
-    desc.m_TargetWidth = static_cast<uint32_t> (sizeTensorData[1]);
-    desc.m_DataLayout = armnn::DataLayout::NHWC;
+    desc.m_TargetWidth  = static_cast<uint32_t> (sizeTensorData[1]);
+    desc.m_DataLayout   = armnn::DataLayout::NHWC;
 
     auto layerName = boost::str(boost::format("ResizeBilinear:%1%:%2%") % subgraphIndex % operatorIndex);
-    IConnectableLayer* layer = m_Network->AddResizeBilinearLayer(desc, layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddResizeLayer(desc, layerName.c_str());
 
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

@@ -1182,16 +1182,22 @@ IConnectableLayer* Network::AddBatchNormalizationLayer(const BatchNormalizationD
     return layer;
 }
 
-IConnectableLayer* Network::AddResizeBilinearLayer(const ResizeBilinearDescriptor&
-resizeDescriptor, const char* name)
+IConnectableLayer* Network::AddResizeBilinearLayer(const ResizeBilinearDescriptor& descriptor,
+                                                   const char* name)
 {
-    return m_Graph->AddLayer<ResizeBilinearLayer>(resizeDescriptor,name);
+    ResizeDescriptor resizeDescriptor;
+    resizeDescriptor.m_Method       = ResizeMethod::Bilinear;
+    resizeDescriptor.m_DataLayout   = descriptor.m_DataLayout;
+    resizeDescriptor.m_TargetWidth  = descriptor.m_TargetWidth;
+    resizeDescriptor.m_TargetHeight = descriptor.m_TargetHeight;
+
+    return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor, name);
 }
 
 IConnectableLayer* Network::AddResizeLayer(const ResizeDescriptor&
 resizeDescriptor, const char* name)
 {
-    return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor,name);
+    return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor, name);
 }
 
 IConnectableLayer* Network::AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,

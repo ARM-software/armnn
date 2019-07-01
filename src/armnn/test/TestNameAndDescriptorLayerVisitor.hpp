@@ -385,33 +385,35 @@ public:
     };
 };
 
-class TestResizeBilinearLayerVisitor : public TestLayerVisitor
+class TestResizeLayerVisitor : public TestLayerVisitor
 {
 private:
-    ResizeBilinearDescriptor m_VisitorDescriptor;
+    ResizeDescriptor m_VisitorDescriptor;
 
 public:
-    explicit TestResizeBilinearLayerVisitor(const ResizeBilinearDescriptor& resizeDesc, const char* name = nullptr)
+    explicit TestResizeLayerVisitor(const ResizeDescriptor& descriptor, const char* name = nullptr)
         : TestLayerVisitor(name)
     {
-        m_VisitorDescriptor.m_TargetWidth  = resizeDesc.m_TargetWidth;
-        m_VisitorDescriptor.m_TargetHeight = resizeDesc.m_TargetHeight;
-        m_VisitorDescriptor.m_DataLayout   = resizeDesc.m_DataLayout;
+        m_VisitorDescriptor.m_Method       = descriptor.m_Method;
+        m_VisitorDescriptor.m_TargetWidth  = descriptor.m_TargetWidth;
+        m_VisitorDescriptor.m_TargetHeight = descriptor.m_TargetHeight;
+        m_VisitorDescriptor.m_DataLayout   = descriptor.m_DataLayout;
     };
 
-    void CheckDescriptor(const ResizeBilinearDescriptor& resizeDesc)
+    void CheckDescriptor(const ResizeDescriptor& descriptor)
     {
-        BOOST_CHECK_EQUAL(resizeDesc.m_TargetWidth, m_VisitorDescriptor.m_TargetWidth);
-        BOOST_CHECK_EQUAL(resizeDesc.m_TargetHeight, m_VisitorDescriptor.m_TargetHeight);
-        BOOST_CHECK(resizeDesc.m_DataLayout == m_VisitorDescriptor.m_DataLayout);
+        BOOST_CHECK(descriptor.m_Method       == m_VisitorDescriptor.m_Method);
+        BOOST_CHECK(descriptor.m_TargetWidth  == m_VisitorDescriptor.m_TargetWidth);
+        BOOST_CHECK(descriptor.m_TargetHeight == m_VisitorDescriptor.m_TargetHeight);
+        BOOST_CHECK(descriptor.m_DataLayout   == m_VisitorDescriptor.m_DataLayout);
     }
 
-    void VisitResizeBilinearLayer(const IConnectableLayer* layer,
-                                  const ResizeBilinearDescriptor& resizeDesc,
-                                  const char* name = nullptr) override
+    void VisitResizeLayer(const IConnectableLayer* layer,
+                          const ResizeDescriptor& descriptor,
+                          const char* name = nullptr) override
     {
         CheckLayerPointer(layer);
-        CheckDescriptor(resizeDesc);
+        CheckDescriptor(descriptor);
         CheckLayerName(name);
     };
 };

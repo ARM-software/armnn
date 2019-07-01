@@ -52,7 +52,6 @@ enum class LayerType
     Prelu,
     Quantize,
     Reshape,
-    ResizeBilinear,
     Resize,
     Rsqrt,
     Softmax,

@@ -52,7 +52,6 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Reshape: return "Reshape";
         case LayerType::Rsqrt: return "Rsqrt";
         case LayerType::Resize: return "Resize";
-        case LayerType::ResizeBilinear: return "ResizeBilinear";
         case LayerType::Softmax: return "Softmax";
         case LayerType::SpaceToBatchNd: return "SpaceToBatchNd";
         case LayerType::Splitter: return "Splitter";

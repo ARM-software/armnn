@@ -507,13 +507,31 @@ bool IsReshapeSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsReshapeSupported, input, descriptor);
 }
 
+bool IsResizeSupported(const BackendId& backend,
+                       const TensorInfo& input,
+                       const TensorInfo& output,
+                       const ResizeDescriptor& descriptor,
+                       char* reasonIfUnsupported,
+                       size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsResizeSupported, input, output, descriptor);
+}
+
+ARMNN_DEPRECATED_MSG("Use IsResizeSupported instead")
 bool IsResizeBilinearSupported(const BackendId& backend,
                                const TensorInfo& input,
                                const TensorInfo& output,
                                char* reasonIfUnsupported,
                                size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsResizeBilinearSupported, input, output);
+    ResizeDescriptor descriptor;
+    descriptor.m_Method = ResizeMethod::Bilinear;
+
+    const TensorShape& outputShape = output.GetShape();
+    descriptor.m_TargetWidth  = outputShape[3];
+    descriptor.m_TargetHeight = outputShape[2];
+
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsResizeSupported, input, output, descriptor);
 }
 
 bool IsRsqrtSupported(const BackendId& backend,

@@ -251,6 +251,25 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMemCopy(const MemCopy
     return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    if (descriptor.m_Parameters.m_Method == ResizeMethod::Bilinear)
+    {
+        ResizeBilinearQueueDescriptor resizeBilinearDescriptor;
+        resizeBilinearDescriptor.m_Inputs  = descriptor.m_Inputs;
+        resizeBilinearDescriptor.m_Outputs = descriptor.m_Outputs;
+
+        resizeBilinearDescriptor.m_Parameters.m_DataLayout   = descriptor.m_Parameters.m_DataLayout;
+        resizeBilinearDescriptor.m_Parameters.m_TargetWidth  = descriptor.m_Parameters.m_TargetWidth;
+        resizeBilinearDescriptor.m_Parameters.m_TargetHeight = descriptor.m_Parameters.m_TargetHeight;
+
+        return MakeWorkload<ClResizeBilinearFloatWorkload, NullWorkload>(resizeBilinearDescriptor, info);
+    }
+
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateResizeBilinear(
     const ResizeBilinearQueueDescriptor& descriptor,
     const WorkloadInfo& info) const

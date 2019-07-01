@@ -314,6 +314,7 @@ public:
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param resizeDesc - Parameters for the resize operation.
     /// @param name - Optional name for the layer.
+    ARMNN_DEPRECATED_MSG("Use VisitResizeLayer instead")
     virtual void VisitResizeBilinearLayer(const IConnectableLayer* layer,
                                           const ResizeBilinearDescriptor& resizeDesc,
                                           const char* name = nullptr) = 0;

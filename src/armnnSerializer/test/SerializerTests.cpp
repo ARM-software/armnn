@@ -2048,10 +2048,10 @@ BOOST_AUTO_TEST_CASE(SerializeResize)
     private:
         void VerifyDescriptor(const armnn::ResizeDescriptor& descriptor)
         {
-            BOOST_CHECK(descriptor.m_DataLayout == m_Descriptor.m_DataLayout);
-            BOOST_CHECK(descriptor.m_TargetWidth == m_Descriptor.m_TargetWidth);
+            BOOST_CHECK(descriptor.m_DataLayout   == m_Descriptor.m_DataLayout);
+            BOOST_CHECK(descriptor.m_TargetWidth  == m_Descriptor.m_TargetWidth);
             BOOST_CHECK(descriptor.m_TargetHeight == m_Descriptor.m_TargetHeight);
-            BOOST_CHECK(descriptor.m_Method == m_Descriptor.m_Method);
+            BOOST_CHECK(descriptor.m_Method       == m_Descriptor.m_Method);
         }
 
         armnn::ResizeDescriptor m_Descriptor;
@@ -2062,9 +2062,9 @@ BOOST_AUTO_TEST_CASE(SerializeResize)
     const armnn::TensorInfo outputInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
 
     armnn::ResizeDescriptor desc;
-    desc.m_TargetWidth = 4;
+    desc.m_TargetWidth  = 4;
     desc.m_TargetHeight = 2;
-    desc.m_Method = armnn::ResizeMethod::NearestNeighbor;
+    desc.m_Method       = armnn::ResizeMethod::NearestNeighbor;
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
@@ -2081,63 +2081,6 @@ BOOST_AUTO_TEST_CASE(SerializeResize)
     BOOST_CHECK(deserializedNetwork);
 
     ResizeLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
-    deserializedNetwork->Accept(verifier);
-}
-
-BOOST_AUTO_TEST_CASE(SerializeResizeBilinear)
-{
-    class ResizeBilinearLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        ResizeBilinearLayerVerifier(const std::string& layerName,
-                                    const std::vector<armnn::TensorInfo>& inputInfos,
-                                    const std::vector<armnn::TensorInfo>& outputInfos,
-                                    const armnn::ResizeBilinearDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitResizeBilinearLayer(const armnn::IConnectableLayer* layer,
-                                      const armnn::ResizeBilinearDescriptor& descriptor,
-                                      const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::ResizeBilinearDescriptor& descriptor)
-        {
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-            BOOST_TEST(descriptor.m_TargetWidth == m_Descriptor.m_TargetWidth);
-            BOOST_TEST(descriptor.m_TargetHeight == m_Descriptor.m_TargetHeight);
-        }
-
-        armnn::ResizeBilinearDescriptor m_Descriptor;
-    };
-
-    const std::string layerName("resizeBilinear");
-    const armnn::TensorInfo inputInfo = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
-
-    armnn::ResizeBilinearDescriptor desc;
-    desc.m_TargetWidth = 4;
-    desc.m_TargetHeight = 2;
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const resizeLayer = network->AddResizeBilinearLayer(desc, layerName.c_str());
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer->GetOutputSlot(0).Connect(resizeLayer->GetInputSlot(0));
-    resizeLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
-    resizeLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    ResizeBilinearLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
     deserializedNetwork->Accept(verifier);
 }
 

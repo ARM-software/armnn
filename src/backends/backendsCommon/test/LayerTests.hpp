@@ -2557,13 +2557,15 @@ LayerTestResult<T, 4> ResizeBilinearNopTest(
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ResizeBilinearQueueDescriptor descriptor;
+    armnn::ResizeQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_Method     = armnn::ResizeMethod::Bilinear;
     descriptor.m_Parameters.m_DataLayout = dataLayout;
+
     armnn::WorkloadInfo info;
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResizeBilinear(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResize(descriptor, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -2655,13 +2657,15 @@ LayerTestResult<T, 4> SimpleResizeBilinearTest(
     std::unique_ptr <armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ResizeBilinearQueueDescriptor descriptor;
+    armnn::ResizeQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_Method     = armnn::ResizeMethod::Bilinear;
     descriptor.m_Parameters.m_DataLayout = dataLayout;
+
     armnn::WorkloadInfo info;
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResizeBilinear(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResize(descriptor, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -2756,13 +2760,15 @@ LayerTestResult<T, 4> ResizeBilinearSqMinTest(
     std::unique_ptr <armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ResizeBilinearQueueDescriptor descriptor;
+    armnn::ResizeQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_Method     = armnn::ResizeMethod::Bilinear;
     descriptor.m_Parameters.m_DataLayout = dataLayout;
+
     armnn::WorkloadInfo info;
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResizeBilinear(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResize(descriptor, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -2852,13 +2858,15 @@ LayerTestResult<T, 4> ResizeBilinearMinTest(
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ResizeBilinearQueueDescriptor descriptor;
+    armnn::ResizeQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_Method     = armnn::ResizeMethod::Bilinear;
     descriptor.m_Parameters.m_DataLayout = dataLayout;
+
     armnn::WorkloadInfo info;
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResizeBilinear(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResize(descriptor, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -2955,13 +2963,15 @@ LayerTestResult<T, 4> ResizeBilinearMagTest(
     std::unique_ptr <armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ResizeBilinearQueueDescriptor descriptor;
+    armnn::ResizeQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_Method     = armnn::ResizeMethod::Bilinear;
     descriptor.m_Parameters.m_DataLayout = dataLayout;
+
     armnn::WorkloadInfo info;
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResizeBilinear(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateResize(descriptor, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

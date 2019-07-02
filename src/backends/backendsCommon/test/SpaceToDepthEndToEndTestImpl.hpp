@@ -81,26 +81,146 @@ void SpaceToDepthEndToEnd(const std::vector<armnn::BackendId>& backends,
 {
     using namespace armnn;
 
-    if (dataLayout == armnn::DataLayout::NCHW){
+    if (dataLayout == armnn::DataLayout::NCHW)
+    {
         PermuteDataToNCHW<armnn::DataType::Float32>(backends, dataLayout, inputTensorInfo, inputData);
         PermuteDataToNCHW<armnn::DataType::Float32>(backends, dataLayout, outputTensorInfo, expectedOutputData);
     }
 
     // Builds up the structure of the network
-    INetworkPtr net = CreateSpaceToDepthNetwork<armnn::DataType::Float32>(inputTensorInfo.GetShape(),
-                                                           outputTensorInfo.GetShape(),
-                                                           dataLayout,
-                                                           blockSize);
+    INetworkPtr net = CreateSpaceToDepthNetwork<armnn::DataType::Float32>(
+            inputTensorInfo.GetShape(),
+            outputTensorInfo.GetShape(),
+            dataLayout,
+            blockSize);
 
     BOOST_TEST_CHECKPOINT("Create a network");
 
     std::map<int, std::vector<float>> inputTensorData = { { 0, inputData } };
     std::map<int, std::vector<float>> expectedOutputTensorData = { { 0, expectedOutputData } };
 
-    EndToEndLayerTestImpl<armnn::DataType::Float32, armnn::DataType::Float32>(move(net),
-                                                                              inputTensorData,
-                                                               expectedOutputTensorData,
-                                                               backends);
+    EndToEndLayerTestImpl<armnn::DataType::Float32, armnn::DataType::Float32>(
+            move(net),
+            inputTensorData,
+            expectedOutputTensorData,
+            backends);
+}
+
+void SpaceToDepthNHWCEndToEndTest1(const std::vector<armnn::BackendId>& defaultBackends)
+{
+    const unsigned int blockSize = 2;
+
+    armnn::TensorShape inputShape{1, 2, 2, 1};
+    armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
+
+    armnn::TensorShape outputShape{1, 1, 1, 4};
+    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+
+    std::vector<float> inputData = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    });
+
+    std::vector<float> expectedOutputData = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    });
+
+    SpaceToDepthEndToEnd(defaultBackends,
+                         armnn::DataLayout::NHWC,
+                         inputTensorInfo,
+                         outputTensorInfo,
+                         inputData,
+                         expectedOutputData,
+                         blockSize);
+}
+
+void SpaceToDepthNCHWEndToEndTest1(const std::vector<armnn::BackendId>& defaultBackends)
+{
+    const unsigned int blockSize = 2;
+
+    armnn::TensorShape inputShape{1, 2, 2, 1};
+    armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
+
+    armnn::TensorShape outputShape{1, 1, 1, 4};
+    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+
+    std::vector<float> inputData = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    });
+
+    std::vector<float> expectedOutputData = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    });
+
+    SpaceToDepthEndToEnd(defaultBackends,
+                         armnn::DataLayout::NCHW,
+                         inputTensorInfo,
+                         outputTensorInfo,
+                         inputData,
+                         expectedOutputData,
+                         blockSize);
+}
+
+void SpaceToDepthNHWCEndToEndTest2(const std::vector<armnn::BackendId>& defaultBackends)
+{
+    const unsigned int blockSize = 2;
+
+    armnn::TensorShape inputShape{1, 2, 2, 2};
+    armnn::TensorShape outputShape{1, 1, 1, 8};
+
+    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+    armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
+
+    std::vector<float> inputData = std::vector<float>(
+    {
+        1.4f, 2.3f, 3.2f, 4.1f, 5.4f, 6.3f, 7.2f, 8.1f
+    });
+
+    std::vector<float> expectedOutputData = std::vector<float>(
+    {
+        1.4f, 2.3f, 3.2f, 4.1f, 5.4f, 6.3f, 7.2f, 8.1f
+    });
+
+    SpaceToDepthEndToEnd(defaultBackends,
+                         armnn::DataLayout::NHWC,
+                         inputTensorInfo,
+                         outputTensorInfo,
+                         inputData,
+                         expectedOutputData,
+                         blockSize);
+}
+
+void SpaceToDepthNCHWEndToEndTest2(const std::vector<armnn::BackendId>& defaultBackends)
+{
+    const unsigned int blockSize = 2;
+
+    armnn::TensorShape inputShape{1, 2, 2, 2};
+    armnn::TensorShape outputShape{1, 1, 1, 8};
+
+    armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+
+
+    std::vector<float> inputData = std::vector<float>(
+    {
+        1.4f, 2.3f, 3.2f, 4.1f, 5.4f, 6.3f, 7.2f, 8.1f
+    });
+
+    std::vector<float> expectedOutputData = std::vector<float>(
+    {
+        1.4f, 2.3f, 3.2f, 4.1f, 5.4f, 6.3f, 7.2f, 8.1f
+    });
+
+    SpaceToDepthEndToEnd(defaultBackends,
+                         armnn::DataLayout::NCHW,
+                         inputTensorInfo,
+                         outputTensorInfo,
+                         inputData,
+                         expectedOutputData,
+                         blockSize);
 }
 
 } // anonymous namespace

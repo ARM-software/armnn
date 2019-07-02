@@ -890,4 +890,41 @@ BOOST_AUTO_TEST_CASE(CreateConcatDim3Uint8Workload)
     ClCreateConcatWorkloadTest<ClConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
 }
 
+template <typename SpaceToDepthWorkloadType, typename armnn::DataType DataType>
+static void ClSpaceToDepthWorkloadTest()
+{
+    Graph graph;
+    ClWorkloadFactory factory =
+            ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateSpaceToDepthWorkloadTest<SpaceToDepthWorkloadType, DataType>(factory, graph);
+
+    SpaceToDepthQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    BOOST_TEST(CompareIClTensorHandleShape(inputHandle, { 1, 2, 2, 1 }));
+    BOOST_TEST(CompareIClTensorHandleShape(outputHandle, { 1, 1, 1, 4 }));
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthFloat32Workload)
+{
+    ClSpaceToDepthWorkloadTest<ClSpaceToDepthWorkload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthFloat16Workload)
+{
+    ClSpaceToDepthWorkloadTest<ClSpaceToDepthWorkload, armnn::DataType::Float16>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthQAsymm8Workload)
+{
+    ClSpaceToDepthWorkloadTest<ClSpaceToDepthWorkload, armnn::DataType::QuantisedAsymm8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthQSymm16Workload)
+{
+    ClSpaceToDepthWorkloadTest<ClSpaceToDepthWorkload, armnn::DataType::QuantisedSymm16>();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

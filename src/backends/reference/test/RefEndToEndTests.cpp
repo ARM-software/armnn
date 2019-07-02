@@ -717,119 +717,23 @@ BOOST_AUTO_TEST_CASE(RefDetectionPostProcessFastNmsUint8Test)
 
 BOOST_AUTO_TEST_CASE(RefSpaceToDepthNHWCEndToEndTest1)
 {
-    const unsigned int blockSize = 2;
-
-    armnn::TensorShape inputShape{1, 2, 2, 1};
-    armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
-
-    armnn::TensorShape outputShape{1, 1, 1, 4};
-    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
-
-    std::vector<float> inputData = std::vector<float>(
-    {
-        1.0f, 2.0f, 3.0f, 4.0f
-    });
-
-    std::vector<float> expectedOutputData = std::vector<float>(
-    {
-        1.0f, 2.0f, 3.0f, 4.0f
-    });
-
-    SpaceToDepthEndToEnd(defaultBackends,
-                        armnn::DataLayout::NHWC,
-                        inputTensorInfo,
-                        outputTensorInfo,
-                        inputData,
-                        expectedOutputData,
-                        blockSize);
+    SpaceToDepthNHWCEndToEndTest1(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefSpaceToDepthNCHWEndToEndTest1)
 {
-    const unsigned int blockSize = 2;
+    SpaceToDepthNCHWEndToEndTest1(defaultBackends);
 
-    armnn::TensorShape inputShape{1, 2, 2, 1};
-    armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
-
-    armnn::TensorShape outputShape{1, 1, 1, 4};
-    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
-
-    std::vector<float> inputData = std::vector<float>(
-    {
-        1.0f, 2.0f, 3.0f, 4.0f
-    });
-
-    std::vector<float> expectedOutputData = std::vector<float>(
-    {
-        1.0f, 2.0f, 3.0f, 4.0f
-    });
-
-    SpaceToDepthEndToEnd(defaultBackends,
-                        armnn::DataLayout::NCHW,
-                        inputTensorInfo,
-                        outputTensorInfo,
-                        inputData,
-                        expectedOutputData,
-                        blockSize);
 }
 
 BOOST_AUTO_TEST_CASE(RefSpaceToDepthNHWCEndToEndTest2)
 {
-    const unsigned int blockSize = 2;
-
-    armnn::TensorShape inputShape{1, 2, 2, 2};
-    armnn::TensorShape outputShape{1, 1, 1, 8};
-
-    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
-    armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
-
-    std::vector<float> inputData = std::vector<float>(
-    {
-        1.4f, 2.3f, 3.2f, 4.1f, 5.4f, 6.3f, 7.2f, 8.1f
-    });
-
-    std::vector<float> expectedOutputData = std::vector<float>(
-    {
-        1.4f, 2.3f, 3.2f, 4.1f, 5.4f, 6.3f, 7.2f, 8.1f
-    });
-
-    SpaceToDepthEndToEnd(defaultBackends,
-                        armnn::DataLayout::NHWC,
-                        inputTensorInfo,
-                        outputTensorInfo,
-                        inputData,
-                        expectedOutputData,
-                        blockSize);
+    SpaceToDepthNHWCEndToEndTest2(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefSpaceToDepthNCHWEndToEndTest2)
 {
-    const unsigned int blockSize = 2;
-
-    armnn::TensorShape inputShape{1, 2, 2, 2};
-    armnn::TensorShape outputShape{1, 1, 1, 8};
-
-    armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Float32);
-    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
-
-
-    std::vector<float> inputData = std::vector<float>(
-    {
-        1.4f, 2.3f, 3.2f, 4.1f, 5.4f, 6.3f, 7.2f, 8.1f
-    });
-
-    std::vector<float> expectedOutputData = std::vector<float>(
-    {
-        1.4f, 2.3f, 3.2f, 4.1f, 5.4f, 6.3f, 7.2f, 8.1f
-    });
-
-    SpaceToDepthEndToEnd(defaultBackends,
-                        armnn::DataLayout::NCHW,
-                        inputTensorInfo,
-                        outputTensorInfo,
-                        inputData,
-                        expectedOutputData,
-                        blockSize);
+    SpaceToDepthNCHWEndToEndTest2(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefSplitter1dEndToEndTest)

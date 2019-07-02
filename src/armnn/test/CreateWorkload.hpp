@@ -1345,4 +1345,35 @@ std::unique_ptr<PreluWorkload> CreatePreluWorkloadTest(armnn::IWorkloadFactory& 
     return workload;
 }
 
+template <typename SpaceToDepthWorkload, armnn::DataType DataType>
+std::unique_ptr<SpaceToDepthWorkload> CreateSpaceToDepthWorkloadTest(armnn::IWorkloadFactory& factory,
+                                                                     armnn::Graph&  graph)
+{
+    SpaceToDepthDescriptor desc;
+    desc.m_BlockSize = 2;
+    Layer* const layer = graph.AddLayer<SpaceToDepthLayer>(desc, "spaceToDepth");
+
+    // Creates extra layers.
+    Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connects up.
+    armnn::TensorInfo inputTensorInfo({ 1, 2, 2, 1 }, DataType);
+    armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 4 }, DataType);
+
+    Connect(input, layer, inputTensorInfo);
+    Connect(layer, output, outputTensorInfo);
+
+    CreateTensorHandles(graph, factory);
+
+    // Makes the workload and checks it.
+    auto workload = MakeAndCheckWorkload<SpaceToDepthWorkload>(*layer, graph, factory);
+
+    SpaceToDepthQueueDescriptor queueDescriptor = workload->GetData();
+    BOOST_TEST(queueDescriptor.m_Inputs.size() == 1);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+
+    return workload;
+}
+
 } // Anonymous namespace

@@ -962,4 +962,32 @@ BOOST_AUTO_TEST_CASE(CreatePreluInt16NoBroadcastWorkload)
                       armnn::InvalidArgumentException);
 }
 
+template <typename SpaceToDepthWorkloadType, armnn::DataType DataType>
+static void RefCreateSpaceToDepthWorkloadTest()
+{
+    Graph graph;
+    RefWorkloadFactory factory;
+
+    auto workload = CreateSpaceToDepthWorkloadTest<SpaceToDepthWorkloadType, DataType>(factory, graph);
+
+    CheckInputOutput(std::move(workload),
+                     TensorInfo({ 1, 2, 2, 1 }, DataType),
+                     TensorInfo({ 1, 1, 1, 4 }, DataType));
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthWorkloadFloat32)
+{
+    RefCreateSpaceToDepthWorkloadTest<RefSpaceToDepthWorkload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthWorkloadQASymm8)
+{
+    RefCreateSpaceToDepthWorkloadTest<RefSpaceToDepthWorkload, armnn::DataType::QuantisedAsymm8>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthWorkloadQSymm16)
+{
+    RefCreateSpaceToDepthWorkloadTest<RefSpaceToDepthWorkload, armnn::DataType::QuantisedSymm16>();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

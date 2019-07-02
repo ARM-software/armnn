@@ -21,7 +21,7 @@ RefTransposeConvolution2dWorkload::RefTransposeConvolution2dWorkload(
     m_Weights = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Weight));
     const TensorInfo& weightsInfo = m_Weights->GetTensorInfo();
 
-    m_WeightsDecoder = MakeDecoder<float>(weightsInfo, m_Weights.get()->Map(true));
+    m_WeightsDecoder = MakeDecoder<float>(weightsInfo, m_Weights->Map(true));
     m_WeightsShape   = weightsInfo.GetShape();
 
     // set up biases decoder
@@ -29,7 +29,7 @@ RefTransposeConvolution2dWorkload::RefTransposeConvolution2dWorkload(
     {
         m_Biases = std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias));
         const TensorInfo& biasesInfo = m_Biases->GetTensorInfo();
-        m_BiasesDecoder = MakeDecoder<float>(biasesInfo, m_Biases.get()->Map(true));
+        m_BiasesDecoder = MakeDecoder<float>(biasesInfo, m_Biases->Map(true));
     }
 }
 
@@ -40,19 +40,22 @@ void RefTransposeConvolution2dWorkload::PostAllocationConfigure()
     const TensorInfo& inputInfo = GetTensorInfo(input);
 
     m_InputShape   = inputInfo.GetShape();
-    m_InputDecoder = MakeDecoder<float>(inputInfo, input->Map());
+    m_InputDecoder = MakeDecoder<float>(inputInfo);
 
     // set up output encoder
     ITensorHandle* output        = m_Data.m_Outputs[0];
     const TensorInfo& outputInfo = GetTensorInfo(output);
 
     m_OutputShape   = outputInfo.GetShape();
-    m_OutputEncoder = MakeEncoder<float>(outputInfo, output->Map());
+    m_OutputEncoder = MakeEncoder<float>(outputInfo);
 }
 
 void RefTransposeConvolution2dWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefTransposeConvolution2dWorkload_Execute");
+
+    m_InputDecoder->Reset(m_Data.m_Inputs[0]->Map());
+    m_OutputEncoder->Reset(m_Data.m_Outputs[0]->Map());
 
     TransposeConvolution2dImpl(m_Data.m_Parameters,
                                m_InputShape,

@@ -122,6 +122,19 @@ ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(const FullyConnected
     return fc_info;
 }
 
+inline arm_compute::InterpolationPolicy ConvertResizeMethodToAclInterpolationPolicy(ResizeMethod resizeMethod)
+{
+    switch (resizeMethod)
+    {
+        case ResizeMethod::Bilinear:
+            return arm_compute::InterpolationPolicy::BILINEAR;
+        case ResizeMethod::NearestNeighbor:
+            return arm_compute::InterpolationPolicy::NEAREST_NEIGHBOR;
+        default:
+            throw InvalidArgumentException("Unsupported resize method");
+    }
+}
+
 inline unsigned int ComputeSoftmaxAclAxis(const armnn::TensorInfo& tensor)
 {
     unsigned int dim = tensor.GetNumDimensions();

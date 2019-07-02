@@ -758,16 +758,15 @@ BOOST_AUTO_TEST_CASE(CreateLSTMWorkloadFloatWorkload)
     ClCreateLstmWorkloadTest<ClLstmFloatWorkload>();
 }
 
-template <typename ResizeBilinearWorkloadType, typename armnn::DataType DataType>
-static void ClResizeBilinearWorkloadTest(DataLayout dataLayout)
+template <typename ResizeWorkloadType, typename armnn::DataType DataType>
+static void ClResizeWorkloadTest(DataLayout dataLayout)
 {
     Graph graph;
     ClWorkloadFactory factory =
         ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
 
-    auto workload = CreateResizeBilinearWorkloadTest<ResizeBilinearWorkloadType, DataType>(factory, graph, dataLayout);
+    auto workload = CreateResizeBilinearWorkloadTest<ResizeWorkloadType, DataType>(factory, graph, dataLayout);
 
-    // Checks that inputs/outputs are as we expect them (see definition of CreateResizeBilinearWorkloadTest).
     auto queueDescriptor = workload->GetData();
 
     auto inputHandle  = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
@@ -786,24 +785,34 @@ static void ClResizeBilinearWorkloadTest(DataLayout dataLayout)
     }
 }
 
-BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32NchwWorkload)
+BOOST_AUTO_TEST_CASE(CreateResizeFloat32NchwWorkload)
 {
-    ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
+    ClResizeWorkloadTest<ClResizeWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat16NchwWorkload)
+BOOST_AUTO_TEST_CASE(CreateResizeFloat16NchwWorkload)
 {
-    ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float16>(DataLayout::NCHW);
+    ClResizeWorkloadTest<ClResizeWorkload, armnn::DataType::Float16>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32NhwcWorkload)
+BOOST_AUTO_TEST_CASE(CreateResizeUint8NchwWorkload)
 {
-    ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+    ClResizeWorkloadTest<ClResizeWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
 }
 
-BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat16NhwcWorkload)
+BOOST_AUTO_TEST_CASE(CreateResizeFloat32NhwcWorkload)
 {
-    ClResizeBilinearWorkloadTest<ClResizeBilinearFloatWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
+    ClResizeWorkloadTest<ClResizeWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeFloat16NhwcWorkload)
+{
+    ClResizeWorkloadTest<ClResizeWorkload, armnn::DataType::Float16>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeUint8NhwcWorkload)
+{
+    ClResizeWorkloadTest<ClResizeWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
 template <typename MeanWorkloadType, typename armnn::DataType DataType>

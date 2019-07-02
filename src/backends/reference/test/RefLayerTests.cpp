@@ -680,10 +680,10 @@ ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMinUint16,
                      armnn::DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMag,
                      ResizeNearestNeighborMagTest<armnn::DataType::Float32>,
-                     armnn::DataLayout::NCHW)
+                     armnn::DataLayout::NCHW, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint8,
                      ResizeNearestNeighborMagTest<armnn::DataType::QuantisedAsymm8>,
-                     armnn::DataLayout::NCHW)
+                     armnn::DataLayout::NCHW, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint16,
                      SimpleResizeNearestNeighborTest<armnn::DataType::QuantisedSymm16>,
                      armnn::DataLayout::NCHW)
@@ -727,10 +727,10 @@ ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMinUint16Nhwc,
                      armnn::DataLayout::NHWC)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagNhwc,
                      ResizeNearestNeighborMagTest<armnn::DataType::Float32>,
-                     armnn::DataLayout::NHWC)
+                     armnn::DataLayout::NHWC, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint8Nhwc,
                      ResizeNearestNeighborMagTest<armnn::DataType::QuantisedAsymm8>,
-                     armnn::DataLayout::NHWC)
+                     armnn::DataLayout::NHWC, 0.10f, 50, 0.11f, 20)
 ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint16Nhwc,
                      ResizeNearestNeighborNopTest<armnn::DataType::QuantisedSymm16>,
                      armnn::DataLayout::NHWC)

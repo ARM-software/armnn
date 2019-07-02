@@ -950,7 +950,11 @@ template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> ResizeNearestNeighborMagTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout  dataLayout);
+        const armnn::DataLayout  dataLayout,
+        float inQuantScale,
+        int32_t inQuantOffset,
+        float outQuantScale,
+        int32_t outQuantOffset);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 2> Rsqrt2dTestCommon(
@@ -3391,7 +3395,11 @@ template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> ResizeNearestNeighborMagTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        const armnn::DataLayout dataLayout)
+        const armnn::DataLayout dataLayout,
+        float inQuantScale,
+        int32_t inQuantOffset,
+        float outQuantScale,
+        int32_t outQuantOffset)
 {
     armnn::TensorInfo inputTensorInfo = armnn::IsQuantizedType<T>()
                                         ?  armnnUtils::GetTensorInfo(1, 1, 3, 2, dataLayout, ArmnnType)
@@ -3402,46 +3410,46 @@ LayerTestResult<T, 4> ResizeNearestNeighborMagTest(
 
     if (armnn::IsQuantizedType<T>())
     {
-        inputTensorInfo.SetQuantizationScale(0.010765f);
-        inputTensorInfo.SetQuantizationOffset(7);
-        outputTensorInfo.SetQuantizationScale(0.010132f);
-        outputTensorInfo.SetQuantizationOffset(-18);
+        inputTensorInfo.SetQuantizationScale(inQuantScale);
+        inputTensorInfo.SetQuantizationOffset(inQuantOffset);
+        outputTensorInfo.SetQuantizationScale(outQuantScale);
+        outputTensorInfo.SetQuantizationOffset(outQuantOffset);
     }
 
     std::vector<float> inputData = armnn::IsQuantizedType<T>()
                                    ? std::initializer_list<float>
-                                           {
-                                                   0.183005f, 2.379065f, // 24, 228, : Expected quantised values
-                                                   1.05497f, 1.302565f, // 105, 128,
-                                                   2.400595f, 0.68896f // 230, 71
-                                           }
+                                        {
+                                            0.183005f, 2.379065f, //  24, 228, : expected quantised values
+                                            1.054970f, 1.302565f, // 105, 128,
+                                            2.400595f, 0.688960f  // 230, 71
+                                        }
                                    : std::initializer_list<float>
-                                           {
-                                                   1.0f,   2.0f,
-                                                   13.0f,  21.0f,
-                                                   144.0f, 233.0f,
+                                        {
+                                               1.0f,   2.0f,
+                                              13.0f,  21.0f,
+                                            144.0f, 233.0f,
 
-                                                   233.0f, 144.0f,
-                                                   21.0f,  13.0f,
-                                                   2.0f,   1.0f
-                                           };
+                                            233.0f, 144.0f,
+                                             21.0f,  13.0f,
+                                              2.0f,   1.0f
+                                        };
     std::vector<float> outputData = armnn::IsQuantizedType<T>()
                                     ? std::initializer_list<float>
-                                            {
-                                                    0.183005f, 0.183005f, 0.183005f, 2.379065f, 2.379065f,
-                                                    1.05497f,  1.05497f,  1.05497f,  1.302565f, 1.302565f,
-                                                    2.400595f, 2.400595f, 2.400595f, 0.68896f,  0.68896f
-                                            }
+                                        {
+                                            0.183005f, 0.183005f, 0.183005f, 2.379065f, 2.379065f,
+                                            1.054970f, 1.054970f, 1.054970f, 1.302565f, 1.302565f,
+                                            2.400595f, 2.400595f, 2.400595f, 0.688960f, 0.688960f
+                                        }
                                     : std::initializer_list<float>
-                                            {
-                                                      1.f,   1.f,   1.f,   2.f,   2.f,
-                                                     13.f,  13.f,  13.f,  21.f,  21.f,
-                                                    144.f, 144.f, 144.f, 233.f, 233.f,
+                                        {
+                                              1.f,   1.f,   1.f,   2.f,   2.f,
+                                             13.f,  13.f,  13.f,  21.f,  21.f,
+                                            144.f, 144.f, 144.f, 233.f, 233.f,
 
-                                                    233.f, 233.f, 233.f, 144.f, 144.f,
-                                                     21.f,  21.f,  21.f,  13.f,  13.f,
-                                                      2.f,   2.f,   2.f,   1.f,   1.f
-                                            };
+                                            233.f, 233.f, 233.f, 144.f, 144.f,
+                                             21.f,  21.f,  21.f,  13.f,  13.f,
+                                              2.f,   2.f,   2.f,   1.f,   1.f
+                                        };
 
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
     if (dataLayout == armnn::DataLayout::NHWC)
@@ -3487,7 +3495,6 @@ LayerTestResult<T, 4> ResizeNearestNeighborMagTest(
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
     return result;
 }
-
 
 template<armnn::DataType ArmnnType, typename T, std::size_t InputDim, std::size_t OutputDim>
 LayerTestResult<T, OutputDim> MeanTestHelper(

@@ -40,6 +40,7 @@
 #include "workloads/ClPermuteWorkload.hpp"
 #include "workloads/ClPooling2dWorkload.hpp"
 #include "workloads/ClPreluWorkload.hpp"
+#include "workloads/ClResizeWorkload.hpp"
 #include "workloads/ClQuantizeWorkload.hpp"
 #include "workloads/ClSoftmaxBaseWorkload.hpp"
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
@@ -570,28 +571,22 @@ bool ClLayerSupport::IsResizeSupported(const TensorInfo& input,
                                        const ResizeDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
-
-    if (descriptor.m_Method == ResizeMethod::Bilinear)
-    {
-        return IsSupportedForDataTypeCl(reasonIfUnsupported,
-                                        input.GetDataType(),
-                                        &TrueFunc<>,
-                                        &FalseFuncU8<>);
-    }
-
-    return false;
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClResizeWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 bool ClLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
                                                const TensorInfo& output,
                                                Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
-    return IsSupportedForDataTypeCl(reasonIfUnsupported,
-                                    input.GetDataType(),
-                                    &TrueFunc<>,
-                                    &FalseFuncU8<>);
+    ResizeDescriptor descriptor;
+    descriptor.m_Method     = ResizeMethod::Bilinear;
+    descriptor.m_DataLayout = DataLayout::NCHW;
+
+    const TensorShape& outputShape = output.GetShape();
+    descriptor.m_TargetHeight = outputShape[2];
+    descriptor.m_TargetWidth  = outputShape[3];
+
+    return IsResizeSupported(input, output, descriptor, reasonIfUnsupported);
 }
 
 bool ClLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

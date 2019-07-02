@@ -30,7 +30,7 @@
 #include "ClPreluWorkload.hpp"
 #include "ClQuantizeWorkload.hpp"
 #include "ClReshapeWorkload.hpp"
-#include "ClResizeBilinearFloatWorkload.hpp"
+#include "ClResizeWorkload.hpp"
 #include "ClSoftmaxFloatWorkload.hpp"
 #include "ClSoftmaxUint8Workload.hpp"
 #include "ClSpaceToBatchNdWorkload.hpp"

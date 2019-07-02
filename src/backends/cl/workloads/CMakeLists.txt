@@ -60,8 +60,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClQuantizeWorkload.hpp
     ClReshapeWorkload.cpp
     ClReshapeWorkload.hpp
-    ClResizeBilinearFloatWorkload.cpp
-    ClResizeBilinearFloatWorkload.hpp
+    ClResizeWorkload.cpp
+    ClResizeWorkload.hpp
     ClSoftmaxBaseWorkload.cpp
     ClSoftmaxBaseWorkload.hpp
     ClSoftmaxFloatWorkload.cpp

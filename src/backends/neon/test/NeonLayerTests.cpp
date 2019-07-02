@@ -427,6 +427,10 @@ ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
 ARMNN_AUTO_TEST_CASE(PadFloat323d, PadFloat323dTest)
 ARMNN_AUTO_TEST_CASE(PadFloat324d, PadFloat324dTest)
 
+ARMNN_AUTO_TEST_CASE(PadUint82d, PadUint82dTest)
+ARMNN_AUTO_TEST_CASE(PadUint83d, PadUint83dTest)
+ARMNN_AUTO_TEST_CASE(PadUint84d, PadUint84dTest)
+
 // Permute
 ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteFloat32Test)
 ARMNN_AUTO_TEST_CASE(SimplePermuteUint8, SimplePermuteUint8Test)

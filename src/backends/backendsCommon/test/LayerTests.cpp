@@ -6054,38 +6054,19 @@ LayerTestResult<T, 2> Pad2dTestCommon(
       3, 2, 4
     }));
 
-    const T padValue = ConvertToDataType<T>(customPaddingValue, inputTensorInfo);
-
+    auto p = customPaddingValue;
     std::vector<T> expectedOutputValues;
-    if (padValue == 0)
+    expectedOutputValues = (
+    QuantizedVector<T>(qScale, qOffset,
     {
-        expectedOutputValues = (
-        QuantizedVector<T>(qScale, qOffset,
-        {
-          0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0,
-          0, 0, 4, 8, 6, 0, 0,
-          0, 0, 7, 4, 4, 0, 0,
-          0, 0, 3, 2, 4, 0, 0,
-          0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0
-        }));
-    }
-    else
-    {
-        expectedOutputValues = (
-        QuantizedVector<T>(qScale, qOffset,
-        {
-          1, 1, 1, 1, 1, 1, 1,
-          1, 1, 1, 1, 1, 1, 1,
-          1, 1, 4, 8, 6, 1, 1,
-          1, 1, 7, 4, 4, 1, 1,
-          1, 1, 3, 2, 4, 1, 1,
-          1, 1, 1, 1, 1, 1, 1,
-          1, 1, 1, 1, 1, 1, 1
-        }));
-    }
-
+      p, p, p, p, p, p, p,
+      p, p, p, p, p, p, p,
+      p, p, 4, 8, 6, p, p,
+      p, p, 7, 4, 4, p, p,
+      p, p, 3, 2, 4, p, p,
+      p, p, p, p, p, p, p,
+      p, p, p, p, p, p, p
+    }));
 
     auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
 
@@ -6097,11 +6078,12 @@ LayerTestResult<T, 2> Pad2dTestCommon(
 
     armnn::PadQueueDescriptor descriptor;
 
-    std::vector<std::pair<unsigned int, unsigned int>> PadList;
-    PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
-    PadList.push_back(std::pair<unsigned int, unsigned int>(2,2));
+    std::vector<std::pair<unsigned int, unsigned int>> padList;
+    padList.push_back(std::pair<unsigned int, unsigned int>(2,2));
+    padList.push_back(std::pair<unsigned int, unsigned int>(2,2));
 
-    descriptor.m_Parameters.m_PadList = PadList;
+    descriptor.m_Parameters.m_PadList = padList;
+    descriptor.m_Parameters.m_PadValue = customPaddingValue;
     armnn::WorkloadInfo info;
 
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
@@ -6449,56 +6431,56 @@ LayerTestResult<uint8_t, 2> PadUint82dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 2> PadUint82dCustomPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0, 1);
 }
 
 LayerTestResult<uint8_t, 3> PadUint83dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad3dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return Pad3dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<uint8_t, 4> PadUint84dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad4dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
+    return Pad4dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
 LayerTestResult<float, 2> PadFloat322dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Pad2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 2> PadFloat322dCustomPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Pad2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Pad2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0, 1);
 }
 
 LayerTestResult<float, 3> PadFloat323dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad3dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Pad3dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> PadFloat324dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-  return Pad4dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Pad4dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -9415,7 +9397,6 @@ LayerTestResult<int16_t, 4> SpaceToBatchNdPaddingNHWCUint16Test(
 {
     return SpaceToBatchNdPaddingNHWCTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
 }
-
 
 LayerTestResult<uint8_t, 4> SpaceToDepthNHWCAsymmQ8Test(
     armnn::IWorkloadFactory& workloadFactory,

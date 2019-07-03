@@ -66,6 +66,12 @@ BOOST_AUTO_TEST_CASE(IsLayerSupportedUint8Reference)
     IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::QuantisedAsymm8>(&factory);
 }
 
+BOOST_AUTO_TEST_CASE(IsLayerSupportedInt16Reference)
+{
+    armnn::RefWorkloadFactory factory;
+    IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::QuantisedSymm16>(&factory);
+}
+
 BOOST_AUTO_TEST_CASE(IsConvertFp16ToFp32SupportedReference)
 {
     std::string reasonIfUnsupported;

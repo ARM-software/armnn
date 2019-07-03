@@ -9,6 +9,7 @@
 #include <armnn/Optional.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
+#include "LstmParams.hpp"
 
 namespace armnn
 {
@@ -178,15 +179,7 @@ bool IsLstmSupported(const BackendId& backend, const TensorInfo& input, const Te
                      const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
                      const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
                      const TensorInfo& output, const LstmDescriptor& descriptor,
-                     const TensorInfo& inputToForgetWeights, const TensorInfo& inputToCellWeights,
-                     const TensorInfo& inputToOutputWeights, const TensorInfo& recurrentToForgetWeights,
-                     const TensorInfo& recurrentToCellWeights, const TensorInfo& recurrentToOutputWeights,
-                     const TensorInfo& forgetGateBias, const TensorInfo& cellBias,
-                     const TensorInfo& outputGateBias, const TensorInfo* inputToInputWeights,
-                     const TensorInfo* recurrentToInputWeights, const TensorInfo* cellToInputWeights,
-                     const TensorInfo* inputGateBias, const TensorInfo* projectionWeights,
-                     const TensorInfo* projectionBias, const TensorInfo* cellToForgetWeights,
-                     const TensorInfo* cellToOutputWeights, char* reasonIfUnsupported = nullptr,
+                     const LstmInputParamsInfo& paramsInfo, char* reasonIfUnsupported = nullptr,
                      size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces

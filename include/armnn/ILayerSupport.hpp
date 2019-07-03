@@ -7,6 +7,7 @@
 #include <armnn/Deprecated.hpp>
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/Optional.hpp>
+#include <armnn/LstmParams.hpp>
 
 #include <cctype>
 #include <functional>
@@ -153,28 +154,8 @@ public:
                                  const TensorInfo& cellStateOut,
                                  const TensorInfo& output,
                                  const LstmDescriptor& descriptor,
-                                 const TensorInfo& inputToForgetWeights,
-                                 const TensorInfo& inputToCellWeights,
-                                 const TensorInfo& inputToOutputWeights,
-                                 const TensorInfo& recurrentToForgetWeights,
-                                 const TensorInfo& recurrentToCellWeights,
-                                 const TensorInfo& recurrentToOutputWeights,
-                                 const TensorInfo& forgetGateBias,
-                                 const TensorInfo& cellBias,
-                                 const TensorInfo& outputGateBias,
-                                 const TensorInfo* inputToInputWeights,
-                                 const TensorInfo* recurrentToInputWeights,
-                                 const TensorInfo* cellToInputWeights,
-                                 const TensorInfo* inputGateBias,
-                                 const TensorInfo* projectionWeights,
-                                 const TensorInfo* projectionBias,
-                                 const TensorInfo* cellToForgetWeights,
-                                 const TensorInfo* cellToOutputWeights,
-                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional(),
-                                 const TensorInfo* inputLayerNormWeights = nullptr,
-                                 const TensorInfo* forgetLayerNormWeights = nullptr,
-                                 const TensorInfo* cellLayerNormWeights = nullptr,
-                                 const TensorInfo* outputLayerNormWeights = nullptr) const = 0;
+                                 const LstmInputParamsInfo& paramsInfo,
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsMaximumSupported(const TensorInfo& input0,
                                     const TensorInfo& input1,

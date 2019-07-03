@@ -333,27 +333,13 @@ bool IsLstmSupported(const BackendId& backend, const TensorInfo& input, const Te
                      const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
                      const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
                      const TensorInfo& output, const LstmDescriptor& descriptor,
-                     const TensorInfo& inputToForgetWeights, const TensorInfo& inputToCellWeights,
-                     const TensorInfo& inputToOutputWeights, const TensorInfo& recurrentToForgetWeights,
-                     const TensorInfo& recurrentToCellWeights, const TensorInfo& recurrentToOutputWeights,
-                     const TensorInfo& forgetGateBias, const TensorInfo& cellBias,
-                     const TensorInfo& outputGateBias, const TensorInfo* inputToInputWeights,
-                     const TensorInfo* recurrentToInputWeights, const TensorInfo* cellToInputWeights,
-                     const TensorInfo* inputGateBias, const TensorInfo* projectionWeights,
-                     const TensorInfo* projectionBias, const TensorInfo* cellToForgetWeights,
-                     const TensorInfo* cellToOutputWeights, char* reasonIfUnsupported,
+                     const LstmInputParamsInfo& paramsInfo, char* reasonIfUnsupported,
                      size_t reasonIfUnsupportedMaxLength)
 
 {
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsLstmSupported, input, outputStateIn, cellStateIn,
                                scratchBuffer, outputStateOut, cellStateOut,
-                               output, descriptor, inputToForgetWeights, inputToCellWeights,
-                               inputToOutputWeights, recurrentToForgetWeights,
-                               recurrentToCellWeights, recurrentToOutputWeights,
-                               forgetGateBias, cellBias, outputGateBias,
-                               inputToInputWeights, recurrentToInputWeights,
-                               cellToInputWeights, inputGateBias, projectionWeights,
-                               projectionBias, cellToForgetWeights, cellToOutputWeights);
+                               output, descriptor, paramsInfo);
 }
 
 bool IsMaximumSupported(const BackendId& backend,

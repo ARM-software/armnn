@@ -537,6 +537,10 @@ ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8Nhwc,
 ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeClampUint8, QuantizeClampUint8Test)
 
+// PReLU
+ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<armnn::DataType::QuantisedAsymm8>)
+
 // ============================================================================
 // COMPARE tests
 

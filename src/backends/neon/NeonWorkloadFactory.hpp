@@ -65,6 +65,9 @@ public:
     std::unique_ptr<IWorkload> CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
                                                const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreatePrelu(const PreluQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 

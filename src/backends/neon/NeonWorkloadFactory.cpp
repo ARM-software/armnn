@@ -145,6 +145,12 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePooling2d(const Poo
     return std::make_unique<NeonPooling2dWorkload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreatePrelu(const armnn::PreluQueueDescriptor &descriptor,
+                                                                   const armnn::WorkloadInfo &info) const
+{
+    return std::make_unique<NeonPreluWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {

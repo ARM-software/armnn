@@ -416,6 +416,49 @@ BOOST_AUTO_TEST_CASE(CreatePooling2dUint8NhwcWorkload)
     NeonCreatePooling2dWorkloadTest<DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
+static void NeonCreatePreluWorkloadTest(const armnn::TensorShape& inputShape,
+                                        const armnn::TensorShape& alphaShape,
+                                        const armnn::TensorShape& outputShape,
+                                        armnn::DataType dataType)
+{
+    Graph graph;
+    NeonWorkloadFactory factory =
+            NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreatePreluWorkloadTest<NeonPreluWorkload>(factory,
+                                                               graph,
+                                                               inputShape,
+                                                               alphaShape,
+                                                               outputShape,
+                                                               dataType);
+
+    // Checks that outputs and inputs are as we expect them (see definition of CreateReshapeWorkloadTest).
+    PreluQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto alphaHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[1]);
+    auto outputHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, dataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(alphaHandle, TensorInfo(alphaShape, dataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, dataType)));
+}
+
+#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+    BOOST_AUTO_TEST_CASE(CreatePreluFloat16Workload)
+{
+    NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::Float16);
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(CreatePreluFloatWorkload)
+{
+    NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::Float32);
+}
+
+BOOST_AUTO_TEST_CASE(CreatePreluUint8Workload)
+{
+    NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::QuantisedAsymm8);
+}
+
 template <typename armnn::DataType DataType>
 static void NeonCreateReshapeWorkloadTest()
 {

@@ -36,6 +36,7 @@
 #include "workloads/NeonPadWorkload.hpp"
 #include "workloads/NeonPermuteWorkload.hpp"
 #include "workloads/NeonPooling2dWorkload.hpp"
+#include "workloads/NeonPreluWorkload.hpp"
 #include "workloads/NeonQuantizeWorkload.hpp"
 #include "workloads/NeonResizeBilinearWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
@@ -448,6 +449,14 @@ bool NeonLayerSupport::IsPooling2dSupported(const TensorInfo& input,
                                             Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonPooling2dWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
+}
+
+bool NeonLayerSupport::IsPreluSupported(const armnn::TensorInfo &input,
+                                        const armnn::TensorInfo &alpha,
+                                        const armnn::TensorInfo &output,
+                                        armnn::Optional<std::string &> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonPreluWorkloadValidate, reasonIfUnsupported, input, alpha, output);
 }
 
 bool NeonLayerSupport::IsQuantizeSupported(const TensorInfo& input,

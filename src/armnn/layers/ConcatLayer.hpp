@@ -24,7 +24,6 @@ public:
     /// otherwise creates tensor handlers.
     /// @param [in] registry Contains all the registered tensor handle factories available for use.
     /// @param [in] factory The workload factory which will create the workload.
-//    virtual void CreateTensorHandles(Graph& graph, const IWorkloadFactory& factory) override;
     virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
                                      const IWorkloadFactory& factory) override;
 

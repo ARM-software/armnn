@@ -38,6 +38,7 @@ private:
 };
 
 using RefDebugFloat32Workload = RefDebugWorkload<DataType::Float32>;
-using RefDebugUint8Workload = RefDebugWorkload<DataType::QuantisedAsymm8>;
+using RefDebugQAsymm8Workload = RefDebugWorkload<DataType::QuantisedAsymm8>;
+using RefDebugQSymm16Workload = RefDebugWorkload<DataType::QuantisedSymm16>;
 
 } // namespace armnn

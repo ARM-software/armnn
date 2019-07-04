@@ -10,6 +10,7 @@
 
 #include <reference/RefWorkloadFactory.hpp>
 
+#include <backendsCommon/test/DebugTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessLayerTestImpl.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
 
@@ -1024,6 +1025,11 @@ ARMNN_AUTO_TEST_CASE(Debug4DUint8, Debug4DUint8Test)
 ARMNN_AUTO_TEST_CASE(Debug3DUint8, Debug3DUint8Test)
 ARMNN_AUTO_TEST_CASE(Debug2DUint8, Debug2DUint8Test)
 ARMNN_AUTO_TEST_CASE(Debug1DUint8, Debug1DUint8Test)
+
+ARMNN_AUTO_TEST_CASE(Debug4DQSymm16, Debug4DTest<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(Debug3DQSymm16, Debug3DTest<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(Debug2DQSymm16, Debug2DTest<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(Debug1DQSymm16, Debug1DTest<armnn::DataType::QuantisedSymm16>)
 
 // Gather
 ARMNN_AUTO_TEST_CASE(Gather1DParamsFloat, Gather1DParamsFloatTest)

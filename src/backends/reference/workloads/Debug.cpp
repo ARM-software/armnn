@@ -97,4 +97,9 @@ template void Debug<uint8_t>(const TensorInfo& inputInfo,
                              const std::string& layerName,
                              unsigned int slotIndex);
 
+template void Debug<int16_t>(const TensorInfo& inputInfo,
+                             const int16_t* inputData,
+                             LayerGuid guid,
+                             const std::string& layerName,
+                             unsigned int slotIndex);
 } // namespace armnn

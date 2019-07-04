@@ -533,11 +533,25 @@ bool RefLayerSupport::IsDebugSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+    bool supported = true;
+
+    std::array<DataType,3> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference debug: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference debug: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference debug: input and output types are mismatched");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,

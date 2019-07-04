@@ -50,9 +50,9 @@ bool IsFloat16(const WorkloadInfo& info)
     return IsDataType<DataType::Float16>(info);
 }
 
-bool IsUint8(const WorkloadInfo& info)
+bool IsQSymm16(const WorkloadInfo& info)
 {
-    return IsDataType<DataType::QuantisedAsymm8>(info);
+    return IsDataType<DataType::QuantisedSymm16>(info);
 }
 
 RefWorkloadFactory::RefWorkloadFactory(const std::shared_ptr<RefMemoryManager>& memoryManager)
@@ -432,7 +432,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGreater(const GreaterQueueD
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefDebugFloat32Workload, RefDebugUint8Workload>(descriptor, info);
+    if (IsQSymm16(info))
+    {
+        return std::make_unique<RefDebugQSymm16Workload>(descriptor, info);
+    }
+    return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymm8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,

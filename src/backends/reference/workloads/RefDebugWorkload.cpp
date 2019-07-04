@@ -46,5 +46,6 @@ void RefDebugWorkload<DataType>::RegisterDebugCallback(const DebugCallbackFuncti
 
 template class RefDebugWorkload<DataType::Float32>;
 template class RefDebugWorkload<DataType::QuantisedAsymm8>;
+template class RefDebugWorkload<DataType::QuantisedSymm16>;
 
 } // namespace armnn

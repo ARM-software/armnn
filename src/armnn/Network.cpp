@@ -415,7 +415,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
                     std::stringstream subgraphMsg;
                     subgraphMsg << "Re-assigning backends to " << failedSubgraph.GetLayers().size()
                                 << " layers inside sub-graph " << count++;
-                    ReportWarning(warningMsg.str(), errMessages);
+                    ReportWarning(subgraphMsg.str(), errMessages);
 
                     OptimizationResult reassignmentResult = AssignBackends(optNetObjPtr,
                                                                            settingsCopy,

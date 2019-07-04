@@ -13,6 +13,7 @@
 #include <layers/BatchToSpaceNdLayer.hpp>
 #include <layers/SpaceToDepthLayer.hpp>
 #include <layers/PreluLayer.hpp>
+#include <layers/StackLayer.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
@@ -189,6 +190,159 @@ void PreluValidateTensorShapesFromInputsNoMatchTest()
 
     // Creates the PReLU layer
     CreatePreluLayerHelper(graph, { 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 7, 3, 2 });
+
+    // Graph::InferTensorInfos calls Layer::ValidateTensorShapesFromInputs
+    BOOST_CHECK_THROW(graph.InferTensorInfos(), armnn::LayerValidationException);
+}
+
+void StackInferOutputShapeImpl(const armnn::StackDescriptor           descriptor,
+                               const std::vector<armnn::TensorShape>& inputShapes,
+                               std::vector<armnn::TensorShape>&       outputShapes)
+{
+    armnn::Graph graph;
+    armnn::StackLayer* const stackLayer = graph.AddLayer<armnn::StackLayer>(descriptor, "stack");
+    outputShapes = stackLayer->InferOutputShapes(inputShapes);
+}
+
+void StackInferOutputShapeFromInputsMatchTest()
+{
+    armnn::Graph graph;
+
+    armnn::StackDescriptor descriptor;
+    descriptor.m_Axis = 1;
+    descriptor.m_NumInputs = 3;
+    descriptor.m_InputShape = armnn::TensorShape
+    (
+        { 4, 2 }  // Defined input shape
+    );
+
+    const std::vector<armnn::TensorShape> inputShapes
+    {
+        { 4, 2 }, // Actual input shapes
+        { 4, 2 },
+        { 4, 2 }
+    };
+
+    std::vector<armnn::TensorShape> outputShapes;
+    BOOST_CHECK_NO_THROW(StackInferOutputShapeImpl(descriptor, inputShapes, outputShapes));
+
+    armnn::TensorShape expectedOutputShape
+    (
+        { 4, 3, 2 }
+    );
+    BOOST_CHECK(outputShapes.size() == 1);
+    BOOST_CHECK(outputShapes[0] == expectedOutputShape);
+}
+
+void StackInferOutputShapeFromInputsNoMatchTest()
+{
+    armnn::Graph graph;
+
+    armnn::StackDescriptor descriptor;
+    descriptor.m_Axis = 1;
+    descriptor.m_NumInputs = 3;
+    descriptor.m_InputShape = armnn::TensorShape
+    (
+        { 4, 2 }  // Defined input shape
+    );
+
+    const std::vector<armnn::TensorShape> inputShapes
+    {
+        { 4, 2 }, // Actual input shapes
+        { 4, 5 }, // Incorrectly shaped input tensor
+        { 4, 2 }
+    };
+
+    // Output shape is inferred from the descriptor, so should still be correct despite mismatching input shapes
+    std::vector<armnn::TensorShape> outputShapes;
+    BOOST_CHECK_NO_THROW(StackInferOutputShapeImpl(descriptor, inputShapes, outputShapes));
+
+    armnn::TensorShape expectedOutputShape
+    (
+        { 4, 3, 2 }
+    );
+    BOOST_CHECK(outputShapes.size() == 1);
+    BOOST_CHECK(outputShapes[0] == expectedOutputShape);
+}
+
+void CreateStackLayerHelper(armnn::Graph& graph,
+                            const armnn::StackDescriptor& descriptor,
+                            const std::vector<armnn::TensorShape>& inputShapes,
+                            const armnn::TensorShape& outputShape)
+{
+    // Creates the Stack layer
+    armnn::Layer* const stackLayer = graph.AddLayer<armnn::StackLayer>(descriptor, "stack");
+
+    // Creates extra layers
+    std::vector<armnn::Layer*> inputs;
+    for (unsigned int i=0; i<inputShapes.size(); ++i)
+    {
+        inputs.push_back(graph.AddLayer<armnn::InputLayer>(static_cast<int>(i), "input"));
+    }
+    armnn::Layer* const output = graph.AddLayer<armnn::OutputLayer>(0, "output");
+
+    // Connects up
+    std::vector<armnn::TensorInfo> inputTensorInfos;
+    for (unsigned int i=0; i<inputs.size(); ++i)
+    {
+        inputTensorInfos.push_back(armnn::TensorInfo(inputShapes[i], armnn::DataType::Float32));
+    }
+    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Float32);
+
+    for (unsigned int i=0; i<inputs.size(); ++i)
+    {
+        Connect(inputs[i], stackLayer, inputTensorInfos[i], 0, i);
+    }
+    Connect(stackLayer, output, outputTensorInfo, 0, 0);
+}
+
+void StackValidateTensorShapesFromInputsMatchTest()
+{
+    armnn::Graph graph;
+
+    armnn::StackDescriptor descriptor;
+    descriptor.m_Axis = 0;
+    descriptor.m_NumInputs = 3;
+    descriptor.m_InputShape = armnn::TensorShape
+    (
+        { 2, 5 }  // Defined input shape
+    );
+
+    const std::vector<armnn::TensorShape> inputShapes
+    {
+        { 2, 5 }, // Actual input shapes
+        { 2, 5 },
+        { 2, 5 }
+    };
+
+    // Creates the Stack layer
+    CreateStackLayerHelper(graph, descriptor, inputShapes, { 3, 2, 5 });
+
+    // Graph::InferTensorInfos calls Layer::ValidateTensorShapesFromInputs
+    BOOST_CHECK_NO_THROW(graph.InferTensorInfos());
+}
+
+void StackValidateTensorShapesFromInputsNoMatchTest()
+{
+    armnn::Graph graph;
+
+    armnn::StackDescriptor descriptor;
+    descriptor.m_Axis = 0;
+    descriptor.m_NumInputs = 3;
+    descriptor.m_InputShape = armnn::TensorShape
+    (
+        { 2, 5 }  // Defined input shape
+    );
+
+    const std::vector<armnn::TensorShape> inputShapes
+    {
+        { 2, 5 }, // Actual input shapes
+        { 2, 2 }, // Incorrectly shaped input tensor
+        { 2, 5 }
+    };
+
+    // Creates the Stack layer
+    CreateStackLayerHelper(graph, descriptor, inputShapes, { 3, 2, 5 });
 
     // Graph::InferTensorInfos calls Layer::ValidateTensorShapesFromInputs
     BOOST_CHECK_THROW(graph.InferTensorInfos(), armnn::LayerValidationException);

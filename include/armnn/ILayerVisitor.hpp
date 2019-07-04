@@ -370,6 +370,14 @@ public:
                                     const ViewsDescriptor& splitterDescriptor,
                                     const char* name = nullptr) = 0;
 
+    /// Function a stack layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param stackDescriptor - Parameters for the stack operation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitStackLayer(const IConnectableLayer* layer,
+                                 const StackDescriptor& stackDescriptor,
+                                 const char* name = nullptr) = 0;
+
     /// Function a strided slice layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param stridedSliceDescriptor - Parameters for the strided slice operation.

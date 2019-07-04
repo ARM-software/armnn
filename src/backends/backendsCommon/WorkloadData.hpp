@@ -110,6 +110,12 @@ struct ConcatQueueDescriptor : QueueDescriptorWithParameters<OriginsDescriptor>
 // Deprecated. Use ConcatQueueDescriptor instead
 using MergerQueueDescriptor = ConcatQueueDescriptor;
 
+// Stack layer workload data.
+struct StackQueueDescriptor : QueueDescriptorWithParameters<StackDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Activation layer workload data.
 struct ActivationQueueDescriptor : QueueDescriptorWithParameters<ActivationDescriptor>
 {

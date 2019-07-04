@@ -415,6 +415,14 @@ bool LayerSupportBase::IsSplitterSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsStackSupported(const std::vector<const TensorInfo*> inputs,
+                                        const TensorInfo& output,
+                                        const StackDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsStridedSliceSupported(const TensorInfo& input,
                                                const TensorInfo& output,
                                                const StridedSliceDescriptor& descriptor,

@@ -50,6 +50,7 @@
 #include "layers/SpaceToBatchNdLayer.hpp"
 #include "layers/SpaceToDepthLayer.hpp"
 #include "layers/SplitterLayer.hpp"
+#include "layers/StackLayer.hpp"
 #include "layers/StridedSliceLayer.hpp"
 #include "layers/SubtractionLayer.hpp"
 #include "layers/SwitchLayer.hpp"
@@ -126,6 +127,7 @@ DECLARE_LAYER(Softmax)
 DECLARE_LAYER(SpaceToBatchNd)
 DECLARE_LAYER(SpaceToDepth)
 DECLARE_LAYER(Splitter)
+DECLARE_LAYER(Stack)
 DECLARE_LAYER(StridedSlice)
 DECLARE_LAYER(Subtraction)
 DECLARE_LAYER(Switch)

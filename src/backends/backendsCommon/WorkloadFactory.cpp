@@ -729,6 +729,33 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                              reason);
             break;
         }
+        case LayerType::Stack:
+        {
+            auto cLayer = boost::polymorphic_downcast<const StackLayer*>(&layer);
+
+            // Get vector of all inputs.
+            auto getTensorInfo = [&dataType](const InputSlot& slot)
+                {
+                    return OverrideDataType(slot.GetConnectedOutputSlot()->GetTensorInfo(), dataType);
+                };
+            auto beginI = boost::make_transform_iterator(layer.GetInputSlots().begin(), getTensorInfo);
+            auto endI = boost::make_transform_iterator(layer.GetInputSlots().end(), getTensorInfo);
+            std::vector<TensorInfo> inputs(beginI, endI);
+
+            auto getTensorInfoPtr = [](const TensorInfo& info)
+                {
+                    return &info;
+                };
+            auto beginPtr = boost::make_transform_iterator(inputs.begin(), getTensorInfoPtr);
+            auto endPtr = boost::make_transform_iterator(inputs.end(), getTensorInfoPtr);
+            std::vector<const TensorInfo*> inputPtrs(beginPtr, endPtr);
+
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsStackSupported(inputPtrs, output, cLayer->GetParameters(), reason);
+
+            break;
+        }
         case LayerType::StridedSlice:
         {
             auto cLayer = boost::polymorphic_downcast<const StridedSliceLayer*>(&layer);
@@ -1126,6 +1153,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateSpaceToBatchNd(const SpaceToB
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

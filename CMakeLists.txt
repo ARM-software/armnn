@@ -312,6 +312,8 @@ list(APPEND armnn_sources
     src/armnn/layers/SpaceToDepthLayer.cpp
     src/armnn/layers/SplitterLayer.hpp
     src/armnn/layers/SplitterLayer.cpp
+    src/armnn/layers/StackLayer.hpp
+    src/armnn/layers/StackLayer.cpp
     src/armnn/layers/StridedSliceLayer.cpp
     src/armnn/layers/StridedSliceLayer.hpp
     src/armnn/layers/SubtractionLayer.cpp

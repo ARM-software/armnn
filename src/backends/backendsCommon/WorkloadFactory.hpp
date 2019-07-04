@@ -189,6 +189,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateSplitter(const SplitterQueueDescriptor& descriptor,
                                                       const WorkloadInfo&            info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateStack(const StackQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& Info) const;
+
     virtual std::unique_ptr<IWorkload> CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
                                                           const WorkloadInfo& Info) const;
 

@@ -202,6 +202,10 @@ public:
                             const armnn::ViewsDescriptor& viewsDescriptor,
                             const char* name = nullptr) override;
 
+    void VisitStackLayer(const armnn::IConnectableLayer* layer,
+                         const armnn::StackDescriptor& stackDescriptor,
+                         const char* name = nullptr) override;
+
     void VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
                                 const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
                                 const char* name = nullptr) override;

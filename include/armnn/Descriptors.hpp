@@ -648,6 +648,29 @@ struct PadDescriptor
     float m_PadValue;
 };
 
+/// A StackDescriptor for the StackLayer.
+struct StackDescriptor
+{
+    StackDescriptor()
+    : m_Axis(0)
+    , m_NumInputs(0)
+    , m_InputShape()
+    {}
+
+    StackDescriptor(uint32_t axis, uint32_t numInputs, const TensorShape& inputShape)
+    : m_Axis(axis)
+    , m_NumInputs(numInputs)
+    , m_InputShape(inputShape)
+    {}
+
+    /// 0-based axis along which to stack the input tensors.
+    uint32_t m_Axis;
+    /// Number of input tensors.
+    uint32_t m_NumInputs;
+    /// Required shape of all input tensors.
+    TensorShape m_InputShape;
+};
+
 /// A StridedSliceDescriptor for the StridedSliceLayer.
 struct StridedSliceDescriptor
 {

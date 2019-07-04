@@ -925,6 +925,13 @@ void SerializerVisitor::VisitNormalizationLayer(const armnn::IConnectableLayer* 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_NormalizationLayer);
 }
 
+void SerializerVisitor::VisitStackLayer(const armnn::IConnectableLayer* layer,
+                                        const armnn::StackDescriptor& stackDescriptor,
+                                        const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::VisitStackLayer not yet implemented");
+}
+
 void SerializerVisitor::VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
                                                const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
                                                const char* name)

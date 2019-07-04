@@ -188,6 +188,10 @@ public:
                             const ViewsDescriptor&,
                             const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitStackLayer(const IConnectableLayer*,
+                         const StackDescriptor&,
+                         const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitStridedSliceLayer(const IConnectableLayer*,
                                 const StridedSliceDescriptor&,
                                 const char*) override { DefaultPolicy::Apply(__func__); }

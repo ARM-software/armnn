@@ -1422,6 +1422,12 @@ IConnectableLayer* Network::AddTransposeConvolution2dLayer(const TransposeConvol
     return layer;
 }
 
+IConnectableLayer* Network::AddStackLayer(const StackDescriptor& stackDescriptor,
+                                          const char* name)
+{
+    return m_Graph->AddLayer<StackLayer>(stackDescriptor, name);
+}
+
 void Network::Accept(ILayerVisitor& visitor) const
 {
     for (auto layer : GetGraph())

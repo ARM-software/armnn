@@ -25,4 +25,10 @@ ARMNN_SIMPLE_TEST_CASE(PreluInferOutputShapeNoMatch,               PreluInferOut
 ARMNN_SIMPLE_TEST_CASE(PreluValidateTensorShapesFromInputsMatch,   PreluValidateTensorShapesFromInputsMatchTest)
 ARMNN_SIMPLE_TEST_CASE(PreluValidateTensorShapesFromInputsNoMatch, PreluValidateTensorShapesFromInputsNoMatchTest)
 
+// Stack
+ARMNN_SIMPLE_TEST_CASE(StackInferOutputShapeFromInputsMatch,       StackInferOutputShapeFromInputsMatchTest)
+ARMNN_SIMPLE_TEST_CASE(StackInferOutputShapeFromInputsNoMatch,     StackInferOutputShapeFromInputsNoMatchTest)
+ARMNN_SIMPLE_TEST_CASE(StackValidateTensorShapesFromInputsMatch,   StackValidateTensorShapesFromInputsMatchTest)
+ARMNN_SIMPLE_TEST_CASE(StackValidateTensorShapesFromInputsNoMatch, StackValidateTensorShapesFromInputsNoMatchTest)
+
 BOOST_AUTO_TEST_SUITE_END()

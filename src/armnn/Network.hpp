@@ -197,6 +197,9 @@ public:
                                                       const Optional<ConstTensor>& biases,
                                                       const char* name = nullptr) override;
 
+    IConnectableLayer* AddStackLayer(const StackDescriptor& stackDescriptor,
+                                     const char* name = nullptr) override;
+
     void Accept(ILayerVisitor& visitor) const override;
 
 private:

@@ -360,6 +360,14 @@ bool IsSplitterSupported(const BackendId& backend,
                          size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsStackSupported(const BackendId& backend,
+                      const std::vector<const TensorInfo*> inputs,
+                      const TensorInfo& output,
+                      const StackDescriptor& descriptor,
+                      char* reasonIfUnsupported = nullptr,
+                      size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsStridedSliceSupported(const BackendId& backend,
                              const TensorInfo& input,
                              const TensorInfo& output,

@@ -451,6 +451,13 @@ public:
                                                               const Optional<ConstTensor>& biases,
                                                               const char* name = nullptr) = 0;
 
+    /// Adds a stack layer to the network.
+    /// @param descriptor - Description of the stack layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddStackLayer(const StackDescriptor& descriptor,
+                                             const char* name = nullptr) = 0;
+
     virtual void Accept(ILayerVisitor& visitor) const = 0;
 
 protected:

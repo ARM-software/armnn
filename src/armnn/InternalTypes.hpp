@@ -58,6 +58,7 @@ enum class LayerType
     SpaceToBatchNd,
     SpaceToDepth,
     Splitter,
+    Stack,
     StridedSlice,
     Subtraction,
     Switch,

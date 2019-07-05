@@ -1712,7 +1712,7 @@ private:
     void VerifyDescriptor(const armnn::PadDescriptor& descriptor)
     {
         BOOST_TEST(descriptor.m_PadList == m_Descriptor.m_PadList);
-        BOOST_TEST(descriptor.m_padValue == m_Descriptor.m_padValue);
+        BOOST_TEST(descriptor.m_PadValue == m_Descriptor.m_PadValue);
     }
 
     armnn::PadDescriptor m_Descriptor;

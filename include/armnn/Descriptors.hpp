@@ -631,11 +631,11 @@ struct MeanDescriptor
 /// A PadDescriptor for the PadLayer.
 struct PadDescriptor
 {
-    PadDescriptor() : m_padValue(0)
+    PadDescriptor() : m_PadValue(0)
     {}
 
     PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList, const float& padValue = 0)
-    : m_PadList(padList), m_padValue(padValue)
+    : m_PadList(padList), m_PadValue(padValue)
     {}
 
     /// @brief Specifies the padding for input dimension.
@@ -645,7 +645,7 @@ struct PadDescriptor
     std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
 
     /// Optional value to use for padding, defaults to 0
-    float m_padValue;
+    float m_PadValue;
 };
 
 /// A StridedSliceDescriptor for the StridedSliceLayer.

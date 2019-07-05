@@ -30,7 +30,7 @@ void RefPadWorkload<DataType>::Execute() const
     const T* inputData = GetInputTensorData<T>(0, m_Data);
     T* outputData = GetOutputTensorData<T>(0, m_Data);
 
-    Pad(inputInfo, outputInfo, m_Data.m_Parameters.m_PadList, inputData, outputData, m_Data.m_Parameters.m_padValue);
+    Pad(inputInfo, outputInfo, m_Data.m_Parameters.m_PadList, inputData, outputData, m_Data.m_Parameters.m_PadValue);
 }
 
 template class RefPadWorkload<DataType::Float32>;

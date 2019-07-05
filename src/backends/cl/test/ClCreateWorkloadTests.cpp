@@ -452,6 +452,48 @@ BOOST_AUTO_TEST_CASE(CreatePooling2dFloat16NhwcWorkload)
     ClPooling2dWorkloadTest<armnn::DataType::Float16>(DataLayout::NHWC);
 }
 
+static void ClCreatePreluWorkloadTest(const armnn::TensorShape& inputShape,
+                                      const armnn::TensorShape& alphaShape,
+                                      const armnn::TensorShape& outputShape,
+                                      armnn::DataType dataType)
+{
+    Graph graph;
+    ClWorkloadFactory factory =
+            ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreatePreluWorkloadTest<ClPreluWorkload>(factory,
+                                                             graph,
+                                                             inputShape,
+                                                             alphaShape,
+                                                             outputShape,
+                                                             dataType);
+
+    // Checks that outputs and inputs are as we expect them (see definition of CreatePreluWorkloadTest).
+    PreluQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto alphaHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Inputs[1]);
+    auto outputHandle = boost::polymorphic_downcast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    BOOST_TEST((inputHandle->GetShape() == inputShape));
+    BOOST_TEST((alphaHandle->GetShape() == alphaShape));
+    BOOST_TEST((outputHandle->GetShape() == outputShape));
+}
+
+BOOST_AUTO_TEST_CASE(CreatePreluFloat16Workload)
+{
+    ClCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::Float16);
+}
+
+BOOST_AUTO_TEST_CASE(CreatePreluFloatWorkload)
+{
+    ClCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::Float32);
+}
+
+BOOST_AUTO_TEST_CASE(CreatePreluUint8Workload)
+{
+    ClCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::QuantisedAsymm8);
+}
+
 template <typename armnn::DataType DataType>
 static void ClCreateReshapeWorkloadTest()
 {

@@ -45,6 +45,7 @@ BACKEND_SOURCES := \
         workloads/ClPadWorkload.cpp \
         workloads/ClPermuteWorkload.cpp \
         workloads/ClPooling2dWorkload.cpp \
+        workloads/ClPreluWorkload.cpp \
         workloads/ClQuantizeWorkload.cpp \
         workloads/ClReshapeWorkload.cpp \
         workloads/ClResizeBilinearFloatWorkload.cpp \

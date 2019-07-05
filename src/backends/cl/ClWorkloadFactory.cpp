@@ -180,6 +180,12 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePooling2d(const Pooli
     return MakeWorkload<ClPooling2dWorkload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePrelu(const armnn::PreluQueueDescriptor &descriptor,
+                                                                 const armnn::WorkloadInfo &info) const
+{
+    return MakeWorkload<ClPreluWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
                                                                          const WorkloadInfo&               info) const
 {

@@ -39,6 +39,10 @@ private:
     std::unique_ptr<arm_compute::CLTensor> m_OutputGateBiasTensor;
     std::unique_ptr<arm_compute::CLTensor> m_ProjectionWeightsTensor;
     std::unique_ptr<arm_compute::CLTensor> m_ProjectionBiasTensor;
+    std::unique_ptr<arm_compute::CLTensor> m_InputLayerNormWeightsTensor;
+    std::unique_ptr<arm_compute::CLTensor> m_ForgetLayerNormWeightsTensor;
+    std::unique_ptr<arm_compute::CLTensor> m_CellLayerNormWeightsTensor;
+    std::unique_ptr<arm_compute::CLTensor> m_OutputLayerNormWeightsTensor;
 
     std::unique_ptr<arm_compute::CLTensor> m_ScratchBuffer;
 

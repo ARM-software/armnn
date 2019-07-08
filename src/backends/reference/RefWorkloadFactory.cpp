@@ -172,7 +172,11 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&           info) const
 {
-    return MakeWorkloadHelper<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteUint8Workload,
+    if (IsQSymm16(info))
+    {
+        return std::make_unique<RefPermuteQSymm16Workload>(descriptor, info);
+    }
+    return MakeWorkloadHelper<RefPermuteFloat16Workload, RefPermuteFloat32Workload, RefPermuteQAsymm8Workload,
         NullWorkload, NullWorkload>(descriptor, info);
 }
 

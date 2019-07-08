@@ -38,7 +38,6 @@
 #include "SoftmaxTestImpl.hpp"
 #include "StridedSliceTestImpl.hpp"
 #include "NormTestImpl.hpp"
-#include "PermuteTestImpl.hpp"
 #include "LstmTestImpl.hpp"
 #include "ConvertFp16ToFp32TestImpl.hpp"
 #include "ConvertFp32ToFp16TestImpl.hpp"
@@ -9089,41 +9088,6 @@ LayerTestResult<float, 2> FullyConnectedLargeTest(
 {
     return FullyConnectedLargeTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, transposeWeights);
 }
-
-LayerTestResult<float, 4> SimplePermuteFloat32Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return SimplePermuteFloat32TestCommon(workloadFactory, memoryManager);
-};
-
-LayerTestResult<uint8_t, 4> SimplePermuteUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return SimplePermuteUint8TestCommon(workloadFactory, memoryManager);
-};
-
-LayerTestResult<float, 4> PermuteFloat32ValueSet1Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return PermuteFloat32ValueSet1TestCommon(workloadFactory, memoryManager);
-};
-
-LayerTestResult<float, 4> PermuteFloat32ValueSet2Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return PermuteFloat32ValueSet2TestCommon(workloadFactory, memoryManager);
-};
-
-LayerTestResult<float, 4> PermuteFloat32ValueSet3Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    return PermuteFloat32ValueSet3TestCommon(workloadFactory, memoryManager);
-};
 
 LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
     armnn::IWorkloadFactory& workloadFactory,

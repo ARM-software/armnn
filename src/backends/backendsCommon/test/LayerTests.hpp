@@ -1406,14 +1406,6 @@ LayerTestResult<float, 2> FullyConnectedLargeTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool transposeWeights);
 
-LayerTestResult<float, 4> SimplePermuteFloat32Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> SimplePermuteUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
 LayerTestResult<uint8_t, 2> PadUint82dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
@@ -1443,18 +1435,6 @@ LayerTestResult<float, 3> PadFloat323dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 4> PadFloat324dTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> PermuteFloat32ValueSet1Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> PermuteFloat32ValueSet2Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> PermuteFloat32ValueSet3Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

@@ -16,6 +16,7 @@
 #include <reference/RefWorkloadFactory.hpp>
 #include <backendsCommon/test/ActivationFixture.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
+#include <backendsCommon/test/PermuteTestImpl.hpp>
 
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
@@ -336,11 +337,14 @@ ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<armnn::DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<armnn::DataType::QuantisedAsymm8>)
 
 // Permute
-ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteFloat32Test)
-ARMNN_AUTO_TEST_CASE(SimplePermuteUint8, SimplePermuteUint8Test)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1, PermuteFloat32ValueSet1Test)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2, PermuteFloat32ValueSet2Test)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3, PermuteFloat32ValueSet3Test)
+ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1Test, PermuteValueSet1Test<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2Test, PermuteValueSet2Test<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3Test, PermuteValueSet3Test<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(SimplePermuteQASymm8, SimplePermuteTest<armnn::DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet1Test, PermuteValueSet1Test<armnn::DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet2Test, PermuteValueSet2Test<armnn::DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet3Test, PermuteValueSet3Test<armnn::DataType::QuantisedAsymm8>)
 
 // Lstm
 ARMNN_AUTO_TEST_CASE(LstmLayerFloat32WithCifgWithPeepholeNoProjection,

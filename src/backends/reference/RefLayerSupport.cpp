@@ -1253,12 +1253,27 @@ bool RefLayerSupport::IsPermuteSupported(const TensorInfo& input,
                                          const PermuteDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
     ignore_unused(descriptor);
-    return IsSupportedForDataTypeRef(reasonIfUnsupported,
-                                     input.GetDataType(),
-                                     &TrueFunc<>,
-                                     &TrueFunc<>);
+    bool supported = true;
+
+    // Define supported output and inputs types.
+    std::array<DataType,3> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference permute: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference permute: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference permute: input and output types are mismatched.");
+
+    return supported;
 }
 
 bool RefLayerSupport::IsPooling2dSupported(const TensorInfo& input,

@@ -13,6 +13,7 @@
 #include <backendsCommon/test/DebugTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessLayerTestImpl.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
+#include <backendsCommon/test/PermuteTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -821,11 +822,18 @@ ARMNN_AUTO_TEST_CASE(Rsqrt2dQuantisedSymm16, Rsqrt2dTest<armnn::DataType::Quanti
 ARMNN_AUTO_TEST_CASE(Rsqrt3dQuantisedSymm16, Rsqrt3dTest<armnn::DataType::QuantisedSymm16>)
 
 // Permute
-ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteFloat32Test)
-ARMNN_AUTO_TEST_CASE(SimplePermuteUint8, SimplePermuteUint8Test)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1, PermuteFloat32ValueSet1Test)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2, PermuteFloat32ValueSet2Test)
-ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3, PermuteFloat32ValueSet3Test)
+ARMNN_AUTO_TEST_CASE(SimplePermuteFloat32, SimplePermuteTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet1Test, PermuteValueSet1Test<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet2Test, PermuteValueSet2Test<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(PermuteFloat32ValueSet3Test, PermuteValueSet3Test<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(SimplePermuteQASymm8, SimplePermuteTest<armnn::DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet1Test, PermuteValueSet1Test<armnn::DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet2Test, PermuteValueSet2Test<armnn::DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(PermuteQASymm8ValueSet3Test, PermuteValueSet3Test<armnn::DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(SimplePermuteQSymm16, SimplePermuteTest<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet1Test, PermuteValueSet1Test<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet2Test, PermuteValueSet2Test<armnn::DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(PermuteQSymm16ValueSet3Test, PermuteValueSet3Test<armnn::DataType::QuantisedSymm16>)
 
 // Lstm
 BOOST_AUTO_TEST_CASE(LstmUtilsZeroVector) {

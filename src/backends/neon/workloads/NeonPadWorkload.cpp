@@ -32,8 +32,10 @@ NeonPadWorkload::NeonPadWorkload(const PadQueueDescriptor& descriptor, const Wor
 
     arm_compute::PaddingList padList = static_cast<arm_compute::PaddingList>(reversed_PadList);
 
+    arm_compute::PixelValue pixelValue = descriptor.m_Parameters.m_PadValue;
+
     auto layer = std::make_unique<arm_compute::NEPadLayer>();
-    layer->configure(&input, &output, padList);
+    layer->configure(&input, &output, padList, pixelValue);
     m_Layer.reset(layer.release());
 }
 

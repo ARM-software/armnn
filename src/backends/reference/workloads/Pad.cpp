@@ -175,5 +175,11 @@ template void Pad<uint8_t>(const TensorInfo& inputInfo,
                            const uint8_t* inputData,
                            uint8_t* outData,
                            const float padValue);
+template void Pad<int16_t>(const TensorInfo& inputInfo,
+                           const TensorInfo& outputInfo,
+                           std::vector<std::pair<unsigned int, unsigned int>> m_PadList,
+                           const int16_t* inputData,
+                           int16_t* outData,
+                           const float padValue);
 
 } //namespace armnn

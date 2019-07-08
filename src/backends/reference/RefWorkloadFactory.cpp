@@ -402,7 +402,11 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMinimum(
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info) const
 {
-    return MakeWorkload<RefPadFloat32Workload, RefPadUint8Workload>(descriptor, info);
+    if (IsQSymm16(info))
+    {
+        return std::make_unique<RefPadQSymm16Workload>(descriptor, info);
+    }
+    return MakeWorkload<RefPadFloat32Workload, RefPadQAsymm8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,

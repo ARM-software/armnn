@@ -1438,6 +1438,28 @@ LayerTestResult<float, 4> PadFloat324dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> Pad2dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    const float customPaddingValue = 0.0f);
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> Pad3dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset);
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> Pad4dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset);
+
 void LstmUtilsZeroVectorTest();
 void LstmUtilsMeanStddevNormalizationNoneZeroInputTest();
 void LstmUtilsMeanStddevNormalizationAllZeroInputTest();

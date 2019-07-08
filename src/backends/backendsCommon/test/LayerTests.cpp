@@ -6030,13 +6030,13 @@ float CalcInvL2Norm(std::initializer_list<float> elements)
 
 } // anonymous namespace
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 2> Pad2dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset,
-    const float customPaddingValue = 0)
+    const float customPaddingValue)
 {
     const armnn::TensorShape inputShape{ 3, 3 };
     const armnn::TensorShape outputShape{ 7, 7 };
@@ -6103,7 +6103,7 @@ LayerTestResult<T, 2> Pad2dTestCommon(
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 3> Pad3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -6188,7 +6188,7 @@ LayerTestResult<T, 3> Pad3dTestCommon(
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> Pad4dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -6437,7 +6437,7 @@ LayerTestResult<uint8_t, 2> PadUint82dCustomPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0, 1);
+    return Pad2dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0, 1.0f);
 }
 
 LayerTestResult<uint8_t, 3> PadUint83dTest(
@@ -6454,6 +6454,29 @@ LayerTestResult<uint8_t, 4> PadUint84dTest(
     return Pad4dTestCommon<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
+
+template LayerTestResult<typename armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 2>
+Pad2dTestCommon<armnn::DataType::QuantisedSymm16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset,
+    const float customPaddingValue);
+
+template LayerTestResult<typename armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 3>
+Pad3dTestCommon<armnn::DataType::QuantisedSymm16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset);
+
+template LayerTestResult<typename armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
+Pad4dTestCommon<armnn::DataType::QuantisedSymm16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset);
+
 LayerTestResult<float, 2> PadFloat322dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -6465,7 +6488,7 @@ LayerTestResult<float, 2> PadFloat322dCustomPaddingTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Pad2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0, 1);
+    return Pad2dTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0, 1.0f);
 }
 
 LayerTestResult<float, 3> PadFloat323dTest(

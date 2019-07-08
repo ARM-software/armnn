@@ -26,6 +26,7 @@
 #include "workloads/NeonDequantizeWorkload.hpp"
 #include "workloads/NeonGreaterWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
+#include "workloads/NeonLstmFloatWorkload.hpp"
 #include "workloads/NeonMaximumWorkload.hpp"
 #include "workloads/NeonMeanWorkload.hpp"
 #include "workloads/NeonConcatWorkload.hpp"
@@ -332,6 +333,30 @@ bool NeonLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                                   Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonL2NormalizationWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
+}
+
+bool NeonLayerSupport::IsLstmSupported(const TensorInfo& input,
+                                       const TensorInfo& outputStateIn,
+                                       const TensorInfo& cellStateIn,
+                                       const TensorInfo& scratchBuffer,
+                                       const TensorInfo& outputStateOut,
+                                       const TensorInfo& cellStateOut,
+                                       const TensorInfo& output,
+                                       const LstmDescriptor& descriptor,
+                                       const LstmInputParamsInfo& paramsInfo,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonLstmFloatWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   outputStateIn,
+                                   cellStateIn,
+                                   scratchBuffer,
+                                   outputStateOut,
+                                   cellStateOut,
+                                   output,
+                                   descriptor,
+                                   paramsInfo);
 }
 
 bool NeonLayerSupport::IsMaximumSupported(const TensorInfo& input0,

@@ -43,6 +43,11 @@ private:
 
     std::unique_ptr<arm_compute::Tensor> m_ScratchBuffer;
 
+    std::unique_ptr<arm_compute::Tensor> m_InputLayerNormWeightsTensor;
+    std::unique_ptr<arm_compute::Tensor> m_ForgetLayerNormWeightsTensor;
+    std::unique_ptr<arm_compute::Tensor> m_CellLayerNormWeightsTensor;
+    std::unique_ptr<arm_compute::Tensor> m_OutputLayerNormWeightsTensor;
+
     void FreeUnusedTensors();
 };
 
@@ -50,21 +55,6 @@ arm_compute::Status NeonLstmFloatWorkloadValidate(const TensorInfo& input, const
                                                   const TensorInfo& cellStateIn, const TensorInfo& scratchBuffer,
                                                   const TensorInfo& outputStateOut, const TensorInfo& cellStateOut,
                                                   const TensorInfo& output, const LstmDescriptor &descriptor,
-                                                  const TensorInfo& inputToForgetWeights,
-                                                  const TensorInfo& inputToCellWeights,
-                                                  const TensorInfo& inputToOutputWeights,
-                                                  const TensorInfo& recurrentToForgetWeights,
-                                                  const TensorInfo& recurrentToCellWeights,
-                                                  const TensorInfo& recurrentToOutputWeights,
-                                                  const TensorInfo& forgetGateBias, const TensorInfo& cellBias,
-                                                  const TensorInfo& outputGateBias,
-                                                  const TensorInfo* inputToInputWeights,
-                                                  const TensorInfo* recurrentToInputWeights,
-                                                  const TensorInfo* cellToInputWeights,
-                                                  const TensorInfo* inputGateBias,
-                                                  const TensorInfo* projectionWeights,
-                                                  const TensorInfo* projectionBias,
-                                                  const TensorInfo* cellToForgetWeights,
-                                                  const TensorInfo* cellToOutputWeights);
+                                                  const LstmInputParamsInfo& paramsInfo);
 
 } //namespace armnn

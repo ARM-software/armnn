@@ -710,6 +710,29 @@ BOOST_AUTO_TEST_CASE(CreateL2NormalizationNhwcWorkload)
     NeonCreateL2NormalizationWorkloadTest<NeonL2NormalizationFloatWorkload, DataType::Float32>(DataLayout::NHWC);
 }
 
+template <typename LstmWorkloadType>
+static void NeonCreateLstmWorkloadTest()
+{
+    Graph graph;
+    NeonWorkloadFactory factory =
+            NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateLstmWorkloadTest<LstmWorkloadType>(factory, graph);
+
+    LstmQueueDescriptor queueDescriptor = workload->GetData();
+
+    auto inputHandle  = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Outputs[1]);
+
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({ 2, 2 }, DataType::Float32)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({ 2, 4 }, DataType::Float32)));
+}
+
+BOOST_AUTO_TEST_CASE(CreateLSTMWorkloadFloatWorkload)
+{
+    NeonCreateLstmWorkloadTest<NeonLstmFloatWorkload>();
+}
+
 template <typename ConcatWorkloadType, armnn::DataType DataType>
 static void NeonCreateConcatWorkloadTest(std::initializer_list<unsigned int> outputShape,
                                          unsigned int concatAxis)

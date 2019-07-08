@@ -96,6 +96,17 @@ public:
                                     const L2NormalizationDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsLstmSupported(const TensorInfo& input,
+                         const TensorInfo& outputStateIn,
+                         const TensorInfo& cellStateIn,
+                         const TensorInfo& scratchBuffer,
+                         const TensorInfo& outputStateOut,
+                         const TensorInfo& cellStateOut,
+                         const TensorInfo& output,
+                         const LstmDescriptor& descriptor,
+                         const LstmInputParamsInfo& paramsInfo,
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsMaximumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,

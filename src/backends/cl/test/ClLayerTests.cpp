@@ -329,8 +329,19 @@ ARMNN_AUTO_TEST_CASE(SimpleReshapeUint8, SimpleReshapeTest<armnn::DataType::Quan
 
 // Pad
 ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
+ARMNN_AUTO_TEST_CASE(PadFloat322dCustomPadding, PadFloat322dCustomPaddingTest)
 ARMNN_AUTO_TEST_CASE(PadFloat323d, PadFloat323dTest)
 ARMNN_AUTO_TEST_CASE(PadFloat324d, PadFloat324dTest)
+
+ARMNN_AUTO_TEST_CASE(PadUint82d, PadUint82dTest)
+ARMNN_AUTO_TEST_CASE(PadUint82dCustomPadding, PadUint82dCustomPaddingTest)
+ARMNN_AUTO_TEST_CASE(PadUint83d, PadUint83dTest)
+ARMNN_AUTO_TEST_CASE(PadUint84d, PadUint84dTest)
+
+ARMNN_AUTO_TEST_CASE(Pad2dQSymm16, Pad2dTestCommon<armnn::DataType::QuantisedSymm16>, 2.0f, 0, 0.0f)
+ARMNN_AUTO_TEST_CASE(Pad2dQSymm16CustomPadding, Pad2dTestCommon<armnn::DataType::QuantisedSymm16>, 2.0f, 0, 1.0f)
+ARMNN_AUTO_TEST_CASE(Pad3dQSymm16, Pad3dTestCommon<armnn::DataType::QuantisedSymm16>, 2.0f, 0)
+ARMNN_AUTO_TEST_CASE(Pad4dQSymm16, Pad4dTestCommon<armnn::DataType::QuantisedSymm16>, 2.0f, 0)
 
 // PReLU
 ARMNN_AUTO_TEST_CASE(PreluFloat32, PreluTest<armnn::DataType::Float32>)

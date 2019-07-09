@@ -121,6 +121,38 @@ ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcInt16,
                      false,
                      armnn::DataLayout::NHWC)
 
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1TestNhwc,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1TestUint8,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1TestNhwcUint8,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1TestInt16,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1TestNhwcInt16,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::QuantisedSymm16, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+
+
 // Depthwise Convolution
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d, DepthwiseConvolution2dTest, true, armnn::DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dUint8, DepthwiseConvolution2dUint8Test, true, armnn::DataLayout::NCHW)

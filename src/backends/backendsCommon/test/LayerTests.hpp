@@ -128,6 +128,13 @@ LayerTestResult<T, 4> Convolution2d2x3x3Dilation3x3Test(
     const armnn::DataLayout layout);
 
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test(
+    armnn::IWorkloadFactory &workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> DepthwiseConvolution2d3x3Dilation3x3Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

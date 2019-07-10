@@ -9,7 +9,6 @@
 #include "Exceptions.hpp"
 #include "INetwork.hpp"
 #include "IRuntime.hpp"
-#include "LayerSupport.hpp"
 #include "LstmParams.hpp"
 #include "Optional.hpp"
 #include "Tensor.hpp"

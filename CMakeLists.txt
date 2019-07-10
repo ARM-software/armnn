@@ -323,6 +323,7 @@ list(APPEND armnn_sources
     src/armnn/layers/TransposeConvolution2dLayer.cpp
     src/armnn/layers/TransposeConvolution2dLayer.hpp
     src/armnn/BackendSettings.hpp
+    src/armnn/BackendHelper.cpp
     src/armnn/CompatibleTypes.hpp
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp

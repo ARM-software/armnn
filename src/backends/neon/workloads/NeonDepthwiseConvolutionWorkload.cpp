@@ -124,8 +124,8 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     bool use3x3Optimisation = (weightInfo.GetShape()[2] == 3) && (weightInfo.GetShape()[3] == 3);
     if (use3x3Optimisation)
     {
-        m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer3x3>();
-        static_cast<arm_compute::NEDepthwiseConvolutionLayer3x3*>(
+        m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayerOptimized>();
+        static_cast<arm_compute::NEDepthwiseConvolutionLayerOptimized*>(
             m_pDepthwiseConvolutionLayer.get())->configure(&input,
                                                            m_KernelTensor.get(),
                                                            m_BiasTensor.get(),

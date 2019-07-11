@@ -42,6 +42,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * SpaceToBatchNd
 * SpaceToDepth
 * Splitter
+* Stack
 * StridedSlice
 * Subtraction
 * Switch

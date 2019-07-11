@@ -223,6 +223,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_SpaceToBatchNdLayer]         = &Deserializer::ParseSpaceToBatchNd;
     m_ParserFunctions[Layer_SpaceToDepthLayer]           = &Deserializer::ParseSpaceToDepth;
     m_ParserFunctions[Layer_SplitterLayer]               = &Deserializer::ParseSplitter;
+    m_ParserFunctions[Layer_StackLayer]                  = &Deserializer::ParseStack;
     m_ParserFunctions[Layer_StridedSliceLayer]           = &Deserializer::ParseStridedSlice;
     m_ParserFunctions[Layer_SubtractionLayer]            = &Deserializer::ParseSubtraction;
     m_ParserFunctions[Layer_SwitchLayer]                 = &Deserializer::ParseSwitch;
@@ -315,6 +316,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_SpaceToDepthLayer()->base();
         case Layer::Layer_SplitterLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SplitterLayer()->base();
+        case Layer::Layer_StackLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_StackLayer()->base();
         case Layer::Layer_StridedSliceLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_StridedSliceLayer()->base();
         case Layer::Layer_SubtractionLayer:
@@ -2306,6 +2309,54 @@ void Deserializer::ParseTransposeConvolution2d(GraphPtr graph, unsigned int laye
                                                                          weights,
                                                                          optionalBiases,
                                                                          layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseStack(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_StackLayer()->descriptor();
+    unsigned int axis = flatBufferDescriptor->axis();
+    unsigned int numInputs = flatBufferDescriptor->numInputs();
+    CHECK_VALID_SIZE(inputs.size(), numInputs);
+
+    auto flatBufferInputShape = flatBufferDescriptor->inputShape();
+    std::vector<uint32_t> vectorInputShape(flatBufferInputShape->begin(),
+                                           flatBufferInputShape->begin() + flatBufferInputShape->size());
+
+    TensorShape inputShape(static_cast<unsigned int>(vectorInputShape.size()), vectorInputShape.data());
+    armnn::StackDescriptor descriptor(axis, numInputs, inputShape);
+
+    for (unsigned int i=0; i<inputs.size(); ++i)
+    {
+        armnn::TensorShape& inputShape = ToTensorInfo(inputs[i]).GetShape();
+        if (descriptor.m_InputShape != inputShape)
+        {
+            std::stringstream ss;
+            ss << "Shape of input  "
+               << i
+               << " "
+               << inputShape
+               << " does not equal defined input shape "
+               << descriptor.m_InputShape
+               << ": "
+               << CHECK_LOCATION().AsString();
+            throw ParseException(ss.str());
+        }
+    }
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddStackLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

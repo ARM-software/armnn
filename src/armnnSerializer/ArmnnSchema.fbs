@@ -130,7 +130,8 @@ enum LayerType : uint {
     SpaceToDepth = 40,
     Prelu = 41,
     TransposeConvolution2d = 42,
-    Resize = 43
+    Resize = 43,
+    Stack = 44
 }
 
 // Base layer table to be used as part of other layers
@@ -599,6 +600,17 @@ table ResizeDescriptor {
     dataLayout:DataLayout;
 }
 
+table StackLayer {
+    base:LayerBase;
+    descriptor:StackDescriptor;
+}
+
+table StackDescriptor {
+    axis:uint;
+    numInputs:uint;
+    inputShape:[uint];
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -643,7 +655,8 @@ union Layer {
     SpaceToDepthLayer,
     PreluLayer,
     TransposeConvolution2dLayer,
-    ResizeLayer
+    ResizeLayer,
+    StackLayer
 }
 
 table AnyLayer {

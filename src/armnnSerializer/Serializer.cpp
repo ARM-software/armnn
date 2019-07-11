@@ -929,7 +929,21 @@ void SerializerVisitor::VisitStackLayer(const armnn::IConnectableLayer* layer,
                                         const armnn::StackDescriptor& stackDescriptor,
                                         const char* name)
 {
-    throw UnimplementedException("SerializerVisitor::VisitStackLayer not yet implemented");
+    auto stackBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Stack);
+
+    std::vector<unsigned int> inputShape;
+    for (unsigned int i =0; i < stackDescriptor.m_InputShape.GetNumDimensions(); i++)
+    {
+        inputShape.push_back(stackDescriptor.m_InputShape[i]);
+    }
+
+    auto flatBufferStackDescriptor = CreateStackDescriptor(m_flatBufferBuilder,
+                                                           stackDescriptor.m_Axis,
+                                                           stackDescriptor.m_NumInputs,
+                                                           m_flatBufferBuilder.CreateVector(inputShape));
+
+    auto stackLayer = serializer::CreateStackLayer(m_flatBufferBuilder, stackBaseLayer, flatBufferStackDescriptor);
+    CreateAnyLayer(stackLayer.o, serializer::Layer::Layer_StackLayer);
 }
 
 void SerializerVisitor::VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,

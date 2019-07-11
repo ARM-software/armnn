@@ -2379,6 +2379,65 @@ BOOST_AUTO_TEST_CASE(SerializeSplitter)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeStack)
+{
+    class StackLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        StackLayerVerifier(const std::string& layerName,
+                           const std::vector<armnn::TensorInfo>& inputInfos,
+                           const std::vector<armnn::TensorInfo>& outputInfos,
+                           const armnn::StackDescriptor& descriptor)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos)
+            , m_Descriptor(descriptor) {}
+
+        void VisitStackLayer(const armnn::IConnectableLayer* layer,
+                             const armnn::StackDescriptor& descriptor,
+                             const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::StackDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_Axis == m_Descriptor.m_Axis);
+            BOOST_TEST(descriptor.m_InputShape == m_Descriptor.m_InputShape);
+            BOOST_TEST(descriptor.m_NumInputs == m_Descriptor.m_NumInputs);
+        }
+
+        armnn::StackDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("stack");
+
+    armnn::TensorInfo inputTensorInfo ({4, 3, 5}, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensorInfo({4, 3, 2, 5}, armnn::DataType::Float32);
+
+    armnn::StackDescriptor descriptor(2, 2, {4, 3, 5});
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const stackLayer = network->AddStackLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer1->GetOutputSlot(0).Connect(stackLayer->GetInputSlot(0));
+    inputLayer2->GetOutputSlot(0).Connect(stackLayer->GetInputSlot(1));
+    stackLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    stackLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    StackLayerVerifier verifier(layerName, {inputTensorInfo, inputTensorInfo}, {outputTensorInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeStridedSlice)
 {
     class StridedSliceLayerVerifier : public LayerVerifierBase

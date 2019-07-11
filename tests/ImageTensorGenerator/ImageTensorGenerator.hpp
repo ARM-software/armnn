@@ -15,8 +15,8 @@
 struct NormalizationParameters
 {
     float scale{ 1.0 };
-    std::array<float, 3> mean{ 0.0, 0.0, 0.0 };
-    std::array<float, 3> stddev{ 1.0, 1.0, 1.0 };
+    std::array<float, 3> mean{ { 0.0, 0.0, 0.0 } };
+    std::array<float, 3> stddev{ { 1.0, 1.0, 1.0 } };
 };
 
 enum class SupportedFrontend

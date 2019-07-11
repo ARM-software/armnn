@@ -30,6 +30,9 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
 
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
+                                                                      descriptor.m_DilationY);
+
     arm_compute::TensorInfo aclBiasesInfo;
     arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
 
@@ -47,7 +50,9 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                      &aclWeightsInfo,
                                                      optionalAclBiasesInfo,
                                                      &aclOutputInfo,
-                                                     layerInfo);
+                                                     layerInfo,
+                                                     arm_compute::WeightsInfo(),
+                                                     aclDilationInfo);
 }
 
 ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,
@@ -69,6 +74,9 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
                                              m_Data.m_Parameters.m_PadBottom,
                                              arm_compute::DimensionRoundingType::FLOOR);
 
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(m_Data.m_Parameters.m_DilationX,
+                                                                      m_Data.m_Parameters.m_DilationY);
+
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::CLTensor>();
@@ -88,7 +96,9 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
                                  m_KernelTensor.get(),
                                  m_BiasTensor.get(),
                                  &output,
-                                 padStrideInfo);
+                                 padStrideInfo,
+                                 arm_compute::WeightsInfo(),
+                                 aclDilationInfo);
 
     InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
 

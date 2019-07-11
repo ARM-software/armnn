@@ -90,6 +90,61 @@ ARMNN_AUTO_TEST_CASE(SimpleConvolution2dAsymmetricPaddingNhwc,
 
 ARMNN_AUTO_TEST_CASE(SimpleConvolution2dSquareNhwc, SimpleConvolution2d3x3NhwcTest, false)
 
+ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3,
+                     Convolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Nhwc,
+                     Convolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3Uint8,
+                     Convolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d3x3Dilation3x3NhwcUint8,
+                     Convolution2d3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+
+ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3,
+                     Convolution2d2x3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Nhwc,
+                     Convolution2d2x3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3Uint8,
+                     Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x3x3Dilation3x3NhwcUint8,
+                     Convolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1TestNhwc,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1TestUint8,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(Convolution2d2x2Dilation2x2Padding1x1TestNhwcUint8,
+                     Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test
+                             <armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>,
+                     false,
+                     armnn::DataLayout::NHWC)
+
 // Depthwise Convolution
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1,
                      DepthwiseConvolution2dDepthMul1Test, true, armnn::DataLayout::NCHW)

@@ -114,16 +114,18 @@ public:
                 ("infile,i", po::value<std::string>(&m_InputFileName)->required(),
                              "Input image file to generate tensor from")
                 ("model-format,f", po::value<std::string>(&m_ModelFormat)->required(),
-                             "Format of the model file, Accepted values (caffe, tensorflow, tflite)")
+                             "Format of the intended model file that uses the images."
+                             "Different formats have different image normalization styles."
+                             "Accepted values (caffe, tensorflow, tflite)")
                 ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(),
                              "Output raw tensor file path")
                 ("output-type,z", po::value<std::string>(&m_OutputType)->default_value("float"),
                              "The data type of the output tensors."
                              "If unset, defaults to \"float\" for all defined inputs. "
                              "Accepted values (float, int or qasymm8)")
-                ("new-width,w", po::value<std::string>(&m_NewWidth)->default_value("0"),
+                ("new-width", po::value<std::string>(&m_NewWidth)->default_value("0"),
                              "Resize image to new width. Keep original width if unspecified")
-                ("new-height,h", po::value<std::string>(&m_NewHeight)->default_value("0"),
+                ("new-height", po::value<std::string>(&m_NewHeight)->default_value("0"),
                              "Resize image to new height. Keep original height if unspecified")
                 ("layout,l", po::value<std::string>(&m_Layout)->default_value("NHWC"),
                              "Output data layout, \"NHWC\" or \"NCHW\", default value NHWC");

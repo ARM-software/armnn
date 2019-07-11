@@ -69,11 +69,13 @@ std::vector<TensorShape> Convolution2dLayer::InferOutputShapes(const std::vector
     unsigned int inBatchSize = inputShape[0];
 
     unsigned int filterWidth = filterShape[dataLayoutIndex.GetWidthIndex()];
-    unsigned int readWidth = (inWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - (filterWidth);
-    unsigned int outWidth =  1 + (readWidth / m_Param.m_StrideX);
+    unsigned int dilatedFilterWidth = filterWidth + (m_Param.m_DilationX - 1) * (filterWidth - 1);
+    unsigned int readWidth = (inWidth + m_Param.m_PadLeft + m_Param.m_PadRight) - dilatedFilterWidth;
+    unsigned int outWidth = 1 + (readWidth / m_Param.m_StrideX);
 
     unsigned int filterHeight = filterShape[dataLayoutIndex.GetHeightIndex()];
-    unsigned int readHeight = (inHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - (filterHeight);
+    unsigned int dilatedFilterHeight = filterHeight + (m_Param.m_DilationY - 1) * (filterHeight - 1);
+    unsigned int readHeight = (inHeight + m_Param.m_PadTop + m_Param.m_PadBottom) - dilatedFilterHeight;
     unsigned int outHeight = 1 + (readHeight / m_Param.m_StrideY);
 
     unsigned int outChannels = filterShape[0];

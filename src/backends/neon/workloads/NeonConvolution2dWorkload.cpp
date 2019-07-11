@@ -29,6 +29,9 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
 
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
+                                                                      descriptor.m_DilationY);
+
     arm_compute::TensorInfo aclBiasesInfo;
     arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
 
@@ -46,7 +49,9 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
                                                      &aclWeightsInfo,
                                                      optionalAclBiasesInfo,
                                                      &aclOutputInfo,
-                                                     layerInfo);
+                                                     layerInfo,
+                                                     arm_compute::WeightsInfo(),
+                                                     aclDilationInfo);
 }
 
 NeonConvolution2dWorkload::NeonConvolution2dWorkload(
@@ -84,12 +89,18 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
                                              m_Data.m_Parameters.m_PadBottom,
                                              arm_compute::DimensionRoundingType::FLOOR);
 
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(m_Data.m_Parameters.m_DilationX,
+                                                                      m_Data.m_Parameters.m_DilationY);
+
     auto convolutionLayer = std::make_unique<arm_compute::NEConvolutionLayer>(memoryManager);
     convolutionLayer->configure(&input,
                                 m_KernelTensor.get(),
                                 m_BiasTensor.get(),
                                 &output,
-                                padStrideInfo);
+                                padStrideInfo,
+                                arm_compute::WeightsInfo(),
+                                aclDilationInfo);
+
     m_ConvolutionLayer.reset(convolutionLayer.release());
 
     BOOST_ASSERT(m_ConvolutionLayer);

@@ -109,6 +109,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefSpaceToDepthWorkload.hpp
     RefSplitterWorkload.cpp
     RefSplitterWorkload.hpp
+    RefStackWorkload.cpp
+    RefStackWorkload.hpp
     RefStridedSliceWorkload.cpp
     RefStridedSliceWorkload.hpp
     RefTransposeConvolution2dWorkload.cpp
@@ -127,6 +129,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     SpaceToDepth.cpp
     Splitter.hpp
     Splitter.cpp
+    Stack.cpp
+    Stack.hpp
     StridedSlice.hpp
     StridedSlice.cpp
     StringMapping.cpp

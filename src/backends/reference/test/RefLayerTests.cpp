@@ -1175,4 +1175,11 @@ ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dUint8Nchw, UnbiasedStr
 ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dInt16Nhwc, UnbiasedStridedTransposeConvolution2dInt16NhwcTest)
 ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dInt16Nchw, UnbiasedStridedTransposeConvolution2dInt16NchwTest)
 
+// Stack
+ARMNN_AUTO_TEST_CASE(Stack0Axis,               Stack0AxisTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Stack4dOutput1Axis,       Stack4dOutput1AxisTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Stack4dOutput2Axis,       Stack4dOutput2AxisTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Stack4dOutput3Axis,       Stack4dOutput3AxisTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Stack3dOutput1Axis3Input, Stack3dOutput1Axis3InputTest<armnn::DataType::Float32>)
+
 BOOST_AUTO_TEST_SUITE_END()

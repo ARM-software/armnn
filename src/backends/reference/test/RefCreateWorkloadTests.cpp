@@ -990,4 +990,41 @@ BOOST_AUTO_TEST_CASE(CreateSpaceToDepthWorkloadQSymm16)
     RefCreateSpaceToDepthWorkloadTest<RefSpaceToDepthWorkload, armnn::DataType::QuantisedSymm16>();
 }
 
+static void RefCreateStackWorkloadTest(const armnn::TensorShape& inputShape,
+                                       const armnn::TensorShape& outputShape,
+                                       unsigned int axis,
+                                       unsigned int numInputs,
+                                       armnn::DataType dataType)
+{
+    armnn::Graph graph;
+    RefWorkloadFactory factory;
+    auto workload = CreateStackWorkloadTest<RefStackWorkload>(factory,
+                                                              graph,
+                                                              inputShape,
+                                                              outputShape,
+                                                              axis,
+                                                              numInputs,
+                                                              dataType);
+
+    // Check output is as expected
+    auto queueDescriptor = workload->GetData();
+    auto outputHandle = boost::polymorphic_downcast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    BOOST_TEST((outputHandle->GetTensorInfo() == TensorInfo(outputShape, dataType)));
+}
+
+BOOST_AUTO_TEST_CASE(CreateStackFloat32Workload)
+{
+    RefCreateStackWorkloadTest({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2, armnn::DataType::Float32);
+}
+
+BOOST_AUTO_TEST_CASE(CreateStackUint8Workload)
+{
+    RefCreateStackWorkloadTest({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2, armnn::DataType::QuantisedAsymm8);
+}
+
+BOOST_AUTO_TEST_CASE(CreateStackUint16Workload)
+{
+    RefCreateStackWorkloadTest({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2, armnn::DataType::QuantisedSymm16);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

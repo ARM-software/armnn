@@ -46,6 +46,7 @@
 #include "RefSplitterWorkload.hpp"
 #include "RefSoftmaxWorkload.hpp"
 #include "RefSpaceToBatchNdWorkload.hpp"
+#include "RefStackWorkload.hpp"
 #include "RefStridedSliceWorkload.hpp"
 #include "RefSpaceToDepthWorkload.hpp"
 #include "RefTransposeConvolution2dWorkload.hpp"

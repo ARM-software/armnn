@@ -506,4 +506,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
     return std::make_unique<RefTransposeConvolution2dWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    return std::make_unique<RefStackWorkload>(descriptor, info);
+}
+
 } // namespace armnn

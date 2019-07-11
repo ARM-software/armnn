@@ -62,6 +62,7 @@ BACKEND_SOURCES := \
         workloads/RefSoftmaxWorkload.cpp \
         workloads/RefSpaceToBatchNdWorkload.cpp \
         workloads/RefSpaceToDepthWorkload.cpp \
+        workloads/RefStackWorkload.cpp \
         workloads/RefStridedSliceWorkload.cpp \
         workloads/RefSplitterWorkload.cpp \
         workloads/RefTransposeConvolution2dWorkload.cpp \
@@ -69,6 +70,7 @@ BACKEND_SOURCES := \
         workloads/Rsqrt.cpp \
         workloads/SpaceToBatchNd.cpp \
         workloads/SpaceToDepth.cpp \
+        workloads/Stack.cpp \
         workloads/StridedSlice.cpp \
         workloads/StringMapping.cpp \
         workloads/Softmax.cpp \

@@ -419,6 +419,7 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
                                   "Reference concatenation: output type not supported");
     for (const TensorInfo* input : inputs)
     {
+        BOOST_ASSERT(input != nullptr);
         supported &= CheckSupportRule(TypeAnyOf(*input, supportedTypes), reasonIfUnsupported,
             "Reference concatenation: input type not supported");
 
@@ -1587,6 +1588,36 @@ bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
 
         supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                       "Reference splitter: input and output types mismatched.");
+    }
+
+    return supported;
+}
+
+bool RefLayerSupport::IsStackSupported(const std::vector<const TensorInfo*>& inputs,
+                                       const TensorInfo& output,
+                                       const StackDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+
+    bool supported = true;
+    std::array<DataType,3> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference stack: output type not supported");
+    for (const TensorInfo* input : inputs)
+    {
+        BOOST_ASSERT(input != nullptr);
+        supported &= CheckSupportRule(TypeAnyOf(*input, supportedTypes), reasonIfUnsupported,
+            "Reference stack: input type not supported");
+
+        supported &= CheckSupportRule(TypesAreEqual(*input, output), reasonIfUnsupported,
+            "Reference stack: input and output types mismatched.");
     }
 
     return supported;

@@ -257,7 +257,7 @@ public:
                              const ViewsDescriptor& descriptor,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsStackSupported(const std::vector<const TensorInfo*> inputs,
+    bool IsStackSupported(const std::vector<const TensorInfo*>& inputs,
                           const TensorInfo& output,
                           const StackDescriptor& descriptor,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

@@ -271,7 +271,7 @@ public:
                                      const ViewsDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    virtual bool IsStackSupported(const std::vector<const TensorInfo*> inputs,
+    virtual bool IsStackSupported(const std::vector<const TensorInfo*>& inputs,
                                   const TensorInfo& output,
                                   const StackDescriptor& descriptor,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;

@@ -138,6 +138,10 @@ public:
                             const SplitterDescriptor& splitterDescriptor,
                             const char* name = nullptr) override;
 
+    void VisitStackLayer(const IConnectableLayer* layer,
+                         const StackDescriptor& stackDescriptor,
+                         const char* name = nullptr) override;
+
     void VisitStridedSliceLayer(const IConnectableLayer* layer,
                                 const StridedSliceDescriptor& stridedSliceDescriptor,
                                 const char* name = nullptr) override;

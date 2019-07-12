@@ -1794,6 +1794,68 @@ BOOST_AUTO_TEST_CASE(QuantizeTransposeConvolution2dWithBiases)
     TestQuantizeTransposeConvolution2d(true);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeStack)
+{
+    class TestStackQuantization : public TestQuantization
+    {
+    public:
+        TestStackQuantization(const TensorShape& inputShape,
+                              const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape) {}
+
+        TestStackQuantization(const QuantizerOptions& options,
+                              const TensorShape& inputShape,
+                              const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape) {}
+
+        void VisitInputLayer(const IConnectableLayer* layer,
+                             LayerBindingId id,
+                             const char* name = nullptr) override
+        {}
+        void VisitOutputLayer(const IConnectableLayer* layer,
+                              LayerBindingId id,
+                              const char* name = nullptr) override
+        {}
+
+        void VisitStackLayer(const IConnectableLayer* layer,
+                             const StackDescriptor& descriptor,
+                             const char* name = nullptr) override
+        {
+            TensorInfo outputInfo = layer->GetOutputSlot(0).GetTensorInfo();
+
+            TestQuantizationParams(outputInfo,
+                { 30.0f / g_Asymm8QuantizationBase, 128 },
+                { 15.0f / g_Symm16QuantizationBase, 0 });
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    IConnectableLayer* input0 = network->AddInputLayer(0);
+    IConnectableLayer* input1 = network->AddInputLayer(1);
+
+    const TensorShape inputShape{ 3, 4, 5 };
+    const TensorShape outputShape{ 3, 4, 2, 5 };
+
+    StackDescriptor descriptor(2, 2, inputShape);
+    IConnectableLayer* stackLayer = network->AddStackLayer(descriptor);
+
+    IConnectableLayer* output = network->AddOutputLayer(0);
+
+    input0->GetOutputSlot(0).Connect(stackLayer->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(stackLayer->GetInputSlot(1));
+    stackLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestStackQuantization validatorQAsymm8(inputShape, outputShape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestStackQuantization validatorQSymm16(options, inputShape, outputShape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 std::vector<uint8_t> SetupQuantize(float value)
 {
     armnn::TensorInfo inputInfo({ 1, 2, 2 }, armnn::DataType::Float32);

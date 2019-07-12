@@ -442,6 +442,15 @@ void QuantizerVisitor::VisitSplitterLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitStackLayer(const IConnectableLayer* layer,
+                                       const StackDescriptor& stackDescriptor,
+                                       const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddStackLayer(stackDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitStridedSliceLayer(const IConnectableLayer* layer,
                                               const StridedSliceDescriptor& stridedSliceDescriptor,
                                               const char* name)

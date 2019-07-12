@@ -874,7 +874,7 @@ LayerTestResult<T, 4> Convolution2d2x2Dilation2x2Padding2x2Stride3x3Test(
 
     // Since the dilation rate is 2 this will dilate the kernel to be like 3x3: d(K-1)+1 --> 2 x (2-1) + 1 = 3,
     // therefore the output will be 4x4: (I − K + 2P)/S +1 => trunc ( (10 - 3 + 2x2 ) / 3 + 1 )
-    // where, dilation size = d = 2; kernel size = K = 2; input size = I = 10; padding size = P = 2; stride = S = 1
+    // where, dilation size = d = 2; kernel size = K = 2; input size = I = 10; padding size = P = 2; stride = S = 3
     armnn::TensorInfo outputTensorInfo({ 1, 1, 4, 4}, ArmnnType);
     std::vector<float> outputExpectedNoQuantizedValues =
     {

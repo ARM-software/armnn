@@ -6,10 +6,6 @@
 #include "FloatingPointConverter.hpp"
 #include <Half.hpp>
 
-#include <malloc.h>
-#include <iostream>
-#include <algorithm>
-
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(TestFPConversion)

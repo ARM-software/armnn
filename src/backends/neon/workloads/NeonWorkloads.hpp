@@ -30,7 +30,7 @@
 #include "NeonPreluWorkload.hpp"
 #include "NeonQuantizeWorkload.hpp"
 #include "NeonReshapeWorkload.hpp"
-#include "NeonResizeBilinearWorkload.hpp"
+#include "NeonResizeWorkload.hpp"
 #include "NeonSoftmaxFloatWorkload.hpp"
 #include "NeonSoftmaxUint8Workload.hpp"
 #include "NeonSpaceToDepthWorkload.hpp"

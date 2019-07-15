@@ -45,7 +45,7 @@ BACKEND_SOURCES := \
         workloads/NeonPreluWorkload.cpp \
         workloads/NeonQuantizeWorkload.cpp \
         workloads/NeonReshapeWorkload.cpp \
-        workloads/NeonResizeBilinearWorkload.cpp \
+        workloads/NeonResizeWorkload.cpp \
         workloads/NeonSoftmaxBaseWorkload.cpp \
         workloads/NeonSoftmaxFloatWorkload.cpp \
         workloads/NeonSoftmaxUint8Workload.cpp \

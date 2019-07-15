@@ -39,7 +39,7 @@
 #include "workloads/NeonPooling2dWorkload.hpp"
 #include "workloads/NeonPreluWorkload.hpp"
 #include "workloads/NeonQuantizeWorkload.hpp"
-#include "workloads/NeonResizeBilinearWorkload.hpp"
+#include "workloads/NeonResizeWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
 #include "workloads/NeonSplitterWorkload.hpp"
@@ -511,25 +511,26 @@ bool NeonLayerSupport::IsResizeSupported(const TensorInfo& input,
                                          const ResizeDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    if (descriptor.m_Method == ResizeMethod::Bilinear)
-    {
-        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonResizeBilinearWorkloadValidate,
-                                       reasonIfUnsupported,
-                                       input,
-                                       output);
-    }
-
-    return false;
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonResizeWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
                                                  const TensorInfo& output,
                                                  Optional<std::string&> reasonIfUnsupported) const
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonResizeBilinearWorkloadValidate,
-                                   reasonIfUnsupported,
-                                   input,
-                                   output);
+    ResizeDescriptor descriptor;
+    descriptor.m_Method     = ResizeMethod::Bilinear;
+    descriptor.m_DataLayout = DataLayout::NCHW;
+
+    const TensorShape& outputShape = output.GetShape();
+    descriptor.m_TargetHeight = outputShape[2];
+    descriptor.m_TargetWidth  = outputShape[3];
+
+    return IsResizeSupported(input, output, descriptor, reasonIfUnsupported);
 }
 
 bool NeonLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

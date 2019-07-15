@@ -19,6 +19,12 @@ BOOST_AUTO_TEST_SUITE(CreateWorkloadNeon)
 namespace
 {
 
+boost::test_tools::predicate_result CompareIAclTensorHandleShape(IAclTensorHandle*                    tensorHandle,
+                                                                std::initializer_list<unsigned int> expectedDimensions)
+{
+    return CompareTensorHandleShape<IAclTensorHandle>(tensorHandle, expectedDimensions);
+}
+
 bool TestNeonTensorHandleInfo(armnn::IAclTensorHandle* handle, const armnn::TensorInfo& expectedInfo)
 {
     using namespace armnn::armcomputetensorutils;
@@ -491,6 +497,52 @@ BOOST_AUTO_TEST_CASE(CreateReshapeFloatWorkload)
 BOOST_AUTO_TEST_CASE(CreateReshapeUint8Workload)
 {
     NeonCreateReshapeWorkloadTest<DataType::QuantisedAsymm8>();
+}
+
+template <typename ResizeWorkloadType, armnn::DataType DataType>
+static void NeonCreateResizeWorkloadTest(DataLayout dataLayout)
+{
+    Graph graph;
+    NeonWorkloadFactory factory =
+            NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+    auto workload = CreateResizeBilinearWorkloadTest<ResizeWorkloadType, DataType>(factory, graph, dataLayout);
+
+    auto queueDescriptor = workload->GetData();
+
+    auto inputHandle  = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    switch (dataLayout)
+    {
+        case DataLayout::NHWC:
+            BOOST_TEST(CompareIAclTensorHandleShape(inputHandle, { 2, 4, 4, 3 }));
+            BOOST_TEST(CompareIAclTensorHandleShape(outputHandle, { 2, 2, 2, 3 }));
+            break;
+        case DataLayout::NCHW:
+        default:
+            BOOST_TEST(CompareIAclTensorHandleShape(inputHandle, { 2, 3, 4, 4 }));
+            BOOST_TEST(CompareIAclTensorHandleShape(outputHandle, { 2, 3, 2, 2 }));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeFloat32NchwWorkload)
+{
+    NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeUint8NchwWorkload)
+{
+    NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeFloat32NhwcWorkload)
+{
+    NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::Float32>(DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateResizeUint8NhwcWorkload)
+{
+    NeonCreateResizeWorkloadTest<NeonResizeWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NHWC);
 }
 
 template <typename SoftmaxWorkloadType, typename armnn::DataType DataType>

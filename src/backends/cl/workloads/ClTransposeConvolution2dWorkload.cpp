@@ -46,16 +46,11 @@ arm_compute::Status ClTransposeConvolution2dWorkloadValidate(const TensorInfo& i
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(descriptor);
 
-    constexpr unsigned int innerBorderRight = 0u;
-    constexpr unsigned int innerBorderTop   = 0u;
-
     return arm_compute::CLDeconvolutionLayer::validate(&aclInputInfo,
                                                        &aclWeightsInfo,
                                                        optionalAclBiasesInfo,
                                                        &aclOutputInfo,
-                                                       padStrideInfo,
-                                                       innerBorderRight,
-                                                       innerBorderTop);
+                                                       padStrideInfo);
 }
 
 ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(

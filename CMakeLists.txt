@@ -570,6 +570,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Mean.cpp
              src/armnnTfLiteParser/test/Minimum.cpp
              src/armnnTfLiteParser/test/Multiplication.cpp
+             src/armnnTfLiteParser/test/Pack.cpp
              src/armnnTfLiteParser/test/Pad.cpp
              src/armnnTfLiteParser/test/Reshape.cpp
              src/armnnTfLiteParser/test/ResizeBilinear.cpp

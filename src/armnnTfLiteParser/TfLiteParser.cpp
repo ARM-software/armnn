@@ -455,6 +455,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_ADD]               =  &TfLiteParser::ParseAdd;
     m_ParserFunctions[tflite::BuiltinOperator_MUL]               =  &TfLiteParser::ParseMul;
     m_ParserFunctions[tflite::BuiltinOperator_MEAN]              =  &TfLiteParser::ParseMean;
+    m_ParserFunctions[tflite::BuiltinOperator_PACK]              =  &TfLiteParser::ParsePack;
     m_ParserFunctions[tflite::BuiltinOperator_PAD]               =  &TfLiteParser::ParsePad;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]             =  &TfLiteParser::ParseSplit;
     m_ParserFunctions[tflite::BuiltinOperator_TANH]              =  &TfLiteParser::ParseTanH;
@@ -1904,6 +1905,46 @@ void TfLiteParser::ParseDetectionPostProcess(size_t subgraphIndex, size_t operat
                                                               outputTensorIndexes[1],
                                                               outputTensorIndexes[2],
                                                               outputTensorIndexes[3]});
+}
+
+/// The TfLite Pack operator is equivalent to the ArmNN Stack operator
+void TfLiteParser::ParsePack(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    if (inputs.size() < 1)
+    {
+        throw ParseException("Pack must have at least one input.");
+    }
+
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsPackOptions();
+
+    StackDescriptor desc;
+    desc.m_Axis = static_cast<uint32_t>(options->axis);
+    desc.m_NumInputs = static_cast<uint32_t>(inputs.size());
+
+    // Use the tensor shape of the first input as the "correct" input shape in the descriptor
+    armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+    desc.m_InputShape = inputTensorInfo.GetShape();
+
+    auto layerName = boost::str(boost::format("Pack:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddStackLayer(desc, layerName.c_str());
+
+    BOOST_ASSERT(layer != nullptr);
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
 
 void TfLiteParser::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)

@@ -12,7 +12,6 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
-#include <cl/ClLayerSupport.hpp>
 #include <cl/ClTensorHandle.hpp>
 
 using namespace armnn::armcomputetensorutils;

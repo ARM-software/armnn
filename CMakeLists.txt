@@ -214,6 +214,7 @@ list(APPEND armnn_sources
     include/armnn/LstmParams.hpp
     include/armnn/NetworkFwd.hpp
     include/armnn/Optional.hpp
+    include/armnn/QuantizedLstmParams.hpp
     include/armnn/Tensor.hpp
     include/armnn/TensorFwd.hpp
     include/armnn/Types.hpp
@@ -292,6 +293,8 @@ list(APPEND armnn_sources
     src/armnn/layers/Pooling2dLayer.cpp
     src/armnn/layers/QuantizeLayer.cpp
     src/armnn/layers/QuantizeLayer.hpp
+    src/armnn/layers/QuantizedLstmLayer.hpp
+    src/armnn/layers/QuantizedLstmLayer.cpp
     src/armnn/layers/DivisionLayer.cpp
     src/armnn/layers/DivisionLayer.hpp
     src/armnn/layers/PreCompiledLayer.hpp

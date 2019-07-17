@@ -356,9 +356,10 @@ public:
     virtual IConnectableLayer* AddOutputLayer(LayerBindingId id, const char* name = nullptr) = 0;
 
     /// Add a Lstm layer to the network
-    /// @param descriptor Parameters for the Lstm operation
-    /// @param name Optional name for the layer
-    /// @return Interface for configuring the layer.
+    /// @param descriptor - Parameters for the Lstm operation
+    /// @param params - Weights and biases for the LSTM cell
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddLstmLayer(const LstmDescriptor& descriptor,
                                             const LstmInputParams& params,
                                             const char* name = nullptr) = 0;
@@ -457,6 +458,13 @@ public:
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddStackLayer(const StackDescriptor& descriptor,
                                              const char* name = nullptr) = 0;
+
+    /// Add a QuantizedLstm layer to the network
+    /// @param params - The weights and biases for the Quantized LSTM cell
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
+                                                     const char* name = nullptr) = 0;
 
     virtual void Accept(ILayerVisitor& visitor) const = 0;
 

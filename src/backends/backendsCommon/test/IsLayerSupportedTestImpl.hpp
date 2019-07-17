@@ -27,14 +27,17 @@ template<armnn::DataType DataType>
 armnn::WorkloadInfo MakeDummyWorkloadInfo(unsigned int numInputs, unsigned int numOutputs)
 {
     armnn::WorkloadInfo info;
+
     for (unsigned int i=0; i < numInputs; i++)
     {
         info.m_InputTensorInfos.push_back(MakeDummyTensorInfo<DataType>());
     }
+
     for (unsigned int o=0; o < numOutputs; o++)
     {
         info.m_OutputTensorInfos.push_back(MakeDummyTensorInfo<DataType>());
     }
+
     return info;
 }
 
@@ -46,10 +49,12 @@ struct DummyLayer
     {
         m_Layer = dummyGraph.AddLayer<LayerType>(DescType(), "");
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     LayerType* m_Layer;
 };
 
@@ -61,10 +66,12 @@ struct DummyLayer<LayerType, void>
     {
         m_Layer = dummyGraph.AddLayer<LayerType>("");
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     LayerType* m_Layer;
 };
 
@@ -83,12 +90,13 @@ struct DummyLayer<armnn::BatchNormalizationLayer>
         m_Layer->m_Gamma = std::make_unique<armnn::ScopedCpuTensorHandle>(
             armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
-    armnn::BatchNormalizationLayer* m_Layer;
 
+    armnn::BatchNormalizationLayer* m_Layer;
 };
 
 template<>
@@ -98,10 +106,12 @@ struct DummyLayer<armnn::BatchToSpaceNdLayer>
     {
         m_Layer = dummyGraph.AddLayer<armnn::BatchToSpaceNdLayer>(armnn::BatchToSpaceNdDescriptor(), "");
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     armnn::BatchToSpaceNdLayer* m_Layer;
 };
 
@@ -112,10 +122,12 @@ struct DummyLayer<armnn::ConstantLayer, void>
     {
         m_Layer = dummyGraph.AddLayer<armnn::ConstantLayer>("");
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     armnn::ConstantLayer* m_Layer;
 };
 
@@ -125,12 +137,13 @@ struct DummyLayer<armnn::InputLayer, armnn::LayerBindingId>
     DummyLayer()
     {
         m_Layer = dummyGraph.AddLayer<armnn::InputLayer>(armnn::LayerBindingId(), "");
-
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     armnn::InputLayer* m_Layer;
 };
 
@@ -141,12 +154,13 @@ struct DummyLayer<armnn::ConcatLayer>
     {
         armnn::OriginsDescriptor desc(2);
         m_Layer = dummyGraph.AddLayer<armnn::ConcatLayer>(desc, "");
-
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     armnn::ConcatLayer* m_Layer;
 };
 
@@ -156,12 +170,13 @@ struct DummyLayer<armnn::OutputLayer, armnn::LayerBindingId>
     DummyLayer()
     {
         m_Layer = dummyGraph.AddLayer<armnn::OutputLayer>(armnn::LayerBindingId(), "");
-
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     armnn::OutputLayer* m_Layer;
 };
 
@@ -172,12 +187,13 @@ struct DummyLayer<armnn::SplitterLayer>
     {
         armnn::ViewsDescriptor desc(1);
         m_Layer = dummyGraph.AddLayer<armnn::SplitterLayer>(desc, "");
-
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     armnn::SplitterLayer* m_Layer;
 };
 
@@ -193,10 +209,12 @@ struct DummyConvolutionLayer
         m_Layer->m_Bias = std::make_unique<armnn::ScopedCpuTensorHandle>(
             armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
     }
+
     ~DummyConvolutionLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     ConvolutionLayerType* m_Layer;
 };
 
@@ -255,10 +273,12 @@ struct DummyLstmLayer
         m_Layer->m_CifgParameters.m_InputGateBias              = std::make_unique<armnn::ScopedCpuTensorHandle>(
                 armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
     }
+
     ~DummyLstmLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     armnn::LstmLayer* m_Layer;
 };
 
@@ -266,6 +286,49 @@ template<>
 struct DummyLayer<armnn::LstmLayer>
         : public DummyLstmLayer<armnn::LstmLayer>
 {
+};
+
+template<>
+struct DummyLayer<armnn::QuantizedLstmLayer, void>
+{
+    DummyLayer()
+    {
+        m_Layer = dummyGraph.AddLayer<armnn::QuantizedLstmLayer>("");
+
+        m_Layer->m_QuantizedLstmParameters.m_InputToInputWeights  = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+        m_Layer->m_QuantizedLstmParameters.m_InputToForgetWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+        m_Layer->m_QuantizedLstmParameters.m_InputToCellWeights   = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+        m_Layer->m_QuantizedLstmParameters.m_InputToOutputWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+
+        m_Layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights  = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+        m_Layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+        m_Layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights   = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+        m_Layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::QuantisedAsymm8));
+
+        m_Layer->m_QuantizedLstmParameters.m_InputGateBias  = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+        m_Layer->m_QuantizedLstmParameters.m_ForgetGateBias = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+        m_Layer->m_QuantizedLstmParameters.m_CellBias       = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+        m_Layer->m_QuantizedLstmParameters.m_OutputGateBias = std::make_unique<armnn::ScopedCpuTensorHandle>(
+                armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Signed32));
+    }
+
+    ~DummyLayer()
+    {
+        dummyGraph.EraseLayer(m_Layer);
+    }
+
+    armnn::QuantizedLstmLayer* m_Layer;
 };
 
 template<>
@@ -278,10 +341,12 @@ struct DummyLayer<armnn::FullyConnectedLayer>
         m_Layer->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(
             armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
     }
+
     ~DummyLayer()
     {
         dummyGraph.EraseLayer(m_Layer);
     }
+
     armnn::FullyConnectedLayer* m_Layer;
 };
 
@@ -391,6 +456,8 @@ DECLARE_LAYER_POLICY_2_PARAM(Pooling2d)
 DECLARE_LAYER_POLICY_2_PARAM(PreCompiled)
 
 DECLARE_LAYER_POLICY_1_PARAM(Prelu)
+
+DECLARE_LAYER_POLICY_1_PARAM(QuantizedLstm)
 
 DECLARE_LAYER_POLICY_1_PARAM(Division)
 

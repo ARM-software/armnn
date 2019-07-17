@@ -157,6 +157,10 @@ public:
     void VisitQuantizeLayer(const IConnectableLayer*,
                             const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitQuantizedLstmLayer(const IConnectableLayer*,
+                                 const QuantizedLstmInputParams&,
+                                 const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitReshapeLayer(const IConnectableLayer*,
                            const ReshapeDescriptor&,
                            const char*) override { DefaultPolicy::Apply(__func__); }

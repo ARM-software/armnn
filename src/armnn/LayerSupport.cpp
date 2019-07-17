@@ -446,12 +446,27 @@ bool IsPadSupported(const BackendId& backend,
 }
 
 bool IsQuantizeSupported(const BackendId& backend,
-                           const TensorInfo& input,
-                           const TensorInfo& output,
-                           char* reasonIfUnsupported,
-                           size_t reasonIfUnsupportedMaxLength)
+                         const TensorInfo& input,
+                         const TensorInfo& output,
+                         char* reasonIfUnsupported,
+                         size_t reasonIfUnsupportedMaxLength)
 {
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsQuantizeSupported, input, output);
+}
+
+bool IsQuantizedLstmSupported(const BackendId& backend,
+                              const TensorInfo& input,
+                              const TensorInfo& previousCellStateIn,
+                              const TensorInfo& previousOutputIn,
+                              const TensorInfo& cellStateOut,
+                              const TensorInfo& output,
+                              const QuantizedLstmInputParamsInfo& paramsInfo,
+                              char* reasonIfUnsupported,
+                              size_t reasonIfUnsupportedMaxLength)
+
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsQuantizedLstmSupported, input, previousCellStateIn, previousOutputIn,
+                               cellStateOut, output, paramsInfo);
 }
 
 bool IsPermuteSupported(const BackendId& backend,

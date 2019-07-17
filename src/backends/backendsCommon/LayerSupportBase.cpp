@@ -347,6 +347,17 @@ bool LayerSupportBase::IsQuantizeSupported(const armnn::TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsQuantizedLstmSupported(const TensorInfo& input,
+                                                const TensorInfo& previousCellStateIn,
+                                                const TensorInfo& previousOutputIn,
+                                                const TensorInfo& cellStateOut,
+                                                const TensorInfo& output,
+                                                const QuantizedLstmInputParamsInfo& paramsInfo,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsReshapeSupported(const TensorInfo& input,
                                           const ReshapeDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const

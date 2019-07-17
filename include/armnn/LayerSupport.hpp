@@ -10,6 +10,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 #include "LstmParams.hpp"
+#include "QuantizedLstmParams.hpp"
 
 namespace armnn
 {
@@ -289,6 +290,17 @@ bool IsPooling2dSupported(const BackendId& backend,
                           const Pooling2dDescriptor& descriptor,
                           char* reasonIfUnsupported = nullptr,
                           size_t reasonIfUnsupportedMaxLength = 1024);
+
+/// Deprecated in favor of IBackend and ILayerSupport interfaces
+bool IsQuantizedLstmSupported(const BackendId& backend,
+                              const TensorInfo& input,
+                              const TensorInfo& previousCellStateIn,
+                              const TensorInfo& previousOutputIn,
+                              const TensorInfo& cellStateOut,
+                              const TensorInfo& output,
+                              const QuantizedLstmInputParamsInfo& paramsInfo,
+                              char* reasonIfUnsupported = nullptr,
+                              size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsReshapeSupported(const BackendId& backend,

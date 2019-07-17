@@ -6,6 +6,7 @@
 
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/LstmParams.hpp>
+#include <armnn/QuantizedLstmParams.hpp>
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Types.hpp>
 
@@ -199,6 +200,9 @@ public:
 
     IConnectableLayer* AddStackLayer(const StackDescriptor& stackDescriptor,
                                      const char* name = nullptr) override;
+
+    IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
+                                             const char* name = nullptr) override;
 
     void Accept(ILayerVisitor& visitor) const override;
 

@@ -11,6 +11,7 @@
 #include "IRuntime.hpp"
 #include "LstmParams.hpp"
 #include "Optional.hpp"
+#include "QuantizedLstmParams.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
 #include "TypesUtils.hpp"

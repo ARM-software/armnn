@@ -477,4 +477,41 @@ struct TransposeConvolution2dQueueDescriptor : QueueDescriptorWithParameters<Tra
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct QuantizedLstmQueueDescriptor : QueueDescriptor
+{
+    QuantizedLstmQueueDescriptor()
+        : m_InputToInputWeights(nullptr)
+        , m_InputToForgetWeights(nullptr)
+        , m_InputToCellWeights(nullptr)
+        , m_InputToOutputWeights(nullptr)
+
+        , m_RecurrentToInputWeights(nullptr)
+        , m_RecurrentToForgetWeights(nullptr)
+        , m_RecurrentToCellWeights(nullptr)
+        , m_RecurrentToOutputWeights(nullptr)
+
+        , m_InputGateBias(nullptr)
+        , m_ForgetGateBias(nullptr)
+        , m_CellBias(nullptr)
+        , m_OutputGateBias(nullptr)
+    {}
+
+    const ConstCpuTensorHandle* m_InputToInputWeights;
+    const ConstCpuTensorHandle* m_InputToForgetWeights;
+    const ConstCpuTensorHandle* m_InputToCellWeights;
+    const ConstCpuTensorHandle* m_InputToOutputWeights;
+
+    const ConstCpuTensorHandle* m_RecurrentToInputWeights;
+    const ConstCpuTensorHandle* m_RecurrentToForgetWeights;
+    const ConstCpuTensorHandle* m_RecurrentToCellWeights;
+    const ConstCpuTensorHandle* m_RecurrentToOutputWeights;
+
+    const ConstCpuTensorHandle* m_InputGateBias;
+    const ConstCpuTensorHandle* m_ForgetGateBias;
+    const ConstCpuTensorHandle* m_CellBias;
+    const ConstCpuTensorHandle* m_OutputGateBias;
+
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } //namespace armnn

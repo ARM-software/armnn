@@ -6,8 +6,9 @@
 
 #include <armnn/Deprecated.hpp>
 #include <armnn/DescriptorsFwd.hpp>
-#include <armnn/Optional.hpp>
 #include <armnn/LstmParams.hpp>
+#include <armnn/Optional.hpp>
+#include <armnn/QuantizedLstmParams.hpp>
 
 #include <cctype>
 #include <functional>
@@ -227,6 +228,14 @@ public:
     virtual bool IsQuantizeSupported(const TensorInfo& input,
                                      const TensorInfo& output,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsQuantizedLstmSupported(const TensorInfo& input,
+                                          const TensorInfo& previousCellStateIn,
+                                          const TensorInfo& previousOutputIn,
+                                          const TensorInfo& cellStateOut,
+                                          const TensorInfo& output,
+                                          const QuantizedLstmInputParamsInfo& paramsInfo,
+                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsReshapeSupported(const TensorInfo& input,
                                     const ReshapeDescriptor& descriptor,

@@ -1042,6 +1042,13 @@ void SerializerVisitor::VisitTransposeConvolution2dLayer(
     CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_TransposeConvolution2dLayer);
 }
 
+void SerializerVisitor::VisitQuantizedLstmLayer(const armnn::IConnectableLayer* layer,
+                                                const armnn::QuantizedLstmInputParams& params,
+                                                const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::VisitQuantizedLstmLayer not yet implemented");
+}
+
 fb::Offset<serializer::LayerBase> SerializerVisitor::CreateLayerBase(const IConnectableLayer* layer,
                                                                      const serializer::LayerType layerType)
 {

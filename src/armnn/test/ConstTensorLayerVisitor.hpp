@@ -7,6 +7,7 @@
 #include "TestLayerVisitor.hpp"
 #include <armnn/Descriptors.hpp>
 #include <armnn/LstmParams.hpp>
+#include <armnn/QuantizedLstmParams.hpp>
 
 namespace armnn
 {
@@ -219,5 +220,33 @@ private:
     LstmDescriptor m_Descriptor;
     LstmInputParams m_InputParams;
 };
+
+
+class TestQuantizedLstmLayerVisitor : public TestLayerVisitor
+{
+public:
+    explicit TestQuantizedLstmLayerVisitor(const QuantizedLstmInputParams& params,
+                                           const char* name = nullptr)
+        : TestLayerVisitor(name)
+        , m_InputParams(params)
+    {}
+
+    void VisitQuantizedLstmLayer(const IConnectableLayer* layer,
+                                 const QuantizedLstmInputParams& params,
+                                 const char* name = nullptr)
+    {
+        CheckLayerPointer(layer);
+        CheckLayerName(name);
+        CheckInputParameters(params);
+    }
+
+protected:
+    void CheckInputParameters(const QuantizedLstmInputParams& inputParams);
+    void CheckConstTensorPtrs(const std::string& name, const ConstTensor* expected, const ConstTensor* actual);
+
+private:
+    QuantizedLstmInputParams m_InputParams;
+};
+
 
 } // namespace armnn

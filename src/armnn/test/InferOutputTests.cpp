@@ -40,4 +40,7 @@ ARMNN_SIMPLE_TEST_CASE(DepthwiseConvolution2dInferOutputShape, DepthwiseConvolut
 // TransposeConvolution2D
 ARMNN_SIMPLE_TEST_CASE(TransposeConvolution2dInferOutputShape, TransposeConvolution2dInferOutputShapeTest)
 
+// QuantizedLstm
+ARMNN_SIMPLE_TEST_CASE(QuantizedLstmInferOutputShape, QuantizedLstmInferOutputShapeTest)
+
 BOOST_AUTO_TEST_SUITE_END()

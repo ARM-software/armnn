@@ -537,6 +537,11 @@ table LstmInputParams {
 
     cellToForgetWeights:ConstTensor;
     cellToOutputWeights:ConstTensor;
+
+    inputLayerNormWeights:ConstTensor;
+    forgetLayerNormWeights:ConstTensor;
+    cellLayerNormWeights:ConstTensor;
+    outputLayerNormWeights:ConstTensor;
 }
 
 table LstmDescriptor {
@@ -546,6 +551,7 @@ table LstmDescriptor {
     cifgEnabled:bool = true;
     peepholeEnabled:bool = false;
     projectionEnabled:bool = false;
+    layerNormEnabled:bool = false;
 }
 
 table LstmLayer {

@@ -1326,6 +1326,39 @@ IConnectableLayer* Network::AddLstmLayer(const LstmDescriptor&  descriptor,
         layer->m_PeepholeParameters.m_CellToOutputWeights =
             std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellToOutputWeights));
     }
+
+    //Lstm Layer Normalization params
+    if(descriptor.m_LayerNormEnabled)
+    {
+        if(!descriptor.m_CifgEnabled)
+        {
+            if(params.m_InputLayerNormWeights == nullptr)
+            {
+                throw InvalidArgumentException("AddLstmLayer: Input layer normalization weights cannot be NULL");
+            }
+            layer->m_LayerNormParameters.m_InputLayerNormWeights =
+                    std::make_unique<ScopedCpuTensorHandle>(*(params.m_InputLayerNormWeights));
+        }
+
+        if(params.m_ForgetLayerNormWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddLstmLayer: Forget layer normalization weights cannot be NULL");
+        }
+        if(params.m_CellLayerNormWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddLstmLayer: Cell layer normalization weights cannot be NULL");
+        }
+        if(params.m_OutputLayerNormWeights == nullptr)
+        {
+            throw InvalidArgumentException("AddLstmLayer: Output layer normalization weights cannot be NULL");
+        }
+        layer->m_LayerNormParameters.m_ForgetLayerNormWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_ForgetLayerNormWeights));
+        layer->m_LayerNormParameters.m_CellLayerNormWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_CellLayerNormWeights));
+        layer->m_LayerNormParameters.m_OutputLayerNormWeights =
+                std::make_unique<ScopedCpuTensorHandle>(*(params.m_OutputLayerNormWeights));
+    }
     return layer;
 }
 

@@ -2089,6 +2089,7 @@ armnn::LstmDescriptor Deserializer::GetLstmDescriptor(Deserializer::LstmDescript
     desc.m_CifgEnabled = lstmDescriptor->cifgEnabled();
     desc.m_PeepholeEnabled = lstmDescriptor->peepholeEnabled();
     desc.m_ProjectionEnabled = lstmDescriptor->projectionEnabled();
+    desc.m_LayerNormEnabled = lstmDescriptor->layerNormEnabled();
 
     return desc;
 }
@@ -2169,6 +2170,26 @@ void Deserializer::ParseLstm(GraphPtr graph, unsigned int layerIndex)
 
         lstmInputParams.m_CellToForgetWeights = &cellToForgetWeights;
         lstmInputParams.m_CellToOutputWeights = &cellToOutputWeights;
+    }
+
+    armnn::ConstTensor inputLayerNormWeights;
+    armnn::ConstTensor forgetLayerNormWeights;
+    armnn::ConstTensor cellLayerNormWeights;
+    armnn::ConstTensor outputLayerNormWeights;
+    if (lstmDescriptor.m_LayerNormEnabled)
+    {
+        if (!lstmDescriptor.m_CifgEnabled)
+        {
+            inputLayerNormWeights = ToConstTensor(flatBufferInputParams->inputLayerNormWeights());
+            lstmInputParams.m_InputLayerNormWeights = &inputLayerNormWeights;
+        }
+        forgetLayerNormWeights = ToConstTensor(flatBufferInputParams->forgetLayerNormWeights());
+        cellLayerNormWeights = ToConstTensor(flatBufferInputParams->cellLayerNormWeights());
+        outputLayerNormWeights = ToConstTensor(flatBufferInputParams->outputLayerNormWeights());
+
+        lstmInputParams.m_ForgetLayerNormWeights = &forgetLayerNormWeights;
+        lstmInputParams.m_CellLayerNormWeights = &cellLayerNormWeights;
+        lstmInputParams.m_OutputLayerNormWeights = &outputLayerNormWeights;
     }
 
     IConnectableLayer* layer = m_Network->AddLstmLayer(lstmDescriptor, lstmInputParams, layerName.c_str());

@@ -31,4 +31,13 @@ ARMNN_SIMPLE_TEST_CASE(StackInferOutputShapeFromInputsNoMatch,     StackInferOut
 ARMNN_SIMPLE_TEST_CASE(StackValidateTensorShapesFromInputsMatch,   StackValidateTensorShapesFromInputsMatchTest)
 ARMNN_SIMPLE_TEST_CASE(StackValidateTensorShapesFromInputsNoMatch, StackValidateTensorShapesFromInputsNoMatchTest)
 
+// Convolution2D
+ARMNN_SIMPLE_TEST_CASE(Convolution2dInferOutputShape, Convolution2dInferOutputShapeTest)
+
+// DepthwiseConvolution2D
+ARMNN_SIMPLE_TEST_CASE(DepthwiseConvolution2dInferOutputShape, DepthwiseConvolution2dInferOutputShapeTest)
+
+// TransposeConvolution2D
+ARMNN_SIMPLE_TEST_CASE(TransposeConvolution2dInferOutputShape, TransposeConvolution2dInferOutputShapeTest)
+
 BOOST_AUTO_TEST_SUITE_END()

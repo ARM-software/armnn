@@ -347,3 +347,100 @@ void StackValidateTensorShapesFromInputsNoMatchTest()
     // Graph::InferTensorInfos calls Layer::ValidateTensorShapesFromInputs
     BOOST_CHECK_THROW(graph.InferTensorInfos(), armnn::LayerValidationException);
 }
+
+void Convolution2dInferOutputShapeTest()
+{
+    armnn::Graph graph;
+
+    armnn::Convolution2dDescriptor descriptor;
+    descriptor.m_DilationX = 2;
+    descriptor.m_DilationY = 2;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 1;
+    descriptor.m_PadLeft = 1;
+    descriptor.m_PadRight = 1;
+    descriptor.m_StrideX = 3;
+    descriptor.m_StrideY = 3;
+    descriptor.m_DataLayout = armnn::DataLayout::NCHW;
+
+    armnn::Convolution2dLayer* const convolution2dLayer =
+            graph.AddLayer<armnn::Convolution2dLayer>(descriptor, "convolution2d");
+
+    std::vector<armnn::TensorShape> shapes;
+    const std::vector<unsigned int> inputSize = {1, 2, 10, 10};
+    armnn::TensorShape inputShape(4, inputSize.data());
+    shapes.push_back(inputShape);
+
+    const std::vector<unsigned int> filterSize = { 1, 2, 2, 2};
+    armnn::TensorShape filterShape(4, filterSize.data());
+    shapes.push_back(filterShape);
+
+    const std::vector<unsigned int> expectedOutputSizes = {1, 1, 4, 4};
+    armnn::TensorShape expectedOutputShape(4, expectedOutputSizes.data());
+
+    BOOST_CHECK(expectedOutputShape == convolution2dLayer->InferOutputShapes(shapes).at(0));
+}
+
+void TransposeConvolution2dInferOutputShapeTest()
+{
+    armnn::Graph graph;
+
+    armnn::TransposeConvolution2dDescriptor descriptor;
+    descriptor.m_PadTop = 0;
+    descriptor.m_PadBottom = 1;
+    descriptor.m_PadLeft = 0;
+    descriptor.m_PadRight = 1;
+    descriptor.m_StrideX = 2;
+    descriptor.m_StrideY = 2;
+    descriptor.m_DataLayout = armnn::DataLayout::NCHW;
+
+    armnn::TransposeConvolution2dLayer* const transposeConvolution2dLayer =
+            graph.AddLayer<armnn::TransposeConvolution2dLayer>(descriptor, "TransposeConvolution2d");
+
+    std::vector<armnn::TensorShape> shapes;
+    const std::vector<unsigned int> inputSize = {1, 2, 3, 3};
+    armnn::TensorShape inputShape(4, inputSize.data());
+    shapes.push_back(inputShape);
+
+    const std::vector<unsigned int> filterSize = { 1, 2, 3, 3};
+    armnn::TensorShape filterShape(4, filterSize.data());
+    shapes.push_back(filterShape);
+
+    const std::vector<unsigned int> expectedOutputSizes = {1, 2, 6, 6};
+    armnn::TensorShape expectedOutputShape(4, expectedOutputSizes.data());
+
+    BOOST_CHECK(expectedOutputShape == transposeConvolution2dLayer->InferOutputShapes(shapes).at(0));
+}
+
+void DepthwiseConvolution2dInferOutputShapeTest()
+{
+    armnn::Graph graph;
+
+    armnn::DepthwiseConvolution2dDescriptor descriptor;
+    descriptor.m_DilationX = 3;
+    descriptor.m_DilationY = 3;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 2;
+    descriptor.m_PadLeft = 1;
+    descriptor.m_PadRight = 2;
+    descriptor.m_StrideX = 2;
+    descriptor.m_StrideY = 2;
+    descriptor.m_DataLayout = armnn::DataLayout::NCHW;
+
+    armnn::DepthwiseConvolution2dLayer* const depthwiseConvolution2dLayer =
+            graph.AddLayer<armnn::DepthwiseConvolution2dLayer>(descriptor, "DepthwiseConvolution2d");
+
+    std::vector<armnn::TensorShape> shapes;
+    const std::vector<unsigned int> inputSize = {1, 2, 10, 10};
+    armnn::TensorShape inputShape(4, inputSize.data());
+    shapes.push_back(inputShape);
+
+    const std::vector<unsigned int> filterSize = { 1, 2, 3, 3};
+    armnn::TensorShape filterShape(4, filterSize.data());
+    shapes.push_back(filterShape);
+
+    const std::vector<unsigned int> expectedOutputSizes = {1, 2, 4, 4};
+    armnn::TensorShape expectedOutputShape(4, expectedOutputSizes.data());
+
+    BOOST_CHECK(expectedOutputShape == depthwiseConvolution2dLayer->InferOutputShapes(shapes).at(0));
+}

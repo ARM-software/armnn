@@ -12,6 +12,7 @@
 #include <iterator>
 #include <string>
 
+// Parameters used in normalizing images
 struct NormalizationParameters
 {
     float scale{ 1.0 };
@@ -26,9 +27,13 @@ enum class SupportedFrontend
     TFLite     = 2,
 };
 
-// Get normalization parameters.
-// Note that different flavours of models have different normalization methods.
-// This tool currently only supports Caffe, TF and TFLite models
+/** Get normalization parameters.
+ * Note that different flavours of models and different model data types have different normalization methods.
+ * This tool currently only supports Caffe, TF and TFLite models
+ *
+ * @param[in] modelFormat   One of the supported frontends
+ * @param[in] outputType    Output type of the image tensor, also the type of the intended model
+ */
 NormalizationParameters GetNormalizationParameters(const SupportedFrontend& modelFormat,
                                                    const armnn::DataType& outputType)
 {
@@ -62,7 +67,15 @@ NormalizationParameters GetNormalizationParameters(const SupportedFrontend& mode
     return normParams;
 }
 
-// Prepare raw image tensor data by loading the image from imagePath and preprocessing it.
+/** Prepare raw image tensor data by loading the image from imagePath and preprocessing it.
+ *
+ * @param[in] imagePath     Path to the image file
+ * @param[in] newWidth      The new width of the output image tensor
+ * @param[in] newHeight     The new height of the output image tensor
+ * @param[in] normParams    Normalization parameters for the normalization of the image
+ * @param[in] batchSize     Batch size
+ * @param[in] outputLayout  Data layout of the output image tensor
+ */
 template <typename ElemType>
 std::vector<ElemType> PrepareImageTensor(const std::string& imagePath,
                                          unsigned int newWidth,
@@ -148,9 +161,21 @@ std::vector<uint8_t> PrepareImageTensor<uint8_t>(const std::string& imagePath,
     return imageDataQasymm8;
 }
 
-// Write image tensor to ofstream
+/** Write image tensor to ofstream
+ *
+ * @param[in] imageData         Image tensor data
+ * @param[in] imageTensorFile   Output filestream (ofstream) to which the image tensor data is written
+ */
 template <typename ElemType>
 void WriteImageTensorImpl(const std::vector<ElemType>& imageData, std::ofstream& imageTensorFile)
 {
     std::copy(imageData.begin(), imageData.end(), std::ostream_iterator<ElemType>(imageTensorFile, " "));
+}
+
+// For uint8_t image tensor, cast it to int before writing it to prevent writing data as characters instead of
+// numerical values
+template <>
+void WriteImageTensorImpl<uint8_t>(const std::vector<uint8_t>& imageData, std::ofstream& imageTensorFile)
+{
+    std::copy(imageData.begin(), imageData.end(), std::ostream_iterator<int>(imageTensorFile, " "));
 }

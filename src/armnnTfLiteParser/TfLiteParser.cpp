@@ -440,6 +440,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]            =  &TfLiteParser::ParseDetectionPostProcess;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]   =  &TfLiteParser::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]          =  &TfLiteParser::ParseLogistic;
+    m_ParserFunctions[tflite::BuiltinOperator_L2_NORMALIZATION]  =  &TfLiteParser::ParseL2Normalization;
     m_ParserFunctions[tflite::BuiltinOperator_MAX_POOL_2D]       =  &TfLiteParser::ParseMaxPool2D;
     m_ParserFunctions[tflite::BuiltinOperator_MAXIMUM]           =  &TfLiteParser::ParseMaximum;
     m_ParserFunctions[tflite::BuiltinOperator_MINIMUM]           =  &TfLiteParser::ParseMinimum;
@@ -908,6 +909,33 @@ void TfLiteParser::ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorInde
     auto layerName = boost::str(boost::format("BatchToSpaceND:%1%:%2%") % subgraphIndex % operatorIndex);
     IConnectableLayer* layer = m_Network->AddBatchToSpaceNdLayer(desc, layerName.c_str());
 
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseL2Normalization(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    L2NormalizationDescriptor desc;
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
+    auto layerName = boost::str(boost::format("L2Normalization:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* layer = m_Network->AddL2NormalizationLayer(desc, layerName.c_str());
+
+    BOOST_ASSERT(layer != nullptr);
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));

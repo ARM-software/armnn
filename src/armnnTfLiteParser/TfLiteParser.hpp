@@ -100,6 +100,7 @@ private:
     void ParseDetectionPostProcess(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
+    void ParseL2Normalization(size_t subgraphIndex, size_t operatorIndex);
     void ParseMaxPool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseMaximum(size_t subgraphIndex, size_t operatorIndex);
     void ParseMean(size_t subgraphIndex, size_t operatorIndex);

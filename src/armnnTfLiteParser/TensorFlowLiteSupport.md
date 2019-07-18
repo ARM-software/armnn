@@ -22,6 +22,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * LOGISTIC
 
+* L2_NORMALIZATION
+
 * MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
 * MAXIMUM

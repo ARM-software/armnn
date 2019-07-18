@@ -10,7 +10,8 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_05" # Release 19.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="cd0b8b521eb309af8cb84e1a1b031280b027c809" #COMPMID-2236: Move assembly implementation interfaces to src folder
+DEFAULT_CLFRAMEWORKREVISION="ff2719299ea76a95f20a35a7900875a8152e293a" #COMPMID-2336: Fix validation for quantized NEDepthwiseConvolutionLayer
+
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -263,27 +263,6 @@ void ValidateBroadcastTensorShapesMatch(const TensorInfo& first,
 }
 
 //---------------------------------------------------------------
-/// Validates that the output tensor's quantization scale is greater than the product
-/// of the two input tensors' quantization scales. This is a requirement of the implementation of
-/// the quantized multiplication.
-void ValidateTensorQuantizationMultiplier(const TensorInfo& inputTensor1, const TensorInfo& inputTensor2,
-    const TensorInfo& outputTensorInfo, std::string const& descName,
-    const std::string& inputTensor1Name, const std::string& inputTensor2Name, const std::string& outputTensorName)
-{
-    if (outputTensorInfo.GetDataType() == DataType::QuantisedAsymm8)
-    {
-        if (outputTensorInfo.GetQuantizationScale() <=
-            inputTensor1.GetQuantizationScale() * inputTensor2.GetQuantizationScale())
-        {
-            std::stringstream msg;
-            msg << descName << ": Quantization scale of " << outputTensorName << " is not greater than " <<
-                "the product of the " << inputTensor1Name << " and " << inputTensor2Name << " tensors";
-            throw InvalidArgumentException(msg.str());
-        }
-    }
-}
-
-//---------------------------------------------------------------
 void ValidateDataTypes(const TensorInfo& info,
                        const std::vector<armnn::DataType>& supportedTypes,
                        std::string const& descName)
@@ -705,8 +684,6 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
         ValidateTensorNumDimensions(m_Bias->GetTensorInfo(), "FullyConnectedQueueDescriptor", 1, "bias");
     }
 
-    ValidateTensorQuantizationMultiplier(workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(),
-        workloadInfo.m_OutputTensorInfos[0], "FullyConnectedQueueDescriptor", "input", "weights", "output");
 
     // Check the supported data types
     std::vector<DataType> supportedTypes =
@@ -892,8 +869,6 @@ void Convolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
             workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(), "Convolution2dQueueDescriptor");
     }
 
-    ValidateTensorQuantizationMultiplier(workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(),
-        workloadInfo.m_OutputTensorInfos[0], "Convolution2dQueueDescriptor", "input", "weights", "output");
 }
 
 void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
@@ -944,9 +919,6 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
                                GetBiasDataType(workloadInfo.m_InputTensorInfos[0].GetDataType()),
                                "DepthwiseConvolution2dQueueDescriptor", "bias");
     }
-
-    ValidateTensorQuantizationMultiplier(workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(),
-        workloadInfo.m_OutputTensorInfos[0], "DepthwiseConvolution2dQueueDescriptor", "input", "weights", "output");
 
     // Check the supported data types
     std::vector<DataType> supportedTypes = {
@@ -2256,13 +2228,6 @@ void TransposeConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
                                        descriptorName);
     }
 
-    ValidateTensorQuantizationMultiplier(workloadInfo.m_InputTensorInfos[0],
-                                         m_Weight->GetTensorInfo(),
-                                         workloadInfo.m_OutputTensorInfos[0],
-                                         descriptorName,
-                                         "input",
-                                         "weights",
-                                         "output");
 }
 
 } //namespace armnn

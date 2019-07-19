@@ -100,9 +100,9 @@ void ValidateNumOutputs(const WorkloadInfo& workloadInfo, std::string const& des
 }
 
 //---------------------------------------------------------------
-void ValidateTensorNumDimensions(const TensorInfo&  tensor,
+void ValidateTensorNumDimensions(const TensorInfo& tensor,
                                  std::string const& descName,
-                                 unsigned int       numDimensions,
+                                 unsigned int numDimensions,
                                  std::string const& tensorName)
 {
     if (tensor.GetNumDimensions() != numDimensions)
@@ -114,10 +114,10 @@ void ValidateTensorNumDimensions(const TensorInfo&  tensor,
 }
 
 //---------------------------------------------------------------
-void ValidateTensorNumElements(const TensorInfo&  tensor,
-                                 std::string const& descName,
-                                 unsigned int       numElements,
-                                 std::string const& tensorName)
+void ValidateTensorNumElements(const TensorInfo& tensor,
+                               std::string const& descName,
+                               unsigned int numElements,
+                               std::string const& tensorName)
 {
     if (tensor.GetNumElements() != numElements)
     {
@@ -129,12 +129,13 @@ void ValidateTensorNumElements(const TensorInfo&  tensor,
 
 //---------------------------------------------------------------
 void ValidateTensorNumDimNumElem(const TensorInfo& tensorInfo,
-                                   unsigned int numDimension,
-                                   unsigned int numElements,
-                                   std::string const& tensorName)
+                                 unsigned int numDimension,
+                                 unsigned int numElements,
+                                 std::string const& tensorName)
 {
-    ValidateTensorNumDimensions(tensorInfo, "ValidateTensorNumDimNumElem: NumDimensionCheck", numDimension, tensorName);
-    ValidateTensorNumElements(tensorInfo, "ValidateTensorNumDimNumElem: NumElementsCheck", numElements, tensorName);
+    const std::string functionName{"ValidateTensorNumDimNumElem"};
+    ValidateTensorNumDimensions(tensorInfo, functionName, numDimension, tensorName);
+    ValidateTensorNumElements(tensorInfo, functionName, numElements, tensorName);
 }
 
 //---------------------------------------------------------------
@@ -185,8 +186,10 @@ void ValidateTensorQuantizationSpace(const TensorInfo& first,
 }
 
 //---------------------------------------------------------------
-void ValidateBiasTensorQuantization(const TensorInfo& biasTensor, const TensorInfo& inputTensorInfo,
-    const TensorInfo& weightsTensorInfo, const std::string& descName)
+void ValidateBiasTensorQuantization(const TensorInfo& biasTensor,
+                                    const TensorInfo& inputTensorInfo,
+                                    const TensorInfo& weightsTensorInfo,
+                                    const std::string& descName)
 {
     if (biasTensor.GetQuantizationOffset() != 0)
     {
@@ -253,7 +256,7 @@ void ValidateBroadcastTensorShapesMatch(const TensorInfo& first,
         }
         outputDims[i] = std::max(first.GetShape()[i], second.GetShape()[i]);
     }
-    TensorShape broadcastShape =  TensorShape(boost::numeric_cast<unsigned int>(outputDims.size()), outputDims.data());
+    TensorShape broadcastShape = TensorShape(boost::numeric_cast<unsigned int>(outputDims.size()), outputDims.data());
     if (broadcastShape != output.GetShape())
     {
         throw InvalidArgumentException(descName + ": The tensor shape resulting from adding "
@@ -288,7 +291,21 @@ void ValidateTensorDataTypesMatch(const TensorInfo& first,
     }
 }
 
-} //namespace
+//---------------------------------------------------------------
+void ValidateTensorNumElementsMatch(const TensorInfo& first,
+                                    const TensorInfo& second,
+                                    std::string const& descName,
+                                    std::string const& firstName,
+                                    std::string const& secondName)
+{
+    if (first.GetNumElements() != second.GetNumElements())
+    {
+        throw InvalidArgumentException(descName + ": " + firstName + " & " + secondName +
+                                       " must have the same number of elements.");
+    }
+}
+
+} // anonymous namespace
 
 void QueueDescriptor::ValidateInputsOutputs(const std::string& descName,
     unsigned int numExpectedIn, unsigned int numExpectedOut) const
@@ -300,86 +317,49 @@ void QueueDescriptor::ValidateInputsOutputs(const std::string& descName,
 //---------------------------------------------------------------
 void MemCopyQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "MemCopyQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "MemCopyQueueDescriptor" , 1);
+    const std::string descriptorName{"MemCopyQueueDescriptor"};
 
-    if (workloadInfo.m_InputTensorInfos.size() != workloadInfo.m_OutputTensorInfos.size())
-    {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of input infos (%1%) does not match the number of output infos (%2%)")
-                % workloadInfo.m_InputTensorInfos.size() % workloadInfo.m_OutputTensorInfos.size()));
-    }
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName , 1);
 
-    for (std::size_t i = 0; i < workloadInfo.m_InputTensorInfos.size(); ++i)
-    {
-        if (workloadInfo.m_InputTensorInfos[i].GetNumElements() !=
-            workloadInfo.m_OutputTensorInfos[i].GetNumElements())
-        {
-            throw InvalidArgumentException(boost::str(
-                boost::format("Number of elements for tensor input and output %1% does not match")
-                    % i ));
-        }
-    }
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumElementsMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
     if (m_Inputs.size() != m_Outputs.size())
     {
         throw InvalidArgumentException(boost::str(
-            boost::format("Number of inputs (%1%) does not match the number of outputs (%2%)")
-                % m_Inputs.size() % m_Outputs.size()));
+            boost::format("%1%: Number of inputs (%2%) does not match the number of outputs (%3%).") %
+                          descriptorName % m_Inputs.size() % m_Outputs.size()));
     }
 
     for (unsigned int i = 0; i < m_Inputs.size(); ++i)
     {
         if (!m_Inputs[i])
         {
-            throw InvalidArgumentException(boost::str(boost::format("Invalid null input %1%") % i));
+            throw InvalidArgumentException(boost::str(boost::format("%1%: Invalid NULL input %2%.") %
+                                                      descriptorName % i));
         }
 
         if (!m_Outputs[i])
         {
-            throw InvalidArgumentException(boost::str(boost::format("Invalid null output %1%") % i));
+            throw InvalidArgumentException(boost::str(boost::format("%1%: Invalid NULL output %2%") %
+                                                      descriptorName % i));
         }
     }
 }
 
-//---------------------------------------------------------------
 void ActivationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "ActivationQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "ActivationQueueDescriptor", 1);
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "ActivationQueueDescriptor",
-                              "input",
-                              "output");
+    const std::string descriptorName{"ActivationQueueDescriptor"};
 
-    std::vector<DataType> supportedTypes = {
-        DataType::Float32,
-        DataType::Float16,
-        DataType::QuantisedAsymm8,
-        DataType::QuantisedSymm16
-    };
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "ActivationQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "ActivationQueueDescriptor");
-}
-
-//---------------------------------------------------------------
-void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
-{
-    ValidateNumInputs(workloadInfo, "SoftmaxQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "SoftmaxQueueDescriptor", 1);
-
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "SoftmaxQueueDescriptor",
-                              "input",
-                              "output");
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     std::vector<DataType> supportedTypes =
     {
@@ -389,19 +369,39 @@ void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "SoftmaxQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "SoftmaxQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
-//---------------------------------------------------------------
+void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"SoftmaxQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float16,
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
+
 void SplitterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "SplitterQueueDescriptor", 1);
+    const std::string descriptorName{"SplitterQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo, descriptorName, 1);
 
     // Check the supported data types
     std::vector<DataType> supportedTypes =
@@ -414,25 +414,25 @@ void SplitterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             DataType::QuantisedSymm16
     };
 
-    for (unsigned long i = 0; i < workloadInfo.m_OutputTensorInfos.size(); ++i)
+    const TensorInfo& inputTensorInfo = workloadInfo.m_InputTensorInfos[0];
+    for (unsigned long i = 0ul; i < workloadInfo.m_OutputTensorInfos.size(); ++i)
     {
-        ValidateDataTypes(workloadInfo.m_OutputTensorInfos[i],
-                          supportedTypes,
-                          "SplitterQueueDescriptor");
+        const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[i];
+        ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
+
+        const std::string outputName = "output_" + std::to_string(i);
+        ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", outputName);
     }
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "SplitterQueueDescriptor");
 
     if (workloadInfo.m_OutputTensorInfos.size() <= 0)
     {
-        throw InvalidArgumentException("SplitterQueueDescriptor: At least one output needs to be provided.");
+        throw InvalidArgumentException(descriptorName + ": At least one output needs to be provided.");
     }
 
     if (workloadInfo.m_OutputTensorInfos.size() != m_ViewOrigins.size())
     {
         throw InvalidArgumentException(
-            "SplitterQueueDescriptor: Number of split windows "
+            descriptorName + ": Number of split windows "
             "has to match number of workloadInfo.m_OutputTensorInfos. "
             "Number of windows: " +
             to_string(m_ViewOrigins.size()) +
@@ -447,7 +447,7 @@ void SplitterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         ViewOrigin const& e = m_ViewOrigins[w];
         if (e.m_Origin.size() != inputDims)
         {
-            throw InvalidArgumentException("SplitterQueueDescriptor: Window origin have to "
+            throw InvalidArgumentException(descriptorName + ": Window origin have to "
                                            "have the same dimensionality as the input tensor. "
                                            "Window origin (index: " +
                                            to_string(w) + ") has " + to_string(e.m_Origin.size()) +
@@ -460,39 +460,40 @@ void SplitterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             if (e.m_Origin[i] + workloadInfo.m_OutputTensorInfos[w].GetShape()[i] >
                 workloadInfo.m_InputTensorInfos[0].GetShape()[i])
             {
-                throw InvalidArgumentException("SplitterQueueDescriptor: Window extent coordinates have to "
+                throw InvalidArgumentException(descriptorName + ": Window extent coordinates have to "
                                                "be smaller or equal than the size of the input in that coord.");
             }
         }
     }
 }
 
-//---------------------------------------------------------------
 void ConcatQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumOutputs(workloadInfo, "ConcatQueueDescriptor", 1);
+    const std::string descriptorName{"ConcatQueueDescriptor"};
+
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
     if (m_Inputs.size() <= 0)
     {
-        throw InvalidArgumentException("ConcatQueueDescriptor: At least one input needs to be provided.");
+        throw InvalidArgumentException(descriptorName + ": At least one input needs to be provided.");
     }
     if (m_Outputs.size() <= 0)
     {
-        throw InvalidArgumentException("ConcatQueueDescriptor: At least one output needs to be provided.");
+        throw InvalidArgumentException(descriptorName + ": At least one output needs to be provided.");
     }
 
     if (workloadInfo.m_InputTensorInfos.size() <= 0)
     {
-        throw InvalidArgumentException("ConcatQueueDescriptor: At least one TensorInfo input needs to be provided.");
+        throw InvalidArgumentException(descriptorName + ": At least one TensorInfo input needs to be provided.");
     }
     if (workloadInfo.m_OutputTensorInfos.size() <= 0)
     {
-        throw InvalidArgumentException("ConcatQueueDescriptor: At least one TensorInfo output needs to be provided.");
+        throw InvalidArgumentException(descriptorName + ": At least one TensorInfo output needs to be provided.");
     }
 
     if(m_Parameters.GetConcatAxis() > workloadInfo.m_InputTensorInfos[0].GetShape().GetNumDimensions())
     {
-        throw InvalidArgumentException("Invalid Concatenation Axis provided");
+        throw InvalidArgumentException(descriptorName + ": Invalid concatenation axis provided.");
     }
 
     if (workloadInfo.m_InputTensorInfos[0].GetShape().GetNumDimensions() - m_Parameters.GetConcatAxis() == 1)
@@ -503,7 +504,7 @@ void ConcatQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     if (workloadInfo.m_InputTensorInfos.size() != m_ViewOrigins.size())
     {
         throw InvalidArgumentException(
-            "ConcatQueueDescriptor: Number of split windows "
+            descriptorName + ": Number of split windows "
             "has to match number of workloadInfo.m_InputTensorInfos. "
             "Number of windows: " +
             to_string(m_ViewOrigins.size()) +
@@ -518,7 +519,7 @@ void ConcatQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         ViewOrigin const& e = m_ViewOrigins[w];
         if (e.m_Origin.size() != outputDims)
         {
-            throw InvalidArgumentException("ConcatQueueDescriptor: Window origin have to "
+            throw InvalidArgumentException(descriptorName + ": Window origin have to "
                                            "have the same dimensionality as the output tensor. "
                                            "Window origin (index: " +
                                            to_string(w) + ") has " + to_string(e.m_Origin.size()) +
@@ -532,7 +533,7 @@ void ConcatQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             if (e.m_Origin[i] + workloadInfo.m_InputTensorInfos[w].GetShape()[i]
                 > workloadInfo.m_OutputTensorInfos[0].GetShape()[i])
             {
-                throw InvalidArgumentException("ConcatQueueDescriptor: Window extent coordinates have to "
+                throw InvalidArgumentException(descriptorName + ": Window extent coordinates have to "
                                                "be smaller or equal than the size of the output in that coord.");
             }
         }
@@ -549,25 +550,26 @@ void ConcatQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             DataType::QuantisedSymm16
     };
 
-    for (unsigned long i = 0; i < workloadInfo.m_InputTensorInfos.size(); ++i)
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+    for (unsigned long i = 0ul; i < workloadInfo.m_InputTensorInfos.size(); ++i)
     {
-        ValidateDataTypes(workloadInfo.m_InputTensorInfos[i],
-                          supportedTypes,
-                          "ConcatQueueDescriptor");
+        const TensorInfo& inputTensorInfo = workloadInfo.m_InputTensorInfos[i];
+        ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+
+        const std::string inputName = "input_" + std::to_string(i);
+        ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, inputName, "output");
     }
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "ConcatQueueDescriptor");
 }
 
-//---------------------------------------------------------------
 void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumOutputs(workloadInfo, "StackQueueDescriptor", 1);
+    const std::string descriptorName{"StackQueueDescriptor"};
+
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
     if (m_Parameters.m_NumInputs != workloadInfo.m_InputTensorInfos.size())
     {
-        throw InvalidArgumentException("StackQueueDescriptor: Must have the defined number of input tensors.");
+        throw InvalidArgumentException(descriptorName + ": Must have the defined number of input tensors.");
     }
 
     // All inputs must have the same shape, which is defined in parameters
@@ -576,8 +578,7 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         if (workloadInfo.m_InputTensorInfos[i].GetShape() != inputShape)
         {
-            throw InvalidArgumentException("StackQueueDescriptor: All input tensor shapes "
-                                           "must match the defined shape.");
+            throw InvalidArgumentException(descriptorName + ": All input tensor shapes must match the defined shape.");
         }
     }
 
@@ -585,7 +586,7 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     // since the output tensor has an additional dimension.
     if (m_Parameters.m_Axis > inputShape.GetNumDimensions())
     {
-        throw InvalidArgumentException("StackQueueDescriptor: Axis may not be greater "
+        throw InvalidArgumentException(descriptorName + ": Axis may not be greater "
                                        "than the number of input dimensions.");
     }
 
@@ -595,14 +596,14 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         if (outputShape[i] != inputShape[i])
         {
-            throw InvalidArgumentException("StackQueueDescriptor: Output tensor must "
+            throw InvalidArgumentException(descriptorName + ": Output tensor must "
                                            "match shape inferred from input tensor.");
         }
     }
 
     if (outputShape[m_Parameters.m_Axis] != m_Parameters.m_NumInputs)
     {
-        throw InvalidArgumentException("StackQueueDescriptor: Output tensor must "
+        throw InvalidArgumentException(descriptorName + ": Output tensor must "
                                        "match shape inferred from input tensor.");
     }
 
@@ -610,7 +611,7 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         if (outputShape[i] != inputShape[i-1])
         {
-            throw InvalidArgumentException("StackQueueDescriptor: Output tensor must "
+            throw InvalidArgumentException(descriptorName + ": Output tensor must "
                                            "match shape inferred from input tensor.");
         }
     }
@@ -626,64 +627,57 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "StackQueueDescriptor");
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0], supportedTypes, descriptorName);
 
-    for (unsigned int i = 1; i < workloadInfo.m_InputTensorInfos.size(); ++i)
+    for (unsigned int i = 1ul; i < workloadInfo.m_InputTensorInfos.size(); ++i)
     {
         ValidateTensorDataTypesMatch(workloadInfo.m_InputTensorInfos[0],
                                      workloadInfo.m_InputTensorInfos[i],
-                                     "StackQueueDescriptor",
-                                     "InputTensor[0]",
-                                     "InputTensor[" + std::to_string(i) + "]");
+                                     descriptorName,
+                                     "input_0",
+                                     "input_" + std::to_string(i));
     }
+
     ValidateTensorDataTypesMatch(workloadInfo.m_InputTensorInfos[0],
                                  workloadInfo.m_OutputTensorInfos[0],
-                                 "StackQueueDescriptor",
-                                 "InputTensor[0]",
-                                 "OutputTensor[0]");
+                                 descriptorName,
+                                 "input_0",
+                                 "output");
 }
 
-//---------------------------------------------------------------
 void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "FullyConnectedQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "FullyConnectedQueueDescriptor", 1);
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "FullyConnectedQueueDescriptor", 2, "output");
+    const std::string descriptorName{"FullyConnectedQueueDescriptor"};
 
-    if (!(workloadInfo.m_InputTensorInfos[0].GetNumDimensions() == 2 ||
-          workloadInfo.m_InputTensorInfos[0].GetNumDimensions() == 4))
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 2, "output");
+
+    if (!(inputTensorInfo.GetNumDimensions() == 2 || inputTensorInfo.GetNumDimensions() == 4))
     {
-        throw InvalidArgumentException("FullyConnectedQueueDescriptor: Input tensor must have 2 or 4 dimensions.");
+        throw InvalidArgumentException(descriptorName + ": Input tensor must have 2 or 4 dimensions.");
     }
 
-    if (m_Weight == nullptr)
-    {
-        throw InvalidArgumentException("FullyConnectedQueueDescriptor: Weight tensor descriptor is missing.");
-    }
+    ValidatePointer(m_Weight, descriptorName, "weight");
 
-    ValidateTensorNumDimensions(m_Weight->GetTensorInfo(), "FullyConnectedQueueDescriptor", 2, "weight");
+    const TensorInfo& weightTensorInfo = m_Weight->GetTensorInfo();
+    ValidateTensorNumDimensions(weightTensorInfo, descriptorName, 2, "weight");
 
     if (m_Parameters.m_BiasEnabled)
     {
-        if (m_Bias == nullptr)
-        {
-            throw InvalidArgumentException("FullyConnectedQueueDescriptor: Bias is enabled but "
-                                           "bias value tensor descriptor is missing.");
-        }
+        ValidatePointer(m_Bias, descriptorName, "bias");
 
         // Validates type and quantization values.
-        ValidateBiasTensorQuantization(m_Bias->GetTensorInfo(),
-            workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(), "FullyConnectedQueueDescriptor");
+        const TensorInfo& biasTensorInfo = m_Bias->GetTensorInfo();
+        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
 
-        ValidateTensorDataType(m_Bias->GetTensorInfo(),
-                               GetBiasDataType(workloadInfo.m_InputTensorInfos[0].GetDataType()),
-                               "FullyConnectedQueueDescriptor", "bias");
-
-        ValidateTensorNumDimensions(m_Bias->GetTensorInfo(), "FullyConnectedQueueDescriptor", 1, "bias");
+        ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
+        ValidateTensorNumDimensions(biasTensorInfo, descriptorName, 1, "bias");
     }
-
 
     // Check the supported data types
     std::vector<DataType> supportedTypes =
@@ -694,20 +688,19 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
             DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "FullyConnectedQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "FullyConnectedQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
-//---------------------------------------------------------------
 void NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "NormalizationQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "NormalizationQueueDescriptor", 1);
+    const std::string descriptorName{"NormalizationQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     // Check the supported data types
     std::vector<DataType> supportedTypes =
@@ -718,93 +711,90 @@ void NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "NormalizationQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      { workloadInfo.m_InputTensorInfos[0].GetDataType() },
-                      "NormalizationQueueDescriptor");
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "NormalizationQueueDescriptor",
-                              "input",
-                              "output");
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void AdditionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "AdditionQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "AdditionQueueDescriptor", 1);
+    const std::string descriptorName{"AdditionQueueDescriptor"};
 
-    std::vector<DataType> supportedTypes = {
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16,
         DataType::Float16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "AdditionQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo1, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
-                      supportedTypes,
-                      "AdditionQueueDescriptor");
+    ValidateTensorDataTypesMatch(inputTensorInfo0, inputTensorInfo1, descriptorName, "input_0", "input_1");
+    ValidateTensorDataTypesMatch(inputTensorInfo1, outputTensorInfo, descriptorName, "input_1", "output");
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      supportedTypes,
-                      "AdditionQueueDescriptor");
-
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "AdditionQueueDescriptor",
-                                       "first input",
-                                       "second input");
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
 }
 
-//---------------------------------------------------------------
 void MultiplicationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "MultiplicationQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "MultiplicationQueueDescriptor", 1);
+    const std::string descriptorName{"MultiplicationQueueDescriptor"};
 
-    std::vector<DataType> supportedTypes = {
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16,
         DataType::Float16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "MultiplicationQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo1, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
-                      supportedTypes,
-                      "MultiplicationQueueDescriptor");
+    ValidateTensorDataTypesMatch(inputTensorInfo0, inputTensorInfo1, descriptorName, "input_0", "input_1");
+    ValidateTensorDataTypesMatch(inputTensorInfo1, outputTensorInfo, descriptorName, "input_1", "output");
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      supportedTypes,
-                      "MultiplicationQueueDescriptor");
-
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "MultiplicationQueueDescriptor",
-                                       "first input",
-                                       "second input");
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
 }
 
 void BatchNormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "BatchNormalizationQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "BatchNormalizationQueueDescriptor", 1);
+    const std::string descriptorName{"BatchNormalizationQueueDescriptor"};
 
-    const TensorInfo& input = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     std::vector<DataType> supportedTypes =
     {
@@ -814,161 +804,184 @@ void BatchNormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInf
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(input,  supportedTypes, "BatchNormalizationQueueDescriptor");
-    ValidateDataTypes(output, supportedTypes, "BatchNormalizationQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(output, { input.GetDataType() }, "BatchNormalizationQueueDescriptor");
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorQuantizationSpace(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
-    ValidateTensorQuantizationSpace(input, output, "BatchNormalizationQueueDescriptor", "input", "output");
-
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "BatchNormalizationQueueDescriptor",
-                              "input",
-                              "output");
-
-    ValidatePointer(m_Mean,     "BatchNormalizationQueueDescriptor", "mean");
-    ValidatePointer(m_Variance, "BatchNormalizationQueueDescriptor", "variance");
-    ValidatePointer(m_Beta,     "BatchNormalizationQueueDescriptor", "beta");
-    ValidatePointer(m_Gamma,    "BatchNormalizationQueueDescriptor", "gamma");
+    ValidatePointer(m_Mean,     descriptorName, "mean");
+    ValidatePointer(m_Variance, descriptorName, "variance");
+    ValidatePointer(m_Beta,     descriptorName, "beta");
+    ValidatePointer(m_Gamma,    descriptorName, "gamma");
 
     const TensorInfo& mean     = m_Mean->GetTensorInfo();
     const TensorInfo& variance = m_Variance->GetTensorInfo();
     const TensorInfo& beta     = m_Beta->GetTensorInfo();
     const TensorInfo& gamma    = m_Gamma->GetTensorInfo();
 
-    ValidateTensorNumDimensions(mean,     "BatchNormalizationQueueDescriptor", 1, "mean");
-    ValidateTensorNumDimensions(variance, "BatchNormalizationQueueDescriptor", 1, "variance");
-    ValidateTensorNumDimensions(beta,     "BatchNormalizationQueueDescriptor", 1, "beta");
-    ValidateTensorNumDimensions(gamma,    "BatchNormalizationQueueDescriptor", 1, "gamma");
+    ValidateTensorNumDimensions(mean,     descriptorName, 1, "mean");
+    ValidateTensorNumDimensions(variance, descriptorName, 1, "variance");
+    ValidateTensorNumDimensions(beta,     descriptorName, 1, "beta");
+    ValidateTensorNumDimensions(gamma,    descriptorName, 1, "gamma");
 
-    ValidateTensorShapesMatch(mean, variance, "BatchNormalizationQueueDescriptor", "mean", "variance");
-    ValidateTensorShapesMatch(mean, beta,     "BatchNormalizationQueueDescriptor", "mean", "beta");
-    ValidateTensorShapesMatch(mean, gamma,    "BatchNormalizationQueueDescriptor", "mean", "gamma");
+    ValidateTensorShapesMatch(mean, variance, descriptorName, "mean", "variance");
+    ValidateTensorShapesMatch(mean, beta,     descriptorName, "mean", "beta");
+    ValidateTensorShapesMatch(mean, gamma,    descriptorName, "mean", "gamma");
 }
 
 void Convolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "Convolution2dQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "Convolution2dQueueDescriptor", 1);
+    const std::string descriptorName{"Convolution2dQueueDescriptor"};
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "Convolution2dQueueDescriptor", 4, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "Convolution2dQueueDescriptor", 4, "output");
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    ValidatePointer(m_Weight, "Convolution2dQueueDescriptor", "weight");
-    ValidateTensorNumDimensions(m_Weight->GetTensorInfo(), "Convolution2dQueueDescriptor", 4, "weight");
-    ValidateTensorDataType(m_Weight->GetTensorInfo(), workloadInfo.m_InputTensorInfos[0].GetDataType(),
-        "Convolution2dQueueDescriptor", "weight");
-    if (m_Parameters.m_BiasEnabled)
-    {
-        ValidateTensorNumDimensions(m_Bias->GetTensorInfo(), "Convolution2dQueueDescriptor", 1, "bias");
-        ValidateTensorDataType(m_Bias->GetTensorInfo(),
-                               GetBiasDataType(workloadInfo.m_InputTensorInfos[0].GetDataType()),
-                               "Convolution2dQueueDescriptor", "bias");
-        ValidateBiasTensorQuantization(m_Bias->GetTensorInfo(),
-            workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(), "Convolution2dQueueDescriptor");
-    }
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
-}
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
 
-void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
-{
-    ValidateNumInputs(workloadInfo, "DepthwiseConvolution2dQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "DepthwiseConvolution2dQueueDescriptor", 1);
+    ValidatePointer(m_Weight, descriptorName, "weight");
 
-    ValidateTensorNumDimensions(
-        workloadInfo.m_InputTensorInfos[0], "DepthwiseConvolution2dQueueDescriptor", 4, "input");
-    ValidateTensorNumDimensions(
-        workloadInfo.m_OutputTensorInfos[0], "DepthwiseConvolution2dQueueDescriptor", 4, "output");
+    const TensorInfo& weightTensorInfo = m_Weight->GetTensorInfo();
+    ValidateTensorNumDimensions(weightTensorInfo, descriptorName, 4, "weight");
 
-    ValidatePointer(m_Weight, "DepthwiseConvolution2dQueueDescriptor", "weight");
-    ValidateTensorNumDimensions(m_Weight->GetTensorInfo(), "DepthwiseConvolution2dQueueDescriptor", 4, "weight");
-
-    if (m_Parameters.m_DilationX < 1 || m_Parameters.m_DilationY < 1 )
-    {
-        throw InvalidArgumentException(
-            boost::str(boost::format("DepthwiseConvolution2dQueueDescriptor: dilationX (provided %1%) "
-                                     "and dilationY (provided %2%) cannot be smaller than 1.")
-                                     % m_Parameters.m_DilationX % m_Parameters.m_DilationX));
-    }
-
-    const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;
-
-    // Expected weight shape: [ M, I, H, W ] - This shape does NOT depend on the data layout
-    // inputChannels * channelMultiplier should be equal to outputChannels.
-    const unsigned int numWeightChannelMultiplier = m_Weight->GetTensorInfo().GetShape()[0];
-    const unsigned int numWeightInputChannels = m_Weight->GetTensorInfo().GetShape()[1];
-    const unsigned int numWeightOutputChannels = workloadInfo.m_OutputTensorInfos[0].GetShape()[channelIndex];
-    if (numWeightChannelMultiplier * numWeightInputChannels != numWeightOutputChannels)
-    {
-        throw InvalidArgumentException(
-            boost::str(boost::format("DepthwiseConvolution2dQueueDescriptor: output_channels (provided %1%) should be "
-                                     "equal to input_channels (provided %2%) multiplied by channel_multiplier "
-                                     "(provided %3%).")
-                                     % numWeightOutputChannels % numWeightInputChannels % numWeightChannelMultiplier));
-    }
+    ValidateTensorDataTypesMatch(inputTensorInfo, weightTensorInfo, descriptorName, "input", "weight");
 
     if (m_Parameters.m_BiasEnabled)
     {
-        ValidatePointer(m_Bias, "DepthwiseConvolution2dQueueDescriptor", "bias");
-        ValidateTensorNumDimensions(m_Bias->GetTensorInfo(), "DepthwiseConvolution2dQueueDescriptor", 1, "bias");
-        ValidateBiasTensorQuantization(m_Bias->GetTensorInfo(),
-            workloadInfo.m_InputTensorInfos[0], m_Weight->GetTensorInfo(), "DepthwiseConvolution2dQueueDescriptor");
+        ValidatePointer(m_Bias, descriptorName, "bias");
 
-        ValidateTensorDataType(m_Bias->GetTensorInfo(),
-                               GetBiasDataType(workloadInfo.m_InputTensorInfos[0].GetDataType()),
-                               "DepthwiseConvolution2dQueueDescriptor", "bias");
+        const TensorInfo& biasTensorInfo = m_Bias->GetTensorInfo();
+        ValidateTensorNumDimensions(biasTensorInfo, descriptorName, 1, "bias");
+
+        ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
+        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
     }
 
-    // Check the supported data types
-    std::vector<DataType> supportedTypes = {
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16,
         DataType::Float16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "DepthwiseConvolution2dQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "DepthwiseConvolution2dQueueDescriptor");
+void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"DepthwiseConvolution2dQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
+
+    ValidatePointer(m_Weight, descriptorName, "weight");
+
+    const TensorInfo& weightTensorInfo = m_Weight->GetTensorInfo();
+    ValidateTensorNumDimensions(weightTensorInfo, descriptorName, 4, "weight");
+
+    if (m_Parameters.m_DilationX < 1 || m_Parameters.m_DilationY < 1 )
+    {
+        throw InvalidArgumentException(
+            boost::str(boost::format("%1%: dilationX (provided %2%) and dilationY (provided %3%) "
+                                     "cannot be smaller than 1.") % descriptorName %
+                                     m_Parameters.m_DilationX % m_Parameters.m_DilationX));
+    }
+
+    const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;
+
+    // Expected weight shape: [ M, I, H, W ] - This shape does NOT depend on the data layout
+    // inputChannels * channelMultiplier should be equal to outputChannels.
+    const unsigned int numWeightChannelMultiplier = weightTensorInfo.GetShape()[0];
+    const unsigned int numWeightInputChannels     = weightTensorInfo.GetShape()[1];
+    const unsigned int numWeightOutputChannels    = outputTensorInfo.GetShape()[channelIndex];
+    if (numWeightChannelMultiplier * numWeightInputChannels != numWeightOutputChannels)
+    {
+        throw InvalidArgumentException(
+            boost::str(boost::format("%1%: output_channels (provided %2%) should be "
+                                     "equal to input_channels (provided %3%) multiplied by channel_multiplier "
+                                     "(provided %4%).") % descriptorName % numWeightOutputChannels %
+                                     numWeightInputChannels % numWeightChannelMultiplier));
+    }
+
+    ValidateTensorDataTypesMatch(inputTensorInfo, weightTensorInfo, descriptorName, "input", "weight");
+
+    if (m_Parameters.m_BiasEnabled)
+    {
+        ValidatePointer(m_Bias, descriptorName, "bias");
+
+        const TensorInfo& biasTensorInfo = m_Bias->GetTensorInfo();
+        ValidateTensorNumDimensions(biasTensorInfo, descriptorName, 1, "bias");
+
+        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
+        ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
+    }
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16,
+        DataType::Float16
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void PermuteQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "PermuteQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "PermuteQueueDescriptor", 1);
+    const std::string descriptorName{"PermuteQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
     const PermutationVector& mapping = m_Parameters.m_DimMappings;
 
-    const TensorInfo& input  = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
-    ValidateTensorNumDimensions(input, "PermuteQueueDescriptor", mapping.GetSize(), "input");
-    ValidateTensorNumDimensions(output, "PermuteQueueDescriptor", mapping.GetSize(), "output");
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, mapping.GetSize(), "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, mapping.GetSize(), "output");
 
-    for (unsigned int i = 0; i < mapping.GetSize(); ++i)
+    for (unsigned int i = 0u; i < mapping.GetSize(); ++i)
     {
-        if (input.GetShape()[i] != output.GetShape()[mapping[i]])
+        if (inputTensorInfo.GetShape()[i] != outputTensorInfo.GetShape()[mapping[i]])
         {
-            throw InvalidArgumentException("PermuteQueueDescriptor: src dimension " + to_string(i) +
-                                               " (=" + to_string(input.GetShape()[i]) + ") " +
-                                               "must match dst dimension " + to_string(mapping[i]) +
-                                               " (=" + to_string(output.GetShape()[mapping[i]]) + ")");
+            throw InvalidArgumentException(descriptorName + ": src dimension " + to_string(i) +
+                                           " (=" + to_string(inputTensorInfo.GetShape()[i]) + ") " +
+                                           "must match dst dimension " + to_string(mapping[i]) +
+                                           " (=" + to_string(outputTensorInfo.GetShape()[mapping[i]]) + ")");
         }
     }
+
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void Pooling2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "Pooling2dQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "Pooling2dQueueDescriptor", 1);
+    const std::string descriptorName{"Pooling2dQueueDescriptor"};
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "Pooling2dQueueDescriptor", 4, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "Pooling2dQueueDescriptor", 4, "output");
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
 
     std::vector<DataType> supportedTypes =
     {
@@ -978,22 +991,22 @@ void Pooling2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "Pooling2dQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "Pooling2dQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "ResizeBilinearQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "ResizeBilinearQueueDescriptor", 1);
+    const std::string descriptorName{"ResizeBilinearQueueDescriptor"};
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "ResizeBilinearQueueDescriptor", 4, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "ResizeBilinearQueueDescriptor", 4, "output");
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
 
     std::vector<DataType> supportedTypes =
     {
@@ -1003,44 +1016,44 @@ void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "ResizeBilinearQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "ResizeBilinearQueueDescriptor");
-
-    // Resizes bilinear only changes width and height: batch and channel count must match.
-    const unsigned int inputBatchSize = workloadInfo.m_InputTensorInfos[0].GetShape()[0];
-    const unsigned int outputBatchSize = workloadInfo.m_OutputTensorInfos[0].GetShape()[0];
+    // ResizeBilinear only changes width and height: batch and channel count must match.
+    const unsigned int inputBatchSize  = inputTensorInfo.GetShape()[0];
+    const unsigned int outputBatchSize = outputTensorInfo.GetShape()[0];
     if (inputBatchSize != outputBatchSize)
     {
         throw InvalidArgumentException(
-            boost::str(boost::format("ResizeBilinearQueueDescriptor: Input batch size (%1%) "
-                "does not match output batch size (%2%)") % inputBatchSize % outputBatchSize));
+            boost::str(boost::format("%1%: Input batch size (%2%) "
+                "does not match output batch size (%3%)") %
+                descriptorName % inputBatchSize % outputBatchSize));
     }
 
     DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
-    const unsigned int inputChannelCount =
-        workloadInfo.m_InputTensorInfos[0].GetShape()[dimensionIndices.GetChannelsIndex()];
-    const unsigned int outputChannelCount =
-        workloadInfo.m_OutputTensorInfos[0].GetShape()[dimensionIndices.GetChannelsIndex()];
+    const unsigned int inputChannelCount  = inputTensorInfo.GetShape()[dimensionIndices.GetChannelsIndex()];
+    const unsigned int outputChannelCount = outputTensorInfo.GetShape()[dimensionIndices.GetChannelsIndex()];
     if (inputChannelCount != outputChannelCount)
     {
         throw InvalidArgumentException(
-            boost::str(boost::format("ResizeBilinearQueueDescriptor: Input channel count (%1%) "
-                "does not match output channel count (%2%)") % inputChannelCount % outputChannelCount));
+            boost::str(boost::format("%1%: Input channel count (%2%) "
+                "does not match output channel count (%3%)") %
+                descriptorName % inputChannelCount % outputChannelCount));
     }
 }
 
 void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "ResizeQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "ResizeQueueDescriptor", 1);
+    const std::string descriptorName{"ResizeQueueDescriptor"};
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "ResizeQueueDescriptor", 4, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "ResizeQueueDescriptor", 4, "output");
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
 
     std::vector<DataType> supportedTypes =
     {
@@ -1050,70 +1063,67 @@ void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "ResizeQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "ResizeQueueDescriptor");
-
-    // Resizes  only changes width and height: batch and channel count must match.
-    const unsigned int inputBatchSize = workloadInfo.m_InputTensorInfos[0].GetShape()[0];
-    const unsigned int outputBatchSize = workloadInfo.m_OutputTensorInfos[0].GetShape()[0];
+    // Resize only changes width and height: batch and channel count must match.
+    const unsigned int inputBatchSize  = inputTensorInfo.GetShape()[0];
+    const unsigned int outputBatchSize = outputTensorInfo.GetShape()[0];
     if (inputBatchSize != outputBatchSize)
     {
         throw InvalidArgumentException(
-                boost::str(boost::format("ResizeQueueDescriptor: Input batch size (%1%) "
-                           "does not match output batch size (%2%)") % inputBatchSize % outputBatchSize));
+                boost::str(boost::format("%1%: Input batch size (%2%) "
+                           "does not match output batch size (%3%)") %
+                           descriptorName % inputBatchSize % outputBatchSize));
     }
 
     DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
-    const unsigned int inputChannelCount =
-            workloadInfo.m_InputTensorInfos[0].GetShape()[dimensionIndices.GetChannelsIndex()];
-    const unsigned int outputChannelCount =
-            workloadInfo.m_OutputTensorInfos[0].GetShape()[dimensionIndices.GetChannelsIndex()];
+    const unsigned int inputChannelCount  = inputTensorInfo.GetShape()[dimensionIndices.GetChannelsIndex()];
+    const unsigned int outputChannelCount = outputTensorInfo.GetShape()[dimensionIndices.GetChannelsIndex()];
     if (inputChannelCount != outputChannelCount)
     {
         throw InvalidArgumentException(
-                boost::str(boost::format("ResizeQueueDescriptor: Input channel count (%1%) "
-                           "does not match output channel count (%2%)") % inputChannelCount % outputChannelCount));
+                boost::str(boost::format("%1%: Input channel count (%2%) "
+                           "does not match output channel count (%3%)") %
+                           descriptorName % inputChannelCount % outputChannelCount));
     }
 }
 
 void FakeQuantizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "FakeQuantizationQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "FakeQuantizationQueueDescriptor", 1);
+    const std::string descriptorName{"FakeQuantizationQueueDescriptor"};
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "FakeQuantizationQueueDescriptor", 2, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "FakeQuantizationQueueDescriptor", 2, "output");
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-        workloadInfo.m_OutputTensorInfos[0],
-        "FakeQuantizationQueueDescriptor",
-        "input",
-        "output");
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 2, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 2, "output");
+
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo,  descriptorName, "input", "output");
+
     if (m_Parameters.m_Min > m_Parameters.m_Max)
     {
-        throw InvalidArgumentException("FakeQuantizationQueueDescriptor: min cannot be greater than max");
+        throw InvalidArgumentException(descriptorName + ": min cannot be greater than max");
     }
-
 }
 
 void L2NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    const std::string& descriptorName = "L2NormalizationQueueDescriptor";
+    const std::string descriptorName{"L2NormalizationQueueDescriptor"};
 
-    ValidateNumInputs(workloadInfo, descriptorName, 1);
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
     ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], descriptorName, 4, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], descriptorName, 4, "output");
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-        workloadInfo.m_OutputTensorInfos[0],
-        descriptorName,
-        "input",
-        "output");
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
+
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
     // Check the supported data types
     std::vector<DataType> supportedTypes =
@@ -1124,27 +1134,26 @@ void L2NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) 
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0], supportedTypes, descriptorName);
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0], supportedTypes, descriptorName);
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()}, descriptorName);
+    ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
+
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void ConstantQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "ConstantQueueDescriptor", 0);
-    ValidateNumOutputs(workloadInfo, "ConstantQueueDescriptor", 1);
+    const std::string descriptorName{"ConstantQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 0);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
     if (!m_LayerOutput)
     {
-        throw InvalidArgumentException("ConstantQueueDescriptor: No const input specified");
+        throw InvalidArgumentException(descriptorName + ": No const input specified.");
     }
 
-    ValidateTensorShapesMatch(m_LayerOutput->GetTensorInfo(),
-        workloadInfo.m_OutputTensorInfos[0],
-        "ConstantQueueDescriptor",
-        "constant",
-        "output");
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+    ValidateTensorShapesMatch(m_LayerOutput->GetTensorInfo(), outputTensorInfo, descriptorName, "constant", "output");
 
     // Check the supported data types
     std::vector<DataType> supportedTypes =
@@ -1156,20 +1165,20 @@ void ConstantQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0], supportedTypes, "ConstantQueueDescriptor");
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 }
 
 void ReshapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "ReshapeQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "ReshapeQueueDescriptor", 1);
+    const std::string descriptorName{"ReshapeQueueDescriptor"};
 
-    if (workloadInfo.m_InputTensorInfos[0].GetNumElements() != workloadInfo.m_OutputTensorInfos[0].GetNumElements())
-    {
-        throw InvalidArgumentException("ReshapeQueueDescriptor: Input tensor has " +
-            to_string(workloadInfo.m_InputTensorInfos[0].GetNumElements()) + " but output tensor has " +
-            to_string(workloadInfo.m_OutputTensorInfos[0].GetNumElements()) + " elements.");
-    }
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumElementsMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
     // Check the supported data types
     std::vector<DataType> supportedTypes =
@@ -1180,54 +1189,61 @@ void ReshapeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0], supportedTypes, "ReshapeQueueDescriptor");
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0], supportedTypes, "ReshapeQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void SpaceToBatchNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "SpaceToBatchNdQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "SpaceToBatchNdQueueDescriptor", 1);
+    const std::string descriptorName{"SpaceToBatchNdQueueDescriptor"};
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], "SpaceToBatchNdQueueDescriptor", 4, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], "SpaceToBatchNdQueueDescriptor", 4, "output");
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
 
     if (m_Parameters.m_BlockShape.size() != 2)
     {
-        throw InvalidArgumentException("Block Shape must contain 2 spatial dimensions");
+        throw InvalidArgumentException(descriptorName + ": Block Shape must contain 2 spatial dimensions.");
     }
 
     if (m_Parameters.m_BlockShape.size() != m_Parameters.m_PadList.size())
     {
-        throw InvalidArgumentException("Pad List must contain the same number of dimensions as Block Shape.");
+        throw InvalidArgumentException(descriptorName + ": Pad List must contain the same number of "
+                                       "dimensions as Block Shape.");
     }
 
-    const TensorShape inputShape = workloadInfo.m_InputTensorInfos[0].GetShape();
+    const TensorShape& inputShape = inputTensorInfo.GetShape();
 
     std::pair<unsigned int, unsigned int> heightPad = m_Parameters.m_PadList[0];
-    std::pair<unsigned int, unsigned int> widthPad = m_Parameters.m_PadList[1];
+    std::pair<unsigned int, unsigned int> widthPad  = m_Parameters.m_PadList[1];
 
     DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
-    unsigned int inputHeight = inputShape[dimensionIndices.GetHeightIndex()]
-                               + heightPad.first + heightPad.second;
 
-    unsigned int inputWidth = inputShape[dimensionIndices.GetWidthIndex()]
-                              + widthPad.first + widthPad.second;
+    const unsigned int inputWidth  = inputShape[dimensionIndices.GetWidthIndex()] +
+                                     widthPad.first + widthPad.second;
+    const unsigned int inputHeight = inputShape[dimensionIndices.GetHeightIndex()] +
+                                     heightPad.first + heightPad.second;
 
-    unsigned int numInputElements = inputShape[0] * inputHeight * inputWidth
-                                    * inputShape[dimensionIndices.GetChannelsIndex()];
+    const unsigned int numInputElements  = inputShape[0] * inputHeight * inputWidth *
+                                           inputShape[dimensionIndices.GetChannelsIndex()];
+    const unsigned int numOutputElements = outputTensorInfo.GetNumElements();
 
-    if (workloadInfo.m_OutputTensorInfos[0].GetNumElements() != numInputElements)
+    if (numOutputElements != numInputElements)
     {
-        throw InvalidArgumentException("SpaceToBatchNdQueueDescriptor: Input tensor has " +
+        throw InvalidArgumentException(descriptorName + ": Input tensor has " +
             to_string(numInputElements) + " after padding but output tensor has " +
-            to_string(workloadInfo.m_OutputTensorInfos[0].GetNumElements()) + " elements.");
+            to_string(numOutputElements) + " elements.");
     }
 
     if (inputHeight % m_Parameters.m_BlockShape[0] != 0 || inputWidth % m_Parameters.m_BlockShape[1] != 0)
     {
-        throw InvalidArgumentException(
-            "Input shape after padding must be divisible by Block Shape in all spatial dimensions");
+        throw InvalidArgumentException(descriptorName + ": Input shape after padding must be "
+                                       "divisible by Block Shape in all spatial dimensions");
     }
 
     std::vector<DataType> supportedTypes =
@@ -1238,26 +1254,22 @@ void SpaceToBatchNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
             DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "SpaceToBatchNdQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "SpaceToBatchNdQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void SpaceToDepthQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "SpaceToDepthQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "SpaceToDepthQueueDescriptor", 1);
+    const std::string descriptorName{"SpaceToDepthQueueDescriptor"};
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0],
-        "SpaceToDepthQueueDescriptor", 4, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0],
-        "SpaceToDepthQueueDescriptor", 4, "output");
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
 
     std::vector<DataType> supportedTypes =
     {
@@ -1267,87 +1279,101 @@ void SpaceToDepthQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) con
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-        supportedTypes,
-        "SpaceToDepthQueueDescriptor");
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-        supportedTypes,
-        "SpaceToDepthQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    const TensorShape inputShape = workloadInfo.m_InputTensorInfos[0].GetShape();
+    DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
+    const unsigned int wIndex = dimensionIndices.GetWidthIndex();
+    const unsigned int hIndex = dimensionIndices.GetHeightIndex();
+    const unsigned int cIndex = dimensionIndices.GetChannelsIndex();
 
-    unsigned int numInputElements = inputShape[0]
-        * inputShape[dimensionIndices.GetWidthIndex()]
-        * inputShape[dimensionIndices.GetHeightIndex()]
-        * inputShape[dimensionIndices.GetChannelsIndex()];
+    const TensorShape& inputShape = inputTensorInfo.GetShape();
 
-    if (workloadInfo.m_OutputTensorInfos[0].GetNumElements() != numInputElements)
+    const unsigned int numInputElements  =
+        inputShape[0] * inputShape[wIndex] * inputShape[hIndex] * inputShape[cIndex];
+    const unsigned int numOutputElements = outputTensorInfo.GetNumElements();
+
+    if (numOutputElements != numInputElements)
     {
-        throw InvalidArgumentException("SpaceToDepthQueueDescriptor: Input tensor has " +
-            to_string(numInputElements) + " but output tensor has " +
-            to_string(workloadInfo.m_OutputTensorInfos[0].GetNumElements()) + " elements.");
+        throw InvalidArgumentException(descriptorName + ": Input tensor has " +
+            std::to_string(numInputElements) + " but output tensor has " +
+            std::to_string(numOutputElements) + " elements.");
     }
 
-    if (inputShape[dimensionIndices.GetHeightIndex()] % m_Parameters.m_BlockSize != 0 ||
-        inputShape[dimensionIndices.GetWidthIndex()]  % m_Parameters.m_BlockSize != 0)
+    if (inputShape[hIndex] % m_Parameters.m_BlockSize != 0 || inputShape[wIndex]  % m_Parameters.m_BlockSize != 0)
     {
-        throw InvalidArgumentException(
-            "Input shape must be divisible by block size in all spatial dimensions");
+        throw InvalidArgumentException(descriptorName + ": Input shape must be divisible "
+                                       "by block size in all spatial dimensions");
     }
 }
 
 void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    const std::string floorQueueDescString = "FloorQueueDescriptor";
+    const std::string descriptorName{"FloorQueueDescriptor"};
 
-    ValidateNumInputs(workloadInfo,  floorQueueDescString, 1);
-    ValidateNumOutputs(workloadInfo, floorQueueDescString, 1);
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32,
-            DataType::QuantisedSymm16
+        DataType::Float32,
+        DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],  supportedTypes, floorQueueDescString);
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0], supportedTypes, floorQueueDescString);
+    ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
 
-    if (workloadInfo.m_InputTensorInfos[0] != workloadInfo.m_OutputTensorInfos[0])
+    if (inputTensorInfo != outputTensorInfo)
     {
-        throw InvalidArgumentException(floorQueueDescString + ": Input and output tensor infos do not match.");
+        throw InvalidArgumentException(descriptorName + ": Input and output tensor infos do not match.");
     }
 }
 
 void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    std::vector<DataType> supportedTypes = {
+    // ported from android/ml/nn/common/operations/LSTM.cpp CheckInputTensorDimensions()
+
+    const std::string descriptorName{"LstmQueueDescriptor"};
+
+    // check dimensions of all inputs and outputs
+    if (workloadInfo.m_InputTensorInfos.size() != 3)
+    {
+        throw InvalidArgumentException(descriptorName + ": Invalid number of inputs.");
+    }
+    if (workloadInfo.m_OutputTensorInfos.size() != 4)
+    {
+        throw InvalidArgumentException(descriptorName + ": Invalid number of outputs.");
+    }
+
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float16,
         DataType::Float32,
         DataType::QuantisedSymm16
     };
-    // ported from android/ml/nn/common/operations/LSTM.cpp CheckInputTensorDimensions()
 
     // check for supported type of one input and match them with all the other input and output
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "LstmQueueDescriptor");
+    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0], supportedTypes, descriptorName);
+
     // type matches all other inputs
-    for (uint32_t i = 1; i < workloadInfo.m_InputTensorInfos.size(); ++i)
+    for (uint32_t i = 1u; i < workloadInfo.m_InputTensorInfos.size(); ++i)
     {
         ValidateTensorDataTypesMatch(workloadInfo.m_InputTensorInfos[0],
                                      workloadInfo.m_InputTensorInfos[i],
-                                     "LstmQueueDescriptor",
-                                     "InputTensor[0]",
-                                     "InputTensor[" + std::to_string(i) + "]");
+                                     descriptorName,
+                                     "input_0",
+                                     "input_" + std::to_string(i));
     }
     // type matches all other outputs
-    for (uint32_t i = 0; i < workloadInfo.m_OutputTensorInfos.size(); ++i)
+    for (uint32_t i = 0u; i < workloadInfo.m_OutputTensorInfos.size(); ++i)
     {
         ValidateTensorDataTypesMatch(workloadInfo.m_InputTensorInfos[0],
                                      workloadInfo.m_OutputTensorInfos[i],
                                      "LstmQueueDescriptor",
-                                     "InputTensor[0]",
-                                     "OutputTensor[" + std::to_string(i) + "]");
+                                     "input_0",
+                                     "output_" + std::to_string(i));
     }
 
     // TODO: check clipping parameter is valid
@@ -1361,37 +1387,28 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidatePointer(m_RecurrentToOutputWeights, "Null pointer check", "RecurrentToOutputWeights");
     const uint32_t n_output = m_RecurrentToOutputWeights->GetShape()[1];
 
-    // check dimensions of all inputs and outputs
-    if (workloadInfo.m_InputTensorInfos.size() != 3)
-    {
-        throw InvalidArgumentException("Invalid number of inputs.");
-    }
-    if (workloadInfo.m_OutputTensorInfos.size() != 4)
-    {
-        throw InvalidArgumentException("Invalid number of outputs.");
-    }
     // input tensor
-    ValidateTensorNumDimNumElem( workloadInfo.m_InputTensorInfos[0], 2, (n_batch * n_input),
-                                 "LstmQueueDescriptor input[0]");
+    ValidateTensorNumDimNumElem(workloadInfo.m_InputTensorInfos[0], 2, (n_batch * n_input),
+                                descriptorName + " input_0");
     // outputStateInTensor
-    ValidateTensorNumDimNumElem( workloadInfo.m_InputTensorInfos[1], 2, (n_batch * n_output),
-                                 "LstmQueueDescriptor input[1]");
+    ValidateTensorNumDimNumElem(workloadInfo.m_InputTensorInfos[1], 2, (n_batch * n_output),
+                                descriptorName + " input_1");
     // outputStateInTensor
-    ValidateTensorNumDimNumElem( workloadInfo.m_InputTensorInfos[2], 2, (n_batch * n_cell),
-                                 "LstmQueueDescriptor input[2]");
+    ValidateTensorNumDimNumElem(workloadInfo.m_InputTensorInfos[2], 2, (n_batch * n_cell),
+                                descriptorName + " input_2");
     // scratchBufferTensor
     unsigned int scratchBufferSize = m_Parameters.m_CifgEnabled ? n_cell * 3 : n_cell * 4;
-    ValidateTensorNumDimNumElem( workloadInfo.m_OutputTensorInfos[0], 2, (n_batch * scratchBufferSize),
-                                 "LstmQueueDescriptor output[0]");
+    ValidateTensorNumDimNumElem(workloadInfo.m_OutputTensorInfos[0], 2, (n_batch * scratchBufferSize),
+                                descriptorName + " output_0");
     // outputStateOutTensor
-    ValidateTensorNumDimNumElem( workloadInfo.m_OutputTensorInfos[1], 2, (n_batch * n_output),
-                                 "LstmQueueDescriptor output[1]");
+    ValidateTensorNumDimNumElem(workloadInfo.m_OutputTensorInfos[1], 2, (n_batch * n_output),
+                                descriptorName + " output_1");
     // cellStateOutTensor
-    ValidateTensorNumDimNumElem( workloadInfo.m_OutputTensorInfos[2], 2, (n_batch * n_cell),
-                                 "LstmQueueDescriptor output[2]");
+    ValidateTensorNumDimNumElem(workloadInfo.m_OutputTensorInfos[2], 2, (n_batch * n_cell),
+                                descriptorName + " output_2");
     // outputTensor
-    ValidateTensorNumDimNumElem( workloadInfo.m_OutputTensorInfos[3], 2, (n_batch * n_output),
-                                 "LstmQueueDescriptor output[3]");
+    ValidateTensorNumDimNumElem(workloadInfo.m_OutputTensorInfos[3], 2, (n_batch * n_output),
+                                descriptorName + " output_3");
 
 
     // check that dimensions of inputs/outputs and QueueDescriptor data match with each other
@@ -1431,9 +1448,10 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                      m_Parameters.m_CifgEnabled));
     if (!cifg_weights_all_or_none)
     {
-        throw InvalidArgumentException("Input-Gate's parameters InputToInputWeights and RecurrentToInputWeights must "
-                                       "either both be present (regular LSTM) or both not present (CIFG-LSTM). In "
-                                       "addition CifgEnable must be set accordingly");
+        throw InvalidArgumentException(descriptorName + ": Input-Gate's parameters InputToInputWeights and "
+                                       "RecurrentToInputWeights must either both be present (regular LSTM) "
+                                       "or both not present (CIFG-LSTM). In addition CifgEnable must be set "
+                                       "accordingly.");
     }
 
     if ( m_CellToInputWeights )
@@ -1460,7 +1478,7 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             && !m_CellToOutputWeights && !m_Parameters.m_PeepholeEnabled));
     if (!peephole_weights_all_or_none)
     {
-        throw InvalidArgumentException("Invalid combination of peephole parameters");
+        throw InvalidArgumentException(descriptorName + ": Invalid combination of peephole parameters.");
     }
 
     // Make sure the input gate bias is present only when not a CIFG-LSTM.
@@ -1468,14 +1486,15 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         if (m_InputGateBias)
         {
-            throw InvalidArgumentException("InputGateBias is present and CIFG-LSTM is enabled");
+            throw InvalidArgumentException(descriptorName + ": InputGateBias is present and CIFG-LSTM is enabled.");
         }
     }
     else
     {
         if (!m_InputGateBias)
         {
-            throw InvalidArgumentException("If CIFG-LSTM is disabled InputGateBias must be present.");
+            throw InvalidArgumentException(descriptorName + ": If CIFG-LSTM is disabled InputGateBias "
+                                           "must be present.");
         }
         ValidateTensorNumDimNumElem(m_InputGateBias->GetTensorInfo(), 1,
                                       n_cell, "InputGateBias");
@@ -1512,7 +1531,7 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                         m_Parameters.m_ProjectionEnabled));
     if (!projecton_tensors_consistent)
     {
-        throw InvalidArgumentException("Projection tensors are inconsistent.");
+        throw InvalidArgumentException(descriptorName + ": Projection tensors are inconsistent.");
     }
 
     // The four layer normalization weights either all have values or none of them have values. Additionally, if
@@ -1536,22 +1555,22 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         ValidateTensorNumDimNumElem(m_OutputLayerNormWeights->GetTensorInfo(), 1, n_cell, "OutputLayerNormWeights");
     }
 
-
     if (m_Parameters.m_LayerNormEnabled)
     {
         if (!m_Parameters.m_CifgEnabled)
         {
             if (!m_InputLayerNormWeights)
             {
-                throw InvalidArgumentException("Layer normalisation is enabled and CIFG-LSTM is disabled but "
-                                               "InputLayerNormWeights are not present");
+                throw InvalidArgumentException(descriptorName + ": Layer normalisation is enabled and CIFG-LSTM is "
+                                               "disabled but InputLayerNormWeights are not present");
             }
             ValidateTensorNumDimNumElem(m_InputLayerNormWeights->GetTensorInfo(),
                                           1, n_cell, "InputLayerNormWeights");
         }
         else if (m_InputLayerNormWeights)
         {
-            throw InvalidArgumentException("InputLayerNormWeights are present while CIFG is enabled");
+            throw InvalidArgumentException(descriptorName + ":InputLayerNormWeights are present while CIFG is "
+                                           "enabled");
         }
 
         ValidatePointer(m_ForgetLayerNormWeights, "Null pointer check layer normalisation enabled",
@@ -1568,155 +1587,158 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
     else if (m_InputLayerNormWeights || m_ForgetLayerNormWeights || m_OutputLayerNormWeights || m_CellLayerNormWeights)
     {
-        throw InvalidArgumentException("Layer normalisation is disabled but one or more layer normalisation weights "
-                                       "are present.");
+        throw InvalidArgumentException(descriptorName + ": Layer normalisation is disabled but one or more layer "
+                                       "normalisation weights are present.");
     }
 }
 
 void ConvertFp32ToFp16QueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "ConvertFp32ToFp16QueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "ConvertFp32ToFp16QueueDescriptor", 1);
+    const std::string descriptorName{"ConvertFp32ToFp16QueueDescriptor"};
 
-    if (workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::Float32)
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    if (inputTensorInfo.GetDataType() != DataType::Float32)
     {
-        throw InvalidArgumentException("ConvertFp32ToFp16QueueDescriptor: Input tensor type must be Float32.");
+        throw InvalidArgumentException(descriptorName + ": Input tensor type must be Float32.");
     }
 
-    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Float16)
+    if (outputTensorInfo.GetDataType() != DataType::Float16)
     {
-        throw InvalidArgumentException("ConvertFp32ToFp16QueueDescriptor: Output tensor type must be Float16.");
+        throw InvalidArgumentException(descriptorName + ": Output tensor type must be Float16.");
     }
 
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "ConvertFp32ToFp16QueueDescriptor",
-                              "input",
-                              "output");
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void ConvertFp16ToFp32QueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "ConvertFp16ToFp32QueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "ConvertFp16ToFp32QueueDescriptor", 1);
+    const std::string descriptorName{"ConvertFp16ToFp32QueueDescriptor"};
 
-    if (workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::Float16)
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    if (inputTensorInfo.GetDataType() != DataType::Float16)
     {
-        throw InvalidArgumentException("ConvertFp16ToFp32QueueDescriptor: Input tensor type must be Float16.");
-    }
-    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Float32)
-    {
-        throw InvalidArgumentException("ConvertFp16ToFp32QueueDescriptor: Output tensor type must be Float32.");
+        throw InvalidArgumentException(descriptorName + ": Input tensor type must be Float16.");
     }
 
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "ConvertFp16ToFp32QueueDescriptor",
-                              "input",
-                              "output");
+    if (outputTensorInfo.GetDataType() != DataType::Float32)
+    {
+        throw InvalidArgumentException(descriptorName + ": Output tensor type must be Float32.");
+    }
+
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void DivisionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "DivisionQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "DivisionQueueDescriptor", 1);
+    const std::string descriptorName{"DivisionQueueDescriptor"};
 
-    std::vector<DataType> supportedTypes = {
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16,
         DataType::Float16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "DivisionQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo1, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
-                      supportedTypes,
-                      "DivisionQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      supportedTypes,
-                      "DivisionQueueDescriptor");
-
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "DivisionQueueDescriptor",
-                                       "first input",
-                                       "second input");
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
 }
 
 void SubtractionQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "SubtractionQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "SubtractionQueueDescriptor", 1);
+    const std::string descriptorName{"SubtractionQueueDescriptor"};
 
-    std::vector<DataType> supportedTypes = {
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16,
         DataType::Float16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "SubtractionQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo1, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
-                      supportedTypes,
-                      "SubtractionQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      supportedTypes,
-                      "SubtractionQueueDescriptor");
-
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "SubtractionQueueDescriptor",
-                                       "first input",
-                                       "second input");
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
 }
 
 void MaximumQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "MaximumQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "MaximumQueueDescriptor", 1);
+    const std::string descriptorName{"MaximumQueueDescriptor"};
 
-    std::vector<DataType> supportedTypes = {
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "MaximumQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo1, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
-                      supportedTypes,
-                      "MaximumQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      supportedTypes,
-                      "MaximumQueueDescriptor");
-
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "MaximumQueueDescriptor",
-                                       "first input",
-                                       "second input");
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
 }
 
 void MeanQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    const std::string meanQueueDescString = "MeanQueueDescriptor";
+    const std::string descriptorName{"MeanQueueDescriptor"};
 
-    ValidateNumInputs(workloadInfo, meanQueueDescString, 1);
-    ValidateNumOutputs(workloadInfo, meanQueueDescString, 1);
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     std::vector<DataType> supportedTypes =
     {
@@ -1726,27 +1748,25 @@ void MeanQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QuantisedSymm16
     };
 
-    const TensorInfo& input  = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
-
     // First check if input tensor data type is supported, then
     // check if this data type matches the output tensor data type
-    ValidateDataTypes(input,  supportedTypes, meanQueueDescString);
-    ValidateTensorDataTypesMatch(input, output, meanQueueDescString, "input", "output");
+    ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
     if (m_Parameters.m_KeepDims)
     {
-        ValidateTensorNumDimensions(output, meanQueueDescString, input.GetNumDimensions(), "output");
+        ValidateTensorNumDimensions(outputTensorInfo, descriptorName, inputTensorInfo.GetNumDimensions(), "output");
     }
     else if (m_Parameters.m_Axis.empty())
     {
-        ValidateTensorNumDimensions(output, meanQueueDescString, 1, "output");
+        ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 1, "output");
     }
     else
     {
-        auto outputDim = input.GetNumDimensions() - boost::numeric_cast<unsigned int>(m_Parameters.m_Axis.size());
-        ValidateTensorNumDimensions(output,
-                                    meanQueueDescString,
+        unsigned int outputDim =
+            inputTensorInfo.GetNumDimensions() - boost::numeric_cast<unsigned int>(m_Parameters.m_Axis.size());
+        ValidateTensorNumDimensions(outputTensorInfo,
+                                    descriptorName,
                                     outputDim > 0 ? outputDim : 1,
                                     "output");
     }
@@ -1754,50 +1774,57 @@ void MeanQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
 void PadQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "PadQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "PadQueueDescriptor", 1);
+    const std::string descriptorName{"PadQueueDescriptor"};
 
-    const TensorInfo& input = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     // input and output should have the same number of dimensions
-    ValidateTensorNumDimensions(output, "PadQueueDescriptor", input.GetNumDimensions(), "output");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, inputTensorInfo.GetNumDimensions(), "output");
+
     // there should be entry in the pad list for each dimension in the input tensor
-    if (m_Parameters.m_PadList.size() != input.GetNumDimensions()) {
-        throw InvalidArgumentException("Pad List should contain the same number of entries as there"
-                                       " are dimensions in the input tensor that is " +
-                                       to_string(input.GetNumDimensions()) + " entries " +
-                                       " not " + to_string(m_Parameters.m_PadList.size()) + " entries.");
+    if (m_Parameters.m_PadList.size() != inputTensorInfo.GetNumDimensions()) {
+        throw InvalidArgumentException(descriptorName + ":Pad List should contain the same number of entries "
+                                       "as there are dimensions in the input tensor that is " +
+                                       std::to_string(inputTensorInfo.GetNumDimensions()) + " entries " +
+                                       " not " + std::to_string(m_Parameters.m_PadList.size()) + " entries.");
     }
 }
 
 void QuantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "QuantizeQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "QuantizeQueueDescriptor", 1);
+    const std::string descriptorName{"QuantizeQueueDescriptor"};
 
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    if (workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::Float32)
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    if (inputTensorInfo.GetDataType() != DataType::Float32)
     {
-        throw InvalidArgumentException("Quantize only accepts Float32 inputs.");
+        throw InvalidArgumentException(descriptorName + ": Quantize only accepts Float32 inputs.");
     }
 
-    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::QuantisedAsymm8 &&
-        workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::QuantisedSymm16)
+    if (outputTensorInfo.GetDataType() != DataType::QuantisedAsymm8 &&
+        outputTensorInfo.GetDataType() != DataType::QuantisedSymm16)
     {
-        throw InvalidArgumentException("Output of quantized layer must be quantized type.");
+        throw InvalidArgumentException(descriptorName + ": Output of quantized layer must be quantized type.");
     }
 }
 
 void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    const std::string batchToSpaceNdQueueDescriptorStr = "BatchToSpaceNdQueueDescriptor";
+    const std::string descriptorName{"BatchToSpaceNdQueueDescriptor"};
 
-    ValidateNumInputs(workloadInfo, batchToSpaceNdQueueDescriptorStr, 1);
-    ValidateNumOutputs(workloadInfo, batchToSpaceNdQueueDescriptorStr, 1);
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    const TensorInfo& input  = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     std::vector<DataType> supportedTypes =
     {
@@ -1806,20 +1833,19 @@ void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
             DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      batchToSpaceNdQueueDescriptorStr);
-
-    ValidateTensorDataTypesMatch(input, output, batchToSpaceNdQueueDescriptorStr, "input", "output");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void StridedSliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "StridedSliceQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "StridedSliceQueueDescriptor", 1);
+    const std::string descriptorName{"StridedSliceQueueDescriptor"};
 
-    const TensorInfo& input = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     std::vector<DataType> supportedTypes =
     {
@@ -1829,38 +1855,31 @@ void StridedSliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) con
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(input,  supportedTypes, "StridedSliceQueueDescriptor");
-    ValidateDataTypes(output, supportedTypes, "StridedSliceQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
-    ValidateDataTypes(output, { input.GetDataType() }, "StridedSliceQueueDescriptor");
+    ValidateTensorQuantizationSpace(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
-    ValidateTensorQuantizationSpace(input, output, "StridedSliceQueueDescriptor", "input", "output");
-
-    const uint32_t rank = input.GetNumDimensions();
-
+    const uint32_t rank = inputTensorInfo.GetNumDimensions();
     if (rank > 4)
     {
-        throw InvalidArgumentException(
-            "StridedSliceLayer: Input tensors with rank greater than 4 are not supported");
+        throw InvalidArgumentException(descriptorName + ": Input tensors with rank greater than 4 are not supported.");
     }
 
     // Begin, End & Stride length must be of rank(input0)
     if (m_Parameters.m_Begin.size() != rank)
     {
-        throw InvalidArgumentException("StridedSliceLayer: Begin length must be of rank input0("
-                                       + to_string(rank) + ")");
+        throw InvalidArgumentException(descriptorName + ": Begin length must be of rank " + std::to_string(rank));
     }
 
     if (m_Parameters.m_End.size() != rank)
     {
-        throw InvalidArgumentException("StridedSliceLayer: End length must be of rank input0("
-                                       + to_string(rank) + ")");
+        throw InvalidArgumentException(descriptorName + ": End length must be of rank " + std::to_string(rank));
     }
 
     if (m_Parameters.m_Stride.size() != rank)
     {
-        throw InvalidArgumentException("StridedSliceLayer: Stride length must be of rank input0("
-                                       + to_string(rank) + ")");
+        throw InvalidArgumentException(descriptorName + ": Stride length must be of rank " + std::to_string(rank));
     }
 
     // Stride entries must be non-zero
@@ -1868,93 +1887,108 @@ void StridedSliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) con
     {
         if (stride == 0)
         {
-            throw InvalidArgumentException("StridedSliceLayer: Stride entries must be non-zero");
+            throw InvalidArgumentException(descriptorName + ": Stride entries must be non-zero.");
         }
     }
 }
 
 void MinimumQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "MinimumQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "MinimumQueueDescriptor", 1);
+    const std::string descriptorName{"MinimumQueueDescriptor"};
 
-    std::vector<DataType> supportedTypes = {
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "MinimumQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo1, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
-                      supportedTypes,
-                      "MinimumQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      supportedTypes,
-                      "MinimumQueueDescriptor");
-
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "MinimumQueueDescriptor",
-                                       "first input",
-                                       "second input");
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
 }
 
 void DebugQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "DebugQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "DebugQueueDescriptor", 1);
+    const std::string descriptorName{"DebugQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 }
 
 void EqualQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "EqualQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "EqualQueueDescriptor", 1);
+    const std::string descriptorName{"EqualQueueDescriptor"};
 
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "EqualQueueDescriptor",
-                                       "first input",
-                                       "second input");
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Boolean)
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
+
+    if (outputTensorInfo.GetDataType() != DataType::Boolean)
     {
-        throw InvalidArgumentException("EqualQueueDescriptor: Output tensor type must be Boolean.");
+        throw InvalidArgumentException(descriptorName + ": Output tensor type must be Boolean.");
     }
 }
 
 void GreaterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "GreaterQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "GreaterQueueDescriptor", 1);
+    const std::string descriptorName{"GreaterQueueDescriptor"};
 
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "GreaterQueueDescriptor",
-                                       "first input",
-                                       "second input");
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Boolean)
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo0,
+                                       inputTensorInfo1,
+                                       outputTensorInfo,
+                                       descriptorName,
+                                       "input_0",
+                                       "input_1");
+
+    if (outputTensorInfo.GetDataType() != DataType::Boolean)
     {
-        throw InvalidArgumentException("GreaterQueueDescriptor: Output tensor type must be Boolean.");
+        throw InvalidArgumentException(descriptorName + ": Output tensor type must be Boolean.");
     }
 }
 
 void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "RsqrtQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "RsqrtQueueDescriptor", 1);
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "RsqrtQueueDescriptor",
-                              "input",
-                              "output");
+    const std::string descriptorName{"RsqrtQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
     std::vector<DataType> supportedTypes =
     {
@@ -1964,28 +1998,25 @@ void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "RsqrtQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      {workloadInfo.m_InputTensorInfos[0].GetDataType()},
-                      "RsqrtQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    const std::string GatherQueueDescriptorStr = "GatherQueueDescriptor";
+    const std::string descriptorName{"GatherQueueDescriptor"};
 
-    ValidateNumInputs(workloadInfo, GatherQueueDescriptorStr, 2);
-    ValidateNumOutputs(workloadInfo, GatherQueueDescriptorStr, 1);
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    const TensorInfo& indices = workloadInfo.m_InputTensorInfos[1];
-
-    if (indices.GetDataType() != DataType::Signed32)
+    const TensorInfo& indicesTensorInfo = workloadInfo.m_InputTensorInfos[1];
+    if (indicesTensorInfo.GetDataType() != DataType::Signed32)
     {
-        throw InvalidArgumentException(GatherQueueDescriptorStr + ": Indices tensor type must be int32.");
+        throw InvalidArgumentException(descriptorName + ": Indices tensor type must be Int32.");
     }
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     std::vector<DataType> supportedTypes =
     {
@@ -1995,26 +2026,18 @@ void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      GatherQueueDescriptorStr);
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateTensorDataTypesMatch(workloadInfo.m_InputTensorInfos[0],
-                      workloadInfo.m_OutputTensorInfos[0],
-                      GatherQueueDescriptorStr, "Input", "Output");
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
-    const TensorInfo& params = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& output = workloadInfo.m_OutputTensorInfos[0];
-    unsigned int paramsDim = params.GetNumDimensions();
-    unsigned int indicesDim = indices.GetNumDimensions();
-    unsigned int outputDim = paramsDim - 1 + indicesDim;
-
-    ValidateTensorNumDimensions(output, GatherQueueDescriptorStr, outputDim, "output");
+    unsigned int outputDim  = inputTensorInfo.GetNumDimensions() + indicesTensorInfo.GetNumDimensions() - 1;
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, outputDim, "output");
 }
 
 void DetectionPostProcessQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    const std::string& descriptorName = " DetectionPostProcessQueueDescriptor";
+    const std::string& descriptorName{"DetectionPostProcessQueueDescriptor"};
+
     ValidateNumInputs(workloadInfo, descriptorName, 2);
 
     if (workloadInfo.m_OutputTensorInfos.size() != 4)
@@ -2068,6 +2091,7 @@ void DetectionPostProcessQueueDescriptor::Validate(const WorkloadInfo& workloadI
         throw InvalidArgumentException(descriptorName + ": Intersection over union threshold "
                                        "must be positive and less than or equal to 1.");
     }
+
     if (scoresInfo.GetShape()[2] != m_Parameters.m_NumClasses + 1)
     {
         throw InvalidArgumentException(descriptorName + ": Number of classes with background "
@@ -2077,77 +2101,81 @@ void DetectionPostProcessQueueDescriptor::Validate(const WorkloadInfo& workloadI
 
 void DequantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "DequantizeQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "DequantizeQueueDescriptor", 1);
+    const std::string& descriptorName{"DequantizeQueueDescriptor"};
 
-    if (workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::QuantisedAsymm8 &&
-        workloadInfo.m_InputTensorInfos[0].GetDataType() != DataType::QuantisedSymm16)
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    if (inputTensorInfo.GetDataType() != DataType::QuantisedAsymm8 &&
+        inputTensorInfo.GetDataType() != DataType::QuantisedSymm16)
     {
-        throw InvalidArgumentException("Input to dequantize layer must be quantized type.");
+        throw InvalidArgumentException(descriptorName + ": Input to dequantize layer must be quantized type.");
     }
 
-    if (workloadInfo.m_OutputTensorInfos[0].GetDataType() != DataType::Float32)
+    if (outputTensorInfo.GetDataType() != DataType::Float32)
     {
-        throw InvalidArgumentException("Output of dequantize layer must be Float32 type.");
+        throw InvalidArgumentException(descriptorName + ": Output of dequantize layer must be Float32 type.");
     }
 }
 
 void MergeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "MergeQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "MergeQueueDescriptor", 1);
+    const std::string& descriptorName{"MergeQueueDescriptor"};
 
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_InputTensorInfos[1],
-                              "MergeQueueDescriptor",
-                              "input0",
-                              "input1");
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "MergeQueueDescriptor",
-                              "input0",
-                              "output");
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
-    const DataType dataType = workloadInfo.m_InputTensorInfos[0].GetDataType();
-    ValidateTensorDataType(workloadInfo.m_InputTensorInfos[1], dataType, "MergeQueueDescriptor", "input1");
-    ValidateTensorDataType(workloadInfo.m_OutputTensorInfos[0], dataType, "MergeQueueDescriptor", "output");
+    ValidateTensorShapesMatch(inputTensorInfo0, inputTensorInfo1, descriptorName, "input_0", "input_1");
+    ValidateTensorShapesMatch(inputTensorInfo0, outputTensorInfo, descriptorName, "input_0", "output");
+
+    ValidateTensorDataTypesMatch(inputTensorInfo0, inputTensorInfo1, descriptorName, "input_0", "input_1");
+    ValidateTensorDataTypesMatch(inputTensorInfo0, outputTensorInfo, descriptorName, "input_0", "output");
 }
 
 void SwitchQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "SwitchQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "SwitchQueueDescriptor", 2);
+    const std::string& descriptorName{"SwitchQueueDescriptor"};
 
-    std::vector<DataType> supportedTypes = {
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 2);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+
+    const TensorInfo& outputTensorInfo0 = workloadInfo.m_OutputTensorInfos[0];
+    const TensorInfo& outputTensorInfo1 = workloadInfo.m_OutputTensorInfos[1];
+
+    std::vector<DataType> supportedTypes =
+    {
         DataType::Float32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "SwitchQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo1, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
-                      supportedTypes,
-                      "SwitchQueueDescriptor");
+    ValidateDataTypes(outputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo1, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      supportedTypes,
-                      "SwitchQueueDescriptor");
+    ValidateTensorShapesMatch(inputTensorInfo0,
+                              outputTensorInfo0,
+                              descriptorName,
+                              "input_0",
+                              "output_0");
 
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[0],
-                              "SwitchQueueDescriptor",
-                              "input0",
-                              "output0");
-
-    ValidateTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                              workloadInfo.m_OutputTensorInfos[1],
-                              "SwitchQueueDescriptor",
-                              "input0",
-                              "output1");
+    ValidateTensorShapesMatch(inputTensorInfo0,
+                              outputTensorInfo1,
+                              descriptorName,
+                              "input_0",
+                              "output_1");
 }
 
 void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
@@ -2157,8 +2185,14 @@ void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) cons
 
 void PreluQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
-    ValidateNumInputs(workloadInfo, "PreluQueueDescriptor", 2);
-    ValidateNumOutputs(workloadInfo, "PreluQueueDescriptor", 1);
+    const std::string& descriptorName{"PreluQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& alphaTensorInfo  = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     std::vector<DataType> supportedTypes
     {
@@ -2168,30 +2202,18 @@ void PreluQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QuantisedSymm16
     };
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      supportedTypes,
-                      "PreluQueueDescriptor");
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateDataTypes(alphaTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[1],
-                      supportedTypes,
-                      "PreluQueueDescriptor");
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
-    ValidateDataTypes(workloadInfo.m_OutputTensorInfos[0],
-                      supportedTypes,
-                      "PreluQueueDescriptor");
+    ValidateTensorDataTypesMatch(inputTensorInfo, alphaTensorInfo,  descriptorName, "input", "alpha");
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "ouptut");
 
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      { workloadInfo.m_InputTensorInfos[1].GetDataType() },
-                      "PreluQueueDescriptor");
-
-    ValidateDataTypes(workloadInfo.m_InputTensorInfos[0],
-                      { workloadInfo.m_OutputTensorInfos[0].GetDataType() },
-                      "PreluQueueDescriptor");
-
-    ValidateBroadcastTensorShapesMatch(workloadInfo.m_InputTensorInfos[0],
-                                       workloadInfo.m_InputTensorInfos[1],
-                                       workloadInfo.m_OutputTensorInfos[0],
-                                       "PreluQueueDescriptor",
+    ValidateBroadcastTensorShapesMatch(inputTensorInfo,
+                                       alphaTensorInfo,
+                                       outputTensorInfo,
+                                       descriptorName,
                                        "input",
                                        "alpha");
 }
@@ -2203,31 +2225,32 @@ void TransposeConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
     ValidateNumInputs(workloadInfo,  descriptorName, 1);
     ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
-    ValidateTensorNumDimensions(workloadInfo.m_InputTensorInfos[0], descriptorName, 4, "input");
-    ValidateTensorNumDimensions(workloadInfo.m_OutputTensorInfos[0], descriptorName, 4, "output");
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
 
     ValidatePointer(m_Weight, descriptorName, "weight");
-    ValidateTensorNumDimensions(m_Weight->GetTensorInfo(), descriptorName, 4, "weight");
 
-    ValidateTensorDataType(m_Weight->GetTensorInfo(),
-                           workloadInfo.m_InputTensorInfos[0].GetDataType(),
-                           descriptorName,
-                           "weight");
+    const TensorInfo& weightTensorInfo = m_Weight->GetTensorInfo();
+    ValidateTensorNumDimensions(weightTensorInfo, descriptorName, 4, "weight");
+    ValidateTensorDataType(weightTensorInfo, inputTensorInfo.GetDataType(), descriptorName, "weight");
 
     if (m_Parameters.m_BiasEnabled)
     {
-        ValidateTensorNumDimensions(m_Bias->GetTensorInfo(), descriptorName, 1, "bias");
+        ValidatePointer(m_Bias, descriptorName, "bias");
 
-        ValidateTensorDataType(m_Bias->GetTensorInfo(),
-                               GetBiasDataType(workloadInfo.m_InputTensorInfos[0].GetDataType()),
-                               descriptorName, "bias");
+        const TensorInfo& biasTensorInfo = m_Bias->GetTensorInfo();
+        ValidateTensorNumDimensions(biasTensorInfo, descriptorName, 1, "bias");
 
-        ValidateBiasTensorQuantization(m_Bias->GetTensorInfo(),
-                                       workloadInfo.m_InputTensorInfos[0],
-                                       m_Weight->GetTensorInfo(),
-                                       descriptorName);
+        ValidateTensorDataType(biasTensorInfo,
+                               GetBiasDataType(inputTensorInfo.GetDataType()),
+                               descriptorName,
+                               "bias");
+
+        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
     }
-
 }
 
-} //namespace armnn
+} // namespace armnn

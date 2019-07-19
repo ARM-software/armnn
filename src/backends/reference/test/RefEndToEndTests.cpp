@@ -11,6 +11,7 @@
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
+#include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
@@ -713,6 +714,21 @@ BOOST_AUTO_TEST_CASE(RefDetectionPostProcessFastNmsUint8Test)
     DetectionPostProcessFastNmsEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, qBoxEncodings,
                                                                           qScores, qAnchors,
                                                                           1.0f, 1, 0.01f, 0, 0.5f, 0);
+}
+
+BOOST_AUTO_TEST_CASE(RefPreluEndToEndTestFloat32)
+{
+    PreluEndToEndNegativeTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefPreluEndToEndTestUint8)
+{
+    PreluEndToEndPositiveTest<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefPreluEndToEndTestQSymm16)
+{
+    PreluEndToEndPositiveTest<armnn::DataType::QuantisedSymm16>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefSpaceToDepthNHWCEndToEndTest1)

@@ -40,6 +40,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     OptimizationViewsTests.cpp
     PermuteTestImpl.hpp
     Pooling2dTestImpl.hpp
+    PreluEndToEndTestImpl.hpp
     QuantizeHelper.hpp
     QuantizeTestImpl.hpp
     ResizeEndToEndTestImpl.hpp

@@ -65,14 +65,6 @@ ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
     m_WeightsTensor = std::make_unique<arm_compute::CLTensor>();
     BuildArmComputeTensor(*m_WeightsTensor, weightInfo, m_Data.m_Parameters.m_DataLayout);
 
-    arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
-                                             m_Data.m_Parameters.m_StrideY,
-                                             m_Data.m_Parameters.m_PadLeft,
-                                             m_Data.m_Parameters.m_PadRight,
-                                             m_Data.m_Parameters.m_PadTop,
-                                             m_Data.m_Parameters.m_PadBottom,
-                                             arm_compute::DimensionRoundingType::FLOOR);
-
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasesTensor = std::make_unique<arm_compute::CLTensor>();
@@ -89,6 +81,7 @@ ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
+    arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
     m_Layer.configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, padStrideInfo);
 
     InitializeArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight);

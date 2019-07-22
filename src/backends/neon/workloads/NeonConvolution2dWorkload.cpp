@@ -81,13 +81,7 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
         BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
     }
 
-    arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
-                                             m_Data.m_Parameters.m_StrideY,
-                                             m_Data.m_Parameters.m_PadLeft,
-                                             m_Data.m_Parameters.m_PadRight,
-                                             m_Data.m_Parameters.m_PadTop,
-                                             m_Data.m_Parameters.m_PadBottom,
-                                             arm_compute::DimensionRoundingType::FLOOR);
+    arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(m_Data.m_Parameters.m_DilationX,
                                                                       m_Data.m_Parameters.m_DilationY);

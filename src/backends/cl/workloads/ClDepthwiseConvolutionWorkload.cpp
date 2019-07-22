@@ -91,14 +91,6 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
         BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
     }
 
-    const arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
-                                             m_Data.m_Parameters.m_StrideY,
-                                             m_Data.m_Parameters.m_PadLeft,
-                                             m_Data.m_Parameters.m_PadRight,
-                                             m_Data.m_Parameters.m_PadTop,
-                                             m_Data.m_Parameters.m_PadBottom,
-                                             arm_compute::DimensionRoundingType::FLOOR);
-
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(
                 m_Data.m_Parameters.m_DilationX,
                 m_Data.m_Parameters.m_DilationY);
@@ -120,6 +112,7 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     // Get the depth multiplier
     const unsigned int depthMultiplier = weightInfo.GetShape()[0];
 
+    arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
     // Check for optimisation opportunities.
     bool use3x3Optimisation = (weightInfo.GetShape()[2] == 3) && (weightInfo.GetShape()[3] == 3);

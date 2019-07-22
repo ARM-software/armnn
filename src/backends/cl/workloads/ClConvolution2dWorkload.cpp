@@ -66,14 +66,6 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
     BuildArmComputeTensor(*m_KernelTensor, weightInfo, m_Data.m_Parameters.m_DataLayout);
 
-    arm_compute::PadStrideInfo padStrideInfo(m_Data.m_Parameters.m_StrideX,
-                                             m_Data.m_Parameters.m_StrideY,
-                                             m_Data.m_Parameters.m_PadLeft,
-                                             m_Data.m_Parameters.m_PadRight,
-                                             m_Data.m_Parameters.m_PadTop,
-                                             m_Data.m_Parameters.m_PadBottom,
-                                             arm_compute::DimensionRoundingType::FLOOR);
-
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(m_Data.m_Parameters.m_DilationX,
                                                                       m_Data.m_Parameters.m_DilationY);
 
@@ -91,6 +83,8 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
+
+    arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
     m_ConvolutionLayer.configure(&input,
                                  m_KernelTensor.get(),

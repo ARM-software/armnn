@@ -791,8 +791,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
     desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
     desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
     desc.m_DataLayout = armnn::DataLayout::NHWC;
-    // ACL only supports a depth (channel) multiplier of {1,2,3}, it is not currently stored in the descriptor
-    CHECK_VALID_SIZE(CHECKED_NON_NEGATIVE(options->depth_multiplier), 1,2,3 );
+    CHECKED_NON_NEGATIVE(options->depth_multiplier);
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2, 3);

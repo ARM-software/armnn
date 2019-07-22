@@ -1498,6 +1498,38 @@ LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul1Test(
         workloadFactory, memoryManager, 0.0f, 0, biasEnabled, layout);
 }
 
+LayerTestResult<float, 4> DepthwiseConvolution2dDepthMul64Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo({ 1, 1, 2, 2 }, armnn::DataType::Float32);
+    auto input = MakeTensor<float, 4>(inputTensorInfo, { 1.f, 2.f, 3.f, 4.f });
+
+    std::vector<float> kernelData;
+    std::vector<float> singleDepthKernel{ 1.f, -1.f, -1.f, 1.f };
+    for (unsigned int i = 0; i < 64; ++i)
+    {
+        kernelData.insert(kernelData.end(), singleDepthKernel.begin(), singleDepthKernel.end());
+    }
+    armnn::TensorInfo kernelTensorInfo({ 64, 1, 2, 2 }, armnn::DataType::Float32);
+    auto kernel = MakeTensor<float, 4>(kernelTensorInfo, kernelData);
+
+    std::vector<float> expectedOutputData(64, 0.f);
+    armnn::TensorInfo outputTensorInfo({ 1, 64, 1, 1 }, armnn::DataType::Float32);
+    auto expectedOutput = MakeTensor<float, 4>(outputTensorInfo, expectedOutputData);
+
+    return DepthwiseConvolution2dTestImpl<armnn::DataType::Float32, armnn::DataType::Float32>(
+            workloadFactory,
+            memoryManager,
+            input,
+            kernel,
+            boost::multi_array<float, 1>(),
+            expectedOutput,
+            0.f,
+            0,
+            armnn::DataLayout::NCHW);
+}
+
 LayerTestResult<float, 4> DepthwiseConvolution2dAsymmetricTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

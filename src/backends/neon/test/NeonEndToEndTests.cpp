@@ -8,6 +8,7 @@
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/ConcatTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 
@@ -134,6 +135,16 @@ BOOST_AUTO_TEST_CASE(DequantizeEndToEndSimpleTest)
 BOOST_AUTO_TEST_CASE(DequantizeEndToEndOffsetTest)
 {
     DequantizeEndToEndOffset<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonPreluEndToEndFloat32Test)
+{
+    PreluEndToEndNegativeTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonPreluEndToEndTestUint8Test)
+{
+    PreluEndToEndPositiveTest<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(NeonSpaceToDepthNHWCEndToEndTest1)

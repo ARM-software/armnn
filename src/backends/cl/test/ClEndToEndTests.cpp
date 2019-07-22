@@ -8,6 +8,7 @@
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/ConcatTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
@@ -101,6 +102,16 @@ BOOST_AUTO_TEST_CASE(ClGreaterBroadcastEndToEndUint8Test)
     ArithmeticBroadcastEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Boolean>(defaultBackends,
                                                                                             LayerType::Greater,
                                                                                             expectedOutput);
+}
+
+BOOST_AUTO_TEST_CASE(ClPreluEndToEndFloat32Test)
+{
+    PreluEndToEndNegativeTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClPreluEndToEndTestUint8)
+{
+    PreluEndToEndPositiveTest<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClSpaceToDepthNHWCEndToEndTest1)

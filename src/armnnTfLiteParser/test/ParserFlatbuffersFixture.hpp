@@ -13,7 +13,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
-#include <experimental/filesystem>
 
 #include "test/TensorHelpers.hpp"
 

@@ -346,9 +346,6 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
     // Get the optimized graph
     Graph& optGraph = optNetObjPtr->GetGraph();
 
-    // Get the entire graph as a sub-graph
-    SubgraphView mainSubgraph(optGraph);
-
     // Run backend specific optimizations
     for (auto&& selectedBackend : backendSettings.m_SelectedBackends)
     {
@@ -357,7 +354,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetwork* optNetObjPtr,
 
         // Select sub-graphs based on backend
         SubgraphViewSelector::Subgraphs subgraphs =
-                SubgraphViewSelector::SelectSubgraphs(mainSubgraph,
+                SubgraphViewSelector::SelectSubgraphs(optGraph,
                                                       // Select layers assigned to the requested backend
                                                       [&backendObjPtr](const Layer& layer)
                                                       {

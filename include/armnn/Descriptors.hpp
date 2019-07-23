@@ -49,9 +49,15 @@ struct PermuteDescriptor
 /// A SoftmaxDescriptor for the SoftmaxLayer.
 struct SoftmaxDescriptor
 {
-    SoftmaxDescriptor() : m_Beta(1.0f) {}
+    SoftmaxDescriptor()
+    : m_Beta(1.0f)
+    , m_Axis(-1)
+    {}
+
     /// Exponentiation value.
-    float              m_Beta;
+    float m_Beta;
+    /// Scalar, defaulted to the last index (-1), specifying the dimension the activation will be performed on.
+    int m_Axis;
 };
 
 /// @brief An OriginsDescriptor for the ConcatLayer.

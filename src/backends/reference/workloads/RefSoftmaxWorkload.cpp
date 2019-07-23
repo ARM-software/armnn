@@ -34,6 +34,7 @@ void RefSoftmaxWorkload::Execute() const
     Softmax(decoder,
             encoder,
             inputTensorInfo,
-            m_Data.m_Parameters.m_Beta);
+            m_Data.m_Parameters.m_Beta,
+            m_Data.m_Parameters.m_Axis);
 }
 } //namespace armnn

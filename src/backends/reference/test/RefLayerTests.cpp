@@ -374,6 +374,30 @@ ARMNN_AUTO_TEST_CASE(SimpleSoftmaxUint16, SimpleSoftmaxUint16Test, 1.0f)
 ARMNN_AUTO_TEST_CASE(Simple3dSoftmaxUint16, Simple3dSoftmaxUint16Test, 1.0f)
 ARMNN_AUTO_TEST_CASE(Simple4dSoftmaxUint16, Simple4dSoftmaxUint16Test, 1.0f)
 
+ARMNN_AUTO_TEST_CASE(Simple2dAxis0Softmax, SimpleAxisSoftmaxTest, 1.0f, 0)
+ARMNN_AUTO_TEST_CASE(Simple2dAxis1Softmax, SimpleAxisSoftmaxTest, 1.0f, 1)
+
+ARMNN_AUTO_TEST_CASE(Simple2dAxis0NegSoftmax, SimpleAxisSoftmaxTest, 1.0f, -2)
+ARMNN_AUTO_TEST_CASE(Simple2dAxis1NegSoftmax, SimpleAxisSoftmaxTest, 1.0f, -1)
+
+ARMNN_AUTO_TEST_CASE(Simple3dAxis0Softmax, Simple3dAxisSoftmaxTest, 1.0f, 0)
+ARMNN_AUTO_TEST_CASE(Simple3dAxis1Softmax, Simple3dAxisSoftmaxTest, 1.0f, 1)
+ARMNN_AUTO_TEST_CASE(Simple3dAxis2Softmax, Simple3dAxisSoftmaxTest, 1.0f, 2)
+
+ARMNN_AUTO_TEST_CASE(Simple3dAxis0NegSoftmax, Simple3dAxisSoftmaxTest, 1.0f, -3)
+ARMNN_AUTO_TEST_CASE(Simple3dAxis1NegSoftmax, Simple3dAxisSoftmaxTest, 1.0f, -2)
+ARMNN_AUTO_TEST_CASE(Simple3dAxis2NegSoftmax, Simple3dAxisSoftmaxTest, 1.0f, -1)
+
+ARMNN_AUTO_TEST_CASE(Simple4dAxis0Softmax, Simple4dAxisSoftmaxTest, 1.0f, 0)
+ARMNN_AUTO_TEST_CASE(Simple4dAxis1Softmax, Simple4dAxisSoftmaxTest, 1.0f, 1)
+ARMNN_AUTO_TEST_CASE(Simple4dAxis2Softmax, Simple4dAxisSoftmaxTest, 1.0f, 2)
+ARMNN_AUTO_TEST_CASE(Simple4dAxis3Softmax, Simple4dAxisSoftmaxTest, 1.0f, 3)
+
+ARMNN_AUTO_TEST_CASE(Simple4dAxis0NegSoftmax, Simple4dAxisSoftmaxTest, 1.0f, -4)
+ARMNN_AUTO_TEST_CASE(Simple4dAxis1NegSoftmax, Simple4dAxisSoftmaxTest, 1.0f, -3)
+ARMNN_AUTO_TEST_CASE(Simple4dAxis2NegSoftmax, Simple4dAxisSoftmaxTest, 1.0f, -2)
+ARMNN_AUTO_TEST_CASE(Simple4dAxis3NegSoftmax, Simple4dAxisSoftmaxTest, 1.0f, -1)
+
 // Sigmoid Activation
 ARMNN_AUTO_TEST_CASE(SimpleSigmoid, SimpleSigmoidTest)
 ARMNN_AUTO_TEST_CASE(SimpleSigmoidUint8, SimpleSigmoidUint8Test)

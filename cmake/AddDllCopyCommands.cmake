@@ -55,6 +55,12 @@ macro(addDllCopyCommands target)
                                         "${PROTOBUF_ROOT}/bin/libprotobuf.dll")
         endif()
 
+        # armnnTfLiteParser.dll
+        if ("armnnTfLiteParser" IN_LIST target_deps)
+            addDllCopyCommand(${target} "$<TARGET_FILE_DIR:armnnTfLiteParser>/armnnTfLiteParser.dll"
+                                        "$<TARGET_FILE_DIR:armnnTfLiteParser>/armnnTfLiteParser.dll")
+        endif()
+
         # caffe.dll and its dependencies
         listContainsRegex(includeCaffeDlls "${target_deps}" "caffe")
         if (${includeCaffeDlls})

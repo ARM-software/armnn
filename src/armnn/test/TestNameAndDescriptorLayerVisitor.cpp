@@ -8,7 +8,7 @@
 namespace armnn
 {
 
-void Set2dDataValues(SplitterDescriptor descriptor, u_int32_t value)
+void Set2dDataValues(SplitterDescriptor descriptor, uint32_t value)
 {
     for (unsigned int i = 0; i < descriptor.GetNumViews(); ++i)
     {
@@ -20,7 +20,7 @@ void Set2dDataValues(SplitterDescriptor descriptor, u_int32_t value)
     }
 }
 
-void Set2dDataValues(OriginsDescriptor& descriptor, u_int32_t value)
+void Set2dDataValues(OriginsDescriptor& descriptor, uint32_t value)
 {
     for (unsigned int i = 0; i < descriptor.GetNumViews(); ++i)
     {

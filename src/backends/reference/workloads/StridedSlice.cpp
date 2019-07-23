@@ -68,7 +68,7 @@ TensorShape ExtendShape(const TensorShape& inputShape,
         return inputShape;
     }
 
-    unsigned int newSizes[newNumDimensions];
+    std::vector<unsigned int> newSizes(newNumDimensions, 0);
 
     unsigned int diff = newNumDimensions - inputShape.GetNumDimensions();
 
@@ -82,7 +82,7 @@ TensorShape ExtendShape(const TensorShape& inputShape,
         newSizes[i] = inputShape[i - diff];
     }
 
-    return TensorShape(newNumDimensions, newSizes);
+    return TensorShape(newNumDimensions, newSizes.data());
 }
 
 } // Anonymous namespace

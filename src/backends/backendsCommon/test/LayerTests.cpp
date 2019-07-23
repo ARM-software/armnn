@@ -3262,7 +3262,7 @@ LayerTestResult<TOutput, 4> ElementwiseTestHelper(
     const unsigned int outShape[4], std::vector<TOutput> outValues,
     float qScale = 0.0f, int qOffset = 0)
 {
-    const size_t dimensionCount = 4;
+    const uint32_t dimensionCount = 4;
     armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, ArmnnTypeInput};
     armnn::TensorInfo inputTensorInfo1{dimensionCount, shape1, ArmnnTypeInput};
     armnn::TensorInfo outputTensorInfo{dimensionCount, outShape, ArmnnTypeOutput};
@@ -4097,7 +4097,7 @@ LayerTestResult<float,4> MultiplicationTestHelper(
     const unsigned int outShape[4],
     const std::vector<float> & outValues)
 {
-    const size_t dimensionCount = 4;
+    const uint32_t dimensionCount = 4;
     armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, armnn::DataType::Float32};
     armnn::TensorInfo inputTensorInfo1{dimensionCount, shape1, armnn::DataType::Float32};
     armnn::TensorInfo outputTensorInfo{dimensionCount, outShape, armnn::DataType::Float32};

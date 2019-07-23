@@ -400,7 +400,7 @@ public:
         {
             boost::filesystem::path filename = params.m_ModelPath;
             filename.replace_extension("dot");
-            std::fstream file(filename.c_str(),file.out);
+            std::fstream file(filename.c_str(), std::ios_base::out);
             optNet->SerializeToDot(file);
         }
 

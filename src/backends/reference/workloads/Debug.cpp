@@ -23,7 +23,7 @@ void Debug(const TensorInfo& inputInfo,
     const unsigned int numElements = inputInfo.GetNumElements();
     const TensorShape& inputShape = inputInfo.GetShape();
 
-    unsigned int strides[numDims];
+    std::vector<unsigned int> strides(numDims, 0);
     strides[numDims - 1] = inputShape[numDims - 1];
 
     for (unsigned int i = 2; i <= numDims; i++)

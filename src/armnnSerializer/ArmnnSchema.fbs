@@ -131,7 +131,8 @@ enum LayerType : uint {
     Prelu = 41,
     TransposeConvolution2d = 42,
     Resize = 43,
-    Stack = 44
+    Stack = 44,
+    QuantizedLstm = 45
 }
 
 // Base layer table to be used as part of other layers
@@ -544,6 +545,23 @@ table LstmInputParams {
     outputLayerNormWeights:ConstTensor;
 }
 
+table QuantizedLstmInputParams {
+    inputToInputWeights:ConstTensor;
+    inputToForgetWeights:ConstTensor;
+    inputToCellWeights:ConstTensor;
+    inputToOutputWeights:ConstTensor;
+
+    recurrentToInputWeights:ConstTensor;
+    recurrentToForgetWeights:ConstTensor;
+    recurrentToCellWeights:ConstTensor;
+    recurrentToOutputWeights:ConstTensor;
+
+    inputGateBias:ConstTensor;
+    forgetGateBias:ConstTensor;
+    cellBias:ConstTensor;
+    outputGateBias:ConstTensor;
+}
+
 table LstmDescriptor {
     activationFunc:uint;
     clippingThresCell:float;
@@ -558,6 +576,11 @@ table LstmLayer {
     base:LayerBase;
     descriptor:LstmDescriptor;
     inputParams:LstmInputParams;
+}
+
+table QuantizedLstmLayer {
+    base:LayerBase;
+    inputParams:QuantizedLstmInputParams;
 }
 
 table DequantizeLayer {
@@ -653,6 +676,7 @@ union Layer {
     SplitterLayer,
     DetectionPostProcessLayer,
     LstmLayer,
+    QuantizedLstmLayer,
     QuantizeLayer,
     DequantizeLayer,
     MergeLayer,

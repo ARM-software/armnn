@@ -24,6 +24,7 @@ public:
     using NormalizationDescriptorPtr = const armnnSerializer::NormalizationDescriptor *;
     using LstmDescriptorPtr = const armnnSerializer::LstmDescriptor *;
     using LstmInputParamsPtr = const armnnSerializer::LstmInputParams *;
+    using QunatizedLstmInputParamsPtr = const armnnSerializer::QuantizedLstmInputParams *;
     using TensorRawPtrVector = std::vector<TensorRawPtr>;
     using LayerRawPtr = const armnnSerializer::LayerBase *;
     using LayerBaseRawPtr = const armnnSerializer::LayerBase *;
@@ -100,6 +101,7 @@ private:
     void ParseMultiplication(GraphPtr graph, unsigned int layerIndex);
     void ParseNormalization(GraphPtr graph, unsigned int layerIndex);
     void ParseLstm(GraphPtr graph, unsigned int layerIndex);
+    void ParseQuantizedLstm(GraphPtr graph, unsigned int layerIndex);
     void ParsePad(GraphPtr graph, unsigned int layerIndex);
     void ParsePermute(GraphPtr graph, unsigned int layerIndex);
     void ParsePooling2d(GraphPtr graph, unsigned int layerIndex);

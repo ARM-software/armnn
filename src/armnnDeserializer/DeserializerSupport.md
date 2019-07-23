@@ -35,6 +35,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Pooling2d
 * Prelu
 * Quantize
+* QuantizedLstm
 * Reshape
 * ResizeBilinear
 * Rsqrt

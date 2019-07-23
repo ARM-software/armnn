@@ -215,6 +215,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_Pooling2dLayer]              = &Deserializer::ParsePooling2d;
     m_ParserFunctions[Layer_PreluLayer]                  = &Deserializer::ParsePrelu;
     m_ParserFunctions[Layer_QuantizeLayer]               = &Deserializer::ParseQuantize;
+    m_ParserFunctions[Layer_QuantizedLstmLayer]          = &Deserializer::ParseQuantizedLstm;
     m_ParserFunctions[Layer_ReshapeLayer]                = &Deserializer::ParseReshape;
     m_ParserFunctions[Layer_ResizeBilinearLayer]         = &Deserializer::ParseResizeBilinear;
     m_ParserFunctions[Layer_ResizeLayer]                 = &Deserializer::ParseResize;
@@ -300,6 +301,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_PreluLayer()->base();
         case Layer::Layer_QuantizeLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_QuantizeLayer()->base();
+        case Layer::Layer_QuantizedLstmLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_QuantizedLstmLayer()->base();
         case Layer::Layer_ReshapeLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ReshapeLayer()->base();
         case Layer::Layer_ResizeBilinearLayer:
@@ -2205,6 +2208,60 @@ void Deserializer::ParseLstm(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo4 = ToTensorInfo(outputs[3]);
     layer->GetOutputSlot(3).SetTensorInfo(outputTensorInfo4);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseQuantizedLstm(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 3);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 2);
+
+    auto flatBufferLayer = graph->layers()->Get(layerIndex)->layer_as_QuantizedLstmLayer();
+    auto layerName = GetLayerName(graph, layerIndex);
+    auto flatBufferInputParams = flatBufferLayer->inputParams();
+
+    armnn::QuantizedLstmInputParams lstmInputParams;
+
+    armnn::ConstTensor inputToInputWeights = ToConstTensor(flatBufferInputParams->inputToInputWeights());
+    armnn::ConstTensor inputToForgetWeights = ToConstTensor(flatBufferInputParams->inputToForgetWeights());
+    armnn::ConstTensor inputToCellWeights = ToConstTensor(flatBufferInputParams->inputToCellWeights());
+    armnn::ConstTensor inputToOutputWeights = ToConstTensor(flatBufferInputParams->inputToOutputWeights());
+    armnn::ConstTensor recurrentToInputWeights = ToConstTensor(flatBufferInputParams->recurrentToInputWeights());
+    armnn::ConstTensor recurrentToForgetWeights = ToConstTensor(flatBufferInputParams->recurrentToForgetWeights());
+    armnn::ConstTensor recurrentToCellWeights = ToConstTensor(flatBufferInputParams->recurrentToCellWeights());
+    armnn::ConstTensor recurrentToOutputWeights = ToConstTensor(flatBufferInputParams->recurrentToOutputWeights());
+    armnn::ConstTensor inputGateBias = ToConstTensor(flatBufferInputParams->inputGateBias());
+    armnn::ConstTensor forgetGateBias = ToConstTensor(flatBufferInputParams->forgetGateBias());
+    armnn::ConstTensor cellBias = ToConstTensor(flatBufferInputParams->cellBias());
+    armnn::ConstTensor outputGateBias = ToConstTensor(flatBufferInputParams->outputGateBias());
+
+    lstmInputParams.m_InputToInputWeights = &inputToInputWeights;
+    lstmInputParams.m_InputToForgetWeights = &inputToForgetWeights;
+    lstmInputParams.m_InputToCellWeights = &inputToCellWeights;
+    lstmInputParams.m_InputToOutputWeights = &inputToOutputWeights;
+    lstmInputParams.m_RecurrentToInputWeights = &recurrentToInputWeights;
+    lstmInputParams.m_RecurrentToForgetWeights = &recurrentToForgetWeights;
+    lstmInputParams.m_RecurrentToCellWeights = &recurrentToCellWeights;
+    lstmInputParams.m_RecurrentToOutputWeights = &recurrentToOutputWeights;
+    lstmInputParams.m_InputGateBias = &inputGateBias;
+    lstmInputParams.m_ForgetGateBias = &forgetGateBias;
+    lstmInputParams.m_CellBias = &cellBias;
+    lstmInputParams.m_OutputGateBias = &outputGateBias;
+
+    IConnectableLayer* layer = m_Network->AddQuantizedLstmLayer(lstmInputParams, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo1 = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo1);
+
+    armnn::TensorInfo outputTensorInfo2 = ToTensorInfo(outputs[1]);
+    layer->GetOutputSlot(1).SetTensorInfo(outputTensorInfo2);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

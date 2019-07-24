@@ -45,7 +45,13 @@ BackendId DynamicBackend::GetBackendId()
         throw RuntimeException("GetBackendId error: invalid function pointer");
     }
 
-    return BackendId(m_BackendIdFunction());
+    const char* backendId = m_BackendIdFunction();
+    if (backendId == nullptr)
+    {
+        throw RuntimeException("GetBackendId error: invalid backend id");
+    }
+
+    return BackendId(backendId);
 }
 
 BackendVersion DynamicBackend::GetBackendVersion()

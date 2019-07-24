@@ -5,17 +5,27 @@
 
 #pragma once
 
+#include <backendsCommon/DynamicBackend.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 
-#include <test/UnitTests.hpp>
+#include <string>
+#include <memory>
 
 #include <string>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 
-static std::string g_TestSharedObjectSubDir = "src/backends/backendsCommon/test/";
-static std::string g_TestSharedObjectFileName = "libarmnnTestSharedObject.so";
+static std::string g_TestSharedObjectSubDir                 = "src/backends/backendsCommon/test/";
+static std::string g_TestSharedObjectFileName               = "libarmnnTestSharedObject.so";
+static std::string g_TestValidTestDynamicBackendFileName    = "libarmnnValidTestDynamicBackend.so";
+static std::string g_TestInvalidTestDynamicBackend1FileName = "libarmnnInvalidTestDynamicBackend1.so";
+static std::string g_TestInvalidTestDynamicBackend2FileName = "libarmnnInvalidTestDynamicBackend2.so";
+static std::string g_TestInvalidTestDynamicBackend3FileName = "libarmnnInvalidTestDynamicBackend3.so";
+static std::string g_TestInvalidTestDynamicBackend4FileName = "libarmnnInvalidTestDynamicBackend4.so";
+static std::string g_TestInvalidTestDynamicBackend5FileName = "libarmnnInvalidTestDynamicBackend5.so";
+static std::string g_TestInvalidTestDynamicBackend6FileName = "libarmnnInvalidTestDynamicBackend6.so";
+static std::string g_TestInvalidTestDynamicBackend7FileName = "libarmnnInvalidTestDynamicBackend7.so";
 
 std::string GetTestFilePath(const std::string& fileName)
 {
@@ -208,4 +218,197 @@ void BackendVersioningTestImpl()
     BOOST_TEST(!(earlierMinorBackendVersion == backendApiVersion));
     BOOST_TEST(earlierMinorBackendVersion <= backendApiVersion);
     BOOST_TEST(TestDynamicBackendUtils::IsBackendCompatibleTest(backendApiVersion, earlierMinorBackendVersion) == true);
+}
+
+void CreateValidDynamicBackendObjectTestImpl()
+{
+    // Valid shared object handle
+    // Correct name mangling
+    // Correct interface
+    // Correct backend implementation
+
+    using namespace armnn;
+
+    std::string sharedObjectFilePath = GetTestFilePath(g_TestValidTestDynamicBackendFileName);
+
+    void* sharedObjectHandle = nullptr;
+    BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
+    BOOST_TEST((sharedObjectHandle != nullptr));
+
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_NO_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)));
+    BOOST_TEST((dynamicBackend != nullptr));
+
+    BackendId dynamicBackendId;
+    BOOST_CHECK_NO_THROW(dynamicBackendId = dynamicBackend->GetBackendId());
+    BOOST_TEST((dynamicBackendId == "ValidTestDynamicBackend"));
+
+    BackendVersion dynamicBackendVersion;
+    BOOST_CHECK_NO_THROW(dynamicBackendVersion = dynamicBackend->GetBackendVersion());
+    BOOST_TEST((dynamicBackendVersion == BackendVersion({ 1, 0 })));
+
+    IBackendInternalUniquePtr dynamicBackendInstance;
+    BOOST_CHECK_NO_THROW(dynamicBackendInstance = dynamicBackend->GetBackend());
+    BOOST_TEST((dynamicBackendInstance != nullptr));
+
+    BOOST_TEST((dynamicBackendInstance->GetId() == "ValidTestDynamicBackend"));
+}
+
+void CreateDynamicBackendObjectInvalidHandleTestImpl()
+{
+    // Invalid (null) shared object handle
+
+    using namespace armnn;
+
+    void* sharedObjectHandle = nullptr;
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)), InvalidArgumentException);
+    BOOST_TEST((dynamicBackend == nullptr));
+}
+
+void CreateDynamicBackendObjectInvalidInterface1TestImpl()
+{
+    // Valid shared object handle
+    // Wrong (not C-style) name mangling
+
+    using namespace armnn;
+
+    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend1FileName);
+
+    void* sharedObjectHandle = nullptr;
+    BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
+    BOOST_TEST((sharedObjectHandle != nullptr));
+
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)), RuntimeException);
+    BOOST_TEST((dynamicBackend == nullptr));
+}
+
+void CreateDynamicBackendObjectInvalidInterface2TestImpl()
+{
+    // Valid shared object handle
+    // Correct name mangling
+    // Wrong interface (missing GetBackendId())
+
+    using namespace armnn;
+
+    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend2FileName);
+
+    void* sharedObjectHandle = nullptr;
+    BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
+    BOOST_TEST((sharedObjectHandle != nullptr));
+
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)), RuntimeException);
+    BOOST_TEST((dynamicBackend == nullptr));
+}
+
+void CreateDynamicBackendObjectInvalidInterface3TestImpl()
+{
+    // Valid shared object handle
+    // Correct name mangling
+    // Wrong interface (missing GetVersion())
+
+    using namespace armnn;
+
+    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend3FileName);
+
+    void* sharedObjectHandle = nullptr;
+    BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
+    BOOST_TEST((sharedObjectHandle != nullptr));
+
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)), RuntimeException);
+    BOOST_TEST((dynamicBackend == nullptr));
+}
+
+void CreateDynamicBackendObjectInvalidInterface4TestImpl()
+{
+    // Valid shared object handle
+    // Correct name mangling
+    // Wrong interface (missing BackendFactory())
+
+    using namespace armnn;
+
+    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend4FileName);
+
+    void* sharedObjectHandle = nullptr;
+    BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
+    BOOST_TEST((sharedObjectHandle != nullptr));
+
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)), RuntimeException);
+    BOOST_TEST((dynamicBackend == nullptr));
+}
+
+void CreateDynamicBackendObjectInvalidInterface5TestImpl()
+{
+    // Valid shared object handle
+    // Correct name mangling
+    // Correct interface
+    // Invalid (null) backend id returned by GetBackendId()
+
+    using namespace armnn;
+
+    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend5FileName);
+
+    void* sharedObjectHandle = nullptr;
+    BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
+    BOOST_TEST((sharedObjectHandle != nullptr));
+
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)), RuntimeException);
+    BOOST_TEST((dynamicBackend == nullptr));
+}
+
+void CreateDynamicBackendObjectInvalidInterface6TestImpl()
+{
+    // Valid shared object handle
+    // Correct name mangling
+    // Correct interface
+    // Invalid (null) backend instance returned by BackendFactory()
+
+    using namespace armnn;
+
+    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend6FileName);
+
+    void* sharedObjectHandle = nullptr;
+    BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
+    BOOST_TEST((sharedObjectHandle != nullptr));
+
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_NO_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)));
+    BOOST_TEST((dynamicBackend != nullptr));
+
+    BackendId dynamicBackendId;
+    BOOST_CHECK_NO_THROW(dynamicBackendId = dynamicBackend->GetBackendId());
+    BOOST_TEST((dynamicBackendId == "InvalidTestDynamicBackend"));
+
+    BackendVersion dynamicBackendVersion;
+    BOOST_CHECK_NO_THROW(dynamicBackendVersion = dynamicBackend->GetBackendVersion());
+    BOOST_TEST((dynamicBackendVersion == BackendVersion({ 1, 0 })));
+
+    IBackendInternalUniquePtr dynamicBackendInstance;
+    BOOST_CHECK_THROW(dynamicBackendInstance = dynamicBackend->GetBackend(), RuntimeException);
+    BOOST_TEST((dynamicBackendInstance == nullptr));
+}
+
+void CreateDynamicBackendObjectInvalidInterface7TestImpl()
+{
+    // Valid shared object handle
+    // Correct name mangling
+    // Correct interface
+    // Invalid (incompatible backend API version) backend instance returned by BackendFactory()
+
+    using namespace armnn;
+
+    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend7FileName);
+
+    void* sharedObjectHandle = nullptr;
+    BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
+    BOOST_TEST((sharedObjectHandle != nullptr));
+
+    std::unique_ptr<DynamicBackend> dynamicBackend;
+    BOOST_CHECK_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)), RuntimeException);
+    BOOST_TEST((dynamicBackend == nullptr));
 }

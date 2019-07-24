@@ -460,9 +460,12 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
             if(descriptor.m_LayerNormEnabled)
             {
-                optInputLayerNormWeights = OverrideDataType(
-                        cLayer->m_LayerNormParameters.m_InputLayerNormWeights->GetTensorInfo(), dataType);
-                paramsInfo.m_InputLayerNormWeights = &optInputLayerNormWeights;
+                if (!descriptor.m_CifgEnabled)
+                {
+                    optInputLayerNormWeights = OverrideDataType(
+                            cLayer->m_LayerNormParameters.m_InputLayerNormWeights->GetTensorInfo(), dataType);
+                    paramsInfo.m_InputLayerNormWeights = &optInputLayerNormWeights;
+                }
 
                 optForgetLayerNormWeights = OverrideDataType(
                         cLayer->m_LayerNormParameters.m_ForgetLayerNormWeights->GetTensorInfo(), dataType);

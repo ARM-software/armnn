@@ -177,6 +177,8 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dAsymmetricNhwc,
 ARMNN_AUTO_TEST_CASE(UnbiasedDepthwiseConvolution2dAsymmetricNhwc,
                      DepthwiseConvolution2dAsymmetricTest, false, armnn::DataLayout::NHWC)
 
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul64, DepthwiseConvolution2dDepthMul64Test);
+
 // Splitter
 ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)
 ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)

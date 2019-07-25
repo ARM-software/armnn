@@ -12,6 +12,8 @@
 #include <arm_compute/core/Types.h>
 #include <arm_compute/core/Size2D.h>
 
+#include <Half.hpp>
+
 #include <boost/cast.hpp>
 
 namespace armnn
@@ -57,6 +59,9 @@ arm_compute::PermutationVector BuildArmComputePermutationVector(const armnn::Per
 
 /// Utility function used to setup an arm_compute::Size2D object from width and height values.
 arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsigned int height);
+
+/// Gets the appropriate PixelValue for the input DataType
+arm_compute::PixelValue GetPixelValue(arm_compute::ITensor& input, float pixelValue);
 
 /// Utility function used to setup an arm_compute::PadStrideInfo object from an armnn layer descriptor.
 template <typename Descriptor>

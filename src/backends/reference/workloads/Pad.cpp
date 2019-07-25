@@ -19,17 +19,6 @@ namespace armnn
 {
 
 template <typename T>
-T ConvertToDataType(const float& value,
-                    const armnn::TensorInfo& tensorInfo)
-{
-    std::vector<T> output(1);
-    std::unique_ptr<armnn::Encoder<float>> pEncoder = armnn::MakeEncoder<float>(tensorInfo, output.data());
-    armnn::Encoder<float>& rEncoder = *pEncoder;
-    rEncoder.Set(value);
-    return output[0];
-}
-
-template <typename T>
 void Pad(const TensorInfo& inputInfo,
          const TensorInfo& outputInfo,
          std::vector<std::pair<unsigned int, unsigned int>> m_padList,
@@ -60,7 +49,7 @@ void Pad(const TensorInfo& inputInfo,
     unsigned int outputHeight = 0;
     unsigned int outputWidth = 0;
 
-    T convertedPadValue = ConvertToDataType<T>(padValue, inputInfo);
+    T convertedPadValue = static_cast<T>(padValue);
 
     for (unsigned int i = 0; i < numOutputElements; ++i)
     {

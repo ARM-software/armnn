@@ -210,5 +210,23 @@ arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsign
     return arm_compute::Size2D(width, height);
 }
 
+arm_compute::PixelValue GetPixelValue(arm_compute::ITensor& input, float pixelValue)
+{
+    switch (input.info()->data_type())
+    {
+        case arm_compute::DataType::QASYMM8:
+            return arm_compute::PixelValue(static_cast<uint8_t>(pixelValue));
+        case arm_compute::DataType::QSYMM16:
+            return arm_compute::PixelValue(static_cast<int16_t>(pixelValue));
+        case arm_compute::DataType::F16:
+            return arm_compute::PixelValue(static_cast<Half>(pixelValue));
+        case arm_compute::DataType::F32:
+            return arm_compute::PixelValue(pixelValue);
+        default:
+            throw InvalidArgumentException("Unsupported DataType: [" +
+                                           std::to_string(static_cast<int>(input.info()->data_type())) + "]");
+    }
+}
+
 } // namespace armcomputetensorutils
 } // namespace armnn

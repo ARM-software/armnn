@@ -25,6 +25,42 @@ class IWorkloadFactory;
 class IMemoryManager;
 class ILayerSupport;
 
+struct BackendVersion
+{
+    uint32_t m_Major;
+    uint32_t m_Minor;
+
+    BackendVersion()
+        : m_Major(0)
+        , m_Minor(0)
+    {}
+    BackendVersion(uint32_t major, uint32_t minor)
+        : m_Major(major)
+        , m_Minor(minor)
+    {}
+
+    bool operator==(const BackendVersion& other) const
+    {
+        return this == &other ||
+               (this->m_Major == other.m_Major &&
+                this->m_Minor == other.m_Minor);
+    }
+
+    bool operator<=(const BackendVersion& other) const
+    {
+        return this->m_Major < other.m_Major ||
+               (this->m_Major == other.m_Major &&
+                this->m_Minor <= other.m_Minor);
+    }
+};
+
+inline std::ostream& operator<<(std::ostream& os, const BackendVersion& backendVersion)
+{
+    os << "[" << backendVersion.m_Major << "." << backendVersion.m_Minor << "]";
+
+    return os;
+}
+
 class IBackendInternal : public IBackend
 {
 protected:
@@ -79,7 +115,7 @@ public:
     virtual IMemoryManagerUniquePtr CreateMemoryManager() const
     {
         return IMemoryManagerUniquePtr();
-    };
+    }
 
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
         const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
@@ -142,6 +178,9 @@ public:
     /// Either this method or CreateMemoryManager() and
     /// IWorkloadFactory::CreateTensor()/IWorkloadFactory::CreateSubtensor() methods must be implemented.
     virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) {}
+
+    /// Returns the version of the Backend API
+    static BackendVersion GetApiVersion() { return { 1, 0 }; }
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

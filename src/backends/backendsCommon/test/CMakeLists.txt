@@ -19,6 +19,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     DequantizeEndToEndTestImpl.hpp
     DetectionPostProcessLayerTestImpl.hpp
     DetectionPostProcessTestImpl.hpp
+    DynamicBackendTests.cpp
+    DynamicBackendTests.hpp
     EndToEndTestImpl.hpp
     FullyConnectedTestImpl.hpp
     GatherTestImpl.hpp

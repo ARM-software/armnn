@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "IBackendInternal.hpp"
+
 #include <armnn/Exceptions.hpp>
 
 #include <string>
@@ -23,6 +25,12 @@ public:
 
     template<typename EntryPointType>
     static EntryPointType GetEntryPoint(const void* sharedObjectHandle, const char* symbolName);
+
+    static bool IsBackendCompatible(const BackendVersion& backendVersion);
+
+protected:
+    /// Protected for testing purposes
+    static bool IsBackendCompatibleImpl(const BackendVersion& backendApiVersion, const BackendVersion& backendVersion);
 
 private:
     static std::string GetDlError();

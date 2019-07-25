@@ -34,6 +34,20 @@ void DynamicBackendUtils::CloseHandle(const void* sharedObjectHandle)
     dlclose(const_cast<void*>(sharedObjectHandle));
 }
 
+bool DynamicBackendUtils::IsBackendCompatible(const BackendVersion &backendVersion)
+{
+    BackendVersion backendApiVersion = IBackendInternal::GetApiVersion();
+
+    return IsBackendCompatibleImpl(backendApiVersion, backendVersion);
+}
+
+bool DynamicBackendUtils::IsBackendCompatibleImpl(const BackendVersion &backendApiVersion,
+                                                  const BackendVersion &backendVersion)
+{
+    return backendVersion.m_Major == backendApiVersion.m_Major &&
+           backendVersion.m_Minor <= backendApiVersion.m_Minor;
+}
+
 std::string DynamicBackendUtils::GetDlError()
 {
     const char* errorMessage = dlerror();

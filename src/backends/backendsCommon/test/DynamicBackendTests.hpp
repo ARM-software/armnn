@@ -10,7 +10,6 @@
 
 #include <string>
 #include <memory>
-
 #include <string>
 
 #include <boost/test/unit_test.hpp>
@@ -569,4 +568,85 @@ void GetBackendPathsOverrideTestImpl()
     // Override with invalid path
     std::vector<std::string> invalidResult = DynamicBackendUtils::GetBackendPaths(subDir4);
     BOOST_TEST(invalidResult.empty());
+}
+
+void GetSharedObjectsTestImpl()
+{
+    using namespace armnn;
+    using namespace boost::filesystem;
+
+    //
+    // The test sub-directory backendsTestPath1/ contains the following test files:
+    //
+    // Arm_GpuAcc_backend.so                                       -> valid (basic backend name)
+    // Arm_GpuAcc_backend.so.1                                     -> valid (single field version number)
+    // Arm_GpuAcc_backend.so.1.2                                   -> valid (multiple field version number)
+    // Arm_GpuAcc_backend.so.1.2.3                                 -> valid (multiple field version number)
+    // Arm_GpuAcc_backend.so.10.1.27                               -> valid (Multiple digit version)
+    // Arm_GpuAcc_backend.so.10.1.33.                              -> not valid (dot not followed by version number)
+    // Arm_GpuAcc_backend.so.3.4..5                                -> not valid (dot not followed by version number)
+    // Arm_GpuAcc_backend.so.1,1.1                                 -> not valid (comma instead of dot in the version)
+    //
+    // Arm123_GpuAcc_backend.so                                    -> valid (digits in vendor name are allowed)
+    // Arm_GpuAcc456_backend.so                                    -> valid (digits in backend id are allowed)
+    // Arm%Co_GpuAcc_backend.so                                    -> not valid (invalid character in vendor name)
+    // Arm_Gpu.Acc_backend.so                                      -> not valid (invalid character in backend id)
+    //
+    // GpuAcc_backend.so                                           -> not valid (missing vendor name)
+    // _GpuAcc_backend.so                                          -> not valid (missing vendor name)
+    // Arm__backend.so                                             -> not valid (missing backend id)
+    // Arm_GpuAcc.so                                               -> not valid (missing "backend" at the end)
+    // __backend.so                                                -> not valid (missing vendor name and backend id)
+    // __.so                                                       -> not valid (missing all fields)
+    //
+    // Arm_GpuAcc_backend                                          -> not valid (missing at least ".so" at the end)
+    // Arm_GpuAcc_backend_v1.2.so                                  -> not valid (extra version info at the end)
+    //
+    // The test sub-directory backendsTestPath1/ contains the following test files:
+    //
+    // Arm_CpuAcc_backend.so                                       -> valid (basic backend name)
+    // Arm_CpuAcc_backend.so.1 -> Arm_CpuAcc_backend.so            -> valid (symlink to valid backend file)
+    // Arm_CpuAcc_backend.so.1.2 -> Arm_CpuAcc_backend.so.1        -> valid (symlink to valid symlink)
+    // Arm_CpuAcc_backend.so.1.2.3 -> Arm_CpuAcc_backend.so.1.2    -> valid (symlink to valid symlink)
+    //
+    // Arm_no_backend.so -> nothing                                -> not valid (symlink resolves to non-existent file)
+    //
+    // Arm_GpuAcc_backend.so                                       -> valid (but duplicated from backendsTestPath1/)
+
+    std::string testDynamicBackendsSubDir1 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir1);
+    std::string testDynamicBackendsSubDir2 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir2);
+    std::string testDynamicBackendsSubDir3 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir3);
+    std::string testDynamicBackendsSubDir4 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir4);
+    BOOST_CHECK(exists(testDynamicBackendsSubDir1));
+    BOOST_CHECK(exists(testDynamicBackendsSubDir2));
+    BOOST_CHECK(exists(testDynamicBackendsSubDir3));
+    BOOST_CHECK(!exists(testDynamicBackendsSubDir4));
+
+    std::vector<std::string> backendPaths
+    {
+        testDynamicBackendsSubDir1,
+        testDynamicBackendsSubDir2,
+        testDynamicBackendsSubDir3,
+        testDynamicBackendsSubDir4
+    };
+    std::vector<std::string> sharedObjects = DynamicBackendUtils::GetSharedObjects(backendPaths);
+    std::unordered_set<std::string> expectedSharedObjects
+    {
+        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so",         // Basic backend name
+        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1",       // Single field version number
+        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1.2",     // Multiple field version number
+        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1.2.3",   // Multiple field version number
+        testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.10.1.27", // Multiple digit version
+        testDynamicBackendsSubDir1 + "Arm123_GpuAcc_backend.so",      // Digits in vendor name are allowed
+        testDynamicBackendsSubDir1 + "Arm_GpuAcc456_backend.so",      // Digits in backend id are allowed
+        testDynamicBackendsSubDir2 + "Arm_CpuAcc_backend.so",         // Duplicate symlinks removed
+        testDynamicBackendsSubDir2 + "Arm_GpuAcc_backend.so"          // Duplicates on different paths are allowed
+    };
+
+    BOOST_TEST(sharedObjects.size() == expectedSharedObjects.size());
+    for (const std::string& sharedObject : sharedObjects)
+    {
+        auto it = expectedSharedObjects.find(sharedObject);
+        BOOST_TEST((it != expectedSharedObjects.end()));
+    }
 }

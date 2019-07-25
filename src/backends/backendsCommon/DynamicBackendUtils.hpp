@@ -35,6 +35,7 @@ public:
 
     static std::vector<std::string> GetBackendPaths(const std::string& overrideBackendPath = "");
     static bool IsPathValid(const std::string& path);
+    static std::vector<std::string> GetSharedObjects(const std::vector<std::string>& backendPaths);
 
 protected:
     /// Protected methods for testing purposes

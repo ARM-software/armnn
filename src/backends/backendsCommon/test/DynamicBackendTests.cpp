@@ -43,4 +43,6 @@ ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendObjectInvalidInterface7,
 ARMNN_SIMPLE_TEST_CASE(GetBackendPaths, GetBackendPathsTestImpl)
 ARMNN_SIMPLE_TEST_CASE(GetBackendPathsOverride, GetBackendPathsOverrideTestImpl)
 
+ARMNN_SIMPLE_TEST_CASE(GetSharedObjects, GetSharedObjectsTestImpl);
+
 BOOST_AUTO_TEST_SUITE_END()

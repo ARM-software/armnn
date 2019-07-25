@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
                 ("validation-labels-path,v", po::value<std::string>(&validationLabelPath)->required(),
                  "Path to ImageNet Validation Label file")
                 ("data-layout,l", po::value<std::string>(&inputLayout)->default_value("NHWC"),
-                 "Data layout. Supported value: NHWC, NCHW. Default: NHCW")
+                 "Data layout. Supported value: NHWC, NCHW. Default: NHWC")
                 ("compute,c", po::value<std::vector<armnn::BackendId>>(&computeDevice)->default_value(defaultBackends),
                  backendsMessage.c_str())
                 ("validation-range,r", po::value<std::string>(&validationRange)->default_value("1:0"),

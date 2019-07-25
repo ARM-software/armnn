@@ -21,7 +21,7 @@ To build ModelAccuracyTool, pass the following options to Cmake:
 | -d | --data-dir               | Path to directory containing the ImageNet test data |
 | -p | --model-output-labels    | Path to model output labels file.
 | -v | --validation-labels-path | Path to ImageNet Validation Label file
-| -l | --data-layout ]          | Data layout. Supported value: NHWC, NCHW. Default: NHCW
+| -l | --data-layout ]          | Data layout. Supported value: NHWC, NCHW. Default: NHWC
 | -c | --compute                | Which device to run layers on by default. Possible choices: CpuRef, CpuAcc, GpuAcc. Default: CpuAcc, CpuRef |
 | -r | --validation-range       | The range of the images to be evaluated. Specified in the form <begin index>:<end index>. The index starts at 1 and the range is inclusive. By default the evaluation will be performed on all images. |
 | -b | --blacklist-path         | Path to a blacklist file where each line denotes the index of an image to be excluded from evaluation. |

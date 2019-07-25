@@ -47,7 +47,7 @@ EntryPointType DynamicBackendUtils::GetEntryPoint(const void* sharedObjectHandle
     auto entryPoint = reinterpret_cast<EntryPointType>(dlsym(const_cast<void*>(sharedObjectHandle), symbolName));
     if (!entryPoint)
     {
-        throw RuntimeException(boost::str(boost::format("GetEntryPoint error: %1") % GetDlError()));
+        throw RuntimeException(boost::str(boost::format("GetEntryPoint error: %1%") % GetDlError()));
     }
 
     return entryPoint;

@@ -18,7 +18,7 @@ void* DynamicBackendUtils::OpenHandle(const std::string& sharedObjectPath)
     void* sharedObjectHandle = dlopen(sharedObjectPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if (!sharedObjectHandle)
     {
-        throw RuntimeException(boost::str(boost::format("OpenHandle error: %1") % GetDlError()));
+        throw RuntimeException(boost::str(boost::format("OpenHandle error: %1%") % GetDlError()));
     }
 
     return sharedObjectHandle;

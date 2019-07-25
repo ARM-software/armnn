@@ -73,7 +73,7 @@ void StackLayer::ValidateTensorShapesFromInputs()
         TensorShape inputShape = GetInputSlot(i).GetConnection()->GetTensorInfo().GetShape();
         if (inputShape != m_Param.m_InputShape)
         {
-            throw LayerValidationException("ConcatLayer: TensorShape set on InputSlot[" +
+            throw LayerValidationException("StackLayer: TensorShape set on InputSlot[" +
                                            std::to_string(i) +
                                            "] does not match defined input shape");
         }

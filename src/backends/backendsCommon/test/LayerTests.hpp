@@ -1059,6 +1059,10 @@ LayerTestResult<uint8_t, 4> L2Normalization2dUint8Test(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::DataLayout layout);
 
+LayerTestResult<float, 2> L2Normalization2dShapeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<float, 4> L2Normalization3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

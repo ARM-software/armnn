@@ -1120,8 +1120,10 @@ void L2NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) 
     const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
-    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
-    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
+    if (inputTensorInfo.GetNumDimensions() > 4)
+    {
+        throw InvalidArgumentException(descriptorName + ": Input tensors with rank greater than 4 are not supported.");
+    }
 
     ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 

@@ -6,6 +6,7 @@
 #include "ClSoftmaxBaseWorkload.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLSoftmaxLayer.h>
 
@@ -13,12 +14,14 @@ namespace armnn
 {
 
 arm_compute::Status ClSoftmaxWorkloadValidate(const TensorInfo& input,
-                                              const TensorInfo& output)
+                                              const TensorInfo& output,
+                                              const SoftmaxDescriptor& descriptor)
 {
     const arm_compute::TensorInfo aclInputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
-    return arm_compute::CLSoftmaxLayer::validate(&aclInputInfo, &aclOutputInfo);
+    unsigned int aclAxis = ComputeSoftmaxAclAxis(input);
+    return arm_compute::CLSoftmaxLayer::validate(&aclInputInfo, &aclOutputInfo, descriptor.m_Beta, aclAxis);
 }
 
 }

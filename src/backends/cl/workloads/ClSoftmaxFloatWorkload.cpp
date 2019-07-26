@@ -14,7 +14,7 @@ namespace armnn
 {
 
 ClSoftmaxFloatWorkload::ClSoftmaxFloatWorkload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,
-                                                   std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
+                                               std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
     : FloatWorkload<SoftmaxQueueDescriptor>(descriptor, info)
     , m_SoftmaxLayer(memoryManager)
 {

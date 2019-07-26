@@ -617,8 +617,13 @@ std::unique_ptr<SoftmaxWorkload> CreateSoftmaxWorkloadTest(armnn::IWorkloadFacto
 {
     // Create the layer we're testing.
     SoftmaxDescriptor softmaxDescriptor;
-    Layer* const layer = graph.AddLayer<SoftmaxLayer>(softmaxDescriptor, "layer");
+    // Set Axis to 1 if CL or Neon until further Axes are supported.
+    if (factory.GetBackendId() == armnn::Compute::CpuAcc || factory.GetBackendId() == armnn::Compute::GpuAcc)
+    {
+        softmaxDescriptor.m_Axis = 1;
+    }
 
+    Layer* const layer = graph.AddLayer<SoftmaxLayer>(softmaxDescriptor, "layer");
     // Create extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");

@@ -6,6 +6,7 @@
 #include "NeonSoftmaxBaseWorkload.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NESoftmaxLayer.h>
 
@@ -19,7 +20,8 @@ arm_compute::Status NeonSoftmaxWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclInputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
-    return arm_compute::NESoftmaxLayer::validate(&aclInputInfo, &aclOutputInfo, descriptor.m_Beta);
+    unsigned int aclAxis = ComputeSoftmaxAclAxis(input);
+    return arm_compute::NESoftmaxLayer::validate(&aclInputInfo, &aclOutputInfo, descriptor.m_Beta, aclAxis);
 }
 
 } //namespace armnn

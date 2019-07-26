@@ -64,3 +64,14 @@ add_library(armnnBackendsCommonUnitTests OBJECT ${armnnBackendsCommonUnitTests_s
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+
+# Dummy shared object for testing.
+# This is a simple library used to test the utility functions that will be used to handle the shared objects.
+
+list(APPEND armnnTestSharedObject_sources
+    TestSharedObject.cpp
+    TestSharedObject.hpp
+)
+
+add_library_ex(armnnTestSharedObject SHARED ${armnnTestSharedObject_sources})
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libarmnnNoSharedObject.txt "This is not a shared object")

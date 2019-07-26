@@ -221,3 +221,62 @@ runtime will hold this for its entire lifetime. It then calls the following inte
 * ```AfterLoadNetwork(NetworkId networkId)```
 * ```BeforeUnloadNetwork(NetworkId networkId)```
 * ```AfterUnloadNetwork(NetworkId networkId)```
+
+### Dynamic backends
+
+Backends can also be loaded by ArmNN dynamically at runtime.
+To be properly loaded and used, the backend instances must comply to the standard interface for dynamic backends and to the versioning
+rules that enforce ABI compatibility.
+
+## Dynamic backends base interface
+
+The dynamic backend shared object must expose the following interface for ArmNN to handle it correctly:
+
+```c++
+extern "C"
+{
+const char* GetBackendId();
+void GetVersion(uint32_t* outMajor, uint32_t* outMinor);
+void* BackendFactory();
+}
+```
+
+Interface details:
+
+* '''extern "C"''' is needed to use avoid C++ name mangling, necessary to allow ArmNN to dynamically load the symbols.
+* '''GetBackendId()''': must return the unique id of the dynamic backends.
+  If at the time of the loading the id already exists in the internal ArmNN's backend registry, the backend will be skipped and
+  not loaded in ArmNN
+* '''GetVersion()''': must return the version of the dynamic backend.
+  The version must indicate the version of the Backend API the dynamic backend has been built with.
+  The current Backend API version can be found by inspecting the IBackendInternal interface.
+  At the time of loading, the version of the backend will be checked against the version of the Backend API ArmNN is built with.
+  If the backend version is not compatible with the current Backend API, the backend will not be loaded as it will be assumed that
+  it is not ABI compatible with the current ArmNN build.
+* '''BackendFactory()''': must return a valid instance of the backend.
+  The backend instance is an object that must inherit from the version of the IBackendInternal interface declared by GetVersion().
+  It is the backend developer's responsibility to ensure that the backend implementation correctly reflects the version declared by
+  GetVersion(), and that the object returned by the BackendFactory() function is a valid and well-formed instance of the IBackendInternal
+  interface.
+
+## Backend versioning and ABI compatibility
+
+Dynamic backend versioning policy:
+
+Updates to ArmNN's Backend API follow these rules: changes to the Backend API (the IBackendInternal interface) that break
+ABI compatibility with the previous API version will be indicated by a change of the API's major version, while changes
+that guarantee ABI compatibility with the previous API version will be indicated by a change in API's the minor version.
+
+For example:
+
+* Dynamic backend version 2.4 (i.e. built with Backend APi version 2.4) is compatible with ArmNN's Backend API version 2.4
+  (same version, backend built against the same Backend API)
+* Dynamic backend version 2.1 (i.e. built with Backend APi version 2.1) is compatible with ArmNN's Backend API version 2.4
+  (same major version, backend built against earlier compatible API)
+* Dynamic backend version 2.5 (i.e. built with Backend APi version 2.5) is not compatible with ArmNN's Backend API version 2.4
+  (same major version, backend built against later incompatible API, backend might require update to the latest compatible backend API)
+* Dynamic backend version 2.0 (i.e. built with Backend APi version 2.0) is not compatible with ArmNN's Backend API version 1.0
+  (backend requires a completely new API version)
+* Dynamic backend version 2.0 (i.e. built with Backend APi version 2.0) is not compatible with ArmNN's Backend API version 3.0
+  (backward compatibility in the Backend API is broken)
+

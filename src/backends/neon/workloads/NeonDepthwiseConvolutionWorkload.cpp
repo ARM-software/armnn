@@ -114,8 +114,10 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
     // Check for optimisation opportunities.
-    bool use3x3Optimisation = (weightInfo.GetShape()[2] == 3) && (weightInfo.GetShape()[3] == 3);
-    if (use3x3Optimisation)
+    const bool use3x3Optimisation = (weightInfo.GetShape()[2] == 3) && (weightInfo.GetShape()[3] == 3);
+    const bool use5x5Optimisation = (weightInfo.GetShape()[2] == 5) && (weightInfo.GetShape()[3] == 5);
+
+    if (use3x3Optimisation||use5x5Optimisation)
     {
         m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayerOptimized>();
         static_cast<arm_compute::NEDepthwiseConvolutionLayerOptimized*>(

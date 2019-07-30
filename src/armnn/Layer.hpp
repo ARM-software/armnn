@@ -123,6 +123,7 @@ public:
     void Disconnect(InputSlot& slot);
 
     const std::vector<InputSlot*>& GetConnections() const { return m_Connections; }
+    const std::vector<MemoryStrategy>& GetMemoryStrategies() const { return m_MemoryStrategies; }
 
     bool ValidateTensorShape(const TensorShape& shape) const;
 

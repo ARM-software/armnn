@@ -285,12 +285,13 @@ void Graph::AddCopyLayers(std::map<BackendId, std::unique_ptr<IBackendInternal>>
         {
             OutputSlot& srcOutputSlot = srcLayer->GetOutputSlot(srcOutputIndex);
             const std::vector<InputSlot*> srcConnections = srcOutputSlot.GetConnections();
+            const std::vector<MemoryStrategy> srcMemoryStrategies = srcOutputSlot.GetMemoryStrategies();
             for (unsigned int srcConnectionIndex = 0; srcConnectionIndex < srcConnections.size(); srcConnectionIndex++)
             {
                 InputSlot* dstInputSlot = srcConnections[srcConnectionIndex];
                 BOOST_ASSERT(dstInputSlot);
 
-                auto strategy = srcOutputSlot.GetMemoryStrategyForConnection(srcConnectionIndex);
+                MemoryStrategy strategy = srcMemoryStrategies[srcConnectionIndex];
                 BOOST_ASSERT_MSG(strategy != MemoryStrategy::Undefined,
                                  "Undefined memory strategy found while adding copy layers for compatibility");
 
@@ -339,8 +340,19 @@ void Graph::AddCopyLayers(std::map<BackendId, std::unique_ptr<IBackendInternal>>
                         copyOutputSlot.SetTensorHandleFactory(ITensorHandleFactory::LegacyFactoryId);
                     }
 
+                    // The output strategy of a copy layer is always DirectCompatibility.
                     copyOutputSlot.SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
-                    srcOutputSlot.SetMemoryStrategy(srcConnectionIndex, MemoryStrategy::DirectCompatibility);
+
+                    // Recalculate the connection index on the previous layer as we have just inserted into it.
+                    const std::vector<InputSlot*>& newSourceConnections = srcOutputSlot.GetConnections();
+                    long newSrcConnectionIndex = std::distance(newSourceConnections.begin(),
+                                                               std::find(newSourceConnections.begin(),
+                                                                         newSourceConnections.end(),
+                                                                         &copyLayer->GetInputSlot(0)));
+
+                    // The input strategy of a copy layer is always DirectCompatibilty.
+                    srcOutputSlot.SetMemoryStrategy(boost::numeric_cast<unsigned int>(newSrcConnectionIndex),
+                                                    MemoryStrategy::DirectCompatibility);
                 }
             }
         }

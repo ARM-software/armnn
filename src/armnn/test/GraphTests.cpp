@@ -342,13 +342,14 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
             if (srcLayer == nullptr || dstLayer == nullptr)
             {
                 BOOST_ERROR("At least one of the two ends of a new edge (" << edge.first << ", " << edge.second << ") "
-                            "introduced after adding copy layers to a graph correspond is not known to the graph");
+                            "introduced after adding copy layers to a graph "
+                            "correspond to a layer not known to the graph");
                 continue;
             }
 
             // One and only one of the two layers referenced by the edge should be present in the original graph.
-            const bool srcLayerInOrigGraph = GraphHasNamedLayer(origGraph, edge.first->GetNameStr());
-            const bool dstLayerInOrigGraph = GraphHasNamedLayer(origGraph, edge.second->GetNameStr());
+            const bool srcLayerInOrigGraph = GraphHasNamedLayer(origGraph, srcLayer->GetNameStr());
+            const bool dstLayerInOrigGraph = GraphHasNamedLayer(origGraph, dstLayer->GetNameStr());
 
             if (srcLayerInOrigGraph == dstLayerInOrigGraph)
             {
@@ -363,7 +364,7 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
                 continue;
             }
 
-            const armnn::Layer* copyLayer = srcLayerInOrigGraph ? edge.second : edge.first;
+            const armnn::Layer* copyLayer = srcLayerInOrigGraph ? dstLayer : srcLayer;
             const armnn::Layer* nonCopyLayer = srcLayerInOrigGraph ? srcLayer : dstLayer;
 
             // Finds all edges connecting the copy layer to other layers.
@@ -412,10 +413,18 @@ static void TestGraphAfterAddingCopyLayers(const armnn::Graph& graph, const armn
 
                 // There must exist an edge connecting both layers directly in the original graph.
                 {
-                    const armnn::Layer* origEdgeN1 = srcLayerInOrigGraph ? nonCopyLayer : adjLayer;
-                    const armnn::Layer* origEdgeN2 = srcLayerInOrigGraph ? adjLayer : nonCopyLayer;
-                    auto origEdgeIter = std::find(origEdges.begin(), origEdges.end(),
-                        Edge(origEdgeN1, origEdgeN2));
+                    const armnn::Layer* origEdgeSrc = srcLayerInOrigGraph ? nonCopyLayer : adjLayer;
+                    const armnn::Layer* origEdgeDst = srcLayerInOrigGraph ? adjLayer : nonCopyLayer;
+
+                    auto origEdgeIter = origEdges.begin();
+                    for (; origEdgeIter != origEdges.end(); origEdgeIter++)
+                    {
+                        if (origEdgeIter->first->GetNameStr() == origEdgeSrc->GetNameStr() &&
+                            origEdgeIter->second->GetNameStr() == origEdgeDst->GetNameStr())
+                        {
+                            break;
+                        }
+                    }
 
                     if (origEdgeIter != origEdges.end())
                     {
@@ -439,6 +448,10 @@ struct CopyLayersFixture
 {
     CopyLayersFixture()
     {
+    }
+
+    void InitialiseTestGraph()
+    {
         using namespace armnn;
         using namespace std;
 
@@ -452,7 +465,7 @@ struct CopyLayersFixture
         inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
 
         Layer* const convLayer2 = AddLayer<Convolution2dLayer>(convolutionDefaults, "conv2");
-        convLayer2->SetBackendId(Compute::CpuRef);
+        convLayer2->SetBackendId(Compute::CpuAcc);
 
         convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
 
@@ -476,18 +489,19 @@ struct CopyLayersFixture
         actLayer->GetOutputSlot(0).Connect(softmaxLayer->GetInputSlot(0));
 
         Layer* const outputLayer = AddLayer<OutputLayer>(0, "output");
-        outputLayer->SetBackendId(armnn::Compute::CpuRef);
+        outputLayer->SetBackendId(armnn::Compute::CpuAcc);
 
         softmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
-        // Set the memory strategies
+        // Set the memory strategies - for this test should be DirectCompatibility for same backends,
+        // and CopyToTarget for different backends
         inputLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
-        convLayer1->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+        convLayer1->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::CopyToTarget);
         convLayer1->GetOutputSlot(0).SetMemoryStrategy(1, MemoryStrategy::DirectCompatibility);
-        convLayer2->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+        convLayer2->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::CopyToTarget);
         concatLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
         actLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
-        softmaxLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+        softmaxLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::CopyToTarget);
     }
 
     armnn::TensorInfo m_TensorDesc;
@@ -513,6 +527,7 @@ private:
 
 BOOST_FIXTURE_TEST_CASE(AddCopyLayers, CopyLayersFixture)
 {
+    InitialiseTestGraph();
     const armnn::Graph origGraph(m_Graph);
     m_Graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
 
@@ -521,6 +536,7 @@ BOOST_FIXTURE_TEST_CASE(AddCopyLayers, CopyLayersFixture)
 
 BOOST_FIXTURE_TEST_CASE(AddCopyLayersSeveralTimes, CopyLayersFixture)
 {
+    InitialiseTestGraph();
     m_Graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
 
     // Calling AddCopyLayers() several times should not change the connections.

@@ -46,6 +46,7 @@
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
 #include "workloads/ClSpaceToDepthWorkload.hpp"
 #include "workloads/ClSplitterWorkload.hpp"
+#include "workloads/ClStackWorkload.hpp"
 #include "workloads/ClStridedSliceWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"
 #include "workloads/ClTransposeConvolution2dWorkload.hpp"
@@ -669,6 +670,18 @@ bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
         }
     }
     return true;
+}
+
+bool ClLayerSupport::IsStackSupported(const std::vector<const TensorInfo*>& inputs,
+                                      const TensorInfo& output,
+                                      const StackDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClStackWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   inputs,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsStridedSliceSupported(const TensorInfo& input,

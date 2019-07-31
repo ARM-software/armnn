@@ -1381,17 +1381,16 @@ std::unique_ptr<SpaceToDepthWorkload> CreateSpaceToDepthWorkloadTest(armnn::IWor
     return workload;
 }
 
-template <typename StackWorkload>
+template <typename StackWorkload, armnn::DataType DataType>
 std::unique_ptr<StackWorkload> CreateStackWorkloadTest(armnn::IWorkloadFactory& factory,
                                                        armnn::Graph& graph,
                                                        const armnn::TensorShape& inputShape,
                                                        const armnn::TensorShape& outputShape,
                                                        unsigned int axis,
-                                                       unsigned int numInputs,
-                                                       armnn::DataType dataType)
+                                                       unsigned int numInputs)
 {
-    armnn::TensorInfo inputTensorInfo(inputShape, dataType);
-    armnn::TensorInfo outputTensorInfo(outputShape, dataType);
+    armnn::TensorInfo inputTensorInfo(inputShape, DataType);
+    armnn::TensorInfo outputTensorInfo(outputShape, DataType);
 
     // Constructs the Stack layer.
     armnn::StackDescriptor descriptor(axis, numInputs, inputShape);

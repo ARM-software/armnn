@@ -36,6 +36,7 @@
 #include "ClSpaceToBatchNdWorkload.hpp"
 #include "ClSpaceToDepthWorkload.hpp"
 #include "ClSplitterWorkload.hpp"
+#include "ClStackWorkload.hpp"
 #include "ClStridedSliceWorkload.hpp"
 #include "ClSubtractionWorkload.hpp"
 #include "ClConvertFp16ToFp32Workload.hpp"

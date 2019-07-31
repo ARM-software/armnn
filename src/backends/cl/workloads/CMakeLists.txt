@@ -74,6 +74,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClSpaceToDepthWorkload.hpp
     ClSplitterWorkload.cpp
     ClSplitterWorkload.hpp
+    ClStackWorkload.cpp
+    ClStackWorkload.hpp
     ClStridedSliceWorkload.cpp
     ClStridedSliceWorkload.hpp
     ClSubtractionWorkload.cpp

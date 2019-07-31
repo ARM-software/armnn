@@ -193,7 +193,7 @@ public:
                                                       const WorkloadInfo&            info) const;
 
     virtual std::unique_ptr<IWorkload> CreateStack(const StackQueueDescriptor& descriptor,
-                                                   const WorkloadInfo& Info) const;
+                                                   const WorkloadInfo& info) const;
 
     virtual std::unique_ptr<IWorkload> CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
                                                           const WorkloadInfo& Info) const;

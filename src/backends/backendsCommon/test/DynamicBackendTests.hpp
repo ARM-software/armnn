@@ -15,6 +15,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/dll.hpp>
 
 static std::string g_TestSharedObjectSubDir                 = "src/backends/backendsCommon/test/";
 static std::string g_TestSharedObjectFileName               = "libarmnnTestSharedObject.so";
@@ -31,8 +32,8 @@ std::string GetTestFilePath(const std::string& fileName)
 {
     using namespace boost::filesystem;
 
-    path currentPath(current_path());
-    path sharedObjectPath = currentPath.append(g_TestSharedObjectSubDir);
+    path programLocation = boost::dll::program_location().parent_path();
+    path sharedObjectPath = programLocation.append(g_TestSharedObjectSubDir);
     path sharedObjectFile = sharedObjectPath.append(fileName);
     BOOST_TEST(exists(sharedObjectFile));
 

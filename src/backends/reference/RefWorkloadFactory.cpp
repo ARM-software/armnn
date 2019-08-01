@@ -5,6 +5,7 @@
 #include <Layer.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
+#include <backendsCommon/MemImportWorkload.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
 #include "RefWorkloadFactory.hpp"
 #include "RefBackendId.hpp"
@@ -248,6 +249,16 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMemCopy(const MemCop
         throw InvalidArgumentException("RefWorkloadFactory: CreateMemCopy() expected an input tensor.");
     }
     return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
+}
+
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& descriptor,
+                                                                      const WorkloadInfo&        info) const
+{
+    if (descriptor.m_Inputs.empty())
+    {
+        throw InvalidArgumentException("RefWorkloadFactory: CreateMemImport() expected an input tensor.");
+    }
+    return std::make_unique<ImportMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,

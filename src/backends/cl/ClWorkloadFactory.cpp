@@ -13,6 +13,7 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
+#include <backendsCommon/MemImportWorkload.hpp>
 
 #include <cl/ClTensorHandle.hpp>
 #include <cl/workloads/ClWorkloads.hpp>
@@ -255,6 +256,17 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMemCopy(const MemCopy
     }
 
     return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
+}
+
+std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& descriptor,
+                                                                     const WorkloadInfo& info) const
+{
+    if (descriptor.m_Inputs.empty() || !descriptor.m_Inputs[0])
+    {
+        throw InvalidArgumentException("ClWorkloadFactory: Invalid null input for MemImport workload");
+    }
+
+    return std::make_unique<ImportMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,

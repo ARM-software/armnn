@@ -212,6 +212,7 @@ list(APPEND armnn_sources
     include/armnn/LayerSupport.hpp
     include/armnn/LayerVisitorBase.hpp
     include/armnn/LstmParams.hpp
+    include/armnn/MemorySources.hpp
     include/armnn/NetworkFwd.hpp
     include/armnn/Optional.hpp
     include/armnn/QuantizedLstmParams.hpp
@@ -275,6 +276,8 @@ list(APPEND armnn_sources
     src/armnn/layers/MeanLayer.cpp
     src/armnn/layers/MemCopyLayer.hpp
     src/armnn/layers/MemCopyLayer.cpp
+    src/armnn/layers/MemImportLayer.hpp
+    src/armnn/layers/MemImportLayer.cpp
     src/armnn/layers/MergeLayer.hpp
     src/armnn/layers/MergeLayer.cpp
     src/armnn/layers/MinimumLayer.cpp

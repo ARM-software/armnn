@@ -63,6 +63,16 @@ struct MemCopyQueueDescriptor : QueueDescriptor
 using InputQueueDescriptor = MemCopyQueueDescriptor;
 using OutputQueueDescriptor = MemCopyQueueDescriptor;
 
+struct MemImportQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
+struct MemSyncQueueDescriptor : QueueDescriptor
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Softmax layer workload data.
 struct SoftmaxQueueDescriptor : QueueDescriptorWithParameters<SoftmaxDescriptor>
 {

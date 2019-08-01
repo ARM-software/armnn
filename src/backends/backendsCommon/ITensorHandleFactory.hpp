@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include <armnn/Types.hpp>
 #include <armnn/IRuntime.hpp>
+#include <armnn/MemorySources.hpp>
+#include <armnn/Types.hpp>
 
 namespace armnn
 {
@@ -20,7 +21,6 @@ public:
 
     virtual ~ITensorHandleFactory() {}
 
-
     virtual std::unique_ptr<ITensorHandle> CreateSubTensorHandle(ITensorHandle& parent,
                                                                  TensorShape const& subTensorShape,
                                                                  unsigned int const* subTensorOrigin) const = 0;
@@ -33,17 +33,16 @@ public:
 
     virtual bool SupportsMapUnmap() const final { return true; }
 
-    virtual bool SupportsExport() const final { return false; }
-
-    virtual bool SupportsImport() const final { return false; }
+    virtual MemorySourceFlags GetExportFlags() const { return 0; }
+    virtual MemorySourceFlags GetImportFlags() const { return 0; }
 };
 
-enum class MemoryStrategy
+enum class EdgeStrategy
 {
-    Undefined,
-    DirectCompatibility,    // Only allocate the tensorhandle using the assigned factory
-    CopyToTarget,           // Default + Insert MemCopy node before target
-    ExportToTarget,         // Default + Insert Import node
+    Undefined,              /// No strategy has been defined. Used internally to verify integrity of optimizations.
+    DirectCompatibility,    /// Destination backend can work directly with tensors on source backend.
+    ExportToTarget,         /// Source backends tensor data can be exported to destination backend tensor without copy.
+    CopyToTarget            /// Copy contents from source backend tensor to destination backend tensor.
 };
 
 } //namespace armnn

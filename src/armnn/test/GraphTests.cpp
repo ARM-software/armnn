@@ -495,13 +495,13 @@ struct CopyLayersFixture
 
         // Set the memory strategies - for this test should be DirectCompatibility for same backends,
         // and CopyToTarget for different backends
-        inputLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
-        convLayer1->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::CopyToTarget);
-        convLayer1->GetOutputSlot(0).SetMemoryStrategy(1, MemoryStrategy::DirectCompatibility);
-        convLayer2->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::CopyToTarget);
-        concatLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
-        actLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
-        softmaxLayer->GetOutputSlot(0).SetMemoryStrategy(0, MemoryStrategy::CopyToTarget);
+        inputLayer->GetOutputSlot(0).SetEdgeStrategy(0, EdgeStrategy::DirectCompatibility);
+        convLayer1->GetOutputSlot(0).SetEdgeStrategy(0, EdgeStrategy::CopyToTarget);
+        convLayer1->GetOutputSlot(0).SetEdgeStrategy(1, EdgeStrategy::DirectCompatibility);
+        convLayer2->GetOutputSlot(0).SetEdgeStrategy(0, EdgeStrategy::CopyToTarget);
+        concatLayer->GetOutputSlot(0).SetEdgeStrategy(0, EdgeStrategy::DirectCompatibility);
+        actLayer->GetOutputSlot(0).SetEdgeStrategy(0, EdgeStrategy::DirectCompatibility);
+        softmaxLayer->GetOutputSlot(0).SetEdgeStrategy(0, EdgeStrategy::CopyToTarget);
     }
 
     armnn::TensorInfo m_TensorDesc;
@@ -529,7 +529,7 @@ BOOST_FIXTURE_TEST_CASE(AddCopyLayers, CopyLayersFixture)
 {
     InitialiseTestGraph();
     const armnn::Graph origGraph(m_Graph);
-    m_Graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
+    m_Graph.AddCompatibilityLayers(m_Backends, m_FactoryRegistry);
 
     TestGraphAfterAddingCopyLayers(m_Graph, origGraph);
 }
@@ -537,13 +537,13 @@ BOOST_FIXTURE_TEST_CASE(AddCopyLayers, CopyLayersFixture)
 BOOST_FIXTURE_TEST_CASE(AddCopyLayersSeveralTimes, CopyLayersFixture)
 {
     InitialiseTestGraph();
-    m_Graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
+    m_Graph.AddCompatibilityLayers(m_Backends, m_FactoryRegistry);
 
-    // Calling AddCopyLayers() several times should not change the connections.
+    // Calling AddCompatibilityLayers() several times should not change the connections.
     const std::vector<Edge> edges = GetEdgeList(m_Graph);
     for (int i = 0; i < 4; ++i)
     {
-        m_Graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
+        m_Graph.AddCompatibilityLayers(m_Backends, m_FactoryRegistry);
         const std::vector<Edge> otherEdges = GetEdgeList(m_Graph);
         BOOST_TEST((edges == otherEdges));
     }
@@ -571,18 +571,18 @@ BOOST_FIXTURE_TEST_CASE(CopyLayersAddedBetweenSameLayersHaveDifferentNames, Copy
     splitterLayer->GetOutputSlot(1).Connect(additionLayer->GetInputSlot(1));
     additionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
-    inputLayer->GetOutputSlot(0).SetMemoryStrategy(0, armnn::MemoryStrategy::DirectCompatibility);
-    splitterLayer->GetOutputSlot(0).SetMemoryStrategy(0, armnn::MemoryStrategy::CopyToTarget);
-    splitterLayer->GetOutputSlot(1).SetMemoryStrategy(0, armnn::MemoryStrategy::CopyToTarget);
-    additionLayer->GetOutputSlot(0).SetMemoryStrategy(0, armnn::MemoryStrategy::DirectCompatibility);
+    inputLayer->GetOutputSlot(0).SetEdgeStrategy(0, armnn::EdgeStrategy::DirectCompatibility);
+    splitterLayer->GetOutputSlot(0).SetEdgeStrategy(0, armnn::EdgeStrategy::CopyToTarget);
+    splitterLayer->GetOutputSlot(1).SetEdgeStrategy(0, armnn::EdgeStrategy::CopyToTarget);
+    additionLayer->GetOutputSlot(0).SetEdgeStrategy(0, armnn::EdgeStrategy::DirectCompatibility);
 
-    graph.AddCopyLayers(m_Backends, m_FactoryRegistry);
+    graph.AddCompatibilityLayers(m_Backends, m_FactoryRegistry);
 
     std::vector<Edge> edges = GetEdgeList(graph);
     BOOST_CHECK(edges.size() == 6u);
     std::sort(edges.begin(), edges.end());
     auto last = std::unique(edges.begin(), edges.end());
-    BOOST_CHECK_MESSAGE(last == edges.end(), "Found duplicated edges after AddCopyLayers()");
+    BOOST_CHECK_MESSAGE(last == edges.end(), "Found duplicated edges after AddCompatibilityLayers()");
 }
 
 BOOST_AUTO_TEST_CASE(DuplicateLayerNames)

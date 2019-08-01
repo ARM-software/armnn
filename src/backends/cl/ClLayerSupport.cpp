@@ -448,15 +448,6 @@ bool ClLayerSupport::IsMeanSupported(const TensorInfo& input,
                                    descriptor);
 }
 
-bool ClLayerSupport::IsMemCopySupported(const TensorInfo &input,
-                                        const TensorInfo &output,
-                                        Optional<std::string &> reasonIfUnsupported) const
-{
-    ignore_unused(input);
-    ignore_unused(output);
-    return true;
-}
-
 bool ClLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                                        const TensorInfo& output,
                                        const MergerDescriptor& descriptor,

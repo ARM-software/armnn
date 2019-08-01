@@ -371,6 +371,15 @@ bool IsMemCopySupported(const BackendId &backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsMemCopySupported, input, output);
 }
 
+bool IsMemImportSupported(const BackendId &backend,
+                          const TensorInfo &input,
+                          const TensorInfo &output,
+                          char *reasonIfUnsupported,
+                          size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMemImportSupported, input, output);
+}
+
 bool IsMergeSupported(const BackendId& backend,
                       const TensorInfo& input0,
                       const TensorInfo& input1,

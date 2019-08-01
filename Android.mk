@@ -114,6 +114,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/MaximumLayer.cpp \
         src/armnn/layers/MeanLayer.cpp \
         src/armnn/layers/MemCopyLayer.cpp \
+        src/armnn/layers/MemImportLayer.cpp \
         src/armnn/layers/MergeLayer.cpp \
         src/armnn/layers/MinimumLayer.cpp \
         src/armnn/layers/MultiplicationLayer.cpp \

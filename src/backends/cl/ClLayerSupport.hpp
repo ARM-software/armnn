@@ -127,10 +127,6 @@ public:
                          const MeanDescriptor& descriptor,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsMemCopySupported(const TensorInfo& input,
-                            const TensorInfo& output,
-                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
     ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
     bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,

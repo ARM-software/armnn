@@ -123,7 +123,7 @@ public:
     void Disconnect(InputSlot& slot);
 
     const std::vector<InputSlot*>& GetConnections() const { return m_Connections; }
-    const std::vector<MemoryStrategy>& GetMemoryStrategies() const { return m_MemoryStrategies; }
+    const std::vector<EdgeStrategy>& GetEdgeStrategies() const { return m_EdgeStrategies; }
 
     bool ValidateTensorShape(const TensorShape& shape) const;
 
@@ -160,8 +160,8 @@ public:
     void SetTensorHandleFactory(const ITensorHandleFactory::FactoryId& id);
     ITensorHandleFactory::FactoryId GetTensorHandleFactoryId() const;
 
-    void SetMemoryStrategy(unsigned int connectionIndex, MemoryStrategy strategy);
-    MemoryStrategy GetMemoryStrategyForConnection(unsigned int connectionIdx) const;
+    void SetEdgeStrategy(unsigned int connectionIndex, EdgeStrategy strategy);
+    EdgeStrategy GetEdgeStrategyForConnection(unsigned int connectionIdx) const;
 
 private:
     void ValidateConnectionIndex(unsigned int index) const;
@@ -171,7 +171,7 @@ private:
     std::vector<InputSlot*> m_Connections;
 
     ITensorHandleFactory::FactoryId m_TensorHandleFactoryId;
-    std::vector<MemoryStrategy> m_MemoryStrategies;
+    std::vector<EdgeStrategy> m_EdgeStrategies;
 };
 
 // InputSlot inlines that need OutputSlot declaration.

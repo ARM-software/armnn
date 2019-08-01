@@ -14,6 +14,8 @@ COMMON_SOURCES := \
     ITensorHandleFactory.cpp \
     LayerSupportBase.cpp \
     MemCopyWorkload.cpp \
+    MemImportWorkload.cpp \
+    MemSyncWorkload.cpp \
     OptimizationViews.cpp \
     OutputHandler.cpp \
     TensorHandleFactoryRegistry.cpp \

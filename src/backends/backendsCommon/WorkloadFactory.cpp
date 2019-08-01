@@ -515,6 +515,16 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                             reason);
             break;
         }
+        case LayerType::MemImport:
+        {
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsMemImportSupported(OverrideDataType(input, dataType),
+                                                              OverrideDataType(output, dataType),
+                                                              reason);
+            break;
+        }
         case LayerType::Merge:
         {
             const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -1088,6 +1098,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateMean(const MeanQueueDescripto
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

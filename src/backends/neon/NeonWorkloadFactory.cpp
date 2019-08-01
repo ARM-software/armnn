@@ -14,6 +14,7 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
+#include <backendsCommon/MemImportWorkload.hpp>
 
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 #include <neon/workloads/NeonWorkloads.hpp>
@@ -222,6 +223,17 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMemCopy(const MemCo
     }
 
     return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
+}
+
+std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& descriptor,
+                                                                       const WorkloadInfo&        info) const
+{
+    if (descriptor.m_Inputs.empty() || !descriptor.m_Inputs[0])
+    {
+        throw InvalidArgumentException("NeonWorkloadFactory: Invalid null input for MemImport workload");
+    }
+
+    return std::make_unique<ImportMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,

@@ -95,6 +95,9 @@ public:
     std::unique_ptr<IWorkload> CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateMemImport(const MemImportQueueDescriptor& descriptor,
+                                               const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateResize(const ResizeQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
 

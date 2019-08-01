@@ -14,6 +14,8 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IMemoryManager.hpp>
+#include <backendsCommon/MemCopyWorkload.hpp>
+#include <backendsCommon/MemSyncWorkload.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/assert.hpp>
@@ -389,8 +391,22 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     inputQueueDescriptor.m_Outputs.push_back(outputTensorHandle);
     info.m_OutputTensorInfos.push_back(outputTensorInfo);
 
-    const IWorkloadFactory& workloadFactory = GetWorkloadFactory(layer);
-    auto inputWorkload = workloadFactory.CreateInput(inputQueueDescriptor, info);
+    MemorySourceFlags importFlags = outputTensorHandle->GetImportFlags();
+    if (CheckFlag(importFlags, MemorySource::Malloc))  // Try import the input tensor
+    {
+        // This assumes a CPU Tensor handle
+        void* mem = tensorHandle->Map(false);
+        if (outputTensorHandle->Import(mem, MemorySource::Malloc))
+        {
+            tensorHandle->Unmap();
+            return; // No need for a workload since the import has been done.
+        }
+        tensorHandle->Unmap();
+    }
+
+    // Create a mem copy workload for input since we could not import
+    auto inputWorkload = std::make_unique<CopyMemGenericWorkload>(inputQueueDescriptor, info);
+
     BOOST_ASSERT_MSG(inputWorkload, "No input workload created");
     m_InputQueue.push_back(move(inputWorkload));
 }
@@ -422,11 +438,41 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     ITensorHandle* inputTensorHandle = outputHandler.GetData();
     BOOST_ASSERT_MSG(inputTensorHandle != nullptr, "Data should have been allocated.");
 
+    // Try import the output tensor.
+    // Note: We can only import the output pointer if all of the following  hold true:
+    // a) The imported pointer is aligned sufficiently
+    // b) The tensor has zero padding
+    // c) There is only one connection to the OutputSlot and it is to an OutputLayer.
+    // d) The output pointer is allocated via malloc. (Other types will be supported in a later release)
+    if (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetNumConnections() == 1)
+    {
+        MemorySourceFlags importFlags = inputTensorHandle->GetImportFlags();
+        if (CheckFlag(importFlags, MemorySource::Malloc))
+        {
+            void* mem = tensorHandle->Map(false);
+            bool importOk = inputTensorHandle->Import(mem, MemorySource::Malloc);
+            tensorHandle->Unmap();
+
+            if (importOk)
+            {
+                // Insert synchronization workload
+                MemSyncQueueDescriptor syncDesc;
+                syncDesc.m_Inputs.push_back(inputTensorHandle);
+                info.m_InputTensorInfos.push_back(inputTensorInfo);
+                auto syncWorkload = std::make_unique<SyncMemGenericWorkload>(syncDesc, info);
+                BOOST_ASSERT_MSG(syncWorkload, "No sync workload created");
+                m_OutputQueue.push_back(move(syncWorkload));
+
+                return; //No need to add the output workload below
+            }
+        }
+    }
+
+    // If we got here then we couldn't import the memory, so add an output workload which performs a memcopy.
     outputQueueDescriptor.m_Inputs.push_back(inputTensorHandle);
     info.m_InputTensorInfos.push_back(inputTensorInfo);
 
-    const IWorkloadFactory& workloadFactory = GetWorkloadFactory(layer);
-    auto outputWorkload = workloadFactory.CreateOutput(outputQueueDescriptor, info);
+    auto outputWorkload = std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
     BOOST_ASSERT_MSG(outputWorkload, "No output workload created");
     m_OutputQueue.push_back(move(outputWorkload));
 }

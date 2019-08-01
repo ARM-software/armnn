@@ -255,26 +255,31 @@ const Graph& Graph::TopologicalSort() const
     return *this;
 }
 
-void Graph::AddCopyLayers(std::map<BackendId, std::unique_ptr<IBackendInternal>>& backends,
-                          TensorHandleFactoryRegistry& registry)
+void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendInternal>>& backends,
+                                   TensorHandleFactoryRegistry& registry)
 {
-    // Returns true if the given layer could potentially need an intermediate copy layer (depending on its
-    // connections to other layers). At the time of writing, copy layers will be inserted in the following situations:
-    // CPU -> CL (and viceversa)
-    // CPU -> Neon (and viceversa)
-    auto MayNeedCopyLayer = [](const Layer& layer)
+    // Returns true if the given layer could potentially need an intermediate copy/import layer (depending on its
+    // connections to other layers).
+    auto MayNeedCompatibilityLayer = [](const Layer& layer)
     {
         // All layers should have been associated with a valid compute device at this point.
         BOOST_ASSERT(layer.GetBackendId() != Compute::Undefined);
-        // Does not need another copy layer if a copy layer is already present.
-        return layer.GetType() != LayerType::MemCopy;
+        // Does not need another compatibility layer if a copy or import layer is already present.
+        return layer.GetType() != LayerType::MemCopy &&
+               layer.GetType() != LayerType::MemImport;
     };
 
-    ForEachLayer([this, &backends, &registry, MayNeedCopyLayer](Layer* srcLayer)
+    auto IsCompatibilityStrategy = [](EdgeStrategy strategy)
+    {
+        return strategy == EdgeStrategy::CopyToTarget ||
+               strategy == EdgeStrategy::ExportToTarget;
+    };
+
+    ForEachLayer([this, &backends, &registry, MayNeedCompatibilityLayer, IsCompatibilityStrategy](Layer* srcLayer)
     {
         BOOST_ASSERT(srcLayer);
 
-        if (!MayNeedCopyLayer(*srcLayer))
+        if (!MayNeedCompatibilityLayer(*srcLayer))
         {
             // The current layer does not need copy layers, move to the next one
             return;
@@ -285,33 +290,43 @@ void Graph::AddCopyLayers(std::map<BackendId, std::unique_ptr<IBackendInternal>>
         {
             OutputSlot& srcOutputSlot = srcLayer->GetOutputSlot(srcOutputIndex);
             const std::vector<InputSlot*> srcConnections = srcOutputSlot.GetConnections();
-            const std::vector<MemoryStrategy> srcMemoryStrategies = srcOutputSlot.GetMemoryStrategies();
+            const std::vector<EdgeStrategy> srcEdgeStrategies = srcOutputSlot.GetEdgeStrategies();
             for (unsigned int srcConnectionIndex = 0; srcConnectionIndex < srcConnections.size(); srcConnectionIndex++)
             {
                 InputSlot* dstInputSlot = srcConnections[srcConnectionIndex];
                 BOOST_ASSERT(dstInputSlot);
 
-                MemoryStrategy strategy = srcMemoryStrategies[srcConnectionIndex];
-                BOOST_ASSERT_MSG(strategy != MemoryStrategy::Undefined,
+                EdgeStrategy strategy = srcEdgeStrategies[srcConnectionIndex];
+                BOOST_ASSERT_MSG(strategy != EdgeStrategy::Undefined,
                                  "Undefined memory strategy found while adding copy layers for compatibility");
 
                 const Layer& dstLayer = dstInputSlot->GetOwningLayer();
-                if (MayNeedCopyLayer(dstLayer) &&
-                    strategy == MemoryStrategy::CopyToTarget)
+                if (MayNeedCompatibilityLayer(dstLayer) &&
+                    IsCompatibilityStrategy(strategy))
                 {
                     // A copy layer is needed in between the source and destination layers.
                     // Record the operation rather than attempting to modify the graph as we go.
                     // (invalidating iterators)
-                    const std::string copyLayerName = boost::str(boost::format("[ %1% (%2%) -> %3% (%4%) ]")
+                    const std::string compLayerName = boost::str(boost::format("[ %1% (%2%) -> %3% (%4%) ]")
                                                                  % srcLayer->GetName()
                                                                  % srcOutputIndex
                                                                  % dstLayer.GetName()
                                                                  % dstInputSlot->GetSlotIndex());
 
-                    MemCopyLayer* const copyLayer = InsertNewLayer<MemCopyLayer>(*dstInputSlot, copyLayerName.c_str());
-                    copyLayer->SetBackendId(dstLayer.GetBackendId());
+                    Layer* compLayer = nullptr;
+                    if (strategy == EdgeStrategy::CopyToTarget)
+                    {
+                        compLayer = InsertNewLayer<MemCopyLayer>(*dstInputSlot, compLayerName.c_str());
+                    }
+                    else
+                    {
+                        BOOST_ASSERT_MSG(strategy == EdgeStrategy::ExportToTarget, "Invalid edge strategy found.");
+                        compLayer = InsertNewLayer<MemImportLayer>(*dstInputSlot, compLayerName.c_str());
+                    }
 
-                    OutputSlot& copyOutputSlot = copyLayer->GetOutputSlot(0);
+                    compLayer->SetBackendId(dstLayer.GetBackendId());
+
+                    OutputSlot& compOutputSlot = compLayer->GetOutputSlot(0);
                     auto backendIt = backends.find(dstLayer.GetBackendId());
                     if (backendIt != backends.end() &&
                         backendIt->second &&
@@ -325,34 +340,40 @@ void Graph::AddCopyLayers(std::map<BackendId, std::unique_ptr<IBackendInternal>>
                         for (auto preference : tensorHandleFactoryIds)
                         {
                             auto factory = registry.GetFactory(preference);
-                            if (factory && factory->SupportsMapUnmap())
+                            if (factory)
                             {
-                                copyOutputSlot.SetTensorHandleFactory(preference);
-                                found = true;
-                                break;
+                                auto srcPref = srcOutputSlot.GetTensorHandleFactoryId();
+                                auto srcFactory = registry.GetFactory(srcPref);
+                                bool canExportImport = (factory->GetImportFlags() & srcFactory->GetExportFlags()) != 0;
+                                if (factory->SupportsMapUnmap() || canExportImport)
+                                {
+                                    compOutputSlot.SetTensorHandleFactory(preference);
+                                    found = true;
+                                    break;
+                                }
                             }
                         }
 
-                        BOOST_ASSERT_MSG(found, "Could not find a mappable TensorHandle for copy layer");
+                        BOOST_ASSERT_MSG(found, "Could not find a valid TensorHandle for compatibilty layer");
                     }
                     else
                     {
-                        copyOutputSlot.SetTensorHandleFactory(ITensorHandleFactory::LegacyFactoryId);
+                        compOutputSlot.SetTensorHandleFactory(ITensorHandleFactory::LegacyFactoryId);
                     }
 
-                    // The output strategy of a copy layer is always DirectCompatibility.
-                    copyOutputSlot.SetMemoryStrategy(0, MemoryStrategy::DirectCompatibility);
+                    // The output strategy of a compatibility layer is always DirectCompatibility.
+                    compOutputSlot.SetEdgeStrategy(0, EdgeStrategy::DirectCompatibility);
 
                     // Recalculate the connection index on the previous layer as we have just inserted into it.
                     const std::vector<InputSlot*>& newSourceConnections = srcOutputSlot.GetConnections();
                     long newSrcConnectionIndex = std::distance(newSourceConnections.begin(),
                                                                std::find(newSourceConnections.begin(),
                                                                          newSourceConnections.end(),
-                                                                         &copyLayer->GetInputSlot(0)));
+                                                                         &compLayer->GetInputSlot(0)));
 
-                    // The input strategy of a copy layer is always DirectCompatibilty.
-                    srcOutputSlot.SetMemoryStrategy(boost::numeric_cast<unsigned int>(newSrcConnectionIndex),
-                                                    MemoryStrategy::DirectCompatibility);
+                    // The input strategy of a compatibility layer is always DirectCompatibilty.
+                    srcOutputSlot.SetEdgeStrategy(boost::numeric_cast<unsigned int>(newSrcConnectionIndex),
+                                                    EdgeStrategy::DirectCompatibility);
                 }
             }
         }

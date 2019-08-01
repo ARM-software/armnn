@@ -20,11 +20,16 @@ list(APPEND armnnBackendsCommon_sources
     ITensorHandleFactory.hpp
     LayerSupportBase.cpp
     LayerSupportBase.hpp
+    LayerSupportRules.hpp
     IMemoryManager.hpp
     ITensorHandle.hpp
     MakeWorkloadHelper.hpp
     MemCopyWorkload.cpp
     MemCopyWorkload.hpp
+    MemImportWorkload.cpp
+    MemImportWorkload.hpp
+    MemSyncWorkload.cpp
+    MemSyncWorkload.hpp
     OptimizationViews.cpp
     OptimizationViews.hpp
     OutputHandler.cpp

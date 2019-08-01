@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include <armnn/MemorySources.hpp>
+
 namespace armnn
 {
 
@@ -61,6 +63,15 @@ public:
     // Testing support to be able to verify and set tensor data content
     virtual void CopyOutTo(void* memory) const = 0;
     virtual void CopyInFrom(const void* memory) = 0;
+
+    /// Get flags describing supported import sources.
+    virtual unsigned int GetImportFlags() const { return 0; }
+
+    /// Import externally allocated memory
+    /// \param memory base address of the memory being imported.
+    /// \param source source of the allocation for the memory being imported.
+    /// \return true on success or false on failure
+    virtual bool Import(void* memory, MemorySource source) { return false; };
 };
 
 }

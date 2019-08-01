@@ -157,6 +157,10 @@ public:
                             const TensorInfo& output,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsMemImportSupported(const TensorInfo& input,
+                              const TensorInfo& output,
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsMergeSupported(const TensorInfo& input0,
                           const TensorInfo& input1,
                           const TensorInfo& output,

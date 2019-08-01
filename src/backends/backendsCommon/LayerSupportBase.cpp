@@ -7,6 +7,8 @@
 
 #include <armnn/Exceptions.hpp>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace
 {
 
@@ -252,7 +254,18 @@ bool LayerSupportBase::IsMemCopySupported(const armnn::TensorInfo& input,
                                           const armnn::TensorInfo& output,
                                           armnn::Optional<std::string &> reasonIfUnsupported) const
 {
-    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+    boost::ignore_unused(input);
+    boost::ignore_unused(output);
+    return true;
+}
+
+bool LayerSupportBase::IsMemImportSupported(const armnn::TensorInfo& input,
+                                            const armnn::TensorInfo& output,
+                                            armnn::Optional<std::string &> reasonIfUnsupported) const
+{
+    boost::ignore_unused(input);
+    boost::ignore_unused(output);
+    return true;
 }
 
 bool LayerSupportBase::IsMergeSupported(const TensorInfo& input0,

@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
 #include <armnn/Types.hpp>
@@ -18,6 +19,7 @@
 #include "OptimizationViews.hpp"
 
 #include <vector>
+#include <memory>
 
 namespace armnn
 {
@@ -30,11 +32,11 @@ struct BackendVersion
     uint32_t m_Major;
     uint32_t m_Minor;
 
-    BackendVersion()
+    constexpr BackendVersion()
         : m_Major(0)
         , m_Minor(0)
     {}
-    BackendVersion(uint32_t major, uint32_t minor)
+    constexpr BackendVersion(uint32_t major, uint32_t minor)
         : m_Major(major)
         , m_Minor(minor)
     {}
@@ -92,87 +94,32 @@ public:
         = std::unique_ptr<SubGraph>;
 
     ARMNN_DEPRECATED_MSG("This method is no longer supported")
-    virtual ISubGraphConverterPtr CreateSubGraphConverter(const std::shared_ptr<SubGraph>& subGraph) const
-    {
-        return ISubGraphConverterPtr{};
-    }
+    virtual ISubGraphConverterPtr CreateSubGraphConverter(const std::shared_ptr<SubGraph>& subGraph) const;
 
     ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
-    virtual Optimizations GetOptimizations() const
-    {
-        return Optimizations{};
-    }
+    virtual Optimizations GetOptimizations() const;
 
     ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
-    virtual SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph, bool& optimizationAttempted) const
-    {
-        optimizationAttempted = false;
-        return nullptr;
-    }
+    virtual SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph, bool& optimizationAttempted) const;
     ARMNN_NO_DEPRECATE_WARN_END
 
-
-    virtual IMemoryManagerUniquePtr CreateMemoryManager() const
-    {
-        return IMemoryManagerUniquePtr();
-    }
+    virtual IMemoryManagerUniquePtr CreateMemoryManager() const;
 
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
         const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
 
-    virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const
-    {
-        return IBackendContextPtr{};
-    }
+    virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const;
 
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;
 
-    // Default implementation of OptimizeSubgraphView for backward compatibility with the old API.
-    // Override this method with a custom optimization implementation.
-    virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const
-    {
-        bool optimizationAttempted = false;
+    virtual OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const;
 
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        SubGraphUniquePtr optSubgraph = OptimizeSubGraph(subgraph, optimizationAttempted);
-        ARMNN_NO_DEPRECATE_WARN_END
+    bool SupportsTensorAllocatorAPI() const;
 
-        OptimizationViews result;
-        if (!optimizationAttempted)
-        {
-            result.AddUntouchedSubgraph(SubgraphView(subgraph));
-        }
-        else
-        {
-            if (optSubgraph)
-            {
-                result.AddSubstitution({subgraph, SubgraphView(*optSubgraph.get())});
-            }
-            else
-            {
-                result.AddFailedSubgraph(SubgraphView(subgraph));
-            }
-        }
-        return result;
-    }
-
-    bool SupportsTensorAllocatorAPI() const { return GetHandleFactoryPreferences().empty() == false; }
-
-    ITensorHandleFactory::FactoryId GetBackwardCompatibleFavoriteHandleFactory()
-    {
-        auto favorites = GetHandleFactoryPreferences();
-        if (favorites.empty())
-        {
-            return ITensorHandleFactory::LegacyFactoryId;
-        }
-        return favorites[0];
-    }
+    ITensorHandleFactory::FactoryId GetBackwardCompatibleFavoriteHandleFactory();
 
     /// (Optional) Returns a vector of supported TensorHandleFactory ids in preference order.
-    virtual std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const
-    {
-        return std::vector<ITensorHandleFactory::FactoryId>();
-    }
+    virtual std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const;
 
     /// (Optional) Register TensorHandleFactories
     /// Either this method or CreateMemoryManager() and
@@ -180,7 +127,7 @@ public:
     virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) {}
 
     /// Returns the version of the Backend API
-    static BackendVersion GetApiVersion() { return { 1, 0 }; }
+    static constexpr BackendVersion GetApiVersion() { return BackendVersion(1, 0); }
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

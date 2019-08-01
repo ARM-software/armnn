@@ -17,34 +17,63 @@
 #include <boost/filesystem.hpp>
 #include <boost/dll.hpp>
 
-static std::string g_TestSharedObjectSubDir                 = "src/backends/backendsCommon/test/";
-static std::string g_TestSharedObjectFileName               = "libarmnnTestSharedObject.so";
-static std::string g_TestValidTestDynamicBackendFileName    = "libarmnnValidTestDynamicBackend.so";
-static std::string g_TestInvalidTestDynamicBackend1FileName = "libarmnnInvalidTestDynamicBackend1.so";
-static std::string g_TestInvalidTestDynamicBackend2FileName = "libarmnnInvalidTestDynamicBackend2.so";
-static std::string g_TestInvalidTestDynamicBackend3FileName = "libarmnnInvalidTestDynamicBackend3.so";
-static std::string g_TestInvalidTestDynamicBackend4FileName = "libarmnnInvalidTestDynamicBackend4.so";
-static std::string g_TestInvalidTestDynamicBackend5FileName = "libarmnnInvalidTestDynamicBackend5.so";
-static std::string g_TestInvalidTestDynamicBackend6FileName = "libarmnnInvalidTestDynamicBackend6.so";
-static std::string g_TestInvalidTestDynamicBackend7FileName = "libarmnnInvalidTestDynamicBackend7.so";
+static std::string g_TestBaseDir                            = "src/backends/backendsCommon/test/";
 
-std::string GetTestFilePath(const std::string& fileName)
+static std::string g_TestSharedObjectSubDir                 = "testSharedObject/";
+static std::string g_TestDynamicBackendSubDir               = "testDynamicBackend/";
+
+static std::string g_TestSharedObjectFileName               = "libTestSharedObject.so";
+static std::string g_TestNoSharedObjectFileName             = "libNoSharedObject.txt";
+
+static std::string g_TestValidTestDynamicBackendFileName    = "libValidTestDynamicBackend.so";
+static std::string g_TestInvalidTestDynamicBackend1FileName = "libInvalidTestDynamicBackend1.so";
+static std::string g_TestInvalidTestDynamicBackend2FileName = "libInvalidTestDynamicBackend2.so";
+static std::string g_TestInvalidTestDynamicBackend3FileName = "libInvalidTestDynamicBackend3.so";
+static std::string g_TestInvalidTestDynamicBackend4FileName = "libInvalidTestDynamicBackend4.so";
+static std::string g_TestInvalidTestDynamicBackend5FileName = "libInvalidTestDynamicBackend5.so";
+static std::string g_TestInvalidTestDynamicBackend6FileName = "libInvalidTestDynamicBackend6.so";
+static std::string g_TestInvalidTestDynamicBackend7FileName = "libInvalidTestDynamicBackend7.so";
+
+std::string GetTestDirectoryBasePath()
 {
     using namespace boost::filesystem;
 
     path programLocation = boost::dll::program_location().parent_path();
-    path sharedObjectPath = programLocation.append(g_TestSharedObjectSubDir);
-    path sharedObjectFile = sharedObjectPath.append(fileName);
-    BOOST_TEST(exists(sharedObjectFile));
+    path sharedObjectPath = programLocation.append(g_TestBaseDir);
+    BOOST_CHECK(exists(sharedObjectPath));
 
-    return sharedObjectFile.string();
+    return sharedObjectPath.string();
+}
+
+std::string GetTestSubDirectory(const std::string& subdir)
+{
+    using namespace boost::filesystem;
+
+    std::string testDynamicBackendsBaseDir = GetTestDirectoryBasePath();
+    path testDynamicBackendsBasePath(testDynamicBackendsBaseDir);
+    path testDynamicBackendsSubDir = testDynamicBackendsBasePath.append(subdir);
+    // Do not check that the sub-directory exists because for testing reasons we may use non-existing paths
+
+    return testDynamicBackendsSubDir.string();
+}
+
+std::string GetTestFilePath(const std::string& directory, const std::string& fileName)
+{
+    using namespace boost::filesystem;
+
+    path directoryPath(directory);
+    path fileNamePath = directoryPath.append(fileName);
+    BOOST_CHECK(exists(fileNamePath));
+
+    return fileNamePath.string();
 }
 
 void OpenCloseHandleTestImpl()
 {
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestSharedObjectFileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestSharedObjectSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestSharedObjectFileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -83,7 +112,8 @@ void OpenNotSharedObjectTestImpl()
 {
     using namespace armnn;
 
-    std::string notSharedObjectFilePath = GetTestFilePath("libarmnnNoSharedObject.txt");
+    std::string testSubDirectory = GetTestSubDirectory(g_TestSharedObjectSubDir);
+    std::string notSharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestNoSharedObjectFileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(notSharedObjectFilePath), RuntimeException);
@@ -94,7 +124,8 @@ void GetValidEntryPointTestImpl()
 {
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestSharedObjectFileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestSharedObjectSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestSharedObjectFileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -114,7 +145,8 @@ void GetNameMangledEntryPointTestImpl()
 {
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestSharedObjectFileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestSharedObjectSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestSharedObjectFileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -134,7 +166,8 @@ void GetNoExternEntryPointTestImpl()
 {
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestSharedObjectFileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestSharedObjectSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestSharedObjectFileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -154,7 +187,8 @@ void GetNotExistingEntryPointTestImpl()
 {
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestSharedObjectFileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestSharedObjectSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestSharedObjectFileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -230,7 +264,8 @@ void CreateValidDynamicBackendObjectTestImpl()
 
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestValidTestDynamicBackendFileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestValidTestDynamicBackendFileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -274,7 +309,8 @@ void CreateDynamicBackendObjectInvalidInterface1TestImpl()
 
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend1FileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestInvalidTestDynamicBackend1FileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -293,7 +329,8 @@ void CreateDynamicBackendObjectInvalidInterface2TestImpl()
 
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend2FileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestInvalidTestDynamicBackend2FileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -312,7 +349,8 @@ void CreateDynamicBackendObjectInvalidInterface3TestImpl()
 
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend3FileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestInvalidTestDynamicBackend3FileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -331,7 +369,8 @@ void CreateDynamicBackendObjectInvalidInterface4TestImpl()
 
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend4FileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestInvalidTestDynamicBackend4FileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -351,7 +390,8 @@ void CreateDynamicBackendObjectInvalidInterface5TestImpl()
 
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend5FileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestInvalidTestDynamicBackend5FileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -371,7 +411,8 @@ void CreateDynamicBackendObjectInvalidInterface6TestImpl()
 
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend6FileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestInvalidTestDynamicBackend6FileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));
@@ -403,7 +444,8 @@ void CreateDynamicBackendObjectInvalidInterface7TestImpl()
 
     using namespace armnn;
 
-    std::string sharedObjectFilePath = GetTestFilePath(g_TestInvalidTestDynamicBackend7FileName);
+    std::string testSubDirectory = GetTestSubDirectory(g_TestDynamicBackendSubDir);
+    std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestInvalidTestDynamicBackend7FileName);
 
     void* sharedObjectHandle = nullptr;
     BOOST_CHECK_NO_THROW(sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObjectFilePath));

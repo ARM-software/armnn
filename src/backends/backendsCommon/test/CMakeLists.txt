@@ -68,59 +68,76 @@ target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE
 # Dummy shared object for testing.
 # This is a simple library used to test the utility functions that will be used to handle the shared objects.
 
-list(APPEND armnnTestSharedObject_sources
+list(APPEND testSharedObject_sources
     TestSharedObject.cpp
     TestSharedObject.hpp
 )
 
-add_library_ex(armnnTestSharedObject SHARED ${armnnTestSharedObject_sources})
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libarmnnNoSharedObject.txt "This is not a shared object")
+add_library_ex(TestSharedObject MODULE ${testSharedObject_sources})
+set_target_properties(TestSharedObject PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testSharedObject)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/testSharedObject/libNoSharedObject.txt "This is not a shared object")
 
 # Dummy dynamic backends for testing.
 # Both a valid and a number of invalid dummy dynamic backends (covering various use cases) share the
 # same source code. The various test cases are put together in the code using compiler directives.
 
-list(APPEND armnnTestDynamicBackend_sources
+list(APPEND testDynamicBackend_sources
     TestDynamicBackend.cpp
     TestDynamicBackend.hpp
 )
 
-add_library_ex(armnnValidTestDynamicBackend SHARED ${armnnTestDynamicBackend_sources})
-target_compile_definitions(armnnValidTestDynamicBackend PRIVATE -DVALID_TEST_DYNAMIC_BACKEND)
-target_include_directories(armnnValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+add_library_ex(ValidTestDynamicBackend MODULE ${testDynamicBackend_sources})
+target_compile_definitions(ValidTestDynamicBackend PRIVATE -DVALID_TEST_DYNAMIC_BACKEND)
+target_include_directories(ValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(ValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(ValidTestDynamicBackend armnn)
+set_target_properties(ValidTestDynamicBackend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
-add_library_ex(armnnInvalidTestDynamicBackend1 SHARED ${armnnTestDynamicBackend_sources})
-target_compile_definitions(armnnInvalidTestDynamicBackend1 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_1)
-target_include_directories(armnnInvalidTestDynamicBackend1 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnInvalidTestDynamicBackend1 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+add_library_ex(InvalidTestDynamicBackend1 MODULE ${testDynamicBackend_sources})
+target_compile_definitions(InvalidTestDynamicBackend1 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_1)
+target_include_directories(InvalidTestDynamicBackend1 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(InvalidTestDynamicBackend1 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(InvalidTestDynamicBackend1 armnn)
+set_target_properties(InvalidTestDynamicBackend1 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
-add_library_ex(armnnInvalidTestDynamicBackend2 SHARED ${armnnTestDynamicBackend_sources})
-target_compile_definitions(armnnInvalidTestDynamicBackend2 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_2)
-target_include_directories(armnnInvalidTestDynamicBackend2 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnInvalidTestDynamicBackend2 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+add_library_ex(InvalidTestDynamicBackend2 MODULE ${testDynamicBackend_sources})
+target_compile_definitions(InvalidTestDynamicBackend2 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_2)
+target_include_directories(InvalidTestDynamicBackend2 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(InvalidTestDynamicBackend2 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(InvalidTestDynamicBackend2 armnn)
+set_target_properties(InvalidTestDynamicBackend2 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
-add_library_ex(armnnInvalidTestDynamicBackend3 SHARED ${armnnTestDynamicBackend_sources})
-target_compile_definitions(armnnInvalidTestDynamicBackend3 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_3)
-target_include_directories(armnnInvalidTestDynamicBackend3 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnInvalidTestDynamicBackend3 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+add_library_ex(InvalidTestDynamicBackend3 MODULE ${testDynamicBackend_sources})
+target_compile_definitions(InvalidTestDynamicBackend3 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_3)
+target_include_directories(InvalidTestDynamicBackend3 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(InvalidTestDynamicBackend3 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(InvalidTestDynamicBackend3 armnn)
+set_target_properties(InvalidTestDynamicBackend3 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
-add_library_ex(armnnInvalidTestDynamicBackend4 SHARED ${armnnTestDynamicBackend_sources})
-target_compile_definitions(armnnInvalidTestDynamicBackend4 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_4)
-target_include_directories(armnnInvalidTestDynamicBackend4 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnInvalidTestDynamicBackend4 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+add_library_ex(InvalidTestDynamicBackend4 MODULE ${testDynamicBackend_sources})
+target_compile_definitions(InvalidTestDynamicBackend4 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_4)
+target_include_directories(InvalidTestDynamicBackend4 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(InvalidTestDynamicBackend4 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(InvalidTestDynamicBackend4 armnn)
+set_target_properties(InvalidTestDynamicBackend4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
-add_library_ex(armnnInvalidTestDynamicBackend5 SHARED ${armnnTestDynamicBackend_sources})
-target_compile_definitions(armnnInvalidTestDynamicBackend5 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_5)
-target_include_directories(armnnInvalidTestDynamicBackend5 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnInvalidTestDynamicBackend5 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+add_library_ex(InvalidTestDynamicBackend5 MODULE ${testDynamicBackend_sources})
+target_compile_definitions(InvalidTestDynamicBackend5 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_5)
+target_include_directories(InvalidTestDynamicBackend5 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(InvalidTestDynamicBackend5 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(InvalidTestDynamicBackend5 armnn)
+set_target_properties(InvalidTestDynamicBackend5 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
-add_library_ex(armnnInvalidTestDynamicBackend6 SHARED ${armnnTestDynamicBackend_sources})
-target_compile_definitions(armnnInvalidTestDynamicBackend6 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_6)
-target_include_directories(armnnInvalidTestDynamicBackend6 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnInvalidTestDynamicBackend6 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+add_library_ex(InvalidTestDynamicBackend6 MODULE ${testDynamicBackend_sources})
+target_compile_definitions(InvalidTestDynamicBackend6 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_6)
+target_include_directories(InvalidTestDynamicBackend6 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(InvalidTestDynamicBackend6 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(InvalidTestDynamicBackend6 armnn)
+set_target_properties(InvalidTestDynamicBackend6 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
 
-add_library_ex(armnnInvalidTestDynamicBackend7 SHARED ${armnnTestDynamicBackend_sources})
-target_compile_definitions(armnnInvalidTestDynamicBackend7 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_7)
-target_include_directories(armnnInvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(armnnInvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+add_library_ex(InvalidTestDynamicBackend7 MODULE ${testDynamicBackend_sources})
+target_compile_definitions(InvalidTestDynamicBackend7 PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_7)
+target_include_directories(InvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(InvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(InvalidTestDynamicBackend7 armnn)
+set_target_properties(InvalidTestDynamicBackend7 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)

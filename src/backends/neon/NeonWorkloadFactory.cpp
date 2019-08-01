@@ -393,4 +393,10 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGather(const armnn::Gather
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonStackWorkload>(descriptor, info);
+}
+
 } // namespace armnn

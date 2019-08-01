@@ -835,4 +835,42 @@ BOOST_AUTO_TEST_CASE(CreateConcatDim3Uint8Workload)
     NeonCreateConcatWorkloadTest<NeonConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 2, 3, 2, 10 }, 3);
 }
 
+template <armnn::DataType DataType>
+static void NeonCreateStackWorkloadTest(const std::initializer_list<unsigned int>& inputShape,
+                                        const std::initializer_list<unsigned int>& outputShape,
+                                        unsigned int axis,
+                                        unsigned int numInputs)
+{
+    armnn::Graph graph;
+    NeonWorkloadFactory factory =
+            NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateStackWorkloadTest<NeonStackWorkload, DataType>(factory,
+                                                                         graph,
+                                                                         TensorShape(inputShape),
+                                                                         TensorShape(outputShape),
+                                                                         axis,
+                                                                         numInputs);
+
+    // Check inputs and output are as expected
+    StackQueueDescriptor queueDescriptor = workload->GetData();
+    for (unsigned int i = 0; i < numInputs; ++i)
+    {
+        auto inputHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[i]);
+        BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo(inputShape, DataType)));
+    }
+    auto outputHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
+}
+
+BOOST_AUTO_TEST_CASE(CreateStackFloat32Workload)
+{
+    NeonCreateStackWorkloadTest<armnn::DataType::Float32>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
+}
+
+BOOST_AUTO_TEST_CASE(CreateStackUint8Workload)
+{
+    NeonCreateStackWorkloadTest<armnn::DataType::QuantisedAsymm8>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

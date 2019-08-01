@@ -180,6 +180,9 @@ public:
     std::unique_ptr<IWorkload> CreateGather(const GatherQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateStack(const StackQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info) const override;
+
 private:
     mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
 };

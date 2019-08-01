@@ -51,6 +51,7 @@ BACKEND_SOURCES := \
         workloads/NeonSoftmaxUint8Workload.cpp \
         workloads/NeonSpaceToDepthWorkload.cpp \
         workloads/NeonSplitterWorkload.cpp \
+        workloads/NeonStackWorkload.cpp \
         workloads/NeonSubtractionWorkload.cpp
 
 else

@@ -35,4 +35,5 @@
 #include "NeonSoftmaxUint8Workload.hpp"
 #include "NeonSpaceToDepthWorkload.hpp"
 #include "NeonSplitterWorkload.hpp"
+#include "NeonStackWorkload.hpp"
 #include "NeonSubtractionWorkload.hpp"

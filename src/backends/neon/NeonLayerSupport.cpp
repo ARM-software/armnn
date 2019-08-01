@@ -43,6 +43,7 @@
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
 #include "workloads/NeonSplitterWorkload.hpp"
+#include "workloads/NeonStackWorkload.hpp"
 #include "workloads/NeonSubtractionWorkload.hpp"
 #endif
 
@@ -600,6 +601,18 @@ bool NeonLayerSupport::IsSplitterSupported(const TensorInfo& input,
         }
     }
     return true;
+}
+
+bool NeonLayerSupport::IsStackSupported(const std::vector<const TensorInfo*>& inputs,
+                                        const TensorInfo& output,
+                                        const StackDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonStackWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   inputs,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsSubtractionSupported(const TensorInfo& input0,

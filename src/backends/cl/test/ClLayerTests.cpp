@@ -401,6 +401,8 @@ ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjection,
 ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNorm,
                      LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNormTest)
 
+ARMNN_AUTO_TEST_CASE(QuantizedLstm, QuantizedLstmTest)
+
 // Convert from Float16 to Float32
 ARMNN_AUTO_TEST_CASE(SimpleConvertFp16ToFp32, SimpleConvertFp16ToFp32Test)
 // Convert from Float32 to Float16

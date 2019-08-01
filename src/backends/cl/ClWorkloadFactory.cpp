@@ -433,6 +433,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSpaceToDepth(const SpaceToDe
     return MakeWorkload<ClSpaceToDepthWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClQuantizedLstmWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {

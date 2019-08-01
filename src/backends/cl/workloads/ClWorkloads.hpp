@@ -29,6 +29,7 @@
 #include "ClPooling2dWorkload.hpp"
 #include "ClPreluWorkload.hpp"
 #include "ClQuantizeWorkload.hpp"
+#include "ClQuantizedLstmWorkload.hpp"
 #include "ClReshapeWorkload.hpp"
 #include "ClResizeWorkload.hpp"
 #include "ClSoftmaxFloatWorkload.hpp"

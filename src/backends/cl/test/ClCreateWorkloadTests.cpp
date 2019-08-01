@@ -9,6 +9,7 @@
 #include <backendsCommon/MemCopyWorkload.hpp>
 
 #include <aclCommon/test/CreateWorkloadClNeon.hpp>
+#include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <cl/ClTensorHandle.hpp>
 #include <cl/ClWorkloadFactory.hpp>
@@ -972,6 +973,46 @@ BOOST_AUTO_TEST_CASE(CreateStackFloat32Workload)
 BOOST_AUTO_TEST_CASE(CreateStackUint8Workload)
 {
     ClCreateStackWorkloadTest<armnn::DataType::QuantisedAsymm8>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
+}
+
+template <typename QuantizedLstmWorkloadType>
+static void ClCreateQuantizedLstmWorkloadTest()
+{
+    using namespace armnn::armcomputetensorutils;
+    using boost::polymorphic_downcast;
+
+    Graph graph;
+    ClWorkloadFactory factory =
+            ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateQuantizedLstmWorkloadTest<QuantizedLstmWorkloadType>(factory, graph);
+
+    QuantizedLstmQueueDescriptor queueDescriptor = workload->GetData();
+
+    IAclTensorHandle* inputHandle = polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    BOOST_TEST((inputHandle->GetShape() == TensorShape({2, 2})));
+    BOOST_TEST((inputHandle->GetDataType() == arm_compute::DataType::QASYMM8));
+
+    IAclTensorHandle* cellStateInHandle = polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[1]);
+    BOOST_TEST((cellStateInHandle->GetShape() == TensorShape({2, 4})));
+    BOOST_TEST((cellStateInHandle->GetDataType() == arm_compute::DataType::QSYMM16));
+
+    IAclTensorHandle* outputStateInHandle = polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[2]);
+    BOOST_TEST((outputStateInHandle->GetShape() == TensorShape({2, 4})));
+    BOOST_TEST((outputStateInHandle->GetDataType() == arm_compute::DataType::QASYMM8));
+
+    IAclTensorHandle* cellStateOutHandle = polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    BOOST_TEST((cellStateOutHandle->GetShape() == TensorShape({2, 4})));
+    BOOST_TEST((cellStateOutHandle->GetDataType() == arm_compute::DataType::QSYMM16));
+
+    IAclTensorHandle* outputStateOutHandle = polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Outputs[1]);
+    BOOST_TEST((outputStateOutHandle->GetShape() == TensorShape({2, 4})));
+    BOOST_TEST((outputStateOutHandle->GetDataType() == arm_compute::DataType::QASYMM8));
+}
+
+BOOST_AUTO_TEST_CASE(CreateQuantizedLstmWorkload)
+{
+    ClCreateQuantizedLstmWorkloadTest<ClQuantizedLstmWorkload>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

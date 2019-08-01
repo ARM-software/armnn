@@ -41,6 +41,7 @@
 #include "workloads/ClPooling2dWorkload.hpp"
 #include "workloads/ClPreluWorkload.hpp"
 #include "workloads/ClResizeWorkload.hpp"
+#include "workloads/ClQuantizedLstmWorkload.hpp"
 #include "workloads/ClQuantizeWorkload.hpp"
 #include "workloads/ClSoftmaxBaseWorkload.hpp"
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
@@ -545,6 +546,24 @@ bool ClLayerSupport::IsPreluSupported(const armnn::TensorInfo &input,
                                       armnn::Optional<std::string &> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClPreluWorkloadValidate, reasonIfUnsupported, input, alpha, output);
+}
+
+bool ClLayerSupport::IsQuantizedLstmSupported(const TensorInfo& input,
+                                              const TensorInfo& previousCellStateIn,
+                                              const TensorInfo& previousOutputIn,
+                                              const TensorInfo& cellStateOut,
+                                              const TensorInfo& output,
+                                              const QuantizedLstmInputParamsInfo& paramsInfo,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClQuantizedLstmWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   previousCellStateIn,
+                                   previousOutputIn,
+                                   cellStateOut,
+                                   output,
+                                   paramsInfo);
 }
 
 bool ClLayerSupport::IsQuantizeSupported(const TensorInfo& input,

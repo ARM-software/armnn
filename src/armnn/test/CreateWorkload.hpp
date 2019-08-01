@@ -351,7 +351,6 @@ template <typename QuantizedLstmWorkload>
 std::unique_ptr<QuantizedLstmWorkload> CreateQuantizedLstmWorkloadTest(armnn::IWorkloadFactory& factory,
                                                                        armnn::Graph& graph)
 {
-
     auto layer = graph.AddLayer<QuantizedLstmLayer>("quantizedLstmlayer");
     unsigned int numBatches = 2;
     unsigned int inputSize = 2;

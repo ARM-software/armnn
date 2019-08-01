@@ -182,6 +182,9 @@ public:
     std::unique_ptr<IWorkload> CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
                                                   const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateStack(const StackQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 

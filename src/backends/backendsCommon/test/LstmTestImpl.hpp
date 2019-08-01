@@ -128,7 +128,7 @@ void LstmUtilsVectorBatchVectorCwiseProductTestImpl(
 }
 
 // Lstm Layer tests:
-
+// *********************************** //
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 2>
 LstmNoCifgNoPeepholeNoProjectionTestImpl(
@@ -1540,4 +1540,193 @@ LstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTestImpl(armnn::IWorkloadF
 
     return ret;
 
+}
+
+// QuantizedLstm tests:
+
+LayerTestResult<uint8_t, 2>
+QuantizedLstmTestImpl(armnn::IWorkloadFactory& workloadFactory,
+                      const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+                      const boost::multi_array<uint8_t, 2>& input,
+                      const boost::multi_array<uint8_t, 2>& outputExpected)
+{
+
+    auto numBatches = boost::numeric_cast<unsigned int>(input.shape()[0]);
+    auto inputSize = boost::numeric_cast<unsigned int>(input.shape()[1]);
+    auto outputSize = boost::numeric_cast<unsigned int>(outputExpected.shape()[1]);
+
+    // Scale/Offset for input/output, cellState In/Out, weights, bias
+    float inputOutputScale = 0.0078125f;
+    int32_t inputOutputOffset = 128;
+
+    float cellStateScale = 0.00048828125f;
+    int32_t cellStateOffset = 0;
+
+    float weightsScale = 0.00408021f;
+    int32_t weightsOffset = 100;
+
+    float biasScale = 3.1876640625e-05f;
+    int32_t biasOffset = 0;
+
+    // Input/Output tensor info
+    armnn::TensorInfo inputInfo({numBatches , inputSize},
+                                 armnn::DataType::QuantisedAsymm8,
+                                 inputOutputScale,
+                                 inputOutputOffset);
+
+    armnn::TensorInfo cellStateInfo({numBatches , outputSize},
+                                     armnn::DataType::QuantisedSymm16,
+                                     cellStateScale,
+                                     cellStateOffset);
+
+    armnn::TensorInfo outputStateInfo({numBatches , outputSize},
+                                       armnn::DataType::QuantisedAsymm8,
+                                       inputOutputScale,
+                                       inputOutputOffset);
+
+    LayerTestResult<uint8_t, 2> ret(outputStateInfo);
+
+    // Input0
+    std::vector<uint8_t> inputVector;
+    inputVector.assign(input.data(), input.data() + (numBatches * inputSize));
+    auto inputTensor = MakeTensor<uint8_t, 2>(inputInfo, inputVector);
+
+    // Input1
+    std::vector<int16_t> cellStateInVector   = {876, 1034, 955, -909, 761, 1029, 796, -1036}; // 13
+    auto cellStateInTensor   = MakeTensor<int16_t, 2>(cellStateInfo, cellStateInVector);
+
+    // Input2
+    std::vector<uint8_t> outputStateInVector = {136, 150, 140, 115, 135, 152, 138, 112}; // 14
+    auto outputStateInTensor = MakeTensor<uint8_t, 2>(outputStateInfo, outputStateInVector);
+
+    // Output0
+    std::vector<int16_t> cellStateOutVector  = {1485, 1177, 1373, -1023, 1019, 1355, 1097, -1235}; // 0
+    auto cellStateOutTensor  = MakeTensor<int16_t, 2>(cellStateInfo, cellStateOutVector);
+
+    // Output1
+    std::vector<uint8_t> outputVector; // 1
+    outputVector.assign(outputExpected.data(), outputExpected.data() + (numBatches * outputSize));
+    ret.outputExpected = MakeTensor<uint8_t, 2>(outputStateInfo, outputVector);
+
+    // Create tensor handles
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
+            workloadFactory.CreateTensorHandle(cellStateInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
+            workloadFactory.CreateTensorHandle(outputStateInfo);
+
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+            workloadFactory.CreateTensorHandle(cellStateInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputStateInfo);
+
+    armnn::QuantizedLstmQueueDescriptor data;
+    armnn::WorkloadInfo info;
+
+    // Add inputs and outputs to workload
+    AddInputToWorkload(data, info, inputInfo, inputHandle.get());
+    AddInputToWorkload(data, info, cellStateInfo, cellStateInHandle.get());
+    AddInputToWorkload(data, info, outputStateInfo, outputStateInHandle.get());
+
+    AddOutputToWorkload(data, info, cellStateInfo, cellStateOutHandle.get());
+    AddOutputToWorkload(data, info, outputStateInfo, outputHandle.get());
+
+    // Weights and bias tensor and quantization info
+    armnn::TensorInfo inputWeightsInfo({outputSize, inputSize},
+                                        armnn::DataType::QuantisedAsymm8,
+                                        weightsScale,
+                                        weightsOffset);
+
+    armnn::TensorInfo recurrentWeightsInfo({outputSize, outputSize},
+                                            armnn::DataType::QuantisedAsymm8,
+                                            weightsScale,
+                                            weightsOffset);
+
+    armnn::TensorInfo biasInfo({outputSize}, armnn::DataType::Signed32, biasScale, biasOffset);
+
+    // Weights and bias tensor data
+    auto inputToInputWeights  = MakeTensor<uint8_t, 2>(inputWeightsInfo, {146, 250, 235, 171, 10, 218, 171, 108});
+    auto inputToForgetWeights = MakeTensor<uint8_t, 2>(inputWeightsInfo, {24, 50, 132, 179, 158, 110, 3, 169});
+    auto inputToCellWeights   = MakeTensor<uint8_t, 2>(inputWeightsInfo, {133, 34, 29, 49, 206, 109, 54, 183});
+    auto inputToOutputWeights = MakeTensor<uint8_t, 2>(inputWeightsInfo, {195, 187, 11, 99, 109, 10, 218, 48});
+
+    auto recurrentToInputWeights  = MakeTensor<uint8_t, 2>(recurrentWeightsInfo,
+            {254, 206, 77, 168, 71, 20, 215, 6, 223, 7, 118, 225, 59, 130, 174, 26});
+    auto recurrentToForgetWeights = MakeTensor<uint8_t, 2>(recurrentWeightsInfo,
+            {137, 240, 103, 52, 68, 51, 237, 112, 0, 220, 89, 23, 69, 4, 207, 253});
+    auto recurrentToCellWeights   = MakeTensor<uint8_t, 2>(recurrentWeightsInfo,
+            {172, 60, 205, 65, 14, 0, 140, 168, 240, 223, 133, 56, 142, 64, 246, 216});
+    auto recurrentToOutputWeights = MakeTensor<uint8_t, 2>(recurrentWeightsInfo,
+            {106, 214, 67, 23, 59, 158, 45, 3, 119, 132, 49, 205, 129, 218, 11, 98});
+
+    auto inputGateBias  = MakeTensor<int32_t, 1>(biasInfo, {-7876, 13488, -726, 32839});
+    auto forgetGateBias = MakeTensor<int32_t, 1>(biasInfo, {9206, -46884, -11693, -38724});
+    auto cellBias       = MakeTensor<int32_t, 1>(biasInfo, {39481, 48624, 48976, -21419});
+    auto outputGateBias = MakeTensor<int32_t, 1>(biasInfo, {-58999, -17050, -41852, -40538});
+
+    // ScopedCpuTensorHandles
+    armnn::ScopedCpuTensorHandle inputToInputWeightsTensor(inputWeightsInfo);
+    armnn::ScopedCpuTensorHandle inputToForgetWeightsTensor(inputWeightsInfo);
+    armnn::ScopedCpuTensorHandle inputToCellWeightsTensor(inputWeightsInfo);
+    armnn::ScopedCpuTensorHandle inputToOutputWeightsTensor(inputWeightsInfo);
+
+    armnn::ScopedCpuTensorHandle recurrentToInputWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedCpuTensorHandle recurrentToForgetWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedCpuTensorHandle recurrentToCellWeightsTensor(recurrentWeightsInfo);
+    armnn::ScopedCpuTensorHandle recurrentToOutputWeightsTensor(recurrentWeightsInfo);
+
+    armnn::ScopedCpuTensorHandle inputGateBiasTensor(biasInfo);
+    armnn::ScopedCpuTensorHandle forgetGateBiasTensor(biasInfo);
+    armnn::ScopedCpuTensorHandle cellBiasTensor(biasInfo);
+    armnn::ScopedCpuTensorHandle outputGateBiasTensor(biasInfo);
+
+    // Allocate and copy data
+    AllocateAndCopyDataToITensorHandle(&inputToInputWeightsTensor, &inputToInputWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, &inputToForgetWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&inputToCellWeightsTensor, &inputToCellWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&inputToOutputWeightsTensor, &inputToOutputWeights[0][0]);
+
+    AllocateAndCopyDataToITensorHandle(&recurrentToInputWeightsTensor, &recurrentToInputWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&recurrentToForgetWeightsTensor, &recurrentToForgetWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&recurrentToCellWeightsTensor, &recurrentToCellWeights[0][0]);
+    AllocateAndCopyDataToITensorHandle(&recurrentToOutputWeightsTensor, &recurrentToOutputWeights[0][0]);
+
+    AllocateAndCopyDataToITensorHandle(&inputGateBiasTensor, &inputGateBias[0]);
+    AllocateAndCopyDataToITensorHandle(&forgetGateBiasTensor, &forgetGateBias[0]);
+    AllocateAndCopyDataToITensorHandle(&cellBiasTensor, &cellBias[0]);
+    AllocateAndCopyDataToITensorHandle(&outputGateBiasTensor, &outputGateBias[0]);
+
+    // Setup queue descriptor
+    data.m_InputToInputWeights = &inputToInputWeightsTensor;
+    data.m_InputToForgetWeights = &inputToForgetWeightsTensor;
+    data.m_InputToCellWeights = &inputToCellWeightsTensor;
+    data.m_InputToOutputWeights = &inputToOutputWeightsTensor;
+
+    data.m_RecurrentToInputWeights = &recurrentToInputWeightsTensor;
+    data.m_RecurrentToForgetWeights = &recurrentToForgetWeightsTensor;
+    data.m_RecurrentToCellWeights = &recurrentToCellWeightsTensor;
+    data.m_RecurrentToOutputWeights = &recurrentToOutputWeightsTensor;
+
+    data.m_InputGateBias = &inputGateBiasTensor;
+    data.m_ForgetGateBias = &forgetGateBiasTensor;
+    data.m_CellBias = &cellBiasTensor;
+    data.m_OutputGateBias = &outputGateBiasTensor;
+
+    // Create workload and allocate tensor handles
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateQuantizedLstm(data, info);
+    inputHandle->Allocate();
+    outputStateInHandle->Allocate();
+    cellStateInHandle->Allocate();
+
+    cellStateOutHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &inputTensor[0][0]);
+    CopyDataToITensorHandle(outputStateInHandle.get(), &outputStateInTensor[0][0]);
+    CopyDataToITensorHandle(cellStateInHandle.get(), &cellStateInTensor[0][0]);
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0], outputHandle.get());
+
+    return ret;
 }

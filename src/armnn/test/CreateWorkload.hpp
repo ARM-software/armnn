@@ -347,6 +347,146 @@ std::unique_ptr<LstmWorkload> CreateLstmWorkloadTest(armnn::IWorkloadFactory& fa
     return workload;
 }
 
+template <typename QuantizedLstmWorkload>
+std::unique_ptr<QuantizedLstmWorkload> CreateQuantizedLstmWorkloadTest(armnn::IWorkloadFactory& factory,
+                                                                       armnn::Graph& graph)
+{
+
+    auto layer = graph.AddLayer<QuantizedLstmLayer>("quantizedLstmlayer");
+    unsigned int numBatches = 2;
+    unsigned int inputSize = 2;
+    unsigned int outputSize = 4;
+
+    // Scale/Offset for input/output, cellState In/Out, weights, bias
+    float inputOutputScale = 0.0078125f;
+    int32_t inputOutputOffset = 128;
+
+    float cellStateScale = 0.00048828125f;
+    int32_t cellStateOffset = 0;
+
+    float weightsScale = 0.00408021f;
+    int32_t weightsOffset = 100;
+
+    float biasScale = 3.1876640625e-05f;
+    int32_t biasOffset = 0;
+
+    // Weights and bias tensor and quantization info
+    armnn::TensorInfo inputWeightsInfo({outputSize, inputSize},
+                                       armnn::DataType::QuantisedAsymm8,
+                                       weightsScale,
+                                       weightsOffset);
+
+    armnn::TensorInfo recurrentWeightsInfo({outputSize, outputSize},
+                                           armnn::DataType::QuantisedAsymm8,
+                                           weightsScale,
+                                           weightsOffset);
+
+    armnn::TensorInfo biasInfo({outputSize},
+                               armnn::DataType::Signed32,
+                               biasScale,
+                               biasOffset);
+
+    // Weights and bias
+    layer->m_QuantizedLstmParameters.m_InputToInputWeights =
+            std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+    layer->m_QuantizedLstmParameters.m_InputToForgetWeights =
+            std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+    layer->m_QuantizedLstmParameters.m_InputToCellWeights =
+            std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+    layer->m_QuantizedLstmParameters.m_InputToOutputWeights =
+            std::make_unique<ScopedCpuTensorHandle>(inputWeightsInfo);
+
+    layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights =
+            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+    layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights =
+            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+    layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights =
+            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+    layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights =
+            std::make_unique<ScopedCpuTensorHandle>(recurrentWeightsInfo);
+
+    layer->m_QuantizedLstmParameters.m_InputGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+    layer->m_QuantizedLstmParameters.m_ForgetGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+    layer->m_QuantizedLstmParameters.m_CellBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+    layer->m_QuantizedLstmParameters.m_OutputGateBias = std::make_unique<ScopedCpuTensorHandle>(biasInfo);
+
+    // Allocate weights and bias
+    layer->m_QuantizedLstmParameters.m_InputToInputWeights->Allocate();
+    layer->m_QuantizedLstmParameters.m_InputToForgetWeights->Allocate();
+    layer->m_QuantizedLstmParameters.m_InputToCellWeights->Allocate();
+    layer->m_QuantizedLstmParameters.m_InputToOutputWeights->Allocate();
+
+    layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights->Allocate();
+    layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights->Allocate();
+    layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights->Allocate();
+    layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights->Allocate();
+
+    layer->m_QuantizedLstmParameters.m_InputGateBias->Allocate();
+    layer->m_QuantizedLstmParameters.m_ForgetGateBias->Allocate();
+    layer->m_QuantizedLstmParameters.m_CellBias->Allocate();
+    layer->m_QuantizedLstmParameters.m_OutputGateBias->Allocate();
+
+    // Create input and output layers
+    Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    Layer* const cellStateIn = graph.AddLayer<InputLayer>(1, "cellStateIn");
+    Layer* const outputStateIn = graph.AddLayer<InputLayer>(2, "outputStateIn");
+
+    Layer* const cellStateOut = graph.AddLayer<OutputLayer>(0, "cellStateOut");
+    Layer* const outputStateOut = graph.AddLayer<OutputLayer>(1, "outputStateOut");
+
+    // Input/output tensor info and quantization info
+    armnn::TensorInfo inputInfo({numBatches , inputSize},
+                                armnn::DataType::QuantisedAsymm8,
+                                inputOutputScale,
+                                inputOutputOffset);
+
+    armnn::TensorInfo cellStateInfo({numBatches , outputSize},
+                                    armnn::DataType::QuantisedSymm16,
+                                    cellStateScale,
+                                    cellStateOffset);
+
+    armnn::TensorInfo outputStateInfo({numBatches , outputSize},
+                                      armnn::DataType::QuantisedAsymm8,
+                                      inputOutputScale,
+                                      inputOutputOffset);
+
+    // Connect input/output slots
+    Connect(input, layer, inputInfo, 0, 0);
+    Connect(cellStateIn, layer, cellStateInfo, 0, 1);
+    Connect(outputStateIn, layer, outputStateInfo, 0, 2);
+
+    Connect(layer, cellStateOut, cellStateInfo, 0, 0);
+    Connect(layer, outputStateOut, outputStateInfo, 1, 0);
+
+    CreateTensorHandles(graph, factory);
+
+    // Create workload and check layer support
+    auto workload = MakeAndCheckWorkload<QuantizedLstmWorkload>(*layer, graph, factory);
+    QuantizedLstmQueueDescriptor queueDescriptor = workload->GetData();
+
+    // Validate input/output sizes
+    BOOST_TEST(queueDescriptor.m_Inputs.size() == 3);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 2);
+
+    // Validate weight tensor info
+    BOOST_TEST((queueDescriptor.m_InputToInputWeights->GetTensorInfo() == inputWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_InputToForgetWeights->GetTensorInfo() == inputWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_InputToCellWeights->GetTensorInfo() == inputWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_InputToOutputWeights->GetTensorInfo() == inputWeightsInfo));
+
+    BOOST_TEST((queueDescriptor.m_RecurrentToInputWeights->GetTensorInfo() == recurrentWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_RecurrentToForgetWeights->GetTensorInfo() == recurrentWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_RecurrentToCellWeights->GetTensorInfo() == recurrentWeightsInfo));
+    BOOST_TEST((queueDescriptor.m_RecurrentToOutputWeights->GetTensorInfo() == recurrentWeightsInfo));
+
+    BOOST_TEST((queueDescriptor.m_InputGateBias->GetTensorInfo() == biasInfo));
+    BOOST_TEST((queueDescriptor.m_ForgetGateBias->GetTensorInfo() == biasInfo));
+    BOOST_TEST((queueDescriptor.m_CellBias->GetTensorInfo() == biasInfo));
+    BOOST_TEST((queueDescriptor.m_OutputGateBias->GetTensorInfo() == biasInfo));
+
+    return workload;
+}
+
 template <typename Convolution2dWorkload, armnn::DataType DataType>
 std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(armnn::IWorkloadFactory& factory,
                                                                        armnn::Graph&            graph)

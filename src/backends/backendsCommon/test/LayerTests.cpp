@@ -2410,6 +2410,22 @@ LayerTestResult<int16_t, 2> LstmLayerInt16NoCifgNoPeepholeNoProjectionInt16Const
         workloadFactory, memoryManager, input, expectedOutput, qScale, qOffset, datatype);
 }
 
+// QuantizedLstm
+LayerTestResult<uint8_t, 2> QuantizedLstmTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputDesc({2, 2}, armnn::DataType::QuantisedAsymm8);
+    boost::multi_array<uint8_t, 2> input = MakeTensor<uint8_t, 2>(inputDesc, std::vector<uint8_t>(
+        {166, 179, 50, 150}));
+
+    armnn::TensorInfo outputDesc({2, 4}, armnn::DataType::QuantisedAsymm8);
+    boost::multi_array<uint8_t, 2> expectedOutput = MakeTensor<uint8_t, 2>(outputDesc, std::vector<uint8_t>(
+        {140, 151, 146, 112, 136, 156, 142, 112 }));
+
+    return QuantizedLstmTestImpl(workloadFactory, memoryManager, input, expectedOutput);
+}
+
 LayerTestResult<float,3> ConcatTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

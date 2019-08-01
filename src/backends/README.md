@@ -222,7 +222,7 @@ runtime will hold this for its entire lifetime. It then calls the following inte
 * ```BeforeUnloadNetwork(NetworkId networkId)```
 * ```AfterUnloadNetwork(NetworkId networkId)```
 
-### Dynamic backends
+## Dynamic backends
 
 Backends can also be loaded by ArmNN dynamically at runtime.
 To be properly loaded and used, the backend instances must comply to the standard interface for dynamic backends and to the versioning
@@ -259,7 +259,7 @@ Interface details:
   GetVersion(), and that the object returned by the BackendFactory() function is a valid and well-formed instance of the IBackendInternal
   interface.
 
-## Backend versioning and ABI compatibility
+## Dynamic backend versioning and ABI compatibility
 
 Dynamic backend versioning policy:
 
@@ -302,4 +302,63 @@ If all path are not valid, then no dynamic backends will be loaded in the ArmNN'
 
 Passing an empty list of paths at compile-time and providing no path override at runtime will effectively disable the
 dynamic backend loading feature, and no dynamic backends will be loaded into ArmNN's runtime.
+
+## Dynamic backend file naming convention
+
+During the creation of a Runtime object, ArmNN will scan the paths specified for dynamic backend loading searching for suitable backend objects.
+ArmNN will try to load only the files that match the following accepted naming scheme:
+
+```
+<vendor>_<name>_backend.so[<version>] (e.g. "Arm_GpuAcc_backend.so" or "Arm_GpuAcc_backend.so.1.2.3")
+```
+
+Only alphanumeric characters are allowed for both the `<vendor>` and the `<name>` fields, namely lowercase and/or uppercase characters,
+and/or numerical digits (see the table below for examples).
+Only dots and numbers are allow for the optional `<version>` field.
+
+Symlinks to other files are allowed to support the standard linux shared object versioning:
+
+```
+Arm_GpuAcc_backend.so -> Arm_GpuAcc_backend.so.1.2.3
+Arm_GpuAcc_backend.so.1 -> Arm_GpuAcc_backend.so.1.2.3
+Arm_GpuAcc_backend.so.1.2 -> Arm_GpuAcc_backend.so.1.2.3
+Arm_GpuAcc_backend.so.1.2.3
+```
+
+Files are identified by their full canonical path, so it is allowed to have files with the same name in different directories.
+However, if those are actually the same dynamic backend, only the first in order of parsing will be loaded.
+
+Examples:
+
+| Filename                                                 | Description                                       |
+| -------------------------------------------------------- | ------------------------------------------------- |
+| Arm_GpuAcc_backend.so                                    | valid: basic backend name                         |
+| Arm_GpuAcc_backend.so.1                                  | valid: single field version number                |
+| Arm_GpuAcc_backend.so.1.2                                | valid: multiple field version number              |
+| Arm_GpuAcc_backend.so.1.2.3                              | valid: multiple field version number              |
+| Arm_GpuAcc_backend.so.10.1.27                            | valid: Multiple digit version                     |
+| Arm_GpuAcc_backend.so.10.1.33.                           | not valid: dot not followed by version number     |
+| Arm_GpuAcc_backend.so.3.4..5                             | not valid: dot not followed by version number     |
+| Arm_GpuAcc_backend.so.1,1.1                              | not valid: comma instead of dot in the version    |
+| Arm123_GpuAcc_backend.so                                 | valid: digits in vendor name are allowed          |
+| Arm_GpuAcc456_backend.so                                 | valid: digits in backend id are allowed           |
+| Arm%Co_GpuAcc_backend.so                                 | not valid: invalid character in vendor name       |
+| Arm_Gpu.Acc_backend.so                                   | not valid: invalid character in backend id        |
+| GpuAcc_backend.so                                        | not valid: missing vendor name                    |
+| _GpuAcc_backend.so                                       | not valid: missing vendor name                    |
+| Arm__backend.so                                          | not valid: missing backend id                     |
+| Arm_GpuAcc.so                                            | not valid: missing "backend" at the end           |
+| __backend.so                                             | not valid: missing vendor name and backend id     |
+| __.so                                                    | not valid: missing all fields                     |
+| Arm_GpuAcc_backend                                       | not valid: missing at least ".so" at the end      |
+| Arm_GpuAcc_backend_v1.2.so                               | not valid: extra version info at the end          |
+| Arm_CpuAcc_backend.so                                    | valid: basic backend name                         |
+| Arm_CpuAcc_backend.so.1 -> Arm_CpuAcc_backend.so         | valid: symlink to valid backend file              |
+| Arm_CpuAcc_backend.so.1.2 -> Arm_CpuAcc_backend.so.1     | valid: symlink to valid symlink                   |
+| Arm_CpuAcc_backend.so.1.2.3 -> Arm_CpuAcc_backend.so.1.2 | valid: symlink to valid symlink                   |
+| Arm_no_backend.so -> nothing                             | not valid: symlink resolves to non-existent file  |
+| pathA/Arm_GpuAcc_backend.so                              | valid: basic backend name                         |
+| pathB/Arm_GpuAcc_backend.so                              | valid: but duplicated from pathA/                 |
+
+ArmNN will try to load the dynamic backends in the same order as they are parsed from the filesystem.
 

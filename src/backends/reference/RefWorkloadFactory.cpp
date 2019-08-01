@@ -380,6 +380,10 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMaximum(
     const MaximumQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
     return std::make_unique<RefMaximumWorkload>(descriptor, info);
 }
 
@@ -396,6 +400,10 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMinimum(
     const MinimumQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
     return std::make_unique<RefMinimumWorkload>(descriptor, info);
 }
 

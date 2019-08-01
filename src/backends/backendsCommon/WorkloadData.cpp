@@ -1715,7 +1715,9 @@ void MaximumQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
+        DataType::Float16,
         DataType::Float32,
+        DataType::Signed32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -1834,6 +1836,7 @@ void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     std::vector<DataType> supportedTypes =
     {
             DataType::Float32,
+            DataType::Float16,
             DataType::QuantisedAsymm8,
             DataType::QuantisedSymm16
     };
@@ -1910,7 +1913,9 @@ void MinimumQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
+        DataType::Float16,
         DataType::Float32,
+        DataType::Signed32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };

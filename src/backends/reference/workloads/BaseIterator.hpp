@@ -175,6 +175,21 @@ private:
     const float m_Scale;
 };
 
+class Int32Decoder : public TypedIterator<const int32_t, Decoder<float>>
+{
+public:
+    Int32Decoder(const int32_t* data)
+        : TypedIterator(data) {}
+
+    Int32Decoder()
+        : Int32Decoder(nullptr) {}
+
+    float Get() const override
+    {
+        return static_cast<float>(*m_Iterator);
+    }
+};
+
 class QASymm8Encoder : public TypedIterator<uint8_t, Encoder<float>>
 {
 public:
@@ -240,6 +255,26 @@ public:
     float Get() const override
     {
         return *m_Iterator;
+    }
+};
+
+class Int32Encoder : public TypedIterator<int32_t, Encoder<float>>
+{
+public:
+    Int32Encoder(int32_t* data)
+        : TypedIterator(data) {}
+
+    Int32Encoder()
+        : Int32Encoder(nullptr) {}
+
+    void Set(float right) override
+    {
+        *m_Iterator = static_cast<int32_t>(right);
+    }
+
+    float Get() const override
+    {
+        return static_cast<float>(*m_Iterator);
     }
 };
 

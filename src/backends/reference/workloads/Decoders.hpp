@@ -40,9 +40,13 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         }
         case armnn::DataType::Signed32:
         {
-            return std::make_unique<ScaledInt32Decoder>(
-                    static_cast<const int32_t*>(data),
-                    info.GetQuantizationScale());
+            const float scale = info.GetQuantizationScale();
+            if (scale == 0.f)
+            {
+                return std::make_unique<Int32Decoder>(static_cast<const int32_t*>(data));
+            }
+            // NOTE: ScaledInt32Decoder is used for quantized convolution biases
+            return std::make_unique<ScaledInt32Decoder>(static_cast<const int32_t*>(data), scale);
         }
         default:
         {

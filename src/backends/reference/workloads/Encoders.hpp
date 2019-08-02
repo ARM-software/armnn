@@ -34,6 +34,10 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
                 info.GetQuantizationScale(),
                 info.GetQuantizationOffset());
         }
+        case armnn::DataType::Signed32:
+        {
+            return std::make_unique<Int32Encoder>(static_cast<int32_t*>(data));
+        }
         case armnn::DataType::Float32:
         {
             return std::make_unique<FloatEncoder>(static_cast<float*>(data));

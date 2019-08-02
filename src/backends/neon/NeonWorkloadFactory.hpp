@@ -135,6 +135,9 @@ public:
     std::unique_ptr<IWorkload> CreateLstm(const LstmQueueDescriptor& descriptor,
                                           const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& descriptor,
                                                        const WorkloadInfo& info) const override;
 

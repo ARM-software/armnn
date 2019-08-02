@@ -39,6 +39,7 @@
 #include "workloads/NeonPooling2dWorkload.hpp"
 #include "workloads/NeonPreluWorkload.hpp"
 #include "workloads/NeonQuantizeWorkload.hpp"
+#include "workloads/NeonQuantizedLstmWorkload.hpp"
 #include "workloads/NeonResizeWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
@@ -485,6 +486,24 @@ bool NeonLayerSupport::IsQuantizeSupported(const TensorInfo& input,
                                    reasonIfUnsupported,
                                    input,
                                    output);
+}
+
+bool NeonLayerSupport::IsQuantizedLstmSupported(const TensorInfo& input,
+                                                const TensorInfo& cellStateIn,
+                                                const TensorInfo& outputStateIn,
+                                                const TensorInfo& cellStateOut,
+                                                const TensorInfo& outputStateOut,
+                                                const QuantizedLstmInputParamsInfo& paramsInfo,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonQuantizedLstmWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   cellStateIn,
+                                   outputStateIn,
+                                   cellStateOut,
+                                   outputStateOut,
+                                   paramsInfo);
 }
 
 bool NeonLayerSupport::IsReshapeSupported(const TensorInfo& input,

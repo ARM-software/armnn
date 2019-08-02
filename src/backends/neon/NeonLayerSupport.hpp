@@ -165,6 +165,14 @@ public:
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsQuantizedLstmSupported(const TensorInfo& input,
+                                  const TensorInfo& cellStateIn,
+                                  const TensorInfo& outputStateIn,
+                                  const TensorInfo& cellStateOut,
+                                  const TensorInfo& outputStateOut,
+                                  const QuantizedLstmInputParamsInfo& paramsInfo,
+                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsReshapeSupported(const TensorInfo& input,
                             const ReshapeDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

@@ -319,6 +319,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateLstm(const LstmQueueDescri
     return MakeWorkloadHelper<NeonLstmFloatWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateQuantizedLstm(const QuantizedLstmQueueDescriptor& descriptor,
+                                                                    const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonQuantizedLstmWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp16ToFp32(
     const ConvertFp16ToFp32QueueDescriptor& descriptor,
     const WorkloadInfo& info) const

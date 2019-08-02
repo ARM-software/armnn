@@ -529,6 +529,8 @@ ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjection,
 ARMNN_AUTO_TEST_CASE(LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNorm,
                      LstmLayerFloat32NoCifgWithPeepholeWithProjectionWithLayerNormTest)
 
+ARMNN_AUTO_TEST_CASE(QuantizedLstm, QuantizedLstmTest)
+
 // Mean
 ARMNN_AUTO_TEST_CASE(MeanSimpleFloat32, MeanSimpleTest<armnn::DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(MeanSimpleAxisFloat32, MeanSimpleAxisTest<armnn::DataType::Float32>)

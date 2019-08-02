@@ -43,6 +43,7 @@ BACKEND_SOURCES := \
         workloads/NeonPermuteWorkload.cpp \
         workloads/NeonPooling2dWorkload.cpp \
         workloads/NeonPreluWorkload.cpp \
+        workloads/NeonQuantizedLstmWorkload.cpp \
         workloads/NeonQuantizeWorkload.cpp \
         workloads/NeonReshapeWorkload.cpp \
         workloads/NeonResizeWorkload.cpp \

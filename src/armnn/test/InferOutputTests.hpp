@@ -406,7 +406,7 @@ void TransposeConvolution2dInferOutputShapeTest()
     armnn::TensorShape filterShape(4, filterSize.data());
     shapes.push_back(filterShape);
 
-    const std::vector<unsigned int> expectedOutputSizes = {1, 2, 6, 6};
+    const std::vector<unsigned int> expectedOutputSizes = {1, 1, 6, 6};
     armnn::TensorShape expectedOutputShape(4, expectedOutputSizes.data());
 
     BOOST_CHECK(expectedOutputShape == transposeConvolution2dLayer->InferOutputShapes(shapes).at(0));

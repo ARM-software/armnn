@@ -67,7 +67,6 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
     const unsigned int batches  = inputShape[0];
-    const unsigned int channels = inputShape[dataLayoutIndex.GetChannelsIndex()];
 
     const unsigned int wInput = inputShape[dataLayoutIndex.GetWidthIndex()];
     const unsigned int hInput = inputShape[dataLayoutIndex.GetHeightIndex()];
@@ -83,6 +82,13 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
 
     unsigned int wOutput = wPaddedOutput - (m_Param.m_PadLeft + m_Param.m_PadRight);
     unsigned int hOutput = hPaddedOutput - (m_Param.m_PadTop + m_Param.m_PadBottom);
+
+    unsigned int kernelElements = kernelShape[0] * kernelShape[dataLayoutIndex.GetChannelsIndex()];
+    unsigned int inputElements = batches * inputShape[dataLayoutIndex.GetChannelsIndex()];
+
+    BOOST_ASSERT_MSG(inputElements != 0, "Invalid number of input elements");
+    BOOST_ASSERT_MSG(kernelElements % inputElements == 0, "Invalid number of elements");
+    unsigned int channels =  kernelElements / inputElements;
 
     TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NHWC ?
          TensorShape( { batches, hOutput, wOutput, channels } ) :

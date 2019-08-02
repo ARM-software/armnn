@@ -72,6 +72,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonSplitterWorkload.hpp
     NeonStackWorkload.cpp
     NeonStackWorkload.hpp
+    NeonStridedSliceWorkload.cpp
+    NeonStridedSliceWorkload.hpp
     NeonSubtractionWorkload.cpp
     NeonSubtractionWorkload.hpp
     NeonWorkloads.hpp

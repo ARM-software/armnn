@@ -37,4 +37,5 @@
 #include "NeonSpaceToDepthWorkload.hpp"
 #include "NeonSplitterWorkload.hpp"
 #include "NeonStackWorkload.hpp"
+#include "NeonStridedSliceWorkload.hpp"
 #include "NeonSubtractionWorkload.hpp"

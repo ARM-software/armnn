@@ -53,6 +53,7 @@ BACKEND_SOURCES := \
         workloads/NeonSpaceToDepthWorkload.cpp \
         workloads/NeonSplitterWorkload.cpp \
         workloads/NeonStackWorkload.cpp \
+        workloads/NeonStridedSliceWorkload.cpp \
         workloads/NeonSubtractionWorkload.cpp
 
 else

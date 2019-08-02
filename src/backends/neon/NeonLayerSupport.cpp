@@ -45,6 +45,7 @@
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
 #include "workloads/NeonSplitterWorkload.hpp"
 #include "workloads/NeonStackWorkload.hpp"
+#include "workloads/NeonStridedSliceWorkload.hpp"
 #include "workloads/NeonSubtractionWorkload.hpp"
 #endif
 
@@ -605,6 +606,18 @@ bool NeonLayerSupport::IsStackSupported(const std::vector<const TensorInfo*>& in
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonStackWorkloadValidate,
                                    reasonIfUnsupported,
                                    inputs,
+                                   output,
+                                   descriptor);
+}
+
+bool NeonLayerSupport::IsStridedSliceSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const StridedSliceDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonStridedSliceWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
                                    output,
                                    descriptor);
 }

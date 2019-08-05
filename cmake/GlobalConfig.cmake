@@ -19,6 +19,7 @@ option(BUILD_ACCURACY_TOOL "Build Accuracy Tool" OFF)
 option(FLATC_DIR "Path to Flatbuffers compiler" OFF)
 option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OFF)
 option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
+option(DYNAMIC_BACKEND_PATHS "Colon seperated list of paths where to load the dynamic backends from" "")
 
 include(SelectLibraryConfigurations)
 

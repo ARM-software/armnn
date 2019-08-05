@@ -31,6 +31,7 @@ public:
         CreationOptions()
             : m_GpuAccTunedParameters(nullptr)
             , m_EnableGpuProfiling(false)
+            , m_DynamicBackendsPath("")
         {}
 
         /// If set, uses the GpuAcc tuned parameters from the given object when executing GPU workloads.
@@ -39,6 +40,10 @@ public:
 
         // Setting this flag will allow the user to obtain GPU profiling information from the runtime.
         bool m_EnableGpuProfiling;
+
+        // Setting this value will override the paths set by the DYNAMIC_BACKEND_PATHS compiler directive
+        // Only a single path is allowed for the override
+        std::string m_DynamicBackendsPath;
     };
 
     static IRuntime* CreateRaw(const CreationOptions& options);

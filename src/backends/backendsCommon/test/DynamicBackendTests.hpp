@@ -34,6 +34,11 @@ static std::string g_TestInvalidTestDynamicBackend5FileName = "libInvalidTestDyn
 static std::string g_TestInvalidTestDynamicBackend6FileName = "libInvalidTestDynamicBackend6.so";
 static std::string g_TestInvalidTestDynamicBackend7FileName = "libInvalidTestDynamicBackend7.so";
 
+static std::string g_TestDynamicBackendsFileParsingSubDir1  = "backendsTestPath1/";
+static std::string g_TestDynamicBackendsFileParsingSubDir2  = "backendsTestPath2/";
+static std::string g_TestDynamicBackendsFileParsingSubDir3  = "backendsTestPath3/";
+static std::string g_TestDynamicBackendsFileParsingSubDir4  = "backendsTestPath4/";
+
 std::string GetTestDirectoryBasePath()
 {
     using namespace boost::filesystem;
@@ -454,4 +459,114 @@ void CreateDynamicBackendObjectInvalidInterface7TestImpl()
     std::unique_ptr<DynamicBackend> dynamicBackend;
     BOOST_CHECK_THROW(dynamicBackend.reset(new DynamicBackend(sharedObjectHandle)), RuntimeException);
     BOOST_TEST((dynamicBackend == nullptr));
+}
+
+void GetBackendPathsTestImpl()
+{
+    using namespace armnn;
+    using namespace boost::filesystem;
+
+    // The test covers four directories:
+    // <unit test path>/src/backends/backendsCommon/test/
+    //                                                ├─ backendsTestPath1/   -> existing, contains files
+    //                                                ├─ backendsTestPath2/   -> existing, contains files
+    //                                                ├─ backendsTestPath3/   -> existing, but empty
+    //                                                └─ backendsTestPath4/   -> not existing
+
+    std::string subDir1 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir1);
+    std::string subDir2 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir2);
+    std::string subDir3 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir3);
+    std::string subDir4 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir4);
+
+    BOOST_CHECK(exists(subDir1));
+    BOOST_CHECK(exists(subDir2));
+    BOOST_CHECK(exists(subDir3));
+    BOOST_CHECK(!exists(subDir4));
+
+    class TestDynamicBackendUtils : public DynamicBackendUtils
+    {
+    public:
+        static std::vector<std::string> GetBackendPathsImplTest(const std::string& path)
+        {
+            return GetBackendPathsImpl(path);
+        }
+    };
+
+    // No path
+    BOOST_TEST(TestDynamicBackendUtils::GetBackendPathsImplTest("").empty());
+
+    // Malformed path
+    std::string malformedDir(subDir1 + "/" + subDir1);
+    BOOST_TEST(TestDynamicBackendUtils::GetBackendPathsImplTest(malformedDir).size()==0);
+
+    // Single valid path
+    std::vector<std::string> DynamicBackendPaths2 = TestDynamicBackendUtils::GetBackendPathsImplTest(subDir1);
+    BOOST_TEST(DynamicBackendPaths2.size() == 1);
+    BOOST_TEST(DynamicBackendPaths2[0] == subDir1);
+
+    // Multiple equal and valid paths
+    std::string multipleEqualDirs(subDir1 + ":" + subDir1);
+    std::vector<std::string> DynamicBackendPaths3 = TestDynamicBackendUtils::GetBackendPathsImplTest(multipleEqualDirs);
+    BOOST_TEST(DynamicBackendPaths3.size() == 1);
+    BOOST_TEST(DynamicBackendPaths3[0] == subDir1);
+
+    // Multiple empty paths
+    BOOST_TEST(TestDynamicBackendUtils::GetBackendPathsImplTest(":::").empty());
+
+    // Multiple valid paths
+    std::string multipleValidPaths(subDir1 + ":" + subDir2 + ":" + subDir3);
+    std::vector<std::string> DynamicBackendPaths5 =
+        TestDynamicBackendUtils::GetBackendPathsImplTest(multipleValidPaths);
+    BOOST_TEST(DynamicBackendPaths5.size() == 3);
+    BOOST_TEST(DynamicBackendPaths5[0] == subDir1);
+    BOOST_TEST(DynamicBackendPaths5[1] == subDir2);
+    BOOST_TEST(DynamicBackendPaths5[2] == subDir3);
+
+    // Valid among empty paths
+    std::string validAmongEmptyDirs("::" + subDir1 + ":");
+    std::vector<std::string> DynamicBackendPaths6 =
+        TestDynamicBackendUtils::GetBackendPathsImplTest(validAmongEmptyDirs);
+    BOOST_TEST(DynamicBackendPaths6.size() == 1);
+    BOOST_TEST(DynamicBackendPaths6[0] == subDir1);
+
+    // Invalid among empty paths
+    std::string invalidAmongEmptyDirs(":" + subDir4 + "::");
+    BOOST_TEST(TestDynamicBackendUtils::GetBackendPathsImplTest(invalidAmongEmptyDirs).empty());
+
+    // Valid, invalid and empty paths
+    std::string validInvalidEmptyDirs(subDir1 + ":" + subDir4 + ":");
+    std::vector<std::string> DynamicBackendPaths8 =
+        TestDynamicBackendUtils::GetBackendPathsImplTest(validInvalidEmptyDirs);
+    BOOST_TEST(DynamicBackendPaths8.size() == 1);
+    BOOST_TEST(DynamicBackendPaths8[0] == subDir1);
+
+    // Mix of duplicates of valid, invalid and empty paths
+    std::string duplicateValidInvalidEmptyDirs(validInvalidEmptyDirs + ":" + validInvalidEmptyDirs + ":" +
+                                               subDir2 + ":" + subDir2);
+    std::vector<std::string> DynamicBackendPaths9 =
+        TestDynamicBackendUtils::GetBackendPathsImplTest(duplicateValidInvalidEmptyDirs);
+    BOOST_TEST(DynamicBackendPaths9.size() == 2);
+    BOOST_TEST(DynamicBackendPaths9[0] == subDir1);
+    BOOST_TEST(DynamicBackendPaths9[1] == subDir2);
+}
+
+void GetBackendPathsOverrideTestImpl()
+{
+    using namespace armnn;
+    using namespace boost::filesystem;
+
+    std::string subDir1 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir1);
+    std::string subDir4 = GetTestSubDirectory(g_TestDynamicBackendsFileParsingSubDir4);
+
+    BOOST_CHECK(exists(subDir1));
+    BOOST_CHECK(!exists(subDir4));
+
+    // Override with valid path
+    std::vector<std::string> validResult = DynamicBackendUtils::GetBackendPaths(subDir1);
+    BOOST_TEST(validResult.size() == 1);
+    BOOST_TEST(validResult[0] == subDir1);
+
+    // Override with invalid path
+    std::vector<std::string> invalidResult = DynamicBackendUtils::GetBackendPaths(subDir4);
+    BOOST_TEST(invalidResult.empty());
 }

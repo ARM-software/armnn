@@ -11,8 +11,13 @@
 
 #include <string>
 #include <dlfcn.h>
+#include <vector>
 
 #include <boost/format.hpp>
+
+#if !defined(DYNAMIC_BACKEND_PATHS)
+#define DYNAMIC_BACKEND_PATHS ""
+#endif
 
 namespace armnn
 {
@@ -28,9 +33,13 @@ public:
 
     static bool IsBackendCompatible(const BackendVersion& backendVersion);
 
+    static std::vector<std::string> GetBackendPaths(const std::string& overrideBackendPath = "");
+    static bool IsPathValid(const std::string& path);
+
 protected:
-    /// Protected for testing purposes
+    /// Protected methods for testing purposes
     static bool IsBackendCompatibleImpl(const BackendVersion& backendApiVersion, const BackendVersion& backendVersion);
+    static std::vector<std::string> GetBackendPathsImpl(const std::string& backendPaths);
 
 private:
     static std::string GetDlError();

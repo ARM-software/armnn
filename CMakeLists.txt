@@ -15,6 +15,11 @@ foreach(cmake_file ${additional_cmake_files})
     include(${cmake_file})
 endforeach()
 
+if (DYNAMIC_BACKEND_PATHS)
+    # It's expected to have the format: DYNAMIC_BACKEND_PATHS="PATH_1:PATH_2...:PATH_N"
+    add_definitions('-DDYNAMIC_BACKEND_PATHS="${DYNAMIC_BACKEND_PATHS}"')
+endif()
+
 include(GNUInstallDirs)
 
 add_subdirectory(samples)
@@ -451,7 +456,8 @@ endif()
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-target_link_libraries(armnn ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(armnn ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY}
+                            ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})

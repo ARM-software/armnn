@@ -70,18 +70,22 @@ BackendVersion DynamicBackend::GetBackendVersion()
 
 IBackendInternalUniquePtr DynamicBackend::GetBackend()
 {
+    // This call throws in case of error
+    return CreateBackend();
+}
+
+BackendRegistry::FactoryFunction DynamicBackend::GetFactoryFunction()
+{
     if (m_BackendFactoryFunction == nullptr)
     {
-        throw RuntimeException("GetBackend error: invalid function pointer");
+        throw RuntimeException("GetFactoryFunction error: invalid function pointer");
     }
 
-    auto backendPointer = reinterpret_cast<IBackendInternal*>(m_BackendFactoryFunction());
-    if (backendPointer == nullptr)
+    return [this]() -> IBackendInternalUniquePtr
     {
-        throw RuntimeException("GetBackend error: backend instance must not be null");
-    }
-
-    return std::unique_ptr<IBackendInternal>(backendPointer);
+        // This call throws in case of error
+        return CreateBackend();
+    };
 }
 
 template<typename BackendFunctionType>
@@ -106,6 +110,22 @@ BackendFunctionType DynamicBackend::SetFunctionPointer(const std::string& backen
     }
 
     return functionPointer;
+}
+
+IBackendInternalUniquePtr DynamicBackend::CreateBackend()
+{
+    if (m_BackendFactoryFunction == nullptr)
+    {
+        throw RuntimeException("CreateBackend error: invalid function pointer");
+    }
+
+    auto backendPointer = reinterpret_cast<IBackendInternal*>(m_BackendFactoryFunction());
+    if (backendPointer == nullptr)
+    {
+        throw RuntimeException("CreateBackend error: backend instance must not be null");
+    }
+
+    return std::unique_ptr<IBackendInternal>(backendPointer);
 }
 
 } // namespace armnn

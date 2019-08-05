@@ -28,6 +28,21 @@ constexpr const char* TestDynamicBackendId()
     // The test dynamic backend 3 is a different backend than the test dynamic backend 2
     return "TestValid3";
 
+#elif defined(VALID_TEST_DYNAMIC_BACKEND_5)
+
+    // The test dynamic backend 5 is a different backend than the test dynamic backend 2
+    return "TestValid5";
+
+#elif defined(INVALID_TEST_DYNAMIC_BACKEND_10)
+
+    // Empty backend id
+    return "";
+
+#elif defined(INVALID_TEST_DYNAMIC_BACKEND_11)
+
+    // "Unknown" backend id, "Unknown" is a reserved id in ArmNN
+    return "Unknown";
+
 #else
 
     return "InvalidTestDynamicBackend";

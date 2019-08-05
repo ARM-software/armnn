@@ -281,7 +281,6 @@ std::vector<DynamicBackendPtr> DynamicBackendUtils::CreateDynamicBackends(const 
         {
             BOOST_LOG_TRIVIAL(warning) << "Invalid dynamic backend object for the shared object file \""
                                        << sharedObject << "\"";
-
             continue;
         }
 
@@ -290,6 +289,73 @@ std::vector<DynamicBackendPtr> DynamicBackendUtils::CreateDynamicBackends(const 
     }
 
     return dynamicBackends;
+}
+
+void DynamicBackendUtils::RegisterDynamicBackends(const std::vector<DynamicBackendPtr>& dynamicBackends)
+{
+    // Get a reference of the backend registry
+    BackendRegistry& backendRegistry = BackendRegistryInstance();
+
+    // Register the dynamic backends in the backend registry
+    RegisterDynamicBackendsImpl(backendRegistry, dynamicBackends);
+}
+
+void DynamicBackendUtils::RegisterDynamicBackendsImpl(BackendRegistry& backendRegistry,
+                                                      const std::vector<DynamicBackendPtr>& dynamicBackends)
+{
+    // Register the dynamic backends in the backend registry
+    for (const DynamicBackendPtr& dynamicBackend : dynamicBackends)
+    {
+        BackendId dynamicBackendId;
+        try
+        {
+            dynamicBackendId = dynamicBackend->GetBackendId();
+        }
+        catch (const RuntimeException& e)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend, "
+                                       << "an error has occurred when getting the backend id: " << e.what();
+            continue;
+        }
+        if (dynamicBackendId.IsEmpty() ||
+            dynamicBackendId.IsUndefined())
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend, invalid backend id: " << dynamicBackendId;
+            continue;
+        }
+
+        // Check whether the dynamic backend is already registered
+        bool backendAlreadyRegistered = backendRegistry.IsBackendRegistered(dynamicBackendId);
+        if (backendAlreadyRegistered)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
+                                       << "\": backend already registered";
+            continue;
+        }
+
+        // Get the dynamic backend factory function
+        BackendRegistry::FactoryFunction dynamicBackendFactoryFunction = nullptr;
+        try
+        {
+            dynamicBackendFactoryFunction = dynamicBackend->GetFactoryFunction();
+        }
+        catch (const RuntimeException& e)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
+                                       << "\": an error has occurred when getting the backend factory function: "
+                                       << e.what();
+            continue;
+        }
+        if (dynamicBackendFactoryFunction == nullptr)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Cannot register dynamic backend \"" << dynamicBackendId
+                                       << "\": invalid backend factory function";
+            continue;
+        }
+
+        // Register the dynamic backend
+        backendRegistry.Register(dynamicBackendId, dynamicBackendFactoryFunction);
+    }
 }
 
 } // namespace armnn

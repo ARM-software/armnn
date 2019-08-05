@@ -9,7 +9,6 @@
 #include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
-#include <backendsCommon/DynamicBackend.hpp>
 
 #include <iostream>
 
@@ -253,7 +252,10 @@ void Runtime::LoadDynamicBackends(const std::string& overrideBackendPath)
     std::vector<std::string> sharedObjects = DynamicBackendUtils::GetSharedObjects(backendPaths);
 
     // Create a list of dynamic backends
-    DynamicBackendUtils::CreateDynamicBackends(sharedObjects);
+    m_DynamicBackends = DynamicBackendUtils::CreateDynamicBackends(sharedObjects);
+
+    // Register the dynamic backends in the backend registry
+    DynamicBackendUtils::RegisterDynamicBackends(m_DynamicBackends);
 }
 
 } // namespace armnn

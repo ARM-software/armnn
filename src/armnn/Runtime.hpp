@@ -6,10 +6,13 @@
 
 #include "LoadedNetwork.hpp"
 #include "DeviceSpec.hpp"
+
 #include <armnn/INetwork.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/BackendId.hpp>
+
+#include <backendsCommon/DynamicBackend.hpp>
 
 #include <mutex>
 #include <unordered_map>
@@ -100,6 +103,9 @@ private:
     int m_NetworkIdCounter;
 
     DeviceSpec m_DeviceSpec;
+
+    /// List of dynamic backends loaded in the runtime
+    std::vector<DynamicBackendPtr> m_DynamicBackends;
 };
 
-}
+} // namespace armnn

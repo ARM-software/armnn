@@ -6,6 +6,7 @@
 #pragma once
 
 #include "IBackendInternal.hpp"
+#include "BackendRegistry.hpp"
 
 #include <functional>
 #include <memory>
@@ -13,7 +14,7 @@
 namespace armnn
 {
 
-class DynamicBackend
+class DynamicBackend final
 {
 public:
     using HandleCloser = std::function<void(const void*)>;
@@ -25,10 +26,13 @@ public:
     BackendId GetBackendId();
     BackendVersion GetBackendVersion();
     IBackendInternalUniquePtr GetBackend();
+    BackendRegistry::FactoryFunction GetFactoryFunction();
 
 private:
+    /// Private utility functions
     template<typename BackendFunctionType>
     BackendFunctionType SetFunctionPointer(const std::string& backendFunctionName);
+    IBackendInternalUniquePtr CreateBackend();
 
     /// Backend function pointer types
     using IdFunctionType      = const char*(*)();

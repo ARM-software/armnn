@@ -129,6 +129,9 @@ public:
 
     const std::string& Get() const { return m_Id; }
 
+    bool IsEmpty() const { return m_Id.empty(); }
+    bool IsUndefined() const { return m_Id == GetComputeDeviceAsCString(Compute::Undefined); }
+
 private:
     std::string m_Id;
 };

@@ -44,4 +44,6 @@ private:
     HandlePtr m_Handle;
 };
 
+using DynamicBackendPtr = std::unique_ptr<DynamicBackend>;
+
 } // namespace armnn

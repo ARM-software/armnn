@@ -5,8 +5,11 @@
 #include "Runtime.hpp"
 
 #include <armnn/Version.hpp>
+
 #include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IBackendContext.hpp>
+#include <backendsCommon/DynamicBackendUtils.hpp>
+#include <backendsCommon/DynamicBackend.hpp>
 
 #include <iostream>
 
@@ -134,6 +137,10 @@ Runtime::Runtime(const CreationOptions& options)
 {
     BOOST_LOG_TRIVIAL(info) << "ArmNN v" << ARMNN_VERSION << "\n";
 
+    // Load any available/compatible dynamic backend before the runtime
+    // goes through the backend registry
+    LoadDynamicBackends(options.m_DynamicBackendsPath);
+
     for (const auto& id : BackendRegistryInstance().GetBackendIds())
     {
         // Store backend contexts for the supported ones
@@ -237,4 +244,16 @@ void Runtime::RegisterDebugCallback(NetworkId networkId, const DebugCallbackFunc
     loadedNetwork->RegisterDebugCallback(func);
 }
 
+void Runtime::LoadDynamicBackends(const std::string& overrideBackendPath)
+{
+    // Get the paths where to load the dynamic backends from
+    std::vector<std::string> backendPaths = DynamicBackendUtils::GetBackendPaths(overrideBackendPath);
+
+    // Get the shared objects to try to load as dynamic backends
+    std::vector<std::string> sharedObjects = DynamicBackendUtils::GetSharedObjects(backendPaths);
+
+    // Create a list of dynamic backends
+    DynamicBackendUtils::CreateDynamicBackends(sharedObjects);
 }
+
+} // namespace armnn

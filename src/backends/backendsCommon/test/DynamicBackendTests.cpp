@@ -45,4 +45,9 @@ ARMNN_SIMPLE_TEST_CASE(GetBackendPathsOverride, GetBackendPathsOverrideTestImpl)
 
 ARMNN_SIMPLE_TEST_CASE(GetSharedObjects, GetSharedObjectsTestImpl);
 
+ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackends, CreateDynamicBackendsTestImpl);
+ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendsNoPaths, CreateDynamicBackendsNoPathsTestImpl);
+ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendsAllInvalid, CreateDynamicBackendsAllInvalidTestImpl);
+ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendsMixedTypes, CreateDynamicBackendsMixedTypesTestImpl);
+
 BOOST_AUTO_TEST_SUITE_END()

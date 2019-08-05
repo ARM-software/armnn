@@ -87,7 +87,7 @@ list(APPEND testDynamicBackend_sources
 )
 
 add_library_ex(ValidTestDynamicBackend MODULE ${testDynamicBackend_sources})
-target_compile_definitions(ValidTestDynamicBackend PRIVATE -DVALID_TEST_DYNAMIC_BACKEND)
+target_compile_definitions(ValidTestDynamicBackend PRIVATE -DVALID_TEST_DYNAMIC_BACKEND_1)
 target_include_directories(ValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(ValidTestDynamicBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_link_libraries(ValidTestDynamicBackend armnn)
@@ -177,3 +177,50 @@ add_custom_target(link_dummy_dynamic_backend ALL
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath2/Arm_GpuAcc_backend.so          "Test file for dynamic backend file parsing")
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath3)
+
+# Dummy dynamic backends for testing.
+# These shared objects are used to test the creation of dynamic backend instances in ArmNN.
+
+add_library_ex(Arm_TestValid2_backend MODULE ${testDynamicBackend_sources})
+target_compile_definitions(Arm_TestValid2_backend PRIVATE -DVALID_TEST_DYNAMIC_BACKEND_2)
+target_include_directories(Arm_TestValid2_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(Arm_TestValid2_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(Arm_TestValid2_backend armnn)
+set_target_properties(Arm_TestValid2_backend PROPERTIES PREFIX "")
+set_target_properties(Arm_TestValid2_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath5)
+add_custom_command(TARGET Arm_TestValid2_backend POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Arm_TestValid2_backend> ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath6)
+
+add_library_ex(Arm_TestValid3_backend MODULE ${testDynamicBackend_sources})
+target_compile_definitions(Arm_TestValid3_backend PRIVATE -DVALID_TEST_DYNAMIC_BACKEND_3)
+target_include_directories(Arm_TestValid3_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(Arm_TestValid3_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(Arm_TestValid3_backend armnn)
+set_target_properties(Arm_TestValid3_backend PROPERTIES PREFIX "")
+set_target_properties(Arm_TestValid3_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath5)
+
+add_library_ex(Arm_TestInvalid8_backend MODULE ${testDynamicBackend_sources})
+target_compile_definitions(Arm_TestInvalid8_backend PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_8)
+target_include_directories(Arm_TestInvalid8_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(Arm_TestInvalid8_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(Arm_TestInvalid8_backend armnn)
+set_target_properties(Arm_TestInvalid8_backend PROPERTIES PREFIX "")
+set_target_properties(Arm_TestInvalid8_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath5)
+
+add_library_ex(Arm_TestValid4_backend MODULE ${testDynamicBackend_sources})
+target_compile_definitions(Arm_TestValid4_backend PRIVATE -DVALID_TEST_DYNAMIC_BACKEND_4)
+target_include_directories(Arm_TestValid4_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(Arm_TestValid4_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(Arm_TestValid4_backend armnn)
+set_target_properties(Arm_TestValid4_backend PROPERTIES PREFIX "")
+set_target_properties(Arm_TestValid4_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath6)
+
+add_library_ex(Arm_TestInvalid9_backend MODULE ${testDynamicBackend_sources})
+target_compile_definitions(Arm_TestInvalid9_backend PRIVATE -DINVALID_TEST_DYNAMIC_BACKEND_9)
+target_include_directories(Arm_TestInvalid9_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(Arm_TestInvalid9_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_link_libraries(Arm_TestInvalid9_backend armnn)
+set_target_properties(Arm_TestInvalid9_backend PROPERTIES PREFIX "")
+set_target_properties(Arm_TestInvalid9_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath6)
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath7)

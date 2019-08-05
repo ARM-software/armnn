@@ -167,7 +167,8 @@ LOCAL_STATIC_LIBRARIES := \
         armnn-arm_compute \
         libboost_log \
         libboost_system \
-        libboost_thread
+        libboost_thread \
+        libboost_filesystem
 
 LOCAL_SHARED_LIBRARIES := \
         liblog
@@ -286,6 +287,7 @@ LOCAL_STATIC_LIBRARIES := \
         libboost_system \
         libboost_unit_test_framework \
         libboost_thread \
+        libboost_filesystem \
         armnn-arm_compute
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libarmnn

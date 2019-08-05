@@ -9,9 +9,24 @@
 
 constexpr const char* TestDynamicBackendId()
 {
-#if defined(VALID_TEST_DYNAMIC_BACKEND)
+#if defined(VALID_TEST_DYNAMIC_BACKEND_1)
 
     return "ValidTestDynamicBackend";
+
+#elif defined(VALID_TEST_DYNAMIC_BACKEND_2) || \
+      defined(VALID_TEST_DYNAMIC_BACKEND_4) || \
+      defined(INVALID_TEST_DYNAMIC_BACKEND_9)
+
+    // This backend id is shared among different test dynamic backends for testing purposes:
+    // the test dynamic backend 4 is actually a duplicate of the test dynamic backend 2 (with the same version),
+    // the test dynamic backend 9 is actually a duplicate of the test dynamic backend 2 (but with a version
+    // incompatible with the current Backend API)
+    return "TestValid2";
+
+#elif defined(VALID_TEST_DYNAMIC_BACKEND_3)
+
+    // The test dynamic backend 3 is a different backend than the test dynamic backend 2
+    return "TestValid3";
 
 #else
 
@@ -46,7 +61,8 @@ private:
 
 const char* GetBackendId()
 {
-#if defined(INVALID_TEST_DYNAMIC_BACKEND_5)
+#if defined(INVALID_TEST_DYNAMIC_BACKEND_5) || \
+    defined(INVALID_TEST_DYNAMIC_BACKEND_8)
 
     // Return an invalid backend id
     return nullptr;
@@ -66,15 +82,27 @@ void GetVersion(uint32_t* outMajor, uint32_t* outMinor)
         return;
     }
 
-#if defined(INVALID_TEST_DYNAMIC_BACKEND_7)
+#if defined(INVALID_TEST_DYNAMIC_BACKEND_7) || \
+    defined(INVALID_TEST_DYNAMIC_BACKEND_8)
 
     *outMajor = 0;
     *outMinor = 7;
 
 #else
 
-    *outMajor = 1;
-    *outMinor = 0;
+    armnn::BackendVersion apiVersion = armnn::IBackendInternal::GetApiVersion();
+
+    *outMajor = apiVersion.m_Major;
+
+#if defined(INVALID_TEST_DYNAMIC_BACKEND_9)
+
+    *outMinor = apiVersion.m_Minor + 1;
+
+#else
+
+    *outMinor = apiVersion.m_Minor;
+
+#endif
 
 #endif
 }

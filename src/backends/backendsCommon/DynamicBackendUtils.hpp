@@ -6,6 +6,7 @@
 #pragma once
 
 #include "IBackendInternal.hpp"
+#include "DynamicBackend.hpp"
 
 #include <armnn/Exceptions.hpp>
 
@@ -36,6 +37,8 @@ public:
     static std::vector<std::string> GetBackendPaths(const std::string& overrideBackendPath = "");
     static bool IsPathValid(const std::string& path);
     static std::vector<std::string> GetSharedObjects(const std::vector<std::string>& backendPaths);
+
+    static std::vector<DynamicBackendPtr> CreateDynamicBackends(const std::vector<std::string>& sharedObjects);
 
 protected:
     /// Protected methods for testing purposes

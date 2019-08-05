@@ -89,6 +89,9 @@ private:
         }
     }
 
+    /// Loads any available/compatible dynamic backend in the runtime.
+    void LoadDynamicBackends(const std::string& overrideBackendPath);
+
     mutable std::mutex m_Mutex;
 
     std::unordered_map<NetworkId, std::unique_ptr<LoadedNetwork>> m_LoadedNetworks;

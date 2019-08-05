@@ -7,7 +7,10 @@
 
 #include <cstdint>
 
-#if defined(VALID_TEST_DYNAMIC_BACKEND)
+#if defined(VALID_TEST_DYNAMIC_BACKEND_1) || \
+    defined(VALID_TEST_DYNAMIC_BACKEND_2) || \
+    defined(VALID_TEST_DYNAMIC_BACKEND_3) || \
+    defined(VALID_TEST_DYNAMIC_BACKEND_4)
 
 // Correct dynamic backend interface
 extern "C"
@@ -49,7 +52,9 @@ void GetVersion(uint32_t* outMajor, uint32_t* outMinor);
 
 #elif defined(INVALID_TEST_DYNAMIC_BACKEND_5) || \
       defined(INVALID_TEST_DYNAMIC_BACKEND_6) || \
-      defined(INVALID_TEST_DYNAMIC_BACKEND_7)
+      defined(INVALID_TEST_DYNAMIC_BACKEND_7) || \
+      defined(INVALID_TEST_DYNAMIC_BACKEND_8) || \
+      defined(INVALID_TEST_DYNAMIC_BACKEND_9)
 
 // The interface is correct, the corresponding invalid changes are in the TestDynamicBackend.cpp file
 const char* GetBackendId();

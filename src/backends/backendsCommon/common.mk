@@ -10,6 +10,8 @@
 COMMON_SOURCES := \
     BackendRegistry.cpp \
     CpuTensorHandle.cpp \
+    DynamicBackend.cpp \
+    DynamicBackendUtils.cpp \
     IBackendInternal.cpp \
     ITensorHandleFactory.cpp \
     LayerSupportBase.cpp \

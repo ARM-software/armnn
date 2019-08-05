@@ -21,7 +21,7 @@ void* DynamicBackendUtils::OpenHandle(const std::string& sharedObjectPath)
         throw RuntimeException("OpenHandle error: shared object path must not be empty");
     }
 
-    void* sharedObjectHandle = dlopen(sharedObjectPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    void* sharedObjectHandle = dlopen(sharedObjectPath.c_str(), RTLD_LAZY);
     if (!sharedObjectHandle)
     {
         throw RuntimeException(boost::str(boost::format("OpenHandle error: %1%") % GetDlError()));
@@ -168,11 +168,16 @@ std::vector<std::string> DynamicBackendUtils::GetSharedObjects(const std::vector
             continue;
         }
 
+        // Get all the files in the current path in alphabetical order
+        std::vector<path> backendPathFiles;
+        std::copy(directory_iterator(backendPath), directory_iterator(), std::back_inserter(backendPathFiles));
+        std::sort(backendPathFiles.begin(), backendPathFiles.end());
+
         // Go through all the files in the current backend path
-        for (directory_iterator fileIterator(backendPath); fileIterator != directory_iterator(); fileIterator++)
+        for (const path& backendPathFile : backendPathFiles)
         {
-            path filePath = *fileIterator;
-            std::string filename = filePath.filename().string();
+            // Get only the name of the file (without the full path)
+            std::string filename = backendPathFile.filename().string();
 
             if (filename.empty())
             {
@@ -185,7 +190,7 @@ std::vector<std::string> DynamicBackendUtils::GetSharedObjects(const std::vector
             {
                 // Get the canonical path for the current file, it will throw if for example the file is a
                 // symlink that cannot be resolved
-                canonicalPath = canonical(filePath);
+                canonicalPath = canonical(backendPathFile);
             }
             catch (const filesystem_error& e)
             {
@@ -233,6 +238,58 @@ std::vector<std::string> DynamicBackendUtils::GetSharedObjects(const std::vector
     }
 
     return sharedObjects;
+}
+
+std::vector<DynamicBackendPtr> DynamicBackendUtils::CreateDynamicBackends(const std::vector<std::string>& sharedObjects)
+{
+    // Create a list of dynamic backends
+    std::vector<DynamicBackendPtr> dynamicBackends;
+    for (const std::string& sharedObject : sharedObjects)
+    {
+        // Create a handle to the shared object
+        void* sharedObjectHandle = nullptr;
+        try
+        {
+            sharedObjectHandle = DynamicBackendUtils::OpenHandle(sharedObject);
+        }
+        catch (const RuntimeException& e)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Cannot create a handle to the shared object file \""
+                                       << sharedObject << "\": " << e.what();
+            continue;
+        }
+        if (!sharedObjectHandle)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Invalid handle to the shared object file \"" << sharedObject << "\"";
+
+            continue;
+        }
+
+        // Create a dynamic backend object
+        DynamicBackendPtr dynamicBackend;
+        try
+        {
+            dynamicBackend.reset(new DynamicBackend(sharedObjectHandle));
+        }
+        catch (const Exception& e)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Cannot create a valid dynamic backend from the shared object file \""
+                                       << sharedObject << "\": " << e.what();
+            continue;
+        }
+        if (!dynamicBackend)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Invalid dynamic backend object for the shared object file \""
+                                       << sharedObject << "\"";
+
+            continue;
+        }
+
+        // Append the newly created dynamic backend to the list
+        dynamicBackends.push_back(std::move(dynamicBackend));
+    }
+
+    return dynamicBackends;
 }
 
 } // namespace armnn

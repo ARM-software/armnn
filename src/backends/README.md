@@ -243,17 +243,17 @@ void* BackendFactory();
 
 Interface details:
 
-* '''extern "C"''' is needed to use avoid C++ name mangling, necessary to allow ArmNN to dynamically load the symbols.
-* '''GetBackendId()''': must return the unique id of the dynamic backends.
+* ```extern "C"``` is needed to use avoid C++ name mangling, necessary to allow ArmNN to dynamically load the symbols.
+* ```GetBackendId()```: must return the unique id of the dynamic backends.
   If at the time of the loading the id already exists in the internal ArmNN's backend registry, the backend will be skipped and
   not loaded in ArmNN
-* '''GetVersion()''': must return the version of the dynamic backend.
+* ```GetVersion()```: must return the version of the dynamic backend.
   The version must indicate the version of the Backend API the dynamic backend has been built with.
   The current Backend API version can be found by inspecting the IBackendInternal interface.
   At the time of loading, the version of the backend will be checked against the version of the Backend API ArmNN is built with.
   If the backend version is not compatible with the current Backend API, the backend will not be loaded as it will be assumed that
   it is not ABI compatible with the current ArmNN build.
-* '''BackendFactory()''': must return a valid instance of the backend.
+* ```BackendFactory()```: must return a valid instance of the backend.
   The backend instance is an object that must inherit from the version of the IBackendInternal interface declared by GetVersion().
   It is the backend developer's responsibility to ensure that the backend implementation correctly reflects the version declared by
   GetVersion(), and that the object returned by the BackendFactory() function is a valid and well-formed instance of the IBackendInternal
@@ -279,4 +279,27 @@ For example:
   (backend requires a completely new API version)
 * Dynamic backend version 2.0 (i.e. built with Backend APi version 2.0) is not compatible with ArmNN's Backend API version 3.0
   (backward compatibility in the Backend API is broken)
+
+## Dynamic backend loading paths
+
+During the creation of the Runtime, ArmNN will scan a given set of paths searching for suitable dynamic backend objects to load.
+A list of (absolute) paths can be specified at compile-time by setting a define named ```DYNAMIC_BACKEND_PATHS``` in the form of a colon-separated list of strings.
+
+```
+-DDYNAMIC_BACKEND_PATHS="PATH_1:PATH_2...:PATH_N"
+```
+
+The paths will be processed in the same order as they are indicated in the macro.
+
+It is also possible to override those paths at runtime when creating the Runtime object by setting the value of the ```m_DynamicBackendsPath``` member in the CreationOptions class.
+Only one path is allowed for the override via the CreationOptions class.
+By setting the value of the ```m_DynamicBackendsPath``` to a path in the filesystem, ArmNN will entirely ignore the list of paths passed via the
+```DYNAMIC_BACKEND_PATHS``` compiler directive.
+
+All the specified paths are validate before processing (they must exist, must be directories, and must be absolute paths),
+in case of error a warning message will be added to the log, but ArmNN's execution will not be stopped.
+If all path are not valid, then no dynamic backends will be loaded in the ArmNN's runtime.
+
+Passing an empty list of paths at compile-time and providing no path override at runtime will effectively disable the
+dynamic backend loading feature, and no dynamic backends will be loaded into ArmNN's runtime.
 

@@ -141,3 +141,39 @@ target_include_directories(InvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_D
 target_include_directories(InvalidTestDynamicBackend7 PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_link_libraries(InvalidTestDynamicBackend7 armnn)
 set_target_properties(InvalidTestDynamicBackend7 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testDynamicBackend)
+
+# Dummy files and directories for testing the dynamic backend file parsing.
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend.so          "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend.so.1        "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend.so.1.2      "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend.so.1.2.3    "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend.so.10.1.27  "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend.so.10.1.33. "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend.so.3.4..5   "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend.so.1,1.1    "Test file for dynamic backend file parsing")
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm123_GpuAcc_backend.so       "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc456_backend.so       "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm%Co_GpuAcc_backend.so       "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_Gpu.Acc_backend.so         "Test file for dynamic backend file parsing")
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/GpuAcc_backend.so              "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/_GpuAcc_backend.so             "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm__backend.so                "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc.so                  "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/__backend.so                   "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/__.so                          "Test file for dynamic backend file parsing")
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend             "Test file for dynamic backend file parsing")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath1/Arm_GpuAcc_backend_v1.2.so     "Test file for dynamic backend file parsing")
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath2/Arm_CpuAcc_backend.so          "Test file for dynamic backend file parsing")
+add_custom_target(link_dummy_dynamic_backend ALL
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink Arm_CpuAcc_backend.so backendsTestPath2/Arm_CpuAcc_backend.so.1
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink Arm_CpuAcc_backend.so.1 backendsTestPath2/Arm_CpuAcc_backend.so.1.2
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink Arm_CpuAcc_backend.so.1.2 backendsTestPath2/Arm_CpuAcc_backend.so.1.2.3
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink nothing backendsTestPath2/Arm_no_backend.so)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath2/Arm_GpuAcc_backend.so          "Test file for dynamic backend file parsing")
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/backendsTestPath3)

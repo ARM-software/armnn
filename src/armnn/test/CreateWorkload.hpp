@@ -1334,7 +1334,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
         constexpr armnn::DataType biasDataType = ( dataType == armnn::DataType::QuantisedAsymm8) ?
             armnn::DataType::Signed32 : armnn::DataType::Float32;
 
-        TensorInfo biasTensorInfo(TensorShape({1, 1, 1, 16}), biasDataType, 0.9f * 0.9f, 0);
+        TensorInfo biasTensorInfo(TensorShape({16}), biasDataType, 0.9f * 0.9f, 0);
         unsigned int biasLength = biasTensorInfo.GetNumElements();
 
         using BiasType = armnn::ResolveType<biasDataType>;

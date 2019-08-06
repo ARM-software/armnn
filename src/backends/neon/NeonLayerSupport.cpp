@@ -549,12 +549,6 @@ bool NeonLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
                                           const SoftmaxDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    if (!(descriptor.m_Axis == 1 ||
-         (descriptor.m_Axis < 0 && static_cast<int>(input.GetNumDimensions()) + descriptor.m_Axis == 1)))
-    {
-        SetValueChecked(reasonIfUnsupported, "Neon Softmax: Only supports Axis equal to 1.");
-        return false;
-    }
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSoftmaxWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 

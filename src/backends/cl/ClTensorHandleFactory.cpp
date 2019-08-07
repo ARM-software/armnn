@@ -68,7 +68,7 @@ const FactoryId& ClTensorHandleFactory::GetIdStatic()
     return s_Id;
 }
 
-const FactoryId ClTensorHandleFactory::GetId() const
+const FactoryId& ClTensorHandleFactory::GetId() const
 {
     return GetIdStatic();
 }

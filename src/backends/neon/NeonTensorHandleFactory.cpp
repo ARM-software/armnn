@@ -62,7 +62,7 @@ const FactoryId& NeonTensorHandleFactory::GetIdStatic()
     return s_Id;
 }
 
-const FactoryId NeonTensorHandleFactory::GetId() const
+const FactoryId& NeonTensorHandleFactory::GetId() const
 {
     return GetIdStatic();
 }

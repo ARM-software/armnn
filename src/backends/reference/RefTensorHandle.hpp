@@ -17,6 +17,9 @@ class RefTensorHandle : public ITensorHandle
 public:
     RefTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<RefMemoryManager> &memoryManager);
 
+    RefTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<RefMemoryManager> &memoryManager,
+                    MemorySourceFlags importFlags);
+
     ~RefTensorHandle();
 
     virtual void Manage() override;
@@ -49,6 +52,13 @@ public:
         return m_TensorInfo;
     }
 
+    virtual MemorySourceFlags GetImportFlags() const override
+    {
+        return m_ImportFlags;
+    }
+
+    virtual bool Import(void* memory, MemorySource source) override;
+
 private:
     // Only used for testing
     void CopyOutTo(void*) const override;
@@ -64,6 +74,8 @@ private:
     std::shared_ptr<RefMemoryManager> m_MemoryManager;
     RefMemoryManager::Pool* m_Pool;
     mutable void *m_UnmanagedMemory;
+    MemorySourceFlags m_ImportFlags;
+    bool m_Imported;
 };
 
 }

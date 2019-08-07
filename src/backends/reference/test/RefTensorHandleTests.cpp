@@ -45,4 +45,56 @@ BOOST_AUTO_TEST_CASE(AcquireAndRelease)
     memoryManager->Release();
 }
 
+BOOST_AUTO_TEST_CASE(CheckSourceType)
+{
+    std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
+
+    TensorInfo info({1}, DataType::Float32);
+    RefTensorHandle handle(info, memoryManager, static_cast<unsigned int>(MemorySource::Malloc));
+
+    // This pointer will be deleted in the handle destructor
+    int* testPtr = new int(4);
+
+    // Not supported
+    BOOST_CHECK(!handle.Import(static_cast<void *>(testPtr), MemorySource::DmaBuf));
+
+    // Not supported
+    BOOST_CHECK(!handle.Import(static_cast<void *>(testPtr), MemorySource::DmaBufProtected));
+
+    // Supported
+    BOOST_CHECK(handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc));
+}
+
+BOOST_AUTO_TEST_CASE(ReusePointer)
+{
+    std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
+
+    TensorInfo info({1}, DataType::Float32);
+    RefTensorHandle handle(info, memoryManager, static_cast<unsigned int>(MemorySource::Malloc));
+
+    // This pointer will be deleted in the handle destructor
+    int* testPtr = new int(4);
+
+    handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc);
+
+    // Reusing previously Imported pointer
+    BOOST_CHECK(handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc));
+}
+
+BOOST_AUTO_TEST_CASE(MisalignedPointer)
+{
+    std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
+
+    TensorInfo info({2}, DataType::Float32);
+    RefTensorHandle handle(info, memoryManager, static_cast<unsigned int>(MemorySource::Malloc));
+
+    // Allocates a 2 int array
+    int* testPtr = new int[2];
+    int* misalignedPtr = testPtr + 1;
+
+    BOOST_CHECK(!handle.Import(static_cast<void *>(misalignedPtr), MemorySource::Malloc));
+
+    delete[] testPtr;
+}
+
 BOOST_AUTO_TEST_SUITE_END()

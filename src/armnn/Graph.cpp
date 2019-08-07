@@ -335,7 +335,6 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
                         auto backend = backendIt->second.get();
                         auto tensorHandleFactoryIds = backend->GetHandleFactoryPreferences();
                         bool found = false;
-                        boost::ignore_unused(found);
 
                         for (auto preference : tensorHandleFactoryIds)
                         {
@@ -344,10 +343,12 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
                             {
                                 auto srcPref = srcOutputSlot.GetTensorHandleFactoryId();
                                 auto srcFactory = registry.GetFactory(srcPref);
+
                                 if (srcFactory)
                                 {
                                     bool canExportImport =
-                                            (factory->GetImportFlags() & srcFactory->GetExportFlags()) != 0;
+                                        (factory->GetImportFlags() & srcFactory->GetExportFlags()) != 0;
+
                                     if (factory->SupportsMapUnmap() || canExportImport)
                                     {
                                         compOutputSlot.SetTensorHandleFactory(preference);

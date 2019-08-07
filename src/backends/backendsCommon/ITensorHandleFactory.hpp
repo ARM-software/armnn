@@ -30,7 +30,7 @@ public:
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               DataLayout dataLayout) const = 0;
 
-    virtual const FactoryId GetId() const = 0;
+    virtual const FactoryId& GetId() const = 0;
 
     virtual bool SupportsSubTensors() const = 0;
 

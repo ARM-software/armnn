@@ -14,6 +14,7 @@ BACKEND_SOURCES := \
         RefTensorHandle.cpp \
         RefWorkloadFactory.cpp \
         RefRegistryInitializer.cpp \
+        RefTensorHandleFactory.cpp \
         workloads/Activation.cpp \
         workloads/BatchNormImpl.cpp \
         workloads/BatchToSpaceNd.cpp \

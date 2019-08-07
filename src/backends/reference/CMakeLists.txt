@@ -16,6 +16,8 @@ list(APPEND armnnRefBackend_sources
     RefRegistryInitializer.cpp
     RefWorkloadFactory.cpp
     RefWorkloadFactory.hpp
+    RefTensorHandleFactory.hpp
+    RefTensorHandleFactory.cpp
 )
 
 add_library(armnnRefBackend OBJECT ${armnnRefBackend_sources})

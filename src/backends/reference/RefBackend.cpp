@@ -7,6 +7,7 @@
 #include "RefBackendId.hpp"
 #include "RefWorkloadFactory.hpp"
 #include "RefLayerSupport.hpp"
+#include "RefTensorHandleFactory.hpp"
 
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/IMemoryManager.hpp>
@@ -29,6 +30,16 @@ const BackendId& RefBackend::GetIdStatic()
 IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
 {
+    return std::make_unique<RefWorkloadFactory>(boost::polymorphic_pointer_downcast<RefMemoryManager>(memoryManager));
+}
+
+IBackendInternal::IWorkloadFactoryPtr RefBackend::CreateWorkloadFactory(
+    class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const
+{
+    auto memoryManager = std::make_shared<RefMemoryManager>();
+
+    tensorHandleFactoryRegistry.RegisterMemoryManager(memoryManager);
+
     return std::make_unique<RefWorkloadFactory>(boost::polymorphic_pointer_downcast<RefMemoryManager>(memoryManager));
 }
 
@@ -60,6 +71,19 @@ OptimizationViews RefBackend::OptimizeSubgraphView(const SubgraphView& subgraph)
     optimizationViews.AddUntouchedSubgraph(SubgraphView(subgraph));
 
     return optimizationViews;
+}
+
+std::vector<ITensorHandleFactory::FactoryId> RefBackend::GetHandleFactoryPreferences() const
+{
+    return std::vector<ITensorHandleFactory::FactoryId> { RefTensorHandleFactory::GetIdStatic() };
+}
+
+void RefBackend::RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry)
+{
+    auto memoryManager = std::make_shared<RefMemoryManager>();
+
+    registry.RegisterMemoryManager(memoryManager);
+    registry.RegisterFactory(std::make_unique<RefTensorHandleFactory>(memoryManager));
 }
 
 } // namespace armnn

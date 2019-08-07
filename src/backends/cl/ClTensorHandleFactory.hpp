@@ -35,7 +35,7 @@ public:
 
     static const FactoryId& GetIdStatic();
 
-    const FactoryId GetId() const override;
+    const FactoryId& GetId() const override;
 
     bool SupportsSubTensors() const override;
 

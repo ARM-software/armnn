@@ -56,7 +56,7 @@ public:
         return nullptr;
     }
 
-    const FactoryId GetId() const override { return m_Id; }
+    const FactoryId& GetId() const override { return m_Id; }
 
     bool SupportsSubTensors() const override { return true; }
 
@@ -94,7 +94,7 @@ public:
         return nullptr;
     }
 
-    const FactoryId GetId() const override { return m_Id; }
+    const FactoryId& GetId() const override { return m_Id; }
 
     bool SupportsSubTensors() const override { return true; }
 

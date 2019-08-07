@@ -11,7 +11,21 @@ RefTensorHandle::RefTensorHandle(const TensorInfo &tensorInfo, std::shared_ptr<R
     m_TensorInfo(tensorInfo),
     m_MemoryManager(memoryManager),
     m_Pool(nullptr),
-    m_UnmanagedMemory(nullptr)
+    m_UnmanagedMemory(nullptr),
+    m_ImportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined)),
+    m_Imported(false)
+{
+
+}
+
+RefTensorHandle::RefTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<RefMemoryManager> &memoryManager,
+                                 MemorySourceFlags importFlags)
+                                 : m_TensorInfo(tensorInfo),
+                                   m_MemoryManager(memoryManager),
+                                   m_Pool(nullptr),
+                                   m_UnmanagedMemory(nullptr),
+                                   m_ImportFlags(importFlags),
+                                   m_Imported(false)
 {
 
 }
@@ -84,6 +98,45 @@ void RefTensorHandle::CopyInFrom(const void* src)
     void *dest = GetPointer();
     BOOST_ASSERT(dest);
     memcpy(dest, src, m_TensorInfo.GetNumBytes());
+}
+
+bool RefTensorHandle::Import(void* memory, MemorySource source)
+{
+
+    if (m_ImportFlags & static_cast<MemorySourceFlags>(source))
+    {
+        if (source == MemorySource::Malloc)
+        {
+            // Checks the 16 byte memory alignment.
+            if (reinterpret_cast<uint64_t>(memory) % 16)
+            {
+                return false;
+            }
+
+            // m_UnmanagedMemory not yet allocated.
+            if (!m_Imported && !m_UnmanagedMemory)
+            {
+                m_UnmanagedMemory = memory;
+                m_Imported = true;
+                return true;
+            }
+
+            // m_UnmanagedMemory initially allocated with Allocate().
+            if (!m_Imported && m_UnmanagedMemory)
+            {
+                return false;
+            }
+
+            // m_UnmanagedMemory previously imported.
+            if (m_Imported)
+            {
+                m_UnmanagedMemory = memory;
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 }

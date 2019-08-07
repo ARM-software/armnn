@@ -444,26 +444,29 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     // b) The tensor has zero padding
     // c) There is only one connection to the OutputSlot and it is to an OutputLayer.
     // d) The output pointer is allocated via malloc. (Other types will be supported in a later release)
-    if (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetNumConnections() == 1)
+    if (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer().GetType() != LayerType::Input)
     {
-        MemorySourceFlags importFlags = inputTensorHandle->GetImportFlags();
-        if (CheckFlag(importFlags, MemorySource::Malloc))
+        if (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetNumConnections() == 1)
         {
-            void* mem = tensorHandle->Map(false);
-            bool importOk = inputTensorHandle->Import(mem, MemorySource::Malloc);
-            tensorHandle->Unmap();
-
-            if (importOk)
+            MemorySourceFlags importFlags = inputTensorHandle->GetImportFlags();
+            if (CheckFlag(importFlags, MemorySource::Malloc))
             {
-                // Insert synchronization workload
-                MemSyncQueueDescriptor syncDesc;
-                syncDesc.m_Inputs.push_back(inputTensorHandle);
-                info.m_InputTensorInfos.push_back(inputTensorInfo);
-                auto syncWorkload = std::make_unique<SyncMemGenericWorkload>(syncDesc, info);
-                BOOST_ASSERT_MSG(syncWorkload, "No sync workload created");
-                m_OutputQueue.push_back(move(syncWorkload));
+                void *mem = tensorHandle->Map(false);
+                bool importOk = inputTensorHandle->Import(mem, MemorySource::Malloc);
+                tensorHandle->Unmap();
 
-                return; //No need to add the output workload below
+                if (importOk)
+                {
+                    // Insert synchronization workload
+                    MemSyncQueueDescriptor syncDesc;
+                    syncDesc.m_Inputs.push_back(inputTensorHandle);
+                    info.m_InputTensorInfos.push_back(inputTensorInfo);
+                    auto syncWorkload = std::make_unique<SyncMemGenericWorkload>(syncDesc, info);
+                    BOOST_ASSERT_MSG(syncWorkload, "No sync workload created");
+                    m_OutputQueue.push_back(move(syncWorkload));
+
+                    return; //No need to add the output workload below
+                }
             }
         }
     }

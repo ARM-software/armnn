@@ -280,6 +280,53 @@ void Profiler::PopulateDescendants(std::map<const Event*, std::vector<const Even
     }
 }
 
+
+void ExtractJsonObjects(unsigned int inferenceIndex,
+                        const Event* parentEvent,
+                        JsonChildObject& parentObject,
+                        std::map<const Event*, std::vector<const Event*>> descendantsMap)
+{
+    BOOST_ASSERT(parentEvent);
+    std::vector<Measurement> instrumentMeasurements = parentEvent->GetMeasurements();
+    unsigned int childIdx=0;
+    for(size_t measurementIndex = 0; measurementIndex < instrumentMeasurements.size(); ++measurementIndex, ++childIdx)
+    {
+        if (inferenceIndex == 0)
+        {
+            // Only add kernel measurement once, in case of multiple inferences
+            JsonChildObject measurementObject{instrumentMeasurements[measurementIndex].m_Name};
+            measurementObject.SetUnit(instrumentMeasurements[measurementIndex].m_Unit);
+            measurementObject.SetType(JsonObjectType::Measurement);
+
+            BOOST_ASSERT(parentObject.NumChildren() == childIdx);
+            parentObject.AddChild(measurementObject);
+        }
+
+        parentObject.GetChild(childIdx).AddMeasurement(instrumentMeasurements[measurementIndex].m_Value);
+    }
+
+
+    auto childEventsIt = descendantsMap.find(parentEvent);
+    if (childEventsIt != descendantsMap.end())
+    {
+        for (auto childEvent : childEventsIt->second)
+        {
+            if (inferenceIndex == 0)
+            {
+                // Only add second level once, in case of multiple inferences
+                JsonChildObject childObject{childEvent->GetName()};
+                childObject.SetType(JsonObjectType::Event);
+                parentObject.AddChild(childObject);
+            }
+
+            // Recursively process children. In reality this won't be very deep recursion. ~4-6 levels deep.
+            ExtractJsonObjects(inferenceIndex, childEvent, parentObject.GetChild(childIdx), descendantsMap);
+
+            childIdx++;
+        }
+    }
+}
+
 void Profiler::Print(std::ostream& outStream) const
 {
     // Makes sure timestamps are output with 6 decimals, and save old settings.
@@ -306,72 +353,15 @@ void Profiler::Print(std::ostream& outStream) const
     for (unsigned int inferenceIndex = 0; inferenceIndex < inferences.size(); ++inferenceIndex)
     {
         auto inference = inferences[inferenceIndex];
-        Measurement measurement = FindMeasurement(WallClockTimer::WALL_CLOCK_TIME, inference);
-        inferenceObject.SetUnit(measurement.m_Unit);
-        inferenceObject.AddMeasurement(measurement.m_Value);
-
-        auto layerEventsIt = descendantsMap.find(inference);
-
-        // Assuming 1 Execute per inference
-        if (layerEventsIt != descendantsMap.end())
-        {
-            auto layerEvent = layerEventsIt->second[0];
-            Measurement measurement = FindMeasurement(WallClockTimer::WALL_CLOCK_TIME, layerEvent);
-            layerObject.SetUnit(measurement.m_Unit);
-            layerObject.AddMeasurement(measurement.m_Value);
-
-            // Get Descendant Events for Execute
-            auto workloadEventsIt = descendantsMap.find(layerEvent);
-            for(unsigned int workloadIndex = 0; workloadIndex < workloadEventsIt->second.size(); ++workloadIndex)
-            {
-                auto workloadEvent = workloadEventsIt->second[workloadIndex];
-                Measurement measurement = FindMeasurement(WallClockTimer::WALL_CLOCK_TIME, workloadEvent);
-                std::vector<Measurement> kernelMeasurements = FindKernelMeasurements(workloadEvent);
-                if (inferenceIndex == 0)
-                {
-                    // Only add second level once, in case of multiple inferences
-                    JsonChildObject workloadObject{workloadEvent->GetName()};
-                    workloadObject.SetUnit(measurement.m_Unit);
-                    workloadObjects.push_back(workloadObject);
-                }
-                workloadObjects[workloadIndex].AddMeasurement(measurement.m_Value);
-
-                for(unsigned int kernelIndex = 0; kernelIndex < kernelMeasurements.size(); ++kernelIndex)
-                {
-                    if (inferenceIndex == 0)
-                    {
-                        // Only add kernel measurement once, in case of multiple inferences
-                        JsonChildObject kernelObject{kernelMeasurements[kernelIndex].m_Name};
-                        kernelObject.SetUnit(kernelMeasurements[kernelIndex].m_Unit);
-                        workloadToKernelObjects[workloadIndex].push_back(kernelObject);
-
-                    }
-                    workloadToKernelObjects[workloadIndex][kernelIndex].
-                            AddMeasurement(kernelMeasurements[kernelIndex].m_Value);
-                }
-            }
-        }
+        ExtractJsonObjects(inferenceIndex, inference, inferenceObject, descendantsMap);
     }
-
-    for (auto workloadToKernelPair : workloadToKernelObjects)
-    {
-        for (auto kernelObject : workloadToKernelPair.second)
-        {
-            workloadObjects[workloadToKernelPair.first].AddChild(kernelObject);
-        }
-    }
-
-    for (auto workloadObject : workloadObjects)
-    {
-        layerObject.AddChild(workloadObject);
-    }
-    inferenceObject.AddChild(layerObject);
 
     printer.PrintHeader();
     printer.PrintArmNNHeader();
 
     // print inference object, also prints child layer and kernel measurements
-    printer.PrintJsonChildObject(inferenceObject);
+    size_t id=0;
+    printer.PrintJsonChildObject(inferenceObject, id);
 
     // end of ArmNN
     printer.PrintNewLine();

@@ -158,9 +158,15 @@ private:
 
 } // namespace armnn
 
+
+#include <boost/preprocessor.hpp>
+
+#define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC(backendId, /*name,*/ ...) \
+    armnn::ScopedProfilingEvent BOOST_PP_CAT(e_,__LINE__)(backendId, /*name,*/ __VA_ARGS__);
+
 // The event name must be known at compile time
 #define ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, /*name,*/ ...) \
-    armnn::ScopedProfilingEvent e_##__FILE__##__LINE__(backendId, /*name,*/ __VA_ARGS__);
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS_UNIQUE_LOC(backendId, /*name,*/ __VA_ARGS__);
 
 #define ARMNN_SCOPED_PROFILING_EVENT(backendId, name) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(backendId, name, armnn::WallClockTimer())

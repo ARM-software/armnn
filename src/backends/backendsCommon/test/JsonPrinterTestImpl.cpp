@@ -199,7 +199,7 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
     return ss.str();
 }
 
-inline void ValidateProfilerJson(std::string& result, const std::string& testData)
+inline void ValidateProfilerJson(std::string& result)
 {
     // ensure all measurements are greater than zero
     std::vector<double> measurementsVector = ExtractMeasurements(result);
@@ -237,8 +237,6 @@ inline void ValidateProfilerJson(std::string& result, const std::string& testDat
 
     BOOST_CHECK(boost::contains(result, "ArmNN"));
     BOOST_CHECK(boost::contains(result, "inference_measurements"));
-    BOOST_CHECK(boost::contains(result, "layer_measurements"));
-    BOOST_CHECK_EQUAL(result, testData);
 
     // ensure no spare parenthesis present in print output
     BOOST_CHECK(AreParenthesesMatching(result));
@@ -249,118 +247,18 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
     // setup the test fixture and obtain JSON Printer result
     std::string result = GetSoftmaxProfilerJson(backends);
 
-    std::string backend = "Ref";
-    std::string testName = "SoftmaxWorkload_Execute";
-    std::string changeLine31 = "\n},\n\"CopyMemGeneric_Execute\": {";
-    std::string changeLine39 = "us\"";
-    std::string changeLine40;
-    std::string changeLine45;
+    // validate the JSON Printer result
+    ValidateProfilerJson(result);
 
     const armnn::BackendId& firstBackend = backends.at(0);
     if (firstBackend == armnn::Compute::GpuAcc)
     {
-        backend = "Cl";
-        testName = "SoftmaxUintWorkload_Execute";
-        changeLine31 = ",\n\"OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]\": {";
-        changeLine39 = R"(us"
-},
-"OpenClKernelTimer/: softmax_layer_norm_quantized GWS[,,]": {
-"raw": [
-,
-,
-
-],
-"unit": "us")";
-
-        changeLine40 = R"(
-},
-"CopyMemGeneric_Execute": {
-"raw": [
-,
-,
-
-],
-"unit": "us")";
-        changeLine45 = "}\n";
+        BOOST_CHECK(boost::contains(result,
+            "OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]"));
     }
     else if (firstBackend == armnn::Compute::CpuAcc)
     {
-        backend = "Neon";
-        testName = "SoftmaxUintWorkload_Execute";
-        changeLine31 = ",\n\"NeonKernelTimer/: NEFillBorderKernel\": {";
-        changeLine39 = R"(us"
-},
-"NeonKernelTimer/: NELogitsDMaxKernel": {
-"raw": [
-,
-,
-
-],
-"unit": "us"
-},
-"NeonKernelTimer/: NELogitsDSoftmaxKernel": {
-"raw": [
-,
-,
-
-],
-"unit": "us")";
-        changeLine40 = R"(
-},
-"CopyMemGeneric_Execute": {
-"raw": [
-,
-,
-
-],
-"unit": "us")";
-        changeLine45 = "}\n";
+        BOOST_CHECK(boost::contains(result,
+            "NeonKernelTimer/: NEFillBorderKernel"));
     }
-
-    std::string testData = R"({
-"ArmNN": {
-"inference_measurements": {
-"raw": [
-,
-,
-
-],
-"unit": "us",
-"layer_measurements": {
-"raw": [
-,
-,
-
-],
-"unit": "us",
-"CopyMemGeneric_Execute": {
-"raw": [
-,
-,
-
-],
-"unit": "us"
-},
-")" + backend + testName + R"(": {
-"raw": [
-,
-,
-
-],
-"unit": "us")" + changeLine31 + R"(
-"raw": [
-,
-,
-
-],
-"unit": ")" + changeLine39 + R"(
-})" + changeLine40 + R"(
-}
-}
-}
-}
-)" + changeLine45 + R"()";
-
-    // validate the JSON Printer result
-    ValidateProfilerJson(result, testData);
 }

@@ -7,25 +7,41 @@
 
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 namespace armnn
 {
 
-void JsonPrinter::PrintJsonChildObject(const JsonChildObject& object)
+void JsonPrinter::PrintJsonChildObject(const JsonChildObject& object, size_t& id)
 {
-    PrintLabel(object.m_Label);
-    PrintMeasurementsList(object.m_Measurements);
-    PrintSeparator();
-    PrintNewLine();
-    PrintUnit(object.m_Unit);
+    if (object.GetType() == JsonObjectType::Event)
+    {
+        // Increase the Id for new events. This ensures a new event has a unique ID and any measurements belonging
+        // to the event have the same id. This id is appended to the name during the call to PrintLabel() below.
+        id++;
+    }
 
-    if (!object.m_Children.empty())
+    PrintLabel(object.m_Label, id);
+    PrintType(object.m_Type);
+
+    if (!object.m_Measurements.empty() || !object.m_Children.empty())
     {
         PrintSeparator();
         PrintNewLine();
+    }
+
+    if (object.GetType() == JsonObjectType::Measurement)
+    {
+        PrintMeasurementsList(object.m_Measurements);
+        PrintSeparator();
+        PrintNewLine();
+        PrintUnit(object.m_Unit);
+    }
+    if (!object.m_Children.empty())
+    {
         for (unsigned int childIndex = 0; childIndex < object.m_Children.size(); ++childIndex)
         {
-            PrintJsonChildObject(object.m_Children[childIndex]);
+            PrintJsonChildObject(object.m_Children[childIndex], id);
             // Only print separator and new line if current child is not the last element.
             if (&object.m_Children[childIndex] != &object.m_Children.back())
             {
@@ -51,10 +67,17 @@ void JsonPrinter::PrintArmNNHeader()
     IncrementNumberOfTabs();
 }
 
-void JsonPrinter::PrintLabel(const std::string& label)
+std::string JsonPrinter::MakeKey(const std::string& label, size_t id)
+{
+    std::stringstream ss;
+    ss << label << std::string("_#") << id;
+    return ss.str();
+}
+
+void JsonPrinter::PrintLabel(const std::string& label, size_t id)
 {
     PrintTabs();
-    m_OutputStream << R"(")" << label << R"(": {)" << std::endl;
+    m_OutputStream << R"(")" << MakeKey(label, id) << R"(": {)" << std::endl;
     IncrementNumberOfTabs();
 }
 
@@ -65,6 +88,33 @@ void JsonPrinter::PrintUnit(armnn::Measurement::Unit unit)
     m_OutputStream << armnn::Measurement::ToString(unit);
     m_OutputStream << R"(")";
 }
+
+void JsonPrinter::PrintType(armnn::JsonObjectType type)
+{
+    auto ToString = [](armnn::JsonObjectType type)
+        {
+            switch (type)
+            {
+                case JsonObjectType::Measurement:
+                {
+                    return "Measurement";
+                }
+                case JsonObjectType::Event:
+                {
+                    return "Event";
+                }
+                default:
+                {
+                    return "Unknown";
+                }
+            }
+        };
+    PrintTabs();
+    m_OutputStream << R"("type": ")";
+    m_OutputStream << ToString(type);
+    m_OutputStream << R"(")";
+}
+
 
 void JsonPrinter::PrintMeasurementsList(const std::vector<double>& measurementsVector)
 {

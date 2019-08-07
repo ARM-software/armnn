@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <thread>
+#include <ostream>
 
 #include <armnn/TypesUtils.hpp>
 #include <Profiling.hpp>
@@ -240,4 +241,107 @@ BOOST_AUTO_TEST_CASE(WriteEventResults)
     profiler->EnableProfiling(false);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_CASE(ProfilerJsonPrinter)
+{
+    class TestInstrument : public armnn::Instrument
+    {
+    public:
+        virtual ~TestInstrument() {}
+        void Start() override {}
+        void Stop() override {}
+
+        std::vector<armnn::Measurement> GetMeasurements() const override
+        {
+            std::vector<armnn::Measurement> measurements;
+            measurements.emplace_back(armnn::Measurement("Measurement1",
+                                                         1.0,
+                                                         armnn::Measurement::Unit::TIME_MS));
+            measurements.emplace_back(armnn::Measurement("Measurement2",
+                                                         2.0,
+                                                         armnn::Measurement::Unit::TIME_US));
+            return measurements;
+        }
+
+        const char* GetName() const override
+        {
+            return "TestInstrument";
+        }
+    };
+
+    // Get a reference to the profiler manager.
+    armnn::ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+
+    // Create and register a profiler for this thread.
+    std::unique_ptr<armnn::Profiler> profiler = std::make_unique<armnn::Profiler>();
+    profilerManager.RegisterProfiler(profiler.get());
+
+    profiler->EnableProfiling(true);
+
+    {
+        // Test scoped macro.
+        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "EnqueueWorkload", TestInstrument())
+        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "Level 0", TestInstrument())
+        {
+            {
+                ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "Level 1A", TestInstrument())
+            }
+
+            {
+                ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "Level 1B", TestInstrument())
+
+                {
+                    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, "Level 2A", TestInstrument())
+                }
+            }
+        }
+    }
+
+    std::stringbuf buffer;
+    std::ostream json(&buffer);
+    profiler->Print(json);
+
+    std::string output = buffer.str();
+    boost::ignore_unused(output);
+
+    // Disable profiling here to not print out anything on stdout.
+    profiler->EnableProfiling(false);
+
+    // blessed output validated by a human eyeballing the output to make sure it's ok and then copying it here.
+    // validation also included running the blessed output through an online json validation site
+    std::string blessedOutput("{\n\t\"ArmNN\": {\n\t\t\"inference_measurements_#1\": {\n\t\t\t\"type\": \""
+                              "Event\",\n\t\t\t\"Measurement1_#1\": {\n\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\"raw\": [\n\t\t\t\t\t1.000000\n\t\t\t\t],\n\t\t\t\t\""
+                              "unit\": \"ms\"\n\t\t\t},\n\t\t\t\"Measurement2_#1\": {\n\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\"raw\": [\n\t\t\t\t\t2.000000\n\t\t\t\t],\n\t\t\t\t\""
+                              "unit\": \"us\"\n\t\t\t},\n\t\t\t\"Level 0_#2\": {\n\t\t\t\t\"type\": \""
+                              "Event\",\n\t\t\t\t\"Measurement1_#2\": {\n\t\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t1.000000\n\t\t\t\t\t],\n\t\t\t\t\t\""
+                              "unit\": \"ms\"\n\t\t\t\t},\n\t\t\t\t\"Measurement2_#2\": {\n\t\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t2.000000\n\t\t\t\t\t],\n\t\t\t\t\t\""
+                              "unit\": \"us\"\n\t\t\t\t},\n\t\t\t\t\"Level 1A_#3\": {\n\t\t\t\t\t\"type\": \""
+                              "Event\",\n\t\t\t\t\t\"Measurement1_#3\": {\n\t\t\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
+                              "1.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\""
+                              "unit\": \"ms\"\n\t\t\t\t\t},\n\t\t\t\t\t\"Measurement2_#3\": {\n\t\t\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
+                              "2.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\""
+                              "unit\": \"us\"\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t\t\"Level 1B_#4\": {\n\t\t\t\t\t\""
+                              "type\": \"Event\",\n\t\t\t\t\t\"Measurement1_#4\": {\n\t\t\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
+                              "1.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\""
+                              "unit\": \"ms\"\n\t\t\t\t\t},\n\t\t\t\t\t\"Measurement2_#4\": {\n\t\t\t\t\t\t\""
+                              "type\": \"Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
+                              "2.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\""
+                              "unit\": \"us\"\n\t\t\t\t\t},\n\t\t\t\t\t\"Level 2A_#5\": {\n\t\t\t\t\t\t\""
+                              "type\": \"Event\",\n\t\t\t\t\t\t\"Measurement1_#5\": {\n\t\t\t\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t\t"
+                              "1.000000\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t\""
+                              "unit\": \"ms\"\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"Measurement2_#5\": {\n\t\t\t\t\t\t\t\""
+                              "type\": \"Measurement\",\n\t\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t\t"
+                              "2.000000\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t\""
+                              "unit\": \"us\"\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n");
+
+    BOOST_CHECK(output == blessedOutput);
+}
+
+BOOST_AUTO_TEST_SUITE_END();

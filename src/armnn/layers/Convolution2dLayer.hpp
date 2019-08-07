@@ -15,6 +15,7 @@ class ScopedCpuTensorHandle;
 class Convolution2dLayer : public LayerWithParameters<Convolution2dDescriptor>
 {
 public:
+
     /// A unique pointer to store Weight values.
     std::unique_ptr<ScopedCpuTensorHandle> m_Weight;
     /// A unique pointer to store Bias values.
@@ -42,6 +43,8 @@ public:
     std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
     void Accept(ILayerVisitor& visitor) const override;
+
+    void SerializeLayerParameters(ParameterStringifyFunction& fn) const override;
 
 protected:
     /// Constructor to create a Convolution2dLayer.

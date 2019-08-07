@@ -68,6 +68,7 @@ StringifyLayerParameters<Convolution2dDescriptor>::Serialize(ParameterStringifyF
     }
 
     fn("BiasEnabled",(desc.m_BiasEnabled?"true":"false"));
+    fn("DataLayout",GetDataLayoutName(desc.m_DataLayout));
 }
 
 void
@@ -95,6 +96,7 @@ StringifyLayerParameters<DepthwiseConvolution2dDescriptor>::Serialize(ParameterS
     }
 
     fn("BiasEnabled",(desc.m_BiasEnabled?"true":"false"));
+    fn("DataLayout",std::to_string(int(desc.m_DataLayout)));
 }
 
 void

@@ -297,6 +297,7 @@ int MainImpl(const char* modelPath,
              const double& thresholdTime,
              bool printIntermediate,
              const size_t subgraphId,
+             bool enableLayerDetails = false,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
     using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
@@ -312,6 +313,7 @@ int MainImpl(const char* modelPath,
         params.m_ComputeDevices = computeDevices;
         params.m_DynamicBackendsPath = dynamicBackendsPath;
         params.m_PrintIntermediateLayers = printIntermediate;
+        params.m_VisualizePostOptimizationModel = enableLayerDetails;
 
         for(const std::string& inputName: inputNames)
         {
@@ -456,6 +458,7 @@ int RunTest(const std::string& format,
             const double& thresholdTime,
             bool printIntermediate,
             const size_t subgraphId,
+            bool enableLayerDetails = false,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
     std::string modelFormat = boost::trim_copy(format);
@@ -568,7 +571,7 @@ int RunTest(const std::string& format,
         dynamicBackendsPath, inputNamesVector, inputTensorShapes,
         inputTensorDataFilePathsVector, inputTypesVector, quantizeInput,
         outputTypesVector, outputNamesVector, outputTensorFilesVector, enableProfiling,
-        enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId, runtime);
+        enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId, enableLayerDetails, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with serialization support.";
     return EXIT_FAILURE;
@@ -584,7 +587,8 @@ int RunTest(const std::string& format,
                                                                quantizeInput, outputTypesVector, outputNamesVector,
                                                                outputTensorFilesVector, enableProfiling,
                                                                enableFp16TurboMode, thresholdTime,
-                                                               printIntermediate, subgraphId, runtime);
+                                                               printIntermediate, subgraphId, enableLayerDetails,
+                                                               runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
@@ -598,9 +602,9 @@ int RunTest(const std::string& format,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          quantizeInput, outputTypesVector, outputNamesVector,
-                                                         outputTensorFilesVector, enableProfiling,
-                                                         enableFp16TurboMode, thresholdTime,
-                                                         printIntermediate, subgraphId, runtime);
+                                                         outputTensorFilesVector, enableProfiling, enableFp16TurboMode,
+                                                         thresholdTime,printIntermediate, subgraphId,
+                                                         enableLayerDetails, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
     return EXIT_FAILURE;
@@ -614,9 +618,9 @@ int RunTest(const std::string& format,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          quantizeInput, outputTypesVector, outputNamesVector,
-                                                         outputTensorFilesVector, enableProfiling,
-                                                         enableFp16TurboMode, thresholdTime,
-                                                         printIntermediate, subgraphId, runtime);
+                                                         outputTensorFilesVector, enableProfiling, enableFp16TurboMode,
+                                                         thresholdTime,printIntermediate, subgraphId,
+                                                         enableLayerDetails, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
@@ -637,8 +641,8 @@ int RunTest(const std::string& format,
                                                                  inputTensorDataFilePathsVector, inputTypesVector,
                                                                  quantizeInput, outputTypesVector, outputNamesVector,
                                                                  outputTensorFilesVector, enableProfiling,
-                                                                 enableFp16TurboMode, thresholdTime,
-                                                                 printIntermediate, subgraphId, runtime);
+                                                                 enableFp16TurboMode, thresholdTime, printIntermediate,
+                                                                 subgraphId, enableLayerDetails, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
             "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
@@ -655,7 +659,7 @@ int RunTest(const std::string& format,
 
 int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IRuntime>& runtime,
                const bool enableProfiling, const bool enableFp16TurboMode, const double& thresholdTime,
-               const bool printIntermediate)
+               const bool printIntermediate, bool enableLayerDetails = false)
 {
     std::string modelFormat;
     std::string modelPath;
@@ -767,5 +771,6 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
 
     return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                    inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames, outputTensorFiles,
-                   enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId);
+                   enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId,
+                   enableLayerDetails);
 }

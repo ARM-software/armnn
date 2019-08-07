@@ -10,7 +10,7 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
+#include <string>
 #include <DataLayoutIndexed.hpp>
 
 using namespace armnnUtils;
@@ -22,6 +22,28 @@ DepthwiseConvolution2dLayer::DepthwiseConvolution2dLayer(const DepthwiseConvolut
                                                          const char* name)
     : LayerWithParameters(1, 1, LayerType::DepthwiseConvolution2d, param, name)
 {
+}
+
+void DepthwiseConvolution2dLayer::SerializeLayerParameters(ParameterStringifyFunction& fn) const
+{
+    const std::vector<TensorShape>& inputShapes =
+    {
+        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
+        m_Weight->GetTensorInfo().GetShape()
+    };
+    const TensorShape filterShape = inputShapes[1];
+    DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
+    unsigned int inputChannels = filterShape[1];
+    unsigned int filterWidth = filterShape[3];
+    unsigned int filterHeight = filterShape[2];
+    unsigned int depthMultiplier = filterShape[0];
+
+    fn("FilterWidth",std::to_string(filterWidth));
+    fn("FilterHeight",std::to_string(filterHeight));
+    fn("DepthMultiplier",std::to_string(depthMultiplier));
+    fn("InputChannels",std::to_string(inputChannels));
+
+    LayerWithParameters<DepthwiseConvolution2dDescriptor>::SerializeLayerParameters(fn);
 }
 
 std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const Graph& graph,

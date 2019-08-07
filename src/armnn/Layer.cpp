@@ -400,4 +400,23 @@ std::vector<TensorShape> Layer::InferOutputShapes(const std::vector<TensorShape>
     }
     return inputShapes;
 }
+
+void Layer::SerializeLayerParameters(ParameterStringifyFunction& fn) const
+{
+    std::string layerType = GetLayerTypeAsCString(m_Type);
+    std::string backendId = std::string(m_BackendId);
+    if(!(m_LayerName.compare("") == 0) && !m_LayerName.empty())
+    {
+        fn("LayerName",m_LayerName);
+    }
+    if(!(layerType.compare("") == 0) && !layerType.empty())
+    {
+        fn("LayerType",layerType);
+    }
+    if(!(backendId.compare("") == 0) && !backendId.empty())
+    {
+        fn("BackendID",backendId);
+    }
+}
+
 } // namespace armnn

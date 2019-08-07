@@ -19,9 +19,10 @@ public:
 
     /// Helper to serialize the layer parameters to string
     /// (currently used in DotSerializer and company).
-    void SerializeLayerParameters(ParameterStringifyFunction & fn) const
+    void SerializeLayerParameters(ParameterStringifyFunction& fn) const override
     {
         StringifyLayerParameters<Parameters>::Serialize(fn, m_Param);
+        Layer::SerializeLayerParameters(fn);
     }
 
 protected:

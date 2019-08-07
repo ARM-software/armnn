@@ -9,7 +9,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-
+#include <string>
 #include <DataLayoutIndexed.hpp>
 
 using namespace armnnUtils;
@@ -20,6 +20,27 @@ namespace armnn
 Convolution2dLayer::Convolution2dLayer(const Convolution2dDescriptor& param, const char* name)
     : LayerWithParameters(1, 1, LayerType::Convolution2d, param, name)
 {
+
+}
+
+void Convolution2dLayer::SerializeLayerParameters(ParameterStringifyFunction& fn) const
+{
+    //using DescriptorType = Parameters;
+    const std::vector<TensorShape>& inputShapes =
+    {
+        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
+        m_Weight->GetTensorInfo().GetShape()
+    };
+    const TensorShape filterShape = inputShapes[1];
+    DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
+    unsigned int filterWidth = filterShape[dataLayoutIndex.GetWidthIndex()];
+    unsigned int filterHeight = filterShape[dataLayoutIndex.GetHeightIndex()];
+    unsigned int outChannels = filterShape[0];
+
+    fn("OutputChannels",std::to_string(outChannels));
+    fn("FilterWidth",std::to_string(filterWidth));
+    fn("FilterHeight",std::to_string(filterHeight));
+    LayerWithParameters<Convolution2dDescriptor>::SerializeLayerParameters(fn);
 }
 
 std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const

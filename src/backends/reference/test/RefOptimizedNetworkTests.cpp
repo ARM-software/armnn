@@ -200,9 +200,9 @@ BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnCpuRef)
              "digraph Optimized {\n"
              "    node [shape=\"record\"];\n"
              "    edge [fontsize=8 fontcolor=\"blue\" fontname=\"arial-bold\"];\n"
-             "    " << inputId << " [label=\"{Input}\"];\n"
-             "    " << floorId << " [label=\"{Floor}\"];\n"
-             "    " << outputId << " [label=\"{Output}\"];\n"
+             "    " << inputId << " [label=\"{Input|LayerType : Input\\lBackendID : CpuRef\\l}\"];\n"
+             "    " << floorId << " [label=\"{Floor|LayerType : Floor\\lBackendID : CpuRef\\l}\"];\n"
+             "    " << outputId << " [label=\"{Output|LayerType : Output\\lBackendID : CpuRef\\l}\"];\n"
              "    " << inputId << " -> " << floorId << " [label=< [4] >];\n"
              "    " << floorId << " -> " << outputId << " [label=< [4] >];\n"
              "}\n";

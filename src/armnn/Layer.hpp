@@ -281,7 +281,7 @@ public:
 
     /// Helper to serialize the layer parameters to string.
     /// (currently used in DotSerializer and company).
-    virtual void SerializeLayerParameters(ParameterStringifyFunction &) const {}
+    virtual void SerializeLayerParameters(ParameterStringifyFunction& fn) const;
 
     // Free up the constant source data
     virtual void ReleaseConstantData();

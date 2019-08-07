@@ -43,6 +43,8 @@ public:
 
     void Accept(ILayerVisitor& visitor) const override;
 
+    void SerializeLayerParameters(ParameterStringifyFunction& fn) const override;
+
 protected:
     /// Constructor to create a DepthwiseConvolution2dLayer.
     /// @param [in] param DepthwiseConvolution2dDescriptor to configure the depthwise convolution2d.

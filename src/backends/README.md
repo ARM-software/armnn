@@ -159,7 +159,9 @@ For registering a backend only this lambda function needs to exist, not the actu
 allows dynamically creating the backend objects when they are needed.
 
 The BackendRegistry has a few convenience functions, like we can query the registered backends and
- are able to tell if a given backend is registered or not.
+are able to tell if a given backend is registered or not.
+
+Dynamic backends are registered during the runtime creation.
 
 ## The ILayerSupport interface
 
@@ -361,4 +363,42 @@ Examples:
 | pathB/Arm_GpuAcc_backend.so                              | valid: but duplicated from pathA/                 |
 
 ArmNN will try to load the dynamic backends in the same order as they are parsed from the filesystem.
+
+## Dynamic backend examples
+
+The source code includes an example that is used to generate some mock dynamic backends for testing purposes. The source files are:
+
+[TestDynamicBackend.hpp](backendsCommon/test/TestDynamicBackend.hpp)
+[TestDynamicBackend.cpp](backendsCommon/test/TestDynamicBackend.cpp)
+
+This example is useful for going through all the use cases that constitute an invalid dynamic backend object, such as
+an invalid/malformed implementation of the shared object interface, or an invalid value returned by any of the interface methods
+that would prevent ArmNN from making use of the dynamic backend.
+
+A dynamic implementation of the reference backend is also provided. The source files are:
+
+[RefDynamicBackend.hpp](dynamic/reference/RefDynamicBackend.hpp)
+[RefDynamicBackend.cpp](dynamic/reference/RefDynamicBackend.cpp)
+
+The implementation itself is quite simple and straightforward. Since an implementation of this particular backend was already available,
+the dynamic version is just a wrapper around the original code that simply returns the backend id, version and an instance of the
+backend itself via the factory function.
+For the sake of the example, the source code of the reference backend is used to build the dynamic version (as you would for any new
+dynamic backend), while all the other symbols needed are provided by linking the dynamic backend against ArmNN.
+
+The makefile used for building the reference dynamic backend is also provided: [CMakeLists.txt](dynamic/reference/CMakeLists.txt)
+
+A unit test that loads the reference backend dynamically and that exercises it is also included in the file
+[DynamicBackendTests.cpp](dynamic/backendsCommon/test/DynamicBackendTests.cpp), by the test case ```CreateReferenceDynamicBackend```.
+In the test, a path on the filesystem is scanned for valid dynamic backend files (using the override option in ```CreationOptions```)
+where only the reference dynamic backend is.
+In this example the file is named ```Arm_CpuRef_backend.so```, which is compliant with the expected naming scheme for dynamic backends.
+A ```DynamicBackend``` is created in the runtime to represent the newly loaded backend, then the backend is registered in the Backend
+Registry with the id "CpuRef" (returned by ```GetBackendId()```).
+The unit test makes sure that the backend is actually registered in ArmNN, before trying to create an instance of the backend by
+calling the factory function provided through the shared object interface (```BackendFactory()```).
+The backend instance is used to verify that everything is in order, testing basic 2D convolution support by making use of the
+Layer Support API and the Workload Factory.
+At the end of test, the runtime object goes out of scope and the dynamic backend instance is automatically destroyed, and the handle to
+the shared object is closed.
 

@@ -8,6 +8,8 @@
 #include <backendsCommon/DynamicBackend.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 
+#include <Runtime.hpp>
+
 #include <string>
 #include <memory>
 #include <string>
@@ -52,7 +54,7 @@ static std::string g_TestDynamicBackendsSubDir7  = "backendsTestPath7/";
 static std::string g_TestDynamicBackendsSubDir8  = "backendsTestPath8/";
 static std::string g_TestDynamicBackendsSubDir9  = "backendsTestPath9/";
 
-// Wrapper class used for testing
+// DynamicBackendUtils wrapper class used for testing (allows to directly invoke the protected methods)
 class TestDynamicBackendUtils : public armnn::DynamicBackendUtils
 {
 public:
@@ -72,6 +74,24 @@ public:
     {
         RegisterDynamicBackendsImpl(backendRegistry, dynamicBackends);
     }
+};
+
+// BackendRegistry wrapper class used for testing (swaps the underlying factory storage)
+class TestBackendRegistry : public armnn::BackendRegistry
+{
+public:
+    TestBackendRegistry() : armnn::BackendRegistry()
+    {
+        Swap(armnn::BackendRegistryInstance(), m_TempStorage);
+    }
+
+    ~TestBackendRegistry()
+    {
+        Swap(armnn::BackendRegistryInstance(), m_TempStorage);
+    }
+
+private:
+    FactoryStorage m_TempStorage;
 };
 
 std::string GetTestDirectoryBasePath()
@@ -1130,4 +1150,121 @@ void RegisterMixedDynamicBackendsTestImpl()
         BOOST_TEST((dynamicBackend != nullptr));
         BOOST_TEST((dynamicBackend->GetId() == expectedRegisteredbackendId));
     }
+}
+
+void RuntimeEmptyTestImpl()
+{
+    using namespace armnn;
+
+    // Swapping the backend registry storage for testing
+    TestBackendRegistry testBackendRegistry;
+
+    IRuntime::CreationOptions creationOptions;
+    IRuntimePtr runtime = IRuntime::Create(creationOptions);
+
+    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    BOOST_TEST(backendRegistry.Size() == 0);
+}
+
+void RuntimeDynamicBackendsTestImpl()
+{
+    using namespace armnn;
+    using namespace boost::filesystem;
+
+    // Swapping the backend registry storage for testing
+    TestBackendRegistry testBackendRegistry;
+
+    // This directory contains valid and invalid backends
+    std::string testDynamicBackendsSubDir5 = GetTestSubDirectory(g_TestDynamicBackendsSubDir5);
+    BOOST_CHECK(exists(testDynamicBackendsSubDir5));
+
+    // Using the path override in CreationOptions to load some test dynamic backends
+    IRuntime::CreationOptions creationOptions;
+    creationOptions.m_DynamicBackendsPath = testDynamicBackendsSubDir5;
+    IRuntimePtr runtime = IRuntime::Create(creationOptions);
+
+    std::vector<BackendId> expectedRegisteredbackendIds
+    {
+        "TestValid2",
+        "TestValid3"
+    };
+
+    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    BOOST_TEST(backendRegistry.Size() == expectedRegisteredbackendIds.size());
+
+    BackendIdSet backendIds = backendRegistry.GetBackendIds();
+    for (const BackendId& expectedRegisteredbackendId : expectedRegisteredbackendIds)
+    {
+        BOOST_TEST((backendIds.find(expectedRegisteredbackendId) != backendIds.end()));
+    }
+}
+
+void RuntimeDuplicateDynamicBackendsTestImpl()
+{
+    using namespace armnn;
+    using namespace boost::filesystem;
+
+    // Swapping the backend registry storage for testing
+    TestBackendRegistry testBackendRegistry;
+
+    // This directory contains valid, invalid and duplicate backends
+    std::string testDynamicBackendsSubDir6 = GetTestSubDirectory(g_TestDynamicBackendsSubDir6);
+    BOOST_CHECK(exists(testDynamicBackendsSubDir6));
+
+    // Using the path override in CreationOptions to load some test dynamic backends
+    IRuntime::CreationOptions creationOptions;
+    creationOptions.m_DynamicBackendsPath = testDynamicBackendsSubDir6;
+    IRuntimePtr runtime = IRuntime::Create(creationOptions);
+
+    std::vector<BackendId> expectedRegisteredbackendIds
+    {
+        "TestValid2",
+        "TestValid5"
+    };
+
+    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    BOOST_TEST(backendRegistry.Size() == expectedRegisteredbackendIds.size());
+
+    BackendIdSet backendIds = backendRegistry.GetBackendIds();
+    for (const BackendId& expectedRegisteredbackendId : expectedRegisteredbackendIds)
+    {
+        BOOST_TEST((backendIds.find(expectedRegisteredbackendId) != backendIds.end()));
+    }
+}
+
+void RuntimeInvalidDynamicBackendsTestImpl()
+{
+    using namespace armnn;
+    using namespace boost::filesystem;
+
+    // Swapping the backend registry storage for testing
+    TestBackendRegistry testBackendRegistry;
+
+    // This directory contains only invalid backends
+    std::string testDynamicBackendsSubDir9 = GetTestSubDirectory(g_TestDynamicBackendsSubDir9);
+    BOOST_CHECK(exists(testDynamicBackendsSubDir9));
+
+    // Using the path override in CreationOptions to load some test dynamic backends
+    IRuntime::CreationOptions creationOptions;
+    creationOptions.m_DynamicBackendsPath = testDynamicBackendsSubDir9;
+    IRuntimePtr runtime = IRuntime::Create(creationOptions);
+
+    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    BOOST_TEST(backendRegistry.Size() == 0);
+}
+
+void RuntimeInvalidOverridePathTestImpl()
+{
+    using namespace armnn;
+
+    // Swapping the backend registry storage for testing
+    TestBackendRegistry testBackendRegistry;
+
+    // Using the path override in CreationOptions to load some test dynamic backends
+    IRuntime::CreationOptions creationOptions;
+    creationOptions.m_DynamicBackendsPath = "InvalidPath";
+    IRuntimePtr runtime = IRuntime::Create(creationOptions);
+
+    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    BOOST_TEST(backendRegistry.Size() == 0);
 }

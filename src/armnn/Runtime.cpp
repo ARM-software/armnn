@@ -143,7 +143,9 @@ Runtime::Runtime(const CreationOptions& options)
     for (const auto& id : BackendRegistryInstance().GetBackendIds())
     {
         // Store backend contexts for the supported ones
-        if (m_DeviceSpec.GetSupportedBackends().count(id) > 0)
+        const BackendIdSet& supportedBackends = m_DeviceSpec.GetSupportedBackends();
+        auto it = supportedBackends.find(id);
+        if (it != supportedBackends.end())
         {
             auto factoryFun = BackendRegistryInstance().GetFactory(id);
             auto backend = factoryFun();

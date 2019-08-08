@@ -19,3 +19,11 @@ foreach(includeFile ${backendIncludes})
     message("Including backend into the build: ${includeFile}")
     include(${includeFile})
 endforeach()
+
+# parse dynamic backend sub-directories
+file(GLOB dynamicBackendDirs ${PROJECT_SOURCE_DIR}/src/backends/dynamic/*)
+foreach(dynamicBackendDir ${dynamicBackendDirs})
+    if (EXISTS ${dynamicBackendDir} AND IS_DIRECTORY ${dynamicBackendDir})
+        add_subdirectory(${dynamicBackendDir})
+    endif()
+endforeach()

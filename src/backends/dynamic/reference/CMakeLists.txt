@@ -1,0 +1,28 @@
+#
+# Copyright © 2017 Arm Ltd. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+
+# File needed to wrap the existing backend into a dynamic one
+list(APPEND armnnRefDynamicBackend_sources
+    RefDynamicBackend.cpp
+    RefDynamicBackend.hpp
+)
+
+# Set the backend source path
+set(RefBackendPath ${PROJECT_SOURCE_DIR}/src/backends/reference)
+
+# Source files of the backend, taken directly from the source tree
+file(GLOB RefBackendBaseFiles ${RefBackendPath}/*.cpp)
+set(RefBackendFiles ${RefBackendBaseFiles})
+
+# Remove the file that contains the static backend registration
+list(REMOVE_ITEM RefBackendFiles ${RefBackendPath}/RefRegistryInitializer.cpp)
+
+# Create the shared object
+add_library(Arm_CpuRef_backend MODULE ${armnnRefDynamicBackend_sources} ${RefBackendFiles})
+target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+set_target_properties(Arm_CpuRef_backend PROPERTIES PREFIX "")
+target_link_libraries(Arm_CpuRef_backend armnn)

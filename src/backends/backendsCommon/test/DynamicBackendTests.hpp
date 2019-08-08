@@ -7,6 +7,12 @@
 
 #include <backendsCommon/DynamicBackend.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
+#include <backendsCommon/BackendRegistry.hpp>
+#include <backendsCommon/CpuTensorHandle.hpp>
+
+#include <armnn/ILayerSupport.hpp>
+
+#include <reference/workloads/RefConvolution2dWorkload.hpp>
 
 #include <Runtime.hpp>
 
@@ -54,6 +60,10 @@ static std::string g_TestDynamicBackendsSubDir7  = "backendsTestPath7/";
 static std::string g_TestDynamicBackendsSubDir8  = "backendsTestPath8/";
 static std::string g_TestDynamicBackendsSubDir9  = "backendsTestPath9/";
 
+static std::string g_DynamicBackendsBaseDir                 = "src/backends/dynamic";
+static std::string g_ReferenceDynamicBackendSubDir          = "reference/";
+static std::string g_ReferenceBackendFileName               = "Arm_CpuRef_backend.so";
+
 // DynamicBackendUtils wrapper class used for testing (allows to directly invoke the protected methods)
 class TestDynamicBackendUtils : public armnn::DynamicBackendUtils
 {
@@ -94,15 +104,25 @@ private:
     FactoryStorage m_TempStorage;
 };
 
-std::string GetTestDirectoryBasePath()
+std::string GetBasePath(const std::string& basePath)
 {
     using namespace boost::filesystem;
 
     path programLocation = boost::dll::program_location().parent_path();
-    path sharedObjectPath = programLocation.append(g_TestBaseDir);
+    path sharedObjectPath = programLocation.append(basePath);
     BOOST_CHECK(exists(sharedObjectPath));
 
     return sharedObjectPath.string();
+}
+
+std::string GetTestDirectoryBasePath()
+{
+    return GetBasePath(g_TestBaseDir);
+}
+
+std::string GetDynamicBackendsBasePath()
+{
+    return GetBasePath(g_DynamicBackendsBaseDir);
 }
 
 std::string GetTestSubDirectory(const std::string& subdir)
@@ -111,6 +131,17 @@ std::string GetTestSubDirectory(const std::string& subdir)
 
     std::string testDynamicBackendsBaseDir = GetTestDirectoryBasePath();
     path testDynamicBackendsBasePath(testDynamicBackendsBaseDir);
+    path testDynamicBackendsSubDir = testDynamicBackendsBasePath.append(subdir);
+    // Do not check that the sub-directory exists because for testing reasons we may use non-existing paths
+
+    return testDynamicBackendsSubDir.string();
+}
+
+std::string GetTestSubDirectory(const std::string& basePath, const std::string& subdir)
+{
+    using namespace boost::filesystem;
+
+    path testDynamicBackendsBasePath(basePath);
     path testDynamicBackendsSubDir = testDynamicBackendsBasePath.append(subdir);
     // Do not check that the sub-directory exists because for testing reasons we may use non-existing paths
 
@@ -1267,4 +1298,83 @@ void RuntimeInvalidOverridePathTestImpl()
 
     const BackendRegistry& backendRegistry = BackendRegistryInstance();
     BOOST_TEST(backendRegistry.Size() == 0);
+}
+
+void CreateReferenceDynamicBackendTestImpl()
+{
+    using namespace armnn;
+    using namespace boost::filesystem;
+
+    // Swapping the backend registry storage for testing
+    TestBackendRegistry testBackendRegistry;
+
+    // This directory contains the reference dynamic backend
+    std::string dynamicBackendsBaseDir = GetDynamicBackendsBasePath();
+    std::string referenceDynamicBackendSubDir = GetTestSubDirectory(dynamicBackendsBaseDir,
+                                                                    g_ReferenceDynamicBackendSubDir);
+    BOOST_CHECK(exists(referenceDynamicBackendSubDir));
+
+    // Check that the reference dynamic backend file exists
+    std::string referenceBackendFilePath = GetTestFilePath(referenceDynamicBackendSubDir,
+                                                           g_ReferenceBackendFileName);
+    BOOST_CHECK(exists(referenceBackendFilePath));
+
+    // Using the path override in CreationOptions to load the reference dynamic backend
+    IRuntime::CreationOptions creationOptions;
+    creationOptions.m_DynamicBackendsPath = referenceDynamicBackendSubDir;
+    IRuntimePtr runtime = IRuntime::Create(creationOptions);
+
+    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    BOOST_TEST(backendRegistry.Size() == 1);
+
+    BackendIdSet backendIds = backendRegistry.GetBackendIds();
+    BOOST_TEST((backendIds.find("CpuRef") != backendIds.end()));
+
+    // Get the factory function
+    auto referenceDynamicBackendFactoryFunction = backendRegistry.GetFactory("CpuRef");
+    BOOST_TEST((referenceDynamicBackendFactoryFunction != nullptr));
+
+    // Use the factory function to create an instance of the reference backend
+    IBackendInternalUniquePtr referenceDynamicBackend = referenceDynamicBackendFactoryFunction();
+    BOOST_TEST((referenceDynamicBackend != nullptr));
+    BOOST_TEST((referenceDynamicBackend->GetId() == "CpuRef"));
+
+    // Test the backend instance by querying the layer support
+    IBackendInternal::ILayerSupportSharedPtr referenceLayerSupport = referenceDynamicBackend->GetLayerSupport();
+    BOOST_TEST((referenceLayerSupport != nullptr));
+
+    TensorShape inputShape {  1, 16, 16, 16 };
+    TensorShape outputShape{  1, 16, 16, 16 };
+    TensorShape weightShape{ 16,  1,  1, 16 };
+    TensorInfo inputInfo (inputShape,  DataType::Float32);
+    TensorInfo outputInfo(outputShape, DataType::Float32);
+    TensorInfo weightInfo(weightShape, DataType::Float32);
+    Convolution2dDescriptor convolution2dDescriptor;
+    bool referenceConvolution2dSupported =
+            referenceLayerSupport->IsConvolution2dSupported(inputInfo,
+                                                            outputInfo,
+                                                            convolution2dDescriptor,
+                                                            weightInfo,
+                                                            EmptyOptional());
+    BOOST_TEST(referenceConvolution2dSupported);
+
+    // Test the backend instance by creating a workload
+    IBackendInternal::IWorkloadFactoryPtr referenceWorkloadFactory = referenceDynamicBackend->CreateWorkloadFactory();
+    BOOST_TEST((referenceWorkloadFactory != nullptr));
+
+    // Create dummy settings for the workload
+    Convolution2dQueueDescriptor convolution2dQueueDescriptor;
+    WorkloadInfo workloadInfo
+    {
+        { inputInfo },
+        { outputInfo }
+    };
+    convolution2dQueueDescriptor.m_Inputs.push_back(nullptr);
+    auto weights = std::make_unique<ScopedCpuTensorHandle>(weightInfo);
+    convolution2dQueueDescriptor.m_Weight = weights.get();
+
+    // Create a convolution workload with the dummy settings
+    auto workload = referenceWorkloadFactory->CreateConvolution2d(convolution2dQueueDescriptor, workloadInfo);
+    BOOST_TEST((workload != nullptr));
+    BOOST_TEST(workload.get() == boost::polymorphic_downcast<RefConvolution2dWorkload*>(workload.get()));
 }

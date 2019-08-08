@@ -13,6 +13,7 @@ list(APPEND armnnRefBackend_sources
     RefLayerSupport.hpp
     RefMemoryManager.hpp
     RefMemoryManager.cpp
+    RefRegistryInitializer.cpp
     RefWorkloadFactory.cpp
     RefWorkloadFactory.hpp
 )

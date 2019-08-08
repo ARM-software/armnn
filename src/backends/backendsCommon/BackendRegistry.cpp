@@ -17,7 +17,7 @@ BackendRegistry& BackendRegistryInstance()
 
 void BackendRegistry::Register(const BackendId& id, BackendRegistry::FactoryFunction factory)
 {
-    if (m_Factories.count(id) > 0)
+    if (m_Factories.find(id) != m_Factories.end())
     {
         throw InvalidArgumentException(
             std::string(id) + " already registered as IBackend factory",

@@ -61,4 +61,6 @@ ARMNN_SIMPLE_TEST_CASE(RuntimeDuplicateDynamicBackends, RuntimeDuplicateDynamicB
 ARMNN_SIMPLE_TEST_CASE(RuntimeInvalidDynamicBackends, RuntimeInvalidDynamicBackendsTestImpl);
 ARMNN_SIMPLE_TEST_CASE(RuntimeInvalidOverridePath, RuntimeInvalidOverridePathTestImpl);
 
+ARMNN_SIMPLE_TEST_CASE(CreateReferenceDynamicBackend, CreateReferenceDynamicBackendTestImpl);
+
 BOOST_AUTO_TEST_SUITE_END()

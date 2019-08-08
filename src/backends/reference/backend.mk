@@ -13,6 +13,7 @@ BACKEND_SOURCES := \
         RefMemoryManager.cpp \
         RefTensorHandle.cpp \
         RefWorkloadFactory.cpp \
+        RefRegistryInitializer.cpp \
         workloads/Activation.cpp \
         workloads/BatchNormImpl.cpp \
         workloads/BatchToSpaceNd.cpp \

@@ -9,6 +9,7 @@
 #include <backendsCommon/test/ConcatTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
+#include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 
@@ -265,6 +266,11 @@ BOOST_AUTO_TEST_CASE(NeonSplitter4dDim2EndToEndUint8Test)
 BOOST_AUTO_TEST_CASE(NeonSplitter4dDim3EndToEndUint8Test)
 {
     Splitter4dDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonQuantizedLstmEndToEndTest)
+{
+    QuantizedLstmEndToEnd(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

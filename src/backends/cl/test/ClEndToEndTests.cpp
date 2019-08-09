@@ -9,6 +9,7 @@
 #include <backendsCommon/test/ConcatTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
+#include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
@@ -257,6 +258,11 @@ BOOST_AUTO_TEST_CASE(ClTransposeConvolution2dEndToEndUint8NhwcTest)
 {
     TransposeConvolution2dEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
         defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(ClQuantizedLstmEndToEndTest)
+{
+    QuantizedLstmEndToEnd(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

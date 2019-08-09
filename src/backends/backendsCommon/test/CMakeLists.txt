@@ -45,6 +45,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     PreluEndToEndTestImpl.hpp
     QuantizeHelper.hpp
     QuantizeTestImpl.hpp
+    QuantizedLstmEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp
     SoftmaxTestImpl.hpp

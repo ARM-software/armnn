@@ -323,10 +323,7 @@ bool NeonLayerSupport::IsGreaterSupported(const armnn::TensorInfo& input0,
 bool NeonLayerSupport::IsInputSupported(const TensorInfo& input,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeNeon(reasonIfUnsupported,
-                                      input.GetDataType(),
-                                      &TrueFunc<>,
-                                      &TrueFunc<>);
+    return IsNeonBackendSupported(reasonIfUnsupported);
 }
 
 bool NeonLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
@@ -432,14 +429,7 @@ bool NeonLayerSupport::IsNormalizationSupported(const TensorInfo& input,
 bool NeonLayerSupport::IsOutputSupported(const TensorInfo& output,
                                          Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsNeonBackendSupported(reasonIfUnsupported) &&
-           IsSupportedForDataTypeGeneric(reasonIfUnsupported,
-                                         output.GetDataType(),
-                                         &TrueFunc<>,
-                                         &TrueFunc<>,
-                                         &TrueFunc<>,
-                                         &FalseFuncI32<>,
-                                         &TrueFunc<>);
+    return IsNeonBackendSupported(reasonIfUnsupported);
 }
 
 bool NeonLayerSupport::IsPadSupported(const TensorInfo& input,

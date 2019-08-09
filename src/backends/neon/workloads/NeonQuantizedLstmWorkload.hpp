@@ -17,6 +17,7 @@ namespace armnn
 class NeonQuantizedLstmWorkload : public BaseWorkload<QuantizedLstmQueueDescriptor>
 {
 public:
+    using BaseWorkload<QuantizedLstmQueueDescriptor>::m_Data;
     NeonQuantizedLstmWorkload(const QuantizedLstmQueueDescriptor& descriptor, const WorkloadInfo& info);
     virtual void Execute() const override;
 

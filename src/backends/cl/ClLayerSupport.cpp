@@ -382,10 +382,7 @@ bool ClLayerSupport::IsGreaterSupported(const TensorInfo& input0,
 bool ClLayerSupport::IsInputSupported(const TensorInfo& input,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsSupportedForDataTypeCl(reasonIfUnsupported,
-                                    input.GetDataType(),
-                                    &TrueFunc<>,
-                                    &TrueFunc<>);
+    return IsClBackendSupported(reasonIfUnsupported);
 }
 
 bool ClLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
@@ -491,14 +488,7 @@ bool ClLayerSupport::IsNormalizationSupported(const TensorInfo& input,
 bool ClLayerSupport::IsOutputSupported(const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    return IsClBackendSupported(reasonIfUnsupported) &&
-           IsSupportedForDataTypeGeneric(reasonIfUnsupported,
-                                         output.GetDataType(),
-                                         &TrueFunc<>,
-                                         &TrueFunc<>,
-                                         &TrueFunc<>,
-                                         &FalseFuncI32<>,
-                                         &TrueFunc<>);
+    return IsClBackendSupported(reasonIfUnsupported);
 }
 
 bool ClLayerSupport::IsPadSupported(const TensorInfo& input,

@@ -92,14 +92,13 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const Ten
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
                                                             const WorkloadInfo&        info) const
 {
-    return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
+    return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
                                                              const WorkloadInfo&        info) const
 {
-    return MakeWorkloadHelper<CopyMemGenericWorkload, CopyMemGenericWorkload,
-                              CopyMemGenericWorkload, NullWorkload, CopyMemGenericWorkload>(descriptor, info);
+    return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,

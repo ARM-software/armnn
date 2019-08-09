@@ -888,9 +888,8 @@ bool RefLayerSupport::IsMaximumSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,4> supportedTypes = {
+    std::array<DataType,3> supportedTypes = {
         DataType::Float32,
-        DataType::Signed32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -1018,9 +1017,8 @@ bool RefLayerSupport::IsMinimumSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,4> supportedTypes = {
+    std::array<DataType,3> supportedTypes = {
         DataType::Float32,
-        DataType::Signed32,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };

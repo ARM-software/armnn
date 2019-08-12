@@ -89,6 +89,14 @@ std::vector<std::string> DynamicBackendUtils::GetBackendPaths(const std::string&
 
 std::vector<std::string> DynamicBackendUtils::GetBackendPathsImpl(const std::string& backendPaths)
 {
+    // Check if there's any path to process at all
+    if (backendPaths.empty())
+    {
+        // Silently return without issuing a warning as no paths have been passed, so
+        // the whole dynamic backend loading feature can be considered as disabled
+        return {};
+    }
+
     std::unordered_set<std::string> uniqueBackendPaths;
     std::vector<std::string> tempBackendPaths;
     std::vector<std::string> validBackendPaths;

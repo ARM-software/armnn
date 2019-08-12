@@ -398,6 +398,14 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateRsqrt(const RsqrtQueueDesc
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateTransposeConvolution2d(
+    const TransposeConvolution2dQueueDescriptor &descriptor,
+    const WorkloadInfo &info) const
+{
+    return std::make_unique<NeonTransposeConvolution2dWorkload>(descriptor, info,
+                                                                m_MemoryManager->GetIntraLayerManager());
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
                                                                   const WorkloadInfo& info) const
 {

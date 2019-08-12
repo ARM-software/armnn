@@ -12,6 +12,7 @@
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
+#include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -271,6 +272,30 @@ BOOST_AUTO_TEST_CASE(NeonSplitter4dDim3EndToEndUint8Test)
 BOOST_AUTO_TEST_CASE(NeonQuantizedLstmEndToEndTest)
 {
     QuantizedLstmEndToEnd(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndFloatNchwTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
+        defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndUint8NchwTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+        defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndFloatNhwcTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
+        defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndUint8NhwcTest)
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
+        defaultBackends, armnn::DataLayout::NHWC);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

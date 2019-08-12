@@ -574,11 +574,11 @@ bool IsSpaceToBatchNdSupported(const BackendId& backend,
 }
 
 bool IsSpaceToDepthSupported(const BackendId& backend,
-                               const TensorInfo& input,
-                               const TensorInfo& output,
-                               const SpaceToDepthDescriptor& descriptor,
-                               char* reasonIfUnsupported,
-                               size_t reasonIfUnsupportedMaxLength)
+                             const TensorInfo& input,
+                             const TensorInfo& output,
+                             const SpaceToDepthDescriptor& descriptor,
+                             char* reasonIfUnsupported,
+                             size_t reasonIfUnsupportedMaxLength)
 {
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsSpaceToDepthSupported, input, output, descriptor);
 }

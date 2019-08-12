@@ -55,7 +55,8 @@ BACKEND_SOURCES := \
         workloads/NeonSplitterWorkload.cpp \
         workloads/NeonStackWorkload.cpp \
         workloads/NeonStridedSliceWorkload.cpp \
-        workloads/NeonSubtractionWorkload.cpp
+        workloads/NeonSubtractionWorkload.cpp \
+        workloads/NeonTransposeConvolution2dWorkload.cpp
 
 else
 

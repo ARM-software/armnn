@@ -1,0 +1,109 @@
+//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+#include "NeonTransposeConvolution2dWorkload.hpp"
+
+#include "NeonWorkloadUtils.hpp"
+
+#include <Profiling.hpp>
+
+#include <armnn/Types.hpp>
+
+#include <aclCommon/ArmComputeTensorUtils.hpp>
+
+#include <backendsCommon/CpuTensorHandle.hpp>
+
+#include <neon/workloads/NeonWorkloadUtils.hpp>
+
+#include <boost/cast.hpp>
+
+namespace armnn
+{
+
+using namespace armcomputetensorutils;
+
+arm_compute::Status NeonTransposeConvolution2dWorkloadValidate(const TensorInfo& input,
+                                                               const TensorInfo& output,
+                                                               const TransposeConvolution2dDescriptor& descriptor,
+                                                               const TensorInfo& weights,
+                                                               const Optional<TensorInfo>& biases)
+{
+    const arm_compute::TensorInfo aclInputInfo   = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutputInfo  = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
+
+    arm_compute::TensorInfo aclBiasesInfo;
+    arm_compute::TensorInfo *optionalAclBiasesInfo = nullptr;
+
+    if (descriptor.m_BiasEnabled)
+    {
+        BOOST_ASSERT(biases.has_value());
+
+        aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
+        optionalAclBiasesInfo = &aclBiasesInfo;
+    }
+
+    arm_compute::PadStrideInfo layerInfo = BuildArmComputePadStrideInfo(descriptor);
+
+    return arm_compute::NEDeconvolutionLayer::validate(&aclInputInfo,
+                                                       &aclWeightsInfo,
+                                                       optionalAclBiasesInfo,
+                                                       &aclOutputInfo,
+                                                       layerInfo);
+}
+
+NeonTransposeConvolution2dWorkload::NeonTransposeConvolution2dWorkload(
+    const TransposeConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,
+    std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
+    : BaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info)
+{
+    m_Data.ValidateInputsOutputs("NeonTransposeConvolution2dWorkload", 1, 1);
+
+    arm_compute::ITensor& input  = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+
+    arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
+    input.info()->set_data_layout(aclDataLayout);
+    output.info()->set_data_layout(aclDataLayout);
+
+    m_KernelTensor = std::make_unique<arm_compute::Tensor>();
+    BuildArmComputeTensor(*m_KernelTensor, m_Data.m_Weight->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
+
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        m_BiasTensor = std::make_unique<arm_compute::Tensor>();
+        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
+    }
+
+    arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
+
+    m_Layer = std::make_unique<arm_compute::NEDeconvolutionLayer>(memoryManager);
+    m_Layer->configure(&input, m_KernelTensor.get(), m_BiasTensor.get(), &output, padStrideInfo);
+
+    BOOST_ASSERT(m_Layer);
+
+    InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
+
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
+    }
+
+    m_Layer->prepare();
+    FreeUnusedTensors();
+}
+
+void NeonTransposeConvolution2dWorkload::Execute() const
+{
+    ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonTransposeConvolution2dWorkload_Execute");
+    m_Layer->run();
+}
+
+void NeonTransposeConvolution2dWorkload::FreeUnusedTensors()
+{
+    FreeTensorIfUnused(m_KernelTensor);
+    FreeTensorIfUnused(m_BiasTensor);
+}
+
+} // namespace armnn

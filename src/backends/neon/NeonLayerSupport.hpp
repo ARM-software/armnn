@@ -221,6 +221,14 @@ public:
                                 const TensorInfo& input1,
                                 const TensorInfo& output,
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
+    bool IsTransposeConvolution2dSupported(const TensorInfo& input,
+                                           const TensorInfo& output,
+                                           const TransposeConvolution2dDescriptor& descriptor,
+                                           const TensorInfo& weights,
+                                           const Optional<TensorInfo>& biases,
+                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
 }; // class NeonLayerSupport
 
 } // namespace armnn

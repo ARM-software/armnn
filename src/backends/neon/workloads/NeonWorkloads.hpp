@@ -39,3 +39,4 @@
 #include "NeonStackWorkload.hpp"
 #include "NeonStridedSliceWorkload.hpp"
 #include "NeonSubtractionWorkload.hpp"
+#include "NeonTransposeConvolution2dWorkload.hpp"

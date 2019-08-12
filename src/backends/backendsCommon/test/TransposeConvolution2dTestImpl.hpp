@@ -106,7 +106,7 @@ void TransposeConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
 }
 
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 4> TransposeConvolution2dTestImpl(
+LayerTestResult<T, 4> TransposeConvolution2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::TransposeConvolution2dDescriptor& descriptor,
@@ -124,8 +124,8 @@ LayerTestResult<T, 4> TransposeConvolution2dTestImpl(
     // set up quantization parameters
     if (armnn::IsQuantizedType<T>())
     {
-        constexpr float   qScale  = 0.25f;
-        constexpr int32_t qOffset = 50;
+        constexpr float   qScale  = 0.50f;
+        constexpr int32_t qOffset = 10;
 
         inputInfo.SetQuantizationScale(qScale);
         inputInfo.SetQuantizationOffset(qOffset);
@@ -191,10 +191,34 @@ LayerTestResult<T, 4> TransposeConvolution2dTestImpl(
     return testResult;
 }
 
+template<typename T>
+void SwizzleData(const armnn::TensorInfo& inputInfo,
+                 std::vector<T>& inputData,
+                 const armnn::TensorInfo& outputInfo,
+                 std::vector<T>& outputData,
+                 const armnn::TensorInfo& weightsInfo,
+                 std::vector<T>& weightsData)
+{
+    constexpr size_t dataTypeSize = sizeof(float);
+    const armnn::PermutationVector nchwToNhwc = { 0, 3, 1, 2 };
+
+    std::vector<T> tmp(inputData.size());
+    armnnUtils::Permute(inputInfo.GetShape(), nchwToNhwc, inputData.data(), tmp.data(), dataTypeSize);
+    inputData = tmp;
+
+    tmp.resize(weightsData.size());
+    armnnUtils::Permute(weightsInfo.GetShape(), nchwToNhwc, weightsData.data(), tmp.data(), dataTypeSize);
+    weightsData = tmp;
+
+    tmp.resize(outputData.size());
+    armnnUtils::Permute(outputInfo.GetShape(), nchwToNhwc, outputData.data(), tmp.data(), dataTypeSize);
+    outputData = tmp;
+}
+
 } // anonymous namespace
 
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 4> SimpleTransposeConvolution2dTestImpl(
+LayerTestResult<T, 4> SimpleTransposeConvolution2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
@@ -264,37 +288,24 @@ LayerTestResult<T, 4> SimpleTransposeConvolution2dTestImpl(
     // swizzle data if needed
     if (layout == armnn::DataLayout::NHWC)
     {
-        constexpr size_t dataTypeSize = sizeof(float);
-        const armnn::PermutationVector nchwToNhwc = { 0, 3, 1, 2 };
-
-        std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputInfo.GetShape(), nchwToNhwc, inputData.data(), tmp.data(), dataTypeSize);
-        inputData = tmp;
-
-        tmp.resize(weightsData.size());
-        armnnUtils::Permute(weightsInfo.GetShape(), nchwToNhwc, weightsData.data(), tmp.data(), dataTypeSize);
-        weightsData = tmp;
-
-        tmp.resize(expectedOutputData.size());
-        armnnUtils::Permute(outputInfo.GetShape(), nchwToNhwc, expectedOutputData.data(), tmp.data(), dataTypeSize);
-        expectedOutputData = tmp;
+       SwizzleData(inputInfo, inputData, outputInfo, expectedOutputData, weightsInfo, weightsData);
     }
 
-    return TransposeConvolution2dTestImpl<ArmnnType, ArmnnBType>(workloadFactory,
-                                                                 memoryManager,
-                                                                 descriptor,
-                                                                 inputInfo,
-                                                                 inputData,
-                                                                 outputInfo,
-                                                                 expectedOutputData,
-                                                                 weightsInfo,
-                                                                 weightsData,
-                                                                 biasesInfo,
-                                                                 biasesData);
+    return TransposeConvolution2dTest<ArmnnType, ArmnnBType>(workloadFactory,
+                                                             memoryManager,
+                                                             descriptor,
+                                                             inputInfo,
+                                                             inputData,
+                                                             outputInfo,
+                                                             expectedOutputData,
+                                                             weightsInfo,
+                                                             weightsData,
+                                                             biasesInfo,
+                                                             biasesData);
 }
 
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 4> PaddedTransposeConvolution2dTestImpl(
+LayerTestResult<T, 4> PaddedTransposeConvolution2dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool biasEnabled,
@@ -366,41 +377,28 @@ LayerTestResult<T, 4> PaddedTransposeConvolution2dTestImpl(
     // swizzle data if needed
     if (layout == armnn::DataLayout::NHWC)
     {
-        constexpr size_t dataTypeSize = sizeof(float);
-        const armnn::PermutationVector nchwToNhwc = { 0, 3, 1, 2 };
-
-        std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputInfo.GetShape(), nchwToNhwc, inputData.data(), tmp.data(), dataTypeSize);
-        inputData = tmp;
-
-        tmp.resize(weightsData.size());
-        armnnUtils::Permute(weightsInfo.GetShape(), nchwToNhwc, weightsData.data(), tmp.data(), dataTypeSize);
-        weightsData = tmp;
-
-        tmp.resize(expectedOutputData.size());
-        armnnUtils::Permute(outputInfo.GetShape(), nchwToNhwc, expectedOutputData.data(), tmp.data(), dataTypeSize);
-        expectedOutputData = tmp;
+        SwizzleData(inputInfo, inputData, outputInfo, expectedOutputData, weightsInfo, weightsData);
     }
 
-    return TransposeConvolution2dTestImpl<ArmnnType, ArmnnBType>(workloadFactory,
-                                                                 memoryManager,
-                                                                 descriptor,
-                                                                 inputInfo,
-                                                                 inputData,
-                                                                 outputInfo,
-                                                                 expectedOutputData,
-                                                                 weightsInfo,
-                                                                 weightsData,
-                                                                 biasesInfo,
-                                                                 biasesData);
+    return TransposeConvolution2dTest<ArmnnType, ArmnnBType>(workloadFactory,
+                                                             memoryManager,
+                                                             descriptor,
+                                                             inputInfo,
+                                                             inputData,
+                                                             outputInfo,
+                                                             expectedOutputData,
+                                                             weightsInfo,
+                                                             weightsData,
+                                                             biasesInfo,
+                                                             biasesData);
 }
 
- template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
- LayerTestResult<T, 4> StridedTransposeConvolution2dTestImpl(
-     armnn::IWorkloadFactory& workloadFactory,
-     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-     bool biasEnabled,
-     const armnn::DataLayout layout)
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedTransposeConvolution2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout)
 {
     using namespace armnn;
 
@@ -468,31 +466,96 @@ LayerTestResult<T, 4> PaddedTransposeConvolution2dTestImpl(
     // swizzle data if needed
     if (layout == armnn::DataLayout::NHWC)
     {
-        constexpr size_t dataTypeSize = sizeof(float);
-        const armnn::PermutationVector nchwToNhwc = { 0, 3, 1, 2 };
-
-        std::vector<float> tmp(inputData.size());
-        armnnUtils::Permute(inputInfo.GetShape(), nchwToNhwc, inputData.data(), tmp.data(), dataTypeSize);
-        inputData = tmp;
-
-        tmp.resize(weightsData.size());
-        armnnUtils::Permute(weightsInfo.GetShape(), nchwToNhwc, weightsData.data(), tmp.data(), dataTypeSize);
-        weightsData = tmp;
-
-        tmp.resize(expectedOutputData.size());
-        armnnUtils::Permute(outputInfo.GetShape(), nchwToNhwc, expectedOutputData.data(), tmp.data(), dataTypeSize);
-        expectedOutputData = tmp;
+        SwizzleData(inputInfo, inputData, outputInfo, expectedOutputData, weightsInfo, weightsData);
     }
 
-    return TransposeConvolution2dTestImpl<ArmnnType, ArmnnBType>(workloadFactory,
-                                                                memoryManager,
-                                                                descriptor,
-                                                                inputInfo,
-                                                                inputData,
-                                                                outputInfo,
-                                                                expectedOutputData,
-                                                                weightsInfo,
-                                                                weightsData,
-                                                                biasesInfo,
-                                                                biasesData);
+    return TransposeConvolution2dTest<ArmnnType, ArmnnBType>(workloadFactory,
+                                                             memoryManager,
+                                                             descriptor,
+                                                             inputInfo,
+                                                             inputData,
+                                                             outputInfo,
+                                                             expectedOutputData,
+                                                             weightsInfo,
+                                                             weightsData,
+                                                             biasesInfo,
+                                                             biasesData);
+}
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> MultiChannelTransposeConvolution2dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout)
+{
+    using namespace armnn;
+
+    TensorShape inputShape   = MakeTensorShape(1, 1, 2, 2, layout);
+    TensorShape outputShape  = MakeTensorShape(1, 2, 5, 5, layout);
+
+    TensorShape weightsShape = MakeTensorShape(1, 2, 3, 3, layout);
+    TensorShape biasesShape  = { 2 };
+
+    TensorInfo inputInfo(inputShape, ArmnnType);
+    TensorInfo outputInfo(outputShape, ArmnnType);
+    TensorInfo weightsInfo(weightsShape, ArmnnType);
+    TensorInfo biasesInfo(biasesShape, ArmnnBType);
+
+    std::vector<float> inputData =
+    {
+        1.f, 2.f,
+        3.f, 4.f,
+    };
+
+    std::vector<float> weightsData =
+    {
+         1.f,  3.f,  5.f,
+         7.f,  9.f, 11.f,
+        13.f, 15.f, 17.f,
+
+         2.f,  4.f,  6.f,
+         8.f, 10.f, 12.f,
+        14.f, 16.f, 18.f
+    };
+
+    std::vector<float> biasesData = { -1.5f, -2.0f };
+
+    std::vector<float> expectedOutputData =
+    {
+        -0.5f,  1.5f,   5.5f,  4.5f,  8.5f,
+         5.5f,  7.5f,  23.5f, 16.5f, 20.5f,
+        14.5f, 22.5f,  60.5f, 40.5f, 52.5f,
+        19.5f, 25.5f,  59.5f, 34.5f, 42.5f,
+        37.5f, 43.5f, 101.5f, 58.5f, 66.5f,
+
+         0.0f,  2.0f,   8.0f,  6.0f, 10.0f,
+         6.0f,  8.0f,  26.0f, 18.0f, 22.0f,
+        18.0f, 26.0f,  70.0f, 46.0f, 58.0f,
+        22.0f, 28.0f,  66.0f, 38.0f, 46.0f,
+        40.0f, 46.0f, 108.0f, 62.0f, 70.0f,
+    };
+
+    TransposeConvolution2dDescriptor descriptor;
+    descriptor.m_StrideX     = 2;
+    descriptor.m_StrideY     = 2;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = layout;
+
+    // swizzle data if needed
+    if (layout == armnn::DataLayout::NHWC)
+    {
+        SwizzleData(inputInfo, inputData, outputInfo, expectedOutputData, weightsInfo, weightsData);
+    }
+
+    return TransposeConvolution2dTest<ArmnnType, ArmnnBType>(workloadFactory,
+                                                             memoryManager,
+                                                             descriptor,
+                                                             inputInfo,
+                                                             inputData,
+                                                             outputInfo,
+                                                             expectedOutputData,
+                                                             weightsInfo,
+                                                             weightsData,
+                                                             biasesInfo,
+                                                             biasesData);
 }

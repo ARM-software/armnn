@@ -1612,24 +1612,6 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
                                       "Reference TransposeConvolution2d: biases is not a supported type.");
     }
 
-    // NOTE: Temporary restriction; should be removed as soon as support for channel
-    // multiplier different from 1 (input channels != output channels) has been added
-    struct ChannelsAreEqual : public Rule
-    {
-        ChannelsAreEqual(const TensorInfo& input,
-                         const TensorInfo& output,
-                         const TransposeConvolution2dDescriptor& descriptor)
-        {
-            armnnUtils::DataLayoutIndexed dataLayoutIndexed(descriptor.m_DataLayout);
-            const unsigned int channelsIndex = dataLayoutIndexed.GetChannelsIndex();
-
-            m_Res = (input.GetShape()[channelsIndex] == output.GetShape()[channelsIndex]);
-        }
-    };
-
-    supported &= CheckSupportRule(ChannelsAreEqual(input, output, descriptor), reasonIfUnsupported,
-                                  "Reference TransposeConvolution2d: inputChannels != outputChannels");
-
     return supported;
 }
 

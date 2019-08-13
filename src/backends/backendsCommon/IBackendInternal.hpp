@@ -108,6 +108,9 @@ public:
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
         const IMemoryManagerSharedPtr& memoryManager = nullptr) const = 0;
 
+    virtual IWorkloadFactoryPtr CreateWorkloadFactory(
+        class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const;
+
     virtual IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const;
 
     virtual ILayerSupportSharedPtr GetLayerSupport() const = 0;

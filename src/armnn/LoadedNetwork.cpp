@@ -99,7 +99,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
             {
                 backend->RegisterTensorHandleFactories(m_TensorHandleFactoryRegistry);
 
-                auto workloadFactory = backend->CreateWorkloadFactory();
+                auto workloadFactory = backend->CreateWorkloadFactory(m_TensorHandleFactoryRegistry);
                 m_WorkloadFactories.emplace(
                     std::make_pair(backendId, std::make_pair(std::move(workloadFactory), nullptr)));
             }
@@ -491,6 +491,7 @@ void LoadedNetwork::AllocateWorkingMemory()
             memoryManager->Acquire();
         }
     }
+    m_TensorHandleFactoryRegistry.AquireMemory();
     m_IsWorkingMemAllocated = true;
 }
 
@@ -510,6 +511,7 @@ void LoadedNetwork::FreeWorkingMemory()
             memoryManager->Release();
         }
     }
+    m_TensorHandleFactoryRegistry.ReleaseMemory();
     m_IsWorkingMemAllocated = false;
 }
 

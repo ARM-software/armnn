@@ -33,6 +33,12 @@ IMemoryManagerUniquePtr IBackendInternal::CreateMemoryManager() const
     return IMemoryManagerUniquePtr();
 }
 
+IBackendInternal::IWorkloadFactoryPtr IBackendInternal::CreateWorkloadFactory(
+    class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const
+{
+    return IWorkloadFactoryPtr{};
+}
+
 IBackendInternal::IBackendContextPtr IBackendInternal::CreateBackendContext(const IRuntime::CreationOptions&) const
 {
     return IBackendContextPtr{};

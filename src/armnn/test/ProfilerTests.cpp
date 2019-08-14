@@ -158,6 +158,10 @@ BOOST_AUTO_TEST_CASE(ProfilingMacros)
     profiler->EnableProfiling(false);
 }
 
+#if defined(ARMCOMPUTEREF_ENABLED)
+
+// This test unit needs the reference backend, it's not available if the reference backend is not built
+
 BOOST_AUTO_TEST_CASE(RuntimeLoadNetwork)
 {
     // Get a reference to the profiler manager.
@@ -184,6 +188,8 @@ BOOST_AUTO_TEST_CASE(RuntimeLoadNetwork)
     // Check that the profiler has been un-registered for this thread.
     BOOST_TEST(!profilerManager.GetProfiler());
 }
+
+#endif
 
 BOOST_AUTO_TEST_CASE(WriteEventResults)
 {

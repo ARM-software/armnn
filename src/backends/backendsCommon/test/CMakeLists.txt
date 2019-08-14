@@ -37,7 +37,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     MockBackend.cpp
     MockBackend.hpp
     MockBackendId.hpp
-    OptimizedNetworkTests.cpp
     OptimizeSubgraphViewTests.cpp
     OptimizationViewsTests.cpp
     PermuteTestImpl.hpp
@@ -56,10 +55,16 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     StridedSliceTestImpl.hpp
     TensorCopyUtils.cpp
     TensorCopyUtils.hpp
-    WorkloadDataValidation.cpp
     WorkloadFactoryHelper.hpp
     WorkloadTestUtils.hpp
 )
+
+if (ARMCOMPUTEREF)
+    list(APPEND armnnBackendsCommonUnitTests_sources
+        OptimizedNetworkTests.cpp
+        WorkloadDataValidation.cpp
+        )
+endif()
 
 add_library(armnnBackendsCommonUnitTests OBJECT ${armnnBackendsCommonUnitTests_sources})
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)

@@ -4,5 +4,11 @@
 #
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/backends/reference)
-list(APPEND armnnLibraries armnnRefBackend armnnRefBackendWorkloads)
-list(APPEND armnnUnitTestLibraries armnnRefBackendUnitTests)
+list(APPEND armnnLibraries armnnRefBackend)
+
+if(ARMCOMPUTEREF)
+    list(APPEND armnnLibraries armnnRefBackendWorkloads)
+    list(APPEND armnnUnitTestLibraries armnnRefBackendUnitTests)
+else()
+    message("Reference backend is disabled")
+endif()

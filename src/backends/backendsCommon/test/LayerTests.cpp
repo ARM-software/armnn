@@ -20,8 +20,6 @@
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <reference/workloads/RefWorkloads.hpp>
-
 #include <algorithm>
 #include <boost/cast.hpp>
 
@@ -2088,6 +2086,10 @@ LayerTestResult<int16_t, 3> CopyViaSplitterInt16Test(
     return CopyViaSplitterTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
+#if defined(ARMCOMPUTEREF_ENABLED)
+
+// The LSTM test units are run only for the reference backend at the moment
+
 void LstmUtilsZeroVectorTest()
 {
     armnn::TensorInfo inputDesc({4}, armnn::DataType::Float32);
@@ -2234,6 +2236,7 @@ void LstmUtilsVectorBatchVectorAddTest()
             vecSize, batchSize, expectedOutput);
 }
 
+#endif
 
 LayerTestResult<float, 2> LstmLayerFloat32WithCifgWithPeepholeNoProjectionTest(
     armnn::IWorkloadFactory& workloadFactory,

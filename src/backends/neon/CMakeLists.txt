@@ -12,13 +12,14 @@ if(ARMCOMPUTENEON)
         NeonInterceptorScheduler.cpp
         NeonLayerSupport.cpp
         NeonLayerSupport.hpp
-        NeonWorkloadFactory.cpp
-        NeonWorkloadFactory.hpp
+        NeonRegistryInitializer.cpp
         NeonTensorHandle.hpp
         NeonTensorHandleFactory.cpp
         NeonTensorHandleFactory.hpp
         NeonTimer.hpp
         NeonTimer.cpp
+        NeonWorkloadFactory.cpp
+        NeonWorkloadFactory.hpp
     )
 
     add_subdirectory(workloads)

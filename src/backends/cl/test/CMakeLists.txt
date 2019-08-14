@@ -10,13 +10,18 @@ list(APPEND armnnClBackendUnitTests_sources
     ClJsonPrinterTests.cpp
     ClLayerSupportTests.cpp
     ClLayerTests.cpp
-    ClMemCopyTests.cpp
     ClOptimizedNetworkTests.cpp
     ClRuntimeTests.cpp
     ClWorkloadFactoryHelper.hpp
     Fp16SupportTest.cpp
     OpenClTimerTest.cpp
 )
+
+if (ARMCOMPUTEREF)
+    list(APPEND armnnClBackendUnitTests_sources
+        ClMemCopyTests.cpp
+        )
+endif()
 
 add_library(armnnClBackendUnitTests OBJECT ${armnnClBackendUnitTests_sources})
 target_include_directories(armnnClBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)

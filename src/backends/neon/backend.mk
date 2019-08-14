@@ -7,7 +7,7 @@
 # in the Android build and it is picked up by the Android.mk
 # file in the root of ArmNN
 
-# The variable to enable/disable the NEON backend (ARMNN_COMPUTE_NEON_ENABLED) is declared in android-nn-driver/Android.mk
+# The variable to enable/disable the NEON backend (ARMNN_COMPUTE_NEON_ENABLED is declared in android-nn-driver/Android.mk)
 ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 
 # ARMNN_COMPUTE_NEON_ENABLED == 1
@@ -17,6 +17,7 @@ BACKEND_SOURCES := \
         NeonBackend.cpp \
         NeonInterceptorScheduler.cpp \
         NeonLayerSupport.cpp \
+        NeonRegistryInitializer.cpp \
         NeonTensorHandleFactory.cpp \
         NeonTimer.cpp \
         NeonWorkloadFactory.cpp \
@@ -71,7 +72,7 @@ endif
 # in the Android unit test build (armnn-tests) and it is picked
 # up by the Android.mk file in the root of ArmNN
 
-# The variable to enable/disable the NEON backend (ARMNN_COMPUTE_NEON_ENABLED) is declared in android-nn-driver/Android.mk
+# The variable to enable/disable the NEON backend (ARMNN_COMPUTE_NEON_ENABLED is declared in android-nn-driver/Android.mk)
 ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 
 # ARMNN_COMPUTE_NEON_ENABLED == 1
@@ -83,10 +84,14 @@ BACKEND_TEST_SOURCES := \
         test/NeonJsonPrinterTests.cpp \
         test/NeonLayerSupportTests.cpp \
         test/NeonLayerTests.cpp \
-        test/NeonMemCopyTests.cpp \
         test/NeonOptimizedNetworkTests.cpp \
         test/NeonRuntimeTests.cpp \
         test/NeonTimerTest.cpp
+
+ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+BACKEND_TEST_SOURCES += \
+        test/NeonMemCopyTests.cpp
+endif # ARMNN_COMPUTE_REF_ENABLED == 1
 
 else
 

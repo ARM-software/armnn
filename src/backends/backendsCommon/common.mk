@@ -33,5 +33,9 @@ COMMON_TEST_SOURCES := \
     test/CommonTestUtils.cpp \
     test/JsonPrinterTestImpl.cpp \
     test/LayerTests.cpp \
-    test/TensorCopyUtils.cpp \
+    test/TensorCopyUtils.cpp
+
+ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+COMMON_TEST_SOURCES += \
     test/WorkloadDataValidation.cpp
+endif # ARMNN_COMPUTE_REF_ENABLED == 1

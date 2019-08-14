@@ -144,7 +144,7 @@ if(BUILD_TF_PARSER)
     target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
 endif()
 
-if(BUILD_ARMNN_QUANTIZER)
+if(BUILD_ARMNN_QUANTIZER AND ARMCOMPUTEREF)
     if(NOT BUILD_ARMNN_SERIALIZER)
         message(ERROR, "In order to build the ArmNN Quantization Tool you must set BUILD_ARMNN_SERIALIZER = YES")
     endif()
@@ -486,7 +486,6 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/ConstTensorLayerVisitor.cpp
         src/armnn/test/CreateWorkload.hpp
         src/armnn/test/CsvReaderTest.cpp
-        src/armnn/test/DebugCallbackTest.cpp
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/ExecutionFrameTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp
@@ -504,9 +503,6 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/OptionalTest.cpp
         src/armnn/test/ProfilerTests.cpp
         src/armnn/test/ProfilingEventTest.cpp
-        src/armnn/test/QuantizerTest.cpp
-        src/armnn/test/RuntimeTests.cpp
-        src/armnn/test/RuntimeTests.hpp
         src/armnn/test/SubgraphViewTests.cpp
         src/armnn/test/TensorHandleStrategyTest.cpp
         src/armnn/test/TensorHelpers.hpp
@@ -529,7 +525,16 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/ProfilingTests.cpp
         )
 
-    if(BUILD_TF_PARSER)
+    if(ARMCOMPUTEREF)
+        list(APPEND unittest_sources
+            src/armnn/test/DebugCallbackTest.cpp
+            src/armnn/test/QuantizerTest.cpp
+            src/armnn/test/RuntimeTests.cpp
+            src/armnn/test/RuntimeTests.hpp
+            )
+    endif()
+
+    if(BUILD_TF_PARSER AND ARMCOMPUTEREF)
         list(APPEND unittest_sources
             src/armnnTfParser/test/Activations.cpp
             src/armnnTfParser/test/Addition.cpp
@@ -571,12 +576,12 @@ if(BUILD_UNIT_TESTS)
             src/armnnTfParser/test/Squeeze.cpp
             src/armnnTfParser/test/Sub.cpp
             )
+
     endif()
 
-    if(BUILD_TF_LITE_PARSER)
+    if(BUILD_TF_LITE_PARSER AND ARMCOMPUTEREF)
         enable_language(ASM)
         list(APPEND unittest_sources
-             src/armnnTfLiteParser/test/ParserFlatbuffersFixture.hpp
              src/armnnTfLiteParser/test/Activations.cpp
              src/armnnTfLiteParser/test/Addition.cpp
              src/armnnTfLiteParser/test/AvgPool2D.cpp
@@ -615,9 +620,10 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Schema.s
              )
         set_source_files_properties(src/armnnTfLiteParser/test/Schema.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
+
     endif()
 
-    if(BUILD_CAFFE_PARSER)
+    if(BUILD_CAFFE_PARSER AND ARMCOMPUTEREF)
         list(APPEND unittest_sources
             src/armnnCaffeParser/test/TestAdd.cpp
             src/armnnCaffeParser/test/TestConcat.cpp
@@ -632,13 +638,31 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
-    if(BUILD_ARMNN_QUANTIZER)
+    if(BUILD_ONNX_PARSER AND ARMCOMPUTEREF)
+        list(APPEND unittest_sources
+            src/armnnOnnxParser/test/Constructor.cpp
+            src/armnnOnnxParser/test/CreateNetwork.cpp
+            src/armnnOnnxParser/test/ProtoxtFixture.cpp
+            src/armnnOnnxParser/test/Const.cpp
+            src/armnnOnnxParser/test/Pooling.cpp
+            src/armnnOnnxParser/test/Reshape.cpp
+            src/armnnOnnxParser/test/Relu.cpp
+            src/armnnOnnxParser/test/Conv2D.cpp
+            src/armnnOnnxParser/test/Addition.cpp
+            src/armnnOnnxParser/test/FullyConnected.cpp
+            src/armnnOnnxParser/test/GetInputsOutputs.cpp
+            src/armnnOnnxParser/test/BatchNorm.cpp
+            src/armnnOnnxParser/test/DepthConv.cpp
+            )
+    endif()
+
+    if(BUILD_ARMNN_QUANTIZER AND ARMCOMPUTEREF)
         list(APPEND unittest_sources
              src/armnnQuantizer/test/QuantizationDataSetTests.cpp
              )
     endif()
 
-    if(BUILD_ARMNN_SERIALIZER)
+    if(BUILD_ARMNN_SERIALIZER AND ARMCOMPUTEREF)
         enable_language(ASM)
         list(APPEND unittest_sources
             src/armnnSerializer/test/ActivationSerializationTests.cpp
@@ -672,24 +696,6 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/SchemaSerialize.s
             )
         set_source_files_properties(src/armnnDeserializer/test/SchemaSerialize.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
-    endif()
-
-    if(BUILD_ONNX_PARSER)
-        list(APPEND unittest_sources
-            src/armnnOnnxParser/test/Constructor.cpp
-            src/armnnOnnxParser/test/CreateNetwork.cpp
-            src/armnnOnnxParser/test/ProtoxtFixture.cpp
-            src/armnnOnnxParser/test/Const.cpp
-            src/armnnOnnxParser/test/Pooling.cpp
-            src/armnnOnnxParser/test/Reshape.cpp
-            src/armnnOnnxParser/test/Relu.cpp
-            src/armnnOnnxParser/test/Conv2D.cpp
-            src/armnnOnnxParser/test/Addition.cpp
-            src/armnnOnnxParser/test/FullyConnected.cpp
-            src/armnnOnnxParser/test/GetInputsOutputs.cpp
-            src/armnnOnnxParser/test/BatchNorm.cpp
-            src/armnnOnnxParser/test/DepthConv.cpp
-            )
     endif()
 
     foreach(lib ${armnnUnitTestLibraries})
@@ -731,13 +737,13 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(UnitTests armnnCaffeParser)
     endif()
 
-    if(BUILD_ARMNN_SERIALIZER)
+    if(BUILD_ARMNN_SERIALIZER AND ARMCOMPUTEREF)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnSerializer)
     endif()
 
-    if(BUILD_ARMNN_QUANTIZER)
+    if(BUILD_ARMNN_QUANTIZER AND ARMCOMPUTEREF)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnQuantizer)
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnQuantizer armnnSerializer)
@@ -750,7 +756,7 @@ if(BUILD_UNIT_TESTS)
     addDllCopyCommands(UnitTests)
 endif()
 
-if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER OR BUILD_CAFFE_PARSER))
+if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER OR BUILD_CAFFE_PARSER) AND ARMCOMPUTEREF)
     set(ArmnnConverter_sources
         src/armnnConverter/ArmnnConverter.cpp)
 

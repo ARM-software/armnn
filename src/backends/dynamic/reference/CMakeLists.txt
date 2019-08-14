@@ -14,7 +14,8 @@ set(RefBackendPath ${PROJECT_SOURCE_DIR}/src/backends/reference)
 
 # Source files of the backend, taken directly from the source tree
 file(GLOB RefBackendBaseFiles ${RefBackendPath}/*.cpp)
-set(RefBackendFiles ${RefBackendBaseFiles})
+file(GLOB RefBackendWorloadFiles ${RefBackendPath}/workloads/*.cpp)
+set(RefBackendFiles ${RefBackendBaseFiles} ${RefBackendWorloadFiles})
 
 # Remove the file that contains the static backend registration
 list(REMOVE_ITEM RefBackendFiles ${RefBackendPath}/RefRegistryInitializer.cpp)

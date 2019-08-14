@@ -9,12 +9,17 @@ list(APPEND armnnNeonBackendUnitTests_sources
     NeonJsonPrinterTests.cpp
     NeonLayerSupportTests.cpp
     NeonLayerTests.cpp
-    NeonMemCopyTests.cpp
     NeonOptimizedNetworkTests.cpp
     NeonRuntimeTests.cpp
     NeonTimerTest.cpp
     NeonWorkloadFactoryHelper.hpp
 )
+
+if (ARMCOMPUTEREF)
+    list(APPEND armnnNeonBackendUnitTests_sources
+        NeonMemCopyTests.cpp
+        )
+endif()
 
 add_library(armnnNeonBackendUnitTests OBJECT ${armnnNeonBackendUnitTests_sources})
 target_include_directories(armnnNeonBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)

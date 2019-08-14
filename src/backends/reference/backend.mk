@@ -7,6 +7,12 @@
 # in the Android build and it is picked up by the Android.mk
 # file in the root of ArmNN
 
+# The variable to enable/disable the reference backend (ARMNN_COMPUTE_REF_ENABLED is declared in android-nn-driver/Android.mk)
+ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+
+# ARMNN_COMPUTE_REF_ENABLED == 1
+# Include the source files for the reference backend
+
 BACKEND_SOURCES := \
         RefBackend.cpp \
         RefLayerSupport.cpp \
@@ -78,10 +84,24 @@ BACKEND_SOURCES := \
         workloads/Softmax.cpp \
         workloads/Splitter.cpp \
         workloads/TransposeConvolution2d.cpp
+else
+
+# ARMNN_COMPUTE_REF_ENABLED == 0
+# No source file will be compiled for the reference backend
+
+BACKEND_SOURCES :=
+
+endif
 
 # BACKEND_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked
 # up by the Android.mk file in the root of ArmNN
+
+# The variable to enable/disable the CL backend (ARMNN_COMPUTE_REF_ENABLED is declared in android-nn-driver/Android.mk)
+ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+
+# ARMNN_COMPUTE_REF_ENABLED == 1
+# Include the source files for the CL backend tests
 
 BACKEND_TEST_SOURCES := \
         test/RefCreateWorkloadTests.cpp \
@@ -93,3 +113,11 @@ BACKEND_TEST_SOURCES := \
         test/RefMemoryManagerTests.cpp \
         test/RefOptimizedNetworkTests.cpp \
         test/RefRuntimeTests.cpp
+else
+
+# ARMNN_COMPUTE_REF_ENABLED == 0
+# No source file will be compiled for the reference backend tests
+
+BACKEND_TEST_SOURCES :=
+
+endif

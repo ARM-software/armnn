@@ -14,6 +14,7 @@ if(ARMCOMPUTECL)
         ClContextControl.hpp
         ClLayerSupport.cpp
         ClLayerSupport.hpp
+        ClRegistryInitializer.cpp
         ClTensorHandle.hpp
         ClTensorHandleFactory.cpp
         ClTensorHandleFactory.hpp

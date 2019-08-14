@@ -710,12 +710,18 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
     BOOST_TEST(validDataPointers);
 }
 
+#if defined(ARMCOMPUTEREF_ENABLED)
+
+// This test unit needs the reference backend, it's not available if the reference backend is not built
+
 BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsNeon)
 {
     NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
     CreateMemCopyWorkloads<IAclTensorHandle>(factory);
 }
+
+#endif
 
 template <typename L2NormalizationWorkloadType, typename armnn::DataType DataType>
 static void NeonCreateL2NormalizationWorkloadTest(DataLayout dataLayout)

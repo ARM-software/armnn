@@ -686,6 +686,10 @@ BOOST_AUTO_TEST_CASE(CreateSingleOutputMultipleInputs)
     BOOST_TEST(validDataPointers);
 }
 
+#if defined(ARMCOMPUTEREF_ENABLED)
+
+// This test unit needs the reference backend, it's not available if the reference backend is not built
+
 BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsCl)
 {
     ClWorkloadFactory factory =
@@ -693,6 +697,8 @@ BOOST_AUTO_TEST_CASE(CreateMemCopyWorkloadsCl)
 
     CreateMemCopyWorkloads<IClTensorHandle>(factory);
 }
+
+#endif
 
 template <typename L2NormalizationWorkloadType, typename armnn::DataType DataType>
 static void ClL2NormalizationWorkloadTest(DataLayout dataLayout)

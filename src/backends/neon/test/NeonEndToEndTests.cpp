@@ -25,6 +25,10 @@ BOOST_AUTO_TEST_CASE(ConstantUsage_Neon_Float32)
     BOOST_TEST(ConstantUsageFloat32Test(defaultBackends));
 }
 
+#if defined(ARMCOMPUTEREF_ENABLED)
+
+// This test unit needs the reference backend, it's not available if the reference backend is not built
+
 BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
 {
     using namespace armnn;
@@ -58,6 +62,8 @@ BOOST_AUTO_TEST_CASE(FallbackToCpuRef)
     NetworkId netId;
     BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
 }
+
+#endif
 
 BOOST_AUTO_TEST_CASE(NeonGreaterSimpleEndToEndTest)
 {

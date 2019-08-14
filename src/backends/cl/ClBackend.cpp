@@ -25,21 +25,6 @@
 namespace armnn
 {
 
-namespace
-{
-
-static BackendRegistry::StaticRegistryInitializer g_RegisterHelper
-{
-    BackendRegistryInstance(),
-    ClBackend::GetIdStatic(),
-    []()
-    {
-        return IBackendInternalUniquePtr(new ClBackend);
-    }
-};
-
-}
-
 const BackendId& ClBackend::GetIdStatic()
 {
     static const BackendId s_Id{ClBackendId()};

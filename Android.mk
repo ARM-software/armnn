@@ -49,11 +49,13 @@ ARMNN_BACKEND_SOURCES :=
 #
 $(foreach mkPath,$(ARMNN_BACKEND_COMMON_MAKEFILE_DIRS),\
         $(eval include $(LOCAL_PATH)/$(mkPath)/common.mk)\
-        $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(COMMON_SOURCES))))
+        $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES)\
+        $(patsubst %,$(mkPath)/%,$(COMMON_SOURCES))))
 
 $(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
         $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
-        $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES) $(patsubst %,$(mkPath)/%,$(BACKEND_SOURCES))))
+        $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES)\
+        $(patsubst %,$(mkPath)/%,$(BACKEND_SOURCES))))
 
 # Mark source files as dependent on Android.mk and backend makefiles
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk \
@@ -76,6 +78,29 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_SOURCES) \
+        src/armnn/BackendHelper.cpp \
+        src/armnn/Descriptors.cpp \
+        src/armnn/Exceptions.cpp \
+        src/armnn/Graph.cpp \
+        src/armnn/InternalTypes.cpp \
+        src/armnn/JsonPrinter.cpp \
+        src/armnn/Layer.cpp \
+        src/armnn/LayerSupport.cpp \
+        src/armnn/LoadedNetwork.cpp \
+        src/armnn/Network.cpp \
+        src/armnn/NetworkUtils.cpp \
+        src/armnn/Observable.cpp \
+        src/armnn/Optimizer.cpp \
+        src/armnn/ProfilingEvent.cpp \
+        src/armnn/Profiling.cpp \
+        src/armnn/Runtime.cpp \
+        src/armnn/SerializeLayerParameters.cpp \
+        src/armnn/SubgraphView.cpp \
+        src/armnn/SubgraphViewSelector.cpp \
+        src/armnn/Tensor.cpp \
+        src/armnn/TypesUtils.cpp \
+        src/armnn/Utils.cpp \
+        src/armnn/WallClockTimer.cpp \
         src/armnnUtils/CsvReader.cpp \
         src/armnnUtils/DataLayoutIndexed.cpp \
         src/armnnUtils/DotSerializer.cpp \
@@ -138,30 +163,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/StridedSliceLayer.cpp \
         src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/layers/SwitchLayer.cpp \
-        src/armnn/layers/TransposeConvolution2dLayer.cpp \
-        src/armnn/BackendHelper.cpp \
-        src/armnn/Descriptors.cpp \
-        src/armnn/Exceptions.cpp \
-        src/armnn/Graph.cpp \
-        src/armnn/Optimizer.cpp \
-        src/armnn/Runtime.cpp \
-        src/armnn/SerializeLayerParameters.cpp \
-        src/armnn/SubgraphView.cpp \
-        src/armnn/SubgraphViewSelector.cpp \
-        src/armnn/InternalTypes.cpp \
-        src/armnn/Layer.cpp \
-        src/armnn/LoadedNetwork.cpp \
-        src/armnn/Network.cpp \
-        src/armnn/NetworkUtils.cpp \
-        src/armnn/WallClockTimer.cpp \
-        src/armnn/ProfilingEvent.cpp \
-        src/armnn/Profiling.cpp \
-        src/armnn/JsonPrinter.cpp \
-        src/armnn/Tensor.cpp \
-        src/armnn/TypesUtils.cpp \
-        src/armnn/Utils.cpp \
-        src/armnn/LayerSupport.cpp \
-        src/armnn/Observable.cpp
+        src/armnn/layers/TransposeConvolution2dLayer.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         armnn-arm_compute \
@@ -188,6 +190,11 @@ ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 LOCAL_CFLAGS += \
         -DARMCOMPUTENEON_ENABLED
 endif # ARMNN_COMPUTE_NEON_ENABLED == 1
+# The variable to enable/disable the REFERENCE backend (ARMNN_COMPUTE_REF_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+LOCAL_CFLAGS += \
+        -DARMCOMPUTEREF_ENABLED
+endif # ARMNN_COMPUTE_REF_ENABLED == 1
 
 ifeq ($(Q_OR_LATER),1)
 LOCAL_CFLAGS += \
@@ -256,6 +263,11 @@ ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 LOCAL_CFLAGS += \
         -DARMCOMPUTENEON_ENABLED
 endif # ARMNN_COMPUTE_NEON_ENABLED == 1
+# The variable to enable/disable the REFERENCE backend (ARMNN_COMPUTE_REF_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+LOCAL_CFLAGS += \
+        -DARMCOMPUTEREF_ENABLED
+endif # ARMNN_COMPUTE_REF_ENABLED == 1
 
 ifeq ($(Q_OR_LATER),1)
 LOCAL_CFLAGS += \
@@ -264,22 +276,27 @@ endif # PLATFORM_VERSION == Q or later
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_TEST_SOURCES) \
-        src/armnn/test/UnitTests.cpp \
         src/armnn/test/EndToEndTest.cpp \
-        src/armnn/test/UtilsTests.cpp \
         src/armnn/test/GraphTests.cpp \
         src/armnn/test/GraphUtils.cpp \
         src/armnn/test/InferOutputTests.cpp \
-        src/armnn/test/RuntimeTests.cpp \
-        src/armnn/test/SubgraphViewTests.cpp \
-        src/armnn/test/TensorTest.cpp \
-        src/armnn/test/NetworkTests.cpp \
         src/armnn/test/InstrumentTests.cpp \
-        src/armnn/test/ProfilingEventTest.cpp \
+        src/armnn/test/NetworkTests.cpp \
         src/armnn/test/ObservableTest.cpp \
         src/armnn/test/OptionalTest.cpp \
+        src/armnn/test/ProfilingEventTest.cpp \
+        src/armnn/test/SubgraphViewTests.cpp \
+        src/armnn/test/TensorHandleStrategyTest.cpp \
+        src/armnn/test/TensorTest.cpp \
         src/armnn/test/TestUtils.cpp \
-        src/armnn/test/TensorHandleStrategyTest.cpp
+        src/armnn/test/UnitTests.cpp \
+        src/armnn/test/UtilsTests.cpp
+
+ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+LOCAL_SRC_FILES += \
+        src/armnn/test/DebugCallbackTest.cpp \
+        src/armnn/test/RuntimeTests.cpp
+endif
 
 LOCAL_STATIC_LIBRARIES := \
         libneuralnetworks_common \

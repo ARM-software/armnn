@@ -7,7 +7,7 @@
 # in the Android build and it is picked up by the Android.mk
 # file in the root of ArmNN
 
-# The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
+# The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED is declared in android-nn-driver/Android.mk)
 ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 
 # ARMNN_COMPUTE_CL_ENABLED == 1
@@ -18,6 +18,7 @@ BACKEND_SOURCES := \
         ClBackendContext.cpp \
         ClContextControl.cpp \
         ClLayerSupport.cpp \
+        ClRegistryInitializer.cpp \
         ClTensorHandleFactory.cpp \
         ClWorkloadFactory.cpp \
         OpenClTimer.cpp \
@@ -74,7 +75,7 @@ endif
 # in the Android unit test build (armnn-tests) and it is picked
 # up by the Android.mk file in the root of ArmNN
 
-# The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
+# The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED is declared in android-nn-driver/Android.mk)
 ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 
 # ARMNN_COMPUTE_CL_ENABLED == 1
@@ -86,11 +87,16 @@ BACKEND_TEST_SOURCES := \
         test/ClJsonPrinterTests.cpp \
         test/ClLayerSupportTests.cpp \
         test/ClLayerTests.cpp \
-        test/ClMemCopyTests.cpp \
         test/ClOptimizedNetworkTests.cpp \
         test/ClRuntimeTests.cpp \
         test/Fp16SupportTest.cpp \
         test/OpenClTimerTest.cpp
+
+ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+BACKEND_TEST_SOURCES += \
+        test/ClMemCopyTests.cpp
+endif # ARMNN_COMPUTE_REF_ENABLED == 1
+
 else
 
 # ARMNN_COMPUTE_CL_ENABLED == 0

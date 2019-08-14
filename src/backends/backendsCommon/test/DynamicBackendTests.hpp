@@ -1344,6 +1344,10 @@ void RuntimeInvalidOverridePathTestImpl()
     BOOST_TEST(supportedBackendIds.empty());
 }
 
+#if defined(ARMCOMPUTEREF_ENABLED)
+
+// This test unit needs the reference backend, it's not available if the reference backend is not built
+
 void CreateReferenceDynamicBackendTestImpl()
 {
     using namespace armnn;
@@ -1427,3 +1431,5 @@ void CreateReferenceDynamicBackendTestImpl()
     BOOST_TEST((workload != nullptr));
     BOOST_TEST(workload.get() == boost::polymorphic_downcast<RefConvolution2dWorkload*>(workload.get()));
 }
+
+#endif

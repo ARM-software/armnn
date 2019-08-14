@@ -493,7 +493,8 @@ LayerTestResult<T, 4> MultiChannelTransposeConvolution2dTest(
     TensorShape inputShape   = MakeTensorShape(1, 1, 2, 2, layout);
     TensorShape outputShape  = MakeTensorShape(1, 2, 5, 5, layout);
 
-    TensorShape weightsShape = MakeTensorShape(1, 2, 3, 3, layout);
+    // OIHW for NCHW; OHWI for NHWC
+    TensorShape weightsShape = MakeTensorShape(2, 1, 3, 3, layout);
     TensorShape biasesShape  = { 2 };
 
     TensorInfo inputInfo(inputShape, ArmnnType);

@@ -411,6 +411,8 @@ list(APPEND armnn_sources
     src/armnn/optimizations/OptimizeInversePermutes.hpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
+    src/profiling/CommandHandlerKey.cpp
+    src/profiling/CommandHandlerKey.hpp
     third-party/half/half.hpp
     )
 
@@ -517,6 +519,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/UtilsTests.cpp
         src/armnnUtils/test/PrototxtConversionsTest.cpp
         src/armnnUtils/test/ParserHelperTest.cpp
+        src/profiling/test/ProfilingTests.cpp
         )
 
     if(BUILD_TF_PARSER)

@@ -417,22 +417,6 @@ void MemSyncQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateNumInputs(workloadInfo, "MemSyncQueueDescriptor", 1);
     ValidateNumOutputs(workloadInfo, "MemSyncQueueDescriptor" , 1);
 
-    if (workloadInfo.m_InputTensorInfos.size() != 1)
-    {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of input infos (%1%) is not 1.")
-            % workloadInfo.m_InputTensorInfos.size()));
-
-    }
-
-    if (workloadInfo.m_OutputTensorInfos.size() != 0)
-    {
-        throw InvalidArgumentException(boost::str(
-            boost::format("Number of output infos (%1%) is not 0.")
-            % workloadInfo.m_InputTensorInfos.size()));
-
-    }
-
     if (m_Inputs.size() != 1)
     {
         throw InvalidArgumentException(boost::str(

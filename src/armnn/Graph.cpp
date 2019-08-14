@@ -344,17 +344,24 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
                             {
                                 auto srcPref = srcOutputSlot.GetTensorHandleFactoryId();
                                 auto srcFactory = registry.GetFactory(srcPref);
-                                bool canExportImport = (factory->GetImportFlags() & srcFactory->GetExportFlags()) != 0;
-                                if (factory->SupportsMapUnmap() || canExportImport)
+                                if (srcFactory)
                                 {
-                                    compOutputSlot.SetTensorHandleFactory(preference);
-                                    found = true;
-                                    break;
+                                    bool canExportImport =
+                                            (factory->GetImportFlags() & srcFactory->GetExportFlags()) != 0;
+                                    if (factory->SupportsMapUnmap() || canExportImport)
+                                    {
+                                        compOutputSlot.SetTensorHandleFactory(preference);
+                                        found = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
 
-                        BOOST_ASSERT_MSG(found, "Could not find a valid TensorHandle for compatibilty layer");
+                        if (!found)
+                        {
+                            compOutputSlot.SetTensorHandleFactory(ITensorHandleFactory::LegacyFactoryId);
+                        }
                     }
                     else
                     {

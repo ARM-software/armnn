@@ -17,6 +17,7 @@ BACKEND_SOURCES := \
         NeonBackend.cpp \
         NeonInterceptorScheduler.cpp \
         NeonLayerSupport.cpp \
+        NeonTensorHandleFactory.cpp \
         NeonTimer.cpp \
         NeonWorkloadFactory.cpp \
         workloads/NeonActivationWorkload.cpp \

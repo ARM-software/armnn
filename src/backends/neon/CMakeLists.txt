@@ -15,6 +15,8 @@ if(ARMCOMPUTENEON)
         NeonWorkloadFactory.cpp
         NeonWorkloadFactory.hpp
         NeonTensorHandle.hpp
+        NeonTensorHandleFactory.cpp
+        NeonTensorHandleFactory.hpp
         NeonTimer.hpp
         NeonTimer.cpp
     )

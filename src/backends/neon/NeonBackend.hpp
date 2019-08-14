@@ -23,12 +23,19 @@ public:
     IWorkloadFactoryPtr CreateWorkloadFactory(
         const IBackendInternal::IMemoryManagerSharedPtr& memoryManager = nullptr) const override;
 
+    IWorkloadFactoryPtr CreateWorkloadFactory(
+        class TensorHandleFactoryRegistry& tensorHandleFactoryRegistry) const override;
+
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
 
     IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
 
     OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const override;
+
+    std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override;
+
+    void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) override;
 };
 
 } // namespace armnn

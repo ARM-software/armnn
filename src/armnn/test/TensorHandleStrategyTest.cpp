@@ -50,6 +50,12 @@ public:
         return nullptr;
     }
 
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                      DataLayout dataLayout) const override
+    {
+        return nullptr;
+    }
+
     const FactoryId GetId() const override { return m_Id; }
 
     bool SupportsSubTensors() const override { return true; }
@@ -78,6 +84,12 @@ public:
     }
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override
+    {
+        return nullptr;
+    }
+
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                      DataLayout dataLayout) const override
     {
         return nullptr;
     }

@@ -65,13 +65,11 @@ void TransposeConvolution2dImpl(const TransposeConvolution2dDescriptor& descript
                 unsigned int xOutputOrigin = xInput * strideX - paddingLeft;
                 unsigned int yOutputOrigin = yInput * strideY - paddingTop;
 
-                unsigned int weightsBaseIndex = 0u;
                 for (unsigned int dOutput = 0u; dOutput < outputDepth; ++dOutput)
                 {
                     for (unsigned int yWeights = 0u; yWeights < weightsHeight; ++yWeights)
                     {
-                        for (unsigned int xWeights = 0u; xWeights < weightsWidth;
-                             ++xWeights, weightsBaseIndex += inputDepth)
+                        for (unsigned int xWeights = 0u; xWeights < weightsWidth; ++xWeights)
                         {
                             unsigned int yOutput = yOutputOrigin + yWeights;
                             unsigned int xOutput = xOutputOrigin + xWeights;

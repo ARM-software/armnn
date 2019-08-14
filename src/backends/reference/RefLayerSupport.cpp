@@ -372,7 +372,7 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
 
     if (biases.has_value())
     {
-        std::array<DataType,3> biasesSupportedTypes = {
+        std::array<DataType,2> biasesSupportedTypes = {
                 DataType::Float32,
                 DataType::Signed32
         };
@@ -471,8 +471,8 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
                                   "Reference dequantize: input type not supported.");
 
-    std::array<DataType,2> supportedOutputTypes = {
-        DataType::Float32,
+    std::array<DataType,1> supportedOutputTypes = {
+        DataType::Float32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,
@@ -491,7 +491,7 @@ bool RefLayerSupport::IsDetectionPostProcessSupported(const armnn::TensorInfo& i
 {
     bool supported = true;
 
-    std::vector<DataType> supportedInputTypes =
+    std::array<DataType,3> supportedInputTypes =
     {
         DataType::Float32,
         DataType::QuantisedAsymm8,
@@ -1603,7 +1603,7 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
 
     if (biases.has_value())
     {
-        std::array<DataType,3> biasesSupportedTypes =
+        std::array<DataType,2> biasesSupportedTypes =
         {
                 DataType::Float32,
                 DataType::Signed32

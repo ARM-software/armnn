@@ -45,7 +45,7 @@ struct QuantizedLstmInputParams
     const ConstTensor* m_CellBias;
     const ConstTensor* m_OutputGateBias;
 
-    const ConstTensor& deref(const ConstTensor* tensorPtr) const
+    const ConstTensor& Deref(const ConstTensor* tensorPtr) const
     {
         if (tensorPtr != nullptr)
         {
@@ -55,64 +55,64 @@ struct QuantizedLstmInputParams
         throw InvalidArgumentException("QuantizedLstmInputParams: Can't dereference a null pointer");
     }
 
-    const ConstTensor& get_InputToInputWeights() const
+    const ConstTensor& GetInputToInputWeights() const
     {
-        return deref(m_InputToInputWeights);
+        return Deref(m_InputToInputWeights);
     }
 
-    const ConstTensor& get_InputToForgetWeights() const
+    const ConstTensor& GetInputToForgetWeights() const
     {
-        return deref(m_InputToForgetWeights);
+        return Deref(m_InputToForgetWeights);
     }
 
-    const ConstTensor& get_InputToCellWeights() const
+    const ConstTensor& GetInputToCellWeights() const
     {
-        return deref(m_InputToCellWeights);
+        return Deref(m_InputToCellWeights);
     }
 
-    const ConstTensor& get_InputToOutputWeights() const
+    const ConstTensor& GetInputToOutputWeights() const
     {
-        return deref(m_InputToOutputWeights);
+        return Deref(m_InputToOutputWeights);
     }
 
-    const ConstTensor& get_RecurrentToInputWeights() const
+    const ConstTensor& GetRecurrentToInputWeights() const
     {
-        return deref(m_RecurrentToInputWeights);
+        return Deref(m_RecurrentToInputWeights);
     }
 
-    const ConstTensor& get_RecurrentToForgetWeights() const
+    const ConstTensor& GetRecurrentToForgetWeights() const
     {
-        return deref(m_RecurrentToForgetWeights);
+        return Deref(m_RecurrentToForgetWeights);
     }
 
-    const ConstTensor& get_RecurrentToCellWeights() const
+    const ConstTensor& GetRecurrentToCellWeights() const
     {
-        return deref(m_RecurrentToCellWeights);
+        return Deref(m_RecurrentToCellWeights);
     }
 
-    const ConstTensor& get_RecurrentToOutputWeights() const
+    const ConstTensor& GetRecurrentToOutputWeights() const
     {
-        return deref(m_RecurrentToOutputWeights);
+        return Deref(m_RecurrentToOutputWeights);
     }
 
-    const ConstTensor& get_InputGateBias() const
+    const ConstTensor& GetInputGateBias() const
     {
-        return deref(m_InputGateBias);
+        return Deref(m_InputGateBias);
     }
 
-    const ConstTensor& get_ForgetGateBias() const
+    const ConstTensor& GetForgetGateBias() const
     {
-        return deref(m_ForgetGateBias);
+        return Deref(m_ForgetGateBias);
     }
 
-    const ConstTensor& get_CellBias() const
+    const ConstTensor& GetCellBias() const
     {
-        return deref(m_CellBias);
+        return Deref(m_CellBias);
     }
 
-    const ConstTensor& get_OutputGateBias() const
+    const ConstTensor& GetOutputGateBias() const
     {
-        return deref(m_OutputGateBias);
+        return Deref(m_OutputGateBias);
     }
 };
 
@@ -152,7 +152,7 @@ struct QuantizedLstmInputParamsInfo
     const TensorInfo* m_OutputGateBias;
 
 
-    const TensorInfo& deref(const TensorInfo* tensorInfo) const
+    const TensorInfo& Deref(const TensorInfo* tensorInfo) const
     {
         if (tensorInfo != nullptr)
         {
@@ -162,55 +162,55 @@ struct QuantizedLstmInputParamsInfo
         throw InvalidArgumentException("Can't dereference a null pointer");
     }
 
-    const TensorInfo& get_InputToInputWeights() const
+    const TensorInfo& GetInputToInputWeights() const
     {
-        return deref(m_InputToInputWeights);
+        return Deref(m_InputToInputWeights);
     }
-    const TensorInfo& get_InputToForgetWeights() const
+    const TensorInfo& GetInputToForgetWeights() const
     {
-        return deref(m_InputToForgetWeights);
+        return Deref(m_InputToForgetWeights);
     }
-    const TensorInfo& get_InputToCellWeights() const
+    const TensorInfo& GetInputToCellWeights() const
     {
-        return deref(m_InputToCellWeights);
+        return Deref(m_InputToCellWeights);
     }
-    const TensorInfo& get_InputToOutputWeights() const
+    const TensorInfo& GetInputToOutputWeights() const
     {
-        return deref(m_InputToOutputWeights);
-    }
-
-    const TensorInfo& get_RecurrentToInputWeights() const
-    {
-        return deref(m_RecurrentToInputWeights);
-    }
-    const TensorInfo& get_RecurrentToForgetWeights() const
-    {
-        return deref(m_RecurrentToForgetWeights);
-    }
-    const TensorInfo& get_RecurrentToCellWeights() const
-    {
-        return deref(m_RecurrentToCellWeights);
-    }
-    const TensorInfo& get_RecurrentToOutputWeights() const
-    {
-        return deref(m_RecurrentToOutputWeights);
+        return Deref(m_InputToOutputWeights);
     }
 
-    const TensorInfo& get_InputGateBias() const
+    const TensorInfo& GetRecurrentToInputWeights() const
     {
-        return deref(m_InputGateBias);
+        return Deref(m_RecurrentToInputWeights);
     }
-    const TensorInfo& get_ForgetGateBias() const
+    const TensorInfo& GetRecurrentToForgetWeights() const
     {
-        return deref(m_ForgetGateBias);
+        return Deref(m_RecurrentToForgetWeights);
     }
-    const TensorInfo& get_CellBias() const
+    const TensorInfo& GetRecurrentToCellWeights() const
     {
-        return deref(m_CellBias);
+        return Deref(m_RecurrentToCellWeights);
     }
-    const TensorInfo& get_OutputGateBias() const
+    const TensorInfo& GetRecurrentToOutputWeights() const
     {
-        return deref(m_OutputGateBias);
+        return Deref(m_RecurrentToOutputWeights);
+    }
+
+    const TensorInfo& GetInputGateBias() const
+    {
+        return Deref(m_InputGateBias);
+    }
+    const TensorInfo& GetForgetGateBias() const
+    {
+        return Deref(m_ForgetGateBias);
+    }
+    const TensorInfo& GetCellBias() const
+    {
+        return Deref(m_CellBias);
+    }
+    const TensorInfo& GetOutputGateBias() const
+    {
+        return Deref(m_OutputGateBias);
     }
 };
 

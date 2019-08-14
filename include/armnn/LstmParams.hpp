@@ -108,7 +108,7 @@ struct LstmInputParamsInfo
     const TensorInfo* m_CellLayerNormWeights;
     const TensorInfo* m_OutputLayerNormWeights;
 
-    const TensorInfo& deref(const TensorInfo* tensorInfo) const
+    const TensorInfo& Deref(const TensorInfo* tensorInfo) const
     {
         if (tensorInfo != nullptr)
         {
@@ -118,89 +118,89 @@ struct LstmInputParamsInfo
         throw InvalidArgumentException("Can't dereference a null pointer");
     }
 
-    const TensorInfo& get_InputToInputWeights() const
+    const TensorInfo& GetInputToInputWeights() const
     {
-        return deref(m_InputToInputWeights);
+        return Deref(m_InputToInputWeights);
     }
-    const TensorInfo& get_InputToForgetWeights() const
+    const TensorInfo& GetInputToForgetWeights() const
     {
-        return deref(m_InputToForgetWeights);
+        return Deref(m_InputToForgetWeights);
     }
-    const TensorInfo& get_InputToCellWeights() const
+    const TensorInfo& GetInputToCellWeights() const
     {
-        return deref(m_InputToCellWeights);
+        return Deref(m_InputToCellWeights);
     }
-    const TensorInfo& get_InputToOutputWeights() const
+    const TensorInfo& GetInputToOutputWeights() const
     {
-        return deref(m_InputToOutputWeights);
+        return Deref(m_InputToOutputWeights);
     }
-    const TensorInfo& get_RecurrentToInputWeights() const
+    const TensorInfo& GetRecurrentToInputWeights() const
     {
-        return deref(m_RecurrentToInputWeights);
+        return Deref(m_RecurrentToInputWeights);
     }
-    const TensorInfo& get_RecurrentToForgetWeights() const
+    const TensorInfo& GetRecurrentToForgetWeights() const
     {
-        return deref(m_RecurrentToForgetWeights);
+        return Deref(m_RecurrentToForgetWeights);
     }
-    const TensorInfo& get_RecurrentToCellWeights() const
+    const TensorInfo& GetRecurrentToCellWeights() const
     {
-        return deref(m_RecurrentToCellWeights);
+        return Deref(m_RecurrentToCellWeights);
     }
-    const TensorInfo& get_RecurrentToOutputWeights() const
+    const TensorInfo& GetRecurrentToOutputWeights() const
     {
-        return deref(m_RecurrentToOutputWeights);
+        return Deref(m_RecurrentToOutputWeights);
     }
-    const TensorInfo& get_CellToInputWeights() const
+    const TensorInfo& GetCellToInputWeights() const
     {
-        return deref(m_CellToInputWeights);
+        return Deref(m_CellToInputWeights);
     }
-    const TensorInfo& get_CellToForgetWeights() const
+    const TensorInfo& GetCellToForgetWeights() const
     {
-        return deref(m_CellToForgetWeights);
+        return Deref(m_CellToForgetWeights);
     }
-    const TensorInfo& get_CellToOutputWeights() const
+    const TensorInfo& GetCellToOutputWeights() const
     {
-        return deref(m_CellToOutputWeights);
+        return Deref(m_CellToOutputWeights);
     }
-    const TensorInfo& get_InputGateBias() const
+    const TensorInfo& GetInputGateBias() const
     {
-        return deref(m_InputGateBias);
+        return Deref(m_InputGateBias);
     }
-    const TensorInfo& get_ForgetGateBias() const
+    const TensorInfo& GetForgetGateBias() const
     {
-        return deref(m_ForgetGateBias);
+        return Deref(m_ForgetGateBias);
     }
-    const TensorInfo& get_CellBias() const
+    const TensorInfo& GetCellBias() const
     {
-        return deref(m_CellBias);
+        return Deref(m_CellBias);
     }
-    const TensorInfo& get_OutputGateBias() const
+    const TensorInfo& GetOutputGateBias() const
     {
-        return deref(m_OutputGateBias);
+        return Deref(m_OutputGateBias);
     }
-    const TensorInfo& get_ProjectionWeights() const
+    const TensorInfo& GetProjectionWeights() const
     {
-        return deref(m_ProjectionWeights);
+        return Deref(m_ProjectionWeights);
     }
-    const TensorInfo& get_ProjectionBias() const
+    const TensorInfo& GetProjectionBias() const
     {
-        return deref(m_ProjectionBias);
+        return Deref(m_ProjectionBias);
     }
-    const TensorInfo& get_InputLayerNormWeights() const
+    const TensorInfo& GetInputLayerNormWeights() const
     {
-        return deref(m_InputLayerNormWeights);
+        return Deref(m_InputLayerNormWeights);
     }
-    const TensorInfo& get_ForgetLayerNormWeights() const
+    const TensorInfo& GetForgetLayerNormWeights() const
     {
-        return deref(m_ForgetLayerNormWeights);
+        return Deref(m_ForgetLayerNormWeights);
     }
-    const TensorInfo& get_CellLayerNormWeights() const
+    const TensorInfo& GetCellLayerNormWeights() const
     {
-        return deref(m_CellLayerNormWeights);
+        return Deref(m_CellLayerNormWeights);
     }
-    const TensorInfo& get_OutputLayerNormWeights() const
+    const TensorInfo& GetOutputLayerNormWeights() const
     {
-        return deref(m_OutputLayerNormWeights);
+        return Deref(m_OutputLayerNormWeights);
     }
 };
 

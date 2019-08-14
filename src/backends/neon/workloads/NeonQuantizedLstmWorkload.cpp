@@ -143,31 +143,31 @@ arm_compute::Status NeonQuantizedLstmWorkloadValidate(const TensorInfo& input,
 
     // Basic parameters
     const arm_compute::TensorInfo aclInputToInputWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_InputToInputWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetInputToInputWeights());
     const arm_compute::TensorInfo aclInputToForgetWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_InputToForgetWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetInputToForgetWeights());
     const arm_compute::TensorInfo aclInputToCellWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_InputToCellWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetInputToCellWeights());
     const arm_compute::TensorInfo aclInputToOutputWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_InputToOutputWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetInputToOutputWeights());
 
     const arm_compute::TensorInfo aclRecurrentToInputWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_RecurrentToInputWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToInputWeights());
     const arm_compute::TensorInfo aclRecurrentToForgetWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_RecurrentToForgetWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToForgetWeights());
     const arm_compute::TensorInfo aclRecurrentToCellWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_RecurrentToCellWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToCellWeights());
     const arm_compute::TensorInfo aclRecurrentToOutputWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_RecurrentToOutputWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToOutputWeights());
 
     const arm_compute::TensorInfo aclInputGateBiasInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_InputGateBias());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetInputGateBias());
     const arm_compute::TensorInfo aclForgetGateBiasInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_ForgetGateBias());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetForgetGateBias());
     const arm_compute::TensorInfo aclCellBiasInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_CellBias());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetCellBias());
     const arm_compute::TensorInfo aclOutputGateBiasInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_OutputGateBias());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetOutputGateBias());
 
     return arm_compute::NELSTMLayerQuantized::validate(&aclInputInfo,
                                                        &aclInputToInputWeightsInfo,

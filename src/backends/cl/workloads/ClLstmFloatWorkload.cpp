@@ -272,20 +272,20 @@ arm_compute::Status ClLstmFloatWorkloadValidate(const TensorInfo& input, const T
 
     // Basic parameters
     const arm_compute::TensorInfo aclInputToForgetWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_InputToForgetWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetInputToForgetWeights());
     const arm_compute::TensorInfo aclInputToCellWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_InputToCellWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetInputToCellWeights());
     const arm_compute::TensorInfo aclInputToOutputWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_InputToOutputWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetInputToOutputWeights());
     const arm_compute::TensorInfo aclRecurrentToForgetWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_RecurrentToForgetWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToForgetWeights());
     const arm_compute::TensorInfo aclRecurrentToCellWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_RecurrentToCellWeights());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToCellWeights());
     const arm_compute::TensorInfo aclRecurrentToOutputWeightsInfo
-                                  = BuildArmComputeTensorInfo(paramsInfo.get_RecurrentToOutputWeights());
-    const arm_compute::TensorInfo aclForgetGateBiasInfo = BuildArmComputeTensorInfo(paramsInfo.get_ForgetGateBias());
-    const arm_compute::TensorInfo aclCellBiasInfo = BuildArmComputeTensorInfo(paramsInfo.get_CellBias());
-    const arm_compute::TensorInfo aclOutputGateBiasInfo = BuildArmComputeTensorInfo(paramsInfo.get_OutputGateBias());
+                                  = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToOutputWeights());
+    const arm_compute::TensorInfo aclForgetGateBiasInfo = BuildArmComputeTensorInfo(paramsInfo.GetForgetGateBias());
+    const arm_compute::TensorInfo aclCellBiasInfo = BuildArmComputeTensorInfo(paramsInfo.GetCellBias());
+    const arm_compute::TensorInfo aclOutputGateBiasInfo = BuildArmComputeTensorInfo(paramsInfo.GetOutputGateBias());
 
     arm_compute::TensorInfo aclInputToInputWeightsInfo;
     arm_compute::TensorInfo aclRecurrentToInputWeightsInfo;
@@ -302,14 +302,14 @@ arm_compute::Status ClLstmFloatWorkloadValidate(const TensorInfo& input, const T
 
     if (!descriptor.m_CifgEnabled)
     {
-        aclInputToInputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.get_InputToInputWeights());
-        aclRecurrentToInputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.get_RecurrentToInputWeights());
+        aclInputToInputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetInputToInputWeights());
+        aclRecurrentToInputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetRecurrentToInputWeights());
 
         if (paramsInfo.m_CellToInputWeights != nullptr)
         {
-            aclCellToInputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.get_CellToInputWeights());
+            aclCellToInputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetCellToInputWeights());
         }
-        aclInputGateBiasInfo = BuildArmComputeTensorInfo(paramsInfo.get_InputGateBias());
+        aclInputGateBiasInfo = BuildArmComputeTensorInfo(paramsInfo.GetInputGateBias());
         lstm_params_info.set_cifg_params(&aclInputToInputWeightsInfo, &aclRecurrentToInputWeightsInfo,
                                          paramsInfo.m_CellToInputWeights != nullptr ?
                                          &aclCellToInputWeightsInfo: nullptr,
@@ -318,11 +318,11 @@ arm_compute::Status ClLstmFloatWorkloadValidate(const TensorInfo& input, const T
 
     if (descriptor.m_ProjectionEnabled)
     {
-        aclProjectionWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.get_ProjectionWeights());
+        aclProjectionWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetProjectionWeights());
 
         if (paramsInfo.m_ProjectionBias != nullptr)
         {
-            aclProjectionBiasInfo = BuildArmComputeTensorInfo(paramsInfo.get_InputGateBias());
+            aclProjectionBiasInfo = BuildArmComputeTensorInfo(paramsInfo.GetInputGateBias());
         }
         lstm_params_info.set_projection_params(&aclProjectionWeightsInfo,
                                                paramsInfo.m_ProjectionBias != nullptr ?
@@ -331,8 +331,8 @@ arm_compute::Status ClLstmFloatWorkloadValidate(const TensorInfo& input, const T
 
     if (descriptor.m_PeepholeEnabled)
     {
-        aclCellToForgetWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.get_CellToForgetWeights());
-        aclCellToOutputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.get_CellToOutputWeights());
+        aclCellToForgetWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetCellToForgetWeights());
+        aclCellToOutputWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetCellToOutputWeights());
         lstm_params_info.set_peephole_params(&aclCellToForgetWeightsInfo, &aclCellToOutputWeightsInfo);
     }
 
@@ -374,14 +374,14 @@ arm_compute::Status ClLstmFloatWorkloadValidate(const TensorInfo& input, const T
     {
         if (!descriptor.m_CifgEnabled)
         {
-            aclInputLayerNormWeightsInfo  = BuildArmComputeTensorInfo(paramsInfo.get_InputLayerNormWeights());
+            aclInputLayerNormWeightsInfo  = BuildArmComputeTensorInfo(paramsInfo.GetInputLayerNormWeights());
         }
 
-        aclForgetLayerNormWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.get_ForgetLayerNormWeights());
+        aclForgetLayerNormWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetForgetLayerNormWeights());
 
-        aclCellLayerNormWeightsInfo   = BuildArmComputeTensorInfo(paramsInfo.get_CellLayerNormWeights());
+        aclCellLayerNormWeightsInfo   = BuildArmComputeTensorInfo(paramsInfo.GetCellLayerNormWeights());
 
-        aclOutputLayerNormWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.get_OutputLayerNormWeights());
+        aclOutputLayerNormWeightsInfo = BuildArmComputeTensorInfo(paramsInfo.GetOutputLayerNormWeights());
 
         lstm_params_info.set_layer_normalization_params(descriptor.m_CifgEnabled ?
                                                         nullptr : &aclInputLayerNormWeightsInfo,

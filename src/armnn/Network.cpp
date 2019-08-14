@@ -1468,33 +1468,33 @@ IConnectableLayer* Network::AddQuantizedLstmLayer(const QuantizedLstmInputParams
 
     // InputToX weights
     layer->m_QuantizedLstmParameters.m_InputToInputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_InputToInputWeights());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetInputToInputWeights());
     layer->m_QuantizedLstmParameters.m_InputToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_InputToForgetWeights());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetInputToForgetWeights());
     layer->m_QuantizedLstmParameters.m_InputToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_InputToCellWeights());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetInputToCellWeights());
     layer->m_QuantizedLstmParameters.m_InputToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_InputToOutputWeights());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetInputToOutputWeights());
 
     // RecurrentToX weights
     layer->m_QuantizedLstmParameters.m_RecurrentToInputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_RecurrentToInputWeights());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetRecurrentToInputWeights());
     layer->m_QuantizedLstmParameters.m_RecurrentToForgetWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_RecurrentToForgetWeights());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetRecurrentToForgetWeights());
     layer->m_QuantizedLstmParameters.m_RecurrentToCellWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_RecurrentToCellWeights());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetRecurrentToCellWeights());
     layer->m_QuantizedLstmParameters.m_RecurrentToOutputWeights =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_RecurrentToOutputWeights());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetRecurrentToOutputWeights());
 
     // Bias
     layer->m_QuantizedLstmParameters.m_InputGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_InputGateBias());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetInputGateBias());
     layer->m_QuantizedLstmParameters.m_ForgetGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_ForgetGateBias());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetForgetGateBias());
     layer->m_QuantizedLstmParameters.m_CellBias =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_CellBias());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetCellBias());
     layer->m_QuantizedLstmParameters.m_OutputGateBias =
-            std::make_unique<ScopedCpuTensorHandle>(params.get_OutputGateBias());
+            std::make_unique<ScopedCpuTensorHandle>(params.GetOutputGateBias());
 
     return layer;
 }

@@ -1049,20 +1049,20 @@ void SerializerVisitor::VisitQuantizedLstmLayer(const armnn::IConnectableLayer* 
     auto fbQuantizedLstmBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_QuantizedLstm);
 
     // Get input parameters
-    auto inputToInputWeights = CreateConstTensorInfo(params.get_InputToInputWeights());
-    auto inputToForgetWeights = CreateConstTensorInfo(params.get_InputToForgetWeights());
-    auto inputToCellWeights = CreateConstTensorInfo(params.get_InputToCellWeights());
-    auto inputToOutputWeights = CreateConstTensorInfo(params.get_InputToOutputWeights());
+    auto inputToInputWeights = CreateConstTensorInfo(params.GetInputToInputWeights());
+    auto inputToForgetWeights = CreateConstTensorInfo(params.GetInputToForgetWeights());
+    auto inputToCellWeights = CreateConstTensorInfo(params.GetInputToCellWeights());
+    auto inputToOutputWeights = CreateConstTensorInfo(params.GetInputToOutputWeights());
 
-    auto recurrentToInputWeights = CreateConstTensorInfo(params.get_RecurrentToInputWeights());
-    auto recurrentToForgetWeights = CreateConstTensorInfo(params.get_RecurrentToForgetWeights());
-    auto recurrentToCellWeights = CreateConstTensorInfo(params.get_RecurrentToCellWeights());
-    auto recurrentToOutputWeights = CreateConstTensorInfo(params.get_RecurrentToOutputWeights());
+    auto recurrentToInputWeights = CreateConstTensorInfo(params.GetRecurrentToInputWeights());
+    auto recurrentToForgetWeights = CreateConstTensorInfo(params.GetRecurrentToForgetWeights());
+    auto recurrentToCellWeights = CreateConstTensorInfo(params.GetRecurrentToCellWeights());
+    auto recurrentToOutputWeights = CreateConstTensorInfo(params.GetRecurrentToOutputWeights());
 
-    auto inputGateBias = CreateConstTensorInfo(params.get_InputGateBias());
-    auto forgetGateBias = CreateConstTensorInfo(params.get_ForgetGateBias());
-    auto cellBias = CreateConstTensorInfo(params.get_CellBias());
-    auto outputGateBias = CreateConstTensorInfo(params.get_OutputGateBias());
+    auto inputGateBias = CreateConstTensorInfo(params.GetInputGateBias());
+    auto forgetGateBias = CreateConstTensorInfo(params.GetForgetGateBias());
+    auto cellBias = CreateConstTensorInfo(params.GetCellBias());
+    auto outputGateBias = CreateConstTensorInfo(params.GetOutputGateBias());
 
     auto fbQuantizedLstmParams = serializer::CreateQuantizedLstmInputParams(
         m_flatBufferBuilder,

@@ -808,54 +808,54 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                   "Reference Lstm: input and output types are mismatched");
     // check layer parameters
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_InputToForgetWeights()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetInputToForgetWeights()), reasonIfUnsupported,
                                   "Reference Lstm: input and InputToForgetWeights types are mismatched");
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_InputToCellWeights()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetInputToCellWeights()), reasonIfUnsupported,
                                   "Reference Lstm: input and InputToCellWeights types are mismatched");
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_InputToOutputWeights()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetInputToOutputWeights()), reasonIfUnsupported,
                                   "Reference Lstm: input and InputToOutputWeights types are mismatched");
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_RecurrentToForgetWeights()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetRecurrentToForgetWeights()), reasonIfUnsupported,
                                   "Reference Lstm: input and RecurrentToForgetWeights types are mismatched");
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_RecurrentToCellWeights()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetRecurrentToCellWeights()), reasonIfUnsupported,
                                   "Reference Lstm: input and RecurrentToCellWeights types are mismatched");
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_RecurrentToOutputWeights()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetRecurrentToOutputWeights()), reasonIfUnsupported,
                                   "Reference Lstm: input and RecurrentToOutputWeights types are mismatched");
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_ForgetGateBias()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetForgetGateBias()), reasonIfUnsupported,
                                   "Reference Lstm: input and ForgetGateBias types are mismatched");
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_CellBias()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetCellBias()), reasonIfUnsupported,
                                   "Reference Lstm: input and CellBias types are mismatched");
-    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_OutputGateBias()), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetOutputGateBias()), reasonIfUnsupported,
                                   "Reference Lstm: input and OutputGateBias types are mismatched");
     if (!descriptor.m_CifgEnabled)
     {
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_InputToInputWeights()), reasonIfUnsupported,
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetInputToInputWeights()), reasonIfUnsupported,
                                       "Reference Lstm: input and InputToInputWeights types are mismatched");
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_RecurrentToInputWeights()),
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetRecurrentToInputWeights()),
                                       reasonIfUnsupported,
                                       "Reference Lstm: input and RecurrentToInputWeights types are mismatched");
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_InputGateBias()), reasonIfUnsupported,
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetInputGateBias()), reasonIfUnsupported,
                                       "Reference Lstm: input and InputGateBias types are mismatched");
         if (descriptor.m_PeepholeEnabled)
         {
-            supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_CellToInputWeights()),
+            supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetCellToInputWeights()),
                                           reasonIfUnsupported,
                                           "Reference Lstm: input and CellToInputWeights types are mismatched");
         }
     }
     if (descriptor.m_PeepholeEnabled)
     {
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_CellToForgetWeights()), reasonIfUnsupported,
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetCellToForgetWeights()), reasonIfUnsupported,
                                       "Reference Lstm: input and CellToForgetWeights types are mismatched");
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_CellToOutputWeights()), reasonIfUnsupported,
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetCellToOutputWeights()), reasonIfUnsupported,
                                       "Reference Lstm: input and CellToOutputWeights types are mismatched");
     }
     if (descriptor.m_ProjectionEnabled)
     {
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_ProjectionWeights()), reasonIfUnsupported,
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetProjectionWeights()), reasonIfUnsupported,
                                       "Reference Lstm: input and mProjectionWeights types are mismatched");
         if (paramsInfo.m_ProjectionBias != nullptr)
         {
-            supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_ProjectionBias()), reasonIfUnsupported,
+            supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetProjectionBias()), reasonIfUnsupported,
                                           "Reference Lstm: input and ProjectionBias types are mismatched");
         }
     }
@@ -863,17 +863,17 @@ bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
     {
         if (!descriptor.m_CifgEnabled)
         {
-            supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_InputLayerNormWeights()),
+            supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetInputLayerNormWeights()),
                                           reasonIfUnsupported,
                                           "Reference Lstm: input and InputLayerNormWeights types are mismatched");
         }
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_ForgetLayerNormWeights()),
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetForgetLayerNormWeights()),
                                       reasonIfUnsupported,
                                       "Reference Lstm: input and ForgetLayerNormWeights types are mismatched");
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_CellLayerNormWeights()),
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetCellLayerNormWeights()),
                                       reasonIfUnsupported,
                                       "Reference Lstm: input and CellLayerNormWeights types are mismatched");
-        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.get_OutputLayerNormWeights()),
+        supported &= CheckSupportRule(TypesAreEqual(input, paramsInfo.GetOutputLayerNormWeights()),
                                       reasonIfUnsupported,
                                       "Reference Lstm: input and OutputLayerNormWeights types are mismatched");
     }

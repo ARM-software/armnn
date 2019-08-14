@@ -254,6 +254,7 @@ template<typename TParser, typename TDataType>
 int MainImpl(const char* modelPath,
              bool isModelBinary,
              const std::vector<armnn::BackendId>& computeDevices,
+             const std::string& dynamicBackendsPath,
              const std::vector<string>& inputNames,
              const std::vector<std::unique_ptr<armnn::TensorShape>>& inputTensorShapes,
              const std::vector<string>& inputTensorDataFilePaths,
@@ -278,6 +279,7 @@ int MainImpl(const char* modelPath,
         params.m_ModelPath = modelPath;
         params.m_IsModelBinary = isModelBinary;
         params.m_ComputeDevices = computeDevices;
+        params.m_DynamicBackendsPath = dynamicBackendsPath;
 
         for(const std::string& inputName: inputNames)
         {
@@ -296,7 +298,7 @@ int MainImpl(const char* modelPath,
 
         params.m_SubgraphId = subgraphId;
         params.m_EnableFp16TurboMode = enableFp16TurboMode;
-        InferenceModel<TParser, TDataType> model(params, enableProfiling, runtime);
+        InferenceModel<TParser, TDataType> model(params, enableProfiling, dynamicBackendsPath, runtime);
 
         for(unsigned int i = 0; i < inputTensorDataFilePaths.size(); ++i)
         {
@@ -407,6 +409,7 @@ int MainImpl(const char* modelPath,
 int RunTest(const std::string& format,
             const std::string& inputTensorShapesStr,
             const vector<armnn::BackendId>& computeDevice,
+            const std::string& dynamicBackendsPath,
             const std::string& path,
             const std::string& inputNames,
             const std::string& inputTensorDataFilePaths,
@@ -513,7 +516,7 @@ int RunTest(const std::string& format,
 #if defined(ARMNN_SERIALIZER)
     return MainImpl<armnnDeserializer::IDeserializer, float>(
         modelPath.c_str(), isModelBinary, computeDevice,
-        inputNamesVector, inputTensorShapes,
+        dynamicBackendsPath, inputNamesVector, inputTensorShapes,
         inputTensorDataFilePathsVector, inputTypesVector, quantizeInput,
         outputTypesVector, outputNamesVector, enableProfiling,
         enableFp16TurboMode, thresholdTime, subgraphId, runtime);
@@ -526,6 +529,7 @@ int RunTest(const std::string& format,
     {
 #if defined(ARMNN_CAFFE_PARSER)
         return MainImpl<armnnCaffeParser::ICaffeParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
+                                                               dynamicBackendsPath,
                                                                inputNamesVector, inputTensorShapes,
                                                                inputTensorDataFilePathsVector, inputTypesVector,
                                                                quantizeInput, outputTypesVector, outputNamesVector,
@@ -540,6 +544,7 @@ int RunTest(const std::string& format,
 {
 #if defined(ARMNN_ONNX_PARSER)
     return MainImpl<armnnOnnxParser::IOnnxParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
+                                                         dynamicBackendsPath,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          quantizeInput, outputTypesVector, outputNamesVector,
@@ -554,6 +559,7 @@ int RunTest(const std::string& format,
     {
 #if defined(ARMNN_TF_PARSER)
         return MainImpl<armnnTfParser::ITfParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
+                                                         dynamicBackendsPath,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          quantizeInput, outputTypesVector, outputNamesVector,
@@ -574,6 +580,7 @@ int RunTest(const std::string& format,
             return EXIT_FAILURE;
         }
         return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
+                                                                 dynamicBackendsPath,
                                                                  inputNamesVector, inputTensorShapes,
                                                                  inputTensorDataFilePathsVector, inputTypesVector,
                                                                  quantizeInput, outputTypesVector, outputNamesVector,
@@ -604,6 +611,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
     std::string outputNames;
     std::string inputTypes;
     std::string outputTypes;
+    std::string dynamicBackendsPath;
 
     size_t subgraphId = 0;
 
@@ -622,6 +630,9 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
          ".tflite, .onnx")
         ("compute,c", po::value<std::vector<armnn::BackendId>>()->multitoken(),
          backendsMessage.c_str())
+        ("dynamic-backends-path,b", po::value(&dynamicBackendsPath),
+         "Path where to load any available dynamic backend from. "
+         "If left empty (the default), dynamic backends will not be used.")
         ("input-name,i", po::value(&inputNames), "Identifier of the input tensors in the network separated by comma.")
         ("subgraph-number,n", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be "
          "executed. Defaults to 0.")
@@ -696,7 +707,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
         return EXIT_FAILURE;
     }
 
-    return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames,
+    return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                    inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
                    enableProfiling, enableFp16TurboMode, thresholdTime, subgraphId);
 }

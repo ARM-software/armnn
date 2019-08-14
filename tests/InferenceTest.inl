@@ -397,7 +397,9 @@ int ClassifierInferenceTestMain(int argc,
                     modelParams.m_VisualizePostOptimizationModel = modelOptions.m_VisualizePostOptimizationModel;
                     modelParams.m_EnableFp16TurboMode = modelOptions.m_EnableFp16TurboMode;
 
-                    return std::make_unique<InferenceModel>(modelParams, commonOptions.m_EnableProfiling);
+                    return std::make_unique<InferenceModel>(modelParams,
+                                                            commonOptions.m_EnableProfiling,
+                                                            commonOptions.m_DynamicBackendsPath);
             });
         });
 }

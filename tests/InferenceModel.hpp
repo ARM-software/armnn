@@ -86,13 +86,14 @@ struct Params
     std::vector<armnn::TensorShape> m_InputShapes;
     std::vector<std::string>        m_OutputBindings;
     std::vector<armnn::BackendId>   m_ComputeDevices;
+    std::string                     m_DynamicBackendsPath;
     size_t                          m_SubgraphId;
     bool                            m_IsModelBinary;
     bool                            m_VisualizePostOptimizationModel;
     bool                            m_EnableFp16TurboMode;
 
     Params()
-        : m_ComputeDevices{"CpuRef"}
+        : m_ComputeDevices{}
         , m_SubgraphId(0)
         , m_IsModelBinary(true)
         , m_VisualizePostOptimizationModel(false)
@@ -318,6 +319,7 @@ public:
     {
         std::string m_ModelDir;
         std::vector<std::string> m_ComputeDevices;
+        std::string m_DynamicBackendsPath;
         bool m_VisualizePostOptimizationModel;
         bool m_EnableFp16TurboMode;
         std::string m_Labels;
@@ -345,6 +347,9 @@ public:
             ("compute,c", po::value<std::vector<std::string>>(&options.m_ComputeDevices)->
                 default_value(defaultComputes, boost::algorithm::join(defaultComputes, ", "))->
                 multitoken(), backendsMessage.c_str())
+            ("dynamic-backends-path,b", po::value(&options.m_DynamicBackendsPath),
+                "Path where to load any available dynamic backend from. "
+                "If left empty (the default), dynamic backends will not be used.")
             ("labels,l", po::value<std::string>(&options.m_Labels),
                 "Text file containing one image filename - correct label pair per line, "
                 "used to test the accuracy of the network.")
@@ -359,8 +364,10 @@ public:
 
     InferenceModel(const Params& params,
                    bool enableProfiling,
+                   const std::string& dynamicBackendsPath,
                    const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
         : m_EnableProfiling(enableProfiling)
+        , m_DynamicBackendsPath(dynamicBackendsPath)
     {
         if (runtime)
         {
@@ -370,6 +377,7 @@ public:
         {
             armnn::IRuntime::CreationOptions options;
             options.m_EnableGpuProfiling = m_EnableProfiling;
+            options.m_DynamicBackendsPath = m_DynamicBackendsPath;
             m_Runtime = std::move(armnn::IRuntime::Create(options));
         }
 
@@ -379,10 +387,9 @@ public:
             throw armnn::Exception("Some backend IDs are invalid: " + invalidBackends);
         }
 
-        armnn::INetworkPtr network =
-            CreateNetworkImpl<IParser>::Create(params, m_InputBindings, m_OutputBindings);
+        armnn::INetworkPtr network = CreateNetworkImpl<IParser>::Create(params, m_InputBindings, m_OutputBindings);
 
-        armnn::IOptimizedNetworkPtr optNet{nullptr, [](armnn::IOptimizedNetwork *){}};
+        armnn::IOptimizedNetworkPtr optNet{nullptr, [](armnn::IOptimizedNetwork*){}};
         {
             ARMNN_SCOPED_HEAP_PROFILING("Optimizing");
 
@@ -544,6 +551,7 @@ private:
     std::vector<armnn::BindingPointInfo> m_InputBindings;
     std::vector<armnn::BindingPointInfo> m_OutputBindings;
     bool m_EnableProfiling;
+    std::string m_DynamicBackendsPath;
 
     template<typename TContainer>
     armnn::InputTensors MakeInputTensors(const std::vector<TContainer>& inputDataContainers)

@@ -58,10 +58,12 @@ struct InferenceTestOptions
     unsigned int m_IterationCount;
     std::string m_InferenceTimesFile;
     bool m_EnableProfiling;
+    std::string m_DynamicBackendsPath;
 
     InferenceTestOptions()
-        : m_IterationCount(0),
-          m_EnableProfiling(0)
+        : m_IterationCount(0)
+        , m_EnableProfiling(0)
+        , m_DynamicBackendsPath()
     {}
 };
 

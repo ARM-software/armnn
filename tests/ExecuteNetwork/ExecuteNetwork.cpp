@@ -27,6 +27,7 @@ int main(int argc, const char* argv[])
     std::string outputNames;
     std::string inputTypes;
     std::string outputTypes;
+    std::string dynamicBackendsPath;
 
     double thresholdTime = 0.0;
 
@@ -52,6 +53,9 @@ int main(int argc, const char* argv[])
              ".prototxt, .tflite, .onnx")
             ("compute,c", po::value<std::vector<std::string>>()->multitoken(),
              backendsMessage.c_str())
+            ("dynamic-backends-path,b", po::value(&dynamicBackendsPath),
+             "Path where to load any available dynamic backend from. "
+             "If left empty (the default), dynamic backends will not be used.")
             ("input-name,i", po::value(&inputNames),
              "Identifier of the input tensors in the network separated by comma.")
             ("subgraph-number,x", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be executed."
@@ -62,7 +66,7 @@ int main(int argc, const char* argv[])
              "This parameter is optional, depending on the network.")
             ("input-tensor-data,d", po::value(&inputTensorDataFilePaths),
              "Path to files containing the input data as a flat array separated by whitespace. "
-             "Several paths can be passed separating them by comma. ")
+             "Several paths can be passed separating them by comma.")
             ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
              "If unset, defaults to \"float\" for all defined inputs. "
              "Accepted values (float, int or qasymm8)")
@@ -196,22 +200,14 @@ int main(int argc, const char* argv[])
     {
         // Get the preferred order of compute devices. If none are specified, default to using CpuRef
         const std::string computeOption("compute");
-        std::vector<std::string> computeDevicesAsStrings = CheckOption(vm, computeOption.c_str()) ?
-            vm[computeOption].as<std::vector<std::string>>() :
-            std::vector<std::string>({ "CpuRef" });
+        std::vector<std::string> computeDevicesAsStrings =
+                CheckOption(vm, computeOption.c_str()) ?
+                    vm[computeOption].as<std::vector<std::string>>() :
+                    std::vector<std::string>();
         std::vector<armnn::BackendId> computeDevices(computeDevicesAsStrings.begin(), computeDevicesAsStrings.end());
 
         // Remove duplicates from the list of compute devices.
         RemoveDuplicateDevices(computeDevices);
-
-        // Check that the specified compute devices are valid.
-        std::string invalidBackends;
-        if (!CheckRequestedBackendsAreValid(computeDevices, armnn::Optional<std::string&>(invalidBackends)))
-        {
-            BOOST_LOG_TRIVIAL(fatal) << "The list of preferred devices contains invalid backend IDs: "
-                                     << invalidBackends;
-            return EXIT_FAILURE;
-        }
 
         try
         {
@@ -224,7 +220,7 @@ int main(int argc, const char* argv[])
             return EXIT_FAILURE;
         }
 
-        return RunTest(modelFormat, inputTensorShapes, computeDevices, modelPath, inputNames,
+        return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
                        enableProfiling, enableFp16TurboMode, thresholdTime, subgraphId);
     }

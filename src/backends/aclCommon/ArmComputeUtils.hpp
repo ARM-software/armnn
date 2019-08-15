@@ -135,9 +135,15 @@ inline arm_compute::InterpolationPolicy ConvertResizeMethodToAclInterpolationPol
     }
 }
 
-inline unsigned int ComputeSoftmaxAclAxis(const armnn::TensorInfo& tensor)
+inline unsigned int ComputeSoftmaxAclAxis(const SoftmaxDescriptor& softmaxDesc, const armnn::TensorInfo& tensor)
 {
-    unsigned int dim = tensor.GetNumDimensions();
+    // Detect the Android default value of -1 and return the ACL default value of 1.
+    if (softmaxDesc.m_Axis == -1)
+    {
+        return 1;
+    }
+
+   unsigned int dim = tensor.GetNumDimensions();
 
     BOOST_ASSERT(dim != 0);
 

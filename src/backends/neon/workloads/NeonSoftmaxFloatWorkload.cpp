@@ -24,7 +24,7 @@ NeonSoftmaxFloatWorkload::NeonSoftmaxFloatWorkload(const SoftmaxQueueDescriptor&
     arm_compute::ITensor& output = boost::polymorphic_downcast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     auto layer = std::make_unique<arm_compute::NESoftmaxLayer>(memoryManager);
-    unsigned int aclAxis = ComputeSoftmaxAclAxis(info.m_InputTensorInfos[0]);
+    unsigned int aclAxis = ComputeSoftmaxAclAxis(m_Data.m_Parameters, info.m_InputTensorInfos[0]);
     layer->configure(&input, &output, m_Data.m_Parameters.m_Beta, aclAxis);
     m_SoftmaxLayer.reset(layer.release());
 }

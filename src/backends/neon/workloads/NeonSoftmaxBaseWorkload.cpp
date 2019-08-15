@@ -20,7 +20,7 @@ arm_compute::Status NeonSoftmaxWorkloadValidate(const TensorInfo& input,
     const arm_compute::TensorInfo aclInputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
-    unsigned int aclAxis = ComputeSoftmaxAclAxis(input);
+    unsigned int aclAxis = ComputeSoftmaxAclAxis(descriptor, input);
     return arm_compute::NESoftmaxLayer::validate(&aclInputInfo, &aclOutputInfo, descriptor.m_Beta, aclAxis);
 }
 

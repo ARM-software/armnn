@@ -615,9 +615,9 @@ void SerializerVisitor::VisitPermuteLayer(const armnn::IConnectableLayer* layer,
     auto flatBufferPermuteBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Permute);
 
     std::vector<unsigned int> dimMappings;
-    for (auto& v: permuteDescriptor.m_DimMappings)
+    for (unsigned int i=0; i<permuteDescriptor.m_DimMappings.GetSize(); ++i)
     {
-        dimMappings.push_back(v);
+        dimMappings.push_back(permuteDescriptor.m_DimMappings[i]);
     }
 
     auto flatBufferPermuteDesc = serializer::CreatePermuteDescriptor(m_flatBufferBuilder,

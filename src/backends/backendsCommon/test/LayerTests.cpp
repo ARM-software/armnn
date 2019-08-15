@@ -2641,6 +2641,103 @@ LayerTestResult<float,4> AdditionTest(
     return ret;
 }
 
+LayerTestResult<float, 5> Addition5dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    unsigned int depth     = 2;
+    unsigned int batchSize = 2;
+    unsigned int channels  = 2;
+    unsigned int height    = 2;
+    unsigned int width     = 3;
+
+    armnn::TensorInfo inputTensorInfo1, inputTensorInfo2;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int shape[] = {depth, batchSize, channels, height, width};
+
+    inputTensorInfo1 = armnn::TensorInfo(5, shape, armnn::DataType::Float32);
+    inputTensorInfo2 = armnn::TensorInfo(5, shape, armnn::DataType::Float32);
+    outputTensorInfo = armnn::TensorInfo(5, shape, armnn::DataType::Float32);
+
+
+    auto input1 = MakeTensor<float, 5>(inputTensorInfo1, std::vector<float>(
+        {
+            2.6f, 4.0f, 4.4f,  2.7f, 4.6f, 2.8f,
+            2.3f, 1.9f, 3.4f,  2.9f, 2.2f, 4.5f,
+
+            2.8f, 1.9f, 2.3f,  2.6f, 4.7f, 3.5f,
+            0.4f, 1.5f, 2.1f,  0.7f, 5.0f, 1.1f,
+
+
+            1.0f, 2.7f, 0.0f,  0.6f, 0.8f, 0.9f,
+            1.0f, 2.6f, 0.4f,  3.8f, 0.4f, 0.8f,
+
+            0.5f, 4.3f, 3.1f,  4.4f, 0.7f, 1.4f,
+            0.4f, 4.4f, 0.7f,  0.6f, 4.7f, 1.2f,
+
+        }));
+
+    auto input2 = MakeTensor<float, 5>(inputTensorInfo2, std::vector<float>(
+        {
+            4.4f, 3.0f, 1.0f,  0.0f, 3.9f, 3.1f,
+            1.7f, 2.9f, 1.3f,  0.4f, 0.4f, 4.3f,
+
+            4.5f, 0.2f, 2.2f,  4.1f, 3.9f, 3.0f,
+            0.1f, 2.5f, 4.1f,  4.6f, 1.5f, 0.0f,
+
+
+            0.5f, 4.9f, 2.5f,  1.5f, 3.4f, 4.5f,
+            2.0f, 3.0f, 4.9f,  1.6f, 2.4f, 3.4f,
+
+            3.6f, 1.8f, 1.3f,  2.6f, 2.1f, 4.8f,
+            2.0f, 4.3f, 4.0f,  0.2f, 0.6f, 4.4f,
+        }));
+
+    LayerTestResult<float, 5> ret(outputTensorInfo);
+    ret.outputExpected = MakeTensor<float, 5>(outputTensorInfo, std::vector<float>(
+        {
+            7.0f, 7.0f, 5.4f,  2.7f, 8.5f, 5.9f,
+            4.0f, 4.8f, 4.7f,  3.3f, 2.6f, 8.8f,
+
+            7.3f, 2.1f, 4.5f,  6.7f, 8.6f, 6.5f,
+            0.5f, 4.0f, 6.2f,  5.3f, 6.5f, 1.1f,
+
+
+            1.5f, 7.6f, 2.5f,  2.1f, 4.2f, 5.4f,
+            3.0f, 5.6f, 5.3f,  5.4f, 2.8f, 4.2f,
+
+            4.1f, 6.1f, 4.4f,  7.0f, 2.8f, 6.2f,
+            2.4f, 8.7f, 4.7f,  0.8f, 5.3f, 5.6f,
+        }));
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::AdditionQueueDescriptor data;
+    armnn::WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
+    AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateAddition(data, info);
+
+    inputHandle1->Allocate();
+    inputHandle2->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle2.get(), &input2[0][0][0][0][0]);
+
+    workload->PostAllocationConfigure();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&ret.output[0][0][0][0][0], outputHandle.get());
+
+    return ret;
+}
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> AdditionBroadcastTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
@@ -4103,25 +4200,25 @@ LayerTestResult<int16_t, 4> MinimumBroadcast1DVectorInt16Test(
 }
 
 namespace {
-LayerTestResult<float,4> MultiplicationTestHelper(
+template<std::size_t NumDims>
+LayerTestResult<float,NumDims> MultiplicationTestHelper(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const unsigned int shape0[4],
+    const unsigned int shape0[NumDims],
     const std::vector<float> & values0,
-    const unsigned int shape1[4],
+    const unsigned int shape1[NumDims],
     const std::vector<float> & values1,
-    const unsigned int outShape[4],
+    const unsigned int outShape[NumDims],
     const std::vector<float> & outValues)
 {
-    const uint32_t dimensionCount = 4;
-    armnn::TensorInfo inputTensorInfo0{dimensionCount, shape0, armnn::DataType::Float32};
-    armnn::TensorInfo inputTensorInfo1{dimensionCount, shape1, armnn::DataType::Float32};
-    armnn::TensorInfo outputTensorInfo{dimensionCount, outShape, armnn::DataType::Float32};
+    armnn::TensorInfo inputTensorInfo0{NumDims, shape0, armnn::DataType::Float32};
+    armnn::TensorInfo inputTensorInfo1{NumDims, shape1, armnn::DataType::Float32};
+    armnn::TensorInfo outputTensorInfo{NumDims, outShape, armnn::DataType::Float32};
 
-    auto input0 = MakeTensor<float, 4>(inputTensorInfo0, values0);
-    auto input1 = MakeTensor<float, 4>(inputTensorInfo1, values1);
+    auto input0 = MakeTensor<float, NumDims>(inputTensorInfo0, values0);
+    auto input1 = MakeTensor<float, NumDims>(inputTensorInfo1, values1);
 
-    LayerTestResult<float,4> ret(outputTensorInfo);
+    LayerTestResult<float,NumDims> ret(outputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle0 = workloadFactory.CreateTensorHandle(inputTensorInfo0);
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
@@ -4139,15 +4236,15 @@ LayerTestResult<float,4> MultiplicationTestHelper(
     inputHandle1->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle0.get(), &input0[0][0][0][0]);
-    CopyDataToITensorHandle(inputHandle1.get(), &input1[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle0.get(), input0.origin());
+    CopyDataToITensorHandle(inputHandle1.get(), input1.origin());
 
     workload->PostAllocationConfigure();
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
 
-    ret.outputExpected = MakeTensor<float, 4>(outputTensorInfo, outValues);
+    ret.outputExpected = MakeTensor<float, NumDims>(outputTensorInfo, outValues);
     return ret;
 }
 } // anonymous namespace
@@ -4176,14 +4273,81 @@ LayerTestResult<float,4> MultiplicationTest(
         2,  2,  2,  2,    6,  6,  6,  6,
         12, 12, 12, 12,  20, 20, 20, 20 });
 
-    return MultiplicationTestHelper(workloadFactory,
-                                    memoryManager,
-                                    shape,
-                                    input0,
-                                    shape,
-                                    input1,
-                                    shape,
-                                    output);
+    return MultiplicationTestHelper<4>(workloadFactory,
+                                       memoryManager,
+                                       shape,
+                                       input0,
+                                       shape,
+                                       input1,
+                                       shape,
+                                       output);
+}
+
+LayerTestResult<float,5> Multiplication5dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const unsigned int width = 3;
+    const unsigned int height = 2;
+    const unsigned int channelCount = 2;
+    const unsigned int batchSize = 2;
+    const unsigned int depth = 2;
+
+    unsigned int shape[] = { depth, batchSize, channelCount, height, width };
+
+    std::vector<float> input0({
+        1.80f, 0.20f, 2.30f,  1.30f, 2.10f, 1.00f,
+        2.60f, 0.60f, 2.10f,  2.30f, 2.30f, 2.00f,
+
+        2.50f, 1.00f, 2.90f,  3.10f, 1.50f, 2.40f,
+        2.80f, 1.10f, 1.00f,  3.20f, 1.00f, 2.30f,
+
+
+        0.30f, 2.20f, 1.00f,  0.20f, 1.60f, 1.40f,
+        0.80f, 3.20f, 0.10f,  0.10f, 3.10f, 2.10f,
+
+        1.50f, 2.40f, 1.40f,  0.70f, 2.40f, 1.40f,
+        1.60f, 1.20f, 1.90f,  0.80f, 0.00f, 0.10f,
+    });
+
+    std::vector<float> input1({
+        0.70f, 1.00f, 2.90f,  2.20f, 3.10f, 2.80f,
+        1.80f, 2.00f, 0.50f,  2.30f, 1.20f, 2.70f,
+
+        2.40f, 0.20f, 3.20f,  1.60f, 0.20f, 2.50f,
+        2.30f, 0.70f, 2.70f,  1.80f, 2.90f, 2.70f,
+
+
+        3.20f, 3.20f, 0.70f,  1.90f, 2.70f, 2.50f,
+        2.40f, 0.90f, 2.30f,  1.80f, 2.50f, 2.00f,
+
+        1.60f, 2.20f, 1.60f,  2.00f, 0.30f, 3.20f,
+        0.40f, 3.00f, 2.60f,  0.30f, 0.00f, 2.50f,
+    });
+
+    std::vector<float> output({
+        1.26f, 0.20f, 6.67f,  2.86f, 6.51f, 2.80f,
+        4.68f, 1.20f, 1.05f,  5.29f, 2.76f, 5.40f,
+
+        6.00f, 0.20f, 9.28f,  4.96f, 0.30f, 6.00f,
+        6.44f, 0.77f, 2.70f,  5.76f, 2.90f, 6.21f,
+
+
+        0.96f, 7.04f, 0.70f,  0.38f, 4.32f, 3.50f,
+        1.92f, 2.88f, 0.23f,  0.18f, 7.75f, 4.20f,
+
+        2.40f, 5.28f, 2.24f,  1.40f, 0.72f, 4.48f,
+        0.64f, 3.60f, 4.94f,  0.24f, 0.00f, 0.25f,
+    });
+
+    return MultiplicationTestHelper<5>(workloadFactory,
+                                       memoryManager,
+                                       shape,
+                                       input0,
+                                       shape,
+                                       input1,
+                                       shape,
+                                       output);
 }
 
 LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(
@@ -4198,14 +4362,14 @@ LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(
 
     std::vector<float> output({ 2, 4, 6, 8, 10, 12, 14, 16});
 
-    return MultiplicationTestHelper(workloadFactory,
-                                    memoryManager,
-                                    shape0,
-                                    input0,
-                                    shape1,
-                                    input1,
-                                    shape0,
-                                    output);
+    return MultiplicationTestHelper<4>(workloadFactory,
+                                       memoryManager,
+                                       shape0,
+                                       input0,
+                                       shape1,
+                                       input1,
+                                       shape0,
+                                       output);
 }
 
 LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(
@@ -4226,14 +4390,14 @@ LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(
         7,   16,      9, 20,     11, 24,
         13,  28,     15, 32,     17, 36});
 
-    return MultiplicationTestHelper(workloadFactory,
-                                    memoryManager,
-                                    shape0,
-                                    input0,
-                                    shape1,
-                                    input1,
-                                    shape0,
-                                    output);
+    return MultiplicationTestHelper<4>(workloadFactory,
+                                       memoryManager,
+                                       shape0,
+                                       input0,
+                                       shape1,
+                                       input1,
+                                       shape0,
+                                       output);
 }
 
 LayerTestResult<float,4> CompareMultiplicationTest(

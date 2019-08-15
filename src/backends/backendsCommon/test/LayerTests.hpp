@@ -539,6 +539,11 @@ LayerTestResult<T, 4> SimpleReshapeTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 5> Reshape5dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<float, 4> SimpleFloorTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
@@ -712,6 +717,10 @@ LayerTestResult<float, 4> AdditionTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+LayerTestResult<float, 5> Addition5dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<float, 4> AdditionBroadcast1ElementTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
@@ -761,6 +770,10 @@ LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 4> MultiplicationTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 5> Multiplication5dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -2084,6 +2097,37 @@ LayerTestResult<int16_t, 4> QuantizeClampInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+std::vector<T> ConvertToDataType(const std::vector<float>& input,
+                                 const armnn::TensorInfo& inputTensorInfo)
+{
+    std::vector<T> output(input.size());
+    auto outputTensorInfo = inputTensorInfo;
+    outputTensorInfo.SetDataType(ArmnnType);
+
+    std::unique_ptr<armnn::Encoder<float>> pOutputEncoder = armnn::MakeEncoder<float>(outputTensorInfo, output.data());
+    armnn::Encoder<float>& rOutputEncoder = *pOutputEncoder;
+
+    for (auto it = input.begin(); it != input.end(); ++it)
+    {
+        rOutputEncoder.Set(*it);
+        ++rOutputEncoder;
+    }
+    return output;
+}
+
+// Utility method to convert a single value to the correct type
+template <typename T>
+T ConvertToDataType(const float& value,
+                    const armnn::TensorInfo& tensorInfo)
+{
+    std::vector<T> output(1);
+    std::unique_ptr<armnn::Encoder<float>> pEncoder = armnn::MakeEncoder<float>(tensorInfo, output.data());
+    armnn::Encoder<float>& rEncoder = *pEncoder;
+    rEncoder.Set(value);
+    return output[0];
+}
+
 template<typename T, typename B>
 LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
         armnn::IWorkloadFactory& workloadFactory,
@@ -2130,35 +2174,75 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
     return result;
 }
 
-template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-std::vector<T> ConvertToDataType(const std::vector<float>& input,
-                                 const armnn::TensorInfo& inputTensorInfo)
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 2> FullyConnectedTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        bool biasEnabled)
 {
-    std::vector<T> output(input.size());
-    auto outputTensorInfo = inputTensorInfo;
-    outputTensorInfo.SetDataType(ArmnnType);
+    constexpr static unsigned int inputWidth = 3u;
+    constexpr static unsigned int inputHeight = 2u;
+    constexpr static unsigned int inputChannels = 1u;
 
-    std::unique_ptr<armnn::Encoder<float>> pOutputEncoder = armnn::MakeEncoder<float>(outputTensorInfo, output.data());
-    armnn::Encoder<float>& rOutputEncoder = *pOutputEncoder;
+    constexpr static unsigned int inputSize = inputWidth * inputHeight * inputChannels;
 
-    for (auto it = input.begin(); it != input.end(); ++it)
+    constexpr static unsigned int outputChannels = 2u;
+
+    armnn::TensorInfo inputTensorInfo({ 1, inputChannels, inputHeight, inputWidth }, ArmnnType);
+    inputTensorInfo.SetQuantizationScale(0.1f);
+    inputTensorInfo.SetQuantizationOffset(63);
+
+    armnn::TensorInfo outputTensorInfo({ 1, outputChannels }, ArmnnType);
+    outputTensorInfo.SetQuantizationScale(5.f);
+    outputTensorInfo.SetQuantizationOffset(biasEnabled ? -50 : 10);
+
+    armnn::TensorInfo weightsDesc({ outputChannels, inputSize }, ArmnnType);
+    weightsDesc.SetQuantizationScale(0.2f);
+    weightsDesc.SetQuantizationOffset(93);
+
+    armnn::TensorInfo biasesDesc({ outputChannels }, GetBiasTypeFromWeightsType(weightsDesc.GetDataType()).value());
+    biasesDesc.SetQuantizationScale(inputTensorInfo.GetQuantizationScale() * weightsDesc.GetQuantizationScale());
+    biasesDesc.SetQuantizationOffset(0);
+
+    LayerTestResult<T, 2> result(outputTensorInfo);
+
+    auto input = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(
+        {
+            -1.2f, 6.1f, -3.5f,
+            18.8f, -5.5f, 2.9f
+        },
+        inputTensorInfo));
+
+    auto weights = MakeTensor<T, 2>(weightsDesc, ConvertToDataType<ArmnnType>(
+        {
+            -8.4f, 20.0f, -10.4f, -8, 16.4f, -11.8f,
+            23.4f, 10.4f, -14.0f, -3.8f, -11.8f, 11.4f
+        },
+        weightsDesc));
+
+    auto bias = MakeTensor<int32_t, 1>(biasesDesc, std::vector<int32_t>{9250, 67500});
+
+    result = SimpleFullyConnectedTestImpl<T>(
+            workloadFactory,
+            memoryManager,
+            inputTensorInfo, outputTensorInfo,
+            weightsDesc, biasesDesc,
+            weights, bias, input,
+            biasEnabled, true
+    );
+
+    if (biasEnabled)
     {
-        rOutputEncoder.Set(*it);
-        ++rOutputEncoder;
+        result.outputExpected = MakeTensor<T, 2>(outputTensorInfo,
+                                                 ConvertToDataType<ArmnnType>({80.f, 1460.f}, outputTensorInfo));
     }
-    return output;
-}
+    else
+    {
+        result.outputExpected = MakeTensor<T, 2>(outputTensorInfo,
+                                                 ConvertToDataType<ArmnnType>({-107.04f, 110.f}, outputTensorInfo));
+    }
 
-// Utility method to convert a single value to the correct type
-template <typename T>
-T ConvertToDataType(const float& value,
-                    const armnn::TensorInfo& tensorInfo)
-{
-    std::vector<T> output(1);
-    std::unique_ptr<armnn::Encoder<float>> pEncoder = armnn::MakeEncoder<float>(tensorInfo, output.data());
-    armnn::Encoder<float>& rEncoder = *pEncoder;
-    rEncoder.Set(value);
-    return output[0];
+    return result;
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -2354,8 +2438,8 @@ LayerTestResult<T, 2> RsqrtNegativeTest(
                                 inputValues, expectedOutputValues);
 }
 
-template<typename T>
-LayerTestResult<T, 4> SimpleReshapeTestImpl(
+template<typename T, size_t NumDims>
+LayerTestResult<T, NumDims> SimpleReshapeTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::TensorInfo inputTensorInfo,
@@ -2363,10 +2447,10 @@ LayerTestResult<T, 4> SimpleReshapeTestImpl(
     const std::vector<T>& inputData,
     const std::vector<T>& outputExpectedData)
 {
-    auto input = MakeTensor<T, 4>(inputTensorInfo, inputData);
+    auto input = MakeTensor<T, NumDims>(inputTensorInfo, inputData);
 
-    LayerTestResult<T, 4> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, outputExpectedData);
+    LayerTestResult<T, NumDims> ret(outputTensorInfo);
+    ret.outputExpected = MakeTensor<T, NumDims>(outputTensorInfo, outputExpectedData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -2381,84 +2465,13 @@ LayerTestResult<T, 4> SimpleReshapeTestImpl(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0]);
+    CopyDataToITensorHandle(inputHandle.get(), input.origin());
 
     workload->Execute();
 
-    CopyDataFromITensorHandle(&ret.output[0][0][0][0], outputHandle.get());
+    CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
 
     return ret;
-}
-
-template<armnn::DataType ArmnnType, typename T>
-LayerTestResult<T, 2> FullyConnectedTest(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-        bool biasEnabled)
-{
-    constexpr static unsigned int inputWidth = 3u;
-    constexpr static unsigned int inputHeight = 2u;
-    constexpr static unsigned int inputChannels = 1u;
-
-    constexpr static unsigned int inputSize = inputWidth * inputHeight * inputChannels;
-
-    constexpr static unsigned int outputChannels = 2u;
-
-    armnn::TensorInfo inputTensorInfo({ 1, inputChannels, inputHeight, inputWidth }, ArmnnType);
-    inputTensorInfo.SetQuantizationScale(0.1f);
-    inputTensorInfo.SetQuantizationOffset(63);
-
-    armnn::TensorInfo outputTensorInfo({ 1, outputChannels }, ArmnnType);
-    outputTensorInfo.SetQuantizationScale(5.f);
-    outputTensorInfo.SetQuantizationOffset(biasEnabled ? -50 : 10);
-
-    armnn::TensorInfo weightsDesc({ outputChannels, inputSize }, ArmnnType);
-    weightsDesc.SetQuantizationScale(0.2f);
-    weightsDesc.SetQuantizationOffset(93);
-
-    armnn::TensorInfo biasesDesc({ outputChannels }, GetBiasTypeFromWeightsType(weightsDesc.GetDataType()).value());
-    biasesDesc.SetQuantizationScale(inputTensorInfo.GetQuantizationScale() * weightsDesc.GetQuantizationScale());
-    biasesDesc.SetQuantizationOffset(0);
-
-    LayerTestResult<T, 2> result(outputTensorInfo);
-
-    auto input = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(
-        {
-            -1.2f, 6.1f, -3.5f,
-            18.8f, -5.5f, 2.9f
-        },
-        inputTensorInfo));
-
-    auto weights = MakeTensor<T, 2>(weightsDesc, ConvertToDataType<ArmnnType>(
-        {
-            -8.4f, 20.0f, -10.4f, -8, 16.4f, -11.8f,
-            23.4f, 10.4f, -14.0f, -3.8f, -11.8f, 11.4f
-        },
-        weightsDesc));
-
-    auto bias = MakeTensor<int32_t, 1>(biasesDesc, std::vector<int32_t>{9250, 67500});
-
-    result = SimpleFullyConnectedTestImpl<T>(
-            workloadFactory,
-            memoryManager,
-            inputTensorInfo, outputTensorInfo,
-            weightsDesc, biasesDesc,
-            weights, bias, input,
-            biasEnabled, true
-    );
-
-    if (biasEnabled)
-    {
-        result.outputExpected = MakeTensor<T, 2>(outputTensorInfo,
-                                                 ConvertToDataType<ArmnnType>({80.f, 1460.f}, outputTensorInfo));
-    }
-    else
-    {
-        result.outputExpected = MakeTensor<T, 2>(outputTensorInfo,
-                                                 ConvertToDataType<ArmnnType>({-107.04f, 110.f}, outputTensorInfo));
-    }
-
-    return result;
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -2509,7 +2522,69 @@ LayerTestResult<T, 4> SimpleReshapeTest(
         },
         outputTensorInfo);
 
-    return SimpleReshapeTestImpl<T>(
+    return SimpleReshapeTestImpl<T, 4>(
+        workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 5> Reshape5dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[] = { 2, 2, 8, 1, 1 };
+    unsigned int outputShape[] = { 2, 2, 2, 2, 2 };
+
+    inputTensorInfo = armnn::TensorInfo(5, inputShape, ArmnnType);
+    inputTensorInfo.SetQuantizationScale(1.0f);
+    outputTensorInfo = armnn::TensorInfo(5, outputShape, ArmnnType);
+    outputTensorInfo.SetQuantizationScale(1.0f);
+
+    auto input = ConvertToDataType<ArmnnType>(
+        {
+            0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f,
+            8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f,
+
+            16.0f, 17.0f, 18.0f, 19.0f, 20.0f, 21.0f, 22.0f, 23.0f,
+            24.0f, 25.0f, 26.0f, 27.0f, 28.0f, 29.0f, 30.0f, 31.0f,
+        },
+        inputTensorInfo);
+
+    auto outputExpected = ConvertToDataType<ArmnnType>(
+        {
+            0.0f, 1.0f,
+            2.0f, 3.0f,
+
+            4.0f, 5.0f,
+            6.0f, 7.0f,
+
+
+            8.0f, 9.0f,
+            10.0f, 11.0f,
+
+            12.0f, 13.0f,
+            14.0f, 15.0f,
+
+
+
+            16.0f, 17.0f,
+            18.0f, 19.0f,
+
+            20.0f, 21.0f,
+            22.0f, 23.0f,
+
+
+            24.0f, 25.0f,
+            26.0f, 27.0f,
+
+            28.0f, 29.0f,
+            30.0f, 31.0f,
+        },
+        outputTensorInfo);
+
+    return SimpleReshapeTestImpl<T, 5>(
         workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected);
 }
 
@@ -4737,6 +4812,91 @@ LayerTestResult<T, 3> Stack3dOutput1Axis3InputTest(
     };
 
     return StackTestHelper<ArmnnType, T, 3>(
+        workloadFactory,
+        memoryManager,
+        inputTensorInfo,
+        outputTensorInfo,
+        1U,
+        inputData,
+        outputExpectedData
+    );
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 5> Stack5dOutputTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo ({ 2, 2, 2, 3 }, ArmnnType);
+    armnn::TensorInfo outputTensorInfo({ 2, 2, 2, 2, 3 }, ArmnnType);
+
+    std::vector<std::vector<T>> inputData;
+
+    inputData.push_back(
+    {
+        1, 2, 3,
+        4, 5, 6,
+
+        7, 8, 9,
+        10, 11, 12,
+
+
+        13, 14, 15,
+        16, 17, 18,
+
+        19, 20, 21,
+        22, 23, 24
+    });
+
+    inputData.push_back(
+    {
+        25, 26, 27,
+        28, 29, 30,
+
+        31, 32, 33,
+        34, 35, 36,
+
+
+        37, 38, 39,
+        40, 41, 42,
+
+        43, 44, 45,
+        46, 47, 48
+    });
+
+    std::vector<T> outputExpectedData =
+    {
+        1, 2, 3,
+        4, 5, 6,
+
+        7, 8, 9,
+        10, 11, 12,
+
+
+        25, 26, 27,
+        28, 29, 30,
+
+        31, 32, 33,
+        34, 35, 36,
+
+
+
+        13, 14, 15,
+        16, 17, 18,
+
+        19, 20, 21,
+        22, 23, 24,
+
+
+        37, 38, 39,
+        40, 41, 42,
+
+        43, 44, 45,
+        46, 47, 48
+
+    };
+
+    return StackTestHelper<ArmnnType, T, 5>(
         workloadFactory,
         memoryManager,
         inputTensorInfo,

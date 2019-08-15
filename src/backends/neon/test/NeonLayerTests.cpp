@@ -394,6 +394,7 @@ ARMNN_AUTO_TEST_CASE(FullyConnectedBiasedUint8, FullyConnectedTest<armnn::DataTy
 
 // Add
 ARMNN_AUTO_TEST_CASE(SimpleAdd, AdditionTest)
+ARMNN_AUTO_TEST_CASE(Add5d, Addition5dTest)
 ARMNN_AUTO_TEST_CASE(AddBroadcast, AdditionBroadcastTest)
 ARMNN_AUTO_TEST_CASE(AddBroadcast1Element, AdditionBroadcast1ElementTest)
 
@@ -412,6 +413,7 @@ ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVector, MultiplicationBroadcast1DV
 ARMNN_AUTO_TEST_CASE(MultiplicationUint8, MultiplicationUint8Test)
 ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1ElementUint8, MultiplicationBroadcast1ElementUint8Test)
 ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadcast1DVectorUint8Test)
+ARMNN_AUTO_TEST_CASE(Multiplication5d, Multiplication5dTest)
 
 // Batch Norm
 ARMNN_AUTO_TEST_CASE(BatchNorm, BatchNormTest)
@@ -492,6 +494,7 @@ ARMNN_AUTO_TEST_CASE(GreaterBroadcast1DVectorUint8, GreaterBroadcast1DVectorUint
 // Reshape
 ARMNN_AUTO_TEST_CASE(SimpleReshapeFloat32, SimpleReshapeTest<armnn::DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(SimpleReshapeUint8, SimpleReshapeTest<armnn::DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(Reshape5d, Reshape5dTest<armnn::DataType::Float32>)
 
 // Pad
 ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
@@ -723,6 +726,7 @@ ARMNN_AUTO_TEST_CASE(Stack4dOutput1Axis,       Stack4dOutput1AxisTest<armnn::Dat
 ARMNN_AUTO_TEST_CASE(Stack4dOutput2Axis,       Stack4dOutput2AxisTest<armnn::DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(Stack4dOutput3Axis,       Stack4dOutput3AxisTest<armnn::DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(Stack3dOutput1Axis3Input, Stack3dOutput1Axis3InputTest<armnn::DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Stack5dOutput,            Stack5dOutputTest<armnn::DataType::Float32>)
 
 // ============================================================================
 // COMPARE tests

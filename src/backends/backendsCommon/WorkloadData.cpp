@@ -669,6 +669,11 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         }
     }
 
+    if (inputShape.GetNumDimensions() > 4)
+    {
+        throw InvalidArgumentException(descriptorName + ": Input tensor may have up to 4 dimensions.");
+    }
+
     // m_Axis is 0-based and may take values from 0 to the number of input dimensions (inclusive),
     // since the output tensor has an additional dimension.
     if (m_Parameters.m_Axis > inputShape.GetNumDimensions())
@@ -701,6 +706,11 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             throw InvalidArgumentException(descriptorName + ": Output tensor must "
                                            "match shape inferred from input tensor.");
         }
+    }
+
+    if (outputShape.GetNumDimensions() > 5)
+    {
+        throw InvalidArgumentException(descriptorName + ": Output tensor may have up to 5 dimensions.");
     }
 
     // Check the supported data types

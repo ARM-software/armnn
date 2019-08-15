@@ -106,11 +106,12 @@ BOOST_FIXTURE_TEST_CASE(ParseSqueezeWithoutSqueezeDims, SqueezeFixtureWithoutSqu
 
 struct SqueezeFixtureWithInvalidInput : SqueezeFixture
 {
-    SqueezeFixtureWithInvalidInput() : SqueezeFixture("[ 1, 2, 2, 1, 2 ]", "[ 1, 2, 2, 1 ]", "[ ]") {}
+    SqueezeFixtureWithInvalidInput() : SqueezeFixture("[ 1, 2, 2, 1, 2, 2 ]", "[ 1, 2, 2, 1, 2 ]", "[ ]") {}
 };
 
 BOOST_FIXTURE_TEST_CASE(ParseSqueezeInvalidInput, SqueezeFixtureWithInvalidInput)
 {
+    static_assert(armnn::MaxNumOfTensorDimensions == 5, "Please update SqueezeFixtureWithInvalidInput");
     BOOST_CHECK_THROW((SetupSingleInputSingleOutput("inputTensor", "outputTensor")),
                       armnn::InvalidArgumentException);
 }

@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(DataTypeSize)
 
 BOOST_AUTO_TEST_CASE(PermuteDescriptorWithTooManyMappings)
 {
-    BOOST_CHECK_THROW(armnn::PermuteDescriptor({ 0u, 1u, 2u, 3u, 4u }), armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(armnn::PermuteDescriptor({ 0u, 1u, 2u, 3u, 4u, 5u }), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_CASE(PermuteDescriptorWithInvalidMappings1d)
@@ -46,6 +46,11 @@ BOOST_AUTO_TEST_CASE(PermuteDescriptorWithInvalidMappings3d)
 BOOST_AUTO_TEST_CASE(PermuteDescriptorWithInvalidMappings4d)
 {
     BOOST_CHECK_THROW(armnn::PermuteDescriptor({ 0u, 1u, 2u, 4u }), armnn::InvalidArgumentException);
+}
+
+BOOST_AUTO_TEST_CASE(PermuteDescriptorWithInvalidMappings5d)
+{
+    BOOST_CHECK_THROW(armnn::PermuteDescriptor({ 0u, 1u, 2u, 3u, 5u }), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_CASE(PermuteDescriptorWithDuplicatedMappings)

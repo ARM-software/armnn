@@ -13,7 +13,7 @@
 namespace armnn
 {
 
-constexpr unsigned int MaxNumOfTensorDimensions = 4U;
+constexpr unsigned int MaxNumOfTensorDimensions = 5U;
 
 /// @enum Status enumeration
 /// @var Status::Successful
@@ -167,7 +167,12 @@ public:
 
     bool IsEqual(const PermutationVector& other) const
     {
-        return std::equal(begin(), end(), other.begin(), other.end());
+        if (m_NumDimMappings != other.m_NumDimMappings) return false;
+        for (unsigned int i = 0; i < m_NumDimMappings; ++i)
+        {
+            if (m_DimMappings[i] != other.m_DimMappings[i]) return false;
+        }
+        return true;
     }
 
     bool IsInverse(const PermutationVector& other) const

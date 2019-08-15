@@ -61,12 +61,12 @@ struct InvalidTensorsFixture : public ParserFlatbuffersFixture
                 "operator_codes": [ ],
                 "subgraphs": [{
                     "tensors": [ {
-                        "shape": [ 1, 1, 1, 1, 1 ],
+                        "shape": [ 1, 1, 1, 1, 1, 1 ],
                         "type": "FLOAT32",
                         "name": "In",
                         "buffer": 0
                     }, {
-                        "shape": [ 1, 1, 1, 1, 1 ],
+                        "shape": [ 1, 1, 1, 1, 1, 1 ],
                         "type": "FLOAT32",
                         "name": "Out",
                         "buffer": 1
@@ -81,6 +81,7 @@ struct InvalidTensorsFixture : public ParserFlatbuffersFixture
 BOOST_FIXTURE_TEST_CASE(InvalidTensorsThrowException, InvalidTensorsFixture)
 {
     // Tensor numDimensions must be less than or equal to MaxNumOfTensorDimensions
+    static_assert(armnn::MaxNumOfTensorDimensions == 5, "Please update InvalidTensorsFixture");
     BOOST_CHECK_THROW(Setup(), armnn::InvalidArgumentException);
 }
 

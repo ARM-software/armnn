@@ -24,9 +24,14 @@ public:
         return m_SupportedBackends;
     }
 
+    void AddSupportedBackends(const BackendIdSet& backendIds)
+    {
+        m_SupportedBackends.insert(backendIds.begin(), backendIds.end());
+    }
+
 private:
     DeviceSpec() = delete;
     BackendIdSet m_SupportedBackends;
 };
 
-}
+} // namespace armnn

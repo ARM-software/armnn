@@ -144,8 +144,7 @@ Runtime::Runtime(const CreationOptions& options)
     {
         // Store backend contexts for the supported ones
         const BackendIdSet& supportedBackends = m_DeviceSpec.GetSupportedBackends();
-        auto it = supportedBackends.find(id);
-        if (it != supportedBackends.end())
+        if (supportedBackends.find(id) != supportedBackends.end())
         {
             auto factoryFun = BackendRegistryInstance().GetFactory(id);
             auto backend = factoryFun();
@@ -257,7 +256,10 @@ void Runtime::LoadDynamicBackends(const std::string& overrideBackendPath)
     m_DynamicBackends = DynamicBackendUtils::CreateDynamicBackends(sharedObjects);
 
     // Register the dynamic backends in the backend registry
-    DynamicBackendUtils::RegisterDynamicBackends(m_DynamicBackends);
+    BackendIdSet registeredBackendIds = DynamicBackendUtils::RegisterDynamicBackends(m_DynamicBackends);
+
+    // Add the registered dynamic backend ids to the list of supported backends
+    m_DeviceSpec.AddSupportedBackends(registeredBackendIds);
 }
 
 } // namespace armnn

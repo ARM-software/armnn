@@ -79,10 +79,11 @@ public:
         return GetBackendPathsImpl(path);
     }
 
-    static void RegisterDynamicBackendsImplTest(armnn::BackendRegistry& backendRegistry,
-                                                const std::vector<armnn::DynamicBackendPtr>& dynamicBackends)
+    static armnn::BackendIdSet RegisterDynamicBackendsImplTest(
+            armnn::BackendRegistry& backendRegistry,
+            const std::vector<armnn::DynamicBackendPtr>& dynamicBackends)
     {
-        RegisterDynamicBackendsImpl(backendRegistry, dynamicBackends);
+        return RegisterDynamicBackendsImpl(backendRegistry, dynamicBackends);
     }
 };
 
@@ -896,12 +897,15 @@ void RegisterSingleDynamicBackendTestImpl()
     BackendVersion dynamicBackendVersion = dynamicBackends[0]->GetBackendVersion();
     BOOST_TEST(TestDynamicBackendUtils::IsBackendCompatible(dynamicBackendVersion));
 
-    TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry, dynamicBackends);
+    BackendIdSet registeredBackendIds = TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry,
+                                                                                                 dynamicBackends);
     BOOST_TEST(backendRegistry.Size() == 1);
+    BOOST_TEST(registeredBackendIds.size() == 1);
 
     BackendIdSet backendIds = backendRegistry.GetBackendIds();
     BOOST_TEST(backendIds.size() == 1);
     BOOST_TEST((backendIds.find(dynamicBackendId) != backendIds.end()));
+    BOOST_TEST((registeredBackendIds.find(dynamicBackendId) != registeredBackendIds.end()));
 
     auto dynamicBackendFactoryFunction = backendRegistry.GetFactory(dynamicBackendId);
     BOOST_TEST((dynamicBackendFactoryFunction != nullptr));
@@ -960,14 +964,19 @@ void RegisterMultipleDynamicBackendsTestImpl()
     BackendRegistry backendRegistry;
     BOOST_TEST(backendRegistry.Size() == 0);
 
-    TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry, dynamicBackends);
+    BackendIdSet registeredBackendIds = TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry,
+                                                                                                 dynamicBackends);
     BOOST_TEST(backendRegistry.Size() == 3);
+    BOOST_TEST(registeredBackendIds.size() == 3);
 
     BackendIdSet backendIds = backendRegistry.GetBackendIds();
     BOOST_TEST(backendIds.size() == 3);
     BOOST_TEST((backendIds.find(dynamicBackendId1) != backendIds.end()));
     BOOST_TEST((backendIds.find(dynamicBackendId2) != backendIds.end()));
     BOOST_TEST((backendIds.find(dynamicBackendId3) != backendIds.end()));
+    BOOST_TEST((registeredBackendIds.find(dynamicBackendId1) != registeredBackendIds.end()));
+    BOOST_TEST((registeredBackendIds.find(dynamicBackendId2) != registeredBackendIds.end()));
+    BOOST_TEST((registeredBackendIds.find(dynamicBackendId3) != registeredBackendIds.end()));
 
     for (size_t i = 0; i < dynamicBackends.size(); i++)
     {
@@ -1036,8 +1045,10 @@ void RegisterMultipleInvalidDynamicBackendsTestImpl()
     BOOST_TEST(backendRegistry.Size() == 0);
 
     // Check that no dynamic backend got registered
-    TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry, dynamicBackends);
+    BackendIdSet registeredBackendIds = TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry,
+                                                                                                 dynamicBackends);
     BOOST_TEST(backendRegistry.Size() == 0);
+    BOOST_TEST(registeredBackendIds.empty());
 }
 
 void RegisterMixedDynamicBackendsTestImpl()
@@ -1165,14 +1176,17 @@ void RegisterMixedDynamicBackendsTestImpl()
         "TestValid5"
     };
 
-    TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry, dynamicBackends);
+    BackendIdSet registeredBackendIds = TestDynamicBackendUtils::RegisterDynamicBackendsImplTest(backendRegistry,
+                                                                                                 dynamicBackends);
     BOOST_TEST(backendRegistry.Size() == expectedRegisteredbackendIds.size());
+    BOOST_TEST(registeredBackendIds.size() == expectedRegisteredbackendIds.size());
 
     BackendIdSet backendIds = backendRegistry.GetBackendIds();
     BOOST_TEST(backendIds.size() == expectedRegisteredbackendIds.size());
     for (const BackendId& expectedRegisteredbackendId : expectedRegisteredbackendIds)
     {
         BOOST_TEST((backendIds.find(expectedRegisteredbackendId) != backendIds.end()));
+        BOOST_TEST((registeredBackendIds.find(expectedRegisteredbackendId) != registeredBackendIds.end()));
 
         auto dynamicBackendFactoryFunction = backendRegistry.GetFactory(expectedRegisteredbackendId);
         BOOST_TEST((dynamicBackendFactoryFunction != nullptr));
@@ -1190,10 +1204,16 @@ void RuntimeEmptyTestImpl()
     // Swapping the backend registry storage for testing
     TestBackendRegistry testBackendRegistry;
 
+    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    BOOST_TEST(backendRegistry.Size() == 0);
+
     IRuntime::CreationOptions creationOptions;
     IRuntimePtr runtime = IRuntime::Create(creationOptions);
 
-    const BackendRegistry& backendRegistry = BackendRegistryInstance();
+    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
+    BOOST_TEST(supportedBackendIds.empty());
+
     BOOST_TEST(backendRegistry.Size() == 0);
 }
 
@@ -1228,6 +1248,14 @@ void RuntimeDynamicBackendsTestImpl()
     {
         BOOST_TEST((backendIds.find(expectedRegisteredbackendId) != backendIds.end()));
     }
+
+    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
+    BOOST_TEST(supportedBackendIds.size() == expectedRegisteredbackendIds.size());
+    for (const BackendId& expectedRegisteredbackendId : expectedRegisteredbackendIds)
+    {
+        BOOST_TEST((supportedBackendIds.find(expectedRegisteredbackendId) != supportedBackendIds.end()));
+    }
 }
 
 void RuntimeDuplicateDynamicBackendsTestImpl()
@@ -1261,6 +1289,14 @@ void RuntimeDuplicateDynamicBackendsTestImpl()
     {
         BOOST_TEST((backendIds.find(expectedRegisteredbackendId) != backendIds.end()));
     }
+
+    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
+    BOOST_TEST(supportedBackendIds.size() == expectedRegisteredbackendIds.size());
+    for (const BackendId& expectedRegisteredbackendId : expectedRegisteredbackendIds)
+    {
+        BOOST_TEST((supportedBackendIds.find(expectedRegisteredbackendId) != supportedBackendIds.end()));
+    }
 }
 
 void RuntimeInvalidDynamicBackendsTestImpl()
@@ -1282,6 +1318,10 @@ void RuntimeInvalidDynamicBackendsTestImpl()
 
     const BackendRegistry& backendRegistry = BackendRegistryInstance();
     BOOST_TEST(backendRegistry.Size() == 0);
+
+    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
+    BOOST_TEST(supportedBackendIds.empty());
 }
 
 void RuntimeInvalidOverridePathTestImpl()
@@ -1298,6 +1338,10 @@ void RuntimeInvalidOverridePathTestImpl()
 
     const BackendRegistry& backendRegistry = BackendRegistryInstance();
     BOOST_TEST(backendRegistry.Size() == 0);
+
+    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
+    BOOST_TEST(supportedBackendIds.empty());
 }
 
 void CreateReferenceDynamicBackendTestImpl()
@@ -1329,6 +1373,11 @@ void CreateReferenceDynamicBackendTestImpl()
 
     BackendIdSet backendIds = backendRegistry.GetBackendIds();
     BOOST_TEST((backendIds.find("CpuRef") != backendIds.end()));
+
+    const DeviceSpec& deviceSpec = *boost::polymorphic_downcast<const DeviceSpec*>(&runtime->GetDeviceSpec());
+    BackendIdSet supportedBackendIds = deviceSpec.GetSupportedBackends();
+    BOOST_TEST(supportedBackendIds.size() == 1);
+    BOOST_TEST((supportedBackendIds.find("CpuRef") != supportedBackendIds.end()));
 
     // Get the factory function
     auto referenceDynamicBackendFactoryFunction = backendRegistry.GetFactory("CpuRef");

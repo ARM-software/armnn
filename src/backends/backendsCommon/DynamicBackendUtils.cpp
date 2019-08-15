@@ -299,21 +299,25 @@ std::vector<DynamicBackendPtr> DynamicBackendUtils::CreateDynamicBackends(const 
     return dynamicBackends;
 }
 
-void DynamicBackendUtils::RegisterDynamicBackends(const std::vector<DynamicBackendPtr>& dynamicBackends)
+BackendIdSet DynamicBackendUtils::RegisterDynamicBackends(const std::vector<DynamicBackendPtr>& dynamicBackends)
 {
     // Get a reference of the backend registry
     BackendRegistry& backendRegistry = BackendRegistryInstance();
 
-    // Register the dynamic backends in the backend registry
-    RegisterDynamicBackendsImpl(backendRegistry, dynamicBackends);
+    // Register the dynamic backends in the backend registry, and return a list of registered backend ids
+    return RegisterDynamicBackendsImpl(backendRegistry, dynamicBackends);
 }
 
-void DynamicBackendUtils::RegisterDynamicBackendsImpl(BackendRegistry& backendRegistry,
-                                                      const std::vector<DynamicBackendPtr>& dynamicBackends)
+BackendIdSet DynamicBackendUtils::RegisterDynamicBackendsImpl(BackendRegistry& backendRegistry,
+                                                              const std::vector<DynamicBackendPtr>& dynamicBackends)
 {
+    // Initialize the list of registered backend ids
+    BackendIdSet registeredBackendIds;
+
     // Register the dynamic backends in the backend registry
     for (const DynamicBackendPtr& dynamicBackend : dynamicBackends)
     {
+        // Get the id of the dynamic backend
         BackendId dynamicBackendId;
         try
         {
@@ -362,8 +366,22 @@ void DynamicBackendUtils::RegisterDynamicBackendsImpl(BackendRegistry& backendRe
         }
 
         // Register the dynamic backend
-        backendRegistry.Register(dynamicBackendId, dynamicBackendFactoryFunction);
+        try
+        {
+            backendRegistry.Register(dynamicBackendId, dynamicBackendFactoryFunction);
+        }
+        catch (const InvalidArgumentException& e)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "An error has occurred when registering the dynamic backend \""
+                                       << dynamicBackendId << "\": " << e.what();
+            continue;
+        }
+
+        // Add the id of the dynamic backend just registered to the list of registered backend ids
+        registeredBackendIds.insert(dynamicBackendId);
     }
+
+    return registeredBackendIds;
 }
 
 } // namespace armnn

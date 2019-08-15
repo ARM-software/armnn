@@ -39,14 +39,14 @@ public:
     static std::vector<std::string> GetSharedObjects(const std::vector<std::string>& backendPaths);
 
     static std::vector<DynamicBackendPtr> CreateDynamicBackends(const std::vector<std::string>& sharedObjects);
-    static void RegisterDynamicBackends(const std::vector<DynamicBackendPtr>& dynamicBackends);
+    static BackendIdSet RegisterDynamicBackends(const std::vector<DynamicBackendPtr>& dynamicBackends);
 
 protected:
     /// Protected methods for testing purposes
     static bool IsBackendCompatibleImpl(const BackendVersion& backendApiVersion, const BackendVersion& backendVersion);
     static std::vector<std::string> GetBackendPathsImpl(const std::string& backendPaths);
-    static void RegisterDynamicBackendsImpl(BackendRegistry& backendRegistry,
-                                            const std::vector<DynamicBackendPtr>& dynamicBackends);
+    static BackendIdSet RegisterDynamicBackendsImpl(BackendRegistry& backendRegistry,
+                                                    const std::vector<DynamicBackendPtr>& dynamicBackends);
 
 private:
     static std::string GetDlError();

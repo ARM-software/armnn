@@ -413,6 +413,8 @@ list(APPEND armnn_sources
     src/armnn/optimizations/SquashEqualSiblings.hpp
     src/profiling/CommandHandlerKey.cpp
     src/profiling/CommandHandlerKey.hpp
+    src/profiling/Packet.cpp
+    src/profiling/Packet.hpp
     third-party/half/half.hpp
     )
 

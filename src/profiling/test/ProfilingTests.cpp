@@ -4,7 +4,10 @@
 //
 
 #include "../CommandHandlerKey.hpp"
+#include "../Packet.hpp"
 
+#include <cstdint>
+#include <cstring>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(ExternalProfiling)
@@ -54,6 +57,25 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
         };
 
     BOOST_CHECK(vect == expectedVect);
+}
+
+BOOST_AUTO_TEST_CASE(CheckPacketClass)
+{
+    const char* data = "test";
+    unsigned int length = static_cast<unsigned int>(std::strlen(data));
+
+    Packet packetTest1(472580096,length,data);
+    BOOST_CHECK_THROW(Packet packetTest2(472580096,0,""), armnn::Exception);
+
+    Packet packetTest3(472580096,0, nullptr);
+
+    BOOST_CHECK(packetTest1.GetLength() == length);
+    BOOST_CHECK(packetTest1.GetData() == data);
+
+    BOOST_CHECK(packetTest1.GetPacketFamily() == 7);
+    BOOST_CHECK(packetTest1.GetPacketId() == 43);
+    BOOST_CHECK(packetTest1.GetPacketType() == 3);
+    BOOST_CHECK(packetTest1.GetPacketClass() == 5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

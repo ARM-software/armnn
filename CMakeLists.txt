@@ -415,6 +415,8 @@ list(APPEND armnn_sources
     src/profiling/CommandHandlerFunctor.hpp
     src/profiling/CommandHandlerKey.cpp
     src/profiling/CommandHandlerKey.hpp
+    src/profiling/CommandHandlerRegistry.cpp
+    src/profiling/CommandHandlerRegistry.hpp
     src/profiling/Packet.cpp
     src/profiling/Packet.hpp
     third-party/half/half.hpp

@@ -11,18 +11,18 @@
 namespace armnn
 {
 
-using FactoryId = std::string;
+using FactoryId = ITensorHandleFactory::FactoryId;
 
 std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateSubTensorHandle(ITensorHandle& parent,
-                                                                              TensorShape const& subTensorShape,
-                                                                              unsigned int const* subTensorOrigin)
+                                                                              const TensorShape& subTensorShape,
+                                                                              const unsigned int* subTensorOrigin)
                                                                               const
 {
     const arm_compute::TensorShape shape = armcomputetensorutils::BuildArmComputeTensorShape(subTensorShape);
 
     arm_compute::Coordinates coords;
     coords.set_num_dimensions(subTensorShape.GetNumDimensions());
-    for (unsigned int i = 0; i < subTensorShape.GetNumDimensions(); i++)
+    for (unsigned int i = 0; i < subTensorShape.GetNumDimensions(); ++i)
     {
         // Arm compute indexes tensor coords in reverse order.
         unsigned int revertedIndex = subTensorShape.GetNumDimensions() - i - 1;
@@ -56,9 +56,15 @@ std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const
     return tensorHandle;
 }
 
+const FactoryId& NeonTensorHandleFactory::GetIdStatic()
+{
+    static const FactoryId s_Id(NeonTensorHandleFactoryId());
+    return s_Id;
+}
+
 const FactoryId NeonTensorHandleFactory::GetId() const
 {
-    return m_Id;
+    return GetIdStatic();
 }
 
 bool NeonTensorHandleFactory::SupportsSubTensors() const

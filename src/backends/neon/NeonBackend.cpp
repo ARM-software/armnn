@@ -97,7 +97,7 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
 std::vector<ITensorHandleFactory::FactoryId> NeonBackend::GetHandleFactoryPreferences() const
 {
-    return std::vector<ITensorHandleFactory::FactoryId>() = {"Arm/Neon/TensorHandleFactory"};
+    return std::vector<ITensorHandleFactory::FactoryId>() = {NeonTensorHandleFactory::GetIdStatic()};
 }
 
 void NeonBackend::RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry)
@@ -106,7 +106,7 @@ void NeonBackend::RegisterTensorHandleFactories(class TensorHandleFactoryRegistr
                                                              BaseMemoryManager::MemoryAffinity::Offset);
 
     registry.RegisterMemoryManager(memoryManager);
-    registry.RegisterFactory(std::make_unique<NeonTensorHandleFactory>(memoryManager, "Arm/Neon/TensorHandleFactory"));
+    registry.RegisterFactory(std::make_unique<NeonTensorHandleFactory>(memoryManager));
 }
 
 } // namespace armnn

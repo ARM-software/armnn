@@ -12,6 +12,7 @@ namespace armnn
 
 enum class MemorySource
 {
+    Undefined = 0,
     Malloc = 1,
     DmaBuf = 2,
     DmaBufProtected = 4

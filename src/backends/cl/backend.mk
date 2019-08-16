@@ -18,6 +18,7 @@ BACKEND_SOURCES := \
         ClBackendContext.cpp \
         ClContextControl.cpp \
         ClLayerSupport.cpp \
+        ClTensorHandleFactory.cpp \
         ClWorkloadFactory.cpp \
         OpenClTimer.cpp \
         workloads/ClActivationWorkload.cpp \

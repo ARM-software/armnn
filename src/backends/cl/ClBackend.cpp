@@ -8,6 +8,7 @@
 #include "ClWorkloadFactory.hpp"
 #include "ClBackendContext.hpp"
 #include "ClLayerSupport.hpp"
+#include "ClTensorHandleFactory.hpp"
 
 #include <aclCommon/BaseMemoryManager.hpp>
 
@@ -55,6 +56,30 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
 {
     return std::make_unique<ClWorkloadFactory>(
         boost::polymorphic_pointer_downcast<ClMemoryManager>(memoryManager));
+}
+
+IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
+    TensorHandleFactoryRegistry& registry) const
+{
+    auto memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
+
+    registry.RegisterMemoryManager(memoryManager);
+
+    return std::make_unique<ClWorkloadFactory>(
+            boost::polymorphic_pointer_downcast<ClMemoryManager>(memoryManager));
+}
+
+std::vector<ITensorHandleFactory::FactoryId> ClBackend::GetHandleFactoryPreferences() const
+{
+    return std::vector<ITensorHandleFactory::FactoryId> {ClTensorHandleFactory::GetIdStatic()};
+}
+
+void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& registry)
+{
+    auto mgr = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
+
+    registry.RegisterMemoryManager(mgr);
+    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(mgr));
 }
 
 IBackendInternal::IBackendContextPtr

@@ -15,6 +15,8 @@ if(ARMCOMPUTECL)
         ClLayerSupport.cpp
         ClLayerSupport.hpp
         ClTensorHandle.hpp
+        ClTensorHandleFactory.cpp
+        ClTensorHandleFactory.hpp
         ClWorkloadFactory.cpp
         ClWorkloadFactory.hpp
         OpenClTimer.cpp

@@ -2,25 +2,27 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-
 #pragma once
 
-#include <aclCommon/BaseMemoryManager.hpp>
 #include <backendsCommon/ITensorHandleFactory.hpp>
+#include <aclCommon/BaseMemoryManager.hpp>
+#include <backendsCommon/IMemoryManager.hpp>
+#include <armnn/MemorySources.hpp>
 
 namespace armnn
 {
 
-constexpr const char* NeonTensorHandleFactoryId() { return "Arm/Neon/TensorHandleFactory"; }
+constexpr const char* ClTensorHandleFactoryId() { return "Arm/Cl/TensorHandleFactory"; }
 
-class NeonTensorHandleFactory : public ITensorHandleFactory
-{
+class ClTensorHandleFactory : public ITensorHandleFactory {
 public:
-    NeonTensorHandleFactory(std::weak_ptr<NeonMemoryManager> mgr)
-                            : m_MemoryManager(mgr),
-                              m_ImportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined)),
-                              m_ExportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined))
-    {}
+    static const FactoryId m_Id;
+
+    ClTensorHandleFactory(std::shared_ptr<ClMemoryManager> mgr)
+                          : m_MemoryManager(mgr),
+                            m_ImportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined)),
+                            m_ExportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined))
+        {}
 
     std::unique_ptr<ITensorHandle> CreateSubTensorHandle(ITensorHandle& parent,
                                                          const TensorShape& subTensorShape,
@@ -42,7 +44,7 @@ public:
     MemorySourceFlags GetImportFlags() const override;
 
 private:
-    mutable std::shared_ptr<NeonMemoryManager> m_MemoryManager;
+    mutable std::shared_ptr<ClMemoryManager> m_MemoryManager;
     MemorySourceFlags m_ImportFlags;
     MemorySourceFlags m_ExportFlags;
 };

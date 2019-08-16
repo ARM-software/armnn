@@ -23,6 +23,13 @@ public:
     IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
         const IBackendInternal::IMemoryManagerSharedPtr& memoryManager = nullptr) const override;
 
+    IBackendInternal::IWorkloadFactoryPtr CreateWorkloadFactory(
+        TensorHandleFactoryRegistry& registry) const override;
+
+    std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override;
+
+    void RegisterTensorHandleFactories(TensorHandleFactoryRegistry& registry) override;
+
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
 
     IBackendInternal::Optimizations GetOptimizations() const override;

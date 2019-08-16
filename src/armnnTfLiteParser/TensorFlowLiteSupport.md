@@ -60,6 +60,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * TANH
 
+* TRANSPOSE_CONV
+
 * UNPACK
 
 ## Custom Operator

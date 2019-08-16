@@ -460,6 +460,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_PAD]               =  &TfLiteParser::ParsePad;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]             =  &TfLiteParser::ParseSplit;
     m_ParserFunctions[tflite::BuiltinOperator_TANH]              =  &TfLiteParser::ParseTanH;
+    m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE_CONV]    =  &TfLiteParser::ParseTransposeConv;
     m_ParserFunctions[tflite::BuiltinOperator_UNPACK]            =  &TfLiteParser::ParseUnpack;
 }
 
@@ -737,7 +738,7 @@ void TfLiteParser::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
     auto filterTensorAndData = CreateConstTensor(inputs[1],
                                                  filterTensorInfo,
                                                  armnn::Optional<armnn::PermutationVector&>());
-    armnn::IConnectableLayer* layer;
+    armnn::IConnectableLayer* layer = nullptr;
 
     auto layerName = boost::str(boost::format("Conv2D:%1%:%2%") % subgraphIndex % operatorIndex);
 
@@ -826,7 +827,7 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
                 desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
     auto filterTensorAndData = CreateConstTensor(inputs[1], filterTensorInfo, permutationVector);
-    armnn::IConnectableLayer* layer;
+    armnn::IConnectableLayer* layer = nullptr;
     auto layerName = boost::str(boost::format("DepthwiseConv2D:%1%:%2%") % subgraphIndex % operatorIndex);
 
     if (inputs.size() == 3)
@@ -860,6 +861,91 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
 
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto * options = operatorPtr->builtin_options.AsTransposeConvOptions();
+
+    TransposeConvolution2dDescriptor desc;
+    desc.m_BiasEnabled = false;
+    desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
+    desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2, 3);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
+
+    // TfLite uses NHWC tensors
+    const unsigned int inputHeight = inputTensorInfo.GetShape()[1];
+    const unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
+
+    const unsigned int filterHeight = filterTensorInfo.GetShape()[1];
+    const unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
+
+    CalcPadding(inputHeight,
+                filterHeight,
+                desc.m_StrideY,
+                1, // DilationY
+                desc.m_PadTop,
+                desc.m_PadBottom,
+                options->padding);
+
+    CalcPadding(inputWidth,
+                filterWidth,
+                desc.m_StrideX,
+                1, // DilationX
+                desc.m_PadLeft,
+                desc.m_PadRight,
+                options->padding);
+
+    auto filterTensorAndData = CreateConstTensor(inputs[1],
+                                                 filterTensorInfo,
+                                                 armnn::Optional<armnn::PermutationVector&>());
+
+    armnn::IConnectableLayer* layer = nullptr;
+    auto layerName = boost::str(boost::format("TransposeConv:%1%:%2%") % subgraphIndex % operatorIndex);
+
+    if (inputs.size() == 3)
+    {
+        desc.m_BiasEnabled = true;
+        armnn::TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
+        auto biasTensorAndData = CreateConstTensor(inputs[2],
+                                                   biasTensorInfo,
+                                                   armnn::Optional<armnn::PermutationVector&>());
+        layer = m_Network->AddTransposeConvolution2dLayer(desc,
+                                                          filterTensorAndData.first,
+                                                          Optional<ConstTensor>(biasTensorAndData.first),
+                                                          layerName.c_str());
+    }
+    else
+    {
+        layer = m_Network->AddTransposeConvolution2dLayer(desc,
+                                                          filterTensorAndData.first,
+                                                          EmptyOptional(),
+                                                          layerName.c_str());
+    }
+
+    BOOST_ASSERT(layer != nullptr);
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    // only the tensors for the inputs are relevant, exclude the const (filter) tensor
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
@@ -1776,7 +1862,7 @@ void TfLiteParser::ParseFullyConnected(size_t subgraphIndex, size_t operatorInde
     auto filterTensorAndData = CreateConstTensor(inputs[1],
                                                  filterTensorInfo,
                                                  armnn::Optional<armnn::PermutationVector&>());
-    armnn::IConnectableLayer* layer;
+    armnn::IConnectableLayer* layer = nullptr;
     auto layerName = boost::str(boost::format("FullyConnected:%1%:%2%") % subgraphIndex % operatorIndex);
 
     if (inputs.size() == 3)

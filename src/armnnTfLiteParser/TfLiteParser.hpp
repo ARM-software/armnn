@@ -120,6 +120,7 @@ private:
     void ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSub(size_t subgraphIndex, size_t operatorIndex);
     void ParseTanH(size_t subgraphIndex, size_t operatorIndex);
+    void ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex);
     void ParseUnpack(size_t subgraphIndex, size_t operatorIndex);
 
     void RegisterProducerOfTensor(size_t subgraphIndex, size_t tensorIndex, armnn::IOutputSlot* slot);

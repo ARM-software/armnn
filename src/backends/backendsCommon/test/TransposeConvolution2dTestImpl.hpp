@@ -98,7 +98,7 @@ void TransposeConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
 
     CopyDataToITensorHandle(inputHandle.get(), input.second.data());
 
-    ExecuteWorkload(*workload, nullptr);
+    ExecuteWorkload(*workload, memoryManager);
 
     // copy output
     output.second = std::vector<T>(output.first.GetNumElements(), 0.0f);

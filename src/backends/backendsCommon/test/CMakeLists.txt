@@ -66,6 +66,11 @@ if (ARMCOMPUTEREF)
         )
 endif()
 
+if(ARMCOMPUTENEON AND ARMCOMPUTECL)
+    list(APPEND armnnBackendsCommonUnitTests_sources
+        CompatibilityTests.cpp)
+endif()
+
 add_library(armnnBackendsCommonUnitTests OBJECT ${armnnBackendsCommonUnitTests_sources})
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)

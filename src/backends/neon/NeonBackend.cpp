@@ -82,7 +82,8 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
 std::vector<ITensorHandleFactory::FactoryId> NeonBackend::GetHandleFactoryPreferences() const
 {
-    return std::vector<ITensorHandleFactory::FactoryId>() = {NeonTensorHandleFactory::GetIdStatic()};
+    return std::vector<ITensorHandleFactory::FactoryId>() = {"Arm/Neon/TensorHandleFactory",
+                                                             "Arm/Cl/TensorHandleFactory"};
 }
 
 void NeonBackend::RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry)

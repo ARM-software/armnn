@@ -411,6 +411,8 @@ list(APPEND armnn_sources
     src/armnn/optimizations/OptimizeInversePermutes.hpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
+    src/profiling/CommandHandlerFunctor.cpp
+    src/profiling/CommandHandlerFunctor.hpp
     src/profiling/CommandHandlerKey.cpp
     src/profiling/CommandHandlerKey.hpp
     src/profiling/Packet.cpp

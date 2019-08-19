@@ -6,6 +6,7 @@
 #include "../CommandHandlerKey.hpp"
 #include "../CommandHandlerFunctor.hpp"
 #include "../CommandHandlerRegistry.hpp"
+#include "../EncodeVersion.hpp"
 #include "../Packet.hpp"
 
 #include <cstdint>
@@ -60,6 +61,36 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
         };
 
     BOOST_CHECK(vect == expectedVect);
+}
+
+BOOST_AUTO_TEST_CASE(CheckEncodeVersion)
+{
+    mlutil::Version version1(12);
+
+    BOOST_CHECK(version1.GetMajor() == 0);
+    BOOST_CHECK(version1.GetMinor() == 0);
+    BOOST_CHECK(version1.GetPatch() == 12);
+
+    mlutil::Version version2(4108);
+
+    BOOST_CHECK(version2.GetMajor() == 0);
+    BOOST_CHECK(version2.GetMinor() == 1);
+    BOOST_CHECK(version2.GetPatch() == 12);
+
+    mlutil::Version version3(4198412);
+
+    BOOST_CHECK(version3.GetMajor() == 1);
+    BOOST_CHECK(version3.GetMinor() == 1);
+    BOOST_CHECK(version3.GetPatch() == 12);
+
+    mlutil::Version version4(0);
+
+    BOOST_CHECK(version4.GetMajor() == 0);
+    BOOST_CHECK(version4.GetMinor() == 0);
+    BOOST_CHECK(version4.GetPatch() == 0);
+
+    mlutil::Version version5(1,0,0);
+    BOOST_CHECK(version5.GetEncodedValue() == 4194304);
 }
 
 BOOST_AUTO_TEST_CASE(CheckPacketClass)

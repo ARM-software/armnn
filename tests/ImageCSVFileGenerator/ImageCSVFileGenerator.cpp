@@ -80,6 +80,17 @@ public:
         return true;
     }
 
+    bool ValidateBindingId(const std::string& id)
+    {
+         if (!std::all_of(id.begin(), id.end(), ::isdigit))
+         {
+             std::cerr << "Invalid input binding Id" << std::endl;
+             return false;
+         }
+
+        return true;
+    }
+
     bool ProcessCommandLine(int argc, char* argv[])
     {
         namespace po = boost::program_options;
@@ -92,7 +103,9 @@ public:
                 ("indir,i", po::value<std::string>(&m_InputDirectory)->required(),
                             "Directory that .raw files are stored in")
                 ("outfile,o", po::value<std::string>(&m_OutputFileName)->required(),
-                              "Output CSV file path");
+                              "Output CSV file path")
+                ("layer-binding-id,l", po::value<std::string>(&m_InputBindingId)->default_value("0"),
+                              "Input layer binding Id, Defaults to 0");
         }
         catch (const std::exception& e)
         {
@@ -131,15 +144,22 @@ public:
             return false;
         }
 
+        if(!ValidateBindingId(m_InputBindingId))
+        {
+            return false;
+        }
+
         return true;
     }
 
     std::string GetInputDirectory() {return m_InputDirectory;}
     std::string GetOutputFileName() {return m_OutputFileName;}
+    std::string GetInputBindingId() {return m_InputBindingId;}
 
 private:
     std::string m_InputDirectory;
     std::string m_OutputFileName;
+    std::string m_InputBindingId;
 };
 
 } // namespace anonymous
@@ -155,10 +175,10 @@ int main(int argc, char* argv[])
     namespace fs = boost::filesystem;
 
     const std::string fileFormat(".raw");
-    const std::string bindingId("0");
 
     const std::string rawDirectory(cmdline.GetInputDirectory());
     const std::string outputPath(cmdline.GetOutputFileName());
+    const std::string bindingId(cmdline.GetInputBindingId());
 
     std::vector<fs::path> rawFiles;
     for (auto& entry : boost::make_iterator_range(fs::directory_iterator(rawDirectory), {}))

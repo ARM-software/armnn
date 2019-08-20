@@ -835,6 +835,19 @@ ARMNN_AUTO_TEST_CASE(UnbiasedStridedTransposeConvolution2dUint8Nhwc,
                      true,
                      DataLayout::NHWC)
 
+ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dFloatNchw,
+                     MultiChannelTransposeConvolution2dTest<DataType::Float32, DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dFloatNhwc,
+                     MultiChannelTransposeConvolution2dTest<DataType::Float32, DataType::Float32>,
+                     DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dUint8Nchw,
+                     MultiChannelTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dUint8Nhwc,
+                     MultiChannelTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
+                     DataLayout::NHWC)
+
 // ============================================================================
 // COMPARE tests
 

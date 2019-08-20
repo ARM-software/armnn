@@ -879,12 +879,12 @@ void TfLiteParser::ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex
     desc.m_DataLayout = armnn::DataLayout::NHWC;
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(inputs.size(), 2, 3);
+    CHECK_VALID_SIZE(inputs.size(), 3);
 
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[2]);
     armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
 
     // TfLite uses NHWC tensors
@@ -917,25 +917,10 @@ void TfLiteParser::ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex
     armnn::IConnectableLayer* layer = nullptr;
     auto layerName = boost::str(boost::format("TransposeConv:%1%:%2%") % subgraphIndex % operatorIndex);
 
-    if (inputs.size() == 3)
-    {
-        desc.m_BiasEnabled = true;
-        armnn::TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensor(inputs[2],
-                                                   biasTensorInfo,
-                                                   armnn::Optional<armnn::PermutationVector&>());
-        layer = m_Network->AddTransposeConvolution2dLayer(desc,
-                                                          filterTensorAndData.first,
-                                                          Optional<ConstTensor>(biasTensorAndData.first),
-                                                          layerName.c_str());
-    }
-    else
-    {
-        layer = m_Network->AddTransposeConvolution2dLayer(desc,
-                                                          filterTensorAndData.first,
-                                                          EmptyOptional(),
-                                                          layerName.c_str());
-    }
+    layer = m_Network->AddTransposeConvolution2dLayer(desc,
+                                                      filterTensorAndData.first,
+                                                      EmptyOptional(),
+                                                      layerName.c_str());
 
     BOOST_ASSERT(layer != nullptr);
 
@@ -944,7 +929,7 @@ void TfLiteParser::ParseTransposeConv(size_t subgraphIndex, size_t operatorIndex
 
     // only the tensors for the inputs are relevant, exclude the const (filter) tensor
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[2]});
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});

@@ -120,8 +120,21 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
 
     for (auto&& layer : order)
     {
-        auto& workloadFacory = GetWorkloadFactory(*layer);
-        layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFacory);
+        auto& workloadFactory = GetWorkloadFactory(*layer);
+
+        switch (layer->GetType())
+        {
+        case LayerType::Input:
+            {
+                // If IsImportEnabled is true then we need to set IsMemoryManaged to false when creating TensorHandles
+                layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFactory, !m_IsImportEnabled);
+                break;
+            }
+        default:
+            {
+                layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFactory);
+            }
+        }
     }
 
     //Then create workloads.

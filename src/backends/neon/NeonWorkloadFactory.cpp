@@ -72,20 +72,26 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateSubTensorHandle(ITenso
         boost::polymorphic_downcast<IAclTensorHandle*>(&parent), shape, coords);
 }
 
-std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                       const bool IsMemoryManaged) const
 {
     auto tensorHandle = std::make_unique<NeonTensorHandle>(tensorInfo);
-    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
-
+    if (IsMemoryManaged)
+    {
+        tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+    }
     return tensorHandle;
 }
 
 std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                       DataLayout dataLayout) const
+                                                                       DataLayout dataLayout,
+                                                                       const bool IsMemoryManaged) const
 {
     auto tensorHandle = std::make_unique<NeonTensorHandle>(tensorInfo, dataLayout);
-    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
-
+    if (IsMemoryManaged)
+    {
+        tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+    }
     return tensorHandle;
 }
 

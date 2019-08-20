@@ -185,40 +185,42 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
 
     IConnectableLayer* input = net->AddInputLayer(0);
 
-    NormalizationDescriptor descriptor;
-    IConnectableLayer* norm = net->AddNormalizationLayer(descriptor);
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::Square;
+    IConnectableLayer* pooling = net->AddActivationLayer(descriptor);
 
     IConnectableLayer* output = net->AddOutputLayer(0);
 
-    input->GetOutputSlot(0).Connect(norm->GetInputSlot(0));
-    norm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
+    pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
-    norm->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    BOOST_CHECK(optNet);
 
     // Loads it into the runtime.
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(true, true);
+    INetworkProperties networkProperties(true, false);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
     std::vector<float> inputData
     {
-        1.0f, 2.0f, 3.0f, 4.0f, 5.0f
+        1.0f, 2.0f, 3.0f, 4.0f
     };
 
     // Misaligned input
     float* misalignedInputData = reinterpret_cast<float*>(reinterpret_cast<char*>(inputData.data()) + 1);
 
-    std::vector<float> outputData(5);
+    std::vector<float> outputData(4);
 
     // Aligned output
-    float * alignedOutputData = outputData.data();
+    float* alignedOutputData = outputData.data();
 
     InputTensors inputTensors
     {
@@ -229,8 +231,6 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
         {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), alignedOutputData)}
     };
 
-    // The result of the inference is not important, just the fact that there
-    // should not be CopyMemGeneric workloads.
     runtime->GetProfiler(netId)->EnableProfiling(true);
 
     // Do the inference and expect it to fail with a ImportMemoryException
@@ -250,24 +250,26 @@ inline void ImportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
 
     IConnectableLayer* input = net->AddInputLayer(0);
 
-    NormalizationDescriptor descriptor;
-    IConnectableLayer* norm = net->AddNormalizationLayer(descriptor);
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::Square;
+    IConnectableLayer* pooling = net->AddActivationLayer(descriptor);
 
     IConnectableLayer* output = net->AddOutputLayer(0);
 
-    input->GetOutputSlot(0).Connect(norm->GetInputSlot(0));
-    norm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
+    pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
-    norm->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    BOOST_CHECK(optNet);
 
     // Loads it into the runtime.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    // Enable Importing
+    // Enable Importing and Exporting
     INetworkProperties networkProperties(true, true);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -278,7 +280,7 @@ inline void ImportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
     };
 
     // Aligned input
-    float * alignedInputData = inputData.data();
+    float* alignedInputData = inputData.data();
 
     std::vector<float> outputData(5);
 
@@ -293,10 +295,6 @@ inline void ImportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
     {
         {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), misalignedOutputData)}
     };
-
-    // The result of the inference is not important, just the fact that there
-    // should not be CopyMemGeneric workloads.
-    runtime->GetProfiler(netId)->EnableProfiling(true);
 
     // Do the inference and expect it to fail with a ImportMemoryException
     BOOST_CHECK_THROW(runtime->EnqueueWorkload(netId, inputTensors, outputTensors), MemoryExportException);
@@ -315,19 +313,21 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
 
     IConnectableLayer* input = net->AddInputLayer(0);
 
-    NormalizationDescriptor descriptor;
-    IConnectableLayer* norm = net->AddNormalizationLayer(descriptor);
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::Square;
+    IConnectableLayer* pooling = net->AddActivationLayer(descriptor);
 
     IConnectableLayer* output = net->AddOutputLayer(0);
 
-    input->GetOutputSlot(0).Connect(norm->GetInputSlot(0));
-    norm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
+    pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
-    norm->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    BOOST_CHECK(optNet);
 
     // Loads it into the runtime.
     NetworkId netId;
@@ -366,8 +366,8 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
     profilerManager.GetProfiler()->Print(ss);;
     std::string dump = ss.str();
 
-    // Contains RefNormalizationWorkload
-    std::size_t found = dump.find("RefNormalizationWorkload");
+    // Contains ActivationWorkload
+    std::size_t found = dump.find("ActivationWorkload");
     BOOST_TEST(found != std::string::npos);
     // Contains SyncMemGeneric
     found = dump.find("SyncMemGeneric");

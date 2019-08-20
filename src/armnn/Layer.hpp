@@ -267,7 +267,9 @@ public:
 
     virtual std::unique_ptr<IWorkload> CreateWorkload(const Graph& graph, const IWorkloadFactory& factory) const = 0;
 
-    virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry, const IWorkloadFactory& factory);
+    virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
+                                     const IWorkloadFactory& factory,
+                                     const bool IsMemoryManaged = true);
 
     /// Creates a dynamically-allocated copy of this layer.
     /// @param graph - The Graph into which this Layer is being cloned.

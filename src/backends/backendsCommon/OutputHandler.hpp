@@ -36,8 +36,8 @@ public:
 
     /// @brief - Creates tensor handles used by the intermediate tensors. Does not allocate memory.
     /// @param factory - Factory to be used for handler creation.
-    void CreateTensorHandles(const IWorkloadFactory& factory);
-    void CreateTensorHandles(const ITensorHandleFactory& factory);
+    void CreateTensorHandles(const IWorkloadFactory& factory, const bool IsMemoryManaged = true);
+    void CreateTensorHandles(const ITensorHandleFactory& factory, const bool IsMemoryManaged = true);
 
     /// @brief - Gets the matching TensorInfo for the output.
     /// @return - References to the output TensorInfo.

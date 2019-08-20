@@ -39,19 +39,33 @@ std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateSubTensorHandle(IT
             boost::polymorphic_downcast<IAclTensorHandle*>(&parent), shape, coords);
 }
 
-std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                           const bool IsMemoryManaged) const
 {
     auto tensorHandle = std::make_unique<NeonTensorHandle>(tensorInfo);
-    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+    if (IsMemoryManaged)
+    {
+        tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+    }
+    // If we are not Managing the Memory then we must be importing
+    tensorHandle->SetImportEnabledFlag(!IsMemoryManaged);
+    tensorHandle->SetImportFlags(m_ImportFlags);
 
     return tensorHandle;
 }
 
 std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                           DataLayout dataLayout) const
+                                                                           DataLayout dataLayout,
+                                                                           const bool IsMemoryManaged) const
 {
     auto tensorHandle = std::make_unique<NeonTensorHandle>(tensorInfo, dataLayout);
-    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+    if (IsMemoryManaged)
+    {
+        tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+    }
+    // If we are not Managing the Memory then we must be importing
+    tensorHandle->SetImportEnabledFlag(!IsMemoryManaged);
+    tensorHandle->SetImportFlags(m_ImportFlags);
 
     return tensorHandle;
 }

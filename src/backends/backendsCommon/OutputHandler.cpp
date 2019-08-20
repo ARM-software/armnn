@@ -22,14 +22,14 @@ void OutputHandler::SetTensorInfo(const TensorInfo& tensorInfo)
     m_bTensorInfoSet = true;
 }
 
-void OutputHandler::CreateTensorHandles(const IWorkloadFactory& factory)
+void OutputHandler::CreateTensorHandles(const IWorkloadFactory& factory, const bool IsMemoryManaged)
 {
-    m_TensorHandle = factory.CreateTensorHandle(m_TensorInfo);
+    m_TensorHandle = factory.CreateTensorHandle(m_TensorInfo, IsMemoryManaged);
 }
 
-void OutputHandler::CreateTensorHandles(const ITensorHandleFactory& factory)
+void OutputHandler::CreateTensorHandles(const ITensorHandleFactory& factory, const bool IsMemoryManaged)
 {
-    m_TensorHandle = factory.CreateTensorHandle(m_TensorInfo);
+    m_TensorHandle = factory.CreateTensorHandle(m_TensorInfo, IsMemoryManaged);
 }
 
 void OutputHandler::CollectWorkloadOutputs(WorkloadDataCollector& dataCollector) const

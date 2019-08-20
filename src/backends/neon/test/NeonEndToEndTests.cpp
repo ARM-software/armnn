@@ -312,4 +312,113 @@ BOOST_AUTO_TEST_CASE(NeonTransposeConvolution2dEndToEndUint8NhwcTest)
         defaultBackends, armnn::DataLayout::NHWC);
 }
 
+BOOST_AUTO_TEST_CASE(NeonImportNonAlignedInputPointerTest)
+{
+    ImportNonAlignedInputPointerTest(defaultBackends);
+}
+
+// Utility function to find the number of instances of a substring within a string.
+int SubStringCounter(std::string& string, std::string&& substring)
+{
+    std::size_t found = 0;
+    int count = 0;
+    // Look for the substring starting from where we last found the substring
+    while((found = string.find(substring, found)) != std::string::npos)
+    {
+        count++;
+        // Offset by substring length to avoid finding the same substring twice
+        found += substring.length();
+    }
+    return count;
+}
+
+BOOST_AUTO_TEST_CASE(NeonImportOnlyWorkload)
+{
+    using namespace armnn;
+
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0);
+
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::Square;
+    IConnectableLayer* pooling = net->AddActivationLayer(descriptor);
+
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
+    pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+
+    // optimize the network
+    std::vector<BackendId> backends = {Compute::CpuAcc};
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+
+    BOOST_TEST_CHECKPOINT("Load Network");
+    // Load it into the runtime. It should pass.
+    NetworkId netId;
+    std::string ignoredErrorMessage;
+    INetworkProperties networkProperties(true, false);
+    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
+               == Status::Success);
+
+    BOOST_TEST_CHECKPOINT("Generate Data");
+    // Creates structures for input & output
+    std::vector<float> inputData
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    };
+
+    std::vector<float> outputData(4);
+
+    std::vector<float> expectedOutput
+    {
+         1.0f, 4.0f, 9.0f, 16.0f
+    };
+
+    BOOST_TEST_CHECKPOINT("Create Network");
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
+    };
+
+    BOOST_TEST_CHECKPOINT("Get Profiler");
+
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+
+    BOOST_TEST_CHECKPOINT("Run Inference");
+    // Do the inference
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    BOOST_TEST_CHECKPOINT("Print Profiler");
+    // Retrieve the Profiler.Print() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->Print(ss);;
+    std::string dump = ss.str();
+
+    // Check there are no SyncMemGeneric workloads as we didn't export
+    BOOST_TEST_CHECKPOINT("Find SyncMemGeneric");
+    int count = SubStringCounter(dump, "SyncMemGeneric");
+    BOOST_TEST(count == 0);
+
+    // Should only be 1 CopyMemGeneric for the output as we imported
+    BOOST_TEST_CHECKPOINT("Find CopyMemGeneric");
+    count = SubStringCounter(dump, "CopyMemGeneric");
+    BOOST_TEST(count == 1);
+
+    // Check the output is correct
+    BOOST_CHECK_EQUAL_COLLECTIONS(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

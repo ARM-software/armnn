@@ -18,18 +18,20 @@ class NeonTensorHandleFactory : public ITensorHandleFactory
 public:
     NeonTensorHandleFactory(std::weak_ptr<NeonMemoryManager> mgr)
                             : m_MemoryManager(mgr),
-                              m_ImportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined)),
-                              m_ExportFlags(static_cast<MemorySourceFlags>(MemorySource::Undefined))
+                              m_ImportFlags(static_cast<MemorySourceFlags>(MemorySource::Malloc)),
+                              m_ExportFlags(static_cast<MemorySourceFlags>(MemorySource::Malloc))
     {}
 
     std::unique_ptr<ITensorHandle> CreateSubTensorHandle(ITensorHandle& parent,
                                                          const TensorShape& subTensorShape,
                                                          const unsigned int* subTensorOrigin) const override;
 
-    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override;
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                      const bool IsMemoryManaged = true) const override;
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                      DataLayout dataLayout) const override;
+                                                      DataLayout dataLayout,
+                                                      const bool IsMemoryManaged = true) const override;
 
     static const FactoryId& GetIdStatic();
 

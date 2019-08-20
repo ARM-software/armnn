@@ -44,10 +44,12 @@ public:
     virtual std::unique_ptr<IWorkload> CreateInput(const InputQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const = 0;
 
-    virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const = 0;
+    virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                              const bool IsMemoryManaged = true) const = 0;
 
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                              DataLayout dataLayout) const = 0;
+                                                              DataLayout dataLayout,
+                                                              const bool IsMemoryManaged = true) const = 0;
 
     virtual std::unique_ptr<IWorkload> CreateAbs(const AbsQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info) const;

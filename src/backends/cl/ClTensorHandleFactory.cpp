@@ -45,20 +45,26 @@ std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateSubTensorHandle(ITen
             boost::polymorphic_downcast<IClTensorHandle *>(&parent), shape, coords);
 }
 
-std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                         const bool IsMemoryManaged) const
 {
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo);
-    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
-
+    if (IsMemoryManaged)
+    {
+        tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+    }
     return tensorHandle;
 }
 
 std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                         DataLayout dataLayout) const
+                                                                         DataLayout dataLayout,
+                                                                         const bool IsMemoryManaged) const
 {
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo, dataLayout);
-    tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
-
+    if (IsMemoryManaged)
+    {
+        tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
+    }
     return tensorHandle;
 }
 

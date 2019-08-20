@@ -244,7 +244,9 @@ void Layer::CollectWorkloadOutputs(WorkloadDataCollector& dataCollector, const G
     }
 }
 
-void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry, const IWorkloadFactory& workloadFactory)
+void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
+                                const IWorkloadFactory& workloadFactory,
+                                const bool IsMemoryManaged)
 {
     for (unsigned int idx=0; idx < GetNumOutputSlots(); idx++)
     {
@@ -255,14 +257,13 @@ void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry, con
         OutputHandler& handler = GetOutputHandler(idx);
         if (factoryId == ITensorHandleFactory::LegacyFactoryId)
         {
-            handler.CreateTensorHandles(workloadFactory);
+            handler.CreateTensorHandles(workloadFactory, IsMemoryManaged);
         }
         else
         {
             ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
             BOOST_ASSERT(handleFactory);
-
-            handler.CreateTensorHandles(*handleFactory);
+            handler.CreateTensorHandles(*handleFactory, IsMemoryManaged);
         }
     }
 }

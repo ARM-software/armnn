@@ -78,14 +78,20 @@ bool RefWorkloadFactory::IsLayerSupported(const Layer& layer,
     return IWorkloadFactory::IsLayerSupported(s_Id, layer, dataType, outReasonIfUnsupported);
 }
 
-std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                      const bool IsMemoryManaged) const
 {
+    // For Ref it is okay to make the TensorHandle memory managed as it can also store a pointer
+    // to unmanaged memory. This also ensures memory alignment.
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                      DataLayout dataLayout) const
+                                                                      DataLayout dataLayout,
+                                                                      const bool IsMemoryManaged) const
 {
+    // For Ref it is okay to make the TensorHandle memory managed as it can also store a pointer
+    // to unmanaged memory. This also ensures memory alignment.
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 

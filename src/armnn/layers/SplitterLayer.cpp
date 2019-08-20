@@ -101,8 +101,10 @@ void SplitterLayer::CreateTensors(const FactoryType& factory)
 }
 
 void SplitterLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
-                                        const IWorkloadFactory& workloadFactory)
+                                        const IWorkloadFactory& workloadFactory,
+                                        const bool IsMemoryManaged)
 {
+    boost::ignore_unused(IsMemoryManaged);
     OutputSlot& slot = GetOutputSlot(0);
     ITensorHandleFactory::FactoryId factoryId = slot.GetTensorHandleFactoryId();
 

@@ -24,10 +24,12 @@ public:
     /// otherwise creates tensor handlers by default. Ignores parameters for Output type.
     /// @param [in] registry Contains all the registered tensor handle factories available for use.
     /// @param [in] factory The workload factory which will create the workload.
+    /// @param [in] IsMemoryManaged Determine whether or not to assign a memory manager during creation
     virtual void CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
-                                     const IWorkloadFactory& factory) override
+                                     const IWorkloadFactory& factory,
+                                     const bool IsMemoryManaged = true) override
     {
-        boost::ignore_unused(registry, factory);
+        boost::ignore_unused(registry, factory, IsMemoryManaged);
     }
 
     /// Creates a dynamically-allocated copy of this layer.

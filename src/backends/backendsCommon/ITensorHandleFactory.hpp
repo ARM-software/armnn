@@ -25,10 +25,12 @@ public:
                                                                  TensorShape const& subTensorShape,
                                                                  unsigned int const* subTensorOrigin) const = 0;
 
-    virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const = 0;
+    virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                              const bool IsMemoryManaged = true) const = 0;
 
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                              DataLayout dataLayout) const = 0;
+                                                              DataLayout dataLayout,
+                                                              const bool IsMemoryManaged = true) const = 0;
 
     virtual const FactoryId& GetId() const = 0;
 

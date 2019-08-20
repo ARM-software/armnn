@@ -82,7 +82,8 @@ ClWorkloadFactory::ClWorkloadFactory(const std::shared_ptr<ClMemoryManager>& mem
 {
 }
 
-std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                     const bool IsMemoryManaged) const
 {
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo);
     tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());
@@ -91,7 +92,8 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const Tenso
 }
 
 std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                     DataLayout dataLayout) const
+                                                                     DataLayout dataLayout,
+                                                                     const bool IsMemoryManaged) const
 {
     std::unique_ptr<ClTensorHandle> tensorHandle = std::make_unique<ClTensorHandle>(tensorInfo, dataLayout);
     tensorHandle->SetMemoryGroup(m_MemoryManager->GetInterLayerMemoryGroup());

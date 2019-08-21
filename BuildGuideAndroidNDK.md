@@ -192,6 +192,43 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	adb shell 'ln -s libprotobuf.so.15.0.1 /data/local/tmp/libprotobuf.so'
 	```
 
+* Push the files needed for the unit tests (they are a mix of files, directories and symbolic links):
+
+	```bash
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/testSharedObject
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/testSharedObject/ /data/local/tmp/src/backends/backendsCommon/test/testSharedObject/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/testDynamicBackend
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/testDynamicBackend/ /data/local/tmp/src/backends/backendsCommon/test/testDynamicBackend/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath1
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath1/ /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath1/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/
+	adb shell ln -s Arm_CpuAcc_backend.so /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so.1
+	adb shell ln -s Arm_CpuAcc_backend.so.1 /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so.1.2
+	adb shell ln -s Arm_CpuAcc_backend.so.1.2 /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so.1.2.3
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath2/Arm_GpuAcc_backend.so /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/
+	adb shell ln -s nothing /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/Arm_no_backend.so
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath3
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath5
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath5/ /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath5/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath6
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath6/ /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath6/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath7
+
+	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath9
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath9/ /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath9/
+
+	adb shell mkdir -p /data/local/tmp/src/backends/dynamic/reference
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/dynamic/reference/Arm_CpuRef_backend.so /data/local/tmp/src/backends/dynamic/reference/
+	```
+
 * Run ArmNN unit tests:
 
 	```bash

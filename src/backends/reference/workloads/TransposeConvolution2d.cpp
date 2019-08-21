@@ -49,12 +49,7 @@ void TransposeConvolution2dImpl(const TransposeConvolution2dDescriptor& descript
     unsigned int strideX = descriptor.m_StrideX;
     unsigned int strideY = descriptor.m_StrideY;
 
-    // Set the initial output values to be logically 0 otherwise the algorithm doesn't work.
-    for (unsigned int i = 0u; i < outputShape.GetNumElements(); ++i)
-    {
-        outputEncoder.Set(0.f);
-        ++outputEncoder;
-    }
+    std::vector<float> outputBuffer(outputShape.GetNumElements(), 0);
 
     for (unsigned int batch = 0u; batch < numBatches; ++batch)
     {
@@ -90,10 +85,9 @@ void TransposeConvolution2dImpl(const TransposeConvolution2dDescriptor& descript
                                         dataLayoutIndexed.GetIndex(outputShape, batch, dOutput, yOutput, xOutput);
                                     outputEncoder[outputIndex];
 
-                                    float output = outputEncoder.Get();
+                                    float output = outputBuffer[outputIndex];
                                     output += inputDecoder.Get() * weightsDecoder.Get();
-
-                                    outputEncoder.Set(output);
+                                    outputBuffer[outputIndex] = output;
                                 }
                             }
                         }
@@ -120,13 +114,17 @@ void TransposeConvolution2dImpl(const TransposeConvolution2dDescriptor& descript
                     {
                         const unsigned int outputIndex =
                             dataLayoutIndexed.GetIndex(outputShape, batch, dOutput, yOutput, xOutput);
-
-                        outputEncoder[outputIndex];
-                        outputEncoder.Set(outputEncoder.Get() + rBiasesDecoder.Get());
+                        outputBuffer[outputIndex] += rBiasesDecoder.Get();
                     }
                 }
             }
         }
+    }
+    outputEncoder[0];
+    for (float output : outputBuffer)
+    {
+        outputEncoder.Set(output);
+        ++outputEncoder;
     }
 }
 

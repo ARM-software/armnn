@@ -8,6 +8,7 @@
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/INetwork.hpp>
+#include <Profiling.hpp>
 
 #include <backendsCommon/test/QuantizeHelper.hpp>
 
@@ -169,6 +170,158 @@ void EndToEndLayerTestImpl(INetworkPtr network,
             }
         }
     }
+}
+
+inline void ImportNonAlignedPointerTest(std::vector<BackendId> backends)
+{
+    using namespace armnn;
+
+    // Create runtime in which test will run
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0);
+
+    NormalizationDescriptor descriptor;
+    IConnectableLayer* norm = net->AddNormalizationLayer(descriptor);
+
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(norm->GetInputSlot(0));
+    norm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
+    norm->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
+
+    // Optimize the network
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+
+    // Loads it into the runtime.
+    NetworkId netId;
+    runtime->LoadNetwork(netId, std::move(optNet));
+
+    // Creates structures for input & output
+    std::vector<float> inputData
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f
+    };
+
+    // Misaligned input
+    float * misalignedInputData = inputData.data();
+    misalignedInputData++;
+
+    std::vector<float> outputData(5);
+
+    // Misaligned output
+    float * misalignedOutputData = outputData.data();
+    misalignedOutputData++;
+
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), misalignedInputData)},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), misalignedOutputData)}
+    };
+
+    // The result of the inference is not important, just the fact that there
+    // should not be CopyMemGeneric workloads.
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+
+    // Do the inference
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    // Retrieve the Profiler.Print() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->Print(ss);;
+    std::string dump = ss.str();
+
+    // Contains RefNormalizationWorkload
+    std::size_t found = dump.find("RefNormalizationWorkload");
+    BOOST_TEST(found != std::string::npos);
+    // No Contains SyncMemGeneric (Created when importing the output tensor handle)
+    found = dump.find("SyncMemGeneric");
+    BOOST_TEST(found == std::string::npos);
+    // Contains CopyMemGeneric
+    found = dump.find("CopyMemGeneric");
+    BOOST_TEST(found != std::string::npos);
+}
+
+inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
+{
+    using namespace armnn;
+
+    // Create runtime in which test will run
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0);
+
+    NormalizationDescriptor descriptor;
+    IConnectableLayer* norm = net->AddNormalizationLayer(descriptor);
+
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(norm->GetInputSlot(0));
+    norm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
+    norm->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
+
+    // Optimize the network
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+
+    // Loads it into the runtime.
+    NetworkId netId;
+    runtime->LoadNetwork(netId, std::move(optNet));
+
+    // Creates structures for input & output
+    std::vector<float> inputData
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    };
+
+    std::vector<float> outputData(4);
+
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
+    };
+
+    // The result of the inference is not important, just the fact that there
+    // should not be CopyMemGeneric workloads.
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+
+    // Do the inference
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    // Retrieve the Profiler.Print() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->Print(ss);;
+    std::string dump = ss.str();
+
+    // Contains RefNormalizationWorkload
+    std::size_t found = dump.find("RefNormalizationWorkload");
+    BOOST_TEST(found != std::string::npos);
+    // Contains SyncMemGeneric
+    found = dump.find("SyncMemGeneric");
+    BOOST_TEST(found != std::string::npos);
+    // No contains CopyMemGeneric
+    found = dump.find("CopyMemGeneric");
+    BOOST_TEST(found == std::string::npos);
 }
 
 } // anonymous namespace

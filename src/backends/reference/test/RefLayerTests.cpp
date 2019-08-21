@@ -223,6 +223,14 @@ ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2d2x3x3Dilation3x3NhwcInt16,
                      DepthwiseConvolution2d2x3x3Dilation3x3Test<DataType::QuantisedSymm16, DataType::Signed32>,
                      false,
                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult4,
+                     DepthwiseConvolution2dMult4Test<armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dMult2,
+                     DepthwiseConvolution2dMult2Test<armnn::DataType::Float32, armnn::DataType::Float32>,
+                     false,
+                     armnn::DataLayout::NCHW)
 
 ARMNN_AUTO_TEST_CASE(DepthwiseConvolution2dDepthMul1,
                      DepthwiseConvolution2dDepthMul1Test, true, DataLayout::NCHW)

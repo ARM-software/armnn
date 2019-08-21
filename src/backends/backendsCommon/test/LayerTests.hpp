@@ -148,6 +148,20 @@ LayerTestResult<T, 4> DepthwiseConvolution2d2x3x3Dilation3x3Test(
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> DepthwiseConvolution2dMult4Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> DepthwiseConvolution2dMult2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    const armnn::DataLayout layout);
+
 LayerTestResult<float, 4> DepthwiseConvolution2dDepthNhwcTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

@@ -75,6 +75,10 @@ static std::vector<float> ConvInput3x8x16({
 // 2-channel bias used by a number of Conv2d tests.
 static std::vector<float> Bias2({0, 2});
 
+static std::vector<float> Bias4({1, 2, 3, 4});
+
+static std::vector<float> Bias8({1, 2, 3, 4, 1, 2, 3, 4});
+
 struct Simple3dSoftmaxOutputData
 {
     const std::vector<float> outputData =
@@ -120,6 +124,65 @@ boost::multi_array<T, 1> GetBias2(bool biasEnabled, float qScale)
         return boost::multi_array<T, 1>();
     }
 }
+
+// Helper function that returns either Bias4 or an empty vector depending on whether bias is enabled.
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+boost::multi_array<T, 1> GetBias4(bool biasEnabled, float qScale)
+{
+    if(biasEnabled)
+    {
+        armnn::TensorInfo biasDesc({static_cast<unsigned int>(Bias4.size())}, ArmnnType);
+        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(qScale, 0.0f, Bias4));
+        return bias;
+    }
+    else
+    {
+        return boost::multi_array<T, 1>();
+    }
+}
+
+// Helper function that returns either Bias8 or an empty vector depending on whether bias is enabled.
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+boost::multi_array<T, 1> GetBias8(bool biasEnabled, float qScale)
+{
+    if(biasEnabled)
+    {
+        armnn::TensorInfo biasDesc({static_cast<unsigned int>(Bias4.size())}, ArmnnType);
+        boost::multi_array<T, 1> bias = MakeTensor<T, 1>(biasDesc, QuantizedVector<T>(qScale, 0.0f, Bias8));
+        return bias;
+    }
+    else
+    {
+        return boost::multi_array<T, 1>();
+    }
+}
+
+// Helper function that returns either Bias4 or an empty vector depending on whether bias is enabled.
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+boost::multi_array<T, 1> GetBias(bool biasEnabled, float qScale, armnn::TensorInfo outputInfo, armnn::DataLayout layout)
+{
+    const armnnUtils::DataLayoutIndexed dataLayoutIndexed(layout);
+    const unsigned int channelsIndex = dataLayoutIndexed.GetChannelsIndex();
+    const unsigned int outputChannels = outputInfo.GetShape()[channelsIndex];
+
+    switch (outputChannels)
+    {
+        case 2:
+        default:
+        {
+            return GetBias2<ArmnnType>(biasEnabled, qScale);
+        }
+        case 4:
+        {
+            return GetBias4<ArmnnType>(biasEnabled, qScale);
+        }
+        case 8:
+        {
+            return GetBias8<ArmnnType>(biasEnabled, qScale);
+        }
+    }
+}
+
 
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleConvolution2d3x5TestCommon(
@@ -1307,7 +1370,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2d3x3DilationTestCommon(
             memoryManager,
             input,
             kernel,
-            GetBias2<ArmnnBType>(biasEnabled, qScale * qScale),
+            GetBias<ArmnnBType>(biasEnabled, qScale * qScale, outputTensorInfo, layout),
             expectedOutput,
             qScale,
             qOffset,
@@ -1454,6 +1517,166 @@ LayerTestResult<T, 4> DepthwiseConvolution2d2x3x3Dilation3x3Test(
             biasEnabled);
 }
 
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T>
+LayerTestResult<T, 4> DepthwiseConvolution2dMult4Test(
+            armnn::IWorkloadFactory& workloadFactory,
+            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+            bool biasEnabled,
+            const armnn::DataLayout layout)
+{
+    armnn::TensorInfo inputTensorInfo({1, 2, 3, 3}, ArmnnType);
+    std::vector<float> inputNoQuantizedValues =
+            {
+                    10.0, 10.0, 10.0,
+                    10.0, 10.0, 10.0,
+                    10.0, 10.0, 10.0,
+
+                    21.0, 22.0, 23.0,
+                    24.0, 25.0, 26.0,
+                    27.0, 28.0, 29.0
+            };
+
+    armnn::TensorInfo kernelTensorInfo({ 4, 2, 2, 2}, ArmnnType);
+
+    std::vector<float> kernelNoQuantizedValues =
+            {
+                    0.25f, 0.25f,
+                    0.25f, 0.25f,
+
+                    0.25f, 0.25f,
+                    0.25f, 0.25f,
+
+                    0.0f , 0.0f,
+                    0.0f , 0.1f,
+
+                    0.0f , 0.0f,
+                    0.0f , 0.1f,
+
+                    0.2f , 0.0f,
+                    0.0f , 0.0f,
+
+                    0.2f , 0.0f,
+                    0.0f , 0.0f,
+
+                    0.0f , 0.3f,
+                    0.0f , 0.0f,
+
+                    0.0f , 0.3f,
+                    0.0f , 0.0f
+            };
+
+    armnn::TensorInfo outputTensorInfo({ 1, 8, 2, 2}, ArmnnType);
+    std::vector<float> outputExpectedNoQuantizedValues =
+            {
+                    10.f, 10.f,
+                    10.f, 10.f,
+
+                    1.f, 1.f,
+                    1.f, 1.f,
+
+                    2.f, 2.f,
+                    2.f, 2.f,
+
+                    3.f, 3.f,
+                    3.f, 3.f,
+
+                    23.f, 24.f,
+                    26.f, 27.f,
+
+                    2.5f, 2.6000001f,
+                    2.8f, 2.9f,
+
+                    4.2000003f, 4.4f,
+                    4.8f, 5.f,
+
+                    6.6000004f, 6.9f,
+                    7.5000005f, 7.8f
+            };
+
+
+    return DepthwiseConvolution2d3x3DilationTestCommon<ArmnnType, ArmnnBType>(
+            workloadFactory,
+            memoryManager,
+            inputNoQuantizedValues,
+            inputTensorInfo,
+            kernelNoQuantizedValues,
+            kernelTensorInfo,
+            outputExpectedNoQuantizedValues,
+            outputTensorInfo,
+            1,
+            1,
+            layout,
+            biasEnabled);
+}
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T>
+LayerTestResult<T, 4> DepthwiseConvolution2dMult2Test(
+            armnn::IWorkloadFactory& workloadFactory,
+            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+            bool biasEnabled,
+            const armnn::DataLayout layout)
+{
+    armnn::TensorInfo inputTensorInfo({1, 2, 3, 3}, ArmnnType);
+    std::vector<float> inputNoQuantizedValues =
+            {
+                    10.0, 10.0, 10.0,
+                    10.0, 10.0, 10.0,
+                    10.0, 10.0, 10.0,
+
+                    21.0, 22.0, 23.0,
+                    24.0, 25.0, 26.0,
+                    27.0, 28.0, 29.0
+            };
+
+    armnn::TensorInfo kernelTensorInfo({ 2, 2, 2, 2}, ArmnnType);
+
+    std::vector<float> kernelNoQuantizedValues =
+            {
+                    0.25f, 0.25f,
+                    0.25f, 0.25f,
+
+                    0.2f , 0.0f,
+                    0.0f , 0.0f,
+
+                    0.0f , 0.0f,
+                    0.0f , 0.1f,
+
+                    0.0f , 0.3f,
+                    0.0f , 0.0f
+
+            };
+
+    armnn::TensorInfo outputTensorInfo({ 1, 4, 2, 2}, ArmnnType);
+    std::vector<float> outputExpectedNoQuantizedValues =
+            {
+                    10.f, 10.f,
+                    10.f, 10.f,
+
+                    1.f, 1.f,
+                    1.f, 1.f,
+
+                    4.2000003f, 4.4f,
+                    4.8f, 5.f,
+
+                    6.6000004f, 6.9f,
+                    7.5000005f, 7.8f
+            };
+
+
+    return DepthwiseConvolution2d3x3DilationTestCommon<ArmnnType, ArmnnBType>(
+            workloadFactory,
+            memoryManager,
+            inputNoQuantizedValues,
+            inputTensorInfo,
+            kernelNoQuantizedValues,
+            kernelTensorInfo,
+            outputExpectedNoQuantizedValues,
+            outputTensorInfo,
+            1,
+            1,
+            layout,
+            biasEnabled);
+}
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
 DepthwiseConvolution2d3x3Dilation3x3Test<armnn::DataType::Float32, armnn::DataType::Float32>(
@@ -1496,6 +1719,20 @@ DepthwiseConvolution2d2x3x3Dilation3x3Test<armnn::DataType::QuantisedSymm16, arm
         const armnn::IBackendInternal::IMemoryManagerSharedPtr&,
         bool,
         armnn::DataLayout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+DepthwiseConvolution2dMult4Test<armnn::DataType::Float32, armnn::DataType::Float32>(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+DepthwiseConvolution2dMult2Test<armnn::DataType::Float32, armnn::DataType::Float32>(
+        armnn::IWorkloadFactory &workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr &memoryManager,
+        bool biasEnabled,
+        const armnn::DataLayout layout);
 
 LayerTestResult<float, 4> DepthwiseConvolution2dTest(
     armnn::IWorkloadFactory& workloadFactory,

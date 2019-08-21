@@ -1,6 +1,6 @@
 # The ArmnnQuantizer
 
-The `ArmnnQuantizer` is a program for loading a 32-bit float network into ArmNN and converting it into a quantized asymmetric 8-bit or quantized symmetric 16-bit network. 
+The `ArmnnQuantizer` is a program for loading a 32-bit float network into ArmNN and converting it into a quantized asymmetric 8-bit or quantized symmetric 16-bit network.
 It supports static quantization by default, dynamic quantization is enabled if CSV file of raw input tensors is provided. Run the program with no arguments to see command-line help.
 
 

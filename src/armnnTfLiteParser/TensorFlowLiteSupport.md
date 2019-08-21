@@ -78,4 +78,10 @@ Arm tested these operators with the following TensorFlow Lite neural network:
 
 * DeepSpeech v1 converted from [TensorFlow model](https://github.com/mozilla/DeepSpeech/releases/tag/v0.4.1)
 
+* DeepSpeaker
+
+* FCRN
+
+* FSRCNN
+
 More machine learning operators will be supported in future releases.

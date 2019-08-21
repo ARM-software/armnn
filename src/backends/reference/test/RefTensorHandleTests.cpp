@@ -45,6 +45,8 @@ BOOST_AUTO_TEST_CASE(AcquireAndRelease)
     memoryManager->Release();
 }
 
+#if !defined(__ANDROID__)
+// Only run these tests on non Android platforms
 BOOST_AUTO_TEST_CASE(CheckSourceType)
 {
     std::shared_ptr<RefMemoryManager> memoryManager = std::make_shared<RefMemoryManager>();
@@ -96,5 +98,7 @@ BOOST_AUTO_TEST_CASE(MisalignedPointer)
 
     delete[] testPtr;
 }
+
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

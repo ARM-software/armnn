@@ -54,7 +54,6 @@ BOOST_AUTO_TEST_CASE(CheckSourceType)
     TensorInfo info({1}, DataType::Float32);
     RefTensorHandle handle(info, memoryManager, static_cast<unsigned int>(MemorySource::Malloc));
 
-    // This pointer will be deleted in the handle destructor
     int* testPtr = new int(4);
 
     // Not supported
@@ -65,6 +64,8 @@ BOOST_AUTO_TEST_CASE(CheckSourceType)
 
     // Supported
     BOOST_CHECK(handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc));
+
+    delete testPtr;
 }
 
 BOOST_AUTO_TEST_CASE(ReusePointer)
@@ -74,13 +75,14 @@ BOOST_AUTO_TEST_CASE(ReusePointer)
     TensorInfo info({1}, DataType::Float32);
     RefTensorHandle handle(info, memoryManager, static_cast<unsigned int>(MemorySource::Malloc));
 
-    // This pointer will be deleted in the handle destructor
     int* testPtr = new int(4);
 
     handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc);
 
     // Reusing previously Imported pointer
     BOOST_CHECK(handle.Import(static_cast<void *>(testPtr), MemorySource::Malloc));
+
+    delete testPtr;
 }
 
 BOOST_AUTO_TEST_CASE(MisalignedPointer)

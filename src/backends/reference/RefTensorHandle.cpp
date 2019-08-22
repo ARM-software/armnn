@@ -35,7 +35,10 @@ RefTensorHandle::~RefTensorHandle()
     if (!m_Pool)
     {
         // unmanaged
-        ::operator delete(m_UnmanagedMemory);
+        if (!m_Imported)
+        {
+            ::operator delete(m_UnmanagedMemory);
+        }
     }
 }
 
@@ -110,6 +113,12 @@ bool RefTensorHandle::Import(void* memory, MemorySource source)
             // Checks the 16 byte memory alignment.
             if (reinterpret_cast<uint64_t>(memory) % 16)
             {
+                if (m_Imported)
+                {
+                    m_Imported = false;
+                    m_UnmanagedMemory = nullptr;
+                }
+
                 return false;
             }
 

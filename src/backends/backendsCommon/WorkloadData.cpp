@@ -122,7 +122,7 @@ void ValidateTensorNumElements(const TensorInfo& tensor,
     if (tensor.GetNumElements() != numElements)
     {
         throw InvalidArgumentException(descName + ": Expected " + to_string(numElements) + " but got " +
-                                       to_string(tensor.GetNumDimensions()) + " elements for " +
+                                       to_string(tensor.GetNumElements()) + " elements for " +
                                        tensorName + " tensor.");
     }
 }

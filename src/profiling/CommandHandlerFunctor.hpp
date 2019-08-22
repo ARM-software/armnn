@@ -7,6 +7,12 @@
 
 #include <cstdint>
 
+namespace armnn
+{
+
+namespace profiling
+{
+
 #pragma once
 
 class CommandHandlerFunctor
@@ -23,3 +29,7 @@ private:
     uint32_t m_PacketId;
     uint32_t m_Version;
 };
+
+} // namespace profiling
+
+} // namespace armnn

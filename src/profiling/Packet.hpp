@@ -4,10 +4,15 @@
 //
 #pragma once
 
+#include <armnn/Exceptions.hpp>
 
 #include <boost/log/trivial.hpp>
 
-#include <armnn/Exceptions.hpp>
+namespace armnn
+{
+
+namespace profiling
+{
 
 class Packet
 {
@@ -43,3 +48,7 @@ private:
     uint32_t m_Length;
     const char* m_Data;
 };
+
+} // namespace profiling
+
+} // namespace armnn

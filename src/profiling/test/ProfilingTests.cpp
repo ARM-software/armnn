@@ -8,13 +8,19 @@
 #include "../CommandHandlerRegistry.hpp"
 #include "../EncodeVersion.hpp"
 #include "../Packet.hpp"
+#include "../PacketVersionResolver.hpp"
+
+#include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <cstring>
-#include <boost/test/unit_test.hpp>
+#include <limits>
 #include <map>
+#include <random>
 
 BOOST_AUTO_TEST_SUITE(ExternalProfiling)
+
+using namespace armnn::profiling;
 
 BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
 {
@@ -45,51 +51,51 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
     BOOST_CHECK(testKey1.GetVersion()==1);
 
     std::vector<CommandHandlerKey> vect =
-        {
-            CommandHandlerKey(0,1), CommandHandlerKey(2,0), CommandHandlerKey(1,0),
-            CommandHandlerKey(2,1), CommandHandlerKey(1,1), CommandHandlerKey(0,1),
-            CommandHandlerKey(2,0), CommandHandlerKey(0,0)
-        };
+    {
+        CommandHandlerKey(0,1), CommandHandlerKey(2,0), CommandHandlerKey(1,0),
+        CommandHandlerKey(2,1), CommandHandlerKey(1,1), CommandHandlerKey(0,1),
+        CommandHandlerKey(2,0), CommandHandlerKey(0,0)
+    };
 
     std::sort(vect.begin(), vect.end());
 
     std::vector<CommandHandlerKey> expectedVect =
-        {
-            CommandHandlerKey(0,0), CommandHandlerKey(0,1), CommandHandlerKey(0,1),
-            CommandHandlerKey(1,0), CommandHandlerKey(1,1), CommandHandlerKey(2,0),
-            CommandHandlerKey(2,0), CommandHandlerKey(2,1)
-        };
+    {
+        CommandHandlerKey(0,0), CommandHandlerKey(0,1), CommandHandlerKey(0,1),
+        CommandHandlerKey(1,0), CommandHandlerKey(1,1), CommandHandlerKey(2,0),
+        CommandHandlerKey(2,0), CommandHandlerKey(2,1)
+    };
 
     BOOST_CHECK(vect == expectedVect);
 }
 
 BOOST_AUTO_TEST_CASE(CheckEncodeVersion)
 {
-    mlutil::Version version1(12);
+    Version version1(12);
 
     BOOST_CHECK(version1.GetMajor() == 0);
     BOOST_CHECK(version1.GetMinor() == 0);
     BOOST_CHECK(version1.GetPatch() == 12);
 
-    mlutil::Version version2(4108);
+    Version version2(4108);
 
     BOOST_CHECK(version2.GetMajor() == 0);
     BOOST_CHECK(version2.GetMinor() == 1);
     BOOST_CHECK(version2.GetPatch() == 12);
 
-    mlutil::Version version3(4198412);
+    Version version3(4198412);
 
     BOOST_CHECK(version3.GetMajor() == 1);
     BOOST_CHECK(version3.GetMinor() == 1);
     BOOST_CHECK(version3.GetPatch() == 12);
 
-    mlutil::Version version4(0);
+    Version version4(0);
 
     BOOST_CHECK(version4.GetMajor() == 0);
     BOOST_CHECK(version4.GetMinor() == 0);
     BOOST_CHECK(version4.GetPatch() == 0);
 
-    mlutil::Version version5(1,0,0);
+    Version version5(1, 0, 0);
     BOOST_CHECK(version5.GetEncodedValue() == 4194304);
 }
 
@@ -234,6 +240,30 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerRegistry)
 
     // Check that non-existent key returns nullptr for its functor
     BOOST_CHECK_THROW(registry.GetFunctor(0, 0), armnn::Exception);
+}
+
+BOOST_AUTO_TEST_CASE(CheckPacketVersionResolver)
+{
+    // Set up random number generator for generating packetId values
+    std::random_device device;
+    std::mt19937 generator(device());
+    std::uniform_int_distribution<uint32_t> distribution(std::numeric_limits<uint32_t>::min(),
+                                                         std::numeric_limits<uint32_t>::max());
+
+    // NOTE: Expected version is always 1.0.0, regardless of packetId
+    const Version expectedVersion(1, 0, 0);
+
+    PacketVersionResolver packetVersionResolver;
+
+    constexpr unsigned int numTests = 10u;
+
+    for (unsigned int i = 0u; i < numTests; ++i)
+    {
+        const uint32_t packetId = distribution(generator);
+        Version resolvedVersion = packetVersionResolver.ResolvePacketVersion(packetId);
+
+        BOOST_TEST(resolvedVersion == expectedVersion);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -420,6 +420,8 @@ list(APPEND armnn_sources
     src/profiling/EncodeVersion.hpp
     src/profiling/Packet.cpp
     src/profiling/Packet.hpp
+    src/profiling/PacketVersionResolver.cpp
+    src/profiling/PacketVersionResolver.hpp
     third-party/half/half.hpp
     )
 

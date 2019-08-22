@@ -5,6 +5,12 @@
 
 #include "CommandHandlerKey.hpp"
 
+namespace armnn
+{
+
+namespace profiling
+{
+
 uint32_t CommandHandlerKey::GetPacketId() const
 {
     return m_PacketId;
@@ -55,3 +61,7 @@ bool CommandHandlerKey::operator!=(const CommandHandlerKey& rhs) const
 {
     return !(*this == rhs);
 }
+
+} // namespace profiling
+
+} // namespace armnn

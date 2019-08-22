@@ -9,7 +9,14 @@
 #include "CommandHandlerKey.hpp"
 
 #include <boost/functional/hash.hpp>
+
 #include <unordered_map>
+
+namespace armnn
+{
+
+namespace profiling
+{
 
 struct CommandHandlerHash
 {
@@ -34,3 +41,7 @@ public:
 private:
     std::unordered_map<CommandHandlerKey, CommandHandlerFunctor*, CommandHandlerHash> registry;
 };
+
+} // namespace profiling
+
+} // namespace armnn

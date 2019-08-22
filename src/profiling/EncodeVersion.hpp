@@ -4,20 +4,21 @@
 //
 #pragma once
 
-#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <ostream>
+#include <sstream>
 
-namespace mlutil
+namespace armnn
 {
 
-namespace Impl
+namespace profiling
 {
 
-    constexpr uint32_t EncodeVersion(uint32_t major, uint32_t minor, uint32_t patch)
-    {
-        return (major << 22) | (minor << 12) | patch;
-    }
-
-} // namespace Impl
+constexpr inline uint32_t EncodeVersion(uint32_t major, uint32_t minor, uint32_t patch)
+{
+    return (major << 22) | (minor << 12) | patch;
+}
 
 // Encodes a semantic version https://semver.org/ into a 32 bit integer in the following fashion
 //
@@ -35,17 +36,35 @@ public:
         m_Patch = encodedValue & 4095;
     }
 
-    Version(uint32_t major, uint32_t minor, uint32_t patch)
-    : m_Major(major), m_Minor(minor), m_Patch(patch) {}
+    Version(uint32_t major, uint32_t minor, uint32_t patch) :
+        m_Major(major),
+        m_Minor(minor),
+        m_Patch(patch)
+    {}
 
     uint32_t GetEncodedValue()
     {
-        return mlutil::Impl::EncodeVersion(m_Major, m_Minor, m_Patch);
+        return EncodeVersion(m_Major, m_Minor, m_Patch);
     }
 
-    uint32_t GetMajor() {return m_Major;}
-    uint32_t GetMinor() {return m_Minor;}
-    uint32_t GetPatch() {return m_Patch;}
+    uint32_t GetMajor() { return m_Major; }
+    uint32_t GetMinor() { return m_Minor; }
+    uint32_t GetPatch() { return m_Patch; }
+
+    bool operator==(const Version& other) const
+    {
+        return m_Major == other.m_Major && m_Minor == other.m_Minor && m_Patch == other.m_Patch;
+    }
+
+    std::string ToString() const
+    {
+        constexpr char separator = '.';
+
+        std::stringstream stringStream;
+        stringStream << m_Major << separator << m_Minor << separator << m_Patch;
+
+        return stringStream.str();
+    }
 
 private:
     uint32_t m_Major;
@@ -53,4 +72,12 @@ private:
     uint32_t m_Patch;
 };
 
-} // namespace mlutil
+inline std::ostream& operator<<(std::ostream& os, const Version& version)
+{
+    os << version.ToString();
+    return os;
+}
+
+} // namespace profiling
+
+} // namespace armnn

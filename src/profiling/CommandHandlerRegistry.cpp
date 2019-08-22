@@ -8,6 +8,12 @@
 #include <boost/assert.hpp>
 #include <boost/log/trivial.hpp>
 
+namespace armnn
+{
+
+namespace profiling
+{
+
 void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor, uint32_t packetId, uint32_t version)
 {
     BOOST_ASSERT_MSG(functor, "Provided functor should not be a nullptr.");
@@ -27,3 +33,7 @@ CommandHandlerFunctor* CommandHandlerRegistry::GetFunctor(uint32_t packetId, uin
 
     return registry.at(key);
 }
+
+} // namespace profiling
+
+} // namespace armnn

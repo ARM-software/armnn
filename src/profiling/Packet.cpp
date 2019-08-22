@@ -5,6 +5,12 @@
 
 #include "Packet.hpp"
 
+namespace armnn
+{
+
+namespace profiling
+{
+
 std::uint32_t Packet::GetHeader() const
 {
     return m_Header;
@@ -39,3 +45,7 @@ std::uint32_t Packet::GetPacketType() const
 {
     return (m_PacketId & 7);
 }
+
+} // namespace profiling
+
+} // namespace armnn

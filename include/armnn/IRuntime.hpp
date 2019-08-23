@@ -44,6 +44,23 @@ public:
         // Setting this value will override the paths set by the DYNAMIC_BACKEND_PATHS compiler directive
         // Only a single path is allowed for the override
         std::string m_DynamicBackendsPath;
+
+        struct ExternalProfilingOptions
+        {
+            ExternalProfilingOptions()
+                : m_EnableProfiling(false)
+                , m_OutgoingCaptureFile("")
+                , m_IncomingCaptureFile("")
+                , m_FileOnly(false)
+                , m_CapturePeriod(150u)
+            {}
+
+            bool        m_EnableProfiling;
+            std::string m_OutgoingCaptureFile;
+            std::string m_IncomingCaptureFile;
+            bool        m_FileOnly;
+            uint32_t    m_CapturePeriod;
+        };
     };
 
     static IRuntime* CreateRaw(const CreationOptions& options);

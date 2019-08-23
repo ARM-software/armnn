@@ -6,8 +6,6 @@
 #include "ParserFlatbuffersFixture.hpp"
 #include "../TfLiteParser.hpp"
 
-#include <unistd.h>
-
 using armnnTfLiteParser::TfLiteParser;
 using ModelPtr = TfLiteParser::ModelPtr;
 using SubgraphPtr = TfLiteParser::SubgraphPtr;

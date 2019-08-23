@@ -6,6 +6,8 @@
 
 #include <boost/assert.hpp>
 
+#include <algorithm>
+
 namespace armnn
 {
 
@@ -73,7 +75,7 @@ RefMemoryManager::Pool::~Pool()
 
 void* RefMemoryManager::Pool::GetPointer()
 {
-    BOOST_ASSERT_MSG(m_Pointer, "RefMemoryManager::Pool::GetPointer() called when memory not acquired"); 
+    BOOST_ASSERT_MSG(m_Pointer, "RefMemoryManager::Pool::GetPointer() called when memory not acquired");
     return m_Pointer;
 }
 
@@ -85,14 +87,14 @@ void RefMemoryManager::Pool::Reserve(unsigned int numBytes)
 
 void RefMemoryManager::Pool::Acquire()
 {
-    BOOST_ASSERT_MSG(!m_Pointer, "RefMemoryManager::Pool::Acquire() called when memory already acquired"); 
+    BOOST_ASSERT_MSG(!m_Pointer, "RefMemoryManager::Pool::Acquire() called when memory already acquired");
     BOOST_ASSERT(m_Size >= 0);
     m_Pointer = ::operator new(size_t(m_Size));
 }
 
 void RefMemoryManager::Pool::Release()
 {
-    BOOST_ASSERT_MSG(m_Pointer, "RefMemoryManager::Pool::Release() called when memory not acquired"); 
+    BOOST_ASSERT_MSG(m_Pointer, "RefMemoryManager::Pool::Release() called when memory not acquired");
     ::operator delete(m_Pointer);
     m_Pointer = nullptr;
 }

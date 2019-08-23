@@ -16,6 +16,7 @@ namespace armnn
 
 void* DynamicBackendUtils::OpenHandle(const std::string& sharedObjectPath)
 {
+#if defined(__unix__)
     if (sharedObjectPath.empty())
     {
         throw RuntimeException("OpenHandle error: shared object path must not be empty");
@@ -28,16 +29,23 @@ void* DynamicBackendUtils::OpenHandle(const std::string& sharedObjectPath)
     }
 
     return sharedObjectHandle;
+#else
+    throw RuntimeException("Dynamic backends not supported on this platform");
+#endif
 }
 
 void DynamicBackendUtils::CloseHandle(const void* sharedObjectHandle)
 {
+#if defined(__unix__)
     if (!sharedObjectHandle)
     {
         return;
     }
 
     dlclose(const_cast<void*>(sharedObjectHandle));
+#else
+    throw RuntimeException("Dynamic backends not supported on this platform");
+#endif
 }
 
 bool DynamicBackendUtils::IsBackendCompatible(const BackendVersion &backendVersion)
@@ -56,6 +64,7 @@ bool DynamicBackendUtils::IsBackendCompatibleImpl(const BackendVersion &backendA
 
 std::string DynamicBackendUtils::GetDlError()
 {
+#if defined(__unix__)
     const char* errorMessage = dlerror();
     if (!errorMessage)
     {
@@ -63,6 +72,9 @@ std::string DynamicBackendUtils::GetDlError()
     }
 
     return std::string(errorMessage);
+#else
+    throw RuntimeException("Dynamic backends not supported on this platform");
+#endif
 }
 
 std::vector<std::string> DynamicBackendUtils::GetBackendPaths(const std::string& overrideBackendPath)

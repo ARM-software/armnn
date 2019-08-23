@@ -22,5 +22,6 @@ if(BUILD_TF_LITE_PARSER)
     target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
 
     install(TARGETS armnnTfLiteParser
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()

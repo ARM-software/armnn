@@ -38,7 +38,7 @@ std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorS
 
     BOOST_ASSERT(axis <= inputNumDimensions);
 
-    unsigned int dimensionSizes[inputNumDimensions + 1];
+    std::vector<unsigned int> dimensionSizes(inputNumDimensions + 1, 0);
     for (unsigned int i = 0; i < axis; ++i)
     {
         dimensionSizes[i] = inputShape[i];
@@ -51,7 +51,7 @@ std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorS
         dimensionSizes[i] = inputShape[i-1];
     }
 
-    TensorShape targetShape = TensorShape(inputNumDimensions + 1, dimensionSizes);
+    TensorShape targetShape = TensorShape(inputNumDimensions + 1, dimensionSizes.data());
 
     return std::vector<TensorShape>({ targetShape });
 }

@@ -10,11 +10,13 @@
 
 #include <armnn/Exceptions.hpp>
 
-#include <string>
-#include <dlfcn.h>
-#include <vector>
-
 #include <boost/format.hpp>
+
+#include <string>
+#include <vector>
+#if defined(__unix__)
+#include <dlfcn.h>
+#endif
 
 #if !defined(DYNAMIC_BACKEND_PATHS)
 #define DYNAMIC_BACKEND_PATHS ""
@@ -58,6 +60,7 @@ private:
 template<typename EntryPointType>
 EntryPointType DynamicBackendUtils::GetEntryPoint(const void* sharedObjectHandle, const char* symbolName)
 {
+#if defined(__unix__)
     if (sharedObjectHandle == nullptr)
     {
         throw RuntimeException("GetEntryPoint error: invalid handle");
@@ -75,6 +78,9 @@ EntryPointType DynamicBackendUtils::GetEntryPoint(const void* sharedObjectHandle
     }
 
     return entryPoint;
+#else
+    throw RuntimeException("Dynamic backends not supported on this platform");
+#endif
 }
 
 } // namespace armnn

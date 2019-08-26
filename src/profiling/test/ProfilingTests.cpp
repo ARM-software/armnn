@@ -12,6 +12,8 @@
 #include "../PacketVersionResolver.hpp"
 #include "../ProfilingStateMachine.hpp"
 
+#include "../ProfilingService.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 #include <cstdint>
@@ -450,7 +452,41 @@ BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
 
     BOOST_CHECK(copyConstructedCaptureData.GetCapturePeriod() == 3);
     BOOST_CHECK(copyConstructedCaptureData.GetCounterIds() == counterIds3);
+}
 
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingService service(options);
+    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
+    service.Run();
+    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
+}
+
+
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService service(options);
+    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::NotConnected);
+    service.Run();
+    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::WaitingForAck);
+}
+
+
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingService service(options);
+    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
+    service.Run();
+    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
+    service.m_Options.m_EnableProfiling = true;
+    service.Run();
+    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::NotConnected);
+    service.Run();
+    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::WaitingForAck);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

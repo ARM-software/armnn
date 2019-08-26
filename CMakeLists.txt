@@ -439,6 +439,8 @@ list(APPEND armnn_sources
     src/profiling/ProfilingUtils.cpp
     src/profiling/ProfilingStateMachine.cpp
     src/profiling/ProfilingStateMachine.hpp
+    src/profiling/ProfilingService.cpp
+    src/profiling/ProfilingService.hpp
     third-party/half/half.hpp
     )
 

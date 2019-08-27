@@ -1344,7 +1344,7 @@ void RuntimeInvalidOverridePathTestImpl()
     BOOST_TEST(supportedBackendIds.empty());
 }
 
-#if defined(ARMCOMPUTEREF_ENABLED)
+#if defined(ARMNNREF_ENABLED)
 
 // This test unit needs the reference backend, it's not available if the reference backend is not built
 

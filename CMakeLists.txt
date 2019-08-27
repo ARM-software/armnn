@@ -144,7 +144,7 @@ if(BUILD_TF_PARSER)
     target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
 endif()
 
-if(BUILD_ARMNN_QUANTIZER AND ARMCOMPUTEREF)
+if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
     if(NOT BUILD_ARMNN_SERIALIZER)
         message(ERROR, "In order to build the ArmNN Quantization Tool you must set BUILD_ARMNN_SERIALIZER = YES")
     endif()
@@ -536,7 +536,7 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/ProfilingTests.cpp
         )
 
-    if(ARMCOMPUTEREF)
+    if(ARMNNREF)
         list(APPEND unittest_sources
             src/armnn/test/DebugCallbackTest.cpp
             src/armnn/test/QuantizerTest.cpp
@@ -545,7 +545,7 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
-    if(BUILD_TF_PARSER AND ARMCOMPUTEREF)
+    if(BUILD_TF_PARSER AND ARMNNREF)
         list(APPEND unittest_sources
             src/armnnTfParser/test/Activations.cpp
             src/armnnTfParser/test/Addition.cpp
@@ -590,7 +590,7 @@ if(BUILD_UNIT_TESTS)
 
     endif()
 
-    if(BUILD_TF_LITE_PARSER AND ARMCOMPUTEREF)
+    if(BUILD_TF_LITE_PARSER AND ARMNNREF)
         enable_language(ASM)
         list(APPEND unittest_sources
              src/armnnTfLiteParser/test/Activations.cpp
@@ -634,7 +634,7 @@ if(BUILD_UNIT_TESTS)
 
     endif()
 
-    if(BUILD_CAFFE_PARSER AND ARMCOMPUTEREF)
+    if(BUILD_CAFFE_PARSER AND ARMNNREF)
         list(APPEND unittest_sources
             src/armnnCaffeParser/test/TestAdd.cpp
             src/armnnCaffeParser/test/TestConcat.cpp
@@ -649,7 +649,7 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
-    if(BUILD_ONNX_PARSER AND ARMCOMPUTEREF)
+    if(BUILD_ONNX_PARSER AND ARMNNREF)
         list(APPEND unittest_sources
             src/armnnOnnxParser/test/Constructor.cpp
             src/armnnOnnxParser/test/CreateNetwork.cpp
@@ -667,13 +667,13 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
-    if(BUILD_ARMNN_QUANTIZER AND ARMCOMPUTEREF)
+    if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
         list(APPEND unittest_sources
              src/armnnQuantizer/test/QuantizationDataSetTests.cpp
              )
     endif()
 
-    if(BUILD_ARMNN_SERIALIZER AND ARMCOMPUTEREF)
+    if(BUILD_ARMNN_SERIALIZER AND ARMNNREF)
         enable_language(ASM)
         list(APPEND unittest_sources
             src/armnnSerializer/test/ActivationSerializationTests.cpp
@@ -748,13 +748,13 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(UnitTests armnnCaffeParser)
     endif()
 
-    if(BUILD_ARMNN_SERIALIZER AND ARMCOMPUTEREF)
+    if(BUILD_ARMNN_SERIALIZER AND ARMNNREF)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnSerializer)
     endif()
 
-    if(BUILD_ARMNN_QUANTIZER AND ARMCOMPUTEREF)
+    if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnQuantizer)
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnQuantizer armnnSerializer)
@@ -767,7 +767,7 @@ if(BUILD_UNIT_TESTS)
     addDllCopyCommands(UnitTests)
 endif()
 
-if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER OR BUILD_CAFFE_PARSER) AND ARMCOMPUTEREF)
+if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER OR BUILD_CAFFE_PARSER) AND ARMNNREF)
     set(ArmnnConverter_sources
         src/armnnConverter/ArmnnConverter.cpp)
 

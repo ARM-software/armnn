@@ -171,7 +171,7 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
       -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary/ \
       -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \
       -DBOOST_ROOT=$HOME/armnn-devenv/boost/install/ \
-      -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMCOMPUTEREF=1 \
+      -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
       -DTF_GENERATED_SOURCES=$HOME/armnn-devenv/google/tf_pb/ -DBUILD_TF_PARSER=1 \
       -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/arm64_pb_install/
 	make -j16

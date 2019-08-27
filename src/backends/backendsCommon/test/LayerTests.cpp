@@ -2323,7 +2323,7 @@ LayerTestResult<int16_t, 3> CopyViaSplitterInt16Test(
     return CopyViaSplitterTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 1.0f, 0);
 }
 
-#if defined(ARMCOMPUTEREF_ENABLED)
+#if defined(ARMNNREF_ENABLED)
 
 // The LSTM test units are run only for the reference backend at the moment
 

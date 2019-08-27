@@ -15,7 +15,7 @@ list(APPEND armnnNeonBackendUnitTests_sources
     NeonWorkloadFactoryHelper.hpp
 )
 
-if (ARMCOMPUTEREF)
+if (ARMNNREF)
     list(APPEND armnnNeonBackendUnitTests_sources
         NeonMemCopyTests.cpp
         )

@@ -6,7 +6,7 @@
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/backends/reference)
 list(APPEND armnnLibraries armnnRefBackend)
 
-if(ARMCOMPUTEREF)
+if(ARMNNREF)
     list(APPEND armnnLibraries armnnRefBackendWorkloads)
     list(APPEND armnnUnitTestLibraries armnnRefBackendUnitTests)
 else()

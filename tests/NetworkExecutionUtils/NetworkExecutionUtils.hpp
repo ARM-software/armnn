@@ -265,6 +265,7 @@ int MainImpl(const char* modelPath,
              bool enableProfiling,
              bool enableFp16TurboMode,
              const double& thresholdTime,
+             bool printIntermediate,
              const size_t subgraphId,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
@@ -280,6 +281,7 @@ int MainImpl(const char* modelPath,
         params.m_IsModelBinary = isModelBinary;
         params.m_ComputeDevices = computeDevices;
         params.m_DynamicBackendsPath = dynamicBackendsPath;
+        params.m_PrintIntermediateLayers = printIntermediate;
 
         for(const std::string& inputName: inputNames)
         {
@@ -420,6 +422,7 @@ int RunTest(const std::string& format,
             bool enableProfiling,
             bool enableFp16TurboMode,
             const double& thresholdTime,
+            bool printIntermediate,
             const size_t subgraphId,
             const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
@@ -519,7 +522,7 @@ int RunTest(const std::string& format,
         dynamicBackendsPath, inputNamesVector, inputTensorShapes,
         inputTensorDataFilePathsVector, inputTypesVector, quantizeInput,
         outputTypesVector, outputNamesVector, enableProfiling,
-        enableFp16TurboMode, thresholdTime, subgraphId, runtime);
+        enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with serialization support.";
     return EXIT_FAILURE;
@@ -534,7 +537,7 @@ int RunTest(const std::string& format,
                                                                inputTensorDataFilePathsVector, inputTypesVector,
                                                                quantizeInput, outputTypesVector, outputNamesVector,
                                                                enableProfiling, enableFp16TurboMode, thresholdTime,
-                                                               subgraphId, runtime);
+                                                               printIntermediate, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
@@ -549,7 +552,7 @@ int RunTest(const std::string& format,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          quantizeInput, outputTypesVector, outputNamesVector,
                                                          enableProfiling, enableFp16TurboMode, thresholdTime,
-                                                         subgraphId, runtime);
+                                                         printIntermediate, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
     return EXIT_FAILURE;
@@ -564,7 +567,7 @@ int RunTest(const std::string& format,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          quantizeInput, outputTypesVector, outputNamesVector,
                                                          enableProfiling, enableFp16TurboMode, thresholdTime,
-                                                         subgraphId, runtime);
+                                                         printIntermediate, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
@@ -585,7 +588,7 @@ int RunTest(const std::string& format,
                                                                  inputTensorDataFilePathsVector, inputTypesVector,
                                                                  quantizeInput, outputTypesVector, outputNamesVector,
                                                                  enableProfiling, enableFp16TurboMode, thresholdTime,
-                                                                 subgraphId, runtime);
+                                                                 printIntermediate, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
             "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
@@ -601,7 +604,8 @@ int RunTest(const std::string& format,
 }
 
 int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IRuntime>& runtime,
-               const bool enableProfiling, const bool enableFp16TurboMode, const double& thresholdTime)
+               const bool enableProfiling, const bool enableFp16TurboMode, const double& thresholdTime,
+               const bool printIntermediate)
 {
     std::string modelFormat;
     std::string modelPath;
@@ -709,5 +713,5 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
 
     return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                    inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
-                   enableProfiling, enableFp16TurboMode, thresholdTime, subgraphId);
+                   enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId);
 }

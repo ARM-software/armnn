@@ -91,6 +91,7 @@ struct Params
     bool                            m_IsModelBinary;
     bool                            m_VisualizePostOptimizationModel;
     bool                            m_EnableFp16TurboMode;
+    bool                            m_PrintIntermediateLayers;
 
     Params()
         : m_ComputeDevices{}
@@ -98,6 +99,7 @@ struct Params
         , m_IsModelBinary(true)
         , m_VisualizePostOptimizationModel(false)
         , m_EnableFp16TurboMode(false)
+        , m_PrintIntermediateLayers(false)
     {}
 };
 
@@ -395,6 +397,7 @@ public:
 
             armnn::OptimizerOptions options;
             options.m_ReduceFp32ToFp16 = params.m_EnableFp16TurboMode;
+            options.m_Debug = params.m_PrintIntermediateLayers;
 
             optNet = armnn::Optimize(*network, params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);
             if (!optNet)

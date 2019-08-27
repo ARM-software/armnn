@@ -87,7 +87,9 @@ int main(int argc, const char* argv[])
             ("threshold-time,r", po::value<double>(&thresholdTime)->default_value(0.0),
              "Threshold time is the maximum allowed time for inference measured in milliseconds. If the actual "
              "inference time is greater than the threshold time, the test will fail. By default, no threshold "
-             "time is used.");
+             "time is used.")
+            ("print-intermediate-layers,p", po::bool_switch()->default_value(false),
+             "If this option is enabled, the output of every graph layer will be printed.");
     }
     catch (const std::exception& e)
     {
@@ -128,6 +130,7 @@ int main(int argc, const char* argv[])
     bool enableProfiling = vm["event-based-profiling"].as<bool>();
     bool enableFp16TurboMode = vm["fp16-turbo-mode"].as<bool>();
     bool quantizeInput = vm["quantize-input"].as<bool>();
+    bool printIntermediate = vm["print-intermediate-layers"].as<bool>();
 
     // Check whether we have to load test cases from a file.
     if (CheckOption(vm, "test-cases"))
@@ -169,7 +172,7 @@ int main(int argc, const char* argv[])
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
                 results.push_back(std::async(std::launch::async, RunCsvTest, std::cref(testCase), std::cref(runtime),
-                                             enableProfiling, enableFp16TurboMode, thresholdTime));
+                                             enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate));
             }
 
             // Check results
@@ -187,7 +190,8 @@ int main(int argc, const char* argv[])
             for (auto&  testCase : testCases)
             {
                 testCase.values.insert(testCase.values.begin(), executableName);
-                if (RunCsvTest(testCase, runtime, enableProfiling, enableFp16TurboMode, thresholdTime) != EXIT_SUCCESS)
+                if (RunCsvTest(testCase, runtime, enableProfiling,
+                               enableFp16TurboMode, thresholdTime, printIntermediate) != EXIT_SUCCESS)
                 {
                     return EXIT_FAILURE;
                 }
@@ -222,6 +226,6 @@ int main(int argc, const char* argv[])
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
-                       enableProfiling, enableFp16TurboMode, thresholdTime, subgraphId);
+                       enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId);
     }
 }

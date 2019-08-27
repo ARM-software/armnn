@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(ConstantUsage_Neon_Float32)
     BOOST_TEST(ConstantUsageFloat32Test(defaultBackends));
 }
 
-#if defined(ARMCOMPUTEREF_ENABLED)
+#if defined(ARMNNREF_ENABLED)
 
 // This test unit needs the reference backend, it's not available if the reference backend is not built
 

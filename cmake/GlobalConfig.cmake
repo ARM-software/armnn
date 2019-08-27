@@ -6,7 +6,7 @@ option(BUILD_TESTS "Build test applications" OFF)
 option(BUILD_FOR_COVERAGE "Use no optimization and output .gcno and .gcda files" OFF)
 option(ARMCOMPUTENEON "Build with ARM Compute NEON support" OFF)
 option(ARMCOMPUTECL "Build with ARM Compute OpenCL support" OFF)
-option(ARMCOMPUTEREF "Build with ARM Compute reference support" OFF)
+option(ARMNNREF "Build with ArmNN reference support" OFF)
 option(PROFILING_BACKEND_STREAMLINE "Forward the armNN profiling events to DS-5/Streamline as annotations" OFF)
 # options used for heap profiling and leak checking
 option(HEAP_PROFILING "Build with heap profiling enabled" OFF)
@@ -290,9 +290,9 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     include_directories(SYSTEM ${HALF_INCLUDE})
 endif()
 
-# ARM Compute reference backend
-if(ARMCOMPUTEREF)
-    add_definitions(-DARMCOMPUTEREF_ENABLED)
+# ArmNN reference backend
+if(ARMNNREF)
+    add_definitions(-DARMNNREF_ENABLED)
 endif()
 
 # Streamline annotate

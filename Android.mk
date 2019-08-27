@@ -193,7 +193,7 @@ endif # ARMNN_COMPUTE_NEON_ENABLED == 1
 # The variable to enable/disable the REFERENCE backend (ARMNN_COMPUTE_REF_ENABLED) is declared in android-nn-driver/Android.mk
 ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
 LOCAL_CFLAGS += \
-        -DARMCOMPUTEREF_ENABLED
+        -DARMNNREF_ENABLED
 endif # ARMNN_COMPUTE_REF_ENABLED == 1
 
 ifeq ($(Q_OR_LATER),1)
@@ -266,7 +266,7 @@ endif # ARMNN_COMPUTE_NEON_ENABLED == 1
 # The variable to enable/disable the REFERENCE backend (ARMNN_COMPUTE_REF_ENABLED) is declared in android-nn-driver/Android.mk
 ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
 LOCAL_CFLAGS += \
-        -DARMCOMPUTEREF_ENABLED
+        -DARMNNREF_ENABLED
 endif # ARMNN_COMPUTE_REF_ENABLED == 1
 
 ifeq ($(Q_OR_LATER),1)

@@ -61,7 +61,7 @@ ARMNN_SIMPLE_TEST_CASE(RuntimeDuplicateDynamicBackends, RuntimeDuplicateDynamicB
 ARMNN_SIMPLE_TEST_CASE(RuntimeInvalidDynamicBackends, RuntimeInvalidDynamicBackendsTestImpl);
 ARMNN_SIMPLE_TEST_CASE(RuntimeInvalidOverridePath, RuntimeInvalidOverridePathTestImpl);
 
-#if defined(ARMCOMPUTEREF_ENABLED)
+#if defined(ARMNNREF_ENABLED)
 
 // This test unit needs the reference backend, it's not available if the reference backend is not built
 

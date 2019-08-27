@@ -59,7 +59,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     WorkloadTestUtils.hpp
 )
 
-if (ARMCOMPUTEREF)
+if (ARMNNREF)
     list(APPEND armnnBackendsCommonUnitTests_sources
         OptimizedNetworkTests.cpp
         WorkloadDataValidation.cpp

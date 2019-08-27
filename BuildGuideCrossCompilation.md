@@ -128,7 +128,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
     -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary \
     -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build/ \
     -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
-    -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMCOMPUTEREF=1 \
+    -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
     -DCAFFE_GENERATED_SOURCES=$HOME/armnn-devenv/caffe/build/src \
     -DBUILD_CAFFE_PARSER=1 \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \

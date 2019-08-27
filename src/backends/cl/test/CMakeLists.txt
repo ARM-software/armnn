@@ -17,7 +17,7 @@ list(APPEND armnnClBackendUnitTests_sources
     OpenClTimerTest.cpp
 )
 
-if (ARMCOMPUTEREF)
+if (ARMNNREF)
     list(APPEND armnnClBackendUnitTests_sources
         ClMemCopyTests.cpp
         )

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-if(ARMCOMPUTEREF)
+if(ARMNNREF)
     list(APPEND armnnRefBackend_sources
         RefBackend.cpp
         RefBackend.hpp

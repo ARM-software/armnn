@@ -7,6 +7,17 @@
 #include <armnn/ArmNN.hpp>
 #include <armnn/Tensor.hpp>
 
+#include <backendsCommon/test/layerTests/LayerTestResult.hpp>
+
+#include <backendsCommon/test/layerTests/AdditionTestImpl.hpp>
+#include <backendsCommon/test/layerTests/DivisionTestImpl.hpp>
+#include <backendsCommon/test/layerTests/EqualTestImpl.hpp>
+#include <backendsCommon/test/layerTests/GreaterTestImpl.hpp>
+#include <backendsCommon/test/layerTests/MaximumTestImpl.hpp>
+#include <backendsCommon/test/layerTests/MinimumTestImpl.hpp>
+#include <backendsCommon/test/layerTests/MultiplicationTestImpl.hpp>
+#include <backendsCommon/test/layerTests/SubtractionTestImpl.hpp>
+
 #include <Half.hpp>
 #include "TensorCopyUtils.hpp"
 #include "WorkloadTestUtils.hpp"
@@ -31,38 +42,6 @@ namespace armnn
 {
 class IWorkloadFactory;
 }
-
-template <std::size_t n>
-boost::array<unsigned int, n> GetTensorShapeAsArray(const armnn::TensorInfo& tensorInfo)
-{
-    BOOST_ASSERT_MSG(n == tensorInfo.GetNumDimensions(),
-        "Attempting to construct a shape array of mismatching size");
-
-    boost::array<unsigned int, n> shape;
-    for (unsigned int i = 0; i < n; i++)
-    {
-        shape[i] = tensorInfo.GetShape()[i];
-    }
-    return shape;
-}
-
-template <typename T, std::size_t n>
-struct LayerTestResult
-{
-    LayerTestResult(const armnn::TensorInfo& outputInfo)
-    {
-        auto shape( GetTensorShapeAsArray<n>(outputInfo) );
-        output.resize(shape);
-        outputExpected.resize(shape);
-        supported = true;
-        compareBoolean = false;
-    }
-
-    boost::multi_array<T, n> output;
-    boost::multi_array<T, n> outputExpected;
-    bool supported;
-    bool compareBoolean;
-};
 
 LayerTestResult<float, 4> SimpleConvolution2d3x5Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -727,82 +706,12 @@ LayerTestResult<float, 3> ConcatTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 4> AdditionTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 5> Addition5dTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> AdditionBroadcast1ElementTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> AdditionBroadcastTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> CompareAdditionTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::IWorkloadFactory& refWorkloadFactory);
-
-LayerTestResult<float, 4> SubtractionTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> SubtractionBroadcastTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
 LayerTestResult<float, 4> CompareActivationTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
     armnn::ActivationFunction f,
     unsigned int batchSize);
-
-LayerTestResult<float, 4> DivisionTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> DivisionByZeroTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> DivisionBroadcast1ElementTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> MultiplicationTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 5> Multiplication5dTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> MultiplicationBroadcast1ElementTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> MultiplicationBroadcast1DVectorTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> CompareMultiplicationTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    armnn::IWorkloadFactory& refWorkloadFactory);
 
 LayerTestResult<float, 4> BatchNormTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -1177,54 +1086,6 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<uint8_t, 4> AdditionUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> AdditionBroadcast1ElementUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> AdditionBroadcastUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> AdditionInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> AdditionBroadcastInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> AdditionBroadcast1ElementInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> SubtractionUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> SubtractionBroadcast1ElementUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> SubtractionBroadcastUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> SubtractionInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> SubtractionBroadcast1ElementInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> SubtractionBroadcastInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
 LayerTestResult<uint8_t, 4> CompareActivationUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1242,54 +1103,6 @@ LayerTestResult<uint8_t, 2> CompareSoftmaxUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory,
     float beta);
-
-LayerTestResult<uint8_t, 4> MultiplicationUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> MultiplicationBroadcast1ElementUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> MultiplicationBroadcast1DVectorUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> MultiplicationInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> MultiplicationBroadcast1ElementInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> MultiplicationBroadcast1DVectorInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> DivisionUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> DivisionBroadcast1ElementUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> DivisionBroadcast1DVectorUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> DivisionInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> DivisionBroadcast1ElementInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> DivisionBroadcast1DVectorInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<uint8_t, 4> SimpleConvolution2d3x5Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
@@ -1416,54 +1229,6 @@ LayerTestResult<uint8_t, 3> Concatenation3dDim2DiffInputDimsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor);
-
-LayerTestResult<uint8_t, 4> EqualSimpleTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> EqualBroadcast1ElementTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> EqualBroadcast1DVectorTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> EqualUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> EqualBroadcast1ElementUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> EqualBroadcast1DVectorUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> GreaterSimpleTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> GreaterUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 2> FullyConnectedLargeTest(
     armnn::IWorkloadFactory& workloadFactory,
@@ -1644,34 +1409,6 @@ LayerTestResult<T, 3> MeanVts2Test(
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 3> MeanVts3Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> MinimumBroadcast1ElementTest1(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> MinimumBroadcast1ElementTest2(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<uint8_t, 4> MinimumBroadcast1DVectorUint8Test(
-    armnn::IWorkloadFactory & workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager);
-
-LayerTestResult<int16_t , 4> MinimumInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> MinimumBroadcast1ElementInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<int16_t, 4> MinimumBroadcast1DVectorInt16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

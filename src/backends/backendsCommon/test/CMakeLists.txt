@@ -57,6 +57,24 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     TensorCopyUtils.hpp
     WorkloadFactoryHelper.hpp
     WorkloadTestUtils.hpp
+    layerTests/AdditionTestImpl.cpp
+    layerTests/AdditionTestImpl.hpp
+    layerTests/DivisionTestImpl.cpp
+    layerTests/DivisionTestImpl.hpp
+    layerTests/ElementwiseTestImpl.hpp
+    layerTests/EqualTestImpl.cpp
+    layerTests/EqualTestImpl.hpp
+    layerTests/GreaterTestImpl.cpp
+    layerTests/GreaterTestImpl.hpp
+    layerTests/LayerTestResult.hpp
+    layerTests/MaximumTestImpl.cpp
+    layerTests/MaximumTestImpl.hpp
+    layerTests/MinimumTestImpl.cpp
+    layerTests/MinimumTestImpl.hpp
+    layerTests/MultiplicationTestImpl.cpp
+    layerTests/MultiplicationTestImpl.hpp
+    layerTests/SubtractionTestImpl.cpp
+    layerTests/SubtractionTestImpl.hpp
 )
 
 if (ARMNNREF)

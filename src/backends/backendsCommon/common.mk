@@ -33,7 +33,15 @@ COMMON_TEST_SOURCES := \
     test/CommonTestUtils.cpp \
     test/JsonPrinterTestImpl.cpp \
     test/LayerTests.cpp \
-    test/TensorCopyUtils.cpp
+    test/TensorCopyUtils.cpp \
+    test/layerTests/AdditionTestImpl.cpp \
+    test/layerTests/DivisionTestImpl.cpp \
+    test/layerTests/EqualTestImpl.cpp \
+    test/layerTests/GreaterTestImpl.cpp \
+    test/layerTests/MaximumTestImpl.cpp \
+    test/layerTests/MinimumTestImpl.cpp \
+    test/layerTests/MultiplicationTestImpl.cpp \
+    test/layerTests/SubtractionTestImpl.cpp
 
 ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
 COMMON_TEST_SOURCES += \

@@ -441,7 +441,8 @@ bool RequiresCopy(ITensorHandleFactory::FactoryId src,
         ITensorHandleFactory* srcFactory = registry.GetFactory(src);
         ITensorHandleFactory* dstFactory = registry.GetFactory(dst);
 
-        if ((srcFactory->GetExportFlags() & dstFactory->GetImportFlags()) != 0)
+        if (srcFactory && dstFactory &&
+            (srcFactory->GetExportFlags() & dstFactory->GetImportFlags()) != 0)
         {
             return false;
         }

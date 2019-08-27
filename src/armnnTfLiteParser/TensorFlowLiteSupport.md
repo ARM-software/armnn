@@ -80,8 +80,4 @@ Arm tested these operators with the following TensorFlow Lite neural network:
 
 * DeepSpeaker
 
-* FCRN
-
-* FSRCNN
-
 More machine learning operators will be supported in future releases.

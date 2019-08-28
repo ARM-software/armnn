@@ -1,0 +1,30 @@
+//
+// Copyright © 2017 Arm Ltd. All rights reserved.
+// SPDX-License-Identifier: MIT
+//
+
+#pragma once
+
+#include "LayerTestResult.hpp"
+
+#include <ResolveType.hpp>
+
+#include <backendsCommon/IBackendInternal.hpp>
+#include <backendsCommon/WorkloadFactory.hpp>
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> FullyConnectedTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled);
+
+LayerTestResult<float, 2> FullyConnectedFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool biasEnabled,
+    bool transposeWeights);
+
+LayerTestResult<float, 2> FullyConnectedLargeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool transposeWeights);

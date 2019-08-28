@@ -5,76 +5,117 @@
 
 list(APPEND armnnBackendsCommonUnitTests_sources
     ActivationFixture.hpp
-    ActivationTestImpl.hpp
     BackendIdTests.cpp
     BackendRegistryTests.cpp
-    BatchNormTestImpl.hpp
     CommonTestUtils.cpp
     CommonTestUtils.hpp
-    Conv2dTestImpl.hpp
-    ConvertFp16ToFp32TestImpl.hpp
-    ConvertFp32ToFp16TestImpl.hpp
-    DebugTestImpl.hpp
-    DequantizeTestImpl.hpp
+    DataTypeUtils.hpp
     DequantizeEndToEndTestImpl.hpp
-    DetectionPostProcessLayerTestImpl.hpp
-    DetectionPostProcessTestImpl.hpp
+    DetectionPostProcessEndToEndTestImpl.hpp
     DynamicBackendTests.cpp
     DynamicBackendTests.hpp
     EndToEndTestImpl.hpp
-    FullyConnectedTestImpl.hpp
-    GatherTestImpl.hpp
     GatherEndToEndTestImpl.hpp
     IsLayerSupportedTestImpl.hpp
     JsonPrinterTestImpl.cpp
     JsonPrinterTestImpl.hpp
     LayerReleaseConstantDataTest.cpp
-    LayerTests.cpp
     LayerTests.hpp
-    LstmTestImpl.hpp
-    NormTestImpl.hpp
-    ConcatTestImpl.hpp
+    ConcatEndToEndTestImpl.hpp
     MockBackend.cpp
     MockBackend.hpp
     MockBackendId.hpp
     OptimizeSubgraphViewTests.cpp
     OptimizationViewsTests.cpp
-    PermuteTestImpl.hpp
-    Pooling2dTestImpl.hpp
     PreluEndToEndTestImpl.hpp
     QuantizeHelper.hpp
-    QuantizeTestImpl.hpp
     QuantizedLstmEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp
-    SoftmaxTestImpl.hpp
-    SpaceToDepthTestImpl.hpp
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
-    SplitterTestImpl.hpp
-    StridedSliceTestImpl.hpp
     TensorCopyUtils.cpp
     TensorCopyUtils.hpp
     WorkloadFactoryHelper.hpp
     WorkloadTestUtils.hpp
+    layerTests/ActivationTestImpl.cpp
+    layerTests/ActivationTestImpl.hpp
     layerTests/AdditionTestImpl.cpp
     layerTests/AdditionTestImpl.hpp
+    layerTests/BatchNormalizationTestImpl.cpp
+    layerTests/BatchNormalizationTestImpl.hpp
+    layerTests/BatchToSpaceNdTestImpl.hpp
+    layerTests/ConcatTestImpl.cpp
+    layerTests/ConcatTestImpl.hpp
+    layerTests/ConstantTestImpl.cpp
+    layerTests/ConstantTestImpl.hpp
+    layerTests/Conv2dTestImpl.cpp
+    layerTests/Conv2dTestImpl.hpp
+    layerTests/ConvertFp16ToFp32TestImpl.cpp
+    layerTests/ConvertFp16ToFp32TestImpl.hpp
+    layerTests/ConvertFp32ToFp16TestImpl.cpp
+    layerTests/ConvertFp32ToFp16TestImpl.hpp
+    layerTests/DebugTestImpl.cpp
+    layerTests/DebugTestImpl.hpp
+    layerTests/DequantizeTestImpl.cpp
+    layerTests/DequantizeTestImpl.hpp
+    layerTests/DetectionPostProcessTestImpl.hpp
     layerTests/DivisionTestImpl.cpp
     layerTests/DivisionTestImpl.hpp
     layerTests/ElementwiseTestImpl.hpp
     layerTests/EqualTestImpl.cpp
     layerTests/EqualTestImpl.hpp
+    layerTests/FakeQuantizationTestImpl.cpp
+    layerTests/FakeQuantizationTestImpl.hpp
+    layerTests/FloorTestImpl.cpp
+    layerTests/FloorTestImpl.hpp
+    layerTests/FullyConnectedTestImpl.cpp
+    layerTests/FullyConnectedTestImpl.hpp
+    layerTests/GatherTestImpl.cpp
+    layerTests/GatherTestImpl.hpp
     layerTests/GreaterTestImpl.cpp
     layerTests/GreaterTestImpl.hpp
+    layerTests/L2NormalizationTestImpl.cpp
+    layerTests/L2NormalizationTestImpl.hpp
     layerTests/LayerTestResult.hpp
+    layerTests/LstmTestImpl.cpp
+    layerTests/LstmTestImpl.hpp
     layerTests/MaximumTestImpl.cpp
     layerTests/MaximumTestImpl.hpp
+    layerTests/MeanTestImpl.hpp
     layerTests/MinimumTestImpl.cpp
     layerTests/MinimumTestImpl.hpp
     layerTests/MultiplicationTestImpl.cpp
     layerTests/MultiplicationTestImpl.hpp
+    layerTests/NormalizationTestImpl.cpp
+    layerTests/NormalizationTestImpl.hpp
+    layerTests/PadTestImpl.cpp
+    layerTests/PadTestImpl.hpp
+    layerTests/PermuteTestImpl.hpp
+    layerTests/Pooling2dTestImpl.cpp
+    layerTests/Pooling2dTestImpl.hpp
+    layerTests/PreluTestImpl.hpp
+    layerTests/QuantizeTestImpl.cpp
+    layerTests/QuantizeTestImpl.hpp
+    layerTests/ReshapeTestImpl.cpp
+    layerTests/ReshapeTestImpl.hpp
+    layerTests/ResizeTestImpl.hpp
+    layerTests/RsqrtTestImpl.cpp
+    layerTests/RsqrtTestImpl.hpp
+    layerTests/SoftmaxTestImpl.cpp
+    layerTests/SoftmaxTestImpl.hpp
+    layerTests/SpaceToBatchNdTestImpl.cpp
+    layerTests/SpaceToBatchNdTestImpl.hpp
+    layerTests/SpaceToDepthTestImpl.cpp
+    layerTests/SpaceToDepthTestImpl.hpp
+    layerTests/SplitterTestImpl.cpp
+    layerTests/SplitterTestImpl.hpp
+    layerTests/StackTestImpl.hpp
+    layerTests/StridedSliceTestImpl.cpp
+    layerTests/StridedSliceTestImpl.hpp
     layerTests/SubtractionTestImpl.cpp
     layerTests/SubtractionTestImpl.hpp
+    layerTests/TransposeConvolution2dTestImpl.hpp
 )
 
 if (ARMNNREF)

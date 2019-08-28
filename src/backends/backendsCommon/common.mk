@@ -32,15 +32,40 @@ COMMON_SOURCES := \
 COMMON_TEST_SOURCES := \
     test/CommonTestUtils.cpp \
     test/JsonPrinterTestImpl.cpp \
-    test/LayerTests.cpp \
     test/TensorCopyUtils.cpp \
+    test/layerTests/ActivationTestImpl.cpp \
     test/layerTests/AdditionTestImpl.cpp \
+    test/layerTests/BatchNormalizationTestImpl.cpp \
+    test/layerTests/ConcatTestImpl.cpp \
+    test/layerTests/ConstantTestImpl.cpp \
+    test/layerTests/Conv2dTestImpl.cpp \
+    test/layerTests/ConvertFp16ToFp32TestImpl.cpp \
+    test/layerTests/ConvertFp32ToFp16TestImpl.cpp \
+    test/layerTests/DebugTestImpl.cpp \
+    test/layerTests/DequantizeTestImpl.cpp \
     test/layerTests/DivisionTestImpl.cpp \
     test/layerTests/EqualTestImpl.cpp \
+    test/layerTests/FakeQuantizationTestImpl.cpp \
+    test/layerTests/FloorTestImpl.cpp \
+    test/layerTests/FullyConnectedTestImpl.cpp \
+    test/layerTests/GatherTestImpl.cpp \
     test/layerTests/GreaterTestImpl.cpp \
+    test/layerTests/L2NormalizationTestImpl.cpp \
+    test/layerTests/LstmTestImpl.cpp \
     test/layerTests/MaximumTestImpl.cpp \
     test/layerTests/MinimumTestImpl.cpp \
     test/layerTests/MultiplicationTestImpl.cpp \
+    test/layerTests/NormalizationTestImpl.cpp \
+    test/layerTests/PadTestImpl.cpp \
+    test/layerTests/Pooling2dTestImpl.cpp \
+    test/layerTests/ReshapeTestImpl.cpp \
+    test/layerTests/RsqrtTestImpl.cpp \
+    test/layerTests/QuantizeTestImpl.cpp \
+    test/layerTests/SoftmaxTestImpl.cpp \
+    test/layerTests/SpaceToBatchNdTestImpl.cpp \
+    test/layerTests/SpaceToDepthTestImpl.cpp \
+    test/layerTests/SplitterTestImpl.cpp \
+    test/layerTests/StridedSliceTestImpl.cpp \
     test/layerTests/SubtractionTestImpl.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)

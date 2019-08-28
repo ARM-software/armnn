@@ -7,9 +7,9 @@
 
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
-#include <backendsCommon/test/ConcatTestImpl.hpp>
+#include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
-#include <backendsCommon/test/DetectionPostProcessTestImpl.hpp>
+#include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>

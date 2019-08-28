@@ -6,7 +6,7 @@
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
-#include <backendsCommon/test/ConcatTestImpl.hpp>
+#include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>

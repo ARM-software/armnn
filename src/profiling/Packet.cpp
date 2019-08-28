@@ -31,7 +31,7 @@ std::uint32_t Packet::GetLength() const
     return m_Length;
 }
 
-const char* Packet::GetData()
+const char* Packet::GetData() const
 {
     return m_Data;
 }

@@ -35,7 +35,7 @@ public:
     uint32_t GetPacketFamily() const;
     uint32_t GetPacketId() const;
     uint32_t GetLength() const;
-    const char* GetData();
+    const char* GetData() const;
 
     uint32_t GetPacketClass() const;
     uint32_t GetPacketType() const;

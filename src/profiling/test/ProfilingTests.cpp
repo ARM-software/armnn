@@ -12,12 +12,17 @@
 #include "../PacketVersionResolver.hpp"
 #include "../ProfilingService.hpp"
 #include "../ProfilingStateMachine.hpp"
+#include "../PeriodicCounterSelectionCommandHandler.hpp"
 #include "../ProfilingUtils.hpp"
 #include "../SocketProfilingConnection.hpp"
+#include "../IPeriodicCounterCapture.hpp"
+#include "SendCounterPacketTests.hpp"
 
 #include <Runtime.hpp>
 
+
 #include <boost/test/unit_test.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -529,6 +534,109 @@ BOOST_AUTO_TEST_CASE(GetNextUidTest)
     BOOST_TEST(uid0 != uid1);
     BOOST_TEST(uid0 != uid2);
     BOOST_TEST(uid1 != uid2);
+}
+
+BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
+{
+    using boost::numeric_cast;
+
+    class TestCaptureThread : public IPeriodicCounterCapture
+    {
+        void Start() override {};
+    };
+
+    const uint32_t packetId = 0x40000;
+
+    uint32_t version = 1;
+    Holder holder;
+    TestCaptureThread captureThread;
+    MockBuffer mockBuffer(512);
+    SendCounterPacket sendCounterPacket(mockBuffer);
+
+    uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
+
+    // Data with period and counters
+    uint32_t period1 = 10;
+    uint32_t dataLength1 = 8;
+    unsigned char data1[dataLength1];
+    uint32_t offset = 0;
+
+    WriteUint32(data1, offset, period1);
+    offset += sizeOfUint32;
+    WriteUint16(data1, offset, 4000);
+    offset += sizeOfUint16;
+    WriteUint16(data1, offset, 5000);
+
+    Packet packetA(packetId, dataLength1, reinterpret_cast<const char*>(data1));
+
+    PeriodicCounterSelectionCommandHandler commandHandler(packetId, version, holder, captureThread,
+                                                          sendCounterPacket);
+    commandHandler(packetA);
+
+    std::vector<uint16_t> counterIds = holder.GetCaptureData().GetCounterIds();
+
+    BOOST_TEST(holder.GetCaptureData().GetCapturePeriod() == period1);
+    BOOST_TEST(counterIds.size() == 2);
+    BOOST_TEST(counterIds[0] == 4000);
+    BOOST_TEST(counterIds[1] == 5000);
+
+    unsigned int size = 0;
+
+    const unsigned char* readBuffer = mockBuffer.GetReadBuffer(size);
+
+    offset = 0;
+
+    uint32_t headerWord0 = ReadUint32(readBuffer, offset);
+    offset += sizeOfUint32;
+    uint32_t headerWord1 = ReadUint32(readBuffer, offset);
+    offset += sizeOfUint32;
+    uint32_t period = ReadUint32(readBuffer, offset);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
+    BOOST_TEST(headerWord1 == 8);                   // data lenght
+    BOOST_TEST(period == 10);                       // capture period
+
+    uint16_t counterId = 0;
+    offset += sizeOfUint32;
+    counterId = ReadUint16(readBuffer, offset);
+    BOOST_TEST(counterId == 4000);
+    offset += sizeOfUint16;
+    counterId = ReadUint16(readBuffer, offset);
+    BOOST_TEST(counterId == 5000);
+
+    // Data with period only
+    uint32_t period2 = 11;
+    uint32_t dataLength2 = 4;
+    unsigned char data2[dataLength2];
+
+    WriteUint32(data2, 0, period2);
+
+    Packet packetB(packetId, dataLength2, reinterpret_cast<const char*>(data2));
+
+    commandHandler(packetB);
+
+    counterIds = holder.GetCaptureData().GetCounterIds();
+
+    BOOST_TEST(holder.GetCaptureData().GetCapturePeriod() == period2);
+    BOOST_TEST(counterIds.size() == 0);
+
+    readBuffer = mockBuffer.GetReadBuffer(size);
+
+    offset = 0;
+
+    headerWord0 = ReadUint32(readBuffer, offset);
+    offset += sizeOfUint32;
+    headerWord1 = ReadUint32(readBuffer, offset);
+    offset += sizeOfUint32;
+    period = ReadUint32(readBuffer, offset);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
+    BOOST_TEST(headerWord1 == 4);                   // data lenght
+    BOOST_TEST(period == 11);                       // capture period
+
 }
 
 BOOST_AUTO_TEST_CASE(CheckSocketProfilingConnection)

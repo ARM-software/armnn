@@ -446,6 +446,8 @@ list(APPEND armnn_sources
     src/profiling/ProfilingStateMachine.hpp
     src/profiling/ProfilingService.cpp
     src/profiling/ProfilingService.hpp
+    src/profiling/PeriodicCounterSelectionCommandHandler.cpp
+    src/profiling/PeriodicCounterSelectionCommandHandler.hpp
     third-party/half/half.hpp
     )
 

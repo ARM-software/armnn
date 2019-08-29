@@ -43,7 +43,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/MultiplicationTestImpl.cpp \
     test/layerTests/SubtractionTestImpl.cpp
 
-ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+ifeq ($(ARMNN_REF_ENABLED),1)
 COMMON_TEST_SOURCES += \
     test/WorkloadDataValidation.cpp
-endif # ARMNN_COMPUTE_REF_ENABLED == 1
+endif # ARMNN_REF_ENABLED == 1

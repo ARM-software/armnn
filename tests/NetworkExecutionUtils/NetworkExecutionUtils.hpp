@@ -470,14 +470,20 @@ int RunTest(const std::string& format,
         //Defaults the value of all inputs to "float"
         inputTypesVector.assign(inputNamesVector.size(), "float");
     }
+    else if ((inputTypesVector.size() != 0) && (inputTypesVector.size() != inputNamesVector.size()))
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "input-name and input-type must have the same amount of elements.";
+        return EXIT_FAILURE;
+    }
+
     if (outputTypesVector.size() == 0)
     {
         //Defaults the value of all outputs to "float"
         outputTypesVector.assign(outputNamesVector.size(), "float");
     }
-    else if ((inputTypesVector.size() != 0) && (inputTypesVector.size() != inputNamesVector.size()))
+    else if ((outputTypesVector.size() != 0) && (outputTypesVector.size() != outputNamesVector.size()))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "input-name and input-type must have the same amount of elements.";
+        BOOST_LOG_TRIVIAL(fatal) << "output-name and output-type must have the same amount of elements.";
         return EXIT_FAILURE;
     }
 

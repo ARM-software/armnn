@@ -92,10 +92,10 @@ BACKEND_TEST_SOURCES := \
         test/Fp16SupportTest.cpp \
         test/OpenClTimerTest.cpp
 
-ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+ifeq ($(ARMNN_REF_ENABLED),1)
 BACKEND_TEST_SOURCES += \
         test/ClMemCopyTests.cpp
-endif # ARMNN_COMPUTE_REF_ENABLED == 1
+endif # ARMNN_REF_ENABLED == 1
 
 else
 

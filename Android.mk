@@ -190,11 +190,11 @@ ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 LOCAL_CFLAGS += \
         -DARMCOMPUTENEON_ENABLED
 endif # ARMNN_COMPUTE_NEON_ENABLED == 1
-# The variable to enable/disable the REFERENCE backend (ARMNN_COMPUTE_REF_ENABLED) is declared in android-nn-driver/Android.mk
-ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+# The variable to enable/disable the REFERENCE backend (ARMNN_REF_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_REF_ENABLED),1)
 LOCAL_CFLAGS += \
         -DARMNNREF_ENABLED
-endif # ARMNN_COMPUTE_REF_ENABLED == 1
+endif # ARMNN_REF_ENABLED == 1
 
 ifeq ($(Q_OR_LATER),1)
 LOCAL_CFLAGS += \
@@ -263,11 +263,11 @@ ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 LOCAL_CFLAGS += \
         -DARMCOMPUTENEON_ENABLED
 endif # ARMNN_COMPUTE_NEON_ENABLED == 1
-# The variable to enable/disable the REFERENCE backend (ARMNN_COMPUTE_REF_ENABLED) is declared in android-nn-driver/Android.mk
-ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+# The variable to enable/disable the REFERENCE backend (ARMNN_REF_ENABLED) is declared in android-nn-driver/Android.mk
+ifeq ($(ARMNN_REF_ENABLED),1)
 LOCAL_CFLAGS += \
         -DARMNNREF_ENABLED
-endif # ARMNN_COMPUTE_REF_ENABLED == 1
+endif # ARMNN_REF_ENABLED == 1
 
 ifeq ($(Q_OR_LATER),1)
 LOCAL_CFLAGS += \
@@ -292,7 +292,7 @@ LOCAL_SRC_FILES := \
         src/armnn/test/UnitTests.cpp \
         src/armnn/test/UtilsTests.cpp
 
-ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+ifeq ($(ARMNN_REF_ENABLED),1)
 LOCAL_SRC_FILES += \
         src/armnn/test/DebugCallbackTest.cpp \
         src/armnn/test/RuntimeTests.cpp

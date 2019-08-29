@@ -35,7 +35,7 @@ COMMON_TEST_SOURCES := \
     test/LayerTests.cpp \
     test/TensorCopyUtils.cpp
 
-ifeq ($(ARMNN_COMPUTE_REF_ENABLED),1)
+ifeq ($(ARMNN_REF_ENABLED),1)
 COMMON_TEST_SOURCES += \
     test/WorkloadDataValidation.cpp
-endif # ARMNN_COMPUTE_REF_ENABLED == 1
+endif # ARMNN_REF_ENABLED == 1

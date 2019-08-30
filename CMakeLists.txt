@@ -427,6 +427,8 @@ list(APPEND armnn_sources
     src/profiling/PacketVersionResolver.hpp
     src/profiling/ProfilingConnectionFactory.cpp
     src/profiling/ProfilingConnectionFactory.hpp
+    src/profiling/IBufferWrapper.hpp
+    src/profiling/ISendCounterPacket.hpp
     third-party/half/half.hpp
     )
 
@@ -534,6 +536,7 @@ if(BUILD_UNIT_TESTS)
         src/armnnUtils/test/PrototxtConversionsTest.cpp
         src/armnnUtils/test/ParserHelperTest.cpp
         src/profiling/test/ProfilingTests.cpp
+        src/profiling/test/SendCounterPacketTests.cpp
         )
 
     if(ARMNNREF)

@@ -28,6 +28,7 @@ int main(int argc, const char* argv[])
     std::string inputTypes;
     std::string outputTypes;
     std::string dynamicBackendsPath;
+    std::string outputTensorFiles;
 
     double thresholdTime = 0.0;
 
@@ -80,6 +81,9 @@ int main(int argc, const char* argv[])
              "Accepted values (float, int or qasymm8).")
             ("output-name,o", po::value(&outputNames),
              "Identifier of the output tensors in the network separated by comma.")
+            ("write-outputs-to-file,w", po::value(&outputTensorFiles),
+             "Comma-separated list of output file paths keyed with the binding-id of the output slot. "
+             "If left empty (the default), the output tensors will not be written to a file.")
             ("event-based-profiling,e", po::bool_switch()->default_value(false),
              "Enables built in profiler. If unset, defaults to off.")
             ("fp16-turbo-mode,h", po::bool_switch()->default_value(false), "If this option is enabled, FP32 layers, "
@@ -226,6 +230,7 @@ int main(int argc, const char* argv[])
 
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
-                       enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId);
+                       outputTensorFiles, enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate,
+                       subgraphId);
     }
 }

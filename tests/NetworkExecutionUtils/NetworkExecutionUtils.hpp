@@ -199,27 +199,34 @@ void RemoveDuplicateDevices(std::vector<armnn::BackendId>& computeDevices)
 
 struct TensorPrinter : public boost::static_visitor<>
 {
-    TensorPrinter(const std::string& binding, const armnn::TensorInfo& info)
+    TensorPrinter(const std::string& binding, const armnn::TensorInfo& info, const std::string& outputTensorFile)
         : m_OutputBinding(binding)
         , m_Scale(info.GetQuantizationScale())
         , m_Offset(info.GetQuantizationOffset())
+        , m_OutputTensorFile(outputTensorFile)
     {}
 
     void operator()(const std::vector<float>& values)
     {
-        ForEachValue(values, [](float value){
+        ForEachValue(values, [](float value)
+            {
                 printf("%f ", value);
             });
+        WriteToFile(values);
     }
 
     void operator()(const std::vector<uint8_t>& values)
     {
         auto& scale = m_Scale;
         auto& offset = m_Offset;
-        ForEachValue(values, [&scale, &offset](uint8_t value)
+        std::vector<float> dequantizedValues;
+        ForEachValue(values, [&scale, &offset, &dequantizedValues](uint8_t value)
             {
-                printf("%f ", armnn::Dequantize(value, scale, offset));
+                auto dequantizedValue = armnn::Dequantize(value, scale, offset);
+                printf("%f ", dequantizedValue);
+                dequantizedValues.push_back(dequantizedValue);
             });
+        WriteToFile(dequantizedValues);
     }
 
     void operator()(const std::vector<int>& values)
@@ -228,6 +235,7 @@ struct TensorPrinter : public boost::static_visitor<>
             {
                 printf("%d ", value);
             });
+        WriteToFile(values);
     }
 
 private:
@@ -242,9 +250,30 @@ private:
         printf("\n");
     }
 
+    template<typename T>
+    void WriteToFile(const std::vector<T>& values)
+    {
+        if (!m_OutputTensorFile.empty())
+        {
+            std::ofstream outputTensorFile;
+            outputTensorFile.open(m_OutputTensorFile, std::ofstream::out | std::ofstream::trunc);
+            if (outputTensorFile.is_open())
+            {
+                outputTensorFile << m_OutputBinding << ": ";
+                std::copy(values.begin(), values.end(), std::ostream_iterator<T>(outputTensorFile, " "));
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(info) << "Output Tensor File: " << m_OutputTensorFile << " could not be opened!";
+            }
+            outputTensorFile.close();
+        }
+    }
+
     std::string m_OutputBinding;
     float m_Scale=0.0f;
     int m_Offset=0;
+    std::string m_OutputTensorFile;
 };
 
 
@@ -262,6 +291,7 @@ int MainImpl(const char* modelPath,
              bool quantizeInput,
              const std::vector<string>& outputTypes,
              const std::vector<string>& outputNames,
+             const std::vector<string>& outputTensorFiles,
              bool enableProfiling,
              bool enableFp16TurboMode,
              const double& thresholdTime,
@@ -373,7 +403,8 @@ int MainImpl(const char* modelPath,
         for (size_t i = 0; i < numOutputs; i++)
         {
             const armnn::TensorInfo& infoOut = infosOut[i].second;
-            TensorPrinter printer(params.m_OutputBindings[i], infoOut);
+            auto outputTensorFile = outputTensorFiles.empty() ? "" : outputTensorFiles[i];
+            TensorPrinter printer(params.m_OutputBindings[i], infoOut, outputTensorFile);
             boost::apply_visitor(printer, outputDataContainers[i]);
         }
 
@@ -419,6 +450,7 @@ int RunTest(const std::string& format,
             bool quantizeInput,
             const std::string& outputTypes,
             const std::string& outputNames,
+            const std::string& outputTensorFiles,
             bool enableProfiling,
             bool enableFp16TurboMode,
             const double& thresholdTime,
@@ -435,6 +467,7 @@ int RunTest(const std::string& format,
     std::vector<std::string> outputNamesVector = ParseStringList(outputNames, ",");
     std::vector<std::string> inputTypesVector = ParseStringList(inputTypes, ",");
     std::vector<std::string> outputTypesVector = ParseStringList(outputTypes, ",");
+    std::vector<std::string> outputTensorFilesVector = ParseStringList(outputTensorFiles, ",");
 
     // Parse model binary flag from the model-format string we got from the command-line
     bool isModelBinary;
@@ -462,6 +495,13 @@ int RunTest(const std::string& format,
         (inputTensorDataFilePathsVector.size() != inputNamesVector.size()))
     {
         BOOST_LOG_TRIVIAL(fatal) << "input-name and input-tensor-data must have the same amount of elements.";
+        return EXIT_FAILURE;
+    }
+
+    if ((outputTensorFilesVector.size() != 0) &&
+        (outputTensorFilesVector.size() != outputNamesVector.size()))
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "output-name and write-outputs-to-file must have the same amount of elements.";
         return EXIT_FAILURE;
     }
 
@@ -527,7 +567,7 @@ int RunTest(const std::string& format,
         modelPath.c_str(), isModelBinary, computeDevice,
         dynamicBackendsPath, inputNamesVector, inputTensorShapes,
         inputTensorDataFilePathsVector, inputTypesVector, quantizeInput,
-        outputTypesVector, outputNamesVector, enableProfiling,
+        outputTypesVector, outputNamesVector, outputTensorFilesVector, enableProfiling,
         enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with serialization support.";
@@ -542,7 +582,8 @@ int RunTest(const std::string& format,
                                                                inputNamesVector, inputTensorShapes,
                                                                inputTensorDataFilePathsVector, inputTypesVector,
                                                                quantizeInput, outputTypesVector, outputNamesVector,
-                                                               enableProfiling, enableFp16TurboMode, thresholdTime,
+                                                               outputTensorFilesVector, enableProfiling,
+                                                               enableFp16TurboMode, thresholdTime,
                                                                printIntermediate, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
@@ -557,7 +598,8 @@ int RunTest(const std::string& format,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          quantizeInput, outputTypesVector, outputNamesVector,
-                                                         enableProfiling, enableFp16TurboMode, thresholdTime,
+                                                         outputTensorFilesVector, enableProfiling,
+                                                         enableFp16TurboMode, thresholdTime,
                                                          printIntermediate, subgraphId, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
@@ -572,7 +614,8 @@ int RunTest(const std::string& format,
                                                          inputNamesVector, inputTensorShapes,
                                                          inputTensorDataFilePathsVector, inputTypesVector,
                                                          quantizeInput, outputTypesVector, outputNamesVector,
-                                                         enableProfiling, enableFp16TurboMode, thresholdTime,
+                                                         outputTensorFilesVector, enableProfiling,
+                                                         enableFp16TurboMode, thresholdTime,
                                                          printIntermediate, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
@@ -593,7 +636,8 @@ int RunTest(const std::string& format,
                                                                  inputNamesVector, inputTensorShapes,
                                                                  inputTensorDataFilePathsVector, inputTypesVector,
                                                                  quantizeInput, outputTypesVector, outputNamesVector,
-                                                                 enableProfiling, enableFp16TurboMode, thresholdTime,
+                                                                 outputTensorFilesVector, enableProfiling,
+                                                                 enableFp16TurboMode, thresholdTime,
                                                                  printIntermediate, subgraphId, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
@@ -622,6 +666,7 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
     std::string inputTypes;
     std::string outputTypes;
     std::string dynamicBackendsPath;
+    std::string outputTensorFiles;
 
     size_t subgraphId = 0;
 
@@ -664,7 +709,10 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
          "If unset, defaults to \"float\" for all defined outputs. "
          "Accepted values (float, int or qasymm8).")
         ("output-name,o", po::value(&outputNames),
-         "Identifier of the output tensors in the network separated by comma.");
+         "Identifier of the output tensors in the network separated by comma.")
+        ("write-outputs-to-file,w", po::value(&outputTensorFiles),
+         "Comma-separated list of output file paths keyed with the binding-id of the output slot. "
+         "If left empty (the default), the output tensors will not be written to a file.");
     }
     catch (const std::exception& e)
     {
@@ -718,6 +766,6 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
     }
 
     return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
-                   inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
+                   inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames, outputTensorFiles,
                    enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId);
 }

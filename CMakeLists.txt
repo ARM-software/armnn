@@ -429,6 +429,10 @@ list(APPEND armnn_sources
     src/profiling/ProfilingConnectionFactory.hpp
     src/profiling/IBufferWrapper.hpp
     src/profiling/ISendCounterPacket.hpp
+    src/profiling/SendCounterPacket.hpp
+    src/profiling/SendCounterPacket.cpp
+    src/profiling/ProfilingUtils.hpp
+    src/profiling/ProfilingUtils.cpp
     third-party/half/half.hpp
     )
 

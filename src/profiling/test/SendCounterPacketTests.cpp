@@ -3,12 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../IBufferWrapper.hpp"
-#include "../ISendCounterPacket.hpp"
+#include "../SendCounterPacket.hpp"
+#include "../ProfilingUtils.hpp"
 
-#include <iostream>
+#include <armnn/Exceptions.hpp>
+
 #include <boost/test/unit_test.hpp>
 
+#include <iostream>
 
 BOOST_AUTO_TEST_SUITE(SendCounterPacketTests)
 
@@ -17,7 +19,9 @@ using namespace armnn::profiling;
 class MockBuffer : public IBufferWrapper
 {
 public:
-    MockBuffer() : m_Buffer() {}
+    MockBuffer(unsigned int size)
+    : m_BufferSize(size),
+      m_Buffer(std::make_unique<unsigned char[]>(size)) {}
 
     unsigned char* Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
     {
@@ -30,22 +34,22 @@ public:
             reservedSize = requestedSize;
         }
 
-        return m_Buffer;
+        return m_Buffer.get();
     }
 
     void Commit(unsigned int size) override {}
 
     const unsigned char* GetReadBuffer(unsigned int& size) override
     {
-        size = static_cast<unsigned int>(strlen(reinterpret_cast<const char*>(m_Buffer)) + 1);
-        return m_Buffer;
+        size = static_cast<unsigned int>(strlen(reinterpret_cast<const char*>(m_Buffer.get())) + 1);
+        return m_Buffer.get();
     }
 
     void Release( unsigned int size) override {}
 
 private:
-    static const unsigned int m_BufferSize = 512;
-    unsigned char m_Buffer[m_BufferSize];
+    unsigned int m_BufferSize;
+    std::unique_ptr<unsigned char[]> m_Buffer;
 };
 
 class MockSendCounterPacket : public ISendCounterPacket
@@ -99,7 +103,7 @@ BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
 {
     unsigned int size = 0;
 
-    MockBuffer mockBuffer;
+    MockBuffer mockBuffer(512);
     MockSendCounterPacket sendCounterPacket(mockBuffer);
 
     sendCounterPacket.SendStreamMetaDataPacket();
@@ -126,6 +130,69 @@ BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
 
     BOOST_TEST(strcmp(buffer, "SendPeriodicCounterSelectionPacket") == 0);
 
+}
+
+BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
+{
+    // Error no space left in buffer
+    MockBuffer mockBuffer1(10);
+    SendCounterPacket sendPacket1(mockBuffer1);
+
+    uint32_t capturePeriod = 1000;
+    std::vector<uint16_t> selectedCounterIds;
+    BOOST_CHECK_THROW(sendPacket1.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds),
+                      armnn::Exception);
+
+    // Packet without any counters
+    MockBuffer mockBuffer2(512);
+    SendCounterPacket sendPacket2(mockBuffer2);
+
+    sendPacket2.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds);
+    unsigned int sizeRead = 0;
+    const unsigned char* readBuffer2 = mockBuffer2.GetReadBuffer(sizeRead);
+
+    uint32_t headerWord0 = ReadUint32(readBuffer2, 0);
+    uint32_t headerWord1 = ReadUint32(readBuffer2, 4);
+    uint32_t period = ReadUint32(readBuffer2, 8);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
+    BOOST_TEST(headerWord1 == 4);                   // data lenght
+    BOOST_TEST(period == 1000);                     // capture period
+
+    // Full packet message
+    MockBuffer mockBuffer3(512);
+    SendCounterPacket sendPacket3(mockBuffer3);
+
+    selectedCounterIds.reserve(5);
+    selectedCounterIds.emplace_back(100);
+    selectedCounterIds.emplace_back(200);
+    selectedCounterIds.emplace_back(300);
+    selectedCounterIds.emplace_back(400);
+    selectedCounterIds.emplace_back(500);
+    sendPacket3.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds);
+    sizeRead = 0;
+    const unsigned char* readBuffer3 = mockBuffer3.GetReadBuffer(sizeRead);
+
+    headerWord0 = ReadUint32(readBuffer3, 0);
+    headerWord1 = ReadUint32(readBuffer3, 4);
+    period = ReadUint32(readBuffer3, 8);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
+    BOOST_TEST(headerWord1 == 14);                  // data lenght
+    BOOST_TEST(period == 1000);                     // capture period
+
+    uint16_t counterId = 0;
+    uint32_t offset = 12;
+
+    // Counter Ids
+    for(const uint16_t& id : selectedCounterIds)
+    {
+        counterId = ReadUint16(readBuffer3, offset);
+        BOOST_TEST(counterId == id);
+        offset += 2;
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

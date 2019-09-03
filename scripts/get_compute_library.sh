@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinnning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_08" # Release 19.08
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_08" # Release 19.08
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="1c29ffc7fe02de68cf2e82709a3bc3e210cb0ba4" #COMPMID-2336: Fix build issues
+DEFAULT_CLFRAMEWORKREVISION="c2a60593436387d20ff142a619f4c3955a5cd41b" #COMPMID-2336: CLPadLayer support for 4D padding
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -433,6 +433,8 @@ list(APPEND armnn_sources
     src/profiling/SendCounterPacket.cpp
     src/profiling/ProfilingUtils.hpp
     src/profiling/ProfilingUtils.cpp
+    src/profiling/ProfilingStateMachine.cpp
+    src/profiling/ProfilingStateMachine.hpp
     third-party/half/half.hpp
     )
 

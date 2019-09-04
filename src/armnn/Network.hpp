@@ -124,6 +124,8 @@ public:
     IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
                                       const char* name = nullptr) override;
 
+    IConnectableLayer* AddAbsLayer(const char* name = nullptr) override;
+
     IConnectableLayer* AddAdditionLayer(const char* name = nullptr) override;
 
     IConnectableLayer* AddMultiplicationLayer(const char* name = nullptr) override;

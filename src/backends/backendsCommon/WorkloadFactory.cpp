@@ -69,6 +69,15 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
     switch(layer.GetType())
     {
+        case LayerType::Abs:
+        {
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsAbsSupported(OverrideDataType(input, dataType),
+                                                        OverrideDataType(output, dataType),
+                                                        reason);
+            break;
+        }
         case LayerType::Activation:
         {
             auto cLayer = boost::polymorphic_downcast<const ActivationLayer*>(&layer);
@@ -952,6 +961,12 @@ bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLaye
 }
 
 // Default Implementations
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
+                                                       const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {

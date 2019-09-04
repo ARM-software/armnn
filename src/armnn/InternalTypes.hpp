@@ -14,7 +14,8 @@ namespace armnn
 enum class LayerType
 {
     FirstLayer,
-    Activation = FirstLayer,
+    Abs = FirstLayer,
+    Activation,
     Addition,
     BatchNormalization,
     BatchToSpaceNd,

@@ -34,6 +34,13 @@ bool DefaultLayerSupport(const char* func,
 namespace armnn
 {
 
+bool LayerSupportBase::IsAbsSupported(const TensorInfo &input,
+                                      const TensorInfo &output,
+                                      Optional<std::string &> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsActivationSupported(const TensorInfo& input,
                                              const TensorInfo& output,
                                              const ActivationDescriptor& descriptor,

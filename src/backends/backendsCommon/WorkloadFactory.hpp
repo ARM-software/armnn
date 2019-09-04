@@ -49,6 +49,9 @@ public:
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               DataLayout dataLayout) const = 0;
 
+    virtual std::unique_ptr<IWorkload> CreateAbs(const AbsQueueDescriptor& descriptor,
+                                                 const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                         const WorkloadInfo&              info) const;
 

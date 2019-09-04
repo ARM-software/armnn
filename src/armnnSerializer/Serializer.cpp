@@ -105,6 +105,11 @@ void SerializerVisitor::VisitOutputLayer(const armnn::IConnectableLayer* layer, 
     CreateAnyLayer(flatBufferOutputLayer.o, serializer::Layer::Layer_OutputLayer);
 }
 
+void SerializerVisitor::VisitAbsLayer(const armnn::IConnectableLayer* layer, const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::VisitAbsLayer is not implemented");
+}
+
 // Build FlatBuffer for Activation Layer
 void SerializerVisitor::VisitActivationLayer(const armnn::IConnectableLayer* layer,
                                              const armnn::ActivationDescriptor& descriptor,

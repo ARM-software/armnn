@@ -27,6 +27,10 @@ protected:
     virtual ~ILayerSupport() {}
 
 public:
+    virtual bool IsAbsSupported(const TensorInfo& input,
+                                const TensorInfo& output,
+                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsActivationSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const ActivationDescriptor& descriptor,

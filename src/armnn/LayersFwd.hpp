@@ -6,6 +6,7 @@
 
 #include "InternalTypes.hpp"
 
+#include "layers/AbsLayer.hpp"
 #include "layers/ActivationLayer.hpp"
 #include "layers/AdditionLayer.hpp"
 #include "layers/BatchNormalizationLayer.hpp"
@@ -85,6 +86,7 @@ constexpr LayerType LayerEnumOf(const T* = nullptr);
 
 #define DECLARE_LAYER(LayerName) DECLARE_LAYER_IMPL(, LayerName)
 
+DECLARE_LAYER(Abs)
 DECLARE_LAYER(Activation)
 DECLARE_LAYER(Addition)
 DECLARE_LAYER(BatchNormalization)

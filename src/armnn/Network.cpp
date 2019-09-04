@@ -1151,6 +1151,11 @@ IConnectableLayer* Network::AddMergerLayer(const MergerDescriptor& mergerDescrip
     return AddConcatLayer(mergerDescriptor, name);
 }
 
+IConnectableLayer* Network::AddAbsLayer(const char * name)
+{
+    return m_Graph->AddLayer<AbsLayer>(name);
+}
+
 IConnectableLayer* Network::AddAdditionLayer(const char* name)
 {
     return m_Graph->AddLayer<AdditionLayer>(name);

@@ -385,6 +385,8 @@ template<armnn::LayerType Type, armnn::DataType DataType>
 struct LayerTypePolicy;
 
 // Every entry in the armnn::LayerType enum must be accounted for below.
+DECLARE_LAYER_POLICY_1_PARAM(Abs)
+
 DECLARE_LAYER_POLICY_2_PARAM(Activation)
 
 DECLARE_LAYER_POLICY_1_PARAM(Addition)

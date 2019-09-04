@@ -229,6 +229,8 @@ list(APPEND armnn_sources
     include/armnn/Version.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
+    src/armnn/layers/AbsLayer.hpp
+    src/armnn/layers/AbsLayer.cpp
     src/armnn/layers/ActivationLayer.hpp
     src/armnn/layers/ActivationLayer.cpp
     src/armnn/layers/AdditionLayer.hpp

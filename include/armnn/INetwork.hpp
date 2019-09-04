@@ -265,6 +265,11 @@ public:
     virtual IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
         const char* name = nullptr) = 0;
 
+    /// Add absolute layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @ return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddAbsLayer(const char* name = nullptr) = 0;
+
     /// Adds an addition layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.

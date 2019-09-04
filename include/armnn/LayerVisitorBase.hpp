@@ -29,6 +29,8 @@ protected:
     virtual ~LayerVisitorBase() {}
 
 public:
+    void VisitAbsLayer(const IConnectableLayer*,
+                       const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitActivationLayer(const IConnectableLayer*,
                               const ActivationDescriptor&,

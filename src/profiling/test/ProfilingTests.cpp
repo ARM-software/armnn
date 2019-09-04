@@ -7,6 +7,7 @@
 #include "../CommandHandlerFunctor.hpp"
 #include "../CommandHandlerRegistry.hpp"
 #include "../EncodeVersion.hpp"
+#include "../Holder.hpp"
 #include "../Packet.hpp"
 #include "../PacketVersionResolver.hpp"
 #include "../ProfilingStateMachine.hpp"
@@ -355,6 +356,100 @@ BOOST_AUTO_TEST_CASE(CheckProfilingStateMachine)
     thread5.join();
 
     BOOST_TEST((profilingState17.GetCurrentState() == ProfilingState::NotConnected));
+}
+
+void CaptureDataWriteThreadImpl(Holder &holder, uint32_t capturePeriod, std::vector<uint16_t>& counterIds)
+{
+    holder.SetCaptureData(capturePeriod, counterIds);
+}
+
+void CaptureDataReadThreadImpl(Holder &holder, CaptureData& captureData)
+{
+    captureData = holder.GetCaptureData();
+}
+
+BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
+{
+    std::vector<uint16_t> counterIds1 = {};
+    uint32_t capturePeriod1(1);
+    std::vector<uint16_t> counterIds2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    uint32_t capturePeriod2(2);
+    std::vector<uint16_t> counterIds3 = {4, 5, 5, 6};
+    uint32_t capturePeriod3(3);
+
+    // Check CaptureData functions
+    CaptureData capture;
+    BOOST_CHECK(capture.GetCapturePeriod() == 0);
+    BOOST_CHECK((capture.GetCounterIds()).empty());
+    capture.SetCapturePeriod(capturePeriod2);
+    capture.SetCounterIds(counterIds2);
+    BOOST_CHECK(capture.GetCapturePeriod() == capturePeriod2);
+    BOOST_CHECK(capture.GetCounterIds() == counterIds2);
+
+    Holder holder;
+    BOOST_CHECK((holder.GetCaptureData()).GetCapturePeriod() == 0);
+    BOOST_CHECK(((holder.GetCaptureData()).GetCounterIds()).empty());
+
+    // Check Holder functions
+    std::thread thread1(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod3, std::ref(counterIds3));
+    thread1.join();
+
+    BOOST_CHECK((holder.GetCaptureData()).GetCapturePeriod() == capturePeriod3);
+    BOOST_CHECK((holder.GetCaptureData()).GetCounterIds() == counterIds3);
+
+    CaptureData captureData;
+    std::thread thread2(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData));
+    thread2.join();
+    BOOST_CHECK(captureData.GetCounterIds() == counterIds3);
+
+    std::thread thread3(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod2, std::ref(counterIds1));
+    std::thread thread4(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData));
+    std::thread thread5(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod1, std::ref(counterIds2));
+    thread3.join();
+    thread4.join();
+    thread5.join();
+
+    // Check CaptureData was written/read correctly from multiple threads
+    std::vector<uint16_t> captureIds = captureData.GetCounterIds();
+    uint32_t capturePeriod = captureData.GetCapturePeriod();
+    if (captureIds == counterIds1)
+    {
+        BOOST_CHECK(capturePeriod == capturePeriod2);
+    }
+    else if (captureIds == counterIds2)
+    {
+        BOOST_CHECK(capturePeriod == capturePeriod1);
+    }
+    else
+    {
+        BOOST_ERROR("Error in CaptureData read/write.");
+    }
+
+    std::vector<uint16_t> readIds = holder.GetCaptureData().GetCounterIds();
+    BOOST_CHECK(readIds == counterIds1 || readIds == counterIds2);
+
+    // Check assignment operator
+    CaptureData assignableCaptureData;
+    assignableCaptureData.SetCapturePeriod(capturePeriod3);
+    assignableCaptureData.SetCounterIds(counterIds3);
+
+    CaptureData secondCaptureData;
+    secondCaptureData.SetCapturePeriod(capturePeriod2);
+    secondCaptureData.SetCounterIds(counterIds2);
+
+    BOOST_CHECK(secondCaptureData.GetCapturePeriod() == 2);
+    BOOST_CHECK(secondCaptureData.GetCounterIds() == counterIds2);
+
+    secondCaptureData = assignableCaptureData;
+    BOOST_CHECK(secondCaptureData.GetCapturePeriod() == 3);
+    BOOST_CHECK(secondCaptureData.GetCounterIds() == counterIds3);
+
+    // Check copy constructor
+    CaptureData copyConstructedCaptureData(assignableCaptureData);
+
+    BOOST_CHECK(copyConstructedCaptureData.GetCapturePeriod() == 3);
+    BOOST_CHECK(copyConstructedCaptureData.GetCounterIds() == counterIds3);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

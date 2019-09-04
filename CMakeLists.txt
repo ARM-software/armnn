@@ -420,6 +420,8 @@ list(APPEND armnn_sources
     src/profiling/CounterDirectory.cpp
     src/profiling/CounterDirectory.hpp
     src/profiling/EncodeVersion.hpp
+    src/profiling/Holder.cpp
+    src/profiling/Holder.hpp
     src/profiling/IProfilingConnection.hpp
     src/profiling/Packet.cpp
     src/profiling/Packet.hpp

@@ -41,7 +41,8 @@ public:
     Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors);
 
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
-                                                            std::string & errorMessage);
+                                                            std::string & errorMessage,
+                                                            const INetworkProperties& networkProperties);
 
     // NOTE we return by reference as the purpose of this method is only to provide
     // access to the private m_Profiler and in theory we should not need to increment
@@ -55,7 +56,7 @@ public:
 private:
     void AllocateWorkingMemory();
 
-    LoadedNetwork(std::unique_ptr<OptimizedNetwork> net);
+    LoadedNetwork(std::unique_ptr<OptimizedNetwork> net, const INetworkProperties& networkProperties);
 
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
@@ -84,6 +85,8 @@ private:
     mutable std::mutex m_WorkingMemMutex;
 
     bool m_IsWorkingMemAllocated=false;
+    bool m_IsImportEnabled=false;
+    bool m_IsExportEnabled=false;
 
     TensorHandleFactoryRegistry m_TensorHandleFactoryRegistry;
 };

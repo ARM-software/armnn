@@ -973,7 +973,12 @@ BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndInt16NhwcTest)
 // Only run these tests on non Android platforms
 BOOST_AUTO_TEST_CASE(RefImportNonAlignedPointerTest)
 {
-    ImportNonAlignedPointerTest(defaultBackends);
+    ImportNonAlignedInputPointerTest(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefExportNonAlignedPointerTest)
+{
+    ImportNonAlignedOutputPointerTest(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefImportAlignedPointerTest)

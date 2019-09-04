@@ -41,7 +41,8 @@ std::string ToErrorMessage(const char * prefix, const ExceptionType & error)
 } // anonymous
 
 std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
-                                                                std::string & errorMessage)
+                                                                std::string& errorMessage,
+                                                                const INetworkProperties& networkProperties)
 {
     std::unique_ptr<LoadedNetwork> loadedNetwork;
 
@@ -55,7 +56,7 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 
     try
     {
-        loadedNetwork.reset(new LoadedNetwork(std::move(net)));
+        loadedNetwork.reset(new LoadedNetwork(std::move(net), networkProperties));
     }
     catch (const armnn::RuntimeException& error)
     {
@@ -73,8 +74,11 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
     return loadedNetwork;
 }
 
-LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net)
-    : m_OptimizedNetwork(std::move(net))
+LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
+                             const INetworkProperties& networkProperties) :
+                             m_OptimizedNetwork(std::move(net)),
+                             m_IsImportEnabled(networkProperties.m_ImportEnabled),
+                             m_IsExportEnabled(networkProperties.m_ExportEnabled)
 {
     // Create a profiler and register it for the current thread.
     m_Profiler = std::make_shared<Profiler>();
@@ -392,7 +396,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     info.m_OutputTensorInfos.push_back(outputTensorInfo);
 
     MemorySourceFlags importFlags = outputTensorHandle->GetImportFlags();
-    if (CheckFlag(importFlags, MemorySource::Malloc))  // Try import the input tensor
+    if (CheckFlag(importFlags, MemorySource::Malloc) && m_IsImportEnabled)  // Try import the input tensor
     {
         // This assumes a CPU Tensor handle
         void* mem = tensorHandle->Map(false);
@@ -402,13 +406,16 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
             return; // No need for a workload since the import has been done.
         }
         tensorHandle->Unmap();
+        throw MemoryImportException("EnqueueInput: Memory Import failed");
     }
+    else
+    {
+        // Create a mem copy workload for input since we did not import
+        auto inputWorkload = std::make_unique<CopyMemGenericWorkload>(inputQueueDescriptor, info);
 
-    // Create a mem copy workload for input since we could not import
-    auto inputWorkload = std::make_unique<CopyMemGenericWorkload>(inputQueueDescriptor, info);
-
-    BOOST_ASSERT_MSG(inputWorkload, "No input workload created");
-    m_InputQueue.push_back(move(inputWorkload));
+        BOOST_ASSERT_MSG(inputWorkload, "No input workload created");
+        m_InputQueue.push_back(move(inputWorkload));
+    }
 }
 
 void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo)
@@ -444,7 +451,8 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     // b) The tensor has zero padding
     // c) There is only one connection to the OutputSlot and it is to an OutputLayer.
     // d) The output pointer is allocated via malloc. (Other types will be supported in a later release)
-    if (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer().GetType() != LayerType::Input)
+    if (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer().GetType() != LayerType::Input
+        && m_IsExportEnabled)
     {
         if (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetNumConnections() == 1)
         {
@@ -467,17 +475,23 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
 
                     return; //No need to add the output workload below
                 }
+                else
+                {
+                    throw MemoryExportException("EnqueueOutput: Memory Export failed");
+                }
             }
         }
     }
+    else
+    {
+        // If we got here then we couldn't import the memory, so add an output workload which performs a memcopy.
+        outputQueueDescriptor.m_Inputs.push_back(inputTensorHandle);
+        info.m_InputTensorInfos.push_back(inputTensorInfo);
 
-    // If we got here then we couldn't import the memory, so add an output workload which performs a memcopy.
-    outputQueueDescriptor.m_Inputs.push_back(inputTensorHandle);
-    info.m_InputTensorInfos.push_back(inputTensorInfo);
-
-    auto outputWorkload = std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
-    BOOST_ASSERT_MSG(outputWorkload, "No output workload created");
-    m_OutputQueue.push_back(move(outputWorkload));
+        auto outputWorkload = std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
+        BOOST_ASSERT_MSG(outputWorkload, "No output workload created");
+        m_OutputQueue.push_back(move(outputWorkload));
+    }
 }
 
 void LoadedNetwork::AllocateWorkingMemory()

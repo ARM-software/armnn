@@ -23,6 +23,18 @@ class IGpuAccTunedParameters;
 class IRuntime;
 using IRuntimePtr = std::unique_ptr<IRuntime, void(*)(IRuntime* runtime)>;
 
+struct INetworkProperties
+{
+    INetworkProperties(bool importEnabled = false, bool exportEnabled = false)
+        : m_ImportEnabled(importEnabled),
+          m_ExportEnabled(exportEnabled) {}
+
+    const bool m_ImportEnabled;
+    const bool m_ExportEnabled;
+
+    virtual ~INetworkProperties() {}
+};
+
 class IRuntime
 {
 public:
@@ -82,7 +94,12 @@ public:
     /// @return armnn::Status
     virtual Status LoadNetwork(NetworkId& networkIdOut,
                                IOptimizedNetworkPtr network,
-                               std::string & errorMessage) = 0;
+                               std::string& errorMessage) = 0;
+
+    virtual Status LoadNetwork(NetworkId& networkIdOut,
+                               IOptimizedNetworkPtr network,
+                               std::string& errorMessage,
+                               const INetworkProperties& networkProperties) = 0;
 
     virtual TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const = 0;
     virtual TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const = 0;
@@ -163,4 +180,4 @@ protected:
     virtual ~IGpuAccTunedParameters() {};
 };
 
-}
+} // namespace armnn

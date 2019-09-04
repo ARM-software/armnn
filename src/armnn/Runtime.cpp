@@ -49,7 +49,16 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut, IOptimizedNetworkPtr inNetw
 
 Status Runtime::LoadNetwork(NetworkId& networkIdOut,
                             IOptimizedNetworkPtr inNetwork,
-                            std::string & errorMessage)
+                            std::string& errorMessage)
+{
+    INetworkProperties networkProperties;
+    return LoadNetwork(networkIdOut, std::move(inNetwork), errorMessage, networkProperties);
+}
+
+Status Runtime::LoadNetwork(NetworkId& networkIdOut,
+                            IOptimizedNetworkPtr inNetwork,
+                            std::string& errorMessage,
+                            const INetworkProperties& networkProperties)
 {
     IOptimizedNetwork* rawNetwork = inNetwork.release();
 
@@ -62,7 +71,8 @@ Status Runtime::LoadNetwork(NetworkId& networkIdOut,
 
     unique_ptr<LoadedNetwork> loadedNetwork = LoadedNetwork::MakeLoadedNetwork(
         std::unique_ptr<OptimizedNetwork>(boost::polymorphic_downcast<OptimizedNetwork*>(rawNetwork)),
-        errorMessage);
+        errorMessage,
+        networkProperties);
 
     if (!loadedNetwork)
     {

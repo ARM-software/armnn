@@ -38,7 +38,12 @@ public:
     /// @return armnn::Status
     virtual Status LoadNetwork(NetworkId& networkIdOut,
                                IOptimizedNetworkPtr network,
-                               std::string & errorMessage) override;
+                               std::string& errorMessage) override;
+
+    virtual Status LoadNetwork(NetworkId& networkIdOut,
+                               IOptimizedNetworkPtr network,
+                               std::string& errorMessage,
+                               const INetworkProperties& networkProperties) override;
 
     virtual TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const override;
     virtual TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const override;

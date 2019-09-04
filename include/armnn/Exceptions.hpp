@@ -115,6 +115,16 @@ class RuntimeException : public Exception
     using Exception::Exception;
 };
 
+class MemoryImportException : public Exception
+{
+    using Exception::Exception;
+};
+
+class MemoryExportException : public Exception
+{
+    using Exception::Exception;
+};
+
 template <typename ExceptionType>
 void ConditionalThrow(bool condition, const std::string& message)
 {

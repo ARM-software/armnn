@@ -7,6 +7,7 @@
 
 #include <armnn/Exceptions.hpp>
 
+#include <string>
 #include <stdint.h>
 
 namespace armnn
@@ -26,6 +27,14 @@ uint64_t ReadUint64(const unsigned char* buffer, unsigned int offset);
 uint32_t ReadUint32(const unsigned char* buffer, unsigned int offset);
 
 uint16_t ReadUint16(const unsigned char* buffer, unsigned int offset);
+
+std::string GetSoftwareInfo();
+
+std::string GetSoftwareVersion();
+
+std::string GetHardwareVersion();
+
+std::string GetProcessName();
 
 class BufferExhaustion : public armnn::Exception
 {

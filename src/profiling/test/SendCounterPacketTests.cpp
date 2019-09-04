@@ -5,10 +5,12 @@
 
 #include "../SendCounterPacket.hpp"
 #include "../ProfilingUtils.hpp"
+#include "../EncodeVersion.hpp"
 
 #include <armnn/Exceptions.hpp>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -142,7 +144,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
     uint32_t capturePeriod = 1000;
     std::vector<uint16_t> selectedCounterIds;
     BOOST_CHECK_THROW(sendPacket1.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds),
-                      armnn::Exception);
+                      armnn::RuntimeException);
 
     // Packet without any counters
     MockBuffer mockBuffer2(512);
@@ -272,5 +274,118 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
     }
 
 }
+
+BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
+{
+    using boost::numeric_cast;
+
+    uint32_t sizeUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
+
+    // Error no space left in buffer
+    MockBuffer mockBuffer1(10);
+    SendCounterPacket sendPacket1(mockBuffer1);
+    BOOST_CHECK_THROW(sendPacket1.SendStreamMetaDataPacket(), armnn::RuntimeException);
+
+    // Full metadata packet
+
+    std::string processName = GetProcessName().substr(0, 60);
+
+    uint32_t infoSize = numeric_cast<uint32_t>(GetSoftwareInfo().size()) > 0 ?
+                        numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1 : 0;
+    uint32_t hardwareVersionSize = numeric_cast<uint32_t>(GetHardwareVersion().size()) > 0 ?
+                                   numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1 : 0;
+    uint32_t softwareVersionSize = numeric_cast<uint32_t>(GetSoftwareVersion().size()) > 0 ?
+                                   numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1 : 0;
+    uint32_t processNameSize = numeric_cast<uint32_t>(processName.size()) > 0 ?
+                               numeric_cast<uint32_t>(processName.size()) + 1 : 0;
+
+    uint32_t packetEntries = 5;
+
+    MockBuffer mockBuffer2(512);
+    SendCounterPacket sendPacket2(mockBuffer2);
+    sendPacket2.SendStreamMetaDataPacket();
+    unsigned int sizeRead = 0;
+    const unsigned char* readBuffer2 = mockBuffer2.GetReadBuffer(sizeRead);
+
+    uint32_t headerWord0 = ReadUint32(readBuffer2, 0);
+    uint32_t headerWord1 = ReadUint32(readBuffer2, sizeUint32);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0); // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 0); // packet id
+
+    uint32_t totalLength = numeric_cast<uint32_t>(2 * sizeUint32 + 10 * sizeUint32 + infoSize + hardwareVersionSize +
+                                                  softwareVersionSize + processNameSize + sizeUint32 +
+                                                  2 * packetEntries * sizeUint32);
+
+    BOOST_TEST(headerWord1 == totalLength - (2 * sizeUint32)); // data length
+
+    uint32_t offset = sizeUint32 * 2;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == SendCounterPacket::PIPE_MAGIC); // pipe_magic
+    offset += sizeUint32;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0)); // stream_metadata_version
+    offset += sizeUint32;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == SendCounterPacket::MAX_METADATA_PACKET_LENGTH); // max_data_len
+    offset += sizeUint32;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == numeric_cast<uint32_t>(getpid())); // pid
+    offset += sizeUint32;
+    uint32_t poolOffset = 10 * sizeUint32;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == (infoSize ? poolOffset : 0)); // offset_info
+    offset += sizeUint32;
+    poolOffset += infoSize;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == (hardwareVersionSize ? poolOffset : 0)); // offset_hw_version
+    offset += sizeUint32;
+    poolOffset += hardwareVersionSize;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == (softwareVersionSize ? poolOffset : 0)); // offset_sw_version
+    offset += sizeUint32;
+    poolOffset += softwareVersionSize;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == (processNameSize ? poolOffset : 0)); // offset_process_name
+    offset += sizeUint32;
+    poolOffset += processNameSize;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == (packetEntries ? poolOffset : 0)); // offset_packet_version_table
+    offset += sizeUint32;
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == 0); // reserved
+
+    offset += sizeUint32;
+    if (infoSize)
+    {
+        BOOST_TEST(strcmp(reinterpret_cast<const char *>(&readBuffer2[offset]), GetSoftwareInfo().c_str()) == 0);
+        offset += infoSize;
+    }
+
+    if (hardwareVersionSize)
+    {
+        BOOST_TEST(strcmp(reinterpret_cast<const char *>(&readBuffer2[offset]), GetHardwareVersion().c_str()) == 0);
+        offset += hardwareVersionSize;
+    }
+
+    if (softwareVersionSize)
+    {
+        BOOST_TEST(strcmp(reinterpret_cast<const char *>(&readBuffer2[offset]), GetSoftwareVersion().c_str()) == 0);
+        offset += softwareVersionSize;
+    }
+
+    if (processNameSize)
+    {
+        BOOST_TEST(strcmp(reinterpret_cast<const char *>(&readBuffer2[offset]), GetProcessName().c_str()) == 0);
+        offset += processNameSize;
+    }
+
+    if (packetEntries)
+    {
+        BOOST_TEST((ReadUint32(readBuffer2, offset) >> 16) == packetEntries);
+        offset += sizeUint32;
+        for (uint32_t i = 0; i < packetEntries; ++i)
+        {
+            BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 26) & 0x3F) == 0);
+            BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 16) & 0x3FF) == i);
+            offset += sizeUint32;
+            BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0));
+            offset += sizeUint32;
+        }
+    }
+
+    BOOST_TEST(offset == totalLength);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

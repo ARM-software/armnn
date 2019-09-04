@@ -5,7 +5,11 @@
 
 #include "ProfilingUtils.hpp"
 
+#include <armnn/Version.hpp>
+
 #include <boost/assert.hpp>
+
+#include <fstream>
 
 namespace armnn
 {
@@ -82,6 +86,31 @@ uint16_t ReadUint16(const unsigned char* buffer, unsigned int offset)
     value = static_cast<uint32_t>(buffer[offset]);
     value |= static_cast<uint32_t>(buffer[offset + 1]) << 8;
     return static_cast<uint16_t>(value);
+}
+
+std::string GetSoftwareInfo()
+{
+    return std::string("ArmNN");
+}
+
+std::string GetHardwareVersion()
+{
+    return std::string();
+}
+
+std::string GetSoftwareVersion()
+{
+    std::string armnnVersion(ARMNN_VERSION);
+    std::string result = "Armnn " + armnnVersion.substr(2,2) + "." + armnnVersion.substr(4,2);
+    return result;
+}
+
+std::string GetProcessName()
+{
+    std::ifstream comm("/proc/self/comm");
+    std::string name;
+    getline(comm, name);
+    return name;
 }
 
 } // namespace profiling

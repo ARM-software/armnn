@@ -11,8 +11,11 @@
 
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/core/ignore_unused.hpp>
 
+#include <iostream>
 #include <unistd.h>
+#include <string.h>
 
 namespace armnn
 {
@@ -22,9 +25,147 @@ namespace profiling
 
 using boost::numeric_cast;
 
+const unsigned int SendCounterPacket::PIPE_MAGIC;
+const unsigned int SendCounterPacket::MAX_METADATA_PACKET_LENGTH;
+
 void SendCounterPacket::SendStreamMetaDataPacket()
 {
-    throw armnn::UnimplementedException();
+    std::string info(GetSoftwareInfo());
+    std::string hardwareVersion(GetHardwareVersion());
+    std::string softwareVersion(GetSoftwareVersion());
+    std::string processName = GetProcessName().substr(0, 60);
+
+    uint32_t infoSize = numeric_cast<uint32_t>(info.size()) > 0 ? numeric_cast<uint32_t>(info.size()) + 1 : 0;
+    uint32_t hardwareVersionSize = numeric_cast<uint32_t>(hardwareVersion.size()) > 0 ?
+                                   numeric_cast<uint32_t>(hardwareVersion.size()) + 1 : 0;
+    uint32_t softwareVersionSize = numeric_cast<uint32_t>(softwareVersion.size()) > 0 ?
+                                   numeric_cast<uint32_t>(softwareVersion.size()) + 1 : 0;
+    uint32_t processNameSize = numeric_cast<uint32_t>(processName.size()) > 0 ?
+                               numeric_cast<uint32_t>(processName.size()) + 1 : 0;
+
+    uint32_t sizeUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
+
+    uint32_t headerSize = 2 * sizeUint32;
+    uint32_t bodySize = 10 * sizeUint32;
+    uint32_t packetVersionCountSize = sizeUint32;
+
+    // Supported Packets
+    // Stream metadata packet            (packet family=0; packet id=0)
+    // Connection Acknowledged packet    (packet family=0, packet id=1)
+    // Counter Directory packet          (packet family=0; packet id=2)
+    // Request Counter Directory packet  (packet family=0, packet id=3)
+    // Periodic Counter Selection packet (packet family=0, packet id=4)
+    uint32_t packetVersionEntries = 5;
+
+    uint32_t payloadSize = numeric_cast<uint32_t>(infoSize + hardwareVersionSize + softwareVersionSize +
+                                                  processNameSize + packetVersionCountSize +
+                                                  (packetVersionEntries * 2 * sizeUint32));
+
+    uint32_t totalSize = headerSize + bodySize + payloadSize;
+    uint32_t offset = 0;
+    uint32_t reserved = 0;
+
+    unsigned char *writeBuffer = m_Buffer.Reserve(totalSize, reserved);
+
+    if (reserved < totalSize)
+    {
+        // Cancel the operation.
+        m_Buffer.Commit(0);
+        throw RuntimeException(boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.")
+                                          % totalSize));
+    }
+
+    if (writeBuffer == nullptr)
+    {
+        // Cancel the operation.
+        m_Buffer.Commit(0);
+        throw RuntimeException("Error reserving buffer memory.");
+    }
+
+    try
+    {
+        // Create header
+
+        WriteUint32(writeBuffer, offset, 0);
+        offset += sizeUint32;
+        WriteUint32(writeBuffer, offset, totalSize - headerSize);
+
+        // Packet body
+
+        offset += sizeUint32;
+        WriteUint32(writeBuffer, offset, PIPE_MAGIC); // pipe_magic
+        offset += sizeUint32;
+        WriteUint32(writeBuffer, offset, EncodeVersion(1, 0, 0)); // stream_metadata_version
+        offset += sizeUint32;
+        WriteUint32(writeBuffer, offset, MAX_METADATA_PACKET_LENGTH); // max_data_length
+        offset += sizeUint32;
+        WriteUint32(writeBuffer, offset, numeric_cast<uint32_t>(getpid())); // pid
+        offset += sizeUint32;
+        uint32_t poolOffset = bodySize;
+        WriteUint32(writeBuffer, offset, infoSize ? poolOffset : 0); // offset_info
+        offset += sizeUint32;
+        poolOffset += infoSize;
+        WriteUint32(writeBuffer, offset, hardwareVersionSize ? poolOffset : 0); // offset_hw_version
+        offset += sizeUint32;
+        poolOffset += hardwareVersionSize;
+        WriteUint32(writeBuffer, offset, softwareVersionSize ? poolOffset : 0); // offset_sw_version
+        offset += sizeUint32;
+        poolOffset += softwareVersionSize;
+        WriteUint32(writeBuffer, offset, processNameSize ? poolOffset : 0); // offset_process_name
+        offset += sizeUint32;
+        poolOffset += processNameSize;
+        WriteUint32(writeBuffer, offset, packetVersionEntries ? poolOffset : 0); // offset_packet_version_table
+        offset += sizeUint32;
+        WriteUint32(writeBuffer, offset, 0); // reserved
+        offset += sizeUint32;
+
+        // Pool
+
+        if (infoSize) {
+            memcpy(&writeBuffer[offset], info.c_str(), infoSize);
+            offset += infoSize;
+        }
+
+        if (hardwareVersionSize) {
+            memcpy(&writeBuffer[offset], hardwareVersion.c_str(), hardwareVersionSize);
+            offset += hardwareVersionSize;
+        }
+
+        if (softwareVersionSize) {
+            memcpy(&writeBuffer[offset], softwareVersion.c_str(), softwareVersionSize);
+            offset += softwareVersionSize;
+        }
+
+        if (processNameSize) {
+            memcpy(&writeBuffer[offset], processName.c_str(), processNameSize);
+            offset += processNameSize;
+        }
+
+        if (packetVersionEntries) {
+            // Packet Version Count
+            WriteUint32(writeBuffer, offset, packetVersionEntries << 16);
+
+            // Packet Version Entries
+            uint32_t packetFamily = 0;
+            uint32_t packetId = 0;
+
+            offset += sizeUint32;
+            for (uint32_t i = 0; i < packetVersionEntries; ++i) {
+                WriteUint32(writeBuffer, offset, ((packetFamily & 0x3F) << 26) | ((packetId++ & 0x3FF) << 16));
+                offset += sizeUint32;
+                WriteUint32(writeBuffer, offset, EncodeVersion(1, 0, 0));
+                offset += sizeUint32;
+            }
+        }
+    }
+    catch(...)
+    {
+        // Cancel the operation.
+        m_Buffer.Commit(0);
+        throw RuntimeException("Error processing packet.");
+    }
+
+    m_Buffer.Commit(totalSize);
 }
 
 void SendCounterPacket::SendCounterDirectoryPacket(const Category& category, const std::vector<Counter>& counters)

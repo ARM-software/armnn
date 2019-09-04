@@ -33,6 +33,9 @@ public:
 
     void SetReadyToRead() override;
 
+    static const unsigned int PIPE_MAGIC = 0x45495434;
+    static const unsigned int MAX_METADATA_PACKET_LENGTH = 4096;
+
 private:
     IBufferWrapper& m_Buffer;
     bool m_ReadyToRead;

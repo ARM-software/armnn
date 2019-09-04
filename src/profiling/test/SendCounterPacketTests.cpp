@@ -10,6 +10,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <chrono>
 #include <iostream>
 
 BOOST_AUTO_TEST_SUITE(SendCounterPacketTests)
@@ -73,8 +74,8 @@ public:
         memcpy(buffer, message.c_str(), static_cast<unsigned int>(message.size()) + 1);
     }
 
-    void SendPeriodicCounterCapturePacket(uint64_t timestamp, const std::vector<uint32_t>& counterValues,
-                                          const std::vector<uint16_t>& counterUids) override
+    void SendPeriodicCounterCapturePacket(uint64_t timestamp,
+                                          const std::vector<std::pair<uint16_t, uint32_t>>& values) override
     {
         std::string message("SendPeriodicCounterCapturePacket");
         unsigned int reserved = 0;
@@ -118,9 +119,9 @@ BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
     BOOST_TEST(strcmp(buffer, "SendCounterDirectoryPacket") == 0);
 
     uint64_t timestamp = 0;
-    std::vector<uint32_t> counterValues;
-    std::vector<uint16_t> counterUids;
-    sendCounterPacket.SendPeriodicCounterCapturePacket(timestamp, counterValues, counterUids);
+    std::vector<std::pair<uint16_t, uint32_t>> indexValuePairs;
+
+    sendCounterPacket.SendPeriodicCounterCapturePacket(timestamp, indexValuePairs);
 
     BOOST_TEST(strcmp(buffer, "SendPeriodicCounterCapturePacket") == 0);
 
@@ -193,6 +194,83 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
         BOOST_TEST(counterId == id);
         offset += 2;
     }
+}
+
+BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
+{
+    // Error no space left in buffer
+    MockBuffer mockBuffer1(10);
+    SendCounterPacket sendPacket1(mockBuffer1);
+
+    auto captureTimestamp = std::chrono::steady_clock::now();
+    uint64_t time =  static_cast<uint64_t >(captureTimestamp.time_since_epoch().count());
+    std::vector<std::pair<uint16_t, uint32_t>> indexValuePairs;
+
+    BOOST_CHECK_THROW(sendPacket1.SendPeriodicCounterCapturePacket(time, indexValuePairs),
+                      BufferExhaustion);
+
+    // Packet without any counters
+    MockBuffer mockBuffer2(512);
+    SendCounterPacket sendPacket2(mockBuffer2);
+
+    sendPacket2.SendPeriodicCounterCapturePacket(time, indexValuePairs);
+    unsigned int sizeRead = 0;
+    const unsigned char* readBuffer2 = mockBuffer2.GetReadBuffer(sizeRead);
+
+    uint32_t headerWord0 = ReadUint32(readBuffer2, 0);
+    uint32_t headerWord1 = ReadUint32(readBuffer2, 4);
+    uint64_t readTimestamp = ReadUint64(readBuffer2, 8);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 1);   // packet family
+    BOOST_TEST(((headerWord0 >> 19) & 0x3F) == 0);   // packet class
+    BOOST_TEST(((headerWord0 >> 16) & 0x3) == 0);    // packet type
+    BOOST_TEST(headerWord1 == 8);                    // data length
+    BOOST_TEST(time == readTimestamp);               // capture period
+
+    // Full packet message
+    MockBuffer mockBuffer3(512);
+    SendCounterPacket sendPacket3(mockBuffer3);
+
+    indexValuePairs.reserve(5);
+    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(0, 100));
+    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(1, 200));
+    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(2, 300));
+    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(3, 400));
+    indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(4, 500));
+    sendPacket3.SendPeriodicCounterCapturePacket(time, indexValuePairs);
+    sizeRead = 0;
+    const unsigned char* readBuffer3 = mockBuffer3.GetReadBuffer(sizeRead);
+
+    headerWord0 = ReadUint32(readBuffer3, 0);
+    headerWord1 = ReadUint32(readBuffer3, 4);
+    uint64_t readTimestamp2 = ReadUint64(readBuffer3, 8);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 1);   // packet family
+    BOOST_TEST(((headerWord0 >> 19) & 0x3F) == 0);   // packet class
+    BOOST_TEST(((headerWord0 >> 16) & 0x3) == 0);    // packet type
+    BOOST_TEST(headerWord1 == 38);                   // data length
+    BOOST_TEST(time == readTimestamp2);              // capture period
+
+    uint16_t counterIndex = 0;
+    uint32_t counterValue = 100;
+    uint32_t offset = 16;
+
+    // Counter Ids
+    for (auto it = indexValuePairs.begin(), end = indexValuePairs.end(); it != end; ++it)
+    {
+        // Check Counter Index
+        uint16_t readIndex = ReadUint16(readBuffer3, offset);
+        BOOST_TEST(counterIndex == readIndex);
+        counterIndex++;
+        offset += 2;
+
+        // Check Counter Value
+        uint32_t readValue = ReadUint32(readBuffer3, offset);
+        BOOST_TEST(counterValue == readValue);
+        counterValue += 100;
+        offset += 4;
+    }
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

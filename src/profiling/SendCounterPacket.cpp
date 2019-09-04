@@ -32,10 +32,57 @@ void SendCounterPacket::SendCounterDirectoryPacket(const Category& category, con
     throw armnn::UnimplementedException();
 }
 
-void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, const std::vector<uint32_t>& counterValues,
-                                                         const std::vector<uint16_t>& counterUids)
+void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, const IndexValuePairsVector& values)
 {
-    throw armnn::UnimplementedException();
+    uint32_t packetFamily = 1;
+    uint32_t packetClass = 0;
+    uint32_t packetType = 0;
+    uint32_t headerSize = numeric_cast<uint32_t>(2 * sizeof(uint32_t));
+    uint32_t bodySize = numeric_cast<uint32_t>((1 * sizeof(uint64_t)) +
+                                               (values.size() * (sizeof(uint16_t) + sizeof(uint32_t))));
+    uint32_t totalSize = headerSize + bodySize;
+    uint32_t offset = 0;
+    uint32_t reserved = 0;
+
+    unsigned char* writeBuffer = m_Buffer.Reserve(totalSize, reserved);
+
+    if (reserved < totalSize)
+    {
+        // Cancel the operation.
+        m_Buffer.Commit(0);
+        throw profiling::BufferExhaustion(
+                boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.") % totalSize));
+    }
+
+    if (writeBuffer == nullptr)
+    {
+        // Cancel the operation.
+        m_Buffer.Commit(0);
+        throw RuntimeException("Error reserving buffer memory.");
+    }
+
+    // Create header.
+    WriteUint32(writeBuffer,
+                offset,
+                ((packetFamily & 0x3F) << 26) | ((packetClass & 0x3FF) << 19) | ((packetType & 0x3FFF) << 16));
+    offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+    WriteUint32(writeBuffer, offset, bodySize);
+
+    // Copy captured Timestamp.
+    offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+    WriteUint64(writeBuffer, offset, timestamp);
+
+    // Copy selectedCounterIds.
+    offset += numeric_cast<uint32_t>(sizeof(uint64_t));
+    for (const auto& pair: values)
+    {
+        WriteUint16(writeBuffer, offset, pair.first);
+        offset += numeric_cast<uint32_t>(sizeof(uint16_t));
+        WriteUint32(writeBuffer, offset, pair.second);
+        offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+    }
+
+    m_Buffer.Commit(totalSize);
 }
 
 void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePeriod,
@@ -44,7 +91,8 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
     uint32_t packetFamily = 0;
     uint32_t packetId = 4;
     uint32_t headerSize = numeric_cast<uint32_t>(2 * sizeof(uint32_t));
-    uint32_t bodySize = numeric_cast<uint32_t>((1 * sizeof(uint32_t)) + (selectedCounterIds.size() * sizeof(uint16_t)));
+    uint32_t bodySize   = numeric_cast<uint32_t>((1 * sizeof(uint32_t)) +
+                                                 (selectedCounterIds.size() * sizeof(uint16_t)));
     uint32_t totalSize = headerSize + bodySize;
     uint32_t offset = 0;
     uint32_t reserved = 0;

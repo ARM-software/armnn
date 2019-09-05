@@ -403,10 +403,11 @@ BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
     BOOST_CHECK(captureData.GetCounterIds() == counterIds3);
 
     std::thread thread3(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod2, std::ref(counterIds1));
-    std::thread thread4(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData));
-    std::thread thread5(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod1, std::ref(counterIds2));
+    std::thread thread4(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod1, std::ref(counterIds2));
     thread3.join();
     thread4.join();
+
+    std::thread thread5(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData));
     thread5.join();
 
     // Check CaptureData was written/read correctly from multiple threads

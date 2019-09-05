@@ -1647,13 +1647,178 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
     BOOST_TEST(headerWord1 == 4);                   // data lenght
     BOOST_TEST(period == 11);                       // capture period
-
 }
 
 BOOST_AUTO_TEST_CASE(CheckSocketProfilingConnection)
 {
     // Check that creating a SocketProfilingConnection results in an exception as the Gator UDS doesn't exist.
     BOOST_CHECK_THROW(new SocketProfilingConnection(), armnn::Exception);
+}
+
+BOOST_AUTO_TEST_CASE(SwTraceIsValidCharTest)
+{
+    // Only ASCII 7-bit encoding supported
+    for (unsigned char c = 0; c < 128; c++)
+    {
+        BOOST_CHECK(SwTraceCharPolicy::IsValidChar(c));
+    }
+
+    // Not ASCII
+    for (unsigned char c = 255; c >= 128; c++)
+    {
+        BOOST_CHECK(!SwTraceCharPolicy::IsValidChar(c));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(SwTraceIsValidNameCharTest)
+{
+    // Only alpha-numeric and underscore ASCII 7-bit encoding supported
+    const unsigned char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    for (unsigned char i = 0; i < sizeof(validChars) / sizeof(validChars[0]) - 1; i++)
+    {
+        BOOST_CHECK(SwTraceNameCharPolicy::IsValidChar(validChars[i]));
+    }
+
+    // Non alpha-numeric chars
+    for (unsigned char c = 0; c < 48; c++)
+    {
+        BOOST_CHECK(!SwTraceNameCharPolicy::IsValidChar(c));
+    }
+    for (unsigned char c = 58; c < 65; c++)
+    {
+        BOOST_CHECK(!SwTraceNameCharPolicy::IsValidChar(c));
+    }
+    for (unsigned char c = 91; c < 95; c++)
+    {
+        BOOST_CHECK(!SwTraceNameCharPolicy::IsValidChar(c));
+    }
+    for (unsigned char c = 96; c < 97; c++)
+    {
+        BOOST_CHECK(!SwTraceNameCharPolicy::IsValidChar(c));
+    }
+    for (unsigned char c = 123; c < 128; c++)
+    {
+        BOOST_CHECK(!SwTraceNameCharPolicy::IsValidChar(c));
+    }
+
+    // Not ASCII
+    for (unsigned char c = 255; c >= 128; c++)
+    {
+        BOOST_CHECK(!SwTraceNameCharPolicy::IsValidChar(c));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(IsValidSwTraceStringTest)
+{
+    // Valid SWTrace strings
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>(""));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>("_"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>("0123"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>("valid_string"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>("VALID_string_456"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>(" "));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>("valid string"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>("!$%"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceCharPolicy>("valid|\\~string#123"));
+
+    // Invalid SWTrace strings
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceCharPolicy>("€£"));
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceCharPolicy>("invalid‡string"));
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceCharPolicy>("12Ž34"));
+}
+
+BOOST_AUTO_TEST_CASE(IsValidSwTraceNameStringTest)
+{
+    // Valid SWTrace name strings
+    BOOST_CHECK(IsValidSwTraceString<SwTraceNameCharPolicy>(""));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceNameCharPolicy>("_"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceNameCharPolicy>("0123"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceNameCharPolicy>("valid_string"));
+    BOOST_CHECK(IsValidSwTraceString<SwTraceNameCharPolicy>("VALID_string_456"));
+
+    // Invalid SWTrace name strings
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceNameCharPolicy>(" "));
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceNameCharPolicy>("invalid string"));
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceNameCharPolicy>("!$%"));
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceNameCharPolicy>("invalid|\\~string#123"));
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceNameCharPolicy>("€£"));
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceNameCharPolicy>("invalid‡string"));
+    BOOST_CHECK(!IsValidSwTraceString<SwTraceNameCharPolicy>("12Ž34"));
+}
+
+template <typename SwTracePolicy>
+void StringToSwTraceStringTestHelper(const std::string& testString, std::vector<uint32_t> buffer, size_t expectedSize)
+{
+    // Convert the test string to a SWTrace string
+    BOOST_CHECK(StringToSwTraceString<SwTracePolicy>(testString, buffer));
+
+    // The buffer must contain at least the length of the string
+    BOOST_CHECK(!buffer.empty());
+
+    // The buffer must be of the expected size (in words)
+    BOOST_CHECK(buffer.size() == expectedSize);
+
+    // The first word of the byte must be the length of the string including the null-terminator
+    BOOST_CHECK(buffer[0] == testString.size() + 1);
+
+    // The contents of the buffer must match the test string
+    BOOST_CHECK(std::memcmp(testString.data(), buffer.data() + 1, testString.size()) == 0);
+
+    // The buffer must include the null-terminator at the end of the string
+    size_t nullTerminatorIndex = sizeof(uint32_t) + testString.size();
+    BOOST_CHECK(reinterpret_cast<unsigned char*>(buffer.data())[nullTerminatorIndex]  == '\0');
+}
+
+BOOST_AUTO_TEST_CASE(StringToSwTraceStringTest)
+{
+    std::vector<uint32_t> buffer;
+
+    // Valid SWTrace strings (expected size in words)
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>("", buffer, 2);
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>("_", buffer, 2);
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>("0123", buffer, 3);
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>("valid_string", buffer, 5);
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>("VALID_string_456", buffer, 6);
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>(" ", buffer, 2);
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>("valid string", buffer, 5);
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>("!$%", buffer, 2);
+    StringToSwTraceStringTestHelper<SwTraceCharPolicy>("valid|\\~string#123", buffer, 6);
+
+    // Invalid SWTrace strings
+    BOOST_CHECK(!StringToSwTraceString<SwTraceCharPolicy>("€£", buffer));
+    BOOST_CHECK(buffer.empty());
+    BOOST_CHECK(!StringToSwTraceString<SwTraceCharPolicy>("invalid‡string", buffer));
+    BOOST_CHECK(buffer.empty());
+    BOOST_CHECK(!StringToSwTraceString<SwTraceCharPolicy>("12Ž34", buffer));
+    BOOST_CHECK(buffer.empty());
+}
+
+BOOST_AUTO_TEST_CASE(StringToSwTraceNameStringTest)
+{
+    std::vector<uint32_t> buffer;
+
+    // Valid SWTrace namestrings (expected size in words)
+    StringToSwTraceStringTestHelper<SwTraceNameCharPolicy>("", buffer, 2);
+    StringToSwTraceStringTestHelper<SwTraceNameCharPolicy>("_", buffer, 2);
+    StringToSwTraceStringTestHelper<SwTraceNameCharPolicy>("0123", buffer, 3);
+    StringToSwTraceStringTestHelper<SwTraceNameCharPolicy>("valid_string", buffer, 5);
+    StringToSwTraceStringTestHelper<SwTraceNameCharPolicy>("VALID_string_456", buffer, 6);
+
+    // Invalid SWTrace namestrings
+    BOOST_CHECK(!StringToSwTraceString<SwTraceNameCharPolicy>(" ", buffer));
+    BOOST_CHECK(buffer.empty());
+    BOOST_CHECK(!StringToSwTraceString<SwTraceNameCharPolicy>("invalid string", buffer));
+    BOOST_CHECK(buffer.empty());
+    BOOST_CHECK(!StringToSwTraceString<SwTraceNameCharPolicy>("!$%", buffer));
+    BOOST_CHECK(buffer.empty());
+    BOOST_CHECK(!StringToSwTraceString<SwTraceNameCharPolicy>("invalid|\\~string#123", buffer));
+    BOOST_CHECK(buffer.empty());
+    BOOST_CHECK(!StringToSwTraceString<SwTraceNameCharPolicy>("€£", buffer));
+    BOOST_CHECK(buffer.empty());
+    BOOST_CHECK(!StringToSwTraceString<SwTraceNameCharPolicy>("invalid‡string", buffer));
+    BOOST_CHECK(buffer.empty());
+    BOOST_CHECK(!StringToSwTraceString<SwTraceNameCharPolicy>("12Ž34", buffer));
+    BOOST_CHECK(buffer.empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -18,6 +18,11 @@ namespace profiling
 class SendCounterPacket : public ISendCounterPacket
 {
 public:
+    using CategoryRecord   = std::vector<uint32_t>;
+    using DeviceRecord     = std::vector<uint32_t>;
+    using CounterSetRecord = std::vector<uint32_t>;
+    using EventRecord      = std::vector<uint32_t>;
+
     using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
 
     SendCounterPacket(IBufferWrapper& buffer)
@@ -27,7 +32,7 @@ public:
 
     void SendStreamMetaDataPacket() override;
 
-    void SendCounterDirectoryPacket(const CounterDirectory& counterDirectory) override;
+    void SendCounterDirectoryPacket(const ICounterDirectory& counterDirectory) override;
 
     void SendPeriodicCounterCapturePacket(uint64_t timestamp, const IndexValuePairsVector& values) override;
 
@@ -52,6 +57,22 @@ private:
 
     IBufferWrapper& m_Buffer;
     bool m_ReadyToRead;
+
+protected:
+    // Helper methods, protected for testing
+    bool CreateCategoryRecord(const CategoryPtr& category,
+                              const Counters& counters,
+                              CategoryRecord& categoryRecord,
+                              std::string& errorMessage);
+    bool CreateDeviceRecord(const DevicePtr& device,
+                            DeviceRecord& deviceRecord,
+                            std::string& errorMessage);
+    bool CreateCounterSetRecord(const CounterSetPtr& counterSet,
+                                CounterSetRecord& counterSetRecord,
+                                std::string& errorMessage);
+    bool CreateEventRecord(const CounterPtr& counter,
+                           EventRecord& eventRecord,
+                           std::string& errorMessage);
 };
 
 } // namespace profiling

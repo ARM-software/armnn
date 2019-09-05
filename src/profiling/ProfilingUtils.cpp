@@ -158,6 +158,13 @@ uint16_t ReadUint16(const unsigned char* buffer, unsigned int offset)
     return static_cast<uint16_t>(value);
 }
 
+uint8_t ReadUint8(const unsigned char* buffer, unsigned int offset)
+{
+    BOOST_ASSERT(buffer);
+
+    return buffer[offset];
+}
+
 std::string GetSoftwareInfo()
 {
     return std::string("ArmNN");

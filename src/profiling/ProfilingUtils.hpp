@@ -92,6 +92,8 @@ uint32_t ReadUint32(const unsigned char* buffer, unsigned int offset);
 
 uint16_t ReadUint16(const unsigned char* buffer, unsigned int offset);
 
+uint8_t ReadUint8(const unsigned char* buffer, unsigned int offset);
+
 std::string GetSoftwareInfo();
 
 std::string GetSoftwareVersion();

@@ -146,6 +146,15 @@ void SerializerVisitor::VisitAdditionLayer(const armnn::IConnectableLayer* layer
     CreateAnyLayer(flatBufferAdditionLayer.o, serializer::Layer::Layer_AdditionLayer);
 }
 
+// Build FlatBuffer for ArgMinMax Layer
+void SerializerVisitor::VisitArgMinMaxLayer(const armnn::IConnectableLayer *layer,
+                                            const armnn::ArgMinMaxDescriptor& descriptor,
+                                            const char *name)
+{
+    // This will be implemented in IVGCVSW-3724
+    throw UnimplementedException("SerializerVisitor::VisitArgMinMaxLayer is not implemented");
+}
+
 // Build FlatBuffer for BatchToSpaceNd Layer
 void SerializerVisitor::VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
                                                  const armnn::BatchToSpaceNdDescriptor& descriptor,

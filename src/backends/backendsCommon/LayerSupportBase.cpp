@@ -57,6 +57,13 @@ bool LayerSupportBase::IsAdditionSupported(const TensorInfo& input0,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsArgMinMaxSupported(const armnn::TensorInfo &input, const armnn::TensorInfo &output,
+                                            const armnn::ArgMinMaxDescriptor& descriptor,
+                                            armnn::Optional<std::string &> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsBatchNormalizationSupported(const TensorInfo& input,
                                                      const TensorInfo& output,
                                                      const TensorInfo& mean,

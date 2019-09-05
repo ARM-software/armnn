@@ -102,6 +102,20 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                         reason);
             break;
         }
+        case LayerType::ArgMinMax:
+        {
+            auto cLayer = boost::polymorphic_downcast<const ArgMinMaxLayer*>(&layer);
+            const ArgMinMaxDescriptor& descriptor = cLayer->GetParameters();
+
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject->IsArgMinMaxSupported(
+                    OverrideDataType(input, dataType),
+                    OverrideDataType(output, dataType),
+                    descriptor,
+                    reason);
+            break;
+        }
         case LayerType::BatchNormalization:
         {
             auto cLayer = boost::polymorphic_downcast<const BatchNormalizationLayer*>(&layer);
@@ -975,6 +989,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateActivation(const ActivationQu
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

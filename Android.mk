@@ -115,6 +115,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/AbsLayer.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
+        src/armnn/layers/ArgMinMaxLayer.cpp \
         src/armnn/layers/BatchNormalizationLayer.cpp \
         src/armnn/layers/BatchToSpaceNdLayer.cpp \
         src/armnn/layers/ConcatLayer.cpp \

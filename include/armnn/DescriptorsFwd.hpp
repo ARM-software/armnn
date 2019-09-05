@@ -8,6 +8,7 @@
 namespace armnn
 {
 struct ActivationDescriptor;
+struct ArgMinMaxDescriptor;
 struct BatchNormalizationDescriptor;
 struct BatchToSpaceNdDescriptor;
 struct Convolution2dDescriptor;

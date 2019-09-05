@@ -102,6 +102,13 @@ public:
     /// @return - Interface for configuring the layer.
     virtual IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name = nullptr) = 0;
 
+    /// Adds an ArgMinMax layer to the network.
+    /// @param desc - Parameters for the L2 normalization operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
+                                                 const char* name = nullptr) = 0;
+
     /// Adds a concatenation layer to the network.
     /// @param concatDescriptor - ConcatDescriptor (synonym for OriginsDescriptor) to configure the concatenation
     ///                           process. Number of Views must be equal to the number of inputs, and their order

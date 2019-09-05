@@ -17,6 +17,7 @@ enum class LayerType
     Abs = FirstLayer,
     Activation,
     Addition,
+    ArgMinMax,
     BatchNormalization,
     BatchToSpaceNd,
     Concat,

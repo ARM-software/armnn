@@ -36,6 +36,9 @@ public:
 
     IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name=nullptr) override;
 
+    IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
+                                         const char* name = nullptr) override;
+
     IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                               const char* name = nullptr) override;
 

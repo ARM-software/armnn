@@ -52,6 +52,10 @@ public:
     void VisitAdditionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 
+    void VisitArgMinMaxLayer(const armnn::IConnectableLayer* layer,
+                             const armnn::ArgMinMaxDescriptor& argMinMaxDescriptor,
+                             const char* name = nullptr) override;
+
     void VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
                                   const armnn::BatchToSpaceNdDescriptor& descriptor,
                                   const char* name = nullptr) override;

@@ -1116,6 +1116,12 @@ IConnectableLayer* Network::AddActivationLayer(const ActivationDescriptor& activ
     return m_Graph->AddLayer<ActivationLayer>(activationDescriptor, name);
 }
 
+IConnectableLayer* Network::AddArgMinMaxLayer(const ArgMinMaxDescriptor& argMinMaxDescriptor,
+                                              const char* name)
+{
+    return m_Graph->AddLayer<ArgMinMaxLayer>(argMinMaxDescriptor, name);
+}
+
 IConnectableLayer* Network::AddNormalizationLayer(const NormalizationDescriptor&
 normalizationDescriptor,
     const char* name)

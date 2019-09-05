@@ -30,6 +30,15 @@ struct ActivationDescriptor
     float              m_B;
 };
 
+/// An ArgMinMaxDescriptor for ArgMinMaxLayer
+struct ArgMinMaxDescriptor
+{
+    ArgMinMaxDescriptor()
+    : m_Axis(-1) {}
+
+    int m_Axis;
+};
+
 /// A PermuteDescriptor for the PermuteLayer.
 struct PermuteDescriptor
 {

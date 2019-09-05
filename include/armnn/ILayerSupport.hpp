@@ -14,6 +14,7 @@
 #include <functional>
 #include <memory>
 #include <vector>
+#include "ArmNN.hpp"
 
 namespace armnn
 {
@@ -40,6 +41,11 @@ public:
                                      const TensorInfo& input1,
                                      const TensorInfo& output,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
+    virtual bool IsArgMinMaxSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const ArgMinMaxDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsBatchNormalizationSupported(const TensorInfo& input,
                                                const TensorInfo& output,

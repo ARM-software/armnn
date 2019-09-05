@@ -9,6 +9,7 @@
 #include "layers/AbsLayer.hpp"
 #include "layers/ActivationLayer.hpp"
 #include "layers/AdditionLayer.hpp"
+#include "layers/ArgMinMaxLayer.hpp"
 #include "layers/BatchNormalizationLayer.hpp"
 #include "layers/BatchToSpaceNdLayer.hpp"
 #include "layers/ConcatLayer.hpp"
@@ -89,6 +90,7 @@ constexpr LayerType LayerEnumOf(const T* = nullptr);
 DECLARE_LAYER(Abs)
 DECLARE_LAYER(Activation)
 DECLARE_LAYER(Addition)
+DECLARE_LAYER(ArgMinMax)
 DECLARE_LAYER(BatchNormalization)
 DECLARE_LAYER(BatchToSpaceNd)
 DECLARE_LAYER(Concat)

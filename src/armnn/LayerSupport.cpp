@@ -91,6 +91,16 @@ bool IsAdditionSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsAdditionSupported, input0, input1, output);
 }
 
+bool IsArgMinMaxSupported(const BackendId& backend,
+                          const TensorInfo& input,
+                          const TensorInfo& output,
+                          const ArgMinMaxDescriptor& descriptor,
+                          char* reasonIfUnsupported,
+                          size_t reasonIfUnsupportedMaxLength)
+{
+    FORWARD_LAYER_SUPPORT_FUNC(backend, IsArgMinMaxSupported, input, output, descriptor);
+}
+
 bool IsBatchNormalizationSupported(const BackendId& backend,
                                    const TensorInfo& input,
                                    const TensorInfo& output,

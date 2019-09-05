@@ -14,6 +14,7 @@ struct SoftmaxQueueDescriptor;
 struct SplitterQueueDescriptor;
 struct ConcatQueueDescriptor;
 struct ActivationQueueDescriptor;
+struct ArgMinMaxQueueDescriptor;
 struct FullyConnectedQueueDescriptor;
 struct PermuteQueueDescriptor;
 struct Pooling2dQueueDescriptor;

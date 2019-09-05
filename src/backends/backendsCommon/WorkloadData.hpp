@@ -132,6 +132,11 @@ struct ActivationQueueDescriptor : QueueDescriptorWithParameters<ActivationDescr
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ArgMinMaxQueueDescriptor : QueueDescriptorWithParameters<ArgMinMaxDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Fully connected layer workload data.
 struct FullyConnectedQueueDescriptor : QueueDescriptorWithParameters<FullyConnectedDescriptor>
 {

@@ -39,6 +39,10 @@ public:
     void VisitAdditionLayer(const IConnectableLayer*,
                             const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitArgMinMaxLayer(const IConnectableLayer*,
+                             const ArgMinMaxDescriptor&,
+                             const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitBatchNormalizationLayer(const IConnectableLayer*,
                                       const BatchNormalizationDescriptor&,
                                       const ConstTensor&,

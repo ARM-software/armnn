@@ -41,6 +41,14 @@ public:
     virtual void VisitAdditionLayer(const IConnectableLayer* layer,
                                     const char* name = nullptr) = 0;
 
+    /// Function that an arg min max layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param argMinMaxDescriptor - ArgMinMaxDescriptor to configure the activation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitArgMinMaxLayer(const IConnectableLayer* layer,
+                                     const ArgMinMaxDescriptor& argMinMaxDescriptor,
+                                     const char* name = nullptr) = 0;
+
     /// Function that a batch normalization layer should call back to when its Accept(ILayerVisitor&)
     /// function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.

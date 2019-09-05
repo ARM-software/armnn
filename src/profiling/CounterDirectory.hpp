@@ -5,9 +5,15 @@
 
 #pragma once
 
-#include <atomic>
+#include "ICounterDirectory.hpp"
+
+#include <armnn/Optional.hpp>
+
 #include <string>
-#include <vector>
+#include <unordered_set>
+#include <unordered_map>
+
+#include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
 {
@@ -15,96 +21,73 @@ namespace armnn
 namespace profiling
 {
 
-class Category
+class CounterDirectory final : public ICounterDirectory
 {
 public:
-    std::string m_Name;
-};
-
-class Device
-{
-public:
-    uint16_t    m_Uid;
-    std::string m_Name;
-    uint16_t    m_Cores;
-};
-
-class Counter
-{
-public:
-    uint16_t    m_Uid;
-    uint16_t    m_MaxCounterUid;
-    uint16_t    m_Class;
-    uint16_t    m_Interpolation;
-    float       m_Multiplier;
-    std::string m_Name;
-    std::string m_Description;
-    std::string m_Units;
-};
-
-class CounterSet
-{
-public:
-    uint16_t    m_Uid;
-    std::string m_Name;
-    uint16_t    m_Count;
-};
-
-class CounterDirectory final
-{
-public:
-    CounterDirectory(uint16_t uid,
-                     const std::string& name,
-                     uint16_t deviceCount,
-                     uint16_t counterCount,
-                     uint16_t categoryCount);
-
+    CounterDirectory() = default;
     ~CounterDirectory() = default;
 
-    uint16_t GetUid() const;
-    const std::string& GetName() const;
+    // Register profiling objects
+    const Category*   RegisterCategory  (const std::string& categoryName,
+                                         const Optional<uint16_t>& deviceUid = EmptyOptional(),
+                                         const Optional<uint16_t>& counterSetUid = EmptyOptional());
+    const Device*     RegisterDevice    (const std::string& deviceName,
+                                         uint16_t cores = 0,
+                                         const Optional<std::string>& parentCategoryName = EmptyOptional());
+    const CounterSet* RegisterCounterSet(const std::string& counterSetName,
+                                         uint16_t count = 0,
+                                         const Optional<std::string>& parentCategoryName = EmptyOptional());
+    const Counter*    RegisterCounter   (const std::string& parentCategoryName,
+                                         uint16_t counterClass,
+                                         uint16_t interpolation,
+                                         double multiplier,
+                                         const std::string& name,
+                                         const std::string& description,
+                                         const Optional<std::string>& units = EmptyOptional(),
+                                         const Optional<uint16_t>& numberOfCores = EmptyOptional(),
+                                         const Optional<uint16_t>& deviceUid = EmptyOptional(),
+                                         const Optional<uint16_t>& counterSetUid = EmptyOptional());
 
-    uint16_t GetDeviceCount() const;
-    uint16_t GetCounterCount() const;
-    uint16_t GetCategoryCount() const;
+    // Getters for counts
+    uint16_t GetCategoryCount()   const override { return boost::numeric_cast<uint16_t>(m_Categories.size());  }
+    uint16_t GetDeviceCount()     const override { return boost::numeric_cast<uint16_t>(m_Devices.size());     }
+    uint16_t GetCounterSetCount() const override { return boost::numeric_cast<uint16_t>(m_CounterSets.size()); }
+    uint16_t GetCounterCount()    const override { return boost::numeric_cast<uint16_t>(m_Counters.size());    }
 
-    void GetDeviceValue(uint16_t index, uint32_t& value) const;
-    void SetDeviceValue(uint16_t index, uint32_t value);
+    // Getters for collections
+    const Categories&  GetCategories()  const override { return m_Categories;  }
+    const Devices&     GetDevices()     const override { return m_Devices;     }
+    const CounterSets& GetCounterSets() const override { return m_CounterSets; }
+    const Counters&    GetCounters()    const override { return m_Counters;    }
 
-    void GetDeviceObject(uint16_t index, Device* counter) const;
-    void SetDeviceObject(uint16_t index, Device* counter);
-
-    void GetCounterValue(uint16_t index, uint32_t& value) const;
-    void SetCounterValue(uint16_t index, uint32_t value);
-
-    void GetCounterObject(uint16_t index, Counter* counter) const;
-    void SetCounterObject(uint16_t index, Counter* counter);
-
-    void GetCategoryValue(uint16_t index, uint32_t& value) const;
-    void SetCategoryValue(uint16_t index, uint32_t value);
-
-    void GetCategoryObject(uint16_t index, Category* counter) const;
-    void SetCategoryObject(uint16_t index, Category* counter);
+    // Getters for profiling objects
+    const Category*   GetCategory(const std::string& name) const override;
+    const Device*     GetDevice(uint16_t uid) const override;
+    const CounterSet* GetCounterSet(uint16_t uid) const override;
+    const Counter*    GetCounter(uint16_t uid) const override;
 
 private:
-    uint16_t    m_Uid;
-    std::string m_Name;
+    // The profiling collections owned by the counter directory
+    Categories  m_Categories;
+    Devices     m_Devices;
+    CounterSets m_CounterSets;
+    Counters    m_Counters;
 
-    uint16_t m_DeviceCount;
-    uint16_t m_CounterCount;
-    uint16_t m_CategoryCount;
-
-    std::vector<std::atomic<uint32_t>> m_DeviceIds;
-    std::vector<std::atomic<uint32_t>> m_CounterIds;
-    std::vector<std::atomic<uint32_t>> m_CategoryIds;
-
-    std::vector<std::atomic<Device*>>   m_DeviceObjects;
-    std::vector<std::atomic<Counter*>>  m_CounterObjects;
-    std::vector<std::atomic<Category*>> m_CategoryObjects;
-
-    void CheckDeviceIndex(uint16_t index) const;
-    void CheckCounterIndex(uint16_t index) const;
-    void CheckCategoryIndex(uint16_t index) const;
+    // Helper functions
+    CategoriesIt  FindCategory(const std::string& categoryName) const;
+    DevicesIt     FindDevice(uint16_t deviceUid) const;
+    DevicesIt     FindDevice(const std::string& deviceName) const;
+    CounterSetsIt FindCounterSet(uint16_t counterSetUid) const;
+    CounterSetsIt FindCounterSet(const std::string& counterSetName) const;
+    CountersIt    FindCounter(uint16_t counterUid) const;
+    bool CheckIfCategoryIsRegistered(const std::string& categoryName) const;
+    bool CheckIfDeviceIsRegistered(uint16_t deviceUid) const;
+    bool CheckIfDeviceIsRegistered(const std::string& deviceName) const;
+    bool CheckIfCounterSetIsRegistered(uint16_t counterSetUid) const;
+    bool CheckIfCounterSetIsRegistered(const std::string& counterSetName) const;
+    uint16_t GetNumberOfCores(const Optional<uint16_t>& numberOfCores,
+                              uint16_t deviceUid,
+                              const CategoryPtr& parentCategory);
 };
 
 } // namespace profiling

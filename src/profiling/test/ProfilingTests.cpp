@@ -3,23 +3,24 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../CommandHandlerKey.hpp"
-#include "../CommandHandlerFunctor.hpp"
-#include "../CommandHandlerRegistry.hpp"
-#include "../EncodeVersion.hpp"
-#include "../Holder.hpp"
-#include "../Packet.hpp"
-#include "../PacketVersionResolver.hpp"
-#include "../ProfilingService.hpp"
-#include "../ProfilingStateMachine.hpp"
-#include "../PeriodicCounterSelectionCommandHandler.hpp"
-#include "../ProfilingUtils.hpp"
-#include "../SocketProfilingConnection.hpp"
-#include "../IPeriodicCounterCapture.hpp"
 #include "SendCounterPacketTests.hpp"
 
+#include <CommandHandlerKey.hpp>
+#include <CommandHandlerFunctor.hpp>
+#include <CommandHandlerRegistry.hpp>
+#include <CounterDirectory.hpp>
+#include <EncodeVersion.hpp>
+#include <Holder.hpp>
+#include <Packet.hpp>
+#include <PacketVersionResolver.hpp>
+#include <PeriodicCounterSelectionCommandHandler.hpp>
+#include <ProfilingStateMachine.hpp>
+#include <ProfilingService.hpp>
+#include <ProfilingUtils.hpp>
 #include <Runtime.hpp>
+#include <SocketProfilingConnection.hpp>
 
+#include <armnn/Conversion.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -538,30 +539,909 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::WaitingForAck);
 }
 
-void GetNextUidTestImpl(uint16_t& outUid)
+BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)
 {
-    outUid = GetNextUid();
+    uint16_t uid = 0;
+    BOOST_CHECK_NO_THROW(uid = GetNextUid());
+    BOOST_CHECK(uid >= 1);
+
+    uint16_t nextUid = 0;
+    BOOST_CHECK_NO_THROW(nextUid = GetNextUid());
+    BOOST_CHECK(nextUid > uid);
+
+    std::vector<uint16_t> counterUids;
+    BOOST_CHECK_NO_THROW(counterUids = GetNextCounterUids(0));
+    BOOST_CHECK(counterUids.size() == 1);
+    BOOST_CHECK(counterUids[0] >= 0);
+
+    std::vector<uint16_t> nextCounterUids;
+    BOOST_CHECK_NO_THROW(nextCounterUids = GetNextCounterUids(1));
+    BOOST_CHECK(nextCounterUids.size() == 1);
+    BOOST_CHECK(nextCounterUids[0] > counterUids[0]);
+
+    std::vector<uint16_t> counterUidsMultiCore;
+    uint16_t numberOfCores = 13;
+    BOOST_CHECK_NO_THROW(counterUidsMultiCore = GetNextCounterUids(numberOfCores));
+    BOOST_CHECK(counterUidsMultiCore.size() == numberOfCores);
+    BOOST_CHECK(counterUidsMultiCore.front() >= nextCounterUids[0]);
+    for (size_t i = 1; i < numberOfCores; i ++)
+    {
+        BOOST_CHECK(counterUidsMultiCore[i] == counterUidsMultiCore[i - 1] + 1);
+    }
+    BOOST_CHECK(counterUidsMultiCore.back() == counterUidsMultiCore.front() + numberOfCores - 1);
 }
 
-BOOST_AUTO_TEST_CASE(GetNextUidTest)
+BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 {
-    uint16_t uid0 = 0;
-    uint16_t uid1 = 0;
-    uint16_t uid2 = 0;
+    CounterDirectory counterDirectory;
+    BOOST_CHECK(counterDirectory.GetCategoryCount()   == 0);
+    BOOST_CHECK(counterDirectory.GetDeviceCount()     == 0);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
+    BOOST_CHECK(counterDirectory.GetCounterCount()    == 0);
 
-    std::thread thread1(GetNextUidTestImpl, std::ref(uid0));
-    std::thread thread2(GetNextUidTestImpl, std::ref(uid1));
-    std::thread thread3(GetNextUidTestImpl, std::ref(uid2));
-    thread1.join();
-    thread2.join();
-    thread3.join();
+    // Register a category with an invalid name
+    const Category* noCategory = nullptr;
+    BOOST_CHECK_THROW(noCategory = counterDirectory.RegisterCategory(""), armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 0);
+    BOOST_CHECK(!noCategory);
 
-    BOOST_TEST(uid0 > 0);
-    BOOST_TEST(uid1 > 0);
-    BOOST_TEST(uid2 > 0);
-    BOOST_TEST(uid0 != uid1);
-    BOOST_TEST(uid0 != uid2);
-    BOOST_TEST(uid1 != uid2);
+    // Register a category with an invalid name
+    BOOST_CHECK_THROW(noCategory = counterDirectory.RegisterCategory("invalid category"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 0);
+    BOOST_CHECK(!noCategory);
+
+    // Register a new category
+    const std::string categoryName = "some_category";
+    const Category* category = nullptr;
+    BOOST_CHECK_NO_THROW(category = counterDirectory.RegisterCategory(categoryName));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
+    BOOST_CHECK(category);
+    BOOST_CHECK(category->m_Name == categoryName);
+    BOOST_CHECK(category->m_Counters.empty());
+    BOOST_CHECK(category->m_DeviceUid == 0);
+    BOOST_CHECK(category->m_CounterSetUid == 0);
+
+    // Get the registered category
+    const Category* registeredCategory = counterDirectory.GetCategory(categoryName);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
+    BOOST_CHECK(registeredCategory);
+    BOOST_CHECK(registeredCategory == category);
+
+    // Try to get a category not registered
+    const Category* notRegisteredCategory = counterDirectory.GetCategory("not_registered_category");
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
+    BOOST_CHECK(!notRegisteredCategory);
+
+    // Register a category already registered
+    const Category* anotherCategory = nullptr;
+    BOOST_CHECK_THROW(anotherCategory = counterDirectory.RegisterCategory(categoryName),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
+    BOOST_CHECK(!anotherCategory);
+
+    // Register a device for testing
+    const std::string deviceName = "some_device";
+    const Device* device = nullptr;
+    BOOST_CHECK_NO_THROW(device = counterDirectory.RegisterDevice(deviceName));
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 1);
+    BOOST_CHECK(device);
+    BOOST_CHECK(device->m_Uid >= 1);
+    BOOST_CHECK(device->m_Name == deviceName);
+    BOOST_CHECK(device->m_Cores == 0);
+
+    // Register a new category not associated to any device
+    const std::string categoryWoDeviceName = "some_category_without_device";
+    const Category* categoryWoDevice = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWoDevice = counterDirectory.RegisterCategory(categoryWoDeviceName, 0));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 2);
+    BOOST_CHECK(categoryWoDevice);
+    BOOST_CHECK(categoryWoDevice->m_Name == categoryWoDeviceName);
+    BOOST_CHECK(categoryWoDevice->m_Counters.empty());
+    BOOST_CHECK(categoryWoDevice->m_DeviceUid == 0);
+    BOOST_CHECK(categoryWoDevice->m_CounterSetUid == 0);
+
+    // Register a new category associated to an invalid device
+    const std::string categoryWInvalidDeviceName = "some_category_with_invalid_device";
+
+    ARMNN_NO_CONVERSION_WARN_BEGIN
+    uint16_t invalidDeviceUid = device->m_Uid + 10;
+    ARMNN_NO_CONVERSION_WARN_END
+
+    const Category* categoryWInvalidDevice = nullptr;
+    BOOST_CHECK_THROW(categoryWInvalidDevice
+                      = counterDirectory.RegisterCategory(categoryWInvalidDeviceName,
+                                                          invalidDeviceUid),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 2);
+    BOOST_CHECK(!categoryWInvalidDevice);
+
+    // Register a new category associated to a valid device
+    const std::string categoryWValidDeviceName = "some_category_with_valid_device";
+    const Category* categoryWValidDevice = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWValidDevice
+                         = counterDirectory.RegisterCategory(categoryWValidDeviceName,
+                                                             device->m_Uid));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 3);
+    BOOST_CHECK(categoryWValidDevice);
+    BOOST_CHECK(categoryWValidDevice != category);
+    BOOST_CHECK(categoryWValidDevice->m_Name == categoryWValidDeviceName);
+    BOOST_CHECK(categoryWValidDevice->m_DeviceUid == device->m_Uid);
+    BOOST_CHECK(categoryWValidDevice->m_CounterSetUid == 0);
+
+    // Register a counter set for testing
+    const std::string counterSetName = "some_counter_set";
+    const CounterSet* counterSet = nullptr;
+    BOOST_CHECK_NO_THROW(counterSet = counterDirectory.RegisterCounterSet(counterSetName));
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 1);
+    BOOST_CHECK(counterSet);
+    BOOST_CHECK(counterSet->m_Uid >= 1);
+    BOOST_CHECK(counterSet->m_Name == counterSetName);
+    BOOST_CHECK(counterSet->m_Count == 0);
+
+    // Register a new category not associated to any counter set
+    const std::string categoryWoCounterSetName = "some_category_without_counter_set";
+    const Category* categoryWoCounterSet = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWoCounterSet
+                         = counterDirectory.RegisterCategory(categoryWoCounterSetName,
+                                                             armnn::EmptyOptional(),
+                                                             0));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 4);
+    BOOST_CHECK(categoryWoCounterSet);
+    BOOST_CHECK(categoryWoCounterSet->m_Name == categoryWoCounterSetName);
+    BOOST_CHECK(categoryWoCounterSet->m_DeviceUid == 0);
+    BOOST_CHECK(categoryWoCounterSet->m_CounterSetUid == 0);
+
+    // Register a new category associated to an invalid counter set
+    const std::string categoryWInvalidCounterSetName = "some_category_with_invalid_counter_set";
+
+    ARMNN_NO_CONVERSION_WARN_BEGIN
+    uint16_t invalidCunterSetUid = counterSet->m_Uid + 10;
+    ARMNN_NO_CONVERSION_WARN_END
+
+    const Category* categoryWInvalidCounterSet = nullptr;
+    BOOST_CHECK_THROW(categoryWInvalidCounterSet
+                      = counterDirectory.RegisterCategory(categoryWInvalidCounterSetName,
+                                                          armnn::EmptyOptional(),
+                                                          invalidCunterSetUid),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 4);
+    BOOST_CHECK(!categoryWInvalidCounterSet);
+
+    // Register a new category associated to a valid counter set
+    const std::string categoryWValidCounterSetName = "some_category_with_valid_counter_set";
+    const Category* categoryWValidCounterSet = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWValidCounterSet
+                         = counterDirectory.RegisterCategory(categoryWValidCounterSetName,
+                                                             armnn::EmptyOptional(),
+                                                             counterSet->m_Uid));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 5);
+    BOOST_CHECK(categoryWValidCounterSet);
+    BOOST_CHECK(categoryWValidCounterSet != category);
+    BOOST_CHECK(categoryWValidCounterSet->m_Name == categoryWValidCounterSetName);
+    BOOST_CHECK(categoryWValidCounterSet->m_DeviceUid == 0);
+    BOOST_CHECK(categoryWValidCounterSet->m_CounterSetUid == counterSet->m_Uid);
+
+    // Register a new category associated to a valid device and counter set
+    const std::string categoryWValidDeviceAndValidCounterSetName = "some_category_with_valid_device_and_counter_set";
+    const Category* categoryWValidDeviceAndValidCounterSet = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWValidDeviceAndValidCounterSet
+                         = counterDirectory.RegisterCategory(categoryWValidDeviceAndValidCounterSetName,
+                                                             device->m_Uid,
+                                                             counterSet->m_Uid));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 6);
+    BOOST_CHECK(categoryWValidDeviceAndValidCounterSet);
+    BOOST_CHECK(categoryWValidDeviceAndValidCounterSet != category);
+    BOOST_CHECK(categoryWValidDeviceAndValidCounterSet->m_Name == categoryWValidDeviceAndValidCounterSetName);
+    BOOST_CHECK(categoryWValidDeviceAndValidCounterSet->m_DeviceUid == device->m_Uid);
+    BOOST_CHECK(categoryWValidDeviceAndValidCounterSet->m_CounterSetUid == counterSet->m_Uid);
+}
+
+BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterDevice)
+{
+    CounterDirectory counterDirectory;
+    BOOST_CHECK(counterDirectory.GetCategoryCount()   == 0);
+    BOOST_CHECK(counterDirectory.GetDeviceCount()     == 0);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
+    BOOST_CHECK(counterDirectory.GetCounterCount()    == 0);
+
+    // Register a device with an invalid name
+    const Device* noDevice = nullptr;
+    BOOST_CHECK_THROW(noDevice = counterDirectory.RegisterDevice(""), armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 0);
+    BOOST_CHECK(!noDevice);
+
+    // Register a device with an invalid name
+    BOOST_CHECK_THROW(noDevice = counterDirectory.RegisterDevice("inv@lid nam€"), armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 0);
+    BOOST_CHECK(!noDevice);
+
+    // Register a new device with no cores or parent category
+    const std::string deviceName = "some_device";
+    const Device* device = nullptr;
+    BOOST_CHECK_NO_THROW(device = counterDirectory.RegisterDevice(deviceName));
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 1);
+    BOOST_CHECK(device);
+    BOOST_CHECK(device->m_Name == deviceName);
+    BOOST_CHECK(device->m_Uid >= 1);
+    BOOST_CHECK(device->m_Cores == 0);
+
+    // Get the registered device
+    const Device* registeredDevice = counterDirectory.GetDevice(device->m_Uid);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 1);
+    BOOST_CHECK(registeredDevice);
+    BOOST_CHECK(registeredDevice == device);
+
+    // Register a new device with cores and no parent category
+    const std::string deviceWCoresName = "some_device_with_cores";
+    const Device* deviceWCores = nullptr;
+    BOOST_CHECK_NO_THROW(deviceWCores = counterDirectory.RegisterDevice(deviceWCoresName, 2));
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
+    BOOST_CHECK(deviceWCores);
+    BOOST_CHECK(deviceWCores->m_Name == deviceWCoresName);
+    BOOST_CHECK(deviceWCores->m_Uid >= 1);
+    BOOST_CHECK(deviceWCores->m_Uid > device->m_Uid);
+    BOOST_CHECK(deviceWCores->m_Cores == 2);
+
+    // Get the registered device
+    const Device* registeredDeviceWCores = counterDirectory.GetDevice(deviceWCores->m_Uid);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
+    BOOST_CHECK(registeredDeviceWCores);
+    BOOST_CHECK(registeredDeviceWCores == deviceWCores);
+    BOOST_CHECK(registeredDeviceWCores != device);
+
+    // Register a new device with cores and invalid parent category
+    const std::string deviceWCoresWInvalidParentCategoryName = "some_device_with_cores_with_invalid_parent_category";
+    const Device* deviceWCoresWInvalidParentCategory = nullptr;
+    BOOST_CHECK_THROW(deviceWCoresWInvalidParentCategory
+                      = counterDirectory.RegisterDevice(deviceWCoresWInvalidParentCategoryName,
+                                                        3,
+                                                        std::string("")),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
+    BOOST_CHECK(!deviceWCoresWInvalidParentCategory);
+
+    // Register a new device with cores and invalid parent category
+    const std::string deviceWCoresWInvalidParentCategoryName2 = "some_device_with_cores_with_invalid_parent_category2";
+    const Device* deviceWCoresWInvalidParentCategory2 = nullptr;
+    BOOST_CHECK_THROW(deviceWCoresWInvalidParentCategory2
+                      = counterDirectory.RegisterDevice(deviceWCoresWInvalidParentCategoryName2,
+                                                        3,
+                                                        std::string("invalid_parent_category")),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
+    BOOST_CHECK(!deviceWCoresWInvalidParentCategory2);
+
+    // Register a category for testing
+    const std::string categoryName = "some_category";
+    const Category* category = nullptr;
+    BOOST_CHECK_NO_THROW(category = counterDirectory.RegisterCategory(categoryName));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
+    BOOST_CHECK(category);
+    BOOST_CHECK(category->m_Name == categoryName);
+    BOOST_CHECK(category->m_Counters.empty());
+    BOOST_CHECK(category->m_DeviceUid == 0);
+    BOOST_CHECK(category->m_CounterSetUid == 0);
+
+    // Register a new device with cores and valid parent category
+    const std::string deviceWCoresWValidParentCategoryName = "some_device_with_cores_with_valid_parent_category";
+    const Device* deviceWCoresWValidParentCategory = nullptr;
+    BOOST_CHECK_NO_THROW(deviceWCoresWValidParentCategory
+                         = counterDirectory.RegisterDevice(deviceWCoresWValidParentCategoryName,
+                                                           4,
+                                                           categoryName));
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 3);
+    BOOST_CHECK(deviceWCoresWValidParentCategory);
+    BOOST_CHECK(deviceWCoresWValidParentCategory->m_Name == deviceWCoresWValidParentCategoryName);
+    BOOST_CHECK(deviceWCoresWValidParentCategory->m_Uid >= 1);
+    BOOST_CHECK(deviceWCoresWValidParentCategory->m_Uid > device->m_Uid);
+    BOOST_CHECK(deviceWCoresWValidParentCategory->m_Uid > deviceWCores->m_Uid);
+    BOOST_CHECK(deviceWCoresWValidParentCategory->m_Cores == 4);
+    BOOST_CHECK(category->m_DeviceUid == deviceWCoresWValidParentCategory->m_Uid);
+}
+
+BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
+{
+    CounterDirectory counterDirectory;
+    BOOST_CHECK(counterDirectory.GetCategoryCount()   == 0);
+    BOOST_CHECK(counterDirectory.GetDeviceCount()     == 0);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
+    BOOST_CHECK(counterDirectory.GetCounterCount()    == 0);
+
+    // Register a counter set with an invalid name
+    const CounterSet* noCounterSet = nullptr;
+    BOOST_CHECK_THROW(noCounterSet = counterDirectory.RegisterCounterSet(""), armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
+    BOOST_CHECK(!noCounterSet);
+
+    // Register a counter set with an invalid name
+    BOOST_CHECK_THROW(noCounterSet = counterDirectory.RegisterCounterSet("invalid name"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
+    BOOST_CHECK(!noCounterSet);
+
+    // Register a new counter set with no count or parent category
+    const std::string counterSetName = "some_counter_set";
+    const CounterSet* counterSet = nullptr;
+    BOOST_CHECK_NO_THROW(counterSet = counterDirectory.RegisterCounterSet(counterSetName));
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 1);
+    BOOST_CHECK(counterSet);
+    BOOST_CHECK(counterSet->m_Name == counterSetName);
+    BOOST_CHECK(counterSet->m_Uid >= 1);
+    BOOST_CHECK(counterSet->m_Count == 0);
+
+    // Get the registered counter set
+    const CounterSet* registeredCounterSet = counterDirectory.GetCounterSet(counterSet->m_Uid);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 1);
+    BOOST_CHECK(registeredCounterSet);
+    BOOST_CHECK(registeredCounterSet == counterSet);
+
+    // Register a new counter set with count and no parent category
+    const std::string counterSetWCountName = "some_counter_set_with_count";
+    const CounterSet* counterSetWCount = nullptr;
+    BOOST_CHECK_NO_THROW(counterSetWCount = counterDirectory.RegisterCounterSet(counterSetWCountName, 37));
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 2);
+    BOOST_CHECK(counterSetWCount);
+    BOOST_CHECK(counterSetWCount->m_Name == counterSetWCountName);
+    BOOST_CHECK(counterSetWCount->m_Uid >= 1);
+    BOOST_CHECK(counterSetWCount->m_Uid > counterSet->m_Uid);
+    BOOST_CHECK(counterSetWCount->m_Count == 37);
+
+    // Get the registered counter set
+    const CounterSet* registeredCounterSetWCount = counterDirectory.GetCounterSet(counterSetWCount->m_Uid);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 2);
+    BOOST_CHECK(registeredCounterSetWCount);
+    BOOST_CHECK(registeredCounterSetWCount == counterSetWCount);
+    BOOST_CHECK(registeredCounterSetWCount != counterSet);
+
+    // Register a new counter set with count and invalid parent category
+    const std::string counterSetWCountWInvalidParentCategoryName = "some_counter_set_with_count_"
+                                                                   "with_invalid_parent_category";
+    const CounterSet* counterSetWCountWInvalidParentCategory = nullptr;
+    BOOST_CHECK_THROW(counterSetWCountWInvalidParentCategory
+                      = counterDirectory.RegisterCounterSet(counterSetWCountWInvalidParentCategoryName,
+                                                            42,
+                                                            std::string("")),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 2);
+    BOOST_CHECK(!counterSetWCountWInvalidParentCategory);
+
+    // Register a new counter set with count and invalid parent category
+    const std::string counterSetWCountWInvalidParentCategoryName2 = "some_counter_set_with_count_"
+                                                                    "with_invalid_parent_category2";
+    const CounterSet* counterSetWCountWInvalidParentCategory2 = nullptr;
+    BOOST_CHECK_THROW(counterSetWCountWInvalidParentCategory2
+                      = counterDirectory.RegisterCounterSet(counterSetWCountWInvalidParentCategoryName2,
+                                                            42,
+                                                            std::string("invalid_parent_category")),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 2);
+    BOOST_CHECK(!counterSetWCountWInvalidParentCategory2);
+
+    // Register a category for testing
+    const std::string categoryName = "some_category";
+    const Category* category = nullptr;
+    BOOST_CHECK_NO_THROW(category = counterDirectory.RegisterCategory(categoryName));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
+    BOOST_CHECK(category);
+    BOOST_CHECK(category->m_Name == categoryName);
+    BOOST_CHECK(category->m_Counters.empty());
+    BOOST_CHECK(category->m_DeviceUid == 0);
+    BOOST_CHECK(category->m_CounterSetUid == 0);
+
+    // Register a new counter set with count and valid parent category
+    const std::string counterSetWCountWValidParentCategoryName = "some_counter_set_with_count_"
+                                                                 "with_valid_parent_category";
+    const CounterSet* counterSetWCountWValidParentCategory = nullptr;
+    BOOST_CHECK_NO_THROW(counterSetWCountWValidParentCategory
+                         = counterDirectory.RegisterCounterSet(counterSetWCountWValidParentCategoryName,
+                                                               42,
+                                                               std::string(categoryName)));
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 3);
+    BOOST_CHECK(counterSetWCountWValidParentCategory);
+    BOOST_CHECK(counterSetWCountWValidParentCategory->m_Name == counterSetWCountWValidParentCategoryName);
+    BOOST_CHECK(counterSetWCountWValidParentCategory->m_Uid >= 1);
+    BOOST_CHECK(counterSetWCountWValidParentCategory->m_Uid > counterSet->m_Uid);
+    BOOST_CHECK(counterSetWCountWValidParentCategory->m_Uid > counterSetWCount->m_Uid);
+    BOOST_CHECK(counterSetWCountWValidParentCategory->m_Count == 42);
+    BOOST_CHECK(category->m_CounterSetUid == counterSetWCountWValidParentCategory->m_Uid);
+}
+
+BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
+{
+    CounterDirectory counterDirectory;
+    BOOST_CHECK(counterDirectory.GetCategoryCount()   == 0);
+    BOOST_CHECK(counterDirectory.GetDeviceCount()     == 0);
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
+    BOOST_CHECK(counterDirectory.GetCounterCount()    == 0);
+
+    // Register a counter with an invalid parent category name
+    const Counter* noCounter = nullptr;
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid parent category name
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("invalid parent category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid class
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
+                                                                   2,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid interpolation
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
+                                                                   0,
+                                                                   3,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid multiplier
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   .0f,
+                                                                   "valid name",
+                                                                   "valid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid name
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "",
+                                                                   "valid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid name
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "invalid nam€",
+                                                                   "valid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid description
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   ""),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid description
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "inv@lid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with an invalid unit2
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description",
+                                                                   std::string("Mb/s2")),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with a non-existing parent category name
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("invalid_parent_category",
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name",
+                                                                   "valid description"),
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
+    BOOST_CHECK(!noCounter);
+
+    // Register a category for testing
+    const std::string categoryName = "some_category";
+    const Category* category = nullptr;
+    BOOST_CHECK_NO_THROW(category = counterDirectory.RegisterCategory(categoryName));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
+    BOOST_CHECK(category);
+    BOOST_CHECK(category->m_Name == categoryName);
+    BOOST_CHECK(category->m_Counters.empty());
+    BOOST_CHECK(category->m_DeviceUid == 0);
+    BOOST_CHECK(category->m_CounterSetUid == 0);
+
+    // Register a counter with a valid parent category name
+    const Counter* counter = nullptr;
+    BOOST_CHECK_NO_THROW(counter = counterDirectory.RegisterCounter(categoryName,
+                                                                    0,
+                                                                    1,
+                                                                    123.45f,
+                                                                    "valid name",
+                                                                    "valid description"));
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 1);
+    BOOST_CHECK(counter);
+    BOOST_CHECK(counter->m_Uid >= 0);
+    BOOST_CHECK(counter->m_MaxCounterUid == counter->m_Uid);
+    BOOST_CHECK(counter->m_Class == 0);
+    BOOST_CHECK(counter->m_Interpolation == 1);
+    BOOST_CHECK(counter->m_Multiplier == 123.45f);
+    BOOST_CHECK(counter->m_Name == "valid name");
+    BOOST_CHECK(counter->m_Description == "valid description");
+    BOOST_CHECK(counter->m_Units == "");
+    BOOST_CHECK(counter->m_DeviceUid == 0);
+    BOOST_CHECK(counter->m_CounterSetUid == 0);
+    BOOST_CHECK(category->m_Counters.size() == 1);
+    BOOST_CHECK(category->m_Counters.back() == counter->m_Uid);
+
+    // Register a counter with a valid parent category name and units
+    const Counter* counterWUnits = nullptr;
+    BOOST_CHECK_NO_THROW(counterWUnits = counterDirectory.RegisterCounter(categoryName,
+                                                                          0,
+                                                                          1,
+                                                                          123.45f,
+                                                                          "valid name 2",
+                                                                          "valid description",
+                                                                          std::string("Mnnsq2"))); // Units
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 2);
+    BOOST_CHECK(counterWUnits);
+    BOOST_CHECK(counterWUnits->m_Uid >= 0);
+    BOOST_CHECK(counterWUnits->m_Uid > counter->m_Uid);
+    BOOST_CHECK(counterWUnits->m_MaxCounterUid == counterWUnits->m_Uid);
+    BOOST_CHECK(counterWUnits->m_Class == 0);
+    BOOST_CHECK(counterWUnits->m_Interpolation == 1);
+    BOOST_CHECK(counterWUnits->m_Multiplier == 123.45f);
+    BOOST_CHECK(counterWUnits->m_Name == "valid name 2");
+    BOOST_CHECK(counterWUnits->m_Description == "valid description");
+    BOOST_CHECK(counterWUnits->m_Units == "Mnnsq2");
+    BOOST_CHECK(counterWUnits->m_DeviceUid == 0);
+    BOOST_CHECK(counterWUnits->m_CounterSetUid == 0);
+    BOOST_CHECK(category->m_Counters.size() == 2);
+    BOOST_CHECK(category->m_Counters.back() == counterWUnits->m_Uid);
+
+    // Register a counter with a valid parent category name and not associated with a device
+    const Counter* counterWoDevice = nullptr;
+    BOOST_CHECK_NO_THROW(counterWoDevice = counterDirectory.RegisterCounter(categoryName,
+                                                                            0,
+                                                                            1,
+                                                                            123.45f,
+                                                                            "valid name 3",
+                                                                            "valid description",
+                                                                            armnn::EmptyOptional(), // Units
+                                                                            armnn::EmptyOptional(), // Number of cores
+                                                                            0));                    // Device UID
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 3);
+    BOOST_CHECK(counterWoDevice);
+    BOOST_CHECK(counterWoDevice->m_Uid >= 0);
+    BOOST_CHECK(counterWoDevice->m_Uid > counter->m_Uid);
+    BOOST_CHECK(counterWoDevice->m_MaxCounterUid == counterWoDevice->m_Uid);
+    BOOST_CHECK(counterWoDevice->m_Class == 0);
+    BOOST_CHECK(counterWoDevice->m_Interpolation == 1);
+    BOOST_CHECK(counterWoDevice->m_Multiplier == 123.45f);
+    BOOST_CHECK(counterWoDevice->m_Name == "valid name 3");
+    BOOST_CHECK(counterWoDevice->m_Description == "valid description");
+    BOOST_CHECK(counterWoDevice->m_Units == "");
+    BOOST_CHECK(counterWoDevice->m_DeviceUid == 0);
+    BOOST_CHECK(counterWoDevice->m_CounterSetUid == 0);
+    BOOST_CHECK(category->m_Counters.size() == 3);
+    BOOST_CHECK(category->m_Counters.back() == counterWoDevice->m_Uid);
+
+    // Register a counter with a valid parent category name and associated to an invalid device
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(categoryName,
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name 4",
+                                                                   "valid description",
+                                                                   armnn::EmptyOptional(), // Units
+                                                                   armnn::EmptyOptional(), // Number of cores
+                                                                   100),                   // Device UID
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 3);
+    BOOST_CHECK(!noCounter);
+
+    // Register a device for testing
+    const std::string deviceName = "some_device";
+    const Device* device = nullptr;
+    BOOST_CHECK_NO_THROW(device = counterDirectory.RegisterDevice(deviceName));
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 1);
+    BOOST_CHECK(device);
+    BOOST_CHECK(device->m_Name == deviceName);
+    BOOST_CHECK(device->m_Uid >= 1);
+    BOOST_CHECK(device->m_Cores == 0);
+
+    // Register a counter with a valid parent category name and associated to a device
+    const Counter* counterWDevice = nullptr;
+    BOOST_CHECK_NO_THROW(counterWDevice = counterDirectory.RegisterCounter(categoryName,
+                                                                           0,
+                                                                           1,
+                                                                           123.45f,
+                                                                           "valid name 5",
+                                                                           "valid description",
+                                                                           armnn::EmptyOptional(), // Units
+                                                                           armnn::EmptyOptional(), // Number of cores
+                                                                           device->m_Uid));        // Device UID
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 4);
+    BOOST_CHECK(counterWDevice);
+    BOOST_CHECK(counterWDevice->m_Uid >= 0);
+    BOOST_CHECK(counterWDevice->m_Uid > counter->m_Uid);
+    BOOST_CHECK(counterWDevice->m_MaxCounterUid == counterWDevice->m_Uid);
+    BOOST_CHECK(counterWDevice->m_Class == 0);
+    BOOST_CHECK(counterWDevice->m_Interpolation == 1);
+    BOOST_CHECK(counterWDevice->m_Multiplier == 123.45f);
+    BOOST_CHECK(counterWDevice->m_Name == "valid name 5");
+    BOOST_CHECK(counterWDevice->m_Description == "valid description");
+    BOOST_CHECK(counterWDevice->m_Units == "");
+    BOOST_CHECK(counterWDevice->m_DeviceUid == device->m_Uid);
+    BOOST_CHECK(counterWDevice->m_CounterSetUid == 0);
+    BOOST_CHECK(category->m_Counters.size() == 4);
+    BOOST_CHECK(category->m_Counters.back() == counterWDevice->m_Uid);
+
+    // Register a counter with a valid parent category name and not associated with a counter set
+    const Counter* counterWoCounterSet = nullptr;
+    BOOST_CHECK_NO_THROW(counterWoCounterSet
+                         = counterDirectory.RegisterCounter(categoryName,
+                                                            0,
+                                                            1,
+                                                            123.45f,
+                                                            "valid name 6",
+                                                            "valid description",
+                                                            armnn::EmptyOptional(), // Units
+                                                            armnn::EmptyOptional(), // Number of cores
+                                                            armnn::EmptyOptional(), // Device UID
+                                                            0));                    // Counter set UID
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 5);
+    BOOST_CHECK(counterWoCounterSet);
+    BOOST_CHECK(counterWoCounterSet->m_Uid >= 0);
+    BOOST_CHECK(counterWoCounterSet->m_Uid > counter->m_Uid);
+    BOOST_CHECK(counterWoCounterSet->m_MaxCounterUid == counterWoCounterSet->m_Uid);
+    BOOST_CHECK(counterWoCounterSet->m_Class == 0);
+    BOOST_CHECK(counterWoCounterSet->m_Interpolation == 1);
+    BOOST_CHECK(counterWoCounterSet->m_Multiplier == 123.45f);
+    BOOST_CHECK(counterWoCounterSet->m_Name == "valid name 6");
+    BOOST_CHECK(counterWoCounterSet->m_Description == "valid description");
+    BOOST_CHECK(counterWoCounterSet->m_Units == "");
+    BOOST_CHECK(counterWoCounterSet->m_DeviceUid == 0);
+    BOOST_CHECK(counterWoCounterSet->m_CounterSetUid == 0);
+    BOOST_CHECK(category->m_Counters.size() == 5);
+    BOOST_CHECK(category->m_Counters.back() == counterWoCounterSet->m_Uid);
+
+    // Register a counter with a valid parent category name and associated to an invalid counter set
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(categoryName,
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name 7",
+                                                                   "valid description",
+                                                                   armnn::EmptyOptional(), // Units
+                                                                   armnn::EmptyOptional(), // Number of cores
+                                                                   armnn::EmptyOptional(), // Device UID
+                                                                   100),                   // Counter set UID
+                      armnn::InvalidArgumentException);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 5);
+    BOOST_CHECK(!noCounter);
+
+    // Register a counter with a valid parent category name and with a given number of cores
+    const Counter* counterWNumberOfCores = nullptr;
+    uint16_t numberOfCores = 15;
+    BOOST_CHECK_NO_THROW(counterWNumberOfCores
+                         = counterDirectory.RegisterCounter(categoryName,
+                                                            0,
+                                                            1,
+                                                            123.45f,
+                                                            "valid name 8",
+                                                            "valid description",
+                                                            armnn::EmptyOptional(),   // Units
+                                                            numberOfCores,            // Number of cores
+                                                            armnn::EmptyOptional(),   // Device UID
+                                                            armnn::EmptyOptional())); // Counter set UID
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 20);
+    BOOST_CHECK(counterWNumberOfCores);
+    BOOST_CHECK(counterWNumberOfCores->m_Uid >= 0);
+    BOOST_CHECK(counterWNumberOfCores->m_Uid > counter->m_Uid);
+    BOOST_CHECK(counterWNumberOfCores->m_MaxCounterUid == counterWNumberOfCores->m_Uid + numberOfCores - 1);
+    BOOST_CHECK(counterWNumberOfCores->m_Class == 0);
+    BOOST_CHECK(counterWNumberOfCores->m_Interpolation == 1);
+    BOOST_CHECK(counterWNumberOfCores->m_Multiplier == 123.45f);
+    BOOST_CHECK(counterWNumberOfCores->m_Name == "valid name 8");
+    BOOST_CHECK(counterWNumberOfCores->m_Description == "valid description");
+    BOOST_CHECK(counterWNumberOfCores->m_Units == "");
+    BOOST_CHECK(counterWNumberOfCores->m_DeviceUid == 0);
+    BOOST_CHECK(counterWNumberOfCores->m_CounterSetUid == 0);
+    BOOST_CHECK(category->m_Counters.size() == 20);
+    for (size_t i = 0; i < numberOfCores; i ++)
+    {
+        BOOST_CHECK(category->m_Counters[category->m_Counters.size() - numberOfCores + i] ==
+                    counterWNumberOfCores->m_Uid + i);
+    }
+
+    // Register a multi-core device for testing
+    const std::string multiCoreDeviceName = "some_multi_core_device";
+    const Device* multiCoreDevice = nullptr;
+    BOOST_CHECK_NO_THROW(multiCoreDevice = counterDirectory.RegisterDevice(multiCoreDeviceName, 4));
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
+    BOOST_CHECK(multiCoreDevice);
+    BOOST_CHECK(multiCoreDevice->m_Name == multiCoreDeviceName);
+    BOOST_CHECK(multiCoreDevice->m_Uid >= 1);
+    BOOST_CHECK(multiCoreDevice->m_Cores == 4);
+
+    // Register a counter with a valid parent category name and associated to the multi-core device
+    const Counter* counterWMultiCoreDevice = nullptr;
+    BOOST_CHECK_NO_THROW(counterWMultiCoreDevice
+                         = counterDirectory.RegisterCounter(categoryName,
+                                                            0,
+                                                            1,
+                                                            123.45f,
+                                                            "valid name 9",
+                                                            "valid description",
+                                                            armnn::EmptyOptional(),   // Units
+                                                            armnn::EmptyOptional(),   // Number of cores
+                                                            multiCoreDevice->m_Uid,   // Device UID
+                                                            armnn::EmptyOptional())); // Counter set UID
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 24);
+    BOOST_CHECK(counterWMultiCoreDevice);
+    BOOST_CHECK(counterWMultiCoreDevice->m_Uid >= 0);
+    BOOST_CHECK(counterWMultiCoreDevice->m_Uid > counter->m_Uid);
+    BOOST_CHECK(counterWMultiCoreDevice->m_MaxCounterUid ==
+                counterWMultiCoreDevice->m_Uid + multiCoreDevice->m_Cores - 1);
+    BOOST_CHECK(counterWMultiCoreDevice->m_Class == 0);
+    BOOST_CHECK(counterWMultiCoreDevice->m_Interpolation == 1);
+    BOOST_CHECK(counterWMultiCoreDevice->m_Multiplier == 123.45f);
+    BOOST_CHECK(counterWMultiCoreDevice->m_Name == "valid name 9");
+    BOOST_CHECK(counterWMultiCoreDevice->m_Description == "valid description");
+    BOOST_CHECK(counterWMultiCoreDevice->m_Units == "");
+    BOOST_CHECK(counterWMultiCoreDevice->m_DeviceUid == multiCoreDevice->m_Uid);
+    BOOST_CHECK(counterWMultiCoreDevice->m_CounterSetUid == 0);
+    BOOST_CHECK(category->m_Counters.size() == 24);
+    for (size_t i = 0; i < 4; i ++)
+    {
+        BOOST_CHECK(category->m_Counters[category->m_Counters.size() - 4 + i] == counterWMultiCoreDevice->m_Uid + i);
+    }
+
+    // Register a counter set for testing
+    const std::string counterSetName = "some_counter_set";
+    const CounterSet* counterSet = nullptr;
+    BOOST_CHECK_NO_THROW(counterSet = counterDirectory.RegisterCounterSet(counterSetName));
+    BOOST_CHECK(counterDirectory.GetCounterSetCount() == 1);
+    BOOST_CHECK(counterSet);
+    BOOST_CHECK(counterSet->m_Name == counterSetName);
+    BOOST_CHECK(counterSet->m_Uid >= 1);
+    BOOST_CHECK(counterSet->m_Count == 0);
+
+    // Register a counter with a valid parent category name and associated to a counter set
+    const Counter* counterWCounterSet = nullptr;
+    BOOST_CHECK_NO_THROW(counterWCounterSet
+                         = counterDirectory.RegisterCounter(categoryName,
+                                                            0,
+                                                            1,
+                                                            123.45f,
+                                                            "valid name 10",
+                                                            "valid description",
+                                                            armnn::EmptyOptional(), // Units
+                                                            armnn::EmptyOptional(), // Number of cores
+                                                            armnn::EmptyOptional(), // Device UID
+                                                            counterSet->m_Uid));    // Counter set UID
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 25);
+    BOOST_CHECK(counterWCounterSet);
+    BOOST_CHECK(counterWCounterSet->m_Uid >= 0);
+    BOOST_CHECK(counterWCounterSet->m_Uid > counter->m_Uid);
+    BOOST_CHECK(counterWCounterSet->m_MaxCounterUid == counterWCounterSet->m_Uid);
+    BOOST_CHECK(counterWCounterSet->m_Class == 0);
+    BOOST_CHECK(counterWCounterSet->m_Interpolation == 1);
+    BOOST_CHECK(counterWCounterSet->m_Multiplier == 123.45f);
+    BOOST_CHECK(counterWCounterSet->m_Name == "valid name 10");
+    BOOST_CHECK(counterWCounterSet->m_Description == "valid description");
+    BOOST_CHECK(counterWCounterSet->m_Units == "");
+    BOOST_CHECK(counterWCounterSet->m_DeviceUid == 0);
+    BOOST_CHECK(counterWCounterSet->m_CounterSetUid == counterSet->m_Uid);
+    BOOST_CHECK(category->m_Counters.size() == 25);
+    BOOST_CHECK(category->m_Counters.back() == counterWCounterSet->m_Uid);
+
+    // Register a counter with a valid parent category name and associated to a device and a counter set
+    const Counter* counterWDeviceWCounterSet = nullptr;
+    BOOST_CHECK_NO_THROW(counterWDeviceWCounterSet
+                         = counterDirectory.RegisterCounter(categoryName,
+                                                            0,
+                                                            1,
+                                                            123.45f,
+                                                            "valid name 11",
+                                                            "valid description",
+                                                            armnn::EmptyOptional(), // Units
+                                                            armnn::EmptyOptional(), // Number of cores
+                                                            device->m_Uid,          // Device UID
+                                                            counterSet->m_Uid));    // Counter set UID
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 26);
+    BOOST_CHECK(counterWDeviceWCounterSet);
+    BOOST_CHECK(counterWDeviceWCounterSet->m_Uid >= 0);
+    BOOST_CHECK(counterWDeviceWCounterSet->m_Uid > counter->m_Uid);
+    BOOST_CHECK(counterWDeviceWCounterSet->m_MaxCounterUid == counterWDeviceWCounterSet->m_Uid);
+    BOOST_CHECK(counterWDeviceWCounterSet->m_Class == 0);
+    BOOST_CHECK(counterWDeviceWCounterSet->m_Interpolation == 1);
+    BOOST_CHECK(counterWDeviceWCounterSet->m_Multiplier == 123.45f);
+    BOOST_CHECK(counterWDeviceWCounterSet->m_Name == "valid name 11");
+    BOOST_CHECK(counterWDeviceWCounterSet->m_Description == "valid description");
+    BOOST_CHECK(counterWDeviceWCounterSet->m_Units == "");
+    BOOST_CHECK(counterWDeviceWCounterSet->m_DeviceUid == device->m_Uid);
+    BOOST_CHECK(counterWDeviceWCounterSet->m_CounterSetUid == counterSet->m_Uid);
+    BOOST_CHECK(category->m_Counters.size() == 26);
+    BOOST_CHECK(category->m_Counters.back() == counterWDeviceWCounterSet->m_Uid);
+
+    // Register another category for testing
+    const std::string anotherCategoryName = "some_other_category";
+    const Category* anotherCategory = nullptr;
+    BOOST_CHECK_NO_THROW(anotherCategory = counterDirectory.RegisterCategory(anotherCategoryName));
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 2);
+    BOOST_CHECK(anotherCategory);
+    BOOST_CHECK(anotherCategory != category);
+    BOOST_CHECK(anotherCategory->m_Name == anotherCategoryName);
+    BOOST_CHECK(anotherCategory->m_Counters.empty());
+    BOOST_CHECK(anotherCategory->m_DeviceUid == 0);
+    BOOST_CHECK(anotherCategory->m_CounterSetUid == 0);
+
+    // Register a counter to the other category
+    const Counter* anotherCounter = nullptr;
+    BOOST_CHECK_NO_THROW(anotherCounter = counterDirectory.RegisterCounter(anotherCategoryName,
+                                                                           1,
+                                                                           0,
+                                                                           .00043f,
+                                                                           "valid name",
+                                                                           "valid description",
+                                                                           armnn::EmptyOptional(), // Units
+                                                                           armnn::EmptyOptional(), // Number of cores
+                                                                           device->m_Uid,          // Device UID
+                                                                           counterSet->m_Uid));    // Counter set UID
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 27);
+    BOOST_CHECK(anotherCounter);
+    BOOST_CHECK(anotherCounter->m_Uid >= 0);
+    BOOST_CHECK(anotherCounter->m_MaxCounterUid == anotherCounter->m_Uid);
+    BOOST_CHECK(anotherCounter->m_Class == 1);
+    BOOST_CHECK(anotherCounter->m_Interpolation == 0);
+    BOOST_CHECK(anotherCounter->m_Multiplier == .00043f);
+    BOOST_CHECK(anotherCounter->m_Name == "valid name");
+    BOOST_CHECK(anotherCounter->m_Description == "valid description");
+    BOOST_CHECK(anotherCounter->m_Units == "");
+    BOOST_CHECK(anotherCounter->m_DeviceUid == device->m_Uid);
+    BOOST_CHECK(anotherCounter->m_CounterSetUid == counterSet->m_Uid);
+    BOOST_CHECK(anotherCategory->m_Counters.size() == 1);
+    BOOST_CHECK(anotherCategory->m_Counters.back() == anotherCounter->m_Uid);
 }
 
 BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)

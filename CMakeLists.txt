@@ -205,7 +205,10 @@ endif()
 
 list(APPEND armnn_sources
     include/armnn/ArmNN.hpp
+    include/armnn/BackendHelper.hpp
     include/armnn/BackendId.hpp
+    include/armnn/Conversion.hpp
+    include/armnn/Deprecated.hpp
     include/armnn/Descriptors.hpp
     include/armnn/DescriptorsFwd.hpp
     include/armnn/Exceptions.hpp
@@ -428,28 +431,29 @@ list(APPEND armnn_sources
     src/profiling/EncodeVersion.hpp
     src/profiling/Holder.cpp
     src/profiling/Holder.hpp
+    src/profiling/IBufferWrapper.hpp
+    src/profiling/ICounterDirectory.hpp
+    src/profiling/ISendCounterPacket.hpp
+    src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
     src/profiling/Packet.cpp
     src/profiling/Packet.hpp
     src/profiling/PacketVersionResolver.cpp
     src/profiling/PacketVersionResolver.hpp
-    src/profiling/ProfilingConnectionFactory.cpp
-    src/profiling/ProfilingConnectionFactory.hpp
-    src/profiling/IBufferWrapper.hpp
-    src/profiling/IPeriodicCounterCapture.hpp
-    src/profiling/ISendCounterPacket.hpp
-    src/profiling/SendCounterPacket.hpp
-    src/profiling/SendCounterPacket.cpp
-    src/profiling/SocketProfilingConnection.cpp
-    src/profiling/SocketProfilingConnection.hpp
-    src/profiling/ProfilingUtils.hpp
-    src/profiling/ProfilingUtils.cpp
-    src/profiling/ProfilingStateMachine.cpp
-    src/profiling/ProfilingStateMachine.hpp
-    src/profiling/ProfilingService.cpp
-    src/profiling/ProfilingService.hpp
     src/profiling/PeriodicCounterSelectionCommandHandler.cpp
     src/profiling/PeriodicCounterSelectionCommandHandler.hpp
+    src/profiling/ProfilingConnectionFactory.cpp
+    src/profiling/ProfilingConnectionFactory.hpp
+    src/profiling/ProfilingService.cpp
+    src/profiling/ProfilingService.hpp
+    src/profiling/ProfilingStateMachine.cpp
+    src/profiling/ProfilingStateMachine.hpp
+    src/profiling/ProfilingUtils.cpp
+    src/profiling/ProfilingUtils.hpp
+    src/profiling/SendCounterPacket.cpp
+    src/profiling/SendCounterPacket.hpp
+    src/profiling/SocketProfilingConnection.cpp
+    src/profiling/SocketProfilingConnection.hpp
     third-party/half/half.hpp
     )
 
@@ -473,6 +477,7 @@ add_library_ex(armnn SHARED ${armnn_sources})
 target_include_directories(armnn PRIVATE src/armnn)
 target_include_directories(armnn PRIVATE src/armnnUtils)
 target_include_directories(armnn PRIVATE src/backends)
+target_include_directories(armnn PRIVATE src/profiling)
 
 target_link_libraries(armnn armnnUtils)
 
@@ -745,6 +750,7 @@ if(BUILD_UNIT_TESTS)
     target_include_directories(UnitTests PRIVATE src/armnn)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
     target_include_directories(UnitTests PRIVATE src/backends)
+    target_include_directories(UnitTests PRIVATE src/profiling)
 
     if(VALGRIND_FOUND)
         if(HEAP_PROFILING OR LEAK_CHECKING)

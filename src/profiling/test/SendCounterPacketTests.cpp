@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../ProfilingUtils.hpp"
-#include "../EncodeVersion.hpp"
-#include "../SendCounterPacket.hpp"
 #include "SendCounterPacketTests.hpp"
+
+#include <ProfilingUtils.hpp>
+#include <EncodeVersion.hpp>
+#include <SendCounterPacket.hpp>
 
 #include <armnn/Exceptions.hpp>
 
@@ -30,7 +31,7 @@ BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
 
     BOOST_TEST(strcmp(buffer, "SendStreamMetaDataPacket") == 0);
 
-    CounterDirectory counterDirectory(1, "counter_directory", 0, 0, 0);
+    CounterDirectory counterDirectory;
     sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
 
     BOOST_TEST(strcmp(buffer, "SendCounterDirectoryPacket") == 0);

@@ -6,12 +6,12 @@
 #include "ProfilingUtils.hpp"
 
 #include <armnn/Version.hpp>
+#include <armnn/Conversion.hpp>
 
 #include <boost/assert.hpp>
 
 #include <fstream>
 #include <limits>
-#include <mutex>
 
 namespace armnn
 {
@@ -19,25 +19,72 @@ namespace armnn
 namespace profiling
 {
 
-uint16_t GetNextUid()
+namespace
 {
-    // Static mutex for reading and modifying the global UID a single thread at the time
-    static std::mutex mutex;
-    std::unique_lock<std::mutex> lock(mutex);
 
-    // The UID used for profiling objects and events. The first valid UID is 1, as 0 is a reserved value
-    // (it is used to indicate that a record is not associated with any device)
-    static uint16_t uid{ 0 };
-
+void ThrowIfCantGenerateNextUid(uint16_t uid, uint16_t cores = 0)
+{
     // Check that it is possible to generate the next UID without causing an overflow
-    if (uid == std::numeric_limits<uint16_t>::max())
+    switch (cores)
     {
-        throw RuntimeException("Generating the next UID for profiling would result in an overflow");
+    case 0:
+    case 1:
+        // Number of cores not specified or set to 1 (a value of zero indicates the device is not capable of
+        // running multiple parallel workloads and will not provide multiple streams of data for each event)
+        if (uid == std::numeric_limits<uint16_t>::max())
+        {
+            throw RuntimeException("Generating the next UID for profiling would result in an overflow");
+        }
+        break;
+    default: // cores > 1
+        // Multiple cores available, as max_counter_uid has to be set to: counter_uid + cores - 1, the maximum
+        // allowed value for a counter UID is consequently: uint16_t_max - cores + 1
+        if (uid >= std::numeric_limits<uint16_t>::max() - cores + 1)
+        {
+            throw RuntimeException("Generating the next UID for profiling would result in an overflow");
+        }
+        break;
     }
+}
 
-    // Thread safe increment, the value that is incremented is the value checked for overflow,
-    // as this whole function is mutexed
-    return ++uid;
+} // Anonymous namespace
+
+uint16_t GetNextUid(bool peekOnly)
+{
+    // The UID used for profiling objects and events. The first valid UID is 1, as 0 is a reserved value
+    static uint16_t uid = 1;
+
+    // Check that it is possible to generate the next UID without causing an overflow (throws in case of error)
+    ThrowIfCantGenerateNextUid(uid);
+
+    if (peekOnly)
+    {
+        // Peek only
+        return uid;
+    }
+    else
+    {
+        // Get the next UID
+        return uid++;
+    }
+}
+
+std::vector<uint16_t> GetNextCounterUids(uint16_t cores)
+{
+    // The UID used for counters only. The first valid UID is 0
+    static uint16_t counterUid = 0;
+
+    // Check that it is possible to generate the next counter UID without causing an overflow (throws in case of error)
+    ThrowIfCantGenerateNextUid(counterUid, cores);
+
+    // Get the next counter UIDs
+    size_t counterUidsSize = cores == 0 ? 1 : cores;
+    std::vector<uint16_t> counterUids(counterUidsSize, 0);
+    for (size_t i = 0; i < counterUidsSize; i++)
+    {
+        counterUids[i] = counterUid++;
+    }
+    return counterUids;
 }
 
 void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value)

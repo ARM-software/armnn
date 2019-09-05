@@ -11,7 +11,7 @@
 #include "../Packet.hpp"
 #include "../PacketVersionResolver.hpp"
 #include "../ProfilingStateMachine.hpp"
-
+#include "../ProfilingUtils.hpp"
 #include "../ProfilingService.hpp"
 
 #include <boost/test/unit_test.hpp>
@@ -500,6 +500,32 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::NotConnected);
     service.Run();
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::WaitingForAck);
+}
+
+void GetNextUidTestImpl(uint16_t& outUid)
+{
+    outUid = GetNextUid();
+}
+
+BOOST_AUTO_TEST_CASE(GetNextUidTest)
+{
+    uint16_t uid0 = 0;
+    uint16_t uid1 = 0;
+    uint16_t uid2 = 0;
+
+    std::thread thread1(GetNextUidTestImpl, std::ref(uid0));
+    std::thread thread2(GetNextUidTestImpl, std::ref(uid1));
+    std::thread thread3(GetNextUidTestImpl, std::ref(uid2));
+    thread1.join();
+    thread2.join();
+    thread3.join();
+
+    BOOST_TEST(uid0 > 0);
+    BOOST_TEST(uid1 > 0);
+    BOOST_TEST(uid2 > 0);
+    BOOST_TEST(uid0 != uid1);
+    BOOST_TEST(uid0 != uid2);
+    BOOST_TEST(uid1 != uid2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

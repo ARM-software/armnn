@@ -16,6 +16,8 @@ namespace armnn
 namespace profiling
 {
 
+uint16_t GetNextUid();
+
 void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value);
 
 void WriteUint32(unsigned char* buffer, unsigned int offset, uint32_t value);

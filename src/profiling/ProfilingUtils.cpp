@@ -10,12 +10,35 @@
 #include <boost/assert.hpp>
 
 #include <fstream>
+#include <limits>
+#include <mutex>
 
 namespace armnn
 {
 
 namespace profiling
 {
+
+uint16_t GetNextUid()
+{
+    // Static mutex for reading and modifying the global UID a single thread at the time
+    static std::mutex mutex;
+    std::unique_lock<std::mutex> lock(mutex);
+
+    // The UID used for profiling objects and events. The first valid UID is 1, as 0 is a reserved value
+    // (it is used to indicate that a record is not associated with any device)
+    static uint16_t uid{ 0 };
+
+    // Check that it is possible to generate the next UID without causing an overflow
+    if (uid == std::numeric_limits<uint16_t>::max())
+    {
+        throw RuntimeException("Generating the next UID for profiling would result in an overflow");
+    }
+
+    // Thread safe increment, the value that is incremented is the value checked for overflow,
+    // as this whole function is mutexed
+    return ++uid;
+}
 
 void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value)
 {
@@ -54,7 +77,7 @@ uint64_t ReadUint64(const unsigned char* buffer, unsigned int offset)
     BOOST_ASSERT(buffer);
 
     uint64_t value = 0;
-    value = static_cast<uint64_t>(buffer[offset]);
+    value  = static_cast<uint64_t>(buffer[offset]);
     value |= static_cast<uint64_t>(buffer[offset + 1]) << 8;
     value |= static_cast<uint64_t>(buffer[offset + 2]) << 16;
     value |= static_cast<uint64_t>(buffer[offset + 3]) << 24;

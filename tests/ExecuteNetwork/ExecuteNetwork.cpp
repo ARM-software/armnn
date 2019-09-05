@@ -34,7 +34,7 @@ int main(int argc, const char* argv[])
 
     size_t subgraphId = 0;
 
-    const std::string backendsMessage = "Which device to run layers on by default. Possible choices: "
+    const std::string backendsMessage = "REQUIRED: Which device to run layers on by default. Possible choices: "
                                       + armnn::BackendRegistryInstance().GetBackendIdsAsString();
 
     po::options_description desc("Options");
@@ -42,6 +42,8 @@ int main(int argc, const char* argv[])
     {
         desc.add_options()
             ("help", "Display usage information")
+            ("compute,c", po::value<std::vector<std::string>>()->multitoken()->required(),
+             backendsMessage.c_str())
             ("test-cases,t", po::value(&testCasesFile), "Path to a CSV file containing test cases to run. "
              "If set, further parameters -- with the exception of compute device and concurrency -- will be ignored, "
              "as they are expected to be defined in the file for each test in particular.")
@@ -52,8 +54,6 @@ int main(int argc, const char* argv[])
              "tensorflow-text.")
             ("model-path,m", po::value(&modelPath)->required(), "Path to model file, e.g. .armnn, .caffemodel, "
              ".prototxt, .tflite, .onnx")
-            ("compute,c", po::value<std::vector<std::string>>()->multitoken(),
-             backendsMessage.c_str())
             ("dynamic-backends-path,b", po::value(&dynamicBackendsPath),
              "Path where to load any available dynamic backend from. "
              "If left empty (the default), dynamic backends will not be used.")

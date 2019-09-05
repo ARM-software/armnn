@@ -77,6 +77,7 @@ private:
     using LayerParsingFunction = void(Deserializer::*)(GraphPtr graph, unsigned int layerIndex);
 
     void ParseUnsupportedLayer(GraphPtr graph, unsigned int layerIndex);
+    void ParseAbs(GraphPtr graph, unsigned int layerIndex);
     void ParseActivation(GraphPtr graph, unsigned int layerIndex);
     void ParseAdd(GraphPtr graph, unsigned int layerIndex);
     void ParseBatchToSpaceNd(GraphPtr graph, unsigned int layerIndex);

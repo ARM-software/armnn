@@ -210,6 +210,44 @@ static std::vector<DataType> GenerateRandomData(size_t size)
 
 BOOST_AUTO_TEST_SUITE(SerializerTests)
 
+BOOST_AUTO_TEST_CASE(SerializeAbs)
+{
+    class AbsLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        AbsLayerVerifier(const std::string& layerName,
+                              const std::vector<armnn::TensorInfo>& inputInfos,
+                              const std::vector<armnn::TensorInfo>& outputInfos)
+                : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+
+        void VisitAbsLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+        }
+    };
+
+    const std::string layerName("abs");
+    const armnn::TensorInfo tensorInfo({1, 2, 3}, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+
+    armnn::IConnectableLayer* const absLayer = network->AddAbsLayer(layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(absLayer->GetInputSlot(0));
+    absLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    absLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    AbsLayerVerifier verifier(layerName, {tensorInfo}, {tensorInfo});
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeAddition)
 {
     class AdditionLayerVerifier : public LayerVerifierBase

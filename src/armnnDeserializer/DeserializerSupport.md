@@ -6,6 +6,7 @@ This reference guide provides a list of layers which can be deserialized current
 
 The Arm NN SDK Deserialize parser currently supports the following layers:
 
+* Abs
 * Activation
 * Addition
 * BatchToSpaceNd

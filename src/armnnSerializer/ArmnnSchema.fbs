@@ -132,7 +132,8 @@ enum LayerType : uint {
     TransposeConvolution2d = 42,
     Resize = 43,
     Stack = 44,
-    QuantizedLstm = 45
+    QuantizedLstm = 45,
+    Abs = 46
 }
 
 // Base layer table to be used as part of other layers
@@ -150,6 +151,11 @@ table BindableLayerBase {
 }
 
 // Table for each layer defined below
+
+table AbsLayer {
+    base:LayerBase;
+}
+
 table ActivationLayer {
     base:LayerBase;
     descriptor:ActivationDescriptor;
@@ -686,7 +692,8 @@ union Layer {
     PreluLayer,
     TransposeConvolution2dLayer,
     ResizeLayer,
-    StackLayer
+    StackLayer,
+    AbsLayer
 }
 
 table AnyLayer {

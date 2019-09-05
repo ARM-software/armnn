@@ -695,6 +695,7 @@ if(BUILD_UNIT_TESTS)
         list(APPEND unittest_sources
             src/armnnSerializer/test/ActivationSerializationTests.cpp
             src/armnnSerializer/test/SerializerTests.cpp
+            src/armnnDeserializer/test/DeserializeAbs.cpp
             src/armnnDeserializer/test/DeserializeActivation.cpp
             src/armnnDeserializer/test/DeserializeAdd.cpp
             src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp

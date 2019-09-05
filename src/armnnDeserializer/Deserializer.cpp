@@ -185,6 +185,7 @@ Deserializer::Deserializer()
 m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
 {
     // register supported layers
+    m_ParserFunctions[Layer_AbsLayer]                    = &Deserializer::ParseAbs;
     m_ParserFunctions[Layer_ActivationLayer]             = &Deserializer::ParseActivation;
     m_ParserFunctions[Layer_AdditionLayer]               = &Deserializer::ParseAdd;
     m_ParserFunctions[Layer_BatchToSpaceNdLayer]         = &Deserializer::ParseBatchToSpaceNd;
@@ -237,6 +238,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
 
     switch(layerType)
     {
+        case Layer::Layer_AbsLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_AbsLayer()->base();
         case Layer::Layer_ActivationLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ActivationLayer()->base();
         case Layer::Layer_AdditionLayer:
@@ -849,6 +852,26 @@ void Deserializer::RegisterOutputSlotOfConnection(uint32_t sourceLayerIndex,
     }
 
     connections.outputSlots[outputSlotIndex] = outputSlot;
+}
+
+void Deserializer::ParseAbs(armnnDeserializer::Deserializer::GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+
+    IConnectableLayer* layer = m_Network->AddAbsLayer(layerName.c_str());
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
 }
 
 void Deserializer::ParseActivation(GraphPtr graph, unsigned int layerIndex)

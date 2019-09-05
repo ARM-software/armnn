@@ -13,9 +13,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/core/ignore_unused.hpp>
 
-#include <iostream>
-#include <unistd.h>
-#include <string.h>
+#include <cstring>
 
 namespace armnn
 {
@@ -69,17 +67,14 @@ void SendCounterPacket::SendStreamMetaDataPacket()
 
     if (reserved < totalSize)
     {
-        // Cancel the operation.
-        m_Buffer.Commit(0);
-        throw RuntimeException(boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.")
-                                          % totalSize));
+        CancelOperationAndThrow<BufferExhaustion>(
+                    boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.")
+                               % totalSize));
     }
 
     if (writeBuffer == nullptr)
     {
-        // Cancel the operation.
-        m_Buffer.Commit(0);
-        throw RuntimeException("Error reserving buffer memory.");
+        CancelOperationAndThrow<RuntimeException>("Error reserving buffer memory.");
     }
 
     try
@@ -121,27 +116,32 @@ void SendCounterPacket::SendStreamMetaDataPacket()
 
         // Pool
 
-        if (infoSize) {
+        if (infoSize)
+        {
             memcpy(&writeBuffer[offset], info.c_str(), infoSize);
             offset += infoSize;
         }
 
-        if (hardwareVersionSize) {
+        if (hardwareVersionSize)
+        {
             memcpy(&writeBuffer[offset], hardwareVersion.c_str(), hardwareVersionSize);
             offset += hardwareVersionSize;
         }
 
-        if (softwareVersionSize) {
+        if (softwareVersionSize)
+        {
             memcpy(&writeBuffer[offset], softwareVersion.c_str(), softwareVersionSize);
             offset += softwareVersionSize;
         }
 
-        if (processNameSize) {
+        if (processNameSize)
+        {
             memcpy(&writeBuffer[offset], processName.c_str(), processNameSize);
             offset += processNameSize;
         }
 
-        if (packetVersionEntries) {
+        if (packetVersionEntries)
+        {
             // Packet Version Count
             WriteUint32(writeBuffer, offset, packetVersionEntries << 16);
 
@@ -160,15 +160,13 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     }
     catch(...)
     {
-        // Cancel the operation.
-        m_Buffer.Commit(0);
-        throw RuntimeException("Error processing packet.");
+        CancelOperationAndThrow<RuntimeException>("Error processing packet.");
     }
 
     m_Buffer.Commit(totalSize);
 }
 
-void SendCounterPacket::SendCounterDirectoryPacket(const Category& category, const std::vector<Counter>& counters)
+void SendCounterPacket::SendCounterDirectoryPacket(const CounterDirectory& counterDirectory)
 {
     throw armnn::UnimplementedException();
 }
@@ -189,17 +187,14 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
 
     if (reserved < totalSize)
     {
-        // Cancel the operation.
-        m_Buffer.Commit(0);
-        throw profiling::BufferExhaustion(
-                boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.") % totalSize));
+        CancelOperationAndThrow<BufferExhaustion>(
+                    boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.")
+                               % totalSize));
     }
 
     if (writeBuffer == nullptr)
     {
-        // Cancel the operation.
-        m_Buffer.Commit(0);
-        throw RuntimeException("Error reserving buffer memory.");
+        CancelOperationAndThrow<RuntimeException>("Error reserving buffer memory.");
     }
 
     // Create header.
@@ -242,17 +237,14 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
 
     if (reserved < totalSize)
     {
-        // Cancel the operation.
-        m_Buffer.Commit(0);
-        throw RuntimeException(boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.")
+        CancelOperationAndThrow<BufferExhaustion>(
+                    boost::str(boost::format("No space left in buffer. Unable to reserve (%1%) bytes.")
                                % totalSize));
     }
 
     if (writeBuffer == nullptr)
     {
-        // Cancel the operation.
-        m_Buffer.Commit(0);
-        throw RuntimeException("Error reserving buffer memory.");
+        CancelOperationAndThrow<RuntimeException>("Error reserving buffer memory.");
     }
 
     // Create header.

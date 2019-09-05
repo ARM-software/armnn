@@ -18,19 +18,18 @@ class Packet
 {
 public:
     Packet(uint32_t header, uint32_t length, const char* data)
-    : m_Header(header), m_Length(length), m_Data(data)
-          {
-              m_PacketId = ((header >> 16) & 1023);
-              m_PacketFamily = (header >> 26);
+        : m_Header(header),
+          m_Length(length),
+          m_Data(data)
+    {
+        m_PacketId = ((header >> 16) & 1023);
+        m_PacketFamily = (header >> 26);
 
-             if (length == 0)
-             {
-                 if (m_Data != nullptr)
-                 {
-                     throw armnn::Exception("Data should be null");
-                 }
-             }
-          };
+        if (length == 0 && m_Data != nullptr)
+        {
+            throw armnn::InvalidArgumentException("Data should be null when length is zero");
+        }
+    }
 
     uint32_t GetHeader() const;
     uint32_t GetPacketFamily() const;

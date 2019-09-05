@@ -24,7 +24,7 @@ public:
     virtual void SendStreamMetaDataPacket() = 0;
 
     /// Create and write a CounterDirectoryPacket from the parameters to the buffer.
-    virtual void SendCounterDirectoryPacket(const Category& category, const std::vector<Counter>& counters) = 0;
+    virtual void SendCounterDirectoryPacket(const CounterDirectory& counterDirectory) = 0;
 
     /// Create and write a PeriodicCounterCapturePacket from the parameters to the buffer.
     virtual void SendPeriodicCounterCapturePacket(uint64_t timestamp, const IndexValuePairsVector& values) = 0;

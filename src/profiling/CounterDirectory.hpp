@@ -15,6 +15,12 @@ namespace armnn
 namespace profiling
 {
 
+class Category
+{
+public:
+    std::string m_Name;
+};
+
 class Device
 {
 public:
@@ -36,10 +42,12 @@ public:
     std::string m_Units;
 };
 
-class Category
+class CounterSet
 {
 public:
+    uint16_t    m_Uid;
     std::string m_Name;
+    uint16_t    m_Count;
 };
 
 class CounterDirectory final

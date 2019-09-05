@@ -68,7 +68,7 @@ public:
         memcpy(buffer, message.c_str(), static_cast<unsigned int>(message.size()) + 1);
     }
 
-    void SendCounterDirectoryPacket(const Category& category, const std::vector<Counter>& counters) override
+    void SendCounterDirectoryPacket(const CounterDirectory& counterDirectory) override
     {
         std::string message("SendCounterDirectoryPacket");
         unsigned int reserved = 0;
@@ -114,9 +114,8 @@ BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
 
     BOOST_TEST(strcmp(buffer, "SendStreamMetaDataPacket") == 0);
 
-    Category category;
-    std::vector<Counter> counters;
-    sendCounterPacket.SendCounterDirectoryPacket(category, counters);
+    CounterDirectory counterDirectory(1, "counter_directory", 0, 0, 0);
+    sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
 
     BOOST_TEST(strcmp(buffer, "SendCounterDirectoryPacket") == 0);
 
@@ -144,7 +143,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
     uint32_t capturePeriod = 1000;
     std::vector<uint16_t> selectedCounterIds;
     BOOST_CHECK_THROW(sendPacket1.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds),
-                      armnn::RuntimeException);
+                      armnn::profiling::BufferExhaustion);
 
     // Packet without any counters
     MockBuffer mockBuffer2(512);
@@ -284,7 +283,7 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     // Error no space left in buffer
     MockBuffer mockBuffer1(10);
     SendCounterPacket sendPacket1(mockBuffer1);
-    BOOST_CHECK_THROW(sendPacket1.SendStreamMetaDataPacket(), armnn::RuntimeException);
+    BOOST_CHECK_THROW(sendPacket1.SendStreamMetaDataPacket(), armnn::profiling::BufferExhaustion);
 
     // Full metadata packet
 

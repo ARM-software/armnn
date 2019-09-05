@@ -20,11 +20,14 @@ class SendCounterPacket : public ISendCounterPacket
 public:
     using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
 
-    SendCounterPacket(IBufferWrapper& buffer) : m_Buffer(buffer), m_ReadyToRead(false) {};
+    SendCounterPacket(IBufferWrapper& buffer)
+        : m_Buffer(buffer),
+          m_ReadyToRead(false)
+    {}
 
     void SendStreamMetaDataPacket() override;
 
-    void SendCounterDirectoryPacket(const Category& category, const std::vector<Counter>& counters) override;
+    void SendCounterDirectoryPacket(const CounterDirectory& counterDirectory) override;
 
     void SendPeriodicCounterCapturePacket(uint64_t timestamp, const IndexValuePairsVector& values) override;
 
@@ -37,6 +40,16 @@ public:
     static const unsigned int MAX_METADATA_PACKET_LENGTH = 4096;
 
 private:
+    template <typename ExceptionType>
+    void CancelOperationAndThrow(const std::string& errorMessage)
+    {
+        // Cancel the operation
+        m_Buffer.Commit(0);
+
+        // Throw a runtime exception with the given error message
+        throw ExceptionType(errorMessage);
+    }
+
     IBufferWrapper& m_Buffer;
     bool m_ReadyToRead;
 };

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "Abs.hpp"
 #include "Activation.hpp"
 #include "BatchNormImpl.hpp"
 #include "ConvImpl.hpp"
@@ -13,6 +14,7 @@
 #include "FullyConnected.hpp"
 #include "Gather.hpp"
 #include "Pooling2d.hpp"
+#include "RefAbsWorkload.hpp"
 #include "RefActivationWorkload.hpp"
 #include "RefBatchNormalizationWorkload.hpp"
 #include "RefBatchToSpaceNdWorkload.hpp"

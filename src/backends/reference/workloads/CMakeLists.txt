@@ -4,6 +4,8 @@
 #
 
 list(APPEND armnnRefBackendWorkloads_sources
+    Abs.cpp
+    Abs.hpp
     Activation.cpp
     Activation.hpp
     BaseIterator.hpp
@@ -41,6 +43,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Pooling2d.hpp
     PreluImpl.cpp
     PreluImpl.hpp
+    RefAbsWorkload.cpp
+    RefAbsWorkload.hpp
     RefActivationWorkload.cpp
     RefActivationWorkload.hpp
     RefBatchNormalizationWorkload.cpp

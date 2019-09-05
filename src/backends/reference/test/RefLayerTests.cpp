@@ -1110,6 +1110,15 @@ ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsMultiDimIndicesFloat, GatherMultiDimPar
 ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsMultiDimIndicesUint8, GatherMultiDimParamsMultiDimIndicesUint8Test)
 ARMNN_AUTO_TEST_CASE(GatherMultiDimParamsMultiDimIndicesInt16, GatherMultiDimParamsMultiDimIndicesInt16Test)
 
+// Abs
+ARMNN_AUTO_TEST_CASE(Abs2d, Abs2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Abs3d, Abs3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(AbsZero, AbsZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Abs2dQuantisedAsymm8, Abs2dTest<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(Abs3dQuantisedAsymm8, Abs3dTest<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(Abs2dQuantisedSymm16, Abs2dTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(Abs3dQuantisedSymm16, Abs3dTest<DataType::QuantisedSymm16>)
+
 // Detection PostProcess
 BOOST_AUTO_TEST_CASE(DetectionPostProcessRegularNmsFloat)
 {

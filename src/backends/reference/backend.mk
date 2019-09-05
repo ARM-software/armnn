@@ -21,6 +21,7 @@ BACKEND_SOURCES := \
         RefWorkloadFactory.cpp \
         RefRegistryInitializer.cpp \
         RefTensorHandleFactory.cpp \
+        workloads/Abs.cpp \
         workloads/Activation.cpp \
         workloads/BatchNormImpl.cpp \
         workloads/BatchToSpaceNd.cpp \
@@ -37,6 +38,7 @@ BACKEND_SOURCES := \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
         workloads/PreluImpl.cpp \
+        workloads/RefAbsWorkload.cpp \
         workloads/RefActivationWorkload.cpp \
         workloads/RefBatchNormalizationWorkload.cpp \
         workloads/RefBatchToSpaceNdWorkload.cpp \

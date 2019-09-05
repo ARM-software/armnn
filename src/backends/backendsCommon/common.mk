@@ -33,6 +33,7 @@ COMMON_TEST_SOURCES := \
     test/CommonTestUtils.cpp \
     test/JsonPrinterTestImpl.cpp \
     test/TensorCopyUtils.cpp \
+    test/layerTests/AbsTestImpl.cpp \
     test/layerTests/ActivationTestImpl.cpp \
     test/layerTests/AdditionTestImpl.cpp \
     test/layerTests/BatchNormalizationTestImpl.cpp \

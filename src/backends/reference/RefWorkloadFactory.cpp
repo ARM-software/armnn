@@ -535,4 +535,14 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStack(const StackQueueDescr
     return std::make_unique<RefStackWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
+{
+    if (IsFloat16(info))
+    {
+        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    }
+    return std::make_unique<RefAbsWorkload>(descriptor, info);
+}
+
 } // namespace armnn

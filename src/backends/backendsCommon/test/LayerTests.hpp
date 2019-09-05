@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <backendsCommon/test/layerTests/AbsTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ActivationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/AdditionTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchNormalizationTestImpl.hpp>

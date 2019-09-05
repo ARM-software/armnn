@@ -66,6 +66,32 @@ std::string CreateIncorrectDimensionsErrorMsg(unsigned int expected,
 
 } // anonymous namespace
 
+bool RefLayerSupport::IsAbsSupported(const TensorInfo& input, const TensorInfo& output,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+    std::array<DataType,3> supportedTypes =
+        {
+            DataType::Float32,
+            DataType::QuantisedAsymm8,
+            DataType::QuantisedSymm16
+        };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference abs: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference abs: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference abs: input and output types not matching");
+
+    supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
+                                  "Reference abs: input and output shapes have different number of total elements");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsActivationSupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             const ActivationDescriptor& descriptor,

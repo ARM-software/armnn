@@ -818,3 +818,22 @@ if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD
         ${Boost_PROGRAM_OPTIONS_LIBRARY})
     addDllCopyCommands(ArmnnConverter)
 endif()
+
+if(BUILD_GATORD_MOCK)
+    set(gatord_mock_sources)
+    list(APPEND gatord_mock_sources
+        tests/profiling/GatordMockMain.cpp
+        tests/profiling/CommandLineProcessor.hpp
+        tests/profiling/CommandLineProcessor.cpp
+        )
+
+    include_directories( ${Boost_INCLUDE_DIRS} )
+
+    add_executable_ex(GartordMock ${gatord_mock_sources})
+
+    target_link_libraries(GartordMock
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        )
+
+endif()
+

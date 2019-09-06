@@ -182,6 +182,7 @@ public:
     }
 };
 
+
 BOOST_AUTO_TEST_CASE(QuantizeAddition)
 {
     INetworkPtr network = INetwork::Create();
@@ -1296,6 +1297,54 @@ BOOST_AUTO_TEST_CASE(QuantizeConstant)
     const QuantizerOptions options(DataType::QuantisedSymm16);
     INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
     TestConstantQuantization validatorQSymm16(options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
+BOOST_AUTO_TEST_CASE(QuantizeAbs)
+{
+    class TestAbsQuantization : public TestLeakyReLuActivationQuantization
+    {
+    public:
+        TestAbsQuantization(const TensorShape& inputShape, const TensorShape& outputShape) :
+                TestLeakyReLuActivationQuantization(inputShape, outputShape)
+        {}
+
+        TestAbsQuantization(const QuantizerOptions& options,
+                            const TensorShape& inputShape,
+                            const TensorShape& outputShape) :
+                TestLeakyReLuActivationQuantization(options, inputShape, outputShape)
+        {}
+
+        void VisitAbsLayer(const IConnectableLayer *layer,
+                           const char *name = nullptr) override
+        {
+            TensorInfo outputInfo = layer->GetOutputSlot(0).GetTensorInfo();
+
+            TestQuantizationParams(outputInfo,
+                                   { 30.0f / g_Asymm8QuantizationBase, 128 },
+                                   { 15.0f / g_Symm16QuantizationBase, 0 });
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    //Add the layer being tested
+    IConnectableLayer* absLayer = network->AddAbsLayer();
+
+    const TensorShape shape{1U};
+    TensorInfo info(shape, DataType::Float32);
+
+    IConnectableLayer* activation = CreateStartOfLeakyReluNetwork(network.get(), info);
+
+    CompleteLeakyReluNetwork(network.get(), activation, absLayer, info);
+
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestAbsQuantization validatorQAsymm8(shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestAbsQuantization validatorQSymm16(options, shape, shape);
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 

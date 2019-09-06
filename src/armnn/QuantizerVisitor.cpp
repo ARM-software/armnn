@@ -113,6 +113,13 @@ void QuantizerVisitor::RecordLayer(const IConnectableLayer* srcLayer, IConnectab
     m_QuantizedGuidToLayerMap[quantizedLayer->GetGuid()] = quantizedLayer;
 }
 
+void QuantizerVisitor::VisitAbsLayer(const IConnectableLayer* layer, const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddAbsLayer(name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitActivationLayer(const IConnectableLayer* layer,
                                             const ActivationDescriptor& activationDescriptor,
                                             const char* name)

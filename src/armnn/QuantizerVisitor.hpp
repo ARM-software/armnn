@@ -32,6 +32,8 @@ public:
     ~QuantizerVisitor() = default;
 
     /// Functions to quantize the individual layers, overridden from ILayerVisitor
+    void VisitAbsLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
+
     void VisitActivationLayer(const IConnectableLayer* layer,
                               const ActivationDescriptor& activationDescriptor,
                               const char* name = nullptr) override;

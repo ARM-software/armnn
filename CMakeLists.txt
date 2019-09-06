@@ -438,6 +438,8 @@ list(APPEND armnn_sources
     src/profiling/ISendCounterPacket.hpp
     src/profiling/SendCounterPacket.hpp
     src/profiling/SendCounterPacket.cpp
+    src/profiling/SocketProfilingConnection.cpp
+    src/profiling/SocketProfilingConnection.hpp
     src/profiling/ProfilingUtils.hpp
     src/profiling/ProfilingUtils.cpp
     src/profiling/ProfilingStateMachine.cpp

@@ -10,9 +10,12 @@
 #include "../Holder.hpp"
 #include "../Packet.hpp"
 #include "../PacketVersionResolver.hpp"
+#include "../ProfilingService.hpp"
 #include "../ProfilingStateMachine.hpp"
 #include "../ProfilingUtils.hpp"
-#include "../ProfilingService.hpp"
+#include "../SocketProfilingConnection.hpp"
+
+#include <Runtime.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -526,6 +529,12 @@ BOOST_AUTO_TEST_CASE(GetNextUidTest)
     BOOST_TEST(uid0 != uid1);
     BOOST_TEST(uid0 != uid2);
     BOOST_TEST(uid1 != uid2);
+}
+
+BOOST_AUTO_TEST_CASE(CheckSocketProfilingConnection)
+{
+    // Check that creating a SocketProfilingConnection results in an exception as the Gator UDS doesn't exist.
+    BOOST_CHECK_THROW(new SocketProfilingConnection(), armnn::Exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

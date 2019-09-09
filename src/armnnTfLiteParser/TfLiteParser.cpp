@@ -460,6 +460,7 @@ TfLiteParser::TfLiteParser()
     m_ParserFunctions[tflite::BuiltinOperator_PAD]               =  &TfLiteParser::ParsePad;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]             =  &TfLiteParser::ParseSplit;
     m_ParserFunctions[tflite::BuiltinOperator_TANH]              =  &TfLiteParser::ParseTanH;
+    m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE]         =  &TfLiteParser::ParseTranspose;
     m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE_CONV]    =  &TfLiteParser::ParseTransposeConv;
     m_ParserFunctions[tflite::BuiltinOperator_UNPACK]            =  &TfLiteParser::ParseUnpack;
 }
@@ -861,6 +862,35 @@ void TfLiteParser::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorInd
 
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::IConnectableLayer* layer = nullptr;
+    auto layerName = boost::str(boost::format("Transpose:%1%:%2%") % subgraphIndex % operatorIndex);
+
+    PermuteDescriptor desc;
+
+    layer = m_Network->AddPermuteLayer(desc, layerName.c_str());
+
+    BOOST_ASSERT(layer != nullptr);
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }

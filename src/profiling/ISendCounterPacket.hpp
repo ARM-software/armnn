@@ -18,6 +18,8 @@ class ISendCounterPacket
 public:
     using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
 
+    virtual ~ISendCounterPacket() {}
+
     /// Create and write a StreamMetaDataPacket in the buffer
     virtual void SendStreamMetaDataPacket() = 0;
 

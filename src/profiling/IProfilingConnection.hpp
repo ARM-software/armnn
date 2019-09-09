@@ -18,6 +18,8 @@ namespace profiling
 class IProfilingConnection
 {
 public:
+    virtual ~IProfilingConnection() {}
+
     virtual bool IsOpen() = 0;
 
     virtual void Close() =  0;

@@ -54,6 +54,12 @@ enum class ActivationFunction
     Square      = 9
 };
 
+enum class ArgMinMaxFunction
+{
+    Min = 0,
+    Max = 1
+};
+
 enum class PoolingAlgorithm
 {
     Max     = 0,

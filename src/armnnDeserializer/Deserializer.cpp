@@ -188,6 +188,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_AbsLayer]                    = &Deserializer::ParseAbs;
     m_ParserFunctions[Layer_ActivationLayer]             = &Deserializer::ParseActivation;
     m_ParserFunctions[Layer_AdditionLayer]               = &Deserializer::ParseAdd;
+    m_ParserFunctions[Layer_ArgMinMaxLayer]              = &Deserializer::ParseArgMinMax;
     m_ParserFunctions[Layer_BatchToSpaceNdLayer]         = &Deserializer::ParseBatchToSpaceNd;
     m_ParserFunctions[Layer_BatchNormalizationLayer]     = &Deserializer::ParseBatchNormalization;
     m_ParserFunctions[Layer_ConcatLayer]                 = &Deserializer::ParseConcat;
@@ -244,6 +245,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_ActivationLayer()->base();
         case Layer::Layer_AdditionLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
+        case Layer::Layer_ArgMinMaxLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ArgMinMaxLayer()->base();
         case Layer::Layer_BatchToSpaceNdLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_BatchToSpaceNdLayer()->base();
         case Layer::Layer_BatchNormalizationLayer:
@@ -398,6 +401,18 @@ armnn::ActivationFunction ToActivationFunction(armnnSerializer::ActivationFuncti
             return armnn::ActivationFunction::Square;
         default:
             return armnn::ActivationFunction::Sigmoid;
+    }
+}
+
+armnn::ArgMinMaxFunction ToArgMinMaxFunction(armnnSerializer::ArgMinMaxFunction function)
+{
+    switch (function)
+    {
+        case armnnSerializer::ArgMinMaxFunction::ArgMinMaxFunction_Max:
+            return armnn::ArgMinMaxFunction::Max;
+        case armnnSerializer::ArgMinMaxFunction::ArgMinMaxFunction_Min:
+        default:
+            return armnn::ArgMinMaxFunction::Min;
     }
 }
 
@@ -914,6 +929,32 @@ void Deserializer::ParseAdd(GraphPtr graph, unsigned int layerIndex)
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddAdditionLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseArgMinMax(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto serializerLayer = graph->layers()->Get(layerIndex)->layer_as_ArgMinMaxLayer();
+    auto serializerDescriptor = serializerLayer->descriptor();
+
+    armnn::ArgMinMaxDescriptor descriptor;
+    descriptor.m_Function = ToArgMinMaxFunction(serializerDescriptor->function());
+    descriptor.m_Axis = serializerDescriptor->axis();
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddArgMinMaxLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

@@ -49,6 +49,18 @@ serializer::ActivationFunction GetFlatBufferActivationFunction(armnn::Activation
     }
 }
 
+serializer::ArgMinMaxFunction GetFlatBufferArgMinMaxFunction(armnn::ArgMinMaxFunction function)
+{
+    switch (function)
+    {
+        case armnn::ArgMinMaxFunction::Max:
+            return serializer::ArgMinMaxFunction::ArgMinMaxFunction_Max;
+        case armnn::ArgMinMaxFunction::Min:
+        default:
+            return serializer::ArgMinMaxFunction::ArgMinMaxFunction_Min;
+    }
+}
+
 uint32_t SerializerVisitor::GetSerializedId(unsigned int guid)
 {
     std::pair<unsigned int, uint32_t> guidPair(guid, m_layerId);
@@ -154,8 +166,20 @@ void SerializerVisitor::VisitArgMinMaxLayer(const armnn::IConnectableLayer *laye
                                             const armnn::ArgMinMaxDescriptor& descriptor,
                                             const char *name)
 {
-    // This will be implemented in IVGCVSW-3724
-    throw UnimplementedException("SerializerVisitor::VisitArgMinMaxLayer is not implemented");
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_ArgMinMax);
+
+    // Create FlatBuffer Descriptor
+    auto flatBufferDescriptor = CreateArgMinMaxDescriptor(m_flatBufferBuilder,
+                                                          GetFlatBufferArgMinMaxFunction(descriptor.m_Function),
+                                                          descriptor.m_Axis);
+
+    // Create FlatBuffer ArgMinMaxLayer
+    auto flatBufferLayer = CreateArgMinMaxLayer(m_flatBufferBuilder,
+                                                flatBufferBaseLayer,
+                                                flatBufferDescriptor);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_ArgMinMaxLayer);
 }
 
 // Build FlatBuffer for BatchToSpaceNd Layer

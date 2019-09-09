@@ -9,6 +9,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Abs
 * Activation
 * Addition
+* ArgMinMax
 * BatchToSpaceNd
 * BatchNormalization
 * Concat

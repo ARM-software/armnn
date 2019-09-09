@@ -22,6 +22,11 @@ enum ActivationFunction : byte {
     Square = 9
 }
 
+enum ArgMinMaxFunction : byte {
+    Min = 0,
+    Max = 1
+}
+
 enum DataType : byte {
     Float16 = 0,
     Float32 = 1,
@@ -133,7 +138,8 @@ enum LayerType : uint {
     Resize = 43,
     Stack = 44,
     QuantizedLstm = 45,
-    Abs = 46
+    Abs = 46,
+    ArgMinMax = 47
 }
 
 // Base layer table to be used as part of other layers
@@ -169,6 +175,16 @@ table ActivationDescriptor {
 
 table AdditionLayer {
     base:LayerBase;
+}
+
+table ArgMinMaxLayer {
+    base:LayerBase;
+    descriptor:ArgMinMaxDescriptor;
+}
+
+table ArgMinMaxDescriptor{
+    function:ArgMinMaxFunction;
+    axis:int;
 }
 
 table ConstantLayer {
@@ -693,7 +709,8 @@ union Layer {
     TransposeConvolution2dLayer,
     ResizeLayer,
     StackLayer,
-    AbsLayer
+    AbsLayer,
+    ArgMinMaxLayer
 }
 
 table AnyLayer {

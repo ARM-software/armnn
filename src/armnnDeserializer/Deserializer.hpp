@@ -80,6 +80,7 @@ private:
     void ParseAbs(GraphPtr graph, unsigned int layerIndex);
     void ParseActivation(GraphPtr graph, unsigned int layerIndex);
     void ParseAdd(GraphPtr graph, unsigned int layerIndex);
+    void ParseArgMinMax(GraphPtr graph, unsigned int layerIndex);
     void ParseBatchToSpaceNd(GraphPtr graph, unsigned int layerIndex);
     void ParseBatchNormalization(GraphPtr graph, unsigned int layerIndex);
     void ParseConcat(GraphPtr graph, unsigned int layerIndex);

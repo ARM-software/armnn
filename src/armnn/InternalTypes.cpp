@@ -14,6 +14,7 @@ char const* GetLayerTypeAsCString(LayerType type)
 {
     switch (type)
     {
+        case LayerType::Abs: return "Abs";
         case LayerType::Activation: return "Activation";
         case LayerType::Addition: return "Addition";
         case LayerType::BatchNormalization: return "BatchNormalization";

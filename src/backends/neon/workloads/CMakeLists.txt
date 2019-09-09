@@ -4,6 +4,8 @@
 #
 
 list(APPEND armnnNeonBackendWorkloads_sources
+    NeonAbsWorkload.cpp
+    NeonAbsWorkload.hpp
     NeonActivationWorkload.cpp
     NeonActivationWorkload.hpp
     NeonAdditionWorkload.cpp

@@ -18,6 +18,7 @@
 
 #if defined(ARMCOMPUTENEON_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
+#include "workloads/NeonAbsWorkload.hpp"
 #include "workloads/NeonAdditionWorkload.hpp"
 #include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
@@ -107,6 +108,16 @@ inline bool IsWorkloadSupported(FuncType& func, Optional<std::string&> reasonIfU
 #endif
 
 } // anonymous namespace
+
+bool NeonLayerSupport::IsAbsSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonAbsWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
+}
 
 bool NeonLayerSupport::IsActivationSupported(const TensorInfo& input,
                                              const TensorInfo& output,

@@ -21,6 +21,7 @@ BACKEND_SOURCES := \
         NeonTensorHandleFactory.cpp \
         NeonTimer.cpp \
         NeonWorkloadFactory.cpp \
+        workloads/NeonAbsWorkload.cpp \
         workloads/NeonActivationWorkload.cpp \
         workloads/NeonAdditionWorkload.cpp \
         workloads/NeonBatchNormalizationWorkload.cpp \

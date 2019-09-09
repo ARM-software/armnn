@@ -4,6 +4,7 @@
 //
 
 #pragma once
+#include "NeonAbsWorkload.hpp"
 #include "NeonActivationWorkload.hpp"
 #include "NeonAdditionWorkload.hpp"
 #include "NeonBatchNormalizationWorkload.hpp"

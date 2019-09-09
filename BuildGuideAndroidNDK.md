@@ -196,13 +196,13 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 
 	```bash
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/testSharedObject
-	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/testSharedObject/ /data/local/tmp/src/backends/backendsCommon/test/testSharedObject/
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/testSharedObject/* /data/local/tmp/src/backends/backendsCommon/test/testSharedObject/
 
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/testDynamicBackend
-	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/testDynamicBackend/ /data/local/tmp/src/backends/backendsCommon/test/testDynamicBackend/
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/testDynamicBackend/* /data/local/tmp/src/backends/backendsCommon/test/testDynamicBackend/
 
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath1
-	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath1/ /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath1/
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath1/* /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath1/
 
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2
 	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath2/Arm_CpuAcc_backend.so /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath2/
@@ -215,15 +215,15 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath3
 
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath5
-	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath5/ /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath5/
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath5/* /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath5/
 
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath6
-	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath6/ /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath6/
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath6/* /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath6/
 
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath7
 
 	adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath9
-	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath9/ /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath9/
+	adb push -p ~/armnn-devenv/armnn/build/src/backends/backendsCommon/test/backendsTestPath9/* /data/local/tmp/src/backends/backendsCommon/test/backendsTestPath9/
 
 	adb shell mkdir -p /data/local/tmp/src/backends/dynamic/reference
 	adb push -p ~/armnn-devenv/armnn/build/src/backends/dynamic/reference/Arm_CpuRef_backend.so /data/local/tmp/src/backends/dynamic/reference/

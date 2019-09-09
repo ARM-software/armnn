@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
+#include <backendsCommon/test/AbsEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
@@ -20,6 +21,13 @@ BOOST_AUTO_TEST_SUITE(ClEndToEnd)
 
 std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::GpuAcc};
 
+// Abs
+BOOST_AUTO_TEST_CASE(ClAbsEndToEndTestFloat32)
+{
+    AbsEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+// Constant
 BOOST_AUTO_TEST_CASE(ConstantUsage_Cl_Float32)
 {
     ConstantUsageFloat32Test(defaultBackends);

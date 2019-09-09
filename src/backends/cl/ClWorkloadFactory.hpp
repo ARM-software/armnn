@@ -42,6 +42,9 @@ public:
     std::unique_ptr<IWorkload> CreateOutput(const OutputQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateAbs(const AbsQueueDescriptor& descriptor,
+                                         const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                 const WorkloadInfo& info) const override;
 

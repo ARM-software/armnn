@@ -767,6 +767,12 @@ ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dUint8Nhwc,
                      MultiChannelTransposeConvolution2dTest<DataType::QuantisedAsymm8, DataType::Signed32>,
                      DataLayout::NHWC)
 
+// Abs
+ARMNN_AUTO_TEST_CASE(Abs2d, Abs2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Abs3d, Abs3dTest<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE(AbsZero, AbsZeroTest<DataType::Float32>)
+
 #if defined(ARMNNREF_ENABLED)
 
 // The ARMNN_COMPARE_REF_AUTO_TEST_CASE and the ARMNN_COMPARE_REF_FIXTURE_TEST_CASE test units are not available

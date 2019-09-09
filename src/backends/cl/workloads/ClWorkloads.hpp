@@ -4,6 +4,7 @@
 //
 
 #pragma once
+#include "ClAbsWorkload.hpp"
 #include "ClActivationWorkload.hpp"
 #include "ClAdditionWorkload.hpp"
 #include "ClConstantWorkload.hpp"

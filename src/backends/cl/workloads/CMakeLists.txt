@@ -4,6 +4,8 @@
 #
 
 list(APPEND armnnClBackendWorkloads_sources
+    ClAbsWorkload.cpp
+    ClAbsWorkload.hpp
     ClActivationWorkload.cpp
     ClActivationWorkload.hpp
     ClAdditionWorkload.cpp

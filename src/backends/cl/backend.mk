@@ -22,6 +22,7 @@ BACKEND_SOURCES := \
         ClTensorHandleFactory.cpp \
         ClWorkloadFactory.cpp \
         OpenClTimer.cpp \
+        workloads/ClAbsWorkload.cpp \
         workloads/ClActivationWorkload.cpp \
         workloads/ClAdditionWorkload.cpp \
         workloads/ClBatchNormalizationFloatWorkload.cpp \

@@ -16,6 +16,7 @@
 
 #if defined(ARMCOMPUTECL_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
+#include "workloads/ClAbsWorkload.hpp"
 #include "workloads/ClAdditionWorkload.hpp"
 #include "workloads/ClActivationWorkload.hpp"
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
@@ -138,6 +139,16 @@ bool IsSupportedForDataTypeCl(Optional<std::string&> reasonIfUnsupported,
 }
 
 } // anonymous namespace
+
+bool ClLayerSupport::IsAbsSupported(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClAbsWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
+}
 
 bool ClLayerSupport::IsActivationSupported(const TensorInfo& input,
                                            const TensorInfo& output,

@@ -136,6 +136,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateOutput(const OutputQueueDesc
     return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
+                                                        const WorkloadInfo&       info) const
+{
+    return MakeWorkload<ClAbsWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                const WorkloadInfo&              info) const
 {

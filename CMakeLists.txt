@@ -825,6 +825,8 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/GatordMockMain.cpp
         tests/profiling/CommandLineProcessor.hpp
         tests/profiling/CommandLineProcessor.cpp
+        tests/profiling/GatordMockService.hpp
+        tests/profiling/GatordMockService.cpp
         )
 
     include_directories( ${Boost_INCLUDE_DIRS} )

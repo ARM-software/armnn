@@ -21,7 +21,11 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char *argv[])
     po::options_description desc("Options");
     try
     {
-        desc.add_options()("help,h", "Display help messages");
+        desc.add_options()
+                ("help,h", "Display help messages")
+                ("namespace,n", po::value<std::string>(&m_UdsNamespace)->default_value("gatord_namespace"),
+                                "The Unix domain socket namespace this server will bind to.\n"
+                                "This will always be prepended with \\0 to use the abstract namespace");
     }
     catch (const std::exception& e)
     {
@@ -34,7 +38,7 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char *argv[])
     {
         po::store(po::parse_command_line(argc, argv, desc), vm);
 
-        if (vm.count("help") || argc <= 1)
+        if (vm.count("help"))
         {
             std::cout << "Simulate a Gatord server to interact with ArmNN external profiling." << std::endl;
             std::cout << std::endl;

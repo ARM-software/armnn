@@ -528,10 +528,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefStackWorkload>(descriptor, info);
 }
 

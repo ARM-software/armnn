@@ -1335,11 +1335,12 @@ ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dInt16Nhwc,
                      DataLayout::NCHW)
 
 // Stack
-ARMNN_AUTO_TEST_CASE(Stack0Axis,               Stack0AxisTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Stack4dOutput1Axis,       Stack4dOutput1AxisTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Stack4dOutput2Axis,       Stack4dOutput2AxisTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Stack4dOutput3Axis,       Stack4dOutput3AxisTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Stack3dOutput1Axis3Input, Stack3dOutput1Axis3InputTest<DataType::Float32>)
-ARMNN_AUTO_TEST_CASE(Stack5dOutput,            Stack5dOutputTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Stack0Axis,           StackAxis0Float32Test)
+ARMNN_AUTO_TEST_CASE(StackOutput4DAxis1,   StackOutput4DAxis1Float32Test)
+ARMNN_AUTO_TEST_CASE(StackOutput4DAxis2,   StackOutput4DAxis2Float32Test)
+ARMNN_AUTO_TEST_CASE(StackOutput4DAxis3,   StackOutput4DAxis3Float32Test)
+ARMNN_AUTO_TEST_CASE(StackOutput3DInputs3, StackOutput3DInputs3Float32Test)
+ARMNN_AUTO_TEST_CASE(StackOutput5D,        StackOutput5DFloat32Test)
+ARMNN_AUTO_TEST_CASE(StackFloat16,         StackFloat16Test)
 
 BOOST_AUTO_TEST_SUITE_END()

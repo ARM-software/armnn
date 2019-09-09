@@ -875,6 +875,13 @@ BOOST_AUTO_TEST_CASE(CreateStackFloat32Workload)
     NeonCreateStackWorkloadTest<armnn::DataType::Float32>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
 
+#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+BOOST_AUTO_TEST_CASE(CreateStackFloat16Workload)
+{
+    NeonCreateStackWorkloadTest<armnn::DataType::Float16>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
+}
+#endif
+
 BOOST_AUTO_TEST_CASE(CreateStackUint8Workload)
 {
     NeonCreateStackWorkloadTest<armnn::DataType::QuantisedAsymm8>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);

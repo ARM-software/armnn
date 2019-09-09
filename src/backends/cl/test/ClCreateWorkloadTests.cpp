@@ -976,6 +976,11 @@ BOOST_AUTO_TEST_CASE(CreateStackFloat32Workload)
     ClCreateStackWorkloadTest<armnn::DataType::Float32>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
 
+BOOST_AUTO_TEST_CASE(CreateStackFloat16Workload)
+{
+    ClCreateStackWorkloadTest<armnn::DataType::Float16>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
+}
+
 BOOST_AUTO_TEST_CASE(CreateStackUint8Workload)
 {
     ClCreateStackWorkloadTest<armnn::DataType::QuantisedAsymm8>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);

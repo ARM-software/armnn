@@ -1481,9 +1481,10 @@ bool RefLayerSupport::IsStackSupported(const std::vector<const TensorInfo*>& inp
     ignore_unused(descriptor);
 
     bool supported = true;
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType,4> supportedTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };

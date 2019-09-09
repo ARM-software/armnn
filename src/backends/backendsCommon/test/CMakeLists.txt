@@ -113,6 +113,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/SpaceToDepthTestImpl.hpp
     layerTests/SplitterTestImpl.cpp
     layerTests/SplitterTestImpl.hpp
+    layerTests/StackTestImpl.cpp
     layerTests/StackTestImpl.hpp
     layerTests/StridedSliceTestImpl.cpp
     layerTests/StridedSliceTestImpl.hpp

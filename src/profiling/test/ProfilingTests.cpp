@@ -365,93 +365,107 @@ void CaptureDataWriteThreadImpl(Holder &holder, uint32_t capturePeriod, std::vec
     holder.SetCaptureData(capturePeriod, counterIds);
 }
 
-void CaptureDataReadThreadImpl(Holder &holder, CaptureData& captureData)
+void CaptureDataReadThreadImpl(const Holder& holder, CaptureData& captureData)
 {
     captureData = holder.GetCaptureData();
 }
 
 BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
 {
-    std::vector<uint16_t> counterIds1 = {};
-    uint32_t capturePeriod1(1);
-    std::vector<uint16_t> counterIds2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    uint32_t capturePeriod2(2);
-    std::vector<uint16_t> counterIds3 = {4, 5, 5, 6};
-    uint32_t capturePeriod3(3);
+    std::map<uint32_t, std::vector<uint16_t>> periodIdMap;
+    std::vector<uint16_t> counterIds;
+    uint16_t numThreads = 50;
+    for (uint16_t i = 0; i < numThreads; ++i)
+    {
+        counterIds.emplace_back(i);
+        periodIdMap.insert(std::make_pair(i, counterIds));
+    }
 
     // Check CaptureData functions
     CaptureData capture;
     BOOST_CHECK(capture.GetCapturePeriod() == 0);
     BOOST_CHECK((capture.GetCounterIds()).empty());
-    capture.SetCapturePeriod(capturePeriod2);
-    capture.SetCounterIds(counterIds2);
-    BOOST_CHECK(capture.GetCapturePeriod() == capturePeriod2);
-    BOOST_CHECK(capture.GetCounterIds() == counterIds2);
+    capture.SetCapturePeriod(0);
+    capture.SetCounterIds(periodIdMap[0]);
+    BOOST_CHECK(capture.GetCapturePeriod() == 0);
+    BOOST_CHECK(capture.GetCounterIds() == periodIdMap[0]);
 
     Holder holder;
     BOOST_CHECK((holder.GetCaptureData()).GetCapturePeriod() == 0);
     BOOST_CHECK(((holder.GetCaptureData()).GetCounterIds()).empty());
 
     // Check Holder functions
-    std::thread thread1(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod3, std::ref(counterIds3));
+    std::thread thread1(CaptureDataWriteThreadImpl, std::ref(holder), 2, std::ref(periodIdMap[2]));
     thread1.join();
 
-    BOOST_CHECK((holder.GetCaptureData()).GetCapturePeriod() == capturePeriod3);
-    BOOST_CHECK((holder.GetCaptureData()).GetCounterIds() == counterIds3);
+    BOOST_CHECK((holder.GetCaptureData()).GetCapturePeriod() == 2);
+    BOOST_CHECK((holder.GetCaptureData()).GetCounterIds() == periodIdMap[2]);
 
     CaptureData captureData;
     std::thread thread2(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData));
     thread2.join();
-    BOOST_CHECK(captureData.GetCounterIds() == counterIds3);
+    BOOST_CHECK(captureData.GetCounterIds() == periodIdMap[2]);
 
-    std::thread thread3(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod2, std::ref(counterIds1));
-    std::thread thread4(CaptureDataWriteThreadImpl, std::ref(holder), capturePeriod1, std::ref(counterIds2));
-    thread3.join();
-    thread4.join();
+    std::vector<std::thread> threadsVect;
+    for (int i = 0; i < numThreads; i+=2)
+    {
+        threadsVect.emplace_back(std::thread(CaptureDataWriteThreadImpl,
+                                 std::ref(holder),
+                                 i,
+                                 std::ref(periodIdMap[static_cast<uint16_t >(i)])));
 
-    std::thread thread5(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData));
-    thread5.join();
+        threadsVect.emplace_back(std::thread(CaptureDataReadThreadImpl,
+                                 std::ref(holder),
+                                 std::ref(captureData)));
+    }
+
+    for (uint16_t i = 0; i < numThreads; ++i)
+    {
+        threadsVect[i].join();
+    }
+
+    std::vector<std::thread> readThreadsVect;
+    for (uint16_t i = 0; i < numThreads; ++i)
+    {
+        readThreadsVect.emplace_back(
+                std::thread(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData)));
+    }
+
+    for (uint16_t i = 0; i < numThreads; ++i)
+    {
+        readThreadsVect[i].join();
+    }
 
     // Check CaptureData was written/read correctly from multiple threads
     std::vector<uint16_t> captureIds = captureData.GetCounterIds();
     uint32_t capturePeriod = captureData.GetCapturePeriod();
-    if (captureIds == counterIds1)
-    {
-        BOOST_CHECK(capturePeriod == capturePeriod2);
-    }
-    else if (captureIds == counterIds2)
-    {
-        BOOST_CHECK(capturePeriod == capturePeriod1);
-    }
-    else
-    {
-        BOOST_ERROR("Error in CaptureData read/write.");
-    }
+
+    BOOST_CHECK(captureIds == periodIdMap[capturePeriod]);
 
     std::vector<uint16_t> readIds = holder.GetCaptureData().GetCounterIds();
-    BOOST_CHECK(readIds == counterIds1 || readIds == counterIds2);
+    BOOST_CHECK(captureIds == readIds);
 
     // Check assignment operator
     CaptureData assignableCaptureData;
-    assignableCaptureData.SetCapturePeriod(capturePeriod3);
-    assignableCaptureData.SetCounterIds(counterIds3);
+    assignableCaptureData.SetCapturePeriod(3);
+    assignableCaptureData.SetCounterIds(periodIdMap[3]);
 
     CaptureData secondCaptureData;
-    secondCaptureData.SetCapturePeriod(capturePeriod2);
-    secondCaptureData.SetCounterIds(counterIds2);
+    secondCaptureData.SetCapturePeriod(2);
+    secondCaptureData.SetCounterIds(periodIdMap[2]);
 
     BOOST_CHECK(secondCaptureData.GetCapturePeriod() == 2);
-    BOOST_CHECK(secondCaptureData.GetCounterIds() == counterIds2);
+    BOOST_CHECK(secondCaptureData.GetCounterIds() == periodIdMap[2]);
 
     secondCaptureData = assignableCaptureData;
     BOOST_CHECK(secondCaptureData.GetCapturePeriod() == 3);
-    BOOST_CHECK(secondCaptureData.GetCounterIds() == counterIds3);
+    BOOST_CHECK(secondCaptureData.GetCounterIds() == periodIdMap[3]);
 
     // Check copy constructor
     CaptureData copyConstructedCaptureData(assignableCaptureData);
 
     BOOST_CHECK(copyConstructedCaptureData.GetCapturePeriod() == 3);
-    BOOST_CHECK(copyConstructedCaptureData.GetCounterIds() == counterIds3);
+    BOOST_CHECK(copyConstructedCaptureData.GetCounterIds() == periodIdMap[3]);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)
@@ -462,7 +476,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)
     service.Run();
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
 }
-
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
 {

@@ -5,6 +5,7 @@
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
+#include <backendsCommon/test/AbsEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
@@ -24,6 +25,23 @@ BOOST_AUTO_TEST_SUITE(RefEndToEnd)
 
 std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuRef};
 
+// Abs
+BOOST_AUTO_TEST_CASE(RefAbsEndToEndTestFloat32)
+{
+    AbsEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefAbsEndToEndTestUint8)
+{
+    AbsEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefAbsEndToEndTestInt16)
+{
+    AbsEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends);
+}
+
+// Constant
 BOOST_AUTO_TEST_CASE(ConstantUsage_Ref_Float32)
 {
     BOOST_TEST(ConstantUsageFloat32Test(defaultBackends));

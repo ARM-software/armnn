@@ -4,6 +4,7 @@
 #
 
 list(APPEND armnnBackendsCommonUnitTests_sources
+    AbsEndToEndTestImpl.hpp
     ActivationFixture.hpp
     BackendIdTests.cpp
     BackendRegistryTests.cpp

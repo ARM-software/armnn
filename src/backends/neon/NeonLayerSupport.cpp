@@ -42,6 +42,7 @@
 #include "workloads/NeonQuantizeWorkload.hpp"
 #include "workloads/NeonQuantizedLstmWorkload.hpp"
 #include "workloads/NeonResizeWorkload.hpp"
+#include "workloads/NeonRsqrtWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
 #include "workloads/NeonSplitterWorkload.hpp"
@@ -545,6 +546,13 @@ bool NeonLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
     descriptor.m_TargetWidth  = outputShape[3];
 
     return IsResizeSupported(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsRsqrtSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonRsqrtWorkloadValidate, reasonIfUnsupported, input, output);
 }
 
 bool NeonLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

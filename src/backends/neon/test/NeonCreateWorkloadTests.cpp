@@ -181,6 +181,36 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationUint8Workload)
                                       DataType::QuantisedAsymm8>();
 }
 
+template <typename WorkloadType,
+          typename DescriptorType,
+          typename LayerType,
+          armnn::DataType DataType>
+static void NeonCreateElementwiseUnaryWorkloadTest()
+{
+    Graph graph;
+    NeonWorkloadFactory factory =
+        NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload = CreateElementwiseUnaryWorkloadTest
+        <WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
+
+    DescriptorType queueDescriptor = workload->GetData();
+
+    auto inputHandle  = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = boost::polymorphic_downcast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
+
+    BOOST_TEST(TestNeonTensorHandleInfo(inputHandle, TensorInfo({2, 3}, DataType)));
+    BOOST_TEST(TestNeonTensorHandleInfo(outputHandle, TensorInfo({2, 3}, DataType)));
+}
+
+BOOST_AUTO_TEST_CASE(CreateRsqrtFloat32Workload)
+{
+    NeonCreateElementwiseUnaryWorkloadTest<NeonRsqrtWorkload,
+                                           RsqrtQueueDescriptor,
+                                           RsqrtLayer,
+                                           DataType::Float32>();
+}
+
 template <typename BatchNormalizationWorkloadType, typename armnn::DataType DataType>
 static void NeonCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
 {

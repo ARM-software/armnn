@@ -401,7 +401,7 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDebug(const DebugQueueDesc
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor &descriptor,
                                                             const WorkloadInfo &info) const
 {
-    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+    return std::make_unique<NeonRsqrtWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateTransposeConvolution2d(

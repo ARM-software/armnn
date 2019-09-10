@@ -42,6 +42,7 @@
 #include "workloads/ClPooling2dWorkload.hpp"
 #include "workloads/ClPreluWorkload.hpp"
 #include "workloads/ClResizeWorkload.hpp"
+#include "workloads/ClRsqrtWorkload.hpp"
 #include "workloads/ClQuantizedLstmWorkload.hpp"
 #include "workloads/ClQuantizeWorkload.hpp"
 #include "workloads/ClSoftmaxBaseWorkload.hpp"
@@ -599,6 +600,13 @@ bool ClLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
     descriptor.m_TargetWidth  = outputShape[3];
 
     return IsResizeSupported(input, output, descriptor, reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsRsqrtSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClRsqrtWorkloadValidate, reasonIfUnsupported, input, output);
 }
 
 bool ClLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

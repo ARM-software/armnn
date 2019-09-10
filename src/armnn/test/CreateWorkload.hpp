@@ -129,6 +129,32 @@ std::unique_ptr<WorkloadType> CreateElementwiseWorkloadTest(armnn::IWorkloadFact
     return workload;
 }
 
+template <typename WorkloadType,
+          typename DescriptorType,
+          typename LayerType,
+          armnn::DataType DataType>
+std::unique_ptr<WorkloadType> CreateElementwiseUnaryWorkloadTest(armnn::IWorkloadFactory & factory,
+                                                                 armnn::Graph & graph)
+{
+    Layer* const layer = graph.AddLayer<LayerType>("layer");
+
+    Layer* const input  = graph.AddLayer<InputLayer>(0, "input");
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    armnn::TensorInfo tensorInfo({ 2, 3 }, DataType);
+    Connect(input, layer, tensorInfo, 0, 0);
+    Connect(layer, output, tensorInfo, 0, 0);
+    CreateTensorHandles(graph, factory);
+
+    auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, graph, factory);
+    DescriptorType queueDescriptor = workload->GetData();
+
+    BOOST_TEST(queueDescriptor.m_Inputs.size()  == 1);
+    BOOST_TEST(queueDescriptor.m_Outputs.size() == 1);
+
+    return workload;
+}
+
 template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>
 std::unique_ptr<BatchNormalizationWorkloadType> CreateBatchNormalizationWorkloadTest(
     armnn::IWorkloadFactory& factory, armnn::Graph& graph, DataLayout dataLayout = DataLayout::NCHW)

@@ -640,6 +640,12 @@ ARMNN_AUTO_TEST_CASE(ResizeNearestNeighborMagUint8Nhwc,
                      ResizeNearestNeighborMagTest<DataType::QuantisedAsymm8>,
                      DataLayout::NHWC, 0.1f, 50, 0.1f, 50)
 
+// Rsqrt
+ARMNN_AUTO_TEST_CASE(Rsqrt2d, Rsqrt2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(Rsqrt3d, Rsqrt3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(RsqrtZero, RsqrtZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(RsqrtNegative, RsqrtNegativeTest<DataType::Float32>)
+
 // Quantize
 ARMNN_AUTO_TEST_CASE(QuantizeSimpleUint8, QuantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(QuantizeClampUint8, QuantizeClampUint8Test)

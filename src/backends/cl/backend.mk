@@ -53,6 +53,7 @@ BACKEND_SOURCES := \
         workloads/ClQuantizeWorkload.cpp \
         workloads/ClReshapeWorkload.cpp \
         workloads/ClResizeWorkload.cpp \
+        workloads/ClRsqrtWorkload.cpp \
         workloads/ClSoftmaxBaseWorkload.cpp \
         workloads/ClSoftmaxFloatWorkload.cpp \
         workloads/ClSoftmaxUint8Workload.cpp \

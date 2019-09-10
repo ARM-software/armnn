@@ -33,6 +33,7 @@
 #include "ClQuantizedLstmWorkload.hpp"
 #include "ClReshapeWorkload.hpp"
 #include "ClResizeWorkload.hpp"
+#include "ClRsqrtWorkload.hpp"
 #include "ClSoftmaxFloatWorkload.hpp"
 #include "ClSoftmaxUint8Workload.hpp"
 #include "ClSpaceToBatchNdWorkload.hpp"

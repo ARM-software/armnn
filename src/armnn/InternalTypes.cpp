@@ -17,6 +17,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Abs: return "Abs";
         case LayerType::Activation: return "Activation";
         case LayerType::Addition: return "Addition";
+        case LayerType::ArgMinMax: return "ArgMinMax";
         case LayerType::BatchNormalization: return "BatchNormalization";
         case LayerType::BatchToSpaceNd: return "BatchToSpaceNd";
         case LayerType::Concat: return "Concat";

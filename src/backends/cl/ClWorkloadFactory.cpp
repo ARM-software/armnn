@@ -170,8 +170,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMerger(const MergerQu
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClFullyConnectedWorkload, ClFullyConnectedWorkload>(descriptor, info,
-                                                                            m_MemoryManager->GetIntraLayerManager());
+    return MakeWorkload<ClFullyConnectedWorkload>(descriptor, info, m_MemoryManager->GetIntraLayerManager());
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
@@ -213,7 +212,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDetectionPostProcess(
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {
-    return std::make_unique<ClDequantizeWorkload>(descriptor, info);
+    return MakeWorkload<ClDequantizeWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
@@ -260,7 +259,7 @@ std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMemCopy(const MemCopy
         throw InvalidArgumentException("ClWorkloadFactory: Invalid null input for MemCopy workload");
     }
 
-    return MakeWorkload<CopyMemGenericWorkload, CopyMemGenericWorkload>(descriptor, info);
+    return MakeWorkload<CopyMemGenericWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& descriptor,
@@ -300,13 +299,13 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFakeQuantization(
     const FakeQuantizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    return nullptr;
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> ClWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                                                     const WorkloadInfo& info) const
 {
-    return std::make_unique<ClQuantizeWorkload>(descriptor, info);
+    return MakeWorkload<ClQuantizeWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
@@ -374,7 +373,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMaximum(const MaximumQueueDe
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    return std::make_unique<ClMeanWorkload>(descriptor, info);
+    return MakeWorkload<ClMeanWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,

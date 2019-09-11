@@ -100,8 +100,9 @@ bool RefLayerSupport::IsActivationSupported(const TensorInfo& input,
    bool supported = true;
 
     // Define supported types.
-    std::array<DataType,3> supportedTypes = {
+    std::array<DataType,4> supportedTypes = {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -162,8 +163,9 @@ bool RefLayerSupport::IsAdditionSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,3> supportedTypes = {
+    std::array<DataType,4> supportedTypes = {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -375,8 +377,9 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType,3> supportedTypes = {
+    std::array<DataType,4> supportedTypes = {
             DataType::Float32,
+            DataType::Float16,
             DataType::QuantisedAsymm8,
             DataType::QuantisedSymm16
     };
@@ -398,8 +401,9 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
 
     if (biases.has_value())
     {
-        std::array<DataType,2> biasesSupportedTypes = {
+        std::array<DataType,3> biasesSupportedTypes = {
                 DataType::Float32,
+                DataType::Float16,
                 DataType::Signed32
         };
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
@@ -445,9 +449,10 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType,4> supportedTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -469,9 +474,10 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
 
     if (biases.has_value())
     {
-        std::array<DataType,2> biasesSupportedTypes =
+        std::array<DataType,3> biasesSupportedTypes =
         {
             DataType::Float32,
+            DataType::Float16,
             DataType::Signed32
         };
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
@@ -656,9 +662,10 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType,4> supportedTypes =
     {
             DataType::Float32,
+            DataType::Float16,
             DataType::QuantisedAsymm8,
             DataType::QuantisedSymm16
     };
@@ -681,10 +688,11 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
     if (descriptor.m_BiasEnabled)
     {
         // Defined supported types for bias
-        std::array<DataType, 2>
+        std::array<DataType, 3>
         supportedBiasTypes =
         {
             DataType::Float32,
+            DataType::Float16,
             DataType::Signed32
         };
 
@@ -772,9 +780,10 @@ bool RefLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
 {
     ignore_unused(descriptor);
     // Define supported types
-    std::array<DataType, 3> supportedTypes =
+    std::array<DataType, 4> supportedTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -950,9 +959,10 @@ bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
     std::string meanLayerStr = "Mean";
     std::string outputTensorStr = "output";
 
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType,4> supportedTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -1077,8 +1087,9 @@ bool RefLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
 {
     bool supported = true;
 
-    std::array<DataType,3> supportedTypes = {
+    std::array<DataType,4> supportedTypes = {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -1150,9 +1161,10 @@ bool RefLayerSupport::IsPadSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported output and inputs types.
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType,4> supportedTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -1206,9 +1218,10 @@ bool RefLayerSupport::IsPooling2dSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported output and inputs types.
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType,4> supportedTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };
@@ -1606,9 +1619,10 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
 {
     bool supported = true;
 
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType,4> supportedTypes =
     {
             DataType::Float32,
+            DataType::Float16,
             DataType::QuantisedAsymm8,
             DataType::QuantisedSymm16
     };
@@ -1630,9 +1644,10 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
 
     if (biases.has_value())
     {
-        std::array<DataType,2> biasesSupportedTypes =
+        std::array<DataType,3> biasesSupportedTypes =
         {
                 DataType::Float32,
+                DataType::Float16,
                 DataType::Signed32
         };
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,

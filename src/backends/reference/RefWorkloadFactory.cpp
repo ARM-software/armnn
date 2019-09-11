@@ -131,10 +131,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateOutput(const OutputQueueDes
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                 const WorkloadInfo&              info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefActivationWorkload>(descriptor, info);
 }
 
@@ -184,10 +180,6 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const Permut
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
                                                                       const WorkloadInfo&           info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefPooling2dWorkload>(descriptor, info);
 }
 
@@ -218,20 +210,12 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateNormalization(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
                                                                      const WorkloadInfo&            info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefAdditionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMultiplication(
     const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefMultiplicationWorkload>(descriptor, info);
 }
 
@@ -293,10 +277,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefL2NormalizationWorkload>(descriptor, info);
 }
 
@@ -401,10 +381,6 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMaximum(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
     const MeanQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return  std::make_unique<RefMeanWorkload>(descriptor, info);
 }
 
@@ -424,6 +400,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescripto
     if (IsQSymm16(info))
     {
         return std::make_unique<RefPadQSymm16Workload>(descriptor, info);
+    }
+    else if (IsFloat16(info))
+    {
+        return std::make_unique<RefPadFloat16Workload>(descriptor, info);
     }
     return MakeWorkload<RefPadFloat32Workload, RefPadQAsymm8Workload>(descriptor, info);
 }
@@ -518,10 +498,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
     const TransposeConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefTransposeConvolution2dWorkload>(descriptor, info);
 }
 

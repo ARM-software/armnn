@@ -158,6 +158,12 @@ template void Pad<float>(const TensorInfo& inputInfo,
                          const float* inputData,
                          float* outData,
                          const float padValue);
+template void Pad<Half>(const TensorInfo& inputInfo,
+                        const TensorInfo& outputInfo,
+                        std::vector<std::pair<unsigned int, unsigned int>> m_PadList,
+                        const Half* inputData,
+                        Half* outData,
+                        const float padValue);
 template void Pad<uint8_t>(const TensorInfo& inputInfo,
                            const TensorInfo& outputInfo,
                            std::vector<std::pair<unsigned int, unsigned int>> m_PadList,

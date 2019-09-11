@@ -55,7 +55,10 @@ public:
         return m_HasValue;
     }
 
-    operator bool() const noexcept
+    /// Conversion to bool, so can be used in if-statements and similar contexts expecting a bool.
+    /// Note this is explicit so that it doesn't get implicitly converted to a bool in unwanted cases,
+    /// for example "Optional<TypeA> == Optional<TypeB>" should not compile.
+    explicit operator bool() const noexcept
     {
         return has_value();
     }
@@ -278,6 +281,21 @@ public:
     template<class... Args>
     explicit Optional(ConstructInPlace, Args&&... args) :
         BaseSwitch(CONSTRUCT_IN_PLACE, std::forward<Args>(args)...) {}
+
+    /// Two optionals are considered equal if they are both empty or both contain values which
+    /// themselves are considered equal (via their own == operator).
+    bool operator==(const Optional<T>& rhs) const
+    {
+        if (!this->has_value() && !rhs.has_value())
+        {
+            return true;
+        }
+        if (this->has_value() && rhs.has_value() && this->value() == rhs.value())
+        {
+            return true;
+        }
+        return false;
+    }
 };
 
 // Utility template that constructs an object of type T in-place and wraps

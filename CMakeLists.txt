@@ -434,6 +434,7 @@ list(APPEND armnn_sources
     src/profiling/ProfilingConnectionFactory.cpp
     src/profiling/ProfilingConnectionFactory.hpp
     src/profiling/IBufferWrapper.hpp
+    src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/ISendCounterPacket.hpp
     src/profiling/SendCounterPacket.hpp
     src/profiling/SendCounterPacket.cpp

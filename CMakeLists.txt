@@ -550,6 +550,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/UtilsTests.cpp
         src/armnnUtils/test/PrototxtConversionsTest.cpp
         src/armnnUtils/test/ParserHelperTest.cpp
+        src/armnnUtils/test/TensorUtilsTest.cpp
         src/profiling/test/ProfilingTests.cpp
         src/profiling/test/SendCounterPacketTests.cpp
         )

@@ -779,6 +779,11 @@ ARMNN_AUTO_TEST_CASE(Abs3d, Abs3dTest<DataType::Float32>)
 
 ARMNN_AUTO_TEST_CASE(AbsZero, AbsZeroTest<DataType::Float32>)
 
+ARMNN_AUTO_TEST_CASE(Abs2dFloat16, Abs2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(Abs3dFloat16, Abs3dTest<DataType::Float16>)
+
+ARMNN_AUTO_TEST_CASE(AbsZeroFloat16, AbsZeroTest<DataType::Float16>)
+
 #if defined(ARMNNREF_ENABLED)
 
 // The ARMNN_COMPARE_REF_AUTO_TEST_CASE and the ARMNN_COMPARE_REF_FIXTURE_TEST_CASE test units are not available

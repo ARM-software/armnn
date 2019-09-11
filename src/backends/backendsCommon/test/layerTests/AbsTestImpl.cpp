@@ -210,6 +210,11 @@ Abs2dTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 2>
+Abs2dTest<armnn::DataType::Float16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 2>
 Abs2dTest<armnn::DataType::QuantisedAsymm8>(
     armnn::IWorkloadFactory& workloadFactory,
@@ -225,6 +230,11 @@ Abs3dTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 3>
+Abs3dTest<armnn::DataType::Float16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 3>
 Abs3dTest<armnn::DataType::QuantisedAsymm8>(
     armnn::IWorkloadFactory& workloadFactory,
@@ -237,5 +247,10 @@ Abs3dTest<armnn::DataType::QuantisedSymm16>(
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 2>
 AbsZeroTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 2>
+AbsZeroTest<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

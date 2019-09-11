@@ -38,7 +38,6 @@ list(APPEND armnnBackendsCommon_sources
     TensorHandleFactoryRegistry.hpp
     WorkloadDataCollector.hpp
     WorkloadData.cpp
-    WorkloadDataFwd.hpp
     WorkloadData.hpp
     WorkloadFactory.cpp
     WorkloadFactory.hpp

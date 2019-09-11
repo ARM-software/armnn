@@ -5,7 +5,6 @@
 #pragma once
 
 #include "CpuTensorHandleFwd.hpp"
-#include "WorkloadDataFwd.hpp"
 
 #include <InternalTypes.hpp>
 

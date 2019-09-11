@@ -12,8 +12,6 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 
-#include <backendsCommon/WorkloadDataFwd.hpp>
-
 #include <memory>
 #include <set>
 #include <string>

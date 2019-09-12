@@ -7,10 +7,16 @@
 
 #include "LayerTestResult.hpp"
 
+#include <Half.hpp>
+
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-LayerTestResult<float, 1> Gather1dParamsFloatTest(
+LayerTestResult<float, 1> Gather1dParamsFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 1> Gather1dParamsFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -22,7 +28,11 @@ LayerTestResult<int16_t, 1> Gather1dParamsInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 2> GatherMultiDimParamsFloatTest(
+LayerTestResult<float, 2> GatherMultiDimParamsFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 2> GatherMultiDimParamsFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -34,7 +44,11 @@ LayerTestResult<int16_t, 2> GatherMultiDimParamsInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 4> GatherMultiDimParamsMultiDimIndicesFloatTest(
+LayerTestResult<float, 4> GatherMultiDimParamsMultiDimIndicesFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> GatherMultiDimParamsMultiDimIndicesFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

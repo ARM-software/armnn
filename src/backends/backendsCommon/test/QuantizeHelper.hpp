@@ -8,6 +8,8 @@
 #include <armnn/ArmNN.hpp>
 #include <armnn/TypesUtils.hpp>
 
+#include <Half.hpp>
+
 #include <initializer_list>
 #include <iterator>
 #include <vector>
@@ -39,6 +41,22 @@ struct SelectiveQuantizer<T, false>
     }
 
     static float Dequantize(T value, float scale, int32_t offset)
+    {
+        boost::ignore_unused(scale, offset);
+        return value;
+    }
+};
+
+template<>
+struct SelectiveQuantizer<armnn::Half, false>
+{
+    static armnn::Half Quantize(float value, float scale, int32_t offset)
+    {
+        boost::ignore_unused(scale, offset);
+        return armnn::Half(value);
+    }
+
+    static float Dequantize(armnn::Half value, float scale, int32_t offset)
     {
         boost::ignore_unused(scale, offset);
         return value;

@@ -149,67 +149,6 @@ BOOST_AUTO_TEST_CASE(OptimizeValidateWorkloadsCpuRefMeanLayer)
     }
 }
 
-BOOST_AUTO_TEST_CASE(FP16TurboModeTestOnCpuRef)
-{
-    // Test to check when FP16 Turbo mode set
-    // it converts the FP32 network to FP16 Network
-    // add FP32ToFP16 conversion layer after the InputLayer
-    // add FP16ToFP32 conversion layer after the OutputLayer
-    // checks the other layers if they are supported in FP16
-    // if they are not put the conversion layers before and after
-    // if they are not supported in FP16 use FP32 instead
-    // if there are inverse conversion layers remove them with optimization
-    // at the moment FloorLayer is not supported in FP16 so it rolls back to FP32
-    // and inverse conversion layers are removed by the optimizer
-    armnn::Network net;
-
-    // Defines layers.
-    auto input = net.AddInputLayer(0);
-    auto floor = net.AddFloorLayer();
-    auto output = net.AddOutputLayer(0);
-
-    // Connects layers.
-    input->GetOutputSlot(0).Connect(floor->GetInputSlot(0));
-    floor->GetOutputSlot(0).Connect(output->GetInputSlot(0));
-
-    armnn::TensorShape shape({4});
-    armnn::TensorInfo info(shape, armnn::DataType::Float32);
-    input->GetOutputSlot(0).SetTensorInfo(info);
-    floor->GetOutputSlot(0).SetTensorInfo(info);
-
-    armnn::IRuntime::CreationOptions options;
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
-
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-
-    armnn::OptimizerOptions optimizerOptions;
-    optimizerOptions.m_ReduceFp32ToFp16 = true;
-
-    armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(net, backends, runtime->GetDeviceSpec(),
-                                                               optimizerOptions);
-
-    std::ostringstream ss;
-    optimizedNet->SerializeToDot(ss);
-
-    auto inputId = input->GetGuid();
-    auto floorId = floor->GetGuid();
-    auto outputId = output->GetGuid();
-
-    std::stringstream expected;
-    expected <<
-             "digraph Optimized {\n"
-             "    node [shape=\"record\"];\n"
-             "    edge [fontsize=8 fontcolor=\"blue\" fontname=\"arial-bold\"];\n"
-             "    " << inputId << " [label=\"{Input|LayerType : Input\\lBackendID : CpuRef\\l}\"];\n"
-             "    " << floorId << " [label=\"{Floor|LayerType : Floor\\lBackendID : CpuRef\\l}\"];\n"
-             "    " << outputId << " [label=\"{Output|LayerType : Output\\lBackendID : CpuRef\\l}\"];\n"
-             "    " << inputId << " -> " << floorId << " [label=< [4] >];\n"
-             "    " << floorId << " -> " << outputId << " [label=< [4] >];\n"
-             "}\n";
-
-    BOOST_TEST(ss.str() == expected.str());
-}
-
 BOOST_AUTO_TEST_CASE(DebugTestOnCpuRef)
 {
     armnn::Network net;

@@ -220,6 +220,11 @@ Rsqrt2dTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 2>
+Rsqrt2dTest<armnn::DataType::Float16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 2>
 Rsqrt2dTest<armnn::DataType::QuantisedAsymm8>(
     armnn::IWorkloadFactory& workloadFactory,
@@ -232,6 +237,11 @@ Rsqrt2dTest<armnn::DataType::QuantisedSymm16>(
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 3>
 Rsqrt3dTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 3>
+Rsqrt3dTest<armnn::DataType::Float16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

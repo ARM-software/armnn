@@ -7,6 +7,8 @@
 
 #include "LayerTestResult.hpp"
 
+#include <Half.hpp>
+
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -19,6 +21,18 @@ LayerTestResult<float, 4> SubtractionBroadcast1ElementTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 4> SubtractionBroadcastTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SubtractionFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SubtractionBroadcast1ElementFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SubtractionBroadcastFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

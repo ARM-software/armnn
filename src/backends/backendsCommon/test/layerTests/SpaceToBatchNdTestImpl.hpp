@@ -6,6 +6,8 @@
 
 #include "LayerTestResult.hpp"
 
+#include <Half.hpp>
+
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -22,6 +24,22 @@ LayerTestResult<float, 4> SpaceToBatchNdMultiBlockFloat32Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 4> SpaceToBatchNdPaddingFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdSimpleFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiChannelsFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiBlockFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdPaddingFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -54,6 +72,22 @@ LayerTestResult<float, 4> SpaceToBatchNdMultiBlockNhwcFloat32Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<float, 4> SpaceToBatchNdPaddingNhwcFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdSimpleNhwcFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiChannelsNhwcFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiBlockNhwcFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdPaddingNhwcFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

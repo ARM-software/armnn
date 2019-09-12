@@ -7,9 +7,7 @@
 
 #include "LayerTestResult.hpp"
 
-#include <ResolveType.hpp>
-
-#include <armnn/ArmNN.hpp>
+#include <Half.hpp>
 
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>

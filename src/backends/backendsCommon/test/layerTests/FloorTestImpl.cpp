@@ -64,6 +64,12 @@ SimpleFloorTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
+SimpleFloorTest<armnn::DataType::Float16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 4>
 SimpleFloorTest<armnn::DataType::QuantisedSymm16>(
     armnn::IWorkloadFactory& workloadFactory,

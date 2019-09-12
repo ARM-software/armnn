@@ -7,6 +7,8 @@
 
 #include "LayerTestResult.hpp"
 
+#include <Half.hpp>
+
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -21,6 +23,18 @@ LayerTestResult<float, 4> MinimumBroadcast1ElementTest2(
 LayerTestResult<uint8_t, 4> MinimumBroadcast1DVectorUint8Test(
     armnn::IWorkloadFactory & workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr & memoryManager);
+
+LayerTestResult<armnn::Half , 4> MinimumFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> MinimumBroadcast1ElementFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 4> MinimumBroadcast1DVectorFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<int16_t , 4> MinimumInt16Test(
     armnn::IWorkloadFactory& workloadFactory,

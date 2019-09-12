@@ -169,6 +169,25 @@ LayerTestResult<uint8_t, 4> SpaceToDepthNchwAsymmQ8Test(
         armnn::DataLayout::NCHW);
 }
 
+LayerTestResult<armnn::Half, 4> SpaceToDepthNhwcFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToDepthSimpleTest1<armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToDepthNchwFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToDepthSimpleTest1<armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager,
+        armnn::DataLayout::NCHW);
+}
+
 LayerTestResult<float, 4> SpaceToDepthNhwcFloat32Test1(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

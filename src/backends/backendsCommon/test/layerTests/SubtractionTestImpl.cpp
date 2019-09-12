@@ -168,6 +168,82 @@ LayerTestResult<float, 4> SubtractionBroadcastTest(
         output);
 }
 
+LayerTestResult<armnn::Half, 4> SubtractionFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 2, 2 };
+
+    std::vector<armnn::Half> input0 = { 1._h,  2._h, 3._h, 4._h };
+    std::vector<armnn::Half> input1 = { 1._h, -1._h, 0._h, 2._h };
+    std::vector<armnn::Half> output = { 0._h,  3._h, 3._h, 2._h };
+
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
+LayerTestResult<armnn::Half, 4> SubtractionBroadcast1ElementFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<armnn::Half> input0 = { 1._h,  2._h, 3._h, 4._h };
+
+    std::vector<armnn::Half> input1 = { 10._h };
+
+    std::vector<armnn::Half> output = { -9._h,  -8._h, -7._h, -6._h };
+
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
+LayerTestResult<armnn::Half, 4> SubtractionBroadcastFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+
+    const unsigned int shape0[] = { 1, 1, 2, 2 };
+    const unsigned int shape1[] = { 1, 1, 1, 2 };
+
+    std::vector<armnn::Half> input0 = { 1._h,  2._h, 3._h, 4._h };
+
+    std::vector<armnn::Half> input1 = { 10._h, -5._h };
+
+    std::vector<armnn::Half> output = { -9._h,  7._h, -7._h, 9._h };
+
+    return ElementwiseTestHelper<4, armnn::SubtractionQueueDescriptor, armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
 LayerTestResult<int16_t, 4> SubtractionInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

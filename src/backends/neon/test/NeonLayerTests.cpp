@@ -380,10 +380,10 @@ ARMNN_AUTO_TEST_CASE(SpaceToDepthNhwcQSymm16, SpaceToDepthNhwcQSymm16Test)
 ARMNN_AUTO_TEST_CASE(SpaceToDepthNchwQSymm16, SpaceToDepthNchwQSymm16Test)
 
 // Splitter
-ARMNN_AUTO_TEST_CASE(SimpleSplitterFloat, SplitterFloatTest)
+ARMNN_AUTO_TEST_CASE(SimpleSplitterFloat32, SplitterFloat32Test)
 ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)
 
-ARMNN_AUTO_TEST_CASE(CopyViaSplitteFloatr, CopyViaSplitterFloatTest)
+ARMNN_AUTO_TEST_CASE(CopyViaSplitterFloat32, CopyViaSplitterFloat32Test)
 ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
 
 // Concat
@@ -425,8 +425,8 @@ ARMNN_AUTO_TEST_CASE(MultiplicationBroadcast1DVectorUint8, MultiplicationBroadca
 ARMNN_AUTO_TEST_CASE(Multiplication5d, Multiplication5dTest)
 
 // Batch Norm
-ARMNN_AUTO_TEST_CASE(BatchNormFloat, BatchNormFloatTest)
-ARMNN_AUTO_TEST_CASE(BatchNormFloatNhwc, BatchNormFloatNhwcTest)
+ARMNN_AUTO_TEST_CASE(BatchNormFloat32, BatchNormFloat32Test)
+ARMNN_AUTO_TEST_CASE(BatchNormFloat32Nhwc, BatchNormFloat32NhwcTest)
 
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)

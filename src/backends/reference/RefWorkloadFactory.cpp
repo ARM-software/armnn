@@ -137,20 +137,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const Activation
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                              const WorkloadInfo&           info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefSoftmaxWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
                                                               const WorkloadInfo&            info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefSplitterWorkload>(descriptor, info);
 }
 
@@ -248,10 +240,6 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMemImport(const MemI
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefResizeWorkload>(descriptor, info);
 }
 
@@ -283,10 +271,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2Nor
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                                    const WorkloadInfo&          info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefConcatWorkload>(descriptor, info);
 }
 
@@ -305,20 +289,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueD
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefSpaceToBatchNdWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSpaceToDepth(const armnn::SpaceToDepthQueueDescriptor& descriptor,
     const armnn::WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefSpaceToDepthWorkload>(descriptor, info);
 }
 
@@ -351,30 +327,18 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp32ToFp16(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDivision(
     const DivisionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefDivisionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
     const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefSubtractionWorkload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMaximum(
     const MaximumQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefMaximumWorkload>(descriptor, info);
 }
 
@@ -387,10 +351,6 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
 std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMinimum(
     const MinimumQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefMinimumWorkload>(descriptor, info);
 }
 
@@ -417,10 +377,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescr
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                                     const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefBatchToSpaceNdWorkload>(descriptor, info);
 }
 
@@ -449,20 +405,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescr
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefRsqrtWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const armnn::GatherQueueDescriptor& descriptor,
                                                             const armnn::WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefGatherWorkload>(descriptor, info);
 }
 
@@ -487,10 +435,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDequantize(const Dequantize
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePrelu(const PreluQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefPreluWorkload>(descriptor, info);
 }
 
@@ -510,10 +454,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStack(const StackQueueDescr
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
-    if (IsFloat16(info))
-    {
-        return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
-    }
     return std::make_unique<RefAbsWorkload>(descriptor, info);
 }
 

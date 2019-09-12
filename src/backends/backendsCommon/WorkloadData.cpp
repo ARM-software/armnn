@@ -1442,6 +1442,7 @@ void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     std::vector<DataType> supportedTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedSymm16
     };
 
@@ -2197,6 +2198,7 @@ void DetectionPostProcessQueueDescriptor::Validate(const WorkloadInfo& workloadI
     const std::vector<DataType> supportedInputTypes =
     {
         DataType::Float32,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         DataType::QuantisedSymm16
     };

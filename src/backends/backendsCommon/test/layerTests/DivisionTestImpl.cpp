@@ -154,6 +154,110 @@ LayerTestResult<float, 4> DivisionBroadcast1DVectorTest(
         output);
 }
 
+LayerTestResult<armnn::Half, 4> DivisionFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+
+    const unsigned int width        = 2u;
+    const unsigned int height       = 2u;
+    const unsigned int channelCount = 2u;
+    const unsigned int batchSize    = 2u;
+
+    unsigned int shape[] = { batchSize, channelCount, height, width };
+
+    std::vector<armnn::Half> input0 =
+    {
+        2._h, 2._h, 2._h, 2._h, 3._h, 3._h, 3._h, 3._h,
+        4._h, 4._h, 4._h, 4._h, 5._h, 5._h, 5._h, 5._h
+    };
+
+    std::vector<armnn::Half> input1 =
+    {
+        1._h, 1._h, 1._h, 1._h, 2._h, 2._h, 2._h, 2._h,
+        4._h, 4._h, 4._h, 4._h, 4._h, 4._h, 4._h, 4._h
+    };
+
+    std::vector<armnn::Half> output =
+    {
+        2._h, 2._h, 2._h, 2._h, 1.50_h, 1.50_h, 1.50_h, 1.50_h,
+        1._h, 1._h, 1._h, 1._h, 1.25_h, 1.25_h, 1.25_h, 1.25_h
+    };
+
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager,
+        shape,
+        input0,
+        shape,
+        input1,
+        shape,
+        output);
+}
+
+LayerTestResult<armnn::Half, 4> DivisionBroadcast1ElementFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+
+    unsigned int shape0[] = { 1, 2, 2, 2 };
+    unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<armnn::Half> input0({ 2._h, 4._h, 6._h, 8._h, 10._h, 12._h, 14._h, 16._h});
+
+    std::vector<armnn::Half> input1({ 2._h });
+
+    std::vector<armnn::Half> output({ 1._h, 2._h, 3._h, 4._h, 5._h, 6._h, 7._h, 8._h});
+
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
+LayerTestResult<armnn::Half, 4> DivisionBroadcast1DVectorFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+
+    unsigned int shape0[] = { 1, 3, 3, 2 };
+    unsigned int shape1[] = { 1, 1, 1, 2 };
+
+    std::vector<armnn::Half> input0 =
+    {
+         1._h,  4._h,  3._h,  8._h,  5._h, 12._h,
+         7._h, 16._h,  9._h, 20._h, 11._h, 24._h,
+        13._h, 28._h, 15._h, 32._h, 17._h, 36._h
+    };
+
+    std::vector<armnn::Half> input1 = { 1._h, 2._h };
+
+    std::vector<armnn::Half> output =
+    {
+         1._h,  2._h,  3._h,  4._h,  5._h,  6._h,
+         7._h,  8._h,  9._h, 10._h, 11._h, 12._h,
+        13._h, 14._h, 15._h, 16._h, 17._h, 18._h
+    };
+
+    return ElementwiseTestHelper<4, armnn::DivisionQueueDescriptor, armnn::DataType::Float16>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
 LayerTestResult<uint8_t, 4> DivisionUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

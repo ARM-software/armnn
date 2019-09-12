@@ -5,16 +5,26 @@
 
 #include "LayerTestResult.hpp"
 
+#include <Half.hpp>
+
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <vector>
 
-std::vector<LayerTestResult<float, 3>> SplitterFloatTest(
+std::vector<LayerTestResult<float, 3>> SplitterFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
-LayerTestResult<float, 3> CopyViaSplitterFloatTest(
+LayerTestResult<float, 3> CopyViaSplitterFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+std::vector<LayerTestResult<armnn::Half, 3>> SplitterFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 3> CopyViaSplitterFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

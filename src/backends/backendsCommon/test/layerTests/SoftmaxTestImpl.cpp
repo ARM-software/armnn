@@ -632,6 +632,34 @@ LayerTestResult<uint8_t,4> Simple4dSoftmaxUint8Test(
                                                                      data.inputShape, data.outputData, data.inputData);
 }
 
+LayerTestResult<armnn::Half,2> SimpleSoftmaxFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta)
+{
+    return SimpleSoftmaxTestImpl<armnn::DataType::Float16>(workloadFactory, memoryManager, beta);
+}
+
+LayerTestResult<armnn::Half,3> Simple3dSoftmaxFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta)
+{
+    Simple3dSoftmaxOutputData data;
+    return Simple3dSoftmaxTestImpl<armnn::DataType::Float16>(workloadFactory, memoryManager, beta,
+                                                             data.inputShape, data.outputData, data.inputData);
+}
+
+LayerTestResult<armnn::Half,4> Simple4dSoftmaxFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta)
+{
+    Simple4dSoftmaxData data;
+    return Simple4dSoftmaxTestImpl<armnn::DataType::Float16>(workloadFactory, memoryManager, beta,
+                                                             data.inputShape, data.outputData, data.inputData);
+}
+
 LayerTestResult<int16_t,2> SimpleSoftmaxUint16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

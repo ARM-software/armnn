@@ -112,12 +112,20 @@ BOOST_AUTO_TEST_CASE(CreateAdditionInt16Workload)
         armnn::DataType::QuantisedSymm16>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateSubtractionFloatWorkload)
+BOOST_AUTO_TEST_CASE(CreateSubtractionFloat32Workload)
 {
     RefCreateElementwiseWorkloadTest<RefSubtractionWorkload,
         SubtractionQueueDescriptor,
         SubtractionLayer,
         armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSubtractionFloat16Workload)
+{
+    RefCreateElementwiseWorkloadTest<RefSubtractionWorkload,
+        SubtractionQueueDescriptor,
+        SubtractionLayer,
+        armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSubtractionUint8Workload)
@@ -160,12 +168,20 @@ BOOST_AUTO_TEST_CASE(CreateMultiplicationInt16Workload)
         armnn::DataType::QuantisedSymm16>();
 }
 
-BOOST_AUTO_TEST_CASE(CreateDivisionFloatWorkload)
+BOOST_AUTO_TEST_CASE(CreateDivisionFloat32Workload)
 {
     RefCreateElementwiseWorkloadTest<RefDivisionWorkload,
         DivisionQueueDescriptor,
         DivisionLayer,
         armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateDivisionFloat16Workload)
+{
+    RefCreateElementwiseWorkloadTest<RefDivisionWorkload,
+        DivisionQueueDescriptor,
+        DivisionLayer,
+        armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateDivisionUint8Workload)
@@ -222,6 +238,18 @@ BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat32Workload)
 BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat32WorkloadNhwc)
 {
     RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload, armnn::DataType::Float32>
+            (DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16Workload)
+{
+    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload,armnn::DataType::Float16>
+            (DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchNormalizationFloat16WorkloadNhwc)
+{
+    RefCreateBatchNormalizationWorkloadTest<RefBatchNormalizationWorkload, armnn::DataType::Float16>
             (DataLayout::NHWC);
 }
 
@@ -486,6 +514,11 @@ BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat32Workload)
     RefCreateSoftmaxWorkloadTest<RefSoftmaxWorkload, armnn::DataType::Float32>();
 }
 
+BOOST_AUTO_TEST_CASE(CreateSoftmaxFloat16Workload)
+{
+    RefCreateSoftmaxWorkloadTest<RefSoftmaxWorkload, armnn::DataType::Float16>();
+}
+
 BOOST_AUTO_TEST_CASE(CreateSoftmaxQuantisedAsymm8Workload)
 {
     RefCreateSoftmaxWorkloadTest<RefSoftmaxWorkload, armnn::DataType::QuantisedAsymm8>();
@@ -521,6 +554,11 @@ static void RefCreateSplitterWorkloadTest()
 BOOST_AUTO_TEST_CASE(CreateSplitterFloat32Workload)
 {
     RefCreateSplitterWorkloadTest<RefSplitterWorkload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSplitterFloat16Workload)
+{
+    RefCreateSplitterWorkloadTest<RefSplitterWorkload, armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterUint8Workload)
@@ -564,6 +602,11 @@ static void RefCreateSplitterConcatWorkloadTest()
 BOOST_AUTO_TEST_CASE(CreateSplitterConcatFloat32)
 {
     RefCreateSplitterConcatWorkloadTest<RefSplitterWorkload, RefConcatWorkload, DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSplitterConcatFloat16)
+{
+    RefCreateSplitterConcatWorkloadTest<RefSplitterWorkload, RefConcatWorkload, DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSplitterConcatUint8)
@@ -654,6 +697,11 @@ BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat32)
     RefCreateResizeBilinearTest<RefResizeWorkload, armnn::DataType::Float32>(DataLayout::NCHW);
 }
 
+BOOST_AUTO_TEST_CASE(CreateResizeBilinearFloat16)
+{
+    RefCreateResizeBilinearTest<RefResizeWorkload, armnn::DataType::Float16>(DataLayout::NCHW);
+}
+
 BOOST_AUTO_TEST_CASE(CreateResizeBilinearUint8)
 {
     RefCreateResizeBilinearTest<RefResizeWorkload, armnn::DataType::QuantisedAsymm8>(DataLayout::NCHW);
@@ -689,6 +737,11 @@ BOOST_AUTO_TEST_CASE(CreateRsqrtFloat32)
     RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::Float32>();
 }
 
+BOOST_AUTO_TEST_CASE(CreateRsqrtFloat16)
+{
+    RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::Float16>();
+}
+
 BOOST_AUTO_TEST_CASE(CreateRsqrtUint8)
 {
     RefCreateRsqrtTest<RefRsqrtWorkload, armnn::DataType::QuantisedAsymm8>();
@@ -715,6 +768,11 @@ static void RefCreateBatchToSpaceNdTest()
 BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdFloat32)
 {
     RefCreateBatchToSpaceNdTest<RefBatchToSpaceNdWorkload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdFloat16)
+{
+    RefCreateBatchToSpaceNdTest<RefBatchToSpaceNdWorkload, armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateBatchToSpaceNdUint8)
@@ -833,6 +891,11 @@ BOOST_AUTO_TEST_CASE(CreateConcatDim0Float32Workload)
     RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::Float32>({ 4, 3, 2, 5 }, 0);
 }
 
+BOOST_AUTO_TEST_CASE(CreateConcatDim0Float16Workload)
+{
+    RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::Float16>({ 4, 3, 2, 5 }, 0);
+}
+
 BOOST_AUTO_TEST_CASE(CreateConcatDim0Uint8Workload)
 {
     RefCreateConcatWorkloadTest<RefConcatWorkload, armnn::DataType::QuantisedAsymm8>({ 4, 3, 2, 5 }, 0);
@@ -931,6 +994,11 @@ BOOST_AUTO_TEST_CASE(CreatePreluFloat32Workload)
     RefCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, armnn::DataType::Float32);
 }
 
+BOOST_AUTO_TEST_CASE(CreatePreluFloat16Workload)
+{
+    RefCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, armnn::DataType::Float16);
+}
+
 BOOST_AUTO_TEST_CASE(CreatePreluUint8Workload)
 {
     RefCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, armnn::DataType::QuantisedAsymm8);
@@ -945,6 +1013,13 @@ BOOST_AUTO_TEST_CASE(CreatePreluFloat32NoBroadcastWorkload)
 {
     BOOST_CHECK_THROW(RefCreatePreluWorkloadTest({ 1, 4, 7, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 },
                                                  armnn::DataType::Float32),
+                      armnn::InvalidArgumentException);
+}
+
+BOOST_AUTO_TEST_CASE(CreatePreluFloat16NoBroadcastWorkload)
+{
+    BOOST_CHECK_THROW(RefCreatePreluWorkloadTest({ 1, 4, 7, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 },
+                                                 armnn::DataType::Float16),
                       armnn::InvalidArgumentException);
 }
 
@@ -978,6 +1053,11 @@ static void RefCreateSpaceToDepthWorkloadTest()
 BOOST_AUTO_TEST_CASE(CreateSpaceToDepthWorkloadFloat32)
 {
     RefCreateSpaceToDepthWorkloadTest<RefSpaceToDepthWorkload, armnn::DataType::Float32>();
+}
+
+BOOST_AUTO_TEST_CASE(CreateSpaceToDepthWorkloadFloat16)
+{
+    RefCreateSpaceToDepthWorkloadTest<RefSpaceToDepthWorkload, armnn::DataType::Float16>();
 }
 
 BOOST_AUTO_TEST_CASE(CreateSpaceToDepthWorkloadQASymm8)

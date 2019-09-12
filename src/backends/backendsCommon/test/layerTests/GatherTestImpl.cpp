@@ -64,181 +64,317 @@ LayerTestResult<T, OutputDim> GatherTestImpl(
     return result;
 }
 
-template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 1> Gather1dParamsTestImpl(armnn::IWorkloadFactory& workloadFactory,
-                                             const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+struct GatherTestHelper
 {
-    armnn::TensorInfo paramsInfo({ 8 }, ArmnnType);
-    armnn::TensorInfo indicesInfo({ 4 }, armnn::DataType::Signed32);
-    armnn::TensorInfo outputInfo({ 4 }, ArmnnType);
-
-    if (armnn::IsQuantizedType<T>())
+    static LayerTestResult<T, 1> Gather1dParamsTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
     {
-        paramsInfo.SetQuantizationScale(1.0f);
-        paramsInfo.SetQuantizationOffset(1);
-        outputInfo.SetQuantizationScale(1.0f);
-        outputInfo.SetQuantizationOffset(1);
-    }
-    const std::vector<T> params         = std::vector<T>({ 1, 2, 3, 4, 5, 6, 7, 8 });
-    const std::vector<int32_t> indices  = std::vector<int32_t>({ 0, 2, 1, 5 });
-    const std::vector<T> expectedOutput = std::vector<T>({ 1, 3, 2, 6 });
+        armnn::TensorInfo paramsInfo({ 8 }, ArmnnType);
+        armnn::TensorInfo indicesInfo({ 4 }, armnn::DataType::Signed32);
+        armnn::TensorInfo outputInfo({ 4 }, ArmnnType);
 
-    return GatherTestImpl<ArmnnType, T, 1, 1, 1>(
-        workloadFactory,
-        memoryManager,
-        paramsInfo,
-        indicesInfo,
-        outputInfo,
-        params,
-        indices,
-        expectedOutput);
-}
+        if (armnn::IsQuantizedType<T>())
+        {
+            paramsInfo.SetQuantizationScale(1.0f);
+            paramsInfo.SetQuantizationOffset(1);
+            outputInfo.SetQuantizationScale(1.0f);
+            outputInfo.SetQuantizationOffset(1);
+        }
+        const std::vector<T> params         = std::vector<T>({ 1, 2, 3, 4, 5, 6, 7, 8 });
+        const std::vector<int32_t> indices  = std::vector<int32_t>({ 0, 2, 1, 5 });
+        const std::vector<T> expectedOutput = std::vector<T>({ 1, 3, 2, 6 });
 
-template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 2> GatherMultiDimParamsTestImpl(
-    armnn::IWorkloadFactory& workloadFactory, const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    armnn::TensorInfo paramsInfo({ 5, 2 }, ArmnnType);
-    armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32);
-    armnn::TensorInfo outputInfo({ 3, 2 }, ArmnnType);
-
-    if (armnn::IsQuantizedType<T>())
-    {
-        paramsInfo.SetQuantizationScale(1.0f);
-        paramsInfo.SetQuantizationOffset(1);
-        outputInfo.SetQuantizationScale(1.0f);
-        outputInfo.SetQuantizationOffset(1);
+        return GatherTestImpl<ArmnnType, T, 1, 1, 1>(
+            workloadFactory,
+            memoryManager,
+            paramsInfo,
+            indicesInfo,
+            outputInfo,
+            params,
+            indices,
+            expectedOutput);
     }
 
-    const std::vector<T> params         = std::vector<T>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
-    const std::vector<int32_t> indices  = std::vector<int32_t>({ 1, 3, 4 });
-    const std::vector<T> expectedOutput = std::vector<T>({ 3, 4, 7, 8, 9, 10 });
-
-    return GatherTestImpl<ArmnnType, T, 2, 1, 2>(
-        workloadFactory,
-        memoryManager,
-        paramsInfo,
-        indicesInfo,
-        outputInfo,
-        params,
-        indices,
-        expectedOutput);
-}
-
-template <armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 4> GatherMultiDimParamsMultiDimIndicesTestImpl(
-    armnn::IWorkloadFactory& workloadFactory, const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    armnn::TensorInfo paramsInfo({ 3, 2, 3}, ArmnnType);
-    armnn::TensorInfo indicesInfo({ 2, 3 }, armnn::DataType::Signed32);
-    armnn::TensorInfo outputInfo({ 2, 3, 2, 3 }, ArmnnType);
-
-    if (armnn::IsQuantizedType<T>())
+    static LayerTestResult<T, 2> GatherMultiDimParamsTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
     {
-        paramsInfo.SetQuantizationScale(1.0f);
-        paramsInfo.SetQuantizationOffset(1);
-        outputInfo.SetQuantizationScale(1.0f);
-        outputInfo.SetQuantizationOffset(1);
+        armnn::TensorInfo paramsInfo({ 5, 2 }, ArmnnType);
+        armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32);
+        armnn::TensorInfo outputInfo({ 3, 2 }, ArmnnType);
+
+        if (armnn::IsQuantizedType<T>())
+        {
+            paramsInfo.SetQuantizationScale(1.0f);
+            paramsInfo.SetQuantizationOffset(1);
+            outputInfo.SetQuantizationScale(1.0f);
+            outputInfo.SetQuantizationOffset(1);
+        }
+
+        const std::vector<T> params         = std::vector<T>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+        const std::vector<int32_t> indices  = std::vector<int32_t>({ 1, 3, 4 });
+        const std::vector<T> expectedOutput = std::vector<T>({ 3, 4, 7, 8, 9, 10 });
+
+        return GatherTestImpl<ArmnnType, T, 2, 1, 2>(
+            workloadFactory,
+            memoryManager,
+            paramsInfo,
+            indicesInfo,
+            outputInfo,
+            params,
+            indices,
+            expectedOutput);
     }
 
-    const std::vector<T> params =
+    static LayerTestResult<T, 4> GatherMultiDimParamsMultiDimIndicesTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
     {
-         1,  2,  3,
-         4,  5,  6,
+        armnn::TensorInfo paramsInfo({ 3, 2, 3}, ArmnnType);
+        armnn::TensorInfo indicesInfo({ 2, 3 }, armnn::DataType::Signed32);
+        armnn::TensorInfo outputInfo({ 2, 3, 2, 3 }, ArmnnType);
 
-         7,  8,  9,
-        10, 11, 12,
+        if (armnn::IsQuantizedType<T>())
+        {
+            paramsInfo.SetQuantizationScale(1.0f);
+            paramsInfo.SetQuantizationOffset(1);
+            outputInfo.SetQuantizationScale(1.0f);
+            outputInfo.SetQuantizationOffset(1);
+        }
 
-        13, 14, 15,
-        16, 17, 18
-    };
+        const std::vector<T> params =
+        {
+            1,  2,  3,
+            4,  5,  6,
 
-    const std::vector<int32_t> indices = { 1, 2, 1, 2, 1, 0 };
+            7,  8,  9,
+            10, 11, 12,
 
-    const std::vector<T> expectedOutput =
+            13, 14, 15,
+            16, 17, 18
+        };
+
+        const std::vector<int32_t> indices = { 1, 2, 1, 2, 1, 0 };
+
+        const std::vector<T> expectedOutput =
+        {
+            7,  8,  9,
+            10, 11, 12,
+            13, 14, 15,
+            16, 17, 18,
+            7,  8,  9,
+            10, 11, 12,
+
+            13, 14, 15,
+            16, 17, 18,
+            7,  8,  9,
+            10, 11, 12,
+            1,  2,  3,
+            4,  5,  6
+        };
+
+        return GatherTestImpl<ArmnnType, T, 3, 2, 4>(
+            workloadFactory,
+            memoryManager,
+            paramsInfo,
+            indicesInfo,
+            outputInfo,
+            params,
+            indices,
+            expectedOutput);
+    }
+};
+
+template<typename T>
+struct GatherTestHelper<armnn::DataType::Float16, T>
+{
+    static LayerTestResult<T, 1> Gather1dParamsTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
     {
-         7,  8,  9,
-        10, 11, 12,
-        13, 14, 15,
-        16, 17, 18,
-         7,  8,  9,
-        10, 11, 12,
+        using namespace half_float::literal;
 
-        13, 14, 15,
-        16, 17, 18,
-         7,  8,  9,
-        10, 11, 12,
-         1,  2,  3,
-         4,  5,  6
-    };
+        armnn::TensorInfo paramsInfo({ 8 }, armnn::DataType::Float16);
+        armnn::TensorInfo indicesInfo({ 4 }, armnn::DataType::Signed32);
+        armnn::TensorInfo outputInfo({ 4 }, armnn::DataType::Float16);
 
-    return GatherTestImpl<ArmnnType, T, 3, 2, 4>(
-        workloadFactory,
-        memoryManager,
-        paramsInfo,
-        indicesInfo,
-        outputInfo,
-        params,
-        indices,
-        expectedOutput);
-}
+        const std::vector<T> params = std::vector<T>({ 1._h, 2._h, 3._h, 4._h, 5._h, 6._h, 7._h, 8._h });
+        const std::vector<int32_t> indices  = std::vector<int32_t>({ 0, 2, 1, 5 });
+        const std::vector<T> expectedOutput = std::vector<T>({ 1._h, 3._h, 2._h, 6._h });
+
+        return GatherTestImpl<armnn::DataType::Float16, T, 1, 1, 1>(
+            workloadFactory,
+            memoryManager,
+            paramsInfo,
+            indicesInfo,
+            outputInfo,
+            params,
+            indices,
+            expectedOutput);
+    }
+
+    static LayerTestResult<T, 2> GatherMultiDimParamsTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    {
+        using namespace half_float::literal;
+
+        armnn::TensorInfo paramsInfo({ 5, 2 }, armnn::DataType::Float16);
+        armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32);
+        armnn::TensorInfo outputInfo({ 3, 2 }, armnn::DataType::Float16);
+
+        const std::vector<T> params = std::vector<T>({ 1._h, 2._h, 3._h, 4._h, 5._h, 6._h, 7._h, 8._h, 9._h, 10._h });
+
+        const std::vector<int32_t> indices  = std::vector<int32_t>({ 1, 3, 4 });
+        const std::vector<T> expectedOutput = std::vector<T>({ 3._h, 4._h, 7._h, 8._h, 9._h, 10._h });
+
+        return GatherTestImpl<armnn::DataType::Float16, T, 2, 1, 2>(
+            workloadFactory,
+            memoryManager,
+            paramsInfo,
+            indicesInfo,
+            outputInfo,
+            params,
+            indices,
+            expectedOutput);
+    }
+
+    static LayerTestResult<T, 4> GatherMultiDimParamsMultiDimIndicesTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    {
+        using namespace half_float::literal;
+
+        armnn::TensorInfo paramsInfo({ 3, 2, 3 }, armnn::DataType::Float16);
+        armnn::TensorInfo indicesInfo({ 2, 3 }, armnn::DataType::Signed32);
+        armnn::TensorInfo outputInfo({ 2, 3, 2, 3 }, armnn::DataType::Float16);
+
+        const std::vector<T> params =
+        {
+            1._h,  2._h,  3._h,
+            4._h,  5._h,  6._h,
+
+            7._h,  8._h,  9._h,
+            10._h, 11._h, 12._h,
+
+            13._h, 14._h, 15._h,
+            16._h, 17._h, 18._h
+        };
+
+        const std::vector<int32_t> indices = { 1, 2, 1, 2, 1, 0 };
+
+        const std::vector<T> expectedOutput =
+        {
+            7._h,  8._h,  9._h,
+            10._h, 11._h, 12._h,
+            13._h, 14._h, 15._h,
+            16._h, 17._h, 18._h,
+            7._h,  8._h,  9._h,
+            10._h, 11._h, 12._h,
+
+            13._h, 14._h, 15._h,
+            16._h, 17._h, 18._h,
+            7._h,  8._h,  9._h,
+            10._h, 11._h, 12._h,
+            1._h,  2._h,  3._h,
+            4._h,  5._h,  6._h
+        };
+
+        return GatherTestImpl<armnn::DataType::Float16, T, 3, 2, 4>(
+            workloadFactory,
+            memoryManager,
+            paramsInfo,
+            indicesInfo,
+            outputInfo,
+            params,
+            indices,
+            expectedOutput);
+    }
+};
 
 } // anonymous namespace
 
-LayerTestResult<float, 1> Gather1dParamsFloatTest(
+LayerTestResult<float, 1> Gather1dParamsFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Gather1dParamsTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::Float32>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 1> Gather1dParamsFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherTestHelper<armnn::DataType::Float16>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 1> Gather1dParamsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Gather1dParamsTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::QuantisedAsymm8>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 1> Gather1dParamsInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Gather1dParamsTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::QuantisedSymm16>::Gather1dParamsTestImpl(workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 2> GatherMultiDimParamsFloatTest(
+LayerTestResult<float, 2> GatherMultiDimParamsFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherMultiDimParamsTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::Float32>::GatherMultiDimParamsTestImpl(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 2> GatherMultiDimParamsFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherTestHelper<armnn::DataType::Float16>::GatherMultiDimParamsTestImpl(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 2> GatherMultiDimParamsUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherMultiDimParamsTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::QuantisedAsymm8>::GatherMultiDimParamsTestImpl(
+        workloadFactory, memoryManager);
 }
 
 LayerTestResult<int16_t, 2> GatherMultiDimParamsInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherMultiDimParamsTestImpl<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::QuantisedSymm16>::GatherMultiDimParamsTestImpl(
+        workloadFactory, memoryManager);
 }
 
-LayerTestResult<float, 4> GatherMultiDimParamsMultiDimIndicesFloatTest(
+LayerTestResult<float, 4> GatherMultiDimParamsMultiDimIndicesFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherMultiDimParamsMultiDimIndicesTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager);
+    return GatherTestHelper<armnn::DataType::Float32>::GatherMultiDimParamsMultiDimIndicesTestImpl(
+        workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> GatherMultiDimParamsMultiDimIndicesFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return GatherTestHelper<armnn::DataType::Float16>::GatherMultiDimParamsMultiDimIndicesTestImpl(
+        workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> GatherMultiDimParamsMultiDimIndicesUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherMultiDimParamsMultiDimIndicesTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return GatherTestHelper<armnn::DataType::QuantisedAsymm8>::GatherMultiDimParamsMultiDimIndicesTestImpl(
         workloadFactory, memoryManager);
 }
 
@@ -246,6 +382,6 @@ LayerTestResult<int16_t, 4> GatherMultiDimParamsMultiDimIndicesInt16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return GatherMultiDimParamsMultiDimIndicesTestImpl<armnn::DataType::QuantisedSymm16>(
+    return GatherTestHelper<armnn::DataType::QuantisedSymm16>::GatherMultiDimParamsMultiDimIndicesTestImpl(
         workloadFactory, memoryManager);
 }

@@ -300,6 +300,34 @@ LayerTestResult<float, 4> SpaceToBatchNdPaddingFloat32Test(
     return SpaceToBatchNdPaddingTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
 }
 
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdSimpleFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdSimpleTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiChannelsFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdMultiChannelsTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiBlockFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdMultiBlockTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdPaddingFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdPaddingTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+}
+
 LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -354,6 +382,34 @@ LayerTestResult<float, 4> SpaceToBatchNdPaddingNhwcFloat32Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdSimpleNhwcFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdSimpleNhwcTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiChannelsNhwcFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdMultiChannelsNhwcTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdMultiBlockNhwcFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdMultiBlockNhwcTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> SpaceToBatchNdPaddingNhwcFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return SpaceToBatchNdPaddingNhwcTest<armnn::DataType::Float16>(workloadFactory, memoryManager);
 }
 
 LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNhwcUint8Test(

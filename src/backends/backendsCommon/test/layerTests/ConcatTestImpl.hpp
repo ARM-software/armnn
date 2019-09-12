@@ -8,6 +8,7 @@
 #include "LayerTestResult.hpp"
 
 #include <ResolveType.hpp>
+#include <Half.hpp>
 
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
@@ -19,6 +20,10 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
     bool useSubtensor);
 
 LayerTestResult<float, 3> ConcatTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<armnn::Half, 3> ConcatFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

@@ -4,8 +4,9 @@
 //
 
 #include "GreaterTestImpl.hpp"
-
 #include "ElementwiseTestImpl.hpp"
+
+#include <Half.hpp>
 
 template<>
 std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::GreaterQueueDescriptor>(
@@ -108,6 +109,116 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorTest(
     return ElementwiseTestHelper<4,
                                  armnn::GreaterQueueDescriptor,
                                  armnn::DataType::Float32,
+                                 armnn::DataType::Boolean>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
+LayerTestResult<uint8_t, 4> GreaterFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+
+    const unsigned int width        = 2u;
+    const unsigned int height       = 2u;
+    const unsigned int channelCount = 2u;
+    const unsigned int batchSize    = 2u;
+
+    unsigned int shape[] = { batchSize, channelCount, height, width };
+
+    std::vector<armnn::Half> input0 =
+    {
+        1._h, 1._h, 1._h, 1._h,  5._h, 5._h, 5._h, 5._h,
+        3._h, 3._h, 3._h, 3._h,  4._h, 4._h, 4._h, 4._h
+    };
+
+    std::vector<armnn::Half> input1 =
+    {
+        1._h, 1._h, 1._h, 1._h,  3._h, 3._h, 3._h, 3._h,
+        5._h, 5._h, 5._h, 5._h,  4._h, 4._h, 4._h, 4._h
+    };
+
+    std::vector<uint8_t> output =
+    {
+        0, 0, 0, 0,  1, 1, 1, 1,
+        0, 0, 0, 0,  0, 0, 0, 0
+    };
+
+    return ElementwiseTestHelper<4,
+                                 armnn::GreaterQueueDescriptor,
+                                 armnn::DataType::Float16,
+                                 armnn::DataType::Boolean>(
+        workloadFactory,
+        memoryManager,
+        shape,
+        input0,
+        shape,
+        input1,
+        shape,
+        output);
+}
+
+LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+
+    unsigned int shape0[] = { 1, 2, 2, 2 };
+    unsigned int shape1[] = { 1, 1, 1, 1 };
+
+    std::vector<armnn::Half> input0 = { 1._h, 2._h, 3._h, 4._h, 5._h, 6._h, 7._h, 8._h };
+    std::vector<armnn::Half> input1 = { 1._h };
+
+    std::vector<uint8_t> output = { 0, 1, 1, 1, 1, 1, 1, 1};
+
+    return ElementwiseTestHelper<4,
+                                 armnn::GreaterQueueDescriptor,
+                                 armnn::DataType::Float16,
+                                 armnn::DataType::Boolean>(
+        workloadFactory,
+        memoryManager,
+        shape0,
+        input0,
+        shape1,
+        input1,
+        shape0,
+        output);
+}
+
+LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    using namespace half_float::literal;
+    
+    const unsigned int shape0[] = { 1, 2, 2, 3 };
+    const unsigned int shape1[] = { 1, 1, 1, 3 };
+
+    std::vector<armnn::Half> input0 =
+    {
+        1.0_h, 2.9_h, 2.1_h,  4.0_h,  5.0_h,  6.0_h,
+        7.0_h, 8.0_h, 9.0_h, 10.0_h, 11.0_h, 12.0_h
+    };
+
+    std::vector<armnn::Half> input1 = { 1._h, 3._h, 2._h };
+
+    std::vector<uint8_t> output =
+    {
+        0, 0, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1
+    };
+
+    return ElementwiseTestHelper<4,
+                                 armnn::GreaterQueueDescriptor,
+                                 armnn::DataType::Float16,
                                  armnn::DataType::Boolean>(
         workloadFactory,
         memoryManager,

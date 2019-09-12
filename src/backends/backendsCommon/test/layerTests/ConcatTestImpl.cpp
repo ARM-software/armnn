@@ -2227,6 +2227,13 @@ LayerTestResult<float, 4> Concat4dDiffShapeDim3Test(
         workloadFactory, memoryManager, 0.0f, 0, useSubtensor);
 }
 
+LayerTestResult<armnn::Half, 3> ConcatFloat16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return Concat3dDim1TestImpl<armnn::DataType::Float16>(workloadFactory, memoryManager, 0.0f, 0);
+}
+
 LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)

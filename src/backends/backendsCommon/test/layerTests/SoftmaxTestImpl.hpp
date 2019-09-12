@@ -7,6 +7,8 @@
 
 #include "LayerTestResult.hpp"
 
+#include <Half.hpp>
+
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
@@ -54,6 +56,21 @@ LayerTestResult<uint8_t,3> Simple3dSoftmaxUint8Test(
         float beta);
 
 LayerTestResult<uint8_t,4> Simple4dSoftmaxUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta);
+
+LayerTestResult<armnn::Half,2> SimpleSoftmaxFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta);
+
+LayerTestResult<armnn::Half,3> Simple3dSoftmaxFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        float beta);
+
+LayerTestResult<armnn::Half,4> Simple4dSoftmaxFloat16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         float beta);

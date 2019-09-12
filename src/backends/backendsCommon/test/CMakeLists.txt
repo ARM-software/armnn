@@ -30,6 +30,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     OptimizationViewsTests.cpp
     PreluEndToEndTestImpl.hpp
     QuantizeHelper.hpp
+    QuantizedLstmEndToEndTestImpl.cpp
     QuantizedLstmEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp

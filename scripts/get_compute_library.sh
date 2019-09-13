@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_08" # Release 19.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c2a60593436387d20ff142a619f4c3955a5cd41b" #COMPMID-2336: CLPadLayer support for 4D padding
+DEFAULT_CLFRAMEWORKREVISION="8d5dd867c32fc31f635fdc58783c29a38a99ebb7" #COMPMID-2659: Activation.SQRT Failure on NEON
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

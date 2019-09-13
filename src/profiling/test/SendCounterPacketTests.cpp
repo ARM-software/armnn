@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     uint32_t processNameSize = numeric_cast<uint32_t>(processName.size()) > 0 ?
                                numeric_cast<uint32_t>(processName.size()) + 1 : 0;
 
-    uint32_t packetEntries = 5;
+    uint32_t packetEntries = 6;
 
     MockBuffer mockBuffer2(512);
     SendCounterPacket sendPacket2(mockBuffer2);
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     {
         BOOST_TEST((ReadUint32(readBuffer2, offset) >> 16) == packetEntries);
         offset += sizeUint32;
-        for (uint32_t i = 0; i < packetEntries; ++i)
+        for (uint32_t i = 0; i < packetEntries - 1; ++i)
         {
             BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 26) & 0x3F) == 0);
             BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 16) & 0x3FF) == i);
@@ -297,6 +297,12 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
             BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0));
             offset += sizeUint32;
         }
+
+        BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 26) & 0x3F) == 1);
+        BOOST_TEST(((ReadUint32(readBuffer2, offset) >> 16) & 0x3FF) == 0);
+        offset += sizeUint32;
+        BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0));
+        offset += sizeUint32;
     }
 
     BOOST_TEST(offset == totalLength);

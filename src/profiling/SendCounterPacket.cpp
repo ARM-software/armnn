@@ -53,7 +53,8 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     // Counter Directory packet          (packet family=0; packet id=2)
     // Request Counter Directory packet  (packet family=0, packet id=3)
     // Periodic Counter Selection packet (packet family=0, packet id=4)
-    uint32_t packetVersionEntries = 5;
+    // Periodic Counter Capture packet   (packet family=1, packet class=0, type=0)
+    uint32_t packetVersionEntries = 6;
 
     uint32_t payloadSize = numeric_cast<uint32_t>(infoSize + hardwareVersionSize + softwareVersionSize +
                                                   processNameSize + packetVersionCountSize +
@@ -150,12 +151,20 @@ void SendCounterPacket::SendStreamMetaDataPacket()
             uint32_t packetId = 0;
 
             offset += sizeUint32;
-            for (uint32_t i = 0; i < packetVersionEntries; ++i) {
+            for (uint32_t i = 0; i < packetVersionEntries - 1; ++i)
+            {
                 WriteUint32(writeBuffer, offset, ((packetFamily & 0x3F) << 26) | ((packetId++ & 0x3FF) << 16));
                 offset += sizeUint32;
                 WriteUint32(writeBuffer, offset, EncodeVersion(1, 0, 0));
                 offset += sizeUint32;
             }
+
+            packetFamily = 1;
+            packetId = 0;
+
+            WriteUint32(writeBuffer, offset, ((packetFamily & 0x3F) << 26) | ((packetId & 0x3FF) << 16));
+            offset += sizeUint32;
+            WriteUint32(writeBuffer, offset, EncodeVersion(1, 0, 0));
         }
     }
     catch(...)

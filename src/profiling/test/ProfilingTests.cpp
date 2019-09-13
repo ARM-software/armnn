@@ -452,28 +452,30 @@ BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
 
     std::vector<uint16_t> readIds = holder.GetCaptureData().GetCounterIds();
     BOOST_CHECK(captureIds == readIds);
+}
 
+BOOST_AUTO_TEST_CASE(CaptureDataMethods)
+{
     // Check assignment operator
     CaptureData assignableCaptureData;
+    std::vector<uint16_t> counterIds = {42, 29, 13};
     assignableCaptureData.SetCapturePeriod(3);
-    assignableCaptureData.SetCounterIds(periodIdMap[3]);
+    assignableCaptureData.SetCounterIds(counterIds);
 
     CaptureData secondCaptureData;
-    secondCaptureData.SetCapturePeriod(2);
-    secondCaptureData.SetCounterIds(periodIdMap[2]);
 
-    BOOST_CHECK(secondCaptureData.GetCapturePeriod() == 2);
-    BOOST_CHECK(secondCaptureData.GetCounterIds() == periodIdMap[2]);
+    BOOST_CHECK(assignableCaptureData.GetCapturePeriod() == 3);
+    BOOST_CHECK(assignableCaptureData.GetCounterIds() == counterIds);
 
     secondCaptureData = assignableCaptureData;
     BOOST_CHECK(secondCaptureData.GetCapturePeriod() == 3);
-    BOOST_CHECK(secondCaptureData.GetCounterIds() == periodIdMap[3]);
+    BOOST_CHECK(secondCaptureData.GetCounterIds() == counterIds);
 
     // Check copy constructor
     CaptureData copyConstructedCaptureData(assignableCaptureData);
 
     BOOST_CHECK(copyConstructedCaptureData.GetCapturePeriod() == 3);
-    BOOST_CHECK(copyConstructedCaptureData.GetCounterIds() == periodIdMap[3]);
+    BOOST_CHECK(copyConstructedCaptureData.GetCounterIds() == counterIds);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)

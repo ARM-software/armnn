@@ -92,11 +92,13 @@ BOOST_AUTO_TEST_CASE(MisalignedPointer)
     TensorInfo info({2}, DataType::Float32);
     RefTensorHandle handle(info, memoryManager, static_cast<unsigned int>(MemorySource::Malloc));
 
-    // Allocates a 2 int array
+    // Allocate a 2 int array
     int* testPtr = new int[2];
-    int* misalignedPtr = testPtr + 1;
 
-    BOOST_CHECK(!handle.Import(static_cast<void *>(misalignedPtr), MemorySource::Malloc));
+    // Increment pointer by 1 byte
+    void* misalignedPtr = static_cast<void*>(reinterpret_cast<char*>(testPtr) + 1);
+
+    BOOST_CHECK(!handle.Import(misalignedPtr, MemorySource::Malloc));
 
     delete[] testPtr;
 }

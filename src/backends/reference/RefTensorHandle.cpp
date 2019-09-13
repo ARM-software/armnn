@@ -110,8 +110,9 @@ bool RefTensorHandle::Import(void* memory, MemorySource source)
     {
         if (source == MemorySource::Malloc)
         {
-            // Checks the 16 byte memory alignment.
-            if (reinterpret_cast<uint64_t>(memory) % 16)
+            // Check memory alignment
+            constexpr uintptr_t alignment = sizeof(size_t);
+            if (reinterpret_cast<uintptr_t>(memory) % alignment)
             {
                 if (m_Imported)
                 {

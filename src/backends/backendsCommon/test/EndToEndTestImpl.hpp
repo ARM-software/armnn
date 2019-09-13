@@ -210,14 +210,12 @@ inline void ImportNonAlignedPointerTest(std::vector<BackendId> backends)
     };
 
     // Misaligned input
-    float * misalignedInputData = inputData.data();
-    misalignedInputData++;
+    float* misalignedInputData = reinterpret_cast<float*>(reinterpret_cast<char*>(inputData.data()) + 1);
 
     std::vector<float> outputData(5);
 
     // Misaligned output
-    float * misalignedOutputData = outputData.data();
-    misalignedOutputData++;
+    float* misalignedOutputData = reinterpret_cast<float*>(reinterpret_cast<char*>(outputData.data()) + 1);
 
     InputTensors inputTensors
     {

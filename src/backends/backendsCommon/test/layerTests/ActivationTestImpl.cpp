@@ -786,6 +786,62 @@ LayerTestResult<int16_t, 4> AbsInt16Test(
     return AbsTestCommon<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager, 0.1f, 0);
 }
 
+LayerTestResult<float, 5> SqrtNNTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const int inputDataSize = 120;
+    std::vector<float> inputData(inputDataSize);
+
+    for (unsigned int i = 0u; i < inputDataSize; ++i)
+    {
+        inputData[i] = static_cast<float>(i) / 10;
+    }
+
+    auto f = [](float value)
+    {
+        return std::sqrt(value);
+    };
+    std::vector<float> outputExpectedData(inputDataSize);
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    armnn::TensorInfo inputTensorInfo(
+        { 1u, 2u, 3u, 4u, 5u }, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensorInfo(
+        { 1u, 2u, 3u, 4u, 5u }, armnn::DataType::Float32);
+
+    LayerTestResult<float, 5> result(inputTensorInfo);
+
+    auto input = MakeTensor<float, 5>(inputTensorInfo, QuantizedVector<float>(0.f, 0.f, inputData));
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::ActivationQueueDescriptor descriptor;
+    armnn::WorkloadInfo workloadInfo;
+    AddInputToWorkload(descriptor, workloadInfo, inputTensorInfo, inputHandle.get());
+    AddOutputToWorkload(descriptor, workloadInfo, outputTensorInfo, outputHandle.get());
+
+    descriptor.m_Parameters.m_Function = armnn::ActivationFunction::Sqrt;
+
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(descriptor, workloadInfo);
+
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), &input[0][0][0][0][0]);
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(&result.output[0][0][0][0][0], outputHandle.get());
+
+    // Calculated manually.
+    result.outputExpected = MakeTensor<float, 5>(outputTensorInfo, QuantizedVector<float>(0.f, 0.f,
+                                                                                  outputExpectedData));
+
+    return result;
+};
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SqrtTestCommon(
         armnn::IWorkloadFactory& workloadFactory,

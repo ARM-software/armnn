@@ -429,6 +429,7 @@ ARMNN_AUTO_TEST_CASE(AbsInt16, AbsInt16Test)
 
 // Sqrt Activation
 ARMNN_AUTO_TEST_CASE(Sqrt, SqrtTest)
+ARMNN_AUTO_TEST_CASE(SqrtNN, SqrtNNTest)
 ARMNN_AUTO_TEST_CASE(SqrtUint8, SqrtUint8Test)
 ARMNN_AUTO_TEST_CASE(SqrtInt16, SqrtInt16Test)
 

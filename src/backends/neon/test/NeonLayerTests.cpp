@@ -354,6 +354,10 @@ ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 ARMNN_AUTO_TEST_CASE(SimpleSigmoid, SimpleSigmoidTest)
 ARMNN_AUTO_TEST_CASE(SimpleSigmoidUint8, SimpleSigmoidUint8Test)
 
+// Sqrt Activation
+ARMNN_AUTO_TEST_CASE(Sqrt, SqrtTest)
+ARMNN_AUTO_TEST_CASE(SqrtNN, SqrtNNTest)
+
 // Softmax
 ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta1, SimpleSoftmaxTest, 1.0f)
 ARMNN_AUTO_TEST_CASE(SimpleSoftmaxBeta2, SimpleSoftmaxTest, 2.0f)

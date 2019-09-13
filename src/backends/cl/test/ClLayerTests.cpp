@@ -42,6 +42,10 @@ ARMNN_AUTO_TEST_CASE(ReLu6Uint8, BoundedReLuUint8UpperBoundOnlyTest)
 ARMNN_AUTO_TEST_CASE(Logistic, SimpleSigmoidTest)
 ARMNN_AUTO_TEST_CASE(LogisticUint8, SimpleSigmoidUint8Test)
 
+// Sqrt Activation
+ARMNN_AUTO_TEST_CASE(Sqrt, SqrtTest)
+ARMNN_AUTO_TEST_CASE(SqrtNN, SqrtNNTest)
+
 // Batch To Space
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat321, BatchToSpaceNdNhwcTest1<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(BatchToSpaceNdNhwcFloat322, BatchToSpaceNdNhwcTest2<DataType::Float32>)

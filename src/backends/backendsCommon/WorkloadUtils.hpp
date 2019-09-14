@@ -125,6 +125,27 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
     size_t copyBatches = std::min(srcBatches, dstBatches);
     size_t copyDepth   = std::min(srcDepth, dstDepth);
 
+    // Coalesce inner dimensions where possible
+    // to reduce overheard calling copy() and to
+    // allow for memory bandwidth optimisations
+    if (copyLength == srcWidthStride &&
+        copyLength == dstWidthStride)
+    {
+        // There is no special padding between rows,
+        // and sizes are compatible, so copy whole rows
+        copyLength *= copyWidth;
+        copyWidth = 1;
+
+        if (copyLength == srcHeightStride &&
+            copyLength == dstHeightStride)
+        {
+            // There is no special padding between batches
+            // and sizes are compatible so copy whole batches
+            copyLength *= copyHeight;
+            copyHeight = 1;
+        }
+    }
+
     for (unsigned int d = 0; d < copyDepth; ++d)
     {
         auto srcPtrDepth = srcData;

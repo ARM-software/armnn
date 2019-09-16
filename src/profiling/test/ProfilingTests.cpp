@@ -702,6 +702,38 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterDirectory)
     BOOST_CHECK(counterDirectory1.GetCounterCount() != 0);
 }
 
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService profilingService(options);
+
+    ProfilingService* profilingServicePtr = &profilingService;
+    std::vector<std::thread> writers;
+
+    for(int i = 0; i < 100 ; ++i)
+    {
+        // Increment and decrement counter 0
+        writers.push_back(std::thread(&ProfilingService::IncrementCounterValue, profilingServicePtr, 0));
+        writers.push_back(std::thread(&ProfilingService::DecrementCounterValue, profilingServicePtr, 0));
+        // Add 10 to counter 0 and subtract 5 from counter 0
+        writers.push_back(std::thread(&ProfilingService::AddCounterValue, profilingServicePtr, 0, 10));
+        writers.push_back(std::thread(&ProfilingService::SubtractCounterValue, profilingServicePtr, 0, 5));
+    }
+
+    std::for_each(writers.begin(), writers.end(), mem_fn(&std::thread::join));
+
+    uint32_t counterValue;
+    profilingService.GetCounterValue(0, counterValue);
+    BOOST_CHECK(counterValue == 500);
+
+    profilingService.SetCounterValue(0, 0);
+    profilingService.GetCounterValue(0, counterValue);
+    BOOST_CHECK(counterValue == 0);
+
+    BOOST_CHECK_THROW(profilingService.SetCounterValue(profilingService.GetCounterCount(), 1), armnn::Exception);
+}
+
 BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)
 {
     uint16_t uid = 0;

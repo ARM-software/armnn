@@ -8,6 +8,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Abs.hpp
     Activation.cpp
     Activation.hpp
+    ArgMinMax.cpp
+    ArgMinMax.hpp
     BaseIterator.hpp
     BatchNormImpl.cpp
     BatchNormImpl.hpp

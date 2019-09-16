@@ -5,26 +5,13 @@
 
 #include "Softmax.hpp"
 
+#include <TensorUtils.hpp>
+
 #include <cmath>
 #include <vector>
 
 namespace armnn
 {
-
-unsigned int GetNumElementsBetween(const TensorShape& shape,
-                                   unsigned int firstAxisInclusive,
-                                   unsigned int lastAxisExclusive)
-{
-    BOOST_ASSERT(0 <= firstAxisInclusive);
-    BOOST_ASSERT(firstAxisInclusive <= lastAxisExclusive);
-    BOOST_ASSERT(lastAxisExclusive <= shape.GetNumDimensions());
-    unsigned int count = 1;
-    for (unsigned int i = firstAxisInclusive; i < lastAxisExclusive; i++)
-    {
-        count *= shape[i];
-    }
-    return count;
-}
 
 /// Computes the softmax function on some inputs, into outputs, with a shape given by tensorInfo.
 void Softmax(Decoder<float>& in, Encoder<float>& out, const TensorInfo& inputTensorInfo, float beta, int axis)
@@ -39,9 +26,11 @@ void Softmax(Decoder<float>& in, Encoder<float>& out, const TensorInfo& inputTen
                          : static_cast<unsigned int>(axis);
 
     const TensorShape& inputShape = inputTensorInfo.GetShape();
-    const unsigned int outerSize  = GetNumElementsBetween(inputShape, 0, uAxis);
+    const unsigned int outerSize  = armnnUtils::GetNumElementsBetween(inputShape, 0, uAxis);
     const unsigned int axisSize   = inputShape[uAxis];
-    const unsigned int innerSize  = GetNumElementsBetween(inputShape, uAxis + 1, inputShape.GetNumDimensions());
+    const unsigned int innerSize  = armnnUtils::GetNumElementsBetween(inputShape,
+                                                                      uAxis + 1,
+                                                                      inputShape.GetNumDimensions());
 
     for (unsigned int outer = 0; outer < outerSize; ++outer)
     {

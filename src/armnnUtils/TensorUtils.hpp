@@ -26,4 +26,10 @@ std::pair<float, float> FindMinMax(armnn::ITensorHandle* tensorHandle);
 
 armnn::TensorShape ExpandDims(const armnn::TensorShape& tensorShape, int axis);
 
+unsigned int GetNumElementsBetween(const armnn::TensorShape& shape,
+                                   unsigned int firstAxisInclusive,
+                                   unsigned int lastAxisExclusive);
+
+unsigned int GetUnsignedAxis(const unsigned int inputDimension, const int axis);
+
 } // namespace armnnUtils

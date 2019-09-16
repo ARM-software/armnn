@@ -31,6 +31,7 @@ struct ResizeDescriptor;
 struct SoftmaxDescriptor;
 struct SpaceToBatchNdDescriptor;
 struct SpaceToDepthDescriptor;
+struct SliceDescriptor;
 struct StackDescriptor;
 struct StridedSliceDescriptor;
 struct TransposeConvolution2dDescriptor;

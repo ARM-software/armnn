@@ -193,6 +193,10 @@ public:
     void VisitRsqrtLayer(const armnn::IConnectableLayer* layer,
                          const char* name = nullptr) override;
 
+    void VisitSliceLayer(const armnn::IConnectableLayer* layer,
+                         const armnn::SliceDescriptor& sliceDescriptor,
+                         const char* name = nullptr) override;
+
     void VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
                            const armnn::SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;

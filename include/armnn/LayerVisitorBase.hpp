@@ -182,6 +182,10 @@ public:
     void VisitRsqrtLayer(const IConnectableLayer*,
                          const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitSliceLayer(const IConnectableLayer*,
+                         const SliceDescriptor&,
+                         const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitSoftmaxLayer(const IConnectableLayer*,
                            const SoftmaxDescriptor&,
                            const char*) override { DefaultPolicy::Apply(__func__); }

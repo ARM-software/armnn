@@ -745,6 +745,13 @@ void SerializerVisitor::VisitRsqrtLayer(const armnn::IConnectableLayer* layer, c
     CreateAnyLayer(fbRsqrtLayer.o, serializer::Layer::Layer_RsqrtLayer);
 }
 
+void SerializerVisitor::VisitSliceLayer(const armnn::IConnectableLayer* layer,
+                                        const armnn::SliceDescriptor& sliceDescriptor,
+                                        const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::VisitSliceLayer is not implemented");
+}
+
 // Build FlatBuffer for Softmax Layer
 void SerializerVisitor::VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::SoftmaxDescriptor& softmaxDescriptor,

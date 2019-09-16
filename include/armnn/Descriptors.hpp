@@ -667,6 +667,24 @@ struct PadDescriptor
     float m_PadValue;
 };
 
+/// A SliceDescriptor for the SliceLayer.
+struct SliceDescriptor
+{
+    SliceDescriptor(const std::vector<unsigned int>& begin, const std::vector<unsigned int>& size)
+        : m_Begin(begin)
+        , m_Size(size)
+    {}
+
+    SliceDescriptor() : SliceDescriptor({}, {})
+    {}
+
+    /// Beginning indices of the slice in each dimension.
+    std::vector<unsigned int> m_Begin;
+
+    /// Size of the slice in each dimension.
+    std::vector<unsigned int> m_Size;
+};
+
 /// A StackDescriptor for the StackLayer.
 struct StackDescriptor
 {

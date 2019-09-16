@@ -760,6 +760,19 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                           reason);
             break;
         }
+        case LayerType::Slice:
+        {
+            auto cLayer = boost::polymorphic_downcast<const SliceLayer*>(&layer);
+
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsSliceSupported(OverrideDataType(input, dataType),
+                                                          OverrideDataType(output, dataType),
+                                                          cLayer->GetParameters(),
+                                                          reason);
+            break;
+        }
         case LayerType::Softmax:
         {
             auto cLayer = boost::polymorphic_downcast<const SoftmaxLayer*>(&layer);
@@ -1240,6 +1253,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateResize(const ResizeQueueDescr
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();

@@ -319,6 +319,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ResizeLayer.cpp
     src/armnn/layers/RsqrtLayer.cpp
     src/armnn/layers/RsqrtLayer.hpp
+    src/armnn/layers/SliceLayer.cpp
+    src/armnn/layers/SliceLayer.hpp
     src/armnn/layers/SoftmaxLayer.hpp
     src/armnn/layers/SoftmaxLayer.cpp
     src/armnn/layers/SpaceToBatchNdLayer.hpp
@@ -846,4 +848,3 @@ if(BUILD_GATORD_MOCK)
         )
 
 endif()
-

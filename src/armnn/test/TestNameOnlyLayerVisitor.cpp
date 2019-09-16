@@ -10,6 +10,7 @@ namespace armnn {
 
 BOOST_AUTO_TEST_SUITE(TestNameOnlyLayerVisitor)
 
+// Addition
 BOOST_AUTO_TEST_CASE(CheckAdditionLayerVisitorName)
 {
     TestAdditionLayerVisitor visitor("AdditionLayer");
@@ -28,42 +29,7 @@ BOOST_AUTO_TEST_CASE(CheckAdditionLayerVisitorNameNullptr)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckMultiplicationLayerVisitorName)
-{
-    TestMultiplicationLayerVisitor visitor("MultiplicationLayer");
-    Network net;
-
-    IConnectableLayer *const layer = net.AddMultiplicationLayer("MultiplicationLayer");
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckMultiplicationLayerVisitorNameNullptr)
-{
-    TestMultiplicationLayerVisitor visitor;
-    Network net;
-
-    IConnectableLayer *const layer = net.AddMultiplicationLayer();
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckFloorLayerVisitorName)
-{
-    TestFloorLayerVisitor visitor("FloorLayer");
-    Network net;
-
-    IConnectableLayer *const layer = net.AddFloorLayer("FloorLayer");
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckFloorLayerVisitorNameNullptr)
-{
-    TestFloorLayerVisitor visitor;
-    Network net;
-
-    IConnectableLayer *const layer = net.AddFloorLayer();
-    layer->Accept(visitor);
-}
-
+// Division
 BOOST_AUTO_TEST_CASE(CheckDivisionLayerVisitorName)
 {
     TestDivisionLayerVisitor visitor("DivisionLayer");
@@ -82,78 +48,7 @@ BOOST_AUTO_TEST_CASE(CheckDivisionLayerVisitorNameNullptr)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckSubtractionLayerVisitorName)
-{
-    TestSubtractionLayerVisitor visitor("SubtractionLayer");
-    Network net;
-
-    IConnectableLayer *const layer = net.AddSubtractionLayer("SubtractionLayer");
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckSubtractionLayerVisitorNameNullptr)
-{
-    TestSubtractionLayerVisitor visitor;
-    Network net;
-
-    IConnectableLayer *const layer = net.AddSubtractionLayer();
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckMaximumLayerVisitorName)
-{
-    TestMaximumLayerVisitor visitor("MaximumLayer");
-    Network net;
-
-    IConnectableLayer *const layer = net.AddMaximumLayer("MaximumLayer");
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckMaximumLayerVisitorNameNullptr)
-{
-    TestMaximumLayerVisitor visitor;
-    Network net;
-
-    IConnectableLayer *const layer = net.AddMaximumLayer();
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckMinimumLayerVisitorName)
-{
-    TestMinimumLayerVisitor visitor("MinimumLayer");
-    Network net;
-
-    IConnectableLayer *const layer = net.AddMinimumLayer("MinimumLayer");
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckMinimumLayerVisitorNameNullptr)
-{
-    TestMinimumLayerVisitor visitor;
-    Network net;
-
-    IConnectableLayer *const layer = net.AddMinimumLayer();
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckGreaterLayerVisitorName)
-{
-    TestGreaterLayerVisitor visitor("GreaterLayer");
-    Network net;
-
-    IConnectableLayer *const layer = net.AddGreaterLayer("GreaterLayer");
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckGreaterLayerVisitorNameNullptr)
-{
-    TestGreaterLayerVisitor visitor;
-    Network net;
-
-    IConnectableLayer *const layer = net.AddGreaterLayer();
-    layer->Accept(visitor);
-}
-
+// Equal
 BOOST_AUTO_TEST_CASE(CheckEqualLayerVisitorName)
 {
     TestEqualLayerVisitor visitor("EqualLayer");
@@ -172,24 +67,26 @@ BOOST_AUTO_TEST_CASE(CheckEqualLayerVisitorNameNullptr)
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckRsqrtLayerVisitorName)
+// Floor
+BOOST_AUTO_TEST_CASE(CheckFloorLayerVisitorName)
 {
-    TestRsqrtLayerVisitor visitor("RsqrtLayer");
+    TestFloorLayerVisitor visitor("FloorLayer");
     Network net;
 
-    IConnectableLayer *const layer = net.AddRsqrtLayer("RsqrtLayer");
+    IConnectableLayer *const layer = net.AddFloorLayer("FloorLayer");
     layer->Accept(visitor);
 }
 
-BOOST_AUTO_TEST_CASE(CheckRsqrtLayerVisitorNameNullptr)
+BOOST_AUTO_TEST_CASE(CheckFloorLayerVisitorNameNullptr)
 {
-    TestRsqrtLayerVisitor visitor;
+    TestFloorLayerVisitor visitor;
     Network net;
 
-    IConnectableLayer *const layer = net.AddRsqrtLayer();
+    IConnectableLayer *const layer = net.AddFloorLayer();
     layer->Accept(visitor);
 }
 
+// Gather
 BOOST_AUTO_TEST_CASE(CheckGatherLayerVisitorName)
 {
     TestGatherLayerVisitor visitor("GatherLayer");
@@ -208,6 +105,139 @@ BOOST_AUTO_TEST_CASE(CheckGatherLayerVisitorNameNullptr)
     layer->Accept(visitor);
 }
 
+// Greater
+BOOST_AUTO_TEST_CASE(CheckGreaterLayerVisitorName)
+{
+    TestGreaterLayerVisitor visitor("GreaterLayer");
+    Network net;
+
+    IConnectableLayer *const layer = net.AddGreaterLayer("GreaterLayer");
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckGreaterLayerVisitorNameNullptr)
+{
+    TestGreaterLayerVisitor visitor;
+    Network net;
+
+    IConnectableLayer *const layer = net.AddGreaterLayer();
+    layer->Accept(visitor);
+}
+
+// Maximum
+BOOST_AUTO_TEST_CASE(CheckMaximumLayerVisitorName)
+{
+    TestMaximumLayerVisitor visitor("MaximumLayer");
+    Network net;
+
+    IConnectableLayer *const layer = net.AddMaximumLayer("MaximumLayer");
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckMaximumLayerVisitorNameNullptr)
+{
+    TestMaximumLayerVisitor visitor;
+    Network net;
+
+    IConnectableLayer *const layer = net.AddMaximumLayer();
+    layer->Accept(visitor);
+}
+
+// Minimum
+BOOST_AUTO_TEST_CASE(CheckMinimumLayerVisitorName)
+{
+    TestMinimumLayerVisitor visitor("MinimumLayer");
+    Network net;
+
+    IConnectableLayer *const layer = net.AddMinimumLayer("MinimumLayer");
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckMinimumLayerVisitorNameNullptr)
+{
+    TestMinimumLayerVisitor visitor;
+    Network net;
+
+    IConnectableLayer *const layer = net.AddMinimumLayer();
+    layer->Accept(visitor);
+}
+
+// Multiplication
+BOOST_AUTO_TEST_CASE(CheckMultiplicationLayerVisitorName)
+{
+    TestMultiplicationLayerVisitor visitor("MultiplicationLayer");
+    Network net;
+
+    IConnectableLayer *const layer = net.AddMultiplicationLayer("MultiplicationLayer");
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckMultiplicationLayerVisitorNameNullptr)
+{
+    TestMultiplicationLayerVisitor visitor;
+    Network net;
+
+    IConnectableLayer *const layer = net.AddMultiplicationLayer();
+    layer->Accept(visitor);
+}
+
+// Rsqrt
+BOOST_AUTO_TEST_CASE(CheckRsqrtLayerVisitorName)
+{
+    TestRsqrtLayerVisitor visitor("RsqrtLayer");
+    Network net;
+
+    IConnectableLayer *const layer = net.AddRsqrtLayer("RsqrtLayer");
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckRsqrtLayerVisitorNameNullptr)
+{
+    TestRsqrtLayerVisitor visitor;
+    Network net;
+
+    IConnectableLayer *const layer = net.AddRsqrtLayer();
+    layer->Accept(visitor);
+}
+
+// Slice
+BOOST_AUTO_TEST_CASE(CheckSliceLayerVisitorName)
+{
+    TestSliceLayerVisitor visitor("SliceLayer");
+    Network net;
+
+    IConnectableLayer *const layer = net.AddSliceLayer(SliceDescriptor(), "SliceLayer");
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckSliceLayerVisitorNameNullptr)
+{
+    TestSliceLayerVisitor visitor;
+    Network net;
+
+    IConnectableLayer *const layer = net.AddSliceLayer(SliceDescriptor());
+    layer->Accept(visitor);
+}
+
+// Subtraction
+BOOST_AUTO_TEST_CASE(CheckSubtractionLayerVisitorName)
+{
+    TestSubtractionLayerVisitor visitor("SubtractionLayer");
+    Network net;
+
+    IConnectableLayer *const layer = net.AddSubtractionLayer("SubtractionLayer");
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckSubtractionLayerVisitorNameNullptr)
+{
+    TestSubtractionLayerVisitor visitor;
+    Network net;
+
+    IConnectableLayer *const layer = net.AddSubtractionLayer();
+    layer->Accept(visitor);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
-} //namespace armnn
+} // namespace armnn

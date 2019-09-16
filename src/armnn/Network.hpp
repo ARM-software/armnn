@@ -117,6 +117,8 @@ public:
     IConnectableLayer* AddNormalizationLayer(const NormalizationDescriptor& normalizationDescriptor,
         const char* name = nullptr) override;
 
+    IConnectableLayer* AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name = nullptr) override;
+
     IConnectableLayer* AddSoftmaxLayer(const SoftmaxDescriptor& softmaxDescriptor,
         const char* name = nullptr) override;
 

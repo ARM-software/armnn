@@ -414,6 +414,14 @@ bool LayerSupportBase::IsRsqrtSupported(const TensorInfo &input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsSliceSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        const SliceDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsSoftmaxSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           const SoftmaxDescriptor& descriptor,

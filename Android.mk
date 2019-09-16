@@ -157,9 +157,10 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ReshapeLayer.cpp \
         src/armnn/layers/ResizeLayer.cpp \
         src/armnn/layers/RsqrtLayer.cpp \
+        src/armnn/layers/SliceLayer.cpp \
+        src/armnn/layers/SoftmaxLayer.cpp \
         src/armnn/layers/SpaceToBatchNdLayer.cpp \
         src/armnn/layers/SpaceToDepthLayer.cpp \
-        src/armnn/layers/SoftmaxLayer.cpp \
         src/armnn/layers/SplitterLayer.cpp \
         src/armnn/layers/StackLayer.cpp \
         src/armnn/layers/StridedSliceLayer.cpp \

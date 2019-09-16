@@ -22,13 +22,25 @@ public:
     };
 };
 
-class TestMultiplicationLayerVisitor : public TestLayerVisitor
+class TestDivisionLayerVisitor : public TestLayerVisitor
 {
 public:
-    explicit TestMultiplicationLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
+    explicit TestDivisionLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
 
-    void VisitMultiplicationLayer(const IConnectableLayer* layer,
-                                  const char* name = nullptr) override {
+    void VisitDivisionLayer(const IConnectableLayer* layer,
+                            const char* name = nullptr) override {
+        CheckLayerPointer(layer);
+        CheckLayerName(name);
+    };
+};
+
+class TestEqualLayerVisitor : public TestLayerVisitor
+{
+public:
+    explicit TestEqualLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
+
+    void VisitEqualLayer(const IConnectableLayer* layer,
+                         const char* name = nullptr) override {
         CheckLayerPointer(layer);
         CheckLayerName(name);
     };
@@ -46,25 +58,37 @@ public:
     };
 };
 
-class TestDivisionLayerVisitor : public TestLayerVisitor
+class TestGatherLayerVisitor : public TestLayerVisitor
 {
 public:
-    explicit TestDivisionLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
+    explicit TestGatherLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
 
-    void VisitDivisionLayer(const IConnectableLayer* layer,
-                            const char* name = nullptr) override {
+    void VisitGatherLayer(const IConnectableLayer* layer,
+                          const char* name = nullptr) override {
         CheckLayerPointer(layer);
         CheckLayerName(name);
     };
 };
 
-class TestSubtractionLayerVisitor : public TestLayerVisitor
+class TestGreaterLayerVisitor : public TestLayerVisitor
 {
 public:
-    explicit TestSubtractionLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
+    explicit TestGreaterLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
 
-    void VisitSubtractionLayer(const IConnectableLayer* layer,
-                               const char* name = nullptr) override {
+    void VisitGreaterLayer(const IConnectableLayer* layer,
+                           const char* name = nullptr) override {
+        CheckLayerPointer(layer);
+        CheckLayerName(name);
+    };
+};
+
+class TestMultiplicationLayerVisitor : public TestLayerVisitor
+{
+public:
+    explicit TestMultiplicationLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
+
+    void VisitMultiplicationLayer(const IConnectableLayer* layer,
+                                  const char* name = nullptr) override {
         CheckLayerPointer(layer);
         CheckLayerName(name);
     };
@@ -94,30 +118,6 @@ public:
     };
 };
 
-class TestGreaterLayerVisitor : public TestLayerVisitor
-{
-public:
-    explicit TestGreaterLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
-
-    void VisitGreaterLayer(const IConnectableLayer* layer,
-                           const char* name = nullptr) override {
-        CheckLayerPointer(layer);
-        CheckLayerName(name);
-    };
-};
-
-class TestEqualLayerVisitor : public TestLayerVisitor
-{
-public:
-    explicit TestEqualLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
-
-    void VisitEqualLayer(const IConnectableLayer* layer,
-                         const char* name = nullptr) override {
-        CheckLayerPointer(layer);
-        CheckLayerName(name);
-    };
-};
-
 class TestRsqrtLayerVisitor : public TestLayerVisitor
 {
 public:
@@ -130,16 +130,30 @@ public:
     };
 };
 
-class TestGatherLayerVisitor : public TestLayerVisitor
+class TestSliceLayerVisitor : public TestLayerVisitor
 {
 public:
-    explicit TestGatherLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
+    explicit TestSliceLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
 
-    void VisitGatherLayer(const IConnectableLayer* layer,
-                          const char* name = nullptr) override {
+    void VisitSliceLayer(const IConnectableLayer* layer,
+                         const SliceDescriptor& sliceDescriptor,
+                         const char* name = nullptr) override
+    {
         CheckLayerPointer(layer);
         CheckLayerName(name);
     };
 };
 
-} //namespace armnn
+class TestSubtractionLayerVisitor : public TestLayerVisitor
+{
+public:
+    explicit TestSubtractionLayerVisitor(const char* name = nullptr) : TestLayerVisitor(name) {};
+
+    void VisitSubtractionLayer(const IConnectableLayer* layer,
+                               const char* name = nullptr) override {
+        CheckLayerPointer(layer);
+        CheckLayerName(name);
+    };
+};
+
+} // namespace armnn

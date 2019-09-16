@@ -237,6 +237,12 @@ public:
     virtual IConnectableLayer* AddNormalizationLayer(const NormalizationDescriptor& normalizationDescriptor,
         const char* name = nullptr) = 0;
 
+    /// Adds a slice layer to the network.
+    /// @param sliceDescriptor - SliceDescriptor to configure the slice operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name = nullptr) = 0;
+
     /// Adds a softmax layer to the network.
     /// If the data type is QAsymm8, then the output quantization parameters
     /// must have a scale of 1/256 and an offset of 0
@@ -253,8 +259,8 @@ public:
     ///                             the first output, second view to the second output, etc....
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
-    virtual IConnectableLayer* AddSplitterLayer(const ViewsDescriptor& splitterDescriptor
-        , const char* name = nullptr) = 0;
+    virtual IConnectableLayer* AddSplitterLayer(const ViewsDescriptor& splitterDescriptor,
+                                                const char* name = nullptr) = 0;
 
     /// Adds a merge layer to the network.
     /// @param name - Optional name for the layer.

@@ -357,6 +357,14 @@ public:
     virtual void VisitRsqrtLayer(const IConnectableLayer* layer,
                                  const char* name = nullptr) = 0;
 
+    /// Function that a slice layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param sliceDescriptor - SliceDescriptor to configure the slice operation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitSliceLayer(const IConnectableLayer* layer,
+                                 const SliceDescriptor& sliceDescriptor,
+                                 const char* name = nullptr) = 0;
+
 
     /// Function that a softmax layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.

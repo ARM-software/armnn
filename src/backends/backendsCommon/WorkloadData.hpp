@@ -533,4 +533,9 @@ struct AbsQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-} //namespace armnn
+struct SliceQueueDescriptor : QueueDescriptorWithParameters<SliceDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
+} // namespace armnn

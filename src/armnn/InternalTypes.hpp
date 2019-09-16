@@ -58,6 +58,7 @@ enum class LayerType
     Reshape,
     Resize,
     Rsqrt,
+    Slice,
     Softmax,
     SpaceToBatchNd,
     SpaceToDepth,

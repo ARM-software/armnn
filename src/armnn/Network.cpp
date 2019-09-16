@@ -1129,6 +1129,11 @@ normalizationDescriptor,
     return m_Graph->AddLayer<NormalizationLayer>(normalizationDescriptor, name);
 }
 
+IConnectableLayer* Network::AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name)
+{
+    return m_Graph->AddLayer<SliceLayer>(sliceDescriptor, name);
+}
+
 IConnectableLayer* Network::AddSoftmaxLayer(const SoftmaxDescriptor& softmaxDescriptor,
     const char* name)
 {

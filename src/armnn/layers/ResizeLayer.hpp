@@ -37,7 +37,7 @@ public:
     void Accept(ILayerVisitor& visitor) const override;
 
 protected:
-    /// Constructor to create a ResizeLayerLayer.
+    /// Constructor to create a ResizeLayer.
     /// @param [in] param ResizeDescriptor to configure the resize  operation.
     /// @param [in] name Optional name for the layer.
     ResizeLayer(const ResizeDescriptor& param, const char* name);

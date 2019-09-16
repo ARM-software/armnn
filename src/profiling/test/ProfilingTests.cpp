@@ -114,21 +114,39 @@ BOOST_AUTO_TEST_CASE(CheckEncodeVersion)
 
 BOOST_AUTO_TEST_CASE(CheckPacketClass)
 {
-    const char* data = "test";
-    unsigned int length = static_cast<unsigned int>(std::strlen(data));
+    uint32_t length = 4;
+    std::unique_ptr<char[]> packetData0 = std::make_unique<char[]>(length);
+    std::unique_ptr<char[]> packetData1 = std::make_unique<char[]>(0);
+    std::unique_ptr<char[]> nullPacketData;
 
-    Packet packetTest1(472580096,length,data);
-    BOOST_CHECK_THROW(Packet packetTest2(472580096,0,""), armnn::Exception);
+    Packet packetTest0(472580096, length, packetData0);
 
-    Packet packetTest3(472580096,0, nullptr);
+    BOOST_CHECK(packetTest0.GetHeader() == 472580096);
+    BOOST_CHECK(packetTest0.GetPacketFamily() == 7);
+    BOOST_CHECK(packetTest0.GetPacketId() == 43);
+    BOOST_CHECK(packetTest0.GetLength() == length);
+    BOOST_CHECK(packetTest0.GetPacketType() == 3);
+    BOOST_CHECK(packetTest0.GetPacketClass() == 5);
 
-    BOOST_CHECK(packetTest1.GetLength() == length);
-    BOOST_CHECK(packetTest1.GetData() == data);
+    BOOST_CHECK_THROW(Packet packetTest1(472580096, 0, packetData1), armnn::Exception);
+    BOOST_CHECK_NO_THROW(Packet packetTest2(472580096, 0, nullPacketData));
 
-    BOOST_CHECK(packetTest1.GetPacketFamily() == 7);
-    BOOST_CHECK(packetTest1.GetPacketId() == 43);
-    BOOST_CHECK(packetTest1.GetPacketType() == 3);
-    BOOST_CHECK(packetTest1.GetPacketClass() == 5);
+    Packet packetTest3(472580096, 0, nullPacketData);
+    BOOST_CHECK(packetTest3.GetLength() == 0);
+    BOOST_CHECK(packetTest3.GetData() == nullptr);
+
+    const char* packetTest0Data = packetTest0.GetData();
+    Packet packetTest4(std::move(packetTest0));
+
+    BOOST_CHECK(packetTest0.GetData() == nullptr);
+    BOOST_CHECK(packetTest4.GetData() == packetTest0Data);
+
+    BOOST_CHECK(packetTest4.GetHeader() == 472580096);
+    BOOST_CHECK(packetTest4.GetPacketFamily() == 7);
+    BOOST_CHECK(packetTest4.GetPacketId() == 43);
+    BOOST_CHECK(packetTest4.GetLength() == length);
+    BOOST_CHECK(packetTest4.GetPacketType() == 3);
+    BOOST_CHECK(packetTest4.GetPacketClass() == 5);
 }
 
 // Create Derived Classes
@@ -186,9 +204,13 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerFunctor)
     it++;
     BOOST_CHECK(it->first==keyC);
 
-    Packet packetA(500000000, 0, nullptr);
-    Packet packetB(600000000, 0, nullptr);
-    Packet packetC(400000000, 0, nullptr);
+    std::unique_ptr<char[]> packetDataA;
+    std::unique_ptr<char[]> packetDataB;
+    std::unique_ptr<char[]> packetDataC;
+
+    Packet packetA(500000000, 0, packetDataA);
+    Packet packetB(600000000, 0, packetDataB);
+    Packet packetC(400000000, 0, packetDataC);
 
     // Check the correct operator of derived class is called
     registry.at(CommandHandlerKey(packetA.GetPacketId(), version))->operator()(packetA);
@@ -224,9 +246,13 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerRegistry)
     registry.RegisterFunctor(&testFunctorB, testFunctorB.GetPacketId(), testFunctorB.GetVersion());
     registry.RegisterFunctor(&testFunctorC, testFunctorC.GetPacketId(), testFunctorC.GetVersion());
 
-    Packet packetA(500000000, 0, nullptr);
-    Packet packetB(600000000, 0, nullptr);
-    Packet packetC(400000000, 0, nullptr);
+    std::unique_ptr<char[]> packetDataA;
+    std::unique_ptr<char[]> packetDataB;
+    std::unique_ptr<char[]> packetDataC;
+
+    Packet packetA(500000000, 0, packetDataA);
+    Packet packetB(600000000, 0, packetDataB);
+    Packet packetC(400000000, 0, packetDataC);
 
     // Check the correct operator of derived class is called
     registry.GetFunctor(packetA.GetPacketId(), version)->operator()(packetA);
@@ -561,8 +587,10 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     // Data with period and counters
     uint32_t period1 = 10;
     uint32_t dataLength1 = 8;
-    unsigned char data1[dataLength1];
     uint32_t offset = 0;
+
+    std::unique_ptr<char[]> uniqueData1 = std::make_unique<char[]>(dataLength1);
+    unsigned char* data1 = reinterpret_cast<unsigned char*>(uniqueData1.get());
 
     WriteUint32(data1, offset, period1);
     offset += sizeOfUint32;
@@ -570,7 +598,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     offset += sizeOfUint16;
     WriteUint16(data1, offset, 5000);
 
-    Packet packetA(packetId, dataLength1, reinterpret_cast<const char*>(data1));
+    Packet packetA(packetId, dataLength1, uniqueData1);
 
     PeriodicCounterSelectionCommandHandler commandHandler(packetId, version, holder, captureThread,
                                                           sendCounterPacket);
@@ -611,11 +639,12 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     // Data with period only
     uint32_t period2 = 11;
     uint32_t dataLength2 = 4;
-    unsigned char data2[dataLength2];
 
-    WriteUint32(data2, 0, period2);
+    std::unique_ptr<char[]> uniqueData2 = std::make_unique<char[]>(dataLength2);
 
-    Packet packetB(packetId, dataLength2, reinterpret_cast<const char*>(data2));
+    WriteUint32(reinterpret_cast<unsigned char*>(uniqueData2.get()), 0, period2);
+
+    Packet packetB(packetId, dataLength2, uniqueData2);
 
     commandHandler(packetB);
 

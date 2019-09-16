@@ -17,10 +17,8 @@ namespace profiling
 class Packet
 {
 public:
-    Packet(uint32_t header, uint32_t length, const char* data)
-        : m_Header(header),
-          m_Length(length),
-          m_Data(data)
+    Packet(uint32_t header, uint32_t length, std::unique_ptr<char[]>& data)
+    : m_Header(header), m_Length(length), m_Data(std::move(data))
     {
         m_PacketId = ((header >> 16) & 1023);
         m_PacketFamily = (header >> 26);
@@ -31,11 +29,21 @@ public:
         }
     }
 
+    Packet(Packet&& other) :
+           m_Header(other.m_Header),
+           m_PacketFamily(other.m_PacketFamily),
+           m_PacketId(other.m_PacketId),
+           m_Length(other.m_Length),
+           m_Data(std::move(other.m_Data)){};
+
+    Packet(const Packet& other) = delete;
+    Packet& operator=(const Packet&) = delete;
+
     uint32_t GetHeader() const;
     uint32_t GetPacketFamily() const;
     uint32_t GetPacketId() const;
     uint32_t GetLength() const;
-    const char* GetData() const;
+    const char* const GetData() const;
 
     uint32_t GetPacketClass() const;
     uint32_t GetPacketType() const;
@@ -45,7 +53,7 @@ private:
     uint32_t m_PacketFamily;
     uint32_t m_PacketId;
     uint32_t m_Length;
-    const char* m_Data;
+    std::unique_ptr<char[]> m_Data;
 };
 
 } // namespace profiling

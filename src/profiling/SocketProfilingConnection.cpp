@@ -135,7 +135,7 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
     }
     else // it's 0 so a timeout.
     {
-        throw armnn::Exception(": Timeout while reading from socket.");
+        throw armnn::TimeoutException(": Timeout while reading from socket.");
     }
 }
 

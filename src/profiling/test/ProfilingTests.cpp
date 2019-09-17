@@ -4,6 +4,7 @@
 //
 
 #include "SendCounterPacketTests.hpp"
+#include "../CommandThread.hpp"
 
 #include <CommandHandlerKey.hpp>
 #include <CommandHandlerFunctor.hpp>
@@ -85,6 +86,150 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
     };
 
     BOOST_CHECK(vect == expectedVect);
+}
+
+class TestProfilingConnectionBase :public IProfilingConnection
+{
+public:
+    TestProfilingConnectionBase() = default;
+    ~TestProfilingConnectionBase() = default;
+
+    bool IsOpen()
+    {
+        return true;
+    }
+
+    void Close(){}
+
+    bool WritePacket(const char* buffer, uint32_t length)
+    {
+        return false;
+    }
+
+    Packet ReadPacket(uint32_t timeout)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        std::unique_ptr<char[]> packetData;
+        //Return connection acknowledged packet
+        return {65536 ,0 , packetData};
+    }
+};
+
+class TestProfilingConnectionTimeoutError :public TestProfilingConnectionBase
+{
+    int readRequests = 0;
+public:
+    Packet ReadPacket(uint32_t timeout) {
+        if (readRequests < 3)
+        {
+            readRequests++;
+            throw armnn::TimeoutException(": Simulate a timeout");
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        std::unique_ptr<char[]> packetData;
+        //Return connection acknowledged packet after three timeouts
+        return {65536 ,0 , packetData};
+    }
+};
+
+class TestProfilingConnectionArmnnError :public TestProfilingConnectionBase
+{
+public:
+
+    Packet ReadPacket(uint32_t timeout)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        throw armnn::Exception(": Simulate a non timeout error");
+    }
+};
+
+BOOST_AUTO_TEST_CASE(CheckCommandThread)
+{
+        PacketVersionResolver packetVersionResolver;
+        ProfilingStateMachine profilingStateMachine;
+
+        TestProfilingConnectionBase testProfilingConnectionBase;
+        TestProfilingConnectionTimeoutError testProfilingConnectionTimeOutError;
+        TestProfilingConnectionArmnnError testProfilingConnectionArmnnError;
+
+        ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(1, 4194304, profilingStateMachine);
+        CommandHandlerRegistry commandHandlerRegistry;
+
+        commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler, 1, 4194304);
+
+        profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+        profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
+
+        CommandThread commandThread0(1,
+                                     true,
+                                     commandHandlerRegistry,
+                                     packetVersionResolver,
+                                     testProfilingConnectionBase);
+
+        commandThread0.Start();
+        commandThread0.Start();
+        commandThread0.Start();
+
+        commandThread0.Stop();
+        commandThread0.Join();
+
+        BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
+
+        profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+        profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
+        //commandThread1 should give up after one timeout
+        CommandThread commandThread1(1,
+                                     true,
+                                     commandHandlerRegistry,
+                                     packetVersionResolver,
+                                     testProfilingConnectionTimeOutError);
+
+        commandThread1.Start();
+        commandThread1.Join();
+
+        BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck);
+        //now commandThread1 should persist after a timeout
+        commandThread1.StopAfterTimeout(false);
+        commandThread1.Start();
+
+        for (int i = 0; i < 100; i++)
+        {
+            if (profilingStateMachine.GetCurrentState() == ProfilingState::Active)
+            {
+                break;
+            }
+            else
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            }
+        }
+
+        commandThread1.Stop();
+        commandThread1.Join();
+
+        BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
+
+
+        CommandThread commandThread2(1,
+                                     false,
+                                     commandHandlerRegistry,
+                                     packetVersionResolver,
+                                     testProfilingConnectionArmnnError);
+
+        commandThread2.Start();
+
+        for (int i = 0; i < 100; i++)
+        {
+            if (!commandThread2.IsRunning())
+            {
+                //commandThread2 should stop once it encounters a non timing error
+                commandThread2.Join();
+                return;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
+
+        BOOST_ERROR("commandThread2 has failed to stop");
 }
 
 BOOST_AUTO_TEST_CASE(CheckEncodeVersion)

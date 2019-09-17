@@ -428,6 +428,8 @@ list(APPEND armnn_sources
     src/profiling/CommandHandlerKey.hpp
     src/profiling/CommandHandlerRegistry.cpp
     src/profiling/CommandHandlerRegistry.hpp
+    src/profiling/CommandThread.cpp
+    src/profiling/CommandThread.hpp
     src/profiling/ConnectionAcknowledgedCommandHandler.cpp
     src/profiling/ConnectionAcknowledgedCommandHandler.hpp
     src/profiling/CounterDirectory.cpp

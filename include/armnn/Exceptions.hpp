@@ -125,6 +125,11 @@ class MemoryExportException : public Exception
     using Exception::Exception;
 };
 
+class TimeoutException : public Exception
+{
+    using Exception::Exception;
+};
+
 template <typename ExceptionType>
 void ConditionalThrow(bool condition, const std::string& message)
 {

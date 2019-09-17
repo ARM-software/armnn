@@ -7,6 +7,7 @@
 #include "NeonAbsWorkload.hpp"
 #include "NeonActivationWorkload.hpp"
 #include "NeonAdditionWorkload.hpp"
+#include "NeonArgMinMaxWorkload.hpp"
 #include "NeonBatchNormalizationWorkload.hpp"
 #include "NeonConstantWorkload.hpp"
 #include "NeonConvertFp16ToFp32Workload.hpp"

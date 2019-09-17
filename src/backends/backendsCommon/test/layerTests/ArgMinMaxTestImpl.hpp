@@ -21,9 +21,17 @@ LayerTestResult<int32_t, 3> ArgMinSimpleTest(armnn::IWorkloadFactory& workloadFa
                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<int32_t, 3> ArgMinChannel4dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+LayerTestResult<int32_t, 3> ArgMinChannelTest(armnn::IWorkloadFactory& workloadFactory,
+                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<int32_t, 3> ArgMaxChannel4dTest(armnn::IWorkloadFactory& workloadFactory,
-                                                const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+LayerTestResult<int32_t, 3> ArgMaxChannelTest(armnn::IWorkloadFactory& workloadFactory,
+                                              const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<int32_t, 3> ArgMaxHeightTest(armnn::IWorkloadFactory& workloadFactory,
+                                             const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<int32_t, 3> ArgMinWidthTest(armnn::IWorkloadFactory& workloadFactory,
+                                            const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

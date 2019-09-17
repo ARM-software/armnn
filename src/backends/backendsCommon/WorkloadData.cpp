@@ -450,10 +450,10 @@ void ActivationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float16,
-            DataType::Float32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -476,15 +476,15 @@ void ArgMinMaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         throw InvalidArgumentException(descriptorName + ": Output of ArgMinMax layer must be Int32.");
     }
 
-    std::vector<DataType> supportedTypes =
-            {
-                    DataType::Float16,
-                    DataType::Float32,
-                    DataType::QuantisedAsymm8,
-                    DataType::QuantisedSymm16
-            };
+    std::vector<DataType> supportedInputTypes =
+    {
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
 
-    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo, supportedInputTypes, descriptorName);
 }
 
 void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
@@ -499,10 +499,10 @@ void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float16,
-            DataType::Float32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -519,12 +519,12 @@ void SplitterQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     // Check the supported data types
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32,
-            DataType::Float16,
-            DataType::Boolean,
-            DataType::Signed32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float32,
+        DataType::Float16,
+        DataType::Boolean,
+        DataType::Signed32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     const TensorInfo& inputTensorInfo = workloadInfo.m_InputTensorInfos[0];
@@ -655,12 +655,12 @@ void ConcatQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     // Check the supported data types
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32,
-            DataType::Float16,
-            DataType::Boolean,
-            DataType::Signed32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float32,
+        DataType::Float16,
+        DataType::Boolean,
+        DataType::Signed32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
@@ -742,12 +742,12 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     // Check the supported data types
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32,
-            DataType::Float16,
-            DataType::Boolean,
-            DataType::Signed32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float32,
+        DataType::Float16,
+        DataType::Boolean,
+        DataType::Signed32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0], supportedTypes, descriptorName);
@@ -805,10 +805,10 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     // Check the supported data types
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32,
-            DataType::Float16,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -1937,8 +1937,8 @@ void QuantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32,
-            DataType::Float16
+        DataType::Float32,
+        DataType::Float16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -1962,10 +1962,10 @@ void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32,
-            DataType::Float16,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -2129,10 +2129,10 @@ void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float16,
-            DataType::Float32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -2157,10 +2157,10 @@ void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float16,
-            DataType::Float32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -2255,8 +2255,8 @@ void DequantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
     std::vector<DataType> supportedTypes =
     {
-            DataType::Float32,
-            DataType::Float16
+        DataType::Float32,
+        DataType::Float16
     };
 
     ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
@@ -2578,12 +2578,12 @@ void AbsQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
     std::vector<DataType> supportedTypes =
-        {
-            DataType::Float16,
-            DataType::Float32,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
-        };
+    {
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");

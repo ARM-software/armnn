@@ -10,6 +10,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonActivationWorkload.hpp
     NeonAdditionWorkload.cpp
     NeonAdditionWorkload.hpp
+    NeonArgMinMaxWorkload.cpp
+    NeonArgMinMaxWorkload.hpp
     NeonBatchNormalizationWorkload.cpp
     NeonBatchNormalizationWorkload.hpp
     NeonConcatWorkload.cpp

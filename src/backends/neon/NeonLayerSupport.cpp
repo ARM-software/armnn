@@ -21,6 +21,7 @@
 #include "workloads/NeonAbsWorkload.hpp"
 #include "workloads/NeonAdditionWorkload.hpp"
 #include "workloads/NeonActivationWorkload.hpp"
+#include "workloads/NeonArgMinMaxWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
@@ -144,6 +145,18 @@ bool NeonLayerSupport::IsAdditionSupported(const TensorInfo& input0,
                                    input0,
                                    input1,
                                    output);
+}
+
+bool NeonLayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const ArgMinMaxDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonArgMinMaxWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,

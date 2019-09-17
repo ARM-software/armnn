@@ -442,4 +442,10 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateStack(const StackQueueDesc
     return std::make_unique<NeonStackWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
+                                                                const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonArgMinMaxWorkload>(descriptor, info);
+}
+
 } // namespace armnn

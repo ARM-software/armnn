@@ -30,7 +30,6 @@ LayerTestResult<int32_t, 3> ArgMinMaxTestCommon(
     auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, ConvertToDataType<ArmnnType>(inputData, inputTensorInfo));
 
     LayerTestResult<int32_t, 3> result(outputTensorInfo);
-
     result.outputExpected = MakeTensor<int32_t, 3>(outputTensorInfo, outputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
@@ -57,7 +56,6 @@ LayerTestResult<int32_t, 3> ArgMinMaxTestCommon(
     CopyDataFromITensorHandle(&result.output[0][0][0], outputHandle.get());
 
     return result;
-
 }
 
 } // namespace
@@ -86,7 +84,7 @@ LayerTestResult<int32_t, 3> ArgMaxSimpleTest(
     return ArgMinMaxTestCommon<ArmnnType>(workloadFactory, memoryManager,
                                           armnn::ArgMinMaxFunction::Max,
                                           inputTensorInfo, outputTensorInfo,
-                                          inputValues, outputValues, 3);
+                                          inputValues, outputValues, -1); // axis -1 === 3
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -117,43 +115,7 @@ LayerTestResult<int32_t, 3> ArgMinSimpleTest(
 }
 
 template<armnn::DataType ArmnnType, typename T>
-LayerTestResult<int32_t, 3> ArgMinChannel4dTest(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
-{
-    const armnn::TensorShape inputShape{ 1, 3, 2, 4};
-    const armnn::TensorShape outputShape{ 1, 2, 4 }; // C=1,2,4 H =1,3,4 W=1,3,2
-
-    armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
-
-    if(armnn::IsQuantizedType<T>())
-    {
-        inputTensorInfo.SetQuantizationScale(1.0f);
-        inputTensorInfo.SetQuantizationOffset(0);
-    }
-
-    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
-
-    std::vector<float> inputValues({ 1.0f,   2.0f,   3.0f,   4.0f,
-                                     5.0f,   6.0f,   7.0f,   8.0f,
-
-                                     10.0f,  20.0f,  30.0f,  40.0f,
-                                     50.0f,  60.0f,  70.0f,  80.0f,
-
-                                     100.0f, 200.0f, 300.0f, 400.0f,
-                                     500.0f, 600.0f, 700.0f, 800.0f });
-
-    std::vector<int32_t> outputValues({ 0, 0, 0, 0,
-                                        0, 0, 0, 0 });
-
-    return ArgMinMaxTestCommon<ArmnnType>(workloadFactory, memoryManager,
-                                          armnn::ArgMinMaxFunction::Min,
-                                          inputTensorInfo, outputTensorInfo,
-                                          inputValues, outputValues, 1);
-}
-
-template<armnn::DataType ArmnnType, typename T>
-LayerTestResult<int32_t, 3> ArgMaxChannel4dTest(
+LayerTestResult<int32_t, 3> ArgMinChannelTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -170,15 +132,49 @@ LayerTestResult<int32_t, 3> ArgMaxChannel4dTest(
 
     armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
 
-    std::vector<float> inputValues({ 1.0f,   2.0f,   3.0f,   4.0f,
-                                     5.0f,   6.0f,   7.0f,   8.0f,
+    std::vector<float> inputValues({   1.0f,   2.0f,   3.0f,   4.0f,
+                                       5.0f,   6.0f,   7.0f,   8.0f,
+
+                                      10.0f,  20.0f,  30.0f,  40.0f,
+                                      50.0f,  60.0f,  70.0f,  80.0f,
+
+                                     100.0f, 200.0f, 300.0f, 400.0f,
+                                     500.0f, 600.0f, 700.0f, 800.0f });
+    std::vector<int32_t> outputValues({ 0, 0, 0, 0,
+                                        0, 0, 0, 0 });
+
+    return ArgMinMaxTestCommon<ArmnnType>(workloadFactory, memoryManager,
+                                          armnn::ArgMinMaxFunction::Min,
+                                          inputTensorInfo, outputTensorInfo,
+                                          inputValues, outputValues, 1);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<int32_t, 3> ArgMaxChannelTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 1, 3, 2, 4};
+    const armnn::TensorShape outputShape{ 1, 2, 4 };
+
+    armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
+
+    if(armnn::IsQuantizedType<T>())
+    {
+        inputTensorInfo.SetQuantizationScale(1.0f);
+        inputTensorInfo.SetQuantizationOffset(0);
+    }
+
+    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
+
+    std::vector<float> inputValues({  1.0f,   2.0f,   3.0f,   4.0f,
+                                      5.0f,   6.0f,   7.0f,   8.0f,
 
                                      10.0f,  20.0f,  30.0f,  40.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f,
 
-                                     100.0f, 200.0f, 300.0f, 400.0f,
-                                     500.0f, 600.0f, 700.0f, 800.0f });
-
+                                    100.0f, 200.0f, 300.0f, 400.0f,
+                                    500.0f, 600.0f, 700.0f, 800.0f });
     std::vector<int32_t> outputValues({ 2, 2, 2, 2,
                                         2, 2, 2, 2 });
 
@@ -186,6 +182,64 @@ LayerTestResult<int32_t, 3> ArgMaxChannel4dTest(
                                           armnn::ArgMinMaxFunction::Max,
                                           inputTensorInfo, outputTensorInfo,
                                           inputValues, outputValues, 1);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<int32_t, 3> ArgMaxHeightTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 1, 3, 2, 4};
+    const armnn::TensorShape outputShape{ 3, 1, 4 };
+
+    armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
+    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
+
+    std::vector<float> inputValues({  1.0f,   2.0f,   3.0f,   4.0f,
+                                      5.0f,   6.0f,   7.0f,   8.0f,
+
+                                     10.0f,  20.0f,  30.0f,  40.0f,
+                                     50.0f,  60.0f,  70.0f,  80.0f,
+
+                                    100.0f, 200.0f, 300.0f, 400.0f,
+                                    500.0f, 600.0f, 700.0f, 800.0f });
+    std::vector<int32_t> outputValues({ 1, 1, 1, 1,
+                                        1, 1, 1, 1,
+                                        1, 1, 1, 1 });
+
+    return ArgMinMaxTestCommon<ArmnnType>(workloadFactory, memoryManager,
+                                          armnn::ArgMinMaxFunction::Max,
+                                          inputTensorInfo, outputTensorInfo,
+                                          inputValues, outputValues, 2);
+}
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<int32_t, 3> ArgMinWidthTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    const armnn::TensorShape inputShape{ 1, 3, 2, 4};
+    const armnn::TensorShape outputShape{ 3, 2, 1 };
+
+    armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
+    armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
+
+    std::vector<float> inputValues({  1.0f,   2.0f,   3.0f,   4.0f,
+                                      5.0f,   6.0f,   7.0f,   8.0f,
+
+                                     10.0f,  20.0f,  30.0f,  40.0f,
+                                     50.0f,  60.0f,  70.0f,  80.0f,
+
+                                    100.0f, 200.0f, 300.0f, 400.0f,
+                                    500.0f, 600.0f, 700.0f, 800.0f });
+    std::vector<int32_t> outputValues({ 0, 0,
+                                        0, 0,
+                                        0, 0 });
+
+    return ArgMinMaxTestCommon<ArmnnType>(workloadFactory, memoryManager,
+                                          armnn::ArgMinMaxFunction::Min,
+                                          inputTensorInfo, outputTensorInfo,
+                                          inputValues, outputValues, 3);
 }
 
 
@@ -197,17 +251,7 @@ ArgMaxSimpleTest<armnn::DataType::Float32>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinSimpleTest<armnn::DataType::Float32>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-template LayerTestResult<int32_t, 3>
 ArgMaxSimpleTest<armnn::DataType::QuantisedAsymm8>(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
-
-template LayerTestResult<int32_t, 3>
-ArgMinSimpleTest<armnn::DataType::QuantisedAsymm8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -217,36 +261,56 @@ ArgMaxSimpleTest<armnn::DataType::QuantisedSymm16>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
+ArgMinSimpleTest<armnn::DataType::Float32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
+ArgMinSimpleTest<armnn::DataType::QuantisedAsymm8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
 ArgMinSimpleTest<armnn::DataType::QuantisedSymm16>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinChannel4dTest<armnn::DataType::Float32>(
+ArgMinChannelTest<armnn::DataType::Float32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinChannel4dTest<armnn::DataType::QuantisedAsymm8>(
+ArgMinChannelTest<armnn::DataType::QuantisedAsymm8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMinChannel4dTest<armnn::DataType::QuantisedSymm16>(
+ArgMinChannelTest<armnn::DataType::QuantisedSymm16>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMaxChannel4dTest<armnn::DataType::Float32>(
+ArgMaxChannelTest<armnn::DataType::Float32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMaxChannel4dTest<armnn::DataType::QuantisedAsymm8>(
+ArgMaxChannelTest<armnn::DataType::QuantisedAsymm8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
-ArgMaxChannel4dTest<armnn::DataType::QuantisedSymm16>(
+ArgMaxChannelTest<armnn::DataType::QuantisedSymm16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
+ArgMaxHeightTest<armnn::DataType::Float32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
+ArgMinWidthTest<armnn::DataType::Float32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

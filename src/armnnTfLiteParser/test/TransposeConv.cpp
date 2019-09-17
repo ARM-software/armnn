@@ -83,7 +83,7 @@ struct TransposeConvFixture : public ParserFlatbuffersFixture
                             "outputs": [ 3 ],
                             "builtin_options_type": "TransposeConvOptions",
                             "builtin_options": {
-                                "padding": "SAME",
+                                "padding": "VALID",
                                 "stride_w": )" + strideX + R"(,
                                 "stride_h": )" + strideY + R"(
                             },

@@ -66,7 +66,7 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
 
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
-    const unsigned int batches  = inputShape[0];
+    const unsigned int batches = inputShape[0];
 
     const unsigned int wInput = inputShape[dataLayoutIndex.GetWidthIndex()];
     const unsigned int hInput = inputShape[dataLayoutIndex.GetHeightIndex()];
@@ -74,20 +74,18 @@ std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
     const unsigned int wKernel = kernelShape[dataLayoutIndex.GetWidthIndex()];
     const unsigned int hKernel = kernelShape[dataLayoutIndex.GetHeightIndex()];
 
-    const unsigned int wStridedInput = 1u + m_Param.m_StrideX * (wInput - 1);
-    const unsigned int hStridedInput = 1u + m_Param.m_StrideY * (hInput - 1);
+    unsigned int wPadding = m_Param.m_PadLeft + m_Param.m_PadRight;
+    unsigned int hPadding = m_Param.m_PadTop + m_Param.m_PadBottom;
 
-    const unsigned int wPaddedOutput = wStridedInput + wKernel - (wKernel % 2);
-    const unsigned int hPaddedOutput = hStridedInput + hKernel - (hKernel % 2);
-
-    unsigned int wOutput = wPaddedOutput - (m_Param.m_PadLeft + m_Param.m_PadRight);
-    unsigned int hOutput = hPaddedOutput - (m_Param.m_PadTop + m_Param.m_PadBottom);
+    unsigned int wOutput = (wInput - 1) * m_Param.m_StrideX + wKernel - wPadding;
+    unsigned int hOutput = (hInput - 1) * m_Param.m_StrideY + hKernel - hPadding;
 
     unsigned int kernelElements = kernelShape[0] * kernelShape[dataLayoutIndex.GetChannelsIndex()];
-    unsigned int inputElements = batches * inputShape[dataLayoutIndex.GetChannelsIndex()];
+    unsigned int inputElements  = batches * inputShape[dataLayoutIndex.GetChannelsIndex()];
 
     BOOST_ASSERT_MSG(inputElements != 0, "Invalid number of input elements");
     BOOST_ASSERT_MSG(kernelElements % inputElements == 0, "Invalid number of elements");
+
     unsigned int channels =  kernelElements / inputElements;
 
     TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NHWC ?

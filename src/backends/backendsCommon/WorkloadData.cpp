@@ -2631,7 +2631,7 @@ void SliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     const TensorShape& inputShape  = inputTensorInfo.GetShape();
     for(unsigned int i = 0u; i < rank; ++i)
     {
-        if (m_Parameters.m_Begin[i] + m_Parameters.m_Size[i] >= inputShape[i])
+        if (m_Parameters.m_Begin[i] + m_Parameters.m_Size[i] > inputShape[i])
         {
             throw InvalidArgumentException(descriptorName + ": Sum of begin offset and size for dimension " +
                 std::to_string(i) + " exceeds input size.");

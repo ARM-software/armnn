@@ -69,6 +69,7 @@ BACKEND_SOURCES := \
         workloads/RefResizeBilinearWorkload.cpp \
         workloads/RefResizeWorkload.cpp \
         workloads/RefRsqrtWorkload.cpp \
+        workloads/RefSliceWorkload.cpp \
         workloads/RefSoftmaxWorkload.cpp \
         workloads/RefSpaceToBatchNdWorkload.cpp \
         workloads/RefSpaceToDepthWorkload.cpp \
@@ -78,6 +79,7 @@ BACKEND_SOURCES := \
         workloads/RefTransposeConvolution2dWorkload.cpp \
         workloads/Resize.cpp \
         workloads/Rsqrt.cpp \
+        workloads/Slice.cpp \
         workloads/SpaceToBatchNd.cpp \
         workloads/SpaceToDepth.cpp \
         workloads/Stack.cpp \

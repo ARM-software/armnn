@@ -457,4 +457,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAbs(const AbsQueueDescripto
     return std::make_unique<RefAbsWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<RefSliceWorkload>(descriptor, info);
+}
+
 } // namespace armnn

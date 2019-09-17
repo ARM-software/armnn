@@ -40,6 +40,7 @@
 #include <backendsCommon/test/layerTests/ReshapeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ResizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/RsqrtTestImpl.hpp>
+#include <backendsCommon/test/layerTests/SliceTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SoftmaxTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SpaceToBatchNdTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SpaceToDepthTestImpl.hpp>

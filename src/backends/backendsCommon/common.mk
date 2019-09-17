@@ -62,6 +62,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/Pooling2dTestImpl.cpp \
     test/layerTests/ReshapeTestImpl.cpp \
     test/layerTests/RsqrtTestImpl.cpp \
+    test/layerTests/SliceTestImpl.cpp \
     test/layerTests/QuantizeTestImpl.cpp \
     test/layerTests/SoftmaxTestImpl.cpp \
     test/layerTests/SpaceToBatchNdTestImpl.cpp \

@@ -1252,6 +1252,22 @@ ARMNN_AUTO_TEST_CASE(PreluFloat16, PreluTest<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE(PreluUint8,   PreluTest<DataType::QuantisedAsymm8>)
 ARMNN_AUTO_TEST_CASE(PreluInt16,   PreluTest<DataType::QuantisedSymm16>)
 
+// Slice
+ARMNN_AUTO_TEST_CASE(Slice4dFloat32, Slice4dFloat32Test)
+ARMNN_AUTO_TEST_CASE(Slice3dFloat32, Slice3dFloat32Test)
+ARMNN_AUTO_TEST_CASE(Slice2dFloat32, Slice2dFloat32Test)
+ARMNN_AUTO_TEST_CASE(Slice1dFloat32, Slice1dFloat32Test)
+
+ARMNN_AUTO_TEST_CASE(Slice4dUint8, Slice4dUint8Test)
+ARMNN_AUTO_TEST_CASE(Slice3dUint8, Slice3dUint8Test)
+ARMNN_AUTO_TEST_CASE(Slice2dUint8, Slice2dUint8Test)
+ARMNN_AUTO_TEST_CASE(Slice1dUint8, Slice1dUint8Test)
+
+ARMNN_AUTO_TEST_CASE(Slice4dInt16, Slice4dInt16Test)
+ARMNN_AUTO_TEST_CASE(Slice3dInt16, Slice3dInt16Test)
+ARMNN_AUTO_TEST_CASE(Slice2dInt16, Slice2dInt16Test)
+ARMNN_AUTO_TEST_CASE(Slice1dInt16, Slice1dInt16Test)
+
 // TransposeConvolution2d
 ARMNN_AUTO_TEST_CASE(SimpleTransposeConvolution2dFloatNchw,
                      SimpleTransposeConvolution2dTest<DataType::Float32, DataType::Float32>,

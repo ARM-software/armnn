@@ -1374,6 +1374,33 @@ bool RefLayerSupport::IsRsqrtSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsSliceSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const SliceDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+    bool supported = true;
+
+    std::array<DataType, 3> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Slice: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Slice: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Slice: input and output types are mismatched");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const SoftmaxDescriptor& descriptor,

@@ -106,6 +106,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ResizeTestImpl.hpp
     layerTests/RsqrtTestImpl.cpp
     layerTests/RsqrtTestImpl.hpp
+    layerTests/SliceTestImpl.cpp
+    layerTests/SliceTestImpl.hpp
     layerTests/SoftmaxTestImpl.cpp
     layerTests/SoftmaxTestImpl.hpp
     layerTests/SpaceToBatchNdTestImpl.cpp

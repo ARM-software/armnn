@@ -107,6 +107,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefResizeWorkload.hpp
     RefRsqrtWorkload.cpp
     RefRsqrtWorkload.hpp
+    RefSliceWorkload.cpp
+    RefSliceWorkload.hpp
     RefSoftmaxWorkload.cpp
     RefSoftmaxWorkload.hpp
     RefSpaceToBatchNdWorkload.cpp
@@ -127,6 +129,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Resize.hpp
     Rsqrt.cpp
     Rsqrt.hpp
+    Slice.cpp
+    Slice.hpp
     Softmax.cpp
     Softmax.hpp
     SpaceToBatchNd.hpp

@@ -212,6 +212,9 @@ public:
     std::unique_ptr<IWorkload> CreateAbs(const AbsQueueDescriptor& descriptor,
                                          const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateSlice(const SliceQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info) const override;
+
 private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>

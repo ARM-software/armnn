@@ -395,7 +395,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingStateMachine)
     BOOST_TEST((profilingState17.GetCurrentState() == ProfilingState::NotConnected));
 }
 
-void CaptureDataWriteThreadImpl(Holder &holder, uint32_t capturePeriod, std::vector<uint16_t>& counterIds)
+void CaptureDataWriteThreadImpl(Holder& holder, uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
 {
     holder.SetCaptureData(capturePeriod, counterIds);
 }
@@ -409,22 +409,15 @@ BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
 {
     std::map<uint32_t, std::vector<uint16_t>> periodIdMap;
     std::vector<uint16_t> counterIds;
-    uint16_t numThreads = 50;
-    for (uint16_t i = 0; i < numThreads; ++i)
+    uint32_t numThreads = 10;
+    for (uint32_t i = 0; i < numThreads; ++i)
     {
         counterIds.emplace_back(i);
         periodIdMap.insert(std::make_pair(i, counterIds));
     }
 
-    // Check CaptureData functions
-    CaptureData capture;
-    BOOST_CHECK(capture.GetCapturePeriod() == 0);
-    BOOST_CHECK((capture.GetCounterIds()).empty());
-    capture.SetCapturePeriod(0);
-    capture.SetCounterIds(periodIdMap[0]);
-    BOOST_CHECK(capture.GetCapturePeriod() == 0);
-    BOOST_CHECK(capture.GetCounterIds() == periodIdMap[0]);
-
+    // Verify the read and write threads set the holder correctly
+    // and retrieve the expected values
     Holder holder;
     BOOST_CHECK((holder.GetCaptureData()).GetCapturePeriod() == 0);
     BOOST_CHECK(((holder.GetCaptureData()).GetCounterIds()).empty());
@@ -432,76 +425,82 @@ BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
     // Check Holder functions
     std::thread thread1(CaptureDataWriteThreadImpl, std::ref(holder), 2, std::ref(periodIdMap[2]));
     thread1.join();
-
     BOOST_CHECK((holder.GetCaptureData()).GetCapturePeriod() == 2);
     BOOST_CHECK((holder.GetCaptureData()).GetCounterIds() == periodIdMap[2]);
+    // NOTE: now that we have some initial values in the holder we don't have to worry
+    //       in the multi-threaded section below about a read thread accessing the holder
+    //       before any write thread has gotten to it so we read period = 0, counterIds empty
+    //       instead of period = 0, counterIds = {0} as will the case when write thread 0
+    //       has executed.
 
     CaptureData captureData;
     std::thread thread2(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData));
     thread2.join();
+    BOOST_CHECK(captureData.GetCapturePeriod() == 2);
     BOOST_CHECK(captureData.GetCounterIds() == periodIdMap[2]);
 
+    std::map<uint32_t, CaptureData> captureDataIdMap;
+    for (uint32_t i = 0; i < numThreads; ++i)
+    {
+        CaptureData perThreadCaptureData;
+        captureDataIdMap.insert(std::make_pair(i, perThreadCaptureData));
+    }
+
     std::vector<std::thread> threadsVect;
-    for (int i = 0; i < numThreads; i+=2)
+    std::vector<std::thread> readThreadsVect;
+    for (uint32_t i = 0; i < numThreads; ++i)
     {
         threadsVect.emplace_back(std::thread(CaptureDataWriteThreadImpl,
                                  std::ref(holder),
                                  i,
-                                 std::ref(periodIdMap[static_cast<uint16_t >(i)])));
+                                 std::ref(periodIdMap[i])));
 
-        threadsVect.emplace_back(std::thread(CaptureDataReadThreadImpl,
-                                 std::ref(holder),
-                                 std::ref(captureData)));
+        // Verify that the CaptureData goes into the thread in a virgin state
+        BOOST_CHECK(captureDataIdMap.at(i).GetCapturePeriod() == 0);
+        BOOST_CHECK(captureDataIdMap.at(i).GetCounterIds().empty());
+        readThreadsVect.emplace_back(std::thread(CaptureDataReadThreadImpl,
+                                     std::ref(holder),
+                                     std::ref(captureDataIdMap.at(i))));
     }
 
-    for (uint16_t i = 0; i < numThreads; ++i)
+    for (uint32_t i = 0; i < numThreads; ++i)
     {
         threadsVect[i].join();
-    }
-
-    std::vector<std::thread> readThreadsVect;
-    for (uint16_t i = 0; i < numThreads; ++i)
-    {
-        readThreadsVect.emplace_back(
-                std::thread(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureData)));
-    }
-
-    for (uint16_t i = 0; i < numThreads; ++i)
-    {
         readThreadsVect[i].join();
     }
 
-    // Check CaptureData was written/read correctly from multiple threads
-    std::vector<uint16_t> captureIds = captureData.GetCounterIds();
-    uint32_t capturePeriod = captureData.GetCapturePeriod();
-
-    BOOST_CHECK(captureIds == periodIdMap[capturePeriod]);
-
-    std::vector<uint16_t> readIds = holder.GetCaptureData().GetCounterIds();
-    BOOST_CHECK(captureIds == readIds);
+    // Look at the CaptureData that each read thread has filled
+    // the capture period it read should match the counter ids entry
+    for (uint32_t i = 0; i < numThreads; ++i)
+    {
+        CaptureData perThreadCaptureData = captureDataIdMap.at(i);
+        BOOST_CHECK(perThreadCaptureData.GetCounterIds() == periodIdMap.at(perThreadCaptureData.GetCapturePeriod()));
+    }
 }
 
 BOOST_AUTO_TEST_CASE(CaptureDataMethods)
 {
-    // Check assignment operator
-    CaptureData assignableCaptureData;
+    // Check CaptureData setter and getter functions
     std::vector<uint16_t> counterIds = {42, 29, 13};
-    assignableCaptureData.SetCapturePeriod(3);
-    assignableCaptureData.SetCounterIds(counterIds);
+    CaptureData captureData;
+    BOOST_CHECK(captureData.GetCapturePeriod() == 0);
+    BOOST_CHECK((captureData.GetCounterIds()).empty());
+    captureData.SetCapturePeriod(150);
+    captureData.SetCounterIds(counterIds);
+    BOOST_CHECK(captureData.GetCapturePeriod() == 150);
+    BOOST_CHECK(captureData.GetCounterIds() == counterIds);
 
+    // Check assignment operator
     CaptureData secondCaptureData;
 
-    BOOST_CHECK(assignableCaptureData.GetCapturePeriod() == 3);
-    BOOST_CHECK(assignableCaptureData.GetCounterIds() == counterIds);
-
-    secondCaptureData = assignableCaptureData;
-    BOOST_CHECK(secondCaptureData.GetCapturePeriod() == 3);
+    secondCaptureData = captureData;
+    BOOST_CHECK(secondCaptureData.GetCapturePeriod() == 150);
     BOOST_CHECK(secondCaptureData.GetCounterIds() == counterIds);
 
     // Check copy constructor
-    CaptureData copyConstructedCaptureData(assignableCaptureData);
+    CaptureData copyConstructedCaptureData(captureData);
 
-    BOOST_CHECK(copyConstructedCaptureData.GetCapturePeriod() == 3);
+    BOOST_CHECK(copyConstructedCaptureData.GetCapturePeriod() == 150);
     BOOST_CHECK(copyConstructedCaptureData.GetCounterIds() == counterIds);
 }
 

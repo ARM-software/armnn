@@ -24,7 +24,7 @@ void CaptureData::SetCapturePeriod(uint32_t capturePeriod)
     m_CapturePeriod = capturePeriod;
 }
 
-void CaptureData::SetCounterIds(std::vector<uint16_t>& counterIds)
+void CaptureData::SetCounterIds(const std::vector<uint16_t>& counterIds)
 {
     m_CounterIds = counterIds;
 }
@@ -45,7 +45,7 @@ CaptureData Holder::GetCaptureData() const
     return m_CaptureData;
 }
 
-void Holder::SetCaptureData(uint32_t capturePeriod, std::vector<uint16_t>& counterIds)
+void Holder::SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
 {
     std::lock_guard<std::mutex> lockGuard(m_CaptureThreadMutex);
     m_CaptureData.SetCapturePeriod(capturePeriod);

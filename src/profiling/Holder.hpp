@@ -26,7 +26,7 @@ public:
     CaptureData& operator= (const CaptureData& captureData);
 
     void SetCapturePeriod(uint32_t capturePeriod);
-    void SetCounterIds(std::vector<uint16_t>& counterIds);
+    void SetCounterIds(const std::vector<uint16_t>& counterIds);
     uint32_t GetCapturePeriod() const;
     std::vector<uint16_t> GetCounterIds() const;
 
@@ -41,7 +41,7 @@ public:
     Holder()
         : m_CaptureData() {};
     CaptureData GetCaptureData() const;
-    void SetCaptureData(uint32_t capturePeriod, std::vector<uint16_t>& counterIds);
+    void SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds);
 
 private:
     mutable std::mutex m_CaptureThreadMutex;

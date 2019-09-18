@@ -426,6 +426,8 @@ list(APPEND armnn_sources
     src/profiling/CommandHandlerKey.hpp
     src/profiling/CommandHandlerRegistry.cpp
     src/profiling/CommandHandlerRegistry.hpp
+    src/profiling/ConnectionAcknowledgedCommandHandler.cpp
+    src/profiling/ConnectionAcknowledgedCommandHandler.hpp
     src/profiling/CounterDirectory.cpp
     src/profiling/CounterDirectory.hpp
     src/profiling/EncodeVersion.hpp

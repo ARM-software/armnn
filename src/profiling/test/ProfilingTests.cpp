@@ -8,6 +8,7 @@
 #include <CommandHandlerKey.hpp>
 #include <CommandHandlerFunctor.hpp>
 #include <CommandHandlerRegistry.hpp>
+#include <ConnectionAcknowledgedCommandHandler.hpp>
 #include <CounterDirectory.hpp>
 #include <EncodeVersion.hpp>
 #include <Holder.hpp>
@@ -1647,6 +1648,62 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
     BOOST_TEST(headerWord1 == 4);                   // data lenght
     BOOST_TEST(period == 11);                       // capture period
+}
+
+BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
+{
+    using boost::numeric_cast;
+
+    const uint32_t connectionPacketId = 0x10000;
+    const uint32_t version = 1;
+
+    uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
+
+    // Data with period and counters
+    uint32_t period1 = 10;
+    uint32_t dataLength1 = 8;
+    uint32_t offset = 0;
+
+    std::unique_ptr<char[]> uniqueData1 = std::make_unique<char[]>(dataLength1);
+    unsigned char* data1 = reinterpret_cast<unsigned char*>(uniqueData1.get());
+
+    WriteUint32(data1, offset, period1);
+    offset += sizeOfUint32;
+    WriteUint16(data1, offset, 4000);
+    offset += sizeOfUint16;
+    WriteUint16(data1, offset, 5000);
+
+    Packet packetA(connectionPacketId, dataLength1, uniqueData1);
+
+    ProfilingStateMachine profilingState(ProfilingState::Uninitialised);
+    BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::Uninitialised);
+
+    ConnectionAcknowledgedCommandHandler commandHandler(connectionPacketId, version, profilingState);
+
+    // command handler received packet on ProfilingState::Uninitialised
+    BOOST_CHECK_THROW(commandHandler(packetA), armnn::Exception);
+
+    profilingState.TransitionToState(ProfilingState::NotConnected);
+    BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::NotConnected);
+    // command handler received packet on ProfilingState::NotConnected
+    BOOST_CHECK_THROW(commandHandler(packetA), armnn::Exception);
+
+    profilingState.TransitionToState(ProfilingState::WaitingForAck);
+    BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::WaitingForAck);
+    // command handler received packet on ProfilingState::WaitingForAck
+    commandHandler(packetA);
+    BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::Active);
+
+    // command handler received packet on ProfilingState::Active
+    commandHandler(packetA);
+    BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::Active);
+
+    // command handler received different packet
+    const uint32_t differentPacketId = 0x40000;
+    Packet packetB(differentPacketId, dataLength1, uniqueData1);
+    ConnectionAcknowledgedCommandHandler differentCommandHandler(differentPacketId, version, profilingState);
+    BOOST_CHECK_THROW(differentCommandHandler(packetB), armnn::Exception);
 }
 
 BOOST_AUTO_TEST_CASE(CheckSocketProfilingConnection)

@@ -7,6 +7,7 @@
 
 #include "ProfilingStateMachine.hpp"
 #include "ProfilingConnectionFactory.hpp"
+#include "CounterDirectory.hpp"
 
 namespace armnn
 {
@@ -22,16 +23,17 @@ public:
 
     void Run();
 
+    const ICounterDirectory& GetCounterDirectory() const;
     ProfilingState GetCurrentState() const;
-
-    // Options are public to allow profiling to be turned on at runtime
-    Runtime::CreationOptions::ExternalProfilingOptions m_Options;
+    void ResetExternalProfilingOptions(const Runtime::CreationOptions::ExternalProfilingOptions& options);
 
 private:
     void Initialise();
 
-    ProfilingStateMachine m_State;
+    CounterDirectory m_CounterDirectory;
     ProfilingConnectionFactory m_Factory;
+    Runtime::CreationOptions::ExternalProfilingOptions m_Options;
+    ProfilingStateMachine m_State;
 };
 
 } // namespace profiling

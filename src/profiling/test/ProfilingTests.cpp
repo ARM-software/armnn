@@ -535,11 +535,26 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
     service.Run();
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
-    service.m_Options.m_EnableProfiling = true;
-    service.Run();
+    options.m_EnableProfiling = true;
+    service.ResetExternalProfilingOptions(options);
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::NotConnected);
     service.Run();
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::WaitingForAck);
+}
+
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterDirectory)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingService service(options);
+
+    const ICounterDirectory& counterDirectory0 = service.GetCounterDirectory();
+    BOOST_CHECK(counterDirectory0.GetCounterCount() == 0);
+
+    options.m_EnableProfiling = true;
+    service.ResetExternalProfilingOptions(options);
+
+    const ICounterDirectory& counterDirectory1 = service.GetCounterDirectory();
+    BOOST_CHECK(counterDirectory1.GetCounterCount() != 0);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)

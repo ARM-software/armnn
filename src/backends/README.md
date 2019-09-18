@@ -298,9 +298,9 @@ Only one path is allowed for the override via the CreationOptions class.
 By setting the value of the ```m_DynamicBackendsPath``` to a path in the filesystem, Arm NN will entirely ignore the list of paths passed via the
 ```DYNAMIC_BACKEND_PATHS``` compiler directive.
 
-All the specified paths are validate before processing (they must exist, must be directories, and must be absolute paths),
+All the specified paths are validated before processing (they must exist, must be directories, and must be absolute paths),
 in case of error a warning message will be added to the log, but Arm NN's execution will not be stopped.
-If all path are not valid, then no dynamic backends will be loaded in the Arm NN's runtime.
+If all paths are not valid, then no dynamic backends will be loaded in the Arm NN's runtime.
 
 Passing an empty list of paths at compile-time and providing no path override at runtime will effectively disable the
 dynamic backend loading feature, and no dynamic backends will be loaded into Arm NN's runtime.
@@ -316,7 +316,7 @@ Arm NN will try to load only the files that match the following accepted naming 
 
 Only alphanumeric characters are allowed for both the `<vendor>` and the `<name>` fields, namely lowercase and/or uppercase characters,
 and/or numerical digits (see the table below for examples).
-Only dots and numbers are allow for the optional `<version>` field.
+Only dots and numbers are allowed for the optional `<version>` field.
 
 Symlinks to other files are allowed to support the standard linux shared object versioning:
 

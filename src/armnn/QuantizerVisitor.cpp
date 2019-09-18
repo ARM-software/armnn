@@ -413,6 +413,15 @@ void QuantizerVisitor::VisitRsqrtLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitSliceLayer(const IConnectableLayer* layer,
+                                       const SliceDescriptor& sliceDescriptor,
+                                       const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddSliceLayer(sliceDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitSoftmaxLayer(const IConnectableLayer* layer,
                                          const SoftmaxDescriptor& softmaxDescriptor,
                                          const char* name)

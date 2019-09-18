@@ -1905,6 +1905,61 @@ BOOST_AUTO_TEST_CASE(QuantizeStack)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeSlice)
+{
+    class TestSliceQuantization : public TestQuantization
+    {
+    public:
+        TestSliceQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape)
+        {}
+
+        TestSliceQuantization(const QuantizerOptions& options,
+                              const TensorShape& inputShape,
+                              const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape)
+        {}
+
+        virtual void VisitSliceLayer(const IConnectableLayer* layer,
+                                     const SliceDescriptor& desc,
+                                     const char* name = nullptr)
+        {
+            const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            const OffsetScalePair qAsymm8Params{ 30.0f / g_Asymm8QuantizationBase, 128 };
+            const OffsetScalePair qSymm16Params{ 15.0f / g_Symm16QuantizationBase, 0 };
+
+            TestQuantizationParams(info, qAsymm8Params, qSymm16Params);
+        }
+    };
+
+    TensorShape shape{ 3 };
+    TensorInfo info(shape, DataType::Float32);
+
+    INetworkPtr network = INetwork::Create();
+
+    IConnectableLayer* inputLayer  = network->AddInputLayer(0);
+    IConnectableLayer* sliceLayer  = network->AddSliceLayer(SliceDescriptor());
+    IConnectableLayer* outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(sliceLayer->GetInputSlot(0));
+    sliceLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    sliceLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    // test QAsymm8 quantization
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestSliceQuantization validatorQAsymm8(shape, shape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    // test QSymm16 quantization
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestSliceQuantization validatorQSymm16(options, shape, shape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 std::vector<uint8_t> SetupQuantize(float value)
 {
     armnn::TensorInfo inputInfo({ 1, 2, 2 }, armnn::DataType::Float32);

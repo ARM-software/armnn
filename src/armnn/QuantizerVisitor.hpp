@@ -124,6 +124,10 @@ public:
     void VisitRsqrtLayer(const IConnectableLayer*,
                          const char* name = nullptr) override;
 
+    void VisitSliceLayer(const IConnectableLayer* layer,
+                         const SliceDescriptor& sliceDescriptor,
+                         const char* name = nullptr) override;
+
     void VisitSoftmaxLayer(const IConnectableLayer* layer,
                            const SoftmaxDescriptor& softmaxDescriptor,
                            const char* name = nullptr) override;

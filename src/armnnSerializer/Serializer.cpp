@@ -749,7 +749,14 @@ void SerializerVisitor::VisitSliceLayer(const armnn::IConnectableLayer* layer,
                                         const armnn::SliceDescriptor& sliceDescriptor,
                                         const char* name)
 {
-    throw UnimplementedException("SerializerVisitor::VisitSliceLayer is not implemented");
+    auto fbSliceBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Slice);
+    auto fbSliceDescriptor = CreateSliceDescriptor(m_flatBufferBuilder,
+                                                   m_flatBufferBuilder.CreateVector(sliceDescriptor.m_Begin),
+                                                   m_flatBufferBuilder.CreateVector(sliceDescriptor.m_Size));
+
+    auto fbSliceLayer = serializer::CreateSliceLayer(m_flatBufferBuilder, fbSliceBaseLayer, fbSliceDescriptor);
+
+    CreateAnyLayer(fbSliceLayer.o, serializer::Layer::Layer_SliceLayer);
 }
 
 // Build FlatBuffer for Softmax Layer

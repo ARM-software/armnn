@@ -139,7 +139,8 @@ enum LayerType : uint {
     Stack = 44,
     QuantizedLstm = 45,
     Abs = 46,
-    ArgMinMax = 47
+    ArgMinMax = 47,
+    Slice = 48
 }
 
 // Base layer table to be used as part of other layers
@@ -471,6 +472,16 @@ table ResizeBilinearDescriptor {
     dataLayout:DataLayout;
 }
 
+table SliceLayer {
+    base:LayerBase;
+    descriptor:SliceDescriptor;
+}
+
+table SliceDescriptor {
+    begin:[uint];
+    size:[uint];
+}
+
 table StridedSliceLayer {
     base:LayerBase;
     descriptor:StridedSliceDescriptor;
@@ -710,7 +721,8 @@ union Layer {
     ResizeLayer,
     StackLayer,
     AbsLayer,
-    ArgMinMaxLayer
+    ArgMinMaxLayer,
+    SliceLayer
 }
 
 table AnyLayer {

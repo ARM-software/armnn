@@ -222,6 +222,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_ResizeBilinearLayer]         = &Deserializer::ParseResizeBilinear;
     m_ParserFunctions[Layer_ResizeLayer]                 = &Deserializer::ParseResize;
     m_ParserFunctions[Layer_RsqrtLayer]                  = &Deserializer::ParseRsqrt;
+    m_ParserFunctions[Layer_SliceLayer]                  = &Deserializer::ParseSlice;
     m_ParserFunctions[Layer_SoftmaxLayer]                = &Deserializer::ParseSoftmax;
     m_ParserFunctions[Layer_SpaceToBatchNdLayer]         = &Deserializer::ParseSpaceToBatchNd;
     m_ParserFunctions[Layer_SpaceToDepthLayer]           = &Deserializer::ParseSpaceToDepth;
@@ -317,6 +318,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_ResizeLayer()->base();
         case Layer::Layer_RsqrtLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_RsqrtLayer()->base();
+        case Layer::Layer_SliceLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_SliceLayer()->base();
         case Layer::Layer_SoftmaxLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SoftmaxLayer()->base();
         case Layer::Layer_SpaceToBatchNdLayer:
@@ -338,8 +341,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
         case Layer::Layer_NONE:
         default:
             throw ParseException(boost::str(
-                  boost::format("Layer must have a type %1%") %
-                  Layer::Layer_NONE));
+                  boost::format("Layer type %1% not recognized") %
+                  layerType));
     }
 }
 
@@ -1981,6 +1984,41 @@ void Deserializer::ParseRsqrt(GraphPtr graph, unsigned int layerIndex)
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddRsqrtLayer(layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseSlice(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto fbDescriptor = graph->layers()->Get(layerIndex)->layer_as_SliceLayer()->descriptor();
+
+    auto fbBegin = fbDescriptor->begin();
+    auto fbSize  = fbDescriptor->size();
+
+    if (fbBegin->Length() != fbSize->Length())
+    {
+        throw ParseException(boost::str(
+            boost::format("Begin and size descriptors must have the same length %1%") % CHECK_LOCATION().AsString()));
+    }
+
+    armnn::SliceDescriptor descriptor;
+    descriptor.m_Begin.insert(descriptor.m_Begin.end(), fbBegin->begin(), fbBegin->end());
+    descriptor.m_Size.insert(descriptor.m_Size.end(), fbSize->begin(), fbSize->end());
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddSliceLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

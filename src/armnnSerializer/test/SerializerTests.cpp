@@ -2259,6 +2259,65 @@ BOOST_AUTO_TEST_CASE(SerializeRsqrt)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeSlice)
+{
+    class SliceLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        SliceLayerVerifier(const std::string& layerName,
+                           const std::vector<armnn::TensorInfo>& inputInfos,
+                           const std::vector<armnn::TensorInfo>& outputInfos,
+                           const armnn::SliceDescriptor& descriptor)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos)
+            , m_Descriptor(descriptor) {}
+
+        void VisitSliceLayer(const armnn::IConnectableLayer* layer,
+                             const armnn::SliceDescriptor& descriptor,
+                             const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::SliceDescriptor& descriptor)
+        {
+            BOOST_CHECK_EQUAL_COLLECTIONS(descriptor.m_Begin.begin(), descriptor.m_Begin.end(),
+                                          m_Descriptor.m_Begin.begin(), m_Descriptor.m_Begin.end());
+
+            BOOST_CHECK_EQUAL_COLLECTIONS(descriptor.m_Size.begin(), descriptor.m_Size.end(),
+                                          m_Descriptor.m_Size.begin(), m_Descriptor.m_Size.end());
+        }
+
+        armnn::SliceDescriptor m_Descriptor;
+    };
+
+    const std::string layerName{"slice"};
+
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo({3, 2, 3, 1}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({2, 2, 2, 1}, armnn::DataType::Float32);
+
+    armnn::SliceDescriptor descriptor({ 0, 0, 1, 0}, {2, 2, 2, 1});
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+
+    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const sliceLayer  = network->AddSliceLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(sliceLayer->GetInputSlot(0));
+    sliceLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    sliceLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    SliceLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeSoftmax)
 {
     class SoftmaxLayerVerifier : public LayerVerifierBase

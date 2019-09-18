@@ -40,6 +40,10 @@ public:
 
     void VisitAdditionLayer(const IConnectableLayer* layer, const char* name = nullptr) override;
 
+    void VisitArgMinMaxLayer(const IConnectableLayer* layer,
+                             const ArgMinMaxDescriptor& argMinMaxDescriptor,
+                             const char* name = nullptr) override;
+
     void VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                       const BatchNormalizationDescriptor& desc,
                                       const ConstTensor& mean,

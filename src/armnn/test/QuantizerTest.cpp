@@ -1348,6 +1348,78 @@ BOOST_AUTO_TEST_CASE(QuantizeAbs)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeArgMinMax)
+{
+    class TestArgMinMaxQuantization : public TestQuantization
+    {
+    public:
+        TestArgMinMaxQuantization(const TensorShape& inputShape, const TensorShape& outputShape)  :
+                TestQuantization(inputShape, outputShape) {}
+
+        TestArgMinMaxQuantization(const QuantizerOptions& options,
+                                  const TensorShape& inputShape,
+                                  const TensorShape& outputShape) :
+                TestQuantization(options, inputShape, outputShape)
+        {}
+
+        void VisitInputLayer(const IConnectableLayer* layer,
+                             LayerBindingId id,
+                             const char* name = nullptr) override
+        {}
+
+        void VisitOutputLayer(const IConnectableLayer* layer,
+                              LayerBindingId id,
+                              const char* name = nullptr) override
+        {}
+        void VisitArgMinMaxLayer(const IConnectableLayer* layer,
+                                 const ArgMinMaxDescriptor& argMinMaxDescriptor,
+                                 const char* name = nullptr) override
+        {
+                TensorInfo outputInfo = layer->GetOutputSlot(0).GetTensorInfo();
+
+                TestQuantizationParams(outputInfo,
+                                       { 30.0f / g_Asymm8QuantizationBase, 128 },
+                                       { 15.0f / g_Symm16QuantizationBase, 0 });
+        }
+    };
+
+    INetworkPtr network = INetwork::Create();
+
+    const TensorShape inputShape{ 1, 1, 1, 5 };
+    const TensorShape outputShape{ 1, 1, 1 };
+
+    TensorInfo inputInfo(inputShape, DataType::Float32);
+    TensorInfo outputInfo(outputShape, DataType::Float32);
+
+    // Add the input layers
+    IConnectableLayer* input = network->AddInputLayer(0);
+
+    // Add the layer under test
+    ArgMinMaxDescriptor argMinMaxDescriptor;
+    argMinMaxDescriptor.m_Function = ArgMinMaxFunction::Max;
+    IConnectableLayer* argMinMaxLayer = network->AddArgMinMaxLayer(argMinMaxDescriptor);
+
+    // Add the output layers
+    IConnectableLayer* output = network->AddOutputLayer(1);
+
+    // Establish connections
+    input->GetOutputSlot(0).Connect(argMinMaxLayer->GetInputSlot(0));
+    argMinMaxLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Set tensor info
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    argMinMaxLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestArgMinMaxQuantization validatorQAsymm8(inputShape, outputShape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestArgMinMaxQuantization validatorQSymm16(options, inputShape, outputShape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 BOOST_AUTO_TEST_CASE(QuantizeConcat)
 {
     class TestConcatQuantization : public TestQuantization

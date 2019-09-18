@@ -136,6 +136,15 @@ void QuantizerVisitor::VisitAdditionLayer(const IConnectableLayer* layer, const 
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitArgMinMaxLayer(const IConnectableLayer* layer,
+                                           const ArgMinMaxDescriptor& argMinMaxDescriptor,
+                                           const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddArgMinMaxLayer(argMinMaxDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitBatchNormalizationLayer(const IConnectableLayer* layer,
                                                     const BatchNormalizationDescriptor& desc,
                                                     const ConstTensor& mean,

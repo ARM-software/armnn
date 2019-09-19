@@ -2481,7 +2481,7 @@ void Deserializer::ParseStack(GraphPtr graph, unsigned int layerIndex)
 
     for (unsigned int i=0; i<inputs.size(); ++i)
     {
-        armnn::TensorShape& inputShape = ToTensorInfo(inputs[i]).GetShape();
+        armnn::TensorShape inputShape = ToTensorInfo(inputs[i]).GetShape();
         if (descriptor.m_InputShape != inputShape)
         {
             std::stringstream ss;

@@ -7,14 +7,14 @@
 
 namespace armnn
 {
-
 namespace profiling
 {
+
 class IPeriodicCounterCapture
 {
 public:
     virtual void Start() = 0;
-    virtual ~IPeriodicCounterCapture() {};
+    virtual ~IPeriodicCounterCapture() {}
 };
 
 } // namespace profiling

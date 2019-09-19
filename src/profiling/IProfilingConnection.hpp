@@ -24,7 +24,7 @@ public:
 
     virtual void Close() =  0;
 
-    virtual bool WritePacket(const char* buffer, uint32_t length) = 0;
+    virtual bool WritePacket(const unsigned char* buffer, uint32_t length) = 0;
 
     virtual Packet ReadPacket(uint32_t timeout) = 0;
 };

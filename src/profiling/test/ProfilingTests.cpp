@@ -36,6 +36,7 @@
 #include <map>
 #include <random>
 #include <thread>
+#include <chrono>
 
 BOOST_AUTO_TEST_SUITE(ExternalProfiling)
 
@@ -101,7 +102,7 @@ public:
 
     void Close(){}
 
-    bool WritePacket(const char* buffer, uint32_t length)
+    bool WritePacket(const unsigned char* buffer, uint32_t length)
     {
         return false;
     }
@@ -1754,8 +1755,9 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     uint32_t version = 1;
     Holder holder;
     TestCaptureThread captureThread;
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(512);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
 
     uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
     uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
@@ -2112,8 +2114,9 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     std::vector<uint16_t> captureIds1 = { 0, 1 };
     std::vector<uint16_t> captureIds2;
 
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(512);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
 
     std::vector<uint16_t> counterIds;
     CaptureReader captureReader;
@@ -2183,8 +2186,9 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest0)
 
     Packet packetA(packetId, 0, packetData);
 
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
 
     CounterDirectory counterDirectory;
 
@@ -2217,8 +2221,9 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
 
     Packet packetA(packetId, 0, packetData);
 
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
 
     CounterDirectory counterDirectory;
     const Device* device = counterDirectory.RegisterDevice("deviceA", 1);

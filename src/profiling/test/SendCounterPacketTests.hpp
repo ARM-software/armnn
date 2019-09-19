@@ -5,24 +5,50 @@
 
 #pragma once
 
-#include "../SendCounterPacket.hpp"
-#include "../ProfilingUtils.hpp"
+#include <SendCounterPacket.hpp>
+#include <ProfilingUtils.hpp>
 
 #include <armnn/Exceptions.hpp>
+#include <armnn/Optional.hpp>
+#include <armnn/Conversion.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
-#include <chrono>
-#include <iostream>
+namespace armnn
+{
 
-using namespace armnn::profiling;
+namespace profiling
+{
+
+class MockProfilingConnection : public IProfilingConnection
+{
+public:
+    MockProfilingConnection()
+        : m_IsOpen(true)
+    {}
+
+    bool IsOpen() override { return m_IsOpen; }
+
+    void Close() override { m_IsOpen = false; }
+
+    bool WritePacket(const unsigned char* buffer, uint32_t length) override
+    {
+        return buffer != nullptr && length > 0;
+    }
+
+    Packet ReadPacket(uint32_t timeout) override { return Packet(); }
+
+private:
+    bool m_IsOpen;
+};
 
 class MockBuffer : public IBufferWrapper
 {
 public:
     MockBuffer(unsigned int size)
-    : m_BufferSize(size),
-      m_Buffer(std::make_unique<unsigned char[]>(size)) {}
+        : m_BufferSize(size)
+        , m_Buffer(std::make_unique<unsigned char[]>(size))
+    {}
 
     unsigned char* Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
     {
@@ -46,11 +72,113 @@ public:
         return m_Buffer.get();
     }
 
-    void Release( unsigned int size) override {}
+    void Release(unsigned int size) override {}
 
 private:
     unsigned int m_BufferSize;
     std::unique_ptr<unsigned char[]> m_Buffer;
+};
+
+class MockStreamCounterBuffer : public IBufferWrapper
+{
+public:
+    MockStreamCounterBuffer(unsigned int size)
+        : m_Buffer(size, 0)
+        , m_CommittedSize(0)
+        , m_ReadSize(0)
+    {}
+
+    unsigned char* Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
+    {
+        std::unique_lock<std::mutex>(m_Mutex);
+
+        // Get the buffer size and the available size in the buffer past the committed size
+        size_t bufferSize = m_Buffer.size();
+        size_t availableSize = bufferSize - m_CommittedSize;
+
+        // Check whether the buffer needs to be resized
+        if (requestedSize > availableSize)
+        {
+            // Resize the buffer
+            size_t newSize = m_CommittedSize + requestedSize;
+            m_Buffer.resize(newSize, 0);
+        }
+
+        // Set the reserved size
+        reservedSize = requestedSize;
+
+        // Get a pointer to the beginning of the part of buffer available for writing
+        return m_Buffer.data() + m_CommittedSize;
+    }
+
+    void Commit(unsigned int size) override
+    {
+        std::unique_lock<std::mutex>(m_Mutex);
+
+        // Update the committed size
+        m_CommittedSize += size;
+    }
+
+    const unsigned char* GetReadBuffer(unsigned int& size) override
+    {
+        std::unique_lock<std::mutex>(m_Mutex);
+
+        // Get the size available for reading
+        size = boost::numeric_cast<unsigned int>(m_CommittedSize - m_ReadSize);
+
+        // Get a pointer to the beginning of the part of buffer available for reading
+        const unsigned char* readBuffer = m_Buffer.data() + m_ReadSize;
+
+        // Update the read size
+        m_ReadSize = m_CommittedSize;
+
+        return readBuffer;
+    }
+
+    void Release(unsigned int size) override
+    {
+        std::unique_lock<std::mutex>(m_Mutex);
+
+        if (size == 0)
+        {
+            // Nothing to release
+            return;
+        }
+
+        // Get the buffer size
+        size_t bufferSize = m_Buffer.size();
+
+        // Remove the last "size" bytes from the buffer
+        if (size < bufferSize)
+        {
+            // Resize the buffer
+            size_t newSize = bufferSize - size;
+            m_Buffer.resize(newSize);
+        }
+        else
+        {
+            // Clear the whole buffer
+            m_Buffer.clear();
+        }
+    }
+
+    size_t GetBufferSize()           const { return m_Buffer.size(); }
+    size_t GetCommittedSize()        const { return m_CommittedSize; }
+    size_t GetReadSize()             const { return m_ReadSize;      }
+    const unsigned char* GetBuffer() const { return m_Buffer.data(); }
+
+private:
+    // This mock uses an ever-expanding vector to simulate a counter stream buffer
+    std::vector<unsigned char> m_Buffer;
+
+    // The size of the buffer that has been committed for reading
+    size_t m_CommittedSize;
+
+    // The size of the buffer that has already been read
+    size_t m_ReadSize;
+
+    // This mock buffer provides basic synchronization
+    std::mutex m_Mutex;
 };
 
 class MockSendCounterPacket : public ISendCounterPacket
@@ -93,8 +221,7 @@ public:
         m_Buffer.Commit(reserved);
     }
 
-    void SetReadyToRead() override
-    {}
+    void SetReadyToRead() override {}
 
 private:
     IBufferWrapper& m_Buffer;
@@ -307,8 +434,8 @@ private:
 class SendCounterPacketTest : public SendCounterPacket
 {
 public:
-    SendCounterPacketTest(IBufferWrapper& buffer)
-        : SendCounterPacket(buffer)
+    SendCounterPacketTest(IProfilingConnection& profilingconnection, IBufferWrapper& buffer)
+        : SendCounterPacket(profilingconnection, buffer)
     {}
 
     bool CreateDeviceRecordTest(const DevicePtr& device,
@@ -340,3 +467,7 @@ public:
         return CreateCategoryRecord(category, counters, categoryRecord, errorMessage);
     }
 };
+
+} // namespace profiling
+
+} // namespace armnn

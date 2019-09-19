@@ -919,7 +919,79 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
 
 void SendCounterPacket::SetReadyToRead()
 {
-    m_ReadyToRead = true;
+    // Signal the send thread that there's something to read in the buffer
+    m_WaitCondition.notify_one();
+}
+
+void SendCounterPacket::Start()
+{
+    // Check is the send thread is already running
+    if (m_IsRunning.load())
+    {
+        // The send thread is already running
+        return;
+    }
+
+    // Mark the send thread as running
+    m_IsRunning.store(true);
+
+    // Keep the send procedure going until the the send thread is signalled to stop
+    m_KeepRunning.store(true);
+
+    // Start the send thread
+    m_SendThread = std::thread(&SendCounterPacket::Send, this);
+}
+
+void SendCounterPacket::Stop()
+{
+    // Signal the send thread to stop
+    m_KeepRunning.store(false);
+
+    // Check that the send thread is running
+    if (m_SendThread.joinable())
+    {
+        // Kick the send thread out of the wait condition
+        m_WaitCondition.notify_one();
+
+        // Wait for the send thread to complete operations
+        m_SendThread.join();
+    }
+}
+
+void SendCounterPacket::Send()
+{
+    // Keep the sending procedure looping until the thread is signalled to stop
+    while (m_KeepRunning.load())
+    {
+        // Wait condition lock scope - Begin
+        {
+            // Lock the mutex to wait on it
+            std::unique_lock<std::mutex> lock(m_WaitMutex);
+
+            // Wait until the thread is notified of something to read from the buffer, or check anyway after a second
+            m_WaitCondition.wait_for(lock, std::chrono::seconds(1));
+        }
+        // Wait condition lock scope - End
+
+        // Get the data to send from the buffer
+        unsigned int readBufferSize = 0;
+        const unsigned char* readBuffer = m_Buffer.GetReadBuffer(readBufferSize);
+        if (readBuffer == nullptr || readBufferSize == 0)
+        {
+            // Nothing to send, ignore and continue
+            continue;
+        }
+
+        // Check that the profiling connection is open, silently drop the data and continue if it's closed
+        if (m_ProfilingConnection.IsOpen())
+        {
+            // Write a packet to the profiling connection. Silently ignore any write error and continue
+            m_ProfilingConnection.WritePacket(readBuffer, boost::numeric_cast<uint32_t>(readBufferSize));
+        }
+    }
+
+    // Mark the send thread as not running
+    m_IsRunning.store(false);
 }
 
 } // namespace profiling

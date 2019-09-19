@@ -8,6 +8,7 @@
 #include <EncodeVersion.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
+#include <CounterDirectory.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
@@ -16,9 +17,21 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <chrono>
-#include <iostream>
 
 using namespace armnn::profiling;
+
+size_t GetDataLength(const MockStreamCounterBuffer& mockStreamCounterBuffer, size_t packetOffset)
+{
+    // The data length is the written in the second byte
+    return ReadUint32(mockStreamCounterBuffer.GetBuffer(),
+                      boost::numeric_cast<unsigned int>(packetOffset + sizeof(uint32_t)));
+}
+
+size_t GetPacketSize(const MockStreamCounterBuffer& mockStreamCounterBuffer, size_t packetOffset)
+{
+    // The packet size is the data length plus the size of the packet header (always two words big)
+    return GetDataLength(mockStreamCounterBuffer, packetOffset) + 2 * sizeof(uint32_t);
+}
 
 BOOST_AUTO_TEST_SUITE(SendCounterPacketTests)
 
@@ -56,17 +69,18 @@ BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
 BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
 {
     // Error no space left in buffer
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockBuffer1);
+    SendCounterPacket sendPacket1(mockProfilingConnection, mockBuffer1);
 
     uint32_t capturePeriod = 1000;
     std::vector<uint16_t> selectedCounterIds;
     BOOST_CHECK_THROW(sendPacket1.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds),
-                      armnn::profiling::BufferExhaustion);
+                      BufferExhaustion);
 
     // Packet without any counters
     MockBuffer mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockBuffer2);
+    SendCounterPacket sendPacket2(mockProfilingConnection, mockBuffer2);
 
     sendPacket2.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds);
     unsigned int sizeRead = 0;
@@ -83,7 +97,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
 
     // Full packet message
     MockBuffer mockBuffer3(512);
-    SendCounterPacket sendPacket3(mockBuffer3);
+    SendCounterPacket sendPacket3(mockProfilingConnection, mockBuffer3);
 
     selectedCounterIds.reserve(5);
     selectedCounterIds.emplace_back(100);
@@ -119,8 +133,9 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
 BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
 {
     // Error no space left in buffer
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockBuffer1);
+    SendCounterPacket sendPacket1(mockProfilingConnection, mockBuffer1);
 
     auto captureTimestamp = std::chrono::steady_clock::now();
     uint64_t time =  static_cast<uint64_t >(captureTimestamp.time_since_epoch().count());
@@ -131,7 +146,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
 
     // Packet without any counters
     MockBuffer mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockBuffer2);
+    SendCounterPacket sendPacket2(mockProfilingConnection, mockBuffer2);
 
     sendPacket2.SendPeriodicCounterCapturePacket(time, indexValuePairs);
     unsigned int sizeRead = 0;
@@ -149,7 +164,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
 
     // Full packet message
     MockBuffer mockBuffer3(512);
-    SendCounterPacket sendPacket3(mockBuffer3);
+    SendCounterPacket sendPacket3(mockProfilingConnection, mockBuffer3);
 
     indexValuePairs.reserve(5);
     indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(0, 100));
@@ -200,8 +215,9 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     uint32_t sizeUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
 
     // Error no space left in buffer
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockBuffer1);
+    SendCounterPacket sendPacket1(mockProfilingConnection, mockBuffer1);
     BOOST_CHECK_THROW(sendPacket1.SendStreamMetaDataPacket(), armnn::profiling::BufferExhaustion);
 
     // Full metadata packet
@@ -220,7 +236,7 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     uint32_t packetEntries = 6;
 
     MockBuffer mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockBuffer2);
+    SendCounterPacket sendPacket2(mockProfilingConnection, mockBuffer2);
     sendPacket2.SendStreamMetaDataPacket();
     unsigned int sizeRead = 0;
     const unsigned char* readBuffer2 = mockBuffer2.GetReadBuffer(sizeRead);
@@ -313,8 +329,9 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
 
 BOOST_AUTO_TEST_CASE(CreateDeviceRecordTest)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a device for testing
     uint16_t deviceUid = 27;
@@ -345,8 +362,9 @@ BOOST_AUTO_TEST_CASE(CreateDeviceRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidDeviceRecordTest)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a device for testing
     uint16_t deviceUid = 27;
@@ -366,8 +384,9 @@ BOOST_AUTO_TEST_CASE(CreateInvalidDeviceRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateCounterSetRecordTest)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a counter set for testing
     uint16_t counterSetUid = 27;
@@ -398,8 +417,9 @@ BOOST_AUTO_TEST_CASE(CreateCounterSetRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidCounterSetRecordTest)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a counter set for testing
     uint16_t counterSetUid = 27;
@@ -419,8 +439,9 @@ BOOST_AUTO_TEST_CASE(CreateInvalidCounterSetRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateEventRecordTest)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 7256;
@@ -539,8 +560,9 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateEventRecordNoUnitsTest)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 44312;
@@ -642,8 +664,9 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordNoUnitsTest)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest1)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 7256;
@@ -680,8 +703,9 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest1)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest2)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 7256;
@@ -718,8 +742,9 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest2)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest3)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 7256;
@@ -756,8 +781,9 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest3)
 
 BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a category for testing
     const std::string categoryName = "some_category";
@@ -957,8 +983,9 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidCategoryRecordTest1)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a category for testing
     const std::string categoryName = "some invalid category";
@@ -980,8 +1007,9 @@ BOOST_AUTO_TEST_CASE(CreateInvalidCategoryRecordTest1)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidCategoryRecordTest2)
 {
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
 
     // Create a category for testing
     const std::string categoryName = "some_category";
@@ -1038,8 +1066,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest1)
     BOOST_CHECK(device2);
 
     // Buffer with not enough space
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(10);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory),
                       armnn::profiling::BufferExhaustion);
 }
@@ -1130,8 +1159,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     BOOST_CHECK(counter3);
 
     // Buffer with enough space
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
     BOOST_CHECK_NO_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory));
 
     // Get the read buffer
@@ -1529,8 +1559,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest3)
     BOOST_CHECK(device);
 
     // Buffer with enough space
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1547,8 +1578,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest4)
     BOOST_CHECK(counterSet);
 
     // Buffer with enough space
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1565,8 +1597,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest5)
     BOOST_CHECK(category);
 
     // Buffer with enough space
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1599,8 +1632,9 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest6)
     BOOST_CHECK(category);
 
     // Buffer with enough space
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1648,9 +1682,355 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest7)
     BOOST_CHECK(counter);
 
     // Buffer with enough space
+    MockProfilingConnection mockProfilingConnection;
     MockBuffer mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
+}
+
+BOOST_AUTO_TEST_CASE(SendThreadTest0)
+{
+    MockProfilingConnection mockProfilingConnection;
+    MockStreamCounterBuffer mockStreamCounterBuffer(0);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
+
+    // Try to start the send thread many times, it must only start once
+
+    sendCounterPacket.Start();
+    BOOST_CHECK(sendCounterPacket.IsRunning());
+    sendCounterPacket.Start();
+    sendCounterPacket.Start();
+    sendCounterPacket.Start();
+    sendCounterPacket.Start();
+    BOOST_CHECK(sendCounterPacket.IsRunning());
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    sendCounterPacket.Stop();
+    BOOST_CHECK(!sendCounterPacket.IsRunning());
+}
+
+BOOST_AUTO_TEST_CASE(SendThreadTest1)
+{
+    size_t totalWrittenSize = 0;
+
+    MockProfilingConnection mockProfilingConnection;
+    MockStreamCounterBuffer mockStreamCounterBuffer(100);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
+    sendCounterPacket.Start();
+
+    // Interleaving writes and reads to/from the buffer with pauses to test that the send thread actually waits for
+    // something to become available for reading
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    CounterDirectory counterDirectory;
+    sendCounterPacket.SendStreamMetaDataPacket();
+
+    // Get the size of the Stream Metadata Packet
+    size_t streamMetadataPacketsize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += streamMetadataPacketsize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
+
+    // Get the size of the Counter Directory Packet
+    size_t counterDirectoryPacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += counterDirectoryPacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SendPeriodicCounterCapturePacket(123u,
+                                                       {
+                                                           {   1u,      23u },
+                                                           {  33u, 1207623u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    size_t periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SendPeriodicCounterCapturePacket(44u,
+                                                       {
+                                                           { 211u,     923u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SendPeriodicCounterCapturePacket(1234u,
+                                                       {
+                                                           { 555u,      23u },
+                                                           { 556u,       6u },
+                                                           { 557u,  893454u },
+                                                           { 558u, 1456623u },
+                                                           { 559u,  571090u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SendPeriodicCounterCapturePacket(997u,
+                                                       {
+                                                           {  88u,      11u },
+                                                           {  96u,      22u },
+                                                           {  97u,      33u },
+                                                           { 999u,     444u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SendPeriodicCounterSelectionPacket(1000u, { 1345u, 254u, 4536u, 408u, 54u, 6323u, 428u, 1u, 6u });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    // To test an exact value of the "read size" in the mock buffer, wait a second to allow the send thread to
+    // read all what's remaining in the buffer
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    sendCounterPacket.Stop();
+
+    BOOST_CHECK(mockStreamCounterBuffer.GetBufferSize()    == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetCommittedSize() == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      == totalWrittenSize);
+}
+
+BOOST_AUTO_TEST_CASE(SendThreadTest2)
+{
+    size_t totalWrittenSize = 0;
+
+    MockProfilingConnection mockProfilingConnection;
+    MockStreamCounterBuffer mockStreamCounterBuffer(100);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
+    sendCounterPacket.Start();
+
+    // Adding many spurious "ready to read" signals throughout the test to check that the send thread is
+    // capable of handling unnecessary read requests
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    sendCounterPacket.SetReadyToRead();
+
+    CounterDirectory counterDirectory;
+    sendCounterPacket.SendStreamMetaDataPacket();
+
+    // Get the size of the Stream Metadata Packet
+    size_t streamMetadataPacketsize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += streamMetadataPacketsize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
+
+    // Get the size of the Counter Directory Packet
+    size_t counterDirectoryPacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += counterDirectoryPacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SendPeriodicCounterCapturePacket(123u,
+                                                       {
+                                                           {   1u,      23u },
+                                                           {  33u, 1207623u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    size_t periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SendPeriodicCounterCapturePacket(44u,
+                                                       {
+                                                           { 211u,     923u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SendPeriodicCounterCapturePacket(1234u,
+                                                       {
+                                                           { 555u,      23u },
+                                                           { 556u,       6u },
+                                                           { 557u,  893454u },
+                                                           { 558u, 1456623u },
+                                                           { 559u,  571090u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SendPeriodicCounterCapturePacket(997u,
+                                                       {
+                                                           {  88u,      11u },
+                                                           {  96u,      22u },
+                                                           {  97u,      33u },
+                                                           { 999u,     444u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    sendCounterPacket.SendPeriodicCounterSelectionPacket(1000u, { 1345u, 254u, 4536u, 408u, 54u, 6323u, 428u, 1u, 6u });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    // To test an exact value of the "read size" in the mock buffer, wait a second to allow the send thread to
+    // read all what's remaining in the buffer
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    sendCounterPacket.Stop();
+
+    BOOST_CHECK(mockStreamCounterBuffer.GetBufferSize()    == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetCommittedSize() == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      == totalWrittenSize);
+}
+
+BOOST_AUTO_TEST_CASE(SendThreadTest3)
+{
+    size_t totalWrittenSize = 0;
+
+    MockProfilingConnection mockProfilingConnection;
+    MockStreamCounterBuffer mockStreamCounterBuffer(100);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
+    sendCounterPacket.Start();
+
+    // Not using pauses or "grace periods" to stress test the send thread
+
+    sendCounterPacket.SetReadyToRead();
+
+    CounterDirectory counterDirectory;
+    sendCounterPacket.SendStreamMetaDataPacket();
+
+    // Get the size of the Stream Metadata Packet
+    size_t streamMetadataPacketsize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += streamMetadataPacketsize;
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
+
+    // Get the size of the Counter Directory Packet
+    size_t counterDirectoryPacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += counterDirectoryPacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SendPeriodicCounterCapturePacket(123u,
+                                                       {
+                                                           {   1u,      23u },
+                                                           {  33u, 1207623u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    size_t periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SendPeriodicCounterCapturePacket(44u,
+                                                       {
+                                                           { 211u,     923u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SendPeriodicCounterCapturePacket(1234u,
+                                                       {
+                                                           { 555u,      23u },
+                                                           { 556u,       6u },
+                                                           { 557u,  893454u },
+                                                           { 558u, 1456623u },
+                                                           { 559u,  571090u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SendPeriodicCounterCapturePacket(997u,
+                                                       {
+                                                           {  88u,      11u },
+                                                           {  96u,      22u },
+                                                           {  97u,      33u },
+                                                           { 999u,     444u }
+                                                       });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SetReadyToRead();
+    sendCounterPacket.SendPeriodicCounterSelectionPacket(1000u, { 1345u, 254u, 4536u, 408u, 54u, 6323u, 428u, 1u, 6u });
+
+    // Get the size of the Periodic Counter Capture Packet
+    periodicCounterCapturePacketSize = GetPacketSize(mockStreamCounterBuffer, totalWrittenSize);
+    totalWrittenSize += periodicCounterCapturePacketSize;
+
+    sendCounterPacket.SetReadyToRead();
+
+    // Abruptly terminating the send thread, the amount of data sent may be less that the amount written (the send
+    // thread is not guaranteed to flush the buffer)
+    sendCounterPacket.Stop();
+
+    BOOST_CHECK(mockStreamCounterBuffer.GetBufferSize()    == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetCommittedSize() == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      <= totalWrittenSize);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

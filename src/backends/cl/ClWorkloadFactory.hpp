@@ -47,6 +47,9 @@ public:
     std::unique_ptr<IWorkload> CreateAddition(const AdditionQueueDescriptor& descriptor,
                                               const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
+                                               const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateBatchNormalization(const BatchNormalizationQueueDescriptor& descriptor,
                                                         const WorkloadInfo& info) const override;
 

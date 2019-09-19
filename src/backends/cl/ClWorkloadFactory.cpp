@@ -144,6 +144,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateAddition(const AdditionQueue
     return MakeWorkload<ClAdditionWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
+{
+    return std::make_unique<ClArgMinMaxWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchNormalization(
     const BatchNormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info) const

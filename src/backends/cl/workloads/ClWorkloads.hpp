@@ -7,6 +7,7 @@
 #include "ClAbsWorkload.hpp"
 #include "ClActivationWorkload.hpp"
 #include "ClAdditionWorkload.hpp"
+#include "ClArgMinMaxWorkload.hpp"
 #include "ClConstantWorkload.hpp"
 #include "ClBatchNormalizationFloatWorkload.hpp"
 #include "ClBatchToSpaceNdWorkload.hpp"

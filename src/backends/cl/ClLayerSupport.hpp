@@ -26,6 +26,11 @@ public:
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsArgMinMaxSupported(const TensorInfo& input,
+                              const TensorInfo& output,
+                              const ArgMinMaxDescriptor& descriptor,
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsBatchNormalizationSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const TensorInfo& mean,

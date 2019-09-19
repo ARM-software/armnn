@@ -955,6 +955,8 @@ ARMNN_AUTO_TEST_CASE(ArgMinFloat32, ArgMinSimpleTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(ArgMaxFloat32, ArgMaxSimpleTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(ArgMinChannel, ArgMinChannelTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE(ArgMaxChannel, ArgMaxChannelTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ArgMaxHeight, ArgMaxHeightTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ArgMinWidth, ArgMinWidthTest<DataType::Float32>)
 
 #if defined(ARMNNREF_ENABLED)
 

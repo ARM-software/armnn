@@ -19,6 +19,7 @@
 #include "workloads/ClAbsWorkload.hpp"
 #include "workloads/ClAdditionWorkload.hpp"
 #include "workloads/ClActivationWorkload.hpp"
+#include "workloads/ClArgMinMaxWorkload.hpp"
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClBatchToSpaceNdWorkload.hpp"
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
@@ -176,6 +177,18 @@ bool ClLayerSupport::IsAdditionSupported(const TensorInfo& input0,
                                    input0,
                                    input1,
                                    output);
+}
+
+bool ClLayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const ArgMinMaxDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClArgMinMaxWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,

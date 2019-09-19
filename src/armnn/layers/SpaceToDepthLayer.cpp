@@ -47,8 +47,6 @@ std::vector<TensorShape> SpaceToDepthLayer::InferOutputShapes(const std::vector<
     TensorShape inputShape = inputShapes[0];
     TensorShape outputShape(inputShape);
 
-    outputShape[0] = inputShape[0];
-
     DataLayoutIndexed dimensionIndices{m_Param.m_DataLayout};
     unsigned int hIndex = dimensionIndices.GetHeightIndex();
     unsigned int wIndex = dimensionIndices.GetWidthIndex();

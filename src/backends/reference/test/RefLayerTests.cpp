@@ -1022,6 +1022,22 @@ ARMNN_AUTO_TEST_CASE(MeanVts3QuantisedSymm16, MeanVts3Test<DataType::QuantisedSy
 
 ARMNN_AUTO_TEST_CASE(AdditionAfterMaxPool, AdditionAfterMaxPoolTest)
 
+// ArgMinMax
+ARMNN_AUTO_TEST_CASE(ArgMaxFloat32, ArgMaxSimpleTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ArgMinFloat32, ArgMinSimpleTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ArgMinChannel4dFloat32, ArgMinChannel4dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(ArgMaxChannel4dFloat32, ArgMaxChannel4dTest<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE(ArgMaxQuantisedAsymm8, ArgMaxSimpleTest<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(ArgMinQuantisedAsymm8, ArgMinSimpleTest<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(ArgMinChannel4dQuantisedAsymm8, ArgMinChannel4dTest<DataType::QuantisedAsymm8>)
+ARMNN_AUTO_TEST_CASE(ArgMaxChannel4dQuantisedAsymm8, ArgMaxChannel4dTest<DataType::QuantisedAsymm8>)
+
+ARMNN_AUTO_TEST_CASE(ArgMaxQuantisedSymm16, ArgMaxSimpleTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(ArgMinQuantisedSymm16, ArgMinSimpleTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(ArgMinChannel4dQuantisedSymm16, ArgMinChannel4dTest<DataType::QuantisedSymm16>)
+ARMNN_AUTO_TEST_CASE(ArgMaxChannel4dQuantisedSymm16, ArgMaxChannel4dTest<DataType::QuantisedSymm16>)
+
 // Space To Batch Nd
 ARMNN_AUTO_TEST_CASE(SpaceToBatchNdSimpleFloat32, SpaceToBatchNdSimpleFloat32Test)
 ARMNN_AUTO_TEST_CASE(SpaceToBatchNdMultiChannelsFloat32, SpaceToBatchNdMultiChannelsFloat32Test)

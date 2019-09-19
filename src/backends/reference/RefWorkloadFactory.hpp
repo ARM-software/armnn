@@ -67,6 +67,9 @@ public:
     std::unique_ptr<IWorkload> CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                 const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
+                                               const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
 

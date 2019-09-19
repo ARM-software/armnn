@@ -471,6 +471,11 @@ void ArgMinMaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
+    if (outputTensorInfo.GetDataType() != DataType::Signed32)
+    {
+        throw InvalidArgumentException(descriptorName + ": Output of ArgMinMax layer must be Int32.");
+    }
+
     std::vector<DataType> supportedTypes =
             {
                     DataType::Float16,
@@ -480,8 +485,6 @@ void ArgMinMaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
             };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
-    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
-    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void SoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

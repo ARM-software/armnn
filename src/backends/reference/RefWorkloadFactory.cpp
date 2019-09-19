@@ -134,6 +134,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const Activation
     return std::make_unique<RefActivationWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
+                                                               const WorkloadInfo&              info) const
+{
+    return std::make_unique<RefArgMinMaxWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                              const WorkloadInfo&           info) const
 {

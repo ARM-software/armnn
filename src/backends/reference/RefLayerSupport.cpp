@@ -192,6 +192,29 @@ bool RefLayerSupport::IsAdditionSupported(const TensorInfo& input0,
     return supported;
 }
 
+bool RefLayerSupport::IsArgMinMaxSupported(const armnn::TensorInfo &input, const armnn::TensorInfo &output,
+                                           const armnn::ArgMinMaxDescriptor &descriptor,
+                                           armnn::Optional<std::string &> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+
+    std::array<DataType, 3> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    bool supported = true;
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference ArgMinMax: input is not a supported type.");
+    supported &= CheckSupportRule(TypeIs(output, DataType::Signed32), reasonIfUnsupported,
+                                  "Reference ArgMinMax: output type not supported");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     const TensorInfo& mean,

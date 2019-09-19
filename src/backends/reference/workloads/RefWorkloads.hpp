@@ -7,6 +7,7 @@
 
 #include "Abs.hpp"
 #include "Activation.hpp"
+#include "ArgMinMax.hpp"
 #include "BatchNormImpl.hpp"
 #include "ConvImpl.hpp"
 #include "Concatenate.hpp"
@@ -16,6 +17,7 @@
 #include "Pooling2d.hpp"
 #include "RefAbsWorkload.hpp"
 #include "RefActivationWorkload.hpp"
+#include "RefArgMinMaxWorkload.hpp"
 #include "RefBatchNormalizationWorkload.hpp"
 #include "RefBatchToSpaceNdWorkload.hpp"
 #include "RefConvolution2dWorkload.hpp"

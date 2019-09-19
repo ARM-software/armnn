@@ -6,6 +6,8 @@
 list(APPEND armnnRefBackendWorkloads_sources
     Abs.cpp
     Abs.hpp
+    ArgMinMax.cpp
+    ArgMinMax.hpp
     Activation.cpp
     Activation.hpp
     ArgMinMax.cpp
@@ -49,6 +51,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefAbsWorkload.hpp
     RefActivationWorkload.cpp
     RefActivationWorkload.hpp
+    RefArgMinMaxWorkload.cpp
+    RefArgMinMaxWorkload.hpp
     RefBatchNormalizationWorkload.cpp
     RefBatchNormalizationWorkload.hpp
     RefBatchToSpaceNdWorkload.cpp

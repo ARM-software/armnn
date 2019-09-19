@@ -23,6 +23,7 @@ BACKEND_SOURCES := \
         RefTensorHandleFactory.cpp \
         workloads/Abs.cpp \
         workloads/Activation.cpp \
+        workloads/ArgMinMax.cpp \
         workloads/BatchNormImpl.cpp \
         workloads/BatchToSpaceNd.cpp \
         workloads/Broadcast.cpp \
@@ -40,6 +41,7 @@ BACKEND_SOURCES := \
         workloads/PreluImpl.cpp \
         workloads/RefAbsWorkload.cpp \
         workloads/RefActivationWorkload.cpp \
+        workloads/RefArgMinMaxWorkload.cpp \
         workloads/RefBatchNormalizationWorkload.cpp \
         workloads/RefBatchToSpaceNdWorkload.cpp \
         workloads/RefConcatWorkload.cpp \

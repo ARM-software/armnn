@@ -35,7 +35,8 @@ struct ArgMinMaxDescriptor
 {
     ArgMinMaxDescriptor()
     : m_Function(ArgMinMaxFunction::Min)
-    , m_Axis(-1) {}
+    , m_Axis(-1)
+    {}
 
     /// Specify if the function is to find Min or Max.
     ArgMinMaxFunction m_Function;

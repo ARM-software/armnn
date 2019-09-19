@@ -978,12 +978,32 @@ BOOST_AUTO_TEST_CASE(RefImportNonAlignedPointerTest)
 
 BOOST_AUTO_TEST_CASE(RefExportNonAlignedPointerTest)
 {
-    ImportNonAlignedOutputPointerTest(defaultBackends);
+    ExportNonAlignedOutputPointerTest(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefImportAlignedPointerTest)
 {
     ImportAlignedPointerTest(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefImportOnlyWorkload)
+{
+    ImportOnlyWorkload(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefExportOnlyWorkload)
+{
+    ExportOnlyWorkload(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefImportAndExportWorkload)
+{
+    ImportAndExportWorkload(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefExportOutputWithSeveralOutputSlotConnectionsTest)
+{
+    ExportOutputWithSeveralOutputSlotConnectionsTest(defaultBackends);
 }
 
 #endif

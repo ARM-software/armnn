@@ -18,6 +18,7 @@
 #include "layers/ConvertFp32ToFp16Layer.hpp"
 #include "layers/Convolution2dLayer.hpp"
 #include "layers/DebugLayer.hpp"
+#include "layers/DepthToSpaceLayer.hpp"
 #include "layers/DepthwiseConvolution2dLayer.hpp"
 #include "layers/DequantizeLayer.hpp"
 #include "layers/DetectionPostProcessLayer.hpp"
@@ -100,6 +101,7 @@ DECLARE_LAYER(ConvertFp16ToFp32)
 DECLARE_LAYER(ConvertFp32ToFp16)
 DECLARE_LAYER(Convolution2d)
 DECLARE_LAYER(Debug)
+DECLARE_LAYER(DepthToSpace)
 DECLARE_LAYER(DepthwiseConvolution2d)
 DECLARE_LAYER(Dequantize)
 DECLARE_LAYER(DetectionPostProcess)

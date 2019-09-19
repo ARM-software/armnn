@@ -82,6 +82,10 @@ public:
                                  const armnn::Optional<armnn::ConstTensor>& biases,
                                  const char* = nullptr) override;
 
+    void VisitDepthToSpaceLayer(const armnn::IConnectableLayer* layer,
+                                const armnn::DepthToSpaceDescriptor& descriptor,
+                                const char* name = nullptr) override;
+
     void VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                           const armnn::DepthwiseConvolution2dDescriptor& descriptor,
                                           const armnn::ConstTensor& weights,

@@ -206,6 +206,19 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                           reason);
             break;
         }
+        case LayerType::DepthToSpace:
+        {
+            auto cLayer = boost::polymorphic_downcast<const DepthToSpaceLayer*>(&layer);
+
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsDepthToSpaceSupported(OverrideDataType(input, dataType),
+                                                                 OverrideDataType(output, dataType),
+                                                                 cLayer->GetParameters(),
+                                                                 reason);
+            break;
+        }
         case LayerType::DepthwiseConvolution2d:
         {
             auto cLayer = boost::polymorphic_downcast<const DepthwiseConvolution2dLayer*>(&layer);
@@ -1056,6 +1069,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvolution2d(const Convoluti
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
+                                                                const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

@@ -538,4 +538,9 @@ struct SliceQueueDescriptor : QueueDescriptorWithParameters<SliceDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct DepthToSpaceQueueDescriptor : QueueDescriptorWithParameters<DepthToSpaceDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

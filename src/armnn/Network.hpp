@@ -61,6 +61,9 @@ public:
                                              const ConstTensor& biases,
                                              const char* name = nullptr) override;
 
+    IConnectableLayer* AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
+                                            const char* name = nullptr) override;
+
     IConnectableLayer* AddDepthwiseConvolution2dLayer(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,

@@ -129,6 +129,14 @@ bool LayerSupportBase::IsDebugSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsDepthToSpaceSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const DepthToSpaceDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                        const TensorInfo& output,
                                                        const DepthwiseConvolution2dDescriptor& descriptor,

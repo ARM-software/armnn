@@ -88,6 +88,11 @@ public:
                                   const TensorInfo& output,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsDepthToSpaceSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const DepthToSpaceDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsDepthwiseConvolutionSupported(
                      const TensorInfo& input,
                      const TensorInfo& output,

@@ -26,6 +26,7 @@ enum class LayerType
     ConvertFp32ToFp16,
     Convolution2d,
     Debug,
+    DepthToSpace,
     DepthwiseConvolution2d,
     Dequantize,
     DetectionPostProcess,

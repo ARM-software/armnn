@@ -115,6 +115,14 @@ public:
                                          const Optional<ConstTensor>& biases,
                                          const char* name = nullptr) = 0;
 
+    /// Function a depth to space layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param depthToSpaceDescriptor - Parameters for the depth to space operation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitDepthToSpaceLayer(const IConnectableLayer* layer,
+                                        const DepthToSpaceDescriptor& depthToSpaceDescriptor,
+                                        const char* name = nullptr) = 0;
+
     /// Function that a 2D depthwise convolution layer with biases should call back to when its
     /// Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.

@@ -141,6 +141,13 @@ public:
                                                      const ConstTensor& biases,
                                                      const char* name = nullptr) = 0;
 
+    /// Adds a depth to space layer to the network.
+    /// @param depthToSpaceDescriptor - Parameters for the depth to space operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
+                                                    const char* name = nullptr) = 0;
+
     /// Adds a 2D depthwise convolution layer to the network.
     /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
     /// @param weights - Tensor for the weights. Expected format: [channelMultiplier, inputChannels, height, width].

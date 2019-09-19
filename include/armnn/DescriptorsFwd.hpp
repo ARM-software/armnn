@@ -37,6 +37,8 @@ struct StridedSliceDescriptor;
 struct TransposeConvolution2dDescriptor;
 struct ViewsDescriptor;
 
+using DepthToSpaceDescriptor = SpaceToDepthDescriptor;
+
 // MergerDescriptor is deprecated use ConcatDescriptor instead
 using MergerDescriptor = OriginsDescriptor;
 using ConcatDescriptor = OriginsDescriptor;

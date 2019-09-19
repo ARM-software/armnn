@@ -299,6 +299,13 @@ void SerializerVisitor::VisitConvolution2dLayer(const armnn::IConnectableLayer* 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_Convolution2dLayer);
 }
 
+void SerializerVisitor::VisitDepthToSpaceLayer(const armnn::IConnectableLayer* layer,
+                                               const armnn::DepthToSpaceDescriptor& descriptor,
+                                               const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::VisitDepthToSpaceLayer is not implemented");
+}
+
 void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                                          const armnn::DepthwiseConvolution2dDescriptor& descriptor,
                                                          const armnn::ConstTensor& weights,

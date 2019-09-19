@@ -1060,6 +1060,12 @@ IConnectableLayer* Network::AddDepthwiseConvolution2dLayerImpl(
     return layer;
 }
 
+IConnectableLayer* Network::AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
+                                                 const char* name)
+{
+    return m_Graph->AddLayer<DepthToSpaceLayer>(depthToSpaceDescriptor, name);
+}
+
 IConnectableLayer* Network::AddDepthwiseConvolution2dLayer(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,

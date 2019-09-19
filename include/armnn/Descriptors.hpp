@@ -589,15 +589,23 @@ struct SpaceToBatchNdDescriptor
 struct SpaceToDepthDescriptor
 {
     SpaceToDepthDescriptor()
-    : m_BlockSize(1u)
-    , m_DataLayout(DataLayout::NHWC)
+        : SpaceToDepthDescriptor(1u, DataLayout::NHWC)
+    {}
+
+    SpaceToDepthDescriptor(unsigned int blockSize, DataLayout dataLayout)
+        : m_BlockSize(blockSize)
+        , m_DataLayout(dataLayout)
     {}
 
     /// Scalar specifying the input block size. It must be >= 1
     unsigned int m_BlockSize;
+
     /// The data layout to be used (NCHW, NHWC).
     DataLayout m_DataLayout;
 };
+
+/// A DepthToSpaceDescriptor for the DepthToSpaceLayer
+using DepthToSpaceDescriptor = SpaceToDepthDescriptor;
 
 /// An LstmDescriptor for the LstmLayer.
 struct LstmDescriptor

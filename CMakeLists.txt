@@ -734,6 +734,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeReshape.cpp
             src/armnnDeserializer/test/DeserializeResizeBilinear.cpp
             src/armnnDeserializer/test/DeserializeRsqrt.cpp
+            src/armnnDeserializer/test/DeserializeSlice.cpp
             src/armnnDeserializer/test/DeserializeSpaceToBatchNd.cpp
             src/armnnDeserializer/test/DeserializeStridedSlice.cpp
             src/armnnDeserializer/test/DeserializeSubtraction.cpp

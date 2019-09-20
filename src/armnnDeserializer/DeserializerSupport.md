@@ -15,6 +15,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * Concat
 * Constant
 * Convolution2d
+* DepthToSpace
 * DepthwiseConvolution2d
 * Dequantize
 * DetectionPostProcess

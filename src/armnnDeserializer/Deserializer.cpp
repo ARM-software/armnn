@@ -194,6 +194,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_ConcatLayer]                 = &Deserializer::ParseConcat;
     m_ParserFunctions[Layer_ConstantLayer]               = &Deserializer::ParseConstant;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
+    m_ParserFunctions[Layer_DepthToSpaceLayer]           = &Deserializer::ParseDepthToSpace;
     m_ParserFunctions[Layer_DepthwiseConvolution2dLayer] = &Deserializer::ParseDepthwiseConvolution2d;
     m_ParserFunctions[Layer_DequantizeLayer]             = &Deserializer::ParseDequantize;
     m_ParserFunctions[Layer_DetectionPostProcessLayer]   = &Deserializer::ParseDetectionPostProcess;
@@ -258,6 +259,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_ConstantLayer()->base();
         case Layer::Layer_Convolution2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_Convolution2dLayer()->base();
+        case Layer::Layer_DepthToSpaceLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_DepthToSpaceLayer()->base();
         case Layer::Layer_DepthwiseConvolution2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_DepthwiseConvolution2dLayer()->base();
         case Layer::Layer_DequantizeLayer:
@@ -1110,6 +1113,32 @@ void Deserializer::ParseConvolution2d(GraphPtr graph, unsigned int layerIndex)
                                                                 layerName.c_str());
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseDepthToSpace(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto fbDescriptor = graph->layers()->Get(layerIndex)->layer_as_DepthToSpaceLayer()->descriptor();
+
+    armnn::DepthToSpaceDescriptor descriptor;
+    descriptor.m_BlockSize  = fbDescriptor->blockSize();
+    descriptor.m_DataLayout = ToDataLayout(fbDescriptor->dataLayout());
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddDepthToSpaceLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

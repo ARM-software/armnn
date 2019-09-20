@@ -658,6 +658,63 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeDepthToSpace)
+{
+    class DepthToSpaceLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        DepthToSpaceLayerVerifier(const std::string& layerName,
+                                  const std::vector<armnn::TensorInfo>& inputInfos,
+                                  const std::vector<armnn::TensorInfo>& outputInfos,
+                                  const armnn::DepthToSpaceDescriptor& descriptor)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos)
+            , m_Descriptor(descriptor) {}
+
+        void VisitDepthToSpaceLayer(const armnn::IConnectableLayer* layer,
+                                    const armnn::DepthToSpaceDescriptor& descriptor,
+                                    const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::DepthToSpaceDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_BlockSize == m_Descriptor.m_BlockSize);
+            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
+        }
+
+        armnn::DepthToSpaceDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("depthToSpace");
+
+    const armnn::TensorInfo inputInfo ({ 1,  8, 4, 12 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, 16, 8,  3 }, armnn::DataType::Float32);
+
+    armnn::DepthToSpaceDescriptor desc;
+    desc.m_BlockSize  = 2;
+    desc.m_DataLayout = armnn::DataLayout::NHWC;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer        = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const depthToSpaceLayer = network->AddDepthToSpaceLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer       = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(depthToSpaceLayer->GetInputSlot(0));
+    depthToSpaceLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    depthToSpaceLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    DepthToSpaceLayerVerifier verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
 {
     class DepthwiseConvolution2dLayerVerifier : public LayerVerifierBase

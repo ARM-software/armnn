@@ -140,7 +140,8 @@ enum LayerType : uint {
     QuantizedLstm = 45,
     Abs = 46,
     ArgMinMax = 47,
-    Slice = 48
+    Slice = 48,
+    DepthToSpace = 49
 }
 
 // Base layer table to be used as part of other layers
@@ -211,6 +212,16 @@ table Convolution2dDescriptor {
     dilationY:uint = 1;
     biasEnabled:bool = false;
     dataLayout:DataLayout = NCHW;
+}
+
+table DepthToSpaceLayer {
+    base:LayerBase;
+    descriptor:DepthToSpaceDescriptor;
+}
+
+table DepthToSpaceDescriptor {
+    blockSize:uint;
+    dataLayout:DataLayout;
 }
 
 table DivisionLayer {
@@ -722,7 +733,8 @@ union Layer {
     StackLayer,
     AbsLayer,
     ArgMinMaxLayer,
-    SliceLayer
+    SliceLayer,
+    DepthToSpaceLayer
 }
 
 table AnyLayer {

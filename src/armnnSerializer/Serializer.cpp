@@ -303,7 +303,14 @@ void SerializerVisitor::VisitDepthToSpaceLayer(const armnn::IConnectableLayer* l
                                                const armnn::DepthToSpaceDescriptor& descriptor,
                                                const char* name)
 {
-    throw UnimplementedException("SerializerVisitor::VisitDepthToSpaceLayer is not implemented");
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_DepthToSpace);
+    auto fbDescriptor = CreateDepthToSpaceDescriptor(m_flatBufferBuilder,
+                                                     descriptor.m_BlockSize,
+                                                     GetFlatBufferDataLayout(descriptor.m_DataLayout));
+
+    auto fbLayer = serializer::CreateDepthToSpaceLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_DepthToSpaceLayer);
 }
 
 void SerializerVisitor::VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,

@@ -19,6 +19,7 @@
 #include <ProfilingStateMachine.hpp>
 #include <ProfilingService.hpp>
 #include <ProfilingUtils.hpp>
+#include <RequestCounterDirectoryCommandHandler.hpp>
 #include <Runtime.hpp>
 #include <SocketProfilingConnection.hpp>
 #include <IReadCounterValue.hpp>
@@ -1977,6 +1978,100 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     offset += 2;
     readValue = ReadUint32(buffer, offset);
     BOOST_TEST((valueB * numSteps) == readValue);
+}
+
+BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest0)
+{
+    using boost::numeric_cast;
+
+    const uint32_t packetId = 0x30000;
+    const uint32_t version = 1;
+
+    std::unique_ptr<char[]> packetData;
+
+    Packet packetA(packetId, 0, packetData);
+
+    MockBuffer mockBuffer(1024);
+    SendCounterPacket sendCounterPacket(mockBuffer);
+
+    CounterDirectory counterDirectory;
+
+    RequestCounterDirectoryCommandHandler commandHandler(packetId, version, counterDirectory, sendCounterPacket);
+    commandHandler(packetA);
+
+    unsigned int size = 0;
+    const unsigned char* readBuffer = mockBuffer.GetReadBuffer(size);
+
+    uint32_t headerWord0 = ReadUint32(readBuffer, 0);
+    uint32_t headerWord1 = ReadUint32(readBuffer, 4);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 2); // packet id
+    BOOST_TEST(headerWord1 == 32);                  // data lenght;
+
+    uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
+    uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
+    BOOST_TEST(deviceRecordCount == 0); // device_records_count
+}
+
+BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
+{
+    using boost::numeric_cast;
+
+    const uint32_t packetId = 0x30000;
+    const uint32_t version = 1;
+
+    std::unique_ptr<char[]> packetData;
+
+    Packet packetA(packetId, 0, packetData);
+
+    MockBuffer mockBuffer(1024);
+    SendCounterPacket sendCounterPacket(mockBuffer);
+
+    CounterDirectory counterDirectory;
+    const Device* device = counterDirectory.RegisterDevice("deviceA", 1);
+    const CounterSet* counterSet = counterDirectory.RegisterCounterSet("countersetA");
+    counterDirectory.RegisterCategory("categoryA", device->m_Uid, counterSet->m_Uid);
+    counterDirectory.RegisterCounter("categoryA", 0, 1, 2.0f, "counterA", "descA");
+    counterDirectory.RegisterCounter("categoryA", 1, 1, 3.0f, "counterB", "descB");
+
+    RequestCounterDirectoryCommandHandler commandHandler(packetId, version, counterDirectory, sendCounterPacket);
+    commandHandler(packetA);
+
+    unsigned int size = 0;
+    const unsigned char* readBuffer = mockBuffer.GetReadBuffer(size);
+
+    uint32_t headerWord0 = ReadUint32(readBuffer, 0);
+    uint32_t headerWord1 = ReadUint32(readBuffer, 4);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 2); // packet id
+    BOOST_TEST(headerWord1 == 248);                 // data lenght;
+
+    uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
+    uint32_t bodyHeaderWord1 = ReadUint32(readBuffer, 12);
+    uint32_t bodyHeaderWord2 = ReadUint32(readBuffer, 16);
+    uint32_t bodyHeaderWord3 = ReadUint32(readBuffer, 20);
+    uint32_t bodyHeaderWord4 = ReadUint32(readBuffer, 24);
+    uint32_t bodyHeaderWord5 = ReadUint32(readBuffer, 28);
+    uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
+    uint16_t counterSetRecordCount = numeric_cast<uint16_t>(bodyHeaderWord2 >> 16);
+    uint16_t categoryRecordCount = numeric_cast<uint16_t>(bodyHeaderWord4 >> 16);
+    BOOST_TEST(deviceRecordCount == 1);     // device_records_count
+    BOOST_TEST(bodyHeaderWord1 == 0);       // device_records_pointer_table_offset
+    BOOST_TEST(counterSetRecordCount == 1); // counter_set_count
+    BOOST_TEST(bodyHeaderWord3 == 4);       // counter_set_pointer_table_offset
+    BOOST_TEST(categoryRecordCount == 1);   // categories_count
+    BOOST_TEST(bodyHeaderWord5 == 8);       // categories_pointer_table_offset
+
+    uint32_t deviceRecordOffset = ReadUint32(readBuffer, 32);
+    BOOST_TEST(deviceRecordOffset ==  0);
+
+    uint32_t counterSetRecordOffset = ReadUint32(readBuffer, 36);
+    BOOST_TEST(counterSetRecordOffset == 20);
+
+    uint32_t categoryRecordOffset = ReadUint32(readBuffer, 40);
+    BOOST_TEST(categoryRecordOffset ==  44);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

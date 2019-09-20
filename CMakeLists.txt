@@ -457,6 +457,8 @@ list(APPEND armnn_sources
     src/profiling/ProfilingStateMachine.hpp
     src/profiling/ProfilingUtils.cpp
     src/profiling/ProfilingUtils.hpp
+    src/profiling/RequestCounterDirectoryCommandHandler.cpp
+    src/profiling/RequestCounterDirectoryCommandHandler.hpp
     src/profiling/SendCounterPacket.cpp
     src/profiling/SendCounterPacket.hpp
     src/profiling/SocketProfilingConnection.cpp

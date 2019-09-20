@@ -14,12 +14,14 @@
 #include <Holder.hpp>
 #include <Packet.hpp>
 #include <PacketVersionResolver.hpp>
+#include <PeriodicCounterCapture.hpp>
 #include <PeriodicCounterSelectionCommandHandler.hpp>
 #include <ProfilingStateMachine.hpp>
 #include <ProfilingService.hpp>
 #include <ProfilingUtils.hpp>
 #include <Runtime.hpp>
 #include <SocketProfilingConnection.hpp>
+#include <IReadCounterValue.hpp>
 
 #include <armnn/Conversion.hpp>
 
@@ -1876,6 +1878,105 @@ BOOST_AUTO_TEST_CASE(StringToSwTraceNameStringTest)
     BOOST_CHECK(buffer.empty());
     BOOST_CHECK(!StringToSwTraceString<SwTraceNameCharPolicy>("12Ž34", buffer));
     BOOST_CHECK(buffer.empty());
+}
+
+BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
+{
+    class CaptureReader : public IReadCounterValue
+    {
+    public:
+        CaptureReader() {}
+
+        void GetCounterValue(uint16_t index, uint32_t &value) const override
+        {
+            if (m_Data.count(index))
+            {
+                value = m_Data.at(index);
+            }
+            else
+            {
+                value = 0;
+            }
+        }
+
+        void SetCounterValue(uint16_t index, uint32_t value)
+        {
+            if (!m_Data.count(index))
+            {
+                m_Data.insert(std::pair<uint16_t, uint32_t>(index, value));
+            }
+            else
+            {
+                m_Data.at(index) = value;
+            }
+        }
+
+    private:
+        std::map<uint16_t, uint32_t> m_Data;
+    };
+
+    Holder data;
+    std::vector<uint16_t> captureIds1 = { 0, 1 };
+    std::vector<uint16_t> captureIds2;
+
+    MockBuffer mockBuffer(512);
+    SendCounterPacket sendCounterPacket(mockBuffer);
+
+    std::vector<uint16_t> counterIds;
+    CaptureReader captureReader;
+
+    unsigned int valueA = 10;
+    unsigned int valueB = 15;
+    unsigned int numSteps = 5;
+
+    PeriodicCounterCapture periodicCounterCapture(std::ref(data), std::ref(sendCounterPacket), captureReader);
+
+    for(unsigned int i = 0; i < numSteps; ++i)
+    {
+        data.SetCaptureData(1, captureIds1);
+        captureReader.SetCounterValue(0, valueA * (i + 1));
+        captureReader.SetCounterValue(1, valueB * (i + 1));
+
+        periodicCounterCapture.Start();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+        periodicCounterCapture.Start();
+
+        data.SetCaptureData(0, captureIds2);
+
+        periodicCounterCapture.Start();
+    }
+
+    periodicCounterCapture.Join();
+
+    unsigned int size = 0;
+
+    const unsigned char* buffer = mockBuffer.GetReadBuffer(size);
+
+    uint32_t headerWord0 = ReadUint32(buffer, 0);
+    uint32_t headerWord1 = ReadUint32(buffer, 4);
+
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 1);   // packet family
+    BOOST_TEST(((headerWord0 >> 19) & 0x3F) == 0);   // packet class
+    BOOST_TEST(((headerWord0 >> 16) & 0x3) == 0);    // packet type
+    BOOST_TEST(headerWord1 == 20);                   // data length
+
+    uint32_t offset = 16;
+    uint16_t readIndex = ReadUint16(buffer, offset);
+    BOOST_TEST(0 == readIndex);
+
+    offset += 2;
+    uint32_t readValue = ReadUint32(buffer, offset);
+    BOOST_TEST((valueA * numSteps) == readValue);
+
+    offset += 4;
+    readIndex = ReadUint16(buffer, offset);
+    BOOST_TEST(1 == readIndex);
+
+    offset += 2;
+    readValue = ReadUint32(buffer, offset);
+    BOOST_TEST((valueB * numSteps) == readValue);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

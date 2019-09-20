@@ -440,10 +440,13 @@ list(APPEND armnn_sources
     src/profiling/ISendCounterPacket.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
+    src/profiling/IReadCounterValue.hpp
     src/profiling/Packet.cpp
     src/profiling/Packet.hpp
     src/profiling/PacketVersionResolver.cpp
     src/profiling/PacketVersionResolver.hpp
+    src/profiling/PeriodicCounterCapture.hpp
+    src/profiling/PeriodicCounterCapture.cpp
     src/profiling/PeriodicCounterSelectionCommandHandler.cpp
     src/profiling/PeriodicCounterSelectionCommandHandler.hpp
     src/profiling/ProfilingConnectionFactory.cpp

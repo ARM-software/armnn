@@ -21,8 +21,8 @@ class MockBuffer : public IBufferWrapper
 {
 public:
     MockBuffer(unsigned int size)
-            : m_BufferSize(size),
-              m_Buffer(std::make_unique<unsigned char[]>(size)) {}
+    : m_BufferSize(size),
+      m_Buffer(std::make_unique<unsigned char[]>(size)) {}
 
     unsigned char* Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
     {

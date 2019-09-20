@@ -638,6 +638,63 @@ BOOST_AUTO_TEST_CASE(QuantizeBatchNorm)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeDepthToSpace)
+{
+    class TestDepthToSpaceQuantization : public TestQuantization
+    {
+    public:
+        TestDepthToSpaceQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape) {}
+
+        TestDepthToSpaceQuantization(const QuantizerOptions& options,
+                                     const TensorShape& inputShape,
+                                     const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape) {}
+
+        virtual void VisitDepthToSpaceLayer(const IConnectableLayer* layer,
+                                            const DepthToSpaceDescriptor& desc,
+                                            const char* name = nullptr)
+        {
+            const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            const OffsetScalePair qAsymm8Params{ 30.0f / g_Asymm8QuantizationBase, 128 };
+            const OffsetScalePair qSymm16Params{ 15.0f / g_Symm16QuantizationBase, 0 };
+
+            TestQuantizationParams(info, qAsymm8Params, qSymm16Params);
+        }
+    };
+
+    const TensorShape inputShape { 1, 2, 2, 4 };
+    const TensorShape outputShape{ 1, 4, 4, 1 };
+
+    const TensorInfo inputInfo (inputShape,  DataType::Float32);
+    const TensorInfo outputInfo(outputShape, DataType::Float32);
+
+    INetworkPtr network = INetwork::Create();
+    const DepthToSpaceDescriptor descriptor(2, armnn::DataLayout::NHWC);
+
+    IConnectableLayer* inputLayer        = network->AddInputLayer(0);
+    IConnectableLayer* depthToSpaceLayer = network->AddDepthToSpaceLayer(descriptor);
+    IConnectableLayer* outputLayer       = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(depthToSpaceLayer->GetInputSlot(0));
+    depthToSpaceLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    depthToSpaceLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    // test QAsymm8 quantization
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestDepthToSpaceQuantization validatorQAsymm8(inputShape, outputShape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    // test QSymm16 quantization
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestDepthToSpaceQuantization validatorQSymm16(options, inputShape, outputShape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 BOOST_AUTO_TEST_CASE(OverrideInputRangeEmptyNetwork)
 {
     RangeTracker ranges;

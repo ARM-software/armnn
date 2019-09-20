@@ -70,6 +70,11 @@ public:
                                  const Optional<ConstTensor>& biases,
                                  const char* name = nullptr) override;
 
+    void VisitDepthToSpaceLayer(const IConnectableLayer* layer,
+                                const DepthToSpaceDescriptor& depthToSpaceDescriptor,
+                                const char* name = nullptr) override;
+
+
     void VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
                                           const DepthwiseConvolution2dDescriptor& desc,
                                           const ConstTensor& weights,

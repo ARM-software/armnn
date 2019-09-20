@@ -231,6 +231,15 @@ void QuantizerVisitor::VisitConvolution2dLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitDepthToSpaceLayer(const IConnectableLayer* layer,
+                                              const DepthToSpaceDescriptor& descriptor,
+                                              const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddDepthToSpaceLayer(descriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitDepthwiseConvolution2dLayer(const IConnectableLayer* layer,
                                                         const DepthwiseConvolution2dDescriptor& desc,
                                                         const ConstTensor& weights,

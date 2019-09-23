@@ -37,8 +37,6 @@ public:
             auto& newReshape = *graph.InsertNewLayer<ReshapeLayer>(base.GetInputSlot(0), descriptor, name.c_str());
             // Sets tensor info for new layer.
             newReshape.GetOutputHandler().SetTensorInfo(outInfo);
-            // Reconnects base with original parent.
-            newReshape.GetOutputSlot().MoveAllConnections(*parentOut);
             // Parent is now the new layer.
             parentOut = &newReshape.GetOutputSlot();
         }

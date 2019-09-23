@@ -17,6 +17,7 @@
 #include <backendsCommon/test/layerTests/Conv2dTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConstantTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DebugTestImpl.hpp>
+#include <backendsCommon/test/layerTests/DepthToSpaceTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DequantizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DetectionPostProcessTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DivisionTestImpl.hpp>

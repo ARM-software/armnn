@@ -63,6 +63,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ConvertFp32ToFp16TestImpl.hpp
     layerTests/DebugTestImpl.cpp
     layerTests/DebugTestImpl.hpp
+    layerTests/DepthToSpaceTestImpl.cpp
+    layerTests/DepthToSpaceTestImpl.hpp
     layerTests/DequantizeTestImpl.cpp
     layerTests/DequantizeTestImpl.hpp
     layerTests/DetectionPostProcessTestImpl.hpp

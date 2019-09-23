@@ -94,6 +94,9 @@ public:
     std::unique_ptr<IWorkload> CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
+                                                  const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateDepthwiseConvolution2d(const DepthwiseConvolution2dQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const override;
 

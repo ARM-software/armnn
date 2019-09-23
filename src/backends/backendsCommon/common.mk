@@ -45,6 +45,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/ConvertFp16ToFp32TestImpl.cpp \
     test/layerTests/ConvertFp32ToFp16TestImpl.cpp \
     test/layerTests/DebugTestImpl.cpp \
+    test/layerTests/DepthToSpaceTestImpl.cpp \
     test/layerTests/DequantizeTestImpl.cpp \
     test/layerTests/DivisionTestImpl.cpp \
     test/layerTests/EqualTestImpl.cpp \

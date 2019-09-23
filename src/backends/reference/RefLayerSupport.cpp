@@ -466,6 +466,34 @@ bool RefLayerSupport::IsDebugSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsDepthToSpaceSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const DepthToSpaceDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+    bool supported = true;
+
+    std::array<DataType,4> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+        "Reference DepthToSpace: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+        "Reference DepthToSpace: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+        "Reference DepthToSpace: input and output types are mismatched");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                       const TensorInfo& output,
                                                       const DepthwiseConvolution2dDescriptor& descriptor,

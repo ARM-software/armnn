@@ -29,6 +29,7 @@ BACKEND_SOURCES := \
         workloads/Broadcast.cpp \
         workloads/ConvImpl.cpp \
         workloads/Debug.cpp \
+        workloads/DepthToSpace.cpp \
         workloads/DetectionPostProcess.cpp \
         workloads/ElementwiseFunction.cpp \
         workloads/FullyConnected.cpp \
@@ -50,6 +51,7 @@ BACKEND_SOURCES := \
         workloads/RefConvertFp32ToFp16Workload.cpp \
         workloads/RefConvolution2dWorkload.cpp \
         workloads/RefDebugWorkload.cpp \
+        workloads/RefDepthToSpaceWorkload.cpp \
         workloads/RefDepthwiseConvolution2dWorkload.cpp \
         workloads/RefDequantizeWorkload.cpp \
         workloads/RefDetectionPostProcessWorkload.cpp \

@@ -24,6 +24,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Debug.cpp
     Debug.hpp
     Decoders.hpp
+    DepthToSpace.cpp
+    DepthToSpace.hpp
     DetectionPostProcess.cpp
     DetectionPostProcess.hpp
     ElementwiseFunction.cpp
@@ -71,6 +73,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefElementwiseWorkload.hpp
     RefDebugWorkload.cpp
     RefDebugWorkload.hpp
+    RefDepthToSpaceWorkload.cpp
+    RefDepthToSpaceWorkload.hpp
     RefDepthwiseConvolution2dWorkload.cpp
     RefDepthwiseConvolution2dWorkload.hpp
     RefDequantizeWorkload.cpp

@@ -82,7 +82,7 @@ ConstTensor ReorderWeightChannelsForAcl(const ConstTensor& weightHandle, DataLay
             break;
     }
 
-    DataType weightAclOrder[height*width*inputChannels*multiplier];
+    std::vector<DataType> weightAclOrder(height*width*inputChannels*multiplier);
     unsigned int destinationWeightsChannel;
     unsigned int totalChannels = inputChannels * multiplier;
     unsigned int channelSize   = height * width;
@@ -105,7 +105,7 @@ ConstTensor ReorderWeightChannelsForAcl(const ConstTensor& weightHandle, DataLay
         }
     }
 
-    ::memcpy(permuteBuffer, weightAclOrder, weightHandle.GetInfo().GetNumBytes());
+    ::memcpy(permuteBuffer, weightAclOrder.data(), weightHandle.GetInfo().GetNumBytes());
     return ConstTensor(weightHandle.GetInfo(), permuteBuffer);
 }
 
@@ -158,7 +158,7 @@ armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstCpuTensorHandle*
     ConstTensor weightPermuted = PermuteTensor(weightTensor, permutationVector, permuteBuffer);
 
     // Shuffle the weights data to obtain the channel order needed used by Acl
-    if (multiplier > 1 and inputChannels > 1 and dataLayout == DataLayout::NCHW)
+    if (multiplier > 1 && inputChannels > 1 && dataLayout == DataLayout::NCHW)
     {
         switch (weightPermuted.GetDataType())
         {

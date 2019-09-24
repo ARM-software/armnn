@@ -40,8 +40,6 @@ DepthToSpaceLayer* DepthToSpaceLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> DepthToSpaceLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    throw UnimplementedException("DepthToSpaceLayer::InferOutputShapes is not implemented");
-
     BOOST_ASSERT(inputShapes.size() == 1);
 
     TensorShape inputShape = inputShapes[0];

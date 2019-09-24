@@ -725,6 +725,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeBatchNormalization.cpp
             src/armnnDeserializer/test/DeserializeConstant.cpp
             src/armnnDeserializer/test/DeserializeConvolution2d.cpp
+            src/armnnDeserializer/test/DeserializeDepthToSpace.cpp
             src/armnnDeserializer/test/DeserializeDivision.cpp
             src/armnnDeserializer/test/DeserializeEqual.cpp
             src/armnnDeserializer/test/DeserializeFloor.cpp

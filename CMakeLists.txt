@@ -455,6 +455,8 @@ list(APPEND armnn_sources
     src/profiling/PeriodicCounterCapture.cpp
     src/profiling/PeriodicCounterSelectionCommandHandler.cpp
     src/profiling/PeriodicCounterSelectionCommandHandler.hpp
+    src/profiling/ProfilingConnectionDumpToFileDecorator.cpp
+    src/profiling/ProfilingConnectionDumpToFileDecorator.hpp
     src/profiling/ProfilingConnectionFactory.cpp
     src/profiling/ProfilingConnectionFactory.hpp
     src/profiling/ProfilingService.cpp
@@ -588,6 +590,7 @@ if(BUILD_UNIT_TESTS)
         src/armnnUtils/test/PrototxtConversionsTest.cpp
         src/armnnUtils/test/ParserHelperTest.cpp
         src/armnnUtils/test/TensorUtilsTest.cpp
+        src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp
         src/profiling/test/ProfilingTests.cpp
         src/profiling/test/SendCounterPacketTests.cpp
         )

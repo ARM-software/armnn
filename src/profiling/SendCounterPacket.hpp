@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "IBufferWrapper.hpp"
+#include "IBufferManager.hpp"
 #include "ISendCounterPacket.hpp"
 #include "ICounterDirectory.hpp"
 #include "IProfilingConnection.hpp"
@@ -31,9 +31,9 @@ public:
 
     using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
 
-    SendCounterPacket(IProfilingConnection& profilingConnection, IBufferWrapper& buffer)
+    SendCounterPacket(IProfilingConnection& profilingConnection, IBufferManager& buffer)
         : m_ProfilingConnection(profilingConnection)
-        , m_Buffer(buffer)
+        , m_BufferManager(buffer)
         , m_IsRunning(false)
         , m_KeepRunning(false)
     {}
@@ -63,15 +63,25 @@ private:
     template <typename ExceptionType>
     void CancelOperationAndThrow(const std::string& errorMessage)
     {
-        // Cancel the operation
-        m_Buffer.Commit(0);
+        // Throw a runtime exception with the given error message
+        throw ExceptionType(errorMessage);
+    }
+
+    template <typename ExceptionType>
+    void CancelOperationAndThrow(std::unique_ptr<IPacketBuffer>& writerBuffer, const std::string& errorMessage)
+    {
+        if (writerBuffer != nullptr)
+        {
+            // Cancel the operation
+            m_BufferManager.Release(writerBuffer);
+        }
 
         // Throw a runtime exception with the given error message
         throw ExceptionType(errorMessage);
     }
 
     IProfilingConnection& m_ProfilingConnection;
-    IBufferWrapper& m_Buffer;
+    IBufferManager& m_BufferManager;
     std::mutex m_WaitMutex;
     std::condition_variable m_WaitCondition;
     std::thread m_SendThread;

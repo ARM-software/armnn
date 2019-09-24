@@ -1756,7 +1756,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     Holder holder;
     TestCaptureThread captureThread;
     MockProfilingConnection mockProfilingConnection;
-    MockBuffer mockBuffer(512);
+    MockBufferManager mockBuffer(512);
     SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
 
     uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
@@ -1789,9 +1789,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     BOOST_TEST(counterIds[0] == 4000);
     BOOST_TEST(counterIds[1] == 5000);
 
-    unsigned int size = 0;
-
-    const unsigned char* readBuffer = mockBuffer.GetReadBuffer(size);
+    auto readBuffer = mockBuffer.GetReadableBuffer();
 
     offset = 0;
 
@@ -1814,6 +1812,8 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     counterId = ReadUint16(readBuffer, offset);
     BOOST_TEST(counterId == 5000);
 
+    mockBuffer.MarkRead(readBuffer);
+
     // Data with period only
     uint32_t period2 = 11;
     uint32_t dataLength2 = 4;
@@ -1831,7 +1831,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     BOOST_TEST(holder.GetCaptureData().GetCapturePeriod() == period2);
     BOOST_TEST(counterIds.size() == 0);
 
-    readBuffer = mockBuffer.GetReadBuffer(size);
+    readBuffer = mockBuffer.GetReadableBuffer();
 
     offset = 0;
 
@@ -2115,7 +2115,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     std::vector<uint16_t> captureIds2;
 
     MockProfilingConnection mockProfilingConnection;
-    MockBuffer mockBuffer(512);
+    MockBufferManager mockBuffer(512);
     SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
 
     std::vector<uint16_t> counterIds;
@@ -2146,9 +2146,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
 
     periodicCounterCapture.Join();
 
-    unsigned int size = 0;
-
-    const unsigned char* buffer = mockBuffer.GetReadBuffer(size);
+    auto buffer = mockBuffer.GetReadableBuffer();
 
     uint32_t headerWord0 = ReadUint32(buffer, 0);
     uint32_t headerWord1 = ReadUint32(buffer, 4);
@@ -2187,7 +2185,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest0)
     Packet packetA(packetId, 0, packetData);
 
     MockProfilingConnection mockProfilingConnection;
-    MockBuffer mockBuffer(1024);
+    MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
 
     CounterDirectory counterDirectory;
@@ -2195,8 +2193,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest0)
     RequestCounterDirectoryCommandHandler commandHandler(packetId, version, counterDirectory, sendCounterPacket);
     commandHandler(packetA);
 
-    unsigned int size = 0;
-    const unsigned char* readBuffer = mockBuffer.GetReadBuffer(size);
+    auto readBuffer = mockBuffer.GetReadableBuffer();
 
     uint32_t headerWord0 = ReadUint32(readBuffer, 0);
     uint32_t headerWord1 = ReadUint32(readBuffer, 4);
@@ -2222,7 +2219,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
     Packet packetA(packetId, 0, packetData);
 
     MockProfilingConnection mockProfilingConnection;
-    MockBuffer mockBuffer(1024);
+    MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
 
     CounterDirectory counterDirectory;
@@ -2235,8 +2232,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
     RequestCounterDirectoryCommandHandler commandHandler(packetId, version, counterDirectory, sendCounterPacket);
     commandHandler(packetA);
 
-    unsigned int size = 0;
-    const unsigned char* readBuffer = mockBuffer.GetReadBuffer(size);
+    auto readBuffer = mockBuffer.GetReadableBuffer();
 
     uint32_t headerWord0 = ReadUint32(readBuffer, 0);
     uint32_t headerWord1 = ReadUint32(readBuffer, 4);

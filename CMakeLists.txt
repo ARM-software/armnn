@@ -438,9 +438,10 @@ list(APPEND armnn_sources
     src/profiling/EncodeVersion.hpp
     src/profiling/Holder.cpp
     src/profiling/Holder.hpp
-    src/profiling/IBufferWrapper.hpp
+    src/profiling/IBufferManager.hpp
     src/profiling/ICounterDirectory.hpp
     src/profiling/ISendCounterPacket.hpp
+    src/profiling/IPacketBuffer.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
     src/profiling/IReadCounterValue.hpp

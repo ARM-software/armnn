@@ -42,15 +42,46 @@ private:
     bool m_IsOpen;
 };
 
-class MockBuffer : public IBufferWrapper
+class MockPacketBuffer : public IPacketBuffer
 {
 public:
-    MockBuffer(unsigned int size)
-        : m_BufferSize(size)
-        , m_Buffer(std::make_unique<unsigned char[]>(size))
-    {}
+    MockPacketBuffer(unsigned int maxSize)
+    : m_MaxSize(maxSize),
+      m_Size(0)
+    {
+        m_Data = std::make_unique<unsigned char[]>(m_MaxSize);
+    }
 
-    unsigned char* Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
+    ~MockPacketBuffer() {}
+
+    const unsigned char* const GetReadableData() const override { return m_Data.get(); }
+
+    unsigned int GetSize() const override { return m_Size; }
+
+    void MarkRead() override { m_Size = 0;}
+
+    void Commit(unsigned int size) override { m_Size = size; }
+
+    void Release() override { m_Size = 0; }
+
+    unsigned char* GetWritableData() override { return m_Data.get(); }
+
+private:
+    unsigned int m_MaxSize;
+    unsigned int m_Size;
+    std::unique_ptr<unsigned char[]> m_Data;
+};
+
+class MockBufferManager : public IBufferManager
+{
+public:
+    MockBufferManager(unsigned int size)
+    : m_BufferSize(size),
+      m_Buffer(std::make_unique<MockPacketBuffer>(size)) {}
+
+    ~MockBufferManager() {}
+
+    std::unique_ptr<IPacketBuffer> Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
     {
         if (requestedSize > m_BufferSize)
         {
@@ -61,145 +92,171 @@ public:
             reservedSize = requestedSize;
         }
 
-        return m_Buffer.get();
+        return std::move(m_Buffer);
     }
 
-    void Commit(unsigned int size) override {}
-
-    const unsigned char* GetReadBuffer(unsigned int& size) override
+    void Commit(std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int size) override
     {
-        size = static_cast<unsigned int>(strlen(reinterpret_cast<const char*>(m_Buffer.get())) + 1);
-        return m_Buffer.get();
+        packetBuffer->Commit(size);
+        m_Buffer = std::move(packetBuffer);
     }
 
-    void Release(unsigned int size) override {}
+    std::unique_ptr<IPacketBuffer> GetReadableBuffer() override
+    {
+        return std::move(m_Buffer);
+    }
+
+    void Release(std::unique_ptr<IPacketBuffer>& packetBuffer) override
+    {
+        packetBuffer->Release();
+        m_Buffer = std::move(packetBuffer);
+    }
+
+    void MarkRead(std::unique_ptr<IPacketBuffer>& packetBuffer) override
+    {
+        packetBuffer->MarkRead();
+        m_Buffer = std::move(packetBuffer);
+    }
 
 private:
     unsigned int m_BufferSize;
-    std::unique_ptr<unsigned char[]> m_Buffer;
+    std::unique_ptr<IPacketBuffer> m_Buffer;
 };
 
-class MockStreamCounterBuffer : public IBufferWrapper
+class MockStreamCounterBuffer : public IBufferManager
 {
 public:
-    MockStreamCounterBuffer(unsigned int size)
-        : m_Buffer(size, 0)
-        , m_CommittedSize(0)
-        , m_ReadSize(0)
-    {}
-
-    unsigned char* Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
+    MockStreamCounterBuffer(unsigned int numberOfBuffers = 5, unsigned int maxPacketSize = 4096)
+    : m_MaxBufferSize(maxPacketSize)
+    , m_ReadableSize(0)
+    , m_CommittedSize(0)
+    , m_ReadSize(0)
     {
-        std::unique_lock<std::mutex>(m_Mutex);
-
-        // Get the buffer size and the available size in the buffer past the committed size
-        size_t bufferSize = m_Buffer.size();
-        size_t availableSize = bufferSize - m_CommittedSize;
-
-        // Check whether the buffer needs to be resized
-        if (requestedSize > availableSize)
+        m_AvailableList.reserve(numberOfBuffers);
+        for (unsigned int i = 0; i < numberOfBuffers; ++i)
         {
-            // Resize the buffer
-            size_t newSize = m_CommittedSize + requestedSize;
-            m_Buffer.resize(newSize, 0);
+            std::unique_ptr<IPacketBuffer> buffer = std::make_unique<MockPacketBuffer>(maxPacketSize);
+            m_AvailableList.emplace_back(std::move(buffer));
         }
-
-        // Set the reserved size
-        reservedSize = requestedSize;
-
-        // Get a pointer to the beginning of the part of buffer available for writing
-        return m_Buffer.data() + m_CommittedSize;
+        m_ReadableList.reserve(numberOfBuffers);
     }
 
-    void Commit(unsigned int size) override
-    {
-        std::unique_lock<std::mutex>(m_Mutex);
+    ~MockStreamCounterBuffer() {}
 
-        // Update the committed size
+    std::unique_ptr<IPacketBuffer> Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
+    {
+        std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
+        if (requestedSize > m_MaxBufferSize)
+       {
+            throw armnn::Exception("Maximum buffer size that can be requested is [" +
+                std::to_string(m_MaxBufferSize) + "] bytes");
+       }
+        availableListLock.lock();
+        if (m_AvailableList.empty())
+        {
+            throw armnn::profiling::BufferExhaustion("Buffer not available");
+        }
+        std::unique_ptr<IPacketBuffer> buffer = std::move(m_AvailableList.back());
+        m_AvailableList.pop_back();
+        availableListLock.unlock();
+        reservedSize = requestedSize;
+        return buffer;
+    }
+
+    void Commit(std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int size) override
+    {
+        std::unique_lock<std::mutex> readableListLock(m_ReadableMutex, std::defer_lock);
+        packetBuffer.get()->Commit(size);
+        readableListLock.lock();
+        m_ReadableList.push_back(std::move(packetBuffer));
+        readableListLock.unlock();
+        m_ReadDataAvailable.notify_one();
         m_CommittedSize += size;
     }
 
-    const unsigned char* GetReadBuffer(unsigned int& size) override
+    void Release(std::unique_ptr<IPacketBuffer>& packetBuffer) override
     {
-        std::unique_lock<std::mutex>(m_Mutex);
-
-        // Get the size available for reading
-        size = boost::numeric_cast<unsigned int>(m_CommittedSize - m_ReadSize);
-
-        // Get a pointer to the beginning of the part of buffer available for reading
-        const unsigned char* readBuffer = m_Buffer.data() + m_ReadSize;
-
-        // Update the read size
-        m_ReadSize = m_CommittedSize;
-
-        return readBuffer;
+        std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
+        packetBuffer.get()->Release();
+        availableListLock.lock();
+        m_AvailableList.push_back(std::move(packetBuffer));
+        availableListLock.unlock();
+        m_CommittedSize = 0;
+        m_ReadSize = 0;
+        m_ReadableSize = 0;
     }
 
-    void Release(unsigned int size) override
+    std::unique_ptr<IPacketBuffer> GetReadableBuffer() override
     {
-        std::unique_lock<std::mutex>(m_Mutex);
-
-        if (size == 0)
+        std::unique_lock<std::mutex> readableListLock(m_ReadableMutex);
+        if (!m_ReadableList.empty())
         {
-            // Nothing to release
-            return;
+            std::unique_ptr<IPacketBuffer> buffer = std::move(m_ReadableList.back());
+            m_ReadableSize+=buffer->GetSize();
+            m_ReadableList.pop_back();
+            readableListLock.unlock();
+            return buffer;
         }
-
-        // Get the buffer size
-        size_t bufferSize = m_Buffer.size();
-
-        // Remove the last "size" bytes from the buffer
-        if (size < bufferSize)
-        {
-            // Resize the buffer
-            size_t newSize = bufferSize - size;
-            m_Buffer.resize(newSize);
-        }
-        else
-        {
-            // Clear the whole buffer
-            m_Buffer.clear();
-        }
+        return nullptr;
     }
 
-    size_t GetBufferSize()           const { return m_Buffer.size(); }
-    size_t GetCommittedSize()        const { return m_CommittedSize; }
-    size_t GetReadSize()             const { return m_ReadSize;      }
-    const unsigned char* GetBuffer() const { return m_Buffer.data(); }
+    void MarkRead(std::unique_ptr<IPacketBuffer>& packetBuffer) override
+    {
+        std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
+        // increase read size
+        m_ReadSize += packetBuffer->GetSize();
+        packetBuffer->MarkRead();
+        availableListLock.lock();
+        m_AvailableList.push_back(std::move(packetBuffer));
+        availableListLock.unlock();
+    }
+
+    unsigned int GetReadableBufferSize() const
+    {
+        return m_ReadableSize;
+    }
+    unsigned int GetCommittedSize()        const { return m_CommittedSize; }
+    unsigned int GetReadSize()             const { return m_ReadSize;      }
 
 private:
-    // This mock uses an ever-expanding vector to simulate a counter stream buffer
-    std::vector<unsigned char> m_Buffer;
+    unsigned int m_MaxBufferSize;
+    std::vector<std::unique_ptr<IPacketBuffer>> m_AvailableList;
+    std::vector<std::unique_ptr<IPacketBuffer>> m_ReadableList;
+    std::mutex m_AvailableMutex;
+    std::mutex m_ReadableMutex;
+    std::condition_variable m_ReadDataAvailable;
+
+    // The size of the buffer that can be read
+    unsigned int m_ReadableSize;
 
     // The size of the buffer that has been committed for reading
-    size_t m_CommittedSize;
+    unsigned int m_CommittedSize;
 
     // The size of the buffer that has already been read
-    size_t m_ReadSize;
-
-    // This mock buffer provides basic synchronization
-    std::mutex m_Mutex;
+    unsigned int m_ReadSize;
 };
 
 class MockSendCounterPacket : public ISendCounterPacket
 {
 public:
-    MockSendCounterPacket(IBufferWrapper& sendBuffer) : m_Buffer(sendBuffer) {}
+    MockSendCounterPacket(IBufferManager& sendBuffer) : m_BufferManager(sendBuffer) {}
 
     void SendStreamMetaDataPacket() override
     {
         std::string message("SendStreamMetaDataPacket");
         unsigned int reserved = 0;
-        unsigned char* buffer = m_Buffer.Reserve(1024, reserved);
-        memcpy(buffer, message.c_str(), static_cast<unsigned int>(message.size()) + 1);
+        std::unique_ptr<IPacketBuffer> buffer = m_BufferManager.Reserve(1024, reserved);
+        memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
+        m_BufferManager.Commit(buffer, reserved);
     }
 
     void SendCounterDirectoryPacket(const ICounterDirectory& counterDirectory) override
     {
         std::string message("SendCounterDirectoryPacket");
         unsigned int reserved = 0;
-        unsigned char* buffer = m_Buffer.Reserve(1024, reserved);
-        memcpy(buffer, message.c_str(), static_cast<unsigned int>(message.size()) + 1);
+        std::unique_ptr<IPacketBuffer> buffer = m_BufferManager.Reserve(1024, reserved);
+        memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
+        m_BufferManager.Commit(buffer, reserved);
     }
 
     void SendPeriodicCounterCapturePacket(uint64_t timestamp,
@@ -207,8 +264,9 @@ public:
     {
         std::string message("SendPeriodicCounterCapturePacket");
         unsigned int reserved = 0;
-        unsigned char* buffer = m_Buffer.Reserve(1024, reserved);
-        memcpy(buffer, message.c_str(), static_cast<unsigned int>(message.size()) + 1);
+        std::unique_ptr<IPacketBuffer> buffer = m_BufferManager.Reserve(1024, reserved);
+        memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
+        m_BufferManager.Commit(buffer, reserved);
     }
 
     void SendPeriodicCounterSelectionPacket(uint32_t capturePeriod,
@@ -216,15 +274,15 @@ public:
     {
         std::string message("SendPeriodicCounterSelectionPacket");
         unsigned int reserved = 0;
-        unsigned char* buffer = m_Buffer.Reserve(1024, reserved);
-        memcpy(buffer, message.c_str(), static_cast<unsigned int>(message.size()) + 1);
-        m_Buffer.Commit(reserved);
+        std::unique_ptr<IPacketBuffer> buffer = m_BufferManager.Reserve(1024, reserved);
+        memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
+        m_BufferManager.Commit(buffer, reserved);
     }
 
     void SetReadyToRead() override {}
 
 private:
-    IBufferWrapper& m_Buffer;
+    IBufferManager& m_BufferManager;
 };
 
 class MockCounterDirectory : public ICounterDirectory
@@ -434,7 +492,7 @@ private:
 class SendCounterPacketTest : public SendCounterPacket
 {
 public:
-    SendCounterPacketTest(IProfilingConnection& profilingconnection, IBufferWrapper& buffer)
+    SendCounterPacketTest(IProfilingConnection& profilingconnection, IBufferManager& buffer)
         : SendCounterPacket(profilingconnection, buffer)
     {}
 

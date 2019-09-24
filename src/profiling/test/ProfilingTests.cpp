@@ -2022,7 +2022,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest0)
 
     BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
     BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 2); // packet id
-    BOOST_TEST(headerWord1 == 32);                  // data lenght;
+    BOOST_TEST(headerWord1 == 24);                  // data length
 
     uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
     uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
@@ -2061,7 +2061,7 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
 
     BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
     BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 2); // packet id
-    BOOST_TEST(headerWord1 == 248);                 // data lenght;
+    BOOST_TEST(headerWord1 == 240);                 // data length
 
     uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
     uint32_t bodyHeaderWord1 = ReadUint32(readBuffer, 12);

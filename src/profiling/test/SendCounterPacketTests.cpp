@@ -1143,7 +1143,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     uint32_t packetHeaderWord1 = ReadUint32(readBuffer, 4);
     BOOST_TEST(((packetHeaderWord0 >> 26) & 0x3F) == 0);  // packet_family
     BOOST_TEST(((packetHeaderWord0 >> 16) & 0x3FF) == 2); // packet_id
-    BOOST_TEST(packetHeaderWord1 == 944);                 // data_length
+    BOOST_TEST(packetHeaderWord1 == 936);                 // data_length
 
     // Check the body header
     uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);

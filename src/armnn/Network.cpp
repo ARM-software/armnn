@@ -818,7 +818,8 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                                                 MovePermuteUp(),
                                                 PermuteAsReshape(),
                                                 OptimizeConsecutiveReshapes(),
-                                                FoldPadIntoConvolution2d()));
+                                                FoldPadIntoConvolution2d(),
+                                                PermuteAndBatchToSpaceAsDepthToSpace()));
 
     // Infer the tensor infos for all output slots. Throws an exception on failure
     optGraph.InferTensorInfos();

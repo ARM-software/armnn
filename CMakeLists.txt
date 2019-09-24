@@ -420,6 +420,8 @@ list(APPEND armnn_sources
     src/armnn/optimizations/OptimizeConsecutiveReshapes.hpp
     src/armnn/optimizations/OptimizeInverseConversions.hpp
     src/armnn/optimizations/OptimizeInversePermutes.hpp
+    src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.hpp
+    src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.cpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
     src/profiling/CommandHandlerFunctor.cpp
@@ -560,6 +562,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/OptimizeConsecutiveReshapesTests.cpp
         src/armnn/test/optimizations/OptimizeInverseConversionsTests.cpp
         src/armnn/test/optimizations/OptimizeInversePermutesTests.cpp
+        src/armnn/test/optimizations/PermuteAndBatchToSpaceAsDepthToSpaceTests.cpp
         src/armnn/test/optimizations/PermuteAsReshapeTests.cpp
         src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp
         src/armnn/test/OptionalTest.cpp

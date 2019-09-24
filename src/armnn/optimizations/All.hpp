@@ -14,3 +14,4 @@
 #include "ConvertFp32NetworkToFp16.hpp"
 #include "AddDebug.hpp"
 #include "FoldPadIntoConvolution2d.hpp"
+#include "PermuteAndBatchToSpaceAsDepthToSpace.hpp"

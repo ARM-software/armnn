@@ -550,6 +550,16 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/NetworkTests.cpp
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptimizerTests.cpp
+        src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp
+        src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp
+        src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp
+        src/armnn/test/optimizations/InsertDebugLayerTests.cpp
+        src/armnn/test/optimizations/MovePermuteUpTests.cpp
+        src/armnn/test/optimizations/OptimizeConsecutiveReshapesTests.cpp
+        src/armnn/test/optimizations/OptimizeInverseConversionsTests.cpp
+        src/armnn/test/optimizations/OptimizeInversePermutesTests.cpp
+        src/armnn/test/optimizations/PermuteAsReshapeTests.cpp
+        src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp
         src/armnn/test/OptionalTest.cpp
         src/armnn/test/ProfilerTests.cpp
         src/armnn/test/ProfilingEventTest.cpp

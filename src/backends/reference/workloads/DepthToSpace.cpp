@@ -50,7 +50,7 @@ void DepthToSpace(const TensorInfo& inputInfo,
     // batch separately and execute 5D permutations
 
     TensorShape permDestShape;
-    std::initializer_list<unsigned int> permVector;
+    PermutationVector permVector{};
     if (descriptor.m_DataLayout == DataLayout::NCHW)
     {
         permDestShape = TensorShape({ outDepth, inHeight, blockSize, inWidth, blockSize });
@@ -69,7 +69,7 @@ void DepthToSpace(const TensorInfo& inputInfo,
         const uintptr_t batchDataOffset = batchIndex * (numElementsPerBatch * dataTypeSize);
 
         armnnUtils::Permute(permDestShape,
-                            PermutationVector(permVector),
+                            permVector,
                             static_cast<const void*>(reinterpret_cast<const uint8_t*>(inputData) + batchDataOffset),
                             static_cast<void*>(reinterpret_cast<uint8_t*>(outputData) + batchDataOffset),
                             dataTypeSize);

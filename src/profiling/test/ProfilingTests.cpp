@@ -27,11 +27,13 @@
 
 #include <armnn/Conversion.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <random>
@@ -663,16 +665,31 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
 }
 
+struct cerr_redirect {
+    cerr_redirect(std::streambuf* new_buffer)
+        : old( std::cerr.rdbuf(new_buffer)) {}
+
+    ~cerr_redirect( ) {
+        std::cerr.rdbuf(old);
+    }
+
+private:
+    std::streambuf* old;
+};
+
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
     ProfilingService service(options);
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::NotConnected);
-    service.Run();
-    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::WaitingForAck);
-}
 
+    // As there is no daemon running a connection cannot be made so expect a std::cerr to console
+    std::stringstream ss;
+    cerr_redirect guard(ss.rdbuf());
+    service.Run();
+    BOOST_CHECK(boost::contains(ss.str(), "Cannot connect to stream socket: Connection refused"));
+}
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
 {
@@ -684,8 +701,12 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
     options.m_EnableProfiling = true;
     service.ResetExternalProfilingOptions(options);
     BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::NotConnected);
+
+    // As there is no daemon running a connection cannot be made so expect a std::cerr to console
+    std::stringstream ss;
+    cerr_redirect guard(ss.rdbuf());
     service.Run();
-    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::WaitingForAck);
+    BOOST_CHECK(boost::contains(ss.str(), "Cannot connect to stream socket: Connection refused"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterDirectory)

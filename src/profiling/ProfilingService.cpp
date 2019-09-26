@@ -57,14 +57,17 @@ void ProfilingService::Run()
 {
     if (m_State.GetCurrentState() == ProfilingState::NotConnected)
     {
-        //  Since GetProfilingConnection is not implemented, if !NULL,
-        //  then change to WaitingForAck. This will need to change once there is implementation
-        //  for the IProfilingConnection
-        if (!m_Factory.GetProfilingConnection(m_Options))
+        try
         {
+            m_Factory.GetProfilingConnection(m_Options);
             m_State.TransitionToState(ProfilingState::WaitingForAck);
         }
-    } else if (m_State.GetCurrentState() == ProfilingState::Uninitialised && m_Options.m_EnableProfiling == true)
+        catch (const armnn::Exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+    }
+    else if (m_State.GetCurrentState() == ProfilingState::Uninitialised && m_Options.m_EnableProfiling == true)
     {
         Initialise();
     }

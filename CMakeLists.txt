@@ -424,6 +424,8 @@ list(APPEND armnn_sources
     src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.cpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
+    src/profiling/BufferManager.cpp
+    src/profiling/BufferManager.hpp
     src/profiling/CommandHandlerFunctor.cpp
     src/profiling/CommandHandlerFunctor.hpp
     src/profiling/CommandHandlerKey.cpp
@@ -449,6 +451,8 @@ list(APPEND armnn_sources
     src/profiling/IReadCounterValue.hpp
     src/profiling/Packet.cpp
     src/profiling/Packet.hpp
+    src/profiling/PacketBuffer.cpp
+    src/profiling/PacketBuffer.hpp
     src/profiling/PacketVersionResolver.cpp
     src/profiling/PacketVersionResolver.hpp
     src/profiling/PeriodicCounterCapture.hpp
@@ -590,6 +594,7 @@ if(BUILD_UNIT_TESTS)
         src/armnnUtils/test/PrototxtConversionsTest.cpp
         src/armnnUtils/test/ParserHelperTest.cpp
         src/armnnUtils/test/TensorUtilsTest.cpp
+        src/profiling/test/BufferTests.cpp
         src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp
         src/profiling/test/ProfilingTests.cpp
         src/profiling/test/SendCounterPacketTests.cpp

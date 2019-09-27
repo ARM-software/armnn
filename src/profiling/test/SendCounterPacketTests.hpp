@@ -147,10 +147,10 @@ public:
     {
         std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
         if (requestedSize > m_MaxBufferSize)
-       {
+        {
             throw armnn::Exception("Maximum buffer size that can be requested is [" +
                 std::to_string(m_MaxBufferSize) + "] bytes");
-       }
+        }
         availableListLock.lock();
         if (m_AvailableList.empty())
         {

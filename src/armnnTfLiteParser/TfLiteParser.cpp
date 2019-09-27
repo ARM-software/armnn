@@ -871,7 +871,7 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(inputs.size(), 2);
+    CHECK_VALID_SIZE(inputs.size(), 1, 2);
 
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
@@ -880,6 +880,19 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = boost::str(boost::format("Transpose:%1%:%2%") % subgraphIndex % operatorIndex);
 
     PermuteDescriptor desc;
+
+    if(inputs.size() == 2)
+    {
+        armnn::TensorInfo permuteTensorInfo = ToTensorInfo(inputs[1]);
+        BufferRawPtr permuteBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+
+        std::vector<unsigned int> permuteShape(permuteTensorInfo.GetNumElements());
+        ::memcpy(permuteShape.data(), permuteBufferPtr->data.data(), permuteTensorInfo.GetNumBytes());
+
+        PermutationVector permutationVector(permuteShape.data(), permuteTensorInfo.GetNumElements());
+
+        desc =  PermuteDescriptor(permutationVector);
+    }
 
     layer = m_Network->AddPermuteLayer(desc, layerName.c_str());
 

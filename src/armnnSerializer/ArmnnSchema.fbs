@@ -156,7 +156,7 @@ table ActivationLayer {
 }
 
 table ActivationDescriptor {
-    function:ActivationFunction = Sigmoid;
+    activationFunction:ActivationFunction = Sigmoid;
     a:float;
     b:float;
 }

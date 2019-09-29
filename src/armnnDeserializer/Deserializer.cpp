@@ -866,7 +866,7 @@ void Deserializer::ParseActivation(GraphPtr graph, unsigned int layerIndex)
     auto serializerDescriptor = serializerLayer->descriptor();
 
     armnn::ActivationDescriptor descriptor;
-    descriptor.m_Function = ToActivationFunction(serializerDescriptor->function());
+    descriptor.m_Function = ToActivationFunction(serializerDescriptor->activationFunction());
     descriptor.m_A = serializerDescriptor->a();
     descriptor.m_B = serializerDescriptor->b();
 

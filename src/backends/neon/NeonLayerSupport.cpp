@@ -23,6 +23,7 @@
 #include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
+#include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonDequantizeWorkload.hpp"
 #include "workloads/NeonGreaterWorkload.hpp"
@@ -247,6 +248,18 @@ bool NeonLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                    descriptor,
                                    weights,
                                    biases);
+}
+
+bool NeonLayerSupport::IsDepthToSpaceSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const DepthToSpaceDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDepthToSpaceWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,

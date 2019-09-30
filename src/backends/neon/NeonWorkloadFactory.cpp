@@ -170,6 +170,12 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
                                                        m_MemoryManager->GetIntraLayerManager());
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonDepthToSpaceWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
 {

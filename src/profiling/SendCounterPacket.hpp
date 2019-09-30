@@ -9,11 +9,13 @@
 #include "ISendCounterPacket.hpp"
 #include "ICounterDirectory.hpp"
 #include "IProfilingConnection.hpp"
+#include "ProfilingUtils.hpp"
 
 #include <atomic>
+#include <condition_variable>
 #include <mutex>
 #include <thread>
-#include <condition_variable>
+#include <type_traits>
 
 namespace armnn
 {
@@ -31,11 +33,12 @@ public:
 
     using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
 
-    SendCounterPacket(IProfilingConnection& profilingConnection, IBufferManager& buffer)
+    SendCounterPacket(IProfilingConnection& profilingConnection, IBufferManager& buffer, int timeout =  1)
         : m_ProfilingConnection(profilingConnection)
         , m_BufferManager(buffer)
         , m_IsRunning(false)
         , m_KeepRunning(false)
+        , m_Timeout(timeout)
     {}
     ~SendCounterPacket() { Stop(); }
 
@@ -70,6 +73,10 @@ private:
     template <typename ExceptionType>
     void CancelOperationAndThrow(std::unique_ptr<IPacketBuffer>& writerBuffer, const std::string& errorMessage)
     {
+        if (std::is_same<ExceptionType, armnn::profiling::BufferExhaustion>::value)
+        {
+            SetReadyToRead();
+        }
         if (writerBuffer != nullptr)
         {
             // Cancel the operation
@@ -80,6 +87,8 @@ private:
         throw ExceptionType(errorMessage);
     }
 
+    void FlushBuffer();
+
     IProfilingConnection& m_ProfilingConnection;
     IBufferManager& m_BufferManager;
     std::mutex m_WaitMutex;
@@ -87,6 +96,7 @@ private:
     std::thread m_SendThread;
     std::atomic<bool> m_IsRunning;
     std::atomic<bool> m_KeepRunning;
+    int m_Timeout;
 
 protected:
     // Helper methods, protected for testing

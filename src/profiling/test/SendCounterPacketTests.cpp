@@ -5,10 +5,11 @@
 
 #include "SendCounterPacketTests.hpp"
 
+#include <CounterDirectory.hpp>
+#include <BufferManager.hpp>
 #include <EncodeVersion.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
-#include <CounterDirectory.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
@@ -2042,6 +2043,198 @@ BOOST_AUTO_TEST_CASE(SendThreadTest3)
     BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      <= totalWrittenSize);
     BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      <= mockStreamCounterBuffer.GetReadableSize());
     BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      <= mockStreamCounterBuffer.GetCommittedSize());
+}
+
+BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
+{
+    MockProfilingConnection mockProfilingConnection;
+    BufferManager bufferManager(1, 1024);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, bufferManager, -1);
+    sendCounterPacket.Start();
+
+    // Interleaving writes and reads to/from the buffer with pauses to test that the send thread actually waits for
+    // something to become available for reading
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // SendStreamMetaDataPacket
+    sendCounterPacket.SendStreamMetaDataPacket();
+
+    // Read data from the buffer
+    // Buffer should become readable after commit by SendStreamMetaDataPacket
+    auto packetBuffer = bufferManager.GetReadableBuffer();
+    BOOST_TEST(packetBuffer.get());
+
+    std::string processName = GetProcessName().substr(0, 60);
+    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
+    unsigned int streamMetadataPacketsize = 118 + processNameSize;
+    BOOST_TEST(packetBuffer->GetSize() == streamMetadataPacketsize);
+
+    // Buffer is not available when SendStreamMetaDataPacket already occupied the buffer.
+    unsigned int reservedSize = 0;
+    auto reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(!reservedBuffer.get());
+
+    // Recommit to be read by sendCounterPacket
+    bufferManager.Commit(packetBuffer, streamMetadataPacketsize);
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // The buffer is read by the send thread so it should not be in the readable buffer.
+    auto readBuffer = bufferManager.GetReadableBuffer();
+    BOOST_TEST(!readBuffer);
+
+    // Successfully reserved the buffer with requested size
+    reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(reservedSize == 512);
+    BOOST_TEST(reservedBuffer.get());
+
+    // Release the buffer to be used by sendCounterPacket
+    bufferManager.Release(reservedBuffer);
+
+    // SendCounterDirectoryPacket
+    CounterDirectory counterDirectory;
+    sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
+
+    // Read data from the buffer
+    // Buffer should become readable after commit by SendCounterDirectoryPacket
+    auto counterDirectoryPacketBuffer = bufferManager.GetReadableBuffer();
+    BOOST_TEST(counterDirectoryPacketBuffer.get());
+
+    // Get the size of the Counter Directory Packet
+    unsigned int counterDirectoryPacketSize = 32;
+    BOOST_TEST(counterDirectoryPacketBuffer->GetSize() == counterDirectoryPacketSize);
+
+    // Buffer is not available when SendCounterDirectoryPacket already occupied the buffer.
+    reservedSize = 0;
+    reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(reservedSize == 0);
+    BOOST_TEST(!reservedBuffer.get());
+
+    // Recommit to be read by sendCounterPacket
+    bufferManager.Commit(counterDirectoryPacketBuffer, counterDirectoryPacketSize);
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // The buffer is read by the send thread so it should not be in the readable buffer.
+    readBuffer = bufferManager.GetReadableBuffer();
+    BOOST_TEST(!readBuffer);
+
+    // Successfully reserved the buffer with requested size
+    reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(reservedSize == 512);
+    BOOST_TEST(reservedBuffer.get());
+
+    // Release the buffer to be used by sendCounterPacket
+    bufferManager.Release(reservedBuffer);
+
+    // SendPeriodicCounterCapturePacket
+    sendCounterPacket.SendPeriodicCounterCapturePacket(123u,
+                                                       {
+                                                           {   1u,      23u },
+                                                           {  33u, 1207623u }
+                                                       });
+
+    // Read data from the buffer
+    // Buffer should become readable after commit by SendPeriodicCounterCapturePacket
+    auto periodicCounterCapturePacketBuffer = bufferManager.GetReadableBuffer();
+    BOOST_TEST(periodicCounterCapturePacketBuffer.get());
+
+    // Get the size of the Periodic Counter Capture Packet
+    unsigned int periodicCounterCapturePacketSize = 28;
+    BOOST_TEST(periodicCounterCapturePacketBuffer->GetSize() == periodicCounterCapturePacketSize);
+
+    // Buffer is not available when SendPeriodicCounterCapturePacket already occupied the buffer.
+    reservedSize = 0;
+    reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(reservedSize == 0);
+    BOOST_TEST(!reservedBuffer.get());
+
+    // Recommit to be read by sendCounterPacket
+    bufferManager.Commit(periodicCounterCapturePacketBuffer, periodicCounterCapturePacketSize);
+
+    sendCounterPacket.SetReadyToRead();
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // The buffer is read by the send thread so it should not be in the readable buffer.
+    readBuffer = bufferManager.GetReadableBuffer();
+    BOOST_TEST(!readBuffer);
+
+    // Successfully reserved the buffer with requested size
+    reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(reservedSize == 512);
+    BOOST_TEST(reservedBuffer.get());
+
+    sendCounterPacket.Stop();
+}
+
+BOOST_AUTO_TEST_CASE(SendThreadBufferTest1)
+{
+    MockWriteProfilingConnection mockProfilingConnection;
+    BufferManager bufferManager(3, 1024);
+    SendCounterPacket sendCounterPacket(mockProfilingConnection, bufferManager, -1);
+    sendCounterPacket.Start();
+
+    // SendStreamMetaDataPacket
+    sendCounterPacket.SendStreamMetaDataPacket();
+
+    // Read data from the buffer
+    // Buffer should become readable after commit by SendStreamMetaDataPacket
+    auto packetBuffer = bufferManager.GetReadableBuffer();
+    BOOST_TEST(packetBuffer.get());
+
+    std::string processName = GetProcessName().substr(0, 60);
+    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
+    unsigned int streamMetadataPacketsize = 118 + processNameSize;
+    BOOST_TEST(packetBuffer->GetSize() == streamMetadataPacketsize);
+
+    // Recommit to be read by sendCounterPacket
+    bufferManager.Commit(packetBuffer, streamMetadataPacketsize);
+
+    sendCounterPacket.SetReadyToRead();
+
+    // SendCounterDirectoryPacket
+    CounterDirectory counterDirectory;
+    sendCounterPacket.SendCounterDirectoryPacket(counterDirectory);
+
+    sendCounterPacket.SetReadyToRead();
+
+    // SendPeriodicCounterCapturePacket
+    sendCounterPacket.SendPeriodicCounterCapturePacket(123u,
+                                                       {
+                                                           {   1u,      23u },
+                                                           {  33u, 1207623u }
+                                                       });
+
+    sendCounterPacket.SetReadyToRead();
+
+    sendCounterPacket.Stop();
+
+    // The buffer is read by the send thread so it should not be in the readable buffer.
+    auto readBuffer = bufferManager.GetReadableBuffer();
+    BOOST_TEST(!readBuffer);
+
+    // Successfully reserved the buffer with requested size
+    unsigned int reservedSize = 0;
+    auto reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(reservedSize == 512);
+    BOOST_TEST(reservedBuffer.get());
+
+    // Check that data was actually written to the profiling connection in any order
+    std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
+    std::vector<uint32_t> expectedOutput{streamMetadataPacketsize, 32, 28};
+    BOOST_TEST(writtenData.size() == 3);
+    bool foundStreamMetaDataPacket =
+        std::find(writtenData.begin(), writtenData.end(), streamMetadataPacketsize) != writtenData.end();
+    bool foundCounterDirectoryPacket = std::find(writtenData.begin(), writtenData.end(), 32) != writtenData.end();
+    bool foundPeriodicCounterCapturePacket = std::find(writtenData.begin(), writtenData.end(), 28) != writtenData.end();
+    BOOST_TEST(foundStreamMetaDataPacket);
+    BOOST_TEST(foundCounterDirectoryPacket);
+    BOOST_TEST(foundPeriodicCounterCapturePacket);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

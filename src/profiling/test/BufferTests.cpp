@@ -130,7 +130,9 @@ BOOST_AUTO_TEST_CASE(BufferReserveExceedingSpaceTest)
     unsigned int reservedSize = 0;
 
     // Cannot reserve buffer bigger than maximum buffer size
-    BOOST_CHECK_THROW(bufferManager.Reserve(1024, reservedSize), armnn::InvalidArgumentException);
+    auto reservedBuffer = bufferManager.Reserve(1024, reservedSize);
+    BOOST_TEST(reservedSize == 0);
+    BOOST_TEST(!reservedBuffer.get());
 }
 
 BOOST_AUTO_TEST_CASE(BufferExhaustionTest)
@@ -144,7 +146,9 @@ BOOST_AUTO_TEST_CASE(BufferExhaustionTest)
     BOOST_TEST(packetBuffer.get());
 
     // Cannot reserve buffer when buffer is not available
-    BOOST_CHECK_THROW(bufferManager.Reserve(512, reservedSize), BufferExhaustion);
+    auto reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(reservedSize == 0);
+    BOOST_TEST(!reservedBuffer.get());
 }
 
 BOOST_AUTO_TEST_CASE(BufferReserveMultipleTest)
@@ -173,7 +177,9 @@ BOOST_AUTO_TEST_CASE(BufferReserveMultipleTest)
 
     // Cannot reserve when buffer is not available
     unsigned int reservedSize3 = 0;
-    BOOST_CHECK_THROW(bufferManager.Reserve(512, reservedSize3), BufferExhaustion);
+    auto reservedBuffer = bufferManager.Reserve(512, reservedSize3);
+    BOOST_TEST(reservedSize3 == 0);
+    BOOST_TEST(!reservedBuffer.get());
 }
 
 BOOST_AUTO_TEST_CASE(BufferReleaseTest)
@@ -195,7 +201,9 @@ BOOST_AUTO_TEST_CASE(BufferReleaseTest)
 
     // Cannot reserve when buffer is not available
     unsigned int reservedSize2 = 0;
-    BOOST_CHECK_THROW(bufferManager.Reserve(512, reservedSize2), BufferExhaustion);
+    auto reservedBuffer = bufferManager.Reserve(512, reservedSize2);
+    BOOST_TEST(reservedSize2 == 0);
+    BOOST_TEST(!reservedBuffer.get());
 
     bufferManager.Release(packetBuffer0);
 
@@ -222,7 +230,9 @@ BOOST_AUTO_TEST_CASE(BufferCommitTest)
     BOOST_TEST(packetBuffer1.get());
 
     unsigned int reservedSize2 = 0;
-    BOOST_CHECK_THROW(bufferManager.Reserve(512, reservedSize2), BufferExhaustion);
+    auto reservedBuffer = bufferManager.Reserve(512, reservedSize2);
+    BOOST_TEST(reservedSize2 == 0);
+    BOOST_TEST(!reservedBuffer.get());
 
     bufferManager.Commit(packetBuffer0, 256);
 
@@ -232,7 +242,10 @@ BOOST_AUTO_TEST_CASE(BufferCommitTest)
     BOOST_TEST(packetBuffer2->GetSize() == 256);
 
     // Buffer not set back to available list after commit
-    BOOST_CHECK_THROW(bufferManager.Reserve(512, reservedSize2), BufferExhaustion);
+    unsigned int reservedSize = 0;
+    reservedBuffer = bufferManager.Reserve(512, reservedSize);
+    BOOST_TEST(reservedSize == 0);
+    BOOST_TEST(!reservedBuffer.get());
 }
 
 BOOST_AUTO_TEST_CASE(BufferMarkReadTest)
@@ -252,7 +265,9 @@ BOOST_AUTO_TEST_CASE(BufferMarkReadTest)
 
     // Cannot reserve when buffer is not available
     unsigned int reservedSize2 = 0;
-    BOOST_CHECK_THROW(bufferManager.Reserve(512, reservedSize2), BufferExhaustion);
+    auto reservedBuffer = bufferManager.Reserve(512, reservedSize2);
+    BOOST_TEST(reservedSize2 == 0);
+    BOOST_TEST(!reservedBuffer.get());
 
     bufferManager.Commit(packetBuffer0, 256);
 
@@ -262,7 +277,9 @@ BOOST_AUTO_TEST_CASE(BufferMarkReadTest)
     BOOST_TEST(packetBuffer2->GetSize() == 256);
 
     // Buffer not set back to available list after commit
-    BOOST_CHECK_THROW(bufferManager.Reserve(512, reservedSize2), BufferExhaustion);
+    reservedBuffer = bufferManager.Reserve(512, reservedSize2);
+    BOOST_TEST(reservedSize2 == 0);
+    BOOST_TEST(!reservedBuffer.get());
 
     bufferManager.MarkRead(packetBuffer2);
 

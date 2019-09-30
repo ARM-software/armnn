@@ -42,6 +42,35 @@ private:
     bool m_IsOpen;
 };
 
+class MockWriteProfilingConnection : public IProfilingConnection
+{
+public:
+    MockWriteProfilingConnection()
+        : m_IsOpen(true)
+    {}
+
+    bool IsOpen() override { return m_IsOpen; }
+
+    void Close() override { m_IsOpen = false; }
+
+    bool WritePacket(const unsigned char* buffer, uint32_t length) override
+    {
+        m_WrittenData.push_back(length);
+        return buffer != nullptr && length > 0;
+    }
+
+    Packet ReadPacket(uint32_t timeout) override { return Packet(); }
+
+    std::vector<uint32_t> GetWrittenData()
+    {
+        return m_WrittenData;
+    }
+
+private:
+    bool m_IsOpen;
+    std::vector<uint32_t> m_WrittenData;
+};
+
 class MockPacketBuffer : public IPacketBuffer
 {
 public:

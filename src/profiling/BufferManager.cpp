@@ -29,16 +29,17 @@ BufferManager::BufferManager(unsigned int numberOfBuffers, unsigned int maxPacke
 
 std::unique_ptr<IPacketBuffer> BufferManager::Reserve(unsigned int requestedSize, unsigned int& reservedSize)
 {
+    reservedSize = 0;
     std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
     if (requestedSize > m_MaxBufferSize)
     {
-        throw armnn::InvalidArgumentException("The maximum buffer size that can be requested is [" +
-                                              std::to_string(m_MaxBufferSize) + "] bytes");
+        return nullptr;
     }
     availableListLock.lock();
     if (m_AvailableList.empty())
     {
-        throw armnn::profiling::BufferExhaustion("Buffer not available");
+        availableListLock.unlock();
+        return nullptr;
     }
     std::unique_ptr<IPacketBuffer> buffer = std::move(m_AvailableList.back());
     m_AvailableList.pop_back();

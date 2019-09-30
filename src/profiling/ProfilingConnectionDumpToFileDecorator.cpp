@@ -9,6 +9,8 @@
 
 #include <fstream>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 namespace armnn
 {
 
@@ -98,12 +100,12 @@ void ProfilingConnectionDumpToFileDecorator::DumpIncomingToFile(const Packet& pa
     }
 
     // attempt to write binary data from packet
-    const unsigned int header = packet.GetHeader();
+    const unsigned int header       = packet.GetHeader();
     const unsigned int packetLength = packet.GetLength();
 
     m_IncomingDumpFileStream.write(reinterpret_cast<const char*>(&header), sizeof header);
     m_IncomingDumpFileStream.write(reinterpret_cast<const char*>(&packetLength), sizeof packetLength);
-    m_IncomingDumpFileStream.write(packet.GetData(), packetLength);
+    m_IncomingDumpFileStream.write(packet.GetData(), boost::numeric_cast<std::streamsize>(packetLength));
 
     success &= m_IncomingDumpFileStream.good();
     if (!(success || m_Settings.m_IgnoreFileErrors))
@@ -134,7 +136,7 @@ bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const char* buff
     }
 
     // attempt to write binary data
-    m_OutgoingDumpFileStream.write(buffer, length);
+    m_OutgoingDumpFileStream.write(buffer, boost::numeric_cast<std::streamsize>(length));
     success &= m_OutgoingDumpFileStream.good();
     if (!(success || m_Settings.m_IgnoreFileErrors))
     {

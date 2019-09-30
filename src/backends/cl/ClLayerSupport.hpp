@@ -67,6 +67,11 @@ public:
                                const TensorInfo& output,
                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsDepthToSpaceSupported(const TensorInfo& input,
+                                 const TensorInfo& output,
+                                 const DepthToSpaceDescriptor& descriptor,
+                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const DepthwiseConvolution2dDescriptor& descriptor,

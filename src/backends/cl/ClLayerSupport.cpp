@@ -24,8 +24,9 @@
 #include "workloads/ClConvertFp16ToFp32Workload.hpp"
 #include "workloads/ClConvertFp32ToFp16Workload.hpp"
 #include "workloads/ClConvolution2dWorkload.hpp"
-#include "workloads/ClDequantizeWorkload.hpp"
+#include "workloads/ClDepthToSpaceWorkload.hpp"
 #include "workloads/ClDepthwiseConvolutionWorkload.hpp"
+#include "workloads/ClDequantizeWorkload.hpp"
 #include "workloads/ClDivisionFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClGreaterWorkload.hpp"
@@ -301,6 +302,18 @@ bool ClLayerSupport::IsDequantizeSupported(const TensorInfo& input,
                                    reasonIfUnsupported,
                                    input,
                                    output);
+}
+
+bool ClLayerSupport::IsDepthToSpaceSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const DepthToSpaceDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClDepthToSpaceWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,

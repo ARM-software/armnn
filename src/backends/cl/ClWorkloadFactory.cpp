@@ -463,4 +463,10 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateStack(const StackQueueDescri
     return MakeWorkload<ClStackWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
+                                                                 const WorkloadInfo& info) const
+{
+    return MakeWorkload<ClDepthToSpaceWorkload>(descriptor, info);
+}
+
 } // namespace armnn

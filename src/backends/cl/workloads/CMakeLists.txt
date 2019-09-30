@@ -24,6 +24,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClConvertFp32ToFp16Workload.hpp
     ClConvolution2dWorkload.cpp
     ClConvolution2dWorkload.hpp
+    ClDepthToSpaceWorkload.cpp
+    ClDepthToSpaceWorkload.hpp
     ClDepthwiseConvolutionWorkload.cpp
     ClDepthwiseConvolutionWorkload.hpp
     ClDequantizeWorkload.cpp

@@ -170,7 +170,7 @@ table ActivationLayer {
 }
 
 table ActivationDescriptor {
-    function:ActivationFunction = Sigmoid;
+    activationFunction:ActivationFunction = Sigmoid;
     a:float;
     b:float;
 }
@@ -185,7 +185,7 @@ table ArgMinMaxLayer {
 }
 
 table ArgMinMaxDescriptor{
-    function:ArgMinMaxFunction;
+    argMinMaxFunction:ArgMinMaxFunction;
     axis:int;
 }
 

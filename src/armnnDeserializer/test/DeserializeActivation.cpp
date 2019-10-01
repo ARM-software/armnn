@@ -71,7 +71,7 @@ struct ActivationFixture : public ParserFlatbuffersSerializeFixture
                     descriptor: {
                         a: )" + a + R"(,
                         b: )" + b + R"(,
-                        function: )" + activationType + R"(
+                        activationFunction: )" + activationType + R"(
                     },
                 },
             },

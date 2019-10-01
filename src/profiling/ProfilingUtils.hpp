@@ -119,6 +119,19 @@ std::string GetHardwareVersion();
 
 std::string GetProcessName();
 
+enum class TimelinePacketStatus
+{
+    Ok,
+    Error,
+    BufferExhaustion
+};
+
+TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
+                                                    const std::string& label,
+                                                    unsigned char* buffer,
+                                                    unsigned int bufferSize,
+                                                    unsigned int& numberOfBytesWritten);
+
 class BufferExhaustion : public armnn::Exception
 {
     using Exception::Exception;

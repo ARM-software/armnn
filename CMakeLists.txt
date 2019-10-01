@@ -600,6 +600,7 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp
         src/profiling/test/ProfilingTests.cpp
         src/profiling/test/SendCounterPacketTests.cpp
+        src/profiling/test/TimelinePacketTests.cpp
         )
 
     if(ARMNNREF)

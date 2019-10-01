@@ -9,6 +9,7 @@
 
 #include <armnn/ArmNN.hpp>
 
+#include <backendsCommon/test/DataLayoutUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -29,22 +30,10 @@ LayerTestResult<T, 4> DepthToSpaceTestImpl(
     const float qScale = 1.0f,
     const int32_t qOffset = 0)
 {
-    const armnn::PermutationVector permVector{0, 2, 3, 1};
-
     if (descriptor.m_Parameters.m_DataLayout == armnn::DataLayout::NCHW)
     {
-        inputInfo  = armnnUtils::Permuted(inputInfo, permVector);
-        outputInfo = armnnUtils::Permuted(outputInfo, permVector);
-
-        constexpr size_t typeSize = sizeof(float);
-
-        std::vector<float> inputTmp(inputData.size());
-        armnnUtils::Permute(inputInfo.GetShape(), permVector, inputData.data(), inputTmp.data(), typeSize);
-        inputData = inputTmp;
-
-        std::vector<float> outputTmp(expectedOutputData.size());
-        armnnUtils::Permute(outputInfo.GetShape(), permVector, expectedOutputData.data(), outputTmp.data(), typeSize);
-        expectedOutputData = outputTmp;
+        PermuteTensorNhwcToNchw<float>(inputInfo, inputData);
+        PermuteTensorNhwcToNchw<float>(outputInfo, expectedOutputData);
     }
 
     if(armnn::IsQuantizedType<T>())

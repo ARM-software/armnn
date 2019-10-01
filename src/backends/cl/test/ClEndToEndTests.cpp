@@ -8,6 +8,7 @@
 #include <backendsCommon/test/AbsEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArithmeticTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
+#include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
@@ -63,6 +64,48 @@ BOOST_AUTO_TEST_CASE(ClConcatEndToEndDim3Uint8Test)
     ConcatDim3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
+// DepthToSpace
+BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNchwFloat32)
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNchwFloat16)
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Float16>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNchwUint8)
+{
+    DepthToSpaceEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNchwInt16)
+{
+    DepthToSpaceEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNhwcFloat32)
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNhwcFloat16)
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Float16>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNhwcUint8)
+{
+    DepthToSpaceEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+BOOST_AUTO_TEST_CASE(DephtToSpaceEndToEndNhwcInt16)
+{
+    DepthToSpaceEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Dequantize
 BOOST_AUTO_TEST_CASE(DequantizeEndToEndSimpleTest)
 {
     DequantizeEndToEndSimple<armnn::DataType::QuantisedAsymm8>(defaultBackends);
@@ -123,24 +166,24 @@ BOOST_AUTO_TEST_CASE(ClPreluEndToEndTestUint8)
     PreluEndToEndPositiveTest<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(ClSpaceToDepthNHWCEndToEndTest1)
+BOOST_AUTO_TEST_CASE(ClSpaceToDepthNhwcEndToEndTest1)
 {
-    SpaceToDepthNHWCEndToEndTest1(defaultBackends);
+    SpaceToDepthNhwcEndToEndTest1(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(ClSpaceToDepthNCHWEndToEndTest1)
+BOOST_AUTO_TEST_CASE(ClSpaceToDepthNchwEndToEndTest1)
 {
-    SpaceToDepthNCHWEndToEndTest1(defaultBackends);
+    SpaceToDepthNchwEndToEndTest1(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(ClSpaceToDepthNHWCEndToEndTest2)
+BOOST_AUTO_TEST_CASE(ClSpaceToDepthNhwcEndToEndTest2)
 {
-    SpaceToDepthNHWCEndToEndTest2(defaultBackends);
+    SpaceToDepthNhwcEndToEndTest2(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(ClSpaceToDepthNCHWEndToEndTest2)
+BOOST_AUTO_TEST_CASE(ClSpaceToDepthNchwEndToEndTest2)
 {
-    SpaceToDepthNCHWEndToEndTest2(defaultBackends);
+    SpaceToDepthNchwEndToEndTest2(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClSplitter1dEndToEndTest)

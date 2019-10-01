@@ -12,7 +12,7 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
-#include <backendsCommon/test/CommonTestUtils.hpp>
+#include <backendsCommon/test/DataLayoutUtils.hpp>
 #include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
@@ -194,27 +194,16 @@ LayerTestResult<T, 4> TransposeConvolution2dTest(
 }
 
 template<typename T>
-void SwizzleData(const armnn::TensorInfo& inputInfo,
+void SwizzleData(armnn::TensorInfo& inputInfo,
                  std::vector<T>& inputData,
-                 const armnn::TensorInfo& outputInfo,
+                 armnn::TensorInfo& outputInfo,
                  std::vector<T>& outputData,
-                 const armnn::TensorInfo& weightsInfo,
+                 armnn::TensorInfo& weightsInfo,
                  std::vector<T>& weightsData)
 {
-    constexpr size_t dataTypeSize = sizeof(float);
-    const armnn::PermutationVector nchwToNhwc = { 0, 3, 1, 2 };
-
-    std::vector<T> tmp(inputData.size());
-    armnnUtils::Permute(inputInfo.GetShape(), nchwToNhwc, inputData.data(), tmp.data(), dataTypeSize);
-    inputData = tmp;
-
-    tmp.resize(weightsData.size());
-    armnnUtils::Permute(weightsInfo.GetShape(), nchwToNhwc, weightsData.data(), tmp.data(), dataTypeSize);
-    weightsData = tmp;
-
-    tmp.resize(outputData.size());
-    armnnUtils::Permute(outputInfo.GetShape(), nchwToNhwc, outputData.data(), tmp.data(), dataTypeSize);
-    outputData = tmp;
+    PermuteTensorNchwToNhwc<T>(inputInfo, inputData);
+    PermuteTensorNchwToNhwc<T>(outputInfo, outputData);
+    PermuteTensorNchwToNhwc<T>(weightsInfo, weightsData);
 }
 
 } // anonymous namespace
@@ -240,9 +229,9 @@ LayerTestResult<T, 4> SimpleTransposeConvolution2dTest(
     constexpr unsigned int wWeights = 3u;
     constexpr unsigned int hWeights = wWeights;
 
-    TensorShape inputShape   = MakeTensorShape(batches, channels, hInput, wInput, layout);
-    TensorShape outputShape  = MakeTensorShape(batches, channels, hOutput, wOutput, layout);
-    TensorShape weightsShape = MakeTensorShape(batches, channels, hWeights, wWeights, layout);
+    TensorShape inputShape   = { batches, channels, hInput,   wInput   };
+    TensorShape outputShape  = { batches, channels, hOutput,  wOutput  };
+    TensorShape weightsShape = { batches, channels, hWeights, wWeights };
 
     TensorInfo inputInfo(inputShape, ArmnnType);
     TensorInfo outputInfo(outputShape, ArmnnType);
@@ -327,9 +316,9 @@ LayerTestResult<T, 4> PaddedTransposeConvolution2dTest(
     constexpr unsigned int wWeights = 3u;
     constexpr unsigned int hWeights = wWeights;
 
-    TensorShape inputShape   = MakeTensorShape(batches, channels, hInput, wInput, layout);
-    TensorShape outputShape  = MakeTensorShape(batches, channels, hOutput, wOutput, layout);
-    TensorShape weightsShape = MakeTensorShape(batches, channels, hWeights, wWeights, layout);
+    TensorShape inputShape   = { batches, channels, hInput,   wInput   };
+    TensorShape outputShape  = { batches, channels, hOutput,  wOutput  };
+    TensorShape weightsShape = { batches, channels, hWeights, wWeights };
 
     TensorInfo inputInfo(inputShape, ArmnnType);
     TensorInfo outputInfo(outputShape, ArmnnType);
@@ -416,9 +405,9 @@ LayerTestResult<T, 4> StridedTransposeConvolution2dTest(
     constexpr unsigned int wWeights = 3u;
     constexpr unsigned int hWeights = wWeights;
 
-    TensorShape inputShape   = MakeTensorShape(batches, channels, hInput, wInput, layout);
-    TensorShape outputShape  = MakeTensorShape(batches, channels, hOutput, wOutput, layout);
-    TensorShape weightsShape = MakeTensorShape(batches, channels, hWeights, wWeights, layout);
+    TensorShape inputShape   = { batches, channels, hInput,   wInput   };
+    TensorShape outputShape  = { batches, channels, hOutput,  wOutput  };
+    TensorShape weightsShape = { batches, channels, hWeights, wWeights };
 
     TensorInfo inputInfo(inputShape, ArmnnType);
     TensorInfo outputInfo(outputShape, ArmnnType);
@@ -492,11 +481,11 @@ LayerTestResult<T, 4> MultiChannelTransposeConvolution2dTest(
 {
     using namespace armnn;
 
-    TensorShape inputShape   = MakeTensorShape(1, 1, 2, 2, layout);
-    TensorShape outputShape  = MakeTensorShape(1, 2, 5, 5, layout);
+    TensorShape inputShape   = { 1, 1, 2, 2 };
+    TensorShape outputShape  = { 1, 2, 5, 5 };
 
     // OIHW for NCHW; OHWI for NHWC
-    TensorShape weightsShape = MakeTensorShape(2, 1, 3, 3, layout);
+    TensorShape weightsShape = { 2, 1, 3, 3 };
     TensorShape biasesShape  = { 2 };
 
     TensorInfo inputInfo(inputShape, ArmnnType);

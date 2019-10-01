@@ -105,11 +105,23 @@ inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
     );
 }
 
-template<typename T>
-bool CompareBoolean(T a, T b)
+// Utility template for comparing tensor elements
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
+bool Compare(T a, T b)
 {
-    return (a == 0 && b == 0) ||(a != 0 && b != 0);
-};
+    if (ArmnnType == DataType::Boolean)
+    {
+        // NOTE: Boolean is represented as uint8_t (with zero equals
+        // false and everything else equals true), therefore values
+        // need to be casted to bool before comparing them
+        return static_cast<bool>(a) == static_cast<bool>(b);
+    }
+
+    // NOTE: All other types can be cast to float and compared with
+    // a certain level of tolerance
+    constexpr float tolerance = 0.000001f;
+    return std::fabs(static_cast<float>(a) - static_cast<float>(b)) <= tolerance;
+}
 
 // Utility function to find the number of instances of a substring within a string.
 int SubStringCounter(std::string& string, std::string&& substring)
@@ -170,19 +182,9 @@ void EndToEndLayerTestImpl(INetworkPtr network,
     for (auto&& it : expectedOutputData)
     {
         std::vector<TOutput> out = outputStorage.at(it.first);
-        if (ArmnnOType == DataType::Boolean)
+        for (unsigned int i = 0; i < out.size(); ++i)
         {
-            for (unsigned int i = 0; i < out.size(); ++i)
-            {
-                BOOST_TEST(CompareBoolean<TOutput>(it.second[i], out[i]));
-            }
-        }
-        else
-        {
-            for (unsigned int i = 0; i < out.size(); ++i)
-            {
-                BOOST_TEST(it.second[i] == out[i], boost::test_tools::tolerance(0.000001f));
-            }
+            BOOST_CHECK(Compare<ArmnnOType>(it.second[i], out[i]) == true);
         }
     }
 }

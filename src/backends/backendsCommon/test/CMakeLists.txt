@@ -10,7 +10,9 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     BackendRegistryTests.cpp
     CommonTestUtils.cpp
     CommonTestUtils.hpp
+    DataLayoutUtils.hpp
     DataTypeUtils.hpp
+    DepthToSpaceEndToEndTestImpl.hpp
     DequantizeEndToEndTestImpl.hpp
     DetectionPostProcessEndToEndTestImpl.hpp
     DynamicBackendTests.cpp
@@ -34,6 +36,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     QuantizedLstmEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp
+    SpaceToDepthEndToEndTestImpl.cpp
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
     TensorCopyUtils.cpp

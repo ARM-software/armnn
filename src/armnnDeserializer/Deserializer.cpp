@@ -910,7 +910,7 @@ void Deserializer::ParseActivation(GraphPtr graph, unsigned int layerIndex)
     auto serializerDescriptor = serializerLayer->descriptor();
 
     armnn::ActivationDescriptor descriptor;
-    descriptor.m_Function = ToActivationFunction(serializerDescriptor->function());
+    descriptor.m_Function = ToActivationFunction(serializerDescriptor->activationFunction());
     descriptor.m_A = serializerDescriptor->a();
     descriptor.m_B = serializerDescriptor->b();
 
@@ -957,7 +957,7 @@ void Deserializer::ParseArgMinMax(GraphPtr graph, unsigned int layerIndex)
     auto serializerDescriptor = serializerLayer->descriptor();
 
     armnn::ArgMinMaxDescriptor descriptor;
-    descriptor.m_Function = ToArgMinMaxFunction(serializerDescriptor->function());
+    descriptor.m_Function = ToArgMinMaxFunction(serializerDescriptor->argMinMaxFunction());
     descriptor.m_Axis = serializerDescriptor->axis();
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddArgMinMaxLayer(descriptor, layerName.c_str());

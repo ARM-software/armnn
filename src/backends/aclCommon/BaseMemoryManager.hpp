@@ -7,12 +7,8 @@
 #include <backendsCommon/IMemoryManager.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#if defined(ARMCOMPUTENEON_ENABLED)
+#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
 #include <arm_compute/runtime/MemoryGroup.h>
-#endif
-
-#if defined(ARMCOMPUTECL_ENABLED)
-#include <arm_compute/runtime/CL/CLMemoryGroup.h>
 #endif
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)

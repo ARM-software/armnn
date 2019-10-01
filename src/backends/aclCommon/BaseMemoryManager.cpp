@@ -101,7 +101,7 @@ NeonMemoryManager::CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryMa
 std::shared_ptr<arm_compute::IMemoryGroup>
 ClMemoryManager::CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
 {
-    return std::make_shared<arm_compute::CLMemoryGroup>(memoryManager);
+    return std::make_shared<arm_compute::MemoryGroup>(memoryManager);
 }
 #endif
 

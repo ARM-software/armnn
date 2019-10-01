@@ -12,8 +12,8 @@
 
 #include <arm_compute/runtime/CL/CLTensor.h>
 #include <arm_compute/runtime/CL/CLSubTensor.h>
-#include <arm_compute/runtime/CL/CLMemoryGroup.h>
 #include <arm_compute/runtime/IMemoryGroup.h>
+#include <arm_compute/runtime/MemoryGroup.h>
 #include <arm_compute/core/TensorShape.h>
 #include <arm_compute/core/Coordinates.h>
 
@@ -72,7 +72,7 @@ public:
 
     virtual void SetMemoryGroup(const std::shared_ptr<arm_compute::IMemoryGroup>& memoryGroup) override
     {
-        m_MemoryGroup = boost::polymorphic_pointer_downcast<arm_compute::CLMemoryGroup>(memoryGroup);
+        m_MemoryGroup = boost::polymorphic_pointer_downcast<arm_compute::MemoryGroup>(memoryGroup);
     }
 
     TensorShape GetStrides() const override
@@ -151,7 +151,7 @@ private:
     }
 
     arm_compute::CLTensor m_Tensor;
-    std::shared_ptr<arm_compute::CLMemoryGroup> m_MemoryGroup;
+    std::shared_ptr<arm_compute::MemoryGroup> m_MemoryGroup;
 };
 
 class ClSubTensorHandle : public IClTensorHandle

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_08" # Release 19.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="8d5dd867c32fc31f635fdc58783c29a38a99ebb7" #COMPMID-2659: Activation.SQRT Failure on NEON
+DEFAULT_CLFRAMEWORKREVISION="5c4a8e96460eb83a6caef1c69ea5cbb4893858d7" #COMPMID-2592 Create a new kernel for CLPad with SYMMETRIC and REFLECT 
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

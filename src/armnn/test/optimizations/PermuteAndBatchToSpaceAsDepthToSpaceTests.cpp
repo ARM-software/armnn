@@ -81,6 +81,9 @@ BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceOptimizerTest)
     BOOST_TEST(CheckRelatedLayers<DepthToSpaceLayer>(graph, testRelatedLayers));
 }
 
+// This unit test needs the reference backend, it's not available if the reference backend is not built
+#if defined(ARMNNREF_ENABLED)
+
 /// Tests that a optimization performed by PermuteAndBatchToSpaceAsDepthToSpace does not change the behaviour
 /// of the network (i.e. it still produces the correct output).
 BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
@@ -88,7 +91,6 @@ BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
     INetworkPtr network = CreateTestNetwork();
 
     IRuntimePtr runtime = IRuntime::Create(IRuntime::CreationOptions());
-
     IOptimizedNetworkPtr optimizedNetwork = Optimize(*network, { Compute::CpuRef }, runtime->GetDeviceSpec());
 
     // Confirm that the optimization has actually taken place
@@ -128,5 +130,6 @@ BOOST_AUTO_TEST_CASE(PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest)
     };
     BOOST_TEST(outputData == expectedOutput);
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

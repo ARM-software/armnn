@@ -37,7 +37,7 @@ void CommandThread::WaitForPacket()
                 m_CommandHandlerRegistry.GetFunctor(packet.GetPacketId(), version.GetEncodedValue());
             commandHandlerFunctor->operator()(packet);
         }
-        catch(armnn::TimeoutException)
+        catch(const armnn::TimeoutException&)
         {
             if(m_StopAfterTimeout)
             {

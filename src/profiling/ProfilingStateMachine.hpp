@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
 #include <atomic>
@@ -23,11 +24,12 @@ enum class ProfilingState
 class ProfilingStateMachine
 {
 public:
-    ProfilingStateMachine(): m_State(ProfilingState::Uninitialised) {};
-    ProfilingStateMachine(ProfilingState state): m_State(state) {};
+    ProfilingStateMachine() : m_State(ProfilingState::Uninitialised) {}
+    ProfilingStateMachine(ProfilingState state) : m_State(state) {}
 
     ProfilingState GetCurrentState() const;
     void TransitionToState(ProfilingState newState);
+    void Reset();
 
     bool IsOneOfStates(ProfilingState state1)
     {
@@ -53,17 +55,17 @@ private:
 
 constexpr char const* GetProfilingStateName(ProfilingState state)
 {
-    switch(state)
+    switch (state)
     {
-        case ProfilingState::Uninitialised:       return "Uninitialised";
-        case ProfilingState::NotConnected:        return "NotConnected";
-        case ProfilingState::WaitingForAck:       return "WaitingForAck";
-        case ProfilingState::Active:              return "Active";
-        default:                                  return "Unknown";
+        case ProfilingState::Uninitialised: return "Uninitialised";
+        case ProfilingState::NotConnected:  return "NotConnected";
+        case ProfilingState::WaitingForAck: return "WaitingForAck";
+        case ProfilingState::Active:        return "Active";
+        default:                            return "Unknown";
     }
 }
 
-} //namespace profiling
+} // namespace profiling
 
-} //namespace armnn
+} // namespace armnn
 

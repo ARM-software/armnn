@@ -16,36 +16,61 @@ namespace armnn
 namespace profiling
 {
 
-class ProfilingService : IWriteCounterValues
+class ProfilingService final : public IReadWriteCounterValues
 {
 public:
-    ProfilingService(const Runtime::CreationOptions::ExternalProfilingOptions& options);
-    ~ProfilingService() = default;
+    using ExternalProfilingOptions = Runtime::CreationOptions::ExternalProfilingOptions;
+    using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
+    using CounterIndices = std::vector<std::atomic<uint32_t>*>;
+    using CounterValues = std::list<std::atomic<uint32_t>>;
 
+    // Getter for the singleton instance
+    static ProfilingService& Instance()
+    {
+        static ProfilingService instance;
+        return instance;
+    }
+
+    // Resets the profiling options, optionally clears the profiling service entirely
+    void ResetExternalProfilingOptions(const ExternalProfilingOptions& options, bool resetProfilingService = false);
+
+    // Runs the profiling service
     void Run();
 
+    // Getters for the profiling service state
     const ICounterDirectory& GetCounterDirectory() const;
     ProfilingState GetCurrentState() const;
-    void ResetExternalProfilingOptions(const Runtime::CreationOptions::ExternalProfilingOptions& options);
+    uint16_t GetCounterCount() const override;
+    uint32_t GetCounterValue(uint16_t counterUid) const override;
 
-    uint16_t GetCounterCount() const;
-    void GetCounterValue(uint16_t index, uint32_t& value) const;
-    void SetCounterValue(uint16_t index, uint32_t value);
-    void AddCounterValue(uint16_t index, uint32_t value);
-    void SubtractCounterValue(uint16_t index, uint32_t value);
-    void IncrementCounterValue(uint16_t index);
-    void DecrementCounterValue(uint16_t index);
+    // Setters for the profiling service state
+    void SetCounterValue(uint16_t counterUid, uint32_t value) override;
+    uint32_t AddCounterValue(uint16_t counterUid, uint32_t value) override;
+    uint32_t SubtractCounterValue(uint16_t counterUid, uint32_t value) override;
+    uint32_t IncrementCounterValue(uint16_t counterUid) override;
+    uint32_t DecrementCounterValue(uint16_t counterUid) override;
 
 private:
-    void Initialise();
-    void CheckIndexSize(uint16_t counterIndex) const;
+    // Default/copy/move constructors/destructors and copy/move assignment operators are kept private
+    ProfilingService() = default;
+    ProfilingService(const ProfilingService&) = delete;
+    ProfilingService(ProfilingService&&) = delete;
+    ProfilingService& operator=(const ProfilingService&) = delete;
+    ProfilingService& operator=(ProfilingService&&) = delete;
+    ~ProfilingService() = default;
 
+    // Initialization functions
+    void Initialize();
+    void InitializeCounterValue(uint16_t counterUid);
+
+    // Profiling service state variables
+    ExternalProfilingOptions m_Options;
     CounterDirectory m_CounterDirectory;
-    ProfilingConnectionFactory m_Factory;
-    Runtime::CreationOptions::ExternalProfilingOptions m_Options;
-    ProfilingStateMachine m_State;
-
-    std::unordered_map<uint16_t, std::atomic<uint32_t>> m_CounterIdToValue;
+    ProfilingConnectionFactory m_ProfilingConnectionFactory;
+    IProfilingConnectionPtr m_ProfilingConnection;
+    ProfilingStateMachine m_StateMachine;
+    CounterIndices m_CounterIndex;
+    CounterValues m_CounterValues;
 };
 
 } // namespace profiling

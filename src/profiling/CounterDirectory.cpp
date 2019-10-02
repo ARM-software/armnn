@@ -29,7 +29,7 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
     }
 
     // Check that the given category is not already registered
-    if (CheckIfCategoryIsRegistered(categoryName))
+    if (IsCategoryRegistered(categoryName))
     {
         throw InvalidArgumentException(
                     boost::str(boost::format("Trying to register a category already registered (\"%1%\")")
@@ -41,7 +41,7 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
     if (deviceUidValue > 0)
     {
         // Check that the (optional) device is already registered
-        if (!CheckIfDeviceIsRegistered(deviceUidValue))
+        if (!IsDeviceRegistered(deviceUidValue))
         {
             throw InvalidArgumentException(
                         boost::str(boost::format("Trying to connect a category (\"%1%\") to a device that is "
@@ -56,7 +56,7 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
     if (counterSetUidValue > 0)
     {
         // Check that the (optional) counter set is already registered
-        if (!CheckIfCounterSetIsRegistered(counterSetUidValue))
+        if (!IsCounterSetRegistered(counterSetUidValue))
         {
             throw InvalidArgumentException(
                         boost::str(boost::format("Trying to connect a category (name: \"%1%\") to a counter set "
@@ -92,7 +92,7 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
     }
 
     // Check that a device with the given name is not already registered
-    if (CheckIfDeviceIsRegistered(deviceName))
+    if (IsDeviceRegistered(deviceName))
     {
         throw InvalidArgumentException(
                     boost::str(boost::format("Trying to register a device already registered (\"%1%\")")
@@ -188,7 +188,7 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
     }
 
     // Check that a counter set with the given name is not already registered
-    if (CheckIfCounterSetIsRegistered(counterSetName))
+    if (IsCounterSetRegistered(counterSetName))
     {
         throw InvalidArgumentException(
                     boost::str(boost::format("Trying to register a counter set already registered (\"%1%\")")
@@ -365,7 +365,7 @@ const Counter* CounterDirectory::RegisterCounter(const std::string& parentCatego
     if (counterSetUidValue > 0)
     {
         // Check that the (optional) counter set is already registered
-        if (!CheckIfCounterSetIsRegistered(counterSetUidValue))
+        if (!IsCounterSetRegistered(counterSetUidValue))
         {
             throw InvalidArgumentException(
                         boost::str(boost::format("Trying to connect a counter to a counter set that is "
@@ -476,6 +476,64 @@ const Counter* CounterDirectory::GetCounter(uint16_t counterUid) const
     return counter;
 }
 
+bool CounterDirectory::IsCategoryRegistered(const std::string& categoryName) const
+{
+    auto it = FindCategory(categoryName);
+
+    return it != m_Categories.end();
+}
+
+bool CounterDirectory::IsDeviceRegistered(uint16_t deviceUid) const
+{
+    auto it = FindDevice(deviceUid);
+
+    return it != m_Devices.end();
+}
+
+bool CounterDirectory::IsDeviceRegistered(const std::string& deviceName) const
+{
+    auto it = FindDevice(deviceName);
+
+    return it != m_Devices.end();
+}
+
+bool CounterDirectory::IsCounterSetRegistered(uint16_t counterSetUid) const
+{
+    auto it = FindCounterSet(counterSetUid);
+
+    return it != m_CounterSets.end();
+}
+
+bool CounterDirectory::IsCounterSetRegistered(const std::string& counterSetName) const
+{
+    auto it = FindCounterSet(counterSetName);
+
+    return it != m_CounterSets.end();
+}
+
+bool CounterDirectory::IsCounterRegistered(uint16_t counterUid) const
+{
+    auto it = FindCounter(counterUid);
+
+    return it != m_Counters.end();
+}
+
+bool CounterDirectory::IsCounterRegistered(const std::string& counterName) const
+{
+    auto it = FindCounter(counterName);
+
+    return it != m_Counters.end();
+}
+
+void CounterDirectory::Clear()
+{
+    // Clear all the counter directory contents
+    m_Categories.clear();
+    m_Devices.clear();
+    m_CounterSets.clear();
+    m_Counters.clear();
+}
+
 CategoriesIt CounterDirectory::FindCategory(const std::string& categoryName) const
 {
     return std::find_if(m_Categories.begin(), m_Categories.end(), [&categoryName](const CategoryPtr& category)
@@ -523,39 +581,15 @@ CountersIt CounterDirectory::FindCounter(uint16_t counterUid) const
     return m_Counters.find(counterUid);
 }
 
-bool CounterDirectory::CheckIfCategoryIsRegistered(const std::string& categoryName) const
+CountersIt CounterDirectory::FindCounter(const std::string& counterName) const
 {
-    auto it = FindCategory(categoryName);
+    return std::find_if(m_Counters.begin(), m_Counters.end(), [&counterName](const auto& pair)
+    {
+        BOOST_ASSERT(pair.second);
+        BOOST_ASSERT(pair.second->m_Uid == pair.first);
 
-    return it != m_Categories.end();
-}
-
-bool CounterDirectory::CheckIfDeviceIsRegistered(uint16_t deviceUid) const
-{
-    auto it = FindDevice(deviceUid);
-
-    return it != m_Devices.end();
-}
-
-bool CounterDirectory::CheckIfDeviceIsRegistered(const std::string& deviceName) const
-{
-    auto it = FindDevice(deviceName);
-
-    return it != m_Devices.end();
-}
-
-bool CounterDirectory::CheckIfCounterSetIsRegistered(uint16_t counterSetUid) const
-{
-    auto it = FindCounterSet(counterSetUid);
-
-    return it != m_CounterSets.end();
-}
-
-bool CounterDirectory::CheckIfCounterSetIsRegistered(const std::string& counterSetName) const
-{
-    auto it = FindCounterSet(counterSetName);
-
-    return it != m_CounterSets.end();
+        return pair.second->m_Name == counterName;
+    });
 }
 
 uint16_t CounterDirectory::GetNumberOfCores(const Optional<uint16_t>& numberOfCores,

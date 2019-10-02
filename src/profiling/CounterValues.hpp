@@ -15,24 +15,30 @@ namespace profiling
 class IReadCounterValues
 {
 public:
-    virtual uint16_t GetCounterCount() const = 0;
-    virtual void GetCounterValue(uint16_t index, uint32_t& value) const = 0;
     virtual ~IReadCounterValues() {}
+
+    virtual uint16_t GetCounterCount() const = 0;
+    virtual uint32_t GetCounterValue(uint16_t counterUid) const = 0;
 };
 
-class IWriteCounterValues : public IReadCounterValues
+class IWriteCounterValues
 {
 public:
-    virtual void SetCounterValue(uint16_t index, uint32_t value) = 0;
-    virtual void AddCounterValue(uint16_t index, uint32_t value) = 0;
-    virtual void SubtractCounterValue(uint16_t index, uint32_t value) = 0;
-    virtual void IncrementCounterValue(uint16_t index) = 0;
-    virtual void DecrementCounterValue(uint16_t index) = 0;
     virtual ~IWriteCounterValues() {}
+
+    virtual void SetCounterValue(uint16_t counterUid, uint32_t value) = 0;
+    virtual uint32_t AddCounterValue(uint16_t counterUid, uint32_t value) = 0;
+    virtual uint32_t SubtractCounterValue(uint16_t counterUid, uint32_t value) = 0;
+    virtual uint32_t IncrementCounterValue(uint16_t counterUid) = 0;
+    virtual uint32_t DecrementCounterValue(uint16_t counterUid) = 0;
+};
+
+class IReadWriteCounterValues : public IReadCounterValues, public IWriteCounterValues
+{
+public:
+    virtual ~IReadWriteCounterValues() {}
 };
 
 } // namespace profiling
 
 } // namespace armnn
-
-

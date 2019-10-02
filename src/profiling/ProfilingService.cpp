@@ -5,71 +5,52 @@
 
 #include "ProfilingService.hpp"
 
+#include <boost/log/trivial.hpp>
+#include <boost/format.hpp>
+
 namespace armnn
 {
 
 namespace profiling
 {
 
-ProfilingService::ProfilingService(const Runtime::CreationOptions::ExternalProfilingOptions& options)
-    : m_Options(options)
+void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOptions& options,
+                                                     bool resetProfilingService)
 {
-    Initialise();
-}
+    // Update the profiling options
+    m_Options = options;
 
-void ProfilingService::Initialise()
-{
-    if (m_Options.m_EnableProfiling == true)
+    if (resetProfilingService)
     {
-        // Setup provisional Counter Directory example - this should only be created if profiling is enabled
-        // Setup provisional Counter meta example
-        const std::string categoryName = "Category";
-
-        m_CounterDirectory.RegisterCategory(categoryName);
-        m_CounterDirectory.RegisterDevice("device name", 0, categoryName);
-        m_CounterDirectory.RegisterCounterSet("counterSet_name", 2, categoryName);
-
-        m_CounterDirectory.RegisterCounter(categoryName,
-                                           0,
-                                           1,
-                                           123.45f,
-                                           "counter name 1",
-                                           "counter description");
-
-        m_CounterDirectory.RegisterCounter(categoryName,
-                                           0,
-                                           1,
-                                           123.45f,
-                                           "counter name 2",
-                                           "counter description");
-
-        for (unsigned short i = 0; i < m_CounterDirectory.GetCounterCount(); ++i)
-        {
-            m_CounterIdToValue[i] = 0;
-        }
-
-        // For now until CounterDirectory setup is implemented, change m_State once everything initialised
-        m_State.TransitionToState(ProfilingState::NotConnected);
+        // Reset the profiling service
+        m_CounterDirectory.Clear();
+        m_ProfilingConnection.reset();
+        m_StateMachine.Reset();
+        m_CounterIndex.clear();
+        m_CounterValues.clear();
     }
+
+    // Re-initialize the profiling service
+    Initialize();
 }
 
 void ProfilingService::Run()
 {
-    if (m_State.GetCurrentState() == ProfilingState::NotConnected)
+    if (m_StateMachine.GetCurrentState() == ProfilingState::Uninitialised)
+    {
+        Initialize();
+    }
+    else if (m_StateMachine.GetCurrentState() == ProfilingState::NotConnected)
     {
         try
         {
-            m_Factory.GetProfilingConnection(m_Options);
-            m_State.TransitionToState(ProfilingState::WaitingForAck);
+            m_ProfilingConnectionFactory.GetProfilingConnection(m_Options);
+            m_StateMachine.TransitionToState(ProfilingState::WaitingForAck);
         }
         catch (const armnn::Exception& e)
         {
             std::cerr << e.what() << std::endl;
         }
-    }
-    else if (m_State.GetCurrentState() == ProfilingState::Uninitialised && m_Options.m_EnableProfiling == true)
-    {
-        Initialise();
     }
 }
 
@@ -78,40 +59,9 @@ const ICounterDirectory& ProfilingService::GetCounterDirectory() const
     return m_CounterDirectory;
 }
 
-void ProfilingService::SetCounterValue(uint16_t counterIndex, uint32_t value)
+ProfilingState ProfilingService::GetCurrentState() const
 {
-    CheckIndexSize(counterIndex);
-    m_CounterIdToValue.at(counterIndex).store(value, std::memory_order::memory_order_relaxed);
-}
-
-void ProfilingService::GetCounterValue(uint16_t counterIndex, uint32_t& value) const
-{
-    CheckIndexSize(counterIndex);
-    value = m_CounterIdToValue.at(counterIndex).load(std::memory_order::memory_order_relaxed);
-}
-
-void ProfilingService::AddCounterValue(uint16_t counterIndex, uint32_t value)
-{
-    CheckIndexSize(counterIndex);
-    m_CounterIdToValue.at(counterIndex).fetch_add(value, std::memory_order::memory_order_relaxed);
-}
-
-void ProfilingService::SubtractCounterValue(uint16_t counterIndex, uint32_t value)
-{
-    CheckIndexSize(counterIndex);
-    m_CounterIdToValue.at(counterIndex).fetch_sub(value, std::memory_order::memory_order_relaxed);
-}
-
-void ProfilingService::IncrementCounterValue(uint16_t counterIndex)
-{
-    CheckIndexSize(counterIndex);
-    m_CounterIdToValue.at(counterIndex).operator++(std::memory_order::memory_order_relaxed);
-}
-
-void ProfilingService::DecrementCounterValue(uint16_t counterIndex)
-{
-    CheckIndexSize(counterIndex);
-    m_CounterIdToValue.at(counterIndex).operator--(std::memory_order::memory_order_relaxed);
+    return m_StateMachine.GetCurrentState();
 }
 
 uint16_t ProfilingService::GetCounterCount() const
@@ -119,28 +69,131 @@ uint16_t ProfilingService::GetCounterCount() const
     return m_CounterDirectory.GetCounterCount();
 }
 
-ProfilingState ProfilingService::GetCurrentState() const
+uint32_t ProfilingService::GetCounterValue(uint16_t counterUid) const
 {
-    return m_State.GetCurrentState();
+    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
+    BOOST_ASSERT(counterValuePtr);
+    return counterValuePtr->load(std::memory_order::memory_order_relaxed);
 }
 
-void ProfilingService::ResetExternalProfilingOptions(const Runtime::CreationOptions::ExternalProfilingOptions& options)
+void ProfilingService::SetCounterValue(uint16_t counterUid, uint32_t value)
 {
-    if(!m_Options.m_EnableProfiling)
+    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
+    BOOST_ASSERT(counterValuePtr);
+    counterValuePtr->store(value, std::memory_order::memory_order_relaxed);
+}
+
+uint32_t ProfilingService::AddCounterValue(uint16_t counterUid, uint32_t value)
+{
+    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
+    BOOST_ASSERT(counterValuePtr);
+    return counterValuePtr->fetch_add(value, std::memory_order::memory_order_relaxed);
+}
+
+uint32_t ProfilingService::SubtractCounterValue(uint16_t counterUid, uint32_t value)
+{
+    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
+    BOOST_ASSERT(counterValuePtr);
+    return counterValuePtr->fetch_sub(value, std::memory_order::memory_order_relaxed);
+}
+
+uint32_t ProfilingService::IncrementCounterValue(uint16_t counterUid)
+{
+    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
+    BOOST_ASSERT(counterValuePtr);
+    return counterValuePtr->operator++(std::memory_order::memory_order_relaxed);
+}
+
+uint32_t ProfilingService::DecrementCounterValue(uint16_t counterUid)
+{
+    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
+    BOOST_ASSERT(counterValuePtr);
+    return counterValuePtr->operator--(std::memory_order::memory_order_relaxed);
+}
+
+void ProfilingService::Initialize()
+{
+    if (!m_Options.m_EnableProfiling)
     {
-        m_Options = options;
-        Initialise();
+        // Skip the initialization if profiling is disabled
         return;
     }
-    m_Options = options;
+
+    // Register a category for the basic runtime counters
+    if (!m_CounterDirectory.IsCategoryRegistered("ArmNN_Runtime"))
+    {
+        m_CounterDirectory.RegisterCategory("ArmNN_Runtime");
+    }
+
+    // Register a counter for the number of loaded networks
+    if (!m_CounterDirectory.IsCounterRegistered("Loaded networks"))
+    {
+        const Counter* loadedNetworksCounter =
+                m_CounterDirectory.RegisterCounter("ArmNN_Runtime",
+                                                   0,
+                                                   0,
+                                                   1.f,
+                                                   "Loaded networks",
+                                                   "The number of networks loaded at runtime",
+                                                   std::string("networks"));
+        BOOST_ASSERT(loadedNetworksCounter);
+        InitializeCounterValue(loadedNetworksCounter->m_Uid);
+    }
+
+    // Register a counter for the number of registered backends
+    if (!m_CounterDirectory.IsCounterRegistered("Registered backends"))
+    {
+        const Counter* registeredBackendsCounter =
+                m_CounterDirectory.RegisterCounter("ArmNN_Runtime",
+                                                   0,
+                                                   0,
+                                                   1.f,
+                                                   "Registered backends",
+                                                   "The number of registered backends",
+                                                   std::string("backends"));
+        BOOST_ASSERT(registeredBackendsCounter);
+        InitializeCounterValue(registeredBackendsCounter->m_Uid);
+    }
+
+    // Register a counter for the number of inferences run
+    if (!m_CounterDirectory.IsCounterRegistered("Inferences run"))
+    {
+        const Counter* inferencesRunCounter =
+                m_CounterDirectory.RegisterCounter("ArmNN_Runtime",
+                                                   0,
+                                                   0,
+                                                   1.f,
+                                                   "Inferences run",
+                                                   "The number of inferences run",
+                                                   std::string("inferences"));
+        BOOST_ASSERT(inferencesRunCounter);
+        InitializeCounterValue(inferencesRunCounter->m_Uid);
+    }
+
+    // Initialization is done, update the profiling service state
+    m_StateMachine.TransitionToState(ProfilingState::NotConnected);
 }
 
-inline void ProfilingService::CheckIndexSize(uint16_t counterIndex) const
+void ProfilingService::InitializeCounterValue(uint16_t counterUid)
 {
-    if (counterIndex >= m_CounterDirectory.GetCounterCount())
+    // Increase the size of the counter index if necessary
+    if (counterUid >= m_CounterIndex.size())
     {
-        throw InvalidArgumentException("Counter index is out of range");
+        m_CounterIndex.resize(boost::numeric_cast<size_t>(counterUid) + 1);
     }
+
+    // Create a new atomic counter and add it to the list
+    m_CounterValues.emplace_back(0);
+
+    // Register the new counter to the counter index for quick access
+    std::atomic<uint32_t>* counterValuePtr = &(m_CounterValues.back());
+    m_CounterIndex.at(counterUid) = counterValuePtr;
 }
 
 } // namespace profiling

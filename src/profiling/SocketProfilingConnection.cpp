@@ -23,7 +23,7 @@ SocketProfilingConnection::SocketProfilingConnection()
     m_Socket[0].fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (m_Socket[0].fd == -1)
     {
-        throw armnn::RuntimeException(std::string("Socket construction failed: ") + strerror(errno));
+        throw RuntimeException(std::string("Socket construction failed: ") + strerror(errno));
     }
 
     // Connect to the named unix domain socket.
@@ -35,7 +35,7 @@ SocketProfilingConnection::SocketProfilingConnection()
     if (0 != connect(m_Socket[0].fd, reinterpret_cast<const sockaddr*>(&server), sizeof(sockaddr_un)))
     {
         close(m_Socket[0].fd);
-        throw armnn::RuntimeException(std::string("Cannot connect to stream socket: ") + strerror(errno));
+        throw RuntimeException(std::string("Cannot connect to stream socket: ") + strerror(errno));
     }
 
     // Our socket will only be interested in polling reads.
@@ -46,7 +46,7 @@ SocketProfilingConnection::SocketProfilingConnection()
     if (0 != fcntl(m_Socket[0].fd, F_SETFL, currentFlags | O_NONBLOCK))
     {
         close(m_Socket[0].fd);
-        throw armnn::RuntimeException(std::string("Failed to set socket as non blocking: ") + strerror(errno));
+        throw RuntimeException(std::string("Failed to set socket as non blocking: ") + strerror(errno));
     }
 }
 
@@ -59,7 +59,7 @@ void SocketProfilingConnection::Close()
 {
     if (close(m_Socket[0].fd) != 0)
     {
-        throw armnn::RuntimeException(std::string("Cannot close stream socket: ") + strerror(errno));
+        throw RuntimeException(std::string("Cannot close stream socket: ") + strerror(errno));
     }
 
     memset(m_Socket, 0, sizeof(m_Socket));
@@ -83,17 +83,17 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
     switch (pollResult)
     {
     case -1: // Error
-        throw armnn::RuntimeException(std::string("Read failure from socket: ") + strerror(errno));
+        throw RuntimeException(std::string("Read failure from socket: ") + strerror(errno));
 
     case 0: // Timeout
-        throw armnn::RuntimeException("Timeout while reading from socket");
+        throw RuntimeException("Timeout while reading from socket");
 
     default: // Normal poll return but it could still contain an error signal
 
         // Check if the socket reported an error
         if (m_Socket[0].revents & (POLLNVAL | POLLERR | POLLHUP))
         {
-            throw armnn::Exception(std::string("Socket 0 reported an error: ") + strerror(errno));
+            throw Exception(std::string("Socket 0 reported an error: ") + strerror(errno));
         }
 
         // Check if there is data to read
@@ -108,7 +108,7 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
         if (8 != recv(m_Socket[0].fd, &header, sizeof(header), 0))
         {
             // What do we do here if there's not a valid 8 byte header to read?
-            throw armnn::RuntimeException("The received packet did not contains a valid MIPE header");
+            throw RuntimeException("The received packet did not contains a valid MIPE header");
         }
 
         // stream_metadata_identifier is the first 4 bytes
@@ -133,7 +133,7 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
         if (dataLength != static_cast<uint32_t>(receivedLength))
         {
             // What do we do here if we can't read in a full packet?
-            throw armnn::RuntimeException("Invalid MIPE packet");
+            throw RuntimeException("Invalid MIPE packet");
         }
 
         return Packet(metadataIdentifier, dataLength, packetData);

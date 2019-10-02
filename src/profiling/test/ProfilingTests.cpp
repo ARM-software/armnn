@@ -659,19 +659,18 @@ BOOST_AUTO_TEST_CASE(CaptureDataMethods)
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    ProfilingService service(options);
-    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
-    service.Run();
-    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    profilingService.Run();
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
 }
 
-struct cerr_redirect {
+struct cerr_redirect
+{
     cerr_redirect(std::streambuf* new_buffer)
-        : old( std::cerr.rdbuf(new_buffer)) {}
-
-    ~cerr_redirect( ) {
-        std::cerr.rdbuf(old);
-    }
+        : old(std::cerr.rdbuf(new_buffer)) {}
+    ~cerr_redirect() { std::cerr.rdbuf(old); }
 
 private:
     std::streambuf* old;
@@ -681,46 +680,49 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
-    ProfilingService service(options);
-    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::NotConnected);
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
 
     // As there is no daemon running a connection cannot be made so expect a std::cerr to console
     std::stringstream ss;
     cerr_redirect guard(ss.rdbuf());
-    service.Run();
+    profilingService.Run();
     BOOST_CHECK(boost::contains(ss.str(), "Cannot connect to stream socket: Connection refused"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    ProfilingService service(options);
-    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
-    service.Run();
-    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::Uninitialised);
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    profilingService.Run();
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     options.m_EnableProfiling = true;
-    service.ResetExternalProfilingOptions(options);
-    BOOST_CHECK(service.GetCurrentState() ==  ProfilingState::NotConnected);
+    profilingService.ResetExternalProfilingOptions(options);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
 
     // As there is no daemon running a connection cannot be made so expect a std::cerr to console
     std::stringstream ss;
     cerr_redirect guard(ss.rdbuf());
-    service.Run();
+    profilingService.Run();
     BOOST_CHECK(boost::contains(ss.str(), "Cannot connect to stream socket: Connection refused"));
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterDirectory)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    ProfilingService service(options);
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
 
-    const ICounterDirectory& counterDirectory0 = service.GetCounterDirectory();
+    const ICounterDirectory& counterDirectory0 = profilingService.GetCounterDirectory();
     BOOST_CHECK(counterDirectory0.GetCounterCount() == 0);
 
     options.m_EnableProfiling = true;
-    service.ResetExternalProfilingOptions(options);
+    profilingService.ResetExternalProfilingOptions(options);
 
-    const ICounterDirectory& counterDirectory1 = service.GetCounterDirectory();
+    const ICounterDirectory& counterDirectory1 = profilingService.GetCounterDirectory();
     BOOST_CHECK(counterDirectory1.GetCounterCount() != 0);
 }
 
@@ -728,32 +730,38 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
-    ProfilingService profilingService(options);
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+
+    const ICounterDirectory& counterDirectory = profilingService.GetCounterDirectory();
+    const Counters& counters = counterDirectory.GetCounters();
+    BOOST_CHECK(!counters.empty());
+
+    // Get the UID of the first counter for testing
+    uint16_t counterUid = counters.begin()->first;
 
     ProfilingService* profilingServicePtr = &profilingService;
     std::vector<std::thread> writers;
 
-    for(int i = 0; i < 100 ; ++i)
+    for (int i = 0; i < 100 ; ++i)
     {
-        // Increment and decrement counter 0
-        writers.push_back(std::thread(&ProfilingService::IncrementCounterValue, profilingServicePtr, 0));
-        writers.push_back(std::thread(&ProfilingService::DecrementCounterValue, profilingServicePtr, 0));
-        // Add 10 to counter 0 and subtract 5 from counter 0
-        writers.push_back(std::thread(&ProfilingService::AddCounterValue, profilingServicePtr, 0, 10));
-        writers.push_back(std::thread(&ProfilingService::SubtractCounterValue, profilingServicePtr, 0, 5));
+        // Increment and decrement the first counter
+        writers.push_back(std::thread(&ProfilingService::IncrementCounterValue, profilingServicePtr, counterUid));
+        writers.push_back(std::thread(&ProfilingService::DecrementCounterValue, profilingServicePtr, counterUid));
+        // Add 10 and subtract 5 from the first counter
+        writers.push_back(std::thread(&ProfilingService::AddCounterValue,      profilingServicePtr, counterUid, 10));
+        writers.push_back(std::thread(&ProfilingService::SubtractCounterValue, profilingServicePtr, counterUid, 5));
     }
 
     std::for_each(writers.begin(), writers.end(), mem_fn(&std::thread::join));
 
-    uint32_t counterValue;
-    profilingService.GetCounterValue(0, counterValue);
+    uint32_t counterValue = 0;
+    BOOST_CHECK_NO_THROW(counterValue = profilingService.GetCounterValue(counterUid));
     BOOST_CHECK(counterValue == 500);
 
-    profilingService.SetCounterValue(0, 0);
-    profilingService.GetCounterValue(0, counterValue);
+    BOOST_CHECK_NO_THROW(profilingService.SetCounterValue(counterUid, 0));
+    BOOST_CHECK_NO_THROW(counterValue = profilingService.GetCounterValue(counterUid));
     BOOST_CHECK(counterValue == 0);
-
-    BOOST_CHECK_THROW(profilingService.SetCounterValue(profilingService.GetCounterCount(), 1), armnn::Exception);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)

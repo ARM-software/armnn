@@ -903,7 +903,7 @@ void SendCounterPacket::SetReadyToRead()
 
 void SendCounterPacket::Start()
 {
-    // Check is the send thread is already running
+    // Check if the send thread is already running
     if (m_IsRunning.load())
     {
         // The send thread is already running

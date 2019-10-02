@@ -66,6 +66,18 @@ public:
     const CounterSet* GetCounterSet(uint16_t uid) const override;
     const Counter*    GetCounter(uint16_t uid) const override;
 
+    // Queries for profiling objects
+    bool IsCategoryRegistered(const std::string& categoryName) const;
+    bool IsDeviceRegistered(uint16_t deviceUid) const;
+    bool IsDeviceRegistered(const std::string& deviceName) const;
+    bool IsCounterSetRegistered(uint16_t counterSetUid) const;
+    bool IsCounterSetRegistered(const std::string& counterSetName) const;
+    bool IsCounterRegistered(uint16_t counterUid) const;
+    bool IsCounterRegistered(const std::string& counterName) const;
+
+    // Clears all the counter directory contents
+    void Clear();
+
 private:
     // The profiling collections owned by the counter directory
     Categories  m_Categories;
@@ -80,14 +92,10 @@ private:
     CounterSetsIt FindCounterSet(uint16_t counterSetUid) const;
     CounterSetsIt FindCounterSet(const std::string& counterSetName) const;
     CountersIt    FindCounter(uint16_t counterUid) const;
-    bool CheckIfCategoryIsRegistered(const std::string& categoryName) const;
-    bool CheckIfDeviceIsRegistered(uint16_t deviceUid) const;
-    bool CheckIfDeviceIsRegistered(const std::string& deviceName) const;
-    bool CheckIfCounterSetIsRegistered(uint16_t counterSetUid) const;
-    bool CheckIfCounterSetIsRegistered(const std::string& counterSetName) const;
-    uint16_t GetNumberOfCores(const Optional<uint16_t>& numberOfCores,
-                              uint16_t deviceUid,
-                              const CategoryPtr& parentCategory);
+    CountersIt    FindCounter(const std::string& counterName) const;
+    uint16_t      GetNumberOfCores(const Optional<uint16_t>& numberOfCores,
+                                   uint16_t deviceUid,
+                                   const CategoryPtr& parentCategory);
 };
 
 } // namespace profiling

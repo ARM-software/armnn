@@ -7,87 +7,89 @@
 
 #include <armnn/Exceptions.hpp>
 
+#include <sstream>
+
 namespace armnn
 {
 
 namespace profiling
 {
 
+namespace
+{
+
+void ThrowStateTransitionException(ProfilingState expectedState, ProfilingState newState)
+{
+    std::stringstream ss;
+    ss << "Cannot transition from state [" << GetProfilingStateName(expectedState) << "] "
+       << "to state [" << GetProfilingStateName(newState) << "]";
+    throw armnn::RuntimeException(ss.str());
+}
+
+} // Anonymous namespace
+
 ProfilingState ProfilingStateMachine::GetCurrentState() const
 {
-    return m_State;
+    return m_State.load();
 }
 
 void ProfilingStateMachine::TransitionToState(ProfilingState newState)
 {
-     switch (newState)
-     {
-         case ProfilingState::Uninitialised:
-         {
-             ProfilingState expectedState = m_State.load(std::memory_order::memory_order_relaxed);
-             do {
-                 if (!IsOneOfStates(expectedState, ProfilingState::Uninitialised))
-                 {
-                     throw armnn::Exception(std::string("Cannot transition from state [")
-                                            + GetProfilingStateName(expectedState)
-                                            +"] to [" + GetProfilingStateName(newState) + "]");
-                 }
-             } while (!m_State.compare_exchange_strong(expectedState, newState,
-                      std::memory_order::memory_order_relaxed));
+    ProfilingState expectedState = m_State.load(std::memory_order::memory_order_relaxed);
 
-             break;
-         }
-         case  ProfilingState::NotConnected:
-         {
-             ProfilingState expectedState = m_State.load(std::memory_order::memory_order_relaxed);
-             do {
-                 if (!IsOneOfStates(expectedState, ProfilingState::Uninitialised, ProfilingState::NotConnected,
-                                    ProfilingState::Active))
-                 {
-                     throw armnn::Exception(std::string("Cannot transition from state [")
-                                            + GetProfilingStateName(expectedState)
-                                            +"] to [" + GetProfilingStateName(newState) + "]");
-                 }
-             } while (!m_State.compare_exchange_strong(expectedState, newState,
-                      std::memory_order::memory_order_relaxed));
-
-             break;
-         }
-         case ProfilingState::WaitingForAck:
-         {
-             ProfilingState expectedState = m_State.load(std::memory_order::memory_order_relaxed);
-             do {
-                 if (!IsOneOfStates(expectedState, ProfilingState::NotConnected, ProfilingState::WaitingForAck))
-                 {
-                     throw armnn::Exception(std::string("Cannot transition from state [")
-                                            + GetProfilingStateName(expectedState)
-                                            +"] to [" + GetProfilingStateName(newState) + "]");
-                 }
-             } while (!m_State.compare_exchange_strong(expectedState, newState,
-                      std::memory_order::memory_order_relaxed));
-
-             break;
-         }
-         case ProfilingState::Active:
-         {
-             ProfilingState expectedState = m_State.load(std::memory_order::memory_order_relaxed);
-             do {
-                 if (!IsOneOfStates(expectedState, ProfilingState::WaitingForAck, ProfilingState::Active))
-                 {
-                     throw armnn::Exception(std::string("Cannot transition from state [")
-                                            + GetProfilingStateName(expectedState)
-                                            +"] to [" + GetProfilingStateName(newState) + "]");
-                 }
-             } while (!m_State.compare_exchange_strong(expectedState, newState,
-                      std::memory_order::memory_order_relaxed));
-
-             break;
-         }
-         default:
-             break;
-     }
+    switch (newState)
+    {
+    case ProfilingState::Uninitialised:
+        do
+        {
+            if (!IsOneOfStates(expectedState, ProfilingState::Uninitialised))
+            {
+                ThrowStateTransitionException(expectedState, newState);
+            }
+        }
+        while (!m_State.compare_exchange_strong(expectedState, newState, std::memory_order::memory_order_relaxed));
+        break;
+    case  ProfilingState::NotConnected:
+        do
+        {
+            if (!IsOneOfStates(expectedState, ProfilingState::Uninitialised, ProfilingState::NotConnected,
+                               ProfilingState::Active))
+            {
+                ThrowStateTransitionException(expectedState, newState);
+            }
+        }
+        while (!m_State.compare_exchange_strong(expectedState, newState, std::memory_order::memory_order_relaxed));
+        break;
+    case ProfilingState::WaitingForAck:
+        do
+        {
+            if (!IsOneOfStates(expectedState, ProfilingState::NotConnected, ProfilingState::WaitingForAck))
+            {
+                ThrowStateTransitionException(expectedState, newState);
+            }
+        }
+        while (!m_State.compare_exchange_strong(expectedState, newState, std::memory_order::memory_order_relaxed));
+        break;
+    case ProfilingState::Active:
+        do
+        {
+            if (!IsOneOfStates(expectedState, ProfilingState::WaitingForAck, ProfilingState::Active))
+            {
+                ThrowStateTransitionException(expectedState, newState);
+            }
+        }
+        while (!m_State.compare_exchange_strong(expectedState, newState, std::memory_order::memory_order_relaxed));
+        break;
+    default:
+        break;
+    }
 }
 
-} //namespace profiling
+void ProfilingStateMachine::Reset()
+{
+    m_State.store(ProfilingState::Uninitialised);
+}
 
-} //namespace armnn
+} // namespace profiling
+
+} // namespace armnn

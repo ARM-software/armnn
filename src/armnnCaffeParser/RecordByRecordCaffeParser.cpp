@@ -474,8 +474,12 @@ armnn::INetworkPtr RecordByRecordCaffeParser::CreateNetworkFromBinaryFile(
     }
     m_RequestedOutputs = requestedOutputs;
 
-    //FILE * fp = fopen(graphFile, "rb");
     std::ifstream ifs(graphFile, std::ifstream::in|std::ifstream::binary);
+    if (ifs.fail())
+    {
+        throw armnn::FileNotFoundException("Failed to open graph file '" + std::string(graphFile) + "'");
+    }
+
     std::vector<LayerParameterInfo> layerInfo;
     NetParameterInfo netParameterInfo;
     while(true)
@@ -727,6 +731,3 @@ armnn::INetworkPtr RecordByRecordCaffeParser::LoadLayers(std::ifstream& ifs,
 
     return move(m_Network);
 }
-
-
-

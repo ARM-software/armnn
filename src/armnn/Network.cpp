@@ -1224,6 +1224,12 @@ resizeDescriptor, const char* name)
     return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor, name);
 }
 
+IConnectableLayer* Network::AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
+                                                          const char* name)
+{
+    return m_Graph->AddLayer<InstanceNormalizationLayer>(desc, name);
+}
+
 IConnectableLayer* Network::AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
                                                     const char* name)
 {

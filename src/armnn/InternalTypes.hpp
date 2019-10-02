@@ -38,6 +38,7 @@ enum class LayerType
     Gather,
     Greater,
     Input,
+    InstanceNormalization,
     L2Normalization,
     Lstm,
     Maximum,

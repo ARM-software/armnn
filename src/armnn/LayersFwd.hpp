@@ -30,6 +30,7 @@
 #include "layers/GatherLayer.hpp"
 #include "layers/GreaterLayer.hpp"
 #include "layers/InputLayer.hpp"
+#include "layers/InstanceNormalizationLayer.hpp"
 #include "layers/L2NormalizationLayer.hpp"
 #include "layers/LstmLayer.hpp"
 #include "layers/MaximumLayer.hpp"
@@ -113,6 +114,7 @@ DECLARE_LAYER(FullyConnected)
 DECLARE_LAYER(Gather)
 DECLARE_LAYER(Greater)
 DECLARE_LAYER(Input)
+DECLARE_LAYER(InstanceNormalization)
 DECLARE_LAYER(L2Normalization)
 DECLARE_LAYER(Lstm)
 DECLARE_LAYER(Maximum)

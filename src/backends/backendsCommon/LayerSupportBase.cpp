@@ -234,6 +234,14 @@ bool LayerSupportBase::IsInputSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsInstanceNormalizationSupported(const TensorInfo& input,
+                                                        const TensorInfo& output,
+                                                        const InstanceNormalizationDescriptor& descriptor,
+                                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsL2NormalizationSupported(const TensorInfo& input,
                                                   const TensorInfo& output,
                                                   const L2NormalizationDescriptor& descriptor,

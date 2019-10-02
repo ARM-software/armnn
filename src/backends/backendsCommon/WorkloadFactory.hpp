@@ -120,6 +120,10 @@ public:
     virtual std::unique_ptr<IWorkload> CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                      const WorkloadInfo& info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateInstanceNormalization(
+        const InstanceNormalizationQueueDescriptor& descriptor,
+        const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const;
 

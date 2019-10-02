@@ -329,6 +329,13 @@ public:
     virtual IConnectableLayer* AddResizeLayer(const ResizeDescriptor& resizeDescriptor,
                                               const char* name = nullptr) = 0;
 
+    /// Adds an instance normalization layer to the network.
+    /// @param desc - Parameters for the instance normalization operation.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
+                                                             const char* name = nullptr) = 0;
+
     /// Adds an L2 normalization layer to the network.
     /// Normalization is performed along dimension 1, but requires a 4d input.
     /// @param desc - Parameters for the L2 normalization operation.

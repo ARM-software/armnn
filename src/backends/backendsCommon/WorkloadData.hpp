@@ -307,6 +307,21 @@ struct FakeQuantizationQueueDescriptor : QueueDescriptorWithParameters<FakeQuant
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct InstanceNormalizationQueueDescriptor : QueueDescriptorWithParameters<InstanceNormalizationDescriptor>
+{
+    InstanceNormalizationQueueDescriptor()
+        : m_Beta(nullptr)
+        , m_Eps(nullptr)
+        , m_Gamma(nullptr)
+    {
+    }
+
+    const ConstCpuTensorHandle* m_Beta;
+    const ConstCpuTensorHandle* m_Eps;
+    const ConstCpuTensorHandle* m_Gamma;
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct L2NormalizationQueueDescriptor : QueueDescriptorWithParameters<L2NormalizationDescriptor>
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

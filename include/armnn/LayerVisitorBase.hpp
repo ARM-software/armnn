@@ -112,6 +112,10 @@ public:
                          LayerBindingId,
                          const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitInstanceNormalizationLayer(const IConnectableLayer*,
+                                         const InstanceNormalizationDescriptor&,
+                                         const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitL2NormalizationLayer(const IConnectableLayer*,
                                    const L2NormalizationDescriptor&,
                                    const char*) override { DefaultPolicy::Apply(__func__); }

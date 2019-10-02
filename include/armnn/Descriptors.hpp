@@ -468,6 +468,26 @@ struct BatchNormalizationDescriptor
     DataLayout m_DataLayout;
 };
 
+/// An InstanceNormalizationDescriptor for InstanceNormalizationLayer
+struct InstanceNormalizationDescriptor
+{
+    InstanceNormalizationDescriptor()
+        : m_Gamma(1.0f)
+        , m_Beta(0.0f)
+        , m_Eps(1e-12f)
+        , m_DataLayout(DataLayout::NCHW)
+    {}
+
+    /// Gamma, the scale scalar value applied for the normalized tensor. Defaults to 1.0.
+    float m_Gamma;
+    /// Beta, the offset scalar value applied for the normalized tensor. Defaults to 1.0.
+    float m_Beta;
+    /// Epsilon, small scalar value added to variance to avoid dividing by zero. Defaults to 1e-12f.
+    float m_Eps;
+    /// The data layout to be used (NCHW, NHWC).
+    DataLayout m_DataLayout;
+};
+
 /// A BatchToSpaceNdDescriptor for the BatchToSpaceNdLayer.
 struct BatchToSpaceNdDescriptor
 {

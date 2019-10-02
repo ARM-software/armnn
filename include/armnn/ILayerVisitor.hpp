@@ -206,6 +206,14 @@ public:
                                  LayerBindingId id,
                                  const char* name = nullptr) = 0;
 
+    /// Function that an instance normalization layer should call back to when its Accept(ILayerVisitor&)
+    /// function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param desc - Parameters for the instance normalization operation.
+    /// @param name - Optional name for the layer.
+    virtual void VisitInstanceNormalizationLayer(const IConnectableLayer* layer,
+                                                 const InstanceNormalizationDescriptor& desc,
+                                                 const char* name = nullptr) = 0;
 
     /// Function that an L2 normalization layer should call back to when its Accept(ILayerVisitor&)
     /// function is invoked. Normalization is performed along dimension 1, but requires a 4d input.

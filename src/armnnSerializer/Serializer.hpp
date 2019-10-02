@@ -125,6 +125,10 @@ public:
                          armnn::LayerBindingId id,
                          const char* name = nullptr) override;
 
+    void VisitInstanceNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                         const armnn::InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
+                                         const char* name = nullptr) override;
+
     void VisitL2NormalizationLayer(const armnn::IConnectableLayer* layer,
                                    const armnn::L2NormalizationDescriptor& l2NormalizationDescriptor,
                                    const char* name = nullptr) override;

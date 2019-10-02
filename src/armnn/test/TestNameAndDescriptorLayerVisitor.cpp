@@ -282,6 +282,29 @@ BOOST_AUTO_TEST_CASE(CheckResizeLayerVisitorNameNullAndDescriptor)
     layer->Accept(visitor);
 }
 
+BOOST_AUTO_TEST_CASE(CheckInstanceNormalizationLayerVisitorNameAndDescriptor)
+{
+    const char* layerName = "InstanceNormalizationLayer";
+    InstanceNormalizationDescriptor descriptor;
+    descriptor.m_DataLayout = DataLayout::NHWC;
+    TestInstanceNormalizationLayerVisitor visitor(descriptor, layerName);
+    Network net;
+
+    IConnectableLayer *const layer = net.AddInstanceNormalizationLayer(descriptor, layerName);
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckInstanceNormalizationLayerVisitorNameNullAndDescriptor)
+{
+    InstanceNormalizationDescriptor descriptor;
+    descriptor.m_DataLayout = DataLayout::NHWC;
+    TestInstanceNormalizationLayerVisitor visitor(descriptor);
+    Network net;
+
+    IConnectableLayer *const layer = net.AddInstanceNormalizationLayer(descriptor);
+    layer->Accept(visitor);
+}
+
 BOOST_AUTO_TEST_CASE(CheckL2NormalizationLayerVisitorNameAndDescriptor)
 {
     const char* layerName = "L2NormalizationLayer";

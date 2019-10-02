@@ -371,6 +371,21 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             result = layerSupportObject->IsInputSupported(OverrideDataType(input, dataType), reason);
             break;
         }
+        case LayerType::InstanceNormalization:
+        {
+            auto cLayer = boost::polymorphic_downcast<const InstanceNormalizationLayer*>(&layer);
+            const InstanceNormalizationDescriptor& descriptor = cLayer->GetParameters();
+
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsInstanceNormalizationSupported(
+                OverrideDataType(input, dataType),
+                OverrideDataType(output, dataType),
+                descriptor,
+                reason);
+            break;
+        }
         case LayerType::L2Normalization:
         {
             auto cLayer = boost::polymorphic_downcast<const L2NormalizationLayer*>(&layer);
@@ -1135,6 +1150,13 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateGather(const GatherQueueDescr
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateInstanceNormalization(
+    const InstanceNormalizationQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

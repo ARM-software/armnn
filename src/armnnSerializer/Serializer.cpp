@@ -426,6 +426,14 @@ void SerializerVisitor::VisitGreaterLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(fbGreaterLayer.o, serializer::Layer::Layer_GreaterLayer);
 }
 
+void SerializerVisitor::VisitInstanceNormalizationLayer(
+    const armnn::IConnectableLayer* layer,
+    const armnn::InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
+    const char* name)
+{
+    throw UnimplementedException("SerializerVisitor::InstanceNormalizationLayer is not implemented");
+}
+
 void SerializerVisitor::VisitL2NormalizationLayer(const armnn::IConnectableLayer* layer,
                                                   const armnn::L2NormalizationDescriptor& l2NormalizationDescriptor,
                                                   const char* name)

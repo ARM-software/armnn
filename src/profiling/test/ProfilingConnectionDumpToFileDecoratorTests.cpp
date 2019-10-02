@@ -41,7 +41,7 @@ public:
 
     ~DummyProfilingConnection() = default;
 
-    bool IsOpen() override
+    bool IsOpen() const override
     {
         return m_Open;
     }

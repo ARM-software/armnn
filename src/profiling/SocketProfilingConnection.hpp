@@ -19,7 +19,7 @@ class SocketProfilingConnection : public IProfilingConnection
 {
 public:
     SocketProfilingConnection();
-    bool IsOpen() final;
+    bool IsOpen() const final;
     void Close() final;
     bool WritePacket(const unsigned char* buffer, uint32_t length) final;
     Packet ReadPacket(uint32_t timeout) final;

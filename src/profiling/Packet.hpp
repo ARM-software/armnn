@@ -23,6 +23,15 @@ public:
         , m_Data(nullptr)
     {}
 
+    Packet(uint32_t header)
+        : m_Header(header)
+        , m_Length(0)
+        , m_Data(nullptr)
+    {
+        m_PacketId = ((header >> 16) & 1023);
+        m_PacketFamily = (header >> 26);
+    }
+
     Packet(uint32_t header, uint32_t length, std::unique_ptr<char[]>& data)
         : m_Header(header)
         , m_Length(length)
@@ -47,6 +56,7 @@ public:
 
     Packet(const Packet& other) = delete;
     Packet& operator=(const Packet&) = delete;
+    Packet& operator=(Packet&&) = default;
 
     uint32_t GetHeader() const;
     uint32_t GetPacketFamily() const;

@@ -50,7 +50,7 @@ SocketProfilingConnection::SocketProfilingConnection()
     }
 }
 
-bool SocketProfilingConnection::IsOpen()
+bool SocketProfilingConnection::IsOpen() const
 {
     return m_Socket[0].fd > 0;
 }

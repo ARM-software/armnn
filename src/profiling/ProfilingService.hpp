@@ -9,6 +9,10 @@
 #include "ProfilingConnectionFactory.hpp"
 #include "CounterDirectory.hpp"
 #include "ICounterValues.hpp"
+#include "CommandHandler.hpp"
+#include "BufferManager.hpp"
+#include "SendCounterPacket.hpp"
+#include "ConnectionAcknowledgedCommandHandler.hpp"
 
 namespace armnn
 {
@@ -16,10 +20,11 @@ namespace armnn
 namespace profiling
 {
 
-class ProfilingService final : public IReadWriteCounterValues
+class ProfilingService : public IReadWriteCounterValues
 {
 public:
     using ExternalProfilingOptions = Runtime::CreationOptions::ExternalProfilingOptions;
+    using IProfilingConnectionFactoryPtr = std::unique_ptr<IProfilingConnectionFactory>;
     using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
     using CounterIndices = std::vector<std::atomic<uint32_t>*>;
     using CounterValues = std::list<std::atomic<uint32_t>>;
@@ -34,8 +39,8 @@ public:
     // Resets the profiling options, optionally clears the profiling service entirely
     void ResetExternalProfilingOptions(const ExternalProfilingOptions& options, bool resetProfilingService = false);
 
-    // Runs the profiling service
-    void Run();
+    // Updates the profiling service, making it transition to a new state if necessary
+    void Update();
 
     // Getters for the profiling service state
     const ICounterDirectory& GetCounterDirectory() const;
@@ -51,26 +56,70 @@ public:
     uint32_t DecrementCounterValue(uint16_t counterUid) override;
 
 private:
-    // Default/copy/move constructors/destructors and copy/move assignment operators are kept private
-    ProfilingService() = default;
+    // Copy/move constructors/destructors and copy/move assignment operators are deleted
     ProfilingService(const ProfilingService&) = delete;
     ProfilingService(ProfilingService&&) = delete;
     ProfilingService& operator=(const ProfilingService&) = delete;
     ProfilingService& operator=(ProfilingService&&) = delete;
-    ~ProfilingService() = default;
 
-    // Initialization functions
+    // Initialization/reset functions
     void Initialize();
     void InitializeCounterValue(uint16_t counterUid);
+    void Reset();
 
-    // Profiling service state variables
+    // Profiling service components
     ExternalProfilingOptions m_Options;
     CounterDirectory m_CounterDirectory;
-    ProfilingConnectionFactory m_ProfilingConnectionFactory;
+    IProfilingConnectionFactoryPtr m_ProfilingConnectionFactory;
     IProfilingConnectionPtr m_ProfilingConnection;
     ProfilingStateMachine m_StateMachine;
     CounterIndices m_CounterIndex;
     CounterValues m_CounterValues;
+    CommandHandlerRegistry m_CommandHandlerRegistry;
+    PacketVersionResolver m_PacketVersionResolver;
+    CommandHandler m_CommandHandler;
+    BufferManager m_BufferManager;
+    SendCounterPacket m_SendCounterPacket;
+    ConnectionAcknowledgedCommandHandler m_ConnectionAcknowledgedCommandHandler;
+
+protected:
+    // Default constructor/destructor kept protected for testing
+    ProfilingService()
+        : m_Options()
+        , m_CounterDirectory()
+        , m_ProfilingConnectionFactory(new ProfilingConnectionFactory())
+        , m_ProfilingConnection()
+        , m_StateMachine()
+        , m_CounterIndex()
+        , m_CounterValues()
+        , m_CommandHandlerRegistry()
+        , m_PacketVersionResolver()
+        , m_CommandHandler(1000,
+                           false,
+                           m_CommandHandlerRegistry,
+                           m_PacketVersionResolver)
+        , m_BufferManager()
+        , m_SendCounterPacket(m_StateMachine, m_BufferManager)
+        , m_ConnectionAcknowledgedCommandHandler(1,
+                                                 m_PacketVersionResolver.ResolvePacketVersion(1).GetEncodedValue(),
+                                                 m_StateMachine)
+    {
+        // Register the "Connection Acknowledged" command handler
+        m_CommandHandlerRegistry.RegisterFunctor(&m_ConnectionAcknowledgedCommandHandler);
+    }
+    ~ProfilingService() = default;
+
+    // Protected method for testing
+    void SwapProfilingConnectionFactory(ProfilingService& instance,
+                                        IProfilingConnectionFactory* other,
+                                        IProfilingConnectionFactory*& backup)
+    {
+        BOOST_ASSERT(instance.m_ProfilingConnectionFactory);
+        BOOST_ASSERT(other);
+
+        backup = instance.m_ProfilingConnectionFactory.release();
+        instance.m_ProfilingConnectionFactory.reset(other);
+    }
 };
 
 } // namespace profiling

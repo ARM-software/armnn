@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "IProfilingConnection.hpp"
+#include "IProfilingConnectionFactory.hpp"
 
 #include <Runtime.hpp>
 
@@ -17,14 +17,13 @@ namespace armnn
 namespace profiling
 {
 
-class ProfilingConnectionFactory final
+class ProfilingConnectionFactory final : public IProfilingConnectionFactory
 {
 public:
     ProfilingConnectionFactory()  = default;
     ~ProfilingConnectionFactory() = default;
 
-    std::unique_ptr<IProfilingConnection> GetProfilingConnection(
-        const Runtime::CreationOptions::ExternalProfilingOptions& options) const;
+    IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const override;
 };
 
 } // namespace profiling

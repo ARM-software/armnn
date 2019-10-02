@@ -34,7 +34,7 @@ ProfilingConnectionDumpToFileDecorator::~ProfilingConnectionDumpToFileDecorator(
     Close();
 }
 
-bool ProfilingConnectionDumpToFileDecorator::IsOpen()
+bool ProfilingConnectionDumpToFileDecorator::IsOpen() const
 {
     return m_Connection->IsOpen();
 }

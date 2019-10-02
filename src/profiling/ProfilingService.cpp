@@ -20,37 +20,76 @@ void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOpti
     // Update the profiling options
     m_Options = options;
 
+    // Check if the profiling service needs to be reset
     if (resetProfilingService)
     {
         // Reset the profiling service
-        m_CounterDirectory.Clear();
-        m_ProfilingConnection.reset();
-        m_StateMachine.Reset();
-        m_CounterIndex.clear();
-        m_CounterValues.clear();
+        Reset();
     }
-
-    // Re-initialize the profiling service
-    Initialize();
 }
 
-void ProfilingService::Run()
+void ProfilingService::Update()
 {
-    if (m_StateMachine.GetCurrentState() == ProfilingState::Uninitialised)
+    if (!m_Options.m_EnableProfiling)
     {
-        Initialize();
+        // Don't run if profiling is disabled
+        return;
     }
-    else if (m_StateMachine.GetCurrentState() == ProfilingState::NotConnected)
+
+    ProfilingState currentState = m_StateMachine.GetCurrentState();
+    switch (currentState)
     {
+    case ProfilingState::Uninitialised:
+        // Initialize the profiling service
+        Initialize();
+
+        // Move to the next state
+        m_StateMachine.TransitionToState(ProfilingState::NotConnected);
+        break;
+    case ProfilingState::NotConnected:
+        BOOST_ASSERT(m_ProfilingConnectionFactory);
+
+        // Reset any existing profiling connection
+        m_ProfilingConnection.reset();
+
         try
         {
-            m_ProfilingConnectionFactory.GetProfilingConnection(m_Options);
-            m_StateMachine.TransitionToState(ProfilingState::WaitingForAck);
+            // Setup the profiling connection
+            //m_ProfilingConnection = m_ProfilingConnectionFactory.GetProfilingConnection(m_Options);
+            m_ProfilingConnection = m_ProfilingConnectionFactory->GetProfilingConnection(m_Options);
         }
-        catch (const armnn::Exception& e)
+        catch (const Exception& e)
         {
-            std::cerr << e.what() << std::endl;
+            BOOST_LOG_TRIVIAL(warning) << "An error has occurred when creating the profiling connection: "
+                                       << e.what();
         }
+
+        // Move to the next state
+        m_StateMachine.TransitionToState(m_ProfilingConnection
+                                         ? ProfilingState::WaitingForAck  // Profiling connection obtained, wait for ack
+                                         : ProfilingState::NotConnected); // Profiling connection failed, stay in the
+                                                                          // "NotConnected" state
+        break;
+    case ProfilingState::WaitingForAck:
+        BOOST_ASSERT(m_ProfilingConnection);
+
+        // Start the command thread
+        m_CommandHandler.Start(*m_ProfilingConnection);
+
+        // Start the send thread, while in "WaitingForAck" state it'll send out a "Stream MetaData" packet waiting for
+        // a valid "Connection Acknowledged" packet confirming the connection
+        m_SendCounterPacket.Start(*m_ProfilingConnection);
+
+        // The connection acknowledged command handler will automatically transition the state to "Active" once a
+        // valid "Connection Acknowledged" packet has been received
+
+        break;
+    case ProfilingState::Active:
+
+        break;
+    default:
+        throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1")
+                                          % static_cast<int>(currentState)));
     }
 }
 
@@ -119,12 +158,6 @@ uint32_t ProfilingService::DecrementCounterValue(uint16_t counterUid)
 
 void ProfilingService::Initialize()
 {
-    if (!m_Options.m_EnableProfiling)
-    {
-        // Skip the initialization if profiling is disabled
-        return;
-    }
-
     // Register a category for the basic runtime counters
     if (!m_CounterDirectory.IsCategoryRegistered("ArmNN_Runtime"))
     {
@@ -175,9 +208,6 @@ void ProfilingService::Initialize()
         BOOST_ASSERT(inferencesRunCounter);
         InitializeCounterValue(inferencesRunCounter->m_Uid);
     }
-
-    // Initialization is done, update the profiling service state
-    m_StateMachine.TransitionToState(ProfilingState::NotConnected);
 }
 
 void ProfilingService::InitializeCounterValue(uint16_t counterUid)
@@ -194,6 +224,18 @@ void ProfilingService::InitializeCounterValue(uint16_t counterUid)
     // Register the new counter to the counter index for quick access
     std::atomic<uint32_t>* counterValuePtr = &(m_CounterValues.back());
     m_CounterIndex.at(counterUid) = counterValuePtr;
+}
+
+void ProfilingService::Reset()
+{
+    // Reset the profiling service
+    m_CounterDirectory.Clear();
+    m_ProfilingConnection.reset();
+    m_StateMachine.Reset();
+    m_CounterIndex.clear();
+    m_CounterValues.clear();
+    m_CommandHandler.Stop();
+    m_SendCounterPacket.Stop(false);
 }
 
 } // namespace profiling

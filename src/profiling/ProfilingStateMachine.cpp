@@ -35,50 +35,50 @@ ProfilingState ProfilingStateMachine::GetCurrentState() const
 
 void ProfilingStateMachine::TransitionToState(ProfilingState newState)
 {
-    ProfilingState expectedState = m_State.load(std::memory_order::memory_order_relaxed);
+    ProfilingState currentState = m_State.load(std::memory_order::memory_order_relaxed);
 
     switch (newState)
     {
     case ProfilingState::Uninitialised:
         do
         {
-            if (!IsOneOfStates(expectedState, ProfilingState::Uninitialised))
+            if (!IsOneOfStates(currentState, ProfilingState::Uninitialised))
             {
-                ThrowStateTransitionException(expectedState, newState);
+                ThrowStateTransitionException(currentState, newState);
             }
         }
-        while (!m_State.compare_exchange_strong(expectedState, newState, std::memory_order::memory_order_relaxed));
+        while (!m_State.compare_exchange_strong(currentState, newState, std::memory_order::memory_order_relaxed));
         break;
     case  ProfilingState::NotConnected:
         do
         {
-            if (!IsOneOfStates(expectedState, ProfilingState::Uninitialised, ProfilingState::NotConnected,
+            if (!IsOneOfStates(currentState, ProfilingState::Uninitialised, ProfilingState::NotConnected,
                                ProfilingState::Active))
             {
-                ThrowStateTransitionException(expectedState, newState);
+                ThrowStateTransitionException(currentState, newState);
             }
         }
-        while (!m_State.compare_exchange_strong(expectedState, newState, std::memory_order::memory_order_relaxed));
+        while (!m_State.compare_exchange_strong(currentState, newState, std::memory_order::memory_order_relaxed));
         break;
     case ProfilingState::WaitingForAck:
         do
         {
-            if (!IsOneOfStates(expectedState, ProfilingState::NotConnected, ProfilingState::WaitingForAck))
+            if (!IsOneOfStates(currentState, ProfilingState::NotConnected, ProfilingState::WaitingForAck))
             {
-                ThrowStateTransitionException(expectedState, newState);
+                ThrowStateTransitionException(currentState, newState);
             }
         }
-        while (!m_State.compare_exchange_strong(expectedState, newState, std::memory_order::memory_order_relaxed));
+        while (!m_State.compare_exchange_strong(currentState, newState, std::memory_order::memory_order_relaxed));
         break;
     case ProfilingState::Active:
         do
         {
-            if (!IsOneOfStates(expectedState, ProfilingState::WaitingForAck, ProfilingState::Active))
+            if (!IsOneOfStates(currentState, ProfilingState::WaitingForAck, ProfilingState::Active))
             {
-                ThrowStateTransitionException(expectedState, newState);
+                ThrowStateTransitionException(currentState, newState);
             }
         }
-        while (!m_State.compare_exchange_strong(expectedState, newState, std::memory_order::memory_order_relaxed));
+        while (!m_State.compare_exchange_strong(currentState, newState, std::memory_order::memory_order_relaxed));
         break;
     default:
         break;

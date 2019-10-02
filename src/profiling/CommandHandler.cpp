@@ -54,8 +54,12 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
                 m_KeepRunning.store(false, std::memory_order_relaxed);
             }
         }
-        catch (...)
+        catch (const Exception& e)
         {
+            // Log the error
+            BOOST_LOG_TRIVIAL(warning) << "An error has occurred when handling a command: "
+                                       << e.what();
+
             // Might want to differentiate the errors more
             m_KeepRunning.store(false);
         }

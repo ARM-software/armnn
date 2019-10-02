@@ -49,7 +49,7 @@ public:
 
     ~ProfilingConnectionDumpToFileDecorator();
 
-    bool IsOpen() override;
+    bool IsOpen() const override;
 
     void Close() override;
 

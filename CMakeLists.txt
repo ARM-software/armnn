@@ -450,6 +450,7 @@ list(APPEND armnn_sources
     src/profiling/IPacketBuffer.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
+    src/profiling/IProfilingConnectionFactory.hpp
     src/profiling/Packet.cpp
     src/profiling/Packet.hpp
     src/profiling/PacketBuffer.cpp

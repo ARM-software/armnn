@@ -24,9 +24,11 @@ class MockProfilingConnection : public IProfilingConnection
 public:
     MockProfilingConnection()
         : m_IsOpen(true)
+        , m_WrittenData()
+        , m_Packet()
     {}
 
-    bool IsOpen() override { return m_IsOpen; }
+    bool IsOpen() const override { return m_IsOpen; }
 
     void Close() override { m_IsOpen = false; }
 
@@ -40,8 +42,19 @@ public:
         m_WrittenData.push_back(length);
         return true;
     }
+    bool WritePacket(Packet&& packet)
+    {
+        m_Packet = std::move(packet);
+        return true;
+    }
 
-    Packet ReadPacket(uint32_t timeout) override { return Packet(); }
+    Packet ReadPacket(uint32_t timeout) override
+    {
+        // Simulate a delay in the reading process
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        return std::move(m_Packet);
+    }
 
     const std::vector<uint32_t>& GetWrittenData() const { return m_WrittenData; }
 
@@ -50,6 +63,7 @@ public:
 private:
     bool m_IsOpen;
     std::vector<uint32_t> m_WrittenData;
+    Packet m_Packet;
 };
 
 class MockPacketBuffer : public IPacketBuffer

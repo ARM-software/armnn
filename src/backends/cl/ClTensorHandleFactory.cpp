@@ -45,6 +45,17 @@ std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateSubTensorHandle(ITen
             boost::polymorphic_downcast<IClTensorHandle *>(&parent), shape, coords);
 }
 
+std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+{
+    return ClTensorHandleFactory::CreateTensorHandle(tensorInfo, true);
+}
+
+std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                         DataLayout dataLayout) const
+{
+    return ClTensorHandleFactory::CreateTensorHandle(tensorInfo, dataLayout, true);
+}
+
 std::unique_ptr<ITensorHandle> ClTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                          const bool IsMemoryManaged) const
 {

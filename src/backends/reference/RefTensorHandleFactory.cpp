@@ -27,18 +27,15 @@ std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateSubTensorHandle(ITe
     return nullptr;
 }
 
-std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                          const bool IsMemoryManaged) const
+std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
 {
-    boost::ignore_unused(IsMemoryManaged);
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager, m_ImportFlags);
 }
 
 std::unique_ptr<ITensorHandle> RefTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                                          DataLayout dataLayout,
-                                                                          const bool IsMemoryManaged) const
+                                                                          DataLayout dataLayout) const
 {
-    boost::ignore_unused(dataLayout, IsMemoryManaged);
+    boost::ignore_unused(dataLayout);
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager, m_ImportFlags);
 }
 

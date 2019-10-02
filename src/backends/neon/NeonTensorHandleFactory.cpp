@@ -39,6 +39,17 @@ std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateSubTensorHandle(IT
             boost::polymorphic_downcast<IAclTensorHandle*>(&parent), shape, coords);
 }
 
+std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const
+{
+    return NeonTensorHandleFactory::CreateTensorHandle(tensorInfo, true);
+}
+
+std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                                           DataLayout dataLayout) const
+{
+    return NeonTensorHandleFactory::CreateTensorHandle(tensorInfo, dataLayout, true);
+}
+
 std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                            const bool IsMemoryManaged) const
 {

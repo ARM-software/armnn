@@ -26,6 +26,11 @@ public:
                                                          const TensorShape& subTensorShape,
                                                          const unsigned int* subTensorOrigin) const override;
 
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override;
+
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                      DataLayout dataLayout) const override;
+
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                       const bool IsMemoryManaged = true) const override;
 

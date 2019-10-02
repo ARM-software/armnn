@@ -28,12 +28,10 @@ public:
                                                          TensorShape const& subTensorShape,
                                                          unsigned int const* subTensorOrigin) const override;
 
-    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                      const bool IsMemoryManaged = true) const override;
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override;
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                      DataLayout dataLayout,
-                                                      const bool IsMemoryManaged = true) const override;
+                                                      DataLayout dataLayout) const override;
 
     static const FactoryId& GetIdStatic();
 

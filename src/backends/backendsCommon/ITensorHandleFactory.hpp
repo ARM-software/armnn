@@ -8,6 +8,9 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/MemorySources.hpp>
 #include <armnn/Types.hpp>
+#include "ITensorHandle.hpp"
+
+#include <boost/core/ignore_unused.hpp>
 
 namespace armnn
 {
@@ -25,12 +28,28 @@ public:
                                                                  TensorShape const& subTensorShape,
                                                                  unsigned int const* subTensorOrigin) const = 0;
 
+    virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const = 0;
+
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                              const bool IsMemoryManaged = true) const = 0;
+                                                              DataLayout dataLayout) const = 0;
+
+    // Utility Functions for backends which require TensorHandles to have unmanaged memory.
+    // These should be overloaded if required to facilitate direct import of input tensors
+    // and direct export of output tensors.
+    virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
+                                                              const bool IsMemoryManaged) const
+    {
+        boost::ignore_unused(IsMemoryManaged);
+        return CreateTensorHandle(tensorInfo);
+    }
 
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               DataLayout dataLayout,
-                                                              const bool IsMemoryManaged = true) const = 0;
+                                                              const bool IsMemoryManaged) const
+    {
+        boost::ignore_unused(IsMemoryManaged);
+        return CreateTensorHandle(tensorInfo, dataLayout);
+    }
 
     virtual const FactoryId& GetId() const = 0;
 

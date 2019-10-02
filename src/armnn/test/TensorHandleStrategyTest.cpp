@@ -45,15 +45,13 @@ public:
         return nullptr;
     }
 
-    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                      const bool IsMemoryManaged) const override
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override
     {
         return nullptr;
     }
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                      DataLayout dataLayout,
-                                                      const bool IsMemoryManaged) const override
+                                                      DataLayout dataLayout) const override
     {
         return nullptr;
     }
@@ -85,15 +83,13 @@ public:
         return nullptr;
     }
 
-    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                      const bool IsMemoryManaged) const override
+    std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo) const override
     {
         return nullptr;
     }
 
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
-                                                      DataLayout dataLayout,
-                                                      const bool IsMemoryManaged) const override
+                                                      DataLayout dataLayout) const override
     {
         return nullptr;
     }

@@ -73,6 +73,8 @@ public:
             bool        m_FileOnly;
             uint32_t    m_CapturePeriod;
         };
+
+        ExternalProfilingOptions m_ProfilingOptions;
     };
 
     static IRuntime* CreateRaw(const CreationOptions& options);

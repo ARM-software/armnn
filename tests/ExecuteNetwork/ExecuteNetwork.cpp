@@ -30,6 +30,11 @@ int main(int argc, const char* argv[])
     std::string dynamicBackendsPath;
     std::string outputTensorFiles;
 
+    // external profiling parameters
+    std::string outgoingCaptureFile;
+    std::string incomingCaptureFile;
+    uint32_t counterCapturePeriod;
+
     double thresholdTime = 0.0;
 
     size_t subgraphId = 0;
@@ -95,7 +100,17 @@ int main(int argc, const char* argv[])
              "inference time is greater than the threshold time, the test will fail. By default, no threshold "
              "time is used.")
             ("print-intermediate-layers,p", po::bool_switch()->default_value(false),
-             "If this option is enabled, the output of every graph layer will be printed.");
+             "If this option is enabled, the output of every graph layer will be printed.")
+            ("enable-external-profiling,a", po::bool_switch()->default_value(false),
+             "If enabled external profiling will be switched on")
+            ("outgoing-capture-file,j", po::value(&outgoingCaptureFile),
+             "If specified the outgoing external profiling packets will be captured in this binary file")
+            ("incoming-capture-file,k", po::value(&incomingCaptureFile),
+             "If specified the incoming external profiling packets will be captured in this binary file")
+            ("file-only-external-profiling,g", po::bool_switch()->default_value(false),
+             "If enabled then the 'file-only' test mode of external profiling will be enabled")
+            ("counter-capture-period,u", po::value<uint32_t>(&counterCapturePeriod)->default_value(150u),
+             "If profiling is enabled in 'file-only' mode this is the capture period that will be used in the test");
     }
     catch (const std::exception& e)
     {
@@ -138,6 +153,8 @@ int main(int argc, const char* argv[])
     bool enableFp16TurboMode = vm["fp16-turbo-mode"].as<bool>();
     bool quantizeInput = vm["quantize-input"].as<bool>();
     bool printIntermediate = vm["print-intermediate-layers"].as<bool>();
+    bool enableExternalProfiling = vm["enable-external-profiling"].as<bool>();
+    bool fileOnlyExternalProfiling = vm["file-only-external-profiling"].as<bool>();
 
     // Check whether we have to load test cases from a file.
     if (CheckOption(vm, "test-cases"))
@@ -163,6 +180,11 @@ int main(int argc, const char* argv[])
         // Create runtime
         armnn::IRuntime::CreationOptions options;
         options.m_EnableGpuProfiling = enableProfiling;
+        options.m_ProfilingOptions.m_EnableProfiling = enableExternalProfiling;
+        options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
+        options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
+        options.m_ProfilingOptions.m_FileOnly = fileOnlyExternalProfiling;
+        options.m_ProfilingOptions.m_CapturePeriod = counterCapturePeriod;
 
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
 

@@ -310,6 +310,15 @@ void QuantizerVisitor::VisitInputLayer(const IConnectableLayer *layer, LayerBind
     }
 }
 
+void QuantizerVisitor::VisitInstanceNormalizationLayer(const IConnectableLayer* layer,
+                                                       const InstanceNormalizationDescriptor& descriptor,
+                                                       const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddInstanceNormalizationLayer(descriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitMeanLayer(const IConnectableLayer* layer,
                                         const MeanDescriptor& meanDescriptor,
                                         const char* name)

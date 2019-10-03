@@ -89,6 +89,10 @@ public:
 
     void VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override;
 
+    void VisitInstanceNormalizationLayer(const IConnectableLayer* layer,
+                                         const InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
+                                         const char* name = nullptr) override;
+
     void VisitMeanLayer(const IConnectableLayer* layer,
                         const MeanDescriptor& meanDescriptor,
                         const char* name = nullptr) override;
@@ -96,8 +100,8 @@ public:
     void VisitMultiplicationLayer(const IConnectableLayer* layer,
                                   const char* name = nullptr) override;
 
-    void VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
-                                 const armnn::NormalizationDescriptor& normalizationDescriptor,
+    void VisitNormalizationLayer(const IConnectableLayer* layer,
+                                 const NormalizationDescriptor& normalizationDescriptor,
                                  const char* name = nullptr) override;
 
     void VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr)  override;

@@ -1009,6 +1009,59 @@ BOOST_AUTO_TEST_CASE(QuantizeDepthwiseConvolution2dWithBiases)
     TestQuantizeDepthwiseConvolution2d(true);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeInstanceNormalization)
+{
+    class TestInstanceNormalizationQuantization : public TestQuantization
+    {
+    public:
+        TestInstanceNormalizationQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape) {}
+
+        TestInstanceNormalizationQuantization(const QuantizerOptions& options,
+                                              const TensorShape& inputShape,
+                                              const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape) {}
+
+        virtual void VisitInstanceNormalizationLayer(const IConnectableLayer* layer,
+                                                     const InstanceNormalizationDescriptor& descriptor,
+                                                     const char* name = nullptr)
+        {
+            const TensorInfo& info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            const OffsetScalePair qAsymm8Params{ 30.0f / g_Asymm8QuantizationBase, 128 };
+            const OffsetScalePair qSymm16Params{ 15.0f / g_Symm16QuantizationBase, 0 };
+
+            TestQuantizationParams(info, qAsymm8Params, qSymm16Params);
+        }
+    };
+
+    const TensorShape tensorShape{ 1, 4, 4, 1 };
+    const TensorInfo tensorInfo(tensorShape, DataType::Float32);
+
+    INetworkPtr network = INetwork::Create();
+
+    IConnectableLayer* inputLayer        = network->AddInputLayer(0);
+    IConnectableLayer* instanceNormLayer = network->AddInstanceNormalizationLayer(InstanceNormalizationDescriptor());
+    IConnectableLayer* outputLayer       = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(instanceNormLayer->GetInputSlot(0));
+    instanceNormLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    instanceNormLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    // test QAsymm8 quantization
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestInstanceNormalizationQuantization validatorQAsymm8(tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    // test QSymm16 quantization
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestInstanceNormalizationQuantization validatorQSymm16(options, tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 INetworkPtr CreateNetworkWithSoftmaxLayer(const SoftmaxDescriptor& descriptor, const TensorShape& shape)
 {
     INetworkPtr network = INetwork::Create();

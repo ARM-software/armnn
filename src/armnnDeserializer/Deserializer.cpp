@@ -204,6 +204,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_FloorLayer]                  = &Deserializer::ParseFloor;
     m_ParserFunctions[Layer_GatherLayer]                 = &Deserializer::ParseGather;
     m_ParserFunctions[Layer_GreaterLayer]                = &Deserializer::ParseGreater;
+    m_ParserFunctions[Layer_InstanceNormalizationLayer]  = &Deserializer::ParseInstanceNormalization;
     m_ParserFunctions[Layer_L2NormalizationLayer]        = &Deserializer::ParseL2Normalization;
     m_ParserFunctions[Layer_LstmLayer]                   = &Deserializer::ParseLstm;
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
@@ -281,6 +282,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_GreaterLayer()->base();
         case Layer::Layer_InputLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_InputLayer()->base()->base();
+        case Layer::Layer_InstanceNormalizationLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_InstanceNormalizationLayer()->base();
         case Layer::Layer_L2NormalizationLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_L2NormalizationLayer()->base();
         case Layer::Layer_LstmLayer:
@@ -1288,6 +1291,35 @@ void Deserializer::ParseGreater(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseInstanceNormalization(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto fbLayer      = graph->layers()->Get(layerIndex)->layer_as_InstanceNormalizationLayer();
+    auto fbDescriptor = fbLayer->descriptor();
+
+    armnn::InstanceNormalizationDescriptor descriptor;
+    descriptor.m_Gamma      = fbDescriptor->gamma();
+    descriptor.m_Beta       = fbDescriptor->beta();
+    descriptor.m_Eps        = fbDescriptor->eps();
+    descriptor.m_DataLayout = ToDataLayout(fbDescriptor->dataLayout());
+
+    const std::string layerName        = GetLayerName(graph, layerIndex);
+    const armnn::TensorInfo outputInfo = ToTensorInfo(outputs[0]);
+
+    IConnectableLayer* layer = m_Network->AddInstanceNormalizationLayer(descriptor, layerName.c_str());
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

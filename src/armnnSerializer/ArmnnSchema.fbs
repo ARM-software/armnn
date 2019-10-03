@@ -141,7 +141,8 @@ enum LayerType : uint {
     Abs = 46,
     ArgMinMax = 47,
     Slice = 48,
-    DepthToSpace = 49
+    DepthToSpace = 49,
+    InstanceNormalization = 50
 }
 
 // Base layer table to be used as part of other layers
@@ -258,6 +259,18 @@ table GreaterLayer {
 
 table InputLayer {
     base:BindableLayerBase;
+}
+
+table InstanceNormalizationLayer {
+    base:LayerBase;
+    descriptor:InstanceNormalizationDescriptor;
+}
+
+table InstanceNormalizationDescriptor {
+    gamma:float;
+    beta:float;
+    eps:float;
+    dataLayout:DataLayout;
 }
 
 table L2NormalizationLayer {
@@ -734,7 +747,8 @@ union Layer {
     AbsLayer,
     ArgMinMaxLayer,
     SliceLayer,
-    DepthToSpaceLayer
+    DepthToSpaceLayer,
+    InstanceNormalizationLayer
 }
 
 table AnyLayer {

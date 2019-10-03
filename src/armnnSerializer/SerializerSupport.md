@@ -26,6 +26,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 * Gather
 * Greater
 * Input
+* InstanceNormalization
 * L2Normalization
 * Lstm
 * Maximum

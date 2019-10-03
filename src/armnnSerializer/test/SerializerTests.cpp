@@ -1267,6 +1267,66 @@ BOOST_AUTO_TEST_CASE(SerializeGreater)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeInstanceNormalization)
+{
+    class InstanceNormalizationLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        InstanceNormalizationLayerVerifier(const std::string& layerName,
+                                           const std::vector<armnn::TensorInfo>& inputInfos,
+                                           const std::vector<armnn::TensorInfo>& outputInfos,
+                                           const armnn::InstanceNormalizationDescriptor& descriptor)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos)
+            , m_Descriptor(descriptor) {}
+
+        void VisitInstanceNormalizationLayer(const armnn::IConnectableLayer* layer,
+                                             const armnn::InstanceNormalizationDescriptor& descriptor,
+                                             const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::InstanceNormalizationDescriptor& descriptor)
+        {
+            BOOST_CHECK(descriptor.m_Gamma      == m_Descriptor.m_Gamma);
+            BOOST_CHECK(descriptor.m_Beta       == m_Descriptor.m_Beta);
+            BOOST_CHECK(descriptor.m_Eps        == m_Descriptor.m_Eps);
+            BOOST_CHECK(descriptor.m_DataLayout == m_Descriptor.m_DataLayout);
+        }
+
+        armnn::InstanceNormalizationDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("instanceNormalization");
+    const armnn::TensorInfo info({ 1, 2, 1, 5 }, armnn::DataType::Float32);
+
+    armnn::InstanceNormalizationDescriptor descriptor;
+    descriptor.m_Gamma      = 1.1f;
+    descriptor.m_Beta       = 0.1f;
+    descriptor.m_Eps        = 0.0001f;
+    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer        = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const instanceNormLayer =
+        network->AddInstanceNormalizationLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer       = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(instanceNormLayer->GetInputSlot(0));
+    instanceNormLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    instanceNormLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    InstanceNormalizationLayerVerifier verifier(layerName, {info}, {info}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
 class L2NormalizationLayerVerifier : public LayerVerifierBase
 {
 public:

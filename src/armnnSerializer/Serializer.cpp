@@ -431,7 +431,17 @@ void SerializerVisitor::VisitInstanceNormalizationLayer(
     const armnn::InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
     const char* name)
 {
-    throw UnimplementedException("SerializerVisitor::InstanceNormalizationLayer is not implemented");
+    auto fbDescriptor = serializer::CreateInstanceNormalizationDescriptor(
+            m_flatBufferBuilder,
+            instanceNormalizationDescriptor.m_Gamma,
+            instanceNormalizationDescriptor.m_Beta,
+            instanceNormalizationDescriptor.m_Eps,
+            GetFlatBufferDataLayout(instanceNormalizationDescriptor.m_DataLayout));
+
+    auto fbBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_InstanceNormalization);
+    auto fbLayer     = serializer::CreateInstanceNormalizationLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_InstanceNormalizationLayer);
 }
 
 void SerializerVisitor::VisitL2NormalizationLayer(const armnn::IConnectableLayer* layer,

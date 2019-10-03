@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(BufferReserveExceedingSpaceTest)
     unsigned int reservedSize = 0;
 
     // Cannot reserve buffer bigger than maximum buffer size
-    BOOST_CHECK_THROW(bufferManager.Reserve(1024, reservedSize), armnn::RuntimeException);
+    BOOST_CHECK_THROW(bufferManager.Reserve(1024, reservedSize), armnn::InvalidArgumentException);
 }
 
 BOOST_AUTO_TEST_CASE(BufferExhaustionTest)

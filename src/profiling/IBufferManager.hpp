@@ -18,7 +18,7 @@ namespace profiling
 class IBufferManager
 {
 public:
-    virtual ~IBufferManager() {};
+    virtual ~IBufferManager() {}
 
     virtual std::unique_ptr<IPacketBuffer> Reserve(unsigned int requestedSize, unsigned int& reservedSize) = 0;
 

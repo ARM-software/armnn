@@ -46,11 +46,10 @@ class MockPacketBuffer : public IPacketBuffer
 {
 public:
     MockPacketBuffer(unsigned int maxSize)
-    : m_MaxSize(maxSize),
-      m_Size(0)
-    {
-        m_Data = std::make_unique<unsigned char[]>(m_MaxSize);
-    }
+        : m_MaxSize(maxSize)
+        , m_Size(0)
+        , m_Data(std::make_unique<unsigned char[]>(m_MaxSize))
+    {}
 
     ~MockPacketBuffer() {}
 
@@ -58,7 +57,7 @@ public:
 
     unsigned int GetSize() const override { return m_Size; }
 
-    void MarkRead() override { m_Size = 0;}
+    void MarkRead() override { m_Size = 0; }
 
     void Commit(unsigned int size) override { m_Size = size; }
 
@@ -126,113 +125,90 @@ private:
 class MockStreamCounterBuffer : public IBufferManager
 {
 public:
-    MockStreamCounterBuffer(unsigned int numberOfBuffers = 5, unsigned int maxPacketSize = 4096)
-    : m_MaxBufferSize(maxPacketSize)
-    , m_ReadableSize(0)
-    , m_CommittedSize(0)
-    , m_ReadSize(0)
-    {
-        m_AvailableList.reserve(numberOfBuffers);
-        for (unsigned int i = 0; i < numberOfBuffers; ++i)
-        {
-            std::unique_ptr<IPacketBuffer> buffer = std::make_unique<MockPacketBuffer>(maxPacketSize);
-            m_AvailableList.emplace_back(std::move(buffer));
-        }
-        m_ReadableList.reserve(numberOfBuffers);
-    }
+    using IPacketBufferPtr = std::unique_ptr<IPacketBuffer>;
 
+    MockStreamCounterBuffer(unsigned int maxBufferSize = 4096)
+        : m_MaxBufferSize(maxBufferSize)
+        , m_BufferList()
+        , m_CommittedSize(0)
+        , m_ReadableSize(0)
+        , m_ReadSize(0)
+    {}
     ~MockStreamCounterBuffer() {}
 
-    std::unique_ptr<IPacketBuffer> Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
+    IPacketBufferPtr Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
     {
-        std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
+        std::unique_lock<std::mutex> lock(m_Mutex);
+
+        reservedSize = 0;
         if (requestedSize > m_MaxBufferSize)
         {
-            throw armnn::Exception("Maximum buffer size that can be requested is [" +
-                std::to_string(m_MaxBufferSize) + "] bytes");
+            throw armnn::InvalidArgumentException("The maximum buffer size that can be requested is [" +
+                                                  std::to_string(m_MaxBufferSize) + "] bytes");
         }
-        availableListLock.lock();
-        if (m_AvailableList.empty())
-        {
-            throw armnn::profiling::BufferExhaustion("Buffer not available");
-        }
-        std::unique_ptr<IPacketBuffer> buffer = std::move(m_AvailableList.back());
-        m_AvailableList.pop_back();
-        availableListLock.unlock();
         reservedSize = requestedSize;
-        return buffer;
+        return std::make_unique<MockPacketBuffer>(requestedSize);
     }
 
-    void Commit(std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int size) override
+    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) override
     {
-        std::unique_lock<std::mutex> readableListLock(m_ReadableMutex, std::defer_lock);
-        packetBuffer.get()->Commit(size);
-        readableListLock.lock();
-        m_ReadableList.push_back(std::move(packetBuffer));
-        readableListLock.unlock();
-        m_ReadDataAvailable.notify_one();
+        std::unique_lock<std::mutex> lock(m_Mutex);
+
+        packetBuffer->Commit(size);
+        m_BufferList.push_back(std::move(packetBuffer));
         m_CommittedSize += size;
     }
 
-    void Release(std::unique_ptr<IPacketBuffer>& packetBuffer) override
+    void Release(IPacketBufferPtr& packetBuffer) override
     {
-        std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
-        packetBuffer.get()->Release();
-        availableListLock.lock();
-        m_AvailableList.push_back(std::move(packetBuffer));
-        availableListLock.unlock();
-        m_CommittedSize = 0;
-        m_ReadSize = 0;
-        m_ReadableSize = 0;
+        std::unique_lock<std::mutex> lock(m_Mutex);
+
+        packetBuffer->Release();
     }
 
-    std::unique_ptr<IPacketBuffer> GetReadableBuffer() override
+    IPacketBufferPtr GetReadableBuffer() override
     {
-        std::unique_lock<std::mutex> readableListLock(m_ReadableMutex);
-        if (!m_ReadableList.empty())
+        std::unique_lock<std::mutex> lock(m_Mutex);
+
+        if (m_BufferList.empty())
         {
-            std::unique_ptr<IPacketBuffer> buffer = std::move(m_ReadableList.back());
-            m_ReadableSize+=buffer->GetSize();
-            m_ReadableList.pop_back();
-            readableListLock.unlock();
-            return buffer;
+            return nullptr;
         }
-        return nullptr;
+        IPacketBufferPtr buffer = std::move(m_BufferList.back());
+        m_BufferList.pop_back();
+        m_ReadableSize += buffer->GetSize();
+        return buffer;
     }
 
-    void MarkRead(std::unique_ptr<IPacketBuffer>& packetBuffer) override
+    void MarkRead(IPacketBufferPtr& packetBuffer) override
     {
-        std::unique_lock<std::mutex> availableListLock(m_AvailableMutex, std::defer_lock);
-        // increase read size
+        std::unique_lock<std::mutex> lock(m_Mutex);
+
         m_ReadSize += packetBuffer->GetSize();
         packetBuffer->MarkRead();
-        availableListLock.lock();
-        m_AvailableList.push_back(std::move(packetBuffer));
-        availableListLock.unlock();
     }
 
-    unsigned int GetReadableBufferSize() const
-    {
-        return m_ReadableSize;
-    }
-    unsigned int GetCommittedSize()        const { return m_CommittedSize; }
-    unsigned int GetReadSize()             const { return m_ReadSize;      }
+    unsigned int GetCommittedSize() const { return m_CommittedSize; }
+    unsigned int GetReadableSize()  const { return m_ReadableSize;  }
+    unsigned int GetReadSize()      const { return m_ReadSize;      }
 
 private:
+    // The maximum buffer size when creating a new buffer
     unsigned int m_MaxBufferSize;
-    std::vector<std::unique_ptr<IPacketBuffer>> m_AvailableList;
-    std::vector<std::unique_ptr<IPacketBuffer>> m_ReadableList;
-    std::mutex m_AvailableMutex;
-    std::mutex m_ReadableMutex;
-    std::condition_variable m_ReadDataAvailable;
 
-    // The size of the buffer that can be read
-    unsigned int m_ReadableSize;
+    // A list of buffers
+    std::vector<IPacketBufferPtr> m_BufferList;
 
-    // The size of the buffer that has been committed for reading
+    // The mutex to synchronize this mock's methods
+    std::mutex m_Mutex;
+
+    // The total size of the buffers that has been committed for reading
     unsigned int m_CommittedSize;
 
-    // The size of the buffer that has already been read
+    // The total size of the buffers that can be read
+    unsigned int m_ReadableSize;
+
+    // The total size of the buffers that has already been read
     unsigned int m_ReadSize;
 };
 

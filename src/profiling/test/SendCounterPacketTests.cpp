@@ -1694,7 +1694,7 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest7)
 BOOST_AUTO_TEST_CASE(SendThreadTest0)
 {
     MockProfilingConnection mockProfilingConnection;
-    MockStreamCounterBuffer mockStreamCounterBuffer(1, 0);
+    MockStreamCounterBuffer mockStreamCounterBuffer(0);
     SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
 
     // Try to start the send thread many times, it must only start once
@@ -1718,7 +1718,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
     unsigned int totalWrittenSize = 0;
 
     MockProfilingConnection mockProfilingConnection;
-    MockStreamCounterBuffer mockStreamCounterBuffer(5,1024);
+    MockStreamCounterBuffer mockStreamCounterBuffer(1024);
     SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
     sendCounterPacket.Start();
 
@@ -1732,8 +1732,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     // Get the size of the Stream Metadata Packet
     std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = boost::numeric_cast<unsigned int>(processName.size()) > 0 ?
-                                   boost::numeric_cast<unsigned int>(processName.size()) + 1 : 0;
+    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
     unsigned int streamMetadataPacketsize = 118 + processNameSize;
     totalWrittenSize += streamMetadataPacketsize;
 
@@ -1811,15 +1810,15 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     sendCounterPacket.SetReadyToRead();
 
-    // To test an exact value of the "read size" in the mock buffer, wait a second to allow the send thread to
+    // To test an exact value of the "read size" in the mock buffer, wait two seconds to allow the send thread to
     // read all what's remaining in the buffer
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     sendCounterPacket.Stop();
 
-    BOOST_CHECK(mockStreamCounterBuffer.GetReadableBufferSize() == totalWrittenSize);
     BOOST_CHECK(mockStreamCounterBuffer.GetCommittedSize() == totalWrittenSize);
-    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize() == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadableSize()  == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      == totalWrittenSize);
 }
 
 BOOST_AUTO_TEST_CASE(SendThreadTest2)
@@ -1827,7 +1826,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
     unsigned int totalWrittenSize = 0;
 
     MockProfilingConnection mockProfilingConnection;
-    MockStreamCounterBuffer mockStreamCounterBuffer(5, 1024);
+    MockStreamCounterBuffer mockStreamCounterBuffer(1024);
     SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
     sendCounterPacket.Start();
 
@@ -1843,8 +1842,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
 
     // Get the size of the Stream Metadata Packet
     std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = boost::numeric_cast<unsigned int>(processName.size()) > 0 ?
-                                   boost::numeric_cast<unsigned int>(processName.size()) + 1 : 0;
+    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
     unsigned int streamMetadataPacketsize = 118 + processNameSize;
     totalWrittenSize += streamMetadataPacketsize;
 
@@ -1932,15 +1930,15 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
 
     sendCounterPacket.SetReadyToRead();
 
-    // To test an exact value of the "read size" in the mock buffer, wait a second to allow the send thread to
+    // To test an exact value of the "read size" in the mock buffer, wait two seconds to allow the send thread to
     // read all what's remaining in the buffer
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     sendCounterPacket.Stop();
 
-    BOOST_CHECK(mockStreamCounterBuffer.GetReadableBufferSize() == totalWrittenSize);
     BOOST_CHECK(mockStreamCounterBuffer.GetCommittedSize() == totalWrittenSize);
-    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize() == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadableSize()  == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      == totalWrittenSize);
 }
 
 BOOST_AUTO_TEST_CASE(SendThreadTest3)
@@ -1948,7 +1946,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest3)
     unsigned int totalWrittenSize = 0;
 
     MockProfilingConnection mockProfilingConnection;
-    MockStreamCounterBuffer mockStreamCounterBuffer(10, 1024);
+    MockStreamCounterBuffer mockStreamCounterBuffer(1024);
     SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
     sendCounterPacket.Start();
 
@@ -1961,8 +1959,7 @@ BOOST_AUTO_TEST_CASE(SendThreadTest3)
 
     // Get the size of the Stream Metadata Packet
     std::string processName = GetProcessName().substr(0, 60);
-    unsigned int processNameSize = boost::numeric_cast<unsigned int>(processName.size()) > 0 ?
-                                   boost::numeric_cast<unsigned int>(processName.size()) + 1 : 0;
+    unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
     unsigned int streamMetadataPacketsize = 118 + processNameSize;
     totalWrittenSize += streamMetadataPacketsize;
 
@@ -2040,10 +2037,11 @@ BOOST_AUTO_TEST_CASE(SendThreadTest3)
     // thread is not guaranteed to flush the buffer)
     sendCounterPacket.Stop();
 
-    BOOST_CHECK(mockStreamCounterBuffer.GetReadableBufferSize() <= totalWrittenSize);
-    BOOST_CHECK(mockStreamCounterBuffer.GetCommittedSize() <= totalWrittenSize);
-    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize() <= totalWrittenSize);
-    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize() <= mockStreamCounterBuffer.GetCommittedSize());
+    BOOST_CHECK(mockStreamCounterBuffer.GetCommittedSize() == totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadableSize()  <= totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      <= totalWrittenSize);
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      <= mockStreamCounterBuffer.GetReadableSize());
+    BOOST_CHECK(mockStreamCounterBuffer.GetReadSize()      <= mockStreamCounterBuffer.GetCommittedSize());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

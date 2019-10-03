@@ -977,17 +977,17 @@ void SendCounterPacket::Send()
         }
         // Wait condition lock scope - End
 
-
-
+        // Get the buffer to read from
         std::unique_ptr<IPacketBuffer> packetBuffer = m_BufferManager.GetReadableBuffer();
         if (packetBuffer == nullptr)
         {
+            // Nothing to read from, ignore and continue
             continue;
         }
-        const unsigned char* readBuffer = packetBuffer->GetReadableData();
-        // Get the data to send from the buffer
-        unsigned int readBufferSize = packetBuffer->GetSize();
 
+        // Get the data to send from the buffer
+        const unsigned char* readBuffer = packetBuffer->GetReadableData();
+        unsigned int readBufferSize = packetBuffer->GetSize();
         if (readBuffer == nullptr || readBufferSize == 0)
         {
             // Nothing to send, ignore and continue
@@ -1001,6 +1001,7 @@ void SendCounterPacket::Send()
             m_ProfilingConnection.WritePacket(readBuffer, boost::numeric_cast<uint32_t>(readBufferSize));
         }
 
+        // Mark the packet buffer as read
         m_BufferManager.MarkRead(packetBuffer);
     }
 

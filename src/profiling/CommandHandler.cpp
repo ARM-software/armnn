@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <atomic>
-#include "CommandThread.hpp"
+#include "CommandHandler.hpp"
 
 namespace armnn
 {
@@ -12,7 +11,7 @@ namespace armnn
 namespace profiling
 {
 
-void CommandThread::Start()
+void CommandHandler::Start(IProfilingConnection& profilingConnection)
 {
     if (IsRunning())
     {
@@ -21,10 +20,10 @@ void CommandThread::Start()
 
     m_IsRunning.store(true, std::memory_order_relaxed);
     m_KeepRunning.store(true, std::memory_order_relaxed);
-    m_CommandThread = std::thread(&CommandThread::WaitForPacket, this);
+    m_CommandThread = std::thread(&CommandHandler::HandleCommands, this, std::ref(profilingConnection));
 }
 
-void CommandThread::Stop()
+void CommandHandler::Stop()
 {
     m_KeepRunning.store(false, std::memory_order_relaxed);
 
@@ -34,28 +33,28 @@ void CommandThread::Stop()
     }
 }
 
-bool CommandThread::IsRunning() const
+bool CommandHandler::IsRunning() const
 {
     return m_IsRunning.load(std::memory_order_relaxed);
 }
 
-void CommandThread::SetTimeout(uint32_t timeout)
+void CommandHandler::SetTimeout(uint32_t timeout)
 {
     m_Timeout.store(timeout, std::memory_order_relaxed);
 }
 
-void CommandThread::SetStopAfterTimeout(bool stopAfterTimeout)
+void CommandHandler::SetStopAfterTimeout(bool stopAfterTimeout)
 {
     m_StopAfterTimeout.store(stopAfterTimeout, std::memory_order_relaxed);
 }
 
-void CommandThread::WaitForPacket()
+void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
 {
     do
     {
         try
         {
-            Packet packet = m_SocketProfilingConnection.ReadPacket(m_Timeout);
+            Packet packet = profilingConnection.ReadPacket(m_Timeout);
             Version version = m_PacketVersionResolver.ResolvePacketVersion(packet.GetPacketId());
 
             CommandHandlerFunctor* commandHandlerFunctor =
@@ -75,7 +74,6 @@ void CommandThread::WaitForPacket()
             // Might want to differentiate the errors more
             m_KeepRunning.store(false, std::memory_order_relaxed);
         }
-
     }
     while (m_KeepRunning.load(std::memory_order_relaxed));
 

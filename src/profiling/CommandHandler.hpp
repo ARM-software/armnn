@@ -8,7 +8,6 @@
 #include "CommandHandlerRegistry.hpp"
 #include "IProfilingConnection.hpp"
 #include "PacketVersionResolver.hpp"
-#include "ProfilingService.hpp"
 
 #include <atomic>
 #include <thread>
@@ -19,14 +18,13 @@ namespace armnn
 namespace profiling
 {
 
-class CommandThread
+class CommandHandler
 {
 public:
-    CommandThread(uint32_t timeout,
+    CommandHandler(uint32_t timeout,
                   bool stopAfterTimeout,
                   CommandHandlerRegistry& commandHandlerRegistry,
-                  PacketVersionResolver& packetVersionResolver,
-                  IProfilingConnection& socketProfilingConnection)
+                  PacketVersionResolver& packetVersionResolver)
         : m_Timeout(timeout)
         , m_StopAfterTimeout(stopAfterTimeout)
         , m_IsRunning(false)
@@ -34,11 +32,10 @@ public:
         , m_CommandThread()
         , m_CommandHandlerRegistry(commandHandlerRegistry)
         , m_PacketVersionResolver(packetVersionResolver)
-        , m_SocketProfilingConnection(socketProfilingConnection)
     {}
-    ~CommandThread() { Stop(); }
+    ~CommandHandler() { Stop(); }
 
-    void Start();
+    void Start(IProfilingConnection& profilingConnection);
     void Stop();
 
     bool IsRunning() const;
@@ -47,7 +44,7 @@ public:
     void SetStopAfterTimeout(bool stopAfterTimeout);
 
 private:
-    void WaitForPacket();
+    void HandleCommands(IProfilingConnection& profilingConnection);
 
     std::atomic<uint32_t> m_Timeout;
     std::atomic<bool> m_StopAfterTimeout;
@@ -57,7 +54,6 @@ private:
 
     CommandHandlerRegistry& m_CommandHandlerRegistry;
     PacketVersionResolver& m_PacketVersionResolver;
-    IProfilingConnection& m_SocketProfilingConnection;
 };
 
 } // namespace profiling

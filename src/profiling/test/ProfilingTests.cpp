@@ -4,8 +4,8 @@
 //
 
 #include "SendCounterPacketTests.hpp"
-#include "../CommandThread.hpp"
 
+#include <CommandHandler.hpp>
 #include <CommandHandlerKey.hpp>
 #include <CommandHandlerFunctor.hpp>
 #include <CommandHandlerRegistry.hpp>
@@ -40,9 +40,9 @@
 #include <thread>
 #include <chrono>
 
-BOOST_AUTO_TEST_SUITE(ExternalProfiling)
-
 using namespace armnn::profiling;
+
+BOOST_AUTO_TEST_SUITE(ExternalProfiling)
 
 BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
 {
@@ -97,17 +97,11 @@ public:
     TestProfilingConnectionBase() = default;
     ~TestProfilingConnectionBase() = default;
 
-    bool IsOpen()
-    {
-        return true;
-    }
+    bool IsOpen() { return true; }
 
-    void Close(){}
+    void Close() {}
 
-    bool WritePacket(const unsigned char* buffer, uint32_t length)
-    {
-        return false;
-    }
+    bool WritePacket(const unsigned char* buffer, uint32_t length) { return false; }
 
     Packet ReadPacket(uint32_t timeout)
     {
@@ -118,9 +112,8 @@ public:
     }
 };
 
-class TestProfilingConnectionTimeoutError :public TestProfilingConnectionBase
+class TestProfilingConnectionTimeoutError : public TestProfilingConnectionBase
 {
-    int readRequests = 0;
 public:
     Packet ReadPacket(uint32_t timeout) {
         if (readRequests < 3)
@@ -133,6 +126,9 @@ public:
         //Return connection acknowledged packet after three timeouts
         return {65536 ,0 , packetData};
     }
+
+private:
+    int readRequests = 0;
 };
 
 class TestProfilingConnectionArmnnError :public TestProfilingConnectionBase
@@ -146,94 +142,90 @@ public:
     }
 };
 
-BOOST_AUTO_TEST_CASE(CheckCommandThread)
+BOOST_AUTO_TEST_CASE(CheckCommandHandler)
 {
-        PacketVersionResolver packetVersionResolver;
-        ProfilingStateMachine profilingStateMachine;
+    PacketVersionResolver packetVersionResolver;
+    ProfilingStateMachine profilingStateMachine;
 
-        TestProfilingConnectionBase testProfilingConnectionBase;
-        TestProfilingConnectionTimeoutError testProfilingConnectionTimeOutError;
-        TestProfilingConnectionArmnnError testProfilingConnectionArmnnError;
+    TestProfilingConnectionBase testProfilingConnectionBase;
+    TestProfilingConnectionTimeoutError testProfilingConnectionTimeOutError;
+    TestProfilingConnectionArmnnError testProfilingConnectionArmnnError;
 
-        ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(1, 4194304, profilingStateMachine);
-        CommandHandlerRegistry commandHandlerRegistry;
+    ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(1, 4194304, profilingStateMachine);
+    CommandHandlerRegistry commandHandlerRegistry;
 
-        commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler, 1, 4194304);
+    commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler, 1, 4194304);
 
-        profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
-        profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
+    profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+    profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
 
-        CommandThread commandThread0(1,
-                                     true,
-                                     commandHandlerRegistry,
-                                     packetVersionResolver,
-                                     testProfilingConnectionBase);
+    CommandHandler commandHandler0(1,
+                                   true,
+                                   commandHandlerRegistry,
+                                   packetVersionResolver);
 
-        commandThread0.Start();
-        commandThread0.Start();
-        commandThread0.Start();
+    commandHandler0.Start(testProfilingConnectionBase);
+    commandHandler0.Start(testProfilingConnectionBase);
+    commandHandler0.Start(testProfilingConnectionBase);
 
-        commandThread0.Stop();
+    commandHandler0.Stop();
 
-        BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
+    BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
 
-        profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
-        profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
-        //commandThread1 should give up after one timeout
-        CommandThread commandThread1(1,
-                                     true,
-                                     commandHandlerRegistry,
-                                     packetVersionResolver,
-                                     testProfilingConnectionTimeOutError);
+    profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+    profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
+    // commandHandler1 should give up after one timeout
+    CommandHandler commandHandler1(1,
+                                   true,
+                                   commandHandlerRegistry,
+                                   packetVersionResolver);
 
-        commandThread1.Start();
+    commandHandler1.Start(testProfilingConnectionTimeOutError);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        BOOST_CHECK(!commandThread1.IsRunning());
-        commandThread1.Stop();
+    BOOST_CHECK(!commandHandler1.IsRunning());
+    commandHandler1.Stop();
 
-        BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck);
-        //now commandThread1 should persist after a timeout
-        commandThread1.SetStopAfterTimeout(false);
-        commandThread1.Start();
+    BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck);
+    // Now commandHandler1 should persist after a timeout
+    commandHandler1.SetStopAfterTimeout(false);
+    commandHandler1.Start(testProfilingConnectionTimeOutError);
 
-        for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 100; i++)
+    {
+        if (profilingStateMachine.GetCurrentState() == ProfilingState::Active)
         {
-            if (profilingStateMachine.GetCurrentState() == ProfilingState::Active)
-            {
-                break;
-            }
-            else
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            }
+            break;
         }
 
-        commandThread1.Stop();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
 
-        BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
+    commandHandler1.Stop();
 
-        CommandThread commandThread2(1,
-                                     false,
-                                     commandHandlerRegistry,
-                                     packetVersionResolver,
-                                     testProfilingConnectionArmnnError);
+    BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
 
-        commandThread2.Start();
+    CommandHandler commandHandler2(1,
+                                   false,
+                                   commandHandlerRegistry,
+                                   packetVersionResolver);
 
-        for (int i = 0; i < 100; i++)
+    commandHandler2.Start(testProfilingConnectionArmnnError);
+
+    for (int i = 0; i < 100; i++)
+    {
+        if (!commandHandler2.IsRunning())
         {
-            if (!commandThread2.IsRunning())
-            {
-                //commandThread2 should stop once it encounters a non timing error
-                return;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            // commandHandler2 should stop once it encounters a non timing error
+            return;
         }
 
-        BOOST_ERROR("commandThread2 has failed to stop");
-        commandThread2.Stop();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+
+    BOOST_ERROR("commandHandler2 has failed to stop");
+    commandHandler2.Stop();
 }
 
 BOOST_AUTO_TEST_CASE(CheckEncodeVersion)

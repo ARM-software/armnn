@@ -428,14 +428,14 @@ list(APPEND armnn_sources
     src/armnn/optimizations/SquashEqualSiblings.hpp
     src/profiling/BufferManager.cpp
     src/profiling/BufferManager.hpp
+    src/profiling/CommandHandler.cpp
+    src/profiling/CommandHandler.hpp
     src/profiling/CommandHandlerFunctor.cpp
     src/profiling/CommandHandlerFunctor.hpp
     src/profiling/CommandHandlerKey.cpp
     src/profiling/CommandHandlerKey.hpp
     src/profiling/CommandHandlerRegistry.cpp
     src/profiling/CommandHandlerRegistry.hpp
-    src/profiling/CommandThread.cpp
-    src/profiling/CommandThread.hpp
     src/profiling/ConnectionAcknowledgedCommandHandler.cpp
     src/profiling/ConnectionAcknowledgedCommandHandler.hpp
     src/profiling/CounterDirectory.cpp

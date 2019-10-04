@@ -125,7 +125,12 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
             packetData = std::make_unique<char[]>(dataLength);
         }
 
-        if (dataLength != recv(m_Socket[0].fd, packetData.get(), dataLength, 0))
+        ssize_t receivedLength = recv(m_Socket[0].fd, packetData.get(), dataLength, 0);
+        if (receivedLength < 0)
+        {
+            throw armnn::RuntimeException(std::string("Error occured on recv: ") + strerror(errno));
+        }
+        if (dataLength != static_cast<uint32_t>(receivedLength))
         {
             // What do we do here if we can't read in a full packet?
             throw armnn::RuntimeException("Invalid MIPE packet");

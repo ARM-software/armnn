@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "Holder.hpp"
 #include "IPeriodicCounterCapture.hpp"
+#include "Holder.hpp"
 #include "Packet.hpp"
-#include "IReadCounterValue.hpp"
 #include "SendCounterPacket.hpp"
+#include "ICounterValues.hpp"
 
-#include "WallClockTimer.hpp"
+#include <WallClockTimer.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -27,20 +27,29 @@ namespace profiling
 class PeriodicCounterCapture final : public IPeriodicCounterCapture
 {
 public:
-    PeriodicCounterCapture(const Holder& data, ISendCounterPacket& packet, const IReadCounterValue& readCounterValue);
+    PeriodicCounterCapture(const Holder& data, ISendCounterPacket& packet, const IReadCounterValues& readCounterValue)
+        : m_CaptureDataHolder(data)
+        , m_IsRunning(false)
+        , m_KeepRunning(false)
+        , m_ReadCounterValues(readCounterValue)
+        , m_SendCounterPacket(packet)
+    {}
+    ~PeriodicCounterCapture() { Stop(); }
 
     void Start() override;
-    void Join();
+    void Stop() override;
+    bool IsRunning() const { return m_IsRunning.load(); }
 
 private:
     CaptureData ReadCaptureData();
-    void Functionality(const IReadCounterValue& readCounterValue);
+    void Capture(const IReadCounterValues& readCounterValues);
 
-    const Holder&            m_CaptureDataHolder;
-    std::atomic<bool>        m_IsRunning;
-    std::thread              m_PeriodCaptureThread;
-    const IReadCounterValue& m_ReadCounterValue;
-    ISendCounterPacket&      m_SendCounterPacket;
+    const Holder&             m_CaptureDataHolder;
+    std::atomic<bool>         m_IsRunning;
+    std::atomic<bool>         m_KeepRunning;
+    std::thread               m_PeriodCaptureThread;
+    const IReadCounterValues& m_ReadCounterValues;
+    ISendCounterPacket&       m_SendCounterPacket;
 };
 
 } // namespace profiling

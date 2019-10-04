@@ -2,6 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
 #include <mutex>
@@ -17,11 +18,14 @@ class CaptureData
 {
 public:
     CaptureData()
-        : m_CapturePeriod(0), m_CounterIds() {};
+        : m_CapturePeriod(0)
+        , m_CounterIds() {}
     CaptureData(uint32_t capturePeriod, std::vector<uint16_t>& counterIds)
-        : m_CapturePeriod(capturePeriod), m_CounterIds(counterIds) {};
+        : m_CapturePeriod(capturePeriod)
+        , m_CounterIds(counterIds) {}
     CaptureData(const CaptureData& captureData)
-        : m_CapturePeriod(captureData.m_CapturePeriod), m_CounterIds(captureData.m_CounterIds) {};
+        : m_CapturePeriod(captureData.m_CapturePeriod)
+        , m_CounterIds(captureData.m_CounterIds) {}
 
     CaptureData& operator= (const CaptureData& captureData);
 
@@ -39,7 +43,7 @@ class Holder
 {
 public:
     Holder()
-        : m_CaptureData() {};
+        : m_CaptureData() {}
     CaptureData GetCaptureData() const;
     void SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds);
 

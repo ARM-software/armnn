@@ -13,6 +13,7 @@
 #include <CounterDirectory.hpp>
 #include <EncodeVersion.hpp>
 #include <Holder.hpp>
+#include <ICounterValues.hpp>
 #include <Packet.hpp>
 #include <PacketVersionResolver.hpp>
 #include <PeriodicCounterCapture.hpp>
@@ -23,7 +24,6 @@
 #include <RequestCounterDirectoryCommandHandler.hpp>
 #include <Runtime.hpp>
 #include <SocketProfilingConnection.hpp>
-#include <IReadCounterValue.hpp>
 
 #include <armnn/Conversion.hpp>
 
@@ -1769,7 +1769,8 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
 
     class TestCaptureThread : public IPeriodicCounterCapture
     {
-        void Start() override {};
+        void Start() override {}
+        void Stop() override {}
     };
 
     const uint32_t packetId = 0x40000;
@@ -2099,26 +2100,29 @@ BOOST_AUTO_TEST_CASE(StringToSwTraceNameStringTest)
 
 BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
 {
-    class CaptureReader : public IReadCounterValue
+    class CaptureReader : public IReadCounterValues
     {
     public:
         CaptureReader() {}
 
-        void GetCounterValue(uint16_t index, uint32_t &value) const override
+        uint16_t GetCounterCount() const override
         {
-            if (m_Data.count(index))
+            return boost::numeric_cast<uint16_t>(m_Data.size());
+        }
+
+        uint32_t GetCounterValue(uint16_t index) const override
+        {
+            if (m_Data.find(index) == m_Data.end())
             {
-                value = m_Data.at(index);
+                return 0;
             }
-            else
-            {
-                value = 0;
-            }
+
+            return m_Data.at(index);
         }
 
         void SetCounterValue(uint16_t index, uint32_t value)
         {
-            if (!m_Data.count(index))
+            if (m_Data.find(index) == m_Data.end())
             {
                 m_Data.insert(std::pair<uint16_t, uint32_t>(index, value));
             }
@@ -2129,7 +2133,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
         }
 
     private:
-        std::map<uint16_t, uint32_t> m_Data;
+        std::unordered_map<uint16_t, uint32_t> m_Data;
     };
 
     Holder data;
@@ -2149,7 +2153,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
 
     PeriodicCounterCapture periodicCounterCapture(std::ref(data), std::ref(sendCounterPacket), captureReader);
 
-    for(unsigned int i = 0; i < numSteps; ++i)
+    for (unsigned int i = 0; i < numSteps; ++i)
     {
         data.SetCaptureData(1, captureIds1);
         captureReader.SetCounterValue(0, valueA * (i + 1));
@@ -2166,7 +2170,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
         periodicCounterCapture.Start();
     }
 
-    periodicCounterCapture.Join();
+    periodicCounterCapture.Stop();
 
     auto buffer = mockBuffer.GetReadableBuffer();
 

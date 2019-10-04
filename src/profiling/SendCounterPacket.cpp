@@ -913,7 +913,7 @@ void SendCounterPacket::Start()
     // Mark the send thread as running
     m_IsRunning.store(true);
 
-    // Keep the send procedure going until the the send thread is signalled to stop
+    // Keep the send procedure going until the send thread is signalled to stop
     m_KeepRunning.store(true);
 
     // Start the send thread

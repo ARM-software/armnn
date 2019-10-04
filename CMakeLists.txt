@@ -440,17 +440,16 @@ list(APPEND armnn_sources
     src/profiling/ConnectionAcknowledgedCommandHandler.hpp
     src/profiling/CounterDirectory.cpp
     src/profiling/CounterDirectory.hpp
-    src/profiling/CounterValues.hpp
     src/profiling/EncodeVersion.hpp
     src/profiling/Holder.cpp
     src/profiling/Holder.hpp
     src/profiling/IBufferManager.hpp
     src/profiling/ICounterDirectory.hpp
+    src/profiling/ICounterValues.hpp
     src/profiling/ISendCounterPacket.hpp
     src/profiling/IPacketBuffer.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
-    src/profiling/IReadCounterValue.hpp
     src/profiling/Packet.cpp
     src/profiling/Packet.hpp
     src/profiling/PacketBuffer.cpp

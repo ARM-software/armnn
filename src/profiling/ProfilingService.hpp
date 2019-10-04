@@ -8,7 +8,7 @@
 #include "ProfilingStateMachine.hpp"
 #include "ProfilingConnectionFactory.hpp"
 #include "CounterDirectory.hpp"
-#include "CounterValues.hpp"
+#include "ICounterValues.hpp"
 
 namespace armnn
 {

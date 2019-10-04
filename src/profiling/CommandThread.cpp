@@ -12,69 +12,26 @@ namespace armnn
 namespace profiling
 {
 
-CommandThread::CommandThread(uint32_t timeout,
-                             bool stopAfterTimeout,
-                             CommandHandlerRegistry& commandHandlerRegistry,
-                             PacketVersionResolver& packetVersionResolver,
-                             IProfilingConnection& socketProfilingConnection)
-    : m_Timeout(timeout)
-    , m_StopAfterTimeout(stopAfterTimeout)
-    , m_IsRunning(false)
-    , m_CommandHandlerRegistry(commandHandlerRegistry)
-    , m_PacketVersionResolver(packetVersionResolver)
-    , m_SocketProfilingConnection(socketProfilingConnection)
-{};
-
-void CommandThread::WaitForPacket()
-{
-    do {
-        try
-        {
-            Packet packet = m_SocketProfilingConnection.ReadPacket(m_Timeout);
-            Version version = m_PacketVersionResolver.ResolvePacketVersion(packet.GetPacketId());
-
-            CommandHandlerFunctor* commandHandlerFunctor =
-                m_CommandHandlerRegistry.GetFunctor(packet.GetPacketId(), version.GetEncodedValue());
-            commandHandlerFunctor->operator()(packet);
-        }
-        catch(const armnn::TimeoutException&)
-        {
-            if(m_StopAfterTimeout)
-            {
-                m_IsRunning.store(false, std::memory_order_relaxed);
-                return;
-            }
-        }
-        catch(...)
-        {
-            //might want to differentiate the errors more
-            m_IsRunning.store(false, std::memory_order_relaxed);
-            return;
-        }
-
-    } while(m_KeepRunning.load(std::memory_order_relaxed));
-
-    m_IsRunning.store(false, std::memory_order_relaxed);
-}
-
 void CommandThread::Start()
 {
-    if (!m_CommandThread.joinable() && !IsRunning())
+    if (IsRunning())
     {
-        m_IsRunning.store(true, std::memory_order_relaxed);
-        m_KeepRunning.store(true, std::memory_order_relaxed);
-        m_CommandThread = std::thread(&CommandThread::WaitForPacket, this);
+        return;
     }
+
+    m_IsRunning.store(true, std::memory_order_relaxed);
+    m_KeepRunning.store(true, std::memory_order_relaxed);
+    m_CommandThread = std::thread(&CommandThread::WaitForPacket, this);
 }
 
 void CommandThread::Stop()
 {
     m_KeepRunning.store(false, std::memory_order_relaxed);
-}
 
-void CommandThread::Join()
-{
-    m_CommandThread.join();
+    if (m_CommandThread.joinable())
+    {
+        m_CommandThread.join();
+    }
 }
 
 bool CommandThread::IsRunning() const
@@ -82,16 +39,49 @@ bool CommandThread::IsRunning() const
     return m_IsRunning.load(std::memory_order_relaxed);
 }
 
-bool CommandThread::StopAfterTimeout(bool stopAfterTimeout)
+void CommandThread::SetTimeout(uint32_t timeout)
 {
-    if (!IsRunning())
-    {
-        m_StopAfterTimeout = stopAfterTimeout;
-        return true;
-    }
-    return false;
+    m_Timeout.store(timeout, std::memory_order_relaxed);
 }
 
-}//namespace profiling
+void CommandThread::SetStopAfterTimeout(bool stopAfterTimeout)
+{
+    m_StopAfterTimeout.store(stopAfterTimeout, std::memory_order_relaxed);
+}
 
-}//namespace armnn
+void CommandThread::WaitForPacket()
+{
+    do
+    {
+        try
+        {
+            Packet packet = m_SocketProfilingConnection.ReadPacket(m_Timeout);
+            Version version = m_PacketVersionResolver.ResolvePacketVersion(packet.GetPacketId());
+
+            CommandHandlerFunctor* commandHandlerFunctor =
+                m_CommandHandlerRegistry.GetFunctor(packet.GetPacketId(), version.GetEncodedValue());
+            BOOST_ASSERT(commandHandlerFunctor);
+            commandHandlerFunctor->operator()(packet);
+        }
+        catch (const armnn::TimeoutException&)
+        {
+            if (m_StopAfterTimeout)
+            {
+                m_KeepRunning.store(false, std::memory_order_relaxed);
+            }
+        }
+        catch (...)
+        {
+            // Might want to differentiate the errors more
+            m_KeepRunning.store(false, std::memory_order_relaxed);
+        }
+
+    }
+    while (m_KeepRunning.load(std::memory_order_relaxed));
+
+    m_IsRunning.store(false, std::memory_order_relaxed);
+}
+
+} // namespace profiling
+
+} // namespace armnn

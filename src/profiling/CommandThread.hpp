@@ -26,19 +26,31 @@ public:
                   bool stopAfterTimeout,
                   CommandHandlerRegistry& commandHandlerRegistry,
                   PacketVersionResolver& packetVersionResolver,
-                  IProfilingConnection& socketProfilingConnection);
+                  IProfilingConnection& socketProfilingConnection)
+        : m_Timeout(timeout)
+        , m_StopAfterTimeout(stopAfterTimeout)
+        , m_IsRunning(false)
+        , m_KeepRunning(false)
+        , m_CommandThread()
+        , m_CommandHandlerRegistry(commandHandlerRegistry)
+        , m_PacketVersionResolver(packetVersionResolver)
+        , m_SocketProfilingConnection(socketProfilingConnection)
+    {}
+    ~CommandThread() { Stop(); }
 
     void Start();
     void Stop();
-    void Join();
+
     bool IsRunning() const;
-    bool StopAfterTimeout(bool StopAfterTimeout);
+
+    void SetTimeout(uint32_t timeout);
+    void SetStopAfterTimeout(bool stopAfterTimeout);
 
 private:
     void WaitForPacket();
 
-    uint32_t m_Timeout;
-    bool m_StopAfterTimeout;
+    std::atomic<uint32_t> m_Timeout;
+    std::atomic<bool> m_StopAfterTimeout;
     std::atomic<bool> m_IsRunning;
     std::atomic<bool> m_KeepRunning;
     std::thread m_CommandThread;
@@ -48,6 +60,6 @@ private:
     IProfilingConnection& m_SocketProfilingConnection;
 };
 
-}//namespace profiling
+} // namespace profiling
 
-}//namespace armnn
+} // namespace armnn

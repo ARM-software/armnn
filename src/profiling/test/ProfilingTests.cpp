@@ -174,7 +174,6 @@ BOOST_AUTO_TEST_CASE(CheckCommandThread)
         commandThread0.Start();
 
         commandThread0.Stop();
-        commandThread0.Join();
 
         BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
 
@@ -188,11 +187,15 @@ BOOST_AUTO_TEST_CASE(CheckCommandThread)
                                      testProfilingConnectionTimeOutError);
 
         commandThread1.Start();
-        commandThread1.Join();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        BOOST_CHECK(!commandThread1.IsRunning());
+        commandThread1.Stop();
 
         BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck);
         //now commandThread1 should persist after a timeout
-        commandThread1.StopAfterTimeout(false);
+        commandThread1.SetStopAfterTimeout(false);
         commandThread1.Start();
 
         for (int i = 0; i < 100; i++)
@@ -208,10 +211,8 @@ BOOST_AUTO_TEST_CASE(CheckCommandThread)
         }
 
         commandThread1.Stop();
-        commandThread1.Join();
 
         BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
-
 
         CommandThread commandThread2(1,
                                      false,
@@ -226,13 +227,13 @@ BOOST_AUTO_TEST_CASE(CheckCommandThread)
             if (!commandThread2.IsRunning())
             {
                 //commandThread2 should stop once it encounters a non timing error
-                commandThread2.Join();
                 return;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
 
         BOOST_ERROR("commandThread2 has failed to stop");
+        commandThread2.Stop();
 }
 
 BOOST_AUTO_TEST_CASE(CheckEncodeVersion)

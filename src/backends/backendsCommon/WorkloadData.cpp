@@ -1261,22 +1261,6 @@ void InstanceNormalizationQueueDescriptor::Validate(const WorkloadInfo& workload
     ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
-
-    ValidatePointer(m_Beta,  descriptorName, "beta");
-    ValidatePointer(m_Eps,   descriptorName, "epsilon");
-    ValidatePointer(m_Gamma, descriptorName, "gamma");
-
-    const TensorInfo& beta     = m_Beta->GetTensorInfo();
-    const TensorInfo& epsilon = m_Eps->GetTensorInfo();
-    const TensorInfo& gamma    = m_Gamma->GetTensorInfo();
-
-    ValidateTensorNumDimensions(beta,     descriptorName, 1, "beta");
-    ValidateTensorNumDimensions(epsilon,  descriptorName, 1, "epsilon");
-    ValidateTensorNumDimensions(gamma,    descriptorName, 1, "gamma");
-
-    ValidateTensorDataTypesMatch(inputTensorInfo, beta,     descriptorName, "input", "beta");
-    ValidateTensorDataTypesMatch(inputTensorInfo, epsilon,  descriptorName, "input", "epsilon");
-    ValidateTensorDataTypesMatch(inputTensorInfo, gamma,    descriptorName, "input", "gamma");
 }
 
 void L2NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

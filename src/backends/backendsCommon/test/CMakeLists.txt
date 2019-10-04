@@ -86,6 +86,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/GatherTestImpl.hpp
     layerTests/GreaterTestImpl.cpp
     layerTests/GreaterTestImpl.hpp
+    layerTests/InstanceNormalizationTestImpl.cpp
+    layerTests/InstanceNormalizationTestImpl.hpp
     layerTests/L2NormalizationTestImpl.cpp
     layerTests/L2NormalizationTestImpl.hpp
     layerTests/LayerTestResult.hpp

@@ -30,6 +30,7 @@
 #include "workloads/ClDivisionFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClGreaterWorkload.hpp"
+#include "workloads/ClInstanceNormalizationWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
 #include "workloads/ClLstmFloatWorkload.hpp"
 #include "workloads/ClMaximumWorkload.hpp"
@@ -408,6 +409,18 @@ bool ClLayerSupport::IsInputSupported(const TensorInfo& input,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
     return IsClBackendSupported(reasonIfUnsupported);
+}
+
+bool ClLayerSupport::IsInstanceNormalizationSupported(const TensorInfo& input,
+                                                      const TensorInfo& output,
+                                                      const InstanceNormalizationDescriptor& descriptor,
+                                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClInstanceNormalizationWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,

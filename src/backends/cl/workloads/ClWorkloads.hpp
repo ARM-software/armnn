@@ -18,6 +18,7 @@
 #include "ClFloorFloatWorkload.hpp"
 #include "ClFullyConnectedWorkload.hpp"
 #include "ClGreaterWorkload.hpp"
+#include "ClInstanceNormalizationWorkload.hpp"
 #include "ClL2NormalizationFloatWorkload.hpp"
 #include "ClLstmFloatWorkload.hpp"
 #include "ClConcatWorkload.hpp"

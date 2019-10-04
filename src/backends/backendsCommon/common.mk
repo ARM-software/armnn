@@ -55,6 +55,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/FullyConnectedTestImpl.cpp \
     test/layerTests/GatherTestImpl.cpp \
     test/layerTests/GreaterTestImpl.cpp \
+    test/layerTests/InstanceNormalizationTestImpl.cpp \
     test/layerTests/L2NormalizationTestImpl.cpp \
     test/layerTests/LstmTestImpl.cpp \
     test/layerTests/MaximumTestImpl.cpp \

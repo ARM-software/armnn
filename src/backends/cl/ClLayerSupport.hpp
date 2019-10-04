@@ -110,6 +110,11 @@ public:
     bool IsInputSupported(const TensorInfo& input,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsInstanceNormalizationSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const InstanceNormalizationDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsL2NormalizationSupported(const TensorInfo& input,
                                     const TensorInfo& output,
                                     const L2NormalizationDescriptor& descriptor,

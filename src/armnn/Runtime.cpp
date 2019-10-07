@@ -10,6 +10,8 @@
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 
+#include "../profiling/ProfilingService.hpp"
+
 #include <iostream>
 
 #include <boost/log/trivial.hpp>
@@ -145,6 +147,9 @@ Runtime::Runtime(const CreationOptions& options)
     , m_DeviceSpec{BackendRegistryInstance().GetBackendIds()}
 {
     BOOST_LOG_TRIVIAL(info) << "ArmNN v" << ARMNN_VERSION << "\n";
+
+    // pass configuration info to the profiling service
+    armnn::profiling::ProfilingService::Instance().ResetExternalProfilingOptions(options.m_ProfilingOptions);
 
     // Load any available/compatible dynamic backend before the runtime
     // goes through the backend registry

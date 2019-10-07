@@ -28,6 +28,8 @@ public:
 
     virtual void operator()(const Packet& packet) {}
 
+    virtual ~CommandHandlerFunctor() {}
+
 private:
     uint32_t m_PacketId;
     uint32_t m_Version;

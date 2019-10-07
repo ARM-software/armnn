@@ -169,7 +169,28 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/StridedSliceLayer.cpp \
         src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/layers/SwitchLayer.cpp \
-        src/armnn/layers/TransposeConvolution2dLayer.cpp
+        src/armnn/layers/TransposeConvolution2dLayer.cpp \
+        src/profiling/BufferManager.cpp \
+        src/profiling/CommandHandler.cpp \
+        src/profiling/CommandHandlerFunctor.cpp \
+        src/profiling/CommandHandlerKey.cpp \
+        src/profiling/CommandHandlerRegistry.cpp \
+        src/profiling/ConnectionAcknowledgedCommandHandler.cpp \
+        src/profiling/CounterDirectory.cpp \
+        src/profiling/Holder.cpp \
+        src/profiling/PacketBuffer.cpp \
+        src/profiling/Packet.cpp \
+        src/profiling/PacketVersionResolver.cpp \
+        src/profiling/PeriodicCounterCapture.cpp \
+        src/profiling/PeriodicCounterSelectionCommandHandler.cpp \
+        src/profiling/ProfilingConnectionDumpToFileDecorator.cpp \
+        src/profiling/ProfilingConnectionFactory.cpp \
+        src/profiling/ProfilingService.cpp \
+        src/profiling/ProfilingStateMachine.cpp \
+        src/profiling/ProfilingUtils.cpp \
+        src/profiling/RequestCounterDirectoryCommandHandler.cpp \
+        src/profiling/SendCounterPacket.cpp \
+        src/profiling/SocketProfilingConnection.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         armnn-arm_compute \

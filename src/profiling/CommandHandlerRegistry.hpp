@@ -36,6 +36,8 @@ public:
 
     void RegisterFunctor(CommandHandlerFunctor* functor, uint32_t packetId, uint32_t version);
 
+    void RegisterFunctor(CommandHandlerFunctor* functor);
+
     CommandHandlerFunctor* GetFunctor(uint32_t packetId, uint32_t version) const;
 
 private:

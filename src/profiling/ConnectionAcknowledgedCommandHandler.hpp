@@ -15,14 +15,16 @@ namespace armnn
 namespace profiling
 {
 
-class ConnectionAcknowledgedCommandHandler : public CommandHandlerFunctor
+class ConnectionAcknowledgedCommandHandler final : public CommandHandlerFunctor
 {
 
 public:
     ConnectionAcknowledgedCommandHandler(uint32_t packetId,
                                          uint32_t version,
                                          ProfilingStateMachine& profilingStateMachine)
-        : CommandHandlerFunctor(packetId, version), m_StateMachine(profilingStateMachine) {}
+        : CommandHandlerFunctor(packetId, version)
+        , m_StateMachine(profilingStateMachine)
+    {}
 
     void operator()(const Packet& packet) override;
 

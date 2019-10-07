@@ -18,34 +18,19 @@ void CommandHandler::Start(IProfilingConnection& profilingConnection)
         return;
     }
 
-    m_IsRunning.store(true, std::memory_order_relaxed);
-    m_KeepRunning.store(true, std::memory_order_relaxed);
+    m_IsRunning.store(true);
+    m_KeepRunning.store(true);
     m_CommandThread = std::thread(&CommandHandler::HandleCommands, this, std::ref(profilingConnection));
 }
 
 void CommandHandler::Stop()
 {
-    m_KeepRunning.store(false, std::memory_order_relaxed);
+    m_KeepRunning.store(false);
 
     if (m_CommandThread.joinable())
     {
         m_CommandThread.join();
     }
-}
-
-bool CommandHandler::IsRunning() const
-{
-    return m_IsRunning.load(std::memory_order_relaxed);
-}
-
-void CommandHandler::SetTimeout(uint32_t timeout)
-{
-    m_Timeout.store(timeout, std::memory_order_relaxed);
-}
-
-void CommandHandler::SetStopAfterTimeout(bool stopAfterTimeout)
-{
-    m_StopAfterTimeout.store(stopAfterTimeout, std::memory_order_relaxed);
 }
 
 void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
@@ -72,12 +57,12 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
         catch (...)
         {
             // Might want to differentiate the errors more
-            m_KeepRunning.store(false, std::memory_order_relaxed);
+            m_KeepRunning.store(false);
         }
     }
-    while (m_KeepRunning.load(std::memory_order_relaxed));
+    while (m_KeepRunning.load());
 
-    m_IsRunning.store(false, std::memory_order_relaxed);
+    m_IsRunning.store(false);
 }
 
 } // namespace profiling

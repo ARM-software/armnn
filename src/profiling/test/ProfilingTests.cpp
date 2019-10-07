@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(1, 4194304, profilingStateMachine);
     CommandHandlerRegistry commandHandlerRegistry;
 
-    commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler, 1, 4194304);
+    commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler);
 
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
@@ -388,9 +388,9 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerRegistry)
     CommandHandlerRegistry registry;
 
     // Register multiple different derived classes
-    registry.RegisterFunctor(&testFunctorA, testFunctorA.GetPacketId(), testFunctorA.GetVersion());
-    registry.RegisterFunctor(&testFunctorB, testFunctorB.GetPacketId(), testFunctorB.GetVersion());
-    registry.RegisterFunctor(&testFunctorC, testFunctorC.GetPacketId(), testFunctorC.GetVersion());
+    registry.RegisterFunctor(&testFunctorA);
+    registry.RegisterFunctor(&testFunctorB);
+    registry.RegisterFunctor(&testFunctorC);
 
     std::unique_ptr<char[]> packetDataA;
     std::unique_ptr<char[]> packetDataB;

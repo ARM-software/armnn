@@ -35,13 +35,12 @@ public:
     {}
     ~CommandHandler() { Stop(); }
 
+    void SetTimeout(uint32_t timeout) { m_Timeout.store(timeout); }
+    void SetStopAfterTimeout(bool stopAfterTimeout) { m_StopAfterTimeout.store(stopAfterTimeout); }
+
     void Start(IProfilingConnection& profilingConnection);
     void Stop();
-
-    bool IsRunning() const;
-
-    void SetTimeout(uint32_t timeout);
-    void SetStopAfterTimeout(bool stopAfterTimeout);
+    bool IsRunning() const { return m_IsRunning.load(); }
 
 private:
     void HandleCommands(IProfilingConnection& profilingConnection);

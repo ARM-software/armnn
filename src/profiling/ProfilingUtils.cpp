@@ -331,6 +331,80 @@ TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
     return TimelinePacketStatus::Ok;
 }
 
+TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
+                                                     unsigned char* buffer,
+                                                     unsigned int bufferSize,
+                                                     unsigned int& numberOfBytesWritten)
+{
+    // Initialize the ouput value
+    numberOfBytesWritten = 0;
+
+    // Check that the given buffer is valid
+    if (buffer == nullptr || bufferSize == 0)
+    {
+        return TimelinePacketStatus::BufferExhaustion;
+    }
+
+    // Utils
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+
+    // Calculate the length of the data (in bytes)
+    unsigned int timelineEntityPacketDataLength = uint64_t_size;   // Profiling GUID
+
+
+    // Calculate the timeline binary packet size (in bytes)
+    unsigned int timelineEntityPacketSize = 2 * uint32_t_size +             // Header (2 words)
+                                           timelineEntityPacketDataLength; // Profiling GUID
+
+    // Check whether the timeline binary packet fits in the given buffer
+    if (timelineEntityPacketSize > bufferSize)
+    {
+        return TimelinePacketStatus::BufferExhaustion;
+    }
+
+    // Packet header word 0:
+    // 26:31 [6] packet_family: timeline Packet Family, value 0b000001
+    // 19:25 [7] packet_class: packet class
+    // 16:18 [3] packet_type: packet type
+    // 8:15  [8] reserved: all zeros
+    // 0:7   [8] stream_id: stream identifier
+    uint32_t packetFamily = 1;
+    uint32_t packetClass  = 0;
+    uint32_t packetType   = 1;
+    uint32_t streamId     = 0;
+    uint32_t packetHeaderWord0 = ((packetFamily & 0x0000003F) << 26) |
+                                 ((packetClass  & 0x0000007F) << 19) |
+                                 ((packetType   & 0x00000007) << 16) |
+                                 ((streamId     & 0x00000007) <<  0);
+
+    // Packet header word 1:
+    // 25:31 [7]  reserved: all zeros
+    // 24    [1]  sequence_numbered: when non-zero the 4 bytes following the header is a u32 sequence number
+    // 0:23  [24] data_length: unsigned 24-bit integer. Length of data, in bytes. Zero is permitted
+    uint32_t sequenceNumbered = 0;
+    uint32_t dataLength       = boost::numeric_cast<uint32_t>(timelineEntityPacketDataLength); // Profiling GUID
+    uint32_t packetHeaderWord1 = ((sequenceNumbered & 0x00000001) << 24) |
+                                 ((dataLength       & 0x00FFFFFF) <<  0);
+
+    // Initialize the offset for writing in the buffer
+    unsigned int offset = 0;
+
+    // Write the timeline binary packet header to the buffer
+    WriteUint32(buffer, offset, packetHeaderWord0);
+    offset += uint32_t_size;
+    WriteUint32(buffer, offset, packetHeaderWord1);
+    offset += uint32_t_size;
+
+    // Write the timeline binary packet payload to the buffer
+    WriteUint64(buffer, offset, profilingGuid); // Profiling GUID
+
+    // Update the number of bytes written
+    numberOfBytesWritten = timelineEntityPacketSize;
+
+    return TimelinePacketStatus::Ok;
+}
+
 } // namespace profiling
 
 } // namespace armnn

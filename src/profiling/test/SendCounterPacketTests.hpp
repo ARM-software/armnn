@@ -19,7 +19,6 @@ namespace armnn
 
 namespace profiling
 {
-
 class MockProfilingConnection : public IProfilingConnection
 {
 public:
@@ -33,38 +32,20 @@ public:
 
     bool WritePacket(const unsigned char* buffer, uint32_t length) override
     {
-        return buffer != nullptr && length > 0;
-    }
+        if (buffer == nullptr || length == 0)
+        {
+            return false;
+        }
 
-    Packet ReadPacket(uint32_t timeout) override { return Packet(); }
-
-private:
-    bool m_IsOpen;
-};
-
-class MockWriteProfilingConnection : public IProfilingConnection
-{
-public:
-    MockWriteProfilingConnection()
-        : m_IsOpen(true)
-    {}
-
-    bool IsOpen() override { return m_IsOpen; }
-
-    void Close() override { m_IsOpen = false; }
-
-    bool WritePacket(const unsigned char* buffer, uint32_t length) override
-    {
         m_WrittenData.push_back(length);
-        return buffer != nullptr && length > 0;
+        return true;
     }
 
     Packet ReadPacket(uint32_t timeout) override { return Packet(); }
 
-    std::vector<uint32_t> GetWrittenData()
-    {
-        return m_WrittenData;
-    }
+    const std::vector<uint32_t>& GetWrittenData() const { return m_WrittenData; }
+
+    void Clear() { m_WrittenData.clear(); }
 
 private:
     bool m_IsOpen;
@@ -497,8 +478,8 @@ private:
 class SendCounterPacketTest : public SendCounterPacket
 {
 public:
-    SendCounterPacketTest(IBufferManager& buffer)
-        : SendCounterPacket(buffer)
+    SendCounterPacketTest(ProfilingStateMachine& profilingStateMachine, IBufferManager& buffer)
+        : SendCounterPacket(profilingStateMachine, buffer)
     {}
 
     bool CreateDeviceRecordTest(const DevicePtr& device,

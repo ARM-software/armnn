@@ -6,9 +6,10 @@
 #pragma once
 
 #include "IBufferManager.hpp"
-#include "ISendCounterPacket.hpp"
 #include "ICounterDirectory.hpp"
+#include "ISendCounterPacket.hpp"
 #include "IProfilingConnection.hpp"
+#include "ProfilingStateMachine.hpp"
 #include "ProfilingUtils.hpp"
 
 #include <atomic>
@@ -26,20 +27,25 @@ namespace profiling
 class SendCounterPacket : public ISendCounterPacket
 {
 public:
-    using CategoryRecord   = std::vector<uint32_t>;
-    using DeviceRecord     = std::vector<uint32_t>;
-    using CounterSetRecord = std::vector<uint32_t>;
-    using EventRecord      = std::vector<uint32_t>;
-
+    using CategoryRecord        = std::vector<uint32_t>;
+    using DeviceRecord          = std::vector<uint32_t>;
+    using CounterSetRecord      = std::vector<uint32_t>;
+    using EventRecord           = std::vector<uint32_t>;
     using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
 
-    SendCounterPacket(IBufferManager& buffer, int timeout = 1000)
-        : m_BufferManager(buffer)
+    SendCounterPacket(ProfilingStateMachine& profilingStateMachine, IBufferManager& buffer, int timeout = 1000)
+        : m_StateMachine(profilingStateMachine)
+        , m_BufferManager(buffer)
         , m_Timeout(timeout)
         , m_IsRunning(false)
         , m_KeepRunning(false)
+        , m_SendThreadException(nullptr)
     {}
-    ~SendCounterPacket() { Stop(); }
+    ~SendCounterPacket()
+    {
+        // Don't rethrow when destructing the object
+        Stop(false);
+    }
 
     void SendStreamMetaDataPacket() override;
 
@@ -56,7 +62,7 @@ public:
     static const unsigned int MAX_METADATA_PACKET_LENGTH = 4096;
 
     void Start(IProfilingConnection& profilingConnection);
-    void Stop();
+    void Stop(bool rethrowSendThreadExceptions = true);
     bool IsRunning() { return m_IsRunning.load(); }
 
 private:
@@ -76,6 +82,7 @@ private:
         {
             SetReadyToRead();
         }
+
         if (writerBuffer != nullptr)
         {
             // Cancel the operation
@@ -88,6 +95,7 @@ private:
 
     void FlushBuffer(IProfilingConnection& profilingConnection);
 
+    ProfilingStateMachine& m_StateMachine;
     IBufferManager& m_BufferManager;
     int m_Timeout;
     std::mutex m_WaitMutex;
@@ -95,6 +103,7 @@ private:
     std::thread m_SendThread;
     std::atomic<bool> m_IsRunning;
     std::atomic<bool> m_KeepRunning;
+    std::exception_ptr m_SendThreadException;
 
 protected:
     // Helper methods, protected for testing

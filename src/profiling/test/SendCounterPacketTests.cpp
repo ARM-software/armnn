@@ -74,9 +74,8 @@ BOOST_AUTO_TEST_CASE(MockSendCounterPacketTest)
 BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
 {
     // Error no space left in buffer
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockProfilingConnection, mockBuffer1);
+    SendCounterPacket sendPacket1(mockBuffer1);
 
     uint32_t capturePeriod = 1000;
     std::vector<uint16_t> selectedCounterIds;
@@ -85,7 +84,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
 
     // Packet without any counters
     MockBufferManager mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockProfilingConnection, mockBuffer2);
+    SendCounterPacket sendPacket2(mockBuffer2);
 
     sendPacket2.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds);
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
@@ -101,7 +100,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
 
     // Full packet message
     MockBufferManager mockBuffer3(512);
-    SendCounterPacket sendPacket3(mockProfilingConnection, mockBuffer3);
+    SendCounterPacket sendPacket3(mockBuffer3);
 
     selectedCounterIds.reserve(5);
     selectedCounterIds.emplace_back(100);
@@ -136,9 +135,8 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterSelectionPacketTest)
 BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
 {
     // Error no space left in buffer
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockProfilingConnection, mockBuffer1);
+    SendCounterPacket sendPacket1(mockBuffer1);
 
     auto captureTimestamp = std::chrono::steady_clock::now();
     uint64_t time =  static_cast<uint64_t >(captureTimestamp.time_since_epoch().count());
@@ -149,7 +147,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
 
     // Packet without any counters
     MockBufferManager mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockProfilingConnection, mockBuffer2);
+    SendCounterPacket sendPacket2(mockBuffer2);
 
     sendPacket2.SendPeriodicCounterCapturePacket(time, indexValuePairs);
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
@@ -166,7 +164,7 @@ BOOST_AUTO_TEST_CASE(SendPeriodicCounterCapturePacketTest)
 
     // Full packet message
     MockBufferManager mockBuffer3(512);
-    SendCounterPacket sendPacket3(mockProfilingConnection, mockBuffer3);
+    SendCounterPacket sendPacket3(mockBuffer3);
 
     indexValuePairs.reserve(5);
     indexValuePairs.emplace_back(std::make_pair<uint16_t, uint32_t >(0, 100));
@@ -216,9 +214,8 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     uint32_t sizeUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
 
     // Error no space left in buffer
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockProfilingConnection, mockBuffer1);
+    SendCounterPacket sendPacket1(mockBuffer1);
     BOOST_CHECK_THROW(sendPacket1.SendStreamMetaDataPacket(), armnn::profiling::BufferExhaustion);
 
     // Full metadata packet
@@ -237,7 +234,7 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     uint32_t packetEntries = 6;
 
     MockBufferManager mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockProfilingConnection, mockBuffer2);
+    SendCounterPacket sendPacket2(mockBuffer2);
     sendPacket2.SendStreamMetaDataPacket();
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
 
@@ -331,9 +328,8 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
 
 BOOST_AUTO_TEST_CASE(CreateDeviceRecordTest)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a device for testing
     uint16_t deviceUid = 27;
@@ -364,9 +360,8 @@ BOOST_AUTO_TEST_CASE(CreateDeviceRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidDeviceRecordTest)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a device for testing
     uint16_t deviceUid = 27;
@@ -386,9 +381,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidDeviceRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateCounterSetRecordTest)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a counter set for testing
     uint16_t counterSetUid = 27;
@@ -419,9 +413,8 @@ BOOST_AUTO_TEST_CASE(CreateCounterSetRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidCounterSetRecordTest)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a counter set for testing
     uint16_t counterSetUid = 27;
@@ -441,9 +434,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidCounterSetRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateEventRecordTest)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 7256;
@@ -562,9 +554,8 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateEventRecordNoUnitsTest)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 44312;
@@ -666,9 +657,8 @@ BOOST_AUTO_TEST_CASE(CreateEventRecordNoUnitsTest)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest1)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 7256;
@@ -705,9 +695,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest1)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest2)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 7256;
@@ -744,9 +733,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest2)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest3)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a counter for testing
     uint16_t counterUid = 7256;
@@ -783,9 +771,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidEventRecordTest3)
 
 BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a category for testing
     const std::string categoryName = "some_category";
@@ -985,9 +972,8 @@ BOOST_AUTO_TEST_CASE(CreateCategoryRecordTest)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidCategoryRecordTest1)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a category for testing
     const std::string categoryName = "some invalid category";
@@ -1009,9 +995,8 @@ BOOST_AUTO_TEST_CASE(CreateInvalidCategoryRecordTest1)
 
 BOOST_AUTO_TEST_CASE(CreateInvalidCategoryRecordTest2)
 {
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(0);
-    SendCounterPacketTest sendCounterPacketTest(mockProfilingConnection, mockBuffer);
+    SendCounterPacketTest sendCounterPacketTest(mockBuffer);
 
     // Create a category for testing
     const std::string categoryName = "some_category";
@@ -1068,9 +1053,8 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest1)
     BOOST_CHECK(device2);
 
     // Buffer with not enough space
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(10);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory),
                       armnn::profiling::BufferExhaustion);
 }
@@ -1161,9 +1145,8 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest2)
     BOOST_CHECK(counter3);
 
     // Buffer with enough space
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
     BOOST_CHECK_NO_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory));
 
     // Get the readable buffer
@@ -1563,9 +1546,8 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest3)
     BOOST_CHECK(device);
 
     // Buffer with enough space
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1582,9 +1564,8 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest4)
     BOOST_CHECK(counterSet);
 
     // Buffer with enough space
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1601,9 +1582,8 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest5)
     BOOST_CHECK(category);
 
     // Buffer with enough space
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1636,9 +1616,8 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest6)
     BOOST_CHECK(category);
 
     // Buffer with enough space
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1686,9 +1665,8 @@ BOOST_AUTO_TEST_CASE(SendCounterDirectoryPacketTest7)
     BOOST_CHECK(counter);
 
     // Buffer with enough space
-    MockProfilingConnection mockProfilingConnection;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer);
     BOOST_CHECK_THROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
 }
 
@@ -1696,16 +1674,16 @@ BOOST_AUTO_TEST_CASE(SendThreadTest0)
 {
     MockProfilingConnection mockProfilingConnection;
     MockStreamCounterBuffer mockStreamCounterBuffer(0);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
+    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer);
 
     // Try to start the send thread many times, it must only start once
 
-    sendCounterPacket.Start();
+    sendCounterPacket.Start(mockProfilingConnection);
     BOOST_CHECK(sendCounterPacket.IsRunning());
-    sendCounterPacket.Start();
-    sendCounterPacket.Start();
-    sendCounterPacket.Start();
-    sendCounterPacket.Start();
+    sendCounterPacket.Start(mockProfilingConnection);
+    sendCounterPacket.Start(mockProfilingConnection);
+    sendCounterPacket.Start(mockProfilingConnection);
+    sendCounterPacket.Start(mockProfilingConnection);
     BOOST_CHECK(sendCounterPacket.IsRunning());
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -1720,8 +1698,8 @@ BOOST_AUTO_TEST_CASE(SendThreadTest1)
 
     MockProfilingConnection mockProfilingConnection;
     MockStreamCounterBuffer mockStreamCounterBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
-    sendCounterPacket.Start();
+    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer);
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // Interleaving writes and reads to/from the buffer with pauses to test that the send thread actually waits for
     // something to become available for reading
@@ -1828,8 +1806,8 @@ BOOST_AUTO_TEST_CASE(SendThreadTest2)
 
     MockProfilingConnection mockProfilingConnection;
     MockStreamCounterBuffer mockStreamCounterBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
-    sendCounterPacket.Start();
+    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer);
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // Adding many spurious "ready to read" signals throughout the test to check that the send thread is
     // capable of handling unnecessary read requests
@@ -1948,8 +1926,8 @@ BOOST_AUTO_TEST_CASE(SendThreadTest3)
 
     MockProfilingConnection mockProfilingConnection;
     MockStreamCounterBuffer mockStreamCounterBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, mockStreamCounterBuffer);
-    sendCounterPacket.Start();
+    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer);
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // Not using pauses or "grace periods" to stress test the send thread
 
@@ -2049,8 +2027,8 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest)
 {
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(1, 1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, bufferManager, -1);
-    sendCounterPacket.Start();
+    SendCounterPacket sendCounterPacket(bufferManager, -1);
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // Interleaving writes and reads to/from the buffer with pauses to test that the send thread actually waits for
     // something to become available for reading
@@ -2176,8 +2154,8 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest1)
 {
     MockWriteProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(3, 1024);
-    SendCounterPacket sendCounterPacket(mockProfilingConnection, bufferManager, -1);
-    sendCounterPacket.Start();
+    SendCounterPacket sendCounterPacket(bufferManager, -1);
+    sendCounterPacket.Start(mockProfilingConnection);
 
     // SendStreamMetaDataPacket
     sendCounterPacket.SendStreamMetaDataPacket();

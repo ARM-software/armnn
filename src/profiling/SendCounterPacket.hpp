@@ -33,12 +33,11 @@ public:
 
     using IndexValuePairsVector = std::vector<std::pair<uint16_t, uint32_t>>;
 
-    SendCounterPacket(IProfilingConnection& profilingConnection, IBufferManager& buffer, int timeout =  1)
-        : m_ProfilingConnection(profilingConnection)
-        , m_BufferManager(buffer)
+    SendCounterPacket(IBufferManager& buffer, int timeout = 1000)
+        : m_BufferManager(buffer)
+        , m_Timeout(timeout)
         , m_IsRunning(false)
         , m_KeepRunning(false)
-        , m_Timeout(timeout)
     {}
     ~SendCounterPacket() { Stop(); }
 
@@ -56,12 +55,12 @@ public:
     static const unsigned int PIPE_MAGIC = 0x45495434;
     static const unsigned int MAX_METADATA_PACKET_LENGTH = 4096;
 
-    void Start();
+    void Start(IProfilingConnection& profilingConnection);
     void Stop();
     bool IsRunning() { return m_IsRunning.load(); }
 
 private:
-    void Send();
+    void Send(IProfilingConnection& profilingConnection);
 
     template <typename ExceptionType>
     void CancelOperationAndThrow(const std::string& errorMessage)
@@ -87,16 +86,15 @@ private:
         throw ExceptionType(errorMessage);
     }
 
-    void FlushBuffer();
+    void FlushBuffer(IProfilingConnection& profilingConnection);
 
-    IProfilingConnection& m_ProfilingConnection;
     IBufferManager& m_BufferManager;
+    int m_Timeout;
     std::mutex m_WaitMutex;
     std::condition_variable m_WaitCondition;
     std::thread m_SendThread;
     std::atomic<bool> m_IsRunning;
     std::atomic<bool> m_KeepRunning;
-    int m_Timeout;
 
 protected:
     // Helper methods, protected for testing

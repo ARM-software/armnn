@@ -497,8 +497,8 @@ private:
 class SendCounterPacketTest : public SendCounterPacket
 {
 public:
-    SendCounterPacketTest(IProfilingConnection& profilingconnection, IBufferManager& buffer)
-        : SendCounterPacket(profilingconnection, buffer)
+    SendCounterPacketTest(IBufferManager& buffer)
+        : SendCounterPacket(buffer)
     {}
 
     bool CreateDeviceRecordTest(const DevicePtr& device,

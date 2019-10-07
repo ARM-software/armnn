@@ -901,7 +901,7 @@ void SendCounterPacket::SetReadyToRead()
     m_WaitCondition.notify_one();
 }
 
-void SendCounterPacket::Start()
+void SendCounterPacket::Start(IProfilingConnection& profilingConnection)
 {
     // Check if the send thread is already running
     if (m_IsRunning.load())
@@ -917,7 +917,7 @@ void SendCounterPacket::Start()
     m_KeepRunning.store(true);
 
     // Start the send thread
-    m_SendThread = std::thread(&SendCounterPacket::Send, this);
+    m_SendThread = std::thread(&SendCounterPacket::Send, this, std::ref(profilingConnection));
 }
 
 void SendCounterPacket::Stop()
@@ -936,7 +936,7 @@ void SendCounterPacket::Stop()
     }
 }
 
-void SendCounterPacket::Send()
+void SendCounterPacket::Send(IProfilingConnection& profilingConnection)
 {
     // Keep the sending procedure looping until the thread is signalled to stop
     while (m_KeepRunning.load())
@@ -954,23 +954,23 @@ void SendCounterPacket::Send()
             else
             {
                 // Wait until the thread is notified of something to read from the buffer,
-                // or check anyway after a second
-                m_WaitCondition.wait_for(lock, std::chrono::seconds(m_Timeout));
+                // or check anyway after the specified number of milliseconds
+                m_WaitCondition.wait_for(lock, std::chrono::milliseconds(m_Timeout));
             }
         }
         // Wait condition lock scope - End
 
-        FlushBuffer();
+        FlushBuffer(profilingConnection);
     }
 
     // Ensure that all readable data got written to the profiling connection before the thread is stopped
-    FlushBuffer();
+    FlushBuffer(profilingConnection);
 
     // Mark the send thread as not running
     m_IsRunning.store(false);
 }
 
-void SendCounterPacket::FlushBuffer()
+void SendCounterPacket::FlushBuffer(IProfilingConnection& profilingConnection)
 {
     // Get the first available readable buffer
     std::unique_ptr<IPacketBuffer> packetBuffer = m_BufferManager.GetReadableBuffer();
@@ -991,10 +991,10 @@ void SendCounterPacket::FlushBuffer()
         }
 
         // Check that the profiling connection is open, silently drop the data and continue if it's closed
-        if (m_ProfilingConnection.IsOpen())
+        if (profilingConnection.IsOpen())
         {
             // Write a packet to the profiling connection. Silently ignore any write error and continue
-            m_ProfilingConnection.WritePacket(readBuffer, boost::numeric_cast<uint32_t>(readBufferSize));
+            profilingConnection.WritePacket(readBuffer, boost::numeric_cast<uint32_t>(readBufferSize));
         }
 
         // Mark the packet buffer as read

@@ -405,6 +405,129 @@ TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
     return TimelinePacketStatus::Ok;
 }
 
+TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
+                                                          unsigned int bufferSize,
+                                                          unsigned int& numberOfBytesWritten)
+{
+    // Initialize the output value
+    numberOfBytesWritten = 0;
+
+    // Check that the given buffer is valid
+    if (buffer == nullptr || bufferSize == 0)
+    {
+        return TimelinePacketStatus::BufferExhaustion;
+    }
+
+    // Utils
+    unsigned int uint32_t_size = sizeof(uint32_t);
+
+    // Packet header word 0:
+    // 26:31 [6] packet_family: timeline Packet Family, value 0b000001
+    // 19:25 [7] packet_class: packet class
+    // 16:18 [3] packet_type: packet type
+    // 8:15  [8] reserved: all zeros
+    // 0:7   [8] stream_id: stream identifier
+    uint32_t packetFamily = 1;
+    uint32_t packetClass  = 0;
+    uint32_t packetType   = 0;
+    uint32_t streamId     = 0;
+    uint32_t packetHeaderWord0 = ((packetFamily & 0x0000003F) << 26) |
+                                 ((packetClass  & 0x0000007F) << 19) |
+                                 ((packetType   & 0x00000007) << 16) |
+                                 ((streamId     & 0x00000007) <<  0);
+
+    // the payload/data of the packet consists of swtrace event definitions encoded according
+    // to the swtrace directory specification. The messages being the five defined below:
+    // |  decl_id  |  decl_name          |    ui_name            |  arg_types  |  arg_names                          |
+    // |-----------|---------------------|-----------------------|-------------|-------------------------------------|
+    // |    0      |   declareLabel      |   declare label       |    ps       |  guid,value                         |
+    // |    1      |   declareEntity     |   declare entity      |    p        |  guid                               |
+    // |    2      | declareEventClass   |  declare event class  |    p        |  guid                               |
+    // |    3      | declareRelationship | declare relationship  |    Ippp     |  relationshipType,relationshipGuid,
+    //                                                                            headGuid,tailGuid                  |
+    // |    4      |   declareEvent      |   declare event       |    @tp      |  timestamp,threadId,eventGuid       |
+
+    std::vector<std::vector<std::string>> timelineDirectoryMessages =
+        { {"declareLabel", "declare label", "ps", "guid,value"},
+          {"declareEntity", "declare entity", "p", "guid"},
+          {"declareEventClass", "declare event class", "p", "guid"},
+          {"declareRelationship", "declare relationship",
+              "Ippp", "relationshipType,relationshipGuid,headGuid,tailGuid"},
+          {"declareEvent", "declare event", "@tp", "timestamp,threadId,eventGuid"} };
+
+    unsigned int messagesDataLength = 0u;
+    std::vector<std::vector<std::vector<uint32_t>>> swTraceTimelineDirectoryMessages;
+
+    for (const auto& timelineDirectoryMessage : timelineDirectoryMessages)
+    {
+        messagesDataLength += uint32_t_size; // decl_id
+
+        std::vector<std::vector<uint32_t>> swTraceStringsVector;
+        for (const auto& label : timelineDirectoryMessage)
+        {
+            std::vector<uint32_t> swTraceString;
+            bool result = StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
+            if (!result)
+            {
+                return TimelinePacketStatus::Error;
+            }
+
+            messagesDataLength += boost::numeric_cast<unsigned int>(swTraceString.size()) * uint32_t_size;
+            swTraceStringsVector.push_back(swTraceString);
+        }
+        swTraceTimelineDirectoryMessages.push_back(swTraceStringsVector);
+    }
+
+    // Calculate the timeline directory binary packet size (in bytes)
+    unsigned int timelineDirectoryPacketSize = 2 * uint32_t_size + // Header (2 words)
+                                               messagesDataLength; // 5 messages length
+
+    // Check whether the timeline directory binary packet fits in the given buffer
+    if (timelineDirectoryPacketSize > bufferSize)
+    {
+        return TimelinePacketStatus::BufferExhaustion;
+    }
+
+    // Packet header word 1:
+    // 25:31 [7]  reserved: all zeros
+    // 24    [1]  sequence_numbered: when non-zero the 4 bytes following the header is a u32 sequence number
+    // 0:23  [24] data_length: unsigned 24-bit integer. Length of data, in bytes. Zero is permitted
+    uint32_t sequenceNumbered  = 0;
+    uint32_t dataLength        = boost::numeric_cast<uint32_t>(messagesDataLength);
+    uint32_t packetHeaderWord1 = ((sequenceNumbered & 0x00000001) << 24) |
+                                 ((dataLength       & 0x00FFFFFF) <<  0);
+
+    // Initialize the offset for writing in the buffer
+    unsigned int offset = 0;
+
+    // Write the timeline binary packet header to the buffer
+    WriteUint32(buffer, offset, packetHeaderWord0);
+    offset += uint32_t_size;
+    WriteUint32(buffer, offset, packetHeaderWord1);
+    offset += uint32_t_size;
+
+    for (unsigned int i = 0u; i < swTraceTimelineDirectoryMessages.size(); ++i)
+    {
+        // Write the timeline binary packet payload to the buffer
+        WriteUint32(buffer, offset, i); // decl_id
+        offset += uint32_t_size;
+
+        for (std::vector<uint32_t> swTraceString : swTraceTimelineDirectoryMessages[i])
+        {
+            for (uint32_t swTraceDeclStringWord : swTraceString)
+            {
+                WriteUint32(buffer, offset, swTraceDeclStringWord);
+                offset += uint32_t_size;
+            }
+        }
+    }
+
+    // Update the number of bytes written
+    numberOfBytesWritten = timelineDirectoryPacketSize;
+
+    return TimelinePacketStatus::Ok;
+}
+
 } // namespace profiling
 
 } // namespace armnn

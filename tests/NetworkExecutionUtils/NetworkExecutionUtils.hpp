@@ -464,7 +464,7 @@ int RunTest(const std::string& format,
     std::string modelFormat = boost::trim_copy(format);
     std::string modelPath = boost::trim_copy(path);
     std::vector<std::string> inputNamesVector = ParseStringList(inputNames, ",");
-    std::vector<std::string> inputTensorShapesVector = ParseStringList(inputTensorShapesStr, ";");
+    std::vector<std::string> inputTensorShapesVector = ParseStringList(inputTensorShapesStr, ":");
     std::vector<std::string> inputTensorDataFilePathsVector = ParseStringList(
         inputTensorDataFilePaths, ",");
     std::vector<std::string> outputNamesVector = ParseStringList(outputNames, ",");

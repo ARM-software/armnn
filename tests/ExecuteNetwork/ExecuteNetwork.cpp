@@ -67,12 +67,12 @@ int main(int argc, const char* argv[])
             ("subgraph-number,x", po::value<size_t>(&subgraphId)->default_value(0), "Id of the subgraph to be executed."
               "Defaults to 0")
             ("input-tensor-shape,s", po::value(&inputTensorShapes),
-             "The shape of the input tensors in the network as a flat array of integers separated by comma. "
-             "Several shapes can be passed separating them by semicolon. "
+             "The shape of the input tensors in the network as a flat array of integers separated by comma."
+             "Several shapes can be passed by separating them with a colon (:)."
              "This parameter is optional, depending on the network.")
             ("input-tensor-data,d", po::value(&inputTensorDataFilePaths),
              "Path to files containing the input data as a flat array separated by whitespace. "
-             "Several paths can be passed separating them by comma.")
+             "Several paths can be passed by separating them with a comma.")
             ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
              "If unset, defaults to \"float\" for all defined inputs. "
              "Accepted values (float, int or qasymm8)")

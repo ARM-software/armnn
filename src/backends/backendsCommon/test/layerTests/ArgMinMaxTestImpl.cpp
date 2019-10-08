@@ -190,7 +190,7 @@ LayerTestResult<int32_t, 3> ArgMaxHeightTest(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const armnn::TensorShape inputShape{ 1, 3, 2, 4};
-    const armnn::TensorShape outputShape{ 3, 1, 4 };
+    const armnn::TensorShape outputShape{ 1, 3, 4 };
 
     armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
     armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
@@ -219,7 +219,7 @@ LayerTestResult<int32_t, 3> ArgMinWidthTest(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     const armnn::TensorShape inputShape{ 1, 3, 2, 4};
-    const armnn::TensorShape outputShape{ 3, 2, 1 };
+    const armnn::TensorShape outputShape{ 1, 3, 2 };
 
     armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
     armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);

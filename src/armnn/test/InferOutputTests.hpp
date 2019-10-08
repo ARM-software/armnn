@@ -10,6 +10,7 @@
 #include <armnn/ArmNN.hpp>
 
 #include <Graph.hpp>
+#include <layers/ArgMinMaxLayer.hpp>
 #include <layers/BatchToSpaceNdLayer.hpp>
 #include <layers/SpaceToDepthLayer.hpp>
 #include <layers/PreluLayer.hpp>
@@ -17,6 +18,91 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
+
+void ArgMinMaxInferOutputShapeImpl(const armnn::ArgMinMaxDescriptor       descriptor,
+                                   const std::vector<armnn::TensorShape>& inputShapes,
+                                   std::vector<armnn::TensorShape>&       outputShapes)
+{
+    armnn::Graph graph;
+    auto argMinMaxLayer = graph.AddLayer<armnn::ArgMinMaxLayer>(descriptor, "argMinMax");
+    outputShapes = argMinMaxLayer->InferOutputShapes(inputShapes);
+}
+
+void ArgMinMaxInferOutputShape4dTest()
+{
+    armnn::Graph graph;
+    armnn::ArgMinMaxDescriptor descriptor;
+    descriptor.m_Axis = 2;
+
+    const std::vector<armnn::TensorShape> inputShapes
+    {
+        { 1, 3, 2, 4 }
+    };
+
+    std::vector<armnn::TensorShape> outputShapes;
+    BOOST_CHECK_NO_THROW(ArgMinMaxInferOutputShapeImpl(descriptor, inputShapes, outputShapes));
+
+    armnn::TensorShape expectedOutputShape( { 1, 3, 4 } );
+    BOOST_CHECK(outputShapes.size() == 1);
+    BOOST_CHECK(outputShapes[0] == expectedOutputShape);
+}
+
+void ArgMinMaxInferOutputShape3dTest()
+{
+    armnn::Graph graph;
+    armnn::ArgMinMaxDescriptor descriptor;
+    descriptor.m_Axis = 0;
+
+    const std::vector<armnn::TensorShape> inputShapes
+    {
+        { 1, 3, 2 }
+    };
+
+    std::vector<armnn::TensorShape> outputShapes;
+    BOOST_CHECK_NO_THROW(ArgMinMaxInferOutputShapeImpl(descriptor, inputShapes, outputShapes));
+
+    armnn::TensorShape expectedOutputShape( { 3, 2 } );
+    BOOST_CHECK(outputShapes.size() == 1);
+    BOOST_CHECK(outputShapes[0] == expectedOutputShape);
+}
+
+void ArgMinMaxInferOutputShape2dTest()
+{
+    armnn::Graph graph;
+    armnn::ArgMinMaxDescriptor descriptor;
+    descriptor.m_Axis = 1;
+
+    const std::vector<armnn::TensorShape> inputShapes
+    {
+        { 3, 2 }
+    };
+
+    std::vector<armnn::TensorShape> outputShapes;
+    BOOST_CHECK_NO_THROW(ArgMinMaxInferOutputShapeImpl(descriptor, inputShapes, outputShapes));
+
+    armnn::TensorShape expectedOutputShape( { 3 } );
+    BOOST_CHECK(outputShapes.size() == 1);
+    BOOST_CHECK(outputShapes[0] == expectedOutputShape);
+}
+
+void ArgMinMaxInferOutputShape1dTest()
+{
+    armnn::Graph graph;
+    armnn::ArgMinMaxDescriptor descriptor;
+    descriptor.m_Axis = 0;
+
+    const std::vector<armnn::TensorShape> inputShapes
+    {
+        { 5 }
+    };
+
+    std::vector<armnn::TensorShape> outputShapes;
+    BOOST_CHECK_NO_THROW(ArgMinMaxInferOutputShapeImpl(descriptor, inputShapes, outputShapes));
+
+    armnn::TensorShape expectedOutputShape( { 1 } );
+    BOOST_CHECK(outputShapes.size() == 1);
+    BOOST_CHECK(outputShapes[0] == expectedOutputShape);
+}
 
 void BatchToSpaceInferOutputShapeTest()
 {

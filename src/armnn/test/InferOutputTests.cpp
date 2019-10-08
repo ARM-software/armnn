@@ -11,6 +11,12 @@
 
 BOOST_AUTO_TEST_SUITE(LayerValidateOutput)
 
+// ArgMinMax
+ARMNN_SIMPLE_TEST_CASE(ArgMinMaxInferOutputShape4d, ArgMinMaxInferOutputShape4dTest)
+ARMNN_SIMPLE_TEST_CASE(ArgMinMaxInferOutputShape3d, ArgMinMaxInferOutputShape3dTest)
+ARMNN_SIMPLE_TEST_CASE(ArgMinMaxInferOutputShape2d, ArgMinMaxInferOutputShape2dTest)
+ARMNN_SIMPLE_TEST_CASE(ArgMinMaxInferOutputShape1d, ArgMinMaxInferOutputShape1dTest)
+
 // BatchToSpace
 ARMNN_SIMPLE_TEST_CASE(BatchToSpaceInferOutputShape, BatchToSpaceInferOutputShapeTest)
 

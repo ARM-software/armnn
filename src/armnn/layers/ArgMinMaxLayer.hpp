@@ -25,6 +25,11 @@ public:
     /// @param [in] graph The graph into which this layer is being cloned.
     ArgMinMaxLayer* Clone(Graph& graph) const override;
 
+    /// Infers the output shape from a given input shape and axis parameter.
+    /// @param [in] inputShapes The vector of input shapes for ArgMinMax.
+    /// @return A vector of inferred output shapes.
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
+
     /// Check if the input tensor shape(s)
     /// will lead to a valid configuration of @ref ArgMinMaxLayer.
     void ValidateTensorShapesFromInputs() override;

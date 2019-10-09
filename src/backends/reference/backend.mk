@@ -34,6 +34,7 @@ BACKEND_SOURCES := \
         workloads/ElementwiseFunction.cpp \
         workloads/FullyConnected.cpp \
         workloads/Gather.cpp \
+        workloads/InstanceNorm.cpp \
         workloads/LstmUtils.cpp \
         workloads/Mean.cpp \
         workloads/Concatenate.cpp \
@@ -60,6 +61,7 @@ BACKEND_SOURCES := \
         workloads/RefFloorWorkload.cpp \
         workloads/RefFullyConnectedWorkload.cpp \
         workloads/RefGatherWorkload.cpp \
+        workloads/RefInstanceNormalizationWorkload.cpp \
         workloads/RefL2NormalizationWorkload.cpp \
         workloads/RefLstmWorkload.cpp \
         workloads/RefMeanWorkload.cpp \

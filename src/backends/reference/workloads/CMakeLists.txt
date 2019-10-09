@@ -35,6 +35,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     FullyConnected.hpp
     Gather.cpp
     Gather.hpp
+    InstanceNorm.cpp
+    InstanceNorm.hpp
     LstmUtils.hpp
     LstmUtils.cpp
     Maximum.hpp
@@ -89,6 +91,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefFullyConnectedWorkload.hpp
     RefGatherWorkload.cpp
     RefGatherWorkload.hpp
+    RefInstanceNormalizationWorkload.cpp
+    RefInstanceNormalizationWorkload.hpp
     RefL2NormalizationWorkload.cpp
     RefL2NormalizationWorkload.hpp
     RefLstmWorkload.cpp

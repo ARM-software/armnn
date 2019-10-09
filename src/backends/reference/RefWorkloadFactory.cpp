@@ -481,4 +481,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSlice(const SliceQueueDescr
     return std::make_unique<RefSliceWorkload>(descriptor, info);
 }
 
+std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateInstanceNormalization(
+    const InstanceNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    return std::make_unique<RefInstanceNormalizationWorkload>(descriptor, info);
+}
+
 } // namespace armnn

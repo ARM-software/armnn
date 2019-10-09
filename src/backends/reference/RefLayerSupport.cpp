@@ -833,6 +833,37 @@ bool RefLayerSupport::IsInputSupported(const TensorInfo& input,
     return true;
 }
 
+bool RefLayerSupport::IsInstanceNormalizationSupported(const TensorInfo& input,
+                                                       const TensorInfo& output,
+                                                       const InstanceNormalizationDescriptor& descriptor,
+                                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+    // Define supported types
+    std::array<DataType, 4> supportedTypes =
+        {
+            DataType::Float32,
+            DataType::Float16
+        };
+
+    bool supported = true;
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Instance Normalization: input type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Instance Normalization: output type not supported.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Instance Normalization: input and output types mismatched.");
+
+    supported &= CheckSupportRule(ShapesAreSameTotalSize(input, output), reasonIfUnsupported,
+                                  "Reference Instance Normalization: input and output shapes have different "
+                                  "num total elements.");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                                  const TensorInfo& output,
                                                  const L2NormalizationDescriptor& descriptor,

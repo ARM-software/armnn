@@ -223,6 +223,9 @@ public:
     std::unique_ptr<IWorkload> CreateSlice(const SliceQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateInstanceNormalization(const InstanceNormalizationQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const override;
+
 private:
 
     template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>

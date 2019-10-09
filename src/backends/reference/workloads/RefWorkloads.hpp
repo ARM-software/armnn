@@ -36,6 +36,7 @@
 #include "RefFloorWorkload.hpp"
 #include "RefFakeQuantizationFloat32Workload.hpp"
 #include "RefGatherWorkload.hpp"
+#include "RefInstanceNormalizationWorkload.hpp"
 #include "RefL2NormalizationWorkload.hpp"
 #include "RefLstmWorkload.hpp"
 #include "RefMeanWorkload.hpp"

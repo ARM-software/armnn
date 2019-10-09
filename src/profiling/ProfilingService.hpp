@@ -109,7 +109,7 @@ protected:
     }
     ~ProfilingService() = default;
 
-    // Protected method for testing
+    // Protected methods for testing
     void SwapProfilingConnectionFactory(ProfilingService& instance,
                                         IProfilingConnectionFactory* other,
                                         IProfilingConnectionFactory*& backup)
@@ -119,6 +119,10 @@ protected:
 
         backup = instance.m_ProfilingConnectionFactory.release();
         instance.m_ProfilingConnectionFactory.reset(other);
+    }
+    IProfilingConnection* GetProfilingConnection(ProfilingService& instance)
+    {
+        return instance.m_ProfilingConnection.get();
     }
 };
 

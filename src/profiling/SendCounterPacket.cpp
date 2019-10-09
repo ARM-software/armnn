@@ -945,7 +945,7 @@ void SendCounterPacket::Stop(bool rethrowSendThreadExceptions)
     // Exception handling lock scope - Begin
     {
         // Lock the mutex to handle any exception coming from the send thread
-        std::unique_lock<std::mutex> lock(m_WaitMutex);
+        std::lock_guard<std::mutex> lock(m_WaitMutex);
 
         // Check if there's an exception to rethrow
         if (m_SendThreadException)

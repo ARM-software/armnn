@@ -2322,7 +2322,7 @@ BOOST_AUTO_TEST_CASE(SendThreadBufferTest1)
     BOOST_TEST(reservedBuffer.get());
 
     // Check that data was actually written to the profiling connection in any order
-    const std::vector<uint32_t>& writtenData = mockProfilingConnection.GetWrittenData();
+    const std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
     BOOST_TEST(writtenData.size() == 3);
     bool foundStreamMetaDataPacket =
         std::find(writtenData.begin(), writtenData.end(), streamMetadataPacketsize) != writtenData.end();
@@ -2391,7 +2391,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket3)
     BOOST_CHECK_NO_THROW(sendCounterPacket.Stop());
 
     // Check that the buffer contains one Stream Metadata packet
-    const std::vector<uint32_t>& writtenData = mockProfilingConnection.GetWrittenData();
+    const std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
     BOOST_TEST(writtenData.size() == 1);
     BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
 }
@@ -2420,7 +2420,7 @@ BOOST_AUTO_TEST_CASE(SendThreadSendStreamMetadataPacket4)
     BOOST_TEST((profilingStateMachine.GetCurrentState() == ProfilingState::WaitingForAck));
 
     // Check that the buffer contains one Stream Metadata packet
-    const std::vector<uint32_t>& writtenData = mockProfilingConnection.GetWrittenData();
+    const std::vector<uint32_t> writtenData = mockProfilingConnection.GetWrittenData();
     BOOST_TEST(writtenData.size() == 1);
     BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
 

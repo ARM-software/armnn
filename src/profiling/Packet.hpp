@@ -2,11 +2,12 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
 #include <armnn/Exceptions.hpp>
 
-#include <boost/log/trivial.hpp>
+#include <memory>
 
 namespace armnn
 {
@@ -46,26 +47,32 @@ public:
         }
     }
 
-    Packet(Packet&& other) :
-           m_Header(other.m_Header),
-           m_PacketFamily(other.m_PacketFamily),
-           m_PacketId(other.m_PacketId),
-           m_Length(other.m_Length),
-           m_Data(std::move(other.m_Data))
-    {}
+    Packet(Packet&& other)
+        : m_Header(other.m_Header)
+        , m_PacketFamily(other.m_PacketFamily)
+        , m_PacketId(other.m_PacketId)
+        , m_Length(other.m_Length)
+        , m_Data(std::move(other.m_Data))
+    {
+        other.m_Header = 0;
+        other.m_PacketFamily = 0;
+        other.m_PacketId = 0;
+        other.m_Length = 0;
+    }
+
+    ~Packet() = default;
 
     Packet(const Packet& other) = delete;
     Packet& operator=(const Packet&) = delete;
     Packet& operator=(Packet&&) = default;
 
-    uint32_t GetHeader() const;
-    uint32_t GetPacketFamily() const;
-    uint32_t GetPacketId() const;
-    uint32_t GetLength() const;
-    const char* const GetData() const;
-
-    uint32_t GetPacketClass() const;
-    uint32_t GetPacketType() const;
+    uint32_t GetHeader() const        { return m_Header;        }
+    uint32_t GetPacketFamily() const  { return m_PacketFamily;  }
+    uint32_t GetPacketId() const      { return m_PacketId;      }
+    uint32_t GetPacketClass() const   { return m_PacketId >> 3; }
+    uint32_t GetPacketType() const    { return m_PacketId & 7;  }
+    uint32_t GetLength() const        { return m_Length;        }
+    const char* const GetData() const { return m_Data.get();    }
 
     bool IsEmpty() { return m_Header == 0 && m_Length == 0; }
 

@@ -47,7 +47,11 @@ void ProfilingService::Update()
         m_StateMachine.TransitionToState(ProfilingState::NotConnected);
         break;
     case ProfilingState::NotConnected:
-        BOOST_ASSERT(m_ProfilingConnectionFactory);
+        // Stop the command thread (if running)
+        m_CommandHandler.Stop();
+
+        // Stop the send thread (if running)
+        m_SendCounterPacket.Stop(false);
 
         // Reset any existing profiling connection
         m_ProfilingConnection.reset();
@@ -55,13 +59,13 @@ void ProfilingService::Update()
         try
         {
             // Setup the profiling connection
-            //m_ProfilingConnection = m_ProfilingConnectionFactory.GetProfilingConnection(m_Options);
+            BOOST_ASSERT(m_ProfilingConnectionFactory);
             m_ProfilingConnection = m_ProfilingConnectionFactory->GetProfilingConnection(m_Options);
         }
         catch (const Exception& e)
         {
             BOOST_LOG_TRIVIAL(warning) << "An error has occurred when creating the profiling connection: "
-                                       << e.what();
+                                       << e.what() << std::endl;
         }
 
         // Move to the next state
@@ -229,13 +233,23 @@ void ProfilingService::InitializeCounterValue(uint16_t counterUid)
 void ProfilingService::Reset()
 {
     // Reset the profiling service
-    m_CounterDirectory.Clear();
-    m_ProfilingConnection.reset();
-    m_StateMachine.Reset();
-    m_CounterIndex.clear();
-    m_CounterValues.clear();
+
+    // The order in which we reset/stop the components is not trivial!
+
+    // First stop the threads (Command Handler first)...
     m_CommandHandler.Stop();
     m_SendCounterPacket.Stop(false);
+
+    // ...then destroy the profiling connection...
+    m_ProfilingConnection.reset();
+
+    // ...then delete all the counter data and configuration...
+    m_CounterIndex.clear();
+    m_CounterValues.clear();
+    m_CounterDirectory.Clear();
+
+    // ...finally reset the profiling state machine
+    m_StateMachine.Reset();
 }
 
 } // namespace profiling

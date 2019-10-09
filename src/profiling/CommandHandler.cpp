@@ -5,6 +5,8 @@
 
 #include "CommandHandler.hpp"
 
+#include <boost/log/trivial.hpp>
+
 namespace armnn
 {
 
@@ -39,7 +41,14 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
     {
         try
         {
-            Packet packet = profilingConnection.ReadPacket(m_Timeout);
+            Packet packet = profilingConnection.ReadPacket(m_Timeout.load());
+
+            if (packet.IsEmpty())
+            {
+                // Nothing to do, continue
+                continue;
+            }
+
             Version version = m_PacketVersionResolver.ResolvePacketVersion(packet.GetPacketId());
 
             CommandHandlerFunctor* commandHandlerFunctor =
@@ -49,19 +58,15 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
         }
         catch (const armnn::TimeoutException&)
         {
-            if (m_StopAfterTimeout)
+            if (m_StopAfterTimeout.load())
             {
-                m_KeepRunning.store(false, std::memory_order_relaxed);
+                m_KeepRunning.store(false);
             }
         }
         catch (const Exception& e)
         {
-            // Log the error
-            BOOST_LOG_TRIVIAL(warning) << "An error has occurred when handling a command: "
-                                       << e.what();
-
-            // Might want to differentiate the errors more
-            m_KeepRunning.store(false);
+            // Log the error and continue
+            BOOST_LOG_TRIVIAL(warning) << "An error has occurred when handling a command: " << e.what() << std::endl;
         }
     }
     while (m_KeepRunning.load());

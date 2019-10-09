@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "SendCounterPacketTests.hpp"
+#include "ProfilingTests.hpp"
 
 #include <CommandHandler.hpp>
 #include <CommandHandlerKey.hpp>
-#include <CommandHandlerFunctor.hpp>
 #include <CommandHandlerRegistry.hpp>
 #include <ConnectionAcknowledgedCommandHandler.hpp>
 #include <CounterDirectory.hpp>
@@ -19,7 +18,6 @@
 #include <PeriodicCounterCapture.hpp>
 #include <PeriodicCounterSelectionCommandHandler.hpp>
 #include <ProfilingStateMachine.hpp>
-#include <ProfilingService.hpp>
 #include <ProfilingUtils.hpp>
 #include <RequestCounterDirectoryCommandHandler.hpp>
 #include <Runtime.hpp>
@@ -27,21 +25,16 @@
 
 #include <armnn/Conversion.hpp>
 
-#include <Logging.hpp>
 #include <armnn/Utils.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/test/unit_test.hpp>
 
 #include <cstdint>
 #include <cstring>
-#include <iostream>
 #include <limits>
 #include <map>
 #include <random>
-#include <thread>
-#include <chrono>
 
 using namespace armnn::profiling;
 
@@ -94,59 +87,6 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
     BOOST_CHECK(vect == expectedVect);
 }
 
-class TestProfilingConnectionBase :public IProfilingConnection
-{
-public:
-    TestProfilingConnectionBase() = default;
-    ~TestProfilingConnectionBase() = default;
-
-    bool IsOpen() const override { return true; }
-
-    void Close() override {}
-
-    bool WritePacket(const unsigned char* buffer, uint32_t length) override { return false; }
-
-    Packet ReadPacket(uint32_t timeout) override
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-        std::unique_ptr<char[]> packetData;
-
-        // Return connection acknowledged packet
-        return { 65536, 0, packetData };
-    }
-};
-
-class TestProfilingConnectionTimeoutError : public TestProfilingConnectionBase
-{
-public:
-    Packet ReadPacket(uint32_t timeout) {
-        if (readRequests < 3)
-        {
-            readRequests++;
-            throw armnn::TimeoutException("Simulate a timeout");
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-        std::unique_ptr<char[]> packetData;
-
-        // Return connection acknowledged packet after three timeouts
-        return { 65536, 0, packetData };
-    }
-
-private:
-    int readRequests = 0;
-};
-
-class TestProfilingConnectionArmnnError :public TestProfilingConnectionBase
-{
-public:
-
-    Packet ReadPacket(uint32_t timeout)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-        throw armnn::Exception(": Simulate a non timeout error");
-    }
-};
-
 BOOST_AUTO_TEST_CASE(CheckCommandHandler)
 {
     PacketVersionResolver packetVersionResolver;
@@ -180,7 +120,7 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
     // commandHandler1 should give up after one timeout
-    CommandHandler commandHandler1(1,
+    CommandHandler commandHandler1(10,
                                    true,
                                    commandHandlerRegistry,
                                    packetVersionResolver);
@@ -204,32 +144,24 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
             break;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     commandHandler1.Stop();
 
     BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
 
-    CommandHandler commandHandler2(1,
+    CommandHandler commandHandler2(100,
                                    false,
                                    commandHandlerRegistry,
                                    packetVersionResolver);
 
     commandHandler2.Start(testProfilingConnectionArmnnError);
 
-    for (int i = 0; i < 100; i++)
-    {
-        if (!commandHandler2.IsRunning())
-        {
-            // commandHandler2 should stop once it encounters a non timing error
-            return;
-        }
+    // commandHandler2 should not stop once it encounters a non timing error
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    }
-
-    BOOST_ERROR("commandHandler2 has failed to stop");
+    BOOST_CHECK(commandHandler2.IsRunning());
     commandHandler2.Stop();
 }
 
@@ -299,33 +231,6 @@ BOOST_AUTO_TEST_CASE(CheckPacketClass)
     BOOST_CHECK(packetTest4.GetPacketType() == 3);
     BOOST_CHECK(packetTest4.GetPacketClass() == 5);
 }
-
-// Create Derived Classes
-class TestFunctorA : public CommandHandlerFunctor
-{
-public:
-    using CommandHandlerFunctor::CommandHandlerFunctor;
-
-    int GetCount() { return m_Count; }
-
-    void operator()(const Packet& packet) override
-    {
-        m_Count++;
-    }
-
-private:
-    int m_Count = 0;
-};
-
-class TestFunctorB : public TestFunctorA
-{
-    using TestFunctorA::TestFunctorA;
-};
-
-class TestFunctorC : public TestFunctorA
-{
-    using TestFunctorA::TestFunctorA;
-};
 
 BOOST_AUTO_TEST_CASE(CheckCommandHandlerFunctor)
 {
@@ -455,6 +360,7 @@ BOOST_AUTO_TEST_CASE(CheckPacketVersionResolver)
         BOOST_TEST(resolvedVersion == expectedVersion);
     }
 }
+
 void ProfilingCurrentStateThreadImpl(ProfilingStateMachine& states)
 {
     ProfilingState newState = ProfilingState::NotConnected;
@@ -664,32 +570,6 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisabled)
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
 }
 
-struct LogLevelSwapper
-{
-public:
-    LogLevelSwapper(armnn::LogSeverity severity)
-    {
-        // Set the new log level
-        armnn::ConfigureLogging(true, true, severity);
-    }
-    ~LogLevelSwapper()
-    {
-        // The default log level for unit tests is "Fatal"
-        armnn::ConfigureLogging(true, true, armnn::LogSeverity::Fatal);
-    }
-};
-
-struct CoutRedirect
-{
-public:
-    CoutRedirect(std::streambuf* newStreamBuffer)
-        : old(std::cout.rdbuf(newStreamBuffer)) {}
-    ~CoutRedirect() { std::cout.rdbuf(old); }
-
-private:
-    std::streambuf* old;
-};
-
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
@@ -705,7 +585,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
 
     // Redirect the output to a local stream so that we can parse the warning message
     std::stringstream ss;
-    CoutRedirect coutRedirect(ss.rdbuf());
+    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
     profilingService.Update();
     BOOST_CHECK(boost::contains(ss.str(), "Cannot connect to stream socket: Connection refused"));
 }
@@ -729,7 +609,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabledRuntime)
 
     // Redirect the output to a local stream so that we can parse the warning message
     std::stringstream ss;
-    CoutRedirect coutRedirect(ss.rdbuf());
+    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
     profilingService.Update();
     BOOST_CHECK(boost::contains(ss.str(), "Cannot connect to stream socket: Connection refused"));
 }
@@ -1949,16 +1829,18 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     profilingState.TransitionToState(ProfilingState::WaitingForAck);
     BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::WaitingForAck);
     // command handler received packet on ProfilingState::WaitingForAck
-    commandHandler(packetA);
+    BOOST_CHECK_NO_THROW(commandHandler(packetA));
     BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::Active);
 
     // command handler received packet on ProfilingState::Active
-    commandHandler(packetA);
+    BOOST_CHECK_NO_THROW(commandHandler(packetA));
     BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::Active);
 
     // command handler received different packet
     const uint32_t differentPacketId = 0x40000;
     Packet packetB(differentPacketId, dataLength1, uniqueData1);
+    profilingState.TransitionToState(ProfilingState::NotConnected);
+    profilingState.TransitionToState(ProfilingState::WaitingForAck);
     ConnectionAcknowledgedCommandHandler differentCommandHandler(differentPacketId, version, profilingState);
     BOOST_CHECK_THROW(differentCommandHandler(packetB), armnn::Exception);
 }
@@ -2333,62 +2215,17 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
     BOOST_TEST(categoryRecordOffset ==  44);
 }
 
-class MockProfilingConnectionFactory : public IProfilingConnectionFactory
-{
-public:
-    MockProfilingConnectionFactory()
-        : m_MockProfilingConnection(new MockProfilingConnection())
-    {}
-
-    IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const override
-    {
-        return std::unique_ptr<MockProfilingConnection>(m_MockProfilingConnection);
-    }
-
-    MockProfilingConnection* GetMockProfilingConnection() { return m_MockProfilingConnection; }
-
-private:
-    MockProfilingConnection* m_MockProfilingConnection;
-};
-
-class SwapProfilingConnectionFactoryHelper : public ProfilingService
-{
-public:
-    SwapProfilingConnectionFactoryHelper()
-        : ProfilingService()
-        , m_MockProfilingConnectionFactory(new MockProfilingConnectionFactory())
-        , m_BackupProfilingConnectionFactory(nullptr)
-    {
-        SwapProfilingConnectionFactory(ProfilingService::Instance(),
-                                       m_MockProfilingConnectionFactory.get(),
-                                       m_BackupProfilingConnectionFactory);
-    }
-    ~SwapProfilingConnectionFactoryHelper()
-    {
-        IProfilingConnectionFactory* temp = nullptr;
-        SwapProfilingConnectionFactory(ProfilingService::Instance(),
-                                       m_BackupProfilingConnectionFactory,
-                                       temp);
-    }
-
-    IProfilingConnectionFactory* GetMockProfilingConnectionFactory() { return m_MockProfilingConnectionFactory.get(); }
-
-private:
-    IProfilingConnectionFactoryPtr m_MockProfilingConnectionFactory;
-    IProfilingConnectionFactory* m_BackupProfilingConnectionFactory;
-};
-
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
 
+    // Swap the profiling connection factory in the profiling service instance with our mock one
     SwapProfilingConnectionFactoryHelper helper;
-    MockProfilingConnectionFactory* mockProfilingConnectionFactory =
-            boost::polymorphic_downcast<MockProfilingConnectionFactory*>(helper.GetMockProfilingConnectionFactory());
-    BOOST_CHECK(mockProfilingConnectionFactory);
-    MockProfilingConnection* mockProfilingConnection = mockProfilingConnectionFactory->GetMockProfilingConnection();
-    BOOST_CHECK(mockProfilingConnection);
+
+    // Redirect the standard output to a local stream so that we can parse the warning message
+    std::stringstream ss;
+    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Calculate the size of a Stream Metadata packet
     std::string processName = GetProcessName().substr(0, 60);
@@ -2408,15 +2245,15 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
     profilingService.Update();
 
-    // Redirect the output to a local stream so that we can parse the warning message
-    std::stringstream ss;
-    CoutRedirect coutRedirect(ss.rdbuf());
-
     // Wait for a bit to make sure that we get the packet
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
+    // Get the mock profiling connection
+    MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
+    BOOST_CHECK(mockProfilingConnection);
+
     // Check that the mock profiling connection contains one Stream Metadata packet
-    const std::vector<uint32_t>& writtenData = mockProfilingConnection->GetWrittenData();
+    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
     BOOST_TEST(writtenData.size() == 1);
     BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
 
@@ -2433,7 +2270,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     uint32_t header = ((packetFamily & 0x0000003F) << 26) |
                       ((packetId     & 0x000003FF) << 16);
 
-    // Connection Acknowledged Packet
+    // Create the Connection Acknowledged Packet
     Packet connectionAcknowledgedPacket(header);
 
     // Write the packet to the mock profiling connection
@@ -2441,23 +2278,23 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
 
     // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
     // the Connection Acknowledged packet gets processed by the profiling service
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     // Check that the expected error has occurred and logged to the standard output
     BOOST_CHECK(boost::contains(ss.str(), "Functor with requested PacketId=37 and Version=4194304 does not exist"));
 
     // The Connection Acknowledged Command Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
+
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
 {
+    // Swap the profiling connection factory in the profiling service instance with our mock one
     SwapProfilingConnectionFactoryHelper helper;
-    MockProfilingConnectionFactory* mockProfilingConnectionFactory =
-            boost::polymorphic_downcast<MockProfilingConnectionFactory*>(helper.GetMockProfilingConnectionFactory());
-    BOOST_CHECK(mockProfilingConnectionFactory);
-    MockProfilingConnection* mockProfilingConnection = mockProfilingConnectionFactory->GetMockProfilingConnection();
-    BOOST_CHECK(mockProfilingConnection);
 
     // Calculate the size of a Stream Metadata packet
     std::string processName = GetProcessName().substr(0, 60);
@@ -2480,8 +2317,12 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     // Wait for a bit to make sure that we get the packet
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
+    // Get the mock profiling connection
+    MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
+    BOOST_CHECK(mockProfilingConnection);
+
     // Check that the mock profiling connection contains one Stream Metadata packet
-    const std::vector<uint32_t>& writtenData = mockProfilingConnection->GetWrittenData();
+    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
     BOOST_TEST(writtenData.size() == 1);
     BOOST_TEST(writtenData[0] == streamMetadataPacketsize);
 
@@ -2498,7 +2339,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     uint32_t header = ((packetFamily & 0x0000003F) << 26) |
                       ((packetId     & 0x000003FF) << 16);
 
-    // Connection Acknowledged Packet
+    // Create the Connection Acknowledged Packet
     Packet connectionAcknowledgedPacket(header);
 
     // Write the packet to the mock profiling connection
@@ -2506,10 +2347,14 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
 
     // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
     // the Connection Acknowledged packet gets processed by the profiling service
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     // The Connection Acknowledged Command Handler should have updated the profiling state accordingly
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

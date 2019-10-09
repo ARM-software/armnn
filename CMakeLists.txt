@@ -451,7 +451,6 @@ list(APPEND armnn_sources
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
     src/profiling/IProfilingConnectionFactory.hpp
-    src/profiling/Packet.cpp
     src/profiling/Packet.hpp
     src/profiling/PacketBuffer.cpp
     src/profiling/PacketBuffer.hpp
@@ -599,7 +598,9 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/BufferTests.cpp
         src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp
         src/profiling/test/ProfilingTests.cpp
+        src/profiling/test/ProfilingTests.hpp
         src/profiling/test/SendCounterPacketTests.cpp
+        src/profiling/test/SendCounterPacketTests.hpp
         src/profiling/test/TimelinePacketTests.cpp
         )
 

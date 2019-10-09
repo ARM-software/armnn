@@ -12,6 +12,7 @@
 #include <armnn/Optional.hpp>
 #include <armnn/Conversion.hpp>
 
+#include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace armnn
@@ -19,6 +20,7 @@ namespace armnn
 
 namespace profiling
 {
+
 class MockProfilingConnection : public IProfilingConnection
 {
 public:
@@ -28,9 +30,19 @@ public:
         , m_Packet()
     {}
 
-    bool IsOpen() const override { return m_IsOpen; }
+    bool IsOpen() const override
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
 
-    void Close() override { m_IsOpen = false; }
+        return m_IsOpen;
+    }
+
+    void Close() override
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+
+        m_IsOpen = false;
+    }
 
     bool WritePacket(const unsigned char* buffer, uint32_t length) override
     {
@@ -39,11 +51,15 @@ public:
             return false;
         }
 
+        std::lock_guard<std::mutex> lock(m_Mutex);
+
         m_WrittenData.push_back(length);
         return true;
     }
     bool WritePacket(Packet&& packet)
     {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+
         m_Packet = std::move(packet);
         return true;
     }
@@ -51,19 +67,32 @@ public:
     Packet ReadPacket(uint32_t timeout) override
     {
         // Simulate a delay in the reading process
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+
+        std::lock_guard<std::mutex> lock(m_Mutex);
 
         return std::move(m_Packet);
     }
 
-    const std::vector<uint32_t>& GetWrittenData() const { return m_WrittenData; }
+    const std::vector<uint32_t> GetWrittenData() const
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
 
-    void Clear() { m_WrittenData.clear(); }
+        return m_WrittenData;
+    }
+
+    void Clear()
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+
+        m_WrittenData.clear();
+    }
 
 private:
     bool m_IsOpen;
     std::vector<uint32_t> m_WrittenData;
     Packet m_Packet;
+    mutable std::mutex m_Mutex;
 };
 
 class MockPacketBuffer : public IPacketBuffer
@@ -162,7 +191,7 @@ public:
 
     IPacketBufferPtr Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
     {
-        std::unique_lock<std::mutex> lock(m_Mutex);
+        std::lock_guard<std::mutex> lock(m_Mutex);
 
         reservedSize = 0;
         if (requestedSize > m_MaxBufferSize)
@@ -176,7 +205,7 @@ public:
 
     void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) override
     {
-        std::unique_lock<std::mutex> lock(m_Mutex);
+        std::lock_guard<std::mutex> lock(m_Mutex);
 
         packetBuffer->Commit(size);
         m_BufferList.push_back(std::move(packetBuffer));
@@ -185,14 +214,14 @@ public:
 
     void Release(IPacketBufferPtr& packetBuffer) override
     {
-        std::unique_lock<std::mutex> lock(m_Mutex);
+        std::lock_guard<std::mutex> lock(m_Mutex);
 
         packetBuffer->Release();
     }
 
     IPacketBufferPtr GetReadableBuffer() override
     {
-        std::unique_lock<std::mutex> lock(m_Mutex);
+        std::lock_guard<std::mutex> lock(m_Mutex);
 
         if (m_BufferList.empty())
         {
@@ -206,7 +235,7 @@ public:
 
     void MarkRead(IPacketBufferPtr& packetBuffer) override
     {
-        std::unique_lock<std::mutex> lock(m_Mutex);
+        std::lock_guard<std::mutex> lock(m_Mutex);
 
         m_ReadSize += packetBuffer->GetSize();
         packetBuffer->MarkRead();

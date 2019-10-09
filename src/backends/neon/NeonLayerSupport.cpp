@@ -28,6 +28,7 @@
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonDequantizeWorkload.hpp"
 #include "workloads/NeonGreaterWorkload.hpp"
+#include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonLstmFloatWorkload.hpp"
 #include "workloads/NeonMaximumWorkload.hpp"
@@ -364,6 +365,18 @@ bool NeonLayerSupport::IsInputSupported(const TensorInfo& input,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     return IsNeonBackendSupported(reasonIfUnsupported);
+}
+
+bool NeonLayerSupport::IsInstanceNormalizationSupported(const TensorInfo& input,
+                                                        const TensorInfo& output,
+                                                        const InstanceNormalizationDescriptor& descriptor,
+                                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonInstanceNormalizationWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,

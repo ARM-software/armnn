@@ -473,6 +473,13 @@ ARMNN_AUTO_TEST_CASE(Multiplication5d, Multiplication5dTest)
 ARMNN_AUTO_TEST_CASE(BatchNormFloat32, BatchNormFloat32Test)
 ARMNN_AUTO_TEST_CASE(BatchNormFloat32Nhwc, BatchNormFloat32NhwcTest)
 
+// InstanceNormalization
+ARMNN_AUTO_TEST_CASE(InstanceNormFloat32Nchw, InstanceNormFloat32Test, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(InstanceNormFloat32Nhwc, InstanceNormFloat32Test, DataLayout::NHWC);
+
+ARMNN_AUTO_TEST_CASE(InstanceNormFloat32Nchw2, InstanceNormFloat32Test2, DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(InstanceNormFloat32Nhwc2, InstanceNormFloat32Test2, DataLayout::NHWC);
+
 // Constant
 ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
 ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8SimpleQuantizationScaleNoOffsetTest)
@@ -518,6 +525,7 @@ ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim3, Concat4dDiffShapeDim3Test, false)
 ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim0Uint8, Concat4dDiffShapeDim0Uint8Test)
 ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim1Uint8, Concat4dDiffShapeDim1Uint8Test)
 ARMNN_AUTO_TEST_CASE(Concat4dDiffShapeDim3Uint8, Concat4dDiffShapeDim3Uint8Test, false)
+
 // L2 Normalization
 ARMNN_AUTO_TEST_CASE(L2Normalization1d, L2Normalization1dTest, DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(L2Normalization2d, L2Normalization2dTest, DataLayout::NCHW)

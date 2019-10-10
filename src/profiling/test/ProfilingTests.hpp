@@ -71,8 +71,7 @@ public:
         std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
 
         // Return connection acknowledged packet
-        std::unique_ptr<char[]> packetData;
-        return Packet(65536, 0, packetData);
+        return Packet(65536);
     }
 };
 
@@ -94,8 +93,7 @@ public:
         }
 
         // Return connection acknowledged packet after three timeouts
-        std::unique_ptr<char[]> packetData;
-        return Packet(65536, 0, packetData);
+        return Packet(65536);
     }
 
 private:

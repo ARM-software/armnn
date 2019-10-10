@@ -64,7 +64,7 @@ private:
 
     void DumpIncomingToFile(const Packet& packet);
 
-    bool DumpOutgoingToFile(const char* buffer, uint32_t length);
+    bool DumpOutgoingToFile(const unsigned char* buffer, uint32_t length);
 
     void Fail(const std::string& errorMessage);
 

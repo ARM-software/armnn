@@ -51,7 +51,7 @@ bool ProfilingConnectionDumpToFileDecorator::WritePacket(const unsigned char* bu
     bool success = true;
     if (m_Settings.m_DumpOutgoing)
     {
-        success &= DumpOutgoingToFile(reinterpret_cast<const char*>(buffer), length);
+        success &= DumpOutgoingToFile(buffer, length);
     }
     success &= m_Connection->WritePacket(buffer, length);
     return success;
@@ -105,7 +105,8 @@ void ProfilingConnectionDumpToFileDecorator::DumpIncomingToFile(const Packet& pa
 
     m_IncomingDumpFileStream.write(reinterpret_cast<const char*>(&header), sizeof header);
     m_IncomingDumpFileStream.write(reinterpret_cast<const char*>(&packetLength), sizeof packetLength);
-    m_IncomingDumpFileStream.write(packet.GetData(), boost::numeric_cast<std::streamsize>(packetLength));
+    m_IncomingDumpFileStream.write(reinterpret_cast<const char*>(packet.GetData()),
+                                   boost::numeric_cast<std::streamsize>(packetLength));
 
     success &= m_IncomingDumpFileStream.good();
     if (!(success || m_Settings.m_IgnoreFileErrors))
@@ -122,7 +123,7 @@ void ProfilingConnectionDumpToFileDecorator::DumpIncomingToFile(const Packet& pa
 /// @param buffer pointer to data to write
 /// @param length number of bytes to write
 /// @return true if write successful, false otherwise
-bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const char* buffer, uint32_t length)
+bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const unsigned char* buffer, uint32_t length)
 {
     bool success = true;
     if (!m_OutgoingDumpFileStream.is_open())
@@ -136,7 +137,8 @@ bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const char* buff
     }
 
     // attempt to write binary data
-    m_OutgoingDumpFileStream.write(buffer, boost::numeric_cast<std::streamsize>(length));
+    m_OutgoingDumpFileStream.write(reinterpret_cast<const char*>(buffer),
+                                   boost::numeric_cast<std::streamsize>(length));
     success &= m_OutgoingDumpFileStream.good();
     if (!(success || m_Settings.m_IgnoreFileErrors))
     {

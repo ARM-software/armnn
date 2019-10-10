@@ -32,7 +32,7 @@ class DummyProfilingConnection : public IProfilingConnection
 public:
     DummyProfilingConnection()
         : m_Open(true)
-        , m_PacketData(std::make_unique<char[]>(g_DataLength))
+        , m_PacketData(std::make_unique<unsigned char[]>(g_DataLength))
     {
         // populate packet data and construct packet
         std::memcpy(m_PacketData.get(), g_DataPtr, g_DataLength);
@@ -65,8 +65,8 @@ public:
     }
 
 private:
-    bool                    m_Open;
-    std::unique_ptr<char[]> m_PacketData;
+    bool m_Open;
+    std::unique_ptr<unsigned char[]> m_PacketData;
     std::unique_ptr<Packet> m_Packet;
 };
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
     decorator.Close();
 
     std::vector<char> data = ReadDumpFile(settings.m_IncomingDumpFileName);
-    const char* packetData = packet->GetData();
+    const char* packetData = reinterpret_cast<const char*>(packet->GetData());
 
     // check if the data read back from the dump file matches the original
     constexpr unsigned int bytesToSkip = 2u * sizeof(uint32_t); // skip header and packet length

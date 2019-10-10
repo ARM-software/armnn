@@ -119,10 +119,10 @@ Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
         uint32_t dataLength = 0;
         std::memcpy(&dataLength, header + 4u, sizeof(dataLength));
 
-        std::unique_ptr<char[]> packetData;
+        std::unique_ptr<unsigned char[]> packetData;
         if (dataLength > 0)
         {
-            packetData = std::make_unique<char[]>(dataLength);
+            packetData = std::make_unique<unsigned char[]>(dataLength);
         }
 
         ssize_t receivedLength = recv(m_Socket[0].fd, packetData.get(), dataLength, 0);

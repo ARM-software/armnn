@@ -198,9 +198,9 @@ BOOST_AUTO_TEST_CASE(CheckEncodeVersion)
 BOOST_AUTO_TEST_CASE(CheckPacketClass)
 {
     uint32_t length = 4;
-    std::unique_ptr<char[]> packetData0 = std::make_unique<char[]>(length);
-    std::unique_ptr<char[]> packetData1 = std::make_unique<char[]>(0);
-    std::unique_ptr<char[]> nullPacketData;
+    std::unique_ptr<unsigned char[]> packetData0 = std::make_unique<unsigned char[]>(length);
+    std::unique_ptr<unsigned char[]> packetData1 = std::make_unique<unsigned char[]>(0);
+    std::unique_ptr<unsigned char[]> nullPacketData;
 
     Packet packetTest0(472580096, length, packetData0);
 
@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE(CheckPacketClass)
     BOOST_CHECK(packetTest3.GetLength() == 0);
     BOOST_CHECK(packetTest3.GetData() == nullptr);
 
-    const char* packetTest0Data = packetTest0.GetData();
+    const unsigned char* packetTest0Data = packetTest0.GetData();
     Packet packetTest4(std::move(packetTest0));
 
     BOOST_CHECK(packetTest0.GetData() == nullptr);
@@ -260,9 +260,9 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerFunctor)
     it++;
     BOOST_CHECK(it->first==keyC);
 
-    std::unique_ptr<char[]> packetDataA;
-    std::unique_ptr<char[]> packetDataB;
-    std::unique_ptr<char[]> packetDataC;
+    std::unique_ptr<unsigned char[]> packetDataA;
+    std::unique_ptr<unsigned char[]> packetDataB;
+    std::unique_ptr<unsigned char[]> packetDataC;
 
     Packet packetA(500000000, 0, packetDataA);
     Packet packetB(600000000, 0, packetDataB);
@@ -302,9 +302,9 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerRegistry)
     registry.RegisterFunctor(&testFunctorB);
     registry.RegisterFunctor(&testFunctorC);
 
-    std::unique_ptr<char[]> packetDataA;
-    std::unique_ptr<char[]> packetDataB;
-    std::unique_ptr<char[]> packetDataC;
+    std::unique_ptr<unsigned char[]> packetDataA;
+    std::unique_ptr<unsigned char[]> packetDataB;
+    std::unique_ptr<unsigned char[]> packetDataC;
 
     Packet packetA(500000000, 0, packetDataA);
     Packet packetB(600000000, 0, packetDataB);
@@ -1707,7 +1707,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     uint32_t dataLength1 = 8;
     uint32_t offset = 0;
 
-    std::unique_ptr<char[]> uniqueData1 = std::make_unique<char[]>(dataLength1);
+    std::unique_ptr<unsigned char[]> uniqueData1 = std::make_unique<unsigned char[]>(dataLength1);
     unsigned char* data1 = reinterpret_cast<unsigned char*>(uniqueData1.get());
 
     WriteUint32(data1, offset, period1);
@@ -1758,7 +1758,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     uint32_t period2 = 11;
     uint32_t dataLength2 = 4;
 
-    std::unique_ptr<char[]> uniqueData2 = std::make_unique<char[]>(dataLength2);
+    std::unique_ptr<unsigned char[]> uniqueData2 = std::make_unique<unsigned char[]>(dataLength2);
 
     WriteUint32(reinterpret_cast<unsigned char*>(uniqueData2.get()), 0, period2);
 
@@ -1802,7 +1802,7 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     uint32_t dataLength1 = 8;
     uint32_t offset = 0;
 
-    std::unique_ptr<char[]> uniqueData1 = std::make_unique<char[]>(dataLength1);
+    std::unique_ptr<unsigned char[]> uniqueData1 = std::make_unique<unsigned char[]>(dataLength1);
     unsigned char* data1 = reinterpret_cast<unsigned char*>(uniqueData1.get());
 
     WriteUint32(data1, offset, period1);

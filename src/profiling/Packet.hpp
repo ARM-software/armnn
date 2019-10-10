@@ -33,7 +33,7 @@ public:
         m_PacketFamily = (header >> 26);
     }
 
-    Packet(uint32_t header, uint32_t length, std::unique_ptr<char[]>& data)
+    Packet(uint32_t header, uint32_t length, std::unique_ptr<unsigned char[]>& data)
         : m_Header(header)
         , m_Length(length)
         , m_Data(std::move(data))
@@ -66,13 +66,13 @@ public:
     Packet& operator=(const Packet&) = delete;
     Packet& operator=(Packet&&) = default;
 
-    uint32_t GetHeader() const        { return m_Header;        }
-    uint32_t GetPacketFamily() const  { return m_PacketFamily;  }
-    uint32_t GetPacketId() const      { return m_PacketId;      }
-    uint32_t GetPacketClass() const   { return m_PacketId >> 3; }
-    uint32_t GetPacketType() const    { return m_PacketId & 7;  }
-    uint32_t GetLength() const        { return m_Length;        }
-    const char* const GetData() const { return m_Data.get();    }
+    uint32_t GetHeader() const                 { return m_Header;        }
+    uint32_t GetPacketFamily() const           { return m_PacketFamily;  }
+    uint32_t GetPacketId() const               { return m_PacketId;      }
+    uint32_t GetPacketClass() const            { return m_PacketId >> 3; }
+    uint32_t GetPacketType() const             { return m_PacketId & 7;  }
+    uint32_t GetLength() const                 { return m_Length;        }
+    const unsigned char* const GetData() const { return m_Data.get();    }
 
     bool IsEmpty() { return m_Header == 0 && m_Length == 0; }
 
@@ -81,7 +81,7 @@ private:
     uint32_t m_PacketFamily;
     uint32_t m_PacketId;
     uint32_t m_Length;
-    std::unique_ptr<char[]> m_Data;
+    std::unique_ptr<unsigned char[]> m_Data;
 };
 
 } // namespace profiling

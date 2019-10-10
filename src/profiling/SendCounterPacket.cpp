@@ -1035,16 +1035,20 @@ void SendCounterPacket::Send(IProfilingConnection& profilingConnection)
     }
 
     // Ensure that all readable data got written to the profiling connection before the thread is stopped
-    FlushBuffer(profilingConnection);
+    // (do not notify any watcher in this case, as this is just to wrap up things before shutting down the send thread)
+    FlushBuffer(profilingConnection, false);
 
     // Mark the send thread as not running
     m_IsRunning.store(false);
 }
 
-void SendCounterPacket::FlushBuffer(IProfilingConnection& profilingConnection)
+void SendCounterPacket::FlushBuffer(IProfilingConnection& profilingConnection, bool notifyWatchers)
 {
     // Get the first available readable buffer
     std::unique_ptr<IPacketBuffer> packetBuffer = m_BufferManager.GetReadableBuffer();
+
+    // Initialize the flag that indicates whether at least a packet has been sent
+    bool packetsSent = false;
 
     while (packetBuffer != nullptr)
     {
@@ -1066,6 +1070,9 @@ void SendCounterPacket::FlushBuffer(IProfilingConnection& profilingConnection)
         {
             // Write a packet to the profiling connection. Silently ignore any write error and continue
             profilingConnection.WritePacket(readBuffer, boost::numeric_cast<uint32_t>(readBufferSize));
+
+            // Set the flag that indicates whether at least a packet has been sent
+            packetsSent = true;
         }
 
         // Mark the packet buffer as read
@@ -1073,6 +1080,13 @@ void SendCounterPacket::FlushBuffer(IProfilingConnection& profilingConnection)
 
         // Get the next available readable buffer
         packetBuffer = m_BufferManager.GetReadableBuffer();
+    }
+
+    // Check whether at least a packet has been sent
+    if (packetsSent && notifyWatchers)
+    {
+        // Notify to any watcher that something has been sent
+        m_PacketSentWaitCondition.notify_one();
     }
 }
 

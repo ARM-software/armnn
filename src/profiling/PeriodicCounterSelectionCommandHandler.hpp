@@ -10,10 +10,7 @@
 #include "Holder.hpp"
 #include "SendCounterPacket.hpp"
 #include "IPeriodicCounterCapture.hpp"
-
-#include <vector>
-#include <thread>
-#include <atomic>
+#include "ICounterValues.hpp"
 
 namespace armnn
 {
@@ -25,22 +22,30 @@ class PeriodicCounterSelectionCommandHandler : public CommandHandlerFunctor
 {
 
 public:
-    PeriodicCounterSelectionCommandHandler(uint32_t packetId, uint32_t version, Holder& captureDataHolder,
-                                           IPeriodicCounterCapture& captureThread,
-                                           ISendCounterPacket& sendCounterPacket)
-    : CommandHandlerFunctor(packetId, version),
-    m_CaptureDataHolder(captureDataHolder),
-    m_CaptureThread(captureThread),
-    m_SendCounterPacket(sendCounterPacket)
+    PeriodicCounterSelectionCommandHandler(uint32_t packetId,
+                                           uint32_t version,
+                                           Holder& captureDataHolder,
+                                           IPeriodicCounterCapture& periodicCounterCapture,
+                                           const IReadCounterValues& readCounterValue,
+                                           ISendCounterPacket& sendCounterPacket,
+                                           const ProfilingStateMachine& profilingStateMachine)
+        : CommandHandlerFunctor(packetId, version)
+        , m_CaptureDataHolder(captureDataHolder)
+        , m_PeriodicCounterCapture(periodicCounterCapture)
+        , m_ReadCounterValues(readCounterValue)
+        , m_SendCounterPacket(sendCounterPacket)
+        , m_StateMachine(profilingStateMachine)
     {}
 
     void operator()(const Packet& packet) override;
 
-
 private:
     Holder& m_CaptureDataHolder;
-    IPeriodicCounterCapture& m_CaptureThread;
+    IPeriodicCounterCapture& m_PeriodicCounterCapture;
+    const IReadCounterValues& m_ReadCounterValues;
     ISendCounterPacket& m_SendCounterPacket;
+    const ProfilingStateMachine& m_StateMachine;
+
     void ParseData(const Packet& packet, CaptureData& captureData);
 };
 

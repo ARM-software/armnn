@@ -53,6 +53,9 @@ void ProfilingService::Update()
         // Stop the send thread (if running)
         m_SendCounterPacket.Stop(false);
 
+        // Stop the periodic counter capture thread (if running)
+        m_PeriodicCounterCapture.Stop();
+
         // Reset any existing profiling connection
         m_ProfilingConnection.reset();
 
@@ -90,6 +93,9 @@ void ProfilingService::Update()
         break;
     case ProfilingState::Active:
 
+        // The period counter capture thread is started by the Periodic Counter Selection command handler upon
+        // request by an external profiling service
+
         break;
     default:
         throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1")
@@ -112,9 +118,14 @@ uint16_t ProfilingService::GetCounterCount() const
     return m_CounterDirectory.GetCounterCount();
 }
 
+bool ProfilingService::IsCounterRegistered(uint16_t counterUid) const
+{
+    return counterUid < m_CounterIndex.size();
+}
+
 uint32_t ProfilingService::GetCounterValue(uint16_t counterUid) const
 {
-    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
     BOOST_ASSERT(counterValuePtr);
     return counterValuePtr->load(std::memory_order::memory_order_relaxed);
@@ -122,7 +133,7 @@ uint32_t ProfilingService::GetCounterValue(uint16_t counterUid) const
 
 void ProfilingService::SetCounterValue(uint16_t counterUid, uint32_t value)
 {
-    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
     BOOST_ASSERT(counterValuePtr);
     counterValuePtr->store(value, std::memory_order::memory_order_relaxed);
@@ -130,7 +141,7 @@ void ProfilingService::SetCounterValue(uint16_t counterUid, uint32_t value)
 
 uint32_t ProfilingService::AddCounterValue(uint16_t counterUid, uint32_t value)
 {
-    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
     BOOST_ASSERT(counterValuePtr);
     return counterValuePtr->fetch_add(value, std::memory_order::memory_order_relaxed);
@@ -138,7 +149,7 @@ uint32_t ProfilingService::AddCounterValue(uint16_t counterUid, uint32_t value)
 
 uint32_t ProfilingService::SubtractCounterValue(uint16_t counterUid, uint32_t value)
 {
-    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
     BOOST_ASSERT(counterValuePtr);
     return counterValuePtr->fetch_sub(value, std::memory_order::memory_order_relaxed);
@@ -146,7 +157,7 @@ uint32_t ProfilingService::SubtractCounterValue(uint16_t counterUid, uint32_t va
 
 uint32_t ProfilingService::IncrementCounterValue(uint16_t counterUid)
 {
-    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
     BOOST_ASSERT(counterValuePtr);
     return counterValuePtr->operator++(std::memory_order::memory_order_relaxed);
@@ -154,7 +165,7 @@ uint32_t ProfilingService::IncrementCounterValue(uint16_t counterUid)
 
 uint32_t ProfilingService::DecrementCounterValue(uint16_t counterUid)
 {
-    BOOST_ASSERT(counterUid < m_CounterIndex.size());
+    CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
     BOOST_ASSERT(counterValuePtr);
     return counterValuePtr->operator--(std::memory_order::memory_order_relaxed);
@@ -239,6 +250,7 @@ void ProfilingService::Reset()
     // First stop the threads (Command Handler first)...
     m_CommandHandler.Stop();
     m_SendCounterPacket.Stop(false);
+    m_PeriodicCounterCapture.Stop();
 
     // ...then destroy the profiling connection...
     m_ProfilingConnection.reset();
@@ -250,6 +262,14 @@ void ProfilingService::Reset()
 
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
+}
+
+inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const
+{
+    if (!IsCounterRegistered(counterUid))
+    {
+        throw InvalidArgumentException(boost::str(boost::format("Counter UID %1% is not registered") % counterUid));
+    }
 }
 
 } // namespace profiling

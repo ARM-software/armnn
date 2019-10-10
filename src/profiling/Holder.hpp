@@ -27,12 +27,12 @@ public:
         : m_CapturePeriod(captureData.m_CapturePeriod)
         , m_CounterIds(captureData.m_CounterIds) {}
 
-    CaptureData& operator= (const CaptureData& captureData);
+    CaptureData& operator=(const CaptureData& other);
 
     void SetCapturePeriod(uint32_t capturePeriod);
     void SetCounterIds(const std::vector<uint16_t>& counterIds);
     uint32_t GetCapturePeriod() const;
-    std::vector<uint16_t> GetCounterIds() const;
+    const std::vector<uint16_t>& GetCounterIds() const;
 
 private:
     uint32_t m_CapturePeriod;

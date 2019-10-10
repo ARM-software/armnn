@@ -12,8 +12,10 @@
 #include "CommandHandler.hpp"
 #include "BufferManager.hpp"
 #include "SendCounterPacket.hpp"
+#include "PeriodicCounterCapture.hpp"
 #include "ConnectionAcknowledgedCommandHandler.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
+#include "PeriodicCounterSelectionCommandHandler.hpp"
 
 namespace armnn
 {
@@ -46,6 +48,7 @@ public:
     // Getters for the profiling service state
     const ICounterDirectory& GetCounterDirectory() const;
     ProfilingState GetCurrentState() const;
+    bool IsCounterRegistered(uint16_t counterUid) const override;
     uint16_t GetCounterCount() const override;
     uint32_t GetCounterValue(uint16_t counterUid) const override;
 
@@ -68,6 +71,9 @@ private:
     void InitializeCounterValue(uint16_t counterUid);
     void Reset();
 
+    // Helper function
+    void CheckCounterUid(uint16_t counterUid) const;
+
     // Profiling service components
     ExternalProfilingOptions m_Options;
     CounterDirectory m_CounterDirectory;
@@ -81,8 +87,11 @@ private:
     CommandHandler m_CommandHandler;
     BufferManager m_BufferManager;
     SendCounterPacket m_SendCounterPacket;
+    Holder m_Holder;
+    PeriodicCounterCapture m_PeriodicCounterCapture;
     ConnectionAcknowledgedCommandHandler m_ConnectionAcknowledgedCommandHandler;
     RequestCounterDirectoryCommandHandler m_RequestCounterDirectoryCommandHandler;
+    PeriodicCounterSelectionCommandHandler m_PeriodicCounterSelectionCommandHandler;
 
 protected:
     // Default constructor/destructor kept protected for testing
@@ -102,6 +111,7 @@ protected:
                            m_PacketVersionResolver)
         , m_BufferManager()
         , m_SendCounterPacket(m_StateMachine, m_BufferManager)
+        , m_PeriodicCounterCapture(m_Holder, m_SendCounterPacket, *this)
         , m_ConnectionAcknowledgedCommandHandler(1,
                                                  m_PacketVersionResolver.ResolvePacketVersion(1).GetEncodedValue(),
                                                  m_StateMachine)
@@ -110,12 +120,22 @@ protected:
                                                   m_CounterDirectory,
                                                   m_SendCounterPacket,
                                                   m_StateMachine)
+        , m_PeriodicCounterSelectionCommandHandler(4,
+                                                   m_PacketVersionResolver.ResolvePacketVersion(4).GetEncodedValue(),
+                                                   m_Holder,
+                                                   m_PeriodicCounterCapture,
+                                                   *this,
+                                                   m_SendCounterPacket,
+                                                   m_StateMachine)
     {
         // Register the "Connection Acknowledged" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_ConnectionAcknowledgedCommandHandler);
 
         // Register the "Request Counter Directory" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_RequestCounterDirectoryCommandHandler);
+
+        // Register the "Periodic Counter Selection" command handler
+        m_CommandHandlerRegistry.RegisterFunctor(&m_PeriodicCounterSelectionCommandHandler);
     }
     ~ProfilingService() = default;
 
@@ -137,6 +157,10 @@ protected:
     void TransitionToState(ProfilingService& instance, ProfilingState newState)
     {
         instance.m_StateMachine.TransitionToState(newState);
+    }
+    void WaitForPacketSent(ProfilingService& instance)
+    {
+        return instance.m_SendCounterPacket.WaitForPacketSent();
     }
 };
 

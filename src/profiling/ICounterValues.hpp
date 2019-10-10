@@ -18,6 +18,7 @@ class IReadCounterValues
 public:
     virtual ~IReadCounterValues() {}
 
+    virtual bool IsCounterRegistered(uint16_t counterUid) const = 0;
     virtual uint16_t GetCounterCount() const = 0;
     virtual uint32_t GetCounterValue(uint16_t counterUid) const = 0;
 };

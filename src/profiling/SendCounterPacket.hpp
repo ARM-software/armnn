@@ -65,6 +65,14 @@ public:
     void Stop(bool rethrowSendThreadExceptions = true);
     bool IsRunning() { return m_IsRunning.load(); }
 
+    void WaitForPacketSent()
+    {
+        std::unique_lock<std::mutex> lock(m_PacketSentWaitMutex);
+
+        // Blocks until notified that at least a packet has been sent
+        m_PacketSentWaitCondition.wait(lock);
+    }
+
 private:
     void Send(IProfilingConnection& profilingConnection);
 
@@ -93,7 +101,7 @@ private:
         throw ExceptionType(errorMessage);
     }
 
-    void FlushBuffer(IProfilingConnection& profilingConnection);
+    void FlushBuffer(IProfilingConnection& profilingConnection, bool notifyWatchers = true);
 
     ProfilingStateMachine& m_StateMachine;
     IBufferManager& m_BufferManager;
@@ -104,6 +112,8 @@ private:
     std::atomic<bool> m_IsRunning;
     std::atomic<bool> m_KeepRunning;
     std::exception_ptr m_SendThreadException;
+    std::mutex m_PacketSentWaitMutex;
+    std::condition_variable m_PacketSentWaitCondition;
 
 protected:
     // Helper methods, protected for testing

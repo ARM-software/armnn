@@ -21,7 +21,7 @@ void RequestCounterDirectoryCommandHandler::operator()(const Packet& packet)
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
     case ProfilingState::WaitingForAck:
-        throw RuntimeException(boost::str(boost::format("Request Counter Directory Handler invoked while in an "
+        throw RuntimeException(boost::str(boost::format("Request Counter Directory Comand Handler invoked while in an "
                                                         "wrong state: %1%")
                                           % GetProfilingStateName(currentState)));
     case ProfilingState::Active:

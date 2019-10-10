@@ -22,7 +22,7 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
     {
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
-        throw RuntimeException(boost::str(boost::format("Connection Acknowledged Handler invoked while in an "
+        throw RuntimeException(boost::str(boost::format("Connection Acknowledged Command Handler invoked while in an "
                                                         "wrong state: %1%")
                                           % GetProfilingStateName(currentState)));
     case ProfilingState::WaitingForAck:

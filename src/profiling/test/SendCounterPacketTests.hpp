@@ -7,6 +7,7 @@
 
 #include <SendCounterPacket.hpp>
 #include <ProfilingUtils.hpp>
+#include <IProfilingConnectionFactory.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Optional.hpp>
@@ -74,11 +75,13 @@ public:
         return std::move(m_Packet);
     }
 
-    const std::vector<uint32_t> GetWrittenData() const
+    const std::vector<uint32_t> GetWrittenData()
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
 
-        return m_WrittenData;
+        std::vector<uint32_t> writtenData = m_WrittenData;
+        m_WrittenData.clear();
+        return writtenData;
     }
 
     void Clear()
@@ -93,6 +96,15 @@ private:
     std::vector<uint32_t> m_WrittenData;
     Packet m_Packet;
     mutable std::mutex m_Mutex;
+};
+
+class MockProfilingConnectionFactory : public IProfilingConnectionFactory
+{
+public:
+    IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const override
+    {
+        return std::make_unique<MockProfilingConnection>();
+    }
 };
 
 class MockPacketBuffer : public IPacketBuffer

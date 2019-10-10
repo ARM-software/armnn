@@ -11,10 +11,10 @@ namespace armnn
 namespace profiling
 {
 
-CaptureData& CaptureData::operator= (const CaptureData& captureData)
+CaptureData& CaptureData::operator=(const CaptureData& other)
 {
-    m_CapturePeriod = captureData.m_CapturePeriod;
-    m_CounterIds    = captureData.m_CounterIds;
+    m_CapturePeriod = other.m_CapturePeriod;
+    m_CounterIds    = other.m_CounterIds;
 
     return *this;
 }
@@ -29,12 +29,12 @@ void CaptureData::SetCounterIds(const std::vector<uint16_t>& counterIds)
     m_CounterIds = counterIds;
 }
 
-std::uint32_t CaptureData::GetCapturePeriod() const
+uint32_t CaptureData::GetCapturePeriod() const
 {
     return m_CapturePeriod;
 }
 
-std::vector<uint16_t> CaptureData::GetCounterIds() const
+const std::vector<uint16_t>& CaptureData::GetCounterIds() const
 {
     return m_CounterIds;
 }
@@ -42,12 +42,14 @@ std::vector<uint16_t> CaptureData::GetCounterIds() const
 CaptureData Holder::GetCaptureData() const
 {
     std::lock_guard<std::mutex> lockGuard(m_CaptureThreadMutex);
+
     return m_CaptureData;
 }
 
 void Holder::SetCaptureData(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
 {
     std::lock_guard<std::mutex> lockGuard(m_CaptureThreadMutex);
+
     m_CaptureData.SetCapturePeriod(capturePeriod);
     m_CaptureData.SetCounterIds(counterIds);
 }

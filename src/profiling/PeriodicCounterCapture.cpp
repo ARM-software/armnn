@@ -5,6 +5,8 @@
 
 #include "PeriodicCounterCapture.hpp"
 
+#include <boost/log/trivial.hpp>
+
 namespace armnn
 {
 
@@ -34,10 +36,13 @@ void PeriodicCounterCapture::Start()
 
 void PeriodicCounterCapture::Stop()
 {
+    // Signal the capture thread to stop
     m_KeepRunning.store(false);
 
+    // Check that the capture thread is running
     if (m_PeriodCaptureThread.joinable())
     {
+        // Wait for the capture thread to complete operations
         m_PeriodCaptureThread.join();
     }
 }
@@ -51,10 +56,12 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
 {
     while (m_KeepRunning.load())
     {
+        // Check if the current capture data indicates that there's data capture
         auto currentCaptureData = ReadCaptureData();
-        std::vector<uint16_t> counterIds = currentCaptureData.GetCounterIds();
+        const std::vector<uint16_t>& counterIds = currentCaptureData.GetCounterIds();
         if (currentCaptureData.GetCapturePeriod() == 0 || counterIds.empty())
         {
+            // No data capture, terminate the thread
             m_KeepRunning.store(false);
             break;
         }
@@ -63,12 +70,22 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
         auto numCounters = counterIds.size();
         values.reserve(numCounters);
 
-        // Create vector of pairs of CounterIndexes and Values
-        uint32_t counterValue = 0;
+        // Create a vector of pairs of CounterIndexes and Values
         for (uint16_t index = 0; index < numCounters; ++index)
         {
             auto requestedId = counterIds[index];
-            counterValue = readCounterValues.GetCounterValue(requestedId);
+            uint32_t counterValue = 0;
+            try
+            {
+                counterValue = readCounterValues.GetCounterValue(requestedId);
+            }
+            catch (const Exception& e)
+            {
+                // Report the error and continue
+                BOOST_LOG_TRIVIAL(warning) << "An error has occurred when getting a counter value: "
+                                           << e.what() << std::endl;
+                continue;
+            }
             values.emplace_back(std::make_pair(requestedId, counterValue));
         }
 
@@ -81,9 +98,15 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
         // Take a timestamp
         auto timestamp = clock::now();
 
+        // Write a Periodic Counter Capture packet to the Counter Stream Buffer
         m_SendCounterPacket.SendPeriodicCounterCapturePacket(
                     static_cast<uint64_t>(timestamp.time_since_epoch().count()), values);
-        std::this_thread::sleep_for(std::chrono::milliseconds(currentCaptureData.GetCapturePeriod()));
+
+        // Notify the Send Thread that new data is available in the Counter Stream Buffer
+        m_SendCounterPacket.SetReadyToRead();
+
+        // Wait the indicated capture period (microseconds)
+        std::this_thread::sleep_for(std::chrono::microseconds(currentCaptureData.GetCapturePeriod()));
     }
 
     m_IsRunning.store(false);

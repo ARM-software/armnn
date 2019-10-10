@@ -9,14 +9,12 @@
 
 #include <CommandHandlerFunctor.hpp>
 #include <IProfilingConnection.hpp>
-#include <IProfilingConnectionFactory.hpp>
 #include <Logging.hpp>
 #include <ProfilingService.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 #include <chrono>
-#include <iostream>
 #include <thread>
 
 namespace armnn
@@ -137,15 +135,6 @@ class TestFunctorC : public TestFunctorA
     using TestFunctorA::TestFunctorA;
 };
 
-class MockProfilingConnectionFactory : public IProfilingConnectionFactory
-{
-public:
-    IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const override
-    {
-        return std::make_unique<MockProfilingConnection>();
-    }
-};
-
 class SwapProfilingConnectionFactoryHelper : public ProfilingService
 {
 public:
@@ -180,6 +169,11 @@ public:
     void ForceTransitionToState(ProfilingState newState)
     {
         TransitionToState(ProfilingService::Instance(), newState);
+    }
+
+    void WaitForProfilingPacketsSent()
+    {
+        return WaitForPacketSent(ProfilingService::Instance());
     }
 
 private:

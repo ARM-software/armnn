@@ -13,6 +13,7 @@
 #include "BufferManager.hpp"
 #include "SendCounterPacket.hpp"
 #include "ConnectionAcknowledgedCommandHandler.hpp"
+#include "RequestCounterDirectoryCommandHandler.hpp"
 
 namespace armnn
 {
@@ -81,6 +82,7 @@ private:
     BufferManager m_BufferManager;
     SendCounterPacket m_SendCounterPacket;
     ConnectionAcknowledgedCommandHandler m_ConnectionAcknowledgedCommandHandler;
+    RequestCounterDirectoryCommandHandler m_RequestCounterDirectoryCommandHandler;
 
 protected:
     // Default constructor/destructor kept protected for testing
@@ -103,9 +105,17 @@ protected:
         , m_ConnectionAcknowledgedCommandHandler(1,
                                                  m_PacketVersionResolver.ResolvePacketVersion(1).GetEncodedValue(),
                                                  m_StateMachine)
+        , m_RequestCounterDirectoryCommandHandler(3,
+                                                  m_PacketVersionResolver.ResolvePacketVersion(3).GetEncodedValue(),
+                                                  m_CounterDirectory,
+                                                  m_SendCounterPacket,
+                                                  m_StateMachine)
     {
         // Register the "Connection Acknowledged" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_ConnectionAcknowledgedCommandHandler);
+
+        // Register the "Request Counter Directory" command handler
+        m_CommandHandlerRegistry.RegisterFunctor(&m_RequestCounterDirectoryCommandHandler);
     }
     ~ProfilingService() = default;
 
@@ -123,6 +133,10 @@ protected:
     IProfilingConnection* GetProfilingConnection(ProfilingService& instance)
     {
         return instance.m_ProfilingConnection.get();
+    }
+    void TransitionToState(ProfilingService& instance, ProfilingState newState)
+    {
+        instance.m_StateMachine.TransitionToState(newState);
     }
 };
 

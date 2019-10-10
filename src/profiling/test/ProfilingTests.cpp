@@ -2119,75 +2119,97 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     BOOST_TEST((valueB * numSteps) == readValue);
 }
 
-BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest0)
+BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
 {
     using boost::numeric_cast;
 
-    ProfilingStateMachine profilingStateMachine;
-
-    const uint32_t packetId = 0x30000;
+    const uint32_t packetId = 3;
     const uint32_t version = 1;
-
-    std::unique_ptr<char[]> packetData;
-
-    Packet packetA(packetId, 0, packetData);
-
+    ProfilingStateMachine profilingStateMachine;
+    CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    RequestCounterDirectoryCommandHandler commandHandler(packetId,
+                                                         version,
+                                                         counterDirectory,
+                                                         sendCounterPacket,
+                                                         profilingStateMachine);
 
-    CounterDirectory counterDirectory;
+    const uint32_t wrongPacketId = 47;
+    const uint32_t wrongHeader = (wrongPacketId & 0x000003FF) << 16;
 
-    RequestCounterDirectoryCommandHandler commandHandler(packetId, version, counterDirectory, sendCounterPacket);
-    commandHandler(packetA);
+    Packet wrongPacket(wrongHeader);
+
+    profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    profilingStateMachine.TransitionToState(ProfilingState::Active);
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::InvalidArgumentException); // Wrong packet
+
+    const uint32_t rightHeader = (packetId & 0x000003FF) << 16;
+
+    Packet rightPacket(rightHeader);
+
+    BOOST_CHECK_NO_THROW(commandHandler(rightPacket)); // Right packet
 
     auto readBuffer = mockBuffer.GetReadableBuffer();
 
     uint32_t headerWord0 = ReadUint32(readBuffer, 0);
     uint32_t headerWord1 = ReadUint32(readBuffer, 4);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 2); // packet id
-    BOOST_TEST(headerWord1 == 24);                  // data length
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 0);  // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x000003FF) == 2);  // packet id
+    BOOST_TEST(headerWord1 == 24);                        // data length
 
     uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
     uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
     BOOST_TEST(deviceRecordCount == 0); // device_records_count
 }
 
-BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
+BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
 {
     using boost::numeric_cast;
 
-    ProfilingStateMachine profilingStateMachine;
-
-    const uint32_t packetId = 0x30000;
+    const uint32_t packetId = 3;
     const uint32_t version = 1;
-
-    std::unique_ptr<char[]> packetData;
-
-    Packet packetA(packetId, 0, packetData);
-
+    ProfilingStateMachine profilingStateMachine;
+    CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    RequestCounterDirectoryCommandHandler commandHandler(packetId,
+                                                         version,
+                                                         counterDirectory,
+                                                         sendCounterPacket,
+                                                         profilingStateMachine);
+    const uint32_t header = (packetId & 0x000003FF) << 16;
+    Packet packet(header);
 
-    CounterDirectory counterDirectory;
     const Device* device = counterDirectory.RegisterDevice("deviceA", 1);
     const CounterSet* counterSet = counterDirectory.RegisterCounterSet("countersetA");
     counterDirectory.RegisterCategory("categoryA", device->m_Uid, counterSet->m_Uid);
     counterDirectory.RegisterCounter("categoryA", 0, 1, 2.0f, "counterA", "descA");
     counterDirectory.RegisterCounter("categoryA", 1, 1, 3.0f, "counterB", "descB");
 
-    RequestCounterDirectoryCommandHandler commandHandler(packetId, version, counterDirectory, sendCounterPacket);
-    commandHandler(packetA);
+    profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
+    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException); // Wrong profiling state
+    profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
+    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException); // Wrong profiling state
+    profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
+    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException); // Wrong profiling state
+    profilingStateMachine.TransitionToState(ProfilingState::Active);
+    BOOST_CHECK_NO_THROW(commandHandler(packet));
 
     auto readBuffer = mockBuffer.GetReadableBuffer();
 
     uint32_t headerWord0 = ReadUint32(readBuffer, 0);
     uint32_t headerWord1 = ReadUint32(readBuffer, 4);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 2); // packet id
-    BOOST_TEST(headerWord1 == 240);                 // data length
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 0);  // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x000003FF) == 2);  // packet id
+    BOOST_TEST(headerWord1 == 240);                       // data length
 
     uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
     uint32_t bodyHeaderWord1 = ReadUint32(readBuffer, 12);
@@ -2351,6 +2373,133 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
 
     // The Connection Acknowledged Command Handler should have updated the profiling state accordingly
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
+{
+    // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
+    LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
+
+    // Swap the profiling connection factory in the profiling service instance with our mock one
+    SwapProfilingConnectionFactoryHelper helper;
+
+    // Redirect the standard output to a local stream so that we can parse the warning message
+    std::stringstream ss;
+    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
+
+    // Reset the profiling service to the uninitialized state
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+
+    // Bring the profiling service to the "Active" state
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    helper.ForceTransitionToState(ProfilingState::NotConnected);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
+    profilingService.Update(); // Create the profiling connection
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
+    profilingService.Update(); // Start the threads
+    helper.ForceTransitionToState(ProfilingState::Active);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Get the mock profiling connection
+    MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
+    BOOST_CHECK(mockProfilingConnection);
+
+    // Write a valid "Request Counter Directory" packet into the mock profiling connection, to simulate a valid
+    // reply from an external profiling service
+
+    // Request Counter Directory packet header (word 0, word 1 is always zero):
+    // 26:31 [6]  packet_family: Control Packet Family, value 0b000000
+    // 16:25 [10] packet_id: Packet identifier, value 0b0000000011
+    // 8:15  [8]  reserved: Reserved, value 0b00000000
+    // 0:7   [8]  reserved: Reserved, value 0b00000000
+    uint32_t packetFamily = 0;
+    uint32_t packetId     = 123; // Wrong packet id!!!
+    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
+                      ((packetId     & 0x000003FF) << 16);
+
+    // Create the Request Counter Directory packet
+    Packet requestCounterDirectoryPacket(header);
+
+    // Write the packet to the mock profiling connection
+    mockProfilingConnection->WritePacket(std::move(requestCounterDirectoryPacket));
+
+    // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
+    // the Create the Request Counter packet gets processed by the profiling service
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    // Check that the expected error has occurred and logged to the standard output
+    BOOST_CHECK(boost::contains(ss.str(), "Functor with requested PacketId=123 and Version=4194304 does not exist"));
+
+    // The Connection Acknowledged Command Handler should not have updated the profiling state
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
+{
+    // Swap the profiling connection factory in the profiling service instance with our mock one
+    SwapProfilingConnectionFactoryHelper helper;
+
+    // Reset the profiling service to the uninitialized state
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+
+    // Bring the profiling service to the "Active" state
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    profilingService.Update(); // Initialize the counter directory
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
+    profilingService.Update(); // Create the profiling connection
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
+    profilingService.Update(); // Start the threads
+    helper.ForceTransitionToState(ProfilingState::Active);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Get the mock profiling connection
+    MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
+    BOOST_CHECK(mockProfilingConnection);
+
+    // Write a valid "Request Counter Directory" packet into the mock profiling connection, to simulate a valid
+    // reply from an external profiling service
+
+    // Request Counter Directory packet header (word 0, word 1 is always zero):
+    // 26:31 [6]  packet_family: Control Packet Family, value 0b000000
+    // 16:25 [10] packet_id: Packet identifier, value 0b0000000011
+    // 8:15  [8]  reserved: Reserved, value 0b00000000
+    // 0:7   [8]  reserved: Reserved, value 0b00000000
+    uint32_t packetFamily = 0;
+    uint32_t packetId     = 3;
+    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
+                      ((packetId     & 0x000003FF) << 16);
+
+    // Create the Request Counter Directory packet
+    Packet requestCounterDirectoryPacket(header);
+
+    // Write the packet to the mock profiling connection
+    mockProfilingConnection->WritePacket(std::move(requestCounterDirectoryPacket));
+
+    // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
+    // the Create the Request Counter packet gets processed by the profiling service
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    // The Connection Acknowledged Command Handler should not have updated the profiling state
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Check that the mock profiling connection contains one Counter Directory packet
+    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
+    BOOST_TEST(writtenData.size() == 1);
+    BOOST_TEST(writtenData[0] == 416); // The size of a valid Counter Directory packet
 
     // Reset the profiling service to stop any running thread
     options.m_EnableProfiling = false;

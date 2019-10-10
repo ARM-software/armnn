@@ -40,17 +40,6 @@ public:
     }
 };
 
-struct CoutRedirect
-{
-public:
-    CoutRedirect(std::streambuf* newStreamBuffer)
-        : m_Old(std::cout.rdbuf(newStreamBuffer)) {}
-    ~CoutRedirect() { std::cout.rdbuf(m_Old); }
-
-private:
-    std::streambuf* m_Old;
-};
-
 struct StreamRedirector
 {
 public:
@@ -188,6 +177,11 @@ public:
     {
         IProfilingConnection* profilingConnection = GetProfilingConnection(ProfilingService::Instance());
         return boost::polymorphic_downcast<MockProfilingConnection*>(profilingConnection);
+    }
+
+    void ForceTransitionToState(ProfilingState newState)
+    {
+        TransitionToState(ProfilingService::Instance(), newState);
     }
 
 private:

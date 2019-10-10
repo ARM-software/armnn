@@ -48,8 +48,11 @@ arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tenso
 /// armnn::DataLayout.
 arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout);
 
-/// Utility function used to setup an arm_compute::PoolingLayerInfo object from an armnn::Pooling2dDescriptor.
-arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDescriptor& descriptor);
+/// Utility function used to setup an arm_compute::PoolingLayerInfo object from given
+/// armnn::Pooling2dDescriptor
+/// bool fpMixedPrecision
+arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDescriptor& descriptor,
+                                                              bool fpMixedPrecision = false);
 
 /// Utility function to setup an arm_compute::NormalizationLayerInfo object from an armnn::NormalizationDescriptor.
 arm_compute::NormalizationLayerInfo BuildArmComputeNormalizationLayerInfo(const NormalizationDescriptor& desc);

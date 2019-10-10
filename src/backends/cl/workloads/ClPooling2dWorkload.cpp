@@ -40,7 +40,20 @@ ClPooling2dWorkload::ClPooling2dWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(m_Data.m_Parameters);
+    // flag to use wider accumulators (32 bit instead of 16 for FP16) to improve accuracy
+    // enable fp_mixed_precision for the the FP16 cases that
+    // accumulation reaches a limit beyond which there is no more increment of the value
+    bool fpMixedPrecision = false;
+    if (input.info()->data_type() == arm_compute::DataType::F16
+        && m_Data.m_Parameters.m_PoolType == PoolingAlgorithm::Average
+        && m_Data.m_Parameters.m_PoolWidth >= 100
+        && input.info()->dimension(3) >= 5
+        && input.info()->dimension(2) * input.info()->dimension(1) >= 3000)
+    {
+        fpMixedPrecision = true;
+    }
+
+    arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(m_Data.m_Parameters, fpMixedPrecision);
 
     // Run the layer.
     m_PoolingLayer.configure(&input, &output, layerInfo);

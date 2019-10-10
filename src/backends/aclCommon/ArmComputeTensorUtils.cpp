@@ -140,7 +140,8 @@ arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout)
     }
 }
 
-arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDescriptor& descriptor)
+arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDescriptor& descriptor,
+                                                              bool fpMixedPrecision)
 {
     using arm_compute::PoolingType;
     using arm_compute::DimensionRoundingType;
@@ -172,7 +173,7 @@ arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDes
 
     const Size2D poolSize(descriptor.m_PoolWidth, descriptor.m_PoolHeight);
 
-    return arm_compute::PoolingLayerInfo(poolingType, poolSize, padStrideInfo, excludePadding);
+    return arm_compute::PoolingLayerInfo(poolingType, poolSize, padStrideInfo, excludePadding, fpMixedPrecision);
 }
 
 arm_compute::NormalizationLayerInfo BuildArmComputeNormalizationLayerInfo(const NormalizationDescriptor& descriptor)

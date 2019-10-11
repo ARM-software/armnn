@@ -127,6 +127,9 @@ public:
     virtual std::unique_ptr<IWorkload> CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const;
 
+    virtual std::unique_ptr<IWorkload> CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
+                                                        const WorkloadInfo& info) const;
+
     virtual std::unique_ptr<IWorkload> CreateLstm(const LstmQueueDescriptor& descriptor,
                                                   const WorkloadInfo& info) const;
 

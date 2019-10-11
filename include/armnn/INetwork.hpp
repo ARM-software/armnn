@@ -344,6 +344,13 @@ public:
     virtual IConnectableLayer* AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
                                                        const char* name = nullptr) = 0;
 
+    /// Adds a log softmax layer to the network.
+    /// @param logSoftmaxDescriptor - LogSoftmaxDescriptor to configure the log softmax.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddLogSoftmaxLayer(const LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                                                  const char* name = nullptr) = 0;
+
     /// Adds a layer with no inputs and a single output, which always corresponds to
     /// the passed in constant tensor.
     /// @param input - Tensor to be provided as the only output of the layer. The layer will maintain

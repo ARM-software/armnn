@@ -158,6 +158,9 @@ public:
     IConnectableLayer* AddL2NormalizationLayer(const L2NormalizationDescriptor& desc,
                                                const char* name = nullptr) override;
 
+    IConnectableLayer* AddLogSoftmaxLayer(const LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                                          const char* name = nullptr) override;
+
     IConnectableLayer* AddConstantLayer(const ConstTensor& input, const char* name = nullptr) override;
 
     IConnectableLayer* AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,

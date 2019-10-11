@@ -40,6 +40,7 @@ enum class LayerType
     Input,
     InstanceNormalization,
     L2Normalization,
+    LogSoftmax,
     Lstm,
     Maximum,
     Mean,

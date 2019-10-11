@@ -224,6 +224,14 @@ public:
                                            const L2NormalizationDescriptor& desc,
                                            const char* name = nullptr) = 0;
 
+    /// Function that a log softmax layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param logSoftmaxDescriptor - LogSoftmaxDescriptor to configure the log softmax.
+    /// @param name - Optional name for the layer.
+    virtual void VisitLogSoftmaxLayer(const IConnectableLayer* layer,
+                                      const LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                                      const char* name = nullptr) = 0;
+
     /// Function an Lstm layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param descriptor - Parameters controlling the operation of the Lstm operation.

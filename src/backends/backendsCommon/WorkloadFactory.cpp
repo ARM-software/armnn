@@ -401,6 +401,19 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                 reason);
             break;
         }
+        case LayerType::LogSoftmax:
+        {
+            auto cLayer = boost::polymorphic_downcast<const LogSoftmaxLayer*>(&layer);
+
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsLogSoftmaxSupported(OverrideDataType(input, dataType),
+                                                               OverrideDataType(output, dataType),
+                                                               cLayer->GetParameters(),
+                                                               reason);
+            break;
+        }
         case LayerType::Lstm:
         {
             auto cLayer = boost::polymorphic_downcast<const LstmLayer*>(&layer);
@@ -1163,6 +1176,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateInstanceNormalization(
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
                                                                    const WorkloadInfo& info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

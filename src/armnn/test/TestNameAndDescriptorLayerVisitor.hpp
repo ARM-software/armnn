@@ -479,6 +479,32 @@ public:
     };
 };
 
+class TestLogSoftmaxLayerVisitor : public TestLayerVisitor
+{
+private:
+    LogSoftmaxDescriptor m_VisitorDescriptor;
+
+public:
+    explicit TestLogSoftmaxLayerVisitor(const LogSoftmaxDescriptor& descriptor, const char* name = nullptr)
+        : TestLayerVisitor(name)
+        , m_VisitorDescriptor(descriptor) {}
+
+    void CheckDescriptor(const LogSoftmaxDescriptor& descriptor)
+    {
+        BOOST_CHECK_EQUAL(descriptor.m_Beta, m_VisitorDescriptor.m_Beta);
+        BOOST_CHECK_EQUAL(descriptor.m_Axis, m_VisitorDescriptor.m_Axis);
+    }
+
+    void VisitLogSoftmaxLayer(const IConnectableLayer* layer,
+                              const LogSoftmaxDescriptor& descriptor,
+                              const char* name = nullptr) override
+    {
+        CheckLayerPointer(layer);
+        CheckDescriptor(descriptor);
+        CheckLayerName(name);
+    };
+};
+
 class TestReshapeLayerVisitor : public TestLayerVisitor
 {
 private:

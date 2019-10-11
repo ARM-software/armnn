@@ -328,6 +328,34 @@ BOOST_AUTO_TEST_CASE(CheckL2NormalizationLayerVisitorNameNullAndDescriptor)
     layer->Accept(visitor);
 }
 
+BOOST_AUTO_TEST_CASE(CheckLogSoftmaxLayerVisitorNameAndDescriptor)
+{
+    const char* layerName = "LogSoftmaxLayer";
+
+    LogSoftmaxDescriptor descriptor;
+    descriptor.m_Beta = 2.0f;
+    descriptor.m_Axis = 1;
+
+    TestLogSoftmaxLayerVisitor visitor(descriptor, layerName);
+    Network net;
+
+    IConnectableLayer *const layer = net.AddLogSoftmaxLayer(descriptor, layerName);
+    layer->Accept(visitor);
+}
+
+BOOST_AUTO_TEST_CASE(CheckLogSoftmaxLayerVisitorNameNullAndDescriptor)
+{
+    LogSoftmaxDescriptor descriptor;
+    descriptor.m_Beta = 2.0f;
+    descriptor.m_Axis = 1;
+
+    TestLogSoftmaxLayerVisitor visitor(descriptor);
+    Network net;
+
+    IConnectableLayer *const layer = net.AddLogSoftmaxLayer(descriptor);
+    layer->Accept(visitor);
+}
+
 BOOST_AUTO_TEST_CASE(CheckReshapeLayerVisitorNameAndDescriptor)
 {
     const char* layerName = "ReshapeLayer";

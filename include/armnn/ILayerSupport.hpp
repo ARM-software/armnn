@@ -168,6 +168,11 @@ public:
                                             const L2NormalizationDescriptor& descriptor,
                                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsLogSoftmaxSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const LogSoftmaxDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsLstmSupported(const TensorInfo& input,
                                  const TensorInfo& outputStateIn,
                                  const TensorInfo& cellStateIn,

@@ -32,6 +32,7 @@
 #include "layers/InputLayer.hpp"
 #include "layers/InstanceNormalizationLayer.hpp"
 #include "layers/L2NormalizationLayer.hpp"
+#include "layers/LogSoftmaxLayer.hpp"
 #include "layers/LstmLayer.hpp"
 #include "layers/MaximumLayer.hpp"
 #include "layers/MeanLayer.hpp"
@@ -116,6 +117,7 @@ DECLARE_LAYER(Greater)
 DECLARE_LAYER(Input)
 DECLARE_LAYER(InstanceNormalization)
 DECLARE_LAYER(L2Normalization)
+DECLARE_LAYER(LogSoftmax)
 DECLARE_LAYER(Lstm)
 DECLARE_LAYER(Maximum)
 DECLARE_LAYER(Mean)

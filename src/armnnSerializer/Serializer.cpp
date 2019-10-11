@@ -463,8 +463,17 @@ void SerializerVisitor::VisitL2NormalizationLayer(const armnn::IConnectableLayer
     CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_L2NormalizationLayer);
 }
 
-void SerializerVisitor::VisitLstmLayer(const armnn::IConnectableLayer* layer, const armnn::LstmDescriptor& descriptor,
-                                       const armnn::LstmInputParams& params, const char* name)
+void SerializerVisitor::VisitLogSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                                             const armnn::LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                                             const char* name)
+{
+    throw armnn::UnimplementedException("SerializerVisitor::VisitLogSoftmaxLayer() is not implemented");
+}
+
+void SerializerVisitor::VisitLstmLayer(const armnn::IConnectableLayer* layer,
+                                       const armnn::LstmDescriptor& descriptor,
+                                       const armnn::LstmInputParams& params,
+                                       const char* name)
 {
     auto fbLstmBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Lstm);
 

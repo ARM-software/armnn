@@ -74,6 +74,9 @@ struct SoftmaxDescriptor
     int m_Axis;
 };
 
+/// A LogSoftmaxDescriptor for the LogSoftmaxLayer
+using LogSoftmaxDescriptor = SoftmaxDescriptor;
+
 /// @brief An OriginsDescriptor for the ConcatLayer.
 /// Descriptor to configure the concatenation process. Number of views must be equal to the number of inputs, and
 /// their order must match - e.g. first view corresponds to the first input, second view to the second input, etc.

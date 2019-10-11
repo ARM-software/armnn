@@ -1236,6 +1236,12 @@ IConnectableLayer* Network::AddL2NormalizationLayer(const L2NormalizationDescrip
     return m_Graph->AddLayer<L2NormalizationLayer>(desc, name);
 }
 
+IConnectableLayer* Network::AddLogSoftmaxLayer(const LogSoftmaxDescriptor& desc,
+                                               const char* name)
+{
+    return m_Graph->AddLayer<LogSoftmaxLayer>(desc, name);
+}
+
 IConnectableLayer* Network::AddConstantLayer(const ConstTensor& input, const char* name)
 {
     auto layer = m_Graph->AddLayer<ConstantLayer>(name);

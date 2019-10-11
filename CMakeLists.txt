@@ -284,6 +284,8 @@ list(APPEND armnn_sources
     src/armnn/layers/InstanceNormalizationLayer.cpp
     src/armnn/layers/L2NormalizationLayer.hpp
     src/armnn/layers/L2NormalizationLayer.cpp
+    src/armnn/layers/LogSoftmaxLayer.hpp
+    src/armnn/layers/LogSoftmaxLayer.cpp
     src/armnn/layers/LstmLayer.cpp
     src/armnn/layers/LstmLayer.hpp
     src/armnn/layers/MaximumLayer.cpp

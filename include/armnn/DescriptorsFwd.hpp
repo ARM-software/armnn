@@ -7,6 +7,7 @@
 
 namespace armnn
 {
+
 struct ActivationDescriptor;
 struct ArgMinMaxDescriptor;
 struct BatchNormalizationDescriptor;
@@ -38,10 +39,11 @@ struct StridedSliceDescriptor;
 struct TransposeConvolution2dDescriptor;
 struct ViewsDescriptor;
 
+using ConcatDescriptor       = OriginsDescriptor;
 using DepthToSpaceDescriptor = SpaceToDepthDescriptor;
+using LogSoftmaxDescriptor   = SoftmaxDescriptor;
+// MergerDescriptor is deprecated, use ConcatDescriptor instead
+using MergerDescriptor       = OriginsDescriptor;
+using SplitterDescriptor     = ViewsDescriptor;
 
-// MergerDescriptor is deprecated use ConcatDescriptor instead
-using MergerDescriptor = OriginsDescriptor;
-using ConcatDescriptor = OriginsDescriptor;
-using SplitterDescriptor = ViewsDescriptor;
-}
+} // namespace armnn

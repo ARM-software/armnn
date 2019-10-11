@@ -317,6 +317,11 @@ struct L2NormalizationQueueDescriptor : QueueDescriptorWithParameters<L2Normaliz
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct LogSoftmaxQueueDescriptor : QueueDescriptorWithParameters<LogSoftmaxDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct ConstantQueueDescriptor : QueueDescriptor
 {
     ConstantQueueDescriptor()

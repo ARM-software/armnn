@@ -133,6 +133,10 @@ public:
                                    const armnn::L2NormalizationDescriptor& l2NormalizationDescriptor,
                                    const char* name = nullptr) override;
 
+    void VisitLogSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                              const armnn::LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                              const char* name = nullptr) override;
+
     void VisitLstmLayer(const armnn::IConnectableLayer* layer,
                         const armnn::LstmDescriptor& descriptor,
                         const armnn::LstmInputParams& params,

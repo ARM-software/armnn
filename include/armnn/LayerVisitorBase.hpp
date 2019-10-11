@@ -120,6 +120,10 @@ public:
                                    const L2NormalizationDescriptor&,
                                    const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitLogSoftmaxLayer(const IConnectableLayer*,
+                              const LogSoftmaxDescriptor&,
+                              const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitLstmLayer(const IConnectableLayer*,
                         const LstmDescriptor&,
                         const LstmInputParams&,

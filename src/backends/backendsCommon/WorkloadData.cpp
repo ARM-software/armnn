@@ -1294,8 +1294,6 @@ void InstanceNormalizationQueueDescriptor::Validate(const WorkloadInfo& workload
         };
 
     ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
-    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
-
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
@@ -1326,8 +1324,28 @@ void L2NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) 
     };
 
     ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
-    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+}
 
+void LogSoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"LogSoftmaxQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::Float16,
+    };
+
+    ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 

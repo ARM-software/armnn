@@ -52,11 +52,7 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch())
             .count());
 
-    sleep_for(5000us);
-
-    uint64_t time2 = static_cast<uint64_t>(
-        std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch())
-            .count());
+    uint64_t time2 = time + 5000;
 
     // UniqueData required for Packet class
     std::unique_ptr<unsigned char[]> uniqueData1 = std::make_unique<unsigned char[]>(dataLength);

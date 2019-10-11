@@ -462,6 +462,8 @@ list(APPEND armnn_sources
     src/profiling/PeriodicCounterCapture.cpp
     src/profiling/PeriodicCounterSelectionCommandHandler.cpp
     src/profiling/PeriodicCounterSelectionCommandHandler.hpp
+    src/profiling/PerJobCounterSelectionCommandHandler.cpp
+    src/profiling/PerJobCounterSelectionCommandHandler.hpp
     src/profiling/ProfilingConnectionDumpToFileDecorator.cpp
     src/profiling/ProfilingConnectionDumpToFileDecorator.hpp
     src/profiling/ProfilingConnectionFactory.cpp

@@ -3072,4 +3072,74 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisconnect)
     profilingService.ResetExternalProfilingOptions(options, true);
 }
 
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
+{
+    // Swap the profiling connection factory in the profiling service instance with our mock one
+    SwapProfilingConnectionFactoryHelper helper;
+
+    // Reset the profiling service to the uninitialized state
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+
+    // Bring the profiling service to the "Active" state
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    profilingService.Update(); // Initialize the counter directory
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
+    profilingService.Update(); // Create the profiling connection
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
+    profilingService.Update(); // Start the command handler and the send thread
+
+    // Wait for the Stream Metadata packet the be sent
+    // (we are not testing the connection acknowledgement here so it will be ignored by this test)
+    helper.WaitForProfilingPacketsSent();
+
+    // Force the profiling service to the "Active" state
+    helper.ForceTransitionToState(ProfilingState::Active);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Get the mock profiling connection
+    MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
+    BOOST_CHECK(mockProfilingConnection);
+
+    // Remove the packets received so far
+    mockProfilingConnection->Clear();
+
+    // Write a "Per-Job Counter Selection" packet into the mock profiling connection, to simulate an input from an
+    // external profiling service
+
+    // Per-Job Counter Selection packet header:
+    // 26:31 [6]  packet_family: Control Packet Family, value 0b000000
+    // 16:25 [10] packet_id: Packet identifier, value 0b0000000100
+    // 8:15  [8]  reserved: Reserved, value 0b00000000
+    // 0:7   [8]  reserved: Reserved, value 0b00000000
+    uint32_t packetFamily = 0;
+    uint32_t packetId     = 5;
+    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
+                      ((packetId     & 0x000003FF) << 16);
+
+    // Create the Per-Job Counter Selection packet
+    Packet periodicCounterSelectionPacket(header); // Length == 0, this will disable the collection of counters
+
+    // Write the packet to the mock profiling connection
+    mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
+
+    // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
+    // the Per-Job Counter Selection packet gets processed by the profiling service
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    // The Per-Job Counter Selection packets are dropped silently, so there should be no reply coming
+    // from the profiling service
+    const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
+    BOOST_TEST(writtenData.empty());
+
+    // The Per-Job Counter Selection Command Handler should not have updated the profiling state
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -183,6 +183,7 @@ LOCAL_SRC_FILES := \
         src/profiling/PacketVersionResolver.cpp \
         src/profiling/PeriodicCounterCapture.cpp \
         src/profiling/PeriodicCounterSelectionCommandHandler.cpp \
+        src/profiling/PerJobCounterSelectionCommandHandler.cpp \
         src/profiling/ProfilingConnectionDumpToFileDecorator.cpp \
         src/profiling/ProfilingConnectionFactory.cpp \
         src/profiling/ProfilingService.cpp \

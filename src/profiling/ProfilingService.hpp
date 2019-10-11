@@ -16,6 +16,7 @@
 #include "ConnectionAcknowledgedCommandHandler.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
+#include "PerJobCounterSelectionCommandHandler.hpp"
 
 namespace armnn
 {
@@ -96,6 +97,7 @@ private:
     ConnectionAcknowledgedCommandHandler m_ConnectionAcknowledgedCommandHandler;
     RequestCounterDirectoryCommandHandler m_RequestCounterDirectoryCommandHandler;
     PeriodicCounterSelectionCommandHandler m_PeriodicCounterSelectionCommandHandler;
+    PerJobCounterSelectionCommandHandler m_PerJobCounterSelectionCommandHandler;
 
 protected:
     // Default constructor/destructor kept protected for testing
@@ -131,6 +133,9 @@ protected:
                                                    *this,
                                                    m_SendCounterPacket,
                                                    m_StateMachine)
+        , m_PerJobCounterSelectionCommandHandler(5,
+                                                 m_PacketVersionResolver.ResolvePacketVersion(4).GetEncodedValue(),
+                                                 m_StateMachine)
     {
         // Register the "Connection Acknowledged" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_ConnectionAcknowledgedCommandHandler);
@@ -140,6 +145,9 @@ protected:
 
         // Register the "Periodic Counter Selection" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_PeriodicCounterSelectionCommandHandler);
+
+        // Register the "Per-Job Counter Selection" command handler
+        m_CommandHandlerRegistry.RegisterFunctor(&m_PerJobCounterSelectionCommandHandler);
     }
     ~ProfilingService() = default;
 

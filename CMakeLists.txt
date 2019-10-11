@@ -782,6 +782,12 @@ if(BUILD_UNIT_TESTS)
         set_source_files_properties(src/armnnDeserializer/test/SchemaSerialize.s PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
     endif()
 
+    if(BUILD_GATORD_MOCK)
+        list(APPEND unittest_sources
+            tests/profiling/gatordmock/tests/GatordMockTests.cpp
+            )
+    endif()
+
     foreach(lib ${armnnUnitTestLibraries})
         message("Adding object library dependency to UnitTests: ${lib}")
         list(APPEND unittest_sources $<TARGET_OBJECTS:${lib}>)
@@ -810,6 +816,10 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_TF_PARSER)
         target_link_libraries(UnitTests armnnTfParser)
+    endif()
+
+    if(BUILD_GATORD_MOCK)
+        target_link_libraries(UnitTests gatordMockService)
     endif()
 
     if(BUILD_TF_LITE_PARSER)
@@ -879,19 +889,30 @@ endif()
 if(BUILD_GATORD_MOCK)
     set(gatord_mock_sources)
     list(APPEND gatord_mock_sources
-        tests/profiling/GatordMockMain.cpp
-        tests/profiling/CommandLineProcessor.hpp
-        tests/profiling/CommandLineProcessor.cpp
-        tests/profiling/GatordMockService.hpp
-        tests/profiling/GatordMockService.cpp
+        tests/profiling/gatordmock/CommandFileParser.hpp
+        tests/profiling/gatordmock/CommandFileParser.cpp
+        tests/profiling/gatordmock/CommandLineProcessor.hpp
+        tests/profiling/gatordmock/CommandLineProcessor.cpp
+        tests/profiling/gatordmock/GatordMockService.hpp
+        tests/profiling/gatordmock/GatordMockService.cpp
+        tests/profiling/gatordmock/MockUtils.hpp
+        tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.cpp
+        tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.hpp
         )
 
-    include_directories( ${Boost_INCLUDE_DIRS} )
+    include_directories( ${Boost_INCLUDE_DIRS} src/profiling)
 
-    add_executable_ex(GartordMock ${gatord_mock_sources})
+    add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
 
+    add_executable_ex(GartordMock tests/profiling/gatordmock/GatordMockMain.cpp)
+
+    if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
+        target_link_libraries(GartordMock pthread)
+    endif()
+
+    target_link_libraries(GartordMock armnn gatordMockService)
     target_link_libraries(GartordMock
-        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
         )
 
 endif()

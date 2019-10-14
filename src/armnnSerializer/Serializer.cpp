@@ -467,7 +467,22 @@ void SerializerVisitor::VisitLogSoftmaxLayer(const armnn::IConnectableLayer* lay
                                              const armnn::LogSoftmaxDescriptor& logSoftmaxDescriptor,
                                              const char* name)
 {
-    throw armnn::UnimplementedException("SerializerVisitor::VisitLogSoftmaxLayer() is not implemented");
+    // Create FlatBuffer BaseLayer
+    auto flatBufferLogSoftmaxBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_LogSoftmax);
+
+    // Create the FlatBuffer LogSoftmaxDescriptor
+    auto flatBufferLogSoftmaxDesc =
+        serializer::CreateLogSoftmaxDescriptor(m_flatBufferBuilder,
+                                               logSoftmaxDescriptor.m_Beta,
+                                               logSoftmaxDescriptor.m_Axis);
+
+    // Create the FlatBuffer LogSoftmaxLayer
+    auto flatBufferLogSoftmaxLayer =
+        serializer::CreateLogSoftmaxLayer(m_flatBufferBuilder,
+                                          flatBufferLogSoftmaxBaseLayer,
+                                          flatBufferLogSoftmaxDesc);
+
+    CreateAnyLayer(flatBufferLogSoftmaxLayer.o, serializer::Layer::Layer_LogSoftmaxLayer);
 }
 
 void SerializerVisitor::VisitLstmLayer(const armnn::IConnectableLayer* layer,

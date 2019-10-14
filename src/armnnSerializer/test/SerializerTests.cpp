@@ -1437,6 +1437,61 @@ BOOST_AUTO_TEST_CASE(EnsureL2NormalizationBackwardCompatibility)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeLogSoftmax)
+{
+    class LogSoftmaxLayerVerifier : public LayerVerifierBase
+    {
+    public:
+        LogSoftmaxLayerVerifier(const std::string& layerName,
+                                const std::vector<armnn::TensorInfo>& inputInfos,
+                                const std::vector<armnn::TensorInfo>& outputInfos,
+                                const armnn::LogSoftmaxDescriptor& descriptor)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos)
+            , m_Descriptor(descriptor) {}
+
+        void VisitLogSoftmaxLayer(const armnn::IConnectableLayer* layer,
+                                  const armnn::LogSoftmaxDescriptor& descriptor,
+                                  const char* name) override
+        {
+            VerifyNameAndConnections(layer, name);
+            VerifyDescriptor(descriptor);
+        }
+
+    private:
+        void VerifyDescriptor(const armnn::LogSoftmaxDescriptor& descriptor)
+        {
+            BOOST_TEST(descriptor.m_Beta == m_Descriptor.m_Beta);
+            BOOST_TEST(descriptor.m_Axis == m_Descriptor.m_Axis);
+        }
+
+        armnn::LogSoftmaxDescriptor m_Descriptor;
+    };
+
+    const std::string layerName("log_softmax");
+    const armnn::TensorInfo info({1, 10}, armnn::DataType::Float32);
+
+    armnn::LogSoftmaxDescriptor descriptor;
+    descriptor.m_Beta = 1.0f;
+    descriptor.m_Axis = -1;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer      = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const logSoftmaxLayer = network->AddLogSoftmaxLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer     = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(logSoftmaxLayer->GetInputSlot(0));
+    logSoftmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(info);
+    logSoftmaxLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    LogSoftmaxLayerVerifier verifier(layerName, {info}, {info}, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeMaximum)
 {
     class MaximumLayerVerifier : public LayerVerifierBase

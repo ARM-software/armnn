@@ -142,7 +142,8 @@ enum LayerType : uint {
     ArgMinMax = 47,
     Slice = 48,
     DepthToSpace = 49,
-    InstanceNormalization = 50
+    InstanceNormalization = 50,
+    LogSoftmax = 51
 }
 
 // Base layer table to be used as part of other layers
@@ -271,6 +272,16 @@ table InstanceNormalizationDescriptor {
     beta:float;
     eps:float;
     dataLayout:DataLayout;
+}
+
+table LogSoftmaxLayer {
+    base:LayerBase;
+    descriptor:LogSoftmaxDescriptor;
+}
+
+table LogSoftmaxDescriptor {
+    beta:float = 1;
+    axis:int = -1;
 }
 
 table L2NormalizationLayer {
@@ -748,7 +759,8 @@ union Layer {
     ArgMinMaxLayer,
     SliceLayer,
     DepthToSpaceLayer,
-    InstanceNormalizationLayer
+    InstanceNormalizationLayer,
+    LogSoftmaxLayer
 }
 
 table AnyLayer {

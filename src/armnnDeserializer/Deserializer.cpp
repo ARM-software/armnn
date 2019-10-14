@@ -206,6 +206,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_GreaterLayer]                = &Deserializer::ParseGreater;
     m_ParserFunctions[Layer_InstanceNormalizationLayer]  = &Deserializer::ParseInstanceNormalization;
     m_ParserFunctions[Layer_L2NormalizationLayer]        = &Deserializer::ParseL2Normalization;
+    m_ParserFunctions[Layer_LogSoftmaxLayer]             = &Deserializer::ParseLogSoftmax;
     m_ParserFunctions[Layer_LstmLayer]                   = &Deserializer::ParseLstm;
     m_ParserFunctions[Layer_MaximumLayer]                = &Deserializer::ParseMaximum;
     m_ParserFunctions[Layer_MeanLayer]                   = &Deserializer::ParseMean;
@@ -286,6 +287,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_InstanceNormalizationLayer()->base();
         case Layer::Layer_L2NormalizationLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_L2NormalizationLayer()->base();
+        case Layer::Layer_LogSoftmaxLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_LogSoftmaxLayer()->base();
         case Layer::Layer_LstmLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_LstmLayer()->base();
         case Layer::Layer_MeanLayer:
@@ -1346,6 +1349,30 @@ void Deserializer::ParseL2Normalization(GraphPtr graph, unsigned int layerIndex)
 
     IConnectableLayer* layer = m_Network->AddL2NormalizationLayer(descriptor, layerName.c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseLogSoftmax(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    Deserializer::TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    Deserializer::TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::LogSoftmaxDescriptor descriptor;
+    descriptor.m_Beta = graph->layers()->Get(layerIndex)->layer_as_LogSoftmaxLayer()->descriptor()->beta();
+    descriptor.m_Axis = graph->layers()->Get(layerIndex)->layer_as_LogSoftmaxLayer()->descriptor()->axis();
+    auto layerName = GetLayerName(graph, layerIndex);
+
+    IConnectableLayer* layer = m_Network->AddLogSoftmaxLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

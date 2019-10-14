@@ -1062,6 +1062,62 @@ BOOST_AUTO_TEST_CASE(QuantizeInstanceNormalization)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeLogSoftmax)
+{
+    class TestLogSoftmaxQuantization : public TestQuantization
+    {
+    public:
+        TestLogSoftmaxQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape) {}
+
+        TestLogSoftmaxQuantization(const QuantizerOptions& options,
+                                   const TensorShape& inputShape,
+                                   const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape) {}
+
+        void VisitLogSoftmaxLayer(const IConnectableLayer* layer,
+                                  const SoftmaxDescriptor& descriptor,
+                                  const char* name = nullptr) override
+        {
+            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            const OffsetScalePair qAsymm8Params{ 30.0f / g_Asymm8QuantizationBase, 128 };
+            const OffsetScalePair qSymm16Params{ 15.0f / g_Symm16QuantizationBase, 0 };
+
+            TestQuantizationParams(info, qAsymm8Params, qSymm16Params);
+        }
+    };
+
+    const TensorShape tensorShape{ 1U };
+    const TensorInfo tensorInfo(tensorShape, DataType::Float32);
+
+    INetworkPtr network = INetwork::Create();
+
+    LogSoftmaxDescriptor descriptor;
+    descriptor.m_Beta = 1.0f;
+
+    IConnectableLayer* inputLayer        = network->AddInputLayer(0);
+    IConnectableLayer* logSoftmaxLayer   = network->AddLogSoftmaxLayer(descriptor);
+    IConnectableLayer* outputLayer       = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(logSoftmaxLayer->GetInputSlot(0));
+    logSoftmaxLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    logSoftmaxLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    // test QAsymm8 quantization
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestLogSoftmaxQuantization validatorQAsymm8(tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    // test QuantisedSymm16 quantization
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestLogSoftmaxQuantization validatorQSymm16(options, tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 INetworkPtr CreateNetworkWithSoftmaxLayer(const SoftmaxDescriptor& descriptor, const TensorShape& shape)
 {
     INetworkPtr network = INetwork::Create();

@@ -93,6 +93,10 @@ public:
                                          const InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
                                          const char* name = nullptr) override;
 
+    void VisitLogSoftmaxLayer(const IConnectableLayer* layer,
+                              const LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                              const char* name = nullptr) override;
+
     void VisitMeanLayer(const IConnectableLayer* layer,
                         const MeanDescriptor& meanDescriptor,
                         const char* name = nullptr) override;

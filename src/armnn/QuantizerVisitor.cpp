@@ -319,9 +319,18 @@ void QuantizerVisitor::VisitInstanceNormalizationLayer(const IConnectableLayer* 
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitLogSoftmaxLayer(const IConnectableLayer* layer,
+                                            const LogSoftmaxDescriptor& logSoftmaxDescriptor,
+                                            const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddLogSoftmaxLayer(logSoftmaxDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitMeanLayer(const IConnectableLayer* layer,
-                                        const MeanDescriptor& meanDescriptor,
-                                        const char* name)
+                                      const MeanDescriptor& meanDescriptor,
+                                      const char* name)
 {
     IConnectableLayer* newLayer = m_QuantizedNetwork->AddMeanLayer(meanDescriptor, name);
     RecordLayer(layer, newLayer);

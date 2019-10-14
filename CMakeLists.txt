@@ -767,6 +767,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeGreater.cpp
             src/armnnDeserializer/test/DeserializeInstanceNormalization.cpp
             src/armnnDeserializer/test/DeserializeL2Normalization.cpp
+            src/armnnDeserializer/test/DeserializeLogSoftmax.cpp
             src/armnnDeserializer/test/DeserializeMean.cpp
             src/armnnDeserializer/test/DeserializeMultiplication.cpp
             src/armnnDeserializer/test/DeserializeNormalization.cpp

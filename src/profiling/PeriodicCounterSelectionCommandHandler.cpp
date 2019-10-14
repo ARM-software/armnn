@@ -109,8 +109,16 @@ void PeriodicCounterSelectionCommandHandler::operator()(const Packet& packet)
         // Notify the Send Thread that new data is available in the Counter Stream Buffer
         m_SendCounterPacket.SetReadyToRead();
 
-        // Start the Period Counter Capture thread (if not running already)
-        m_PeriodicCounterCapture.Start();
+        if (capturePeriod == 0 || validCounterIds.empty())
+        {
+            // No data capture stop the thread
+            m_PeriodicCounterCapture.Stop();
+        }
+        else
+        {
+            // Start the Period Counter Capture thread (if not running already)
+            m_PeriodicCounterCapture.Start();
+        }
 
         break;
     }

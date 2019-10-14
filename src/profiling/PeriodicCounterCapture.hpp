@@ -38,14 +38,14 @@ public:
 
     void Start() override;
     void Stop() override;
-    bool IsRunning() const { return m_IsRunning.load(); }
+    bool IsRunning() const { return m_IsRunning; }
 
 private:
     CaptureData ReadCaptureData();
     void Capture(const IReadCounterValues& readCounterValues);
 
     const Holder&             m_CaptureDataHolder;
-    std::atomic<bool>         m_IsRunning;
+    bool                      m_IsRunning;
     std::atomic<bool>         m_KeepRunning;
     std::thread               m_PeriodCaptureThread;
     const IReadCounterValues& m_ReadCounterValues;

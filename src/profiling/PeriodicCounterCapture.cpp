@@ -6,6 +6,7 @@
 #include "PeriodicCounterCapture.hpp"
 
 #include <boost/log/trivial.hpp>
+#include <iostream>
 
 namespace armnn
 {
@@ -16,14 +17,14 @@ namespace profiling
 void PeriodicCounterCapture::Start()
 {
     // Check if the capture thread is already running
-    if (m_IsRunning.load())
+    if (m_IsRunning)
     {
         // The capture thread is already running
         return;
     }
 
     // Mark the capture thread as running
-    m_IsRunning.store(true);
+    m_IsRunning = true;
 
     // Keep the capture procedure going until the capture thread is signalled to stop
     m_KeepRunning.store(true);
@@ -45,6 +46,8 @@ void PeriodicCounterCapture::Stop()
         // Wait for the capture thread to complete operations
         m_PeriodCaptureThread.join();
     }
+
+    m_IsRunning = false;
 }
 
 CaptureData PeriodicCounterCapture::ReadCaptureData()
@@ -54,16 +57,17 @@ CaptureData PeriodicCounterCapture::ReadCaptureData()
 
 void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues)
 {
-    while (m_KeepRunning.load())
+    do
     {
         // Check if the current capture data indicates that there's data capture
         auto currentCaptureData = ReadCaptureData();
         const std::vector<uint16_t>& counterIds = currentCaptureData.GetCounterIds();
+
         if (currentCaptureData.GetCapturePeriod() == 0 || counterIds.empty())
         {
-            // No data capture, terminate the thread
-            m_KeepRunning.store(false);
-            break;
+            // No data capture, wait the indicated capture period (milliseconds)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            continue;
         }
 
         std::vector<std::pair<uint16_t, uint32_t>> values;
@@ -107,9 +111,10 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
 
         // Wait the indicated capture period (microseconds)
         std::this_thread::sleep_for(std::chrono::microseconds(currentCaptureData.GetCapturePeriod()));
-    }
 
-    m_IsRunning.store(false);
+    }
+    while (m_KeepRunning.load());
+
 }
 
 } // namespace profiling

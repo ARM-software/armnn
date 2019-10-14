@@ -1805,7 +1805,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
 
     BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
     BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
-    BOOST_TEST(headerWord1 == 4);                   // data lenght
+    BOOST_TEST(headerWord1 == 4);                   // data length
     BOOST_TEST(period == 11);                       // capture period
 }
 
@@ -2044,42 +2044,46 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     class CaptureReader : public IReadCounterValues
     {
     public:
-        CaptureReader() {}
-
+        CaptureReader(uint16_t counterSize)
+        {
+            for(uint16_t i = 0; i < counterSize; ++i)
+            {
+                m_Data[i] = 0;
+            }
+            m_CounterSize = counterSize;
+        }
+        //not used
         bool IsCounterRegistered(uint16_t counterUid) const override
         {
-            return m_Data.find(counterUid) != m_Data.end();
+            return false;
         }
 
         uint16_t GetCounterCount() const override
         {
-            return boost::numeric_cast<uint16_t>(m_Data.size());
+            return m_CounterSize;
         }
 
         uint32_t GetCounterValue(uint16_t counterUid) const override
         {
-            if (m_Data.find(counterUid) == m_Data.end())
+            if(counterUid > m_CounterSize)
             {
-                return 0;
+                BOOST_FAIL("Invalid counter Uid");
             }
-
             return m_Data.at(counterUid).load();
         }
 
         void SetCounterValue(uint16_t counterUid, uint32_t value)
         {
-            if (m_Data.find(counterUid) == m_Data.end())
+            if(counterUid > m_CounterSize)
             {
-                m_Data.insert(std::make_pair(counterUid, value));
+                BOOST_FAIL("Invalid counter Uid");
             }
-            else
-            {
-                m_Data.at(counterUid).store(value);
-            }
+            m_Data.at(counterUid).store(value);
         }
 
     private:
         std::unordered_map<uint16_t, std::atomic<uint32_t>> m_Data;
+        uint16_t m_CounterSize;
     };
 
     ProfilingStateMachine profilingStateMachine;
@@ -2092,7 +2096,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
 
     std::vector<uint16_t> counterIds;
-    CaptureReader captureReader;
+    CaptureReader captureReader(2);
 
     unsigned int valueA = 10;
     unsigned int valueB = 15;
@@ -2107,17 +2111,8 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
         captureReader.SetCounterValue(1, valueB * (i + 1));
 
         periodicCounterCapture.Start();
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-        periodicCounterCapture.Start();
-
-        data.SetCaptureData(0, captureIds2);
-
-        periodicCounterCapture.Start();
+        periodicCounterCapture.Stop();
     }
-
-    periodicCounterCapture.Stop();
 
     auto buffer = mockBuffer.GetReadableBuffer();
 

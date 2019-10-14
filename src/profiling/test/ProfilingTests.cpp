@@ -424,8 +424,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingStateMachine)
                       armnn::Exception);
 
     ProfilingStateMachine profilingState14(ProfilingState::WaitingForAck);
-    BOOST_CHECK_THROW(profilingState14.TransitionToState(ProfilingState::NotConnected),
-                      armnn::Exception);
+    profilingState14.TransitionToState(ProfilingState::NotConnected);
+    BOOST_CHECK(profilingState14.GetCurrentState() == ProfilingState::NotConnected);
 
     ProfilingStateMachine profilingState15(ProfilingState::Active);
     BOOST_CHECK_THROW(profilingState15.TransitionToState(ProfilingState::Uninitialised),
@@ -2281,6 +2281,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
     unsigned int streamMetadataPacketsize = 118 + processNameSize;
 
+    // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
     ProfilingService& profilingService = ProfilingService::Instance();
@@ -2354,6 +2355,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
     unsigned int streamMetadataPacketsize = 118 + processNameSize;
 
+    // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
     ProfilingService& profilingService = ProfilingService::Instance();
@@ -3006,6 +3008,64 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMult
 
     // The Periodic Counter Selection Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisconnect)
+{
+    // Swap the profiling connection factory in the profiling service instance with our mock one
+    SwapProfilingConnectionFactoryHelper helper;
+
+    // Reset the profiling service to the uninitialized state
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+
+    // Try to disconnect the profiling service while in the "Uninitialised" state
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    profilingService.Disconnect();
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised); // The state should not change
+
+    // Try to disconnect the profiling service while in the "NotConnected" state
+    profilingService.Update(); // Initialize the counter directory
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
+    profilingService.Disconnect();
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected); // The state should not change
+
+    // Try to disconnect the profiling service while in the "WaitingForAck" state
+    profilingService.Update(); // Create the profiling connection
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
+    profilingService.Disconnect();
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck); // The state should not change
+
+    // Try to disconnect the profiling service while in the "Active" state
+    profilingService.Update(); // Start the command handler and the send thread
+
+    // Wait for the Stream Metadata packet the be sent
+    // (we are not testing the connection acknowledgement here so it will be ignored by this test)
+    helper.WaitForProfilingPacketsSent();
+
+    // Force the profiling service to the "Active" state
+    helper.ForceTransitionToState(ProfilingState::Active);
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
+
+    // Get the mock profiling connection
+    MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
+    BOOST_CHECK(mockProfilingConnection);
+
+    // Check that the profiling connection is open
+    BOOST_CHECK(mockProfilingConnection->IsOpen());
+
+    profilingService.Disconnect();
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected); // The state should have changed
+
+    // Check that the profiling connection has been reset
+    mockProfilingConnection = helper.GetMockProfilingConnection();
+    BOOST_CHECK(mockProfilingConnection == nullptr);
 
     // Reset the profiling service to stop any running thread
     options.m_EnableProfiling = false;

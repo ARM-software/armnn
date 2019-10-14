@@ -103,6 +103,26 @@ void ProfilingService::Update()
     }
 }
 
+void ProfilingService::Disconnect()
+{
+    ProfilingState currentState = m_StateMachine.GetCurrentState();
+    switch (currentState)
+    {
+    case ProfilingState::Uninitialised:
+    case ProfilingState::NotConnected:
+    case ProfilingState::WaitingForAck:
+        return; // NOP
+    case ProfilingState::Active:
+        // Stop the command thread (if running)
+        Stop();
+
+        break;
+    default:
+        throw RuntimeException(boost::str(boost::format("Unknown profiling service state: %1")
+                                          % static_cast<int>(currentState)));
+    }
+}
+
 const ICounterDirectory& ProfilingService::GetCounterDirectory() const
 {
     return m_CounterDirectory;
@@ -244,7 +264,18 @@ void ProfilingService::InitializeCounterValue(uint16_t counterUid)
 void ProfilingService::Reset()
 {
     // Reset the profiling service
+    Stop();
+    // ...then delete all the counter data and configuration...
+    m_CounterIndex.clear();
+    m_CounterValues.clear();
+    m_CounterDirectory.Clear();
 
+    // ...finally reset the profiling state machine
+    m_StateMachine.Reset();
+}
+
+void ProfilingService::Stop()
+{
     // The order in which we reset/stop the components is not trivial!
 
     // First stop the threads (Command Handler first)...
@@ -253,15 +284,13 @@ void ProfilingService::Reset()
     m_PeriodicCounterCapture.Stop();
 
     // ...then destroy the profiling connection...
+    if (m_ProfilingConnection != nullptr && m_ProfilingConnection->IsOpen())
+    {
+        m_ProfilingConnection->Close();
+    }
     m_ProfilingConnection.reset();
 
-    // ...then delete all the counter data and configuration...
-    m_CounterIndex.clear();
-    m_CounterValues.clear();
-    m_CounterDirectory.Clear();
-
-    // ...finally reset the profiling state machine
-    m_StateMachine.Reset();
+    m_StateMachine.TransitionToState(ProfilingState::NotConnected);
 }
 
 inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const

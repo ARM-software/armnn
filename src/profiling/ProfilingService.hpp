@@ -45,6 +45,9 @@ public:
     // Updates the profiling service, making it transition to a new state if necessary
     void Update();
 
+    // Disconnects the profiling service from the external server
+    void Disconnect();
+
     // Getters for the profiling service state
     const ICounterDirectory& GetCounterDirectory() const;
     ProfilingState GetCurrentState() const;
@@ -70,6 +73,7 @@ private:
     void Initialize();
     void InitializeCounterValue(uint16_t counterUid);
     void Reset();
+    void Stop();
 
     // Helper function
     void CheckCounterUid(uint16_t counterUid) const;

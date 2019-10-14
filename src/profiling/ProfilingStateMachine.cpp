@@ -53,7 +53,7 @@ void ProfilingStateMachine::TransitionToState(ProfilingState newState)
         do
         {
             if (!IsOneOfStates(currentState, ProfilingState::Uninitialised, ProfilingState::NotConnected,
-                               ProfilingState::Active))
+                               ProfilingState::Active, ProfilingState::WaitingForAck))
             {
                 ThrowStateTransitionException(currentState, newState);
             }

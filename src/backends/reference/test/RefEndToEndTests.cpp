@@ -13,6 +13,7 @@
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
+#include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
@@ -1010,6 +1011,27 @@ BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndUint8NhwcTest)
 BOOST_AUTO_TEST_CASE(RefResizeNearestNeighborEndToEndInt16NhwcTest)
 {
     ResizeNearestNeighborEndToEnd<armnn::DataType::QuantisedSymm16>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+// InstanceNormalization
+BOOST_AUTO_TEST_CASE(RefInstanceNormalizationNhwcEndToEndTest1)
+{
+    InstanceNormalizationNhwcEndToEndTest1(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefInstanceNormalizationNchwEndToEndTest1)
+{
+    InstanceNormalizationNchwEndToEndTest1(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefInstanceNormalizationNhwcEndToEndTest2)
+{
+    InstanceNormalizationNhwcEndToEndTest2(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefInstanceNormalizationNchwEndToEndTest2)
+{
+    InstanceNormalizationNchwEndToEndTest2(defaultBackends);
 }
 
 #if !defined(__ANDROID__)

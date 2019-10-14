@@ -19,6 +19,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     DynamicBackendTests.hpp
     EndToEndTestImpl.hpp
     GatherEndToEndTestImpl.hpp
+    InstanceNormalizationEndToEndTestImpl.cpp
+    InstanceNormalizationEndToEndTestImpl.hpp
     IsLayerSupportedTestImpl.hpp
     JsonPrinterTestImpl.cpp
     JsonPrinterTestImpl.hpp

@@ -10,6 +10,7 @@
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
@@ -388,6 +389,17 @@ BOOST_AUTO_TEST_CASE(NeonImportAndExportWorkload)
 BOOST_AUTO_TEST_CASE(NeonExportOutputWithSeveralOutputSlotConnectionsTest)
 {
     ExportOutputWithSeveralOutputSlotConnectionsTest(defaultBackends);
+}
+
+// InstanceNormalization
+BOOST_AUTO_TEST_CASE(NeonInstanceNormalizationNchwEndToEndTest1)
+{
+    InstanceNormalizationNchwEndToEndTest1(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonInstanceNormalizationNchwEndToEndTest2)
+{
+    InstanceNormalizationNchwEndToEndTest2(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

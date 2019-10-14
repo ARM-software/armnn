@@ -31,6 +31,7 @@ COMMON_SOURCES := \
 
 COMMON_TEST_SOURCES := \
     test/CommonTestUtils.cpp \
+    test/InstanceNormalizationEndToEndTestImpl.cpp \
     test/JsonPrinterTestImpl.cpp \
     test/QuantizedLstmEndToEndTestImpl.cpp \
     test/SpaceToDepthEndToEndTestImpl.cpp \

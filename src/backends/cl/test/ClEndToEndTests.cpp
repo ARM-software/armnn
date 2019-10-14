@@ -10,6 +10,7 @@
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
@@ -154,6 +155,27 @@ BOOST_AUTO_TEST_CASE(ClGreaterBroadcastEndToEndUint8Test)
     ArithmeticBroadcastEndToEnd<armnn::DataType::QuantisedAsymm8, armnn::DataType::Boolean>(defaultBackends,
                                                                                             LayerType::Greater,
                                                                                             expectedOutput);
+}
+
+// InstanceNormalization
+BOOST_AUTO_TEST_CASE(ClInstanceNormalizationNhwcEndToEndTest1)
+{
+    InstanceNormalizationNhwcEndToEndTest1(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClInstanceNormalizationNchwEndToEndTest1)
+{
+    InstanceNormalizationNchwEndToEndTest1(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClInstanceNormalizationNhwcEndToEndTest2)
+{
+    InstanceNormalizationNhwcEndToEndTest2(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClInstanceNormalizationNchwEndToEndTest2)
+{
+    InstanceNormalizationNchwEndToEndTest2(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(ClPreluEndToEndFloat32Test)

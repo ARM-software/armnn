@@ -897,6 +897,32 @@ bool RefLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const LogSoftmaxDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    ignore_unused(descriptor);
+
+    std::array<DataType, 2> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::Float16
+    };
+
+    bool supported = true;
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference LogSoftmax: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference LogSoftmax: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference LogSoftmax: input and output types do not match");
+
+    return supported;
+}
+
 bool RefLayerSupport::IsLstmSupported(const TensorInfo& input,
                                       const TensorInfo& outputStateIn,
                                       const TensorInfo& cellStateIn,
@@ -1499,13 +1525,13 @@ bool RefLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference concatenation: output type not supported");
+                                  "Reference Softmax: output type not supported");
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
-                                  "Reference concatenation: input type not supported");
+                                  "Reference Softmax: input type not supported");
 
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
-                                  "Reference concatenation: input type not supported");
+                                  "Reference Softmax: input type not supported");
 
     return supported;
 }

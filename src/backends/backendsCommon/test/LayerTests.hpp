@@ -29,6 +29,7 @@
 #include <backendsCommon/test/layerTests/GreaterTestImpl.hpp>
 #include <backendsCommon/test/layerTests/InstanceNormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/L2NormalizationTestImpl.hpp>
+#include <backendsCommon/test/layerTests/LogSoftmaxTestImpl.hpp>
 #include <backendsCommon/test/layerTests/LstmTestImpl.hpp>
 #include <backendsCommon/test/layerTests/MaximumTestImpl.hpp>
 #include <backendsCommon/test/layerTests/MeanTestImpl.hpp>

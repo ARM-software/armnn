@@ -37,6 +37,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Gather.hpp
     InstanceNorm.cpp
     InstanceNorm.hpp
+    LogSoftmax.cpp
+    LogSoftmax.hpp
     LstmUtils.hpp
     LstmUtils.cpp
     Maximum.hpp
@@ -95,6 +97,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefInstanceNormalizationWorkload.hpp
     RefL2NormalizationWorkload.cpp
     RefL2NormalizationWorkload.hpp
+    RefLogSoftmaxWorkload.cpp
+    RefLogSoftmaxWorkload.hpp
     RefLstmWorkload.cpp
     RefLstmWorkload.hpp
     RefMeanWorkload.cpp

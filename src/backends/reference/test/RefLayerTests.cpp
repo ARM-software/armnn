@@ -868,6 +868,17 @@ ARMNN_AUTO_TEST_CASE(L2Normalization2dShape, L2Normalization2dShapeTest);
 ARMNN_AUTO_TEST_CASE(L2NormalizationDefaultEpsilon, L2NormalizationDefaultEpsilonTest, DataLayout::NCHW)
 ARMNN_AUTO_TEST_CASE(L2NormalizationNonDefaultEpsilon, L2NormalizationNonDefaultEpsilonTest, DataLayout::NCHW)
 
+// LogSoftmax
+ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat32_1, LogSoftmaxTest1<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat32_2, LogSoftmaxTest2<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat32_3, LogSoftmaxTest3<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat32_4, LogSoftmaxTest4<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat16_1, LogSoftmaxTest1<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat16_2, LogSoftmaxTest2<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat16_3, LogSoftmaxTest3<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE(LogSoftmaxFloat16_4, LogSoftmaxTest4<DataType::Float16>)
+
 // Pad
 ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
 ARMNN_AUTO_TEST_CASE(PadFloat322dCustomPadding, PadFloat322dCustomPaddingTest)

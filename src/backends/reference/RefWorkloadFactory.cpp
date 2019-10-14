@@ -23,10 +23,9 @@ static const BackendId s_Id{RefBackendId()};
 }
 template <typename F32Workload, typename U8Workload, typename QueueDescriptorType>
 std::unique_ptr<IWorkload> RefWorkloadFactory::MakeWorkload(const QueueDescriptorType& descriptor,
-    const WorkloadInfo& info) const
+                                                            const WorkloadInfo& info) const
 {
-    return armnn::MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload, NullWorkload, NullWorkload>(descriptor,
-                                                                                                        info);
+    return MakeWorkloadHelper<NullWorkload, F32Workload, U8Workload, NullWorkload, NullWorkload>(descriptor, info);
 }
 
 template <DataType ArmnnType>
@@ -95,6 +94,155 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
+{
+    return std::make_unique<RefAbsWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
+                                                                const WorkloadInfo& info) const
+{
+    return std::make_unique<RefActivationWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
+{
+    return std::make_unique<RefAdditionWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
+{
+    return std::make_unique<RefArgMinMaxWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateBatchNormalization(
+    const BatchNormalizationQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefBatchNormalizationWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
+                                                                    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefBatchToSpaceNdWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    return std::make_unique<RefConcatWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
+{
+    return std::make_unique<RefConstantWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp16ToFp32(
+    const ConvertFp16ToFp32QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefConvertFp16ToFp32Workload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp32ToFp16(
+    const ConvertFp32ToFp16QueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefConvertFp32ToFp16Workload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
+{
+    return std::make_unique<RefConvolution2dWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    if (IsQSymm16(info))
+    {
+        return std::make_unique<RefDebugQSymm16Workload>(descriptor, info);
+    }
+    return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymm8Workload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    return std::make_unique<RefDepthToSpaceWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDepthwiseConvolution2d(
+    const DepthwiseConvolution2dQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefDepthwiseConvolution2dWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
+                                                                const WorkloadInfo& info) const
+{
+    return std::make_unique<RefDequantizeWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDetectionPostProcess(
+    const DetectionPostProcessQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefDetectionPostProcessWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDivision(const DivisionQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
+{
+    return std::make_unique<RefDivisionWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<RefEqualWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(
+    const FakeQuantizationQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return MakeWorkload<RefFakeQuantizationFloat32Workload, NullWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<RefFloorWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFullyConnected(
+    const FullyConnectedQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefFullyConnectedWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const GatherQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    return std::make_unique<RefGatherWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
+{
+    return std::make_unique<RefGreaterWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
@@ -113,6 +261,87 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInput(const InputQueueDescr
     }
 
     return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInstanceNormalization(
+    const InstanceNormalizationQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefInstanceNormalizationWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
+                                                                     const WorkloadInfo& info) const
+{
+    return std::make_unique<RefL2NormalizationWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateLogSoftmax(const LogSoftmaxQueueDescriptor& descriptor,
+                                                                const WorkloadInfo& info) const
+{
+    return std::make_unique<RefLogSoftmaxWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
+{
+    return std::make_unique<RefLstmWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMaximum(const MaximumQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
+{
+    return std::make_unique<RefMaximumWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMean(const MeanQueueDescriptor& descriptor,
+                                                          const WorkloadInfo& info) const
+{
+    return  std::make_unique<RefMeanWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
+{
+    if (descriptor.m_Inputs.empty())
+    {
+        throw InvalidArgumentException("RefWorkloadFactory: CreateMemCopy() expected an input tensor.");
+    }
+    return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
+{
+    if (descriptor.m_Inputs.empty())
+    {
+        throw InvalidArgumentException("RefWorkloadFactory: CreateMemImport() expected an input tensor.");
+    }
+    return std::make_unique<ImportMemGenericWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    return CreateConcat(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
+{
+    return std::make_unique<RefMinimumWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMultiplication(const MultiplicationQueueDescriptor& descriptor,
+                                                                    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefMultiplicationWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateNormalization(const NormalizationQueueDescriptor& descriptor,
+                                                                   const WorkloadInfo& info) const
+{
+    return std::make_unique<RefNormalizationWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateOutput(const OutputQueueDescriptor& descriptor,
@@ -134,44 +363,22 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateOutput(const OutputQueueDes
     return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
-                                                                const WorkloadInfo&              info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
+                                                         const WorkloadInfo& info) const
 {
-    return std::make_unique<RefActivationWorkload>(descriptor, info);
+    if (IsQSymm16(info))
+    {
+        return std::make_unique<RefPadQSymm16Workload>(descriptor, info);
+    }
+    else if (IsFloat16(info))
+    {
+        return std::make_unique<RefPadFloat16Workload>(descriptor, info);
+    }
+    return MakeWorkload<RefPadFloat32Workload, RefPadQAsymm8Workload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateArgMinMax(const ArgMinMaxQueueDescriptor& descriptor,
-                                                               const WorkloadInfo&              info) const
-{
-    return std::make_unique<RefArgMinMaxWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
-                                                             const WorkloadInfo&           info) const
-{
-    return std::make_unique<RefSoftmaxWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
-                                                              const WorkloadInfo&            info) const
-{
-    return std::make_unique<RefSplitterWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
-                                                                   const WorkloadInfo&          info) const
-{
-    return CreateConcat(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateFullyConnected(
-    const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return std::make_unique<RefFullyConnectedWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
-                                                                    const WorkloadInfo&           info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePermute(const PermuteQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
 {
     if (IsQSymm16(info))
     {
@@ -181,78 +388,34 @@ std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePermute(const Permut
         NullWorkload, NullWorkload>(descriptor, info);
 }
 
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
-                                                                      const WorkloadInfo&           info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
 {
     return std::make_unique<RefPooling2dWorkload>(descriptor, info);
 }
 
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateConvolution2d(
-    const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
+                                                                 const WorkloadInfo& info) const
 {
-    return std::make_unique<RefConvolution2dWorkload>(descriptor, info);
+    return nullptr;
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDepthToSpace(const DepthToSpaceQueueDescriptor& descriptor,
-                                                                  const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePrelu(const PreluQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
 {
-    return std::make_unique<RefDepthToSpaceWorkload>(descriptor, info);
+    return std::make_unique<RefPreluWorkload>(descriptor, info);
 }
 
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDepthwiseConvolution2d(
-    const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
 {
-    return std::make_unique<RefDepthwiseConvolution2dWorkload>(descriptor, info);
+    return std::make_unique<RefQuantizeWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDetectionPostProcess(
-    const armnn::DetectionPostProcessQueueDescriptor& descriptor, const armnn::WorkloadInfo& info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
 {
-    return std::make_unique<RefDetectionPostProcessWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateNormalization(
-    const NormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return std::make_unique<RefNormalizationWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateAddition(const AdditionQueueDescriptor& descriptor,
-                                                                     const WorkloadInfo&            info) const
-{
-    return std::make_unique<RefAdditionWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMultiplication(
-    const MultiplicationQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return std::make_unique<RefMultiplicationWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateBatchNormalization(
-    const BatchNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return std::make_unique<RefBatchNormalizationWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMemCopy(const MemCopyQueueDescriptor& descriptor,
-                                                                    const WorkloadInfo&        info) const
-{
-    if (descriptor.m_Inputs.empty())
-    {
-        throw InvalidArgumentException("RefWorkloadFactory: CreateMemCopy() expected an input tensor.");
-    }
-    return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMemImport(const MemImportQueueDescriptor& descriptor,
-                                                                      const WorkloadInfo&        info) const
-{
-    if (descriptor.m_Inputs.empty())
-    {
-        throw InvalidArgumentException("RefWorkloadFactory: CreateMemImport() expected an input tensor.");
-    }
-    return std::make_unique<ImportMemGenericWorkload>(descriptor, info);
+    return std::make_unique<RefReshapeWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResize(const ResizeQueueDescriptor& descriptor,
@@ -273,206 +436,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResizeBilinear(const Resize
     return CreateResize(resizeDescriptor, info);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(
-    const FakeQuantizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return MakeWorkload<RefFakeQuantizationFloat32Workload, NullWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateL2Normalization(const L2NormalizationQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefL2NormalizationWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
-                                                                   const WorkloadInfo&          info) const
-{
-    return std::make_unique<RefConcatWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConstant(const ConstantQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefConstantWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateReshape(const ReshapeQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefReshapeWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefSpaceToBatchNdWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSpaceToDepth(const armnn::SpaceToDepthQueueDescriptor& descriptor,
-    const armnn::WorkloadInfo& info) const
-{
-    return std::make_unique<RefSpaceToDepthWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFloor(const FloorQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
-{
-    return std::make_unique<RefFloorWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateLstm(const LstmQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefLstmWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp16ToFp32(
-    const ConvertFp16ToFp32QueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefConvertFp16ToFp32Workload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvertFp32ToFp16(
-    const ConvertFp32ToFp16QueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefConvertFp32ToFp16Workload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateDivision(
-    const DivisionQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return std::make_unique<RefDivisionWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateSubtraction(
-    const SubtractionQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return std::make_unique<RefSubtractionWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMaximum(
-    const MaximumQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return std::make_unique<RefMaximumWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMean(
-    const MeanQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return  std::make_unique<RefMeanWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateMinimum(
-    const MinimumQueueDescriptor& descriptor, const WorkloadInfo& info) const
-{
-    return std::make_unique<RefMinimumWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePad(const PadQueueDescriptor& descriptor,
-                                                 const WorkloadInfo& info) const
-{
-    if (IsQSymm16(info))
-    {
-        return std::make_unique<RefPadQSymm16Workload>(descriptor, info);
-    }
-    else if (IsFloat16(info))
-    {
-        return std::make_unique<RefPadFloat16Workload>(descriptor, info);
-    }
-    return MakeWorkload<RefPadFloat32Workload, RefPadQAsymm8Workload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
-{
-    return std::make_unique<RefEqualWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
-                                                                    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefBatchToSpaceNdWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
-                                                                  const WorkloadInfo& info) const
-{
-    return std::make_unique<RefStridedSliceWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
-                                                             const WorkloadInfo& info) const
-{
-    return std::make_unique<RefGreaterWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
-{
-    if (IsQSymm16(info))
-    {
-        return std::make_unique<RefDebugQSymm16Workload>(descriptor, info);
-    }
-    return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymm8Workload>(descriptor, info);
-}
-
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
     return std::make_unique<RefRsqrtWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const armnn::GatherQueueDescriptor& descriptor,
-                                                            const armnn::WorkloadInfo& info) const
-{
-    return std::make_unique<RefGatherWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
-                                                                 const WorkloadInfo& info) const
-{
-    return nullptr;
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
-                                                              const WorkloadInfo& info) const
-{
-    return std::make_unique<RefQuantizeWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
-                                                                const WorkloadInfo& info) const
-{
-    return std::make_unique<RefDequantizeWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePrelu(const PreluQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
-{
-    return std::make_unique<RefPreluWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
-    const TransposeConvolution2dQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<RefTransposeConvolution2dWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
-{
-    return std::make_unique<RefStackWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info) const
-{
-    return std::make_unique<RefAbsWorkload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,
@@ -481,10 +448,53 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSlice(const SliceQueueDescr
     return std::make_unique<RefSliceWorkload>(descriptor, info);
 }
 
-std::unique_ptr<armnn::IWorkload> RefWorkloadFactory::CreateInstanceNormalization(
-    const InstanceNormalizationQueueDescriptor& descriptor, const WorkloadInfo& info) const
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
 {
-    return std::make_unique<RefInstanceNormalizationWorkload>(descriptor, info);
+    return std::make_unique<RefSoftmaxWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSpaceToBatchNd(const SpaceToBatchNdQueueDescriptor& descriptor,
+                                                                    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefSpaceToBatchNdWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSpaceToDepth(const SpaceToDepthQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    return std::make_unique<RefSpaceToDepthWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
+{
+    return std::make_unique<RefSplitterWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStack(const StackQueueDescriptor& descriptor,
+                                                           const WorkloadInfo& info) const
+{
+    return std::make_unique<RefStackWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateStridedSlice(const StridedSliceQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    return std::make_unique<RefStridedSliceWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateSubtraction(const SubtractionQueueDescriptor& descriptor,
+                                                                 const WorkloadInfo& info) const
+{
+    return std::make_unique<RefSubtractionWorkload>(descriptor, info);
+}
+
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateTransposeConvolution2d(
+    const TransposeConvolution2dQueueDescriptor& descriptor,
+    const WorkloadInfo& info) const
+{
+    return std::make_unique<RefTransposeConvolution2dWorkload>(descriptor, info);
 }
 
 } // namespace armnn

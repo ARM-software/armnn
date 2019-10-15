@@ -811,12 +811,15 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
 void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, const IndexValuePairsVector& values)
 {
+    uint32_t uint16_t_size = sizeof(uint16_t);
+    uint32_t uint32_t_size = sizeof(uint32_t);
+    uint32_t uint64_t_size = sizeof(uint64_t);
+
     uint32_t packetFamily = 1;
     uint32_t packetClass = 0;
     uint32_t packetType = 0;
-    uint32_t headerSize = numeric_cast<uint32_t>(2 * sizeof(uint32_t));
-    uint32_t bodySize = numeric_cast<uint32_t>((1 * sizeof(uint64_t)) +
-                                               (values.size() * (sizeof(uint16_t) + sizeof(uint32_t))));
+    uint32_t headerSize = 2 * uint32_t_size;
+    uint32_t bodySize = uint64_t_size + numeric_cast<uint32_t>(values.size()) * (uint16_t_size + uint32_t_size);
     uint32_t totalSize = headerSize + bodySize;
     uint32_t offset = 0;
     uint32_t reserved = 0;
@@ -833,22 +836,24 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
     // Create header.
     WriteUint32(writeBuffer,
                 offset,
-                ((packetFamily & 0x3F) << 26) | ((packetClass & 0x3FF) << 19) | ((packetType & 0x3FFF) << 16));
-    offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+                ((packetFamily & 0x0000003F) << 26) |
+                ((packetClass  & 0x0000007F) << 19) |
+                ((packetType   & 0x00000007) << 16));
+    offset += uint32_t_size;
     WriteUint32(writeBuffer, offset, bodySize);
 
     // Copy captured Timestamp.
-    offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+    offset += uint32_t_size;
     WriteUint64(writeBuffer, offset, timestamp);
 
     // Copy selectedCounterIds.
-    offset += numeric_cast<uint32_t>(sizeof(uint64_t));
+    offset += uint64_t_size;
     for (const auto& pair: values)
     {
         WriteUint16(writeBuffer, offset, pair.first);
-        offset += numeric_cast<uint32_t>(sizeof(uint16_t));
+        offset += uint16_t_size;
         WriteUint32(writeBuffer, offset, pair.second);
-        offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+        offset += uint32_t_size;
     }
 
     m_BufferManager.Commit(writeBuffer, totalSize);
@@ -857,11 +862,13 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
 void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePeriod,
                                                            const std::vector<uint16_t>& selectedCounterIds)
 {
+    uint32_t uint16_t_size = sizeof(uint16_t);
+    uint32_t uint32_t_size = sizeof(uint32_t);
+
     uint32_t packetFamily = 0;
     uint32_t packetId = 4;
-    uint32_t headerSize = numeric_cast<uint32_t>(2 * sizeof(uint32_t));
-    uint32_t bodySize   = numeric_cast<uint32_t>((1 * sizeof(uint32_t)) +
-                                                 (selectedCounterIds.size() * sizeof(uint16_t)));
+    uint32_t headerSize = 2 * uint32_t_size;
+    uint32_t bodySize = uint32_t_size + numeric_cast<uint32_t>(selectedCounterIds.size()) * uint16_t_size;
     uint32_t totalSize = headerSize + bodySize;
     uint32_t offset = 0;
     uint32_t reserved = 0;
@@ -877,19 +884,19 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
 
     // Create header.
     WriteUint32(writeBuffer, offset, ((packetFamily & 0x3F) << 26) | ((packetId & 0x3FF) << 16));
-    offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+    offset += uint32_t_size;
     WriteUint32(writeBuffer, offset, bodySize);
 
     // Copy capturePeriod.
-    offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+    offset += uint32_t_size;
     WriteUint32(writeBuffer, offset, capturePeriod);
 
     // Copy selectedCounterIds.
-    offset += numeric_cast<uint32_t>(sizeof(uint32_t));
+    offset += uint32_t_size;
     for(const uint16_t& id: selectedCounterIds)
     {
         WriteUint16(writeBuffer, offset, id);
-        offset += numeric_cast<uint32_t>(sizeof(uint16_t));
+        offset += uint16_t_size;
     }
 
     m_BufferManager.Commit(writeBuffer, totalSize);

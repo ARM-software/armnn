@@ -313,8 +313,9 @@ void ProfilingService::InitializeCounterValue(uint16_t counterUid)
 
 void ProfilingService::Reset()
 {
-    // Reset the profiling service
+    // Stop the profiling service...
     Stop();
+
     // ...then delete all the counter data and configuration...
     m_CounterIndex.clear();
     m_CounterValues.clear();
@@ -333,13 +334,14 @@ void ProfilingService::Stop()
     m_SendCounterPacket.Stop(false);
     m_PeriodicCounterCapture.Stop();
 
-    // ...then destroy the profiling connection...
+    // ...then close and destroy the profiling connection...
     if (m_ProfilingConnection != nullptr && m_ProfilingConnection->IsOpen())
     {
         m_ProfilingConnection->Close();
     }
     m_ProfilingConnection.reset();
 
+    // ...then move to the "NotConnected" state
     m_StateMachine.TransitionToState(ProfilingState::NotConnected);
 }
 

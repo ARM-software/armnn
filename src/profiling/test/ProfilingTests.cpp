@@ -2119,10 +2119,10 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     uint32_t headerWord0 = ReadUint32(buffer, 0);
     uint32_t headerWord1 = ReadUint32(buffer, 4);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 1);   // packet family
-    BOOST_TEST(((headerWord0 >> 19) & 0x3F) == 0);   // packet class
-    BOOST_TEST(((headerWord0 >> 16) & 0x3) == 0);    // packet type
-    BOOST_TEST(headerWord1 == 20);                   // data length
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 1); // packet family
+    BOOST_TEST(((headerWord0 >> 19) & 0x0000007F) == 0); // packet class
+    BOOST_TEST(((headerWord0 >> 16) & 0x00000007) == 0); // packet type
+    BOOST_TEST(headerWord1 == 20);
 
     uint32_t offset = 16;
     uint16_t readIndex = ReadUint16(buffer, offset);

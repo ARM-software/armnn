@@ -30,9 +30,7 @@ void PeriodicCounterCapture::Start()
     m_KeepRunning.store(true);
 
     // Start the new capture thread.
-    m_PeriodCaptureThread = std::thread(&PeriodicCounterCapture::Capture,
-                                        this,
-                                        std::ref(m_ReadCounterValues));
+    m_PeriodCaptureThread = std::thread(&PeriodicCounterCapture::Capture, this, std::ref(m_ReadCounterValues));
 }
 
 void PeriodicCounterCapture::Stop()
@@ -47,6 +45,7 @@ void PeriodicCounterCapture::Stop()
         m_PeriodCaptureThread.join();
     }
 
+    // Mark the capture thread as not running
     m_IsRunning = false;
 }
 
@@ -114,7 +113,6 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
 
     }
     while (m_KeepRunning.load());
-
 }
 
 } // namespace profiling

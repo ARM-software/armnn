@@ -78,44 +78,42 @@ bool SocketProfilingConnection::WritePacket(const unsigned char* buffer, uint32_
 
 Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
 {
-    // Is there currently at least a headers worth of data waiting to be read?
-    int bytes_available;
+    // Is there currently at least a header worth of data waiting to be read?
+    int bytes_available = 0;
     ioctl(m_Socket[0].fd, FIONREAD, &bytes_available);
     if (bytes_available >= 8)
     {
         // Yes there is. Read it:
         return ReceivePacket();
     }
-    else
+
+    // Poll for data on the socket or until timeout occurs
+    int pollResult = poll(m_Socket, 1, static_cast<int>(timeout));
+
+    switch (pollResult)
     {
-        // Poll for data on the socket or until timeout occurs
-        int pollResult = poll(m_Socket, 1, static_cast<int>(timeout));
+    case -1: // Error
+        throw armnn::RuntimeException(std::string("Read failure from socket: ") + strerror(errno));
 
-        switch (pollResult)
+    case 0: // Timeout
+        throw TimeoutException("Timeout while reading from socket");
+
+    default: // Normal poll return but it could still contain an error signal
+
+        // Check if the socket reported an error
+        if (m_Socket[0].revents & (POLLNVAL | POLLERR | POLLHUP))
         {
-            case -1: // Error
-                throw armnn::RuntimeException(std::string("Read failure from socket: ") + strerror(errno));
-
-            case 0: // Timeout
-                throw TimeoutException("Timeout while reading from socket");
-
-            default: // Normal poll return but it could still contain an error signal
-
-                // Check if the socket reported an error
-                if (m_Socket[0].revents & (POLLNVAL | POLLERR | POLLHUP))
-                {
-                    throw armnn::RuntimeException(std::string("Socket reported an error: ") + strerror(errno));
-                }
-
-                // Check if there is data to read
-                if (!(m_Socket[0].revents & (POLLIN)))
-                {
-                    // This is a very odd case. The file descriptor was woken up but no data was written.
-                    throw armnn::RuntimeException("Poll resulted in : no data to read");
-                }
-
-                return ReceivePacket();
+            throw armnn::RuntimeException(std::string("Socket reported an error: ") + strerror(errno));
         }
+
+        // Check if there is data to read
+        if (!(m_Socket[0].revents & (POLLIN)))
+        {
+            // This is a very odd case. The file descriptor was woken up but no data was written.
+            throw armnn::RuntimeException("Poll resulted in : no data to read");
+        }
+
+        return ReceivePacket();
     }
 }
 
@@ -127,6 +125,7 @@ Packet SocketProfilingConnection::ReceivePacket()
         // What do we do here if there's not a valid 8 byte header to read?
         throw armnn::RuntimeException("The received packet did not contains a valid MIPE header");
     }
+
     // stream_metadata_identifier is the first 4 bytes
     uint32_t metadataIdentifier = 0;
     std::memcpy(&metadataIdentifier, header, sizeof(metadataIdentifier));
@@ -135,10 +134,10 @@ Packet SocketProfilingConnection::ReceivePacket()
     uint32_t dataLength = 0;
     std::memcpy(&dataLength, header + 4u, sizeof(dataLength));
 
-        std::unique_ptr<unsigned char[]> packetData;
+    std::unique_ptr<unsigned char[]> packetData;
     if (dataLength > 0)
     {
-            packetData = std::make_unique<unsigned char[]>(dataLength);
+        packetData = std::make_unique<unsigned char[]>(dataLength);
         ssize_t receivedLength = recv(m_Socket[0].fd, packetData.get(), dataLength, 0);
         if (receivedLength < 0)
         {

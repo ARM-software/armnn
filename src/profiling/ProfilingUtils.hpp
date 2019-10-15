@@ -141,6 +141,11 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
                                                           unsigned int bufferSize,
                                                           unsigned int& numberOfBytesWritten);
 
+TimelinePacketStatus WriteTimelineEventClassBinaryPacket(uint64_t profilingGuid,
+                                                         unsigned char* buffer,
+                                                         unsigned int bufferSize,
+                                                         unsigned int& numberOfBytesWritten);
+
 class BufferExhaustion : public armnn::Exception
 {
     using Exception::Exception;

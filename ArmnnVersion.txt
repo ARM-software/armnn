@@ -1,0 +1,9 @@
+#
+# Copyright © 2019 Arm Ltd. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+
+# ArmNN version number components
+ARMNN_MAJOR_VERSION 19
+ARMNN_MINOR_VERSION 08
+ARMNN_PATCH_VERSION 00

@@ -7,6 +7,7 @@ project(armnn)
 
 set(additional_cmake_files)
 list(APPEND additional_cmake_files
+    cmake/ArmnnVersion.cmake
     cmake/Utils.cmake
     cmake/GlobalConfig.cmake
     cmake/AddDllCopyCommands.cmake)

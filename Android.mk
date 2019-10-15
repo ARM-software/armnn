@@ -6,7 +6,6 @@
 LOCAL_PATH := $(call my-dir)
 
 # Configure these paths if you move the source or Khronos headers
-#
 OPENCL_HEADER_PATH := $(LOCAL_PATH)/../clframework/include
 NN_HEADER_PATH := $(LOCAL_PATH)/../../../../frameworks/ml/nn/runtime/include
 ARMNN_HEADER_PATH := $(LOCAL_PATH)/include
@@ -23,6 +22,11 @@ ARMNN_BACKEND_COMMON_MAKEFILE_DIRS := $(subst /common.mk,,$(ARMNN_BACKEND_COMMON
 ARMNN_BACKEND_MAKEFILE_LOCAL_PATHS := $(wildcard $(LOCAL_PATH)/src/backends/*/backend.mk)
 ARMNN_BACKEND_MAKEFILE_PATHS := $(subst $(LOCAL_PATH),,$(ARMNN_BACKEND_MAKEFILE_LOCAL_PATHS))
 ARMNN_BACKEND_MAKEFILE_DIRS := $(subst /backend.mk,,$(ARMNN_BACKEND_MAKEFILE_PATHS))
+
+# Get ArmNN's version from file
+get_version_number = $(shell sed -n 's/.*$1  *\([0-9*]\)/\1/p' $(LOCAL_PATH)/ArmnnVersion.txt)
+ARMNN_VERSION := 20$(call get_version_number,ARMNN_MAJOR_VERSION)$(call get_version_number,ARMNN_MINOR_VERSION)$(call get_version_number,ARMNN_PATCH_VERSION)
+$(info armnn ARMNN_VERSION: $(ARMNN_VERSION))
 
 ##############
 # libarmnn.a #
@@ -207,7 +211,9 @@ LOCAL_CFLAGS := \
         -std=$(CPP_VERSION) \
         -fexceptions \
         -Wno-unused-parameter \
-        -frtti
+        -frtti \
+        -DARMNN_VERSION_FROM_FILE=$(ARMNN_VERSION)
+
 # The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
 ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 LOCAL_CFLAGS += \
@@ -280,7 +286,9 @@ LOCAL_CFLAGS := \
         -std=$(CPP_VERSION) \
         -fexceptions \
         -frtti \
-        -isystem vendor/arm/android-nn-driver/boost_1_64_0
+        -isystem vendor/arm/android-nn-driver/boost_1_64_0 \
+        -DARMNN_VERSION_FROM_FILE=$(ARMNN_VERSION)
+
 # The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
 ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 LOCAL_CFLAGS += \

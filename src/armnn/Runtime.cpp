@@ -149,7 +149,7 @@ Runtime::Runtime(const CreationOptions& options)
     BOOST_LOG_TRIVIAL(info) << "ArmNN v" << ARMNN_VERSION << "\n";
 
     // pass configuration info to the profiling service
-    armnn::profiling::ProfilingService::Instance().ResetExternalProfilingOptions(options.m_ProfilingOptions);
+    armnn::profiling::ProfilingService::Instance().ConfigureProfilingService(options.m_ProfilingOptions);
 
     // Load any available/compatible dynamic backend before the runtime
     // goes through the backend registry

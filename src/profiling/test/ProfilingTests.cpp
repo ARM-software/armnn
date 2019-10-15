@@ -3137,4 +3137,31 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
     profilingService.ResetExternalProfilingOptions(options, true);
 }
 
+BOOST_AUTO_TEST_CASE(CheckConfigureProfilingServiceOn)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    profilingService.ConfigureProfilingService(options);
+    // should get as far as NOT_CONNECTED
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
+}
+
+BOOST_AUTO_TEST_CASE(CheckConfigureProfilingServiceOff)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    profilingService.ConfigureProfilingService(options);
+    // should not move from Uninitialised
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
+    // Reset the profiling service to stop any running thread
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

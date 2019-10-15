@@ -42,6 +42,9 @@ public:
 
     // Resets the profiling options, optionally clears the profiling service entirely
     void ResetExternalProfilingOptions(const ExternalProfilingOptions& options, bool resetProfilingService = false);
+    ProfilingState ConfigureProfilingService(const ExternalProfilingOptions& options,
+                                             bool resetProfilingService = false);
+
 
     // Updates the profiling service, making it transition to a new state if necessary
     void Update();

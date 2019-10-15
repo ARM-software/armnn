@@ -28,6 +28,56 @@ void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOpti
     }
 }
 
+ProfilingState ProfilingService::ConfigureProfilingService(
+        const ExternalProfilingOptions& options,
+        bool resetProfilingService)
+{
+    ResetExternalProfilingOptions(options, resetProfilingService);
+    ProfilingState currentState = m_StateMachine.GetCurrentState();
+    if (options.m_EnableProfiling)
+    {
+        switch (currentState)
+        {
+            case ProfilingState::Uninitialised:
+                Update(); // should transition to NotConnected
+                Update(); // will either stay in NotConnected because there is no server
+                          // or will enter WaitingForAck.
+                currentState = m_StateMachine.GetCurrentState();
+                if (currentState == ProfilingState::WaitingForAck)
+                {
+                    Update(); // poke it again to send out the metadata packet
+                }
+                currentState = m_StateMachine.GetCurrentState();
+                return currentState;
+            case ProfilingState::NotConnected:
+                Update(); // will either stay in NotConnected because there is no server
+                          // or will enter WaitingForAck
+                currentState = m_StateMachine.GetCurrentState();
+                if (currentState == ProfilingState::WaitingForAck)
+                {
+                    Update(); // poke it again to send out the metadata packet
+                }
+                currentState = m_StateMachine.GetCurrentState();
+                return currentState;
+            default:
+                return currentState;
+        }
+    }
+    else
+    {
+        // Make sure profiling is shutdown
+        switch (currentState)
+        {
+            case ProfilingState::Uninitialised:
+            case ProfilingState::NotConnected:
+                return currentState;
+            default:
+                Stop();
+                return m_StateMachine.GetCurrentState();
+        }
+    }
+}
+
 void ProfilingService::Update()
 {
     if (!m_Options.m_EnableProfiling)

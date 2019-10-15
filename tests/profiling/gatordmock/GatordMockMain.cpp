@@ -7,6 +7,7 @@
 #include "../../../src/profiling/PeriodicCounterSelectionCommandHandler.hpp"
 #include "CommandFileParser.hpp"
 #include "CommandLineProcessor.hpp"
+#include "DirectoryCaptureCommandHandler.hpp"
 #include "GatordMockService.hpp"
 #include "PeriodicCounterCaptureCommandHandler.hpp"
 #include "PeriodicCounterSelectionResponseHandler.hpp"
@@ -34,9 +35,13 @@ int main(int argc, char* argv[])
     armnn::gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
         1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue());
 
+    armnn::gatordmock::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
+        0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue());
+
     // Register different derived functors
     registry.RegisterFunctor(&periodicCounterSelectionResponseHandler);
     registry.RegisterFunctor(&counterCaptureCommandHandler);
+    registry.RegisterFunctor(&directoryCaptureCommandHandler);
 
     armnn::gatordmock::GatordMockService mockService(registry, cmdLine.IsEchoEnabled());
 

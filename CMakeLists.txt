@@ -905,8 +905,12 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/CommandFileParser.cpp
         tests/profiling/gatordmock/CommandLineProcessor.hpp
         tests/profiling/gatordmock/CommandLineProcessor.cpp
+        tests/profiling/gatordmock/CounterDirectory.hpp
+        tests/profiling/gatordmock/DirectoryCaptureCommandHandler.cpp
+        tests/profiling/gatordmock/DirectoryCaptureCommandHandler.hpp
         tests/profiling/gatordmock/GatordMockService.hpp
         tests/profiling/gatordmock/GatordMockService.cpp
+        tests/profiling/gatordmock/MockUtils.cpp
         tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.cpp
         tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.hpp
         tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.cpp

@@ -34,6 +34,15 @@ void CommandFileParser::ParseFile(std::string CommandFile, GatordMockService& mo
 
         std::string command = tokens[0];
 
+        if (command == "LIST")
+        {
+            // Expected format for the SET command
+            //
+            //      LIST
+            //
+
+            mockService.SendRequestCounterDir();
+        }
         if (command == "SET")
         {
             // Expected format for the SET command

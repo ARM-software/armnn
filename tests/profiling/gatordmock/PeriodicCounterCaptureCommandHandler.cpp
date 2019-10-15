@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "MockUtils.hpp"
 #include "PeriodicCounterCaptureCommandHandler.hpp"
 
 #include <ProfilingUtils.hpp>
@@ -18,26 +19,6 @@ namespace gatordmock
 {
 
 using boost::numeric_cast;
-
-std::string CentreAlignFormatting(const std::string stringToPass, const int spacingWidth)
-{
-    std::stringstream outputStream, centrePadding;
-    int padding = spacingWidth - static_cast<int>(stringToPass.size());
-
-    for (int i = 0; i < padding / 2; ++i)
-    {
-        centrePadding << " ";
-    }
-
-    outputStream << centrePadding.str() << stringToPass << centrePadding.str();
-
-    if (padding > 0 && padding % 2 != 0)
-    {
-        outputStream << " ";
-    }
-
-    return outputStream.str();
-}
 
 void PeriodicCounterCaptureCommandHandler::ParseData(const armnn::profiling::Packet& packet)
 {

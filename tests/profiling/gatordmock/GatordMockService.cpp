@@ -136,6 +136,16 @@ void GatordMockService::SendConnectionAck()
     SendPacket(0, 1, nullptr, 0);
 }
 
+void GatordMockService::SendRequestCounterDir()
+{
+    if (m_EchoPackets)
+    {
+        std::cout << "Sending connection acknowledgement." << std::endl;
+    }
+    // The connection ack packet is an empty data packet with packetId == 1.
+    SendPacket(0, 3, nullptr, 0);
+}
+
 bool GatordMockService::LaunchReceivingThread()
 {
     if (m_EchoPackets)

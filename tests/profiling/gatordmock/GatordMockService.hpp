@@ -69,6 +69,9 @@ public:
     /// Send a connection acknowledged packet back to the client.
     void SendConnectionAck();
 
+    /// Send a request counter directory packet back to the client.
+    void SendRequestCounterDir();
+
     /// Start the thread that will receive all packets and print them nicely to stdout.
     bool LaunchReceivingThread();
 

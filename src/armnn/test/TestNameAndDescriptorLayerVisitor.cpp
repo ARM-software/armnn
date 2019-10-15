@@ -5,475 +5,261 @@
 #include "TestNameAndDescriptorLayerVisitor.hpp"
 #include "Network.hpp"
 
-namespace armnn
+#include <armnn/Exceptions.hpp>
+
+namespace
 {
 
-void Set2dDataValues(SplitterDescriptor descriptor, uint32_t value)
-{
-    for (unsigned int i = 0; i < descriptor.GetNumViews(); ++i)
-    {
-        for (unsigned int j = 0; j < descriptor.GetNumDimensions(); ++j)
-        {
-            descriptor.SetViewOriginCoord(i, j, value);
-            descriptor.SetViewSize(i, j, value);
-        }
-    }
+#define TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(name) \
+BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameAndDescriptor) \
+{ \
+    const char* layerName = "name##Layer"; \
+    armnn::name##Descriptor descriptor = GetDescriptor<armnn::name##Descriptor>(); \
+    Test##name##LayerVisitor visitor(descriptor, layerName); \
+    armnn::Network net; \
+    armnn::IConnectableLayer *const layer = net.Add##name##Layer(descriptor, layerName); \
+    layer->Accept(visitor); \
 }
 
-void Set2dDataValues(OriginsDescriptor& descriptor, uint32_t value)
+#define TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(name) \
+BOOST_AUTO_TEST_CASE(Check##name##LayerVisitorNameNullptrAndDescriptor) \
+{ \
+    armnn::name##Descriptor descriptor = GetDescriptor<armnn::name##Descriptor>(); \
+    Test##name##LayerVisitor visitor(descriptor); \
+    armnn::Network net; \
+    armnn::IConnectableLayer *const layer = net.Add##name##Layer(descriptor); \
+    layer->Accept(visitor); \
+}
+
+#define TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(name) \
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(name) \
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(name)
+
+template<typename Descriptor> Descriptor GetDescriptor();
+
+template<>
+armnn::ActivationDescriptor GetDescriptor<armnn::ActivationDescriptor>()
 {
-    for (unsigned int i = 0; i < descriptor.GetNumViews(); ++i)
+    armnn::ActivationDescriptor descriptor;
+    descriptor.m_Function = armnn::ActivationFunction::Linear;
+    descriptor.m_A        = 2.0f;
+    descriptor.m_B        = 2.0f;
+
+    return descriptor;
+}
+
+template<>
+armnn::ArgMinMaxDescriptor GetDescriptor<armnn::ArgMinMaxDescriptor>()
+{
+    armnn::ArgMinMaxDescriptor descriptor;
+    descriptor.m_Function = armnn::ArgMinMaxFunction::Max;
+    descriptor.m_Axis     = 1;
+
+    return descriptor;
+}
+
+template<>
+armnn::BatchToSpaceNdDescriptor GetDescriptor<armnn::BatchToSpaceNdDescriptor>()
+{
+    return armnn::BatchToSpaceNdDescriptor({ 1, 1 }, {{ 0, 0 }, { 0, 0 }});
+}
+
+template<>
+armnn::ConcatDescriptor GetDescriptor<armnn::ConcatDescriptor>()
+{
+    armnn::ConcatDescriptor descriptor(2, 2);
+    for (unsigned int i = 0u; i < descriptor.GetNumViews(); ++i)
     {
-        for (unsigned int j = 0; j < descriptor.GetNumDimensions(); ++j)
+        for (unsigned int j = 0u; j < descriptor.GetNumDimensions(); ++j)
         {
-            descriptor.SetViewOriginCoord(i, j, value);
+            descriptor.SetViewOriginCoord(i, j, i);
         }
     }
+
+    return descriptor;
 }
+
+template<>
+armnn::InstanceNormalizationDescriptor GetDescriptor<armnn::InstanceNormalizationDescriptor>()
+{
+    armnn::InstanceNormalizationDescriptor descriptor;
+    descriptor.m_Gamma      = 1.0f;
+    descriptor.m_Beta       = 2.0f;
+    descriptor.m_Eps        = 0.0001f;
+    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
+
+    return descriptor;
+}
+
+template<>
+armnn::L2NormalizationDescriptor GetDescriptor<armnn::L2NormalizationDescriptor>()
+{
+    armnn::L2NormalizationDescriptor descriptor;
+    descriptor.m_Eps        = 0.0001f;
+    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
+
+    return descriptor;
+}
+
+template<>
+armnn::MeanDescriptor GetDescriptor<armnn::MeanDescriptor>()
+{
+    return armnn::MeanDescriptor({ 1, 2, }, true);
+}
+
+template<>
+armnn::NormalizationDescriptor GetDescriptor<armnn::NormalizationDescriptor>()
+{
+    armnn::NormalizationDescriptor descriptor;
+    descriptor.m_NormChannelType = armnn::NormalizationAlgorithmChannel::Within;
+    descriptor.m_NormMethodType  = armnn::NormalizationAlgorithmMethod::LocalContrast;
+    descriptor.m_NormSize        = 1u;
+    descriptor.m_Alpha           = 1.0f;
+    descriptor.m_Beta            = 1.0f;
+    descriptor.m_K               = 1.0f;
+    descriptor.m_DataLayout      = armnn::DataLayout::NHWC;
+
+    return descriptor;
+}
+
+template<>
+armnn::PadDescriptor GetDescriptor<armnn::PadDescriptor>()
+{
+    return armnn::PadDescriptor({{ 1, 2 }, { 3, 4 }});
+}
+
+template<>
+armnn::PermuteDescriptor GetDescriptor<armnn::PermuteDescriptor>()
+{
+    return armnn::PermuteDescriptor({ 0, 1, 2, 3 });
+}
+
+template<>
+armnn::Pooling2dDescriptor GetDescriptor<armnn::Pooling2dDescriptor>()
+{
+    armnn::Pooling2dDescriptor descriptor;
+    descriptor.m_PoolType            = armnn::PoolingAlgorithm::Max;
+    descriptor.m_PadLeft             = 1u;
+    descriptor.m_PadRight            = 1u;
+    descriptor.m_PadTop              = 1u;
+    descriptor.m_PadBottom           = 1u;
+    descriptor.m_PoolWidth           = 1u;
+    descriptor.m_PoolHeight          = 1u;
+    descriptor.m_StrideX             = 1u;
+    descriptor.m_StrideY             = 1u;
+    descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Ceiling;
+    descriptor.m_PaddingMethod       = armnn::PaddingMethod::IgnoreValue;
+    descriptor.m_DataLayout          = armnn::DataLayout::NHWC;
+
+    return descriptor;
+}
+
+template<>
+armnn::ReshapeDescriptor GetDescriptor<armnn::ReshapeDescriptor>()
+{
+    return armnn::ReshapeDescriptor({ 1, 2, 3, 4 });
+}
+
+template<>
+armnn::ResizeDescriptor GetDescriptor<armnn::ResizeDescriptor>()
+{
+    armnn::ResizeDescriptor descriptor;
+    descriptor.m_TargetHeight = 1u;
+    descriptor.m_TargetWidth  = 1u;
+    descriptor.m_DataLayout   = armnn::DataLayout::NHWC;
+
+    return descriptor;
+}
+
+template<>
+armnn::SliceDescriptor GetDescriptor<armnn::SliceDescriptor>()
+{
+    return armnn::SliceDescriptor({ 1, 1 }, { 2, 2 });
+}
+
+template<>
+armnn::SoftmaxDescriptor GetDescriptor<armnn::SoftmaxDescriptor>()
+{
+    armnn::SoftmaxDescriptor descriptor;
+    descriptor.m_Beta = 2.0f;
+    descriptor.m_Axis = -1;
+
+    return descriptor;
+}
+
+template<>
+armnn::SpaceToBatchNdDescriptor GetDescriptor<armnn::SpaceToBatchNdDescriptor>()
+{
+    return armnn::SpaceToBatchNdDescriptor({ 2, 2 }, {{ 1, 1 } , { 1, 1 }});
+}
+
+template<>
+armnn::SpaceToDepthDescriptor GetDescriptor<armnn::SpaceToDepthDescriptor>()
+{
+    return armnn::SpaceToDepthDescriptor(2, armnn::DataLayout::NHWC);
+}
+
+template<>
+armnn::SplitterDescriptor GetDescriptor<armnn::SplitterDescriptor>()
+{
+    armnn::SplitterDescriptor descriptor(2, 2);
+    for (unsigned int i = 0u; i < descriptor.GetNumViews(); ++i)
+    {
+        for (unsigned int j = 0u; j < descriptor.GetNumDimensions(); ++j)
+        {
+            descriptor.SetViewOriginCoord(i, j, i);
+            descriptor.SetViewSize(i, j, 1);
+        }
+    }
+
+    return descriptor;
+}
+
+template<>
+armnn::StackDescriptor GetDescriptor<armnn::StackDescriptor>()
+{
+    return armnn::StackDescriptor(1, 2, { 2, 2 });
+}
+
+template<>
+armnn::StridedSliceDescriptor GetDescriptor<armnn::StridedSliceDescriptor>()
+{
+    armnn::StridedSliceDescriptor descriptor({ 1, 2 }, { 3, 4 }, { 3, 4 });
+    descriptor.m_BeginMask      = 1;
+    descriptor.m_EndMask        = 1;
+    descriptor.m_ShrinkAxisMask = 1;
+    descriptor.m_EllipsisMask   = 1;
+    descriptor.m_NewAxisMask    = 1;
+    descriptor.m_DataLayout     = armnn::DataLayout::NHWC;
+
+    return descriptor;
+}
+
+} // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(TestNameAndDescriptorLayerVisitor)
 
-BOOST_AUTO_TEST_CASE(CheckPermuteLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "PermuteLayer";
-    PermuteDescriptor descriptor({0, 1, 2, 3});
-    TestPermuteLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddPermuteLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckPermuteLayerVisitorNameNullAndDescriptor)
-{
-    PermuteDescriptor descriptor({0, 1, 2, 3});
-    TestPermuteLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddPermuteLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckBatchToSpaceNdLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "BatchToSpaceNdLayer";
-    BatchToSpaceNdDescriptor descriptor({1, 1}, {{0, 0}, {0, 0}});
-    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
-    TestBatchToSpaceNdLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddBatchToSpaceNdLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckBatchToSpaceNdLayerVisitorNameNullAndDescriptor)
-{
-    BatchToSpaceNdDescriptor descriptor({1, 1}, {{0, 0}, {0, 0}});
-    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
-    TestBatchToSpaceNdLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddBatchToSpaceNdLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckPooling2dLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "Pooling2dLayer";
-    Pooling2dDescriptor descriptor;
-    descriptor.m_PoolType            = PoolingAlgorithm::Max;
-    descriptor.m_PadLeft             = 1;
-    descriptor.m_PadRight            = 1;
-    descriptor.m_PadTop              = 1;
-    descriptor.m_PadBottom           = 1;
-    descriptor.m_PoolWidth           = 1;
-    descriptor.m_PoolHeight          = 1;
-    descriptor.m_StrideX             = 1;
-    descriptor.m_StrideY             = 1;
-    descriptor.m_OutputShapeRounding = OutputShapeRounding::Ceiling;
-    descriptor.m_PaddingMethod       = PaddingMethod::IgnoreValue;
-    descriptor.m_DataLayout          = DataLayout::NHWC;
-    TestPooling2dLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddPooling2dLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckPooling2dLayerVisitorNameNullAndDescriptor)
-{
-    Pooling2dDescriptor descriptor;
-    descriptor.m_PoolType            = PoolingAlgorithm::Max;
-    descriptor.m_PadLeft             = 1;
-    descriptor.m_PadRight            = 1;
-    descriptor.m_PadTop              = 1;
-    descriptor.m_PadBottom           = 1;
-    descriptor.m_PoolWidth           = 1;
-    descriptor.m_PoolHeight          = 1;
-    descriptor.m_StrideX             = 1;
-    descriptor.m_StrideY             = 1;
-    descriptor.m_OutputShapeRounding = OutputShapeRounding::Ceiling;
-    descriptor.m_PaddingMethod       = PaddingMethod::IgnoreValue;
-    descriptor.m_DataLayout          = DataLayout::NHWC;
-    TestPooling2dLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddPooling2dLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckActivationLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "ActivationLayer";
-    ActivationDescriptor descriptor;
-    descriptor.m_Function = ActivationFunction::Linear;
-    descriptor.m_A = 2;
-    descriptor.m_B = 2;
-    TestActivationLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddActivationLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckActivationLayerVisitorNameNullAndDescriptor)
-{
-    ActivationDescriptor descriptor;
-    descriptor.m_Function = ActivationFunction::Linear;
-    descriptor.m_A = 2;
-    descriptor.m_B = 2;
-    TestActivationLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddActivationLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckNormalizationLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "NormalizationLayer";
-    NormalizationDescriptor descriptor;
-    descriptor.m_NormChannelType = NormalizationAlgorithmChannel::Within;
-    descriptor.m_NormMethodType  = NormalizationAlgorithmMethod::LocalContrast;
-    descriptor.m_NormSize        = 1;
-    descriptor.m_Alpha           = 1;
-    descriptor.m_Beta            = 1;
-    descriptor.m_K               = 1;
-    descriptor.m_DataLayout      = DataLayout::NHWC;
-    TestNormalizationLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddNormalizationLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckNormalizationLayerVisitorNameNullAndDescriptor)
-{
-    NormalizationDescriptor descriptor;
-    descriptor.m_NormChannelType = NormalizationAlgorithmChannel::Within;
-    descriptor.m_NormMethodType  = NormalizationAlgorithmMethod::LocalContrast;
-    descriptor.m_NormSize        = 1;
-    descriptor.m_Alpha           = 1;
-    descriptor.m_Beta            = 1;
-    descriptor.m_K               = 1;
-    descriptor.m_DataLayout      = DataLayout::NHWC;
-    TestNormalizationLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddNormalizationLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckSoftmaxLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "SoftmaxLayer";
-    SoftmaxDescriptor descriptor;
-    descriptor.m_Beta = 2;
-    TestSoftmaxLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddSoftmaxLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckSoftmaxLayerVisitorNameNullAndDescriptor)
-{
-    SoftmaxDescriptor descriptor;
-    descriptor.m_Beta = 2;
-    TestSoftmaxLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddSoftmaxLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckSplitterLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "SplitterLayer";
-    SplitterDescriptor descriptor(2, 2);
-    Set2dDataValues(descriptor, 1);
-    TestSplitterLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddSplitterLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckSplitterLayerVisitorNameNullAndDescriptor)
-{
-    SplitterDescriptor descriptor(2, 2);
-    Set2dDataValues(descriptor, 1);
-    TestSplitterLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddSplitterLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckConcatLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "ConcatLayer";
-    OriginsDescriptor descriptor(2, 2);
-    Set2dDataValues(descriptor, 1);
-    descriptor.SetConcatAxis(1);
-    TestConcatLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddConcatLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckConcatLayerVisitorNameNullAndDescriptor)
-{
-    OriginsDescriptor descriptor(2, 2);
-    Set2dDataValues(descriptor, 1);
-    descriptor.SetConcatAxis(1);
-    TestConcatLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddConcatLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckResizeLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "ResizeLayer";
-    ResizeDescriptor descriptor;
-    descriptor.m_TargetHeight = 1;
-    descriptor.m_TargetWidth  = 1;
-    descriptor.m_DataLayout   = DataLayout::NHWC;
-    TestResizeLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddResizeLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckResizeLayerVisitorNameNullAndDescriptor)
-{
-    ResizeDescriptor descriptor;
-    descriptor.m_TargetHeight = 1;
-    descriptor.m_TargetWidth  = 1;
-    descriptor.m_DataLayout   = DataLayout::NHWC;
-    TestResizeLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddResizeLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckInstanceNormalizationLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "InstanceNormalizationLayer";
-    InstanceNormalizationDescriptor descriptor;
-    descriptor.m_DataLayout = DataLayout::NHWC;
-    TestInstanceNormalizationLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddInstanceNormalizationLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckInstanceNormalizationLayerVisitorNameNullAndDescriptor)
-{
-    InstanceNormalizationDescriptor descriptor;
-    descriptor.m_DataLayout = DataLayout::NHWC;
-    TestInstanceNormalizationLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddInstanceNormalizationLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckL2NormalizationLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "L2NormalizationLayer";
-    L2NormalizationDescriptor descriptor;
-    descriptor.m_DataLayout = DataLayout::NHWC;
-    TestL2NormalizationLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddL2NormalizationLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckL2NormalizationLayerVisitorNameNullAndDescriptor)
-{
-    L2NormalizationDescriptor descriptor;
-    descriptor.m_DataLayout = DataLayout::NHWC;
-    TestL2NormalizationLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddL2NormalizationLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckLogSoftmaxLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "LogSoftmaxLayer";
-
-    LogSoftmaxDescriptor descriptor;
-    descriptor.m_Beta = 2.0f;
-    descriptor.m_Axis = 1;
-
-    TestLogSoftmaxLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddLogSoftmaxLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckLogSoftmaxLayerVisitorNameNullAndDescriptor)
-{
-    LogSoftmaxDescriptor descriptor;
-    descriptor.m_Beta = 2.0f;
-    descriptor.m_Axis = 1;
-
-    TestLogSoftmaxLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddLogSoftmaxLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckReshapeLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "ReshapeLayer";
-    ReshapeDescriptor descriptor({1, 2, 3, 4});
-    TestReshapeLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddReshapeLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckReshapeLayerVisitorNameNullAndDescriptor)
-{
-    ReshapeDescriptor descriptor({1, 2, 3, 4});
-    TestReshapeLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddReshapeLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckSpaceToBatchNdLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "SpaceToBatchNdLayer";
-    SpaceToBatchNdDescriptor descriptor({2, 2}, {{1, 1}, {1, 1}});
-    TestSpaceToBatchNdLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddSpaceToBatchNdLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckSpaceToBatchNdLayerVisitorNameNullAndDescriptor)
-{
-    SpaceToBatchNdDescriptor descriptor({2, 2}, {{1, 1}, {1, 1}});
-    TestSpaceToBatchNdLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddSpaceToBatchNdLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-
-BOOST_AUTO_TEST_CASE(CheckMeanLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "MeanLayer";
-    MeanDescriptor descriptor({1, 2}, false);
-    TestMeanLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddMeanLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckMeanLayerVisitorNameNullAndDescriptor)
-{
-    MeanDescriptor descriptor({1, 2}, false);
-    TestMeanLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddMeanLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckPadLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "PadLayer";
-    PadDescriptor descriptor({{1, 2}, {3, 4}});
-    TestPadLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddPadLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckPadLayerVisitorNameNullAndDescriptor)
-{
-    PadDescriptor descriptor({{1, 2}, {3, 4}});
-    TestPadLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddPadLayer(descriptor);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckStridedSliceLayerVisitorNameAndDescriptor)
-{
-    const char* layerName = "StridedSliceLayer";
-    StridedSliceDescriptor descriptor({1, 2}, {3, 4}, {3, 4});
-    descriptor.m_BeginMask      = 1;
-    descriptor.m_EndMask        = 1;
-    descriptor.m_ShrinkAxisMask = 1;
-    descriptor.m_EllipsisMask   = 1;
-    descriptor.m_NewAxisMask    = 1;
-    descriptor.m_DataLayout     = DataLayout::NHWC;
-    TestStridedSliceLayerVisitor visitor(descriptor, layerName);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddStridedSliceLayer(descriptor, layerName);
-    layer->Accept(visitor);
-}
-
-BOOST_AUTO_TEST_CASE(CheckStridedSliceLayerVisitorNameNullAndDescriptor)
-{
-    StridedSliceDescriptor descriptor({1, 2}, {3, 4}, {3, 4});
-    descriptor.m_BeginMask      = 1;
-    descriptor.m_EndMask        = 1;
-    descriptor.m_ShrinkAxisMask = 1;
-    descriptor.m_EllipsisMask   = 1;
-    descriptor.m_NewAxisMask    = 1;
-    descriptor.m_DataLayout     = DataLayout::NHWC;
-    TestStridedSliceLayerVisitor visitor(descriptor);
-    Network net;
-
-    IConnectableLayer *const layer = net.AddStridedSliceLayer(descriptor);
-    layer->Accept(visitor);
-}
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Activation)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(ArgMinMax)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(DepthToSpace)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(BatchToSpaceNd)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Concat)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(InstanceNormalization)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(L2Normalization)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(LogSoftmax)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Mean)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Normalization)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Pad)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Permute)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Pooling2d)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Reshape)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Resize)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Slice)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Softmax)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(SpaceToBatchNd)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(SpaceToDepth)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Splitter)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Stack)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(StridedSlice)
 
 BOOST_AUTO_TEST_SUITE_END()
-
-} //namespace armnn

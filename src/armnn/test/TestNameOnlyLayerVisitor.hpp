@@ -9,51 +9,36 @@
 namespace
 {
 
-// Defines a visitor function with 1 required parameter to be used
-// with layers that do not have a descriptor
-#define VISIT_METHOD_1_PARAM(name) \
-void Visit##name##Layer(const armnn::IConnectableLayer* layer, const char* layerName = nullptr) override
-
-// Defines a visitor function with 2 required parameters to be used
-// with layers that have a descriptor
-#define VISIT_METHOD_2_PARAM(name) \
-void Visit##name##Layer(const armnn::IConnectableLayer* layer, \
-                        const armnn::name##Descriptor&, \
-                        const char* layerName = nullptr) override
-
-#define TEST_LAYER_VISITOR(name, numVisitorParams) \
+#define DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(name) \
 class Test##name##LayerVisitor : public armnn::TestLayerVisitor \
 { \
 public: \
     explicit Test##name##LayerVisitor(const char* layerName = nullptr) : armnn::TestLayerVisitor(layerName) {}; \
     \
-    VISIT_METHOD_##numVisitorParams##_PARAM(name) \
+    void Visit##name##Layer(const armnn::IConnectableLayer* layer, \
+                            const char* layerName = nullptr) override \
     { \
         CheckLayerPointer(layer); \
         CheckLayerName(layerName); \
     } \
 };
 
-// Defines a test layer visitor class for a layer, of a given name,
-// that does not require a descriptor
-#define TEST_LAYER_VISITOR_1_PARAM(name) TEST_LAYER_VISITOR(name, 1)
-
-// Defines a test layer visitor class for a layer, of a given name,
-// that requires a descriptor
-#define TEST_LAYER_VISITOR_2_PARAM(name) TEST_LAYER_VISITOR(name, 2)
-
 } // anonymous namespace
 
-TEST_LAYER_VISITOR_1_PARAM(Addition)
-TEST_LAYER_VISITOR_2_PARAM(DepthToSpace)
-TEST_LAYER_VISITOR_1_PARAM(Division)
-TEST_LAYER_VISITOR_1_PARAM(Equal)
-TEST_LAYER_VISITOR_1_PARAM(Floor)
-TEST_LAYER_VISITOR_1_PARAM(Gather)
-TEST_LAYER_VISITOR_1_PARAM(Greater)
-TEST_LAYER_VISITOR_1_PARAM(Maximum)
-TEST_LAYER_VISITOR_1_PARAM(Minimum)
-TEST_LAYER_VISITOR_1_PARAM(Multiplication)
-TEST_LAYER_VISITOR_1_PARAM(Rsqrt)
-TEST_LAYER_VISITOR_2_PARAM(Slice)
-TEST_LAYER_VISITOR_1_PARAM(Subtraction)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Abs)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Addition)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Dequantize)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Division)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Equal)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Floor)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Gather)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Greater)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Maximum)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Merge)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Minimum)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Multiplication)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Prelu)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Quantize)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Rsqrt)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Subtraction)
+DECLARE_TEST_NAME_ONLY_LAYER_VISITOR_CLASS(Switch)

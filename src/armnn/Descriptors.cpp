@@ -124,6 +124,29 @@ OriginsDescriptor& OriginsDescriptor::operator=(OriginsDescriptor rhs)
     return *this;
 }
 
+bool OriginsDescriptor::operator==(const OriginsDescriptor& rhs) const
+{
+    if (GetNumViews()      != rhs.GetNumViews() ||
+        GetNumDimensions() != rhs.GetNumDimensions() ||
+        GetConcatAxis()    != rhs.GetConcatAxis())
+    {
+        return false;
+    }
+
+    for (unsigned int i = 0u; i < GetNumViews(); ++i)
+    {
+        for (unsigned int j = 0u; j < GetNumDimensions(); ++j)
+        {
+            if (GetViewOrigin(i)[j] != rhs.GetViewOrigin(i)[j])
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 void OriginsDescriptor::SetConcatAxis(unsigned int concatAxis)
 {
     m_ConcatAxis = concatAxis;
@@ -238,6 +261,27 @@ ViewsDescriptor& ViewsDescriptor::operator=(ViewsDescriptor rhs)
 {
     swap(*this, rhs);
     return *this;
+}
+
+bool ViewsDescriptor::operator==(const ViewsDescriptor& rhs) const
+{
+    if (GetNumViews() != rhs.GetNumViews() || GetNumDimensions() != rhs.GetNumDimensions())
+    {
+        return false;
+    }
+
+    for (unsigned int i = 0u; i < GetNumViews(); ++i)
+    {
+        for (unsigned int j = 0u; j < GetNumDimensions(); ++j)
+        {
+            if (GetViewOrigin(i)[j] != rhs.GetViewOrigin(i)[j] || GetViewSizes(i)[j] != rhs.GetViewSizes(i)[j])
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 uint32_t ViewsDescriptor::GetNumViews() const

@@ -14,6 +14,7 @@
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
+#include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
@@ -776,6 +777,12 @@ BOOST_AUTO_TEST_CASE(RefDetectionPostProcessFastNmsUint8Test)
     DetectionPostProcessFastNmsEndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends, qBoxEncodings,
                                                                           qScores, qAnchors,
                                                                           1.0f, 1, 0.01f, 0, 0.5f, 0);
+}
+
+// LogSoftmax
+BOOST_AUTO_TEST_CASE(RefLogSoftmaxEndToEndTest)
+{
+    LogSoftmaxEndToEndTest(defaultBackends);
 }
 
 BOOST_AUTO_TEST_CASE(RefPreluEndToEndTestFloat32)

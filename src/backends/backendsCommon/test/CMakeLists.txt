@@ -26,6 +26,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     JsonPrinterTestImpl.hpp
     LayerReleaseConstantDataTest.cpp
     LayerTests.hpp
+    LogSoftmaxEndToEndTestImpl.cpp
+    LogSoftmaxEndToEndTestImpl.hpp
     ConcatEndToEndTestImpl.hpp
     MockBackend.cpp
     MockBackend.hpp

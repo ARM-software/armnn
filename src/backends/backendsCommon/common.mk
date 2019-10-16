@@ -33,6 +33,7 @@ COMMON_TEST_SOURCES := \
     test/CommonTestUtils.cpp \
     test/InstanceNormalizationEndToEndTestImpl.cpp \
     test/JsonPrinterTestImpl.cpp \
+    test/LogSoftmaxEndToEndTestImpl.cpp \
     test/QuantizedLstmEndToEndTestImpl.cpp \
     test/SpaceToDepthEndToEndTestImpl.cpp \
     test/TensorCopyUtils.cpp \

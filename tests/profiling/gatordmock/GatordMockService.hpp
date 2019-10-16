@@ -8,9 +8,9 @@
 #include <CommandHandlerRegistry.hpp>
 #include <Packet.hpp>
 
+#include <atomic>
 #include <string>
 #include <thread>
-#include <atomic>
 
 namespace armnn
 {
@@ -20,12 +20,15 @@ namespace gatordmock
 
 enum class TargetEndianness
 {
-    BeWire, LeWire
+    BeWire,
+    LeWire
 };
 
 enum class PacketDirection
 {
-    Sending, Received
+    Sending,
+    ReceivedHeader,
+    ReceivedData
 };
 
 ///  A class that implements a Mock Gatord server. It will listen on a specified Unix domain socket (UDS)
@@ -33,8 +36,6 @@ enum class PacketDirection
 class GatordMockService
 {
 public:
-
-
     /// @param registry reference to a command handler registry.
     /// @param echoPackets if true the raw packets will be printed to stdout.
     GatordMockService(armnn::profiling::CommandHandlerRegistry& registry, bool echoPackets)
@@ -83,7 +84,7 @@ public:
     void WaitForReceivingThread();
 
     /// Send the counter list to ArmNN.
-    void SendPeriodicCounterSelectionList(uint period, std::vector<uint16_t> counters);
+    void SendPeriodicCounterSelectionList(uint32_t period, std::vector<uint16_t> counters);
 
     /// Execute the WAIT command from the comamnd file.
     void WaitCommand(uint timeout);
@@ -104,7 +105,6 @@ public:
     }
 
 private:
-
     void ReceiveLoop(GatordMockService& mockService);
 
     /// Block on the client connection until a complete packet has been received. This is a placeholder function to
@@ -129,10 +129,10 @@ private:
     static const uint32_t PIPE_MAGIC = 0x45495434;
 
     std::atomic<uint32_t> m_PacketsReceivedCount;
-    TargetEndianness      m_Endianness;
-    uint32_t              m_StreamMetaDataVersion;
-    uint32_t              m_StreamMetaDataMaxDataLen;
-    uint32_t              m_StreamMetaDataPid;
+    TargetEndianness m_Endianness;
+    uint32_t m_StreamMetaDataVersion;
+    uint32_t m_StreamMetaDataMaxDataLen;
+    uint32_t m_StreamMetaDataPid;
 
     armnn::profiling::CommandHandlerRegistry& m_HandlerRegistry;
 
@@ -142,8 +142,6 @@ private:
     std::thread m_ListeningThread;
     std::atomic<bool> m_CloseReceivingThread;
 };
-} // namespace gatordmock
+}    // namespace gatordmock
 
-} // namespace armnn
-
-
+}    // namespace armnn

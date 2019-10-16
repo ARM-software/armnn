@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <string>
 #include "GatordMockService.hpp"
+#include <string>
 
 namespace armnn
 {
@@ -25,7 +25,5 @@ public:
     void ParseFile(std::string CommandFile, GatordMockService& mockService);
 };
 
-} // namespace gatordmock
-} // namespace armnn
-
-
+}    // namespace gatordmock
+}    // namespace armnn

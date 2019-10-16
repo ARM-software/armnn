@@ -4,7 +4,6 @@
 //
 
 #include "../GatordMockService.hpp"
-#include "../MockUtils.hpp"
 #include "../PeriodicCounterCaptureCommandHandler.hpp"
 
 #include <CommandHandlerRegistry.hpp>
@@ -25,12 +24,22 @@ using namespace std::chrono_literals;
 // Required so build succeeds when local variable used only in assert
 #define _unused(x) ((void)(x))
 
+uint32_t ConstructHeader(uint32_t packetFamily, uint32_t packetClass, uint32_t packetType)
+{
+    return ((packetFamily & 0x3F) << 26) | ((packetClass & 0x3FF) << 19) | ((packetType & 0x3FFF) << 16);
+}
+
+uint32_t ConstructHeader(uint32_t packetFamily, uint32_t packetId)
+{
+    return ((packetFamily & 0x3F) << 26) | ((packetId & 0x3FF) << 16);
+}
+
 BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
 {
     using boost::numeric_cast;
 
     // Initialise functors and register into the CommandHandlerRegistry
-    uint32_t headerWord1 = gatordmock::ConstructHeader(1, 0, 0);
+    uint32_t headerWord1 = ConstructHeader(1, 0, 0);
 
     // Create the Command Handler Registry
     profiling::CommandHandlerRegistry registry;
@@ -56,10 +65,10 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
 
     // UniqueData required for Packet class
     std::unique_ptr<unsigned char[]> uniqueData1 = std::make_unique<unsigned char[]>(dataLength);
-    unsigned char* data1                = reinterpret_cast<unsigned char*>(uniqueData1.get());
+    unsigned char* data1                         = reinterpret_cast<unsigned char*>(uniqueData1.get());
 
     std::unique_ptr<unsigned char[]> uniqueData2 = std::make_unique<unsigned char[]>(dataLength);
-    unsigned char* data2                = reinterpret_cast<unsigned char*>(uniqueData2.get());
+    unsigned char* data2                         = reinterpret_cast<unsigned char*>(uniqueData2.get());
 
     uint32_t sizeOfUint64 = numeric_cast<uint32_t>(sizeof(uint64_t));
     uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
@@ -94,7 +103,7 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
     profiling::Packet packet2(headerWord1, dataLength, uniqueData2);
 
     uint32_t version = 1;
-    gatordmock::PeriodicCounterCaptureCommandHandler commandHandler(headerWord1, version, false);
+    gatordmock::PeriodicCounterCaptureCommandHandler commandHandler(headerWord1, version, true);
 
     // Simulate two separate packets coming in to calculate period
     commandHandler(packet1);
@@ -114,14 +123,14 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // performance data.
 
     // Initialise functors and register into the CommandHandlerRegistry
-    uint32_t counterCaptureHeader = gatordmock::ConstructHeader(1, 0);
+    uint32_t counterCaptureHeader = ConstructHeader(1, 0);
     uint32_t version              = 1;
 
     // Create the Command Handler Registry
     profiling::CommandHandlerRegistry registry;
 
     // Update with derived functors
-    gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(counterCaptureHeader, version, false);
+    gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(counterCaptureHeader, version, true);
     // Register different derived functors
     registry.RegisterFunctor(&counterCaptureCommandHandler);
 

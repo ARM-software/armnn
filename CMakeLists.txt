@@ -901,9 +901,10 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/CommandLineProcessor.cpp
         tests/profiling/gatordmock/GatordMockService.hpp
         tests/profiling/gatordmock/GatordMockService.cpp
-        tests/profiling/gatordmock/MockUtils.hpp
         tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.cpp
         tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.hpp
+        tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.cpp
+        tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.hpp
         )
 
     include_directories(${Boost_INCLUDE_DIRS} src/profiling)

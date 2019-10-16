@@ -41,7 +41,6 @@ int main(int argc, const char* argv[])
 
     const std::string backendsMessage = "REQUIRED: Which device to run layers on by default. Possible choices: "
                                       + armnn::BackendRegistryInstance().GetBackendIdsAsString();
-
     po::options_description desc("Options");
     try
     {
@@ -185,7 +184,6 @@ int main(int argc, const char* argv[])
         options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
         options.m_ProfilingOptions.m_FileOnly = fileOnlyExternalProfiling;
         options.m_ProfilingOptions.m_CapturePeriod = counterCapturePeriod;
-
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
 
         const std::string executableName("ExecuteNetwork");
@@ -254,10 +252,18 @@ int main(int argc, const char* argv[])
             std::cerr << desc << std::endl;
             return EXIT_FAILURE;
         }
-
+        // Create runtime
+        armnn::IRuntime::CreationOptions options;
+        options.m_EnableGpuProfiling = enableProfiling;
+        options.m_ProfilingOptions.m_EnableProfiling = enableExternalProfiling;
+        options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
+        options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
+        options.m_ProfilingOptions.m_FileOnly = fileOnlyExternalProfiling;
+        options.m_ProfilingOptions.m_CapturePeriod = counterCapturePeriod;
+        std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
                        outputTensorFiles, enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate,
-                       subgraphId, enableLayerDetails);
+                       subgraphId, enableLayerDetails, runtime);
     }
 }

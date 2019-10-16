@@ -12,7 +12,6 @@ namespace armnn
 namespace gatordmock
 {
 
-
 /// Use Boost program options to process the command line.
 /// -h or --help to print the options.
 /// -n or --namespace to specify the UDS namespace that the server will be listening on.
@@ -21,11 +20,20 @@ namespace gatordmock
 class CommandLineProcessor
 {
 public:
-    bool ProcessCommandLine(int argc, char *argv[]);
-    bool IsEchoEnabled() { return m_Echo; }
+    bool ProcessCommandLine(int argc, char* argv[]);
+    bool IsEchoEnabled()
+    {
+        return m_Echo;
+    }
 
-    std::string GetUdsNamespace() { return m_UdsNamespace; }
-    std::string GetCommandFile() { return m_File; }
+    std::string GetUdsNamespace()
+    {
+        return m_UdsNamespace;
+    }
+    std::string GetCommandFile()
+    {
+        return m_File;
+    }
 
 private:
     std::string m_UdsNamespace;
@@ -34,6 +42,6 @@ private:
     bool m_Echo;
 };
 
-} // namespace gatordmock
+}    // namespace gatordmock
 
-} // namespace armnn
+}    // namespace armnn

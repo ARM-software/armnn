@@ -6,9 +6,12 @@
 #include "GatordMockService.hpp"
 
 #include <CommandHandlerRegistry.hpp>
+#include "../../src/profiling/PacketVersionResolver.hpp"
+#include "../../src/profiling/ProfilingUtils.hpp"
 
 #include <cerrno>
 #include <fcntl.h>
+#include <iomanip>
 #include <iostream>
 #include <poll.h>
 #include <string>
@@ -39,7 +42,7 @@ bool GatordMockService::OpenListeningSocket(std::string udsNamespace)
     udsAddress.sun_family = AF_UNIX;
 
     // Bind the socket to the UDS namespace.
-    if (-1 == bind(m_ListeningSocket, reinterpret_cast<const sockaddr *>(&udsAddress), sizeof(sockaddr_un)))
+    if (-1 == bind(m_ListeningSocket, reinterpret_cast<const sockaddr*>(&udsAddress), sizeof(sockaddr_un)))
     {
         std::cerr << ": Binding on socket failed: " << strerror(errno) << std::endl;
         return false;
@@ -50,29 +53,16 @@ bool GatordMockService::OpenListeningSocket(std::string udsNamespace)
         std::cerr << ": Listen call on socket failed: " << strerror(errno) << std::endl;
         return false;
     }
-    if (m_EchoPackets)
-    {
-        std::cout << "Bound to UDS namespace: \\0" << udsNamespace << std::endl;
-    }
     return true;
 }
 
 int GatordMockService::BlockForOneClient()
 {
-    if (m_EchoPackets)
-    {
-        std::cout << "Waiting for client connection." << std::endl;
-    }
     m_ClientConnection = accept4(m_ListeningSocket, nullptr, nullptr, SOCK_CLOEXEC);
     if (-1 == m_ClientConnection)
     {
         std::cerr << ": Failure when waiting for a client connection: " << strerror(errno) << std::endl;
         return -1;
-    }
-
-    if (m_EchoPackets)
-    {
-        std::cout << "Client connection established." << std::endl;
     }
     return m_ClientConnection;
 }
@@ -89,7 +79,7 @@ bool GatordMockService::WaitForStreamMetaData()
     {
         return false;
     }
-    EchoPacket(PacketDirection::Received, header, 8);
+    EchoPacket(PacketDirection::ReceivedHeader, header, 8);
     // The first word, stream_metadata_identifer, should always be 0.
     if (ToUint32(&header[0], TargetEndianness::BeWire) != 0)
     {
@@ -102,7 +92,7 @@ bool GatordMockService::WaitForStreamMetaData()
     {
         return false;
     }
-    EchoPacket(PacketDirection::Received, pipeMagic, 4);
+    EchoPacket(PacketDirection::ReceivedData, pipeMagic, 4);
 
     // Before we interpret the length we need to read the pipe_magic word to determine endianness.
     if (ToUint32(&pipeMagic[0], TargetEndianness::BeWire) == PIPE_MAGIC)
@@ -128,10 +118,10 @@ bool GatordMockService::WaitForStreamMetaData()
         std::cerr << ": Protocol read error. Data length mismatch." << std::endl;
         return false;
     }
-    EchoPacket(PacketDirection::Received, packetData, metaDataLength);
-    m_StreamMetaDataVersion = ToUint32(&packetData[0], m_Endianness);
+    EchoPacket(PacketDirection::ReceivedData, packetData, metaDataLength);
+    m_StreamMetaDataVersion    = ToUint32(&packetData[0], m_Endianness);
     m_StreamMetaDataMaxDataLen = ToUint32(&packetData[4], m_Endianness);
-    m_StreamMetaDataPid = ToUint32(&packetData[8], m_Endianness);
+    m_StreamMetaDataPid        = ToUint32(&packetData[8], m_Endianness);
 
     return true;
 }
@@ -175,27 +165,37 @@ void GatordMockService::WaitForReceivingThread()
     }
 }
 
-
-void GatordMockService::SendPeriodicCounterSelectionList(uint period, std::vector<uint16_t> counters)
+void GatordMockService::SendPeriodicCounterSelectionList(uint32_t period, std::vector<uint16_t> counters)
 {
-    //get the datalength in bytes
-    uint32_t datalength = static_cast<uint32_t>(4 + counters.size() * 2);
+    // The packet body consists of a UINT32 representing the period following by zero or more
+    // UINT16's representing counter UID's. If the list is empty it implies all counters are to
+    // be disabled.
 
-    u_char data[datalength];
-
-    *data = static_cast<u_char>(period >> 24);
-    *(data + 1) = static_cast<u_char>(period >> 16 & 0xFF);
-    *(data + 2) = static_cast<u_char>(period >> 8 & 0xFF);
-    *(data + 3) = static_cast<u_char>(period & 0xFF);
-
-    for (unsigned long i = 0; i < counters.size(); ++i)
+    if (m_EchoPackets)
     {
-        *(data + 4 + i * 2) = static_cast<u_char>(counters[i] >> 8);
-        *(data + 5 + i * 2) = static_cast<u_char>(counters[i] & 0xFF);
+        std::cout << "SendPeriodicCounterSelectionList: Period=" << std::dec << period << "uSec" << std::endl;
+        std::cout << "List length=" << counters.size() << std::endl;
+        ;
+    }
+    // Start by calculating the length of the packet body in bytes. This will be at least 4.
+    uint32_t dataLength = static_cast<uint32_t>(4 + (counters.size() * 2));
+
+    std::unique_ptr<unsigned char[]> uniqueData = std::make_unique<unsigned char[]>(dataLength);
+    unsigned char* data                         = reinterpret_cast<unsigned char*>(uniqueData.get());
+
+    uint32_t offset = 0;
+    profiling::WriteUint32(data, offset, period);
+    offset += 4;
+    for (std::vector<uint16_t>::iterator it = counters.begin(); it != counters.end(); ++it)
+    {
+        profiling::WriteUint16(data, offset, *it);
+        offset += 2;
     }
 
-    // create packet send packet
-    SendPacket(0, 4, data, datalength);
+    // Send the packet.
+    SendPacket(0, 4, data, dataLength);
+    // There will be an echo response packet sitting in the receive thread. PeriodicCounterSelectionResponseHandler
+    // should deal with it.
 }
 
 void GatordMockService::WaitCommand(uint timeout)
@@ -217,9 +217,20 @@ void GatordMockService::ReceiveLoop(GatordMockService& mockService)
         {
             armnn::profiling::Packet packet = mockService.WaitForPacket(500);
         }
-        catch(armnn::TimeoutException)
+        catch (armnn::TimeoutException)
         {
             // In this case we ignore timeouts and and keep trying to receive.
+        }
+        catch (armnn::InvalidArgumentException e)
+        {
+            // We couldn't find a functor to handle the packet?
+            std::cerr << "Packet received that could not be processed: " << e.what() << std::endl;
+        }
+        catch (armnn::RuntimeException e)
+        {
+            // A runtime exception occurred which means we must exit the loop.
+            std::cerr << "Receive thread closing: " << e.what() << std::endl;
+            m_CloseReceivingThread.store(true);
         }
     }
 }
@@ -239,7 +250,7 @@ armnn::profiling::Packet GatordMockService::WaitForPacket(uint32_t timeoutMs)
         // No there's not. Poll for more data.
         struct pollfd pollingFd[1]{};
         pollingFd[0].fd = m_ClientConnection;
-        int pollResult = poll(pollingFd, 1, static_cast<int>(timeoutMs));
+        int pollResult  = poll(pollingFd, 1, static_cast<int>(timeoutMs));
 
         switch (pollResult)
         {
@@ -254,13 +265,22 @@ armnn::profiling::Packet GatordMockService::WaitForPacket(uint32_t timeoutMs)
 
             // Normal poll return. It could still contain an error signal
             default:
-
                 // Check if the socket reported an error
                 if (pollingFd[0].revents & (POLLNVAL | POLLERR | POLLHUP))
                 {
-                    std::cout << "Error while polling receiving socket." << std::endl;
-                    throw armnn::RuntimeException(std::string("File descriptor reported an error during polling: ") +
-                                                  strerror(errno));
+                    if (pollingFd[0].revents == POLLNVAL)
+                    {
+                        throw armnn::RuntimeException(std::string("Error while polling receiving socket: POLLNVAL"));
+                    }
+                    if (pollingFd[0].revents == POLLERR)
+                    {
+                        throw armnn::RuntimeException(std::string("Error while polling receiving socket: POLLERR: ") +
+                                                      strerror(errno));
+                    }
+                    if (pollingFd[0].revents == POLLHUP)
+                    {
+                        throw armnn::RuntimeException(std::string("Connection closed by remote client: POLLHUP"));
+                    }
                 }
 
                 // Check if there is data to read
@@ -275,7 +295,6 @@ armnn::profiling::Packet GatordMockService::WaitForPacket(uint32_t timeoutMs)
     }
 }
 
-
 armnn::profiling::Packet GatordMockService::ReceivePacket()
 {
     uint32_t header[2];
@@ -285,24 +304,30 @@ armnn::profiling::Packet GatordMockService::ReceivePacket()
     }
     // Read data_length bytes from the socket.
     std::unique_ptr<unsigned char[]> uniquePacketData = std::make_unique<unsigned char[]>(header[1]);
-    unsigned char *packetData = reinterpret_cast<unsigned char *>(uniquePacketData.get());
+    unsigned char* packetData                         = reinterpret_cast<unsigned char*>(uniquePacketData.get());
 
     if (!ReadFromSocket(packetData, header[1]))
     {
         return armnn::profiling::Packet();
     }
 
+    EchoPacket(PacketDirection::ReceivedData, packetData, header[1]);
+
     // Construct received packet
+    armnn::profiling::PacketVersionResolver packetVersionResolver;
     armnn::profiling::Packet packetRx = armnn::profiling::Packet(header[0], header[1], uniquePacketData);
-
-    // Pass packet into the handler registry
-    if (packetRx.GetHeader()!= 0)
+    if (m_EchoPackets)
     {
-        m_PacketsReceivedCount.operator++(std::memory_order::memory_order_release);
-        m_HandlerRegistry.GetFunctor(header[0],1)->operator()(packetRx);
+        std::cout << "Processing packet ID= " << packetRx.GetPacketId() << " Length=" << packetRx.GetLength()
+                  << std::endl;
     }
+    // Pass packet into the handler registry
+    m_PacketsReceivedCount.operator++(std::memory_order::memory_order_release);
+    m_HandlerRegistry
+        .GetFunctor(packetRx.GetPacketId(),
+                    packetVersionResolver.ResolvePacketVersion(packetRx.GetPacketId()).GetEncodedValue())
+        ->operator()(packetRx);
 
-    EchoPacket(PacketDirection::Received, packetData, sizeof(packetData));
     return packetRx;
 }
 
@@ -314,7 +339,7 @@ bool GatordMockService::SendPacket(uint32_t packetFamily, uint32_t packetId, con
     header[0] = packetFamily << 26 | packetId << 16;
     header[1] = dataLength;
     // Add the header to the packet.
-    u_char packet[8 + dataLength ];
+    u_char packet[8 + dataLength];
     InsertU32(header[0], packet, m_Endianness);
     InsertU32(header[1], packet + 4, m_Endianness);
     // And the rest of the data if there is any.
@@ -333,12 +358,13 @@ bool GatordMockService::SendPacket(uint32_t packetFamily, uint32_t packetId, con
 
 bool GatordMockService::ReadHeader(uint32_t headerAsWords[2])
 {
-    // The herader will always be 2x32bit words.
+    // The header will always be 2x32bit words.
     u_char header[8];
     if (!ReadFromSocket(header, 8))
     {
         return false;
     }
+    EchoPacket(PacketDirection::ReceivedHeader, header, 8);
     headerAsWords[0] = ToUint32(&header[0], m_Endianness);
     headerAsWords[1] = ToUint32(&header[4], m_Endianness);
     return true;
@@ -373,10 +399,15 @@ void GatordMockService::EchoPacket(PacketDirection direction, u_char* packet, si
     {
         if (direction == PacketDirection::Sending)
         {
-            std::cout << "Sending " << std::dec << lengthInBytes << " bytes : ";
-        } else
+            std::cout << "TX " << std::dec << lengthInBytes << " bytes : ";
+        }
+        else if (direction == PacketDirection::ReceivedHeader)
         {
-            std::cout << "Received " << std::dec << lengthInBytes << " bytes : ";
+            std::cout << "RX Header " << std::dec << lengthInBytes << " bytes : ";
+        }
+        else
+        {
+            std::cout << "RX Data " << std::dec << lengthInBytes << " bytes : ";
         }
         for (unsigned int i = 0; i < lengthInBytes; i++)
         {
@@ -384,7 +415,8 @@ void GatordMockService::EchoPacket(PacketDirection direction, u_char* packet, si
             {
                 std::cout << std::endl;
             }
-            std::cout << std::hex << "0x" << static_cast<unsigned int>(packet[i]) << " ";
+            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<unsigned int>(packet[i])
+                      << " ";
         }
         std::cout << std::endl;
     }
@@ -412,7 +444,7 @@ void GatordMockService::InsertU32(uint32_t value, u_char* data, TargetEndianness
     // the endianness value.
     if (endianness == TargetEndianness::BeWire)
     {
-        *data = static_cast<u_char>((value >> 24) & 0xFF);
+        *data       = static_cast<u_char>((value >> 24) & 0xFF);
         *(data + 1) = static_cast<u_char>((value >> 16) & 0xFF);
         *(data + 2) = static_cast<u_char>((value >> 8) & 0xFF);
         *(data + 3) = static_cast<u_char>(value & 0xFF);
@@ -422,10 +454,10 @@ void GatordMockService::InsertU32(uint32_t value, u_char* data, TargetEndianness
         *(data + 3) = static_cast<u_char>((value >> 24) & 0xFF);
         *(data + 2) = static_cast<u_char>((value >> 16) & 0xFF);
         *(data + 1) = static_cast<u_char>((value >> 8) & 0xFF);
-        *data = static_cast<u_char>(value & 0xFF);
+        *data       = static_cast<u_char>(value & 0xFF);
     }
 }
 
-} // namespace gatordmock
+}    // namespace gatordmock
 
-} // namespace armnn
+}    // namespace armnn

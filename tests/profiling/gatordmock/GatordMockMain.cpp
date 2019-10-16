@@ -3,15 +3,18 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "../../../src/profiling/PacketVersionResolver.hpp"
+#include "../../../src/profiling/PeriodicCounterSelectionCommandHandler.hpp"
 #include "CommandFileParser.hpp"
 #include "CommandLineProcessor.hpp"
 #include "GatordMockService.hpp"
-#include "MockUtils.hpp"
 #include "PeriodicCounterCaptureCommandHandler.hpp"
+#include "PeriodicCounterSelectionResponseHandler.hpp"
 
+#include <iostream>
 #include <string>
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     // Process command line arguments
     armnn::gatordmock::CommandLineProcessor cmdLine;
@@ -20,21 +23,19 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // Initialise functors and register into the CommandHandlerRegistry
-    uint32_t version = 1;
-
-    // Create headers
-    uint32_t counterCaptureCommandHeader = armnn::gatordmock::ConstructHeader(1,0,0);
-
+    armnn::profiling::PacketVersionResolver packetVersionResolver;
     // Create the Command Handler Registry
     armnn::profiling::CommandHandlerRegistry registry;
 
-    // Update with derived functors
-    armnn::gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(counterCaptureCommandHeader,
-                                                                                         version,
-                                                                                         cmdLine.IsEchoEnabled());
+    // This functor will receive back the selection response packet.
+    armnn::gatordmock::PeriodicCounterSelectionResponseHandler periodicCounterSelectionResponseHandler(
+        4, packetVersionResolver.ResolvePacketVersion(4).GetEncodedValue());
+    // This functor will receive the counter data.
+    armnn::gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
+        0, packetVersionResolver.ResolvePacketVersion(0).GetEncodedValue());
 
     // Register different derived functors
+    registry.RegisterFunctor(&periodicCounterSelectionResponseHandler);
     registry.RegisterFunctor(&counterCaptureCommandHandler);
 
     armnn::gatordmock::GatordMockService mockService(registry, cmdLine.IsEchoEnabled());
@@ -43,12 +44,14 @@ int main(int argc, char *argv[])
     {
         return EXIT_FAILURE;
     }
+    std::cout << "Bound to UDS namespace: \\0" << cmdLine.GetUdsNamespace() << std::endl;
 
     // Wait for a single connection.
     if (-1 == mockService.BlockForOneClient())
     {
         return EXIT_FAILURE;
     }
+    std::cout << "Client connection established." << std::endl;
 
     // Send receive the strweam metadata and send connection ack.
     if (!mockService.WaitForStreamMetaData())

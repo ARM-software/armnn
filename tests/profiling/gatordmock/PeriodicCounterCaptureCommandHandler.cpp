@@ -97,7 +97,7 @@ void PeriodicCounterCaptureCommandHandler::ParseData(const armnn::profiling::Pac
 void PeriodicCounterCaptureCommandHandler::operator()(const profiling::Packet& packet)
 {
     ParseData(packet);
-    if (m_EchoPackets)
+    if (!m_QuietOperation)    // Are we supposed to print to stdout?
     {
         std::string header, body, uidString, valueString;
 

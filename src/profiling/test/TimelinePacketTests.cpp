@@ -135,6 +135,360 @@ BOOST_AUTO_TEST_CASE(TimelineLabelPacketTest5)
     BOOST_CHECK(buffer[offset] == '\0'); // The null-terminator at the end of the SWTrace label
 }
 
+BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketNullBufferTest)
+{
+    ProfilingRelationshipType relationshipType = ProfilingRelationshipType::DataLink;
+    const uint64_t relationshipGuid = 123456u;
+    const uint64_t headGuid = 234567u;
+    const uint64_t tailGuid = 345678u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result = WriteTimelineRelationshipBinaryPacket(relationshipType,
+                                                                        relationshipGuid,
+                                                                        headGuid,
+                                                                        tailGuid,
+                                                                        nullptr,
+                                                                        512u,
+                                                                        numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
+    BOOST_CHECK(numberOfBytesWritten == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketZeroBufferSizeTest)
+{
+    std::vector<unsigned char> buffer(512, 0);
+
+    ProfilingRelationshipType relationshipType = ProfilingRelationshipType::DataLink;
+    const uint64_t relationshipGuid = 123456u;
+    const uint64_t headGuid = 234567u;
+    const uint64_t tailGuid = 345678u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result = WriteTimelineRelationshipBinaryPacket(relationshipType,
+                                                                        relationshipGuid,
+                                                                        headGuid,
+                                                                        tailGuid,
+                                                                        buffer.data(),
+                                                                        0,
+                                                                        numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
+    BOOST_CHECK(numberOfBytesWritten == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketSmallBufferSizeTest)
+{
+    std::vector<unsigned char> buffer(10, 0);
+
+    ProfilingRelationshipType relationshipType = ProfilingRelationshipType::DataLink;
+    const uint64_t relationshipGuid = 123456u;
+    const uint64_t headGuid = 234567u;
+    const uint64_t tailGuid = 345678u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result =
+        WriteTimelineRelationshipBinaryPacket(relationshipType,
+                                              relationshipGuid,
+                                              headGuid,
+                                              tailGuid,
+                                              buffer.data(),
+                                              boost::numeric_cast<unsigned int>(buffer.size()),
+                                              numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
+    BOOST_CHECK(numberOfBytesWritten == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketInvalidRelationTest)
+{
+    std::vector<unsigned char> buffer(512, 0);
+    ProfilingRelationshipType relationshipType = static_cast<ProfilingRelationshipType>(5);
+    const uint64_t relationshipGuid = 123456u;
+    const uint64_t headGuid = 234567u;
+    const uint64_t tailGuid = 345678u;
+    unsigned int numberOfBytesWritten = 789u;
+
+    BOOST_CHECK_THROW(WriteTimelineRelationshipBinaryPacket(relationshipType,
+                                                            relationshipGuid,
+                                                            headGuid,
+                                                            tailGuid,
+                                                            buffer.data(),
+                                                            boost::numeric_cast<unsigned int>(buffer.size()),
+                                                            numberOfBytesWritten),
+                       armnn::InvalidArgumentException);
+
+    BOOST_CHECK(numberOfBytesWritten == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketTest)
+{
+    std::vector<unsigned char> buffer(512, 0);
+
+    ProfilingRelationshipType relationshipType = ProfilingRelationshipType::RetentionLink;
+    const uint64_t relationshipGuid = 123456u;
+    const uint64_t headGuid = 234567u;
+    const uint64_t tailGuid = 345678u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result =
+        WriteTimelineRelationshipBinaryPacket(relationshipType,
+                                              relationshipGuid,
+                                              headGuid,
+                                              tailGuid,
+                                              buffer.data(),
+                                              boost::numeric_cast<unsigned int>(buffer.size()),
+                                              numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::Ok);
+    BOOST_CHECK(numberOfBytesWritten == 40);
+
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+
+    // Check the packet header
+    unsigned int offset = 0;
+    uint32_t packetHeaderWord0 = ReadUint32(buffer.data(), offset);
+    uint32_t packetFamily = (packetHeaderWord0 >> 26) & 0x0000003F;
+    uint32_t packetClass  = (packetHeaderWord0 >> 19) & 0x0000007F;
+    uint32_t packetType   = (packetHeaderWord0 >> 16) & 0x00000007;
+    uint32_t streamId     = (packetHeaderWord0 >>  0) & 0x00000007;
+    BOOST_CHECK(packetFamily == 1);
+    BOOST_CHECK(packetClass  == 0);
+    BOOST_CHECK(packetType   == 1);
+    BOOST_CHECK(streamId     == 0);
+
+    offset += uint32_t_size;
+    uint32_t packetHeaderWord1 = ReadUint32(buffer.data(), offset);
+    uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
+    uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
+    BOOST_CHECK(sequenceNumbered ==  0);
+    BOOST_CHECK(dataLength       == 32);
+
+    // Check the decl_id
+    offset += uint32_t_size;
+    uint32_t readDeclId = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readDeclId == 3);
+
+    // Check the relationship type
+    offset += uint32_t_size;
+    uint32_t readRelationshipType = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readRelationshipType == 0);
+
+    // Check the relationship GUID
+    offset += uint32_t_size;
+    uint64_t readRelationshipGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readRelationshipGuid == relationshipGuid);
+
+    // Check the head GUID
+    offset += uint64_t_size;
+    uint64_t readHeadGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readHeadGuid == headGuid);
+
+    // Check the tail GUID
+    offset += uint64_t_size;
+    uint64_t readTailGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readTailGuid == tailGuid);
+}
+
+BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketExecutionLinkTest)
+{
+    std::vector<unsigned char> buffer(512, 0);
+
+    ProfilingRelationshipType relationshipType = ProfilingRelationshipType::ExecutionLink;
+    const uint64_t relationshipGuid = 123456u;
+    const uint64_t headGuid = 234567u;
+    const uint64_t tailGuid = 345678u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result =
+        WriteTimelineRelationshipBinaryPacket(relationshipType,
+                                              relationshipGuid,
+                                              headGuid,
+                                              tailGuid,
+                                              buffer.data(),
+                                              boost::numeric_cast<unsigned int>(buffer.size()),
+                                              numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::Ok);
+    BOOST_CHECK(numberOfBytesWritten == 40);
+
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+
+    // Check the packet header
+    unsigned int offset = 0;
+    uint32_t packetHeaderWord0 = ReadUint32(buffer.data(), offset);
+    uint32_t packetFamily = (packetHeaderWord0 >> 26) & 0x0000003F;
+    uint32_t packetClass  = (packetHeaderWord0 >> 19) & 0x0000007F;
+    uint32_t packetType   = (packetHeaderWord0 >> 16) & 0x00000007;
+    uint32_t streamId     = (packetHeaderWord0 >>  0) & 0x00000007;
+    BOOST_CHECK(packetFamily == 1);
+    BOOST_CHECK(packetClass  == 0);
+    BOOST_CHECK(packetType   == 1);
+    BOOST_CHECK(streamId     == 0);
+
+    offset += uint32_t_size;
+    uint32_t packetHeaderWord1 = ReadUint32(buffer.data(), offset);
+    uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
+    uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
+    BOOST_CHECK(sequenceNumbered ==  0);
+    BOOST_CHECK(dataLength       == 32);
+
+    // Check the decl_id
+    offset += uint32_t_size;
+    uint32_t readDeclId = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readDeclId == 3);
+
+    // Check the relationship type
+    offset += uint32_t_size;
+    uint32_t readRelationshipType = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readRelationshipType == 1);
+
+    // Check the relationship GUID
+    offset += uint32_t_size;
+    uint64_t readRelationshipGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readRelationshipGuid == relationshipGuid);
+
+    // Check the head GUID
+    offset += uint64_t_size;
+    uint64_t readHeadGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readHeadGuid == headGuid);
+
+    // Check the tail GUID
+    offset += uint64_t_size;
+    uint64_t readTailGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readTailGuid == tailGuid);
+}
+
+
+BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketDataLinkTest)
+{
+    std::vector<unsigned char> buffer(512, 0);
+
+    ProfilingRelationshipType relationshipType = ProfilingRelationshipType::DataLink;
+    const uint64_t relationshipGuid = 123456u;
+    const uint64_t headGuid = 234567u;
+    const uint64_t tailGuid = 345678u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result =
+        WriteTimelineRelationshipBinaryPacket(relationshipType,
+                                              relationshipGuid,
+                                              headGuid,
+                                              tailGuid,
+                                              buffer.data(),
+                                              boost::numeric_cast<unsigned int>(buffer.size()),
+                                              numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::Ok);
+    BOOST_CHECK(numberOfBytesWritten == 40);
+
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+
+    // Check the packet header
+    unsigned int offset = 0;
+    uint32_t packetHeaderWord0 = ReadUint32(buffer.data(), offset);
+    uint32_t packetFamily = (packetHeaderWord0 >> 26) & 0x0000003F;
+    uint32_t packetClass  = (packetHeaderWord0 >> 19) & 0x0000007F;
+    uint32_t packetType   = (packetHeaderWord0 >> 16) & 0x00000007;
+    uint32_t streamId     = (packetHeaderWord0 >>  0) & 0x00000007;
+    BOOST_CHECK(packetFamily == 1);
+    BOOST_CHECK(packetClass  == 0);
+    BOOST_CHECK(packetType   == 1);
+    BOOST_CHECK(streamId     == 0);
+
+    offset += uint32_t_size;
+    uint32_t packetHeaderWord1 = ReadUint32(buffer.data(), offset);
+    uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
+    uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
+    BOOST_CHECK(sequenceNumbered ==  0);
+    BOOST_CHECK(dataLength       == 32);
+
+    // Check the decl_id
+    offset += uint32_t_size;
+    uint32_t readDeclId = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readDeclId == 3);
+
+    // Check the relationship type
+    offset += uint32_t_size;
+    uint32_t readRelationshipType = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readRelationshipType == 2);
+
+    // Check the relationship GUID
+    offset += uint32_t_size;
+    uint64_t readRelationshipGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readRelationshipGuid == relationshipGuid);
+
+    // Check the head GUID
+    offset += uint64_t_size;
+    uint64_t readHeadGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readHeadGuid == headGuid);
+
+    // Check the tail GUID
+    offset += uint64_t_size;
+    uint64_t readTailGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readTailGuid == tailGuid);
+}
+
+
+BOOST_AUTO_TEST_CASE(TimelineRelationshipPacketLabelLinkTest)
+{
+    std::vector<unsigned char> buffer(512, 0);
+
+    ProfilingRelationshipType relationshipType = ProfilingRelationshipType::LabelLink;
+    const uint64_t relationshipGuid = 123456u;
+    const uint64_t headGuid = 234567u;
+    const uint64_t tailGuid = 345678u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result =
+        WriteTimelineRelationshipBinaryPacket(relationshipType,
+                                              relationshipGuid,
+                                              headGuid,
+                                              tailGuid,
+                                              buffer.data(),
+                                              boost::numeric_cast<unsigned int>(buffer.size()),
+                                              numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::Ok);
+    BOOST_CHECK(numberOfBytesWritten == 40);
+
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+
+    // Check the packet header
+    unsigned int offset = 0;
+    uint32_t packetHeaderWord0 = ReadUint32(buffer.data(), offset);
+    uint32_t packetFamily = (packetHeaderWord0 >> 26) & 0x0000003F;
+    uint32_t packetClass  = (packetHeaderWord0 >> 19) & 0x0000007F;
+    uint32_t packetType   = (packetHeaderWord0 >> 16) & 0x00000007;
+    uint32_t streamId     = (packetHeaderWord0 >>  0) & 0x00000007;
+    BOOST_CHECK(packetFamily == 1);
+    BOOST_CHECK(packetClass  == 0);
+    BOOST_CHECK(packetType   == 1);
+    BOOST_CHECK(streamId     == 0);
+
+    offset += uint32_t_size;
+    uint32_t packetHeaderWord1 = ReadUint32(buffer.data(), offset);
+    uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
+    uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
+    BOOST_CHECK(sequenceNumbered ==  0);
+    BOOST_CHECK(dataLength       == 32);
+
+    // Check the decl_id
+    offset += uint32_t_size;
+    uint32_t readDeclId = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readDeclId == 3);
+
+    // Check the relationship type
+    offset += uint32_t_size;
+    uint32_t readRelationshipType = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readRelationshipType == 3);
+
+    // Check the relationship GUID
+    offset += uint32_t_size;
+    uint64_t readRelationshipGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readRelationshipGuid == relationshipGuid);
+
+    // Check the head GUID
+    offset += uint64_t_size;
+    uint64_t readHeadGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readHeadGuid == headGuid);
+
+    // Check the tail GUID
+    offset += uint64_t_size;
+    uint64_t readTailGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readTailGuid == tailGuid);
+}
+
 BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTest1)
 {
     unsigned int numberOfBytesWritten = 789u;

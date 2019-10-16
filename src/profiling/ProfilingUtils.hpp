@@ -126,6 +126,14 @@ enum class TimelinePacketStatus
     BufferExhaustion
 };
 
+enum class ProfilingRelationshipType
+{
+    RetentionLink, /// Head retains(parents) Tail
+    ExecutionLink, /// Head execution start depends on Tail execution completion
+    DataLink,      /// Head uses data of Tail
+    LabelLink      /// Head uses label Tail (Tail MUST be a guid of a label).
+};
+
 TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
                                                     const std::string& label,
                                                     unsigned char* buffer,
@@ -136,6 +144,14 @@ TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
                                                      unsigned char* buffer,
                                                      unsigned int bufferSize,
                                                      unsigned int& numberOfBytesWritten);
+
+TimelinePacketStatus WriteTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationshipType,
+                                                           uint64_t relationshipGuid,
+                                                           uint64_t headGuid,
+                                                           uint64_t tailGuid,
+                                                           unsigned char* buffer,
+                                                           unsigned int bufferSize,
+                                                           unsigned int& numberOfBytesWritten);
 
 TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
                                                           unsigned int bufferSize,

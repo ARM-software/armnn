@@ -435,6 +435,93 @@ TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
     return TimelinePacketStatus::Ok;
 }
 
+TimelinePacketStatus WriteTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationshipType,
+                                                           uint64_t relationshipGuid,
+                                                           uint64_t headGuid,
+                                                           uint64_t tailGuid,
+                                                           unsigned char* buffer,
+                                                           unsigned int bufferSize,
+                                                           unsigned int& numberOfBytesWritten)
+{
+    // Initialize the output value
+    numberOfBytesWritten = 0;
+
+    // Check that the given buffer is valid
+    if (buffer == nullptr || bufferSize == 0)
+    {
+        return TimelinePacketStatus::BufferExhaustion;
+    }
+
+    // Utils
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+
+    // Calculate the length of the data (in bytes)
+    unsigned int timelineRelationshipPacketDataLength = uint32_t_size * 2 + // decl_id + Relationship Type
+                                                        uint64_t_size * 3; // Relationship GUID + Head GUID + tail GUID
+
+    // Calculate the timeline binary packet size (in bytes)
+    unsigned int timelineRelationshipPacketSize = 2 * uint32_t_size + // Header (2 words)
+                                                  timelineRelationshipPacketDataLength;
+
+    // Check whether the timeline binary packet fits in the given buffer
+    if (timelineRelationshipPacketSize > bufferSize)
+    {
+        return TimelinePacketStatus::BufferExhaustion;
+    }
+
+    // Create packet header
+    uint32_t dataLength = boost::numeric_cast<uint32_t>(timelineRelationshipPacketDataLength);
+    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelineMessagePacketHeader(dataLength);
+
+    // Initialize the offset for writing in the buffer
+    unsigned int offset = 0;
+
+    // Write the timeline binary packet header to the buffer
+    WriteUint32(buffer, offset, packetHeader.first);
+    offset += uint32_t_size;
+    WriteUint32(buffer, offset, packetHeader.second);
+    offset += uint32_t_size;
+
+    uint32_t relationshipTypeUint = 0;
+
+    switch (relationshipType)
+    {
+        case ProfilingRelationshipType::RetentionLink:
+            relationshipTypeUint = 0;
+            break;
+        case ProfilingRelationshipType::ExecutionLink:
+            relationshipTypeUint = 1;
+            break;
+        case ProfilingRelationshipType::DataLink:
+            relationshipTypeUint = 2;
+            break;
+        case ProfilingRelationshipType::LabelLink:
+            relationshipTypeUint = 3;
+            break;
+        default:
+            throw InvalidArgumentException("Unknown relationship type given.");
+    }
+
+    // Write the timeline binary packet payload to the buffer
+    // decl_id of the timeline message
+    uint32_t declId = 3;
+    WriteUint32(buffer, offset, declId); // decl_id
+    offset += uint32_t_size;
+    WriteUint32(buffer, offset, relationshipTypeUint); // Relationship Type
+    offset += uint32_t_size;
+    WriteUint64(buffer, offset, relationshipGuid); // GUID of this relationship
+    offset += uint64_t_size;
+    WriteUint64(buffer, offset, headGuid); // head of relationship GUID
+    offset += uint64_t_size;
+    WriteUint64(buffer, offset, tailGuid); // tail of relationship GUID
+
+    // Update the number of bytes written
+    numberOfBytesWritten = timelineRelationshipPacketSize;
+
+    return TimelinePacketStatus::Ok;
+}
+
 TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
                                                           unsigned int bufferSize,
                                                           unsigned int& numberOfBytesWritten)

@@ -327,12 +327,13 @@ TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
     unsigned int swTraceLabelSize = boost::numeric_cast<unsigned int>(swTraceLabel.size()) * uint32_t_size;
 
     // Calculate the length of the data (in bytes)
-    unsigned int timelineLabelPacketDataLength = uint64_t_size +   // Profiling GUID
+    unsigned int timelineLabelPacketDataLength = uint32_t_size +   // decl_Id
+                                                 uint64_t_size +   // Profiling GUID
                                                  swTraceLabelSize; // Label
 
     // Calculate the timeline binary packet size (in bytes)
     unsigned int timelineLabelPacketSize = 2 * uint32_t_size +            // Header (2 words)
-                                           timelineLabelPacketDataLength; // Profiling GUID + label
+                                           timelineLabelPacketDataLength; // decl_Id + Profiling GUID + label
 
     // Check whether the timeline binary packet fits in the given buffer
     if (timelineLabelPacketSize > bufferSize)
@@ -340,37 +341,21 @@ TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
         return TimelinePacketStatus::BufferExhaustion;
     }
 
-    // Packet header word 0:
-    // 26:31 [6] packet_family: timeline Packet Family, value 0b000001
-    // 19:25 [7] packet_class: packet class
-    // 16:18 [3] packet_type: packet type
-    // 8:15  [8] reserved: all zeros
-    // 0:7   [8] stream_id: stream identifier
-    uint32_t packetFamily = 1;
-    uint32_t packetClass  = 0;
-    uint32_t packetType   = 1;
-    uint32_t streamId     = 0;
-    uint32_t packetHeaderWord0 = ((packetFamily & 0x0000003F) << 26) |
-                                 ((packetClass  & 0x0000007F) << 19) |
-                                 ((packetType   & 0x00000007) << 16) |
-                                 ((streamId     & 0x00000007) <<  0);
-
-    // Packet header word 1:
-    // 25:31 [7]  reserved: all zeros
-    // 24    [1]  sequence_numbered: when non-zero the 4 bytes following the header is a u32 sequence number
-    // 0:23  [24] data_length: unsigned 24-bit integer. Length of data, in bytes. Zero is permitted
-    uint32_t sequenceNumbered = 0;
-    uint32_t dataLength       = boost::numeric_cast<uint32_t>(timelineLabelPacketDataLength); // Profiling GUID + label
-    uint32_t packetHeaderWord1 = ((sequenceNumbered & 0x00000001) << 24) |
-                                 ((dataLength       & 0x00FFFFFF) <<  0);
+    // Create packet header
+    uint32_t dataLength = boost::numeric_cast<uint32_t>(timelineLabelPacketDataLength); // decl_id + GUID + label
+    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelineMessagePacketHeader(dataLength);
 
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
 
     // Write the timeline binary packet header to the buffer
-    WriteUint32(buffer, offset, packetHeaderWord0);
+    WriteUint32(buffer, offset, packetHeader.first);
     offset += uint32_t_size;
-    WriteUint32(buffer, offset, packetHeaderWord1);
+    WriteUint32(buffer, offset, packetHeader.second);
+    offset += uint32_t_size;
+
+    // Write decl_Id to the buffer
+    WriteUint32(buffer, offset, 0u);
     offset += uint32_t_size;
 
     // Write the timeline binary packet payload to the buffer
@@ -412,7 +397,8 @@ TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
 
     // Calculate the timeline binary packet size (in bytes)
     unsigned int timelineEntityPacketSize = 2 * uint32_t_size +             // Header (2 words)
-                                           timelineEntityPacketDataLength; // Profiling GUID
+                                            uint32_t_size +                 // decl_Id
+                                            timelineEntityPacketDataLength; // Profiling GUID
 
     // Check whether the timeline binary packet fits in the given buffer
     if (timelineEntityPacketSize > bufferSize)
@@ -420,37 +406,21 @@ TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
         return TimelinePacketStatus::BufferExhaustion;
     }
 
-    // Packet header word 0:
-    // 26:31 [6] packet_family: timeline Packet Family, value 0b000001
-    // 19:25 [7] packet_class: packet class
-    // 16:18 [3] packet_type: packet type
-    // 8:15  [8] reserved: all zeros
-    // 0:7   [8] stream_id: stream identifier
-    uint32_t packetFamily = 1;
-    uint32_t packetClass  = 0;
-    uint32_t packetType   = 1;
-    uint32_t streamId     = 0;
-    uint32_t packetHeaderWord0 = ((packetFamily & 0x0000003F) << 26) |
-                                 ((packetClass  & 0x0000007F) << 19) |
-                                 ((packetType   & 0x00000007) << 16) |
-                                 ((streamId     & 0x00000007) <<  0);
-
-    // Packet header word 1:
-    // 25:31 [7]  reserved: all zeros
-    // 24    [1]  sequence_numbered: when non-zero the 4 bytes following the header is a u32 sequence number
-    // 0:23  [24] data_length: unsigned 24-bit integer. Length of data, in bytes. Zero is permitted
-    uint32_t sequenceNumbered = 0;
-    uint32_t dataLength       = boost::numeric_cast<uint32_t>(timelineEntityPacketDataLength); // Profiling GUID
-    uint32_t packetHeaderWord1 = ((sequenceNumbered & 0x00000001) << 24) |
-                                 ((dataLength       & 0x00FFFFFF) <<  0);
+    // Create packet header
+    uint32_t dataLength = boost::numeric_cast<uint32_t>(timelineEntityPacketDataLength);
+    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelineMessagePacketHeader(dataLength);
 
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
 
     // Write the timeline binary packet header to the buffer
-    WriteUint32(buffer, offset, packetHeaderWord0);
+    WriteUint32(buffer, offset, packetHeader.first);
     offset += uint32_t_size;
-    WriteUint32(buffer, offset, packetHeaderWord1);
+    WriteUint32(buffer, offset, packetHeader.second);
+    offset += uint32_t_size;
+
+    // Write the decl_Id to the buffer
+    WriteUint32(buffer, offset, 1u);
     offset += uint32_t_size;
 
     // Write the timeline binary packet payload to the buffer
@@ -477,21 +447,6 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
-
-    // Packet header word 0:
-    // 26:31 [6] packet_family: timeline Packet Family, value 0b000001
-    // 19:25 [7] packet_class: packet class
-    // 16:18 [3] packet_type: packet type
-    // 8:15  [8] reserved: all zeros
-    // 0:7   [8] stream_id: stream identifier
-    uint32_t packetFamily = 1;
-    uint32_t packetClass  = 0;
-    uint32_t packetType   = 0;
-    uint32_t streamId     = 0;
-    uint32_t packetHeaderWord0 = ((packetFamily & 0x0000003F) << 26) |
-                                 ((packetClass  & 0x0000007F) << 19) |
-                                 ((packetType   & 0x00000007) << 16) |
-                                 ((streamId     & 0x00000007) <<  0);
 
     // the payload/data of the packet consists of swtrace event definitions encoded according
     // to the swtrace directory specification. The messages being the five defined below:
@@ -545,22 +500,17 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
         return TimelinePacketStatus::BufferExhaustion;
     }
 
-    // Packet header word 1:
-    // 25:31 [7]  reserved: all zeros
-    // 24    [1]  sequence_numbered: when non-zero the 4 bytes following the header is a u32 sequence number
-    // 0:23  [24] data_length: unsigned 24-bit integer. Length of data, in bytes. Zero is permitted
-    uint32_t sequenceNumbered  = 0;
+    // Create packet header
     uint32_t dataLength        = boost::numeric_cast<uint32_t>(messagesDataLength);
-    uint32_t packetHeaderWord1 = ((sequenceNumbered & 0x00000001) << 24) |
-                                 ((dataLength       & 0x00FFFFFF) <<  0);
+    std::pair<uint32_t, uint32_t> packetHeader = CreateTimelinePacketHeader(1,0,0,0,0,dataLength);
 
     // Initialize the offset for writing in the buffer
     unsigned int offset = 0;
 
     // Write the timeline binary packet header to the buffer
-    WriteUint32(buffer, offset, packetHeaderWord0);
+    WriteUint32(buffer, offset, packetHeader.first);
     offset += uint32_t_size;
-    WriteUint32(buffer, offset, packetHeaderWord1);
+    WriteUint32(buffer, offset, packetHeader.second);
     offset += uint32_t_size;
 
     for (unsigned int i = 0u; i < swTraceTimelineDirectoryMessages.size(); ++i)

@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(TimelineLabelPacketTest5)
                                                                  boost::numeric_cast<unsigned int>(buffer.size()),
                                                                  numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
-    BOOST_CHECK(numberOfBytesWritten == 32);
+    BOOST_CHECK(numberOfBytesWritten == 36);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
@@ -109,7 +109,12 @@ BOOST_AUTO_TEST_CASE(TimelineLabelPacketTest5)
     uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
     uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(sequenceNumbered ==  0);
-    BOOST_CHECK(dataLength       == 24);
+    BOOST_CHECK(dataLength       == 28);
+
+    // Check decl_Id
+    offset += uint32_t_size;
+    uint32_t decl_Id = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(decl_Id == uint32_t(0));
 
     // Check the profiling GUID
     offset += uint32_t_size;
@@ -258,10 +263,6 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTest3)
                             swTraceDeclNameLength - 1) == 0); // The length of the label
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE(TimelineEntityTests)
-
 BOOST_AUTO_TEST_CASE(TimelineEntityPacketTest1)
 {
     const uint64_t profilingGuid = 123456u;
@@ -313,7 +314,7 @@ BOOST_AUTO_TEST_CASE(TimelineEntityPacketTest4)
                                                                  boost::numeric_cast<unsigned int>(buffer.size()),
                                                                  numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
-    BOOST_CHECK(numberOfBytesWritten == 16);
+    BOOST_CHECK(numberOfBytesWritten == 20);
 
     unsigned int uint32_t_size = sizeof(uint32_t);
 
@@ -336,16 +337,16 @@ BOOST_AUTO_TEST_CASE(TimelineEntityPacketTest4)
     BOOST_CHECK(sequenceNumbered ==  0);
     BOOST_CHECK(dataLength       == 8);
 
+    // Check decl_Id
+    offset += uint32_t_size;
+    uint32_t decl_Id = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(decl_Id == uint32_t(1));
+
     // Check the profiling GUID
     offset += uint32_t_size;
     uint64_t readProfilingGuid = ReadUint64(buffer.data(), offset);
     BOOST_CHECK(readProfilingGuid == profilingGuid);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-
-
-BOOST_AUTO_TEST_SUITE(TimelineEventClassTests)
 
 BOOST_AUTO_TEST_CASE(TimelineEventClassTest1)
 {
@@ -432,4 +433,4 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTest4)
     BOOST_CHECK(readProfilingGuid == profilingGuid);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END() // TimelinePacketTests

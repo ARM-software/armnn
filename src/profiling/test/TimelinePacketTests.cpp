@@ -433,4 +433,116 @@ BOOST_AUTO_TEST_CASE(TimelineEventClassTest4)
     BOOST_CHECK(readProfilingGuid == profilingGuid);
 }
 
-BOOST_AUTO_TEST_SUITE_END() // TimelinePacketTests
+BOOST_AUTO_TEST_CASE(TimelineEventPacketTest1)
+{
+    const uint64_t timestamp = 456789u;
+    const uint32_t threadId = 654321u;
+    const uint64_t profilingGuid = 123456u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result = WriteTimelineEventBinaryPacket(timestamp,
+                                                                 threadId,
+                                                                 profilingGuid,
+                                                                 nullptr,
+                                                                 512u,
+                                                                 numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
+    BOOST_CHECK(numberOfBytesWritten == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TimelineEventPacketTest2)
+{
+    std::vector<unsigned char> buffer(512, 0);
+
+    const uint64_t timestamp = 456789u;
+    const uint32_t threadId = 654321u;
+    const uint64_t profilingGuid = 123456u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result = WriteTimelineEventBinaryPacket(timestamp,
+                                                                 threadId,
+                                                                 profilingGuid,
+                                                                 buffer.data(),
+                                                                 0,
+                                                                 numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
+    BOOST_CHECK(numberOfBytesWritten == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TimelineEventPacketTest3)
+{
+    std::vector<unsigned char> buffer(10, 0);
+
+    const uint64_t timestamp = 456789u;
+    const uint32_t threadId = 654321u;
+    const uint64_t profilingGuid = 123456u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result = WriteTimelineEventBinaryPacket(timestamp,
+                                                                 threadId,
+                                                                 profilingGuid,
+                                                                 buffer.data(),
+                                                                 boost::numeric_cast<unsigned int>(buffer.size()),
+                                                                 numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::BufferExhaustion);
+    BOOST_CHECK(numberOfBytesWritten == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TimelineEventPacketTest4)
+{
+    std::vector<unsigned char> buffer(512, 0);
+
+    const uint64_t timestamp = 456789u;
+    const uint32_t threadId = 654321u;
+    const uint64_t profilingGuid = 123456u;
+    unsigned int numberOfBytesWritten = 789u;
+    TimelinePacketStatus result = WriteTimelineEventBinaryPacket(timestamp,
+                                                                 threadId,
+                                                                 profilingGuid,
+                                                                 buffer.data(),
+                                                                 boost::numeric_cast<unsigned int>(buffer.size()),
+                                                                 numberOfBytesWritten);
+    BOOST_CHECK(result == TimelinePacketStatus::Ok);
+    BOOST_CHECK(numberOfBytesWritten == 32);
+
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+
+    // Check the packet header
+    unsigned int offset = 0;
+    uint32_t packetHeaderWord0 = ReadUint32(buffer.data(), offset);
+    uint32_t packetFamily = (packetHeaderWord0 >> 26) & 0x0000003F;
+    uint32_t packetClass  = (packetHeaderWord0 >> 19) & 0x0000007F;
+    uint32_t packetType   = (packetHeaderWord0 >> 16) & 0x00000007;
+    uint32_t streamId     = (packetHeaderWord0 >>  0) & 0x00000007;
+    BOOST_CHECK(packetFamily == 1);
+    BOOST_CHECK(packetClass  == 0);
+    BOOST_CHECK(packetType   == 1);
+    BOOST_CHECK(streamId     == 0);
+
+    offset += uint32_t_size;
+    uint32_t packetHeaderWord1 = ReadUint32(buffer.data(), offset);
+    uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
+    uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
+    BOOST_CHECK(sequenceNumbered ==  0);
+    BOOST_CHECK(dataLength       == 24);
+
+    // Check the decl_id
+    offset += uint32_t_size;
+    uint32_t readDeclId = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readDeclId == 4);
+
+    // Check the timestamp
+    offset += uint32_t_size;
+    uint64_t readTimestamp = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readTimestamp == timestamp);
+
+    // Check the thread id
+    offset += uint64_t_size;
+    uint32_t readThreadId = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(readThreadId == threadId);
+
+    // Check the profiling GUID
+    offset += uint32_t_size;
+    uint64_t readProfilingGuid = ReadUint64(buffer.data(), offset);
+    BOOST_CHECK(readProfilingGuid == profilingGuid);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

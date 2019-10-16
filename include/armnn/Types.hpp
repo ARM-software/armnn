@@ -60,6 +60,16 @@ enum class ArgMinMaxFunction
     Max = 1
 };
 
+enum class ComparisonOperation
+{
+    Equal          = 0,
+    Greater        = 1,
+    GreaterOrEqual = 2,
+    Less           = 3,
+    LessOrEqual    = 4,
+    NotEqual       = 5
+};
+
 enum class PoolingAlgorithm
 {
     Max     = 0,

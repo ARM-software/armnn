@@ -109,6 +109,13 @@ public:
     virtual IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
                                                  const char* name = nullptr) = 0;
 
+    /// Add a Comparison layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @param desc - Descriptor for the comparison operation.
+    /// @ return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
+                                                  const char* name = nullptr) = 0;
+
     /// Adds a concatenation layer to the network.
     /// @param concatDescriptor - ConcatDescriptor (synonym for OriginsDescriptor) to configure the concatenation
     ///                           process. Number of Views must be equal to the number of inputs, and their order
@@ -453,11 +460,13 @@ public:
     /// Add a Greater layer to the network.
     /// @param name - Optional name for the layer.
     /// @ return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
     virtual IConnectableLayer* AddGreaterLayer(const char* name = nullptr) = 0;
 
     /// Add a Equal layer to the network.
     /// @param name - Optional name for the layer.
     /// @ return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
     virtual IConnectableLayer* AddEqualLayer(const char* name = nullptr) = 0;
 
     /// Add Reciprocal of square root layer to the network.

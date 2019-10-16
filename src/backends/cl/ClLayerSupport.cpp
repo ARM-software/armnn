@@ -209,6 +209,24 @@ bool ClLayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
                                    descriptor);
 }
 
+bool ClLayerSupport::IsComparisonSupported(const TensorInfo& input0,
+                                           const TensorInfo& input1,
+                                           const TensorInfo& output,
+                                           const ComparisonDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    if (descriptor.m_Operation == ComparisonOperation::Greater)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(ClGreaterWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input0,
+                                       input1,
+                                       output);
+    }
+
+    return false;
+}
+
 bool ClLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                                        const TensorInfo& output,
                                        const ConcatDescriptor& descriptor,
@@ -398,11 +416,8 @@ bool ClLayerSupport::IsGreaterSupported(const TensorInfo& input0,
                                         const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(ClGreaterWorkloadValidate,
-                                   reasonIfUnsupported,
-                                   input0,
-                                   input1,
-                                   output);
+    ComparisonDescriptor descriptor(ComparisonOperation::Greater);
+    return IsComparisonSupported(input0, input1, output, descriptor, reasonIfUnsupported);
 }
 
 bool ClLayerSupport::IsInputSupported(const TensorInfo& input,

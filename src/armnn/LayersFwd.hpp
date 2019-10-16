@@ -12,6 +12,7 @@
 #include "layers/ArgMinMaxLayer.hpp"
 #include "layers/BatchNormalizationLayer.hpp"
 #include "layers/BatchToSpaceNdLayer.hpp"
+#include "layers/ComparisonLayer.hpp"
 #include "layers/ConcatLayer.hpp"
 #include "layers/ConstantLayer.hpp"
 #include "layers/ConvertFp16ToFp32Layer.hpp"
@@ -23,12 +24,10 @@
 #include "layers/DequantizeLayer.hpp"
 #include "layers/DetectionPostProcessLayer.hpp"
 #include "layers/DivisionLayer.hpp"
-#include "layers/EqualLayer.hpp"
 #include "layers/FakeQuantizationLayer.hpp"
 #include "layers/FloorLayer.hpp"
 #include "layers/FullyConnectedLayer.hpp"
 #include "layers/GatherLayer.hpp"
-#include "layers/GreaterLayer.hpp"
 #include "layers/InputLayer.hpp"
 #include "layers/InstanceNormalizationLayer.hpp"
 #include "layers/L2NormalizationLayer.hpp"
@@ -97,6 +96,7 @@ DECLARE_LAYER(Addition)
 DECLARE_LAYER(ArgMinMax)
 DECLARE_LAYER(BatchNormalization)
 DECLARE_LAYER(BatchToSpaceNd)
+DECLARE_LAYER(Comparison)
 DECLARE_LAYER(Concat)
 DECLARE_LAYER(Constant)
 DECLARE_LAYER(ConvertFp16ToFp32)
@@ -108,12 +108,10 @@ DECLARE_LAYER(DepthwiseConvolution2d)
 DECLARE_LAYER(Dequantize)
 DECLARE_LAYER(DetectionPostProcess)
 DECLARE_LAYER(Division)
-DECLARE_LAYER(Equal)
 DECLARE_LAYER(FakeQuantization)
 DECLARE_LAYER(Floor)
 DECLARE_LAYER(FullyConnected)
 DECLARE_LAYER(Gather)
-DECLARE_LAYER(Greater)
 DECLARE_LAYER(Input)
 DECLARE_LAYER(InstanceNormalization)
 DECLARE_LAYER(L2Normalization)

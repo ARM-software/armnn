@@ -4,18 +4,10 @@
 //
 
 #include "GreaterTestImpl.hpp"
-#include "ElementwiseTestImpl.hpp"
+
+#include "ComparisonTestImpl.hpp"
 
 #include <Half.hpp>
-
-template<>
-std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::GreaterQueueDescriptor>(
-    const armnn::IWorkloadFactory& workloadFactory,
-    const armnn::WorkloadInfo& info,
-    const armnn::GreaterQueueDescriptor& descriptor)
-{
-    return workloadFactory.CreateGreater(descriptor, info);
-}
 
 LayerTestResult<uint8_t, 4> GreaterSimpleTest(armnn::IWorkloadFactory& workloadFactory,
                                               const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -45,12 +37,10 @@ LayerTestResult<uint8_t, 4> GreaterSimpleTest(armnn::IWorkloadFactory& workloadF
         0, 0, 0, 0,  0, 0, 0, 0
     };
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::Float32,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4, armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape,
         input0,
         shape,
@@ -71,12 +61,10 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementTest(
 
     std::vector<uint8_t> output = { 0, 1, 1, 1, 1, 1, 1, 1};
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::Float32,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4, armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape0,
         input0,
         shape1,
@@ -106,12 +94,10 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorTest(
         1, 1, 1, 1, 1, 1
     };
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::Float32,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4, armnn::DataType::Float32>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape0,
         input0,
         shape1,
@@ -151,12 +137,10 @@ LayerTestResult<uint8_t, 4> GreaterFloat16Test(
         0, 0, 0, 0,  0, 0, 0, 0
     };
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::Float16,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4,armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape,
         input0,
         shape,
@@ -179,12 +163,10 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementFloat16Test(
 
     std::vector<uint8_t> output = { 0, 1, 1, 1, 1, 1, 1, 1};
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::Float16,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4, armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape0,
         input0,
         shape1,
@@ -198,7 +180,7 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorFloat16Test(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     using namespace half_float::literal;
-    
+
     const unsigned int shape0[] = { 1, 2, 2, 3 };
     const unsigned int shape1[] = { 1, 1, 1, 3 };
 
@@ -216,12 +198,10 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorFloat16Test(
         1, 1, 1, 1, 1, 1
     };
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::Float16,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4, armnn::DataType::Float16>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape0,
         input0,
         shape1,
@@ -255,12 +235,10 @@ LayerTestResult<uint8_t, 4> GreaterUint8Test(
         1, 1, 1, 1, 0, 0, 0, 0
     };
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::QuantisedAsymm8,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4, armnn::DataType::QuantisedAsymm8>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape,
         input0,
         shape,
@@ -290,12 +268,10 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1ElementUint8Test(
         1, 1, 1, 1, 1, 1
     };
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::QuantisedAsymm8,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4, armnn::DataType::QuantisedAsymm8>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape0,
         input0,
         shape1,
@@ -325,12 +301,10 @@ LayerTestResult<uint8_t, 4> GreaterBroadcast1DVectorUint8Test(
         1, 1, 1, 1, 1, 1
     };
 
-    return ElementwiseTestHelper<4,
-                                 armnn::GreaterQueueDescriptor,
-                                 armnn::DataType::QuantisedAsymm8,
-                                 armnn::DataType::Boolean>(
+    return ComparisonTestImpl<4, armnn::DataType::QuantisedAsymm8>(
         workloadFactory,
         memoryManager,
+        armnn::ComparisonDescriptor(armnn::ComparisonOperation::Greater),
         shape0,
         input0,
         shape1,

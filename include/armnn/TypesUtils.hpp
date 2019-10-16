@@ -42,6 +42,20 @@ constexpr char const* GetActivationFunctionAsCString(ActivationFunction activati
     }
 }
 
+constexpr char const* GetComparisonOperationAsCString(ComparisonOperation operation)
+{
+    switch (operation)
+    {
+        case ComparisonOperation::Equal:          return "Equal";
+        case ComparisonOperation::Greater:        return "Greater";
+        case ComparisonOperation::GreaterOrEqual: return "GreaterOrEqual";
+        case ComparisonOperation::Less:           return "Less";
+        case ComparisonOperation::LessOrEqual:    return "LessOrEqual";
+        case ComparisonOperation::NotEqual:       return "NotEqual";
+        default:                                  return "Unknown";
+    }
+}
+
 constexpr char const* GetPoolingAlgorithmAsCString(PoolingAlgorithm pooling)
 {
     switch (pooling)

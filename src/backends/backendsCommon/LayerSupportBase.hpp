@@ -46,6 +46,12 @@ public:
                                    const BatchToSpaceNdDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsComparisonSupported(const TensorInfo& input0,
+                               const TensorInfo& input1,
+                               const TensorInfo& output,
+                               const ComparisonDescriptor& descriptor,
+                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
                            const OriginsDescriptor& descriptor,
@@ -108,6 +114,7 @@ public:
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
     bool IsEqualSupported(const TensorInfo& input0,
                           const TensorInfo& input1,
                           const TensorInfo& output,
@@ -133,6 +140,7 @@ public:
                            const TensorInfo& output,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
     bool IsGreaterSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,

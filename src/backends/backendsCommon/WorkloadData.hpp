@@ -553,4 +553,9 @@ struct DepthToSpaceQueueDescriptor : QueueDescriptorWithParameters<DepthToSpaceD
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ComparisonQueueDescriptor : QueueDescriptorWithParameters<ComparisonDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

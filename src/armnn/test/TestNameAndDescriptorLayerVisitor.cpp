@@ -65,6 +65,12 @@ armnn::BatchToSpaceNdDescriptor GetDescriptor<armnn::BatchToSpaceNdDescriptor>()
 }
 
 template<>
+armnn::ComparisonDescriptor GetDescriptor<armnn::ComparisonDescriptor>()
+{
+    return armnn::ComparisonDescriptor(armnn::ComparisonOperation::GreaterOrEqual);
+}
+
+template<>
 armnn::ConcatDescriptor GetDescriptor<armnn::ConcatDescriptor>()
 {
     armnn::ConcatDescriptor descriptor(2, 2);
@@ -243,6 +249,7 @@ TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Activation)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(ArgMinMax)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(DepthToSpace)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(BatchToSpaceNd)
+TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Comparison)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(Concat)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(InstanceNormalization)
 TEST_SUITE_NAME_AND_DESCRIPTOR_LAYER_VISITOR(L2Normalization)

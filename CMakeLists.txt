@@ -250,6 +250,8 @@ list(APPEND armnn_sources
     src/armnn/layers/BatchNormalizationLayer.cpp
     src/armnn/layers/BatchToSpaceNdLayer.hpp
     src/armnn/layers/BatchToSpaceNdLayer.cpp
+    src/armnn/layers/ComparisonLayer.hpp
+    src/armnn/layers/ComparisonLayer.cpp
     src/armnn/layers/ConcatLayer.hpp
     src/armnn/layers/ConcatLayer.cpp
     src/armnn/layers/ConstantLayer.hpp
@@ -272,8 +274,6 @@ list(APPEND armnn_sources
     src/armnn/layers/DetectionPostProcessLayer.cpp
     src/armnn/layers/ElementwiseBaseLayer.hpp
     src/armnn/layers/ElementwiseBaseLayer.cpp
-    src/armnn/layers/EqualLayer.hpp
-    src/armnn/layers/EqualLayer.cpp
     src/armnn/layers/FakeQuantizationLayer.hpp
     src/armnn/layers/FakeQuantizationLayer.cpp
     src/armnn/layers/FloorLayer.hpp
@@ -282,8 +282,6 @@ list(APPEND armnn_sources
     src/armnn/layers/FullyConnectedLayer.cpp
     src/armnn/layers/GatherLayer.cpp
     src/armnn/layers/GatherLayer.hpp
-    src/armnn/layers/GreaterLayer.cpp
-    src/armnn/layers/GreaterLayer.hpp
     src/armnn/layers/InputLayer.hpp
     src/armnn/layers/InputLayer.cpp
     src/armnn/layers/InstanceNormalizationLayer.hpp

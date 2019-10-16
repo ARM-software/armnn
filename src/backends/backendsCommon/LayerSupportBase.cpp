@@ -84,6 +84,15 @@ bool LayerSupportBase::IsBatchToSpaceNdSupported(const TensorInfo& input,
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsComparisonSupported(const TensorInfo& input0,
+                                             const TensorInfo& input1,
+                                             const TensorInfo& output,
+                                             const ComparisonDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                                          const TensorInfo& output,
                                          const OriginsDescriptor& descriptor,

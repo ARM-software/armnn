@@ -157,6 +157,20 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateBatchToSpaceNd(const BatchTo
     return MakeWorkload<ClBatchToSpaceNdWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
+{
+    if (descriptor.m_Parameters.m_Operation == ComparisonOperation::Greater)
+    {
+        GreaterQueueDescriptor greaterQueueDescriptor;
+        greaterQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+        greaterQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+
+        return MakeWorkload<ClGreaterFloat32Workload, ClGreaterUint8Workload>(greaterQueueDescriptor, info);
+    }
+    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
@@ -230,7 +244,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDivision(const DivisionQueue
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {
-    return MakeWorkload<NullWorkload, NullWorkload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+
+    ComparisonQueueDescriptor comparisonDescriptor;
+    comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Equal);
+
+    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFakeQuantization(
@@ -261,7 +280,12 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGather(const GatherQueueDesc
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkload<ClGreaterFloat32Workload, ClGreaterUint8Workload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+
+    ComparisonQueueDescriptor comparisonDescriptor;
+    comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Greater);
+
+    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,

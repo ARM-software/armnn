@@ -20,6 +20,7 @@
 #include "RefArgMinMaxWorkload.hpp"
 #include "RefBatchNormalizationWorkload.hpp"
 #include "RefBatchToSpaceNdWorkload.hpp"
+#include "RefComparisonWorkload.hpp"
 #include "RefConvolution2dWorkload.hpp"
 #include "RefConstantWorkload.hpp"
 #include "RefConcatWorkload.hpp"

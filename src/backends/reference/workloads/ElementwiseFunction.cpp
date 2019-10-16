@@ -32,6 +32,11 @@ template struct armnn::ElementwiseFunction<std::multiplies<float>>;
 template struct armnn::ElementwiseFunction<std::divides<float>>;
 template struct armnn::ElementwiseFunction<armnn::maximum<float>>;
 template struct armnn::ElementwiseFunction<armnn::minimum<float>>;
+
+// Comparison
 template struct armnn::ElementwiseFunction<std::equal_to<float>>;
 template struct armnn::ElementwiseFunction<std::greater<float>>;
-
+template struct armnn::ElementwiseFunction<std::greater_equal<float>>;
+template struct armnn::ElementwiseFunction<std::less<float>>;
+template struct armnn::ElementwiseFunction<std::less_equal<float>>;
+template struct armnn::ElementwiseFunction<std::not_equal_to<float>>;

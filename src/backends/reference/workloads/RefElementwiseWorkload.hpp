@@ -65,13 +65,4 @@ using RefMinimumWorkload =
                           MinimumQueueDescriptor,
                           StringMapping::RefMinimumWorkload_Execute>;
 
-using RefEqualWorkload =
-    RefElementwiseWorkload<std::equal_to<float>,
-                           armnn::EqualQueueDescriptor,
-                           armnn::StringMapping::RefEqualWorkload_Execute>;
-
-using RefGreaterWorkload =
-    RefElementwiseWorkload<std::greater<float>,
-                           armnn::GreaterQueueDescriptor,
-                           armnn::StringMapping::RefGreaterWorkload_Execute>;
 } // armnn

@@ -131,6 +131,20 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateBatchToSpaceNd(const Batch
     return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
+                                                                 const WorkloadInfo& info) const
+{
+    if (descriptor.m_Parameters.m_Operation == ComparisonOperation::Greater)
+    {
+        GreaterQueueDescriptor greaterQueueDescriptor;
+        greaterQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+        greaterQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+
+        return MakeWorkloadHelper<NeonGreaterFloat32Workload, NeonGreaterUint8Workload>(greaterQueueDescriptor, info);
+    }
+    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+}
+
 std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                                     const WorkloadInfo&          info) const
 {
@@ -203,7 +217,12 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateDivision(
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NullWorkload, NullWorkload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+
+    ComparisonQueueDescriptor comparisonDescriptor;
+    comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Equal);
+
+    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFakeQuantization(
@@ -235,7 +254,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGather(const armnn::Gather
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {
-    return MakeWorkloadHelper<NeonGreaterFloat32Workload, NeonGreaterUint8Workload>(descriptor, info);
+    boost::ignore_unused(descriptor);
+
+    ComparisonQueueDescriptor comparisonDescriptor;
+    comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Greater);
+
+    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,

@@ -1270,7 +1270,8 @@ void Deserializer::ParseEqual(GraphPtr graph, unsigned int layerIndex)
     CHECK_VALID_SIZE(outputs.size(), 1);
 
     auto layerName = GetLayerName(graph, layerIndex);
-    IConnectableLayer* layer = m_Network->AddEqualLayer(layerName.c_str());
+    armnn::ComparisonDescriptor descriptor(armnn::ComparisonOperation::Equal);
+    IConnectableLayer* layer = m_Network->AddComparisonLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1290,7 +1291,8 @@ void Deserializer::ParseGreater(GraphPtr graph, unsigned int layerIndex)
     CHECK_VALID_SIZE(outputs.size(), 1);
 
     auto layerName = GetLayerName(graph, layerIndex);
-    IConnectableLayer* layer = m_Network->AddGreaterLayer(layerName.c_str());
+    armnn::ComparisonDescriptor descriptor(armnn::ComparisonOperation::Greater);
+    IConnectableLayer* layer = m_Network->AddComparisonLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

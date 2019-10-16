@@ -58,6 +58,26 @@ struct ArgMinMaxDescriptor
     int m_Axis;
 };
 
+/// A ComparisonDescriptor for the ComparisonLayer
+struct ComparisonDescriptor
+{
+    ComparisonDescriptor()
+        : ComparisonDescriptor(ComparisonOperation::Equal)
+    {}
+
+    ComparisonDescriptor(ComparisonOperation operation)
+        : m_Operation(operation)
+    {}
+
+    bool operator ==(const ComparisonDescriptor &rhs) const
+    {
+        return m_Operation == rhs.m_Operation;
+    }
+
+    /// Specifies the comparison operation to execute
+    ComparisonOperation m_Operation;
+};
+
 /// A PermuteDescriptor for the PermuteLayer.
 struct PermuteDescriptor
 {

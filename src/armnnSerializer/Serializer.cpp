@@ -240,6 +240,13 @@ void SerializerVisitor::VisitBatchNormalizationLayer(const armnn::IConnectableLa
     CreateAnyLayer(fbBatchNormalizationLayer.o, serializer::Layer::Layer_BatchNormalizationLayer);
 }
 
+void SerializerVisitor::VisitComparisonLayer(const armnn::IConnectableLayer* layer,
+                                             const armnn::ComparisonDescriptor& descriptor,
+                                             const char* name)
+{
+    throw armnn::UnimplementedException("SerializerVisitor::VisitComparisonLayer() is not implemented");
+}
+
 // Build FlatBuffer for Constant Layer
 void SerializerVisitor::VisitConstantLayer(const armnn::IConnectableLayer* layer,
                                            const armnn::ConstTensor& input,

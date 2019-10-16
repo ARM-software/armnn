@@ -42,6 +42,9 @@ public:
     IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                               const char* name = nullptr) override;
 
+    IConnectableLayer* AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
+                                          const char* name = nullptr) override;
+
     IConnectableLayer* AddConcatLayer(const ConcatDescriptor& concatDescriptor,
                                       const char* name = nullptr) override;
 
@@ -197,8 +200,10 @@ public:
 
     IConnectableLayer* AddMinimumLayer(const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
     IConnectableLayer* AddGreaterLayer(const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
     IConnectableLayer* AddEqualLayer(const char* name = nullptr) override;
 
     IConnectableLayer* AddRsqrtLayer(const char* name = nullptr) override;

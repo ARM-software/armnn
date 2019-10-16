@@ -63,6 +63,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefBatchNormalizationWorkload.hpp
     RefBatchToSpaceNdWorkload.cpp
     RefBatchToSpaceNdWorkload.hpp
+    RefComparisonWorkload.cpp
+    RefComparisonWorkload.hpp
     RefConcatWorkload.cpp
     RefConcatWorkload.hpp
     RefConstantWorkload.cpp

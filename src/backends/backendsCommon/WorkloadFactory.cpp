@@ -148,6 +148,21 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                                    reason);
             break;
         }
+        case LayerType::Comparison:
+        {
+            auto cLayer = boost::polymorphic_downcast<const ComparisonLayer*>(&layer);
+
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject->IsComparisonSupported(OverrideDataType(input0, dataType),
+                                                               OverrideDataType(input1, dataType),
+                                                               OverrideDataType(output, DataType::Boolean),
+                                                               cLayer->GetParameters(),
+                                                               reason);
+            break;
+        }
         case LayerType::Constant:
         {
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
@@ -266,17 +281,6 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                                          input1,
                                                                          descriptor,
                                                                          reason);
-            break;
-        }
-        case LayerType::Equal:
-        {
-            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
-            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsEqualSupported(OverrideDataType(input0, dataType),
-                                                          OverrideDataType(input1, dataType),
-                                                          OverrideDataType(output, dataType),
-                                                          reason);
             break;
         }
         case LayerType::FakeQuantization:
@@ -957,17 +961,6 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                                             reason);
             break;
         }
-        case LayerType::Greater:
-        {
-            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
-            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject->IsGreaterSupported(OverrideDataType(input0, dataType),
-                                                            OverrideDataType(input1, dataType),
-                                                            OverrideDataType(output, DataType::Boolean),
-                                                            reason);
-            break;
-        }
         case LayerType::Prelu:
         {
             const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
@@ -1061,6 +1054,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchNormalization(
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                                   const WorkloadInfo& Info) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) const
 {
     return std::unique_ptr<IWorkload>();
 }

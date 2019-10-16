@@ -68,6 +68,10 @@ public:
                                       const armnn::ConstTensor& gamma,
                                       const char* name = nullptr) override;
 
+    void VisitComparisonLayer(const armnn::IConnectableLayer* layer,
+                              const armnn::ComparisonDescriptor& descriptor,
+                              const char* name = nullptr) override;
+
     void VisitConcatLayer(const armnn::IConnectableLayer* layer,
                           const armnn::ConcatDescriptor& concatDescriptor,
                           const char* name = nullptr) override;
@@ -103,6 +107,7 @@ public:
     void VisitDivisionLayer(const armnn::IConnectableLayer* layer,
                             const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
     void VisitEqualLayer(const armnn::IConnectableLayer* layer,
                          const char* name = nullptr) override;
 
@@ -118,6 +123,7 @@ public:
     void VisitGatherLayer(const armnn::IConnectableLayer* layer,
                           const char* name = nullptr) override;
 
+    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
     void VisitGreaterLayer(const armnn::IConnectableLayer* layer,
                            const char* name = nullptr) override;
 

@@ -131,6 +131,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateBatchToSpaceNd(const BatchT
     return std::make_unique<RefBatchToSpaceNdWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreateComparison(const ComparisonQueueDescriptor& descriptor,
+                                                                const WorkloadInfo& info) const
+{
+    return std::make_unique<RefComparisonWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConcat(const ConcatQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {
@@ -208,7 +214,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDivision(const DivisionQueu
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
-    return std::make_unique<RefEqualWorkload>(descriptor, info);
+    ComparisonQueueDescriptor comparisonDescriptor;
+    comparisonDescriptor.m_Parameters.m_Operation = ComparisonOperation::Equal;
+
+    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(
@@ -240,7 +249,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const GatherQueueDes
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const
 {
-    return std::make_unique<RefGreaterWorkload>(descriptor, info);
+    ComparisonQueueDescriptor comparisonDescriptor;
+    comparisonDescriptor.m_Parameters.m_Operation = ComparisonOperation::Greater;
+
+    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,

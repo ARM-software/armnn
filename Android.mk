@@ -118,6 +118,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ArgMinMaxLayer.cpp \
         src/armnn/layers/BatchNormalizationLayer.cpp \
         src/armnn/layers/BatchToSpaceNdLayer.cpp \
+        src/armnn/layers/ComparisonLayer.cpp \
         src/armnn/layers/ConcatLayer.cpp \
         src/armnn/layers/ConstantLayer.cpp \
         src/armnn/layers/Convolution2dLayer.cpp \
@@ -130,12 +131,10 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/DetectionPostProcessLayer.cpp \
         src/armnn/layers/DivisionLayer.cpp \
         src/armnn/layers/ElementwiseBaseLayer.cpp \
-        src/armnn/layers/EqualLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
         src/armnn/layers/FloorLayer.cpp \
         src/armnn/layers/FullyConnectedLayer.cpp \
         src/armnn/layers/GatherLayer.cpp \
-        src/armnn/layers/GreaterLayer.cpp \
         src/armnn/layers/InputLayer.cpp \
         src/armnn/layers/InstanceNormalizationLayer.cpp \
         src/armnn/layers/L2NormalizationLayer.cpp \

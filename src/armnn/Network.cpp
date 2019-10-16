@@ -938,6 +938,12 @@ IConnectableLayer* Network::AddBatchToSpaceNdLayer(const BatchToSpaceNdDescripto
     return m_Graph->AddLayer<BatchToSpaceNdLayer>(batchToSpaceNdDescriptor, name);
 }
 
+IConnectableLayer* Network::AddComparisonLayer(const ComparisonDescriptor& comparisonDescriptor,
+                                               const char* name)
+{
+    return m_Graph->AddLayer<ComparisonLayer>(comparisonDescriptor, name);
+}
+
 IConnectableLayer* Network::AddFullyConnectedLayerImpl(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                        const ConstTensor& weights,
                                                        const Optional<ConstTensor>& biases,
@@ -1436,12 +1442,12 @@ IConnectableLayer* Network::AddStridedSliceLayer(const StridedSliceDescriptor& s
 
 IConnectableLayer* Network::AddGreaterLayer(const char* name)
 {
-    return m_Graph->AddLayer<GreaterLayer>(name);
+    return AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Greater), name);
 }
 
 IConnectableLayer* Network::AddEqualLayer(const char* name)
 {
-    return m_Graph->AddLayer<EqualLayer>(name);
+    return AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Equal), name);
 }
 
 IConnectableLayer* Network::AddRsqrtLayer(const char * name)

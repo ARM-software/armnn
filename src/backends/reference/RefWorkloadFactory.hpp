@@ -78,6 +78,9 @@ public:
     std::unique_ptr<IWorkload> CreateBatchToSpaceNd(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                     const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateComparison(const ComparisonQueueDescriptor& descriptor,
+                                                const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateConcat(const ConcatQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
 
@@ -111,6 +114,7 @@ public:
     std::unique_ptr<IWorkload> CreateDivision(const DivisionQueueDescriptor& descriptor,
                                               const WorkloadInfo& info) const override;
 
+    ARMNN_DEPRECATED_MSG("Use CreateComparison instead")
     std::unique_ptr<IWorkload> CreateEqual(const EqualQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 
@@ -126,6 +130,7 @@ public:
     std::unique_ptr<IWorkload> CreateGather(const GatherQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
 
+    ARMNN_DEPRECATED_MSG("Use CreateComparison instead")
     std::unique_ptr<IWorkload> CreateGreater(const GreaterQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
 

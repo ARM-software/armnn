@@ -55,6 +55,10 @@ public:
                                   const BatchToSpaceNdDescriptor&,
                                   const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitComparisonLayer(const IConnectableLayer*,
+                              const ComparisonDescriptor&,
+                              const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitConcatLayer(const IConnectableLayer*,
                           const ConcatDescriptor&,
                           const char*) override { DefaultPolicy::Apply(__func__); }

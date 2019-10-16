@@ -74,6 +74,14 @@ public:
                                           const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                           const char* name = nullptr) = 0;
 
+    /// Function a Comparison layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param comparisonDescriptor - Description of the layer.
+    /// @param name - Optional name for the layer.
+    virtual void VisitComparisonLayer(const IConnectableLayer* layer,
+                                      const ComparisonDescriptor& comparisonDescriptor,
+                                      const char* name = nullptr) = 0;
+
     /// Function that a concat layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param concatDescriptor - ConcatDescriptor (synonym for OriginsDescriptor) to configure the concatenation
@@ -163,6 +171,7 @@ public:
     /// Function an Equal layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param name - Optional name for the layer.
+    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
     virtual void VisitEqualLayer(const IConnectableLayer* layer,
                                  const char* name = nullptr) = 0;
 
@@ -194,6 +203,7 @@ public:
     /// Function a Greater layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param name - Optional name for the layer.
+    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
     virtual void VisitGreaterLayer(const IConnectableLayer* layer,
                                    const char* name = nullptr) = 0;
 

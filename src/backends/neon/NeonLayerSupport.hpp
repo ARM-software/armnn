@@ -40,6 +40,12 @@ public:
                                        const BatchNormalizationDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsComparisonSupported(const TensorInfo& input0,
+                               const TensorInfo& input1,
+                               const TensorInfo& output,
+                               const ComparisonDescriptor& descriptor,
+                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
                            const ConcatDescriptor& descriptor,
@@ -98,6 +104,7 @@ public:
                                    const FullyConnectedDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
     bool IsGreaterSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,

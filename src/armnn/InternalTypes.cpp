@@ -20,6 +20,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::ArgMinMax: return "ArgMinMax";
         case LayerType::BatchNormalization: return "BatchNormalization";
         case LayerType::BatchToSpaceNd: return "BatchToSpaceNd";
+        case LayerType::Comparison: return "Comparison";
         case LayerType::Concat: return "Concat";
         case LayerType::Constant: return "Constant";
         case LayerType::ConvertFp16ToFp32: return "ConvertFp16ToFp32";
@@ -31,12 +32,10 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Dequantize: return "Dequantize";
         case LayerType::DetectionPostProcess: return "DetectionPostProcess";
         case LayerType::Division: return "Division";
-        case LayerType::Equal: return "Equal";
         case LayerType::FakeQuantization: return "FakeQuantization";
         case LayerType::Floor: return "Floor";
         case LayerType::FullyConnected: return "FullyConnected";
         case LayerType::Gather: return "Gather";
-        case LayerType::Greater: return "Greater";
         case LayerType::Input: return "Input";
         case LayerType::InstanceNormalization: return "InstanceNormalization";
         case LayerType::L2Normalization: return "L2Normalization";

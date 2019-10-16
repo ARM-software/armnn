@@ -18,9 +18,7 @@ struct StringMapping
 public:
     enum Id {
         RefAdditionWorkload_Execute,
-        RefEqualWorkload_Execute,
         RefDivisionWorkload_Execute,
-        RefGreaterWorkload_Execute,
         RefMaximumWorkload_Execute,
         RefMinimumWorkload_Execute,
         RefMultiplicationWorkload_Execute,
@@ -40,8 +38,6 @@ private:
     {
         m_Strings[RefAdditionWorkload_Execute] = "RefAdditionWorkload_Execute";
         m_Strings[RefDivisionWorkload_Execute] = "RefDivisionWorkload_Execute";
-        m_Strings[RefEqualWorkload_Execute] = "RefEqualWorkload_Execute";
-        m_Strings[RefGreaterWorkload_Execute] = "RefGreaterWorkload_Execute";
         m_Strings[RefMaximumWorkload_Execute] = "RefMaximumWorkload_Execute";
         m_Strings[RefMinimumWorkload_Execute] = "RefMinimumWorkload_Execute";
         m_Strings[RefMultiplicationWorkload_Execute] = "RefMultiplicationWorkload_Execute";

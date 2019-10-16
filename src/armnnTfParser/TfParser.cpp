@@ -1862,7 +1862,8 @@ ParsedTfOperationPtr TfParser::ParseGreater(const tensorflow::NodeDef& nodeDef,
     IOutputSlot* input0Slot = inputLayers.first;
     IOutputSlot* input1Slot = inputLayers.second;
 
-    IConnectableLayer* const layer = m_Network->AddGreaterLayer(nodeDef.name().c_str());
+    ComparisonDescriptor descriptor(ComparisonOperation::Greater);
+    IConnectableLayer* const layer = m_Network->AddComparisonLayer(descriptor, nodeDef.name().c_str());
 
     return ProcessComparisonLayer(input0Slot, input1Slot, layer, nodeDef);
 }
@@ -1874,7 +1875,8 @@ ParsedTfOperationPtr TfParser::ParseEqual(const tensorflow::NodeDef& nodeDef,
     IOutputSlot* input0Slot = inputLayers.first;
     IOutputSlot* input1Slot = inputLayers.second;
 
-    IConnectableLayer* const layer = m_Network->AddEqualLayer(nodeDef.name().c_str());
+    ComparisonDescriptor descriptor(ComparisonOperation::Equal);
+    IConnectableLayer* const layer = m_Network->AddComparisonLayer(descriptor, nodeDef.name().c_str());
 
     return ProcessComparisonLayer(input0Slot, input1Slot, layer, nodeDef);
 }

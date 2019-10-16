@@ -86,11 +86,3 @@ template class armnn::RefElementwiseWorkload<armnn::maximum<float>,
 template class armnn::RefElementwiseWorkload<armnn::minimum<float>,
                                             armnn::MinimumQueueDescriptor,
                                             armnn::StringMapping::RefMinimumWorkload_Execute>;
-
-template class armnn::RefElementwiseWorkload<std::equal_to<float>,
-                                            armnn::EqualQueueDescriptor,
-                                            armnn::StringMapping::RefEqualWorkload_Execute>;
-
-template class armnn::RefElementwiseWorkload<std::greater<float>,
-                                            armnn::GreaterQueueDescriptor,
-                                            armnn::StringMapping::RefGreaterWorkload_Execute>;

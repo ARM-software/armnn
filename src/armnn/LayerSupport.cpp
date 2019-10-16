@@ -262,7 +262,12 @@ bool IsEqualSupported(const BackendId& backend,
                       char* reasonIfUnsupported,
                       size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsEqualSupported, input0, input1, output);
+    FORWARD_LAYER_SUPPORT_FUNC(backend,
+                               IsComparisonSupported,
+                               input0,
+                               input1,
+                               output,
+                               ComparisonDescriptor(ComparisonOperation::Equal));
 }
 
 bool IsFakeQuantizationSupported(const BackendId& backend,
@@ -317,7 +322,12 @@ bool IsGreaterSupported(const BackendId& backend,
                         char* reasonIfUnsupported,
                         size_t reasonIfUnsupportedMaxLength)
 {
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsGreaterSupported, input0, input1, output);
+    FORWARD_LAYER_SUPPORT_FUNC(backend,
+                               IsComparisonSupported,
+                               input0,
+                               input1,
+                               output,
+                               ComparisonDescriptor(ComparisonOperation::Greater));
 }
 
 bool IsInputSupported(const BackendId& backend,

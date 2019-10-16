@@ -10,6 +10,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     BackendRegistryTests.cpp
     CommonTestUtils.cpp
     CommonTestUtils.hpp
+    ComparisonEndToEndTestImpl.hpp
     DataLayoutUtils.hpp
     DataTypeUtils.hpp
     DepthToSpaceEndToEndTestImpl.hpp
@@ -58,6 +59,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/BatchNormalizationTestImpl.cpp
     layerTests/BatchNormalizationTestImpl.hpp
     layerTests/BatchToSpaceNdTestImpl.hpp
+    layerTests/ComparisonTestImpl.hpp
     layerTests/ConcatTestImpl.cpp
     layerTests/ConcatTestImpl.hpp
     layerTests/ConstantTestImpl.cpp

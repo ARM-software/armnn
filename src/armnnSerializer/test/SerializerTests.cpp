@@ -1009,48 +1009,6 @@ BOOST_AUTO_TEST_CASE(SerializeDivision)
     deserializedNetwork->Accept(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeEqual)
-{
-    class EqualLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        EqualLayerVerifier(const std::string& layerName,
-                           const std::vector<armnn::TensorInfo>& inputInfos,
-                           const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitEqualLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
-
-    const std::string layerName("equal");
-    const armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
-    const armnn::TensorInfo inputTensorInfo2 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Boolean);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
-    armnn::IConnectableLayer* const equalLayer = network->AddEqualLayer(layerName.c_str());
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer1->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(0));
-    inputLayer2->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(1));
-    equalLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo1);
-    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo2);
-    equalLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    EqualLayerVerifier verifier(layerName, {inputTensorInfo1, inputTensorInfo2}, {outputTensorInfo});
-    deserializedNetwork->Accept(verifier);
-}
-
 BOOST_AUTO_TEST_CASE(SerializeFloor)
 {
     class FloorLayerVerifier : public LayerVerifierBase
@@ -1222,48 +1180,6 @@ BOOST_AUTO_TEST_CASE(SerializeGather)
     BOOST_CHECK(deserializedNetwork);
 
     GatherLayerVerifier verifier(layerName, {paramsInfo, indicesInfo}, {outputInfo});
-    deserializedNetwork->Accept(verifier);
-}
-
-BOOST_AUTO_TEST_CASE(SerializeGreater)
-{
-    class GreaterLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        GreaterLayerVerifier(const std::string& layerName,
-                             const std::vector<armnn::TensorInfo>& inputInfos,
-                             const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitGreaterLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
-
-    const std::string layerName("greater");
-    const armnn::TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, armnn::DataType::Float32);
-    const armnn::TensorInfo inputTensorInfo2({ 1, 2, 2, 2 }, armnn::DataType::Float32);
-    const armnn::TensorInfo outputTensorInfo({ 1, 2, 2, 2 }, armnn::DataType::Boolean);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
-    armnn::IConnectableLayer* const greaterLayer = network->AddGreaterLayer(layerName.c_str());
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayer1->GetOutputSlot(0).Connect(greaterLayer->GetInputSlot(0));
-    inputLayer2->GetOutputSlot(0).Connect(greaterLayer->GetInputSlot(1));
-    greaterLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputTensorInfo1);
-    inputLayer2->GetOutputSlot(0).SetTensorInfo(inputTensorInfo2);
-    greaterLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
-    BOOST_CHECK(deserializedNetwork);
-
-    GreaterLayerVerifier verifier(layerName, {inputTensorInfo1, inputTensorInfo2}, {outputTensorInfo});
     deserializedNetwork->Accept(verifier);
 }
 

@@ -4,6 +4,7 @@
 //
 
 #include "CommandHandler.hpp"
+#include "ProfilingService.hpp"
 
 #include <boost/log/trivial.hpp>
 
@@ -18,6 +19,11 @@ void CommandHandler::Start(IProfilingConnection& profilingConnection)
     if (IsRunning())
     {
         return;
+    }
+
+    if (m_CommandThread.joinable())
+    {
+        m_CommandThread.join();
     }
 
     m_IsRunning.store(true);
@@ -67,6 +73,14 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
         {
             // Log the error and continue
             BOOST_LOG_TRIVIAL(warning) << "An error has occurred when handling a command: " << e.what() << std::endl;
+            // Did we get here because the socket failed?
+            if ( !profilingConnection.IsOpen() )
+            {
+                // We're going to stop processing commands.
+                // This will leave the thread idle. There is no mechanism to restart the profiling service when the
+                // connection is lost.
+                m_KeepRunning.store(false);
+            }
         }
     }
     while (m_KeepRunning.load());

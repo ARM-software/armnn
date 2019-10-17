@@ -19,9 +19,11 @@ namespace profiling
 
 ProfilingConnectionDumpToFileDecorator::ProfilingConnectionDumpToFileDecorator(
     std::unique_ptr<IProfilingConnection> connection,
-    const Settings& settings)
-    : m_Connection(std::move(connection))
-    , m_Settings(settings)
+    const Runtime::CreationOptions::ExternalProfilingOptions& options,
+    bool ignoreFailures)
+      : m_Connection(std::move(connection))
+      , m_Options(options)
+      , m_IgnoreFileErrors(ignoreFailures)
 {
     if (!m_Connection)
     {
@@ -49,7 +51,7 @@ void ProfilingConnectionDumpToFileDecorator::Close()
 bool ProfilingConnectionDumpToFileDecorator::WritePacket(const unsigned char* buffer, uint32_t length)
 {
     bool success = true;
-    if (m_Settings.m_DumpOutgoing)
+    if (!m_Options.m_OutgoingCaptureFile.empty())
     {
         success &= DumpOutgoingToFile(buffer, length);
     }
@@ -60,7 +62,7 @@ bool ProfilingConnectionDumpToFileDecorator::WritePacket(const unsigned char* bu
 Packet ProfilingConnectionDumpToFileDecorator::ReadPacket(uint32_t timeout)
 {
     Packet packet = m_Connection->ReadPacket(timeout);
-    if (m_Settings.m_DumpIncoming)
+    if (!m_Options.m_IncomingCaptureFile.empty())
     {
         DumpIncomingToFile(packet);
     }
@@ -69,13 +71,13 @@ Packet ProfilingConnectionDumpToFileDecorator::ReadPacket(uint32_t timeout)
 
 bool ProfilingConnectionDumpToFileDecorator::OpenIncomingDumpFile()
 {
-    m_IncomingDumpFileStream.open(m_Settings.m_IncomingDumpFileName, std::ios::out | std::ios::binary);
+    m_IncomingDumpFileStream.open(m_Options.m_IncomingCaptureFile, std::ios::out | std::ios::binary);
     return m_IncomingDumpFileStream.is_open();
 }
 
 bool ProfilingConnectionDumpToFileDecorator::OpenOutgoingDumpFile()
 {
-    m_OutgoingDumpFileStream.open(m_Settings.m_OutgoingDumpFileName, std::ios::out | std::ios::binary);
+    m_OutgoingDumpFileStream.open(m_Options.m_OutgoingCaptureFile, std::ios::out | std::ios::binary);
     return m_OutgoingDumpFileStream.is_open();
 }
 
@@ -93,9 +95,9 @@ void ProfilingConnectionDumpToFileDecorator::DumpIncomingToFile(const Packet& pa
     {
         // attempt to open dump file
         success &= OpenIncomingDumpFile();
-        if (!(success || m_Settings.m_IgnoreFileErrors))
+        if (!(success || m_IgnoreFileErrors))
         {
-            Fail("Failed to open \"" + m_Settings.m_IncomingDumpFileName + "\" for writing");
+            Fail("Failed to open \"" + m_Options.m_IncomingCaptureFile + "\" for writing");
         }
     }
 
@@ -109,7 +111,7 @@ void ProfilingConnectionDumpToFileDecorator::DumpIncomingToFile(const Packet& pa
                                    boost::numeric_cast<std::streamsize>(packetLength));
 
     success &= m_IncomingDumpFileStream.good();
-    if (!(success || m_Settings.m_IgnoreFileErrors))
+    if (!(success || m_IgnoreFileErrors))
     {
         Fail("Error writing incoming packet of " + std::to_string(packetLength) + " bytes");
     }
@@ -130,9 +132,9 @@ bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const unsigned c
     {
         // attempt to open dump file
         success &= OpenOutgoingDumpFile();
-        if (!(success || m_Settings.m_IgnoreFileErrors))
+        if (!(success || m_IgnoreFileErrors))
         {
-            Fail("Failed to open \"" + m_Settings.m_OutgoingDumpFileName + "\" for writing");
+            Fail("Failed to open \"" + m_Options.m_OutgoingCaptureFile + "\" for writing");
         }
     }
 
@@ -140,7 +142,7 @@ bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const unsigned c
     m_OutgoingDumpFileStream.write(reinterpret_cast<const char*>(buffer),
                                    boost::numeric_cast<std::streamsize>(length));
     success &= m_OutgoingDumpFileStream.good();
-    if (!(success || m_Settings.m_IgnoreFileErrors))
+    if (!(success || m_IgnoreFileErrors))
     {
         Fail("Error writing outgoing packet of " + std::to_string(length) + " bytes");
     }

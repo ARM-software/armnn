@@ -6,7 +6,9 @@
 #pragma once
 
 #include "IProfilingConnection.hpp"
+#include "ProfilingUtils.hpp"
 
+#include <Runtime.hpp>
 #include <armnn/Optional.hpp>
 
 #include <fstream>
@@ -23,29 +25,10 @@ namespace profiling
 class ProfilingConnectionDumpToFileDecorator : public IProfilingConnection
 {
 public:
-    struct Settings
-    {
-        Settings(const std::string& incomingDumpFileName = "",
-                 const std::string& outgoingDumpFileName = "",
-                 bool ignoreFileErrors = true)
-            : m_IncomingDumpFileName(incomingDumpFileName)
-            , m_OutgoingDumpFileName(outgoingDumpFileName)
-            , m_DumpIncoming(!incomingDumpFileName.empty())
-            , m_DumpOutgoing(!outgoingDumpFileName.empty())
-            , m_IgnoreFileErrors(ignoreFileErrors)
-        {}
-
-        ~Settings() = default;
-
-        std::string m_IncomingDumpFileName;
-        std::string m_OutgoingDumpFileName;
-        bool        m_DumpIncoming;
-        bool        m_DumpOutgoing;
-        bool        m_IgnoreFileErrors;
-    };
 
     ProfilingConnectionDumpToFileDecorator(std::unique_ptr<IProfilingConnection> connection,
-                                           const Settings& settings);
+                                           const Runtime::CreationOptions::ExternalProfilingOptions& options,
+                                           bool ignoreFailures);
 
     ~ProfilingConnectionDumpToFileDecorator();
 
@@ -68,13 +51,12 @@ private:
 
     void Fail(const std::string& errorMessage);
 
-    std::unique_ptr<IProfilingConnection> m_Connection;
-    Settings                              m_Settings;
-    std::ofstream                         m_IncomingDumpFileStream;
-    std::ofstream                         m_OutgoingDumpFileStream;
+    std::unique_ptr<IProfilingConnection>              m_Connection;
+    Runtime::CreationOptions::ExternalProfilingOptions m_Options;
+    std::ofstream                                      m_IncomingDumpFileStream;
+    std::ofstream                                      m_OutgoingDumpFileStream;
+    bool                                               m_IgnoreFileErrors;
 };
-
-using ProfilingConnectionDumpToFileDecoratorSettings = ProfilingConnectionDumpToFileDecorator::Settings;
 
 } // namespace profiling
 

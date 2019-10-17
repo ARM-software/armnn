@@ -4,6 +4,7 @@
 //
 
 #include "../ProfilingConnectionDumpToFileDecorator.hpp"
+#include <Runtime.hpp>
 
 #include <fstream>
 #include <sstream>
@@ -80,36 +81,22 @@ std::vector<char> ReadDumpFile(const std::string& dumpFileName)
 
 BOOST_AUTO_TEST_SUITE(ProfilingConnectionDumpToFileDecoratorTests)
 
-BOOST_AUTO_TEST_CASE(CheckSettings)
-{
-    ProfilingConnectionDumpToFileDecoratorSettings settings0("", "");
-    BOOST_CHECK(settings0.m_DumpIncoming == false);
-    BOOST_CHECK(settings0.m_DumpOutgoing == false);
-
-    ProfilingConnectionDumpToFileDecoratorSettings settings1("incomingDumpFile.dat", "");
-    BOOST_CHECK(settings1.m_DumpIncoming == true);
-    BOOST_CHECK(settings1.m_DumpOutgoing == false);
-
-    ProfilingConnectionDumpToFileDecoratorSettings settings2("", "outgoingDumpFile.dat");
-    BOOST_CHECK(settings2.m_DumpIncoming == false);
-    BOOST_CHECK(settings2.m_DumpOutgoing == true);
-
-    ProfilingConnectionDumpToFileDecoratorSettings settings3("incomingDumpFile.dat", "outgoingDumpFile.dat");
-    BOOST_CHECK(settings3.m_DumpIncoming == true);
-    BOOST_CHECK(settings3.m_DumpOutgoing == true);
-}
 
 BOOST_AUTO_TEST_CASE(DumpIncomingInvalidFile)
 {
-    ProfilingConnectionDumpToFileDecoratorSettings settings("/", "", false);
-    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), settings);
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_IncomingCaptureFile = "/";
+    options.m_OutgoingCaptureFile =  "";
+    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
     BOOST_CHECK_THROW(decorator.ReadPacket(0), armnn::RuntimeException);
 }
 
 BOOST_AUTO_TEST_CASE(DumpIncomingInvalidFileIgnoreErrors)
 {
-    ProfilingConnectionDumpToFileDecoratorSettings settings("/", "", true);
-    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), settings);
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_IncomingCaptureFile = "/";
+    options.m_OutgoingCaptureFile =  "";
+    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, true);
     BOOST_CHECK_NO_THROW(decorator.ReadPacket(0));
 }
 
@@ -117,9 +104,11 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
 {
     std::stringstream fileName;
     fileName << ARMNN_PROFILING_CONNECTION_TEST_DUMP_DIR << "/test_dump_file_incoming.dat";
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_IncomingCaptureFile = fileName.str();
+    options.m_OutgoingCaptureFile =  "";
 
-    ProfilingConnectionDumpToFileDecoratorSettings settings(fileName.str(), "", false);
-    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), settings);
+    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
 
     // NOTE: unique_ptr is needed here because operator=() is deleted for Packet
     std::unique_ptr<Packet> packet;
@@ -127,7 +116,7 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
 
     decorator.Close();
 
-    std::vector<char> data = ReadDumpFile(settings.m_IncomingDumpFileName);
+    std::vector<char> data = ReadDumpFile(options.m_IncomingCaptureFile);
     const char* packetData = reinterpret_cast<const char*>(packet->GetData());
 
     // check if the data read back from the dump file matches the original
@@ -138,15 +127,20 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingInvalidFile)
 {
-    ProfilingConnectionDumpToFileDecoratorSettings settings("", "/", false);
-    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), settings);
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_IncomingCaptureFile = "";
+    options.m_OutgoingCaptureFile = "/";
+    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
     BOOST_CHECK_THROW(decorator.WritePacket(g_DataPtr, g_DataLength), armnn::RuntimeException);
 }
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingInvalidFileIgnoreErrors)
 {
-    ProfilingConnectionDumpToFileDecoratorSettings settings("", "/", true);
-    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), settings);
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_IncomingCaptureFile = "";
+    options.m_OutgoingCaptureFile = "/";
+
+    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, true);
     BOOST_CHECK_NO_THROW(decorator.WritePacket(g_DataPtr, g_DataLength));
 
     bool success = decorator.WritePacket(g_DataPtr, g_DataLength);
@@ -158,8 +152,11 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFile)
     std::stringstream fileName;
     fileName << ARMNN_PROFILING_CONNECTION_TEST_DUMP_DIR << "/test_dump_file.dat";
 
-    ProfilingConnectionDumpToFileDecoratorSettings settings("", fileName.str(), false);
-    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), settings);
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_IncomingCaptureFile = "";
+    options.m_OutgoingCaptureFile = fileName.str();
+
+    ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
 
     bool success = false;
     BOOST_CHECK_NO_THROW(success = decorator.WritePacket(g_DataPtr, g_DataLength));
@@ -167,7 +164,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFile)
 
     decorator.Close();
 
-    std::vector<char> data = ReadDumpFile(settings.m_OutgoingDumpFileName);
+    std::vector<char> data = ReadDumpFile(options.m_OutgoingCaptureFile);
 
     // check if the data read back from the dump file matches the original
     int diff = std::strncmp(data.data(), g_Data.data(), g_DataLength);

@@ -143,7 +143,8 @@ enum LayerType : uint {
     Slice = 48,
     DepthToSpace = 49,
     InstanceNormalization = 50,
-    LogSoftmax = 51
+    LogSoftmax = 51,
+    Comparison = 52
 }
 
 // Base layer table to be used as part of other layers
@@ -191,6 +192,24 @@ table ArgMinMaxDescriptor{
     axis:int;
 }
 
+enum ComparisonOperation : byte {
+    Equal = 0,
+    Greater = 1,
+    GreaterOrEqual = 2,
+    Less = 3,
+    LessOrEqual = 4,
+    NotEqual = 5
+}
+
+table ComparisonDescriptor {
+    operation:ComparisonOperation;
+}
+
+table ComparisonLayer {
+    base:LayerBase;
+    descriptor:ComparisonDescriptor;
+}
+
 table ConstantLayer {
     base:LayerBase;
     input:ConstTensor;
@@ -230,6 +249,7 @@ table DivisionLayer {
     base:LayerBase;
 }
 
+/// @deprecated Use ComparisonLayer instead
 table EqualLayer {
     base:LayerBase;
 }
@@ -254,6 +274,7 @@ table GatherLayer {
     base:LayerBase;
 }
 
+/// @deprecated Use ComparisonLayer instead
 table GreaterLayer {
     base:LayerBase;
 }
@@ -496,6 +517,7 @@ table BatchNormalizationDescriptor {
     dataLayout:DataLayout;
 }
 
+/// @deprecated Use ResizeLayer instead
 table ResizeBilinearLayer {
     base:LayerBase;
     descriptor:ResizeBilinearDescriptor;
@@ -539,6 +561,7 @@ table ConcatLayer {
     descriptor:OriginsDescriptor;
 }
 
+/// @deprecated Use ConcatLayer instead
 table MergerLayer {
     base:LayerBase;
     descriptor:OriginsDescriptor;
@@ -760,7 +783,8 @@ union Layer {
     SliceLayer,
     DepthToSpaceLayer,
     InstanceNormalizationLayer,
-    LogSoftmaxLayer
+    LogSoftmaxLayer,
+    ComparisonLayer
 }
 
 table AnyLayer {

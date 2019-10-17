@@ -191,6 +191,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_ArgMinMaxLayer]              = &Deserializer::ParseArgMinMax;
     m_ParserFunctions[Layer_BatchToSpaceNdLayer]         = &Deserializer::ParseBatchToSpaceNd;
     m_ParserFunctions[Layer_BatchNormalizationLayer]     = &Deserializer::ParseBatchNormalization;
+    m_ParserFunctions[Layer_ComparisonLayer]             = &Deserializer::ParseComparison;
     m_ParserFunctions[Layer_ConcatLayer]                 = &Deserializer::ParseConcat;
     m_ParserFunctions[Layer_ConstantLayer]               = &Deserializer::ParseConstant;
     m_ParserFunctions[Layer_Convolution2dLayer]          = &Deserializer::ParseConvolution2d;
@@ -255,6 +256,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_BatchToSpaceNdLayer()->base();
         case Layer::Layer_BatchNormalizationLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_BatchNormalizationLayer()->base();
+        case Layer::Layer_ComparisonLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ComparisonLayer()->base();
         case Layer::Layer_ConcatLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ConcatLayer()->base();
         case Layer::Layer_ConstantLayer:
@@ -425,6 +428,26 @@ armnn::ArgMinMaxFunction ToArgMinMaxFunction(armnnSerializer::ArgMinMaxFunction 
         case armnnSerializer::ArgMinMaxFunction::ArgMinMaxFunction_Min:
         default:
             return armnn::ArgMinMaxFunction::Min;
+    }
+}
+
+armnn::ComparisonOperation ToComparisonOperation(armnnSerializer::ComparisonOperation operation)
+{
+    switch (operation)
+    {
+        case armnnSerializer::ComparisonOperation::ComparisonOperation_Equal:
+            return armnn::ComparisonOperation::Equal;
+        case armnnSerializer::ComparisonOperation::ComparisonOperation_Greater:
+            return armnn::ComparisonOperation::Greater;
+        case armnnSerializer::ComparisonOperation::ComparisonOperation_GreaterOrEqual:
+            return armnn::ComparisonOperation::GreaterOrEqual;
+        case armnnSerializer::ComparisonOperation::ComparisonOperation_Less:
+            return armnn::ComparisonOperation::Less;
+        case armnnSerializer::ComparisonOperation::ComparisonOperation_LessOrEqual:
+            return armnn::ComparisonOperation::LessOrEqual;
+        case armnnSerializer::ComparisonOperation::ComparisonOperation_NotEqual:
+        default:
+            return armnn::ComparisonOperation::NotEqual;
     }
 }
 
@@ -1434,6 +1457,33 @@ const armnnSerializer::OriginsDescriptor* GetOriginsDescriptor(const armnnSerial
         default:
             throw armnn::Exception("unknown layer type, should be concat or merger");
     }
+}
+
+void Deserializer::ParseComparison(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    CHECK_LOCATION();
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto fbLayer      = graph->layers()->Get(layerIndex)->layer_as_ComparisonLayer();
+    auto fbDescriptor = fbLayer->descriptor();
+
+    armnn::ComparisonDescriptor descriptor;
+    descriptor.m_Operation = ToComparisonOperation(fbDescriptor->operation());
+
+    const std::string& layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer     = m_Network->AddComparisonLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
 }
 
 void Deserializer::ParseConcat(GraphPtr graph, unsigned int layerIndex)

@@ -19,6 +19,41 @@ using armnnDeserializer::IDeserializer;
 namespace
 {
 
+#define DECLARE_LAYER_VERIFIER_CLASS(name) \
+class name##LayerVerifier : public LayerVerifierBase \
+{ \
+public: \
+    name##LayerVerifier(const std::string& layerName, \
+                        const std::vector<armnn::TensorInfo>& inputInfos, \
+                        const std::vector<armnn::TensorInfo>& outputInfos) \
+        : LayerVerifierBase(layerName, inputInfos, outputInfos) {} \
+\
+    void Visit##name##Layer(const armnn::IConnectableLayer* layer, const char* name) override \
+    { \
+        VerifyNameAndConnections(layer, name); \
+    } \
+};
+
+#define DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(name) \
+class name##LayerVerifier : public LayerVerifierBaseWithDescriptor<armnn::name##Descriptor> \
+{ \
+public: \
+    name##LayerVerifier(const std::string& layerName, \
+                        const std::vector<armnn::TensorInfo>& inputInfos, \
+                        const std::vector<armnn::TensorInfo>& outputInfos, \
+                        const armnn::name##Descriptor& descriptor) \
+        : LayerVerifierBaseWithDescriptor<armnn::name##Descriptor>( \
+            layerName, inputInfos, outputInfos, descriptor) {} \
+\
+    void Visit##name##Layer(const armnn::IConnectableLayer* layer, \
+                            const armnn::name##Descriptor& descriptor, \
+                            const char* name) override \
+    { \
+        VerifyNameAndConnections(layer, name); \
+        VerifyDescriptor(descriptor); \
+    } \
+};
+
 struct DefaultLayerVerifierPolicy
 {
     static void Apply(const std::string s = "")
@@ -126,6 +161,27 @@ private:
     std::vector<armnn::TensorInfo> m_OutputTensorInfos;
 };
 
+template<typename Descriptor>
+class LayerVerifierBaseWithDescriptor : public LayerVerifierBase
+{
+public:
+    LayerVerifierBaseWithDescriptor(const std::string& layerName,
+                                    const std::vector<armnn::TensorInfo>& inputInfos,
+                                    const std::vector<armnn::TensorInfo>& outputInfos,
+                                    const Descriptor& descriptor)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos)
+        , m_Descriptor(descriptor) {}
+
+protected:
+    void VerifyDescriptor(const Descriptor& descriptor)
+    {
+        BOOST_CHECK(descriptor == m_Descriptor);
+    }
+
+private:
+    Descriptor m_Descriptor;
+};
+
 template<typename T>
 void CompareConstTensorData(const void* data1, const void* data2, unsigned int numElements)
 {
@@ -212,19 +268,7 @@ BOOST_AUTO_TEST_SUITE(SerializerTests)
 
 BOOST_AUTO_TEST_CASE(SerializeAbs)
 {
-    class AbsLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        AbsLayerVerifier(const std::string& layerName,
-                              const std::vector<armnn::TensorInfo>& inputInfos,
-                              const std::vector<armnn::TensorInfo>& outputInfos)
-                : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitAbsLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Abs)
 
     const std::string layerName("abs");
     const armnn::TensorInfo tensorInfo({1, 2, 3}, armnn::DataType::Float32);
@@ -250,19 +294,7 @@ BOOST_AUTO_TEST_CASE(SerializeAbs)
 
 BOOST_AUTO_TEST_CASE(SerializeAddition)
 {
-    class AdditionLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        AdditionLayerVerifier(const std::string& layerName,
-                              const std::vector<armnn::TensorInfo>& inputInfos,
-                              const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitAdditionLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Addition)
 
     const std::string layerName("addition");
     const armnn::TensorInfo tensorInfo({1, 2, 3}, armnn::DataType::Float32);
@@ -290,33 +322,7 @@ BOOST_AUTO_TEST_CASE(SerializeAddition)
 
 BOOST_AUTO_TEST_CASE(SerializeArgMinMax)
 {
-    class ArgMinMaxLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        ArgMinMaxLayerVerifier(const std::string& layerName,
-                               const std::vector<armnn::TensorInfo>& inputInfos,
-                               const std::vector<armnn::TensorInfo>& outputInfos,
-                               const armnn::ArgMinMaxDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitArgMinMaxLayer(const armnn::IConnectableLayer* layer,
-                                 const armnn::ArgMinMaxDescriptor& descriptor,
-                                 const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::ArgMinMaxDescriptor& descriptor)
-        {
-            BOOST_CHECK(descriptor.m_Function == m_Descriptor.m_Function);
-            BOOST_CHECK(descriptor.m_Axis == m_Descriptor.m_Axis);
-        }
-
-        armnn::ArgMinMaxDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(ArgMinMax)
 
     const std::string layerName("argminmax");
     const armnn::TensorInfo inputInfo({1, 2, 3}, armnn::DataType::Float32);
@@ -346,26 +352,26 @@ BOOST_AUTO_TEST_CASE(SerializeArgMinMax)
 
 BOOST_AUTO_TEST_CASE(SerializeBatchNormalization)
 {
-    class BatchNormalizationLayerVerifier : public LayerVerifierBase
+    using Descriptor = armnn::BatchNormalizationDescriptor;
+    class BatchNormalizationLayerVerifier : public LayerVerifierBaseWithDescriptor<Descriptor>
     {
     public:
         BatchNormalizationLayerVerifier(const std::string& layerName,
                                         const std::vector<armnn::TensorInfo>& inputInfos,
                                         const std::vector<armnn::TensorInfo>& outputInfos,
-                                        const armnn::BatchNormalizationDescriptor& descriptor,
+                                        const Descriptor& descriptor,
                                         const armnn::ConstTensor& mean,
                                         const armnn::ConstTensor& variance,
                                         const armnn::ConstTensor& beta,
                                         const armnn::ConstTensor& gamma)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor)
-        , m_Mean(mean)
-        , m_Variance(variance)
-        , m_Beta(beta)
-        , m_Gamma(gamma) {}
+            : LayerVerifierBaseWithDescriptor<Descriptor>(layerName, inputInfos, outputInfos, descriptor)
+            , m_Mean(mean)
+            , m_Variance(variance)
+            , m_Beta(beta)
+            , m_Gamma(gamma) {}
 
         void VisitBatchNormalizationLayer(const armnn::IConnectableLayer* layer,
-                                          const armnn::BatchNormalizationDescriptor& descriptor,
+                                          const Descriptor& descriptor,
                                           const armnn::ConstTensor& mean,
                                           const armnn::ConstTensor& variance,
                                           const armnn::ConstTensor& beta,
@@ -382,13 +388,6 @@ BOOST_AUTO_TEST_CASE(SerializeBatchNormalization)
         }
 
     private:
-        void VerifyDescriptor(const armnn::BatchNormalizationDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_Eps == m_Descriptor.m_Eps);
-            BOOST_TEST(static_cast<int>(descriptor.m_DataLayout) == static_cast<int>(m_Descriptor.m_DataLayout));
-        }
-
-        armnn::BatchNormalizationDescriptor m_Descriptor;
         armnn::ConstTensor m_Mean;
         armnn::ConstTensor m_Variance;
         armnn::ConstTensor m_Beta;
@@ -440,34 +439,7 @@ BOOST_AUTO_TEST_CASE(SerializeBatchNormalization)
 
 BOOST_AUTO_TEST_CASE(SerializeBatchToSpaceNd)
 {
-    class BatchToSpaceNdLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        BatchToSpaceNdLayerVerifier(const std::string& layerName,
-                                    const std::vector<armnn::TensorInfo>& inputInfos,
-                                    const std::vector<armnn::TensorInfo>& outputInfos,
-                                    const armnn::BatchToSpaceNdDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
-                                      const armnn::BatchToSpaceNdDescriptor& descriptor,
-                                      const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::BatchToSpaceNdDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_Crops == m_Descriptor.m_Crops);
-            BOOST_TEST(descriptor.m_BlockShape == m_Descriptor.m_BlockShape);
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-        }
-
-        armnn::BatchToSpaceNdDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(BatchToSpaceNd)
 
     const std::string layerName("spaceToBatchNd");
     const armnn::TensorInfo inputInfo({4, 1, 2, 2}, armnn::DataType::Float32);
@@ -496,6 +468,40 @@ BOOST_AUTO_TEST_CASE(SerializeBatchToSpaceNd)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeComparison)
+{
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Comparison)
+
+    const std::string layerName("comparison");
+
+    const armnn::TensorShape shape{2, 1, 2, 4};
+
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo(shape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo(shape, armnn::DataType::Boolean);
+
+    armnn::ComparisonDescriptor descriptor(armnn::ComparisonOperation::NotEqual);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0     = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1     = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const comparisonLayer = network->AddComparisonLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer     = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(comparisonLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(comparisonLayer->GetInputSlot(1));
+    comparisonLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    comparisonLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    ComparisonLayerVerifier verifier(layerName, { inputInfo, inputInfo }, { outputInfo }, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeConstant)
 {
     class ConstantLayerVerifier : public LayerVerifierBase
@@ -505,15 +511,14 @@ BOOST_AUTO_TEST_CASE(SerializeConstant)
                               const std::vector<armnn::TensorInfo>& inputInfos,
                               const std::vector<armnn::TensorInfo>& outputInfos,
                               const armnn::ConstTensor& layerInput)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_LayerInput(layerInput) {}
+            : LayerVerifierBase(layerName, inputInfos, outputInfos)
+            , m_LayerInput(layerInput) {}
 
         void VisitConstantLayer(const armnn::IConnectableLayer* layer,
                                 const armnn::ConstTensor& input,
                                 const char* name) override
         {
             VerifyNameAndConnections(layer, name);
-
             CompareConstTensor(input, m_LayerInput);
         }
 
@@ -552,23 +557,22 @@ BOOST_AUTO_TEST_CASE(SerializeConstant)
 
 BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
 {
-    class Convolution2dLayerVerifier : public LayerVerifierBase
+    using Descriptor = armnn::Convolution2dDescriptor;
+    class Convolution2dLayerVerifier : public LayerVerifierBaseWithDescriptor<Descriptor>
     {
     public:
         Convolution2dLayerVerifier(const std::string& layerName,
                                    const std::vector<armnn::TensorInfo>& inputInfos,
                                    const std::vector<armnn::TensorInfo>& outputInfos,
-                                   const armnn::Convolution2dDescriptor& descriptor,
+                                   const Descriptor& descriptor,
                                    const armnn::ConstTensor& weights,
-                                   const armnn::Optional<armnn::ConstTensor>& biases) :
-            LayerVerifierBase(layerName, inputInfos, outputInfos),
-            m_Descriptor(descriptor),
-            m_Weights(weights),
-            m_Biases(biases)
-        {}
+                                   const armnn::Optional<armnn::ConstTensor>& biases)
+            : LayerVerifierBaseWithDescriptor<Descriptor>(layerName, inputInfos, outputInfos, descriptor)
+            , m_Weights(weights)
+            , m_Biases(biases) {}
 
         void VisitConvolution2dLayer(const armnn::IConnectableLayer* layer,
-                                     const armnn::Convolution2dDescriptor& descriptor,
+                                     const Descriptor& descriptor,
                                      const armnn::ConstTensor& weights,
                                      const armnn::Optional<armnn::ConstTensor>& biases,
                                      const char* name) override
@@ -580,9 +584,7 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
             CompareConstTensor(weights, m_Weights);
 
             // check biases
-            BOOST_CHECK(biases.has_value()   == descriptor.m_BiasEnabled);
-            BOOST_CHECK(m_Biases.has_value() == m_Descriptor.m_BiasEnabled);
-
+            BOOST_CHECK(biases.has_value() == descriptor.m_BiasEnabled);
             BOOST_CHECK(biases.has_value() == m_Biases.has_value());
 
             if (biases.has_value() && m_Biases.has_value())
@@ -592,21 +594,6 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
         }
 
     private:
-        void VerifyDescriptor(const armnn::Convolution2dDescriptor& descriptor)
-        {
-            BOOST_CHECK(descriptor.m_PadLeft     == m_Descriptor.m_PadLeft);
-            BOOST_CHECK(descriptor.m_PadRight    == m_Descriptor.m_PadRight);
-            BOOST_CHECK(descriptor.m_PadTop      == m_Descriptor.m_PadTop);
-            BOOST_CHECK(descriptor.m_PadBottom   == m_Descriptor.m_PadBottom);
-            BOOST_CHECK(descriptor.m_StrideX     == m_Descriptor.m_StrideX);
-            BOOST_CHECK(descriptor.m_StrideY     == m_Descriptor.m_StrideY);
-            BOOST_CHECK(descriptor.m_DilationX   == m_Descriptor.m_DilationX);
-            BOOST_CHECK(descriptor.m_DilationY   == m_Descriptor.m_DilationY);
-            BOOST_CHECK(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
-            BOOST_CHECK(descriptor.m_DataLayout  == m_Descriptor.m_DataLayout);
-        }
-
-        armnn::Convolution2dDescriptor      m_Descriptor;
         armnn::ConstTensor                  m_Weights;
         armnn::Optional<armnn::ConstTensor> m_Biases;
     };
@@ -660,33 +647,7 @@ BOOST_AUTO_TEST_CASE(SerializeConvolution2d)
 
 BOOST_AUTO_TEST_CASE(SerializeDepthToSpace)
 {
-    class DepthToSpaceLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        DepthToSpaceLayerVerifier(const std::string& layerName,
-                                  const std::vector<armnn::TensorInfo>& inputInfos,
-                                  const std::vector<armnn::TensorInfo>& outputInfos,
-                                  const armnn::DepthToSpaceDescriptor& descriptor)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos)
-            , m_Descriptor(descriptor) {}
-
-        void VisitDepthToSpaceLayer(const armnn::IConnectableLayer* layer,
-                                    const armnn::DepthToSpaceDescriptor& descriptor,
-                                    const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::DepthToSpaceDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_BlockSize == m_Descriptor.m_BlockSize);
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-        }
-
-        armnn::DepthToSpaceDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(DepthToSpace)
 
     const std::string layerName("depthToSpace");
 
@@ -717,23 +678,22 @@ BOOST_AUTO_TEST_CASE(SerializeDepthToSpace)
 
 BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
 {
-    class DepthwiseConvolution2dLayerVerifier : public LayerVerifierBase
+    using Descriptor = armnn::DepthwiseConvolution2dDescriptor;
+    class DepthwiseConvolution2dLayerVerifier : public LayerVerifierBaseWithDescriptor<Descriptor>
     {
     public:
         DepthwiseConvolution2dLayerVerifier(const std::string& layerName,
                                             const std::vector<armnn::TensorInfo>& inputInfos,
                                             const std::vector<armnn::TensorInfo>& outputInfos,
-                                            const armnn::DepthwiseConvolution2dDescriptor& descriptor,
+                                            const Descriptor& descriptor,
                                             const armnn::ConstTensor& weights,
                                             const armnn::Optional<armnn::ConstTensor>& biases) :
-            LayerVerifierBase(layerName, inputInfos, outputInfos),
-            m_Descriptor(descriptor),
+            LayerVerifierBaseWithDescriptor<Descriptor>(layerName, inputInfos, outputInfos, descriptor),
             m_Weights(weights),
-            m_Biases(biases)
-        {}
+            m_Biases(biases) {}
 
         void VisitDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
-                                              const armnn::DepthwiseConvolution2dDescriptor& descriptor,
+                                              const Descriptor& descriptor,
                                               const armnn::ConstTensor& weights,
                                               const armnn::Optional<armnn::ConstTensor>& biases,
                                               const char* name) override
@@ -745,9 +705,7 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
             CompareConstTensor(weights, m_Weights);
 
             // check biases
-            BOOST_CHECK(biases.has_value()   == descriptor.m_BiasEnabled);
-            BOOST_CHECK(m_Biases.has_value() == m_Descriptor.m_BiasEnabled);
-
+            BOOST_CHECK(biases.has_value() == descriptor.m_BiasEnabled);
             BOOST_CHECK(biases.has_value() == m_Biases.has_value());
 
             if (biases.has_value() && m_Biases.has_value())
@@ -757,21 +715,6 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
         }
 
     private:
-        void VerifyDescriptor(const armnn::DepthwiseConvolution2dDescriptor& descriptor)
-        {
-            BOOST_CHECK(descriptor.m_PadLeft     == m_Descriptor.m_PadLeft);
-            BOOST_CHECK(descriptor.m_PadRight    == m_Descriptor.m_PadRight);
-            BOOST_CHECK(descriptor.m_PadTop      == m_Descriptor.m_PadTop);
-            BOOST_CHECK(descriptor.m_PadBottom   == m_Descriptor.m_PadBottom);
-            BOOST_CHECK(descriptor.m_StrideX     == m_Descriptor.m_StrideX);
-            BOOST_CHECK(descriptor.m_StrideY     == m_Descriptor.m_StrideY);
-            BOOST_CHECK(descriptor.m_DilationX   == m_Descriptor.m_DilationX);
-            BOOST_CHECK(descriptor.m_DilationY   == m_Descriptor.m_DilationY);
-            BOOST_CHECK(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
-            BOOST_CHECK(descriptor.m_DataLayout  == m_Descriptor.m_DataLayout);
-        }
-
-        armnn::DepthwiseConvolution2dDescriptor m_Descriptor;
         armnn::ConstTensor                      m_Weights;
         armnn::Optional<armnn::ConstTensor>     m_Biases;
     };
@@ -825,19 +768,7 @@ BOOST_AUTO_TEST_CASE(SerializeDepthwiseConvolution2d)
 
 BOOST_AUTO_TEST_CASE(SerializeDequantize)
 {
-    class DequantizeLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        DequantizeLayerVerifier(const std::string& layerName,
-                                const std::vector<armnn::TensorInfo>& inputInfos,
-                                const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitDequantizeLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Dequantize)
 
     const std::string layerName("dequantize");
     const armnn::TensorInfo inputInfo({ 1, 5, 2, 3 }, armnn::DataType::QuantisedAsymm8, 0.5f, 1);
@@ -863,20 +794,20 @@ BOOST_AUTO_TEST_CASE(SerializeDequantize)
 
 BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
 {
-    class DetectionPostProcessLayerVerifier : public LayerVerifierBase
+    using Descriptor = armnn::DetectionPostProcessDescriptor;
+    class DetectionPostProcessLayerVerifier : public LayerVerifierBaseWithDescriptor<Descriptor>
     {
     public:
         DetectionPostProcessLayerVerifier(const std::string& layerName,
                                           const std::vector<armnn::TensorInfo>& inputInfos,
                                           const std::vector<armnn::TensorInfo>& outputInfos,
-                                          const armnn::DetectionPostProcessDescriptor& descriptor,
+                                          const Descriptor& descriptor,
                                           const armnn::ConstTensor& anchors)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor)
-        , m_Anchors(anchors) {}
+            : LayerVerifierBaseWithDescriptor<Descriptor>(layerName, inputInfos, outputInfos, descriptor)
+            , m_Anchors(anchors) {}
 
         void VisitDetectionPostProcessLayer(const armnn::IConnectableLayer* layer,
-                                            const armnn::DetectionPostProcessDescriptor& descriptor,
+                                            const Descriptor& descriptor,
                                             const armnn::ConstTensor& anchors,
                                             const char* name) override
         {
@@ -887,22 +818,6 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
         }
 
     private:
-        void VerifyDescriptor(const armnn::DetectionPostProcessDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_UseRegularNms == m_Descriptor.m_UseRegularNms);
-            BOOST_TEST(descriptor.m_MaxDetections == m_Descriptor.m_MaxDetections);
-            BOOST_TEST(descriptor.m_MaxClassesPerDetection == m_Descriptor.m_MaxClassesPerDetection);
-            BOOST_TEST(descriptor.m_DetectionsPerClass == m_Descriptor.m_DetectionsPerClass);
-            BOOST_TEST(descriptor.m_NmsScoreThreshold == m_Descriptor.m_NmsScoreThreshold);
-            BOOST_TEST(descriptor.m_NmsIouThreshold == m_Descriptor.m_NmsIouThreshold);
-            BOOST_TEST(descriptor.m_NumClasses == m_Descriptor.m_NumClasses);
-            BOOST_TEST(descriptor.m_ScaleY == m_Descriptor.m_ScaleY);
-            BOOST_TEST(descriptor.m_ScaleX == m_Descriptor.m_ScaleX);
-            BOOST_TEST(descriptor.m_ScaleH == m_Descriptor.m_ScaleH);
-            BOOST_TEST(descriptor.m_ScaleW == m_Descriptor.m_ScaleW);
-        }
-
-        armnn::DetectionPostProcessDescriptor m_Descriptor;
         armnn::ConstTensor m_Anchors;
     };
 
@@ -971,19 +886,7 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeDetectionPostProcess)
 
 BOOST_AUTO_TEST_CASE(SerializeDivision)
 {
-    class DivisionLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        DivisionLayerVerifier(const std::string& layerName,
-                              const std::vector<armnn::TensorInfo>& inputInfos,
-                              const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitDivisionLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Division)
 
     const std::string layerName("division");
     const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
@@ -1009,21 +912,66 @@ BOOST_AUTO_TEST_CASE(SerializeDivision)
     deserializedNetwork->Accept(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeFloor)
+// NOTE: Until the deprecated AddEqualLayer disappears this test checks that calling
+//       AddEqualLayer places a ComparisonLayer into the serialized format and that
+//       when this deserialises we have a ComparisonLayer
+BOOST_AUTO_TEST_CASE(SerializeEqual)
 {
-    class FloorLayerVerifier : public LayerVerifierBase
+    class EqualLayerVerifier : public LayerVerifierBase
     {
     public:
-        FloorLayerVerifier(const std::string& layerName,
+        EqualLayerVerifier(const std::string& layerName,
                            const std::vector<armnn::TensorInfo>& inputInfos,
                            const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+            : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
 
-        void VisitFloorLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        void VisitComparisonLayer(const armnn::IConnectableLayer* layer,
+                                  const armnn::ComparisonDescriptor& descriptor,
+                                  const char* name) override
         {
             VerifyNameAndConnections(layer, name);
+            BOOST_CHECK(descriptor.m_Operation == armnn::ComparisonOperation::Equal);
+        }
+
+        void VisitEqualLayer(const armnn::IConnectableLayer* layer, const char* name) override
+        {
+            throw armnn::Exception("EqualLayer should have translated to ComparisonLayer");
         }
     };
+
+    const std::string layerName("equal");
+
+    const armnn::TensorShape shape{2, 1, 2, 4};
+
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo(shape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo(shape, armnn::DataType::Boolean);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
+    armnn::IConnectableLayer* const equalLayer = network->AddEqualLayer(layerName.c_str());
+    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(1));
+    equalLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    equalLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    EqualLayerVerifier verifier(layerName, { inputInfo, inputInfo }, { outputInfo });
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeFloor)
+{
+    DECLARE_LAYER_VERIFIER_CLASS(Floor)
 
     const std::string layerName("floor");
     const armnn::TensorInfo info({4,4}, armnn::DataType::Float32);
@@ -1048,22 +996,22 @@ BOOST_AUTO_TEST_CASE(SerializeFloor)
 
 BOOST_AUTO_TEST_CASE(SerializeFullyConnected)
 {
-    class FullyConnectedLayerVerifier : public LayerVerifierBase
+    using Descriptor = armnn::FullyConnectedDescriptor;
+    class FullyConnectedLayerVerifier : public LayerVerifierBaseWithDescriptor<Descriptor>
     {
     public:
         FullyConnectedLayerVerifier(const std::string& layerName,
                                     const std::vector<armnn::TensorInfo>& inputInfos,
                                     const std::vector<armnn::TensorInfo>& outputInfos,
-                                    const armnn::FullyConnectedDescriptor& descriptor,
+                                    const Descriptor& descriptor,
                                     const armnn::ConstTensor& weight,
                                     const armnn::Optional<armnn::ConstTensor>& bias)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor)
-        , m_Weight(weight)
-        , m_Bias(bias) {}
+            : LayerVerifierBaseWithDescriptor<Descriptor>(layerName, inputInfos, outputInfos, descriptor)
+            , m_Weight(weight)
+            , m_Bias(bias) {}
 
         void VisitFullyConnectedLayer(const armnn::IConnectableLayer* layer,
-                                      const armnn::FullyConnectedDescriptor& descriptor,
+                                      const Descriptor& descriptor,
                                       const armnn::ConstTensor& weight,
                                       const armnn::Optional<armnn::ConstTensor>& bias,
                                       const char* name) override
@@ -1073,7 +1021,9 @@ BOOST_AUTO_TEST_CASE(SerializeFullyConnected)
 
             CompareConstTensor(weight, m_Weight);
 
+            BOOST_TEST(bias.has_value() == descriptor.m_BiasEnabled);
             BOOST_TEST(bias.has_value() == m_Bias.has_value());
+
             if (bias.has_value() && m_Bias.has_value())
             {
                 CompareConstTensor(bias.value(), m_Bias.value());
@@ -1081,13 +1031,6 @@ BOOST_AUTO_TEST_CASE(SerializeFullyConnected)
         }
 
     private:
-        void VerifyDescriptor(const armnn::FullyConnectedDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
-            BOOST_TEST(descriptor.m_TransposeWeightMatrix == m_Descriptor.m_TransposeWeightMatrix);
-        }
-
-        armnn::FullyConnectedDescriptor m_Descriptor;
         armnn::ConstTensor m_Weight;
         armnn::Optional<armnn::ConstTensor> m_Bias;
     };
@@ -1137,7 +1080,7 @@ BOOST_AUTO_TEST_CASE(SerializeGather)
         GatherLayerVerifier(const std::string& layerName,
                             const std::vector<armnn::TensorInfo>& inputInfos,
                             const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
+            : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
 
         void VisitGatherLayer(const armnn::IConnectableLayer* layer, const char *name) override
         {
@@ -1183,37 +1126,66 @@ BOOST_AUTO_TEST_CASE(SerializeGather)
     deserializedNetwork->Accept(verifier);
 }
 
-BOOST_AUTO_TEST_CASE(SerializeInstanceNormalization)
+// NOTE: Until the deprecated AddGreaterLayer disappears this test checks that calling
+//       AddGreaterLayer places a ComparisonLayer into the serialized format and that
+//       when this deserialises we have a ComparisonLayer
+BOOST_AUTO_TEST_CASE(SerializeGreater)
 {
-    class InstanceNormalizationLayerVerifier : public LayerVerifierBase
+    class GreaterLayerVerifier : public LayerVerifierBase
     {
     public:
-        InstanceNormalizationLayerVerifier(const std::string& layerName,
-                                           const std::vector<armnn::TensorInfo>& inputInfos,
-                                           const std::vector<armnn::TensorInfo>& outputInfos,
-                                           const armnn::InstanceNormalizationDescriptor& descriptor)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos)
-            , m_Descriptor(descriptor) {}
+        GreaterLayerVerifier(const std::string& layerName,
+                           const std::vector<armnn::TensorInfo>& inputInfos,
+                           const std::vector<armnn::TensorInfo>& outputInfos)
+            : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
 
-        void VisitInstanceNormalizationLayer(const armnn::IConnectableLayer* layer,
-                                             const armnn::InstanceNormalizationDescriptor& descriptor,
-                                             const char* name) override
+        void VisitComparisonLayer(const armnn::IConnectableLayer* layer,
+                                  const armnn::ComparisonDescriptor& descriptor,
+                                  const char* name) override
         {
             VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
+            BOOST_CHECK(descriptor.m_Operation == armnn::ComparisonOperation::Greater);
         }
 
-    private:
-        void VerifyDescriptor(const armnn::InstanceNormalizationDescriptor& descriptor)
+        void VisitGreaterLayer(const armnn::IConnectableLayer* layer, const char* name) override
         {
-            BOOST_CHECK(descriptor.m_Gamma      == m_Descriptor.m_Gamma);
-            BOOST_CHECK(descriptor.m_Beta       == m_Descriptor.m_Beta);
-            BOOST_CHECK(descriptor.m_Eps        == m_Descriptor.m_Eps);
-            BOOST_CHECK(descriptor.m_DataLayout == m_Descriptor.m_DataLayout);
+            throw armnn::Exception("GreaterLayer should have translated to ComparisonLayer");
         }
-
-        armnn::InstanceNormalizationDescriptor m_Descriptor;
     };
+
+    const std::string layerName("greater");
+
+    const armnn::TensorShape shape{2, 1, 2, 4};
+
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo(shape, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo(shape, armnn::DataType::Boolean);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
+    armnn::IConnectableLayer* const equalLayer = network->AddGreaterLayer(layerName.c_str());
+    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(1));
+    equalLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    equalLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    GreaterLayerVerifier verifier(layerName, { inputInfo, inputInfo }, { outputInfo });
+    deserializedNetwork->Accept(verifier);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeInstanceNormalization)
+{
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(InstanceNormalization)
 
     const std::string layerName("instanceNormalization");
     const armnn::TensorInfo info({ 1, 2, 1, 5 }, armnn::DataType::Float32);
@@ -1243,32 +1215,7 @@ BOOST_AUTO_TEST_CASE(SerializeInstanceNormalization)
     deserializedNetwork->Accept(verifier);
 }
 
-class L2NormalizationLayerVerifier : public LayerVerifierBase
-{
-public:
-    L2NormalizationLayerVerifier(const std::string& layerName,
-                                 const std::vector<armnn::TensorInfo>& inputInfos,
-                                 const std::vector<armnn::TensorInfo>& outputInfos,
-                                 const armnn::L2NormalizationDescriptor& descriptor)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos)
-            , m_Descriptor(descriptor) {}
-
-    void VisitL2NormalizationLayer(const armnn::IConnectableLayer* layer,
-                                   const armnn::L2NormalizationDescriptor& descriptor,
-                                   const char* name) override
-    {
-        VerifyNameAndConnections(layer, name);
-        VerifyDescriptor(descriptor);
-    }
-private:
-    void VerifyDescriptor(const armnn::L2NormalizationDescriptor& descriptor)
-    {
-        BOOST_TEST(descriptor.m_Eps == m_Descriptor.m_Eps);
-        BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-    }
-
-    armnn::L2NormalizationDescriptor m_Descriptor;
-};
+DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(L2Normalization)
 
 BOOST_AUTO_TEST_CASE(SerializeL2Normalization)
 {
@@ -1355,33 +1302,7 @@ BOOST_AUTO_TEST_CASE(EnsureL2NormalizationBackwardCompatibility)
 
 BOOST_AUTO_TEST_CASE(SerializeLogSoftmax)
 {
-    class LogSoftmaxLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        LogSoftmaxLayerVerifier(const std::string& layerName,
-                                const std::vector<armnn::TensorInfo>& inputInfos,
-                                const std::vector<armnn::TensorInfo>& outputInfos,
-                                const armnn::LogSoftmaxDescriptor& descriptor)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos)
-            , m_Descriptor(descriptor) {}
-
-        void VisitLogSoftmaxLayer(const armnn::IConnectableLayer* layer,
-                                  const armnn::LogSoftmaxDescriptor& descriptor,
-                                  const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::LogSoftmaxDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_Beta == m_Descriptor.m_Beta);
-            BOOST_TEST(descriptor.m_Axis == m_Descriptor.m_Axis);
-        }
-
-        armnn::LogSoftmaxDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(LogSoftmax)
 
     const std::string layerName("log_softmax");
     const armnn::TensorInfo info({1, 10}, armnn::DataType::Float32);
@@ -1410,19 +1331,7 @@ BOOST_AUTO_TEST_CASE(SerializeLogSoftmax)
 
 BOOST_AUTO_TEST_CASE(SerializeMaximum)
 {
-    class MaximumLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        MaximumLayerVerifier(const std::string& layerName,
-                             const std::vector<armnn::TensorInfo>& inputInfos,
-                             const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitMaximumLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Maximum)
 
     const std::string layerName("maximum");
     const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
@@ -1450,33 +1359,7 @@ BOOST_AUTO_TEST_CASE(SerializeMaximum)
 
 BOOST_AUTO_TEST_CASE(SerializeMean)
 {
-    class MeanLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        MeanLayerVerifier(const std::string& layerName,
-                          const std::vector<armnn::TensorInfo>& inputInfos,
-                          const std::vector<armnn::TensorInfo>& outputInfos,
-                          const armnn::MeanDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitMeanLayer(const armnn::IConnectableLayer* layer,
-                            const armnn::MeanDescriptor& descriptor,
-                            const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::MeanDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_Axis == m_Descriptor.m_Axis);
-            BOOST_TEST(descriptor.m_KeepDims == m_Descriptor.m_KeepDims);
-        }
-
-        armnn::MeanDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Mean)
 
     const std::string layerName("mean");
     const armnn::TensorInfo inputInfo({1, 1, 3, 2}, armnn::DataType::Float32);
@@ -1506,19 +1389,7 @@ BOOST_AUTO_TEST_CASE(SerializeMean)
 
 BOOST_AUTO_TEST_CASE(SerializeMerge)
 {
-    class MergeLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        MergeLayerVerifier(const std::string& layerName,
-                           const std::vector<armnn::TensorInfo>& inputInfos,
-                           const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitMergeLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Merge)
 
     const std::string layerName("merge");
     const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
@@ -1544,15 +1415,14 @@ BOOST_AUTO_TEST_CASE(SerializeMerge)
     deserializedNetwork->Accept(verifier);
 }
 
-class MergerLayerVerifier : public LayerVerifierBase
+class MergerLayerVerifier : public LayerVerifierBaseWithDescriptor<armnn::OriginsDescriptor>
 {
 public:
     MergerLayerVerifier(const std::string& layerName,
                         const std::vector<armnn::TensorInfo>& inputInfos,
                         const std::vector<armnn::TensorInfo>& outputInfos,
                         const armnn::OriginsDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
+        : LayerVerifierBaseWithDescriptor<armnn::OriginsDescriptor>(layerName, inputInfos, outputInfos, descriptor) {}
 
     void VisitMergerLayer(const armnn::IConnectableLayer* layer,
                           const armnn::OriginsDescriptor& descriptor,
@@ -1568,27 +1438,9 @@ public:
         VerifyNameAndConnections(layer, name);
         VerifyDescriptor(descriptor);
     }
-
-private:
-    void VerifyDescriptor(const armnn::OriginsDescriptor& descriptor)
-    {
-        BOOST_TEST(descriptor.GetConcatAxis() == m_Descriptor.GetConcatAxis());
-        BOOST_TEST(descriptor.GetNumViews() == m_Descriptor.GetNumViews());
-        BOOST_TEST(descriptor.GetNumDimensions() == m_Descriptor.GetNumDimensions());
-
-        for (uint32_t i = 0; i < descriptor.GetNumViews(); i++)
-        {
-            for (uint32_t j = 0; j < descriptor.GetNumDimensions(); j++)
-            {
-                BOOST_TEST(descriptor.GetViewOrigin(i)[j] == m_Descriptor.GetViewOrigin(i)[j]);
-            }
-        }
-    }
-
-    armnn::OriginsDescriptor m_Descriptor;
 };
 
-// NOTE: until the deprecated AddMergerLayer disappears this test checks that calling
+// NOTE: Until the deprecated AddMergerLayer disappears this test checks that calling
 //       AddMergerLayer places a ConcatLayer into the serialized format and that
 //       when this deserialises we have a ConcatLayer
 BOOST_AUTO_TEST_CASE(SerializeMerger)
@@ -1731,19 +1583,7 @@ BOOST_AUTO_TEST_CASE(SerializeConcat)
 
 BOOST_AUTO_TEST_CASE(SerializeMinimum)
 {
-    class MinimumLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        MinimumLayerVerifier(const std::string& layerName,
-                             const std::vector<armnn::TensorInfo>& inputInfos,
-                             const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitMinimumLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Minimum)
 
     const std::string layerName("minimum");
     const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
@@ -1771,19 +1611,7 @@ BOOST_AUTO_TEST_CASE(SerializeMinimum)
 
 BOOST_AUTO_TEST_CASE(SerializeMultiplication)
 {
-    class MultiplicationLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        MultiplicationLayerVerifier(const std::string& layerName,
-                                    const std::vector<armnn::TensorInfo>& inputInfos,
-                                    const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitMultiplicationLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Multiplication)
 
     const std::string layerName("multiplication");
     const armnn::TensorInfo info({ 1, 5, 2, 3 }, armnn::DataType::Float32);
@@ -1811,19 +1639,7 @@ BOOST_AUTO_TEST_CASE(SerializeMultiplication)
 
 BOOST_AUTO_TEST_CASE(SerializePrelu)
 {
-    class PreluLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        PreluLayerVerifier(const std::string& layerName,
-                           const std::vector<armnn::TensorInfo>& inputInfos,
-                           const std::vector<armnn::TensorInfo>& outputInfos)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitPreluLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Prelu)
 
     const std::string layerName("prelu");
 
@@ -1854,40 +1670,7 @@ BOOST_AUTO_TEST_CASE(SerializePrelu)
 
 BOOST_AUTO_TEST_CASE(SerializeNormalization)
 {
-    class NormalizationLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        NormalizationLayerVerifier(const std::string& layerName,
-                                   const std::vector<armnn::TensorInfo>& inputInfos,
-                                   const std::vector<armnn::TensorInfo>& outputInfos,
-                                   const armnn::NormalizationDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitNormalizationLayer(const armnn::IConnectableLayer* layer,
-                                     const armnn::NormalizationDescriptor& descriptor,
-                                     const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::NormalizationDescriptor& descriptor)
-        {
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-            BOOST_TEST(descriptor.m_NormSize == m_Descriptor.m_NormSize);
-            BOOST_TEST(descriptor.m_Alpha == m_Descriptor.m_Alpha);
-            BOOST_TEST(descriptor.m_Beta == m_Descriptor.m_Beta);
-            BOOST_TEST(descriptor.m_K == m_Descriptor.m_K);
-            BOOST_TEST(
-                static_cast<int>(descriptor.m_NormChannelType) == static_cast<int>(m_Descriptor.m_NormChannelType));
-            BOOST_TEST(
-                static_cast<int>(descriptor.m_NormMethodType) == static_cast<int>(m_Descriptor.m_NormMethodType));
-        }
-
-        armnn::NormalizationDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Normalization)
 
     const std::string layerName("normalization");
     const armnn::TensorInfo info({2, 1, 2, 2}, armnn::DataType::Float32);
@@ -1917,36 +1700,10 @@ BOOST_AUTO_TEST_CASE(SerializeNormalization)
     deserializedNetwork->Accept(verifier);
 }
 
-class PadLayerVerifier : public LayerVerifierBase
-{
-public:
-    PadLayerVerifier(const std::string& layerName,
-                     const std::vector<armnn::TensorInfo>& inputInfos,
-                     const std::vector<armnn::TensorInfo>& outputInfos,
-                     const armnn::PadDescriptor& descriptor)
-    : LayerVerifierBase(layerName, inputInfos, outputInfos), m_Descriptor(descriptor) {}
-
-    void VisitPadLayer(const armnn::IConnectableLayer* layer,
-                       const armnn::PadDescriptor& descriptor,
-                       const char* name) override
-    {
-        VerifyNameAndConnections(layer, name);
-        VerifyDescriptor(descriptor);
-    }
-
-private:
-    void VerifyDescriptor(const armnn::PadDescriptor& descriptor)
-    {
-        BOOST_TEST(descriptor.m_PadList == m_Descriptor.m_PadList);
-        BOOST_TEST(descriptor.m_PadValue == m_Descriptor.m_PadValue);
-    }
-
-    armnn::PadDescriptor m_Descriptor;
-};
+DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Pad)
 
 BOOST_AUTO_TEST_CASE(SerializePad)
 {
-
     const std::string layerName("pad");
     const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({1, 2, 3, 4}, armnn::DataType::Float32);
     const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 5, 7}, armnn::DataType::Float32);
@@ -2030,32 +1787,7 @@ BOOST_AUTO_TEST_CASE(CheckSerializePadBackwardCompatibility)
 
 BOOST_AUTO_TEST_CASE(SerializePermute)
 {
-    class PermuteLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        PermuteLayerVerifier(const std::string& layerName,
-                             const std::vector<armnn::TensorInfo>& inputInfos,
-                             const std::vector<armnn::TensorInfo>& outputInfos,
-                             const armnn::PermuteDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitPermuteLayer(const armnn::IConnectableLayer* layer,
-                               const armnn::PermuteDescriptor& descriptor,
-                               const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::PermuteDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_DimMappings.IsEqual(m_Descriptor.m_DimMappings));
-        }
-
-        armnn::PermuteDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Permute)
 
     const std::string layerName("permute");
     const armnn::TensorInfo inputTensorInfo({4, 3, 2, 1}, armnn::DataType::Float32);
@@ -2083,48 +1815,7 @@ BOOST_AUTO_TEST_CASE(SerializePermute)
 
 BOOST_AUTO_TEST_CASE(SerializePooling2d)
 {
-    class Pooling2dLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        Pooling2dLayerVerifier(const std::string& layerName,
-                               const std::vector<armnn::TensorInfo>& inputInfos,
-                               const std::vector<armnn::TensorInfo>& outputInfos,
-                               const armnn::Pooling2dDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitPooling2dLayer(const armnn::IConnectableLayer* layer,
-                                 const armnn::Pooling2dDescriptor& descriptor,
-                                 const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::Pooling2dDescriptor& descriptor)
-        {
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-            BOOST_TEST(descriptor.m_PadLeft == m_Descriptor.m_PadLeft);
-            BOOST_TEST(descriptor.m_PadRight == m_Descriptor.m_PadRight);
-            BOOST_TEST(descriptor.m_PadTop == m_Descriptor.m_PadTop);
-            BOOST_TEST(descriptor.m_PadBottom == m_Descriptor.m_PadBottom);
-            BOOST_TEST(descriptor.m_PoolWidth == m_Descriptor.m_PoolWidth);
-            BOOST_TEST(descriptor.m_PoolHeight == m_Descriptor.m_PoolHeight);
-            BOOST_TEST(descriptor.m_StrideX == m_Descriptor.m_StrideX);
-            BOOST_TEST(descriptor.m_StrideY == m_Descriptor.m_StrideY);
-
-            BOOST_TEST(
-                static_cast<int>(descriptor.m_PaddingMethod) == static_cast<int>(m_Descriptor.m_PaddingMethod));
-            BOOST_TEST(
-                static_cast<int>(descriptor.m_PoolType) == static_cast<int>(m_Descriptor.m_PoolType));
-            BOOST_TEST(
-                static_cast<int>(descriptor.m_OutputShapeRounding) ==
-                static_cast<int>(m_Descriptor.m_OutputShapeRounding));
-        }
-
-        armnn::Pooling2dDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Pooling2d)
 
     const std::string layerName("pooling2d");
     const armnn::TensorInfo inputInfo({1, 2, 2, 1}, armnn::DataType::Float32);
@@ -2164,19 +1855,7 @@ BOOST_AUTO_TEST_CASE(SerializePooling2d)
 
 BOOST_AUTO_TEST_CASE(SerializeQuantize)
 {
-    class QuantizeLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        QuantizeLayerVerifier(const std::string& layerName,
-                             const std::vector<armnn::TensorInfo>& inputInfos,
-                             const std::vector<armnn::TensorInfo>& outputInfos)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitQuantizeLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Quantize)
 
     const std::string layerName("quantize");
     const armnn::TensorInfo info({ 1, 2, 2, 3 }, armnn::DataType::Float32);
@@ -2198,34 +1877,10 @@ BOOST_AUTO_TEST_CASE(SerializeQuantize)
     QuantizeLayerVerifier verifier(layerName, {info}, {info});
     deserializedNetwork->Accept(verifier);
 }
+
 BOOST_AUTO_TEST_CASE(SerializeReshape)
 {
-    class ReshapeLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        ReshapeLayerVerifier(const std::string& layerName,
-                             const std::vector<armnn::TensorInfo>& inputInfos,
-                             const std::vector<armnn::TensorInfo>& outputInfos,
-                             const armnn::ReshapeDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitReshapeLayer(const armnn::IConnectableLayer* layer,
-                               const armnn::ReshapeDescriptor& descriptor,
-                               const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::ReshapeDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_TargetShape == m_Descriptor.m_TargetShape);
-        }
-
-        armnn::ReshapeDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Reshape)
 
     const std::string layerName("reshape");
     const armnn::TensorInfo inputInfo({1, 9}, armnn::DataType::Float32);
@@ -2253,35 +1908,7 @@ BOOST_AUTO_TEST_CASE(SerializeReshape)
 
 BOOST_AUTO_TEST_CASE(SerializeResize)
 {
-    class ResizeLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        ResizeLayerVerifier(const std::string& layerName,
-                            const std::vector<armnn::TensorInfo>& inputInfos,
-                            const std::vector<armnn::TensorInfo>& outputInfos,
-                            const armnn::ResizeDescriptor& descriptor)
-                : LayerVerifierBase(layerName, inputInfos, outputInfos)
-                , m_Descriptor(descriptor) {}
-
-        void VisitResizeLayer(const armnn::IConnectableLayer* layer,
-                                      const armnn::ResizeDescriptor& descriptor,
-                                      const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::ResizeDescriptor& descriptor)
-        {
-            BOOST_CHECK(descriptor.m_DataLayout   == m_Descriptor.m_DataLayout);
-            BOOST_CHECK(descriptor.m_TargetWidth  == m_Descriptor.m_TargetWidth);
-            BOOST_CHECK(descriptor.m_TargetHeight == m_Descriptor.m_TargetHeight);
-            BOOST_CHECK(descriptor.m_Method       == m_Descriptor.m_Method);
-        }
-
-        armnn::ResizeDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Resize)
 
     const std::string layerName("resize");
     const armnn::TensorInfo inputInfo = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
@@ -2312,19 +1939,7 @@ BOOST_AUTO_TEST_CASE(SerializeResize)
 
 BOOST_AUTO_TEST_CASE(SerializeRsqrt)
 {
-    class RsqrtLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        RsqrtLayerVerifier(const std::string& layerName,
-                           const std::vector<armnn::TensorInfo>& inputInfos,
-                           const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitRsqrtLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Rsqrt)
 
     const std::string layerName("rsqrt");
     const armnn::TensorInfo tensorInfo({ 3, 1, 2 }, armnn::DataType::Float32);
@@ -2349,36 +1964,7 @@ BOOST_AUTO_TEST_CASE(SerializeRsqrt)
 
 BOOST_AUTO_TEST_CASE(SerializeSlice)
 {
-    class SliceLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        SliceLayerVerifier(const std::string& layerName,
-                           const std::vector<armnn::TensorInfo>& inputInfos,
-                           const std::vector<armnn::TensorInfo>& outputInfos,
-                           const armnn::SliceDescriptor& descriptor)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos)
-            , m_Descriptor(descriptor) {}
-
-        void VisitSliceLayer(const armnn::IConnectableLayer* layer,
-                             const armnn::SliceDescriptor& descriptor,
-                             const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::SliceDescriptor& descriptor)
-        {
-            BOOST_CHECK_EQUAL_COLLECTIONS(descriptor.m_Begin.begin(), descriptor.m_Begin.end(),
-                                          m_Descriptor.m_Begin.begin(), m_Descriptor.m_Begin.end());
-
-            BOOST_CHECK_EQUAL_COLLECTIONS(descriptor.m_Size.begin(), descriptor.m_Size.end(),
-                                          m_Descriptor.m_Size.begin(), m_Descriptor.m_Size.end());
-        }
-
-        armnn::SliceDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Slice)
 
     const std::string layerName{"slice"};
 
@@ -2408,32 +1994,7 @@ BOOST_AUTO_TEST_CASE(SerializeSlice)
 
 BOOST_AUTO_TEST_CASE(SerializeSoftmax)
 {
-    class SoftmaxLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        SoftmaxLayerVerifier(const std::string& layerName,
-                             const std::vector<armnn::TensorInfo>& inputInfos,
-                             const std::vector<armnn::TensorInfo>& outputInfos,
-                             const armnn::SoftmaxDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitSoftmaxLayer(const armnn::IConnectableLayer* layer,
-                               const armnn::SoftmaxDescriptor& descriptor,
-                               const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::SoftmaxDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_Beta == m_Descriptor.m_Beta);
-        }
-
-        armnn::SoftmaxDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Softmax)
 
     const std::string layerName("softmax");
     const armnn::TensorInfo info({1, 10}, armnn::DataType::Float32);
@@ -2461,34 +2022,7 @@ BOOST_AUTO_TEST_CASE(SerializeSoftmax)
 
 BOOST_AUTO_TEST_CASE(SerializeSpaceToBatchNd)
 {
-    class SpaceToBatchNdLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        SpaceToBatchNdLayerVerifier(const std::string& layerName,
-                                    const std::vector<armnn::TensorInfo>& inputInfos,
-                                    const std::vector<armnn::TensorInfo>& outputInfos,
-                                    const armnn::SpaceToBatchNdDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitSpaceToBatchNdLayer(const armnn::IConnectableLayer* layer,
-                                      const armnn::SpaceToBatchNdDescriptor& descriptor,
-                                      const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::SpaceToBatchNdDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_PadList == m_Descriptor.m_PadList);
-            BOOST_TEST(descriptor.m_BlockShape == m_Descriptor.m_BlockShape);
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-        }
-
-        armnn::SpaceToBatchNdDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(SpaceToBatchNd)
 
     const std::string layerName("spaceToBatchNd");
     const armnn::TensorInfo inputInfo({2, 1, 2, 4}, armnn::DataType::Float32);
@@ -2519,33 +2053,7 @@ BOOST_AUTO_TEST_CASE(SerializeSpaceToBatchNd)
 
 BOOST_AUTO_TEST_CASE(SerializeSpaceToDepth)
 {
-    class SpaceToDepthLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        SpaceToDepthLayerVerifier(const std::string& layerName,
-                                  const std::vector<armnn::TensorInfo>& inputInfos,
-                                  const std::vector<armnn::TensorInfo>& outputInfos,
-                                  const armnn::SpaceToDepthDescriptor& descriptor)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos)
-            , m_Descriptor(descriptor) {}
-
-        void VisitSpaceToDepthLayer(const armnn::IConnectableLayer* layer,
-                                    const armnn::SpaceToDepthDescriptor& descriptor,
-                                    const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::SpaceToDepthDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_BlockSize == m_Descriptor.m_BlockSize);
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-        }
-
-        armnn::SpaceToDepthDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(SpaceToDepth)
 
     const std::string layerName("spaceToDepth");
 
@@ -2576,42 +2084,7 @@ BOOST_AUTO_TEST_CASE(SerializeSpaceToDepth)
 
 BOOST_AUTO_TEST_CASE(SerializeSplitter)
 {
-    class SplitterLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        SplitterLayerVerifier(const std::string& layerName,
-                              const std::vector<armnn::TensorInfo>& inputInfos,
-                              const std::vector<armnn::TensorInfo>& outputInfos,
-                              const armnn::ViewsDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitSplitterLayer(const armnn::IConnectableLayer* layer,
-                                const armnn::ViewsDescriptor& descriptor,
-                                const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::ViewsDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.GetNumViews() == m_Descriptor.GetNumViews());
-            BOOST_TEST(descriptor.GetNumDimensions() == m_Descriptor.GetNumDimensions());
-
-            for (uint32_t i = 0; i < descriptor.GetNumViews(); i++)
-            {
-                for (uint32_t j = 0; j < descriptor.GetNumDimensions(); j++)
-                {
-                    BOOST_TEST(descriptor.GetViewOrigin(i)[j] == m_Descriptor.GetViewOrigin(i)[j]);
-                    BOOST_TEST(descriptor.GetViewSizes(i)[j] == m_Descriptor.GetViewSizes(i)[j]);
-                }
-            }
-        }
-
-        armnn::ViewsDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Splitter)
 
     const unsigned int numViews = 3;
     const unsigned int numDimensions = 4;
@@ -2666,34 +2139,7 @@ BOOST_AUTO_TEST_CASE(SerializeSplitter)
 
 BOOST_AUTO_TEST_CASE(SerializeStack)
 {
-    class StackLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        StackLayerVerifier(const std::string& layerName,
-                           const std::vector<armnn::TensorInfo>& inputInfos,
-                           const std::vector<armnn::TensorInfo>& outputInfos,
-                           const armnn::StackDescriptor& descriptor)
-            : LayerVerifierBase(layerName, inputInfos, outputInfos)
-            , m_Descriptor(descriptor) {}
-
-        void VisitStackLayer(const armnn::IConnectableLayer* layer,
-                             const armnn::StackDescriptor& descriptor,
-                             const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::StackDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_Axis == m_Descriptor.m_Axis);
-            BOOST_TEST(descriptor.m_InputShape == m_Descriptor.m_InputShape);
-            BOOST_TEST(descriptor.m_NumInputs == m_Descriptor.m_NumInputs);
-        }
-
-        armnn::StackDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(Stack)
 
     const std::string layerName("stack");
 
@@ -2725,39 +2171,7 @@ BOOST_AUTO_TEST_CASE(SerializeStack)
 
 BOOST_AUTO_TEST_CASE(SerializeStridedSlice)
 {
-    class StridedSliceLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        StridedSliceLayerVerifier(const std::string& layerName,
-                                  const std::vector<armnn::TensorInfo>& inputInfos,
-                                  const std::vector<armnn::TensorInfo>& outputInfos,
-                                  const armnn::StridedSliceDescriptor& descriptor)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos)
-        , m_Descriptor(descriptor) {}
-
-        void VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
-                                    const armnn::StridedSliceDescriptor& descriptor,
-                                    const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-            VerifyDescriptor(descriptor);
-        }
-
-    private:
-        void VerifyDescriptor(const armnn::StridedSliceDescriptor& descriptor)
-        {
-            BOOST_TEST(descriptor.m_Begin == m_Descriptor.m_Begin);
-            BOOST_TEST(descriptor.m_End == m_Descriptor.m_End);
-            BOOST_TEST(descriptor.m_Stride == m_Descriptor.m_Stride);
-            BOOST_TEST(descriptor.m_BeginMask == m_Descriptor.m_BeginMask);
-            BOOST_TEST(descriptor.m_EndMask == m_Descriptor.m_EndMask);
-            BOOST_TEST(descriptor.m_ShrinkAxisMask == m_Descriptor.m_ShrinkAxisMask);
-            BOOST_TEST(descriptor.m_EllipsisMask == m_Descriptor.m_EllipsisMask);
-            BOOST_TEST(descriptor.m_NewAxisMask == m_Descriptor.m_NewAxisMask);
-            BOOST_TEST(GetDataLayoutName(descriptor.m_DataLayout) == GetDataLayoutName(m_Descriptor.m_DataLayout));
-        }
-        armnn::StridedSliceDescriptor m_Descriptor;
-    };
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(StridedSlice)
 
     const std::string layerName("stridedSlice");
     const armnn::TensorInfo inputInfo = armnn::TensorInfo({3, 2, 3, 1}, armnn::DataType::Float32);
@@ -2788,19 +2202,7 @@ BOOST_AUTO_TEST_CASE(SerializeStridedSlice)
 
 BOOST_AUTO_TEST_CASE(SerializeSubtraction)
 {
-    class SubtractionLayerVerifier : public LayerVerifierBase
-    {
-    public:
-        SubtractionLayerVerifier(const std::string& layerName,
-                                 const std::vector<armnn::TensorInfo>& inputInfos,
-                                 const std::vector<armnn::TensorInfo>& outputInfos)
-        : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
-
-        void VisitSubtractionLayer(const armnn::IConnectableLayer* layer, const char* name) override
-        {
-            VerifyNameAndConnections(layer, name);
-        }
-    };
+    DECLARE_LAYER_VERIFIER_CLASS(Subtraction)
 
     const std::string layerName("subtraction");
     const armnn::TensorInfo info({ 1, 4 }, armnn::DataType::Float32);
@@ -2832,8 +2234,8 @@ BOOST_AUTO_TEST_CASE(SerializeSwitch)
     {
     public:
         SwitchLayerVerifier(const std::string& layerName,
-                                 const std::vector<armnn::TensorInfo>& inputInfos,
-                                 const std::vector<armnn::TensorInfo>& outputInfos)
+                            const std::vector<armnn::TensorInfo>& inputInfos,
+                            const std::vector<armnn::TensorInfo>& outputInfos)
             : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
 
         void VisitSwitchLayer(const armnn::IConnectableLayer* layer, const char* name) override
@@ -2878,23 +2280,23 @@ BOOST_AUTO_TEST_CASE(SerializeSwitch)
 
 BOOST_AUTO_TEST_CASE(SerializeTransposeConvolution2d)
 {
-    class TransposeConvolution2dLayerVerifier : public LayerVerifierBase
+    using Descriptor = armnn::TransposeConvolution2dDescriptor;
+    class TransposeConvolution2dLayerVerifier : public LayerVerifierBaseWithDescriptor<Descriptor>
     {
     public:
         TransposeConvolution2dLayerVerifier(const std::string& layerName,
                                             const std::vector<armnn::TensorInfo>& inputInfos,
                                             const std::vector<armnn::TensorInfo>& outputInfos,
-                                            const armnn::TransposeConvolution2dDescriptor& descriptor,
+                                            const Descriptor& descriptor,
                                             const armnn::ConstTensor& weights,
-                                            const armnn::Optional<armnn::ConstTensor>& biases) :
-            LayerVerifierBase(layerName, inputInfos, outputInfos),
-            m_Descriptor(descriptor),
-            m_Weights(weights),
-            m_Biases(biases)
+                                            const armnn::Optional<armnn::ConstTensor>& biases)
+            : LayerVerifierBaseWithDescriptor<Descriptor>(layerName, inputInfos, outputInfos, descriptor)
+            , m_Weights(weights)
+            , m_Biases(biases)
         {}
 
         void VisitTransposeConvolution2dLayer(const armnn::IConnectableLayer* layer,
-                                              const armnn::TransposeConvolution2dDescriptor& descriptor,
+                                              const Descriptor& descriptor,
                                               const armnn::ConstTensor& weights,
                                               const armnn::Optional<armnn::ConstTensor>& biases,
                                               const char* name) override
@@ -2906,9 +2308,7 @@ BOOST_AUTO_TEST_CASE(SerializeTransposeConvolution2d)
             CompareConstTensor(weights, m_Weights);
 
             // check biases
-            BOOST_CHECK(biases.has_value()   == descriptor.m_BiasEnabled);
-            BOOST_CHECK(m_Biases.has_value() == m_Descriptor.m_BiasEnabled);
-
+            BOOST_CHECK(biases.has_value() == descriptor.m_BiasEnabled);
             BOOST_CHECK(biases.has_value() == m_Biases.has_value());
 
             if (biases.has_value() && m_Biases.has_value())
@@ -2918,19 +2318,6 @@ BOOST_AUTO_TEST_CASE(SerializeTransposeConvolution2d)
         }
 
     private:
-        void VerifyDescriptor(const armnn::TransposeConvolution2dDescriptor& descriptor)
-        {
-            BOOST_CHECK(descriptor.m_PadLeft     == m_Descriptor.m_PadLeft);
-            BOOST_CHECK(descriptor.m_PadRight    == m_Descriptor.m_PadRight);
-            BOOST_CHECK(descriptor.m_PadTop      == m_Descriptor.m_PadTop);
-            BOOST_CHECK(descriptor.m_PadBottom   == m_Descriptor.m_PadBottom);
-            BOOST_CHECK(descriptor.m_StrideX     == m_Descriptor.m_StrideX);
-            BOOST_CHECK(descriptor.m_StrideY     == m_Descriptor.m_StrideY);
-            BOOST_CHECK(descriptor.m_BiasEnabled == m_Descriptor.m_BiasEnabled);
-            BOOST_CHECK(descriptor.m_DataLayout  == m_Descriptor.m_DataLayout);
-        }
-
-        armnn::TransposeConvolution2dDescriptor m_Descriptor;
         armnn::ConstTensor                      m_Weights;
         armnn::Optional<armnn::ConstTensor>     m_Biases;
     };
@@ -2997,7 +2384,6 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeNonLinearNetwork)
                                 const char* name) override
         {
             VerifyNameAndConnections(layer, name);
-
             CompareConstTensor(input, m_LayerInput);
         }
 
@@ -3034,17 +2420,17 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeNonLinearNetwork)
     deserializedNetwork->Accept(verifier);
 }
 
-class VerifyLstmLayer : public LayerVerifierBase
+class VerifyLstmLayer : public LayerVerifierBaseWithDescriptor<armnn::LstmDescriptor>
 {
 public:
     VerifyLstmLayer(const std::string& layerName,
                     const std::vector<armnn::TensorInfo>& inputInfos,
                     const std::vector<armnn::TensorInfo>& outputInfos,
                     const armnn::LstmDescriptor& descriptor,
-                    const armnn::LstmInputParams& inputParams) :
-         LayerVerifierBase(layerName, inputInfos, outputInfos), m_Descriptor(descriptor), m_InputParams(inputParams)
-    {
-    }
+                    const armnn::LstmInputParams& inputParams)
+        : LayerVerifierBaseWithDescriptor<armnn::LstmDescriptor>(layerName, inputInfos, outputInfos, descriptor)
+        , m_InputParams(inputParams) {}
+
     void VisitLstmLayer(const armnn::IConnectableLayer* layer,
                         const armnn::LstmDescriptor& descriptor,
                         const armnn::LstmInputParams& params,
@@ -3054,17 +2440,8 @@ public:
         VerifyDescriptor(descriptor);
         VerifyInputParameters(params);
     }
+
 protected:
-    void VerifyDescriptor(const armnn::LstmDescriptor& descriptor)
-    {
-        BOOST_TEST(m_Descriptor.m_ActivationFunc == descriptor.m_ActivationFunc);
-        BOOST_TEST(m_Descriptor.m_ClippingThresCell == descriptor.m_ClippingThresCell);
-        BOOST_TEST(m_Descriptor.m_ClippingThresProj == descriptor.m_ClippingThresProj);
-        BOOST_TEST(m_Descriptor.m_CifgEnabled == descriptor.m_CifgEnabled);
-        BOOST_TEST(m_Descriptor.m_PeepholeEnabled = descriptor.m_PeepholeEnabled);
-        BOOST_TEST(m_Descriptor.m_ProjectionEnabled == descriptor.m_ProjectionEnabled);
-        BOOST_TEST(m_Descriptor.m_LayerNormEnabled == descriptor.m_LayerNormEnabled);
-    }
     void VerifyInputParameters(const armnn::LstmInputParams& params)
     {
         VerifyConstTensors(
@@ -3110,8 +2487,8 @@ protected:
         VerifyConstTensors(
             "m_OutputLayerNormWeights", m_InputParams.m_OutputLayerNormWeights, params.m_OutputLayerNormWeights);
     }
+
 private:
-    armnn::LstmDescriptor m_Descriptor;
     armnn::LstmInputParams m_InputParams;
 };
 
@@ -4213,7 +3590,6 @@ BOOST_AUTO_TEST_CASE(EnsureLstmLayersBackwardCompatibility)
             params);
     deserializedNetwork->Accept(checker);
 }
-
 class VerifyQuantizedLstmLayer : public LayerVerifierBase
 {
 
@@ -4221,10 +3597,8 @@ public:
     VerifyQuantizedLstmLayer(const std::string& layerName,
                              const std::vector<armnn::TensorInfo>& inputInfos,
                              const std::vector<armnn::TensorInfo>& outputInfos,
-                             const armnn::QuantizedLstmInputParams& inputParams) :
-            LayerVerifierBase(layerName, inputInfos, outputInfos), m_InputParams(inputParams)
-    {
-    }
+                             const armnn::QuantizedLstmInputParams& inputParams)
+        : LayerVerifierBase(layerName, inputInfos, outputInfos), m_InputParams(inputParams) {}
 
     void VisitQuantizedLstmLayer(const armnn::IConnectableLayer* layer,
                                  const armnn::QuantizedLstmInputParams& params,

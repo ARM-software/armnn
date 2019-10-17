@@ -8,7 +8,25 @@
 namespace armnnSerializer
 {
 
-using namespace armnn;
+armnnSerializer::ComparisonOperation GetFlatBufferComparisonOperation(armnn::ComparisonOperation comparisonOperation)
+{
+    switch (comparisonOperation)
+    {
+        case armnn::ComparisonOperation::Equal:
+            return armnnSerializer::ComparisonOperation::ComparisonOperation_Equal;
+        case armnn::ComparisonOperation::Greater:
+            return armnnSerializer::ComparisonOperation::ComparisonOperation_Greater;
+        case armnn::ComparisonOperation::GreaterOrEqual:
+            return armnnSerializer::ComparisonOperation::ComparisonOperation_GreaterOrEqual;
+        case armnn::ComparisonOperation::Less:
+            return armnnSerializer::ComparisonOperation::ComparisonOperation_Less;
+        case armnn::ComparisonOperation::LessOrEqual:
+            return armnnSerializer::ComparisonOperation::ComparisonOperation_LessOrEqual;
+        case armnn::ComparisonOperation::NotEqual:
+        default:
+            return armnnSerializer::ComparisonOperation::ComparisonOperation_NotEqual;
+    }
+}
 
 armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType dataType)
 {

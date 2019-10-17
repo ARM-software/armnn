@@ -11,6 +11,8 @@
 namespace armnnSerializer
 {
 
+armnnSerializer::ComparisonOperation GetFlatBufferComparisonOperation(armnn::ComparisonOperation comparisonOperation);
+
 armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType dataType);
 
 armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType);

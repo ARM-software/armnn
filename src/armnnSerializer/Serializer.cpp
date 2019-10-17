@@ -244,7 +244,13 @@ void SerializerVisitor::VisitComparisonLayer(const armnn::IConnectableLayer* lay
                                              const armnn::ComparisonDescriptor& descriptor,
                                              const char* name)
 {
-    throw armnn::UnimplementedException("SerializerVisitor::VisitComparisonLayer() is not implemented");
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Comparison);
+    auto fbDescriptor = serializer::CreateComparisonDescriptor(
+        m_flatBufferBuilder,
+        GetFlatBufferComparisonOperation(descriptor.m_Operation));
+
+    auto fbLayer = serializer::CreateComparisonLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_ComparisonLayer);
 }
 
 // Build FlatBuffer for Constant Layer

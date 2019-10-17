@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "../GatordMockService.hpp"
 #include "../MockUtils.hpp"
 #include "../PeriodicCounterCaptureCommandHandler.hpp"
 
-#include "../../src/profiling/CommandHandlerRegistry.hpp"
-#include "../GatordMockService.hpp"
+#include <CommandHandlerRegistry.hpp>
+#include <ProfilingService.hpp>
 
-#include "../../src/profiling/ProfilingService.hpp"
-#include "../../src/profiling/test/SendCounterPacketTests.hpp"
+#include <test/SendCounterPacketTests.hpp>
 
 #include <boost/cast.hpp>
 #include <boost/test/test_tools.hpp>

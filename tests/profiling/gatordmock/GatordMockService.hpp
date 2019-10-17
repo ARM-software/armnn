@@ -5,12 +5,12 @@
 
 #pragma once
 
+#include <CommandHandlerRegistry.hpp>
+#include <Packet.hpp>
+
 #include <string>
 #include <thread>
 #include <atomic>
-
-#include "../../src/profiling/CommandHandlerRegistry.hpp"
-#include "../../src/profiling/Packet.hpp"
 
 namespace armnn
 {

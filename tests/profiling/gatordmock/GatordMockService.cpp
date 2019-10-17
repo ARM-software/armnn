@@ -2,9 +2,10 @@
 // Copyright © 2019 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "GatordMockService.hpp"
 
-#include "../../src/profiling/CommandHandlerRegistry.hpp"
+#include <CommandHandlerRegistry.hpp>
 
 #include <cerrno>
 #include <fcntl.h>
@@ -15,7 +16,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-
 
 namespace armnn
 {

@@ -3,12 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <iostream>
-
-#include "../../../src/profiling/ProfilingUtils.hpp"
 #include "PeriodicCounterCaptureCommandHandler.hpp"
 
+#include <ProfilingUtils.hpp>
+
 #include <boost/numeric/conversion/cast.hpp>
+
+#include <iostream>
 
 namespace armnn
 {

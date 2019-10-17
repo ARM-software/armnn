@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "../../armnn/src/profiling/Packet.hpp"
-#include "../../armnn/src/profiling/CommandHandlerFunctor.hpp"
+#include <Packet.hpp>
+#include <CommandHandlerFunctor.hpp>
 
 #include <vector>
 

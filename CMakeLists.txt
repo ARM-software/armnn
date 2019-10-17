@@ -905,7 +905,7 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.hpp
         )
 
-    include_directories( ${Boost_INCLUDE_DIRS} src/profiling)
+    include_directories(${Boost_INCLUDE_DIRS} src/profiling)
 
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
 
@@ -915,9 +915,10 @@ if(BUILD_GATORD_MOCK)
         target_link_libraries(GartordMock pthread)
     endif()
 
-    target_link_libraries(GartordMock armnn gatordMockService)
     target_link_libraries(GartordMock
-        ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
-        )
+        armnn
+        gatordMockService
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY})
 
 endif()

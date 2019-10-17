@@ -324,7 +324,8 @@ armnn::profiling::Packet GatordMockService::ReceivePacket()
     // Pass packet into the handler registry
     m_PacketsReceivedCount.operator++(std::memory_order::memory_order_release);
     m_HandlerRegistry
-        .GetFunctor(packetRx.GetPacketId(),
+        .GetFunctor(packetRx.GetPacketFamily(),
+                    packetRx.GetPacketId(),
                     packetVersionResolver.ResolvePacketVersion(packetRx.GetPacketId()).GetEncodedValue())
         ->operator()(packetRx);
 

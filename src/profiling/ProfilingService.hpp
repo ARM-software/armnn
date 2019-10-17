@@ -121,22 +121,26 @@ protected:
         , m_BufferManager()
         , m_SendCounterPacket(m_StateMachine, m_BufferManager)
         , m_PeriodicCounterCapture(m_Holder, m_SendCounterPacket, *this)
-        , m_ConnectionAcknowledgedCommandHandler(1,
+        , m_ConnectionAcknowledgedCommandHandler(0,
+                                                 1,
                                                  m_PacketVersionResolver.ResolvePacketVersion(1).GetEncodedValue(),
                                                  m_StateMachine)
-        , m_RequestCounterDirectoryCommandHandler(3,
+        , m_RequestCounterDirectoryCommandHandler(0,
+                                                  3,
                                                   m_PacketVersionResolver.ResolvePacketVersion(3).GetEncodedValue(),
                                                   m_CounterDirectory,
                                                   m_SendCounterPacket,
                                                   m_StateMachine)
-        , m_PeriodicCounterSelectionCommandHandler(4,
+        , m_PeriodicCounterSelectionCommandHandler(0,
+                                                   4,
                                                    m_PacketVersionResolver.ResolvePacketVersion(4).GetEncodedValue(),
                                                    m_Holder,
                                                    m_PeriodicCounterCapture,
                                                    *this,
                                                    m_SendCounterPacket,
                                                    m_StateMachine)
-        , m_PerJobCounterSelectionCommandHandler(5,
+        , m_PerJobCounterSelectionCommandHandler(0,
+                                                 5,
                                                  m_PacketVersionResolver.ResolvePacketVersion(4).GetEncodedValue(),
                                                  m_StateMachine)
     {

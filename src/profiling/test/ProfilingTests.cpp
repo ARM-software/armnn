@@ -43,12 +43,20 @@ BOOST_AUTO_TEST_SUITE(ExternalProfiling)
 
 BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
 {
-    CommandHandlerKey testKey0(1, 1);
-    CommandHandlerKey testKey1(1, 1);
-    CommandHandlerKey testKey2(1, 1);
-    CommandHandlerKey testKey3(0, 0);
-    CommandHandlerKey testKey4(2, 2);
-    CommandHandlerKey testKey5(0, 2);
+    CommandHandlerKey testKey1_0(1, 1, 1);
+    CommandHandlerKey testKey1_1(1, 1, 1);
+    CommandHandlerKey testKey1_2(1, 2, 1);
+
+    CommandHandlerKey testKey0(0, 1, 1);
+    CommandHandlerKey testKey1(0, 1, 1);
+    CommandHandlerKey testKey2(0, 1, 1);
+    CommandHandlerKey testKey3(0, 0, 0);
+    CommandHandlerKey testKey4(0, 2, 2);
+    CommandHandlerKey testKey5(0, 0, 2);
+
+    BOOST_CHECK(testKey1_0 > testKey0);
+    BOOST_CHECK(testKey1_0 == testKey1_1);
+    BOOST_CHECK(testKey1_0 < testKey1_2);
 
     BOOST_CHECK(testKey1<testKey4);
     BOOST_CHECK(testKey1>testKey3);
@@ -71,18 +79,18 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
 
     std::vector<CommandHandlerKey> vect =
     {
-        CommandHandlerKey(0,1), CommandHandlerKey(2,0), CommandHandlerKey(1,0),
-        CommandHandlerKey(2,1), CommandHandlerKey(1,1), CommandHandlerKey(0,1),
-        CommandHandlerKey(2,0), CommandHandlerKey(0,0)
+        CommandHandlerKey(0,0,1), CommandHandlerKey(0,2,0), CommandHandlerKey(0,1,0),
+        CommandHandlerKey(0,2,1), CommandHandlerKey(0,1,1), CommandHandlerKey(0,0,1),
+        CommandHandlerKey(0,2,0), CommandHandlerKey(0,0,0)
     };
 
     std::sort(vect.begin(), vect.end());
 
     std::vector<CommandHandlerKey> expectedVect =
     {
-        CommandHandlerKey(0,0), CommandHandlerKey(0,1), CommandHandlerKey(0,1),
-        CommandHandlerKey(1,0), CommandHandlerKey(1,1), CommandHandlerKey(2,0),
-        CommandHandlerKey(2,0), CommandHandlerKey(2,1)
+        CommandHandlerKey(0,0,0), CommandHandlerKey(0,0,1), CommandHandlerKey(0,0,1),
+        CommandHandlerKey(0,1,0), CommandHandlerKey(0,1,1), CommandHandlerKey(0,2,0),
+        CommandHandlerKey(0,2,0), CommandHandlerKey(0,2,1)
     };
 
     BOOST_CHECK(vect == expectedVect);
@@ -97,7 +105,7 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     TestProfilingConnectionTimeoutError testProfilingConnectionTimeOutError;
     TestProfilingConnectionArmnnError testProfilingConnectionArmnnError;
 
-    ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(1, 4194304, profilingStateMachine);
+    ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(0, 1, 4194304, profilingStateMachine);
     CommandHandlerRegistry commandHandlerRegistry;
 
     commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler);
@@ -238,13 +246,13 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerFunctor)
     // Hard code the version as it will be the same during a single profiling session
     uint32_t version = 1;
 
-    TestFunctorA testFunctorA(461, version);
-    TestFunctorB testFunctorB(963, version);
-    TestFunctorC testFunctorC(983, version);
+    TestFunctorA testFunctorA(7, 461, version);
+    TestFunctorB testFunctorB(8, 963, version);
+    TestFunctorC testFunctorC(5, 983, version);
 
-    CommandHandlerKey keyA(testFunctorA.GetPacketId(), testFunctorA.GetVersion());
-    CommandHandlerKey keyB(testFunctorB.GetPacketId(), testFunctorB.GetVersion());
-    CommandHandlerKey keyC(testFunctorC.GetPacketId(), testFunctorC.GetVersion());
+    CommandHandlerKey keyA(testFunctorA.GetFamilyId(), testFunctorA.GetPacketId(), testFunctorA.GetVersion());
+    CommandHandlerKey keyB(testFunctorB.GetFamilyId(), testFunctorB.GetPacketId(), testFunctorB.GetVersion());
+    CommandHandlerKey keyC(testFunctorC.GetFamilyId(), testFunctorC.GetPacketId(), testFunctorC.GetVersion());
 
     // Create the unwrapped map to simulate the Command Handler Registry
     std::map<CommandHandlerKey, CommandHandlerFunctor*> registry;
@@ -255,11 +263,11 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerFunctor)
 
     // Check the order of the map is correct
     auto it = registry.begin();
-    BOOST_CHECK(it->first==keyA);
+    BOOST_CHECK(it->first==keyC); // familyId == 5
     it++;
-    BOOST_CHECK(it->first==keyB);
+    BOOST_CHECK(it->first==keyA); // familyId == 7
     it++;
-    BOOST_CHECK(it->first==keyC);
+    BOOST_CHECK(it->first==keyB); // familyId == 8
 
     std::unique_ptr<unsigned char[]> packetDataA;
     std::unique_ptr<unsigned char[]> packetDataB;
@@ -270,17 +278,17 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerFunctor)
     Packet packetC(400000000, 0, packetDataC);
 
     // Check the correct operator of derived class is called
-    registry.at(CommandHandlerKey(packetA.GetPacketId(), version))->operator()(packetA);
+    registry.at(CommandHandlerKey(packetA.GetPacketFamily(), packetA.GetPacketId(), version))->operator()(packetA);
     BOOST_CHECK(testFunctorA.GetCount() == 1);
     BOOST_CHECK(testFunctorB.GetCount() == 0);
     BOOST_CHECK(testFunctorC.GetCount() == 0);
 
-    registry.at(CommandHandlerKey(packetB.GetPacketId(), version))->operator()(packetB);
+    registry.at(CommandHandlerKey(packetB.GetPacketFamily(), packetB.GetPacketId(), version))->operator()(packetB);
     BOOST_CHECK(testFunctorA.GetCount() == 1);
     BOOST_CHECK(testFunctorB.GetCount() == 1);
     BOOST_CHECK(testFunctorC.GetCount() == 0);
 
-    registry.at(CommandHandlerKey(packetC.GetPacketId(), version))->operator()(packetC);
+    registry.at(CommandHandlerKey(packetC.GetPacketFamily(), packetC.GetPacketId(), version))->operator()(packetC);
     BOOST_CHECK(testFunctorA.GetCount() == 1);
     BOOST_CHECK(testFunctorB.GetCount() == 1);
     BOOST_CHECK(testFunctorC.GetCount() == 1);
@@ -291,9 +299,9 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerRegistry)
     // Hard code the version as it will be the same during a single profiling session
     uint32_t version = 1;
 
-    TestFunctorA testFunctorA(461, version);
-    TestFunctorB testFunctorB(963, version);
-    TestFunctorC testFunctorC(983, version);
+    TestFunctorA testFunctorA(7, 461, version);
+    TestFunctorB testFunctorB(8, 963, version);
+    TestFunctorC testFunctorC(5, 983, version);
 
     // Create the Command Handler Registry
     CommandHandlerRegistry registry;
@@ -312,30 +320,30 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerRegistry)
     Packet packetC(400000000, 0, packetDataC);
 
     // Check the correct operator of derived class is called
-    registry.GetFunctor(packetA.GetPacketId(), version)->operator()(packetA);
+    registry.GetFunctor(packetA.GetPacketFamily(), packetA.GetPacketId(), version)->operator()(packetA);
     BOOST_CHECK(testFunctorA.GetCount() == 1);
     BOOST_CHECK(testFunctorB.GetCount() == 0);
     BOOST_CHECK(testFunctorC.GetCount() == 0);
 
-    registry.GetFunctor(packetB.GetPacketId(), version)->operator()(packetB);
+    registry.GetFunctor(packetB.GetPacketFamily(), packetB.GetPacketId(), version)->operator()(packetB);
     BOOST_CHECK(testFunctorA.GetCount() == 1);
     BOOST_CHECK(testFunctorB.GetCount() == 1);
     BOOST_CHECK(testFunctorC.GetCount() == 0);
 
-    registry.GetFunctor(packetC.GetPacketId(), version)->operator()(packetC);
+    registry.GetFunctor(packetC.GetPacketFamily(), packetC.GetPacketId(), version)->operator()(packetC);
     BOOST_CHECK(testFunctorA.GetCount() == 1);
     BOOST_CHECK(testFunctorB.GetCount() == 1);
     BOOST_CHECK(testFunctorC.GetCount() == 1);
 
     // Re-register an existing key with a new function
-    registry.RegisterFunctor(&testFunctorC, testFunctorA.GetPacketId(), version);
-    registry.GetFunctor(packetA.GetPacketId(), version)->operator()(packetC);
+    registry.RegisterFunctor(&testFunctorC, testFunctorA.GetFamilyId(), testFunctorA.GetPacketId(), version);
+    registry.GetFunctor(packetA.GetPacketFamily(), packetA.GetPacketId(), version)->operator()(packetC);
     BOOST_CHECK(testFunctorA.GetCount() == 1);
     BOOST_CHECK(testFunctorB.GetCount() == 1);
     BOOST_CHECK(testFunctorC.GetCount() == 2);
 
     // Check that non-existent key returns nullptr for its functor
-    BOOST_CHECK_THROW(registry.GetFunctor(0, 0), armnn::Exception);
+    BOOST_CHECK_THROW(registry.GetFunctor(0, 0, 0), armnn::Exception);
 }
 
 BOOST_AUTO_TEST_CASE(CheckPacketVersionResolver)
@@ -1698,7 +1706,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
         uint16_t GetCounterCount() const override { return 0; }
         uint32_t GetCounterValue(uint16_t counterUid) const override { return 0; }
     };
-
+    const uint32_t familyId = 0;
     const uint32_t packetId = 0x40000;
 
     uint32_t version = 1;
@@ -1727,7 +1735,8 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
 
     Packet packetA(packetId, dataLength1, uniqueData1);
 
-    PeriodicCounterSelectionCommandHandler commandHandler(packetId,
+    PeriodicCounterSelectionCommandHandler commandHandler(familyId,
+                                                          packetId,
                                                           version,
                                                           holder,
                                                           captureThread,
@@ -1813,6 +1822,7 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
 {
     using boost::numeric_cast;
 
+    const uint32_t packetFamilyId = 0;
     const uint32_t connectionPacketId = 0x10000;
     const uint32_t version = 1;
 
@@ -1838,7 +1848,7 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     ProfilingStateMachine profilingState(ProfilingState::Uninitialised);
     BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::Uninitialised);
 
-    ConnectionAcknowledgedCommandHandler commandHandler(connectionPacketId, version, profilingState);
+    ConnectionAcknowledgedCommandHandler commandHandler(packetFamilyId, connectionPacketId, version, profilingState);
 
     // command handler received packet on ProfilingState::Uninitialised
     BOOST_CHECK_THROW(commandHandler(packetA), armnn::Exception);
@@ -1863,7 +1873,8 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     Packet packetB(differentPacketId, dataLength1, uniqueData1);
     profilingState.TransitionToState(ProfilingState::NotConnected);
     profilingState.TransitionToState(ProfilingState::WaitingForAck);
-    ConnectionAcknowledgedCommandHandler differentCommandHandler(differentPacketId, version, profilingState);
+    ConnectionAcknowledgedCommandHandler differentCommandHandler(
+        packetFamilyId, differentPacketId, version, profilingState);
     BOOST_CHECK_THROW(differentCommandHandler(packetB), armnn::Exception);
 }
 
@@ -2145,13 +2156,15 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
 {
     using boost::numeric_cast;
 
+    const uint32_t familyId = 0;
     const uint32_t packetId = 3;
     const uint32_t version = 1;
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
-    RequestCounterDirectoryCommandHandler commandHandler(packetId,
+    RequestCounterDirectoryCommandHandler commandHandler(familyId,
+                                                         packetId,
                                                          version,
                                                          counterDirectory,
                                                          sendCounterPacket,
@@ -2195,13 +2208,15 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
 {
     using boost::numeric_cast;
 
+    const uint32_t familyId = 0;
     const uint32_t packetId = 3;
     const uint32_t version = 1;
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
-    RequestCounterDirectoryCommandHandler commandHandler(packetId,
+    RequestCounterDirectoryCommandHandler commandHandler(familyId,
+                                                         packetId,
                                                          version,
                                                          counterDirectory,
                                                          sendCounterPacket,

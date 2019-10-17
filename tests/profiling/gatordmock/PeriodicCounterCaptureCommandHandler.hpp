@@ -29,13 +29,16 @@ class PeriodicCounterCaptureCommandHandler : public profiling::CommandHandlerFun
 
 public:
     /**
-     *
+     * @param familyId The family of the packets this handler will service 
      * @param packetId The id of packets this handler will process.
      * @param version The version of that id.
      * @param quietOperation Optional parameter to turn off printouts. This is useful for unittests.
      */
-    PeriodicCounterCaptureCommandHandler(uint32_t packetId, uint32_t version, bool quietOperation = false)
-        : CommandHandlerFunctor(packetId, version)
+    PeriodicCounterCaptureCommandHandler(uint32_t familyId,
+                                         uint32_t packetId,
+                                         uint32_t version,
+                                         bool quietOperation = false)
+        : CommandHandlerFunctor(familyId, packetId, version)
         , m_QuietOperation(quietOperation)
     {}
 

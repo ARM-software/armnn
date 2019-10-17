@@ -19,10 +19,11 @@ class PerJobCounterSelectionCommandHandler : public CommandHandlerFunctor
 {
 
 public:
-    PerJobCounterSelectionCommandHandler(uint32_t packetId,
-                                           uint32_t version,
-                                           const ProfilingStateMachine& profilingStateMachine)
-        : CommandHandlerFunctor(packetId, version)
+    PerJobCounterSelectionCommandHandler(uint32_t familyId,
+                                         uint32_t packetId,
+                                         uint32_t version,
+                                         const ProfilingStateMachine& profilingStateMachine)
+        : CommandHandlerFunctor(familyId, packetId, version)
         , m_StateMachine(profilingStateMachine)
     {}
 

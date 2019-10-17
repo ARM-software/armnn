@@ -26,8 +26,11 @@ public:
      * @param version The version of that id.
      * @param quietOperation Optional parameter to turn off printouts. This is useful for unittests.
      */
-    PeriodicCounterSelectionResponseHandler(uint32_t packetId, uint32_t version, bool quietOperation = true)
-        : CommandHandlerFunctor(packetId, version)
+    PeriodicCounterSelectionResponseHandler(uint32_t familyId,
+                                            uint32_t packetId,
+                                            uint32_t version,
+                                            bool quietOperation = true)
+        : CommandHandlerFunctor(familyId, packetId, version)
         , m_QuietOperation(quietOperation)
     {}
 

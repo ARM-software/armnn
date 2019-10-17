@@ -14,11 +14,14 @@ namespace armnn
 namespace profiling
 {
 
-void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor, uint32_t packetId, uint32_t version)
+void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor,
+                                             uint32_t familyId,
+                                             uint32_t packetId,
+                                             uint32_t version)
 {
     BOOST_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
 
-    CommandHandlerKey key(packetId, version);
+    CommandHandlerKey key(familyId, packetId, version);
     registry[key] = functor;
 }
 
@@ -26,12 +29,12 @@ void CommandHandlerRegistry::RegisterFunctor(CommandHandlerFunctor* functor)
 {
     BOOST_ASSERT_MSG(functor, "Provided functor should not be a nullptr");
 
-    RegisterFunctor(functor, functor->GetPacketId(), functor->GetVersion());
+    RegisterFunctor(functor, functor->GetFamilyId(), functor->GetPacketId(), functor->GetVersion());
 }
 
-CommandHandlerFunctor* CommandHandlerRegistry::GetFunctor(uint32_t packetId, uint32_t version) const
+CommandHandlerFunctor* CommandHandlerRegistry::GetFunctor(uint32_t familyId,uint32_t packetId, uint32_t version) const
 {
-    CommandHandlerKey key(packetId, version);
+    CommandHandlerKey key(familyId, packetId, version);
 
     // Check that the requested key exists
     if (registry.find(key) == registry.end())

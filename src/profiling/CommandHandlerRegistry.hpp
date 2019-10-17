@@ -34,11 +34,11 @@ class CommandHandlerRegistry
 public:
     CommandHandlerRegistry() = default;
 
-    void RegisterFunctor(CommandHandlerFunctor* functor, uint32_t packetId, uint32_t version);
+    void RegisterFunctor(CommandHandlerFunctor* functor, uint32_t familyId, uint32_t packetId, uint32_t version);
 
     void RegisterFunctor(CommandHandlerFunctor* functor);
 
-    CommandHandlerFunctor* GetFunctor(uint32_t packetId, uint32_t version) const;
+    CommandHandlerFunctor* GetFunctor(uint32_t familyId, uint32_t packetId, uint32_t version) const;
 
 private:
     std::unordered_map<CommandHandlerKey, CommandHandlerFunctor*, CommandHandlerHash> registry;

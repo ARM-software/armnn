@@ -20,12 +20,13 @@ class RequestCounterDirectoryCommandHandler : public CommandHandlerFunctor
 {
 
 public:
-    RequestCounterDirectoryCommandHandler(uint32_t packetId,
+    RequestCounterDirectoryCommandHandler(uint32_t familyId,
+                                          uint32_t packetId,
                                           uint32_t version,
                                           ICounterDirectory& counterDirectory,
                                           ISendCounterPacket& sendCounterPacket,
                                           ProfilingStateMachine& profilingStateMachine)
-        : CommandHandlerFunctor(packetId, version)
+        : CommandHandlerFunctor(familyId, packetId, version)
         , m_CounterDirectory(counterDirectory)
         , m_SendCounterPacket(sendCounterPacket)
         , m_StateMachine(profilingStateMachine)

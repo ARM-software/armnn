@@ -19,10 +19,11 @@ class ConnectionAcknowledgedCommandHandler final : public CommandHandlerFunctor
 {
 
 public:
-    ConnectionAcknowledgedCommandHandler(uint32_t packetId,
+    ConnectionAcknowledgedCommandHandler(uint32_t familyId,
+                                         uint32_t packetId,
                                          uint32_t version,
                                          ProfilingStateMachine& profilingStateMachine)
-        : CommandHandlerFunctor(packetId, version)
+        : CommandHandlerFunctor(familyId, packetId, version)
         , m_StateMachine(profilingStateMachine)
     {}
 

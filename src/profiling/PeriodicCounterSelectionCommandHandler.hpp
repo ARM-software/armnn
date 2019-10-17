@@ -22,14 +22,15 @@ class PeriodicCounterSelectionCommandHandler : public CommandHandlerFunctor
 {
 
 public:
-    PeriodicCounterSelectionCommandHandler(uint32_t packetId,
+    PeriodicCounterSelectionCommandHandler(uint32_t familyId,
+                                           uint32_t packetId,
                                            uint32_t version,
                                            Holder& captureDataHolder,
                                            IPeriodicCounterCapture& periodicCounterCapture,
                                            const IReadCounterValues& readCounterValue,
                                            ISendCounterPacket& sendCounterPacket,
                                            const ProfilingStateMachine& profilingStateMachine)
-        : CommandHandlerFunctor(packetId, version)
+        : CommandHandlerFunctor(familyId, packetId, version)
         , m_CaptureDataHolder(captureDataHolder)
         , m_PeriodicCounterCapture(periodicCounterCapture)
         , m_ReadCounterValues(readCounterValue)

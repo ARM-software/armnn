@@ -11,6 +11,11 @@ namespace armnn
 namespace profiling
 {
 
+uint32_t CommandHandlerFunctor::GetFamilyId() const
+{
+    return m_FamilyId;
+}
+
 uint32_t CommandHandlerFunctor::GetPacketId() const
 {
     return m_PacketId;

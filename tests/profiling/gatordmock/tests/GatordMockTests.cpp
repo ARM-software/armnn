@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
     profiling::Packet packet2(headerWord1, dataLength, uniqueData2);
 
     uint32_t version = 1;
-    gatordmock::PeriodicCounterCaptureCommandHandler commandHandler(0, 4, version, false);
+    gatordmock::PeriodicCounterCaptureCommandHandler commandHandler(0, 4, version, true);
 
     // Simulate two separate packets coming in to calculate period
     commandHandler(packet1);
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     profiling::CommandHandlerRegistry registry;
 
     // Update with derived functors
-    gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(0, 4, version, false);
+    gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(0, 4, version, true);
 
     // Register different derived functors
     registry.RegisterFunctor(&counterCaptureCommandHandler);

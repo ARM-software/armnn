@@ -96,6 +96,7 @@ if(BUILD_CAFFE_PARSER)
 
     target_link_libraries(armnnCaffeParser armnn)
     target_link_libraries(armnnCaffeParser ${PROTOBUF_LIBRARIES})
+    set_target_properties(armnnCaffeParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
 
 endif()
 
@@ -120,6 +121,7 @@ if(BUILD_ONNX_PARSER)
 
     # Protobuf
     target_link_libraries(armnnOnnxParser ${PROTOBUF_LIBRARIES})
+    set_target_properties(armnnOnnxParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
 endif()
 
 if(BUILD_TF_PARSER)
@@ -143,6 +145,7 @@ if(BUILD_TF_PARSER)
 
     # Protobuf (use the specific version tensorflow wants)
     target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
+    set_target_properties(armnnTfParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
 endif()
 
 if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
@@ -200,6 +203,8 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
         target_link_libraries(ArmnnQuantizer pthread)
     endif()
+
+    set_target_properties(ArmnnQuantizer PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
 
 endif()
 
@@ -544,6 +549,8 @@ endif()
 if(PROFILING_BACKEND_STREAMLINE)
     target_link_libraries(armnn pthread)
 endif()
+
+set_target_properties(armnn PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
 
 if(BUILD_UNIT_TESTS)
     set(unittest_sources)

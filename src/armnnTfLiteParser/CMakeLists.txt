@@ -21,6 +21,8 @@ if(BUILD_TF_LITE_PARSER)
     target_link_libraries(armnnTfLiteParser ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
     target_link_libraries(armnnTfLiteParser armnn ${FLATBUFFERS_LIBRARY})
 
+    set_target_properties(armnnTfLiteParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION} )
+
     install(TARGETS armnnTfLiteParser
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

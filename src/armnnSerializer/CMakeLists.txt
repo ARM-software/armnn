@@ -43,4 +43,5 @@ if(BUILD_ARMNN_SERIALIZER)
 
     install(TARGETS armnnSerializer
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    set_target_properties(armnnSerializer PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION} )
 endif()

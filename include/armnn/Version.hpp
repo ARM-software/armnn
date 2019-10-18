@@ -5,20 +5,20 @@
 
 #pragma once
 
-#if !defined(ARMNN_VERSION_FROM_FILE)
-#error "A valid version of ArmNN must be provided at compile time"
-#endif
-
+// Macro utils
 #define STRINGIFY_VALUE(s) STRINGIFY_MACRO(s)
 #define STRINGIFY_MACRO(s) #s
+#define CONCAT_VALUE(a, b, c) CONCAT_MACRO(a, b, c)
+#define CONCAT_MACRO(a, b, c) a ## b ## c
 
-// YYYYMMPP
+// ArmNN version components
+#define ARMNN_MAJOR_VERSION 19
+#define ARMNN_MINOR_VERSION 08
+#define ARMNN_PATCH_VERSION 00
+
+// ARMNN_VERSION: "YYYYMMPP"
 // where:
 //   YYYY = 4-digit year number
 //   MM   = 2-digit month number
 //   PP   = 2-digit patch number
-// Defined in ArmnnVersion.txt
-#define ARMNN_VERSION STRINGIFY_VALUE(ARMNN_VERSION_FROM_FILE)
-
-// Check that the provided ArmNN version is valid
-static_assert(sizeof(ARMNN_VERSION) == 9, "Invalid ArmNN version, a valid version should have exactly 8 digits");
+#define ARMNN_VERSION "20" STRINGIFY_VALUE(CONCAT_VALUE(ARMNN_MAJOR_VERSION, ARMNN_MINOR_VERSION, ARMNN_PATCH_VERSION))

@@ -42,6 +42,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/AdditionTestImpl.cpp \
     test/layerTests/ArgMinMaxTestImpl.cpp \
     test/layerTests/BatchNormalizationTestImpl.cpp \
+    test/layerTests/ComparisonTestImpl.cpp \
     test/layerTests/ConcatTestImpl.cpp \
     test/layerTests/ConstantTestImpl.cpp \
     test/layerTests/Conv2dTestImpl.cpp \
@@ -51,12 +52,10 @@ COMMON_TEST_SOURCES := \
     test/layerTests/DepthToSpaceTestImpl.cpp \
     test/layerTests/DequantizeTestImpl.cpp \
     test/layerTests/DivisionTestImpl.cpp \
-    test/layerTests/EqualTestImpl.cpp \
     test/layerTests/FakeQuantizationTestImpl.cpp \
     test/layerTests/FloorTestImpl.cpp \
     test/layerTests/FullyConnectedTestImpl.cpp \
     test/layerTests/GatherTestImpl.cpp \
-    test/layerTests/GreaterTestImpl.cpp \
     test/layerTests/InstanceNormalizationTestImpl.cpp \
     test/layerTests/L2NormalizationTestImpl.cpp \
     test/layerTests/LogSoftmaxTestImpl.cpp \

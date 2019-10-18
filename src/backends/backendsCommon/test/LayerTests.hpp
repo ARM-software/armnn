@@ -11,6 +11,7 @@
 #include <backendsCommon/test/layerTests/ArgMinMaxTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchNormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchToSpaceNdTestImpl.hpp>
+#include <backendsCommon/test/layerTests/ComparisonTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConcatTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConvertFp16ToFp32TestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConvertFp32ToFp16TestImpl.hpp>
@@ -21,12 +22,10 @@
 #include <backendsCommon/test/layerTests/DequantizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DetectionPostProcessTestImpl.hpp>
 #include <backendsCommon/test/layerTests/DivisionTestImpl.hpp>
-#include <backendsCommon/test/layerTests/EqualTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FakeQuantizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FloorTestImpl.hpp>
 #include <backendsCommon/test/layerTests/FullyConnectedTestImpl.hpp>
 #include <backendsCommon/test/layerTests/GatherTestImpl.hpp>
-#include <backendsCommon/test/layerTests/GreaterTestImpl.hpp>
 #include <backendsCommon/test/layerTests/InstanceNormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/L2NormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/LogSoftmaxTestImpl.hpp>

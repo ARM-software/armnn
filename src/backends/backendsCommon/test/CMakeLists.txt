@@ -59,6 +59,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/BatchNormalizationTestImpl.cpp
     layerTests/BatchNormalizationTestImpl.hpp
     layerTests/BatchToSpaceNdTestImpl.hpp
+    layerTests/ComparisonTestImpl.cpp
     layerTests/ComparisonTestImpl.hpp
     layerTests/ConcatTestImpl.cpp
     layerTests/ConcatTestImpl.hpp
@@ -80,8 +81,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/DivisionTestImpl.cpp
     layerTests/DivisionTestImpl.hpp
     layerTests/ElementwiseTestImpl.hpp
-    layerTests/EqualTestImpl.cpp
-    layerTests/EqualTestImpl.hpp
     layerTests/FakeQuantizationTestImpl.cpp
     layerTests/FakeQuantizationTestImpl.hpp
     layerTests/FloorTestImpl.cpp
@@ -90,8 +89,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/FullyConnectedTestImpl.hpp
     layerTests/GatherTestImpl.cpp
     layerTests/GatherTestImpl.hpp
-    layerTests/GreaterTestImpl.cpp
-    layerTests/GreaterTestImpl.hpp
     layerTests/InstanceNormalizationTestImpl.cpp
     layerTests/InstanceNormalizationTestImpl.hpp
     layerTests/L2NormalizationTestImpl.cpp

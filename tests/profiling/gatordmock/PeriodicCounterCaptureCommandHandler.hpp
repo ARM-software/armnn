@@ -37,7 +37,7 @@ public:
     PeriodicCounterCaptureCommandHandler(uint32_t familyId,
                                          uint32_t packetId,
                                          uint32_t version,
-                                         bool quietOperation = false)
+                                         bool quietOperation = true)
         : CommandHandlerFunctor(familyId, packetId, version)
         , m_QuietOperation(quietOperation)
     {}

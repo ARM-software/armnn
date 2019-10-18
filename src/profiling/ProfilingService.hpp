@@ -123,17 +123,17 @@ protected:
         , m_PeriodicCounterCapture(m_Holder, m_SendCounterPacket, *this)
         , m_ConnectionAcknowledgedCommandHandler(0,
                                                  1,
-                                                 m_PacketVersionResolver.ResolvePacketVersion(1).GetEncodedValue(),
+                                                 m_PacketVersionResolver.ResolvePacketVersion(0, 1).GetEncodedValue(),
                                                  m_StateMachine)
         , m_RequestCounterDirectoryCommandHandler(0,
                                                   3,
-                                                  m_PacketVersionResolver.ResolvePacketVersion(3).GetEncodedValue(),
+                                                  m_PacketVersionResolver.ResolvePacketVersion(0, 3).GetEncodedValue(),
                                                   m_CounterDirectory,
                                                   m_SendCounterPacket,
                                                   m_StateMachine)
         , m_PeriodicCounterSelectionCommandHandler(0,
                                                    4,
-                                                   m_PacketVersionResolver.ResolvePacketVersion(4).GetEncodedValue(),
+                                                   m_PacketVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(),
                                                    m_Holder,
                                                    m_PeriodicCounterCapture,
                                                    *this,
@@ -141,7 +141,7 @@ protected:
                                                    m_StateMachine)
         , m_PerJobCounterSelectionCommandHandler(0,
                                                  5,
-                                                 m_PacketVersionResolver.ResolvePacketVersion(4).GetEncodedValue(),
+                                                 m_PacketVersionResolver.ResolvePacketVersion(0, 5).GetEncodedValue(),
                                                  m_StateMachine)
     {
         // Register the "Connection Acknowledged" command handler

@@ -55,7 +55,8 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
                 continue;
             }
 
-            Version version = m_PacketVersionResolver.ResolvePacketVersion(packet.GetPacketId());
+            Version version = m_PacketVersionResolver.ResolvePacketVersion(packet.GetPacketFamily(),
+                                                                           packet.GetPacketId());
 
             CommandHandlerFunctor* commandHandlerFunctor =
                 m_CommandHandlerRegistry.GetFunctor(packet.GetPacketFamily(), 

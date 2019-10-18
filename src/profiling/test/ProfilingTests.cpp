@@ -96,6 +96,31 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
     BOOST_CHECK(vect == expectedVect);
 }
 
+BOOST_AUTO_TEST_CASE(CheckPacketKeyComparisons)
+{
+    PacketKey key0(0,0);
+    PacketKey key1(0,0);
+    PacketKey key2(0,1);
+    PacketKey key3(0,2);
+    PacketKey key4(1,0);
+    PacketKey key5(1,0);
+    PacketKey key6(1,1);
+
+    BOOST_CHECK(!(key0 < key1));
+    BOOST_CHECK(!(key0 > key1));
+    BOOST_CHECK(key0 <= key1);
+    BOOST_CHECK(key0 >= key1);
+    BOOST_CHECK(key0 == key1);
+    BOOST_CHECK(key0 < key2);
+    BOOST_CHECK(key2 < key3);
+    BOOST_CHECK(key3 > key0);
+    BOOST_CHECK(key4 == key5);
+    BOOST_CHECK(key4 > key0);
+    BOOST_CHECK(key5 < key6);
+    BOOST_CHECK(key5 <= key6);
+    BOOST_CHECK(key5 != key6);
+}
+
 BOOST_AUTO_TEST_CASE(CheckCommandHandler)
 {
     PacketVersionResolver packetVersionResolver;
@@ -363,8 +388,9 @@ BOOST_AUTO_TEST_CASE(CheckPacketVersionResolver)
 
     for (unsigned int i = 0u; i < numTests; ++i)
     {
+        const uint32_t familyId = distribution(generator);
         const uint32_t packetId = distribution(generator);
-        Version resolvedVersion = packetVersionResolver.ResolvePacketVersion(packetId);
+        Version resolvedVersion = packetVersionResolver.ResolvePacketVersion(familyId, packetId);
 
         BOOST_TEST(resolvedVersion == expectedVersion);
     }

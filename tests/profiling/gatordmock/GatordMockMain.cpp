@@ -29,10 +29,10 @@ int main(int argc, char* argv[])
 
     // This functor will receive back the selection response packet.
     armnn::gatordmock::PeriodicCounterSelectionResponseHandler periodicCounterSelectionResponseHandler(
-        0, 4, packetVersionResolver.ResolvePacketVersion(4).GetEncodedValue());
+        0, 4, packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue());
     // This functor will receive the counter data.
     armnn::gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
-        1, 0, packetVersionResolver.ResolvePacketVersion(0).GetEncodedValue());
+        1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue());
 
     // Register different derived functors
     registry.RegisterFunctor(&periodicCounterSelectionResponseHandler);

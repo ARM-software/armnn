@@ -326,7 +326,8 @@ armnn::profiling::Packet GatordMockService::ReceivePacket()
     m_HandlerRegistry
         .GetFunctor(packetRx.GetPacketFamily(),
                     packetRx.GetPacketId(),
-                    packetVersionResolver.ResolvePacketVersion(packetRx.GetPacketId()).GetEncodedValue())
+                    packetVersionResolver.ResolvePacketVersion(packetRx.GetPacketFamily(),
+                                                               packetRx.GetPacketId()).GetEncodedValue())
         ->operator()(packetRx);
 
     return packetRx;

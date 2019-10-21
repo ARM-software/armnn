@@ -362,7 +362,7 @@ struct LayerTypePolicy<armnn::LayerType::name, DataType> \
     using Desc = descType; \
     using QueueDesc = armnn::name##QueueDescriptor; \
     constexpr static const char* NameStr = #name; \
-    constexpr static const bool IsException = true; \
+    constexpr static const bool IsException = false; \
     \
     static std::unique_ptr<armnn::IWorkload> MakeDummyWorkload(armnn::IWorkloadFactory *factory, \
         unsigned int nIn, unsigned int nOut) \

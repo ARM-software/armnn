@@ -507,6 +507,16 @@ public:
     virtual IConnectableLayer* AddStackLayer(const StackDescriptor& descriptor,
                                              const char* name = nullptr) = 0;
 
+
+    /// Add a stand-in layer for a type unknown to the Arm NN framework.
+    /// Note: Due to the nature of this layer, no validation can be performed by the framework.
+    /// Furthermore, Any model containing this layer cannot make use of dynamic tensors since the
+    /// tensor sizes cannot be inferred.
+    /// @descriptor - Descriptor for the StandIn layer.
+    /// @return - Interface for configuring the layer.
+    virtual IConnectableLayer* AddStandInLayer(const StandInDescriptor& descriptor,
+                                               const char* name = nullptr) = 0;
+
     /// Add a QuantizedLstm layer to the network
     /// @param params - The weights and biases for the Quantized LSTM cell
     /// @param name - Optional name for the layer

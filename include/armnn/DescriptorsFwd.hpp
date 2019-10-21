@@ -36,6 +36,7 @@ struct SpaceToBatchNdDescriptor;
 struct SpaceToDepthDescriptor;
 struct SliceDescriptor;
 struct StackDescriptor;
+struct StandInDescriptor;
 struct StridedSliceDescriptor;
 struct TransposeConvolution2dDescriptor;
 struct ViewsDescriptor;

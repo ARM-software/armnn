@@ -380,6 +380,25 @@ struct LayerTypePolicy<armnn::LayerType::name, DataType> \
 // Use this version for layers whose constructor takes 2 parameters(descriptor and name).
 #define DECLARE_LAYER_POLICY_2_PARAM(name) DECLARE_LAYER_POLICY_CUSTOM_PARAM(name, armnn::name##Descriptor)
 
+
+#define DECLARE_LAYER_POLICY_EXCEPTION(name, descType) \
+template<armnn::DataType DataType> \
+struct LayerTypePolicy<armnn::LayerType::name, DataType> \
+{ \
+    using Type = armnn::name##Layer; \
+    using Desc = descType; \
+    constexpr static const char* NameStr = #name; \
+    \
+    static std::unique_ptr<armnn::IWorkload> MakeDummyWorkload(armnn::IWorkloadFactory *factory, \
+        unsigned int nIn, unsigned int nOut) \
+    { \
+        return std::unique_ptr<armnn::IWorkload>(); \
+    } \
+};
+
+#define DECLARE_LAYER_POLICY_EXCEPTION_1_PARAM(name) DECLARE_LAYER_POLICY_EXCEPTION(name, void)
+#define DECLARE_LAYER_POLICY_EXCEPTION_2_PARAM(name) DECLARE_LAYER_POLICY_EXCEPTION(name, armnn::name##Descriptor)
+
 // Layer policy template.
 template<armnn::LayerType Type, armnn::DataType DataType>
 struct LayerTypePolicy;
@@ -488,6 +507,8 @@ DECLARE_LAYER_POLICY_2_PARAM(SpaceToDepth)
 DECLARE_LAYER_POLICY_2_PARAM(Splitter)
 
 DECLARE_LAYER_POLICY_2_PARAM(Stack)
+
+DECLARE_LAYER_POLICY_EXCEPTION_2_PARAM(StandIn)
 
 DECLARE_LAYER_POLICY_2_PARAM(StridedSlice)
 

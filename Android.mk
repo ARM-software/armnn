@@ -165,6 +165,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/SpaceToDepthLayer.cpp \
         src/armnn/layers/SplitterLayer.cpp \
         src/armnn/layers/StackLayer.cpp \
+        src/armnn/layers/StandInLayer.cpp \
         src/armnn/layers/StridedSliceLayer.cpp \
         src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/layers/SwitchLayer.cpp \

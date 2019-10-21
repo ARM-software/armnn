@@ -1090,6 +1090,13 @@ void SerializerVisitor::VisitStackLayer(const armnn::IConnectableLayer* layer,
     CreateAnyLayer(stackLayer.o, serializer::Layer::Layer_StackLayer);
 }
 
+void SerializerVisitor::VisitStandInLayer(const armnn::IConnectableLayer *layer,
+                                          const armnn::StandInDescriptor& standInDescriptor,
+                                          const char *name)
+{
+    // TODO: IVGCVSW-4010 Implement serialization
+}
+
 void SerializerVisitor::VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,
                                                const armnn::StridedSliceDescriptor& stridedSliceDescriptor,
                                                const char* name)

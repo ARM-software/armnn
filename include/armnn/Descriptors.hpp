@@ -952,6 +952,22 @@ struct StackDescriptor
     TensorShape m_InputShape;
 };
 
+/// A StandInDescriptor for the StandIn layer
+struct StandInDescriptor
+{
+    StandInDescriptor() {};
+
+    StandInDescriptor(uint32_t numInputs, uint32_t numOutputs)
+        : m_NumInputs(numInputs)
+        , m_NumOutputs(numOutputs)
+    {}
+
+    /// Number of input tensors
+    uint32_t m_NumInputs = 0;
+    /// Number of output tensors
+    uint32_t m_NumOutputs = 0;
+};
+
 /// A StridedSliceDescriptor for the StridedSliceLayer.
 struct StridedSliceDescriptor
 {

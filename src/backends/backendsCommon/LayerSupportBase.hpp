@@ -312,6 +312,11 @@ public:
                           const StackDescriptor& descriptor,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsStandInSupported(const std::vector<const TensorInfo*>& inputs,
+                            const std::vector<const TensorInfo*>& outputs,
+                            const StandInDescriptor& descriptor,
+                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsStridedSliceSupported(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const StridedSliceDescriptor& descriptor,

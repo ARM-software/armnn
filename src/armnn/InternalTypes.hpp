@@ -66,6 +66,7 @@ enum class LayerType
     SpaceToDepth,
     Splitter,
     Stack,
+    StandIn,
     StridedSlice,
     Subtraction,
     Switch,

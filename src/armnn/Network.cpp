@@ -1503,6 +1503,13 @@ IConnectableLayer* Network::AddStackLayer(const StackDescriptor& stackDescriptor
     return m_Graph->AddLayer<StackLayer>(stackDescriptor, name);
 }
 
+
+IConnectableLayer* Network::AddStandInLayer(const StandInDescriptor& desc,
+                                            const char* name)
+{
+    return m_Graph->AddLayer<StandInLayer>(desc, name);
+}
+
 IConnectableLayer* Network::AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
                                                   const char* name)
 {

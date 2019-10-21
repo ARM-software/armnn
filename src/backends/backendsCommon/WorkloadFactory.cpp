@@ -902,6 +902,47 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
 
             break;
         }
+        case LayerType::StandIn:
+        {
+            auto cLayer = boost::polymorphic_downcast<const StandInLayer*>(&layer);
+
+            // Get vector of all inputs.
+            auto getTensorInfoIn = [&dataType](const InputSlot& slot)
+                {
+                    return OverrideDataType(slot.GetConnectedOutputSlot()->GetTensorInfo(), dataType);
+                };
+            auto getTensorInfoOut = [&dataType](const OutputSlot& slot)
+                {
+                    return OverrideDataType(slot.GetTensorInfo(), dataType);
+                };
+            auto beginI = boost::make_transform_iterator(layer.GetInputSlots().begin(), getTensorInfoIn);
+            auto endI = boost::make_transform_iterator(layer.GetInputSlots().end(), getTensorInfoIn);
+            std::vector<TensorInfo> inputs(beginI, endI);
+
+            auto beginO = boost::make_transform_iterator(layer.GetOutputSlots().begin(), getTensorInfoOut);
+            auto endO = boost::make_transform_iterator(layer.GetOutputSlots().end(), getTensorInfoOut);
+            std::vector<TensorInfo> outputs(beginO, endO);
+
+
+            auto getTensorInfoPtr = [](const TensorInfo& info)
+                {
+                    return &info;
+                };
+            auto beginPtrI = boost::make_transform_iterator(inputs.begin(), getTensorInfoPtr);
+            auto endPtrI = boost::make_transform_iterator(inputs.end(), getTensorInfoPtr);
+            std::vector<const TensorInfo*> inputPtrs(beginPtrI, endPtrI);
+
+            auto beginPtrO = boost::make_transform_iterator(outputs.begin(), getTensorInfoPtr);
+            auto endPtrO = boost::make_transform_iterator(outputs.end(), getTensorInfoPtr);
+            std::vector<const TensorInfo*> outputPtrs(beginPtrO, endPtrO);
+
+
+            result = layerSupportObject->IsStandInSupported(inputPtrs,
+                                                            outputPtrs,
+                                                            cLayer->GetParameters(),
+                                                            reason);
+            break;
+        }
         case LayerType::StridedSlice:
         {
             auto cLayer = boost::polymorphic_downcast<const StridedSliceLayer*>(&layer);

@@ -222,6 +222,10 @@ public:
                          const StackDescriptor&,
                          const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitStandInLayer(const IConnectableLayer*,
+                           const StandInDescriptor&,
+                           const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitStridedSliceLayer(const IConnectableLayer*,
                                 const StridedSliceDescriptor&,
                                 const char*) override { DefaultPolicy::Apply(__func__); }

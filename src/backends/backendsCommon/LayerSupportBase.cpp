@@ -502,6 +502,22 @@ bool LayerSupportBase::IsStackSupported(const std::vector<const TensorInfo*>& in
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsStandInSupported(const std::vector<const TensorInfo*>& inputs,
+                                          const std::vector<const TensorInfo*>& outputs,
+                                          const StandInDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    if (reasonIfUnsupported)
+    {
+        std::stringstream message;
+        message << "StandIn layer is not executable via backends";
+
+        reasonIfUnsupported.value() = message.str();
+    }
+
+    return false;
+}
+
 bool LayerSupportBase::IsStridedSliceSupported(const TensorInfo& input,
                                                const TensorInfo& output,
                                                const StridedSliceDescriptor& descriptor,

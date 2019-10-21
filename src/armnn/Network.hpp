@@ -222,6 +222,9 @@ public:
     IConnectableLayer* AddStackLayer(const StackDescriptor& stackDescriptor,
                                      const char* name = nullptr) override;
 
+    IConnectableLayer* AddStandInLayer(const StandInDescriptor& descriptor,
+                                       const char* name = nullptr) override;
+
     IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
                                              const char* name = nullptr) override;
 

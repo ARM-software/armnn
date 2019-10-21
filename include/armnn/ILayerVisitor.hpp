@@ -443,6 +443,14 @@ public:
                                  const StackDescriptor& stackDescriptor,
                                  const char* name = nullptr) = 0;
 
+    /// Function a StandInLayer should call back to when its Accept(ILaterVisitor&) function is invoked
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param standInDescriptor - Parameters for the stand-in layer.
+    /// @param name - Optional name for the layer.
+    virtual void VisitStandInLayer(const IConnectableLayer* layer,
+                                   const StandInDescriptor& standInDescriptor,
+                                   const char* name = nullptr) = 0;
+
     /// Function a strided slice layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param stridedSliceDescriptor - Parameters for the strided slice operation.

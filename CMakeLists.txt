@@ -764,15 +764,14 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeAdd.cpp
             src/armnnDeserializer/test/DeserializeBatchToSpaceNd.cpp
             src/armnnDeserializer/test/DeserializeBatchNormalization.cpp
+            src/armnnDeserializer/test/DeserializeComparison.cpp
             src/armnnDeserializer/test/DeserializeConstant.cpp
             src/armnnDeserializer/test/DeserializeConvolution2d.cpp
             src/armnnDeserializer/test/DeserializeDepthToSpace.cpp
             src/armnnDeserializer/test/DeserializeDivision.cpp
-            src/armnnDeserializer/test/DeserializeEqual.cpp
             src/armnnDeserializer/test/DeserializeFloor.cpp
             src/armnnDeserializer/test/DeserializeFullyConnected.cpp
             src/armnnDeserializer/test/DeserializeGather.cpp
-            src/armnnDeserializer/test/DeserializeGreater.cpp
             src/armnnDeserializer/test/DeserializeInstanceNormalization.cpp
             src/armnnDeserializer/test/DeserializeL2Normalization.cpp
             src/armnnDeserializer/test/DeserializeLogSoftmax.cpp

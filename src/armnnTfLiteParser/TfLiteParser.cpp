@@ -2168,35 +2168,22 @@ void TfLiteParser::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
-    // Reshape to remove unpacked dimension
-    unsigned int reshapedNumDimensions = inputDimSize - 1;
-    std::vector<unsigned int> reshapedDimensions(reshapedNumDimensions);
-
-    unsigned int reshapeIndex = 0;
-    for (unsigned int i = 0; i < inputDimSize; ++i)
-    {
-        if (i == unpackAxis)
-        {
-            continue;
-        }
-        reshapedDimensions[reshapeIndex++] = unpackDimSizes[i];
-    }
-
     // Create reshape to remove the unpacked dimension for unpack operator of each output from Splitter.
     for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
     {
-        armnn::TensorInfo reshapedTensorInfo = inputTensorInfo;
-        reshapedTensorInfo.SetShape(armnn::TensorShape{ reshapedNumDimensions, reshapedDimensions.data() });
-
+        armnn::TensorInfo outputTensorInfo  = ToTensorInfo(outputs[k]);
         std::string reshapeLayerName = boost::str(boost::format("Reshape_for:%1%") % layer->GetName());
         armnn::ReshapeDescriptor desc;
-        desc.m_TargetShape = reshapedTensorInfo.GetShape();
+        desc.m_TargetShape = outputTensorInfo.GetShape();
         armnn::IConnectableLayer* reshapeLayer = m_Network->AddReshapeLayer(desc, layerName.c_str());
 
-        layer->GetOutputSlot(k).SetTensorInfo(armnn::TensorInfo(splitOutShape, inputTensorInfo.GetDataType()));
+        layer->GetOutputSlot(k).SetTensorInfo(armnn::TensorInfo(splitOutShape,
+                                                                outputTensorInfo.GetDataType(),
+                                                                outputTensorInfo.GetQuantizationScale(),
+                                                                outputTensorInfo.GetQuantizationOffset()));
         layer->GetOutputSlot(k).Connect(reshapeLayer->GetInputSlot(0));
 
-        reshapeLayer->GetOutputSlot(0).SetTensorInfo(reshapedTensorInfo);
+        reshapeLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
         uint32_t reshapedOutputId = CHECKED_NON_NEGATIVE(operatorPtr->outputs[k]);
         armnn::IOutputSlot* slot = &(reshapeLayer->GetOutputSlot(0));

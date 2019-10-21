@@ -113,7 +113,7 @@ bool GatordMockService::WaitForStreamMetaData()
     uint32_t metaDataLength = ToUint32(&header[4], m_Endianness) - 4;
     // Read the entire packet.
     u_char packetData[metaDataLength];
-    if (metaDataLength != read(m_ClientConnection, &packetData, metaDataLength))
+    if (metaDataLength != boost::numeric_cast<uint32_t>(read(m_ClientConnection, &packetData, metaDataLength)))
     {
         std::cerr << ": Protocol read error. Data length mismatch." << std::endl;
         return false;
@@ -227,16 +227,16 @@ void GatordMockService::ReceiveLoop(GatordMockService& mockService)
         {
             armnn::profiling::Packet packet = mockService.WaitForPacket(500);
         }
-        catch (armnn::TimeoutException)
+        catch (const armnn::TimeoutException&)
         {
             // In this case we ignore timeouts and and keep trying to receive.
         }
-        catch (armnn::InvalidArgumentException e)
+        catch (const armnn::InvalidArgumentException &e)
         {
             // We couldn't find a functor to handle the packet?
             std::cerr << "Packet received that could not be processed: " << e.what() << std::endl;
         }
-        catch (armnn::RuntimeException e)
+        catch (const armnn::RuntimeException &e)
         {
             // A runtime exception occurred which means we must exit the loop.
             std::cerr << "Receive thread closing: " << e.what() << std::endl;
@@ -386,7 +386,7 @@ bool GatordMockService::ReadFromSocket(u_char* packetData, uint32_t expectedLeng
 {
     // This is a blocking read until either expectedLength has been received or an error is detected.
     ssize_t totalBytesRead = 0;
-    while (totalBytesRead < expectedLength)
+    while (boost::numeric_cast<uint32_t>(totalBytesRead) < expectedLength)
     {
         ssize_t bytesRead = recv(m_ClientConnection, packetData, expectedLength, 0);
         if (bytesRead < 0)

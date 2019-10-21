@@ -123,7 +123,7 @@ inline size_t GetTensorOffset(const arm_compute::ITensorInfo& info,
     coords.set(2, static_cast<int>(channelIndex));
     coords.set(1, static_cast<int>(y));
     coords.set(0, static_cast<int>(x));
-    return info.offset_element_in_bytes(coords);
+    return boost::numeric_cast<size_t>(info.offset_element_in_bytes(coords));
 }
 
 // Helper function to obtain element offset into data buffer representing tensor data (assuming no strides).

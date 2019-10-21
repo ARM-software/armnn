@@ -204,7 +204,7 @@ if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
         target_link_libraries(ArmnnQuantizer pthread)
     endif()
 
-    set_target_properties(ArmnnQuantizer PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+    set_target_properties(armnnQuantizer PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
 
 endif()
 

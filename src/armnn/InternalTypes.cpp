@@ -63,6 +63,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::SpaceToBatchNd: return "SpaceToBatchNd";
         case LayerType::Splitter: return "Splitter";
         case LayerType::Stack: return "Stack";
+        case LayerType::StandIn: return "StandIn";
         case LayerType::StridedSlice: return "StridedSlice";
         case LayerType::Subtraction: return "Subtraction";
         case LayerType::Switch: return "Switch";

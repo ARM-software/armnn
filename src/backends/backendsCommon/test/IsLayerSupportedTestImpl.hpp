@@ -362,6 +362,7 @@ struct LayerTypePolicy<armnn::LayerType::name, DataType> \
     using Desc = descType; \
     using QueueDesc = armnn::name##QueueDescriptor; \
     constexpr static const char* NameStr = #name; \
+    constexpr static const bool IsException = true; \
     \
     static std::unique_ptr<armnn::IWorkload> MakeDummyWorkload(armnn::IWorkloadFactory *factory, \
         unsigned int nIn, unsigned int nOut) \
@@ -388,6 +389,7 @@ struct LayerTypePolicy<armnn::LayerType::name, DataType> \
     using Type = armnn::name##Layer; \
     using Desc = descType; \
     constexpr static const char* NameStr = #name; \
+    constexpr static const bool IsException = true; \
     \
     static std::unique_ptr<armnn::IWorkload> MakeDummyWorkload(armnn::IWorkloadFactory *factory, \
         unsigned int nIn, unsigned int nOut) \
@@ -550,6 +552,11 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
     using LayerType = typename LayerPolicy::Type;
     using LayerDesc = typename LayerPolicy::Desc;
     DummyLayer<LayerType, LayerDesc> layer;
+
+    if (LayerPolicy::IsException) //Don't test exceptions to the rule.
+    {
+        return true;
+    }
 
     unsigned int numIn = GetNumInputs<Type>(*layer.m_Layer);
     unsigned int numOut = GetNumOutputs<Type>(*layer.m_Layer);

@@ -19,7 +19,8 @@ struct SplitFixture : public ParserFlatbuffersFixture
                           const std::string& numSplits,
                           const std::string& outputShape1,
                           const std::string& outputShape2,
-                          const std::string& axisData)
+                          const std::string& axisData,
+                          const std::string& dataType)
     {
         m_JsonString = R"(
             {
@@ -29,7 +30,7 @@ struct SplitFixture : public ParserFlatbuffersFixture
                     "tensors": [
                         {
                             "shape": )" + inputShape + R"(,
-                            "type": "FLOAT32",
+                            "type": )" + dataType + R"(,
                             "buffer": 0,
                             "name": "inputTensor",
                             "quantization": {
@@ -53,7 +54,7 @@ struct SplitFixture : public ParserFlatbuffersFixture
                         },
                         {
                             "shape": )" + outputShape1 + R"( ,
-                            "type": "FLOAT32",
+                            "type":)" + dataType + R"(,
                             "buffer": 2,
                             "name": "outputTensor1",
                             "quantization": {
@@ -65,7 +66,7 @@ struct SplitFixture : public ParserFlatbuffersFixture
                         },
                         {
                             "shape": )" + outputShape2 + R"( ,
-                            "type": "FLOAT32",
+                            "type":)" + dataType + R"(,
                             "buffer": 3,
                             "name": "outputTensor2",
                             "quantization": {
@@ -100,70 +101,140 @@ struct SplitFixture : public ParserFlatbuffersFixture
 };
 
 
-struct SimpleSplitFixture : SplitFixture
+struct SimpleSplitFixtureFloat32 : SplitFixture
 {
-    SimpleSplitFixture() : SplitFixture( "[ 2, 2, 2, 2 ]", "[ ]", "2",
-        "[ 2, 1, 2, 2 ]", "[ 2, 1, 2, 2 ]", "[ 1, 0, 0, 0 ]")
-         {}
+    SimpleSplitFixtureFloat32()
+        : SplitFixture( "[ 2, 2, 2, 2 ]", "[ ]", "2", "[ 2, 1, 2, 2 ]", "[ 2, 1, 2, 2 ]", "[ 1, 0, 0, 0 ]", "FLOAT32")
+        {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseAxisOneSplitTwo, SimpleSplitFixture)
+BOOST_FIXTURE_TEST_CASE(ParseAxisOneSplitTwoFloat32, SimpleSplitFixtureFloat32)
 {
 
     RunTest<4, armnn::DataType::Float32>(
         0,
-        { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f,
-                            11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f } } },
+        { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f,
+                            9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f } } },
         { {"outputTensor1", { 1.0f, 2.0f, 3.0f, 4.0f, 9.0f, 10.0f, 11.0f, 12.0f } },
           {"outputTensor2", { 5.0f, 6.0f, 7.0f, 8.0f, 13.0f, 14.0f, 15.0f, 16.0f } } });
 }
 
-struct SimpleSplitAxisThreeFixture : SplitFixture
+struct SimpleSplitAxisThreeFixtureFloat32 : SplitFixture
 {
-    SimpleSplitAxisThreeFixture() : SplitFixture( "[ 2, 2, 2, 2 ]", "[ ]", "2",
-        "[ 2, 2, 2, 1 ]", "[ 2, 2, 2, 1 ]", "[ 3, 0, 0, 0 ]")
-    {}
+    SimpleSplitAxisThreeFixtureFloat32()
+        : SplitFixture( "[ 2, 2, 2, 2 ]", "[ ]", "2", "[ 2, 2, 2, 1 ]", "[ 2, 2, 2, 1 ]", "[ 3, 0, 0, 0 ]", "FLOAT32")
+        {}
 };
 
-BOOST_FIXTURE_TEST_CASE(ParseAxisThreeSplitTwo, SimpleSplitAxisThreeFixture)
+BOOST_FIXTURE_TEST_CASE(ParseAxisThreeSplitTwoFloat32, SimpleSplitAxisThreeFixtureFloat32)
 {
     RunTest<4, armnn::DataType::Float32>(
         0,
-        { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f,
-                            11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f } } },
+        { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f,
+                            9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f } } },
         { {"outputTensor1", { 1.0f, 3.0f, 5.0f, 7.0f, 9.0f, 11.0f, 13.0f, 15.0f } },
           {"outputTensor2", { 2.0f, 4.0f, 6.0f, 8.0f, 10.0f, 12.0f, 14.0f, 16.0f } } } );
 }
 
-struct SimpleSplit2DFixture : SplitFixture
+struct SimpleSplit2DFixtureFloat32 : SplitFixture
 {
-    SimpleSplit2DFixture() : SplitFixture( "[ 1, 8 ]", "[ ]", "2", "[ 1, 4 ]", "[ 1, 4 ]", "[ 1, 0, 0, 0 ]")
-    {}
+    SimpleSplit2DFixtureFloat32()
+        : SplitFixture( "[ 1, 8 ]", "[ ]", "2", "[ 1, 4 ]", "[ 1, 4 ]", "[ 1, 0, 0, 0 ]", "FLOAT32")
+        {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimpleSplit2D, SimpleSplit2DFixture)
+BOOST_FIXTURE_TEST_CASE(SimpleSplit2DFloat32, SimpleSplit2DFixtureFloat32)
 {
     RunTest<2, armnn::DataType::Float32>(
-            0,
-            { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f } } },
-            { {"outputTensor1", { 1.0f, 2.0f, 3.0f, 4.0f } },
-              {"outputTensor2", { 5.0f, 6.0f, 7.0f, 8.0f } } } );
+        0,
+        { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f } } },
+        { {"outputTensor1", { 1.0f, 2.0f, 3.0f, 4.0f } },
+          {"outputTensor2", { 5.0f, 6.0f, 7.0f, 8.0f } } } );
 }
 
-struct SimpleSplit3DFixture : SplitFixture
+struct SimpleSplit3DFixtureFloat32 : SplitFixture
 {
-    SimpleSplit3DFixture() : SplitFixture( "[ 1, 8, 2 ]", "[ ]", "2", "[ 1, 4, 2 ]", "[ 1, 4, 2 ]", "[ 1, 0, 0, 0 ]")
-    {}
+    SimpleSplit3DFixtureFloat32()
+        : SplitFixture( "[ 1, 8, 2 ]", "[ ]", "2", "[ 1, 4, 2 ]", "[ 1, 4, 2 ]", "[ 1, 0, 0, 0 ]", "FLOAT32")
+        {}
 };
 
-BOOST_FIXTURE_TEST_CASE(SimpleSplit3D, SimpleSplit3DFixture)
+BOOST_FIXTURE_TEST_CASE(SimpleSplit3DFloat32, SimpleSplit3DFixtureFloat32)
 {
     RunTest<3, armnn::DataType::Float32>(
+        0,
+        { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f,
+                            9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f } } },
+        { {"outputTensor1", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f } },
+          {"outputTensor2", { 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f } } } );
+}
+
+struct SimpleSplitFixtureUint8 : SplitFixture
+{
+    SimpleSplitFixtureUint8()
+        : SplitFixture( "[ 2, 2, 2, 2 ]", "[ ]", "2", "[ 2, 1, 2, 2 ]", "[ 2, 1, 2, 2 ]", "[ 1, 0, 0, 0 ]", "UINT8")
+        {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseAxisOneSplitTwoUint8, SimpleSplitFixtureUint8)
+{
+
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+        0,
+        { {"inputTensor", { 1, 2, 3, 4, 5, 6, 7, 8,
+                            9, 10, 11, 12, 13, 14, 15, 16 } } },
+        { {"outputTensor1", { 1, 2, 3, 4, 9, 10, 11, 12 } },
+          {"outputTensor2", { 5, 6, 7, 8, 13, 14, 15, 16 } } });
+}
+
+struct SimpleSplitAxisThreeFixtureUint8 : SplitFixture
+{
+    SimpleSplitAxisThreeFixtureUint8()
+        : SplitFixture( "[ 2, 2, 2, 2 ]", "[ ]", "2", "[ 2, 2, 2, 1 ]", "[ 2, 2, 2, 1 ]", "[ 3, 0, 0, 0 ]", "UINT8")
+        {}
+};
+
+BOOST_FIXTURE_TEST_CASE(ParseAxisThreeSplitTwoUint8, SimpleSplitAxisThreeFixtureUint8)
+{
+    RunTest<4, armnn::DataType::QuantisedAsymm8>(
+        0,
+        { {"inputTensor", { 1, 2, 3, 4, 5, 6, 7, 8,
+                            9, 10, 11, 12, 13, 14, 15, 16 } } },
+        { {"outputTensor1", { 1, 3, 5, 7, 9, 11, 13, 15 } },
+          {"outputTensor2", { 2, 4, 6, 8, 10, 12, 14, 16 } } } );
+}
+
+struct SimpleSplit2DFixtureUint8 : SplitFixture
+{
+    SimpleSplit2DFixtureUint8()
+        : SplitFixture( "[ 1, 8 ]", "[ ]", "2", "[ 1, 4 ]", "[ 1, 4 ]", "[ 1, 0, 0, 0 ]", "UINT8")
+        {}
+};
+
+BOOST_FIXTURE_TEST_CASE(SimpleSplit2DUint8, SimpleSplit2DFixtureUint8)
+{
+    RunTest<2, armnn::DataType::QuantisedAsymm8>(
             0,
-            { {"inputTensor", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f,
-                                10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f } } },
-            { {"outputTensor1", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f } },
-              {"outputTensor2", { 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f } } } );
+            { {"inputTensor", { 1, 2, 3, 4, 5, 6, 7, 8 } } },
+            { {"outputTensor1", { 1, 2, 3, 4 } },
+              {"outputTensor2", { 5, 6, 7, 8 } } } );
+}
+
+struct SimpleSplit3DFixtureUint8 : SplitFixture
+{
+    SimpleSplit3DFixtureUint8()
+        : SplitFixture( "[ 1, 8, 2 ]", "[ ]", "2", "[ 1, 4, 2 ]", "[ 1, 4, 2 ]", "[ 1, 0, 0, 0 ]", "UINT8")
+        {}
+};
+
+BOOST_FIXTURE_TEST_CASE(SimpleSplit3DUint8, SimpleSplit3DFixtureUint8)
+{
+    RunTest<3, armnn::DataType::QuantisedAsymm8>(
+        0,
+        { {"inputTensor", { 1, 2, 3, 4, 5, 6, 7, 8,
+                            9, 10, 11, 12, 13, 14, 15, 16 } } },
+        { {"outputTensor1", { 1, 2, 3, 4, 5, 6, 7, 8 } },
+          {"outputTensor2", { 9, 10, 11, 12, 13, 14, 15, 16 } } } );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

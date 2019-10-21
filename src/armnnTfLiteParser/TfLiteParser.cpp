@@ -2276,13 +2276,10 @@ void TfLiteParser::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[1]});
 
-    TensorShape outShape = TensorShape(static_cast<unsigned int>(splitterDimSizes.size()),
-                                       splitterDimSizes.data());
-
     for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
     {
-        layer->GetOutputSlot(k).SetTensorInfo(armnn::TensorInfo(outShape,
-                                                                inputTensorInfo.GetDataType()));
+        armnn::TensorInfo tensorInfo = ToTensorInfo(outputs[k]);
+        layer->GetOutputSlot(k).SetTensorInfo(tensorInfo);
     }
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));

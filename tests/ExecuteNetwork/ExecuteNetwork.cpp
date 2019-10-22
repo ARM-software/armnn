@@ -179,6 +179,7 @@ int main(int argc, const char* argv[])
         // Create runtime
         armnn::IRuntime::CreationOptions options;
         options.m_EnableGpuProfiling = enableProfiling;
+        options.m_DynamicBackendsPath = dynamicBackendsPath;
         options.m_ProfilingOptions.m_EnableProfiling = enableExternalProfiling;
         options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
         options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
@@ -255,6 +256,7 @@ int main(int argc, const char* argv[])
         // Create runtime
         armnn::IRuntime::CreationOptions options;
         options.m_EnableGpuProfiling = enableProfiling;
+        options.m_DynamicBackendsPath = dynamicBackendsPath;
         options.m_ProfilingOptions.m_EnableProfiling = enableExternalProfiling;
         options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
         options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;

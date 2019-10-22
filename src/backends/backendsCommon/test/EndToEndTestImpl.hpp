@@ -4,13 +4,12 @@
 //
 #pragma once
 
-#include <ResolveType.hpp>
-
 #include <armnn/ArmNN.hpp>
 #include <armnn/INetwork.hpp>
-#include <Profiling.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
+#include <Profiling.hpp>
+#include <QuantizeHelper.hpp>
+#include <ResolveType.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -99,9 +98,9 @@ inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
 
     return ConstantUsageTest(backends,
         commonTensorInfo,
-        QuantizedVector<uint8_t>(scale, offset, { 1.f, 2.f, 3.f, 4.f, 5.f, 6.f }), // Input.
-        QuantizedVector<uint8_t>(scale, offset, { 6.f, 5.f, 4.f, 3.f, 2.f, 1.f }), // Const input.
-        QuantizedVector<uint8_t>(scale, offset, { 7.f, 7.f, 7.f, 7.f, 7.f, 7.f })  // Expected output.
+        armnnUtils::QuantizedVector<uint8_t>({ 1.f, 2.f, 3.f, 4.f, 5.f, 6.f }, scale, offset), // Input.
+        armnnUtils::QuantizedVector<uint8_t>({ 6.f, 5.f, 4.f, 3.f, 2.f, 1.f }, scale, offset), // Const input.
+        armnnUtils::QuantizedVector<uint8_t>({ 7.f, 7.f, 7.f, 7.f, 7.f, 7.f }, scale, offset)  // Expected output.
     );
 }
 

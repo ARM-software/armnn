@@ -9,6 +9,7 @@
 #include <armnn/ArmNN.hpp>
 
 #include <Permute.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <backendsCommon/test/CommonTestUtils.hpp>
@@ -129,12 +130,12 @@ void TransposeConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
     }
 
     // quantize data
-    std::vector<T> qInputData          = QuantizedVector<T>(qScale, qOffset, inputData);
-    std::vector<T> qWeightsData        = QuantizedVector<T>(qScale, qOffset, weightsData);
-    std::vector<T> qExpectedOutputData = QuantizedVector<T>(qScale, qOffset, expectedOutputData);
+    std::vector<T> qInputData          = armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset);
+    std::vector<T> qWeightsData        = armnnUtils::QuantizedVector<T>(weightsData, qScale, qOffset);
+    std::vector<T> qExpectedOutputData = armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset);
 
     using BT = ResolveType<ArmnnBType>;
-    std::vector<BT> qBiasesData  = QuantizedVector<BT>(qScale * qScale, 0, biasesData);
+    std::vector<BT> qBiasesData = armnnUtils::QuantizedVector<BT>(biasesData, qScale * qScale, 0);
 
     ConstTensor weights(weightsInfo, qWeightsData);
     ConstTensor biases(biasesInfo, qBiasesData);

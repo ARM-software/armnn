@@ -6,6 +6,7 @@
 #include "BatchNormalizationTestImpl.hpp"
 
 #include <DataLayoutIndexed.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -14,7 +15,6 @@
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -22,6 +22,8 @@
 
 namespace
 {
+
+using namespace armnnUtils;
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> BatchNormTestImpl(
@@ -53,19 +55,18 @@ LayerTestResult<T, 4> BatchNormTestImpl(
         tensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo,
-                                        QuantizedVector<T>(qScale, qOffset, inputValues));
+    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputValues, qScale, qOffset));
 
     // These values are per-channel of the input.
-    auto mean     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {3, -2}));
-    auto variance = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {4,  9}));
-    auto beta     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {3,  2}));
-    auto gamma    = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {2,  1}));
+    auto mean     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 3, -2 }, qScale, qOffset));
+    auto variance = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 4,  9 }, qScale, qOffset));
+    auto beta     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 3,  2 }, qScale, qOffset));
+    auto gamma    = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 2,  1 }, qScale, qOffset));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
     result.outputExpected = MakeTensor<T, 4>(inputTensorInfo,
-                                             QuantizedVector<T>(qScale, qOffset, expectedOutputValues));
+                                             QuantizedVector<T>(expectedOutputValues, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -134,17 +135,18 @@ LayerTestResult<T,4> BatchNormTestNhwcImpl(
     }
 
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset,
+        QuantizedVector<T>(
         {
             1.f, 1.f, 4.f, 1.f,
             4.f, 4.f, 2.f, 1.f,
             1.f, -2.f, 6.f, 4.f
-        }));
+        },
+        qScale, qOffset));
     // These values are per-channel of the input.
-    auto mean     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {3, -2}));
-    auto variance = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {4, 9}));
-    auto beta     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {3, 2}));
-    auto gamma    = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>(qScale, qOffset, {2, 1}));
+    auto mean     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 3, -2 }, qScale, qOffset));
+    auto variance = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 4,  9 }, qScale, qOffset));
+    auto beta     = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 3,  2 }, qScale, qOffset));
+    auto gamma    = MakeTensor<T, 1>(tensorInfo, QuantizedVector<T>({ 2,  1 }, qScale, qOffset));
     LayerTestResult<T,4> ret(outputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
@@ -175,12 +177,13 @@ LayerTestResult<T,4> BatchNormTestNhwcImpl(
     // substract mean, divide by standard deviation (with an epsilon to avoid div by 0),
     // multiply by gamma and add beta
     ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset,
+        QuantizedVector<T>(
         {
             1.f, 3.f, 4.f, 3.f,
             4.f, 4.f, 2.f, 3.f,
             1.f, 2.f, 6.f, 4.f
-        }));
+        },
+        qScale, qOffset));
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateBatchNormalization(data, info);
 

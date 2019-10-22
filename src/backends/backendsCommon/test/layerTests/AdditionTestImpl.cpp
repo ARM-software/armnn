@@ -7,6 +7,8 @@
 
 #include "ElementwiseTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
+
 template<>
 std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::AdditionQueueDescriptor>(
     const armnn::IWorkloadFactory& workloadFactory,
@@ -177,7 +179,7 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset,
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, armnnUtils::QuantizedVector<T>(
     {
         0.0f,
         1.0f,
@@ -187,16 +189,18 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
 
         4.0f,
         5.0f,
-    }));
+    },
+    qScale, qOffset));
 
-    auto input2 = MakeTensor<T, 4>(inputTensorInfo2, QuantizedVector<T>(qScale, qOffset,
+    auto input2 = MakeTensor<T, 4>(inputTensorInfo2, armnnUtils::QuantizedVector<T>(
     {
         0.5f, 1.5f, 2.5f,
         3.5f, 4.5f, 5.5f,
-    }));
+    },
+    qScale, qOffset));
 
     LayerTestResult<T,4> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset,
+    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, armnnUtils::QuantizedVector<T>(
     {
         0.5f, 1.5f, 2.5f,
         4.5f, 5.5f, 6.5f,
@@ -206,7 +210,8 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
 
         4.5f, 5.5f, 6.5f,
         8.5f, 9.5f, 10.5f,
-    }));
+    },
+    qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
     std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);
@@ -256,31 +261,34 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset,
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, armnnUtils::QuantizedVector<T>(
     {
-            0.0f,  1.0f,  2.0f,
-            3.0f,  4.0f,  5.0f,
-            6.0f,  7.0f,  8.0f,
-            9.0f, 10.0f, 11.0f,
+         0.0f,  1.0f,  2.0f,
+         3.0f,  4.0f,  5.0f,
+         6.0f,  7.0f,  8.0f,
+         9.0f, 10.0f, 11.0f,
         12.0f, 13.0f, 14.0f,
         15.0f, 16.0f, 17.0f,
-    }));
+    },
+    qScale, qOffset));
 
-    auto input2 = MakeTensor<T, 4>(inputTensorInfo2, QuantizedVector<T>(qScale, qOffset,
+    auto input2 = MakeTensor<T, 4>(inputTensorInfo2, armnnUtils::QuantizedVector<T>(
     {
         0.5f,
-    }));
+    },
+    qScale, qOffset));
 
     LayerTestResult<T,4> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset,
+    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, armnnUtils::QuantizedVector<T>(
     {
-            0.5f,  1.5f,  2.5f,
-            3.5f,  4.5f,  5.5f,
-            6.5f,  7.5f,  8.5f,
-            9.5f, 10.5f, 11.5f,
+         0.5f,  1.5f,  2.5f,
+         3.5f,  4.5f,  5.5f,
+         6.5f,  7.5f,  8.5f,
+         9.5f, 10.5f, 11.5f,
         12.5f, 13.5f, 14.5f,
         15.5f, 16.5f, 17.5f,
-    }));
+    },
+    qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle1 = workloadFactory.CreateTensorHandle(inputTensorInfo1);
     std::unique_ptr<armnn::ITensorHandle> inputHandle2 = workloadFactory.CreateTensorHandle(inputTensorInfo2);

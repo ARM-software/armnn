@@ -4,17 +4,19 @@
 //
 
 #include <armnn/INetwork.hpp>
+#include <armnn/LayerVisitorBase.hpp>
 #include <armnn/Tensor.hpp>
-#include <armnnQuantizer/INetworkQuantizer.hpp>
 #include <armnn/Types.hpp>
 
-#include "armnn/LayerVisitorBase.hpp"
+#include <armnnQuantizer/INetworkQuantizer.hpp>
+
+#include <QuantizeHelper.hpp>
+
 #include "../Graph.hpp"
 #include "../Network.hpp"
 #include "../NetworkQuantizerUtils.hpp"
 #include "../OverrideInputRangeVisitor.hpp"
 #include "../RangeTracker.hpp"
-#include "../backends/backendsCommon/test/QuantizeHelper.hpp"
 #include "../../armnnQuantizer/CommandLineProcessor.hpp"
 
 #include <boost/test/unit_test.hpp>
@@ -2294,9 +2296,9 @@ std::vector<uint8_t> SetupQuantize(float value)
     std::vector<float> input({ value, 0.0f, 0.0f, 1.0f });
     const std::vector<float> &inputRef = input;
 
-    auto output = QuantizedVector<uint8_t>(inputInfo.GetQuantizationScale(),
-                                           inputInfo.GetQuantizationOffset(),
-                                           inputRef);
+    auto output = armnnUtils::QuantizedVector<uint8_t>(inputRef,
+                                                       inputInfo.GetQuantizationScale(),
+                                                       inputInfo.GetQuantizationOffset());
 
     return output;
 }

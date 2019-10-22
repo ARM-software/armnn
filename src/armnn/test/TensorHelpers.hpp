@@ -4,23 +4,21 @@
 //
 #pragma once
 
-#include <armnn/TensorFwd.hpp>
-#include <boost/test/unit_test.hpp>
-#include <boost/multi_array.hpp>
-#include <vector>
-#include <array>
-
-#include <boost/assert.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <armnn/Tensor.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
+#include <QuantizeHelper.hpp>
 
+#include <boost/assert.hpp>
+#include <boost/multi_array.hpp>
+#include <boost/numeric/conversion/cast.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
+#include <boost/test/unit_test.hpp>
+
+#include <array>
 #include <cmath>
+#include <vector>
 
 constexpr float g_FloatCloseToZeroTolerance = 1.0e-6f;
 
@@ -235,7 +233,9 @@ boost::multi_array<T, n> MakeRandomTensor(const armnn::TensorInfo& tensorInfo,
     {
         init[i] = dist(gen);
     }
-    float qScale = tensorInfo.GetQuantizationScale();
-    int32_t qOffset = tensorInfo.GetQuantizationOffset();
-    return MakeTensor<T, n>(tensorInfo, QuantizedVector<T>(qScale, qOffset, init));
+
+    const float   qScale  = tensorInfo.GetQuantizationScale();
+    const int32_t qOffset = tensorInfo.GetQuantizationOffset();
+
+    return MakeTensor<T, n>(tensorInfo, armnnUtils::QuantizedVector<T>(init, qScale, qOffset));
 }

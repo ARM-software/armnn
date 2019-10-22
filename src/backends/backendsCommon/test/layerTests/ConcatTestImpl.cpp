@@ -6,6 +6,7 @@
 #include "ConcatTestImpl.hpp"
 
 #include <Permute.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -15,22 +16,25 @@
 
 #include <test/TensorHelpers.hpp>
 
+using namespace armnn;
+using namespace armnnUtils;
+
 //
 // Helper functions and templates
 //
 
-armnn::OriginsDescriptor CreateDescriptorForConcat(
-    const std::vector<armnn::TensorInfo> & inputTensorInfos,
+OriginsDescriptor CreateDescriptorForConcat(
+    const std::vector<TensorInfo> & inputTensorInfos,
     unsigned int concatDim)
 {
-    std::vector<armnn::TensorShape> shapes;
+    std::vector<TensorShape> shapes;
     shapes.reserve(inputTensorInfos.size());
-    for (const armnn::TensorInfo& it: inputTensorInfos)
+    for (const TensorInfo& it: inputTensorInfos)
     {
         shapes.push_back(it.GetShape());
     }
 
-    return armnn::CreateDescriptorForConcatenation(shapes.begin(), shapes.end(), concatDim);
+    return CreateDescriptorForConcatenation(shapes.begin(), shapes.end(), concatDim);
 }
 
 //
@@ -40,7 +44,7 @@ armnn::OriginsDescriptor CreateDescriptorForConcat(
 //
 
 bool NeedPermuteForConcat(
-    const std::vector<armnn::TensorInfo> & inputTensorInfos,
+    const std::vector<TensorInfo> & inputTensorInfos,
     unsigned int concatDim)
 {
     // See note above. Additionally we expect the input shapes to have the
@@ -65,7 +69,7 @@ bool NeedPermuteForConcat(
     return (nDimensions < 3 || (nDimensions == 3 && (nDimensions-concatDim) < 3 && (nDimensions-concatDim) != 1));
 }
 
-armnn::TensorShape ExpandTensorShapeTo3dForPermute(const armnn::TensorShape & inputShape)
+TensorShape ExpandTensorShapeTo3dForPermute(const TensorShape & inputShape)
 {
     unsigned int numDims = inputShape.GetNumDimensions();
     if (numDims >= 3)
@@ -80,13 +84,13 @@ armnn::TensorShape ExpandTensorShapeTo3dForPermute(const armnn::TensorShape & in
     {
         newDims[expandedBy+i] = inputShape[i];
     }
-    return armnn::TensorShape(3u, &newDims[0]);
+    return TensorShape(3u, &newDims[0]);
 }
 
 void Generate3dPermuteVectorForConcat(
     unsigned int numDimensions,
     unsigned int & concatDim,
-    std::pair<armnn::PermutationVector, armnn::PermutationVector> & permutations)
+    std::pair<PermutationVector, PermutationVector> & permutations)
 {
     BOOST_ASSERT_MSG(numDimensions <= 3,
        "Only dimensions 1,2 and 3 are supported by this helper");
@@ -96,15 +100,15 @@ void Generate3dPermuteVectorForConcat(
     if (expandedConcatAxis == 2)
     {
         concatDim = 0;
-        armnn::PermutationVector forwardPermutation({1, 2, 0});
-        armnn::PermutationVector reversePermutation({2, 0, 1});
+        PermutationVector forwardPermutation({1, 2, 0});
+        PermutationVector reversePermutation({2, 0, 1});
         permutations = std::make_pair(forwardPermutation, reversePermutation);
     }
     else if (expandedConcatAxis == 1)
     {
         concatDim = 0;
-        armnn::PermutationVector forwardPermutation({2, 0, 1});
-        armnn::PermutationVector reversePermutation({1, 2, 0});
+        PermutationVector forwardPermutation({2, 0, 1});
+        PermutationVector reversePermutation({1, 2, 0});
         permutations = std::make_pair(forwardPermutation, reversePermutation);
     }
     else
@@ -115,10 +119,10 @@ void Generate3dPermuteVectorForConcat(
 }
 
 template<typename T> void PermuteTensorData(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::PermutationVector& mappings,
-    armnn::TensorInfo & inputTensorInfo,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const PermutationVector& mappings,
+    TensorInfo & inputTensorInfo,
     const T * inputData,
     std::vector<T>& outputData)
 {
@@ -131,18 +135,18 @@ template<typename T> void PermuteTensorData(
         return;
     }
 
-    armnn::TensorInfo outputTensorInfo = armnnUtils::Permuted(inputTensorInfo, mappings);
+    TensorInfo outputTensorInfo = armnnUtils::Permuted(inputTensorInfo, mappings);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::PermuteQueueDescriptor queueDescriptor;
-    queueDescriptor.m_Parameters = armnn::PermuteDescriptor{mappings};
-    armnn::WorkloadInfo workloadInfo;
+    PermuteQueueDescriptor queueDescriptor;
+    queueDescriptor.m_Parameters = PermuteDescriptor{mappings};
+    WorkloadInfo workloadInfo;
     AddInputToWorkload(queueDescriptor, workloadInfo, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePermute(queueDescriptor, workloadInfo);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreatePermute(queueDescriptor, workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -164,23 +168,23 @@ template<typename T> void PermuteTensorData(
 // of the permuted concatenated tensor is going to be.
 //
 template<typename T> void PermuteInputsForConcat(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    std::vector<armnn::TensorInfo> & inputTensorInfos,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    std::vector<TensorInfo> & inputTensorInfos,
     std::vector<T *> & inputData,
     std::vector<std::vector<T>> & inputDataStorage,
-    armnn::PermutationVector & permuteVector,
+    PermutationVector & permuteVector,
     unsigned int & concatDim,
-    armnn::TensorInfo & outputTensorInfo)
+    TensorInfo & outputTensorInfo)
 {
     BOOST_ASSERT_MSG(inputTensorInfos.size() > 1,
         "Expecting more than one tensor to be concatenated here");
 
     unsigned int numDims = 0;
     unsigned int nthInput = 0;
-    const armnn::PermutationVector identity({0, 1, 2});
+    const PermutationVector identity({0, 1, 2});
 
-    std::pair<armnn::PermutationVector, armnn::PermutationVector> permutations =
+    std::pair<PermutationVector, PermutationVector> permutations =
         std::make_pair(identity, identity);
 
     inputDataStorage.resize(inputData.size());
@@ -203,7 +207,7 @@ template<typename T> void PermuteInputsForConcat(
                 "All inputs must have the same number of dimensions");
         }
 
-        armnn::TensorInfo newTensorInfo = tensorInfo;
+        TensorInfo newTensorInfo = tensorInfo;
         newTensorInfo.SetShape(ExpandTensorShapeTo3dForPermute(tensorInfo.GetShape()));
 
         PermuteTensorData<T>(workloadFactory,
@@ -231,11 +235,11 @@ template<typename T> void PermuteInputsForConcat(
 // output.
 //
 template <typename T> void PermuteOutputForConcat(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::TensorInfo & tensorInfo,
-    const armnn::PermutationVector & permuteVector,
-    std::unique_ptr<armnn::ITensorHandle> && inputDataHandle,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const TensorInfo & tensorInfo,
+    const PermutationVector & permuteVector,
+    std::unique_ptr<ITensorHandle> && inputDataHandle,
     T * data)
 {
     BOOST_ASSERT_MSG(data != nullptr, "data must not be null");
@@ -247,7 +251,7 @@ template <typename T> void PermuteOutputForConcat(
         return;
     }
 
-    armnn::TensorInfo resultTensorInfo = tensorInfo;
+    TensorInfo resultTensorInfo = tensorInfo;
     std::vector<T> inputData(tensorInfo.GetNumElements());
     std::vector<T> outputData;
 
@@ -264,11 +268,11 @@ template <typename T> void PermuteOutputForConcat(
 }
 
 template<typename T> void Concatenate(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    std::initializer_list<const armnn::TensorInfo> inputTensorInfosOrig,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    std::initializer_list<const TensorInfo> inputTensorInfosOrig,
     std::initializer_list<T *> inputsOrig,
-    const armnn::TensorInfo& outputTensorInfoOrig,
+    const TensorInfo& outputTensorInfoOrig,
     T * output,
     unsigned int concatDim,
     bool useSubtensor)
@@ -283,11 +287,11 @@ template<typename T> void Concatenate(
     }
 
     // Saves a copy of the parameters which we might need to change.
-    std::vector<armnn::TensorInfo> inputTensorInfos(inputTensorInfosOrig.begin(), inputTensorInfosOrig.end());
+    std::vector<TensorInfo> inputTensorInfos(inputTensorInfosOrig.begin(), inputTensorInfosOrig.end());
     std::vector<T *> inputs            = inputsOrig;
-    armnn::TensorInfo outputTensorInfo = outputTensorInfoOrig;
+    TensorInfo outputTensorInfo = outputTensorInfoOrig;
 
-    armnn::PermutationVector permuteVector{0, 1, 2};
+    PermutationVector permuteVector{0, 1, 2};
 
     // Holds and automatically releases memory for the reshaped input data.
     std::vector<std::vector<T>> tmpInputDataStorage;
@@ -312,15 +316,15 @@ template<typename T> void Concatenate(
                                   outputTensorInfo);
     }
 
-    armnn::WorkloadInfo workloadInfo;
+    WorkloadInfo workloadInfo;
 
-    std::vector<std::unique_ptr<armnn::ITensorHandle>> inputHandles;
+    std::vector<std::unique_ptr<ITensorHandle>> inputHandles;
     inputHandles.reserve(inputCount);
 
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
-    armnn::ConcatQueueDescriptor queueDescriptor;
-    armnn::OriginsDescriptor viewsDescriptor = CreateDescriptorForConcat(inputTensorInfos, concatDim);
+    ConcatQueueDescriptor queueDescriptor;
+    OriginsDescriptor viewsDescriptor = CreateDescriptorForConcat(inputTensorInfos, concatDim);
     queueDescriptor.m_Parameters = viewsDescriptor;
 
     if (useSubtensor)
@@ -337,8 +341,8 @@ template<typename T> void Concatenate(
         const bool subTensorsSupported = workloadFactory.SupportsSubTensors();
         for (unsigned int i = 0; i < inputCount; ++i)
         {
-            const armnn::TensorInfo& inputTensorInfo = inputTensorInfos[i];
-            std::unique_ptr<armnn::ITensorHandle> inputHandle =
+            const TensorInfo& inputTensorInfo = inputTensorInfos[i];
+            std::unique_ptr<ITensorHandle> inputHandle =
                 subTensorsSupported ?
                     workloadFactory.CreateSubTensorHandle(*outputHandle,
                                                           inputTensorInfo.GetShape(),
@@ -353,7 +357,7 @@ template<typename T> void Concatenate(
     {
         for (unsigned int i = 0; i < inputCount; ++i)
         {
-            std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfos[i]);
+            std::unique_ptr<ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfos[i]);
             inputHandles.emplace_back(std::move(inputHandle));
         }
     }
@@ -365,7 +369,7 @@ template<typename T> void Concatenate(
 
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(queueDescriptor, workloadInfo);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(queueDescriptor, workloadInfo);
 
     for (auto& inputHandle : inputHandles)
     {
@@ -403,20 +407,20 @@ template<typename T> void Concatenate(
 // Implementation templates
 //
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 1> Concat1dTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo inputTensorInfo({ 3 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputTensorInfo({ 3 }, ArmnnType, qScale, qOffset);
 
-    auto input0 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, { 1.0f, 2.0f, 3.0f }));
-    auto input1 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, { 4.0f, 5.0f, 6.0f }));
-    auto input2 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, { 7.0f, 8.0f, 9.0f }));
+    auto input0 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>({ 1.0f, 2.0f, 3.0f }, qScale, qOffset));
+    auto input1 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>({ 4.0f, 5.0f, 6.0f }, qScale, qOffset));
+    auto input2 = MakeTensor<T, 1>(inputTensorInfo, QuantizedVector<T>({ 7.0f, 8.0f, 9.0f }, qScale, qOffset));
 
-    armnn::TensorInfo outputTensorInfo({ 9 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 9 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 1> result(outputTensorInfo);
 
@@ -430,48 +434,56 @@ LayerTestResult<T, 1> Concat1dTestImpl(
                    0,
                    true);
 
-    result.output = MakeTensor<T, 1>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 1>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f
-    }));
+    result.output         = MakeTensor<T, 1>(outputTensorInfo, output);
+    result.outputExpected = MakeTensor<T, 1>(outputTensorInfo, QuantizedVector<T>(
+        {
+            1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 2> Concat2dTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::TensorInfo& outputTensorInfo,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const TensorInfo& outputTensorInfo,
     unsigned int dimension,
     const float qScale,
     const int32_t qOffset)
 {
-    armnn::TensorInfo inputTensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputTensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
 
-    auto input0 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        1.0f, 2.0f, 3.0f,
+    auto input0 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            1.0f, 2.0f, 3.0f,
 
-        // Batch 1
-        10.0f, 11.0f, 12.0f,
-    }));
+            // Batch 1
+            10.0f, 11.0f, 12.0f,
+        },
+        qScale, qOffset));
 
-    auto input1 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        4.0f, 5.0f, 6.0f,
+    auto input1 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(
+         {
+            // Batch 0
+            4.0f, 5.0f, 6.0f,
 
-        // Batch 1
-        13.0f, 14.0f, 15.0f,
-    }));
+            // Batch 1
+            13.0f, 14.0f, 15.0f,
+        },
+        qScale, qOffset));
 
-    auto input2 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        7.0f, 8.0f, 9.0f,
+    auto input2 = MakeTensor<T, 2>(inputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            7.0f, 8.0f, 9.0f,
 
-        // Batch 1
-        16.0f, 17.0f, 18.0f,
-    }));
+            // Batch 1
+            16.0f, 17.0f, 18.0f,
+        },
+        qScale, qOffset));
 
     LayerTestResult<T, 2> result(outputTensorInfo);
 
@@ -489,99 +501,109 @@ LayerTestResult<T, 2> Concat2dTestImpl(
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 2> Concat2dDim0TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 2> result = Concat2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 0, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        1.0f, 2.0f, 3.0f,
+    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            1.0f, 2.0f, 3.0f,
 
-        // Batch 1
-        10.0f, 11.0f, 12.0f,
+            // Batch 1
+            10.0f, 11.0f, 12.0f,
 
-        // Batch 2
-        4.0f, 5.0f, 6.0f,
+            // Batch 2
+            4.0f, 5.0f, 6.0f,
 
-        // Batch 3
-        13.0f, 14.0f, 15.0f,
+            // Batch 3
+            13.0f, 14.0f, 15.0f,
 
-        // Batch 4
-        7.0f, 8.0f, 9.0f,
+            // Batch 4
+            7.0f, 8.0f, 9.0f,
 
-        // Batch 5
-        16.0f, 17.0f, 18.0f,
-    }));
+            // Batch 5
+            16.0f, 17.0f, 18.0f,
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 2> Concat2dDim1TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 2> result = Concat2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 1, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f,
+    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f,
 
-        // Batch 1
-        10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
-    }));
+            // Batch 1
+            10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 2> Concat2dDim0DiffInputDimsTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 2>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        1.0f, 2.0f, 3.0f,
+    TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
+    auto input0 = MakeTensor<T, 2>(input0TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            1.0f, 2.0f, 3.0f,
 
-        // Batch 1
-        10.0f, 11.0f, 12.0f,
-    }));
+            // Batch 1
+            10.0f, 11.0f, 12.0f,
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input1TensorInfo({ 3, 3 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 2>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        4.0f, 5.0f, 6.0f,
+    TensorInfo input1TensorInfo({ 3, 3 }, ArmnnType, qScale, qOffset);
+    auto input1 = MakeTensor<T, 2>(input1TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            4.0f, 5.0f, 6.0f,
 
-        // Batch 1
-        13.0f, 14.0f, 15.0f,
+            // Batch 1
+            13.0f, 14.0f, 15.0f,
 
-        // Batch 0
-        7.0f, 8.0f, 9.0f,
-    }));
+            // Batch 0
+            7.0f, 8.0f, 9.0f,
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input2TensorInfo({ 1, 3 }, ArmnnType, qScale, qOffset);
-    auto input2 = MakeTensor<T, 2>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 1
-        16.0f, 17.0f, 18.0f,
-    }));
+    TensorInfo input2TensorInfo({ 1, 3 }, ArmnnType, qScale, qOffset);
+    auto input2 = MakeTensor<T, 2>(input2TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 1
+            16.0f, 17.0f, 18.0f,
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 6, 3 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 2> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -595,64 +617,72 @@ LayerTestResult<T, 2> Concat2dDim0DiffInputDimsTestImpl(
                    true);
 
     result.output = MakeTensor<T, 2>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        1.0f, 2.0f, 3.0f,
+    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            1.0f, 2.0f, 3.0f,
 
-        // Batch 1
-        10.0f, 11.0f, 12.0f,
+            // Batch 1
+            10.0f, 11.0f, 12.0f,
 
-        // Batch 2
-        4.0f, 5.0f, 6.0f,
+            // Batch 2
+            4.0f, 5.0f, 6.0f,
 
-        // Batch 3
-        13.0f, 14.0f, 15.0f,
+            // Batch 3
+            13.0f, 14.0f, 15.0f,
 
-        // Batch 4
-        7.0f, 8.0f, 9.0f,
+            // Batch 4
+            7.0f, 8.0f, 9.0f,
 
-        // Batch 5
-        16.0f, 17.0f, 18.0f,
-    }));
+            // Batch 5
+            16.0f, 17.0f, 18.0f,
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 2> Concat2dDim1DiffInputDimsTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 2>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        1.0f, 2.0f, 3.0f,
+    TensorInfo input0TensorInfo({ 2, 3 }, ArmnnType, qScale, qOffset);
+    auto input0 = MakeTensor<T, 2>(input0TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            1.0f, 2.0f, 3.0f,
 
-        // Batch 1
-        10.0f, 11.0f, 12.0f,
-    }));
+            // Batch 1
+            10.0f, 11.0f, 12.0f,
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input1TensorInfo({ 2, 5 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 2>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        4.0f, 5.0f, 6.0f, 7.0f, 8.0f,
+    TensorInfo input1TensorInfo({ 2, 5 }, ArmnnType, qScale, qOffset);
+    auto input1 = MakeTensor<T, 2>(input1TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            4.0f, 5.0f, 6.0f, 7.0f, 8.0f,
 
-        // Batch 1
-        13.0f, 14.0f, 15.0f, 16.0f, 17.0f,
-    }));
+            // Batch 1
+            13.0f, 14.0f, 15.0f, 16.0f, 17.0f,
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input2TensorInfo({ 2, 1 }, ArmnnType, qScale, qOffset);
-    auto input2 = MakeTensor<T, 2>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        9.0f,
+    TensorInfo input2TensorInfo({ 2, 1 }, ArmnnType, qScale, qOffset);
+    auto input2 = MakeTensor<T, 2>(input2TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            9.0f,
 
-        // Batch 1
-        18.0f
-    }));
+            // Batch 1
+            18.0f
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 2, 9 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 2> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -666,292 +696,33 @@ LayerTestResult<T, 2> Concat2dDim1DiffInputDimsTestImpl(
                    true);
 
     result.output = MakeTensor<T, 2>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0
-        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f,
+    result.outputExpected = MakeTensor<T, 2>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0
+            1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f,
 
-        // Batch 1
-        10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f,
-    }));
+            // Batch 1
+            10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f,
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 3> Concat3dTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::TensorInfo& outputTensorInfo,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const TensorInfo& outputTensorInfo,
     unsigned int dimension,
     bool useSubtensor,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo inputTensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputTensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
 
-    auto input0 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f,
-
-        // Batch 0, Channel 1
-        3.0f, 4.0f,
-
-        // Batch 0, Channel 2
-        5.0f, 6.0f,
-
-        // Batch 1, Channel 0
-        19.0f, 20.0f,
-
-        // Batch 1, Channel 1
-        21.0f, 22.0f,
-
-        // Batch 1, Channel 2
-        23.0f, 24.0f
-    }));
-
-    auto input1 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        7.0f, 8.0f,
-
-        // Batch 0, Channel 1
-        9.0f, 10.0f,
-
-        // Batch 0, Channel 2
-        11.0f, 12.0f,
-
-        // Batch 1, Channel 0
-        25.0f, 26.0f,
-
-        // Batch 1, Channel 1
-        27.0f, 28.0f,
-
-        // Batch 1, Channel 2
-        29.0f, 30.0f
-    }));
-
-    auto input2 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        13.0f, 14.0f,
-
-        // Batch 0, Channel 1
-        15.0f, 16.0f,
-
-        // Batch 0, Channel 2
-        17.0f, 18.0f,
-
-        // Batch 1, Channel 0
-        31.0f, 32.0f,
-
-        // Batch 1, Channel 1
-        33.0f, 34.0f,
-
-        // Batch 1, Channel 2
-        35.0f, 36.0f
-    }));
-
-    LayerTestResult<T, 3> result(outputTensorInfo);
-
-    std::vector<T> output;
-    output.resize(outputTensorInfo.GetNumElements());
-    Concatenate<T>(workloadFactory, memoryManager,
-                   { inputTensorInfo, inputTensorInfo, inputTensorInfo },
-                   { input0.data(), input1.data(), input2.data() },
-                   outputTensorInfo,
-                   output.data(),
-                   dimension,
-                   useSubtensor);
-
-    result.output = MakeTensor<T, 3>(outputTensorInfo, output);
-    return result;
-}
-
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 3> Concat3dDim0TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    float qScale,
-    int32_t qOffset)
-{
-    armnn::TensorInfo outputTensorInfo({ 6, 3, 2 }, ArmnnType, qScale, qOffset);
-
-    LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, outputTensorInfo, 0, true, qScale, qOffset);
-
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f,
-
-        // Batch 0, Channel 1
-        3.0f, 4.0f,
-
-        // Batch 0, Channel 2
-        5.0f, 6.0f,
-
-        // Batch 1, Channel 0
-        19.0f, 20.0f,
-
-        // Batch 1, Channel 1
-        21.0f, 22.0f,
-
-        // Batch 1, Channel 2
-        23.0f, 24.0f,
-
-        // Batch 2, Channel 0
-        7.0f, 8.0f,
-
-        // Batch 2, Channel 1
-        9.0f, 10.0f,
-
-        // Batch 2, Channel 2
-        11.0f, 12.0f,
-
-        // Batch 3, Channel 0
-        25.0f, 26.0f,
-
-        // Batch 3, Channel 1
-        27.0f, 28.0f,
-
-        // Batch 3, Channel 2
-        29.0f, 30.0f,
-
-        // Batch 4, Channel 0
-        13.0f, 14.0f,
-
-        // Batch 4, Channel 1
-        15.0f, 16.0f,
-
-        // Batch 4, Channel 2
-        17.0f, 18.0f,
-
-        // Batch 5, Channel 0
-        31.0f, 32.0f,
-
-        // Batch 5, Channel 1
-        33.0f, 34.0f,
-
-        // Batch 5, Channel 2
-        35.0f, 36.0f
-    }));
-
-    return result;
-}
-
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 3> Concat3dDim1TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    float qScale,
-    int32_t qOffset)
-{
-    armnn::TensorInfo outputTensorInfo({ 2, 9, 2 }, ArmnnType, qScale, qOffset);
-
-    LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, outputTensorInfo, 1, true, qScale, qOffset);
-
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f,
-
-        // Batch 0, Channel 1
-        3.0f, 4.0f,
-
-        // Batch 0, Channel 2
-        5.0f, 6.0f,
-
-        // Batch 0, Channel 3
-        7.0f, 8.0f,
-
-        // Batch 0, Channel 4
-        9.0f, 10.0f,
-
-        // Batch 0, Channel 5
-        11.0f, 12.0f,
-
-        // Batch 0, Channel 6
-        13.0f, 14.0f,
-
-        // Batch 0, Channel 7
-        15.0f, 16.0f,
-
-        // Batch 0, Channel 8
-        17.0f, 18.0f,
-
-        // Batch 1, Channel 0
-        19.0f, 20.0f,
-
-        // Batch 1, Channel 1
-        21.0f, 22.0f,
-
-        // Batch 1, Channel 2
-        23.0f, 24.0f,
-
-        // Batch 1, Channel 3
-        25.0f, 26.0f,
-
-        // Batch 1, Channel 4
-        27.0f, 28.0f,
-
-        // Batch 1, Channel 5
-        29.0f, 30.0f,
-
-        // Batch 1, Channel 6
-        31.0f, 32.0f,
-
-        // Batch 1, Channel 7
-        33.0f, 34.0f,
-
-        // Batch 1, Channel 8
-        35.0f, 36.0f
-    }));
-
-    return result;
-}
-
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 3> Concat3dDim2TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    bool useSubtensor,
-    float qScale,
-    int32_t qOffset)
-{
-    armnn::TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType, qScale, qOffset);
-
-    LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, outputTensorInfo, 2, useSubtensor, qScale, qOffset);
-
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f, 7.0f, 8.0f, 13.0f, 14.0f,
-
-        // Batch 0, Channel 1
-        3.0f, 4.0f, 9.0f, 10.0f, 15.0f, 16.0f,
-
-        // Batch 0, Channel 2
-        5.0f, 6.0f, 11.0f, 12.0f, 17.0f, 18.0f,
-
-        // Batch 1, Channel 0
-        19.0f, 20.0f, 25.0f, 26.0f, 31.0f, 32.0f,
-
-        // Batch 1, Channel 1
-        21.0f, 22.0f, 27.0f, 28.0f, 33.0f, 34.0f,
-
-        // Batch 1, Channel 2
-        23.0f, 24.0f, 29.0f, 30.0f, 35.0f, 36.0f,
-    }));
-
-    return result;
-}
-
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    float qScale,
-    int32_t qOffset)
-{
-    armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType);
-    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
+    auto input0 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(
+        {
             // Batch 0, Channel 0
             1.0f, 2.0f,
 
@@ -969,10 +740,11 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
 
             // Batch 1, Channel 2
             23.0f, 24.0f
-    }));
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input1TensorInfo({ 1, 3, 2 }, ArmnnType);
-    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
+    auto input1 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(
+        {
             // Batch 0, Channel 0
             7.0f, 8.0f,
 
@@ -981,10 +753,287 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
 
             // Batch 0, Channel 2
             11.0f, 12.0f,
-    }));
 
-    armnn::TensorInfo input2TensorInfo({ 3, 3, 2 }, ArmnnType);
-    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
+            // Batch 1, Channel 0
+            25.0f, 26.0f,
+
+            // Batch 1, Channel 1
+            27.0f, 28.0f,
+
+            // Batch 1, Channel 2
+            29.0f, 30.0f
+        },
+        qScale, qOffset));
+
+    auto input2 = MakeTensor<T, 3>(inputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            13.0f, 14.0f,
+
+            // Batch 0, Channel 1
+            15.0f, 16.0f,
+
+            // Batch 0, Channel 2
+            17.0f, 18.0f,
+
+            // Batch 1, Channel 0
+            31.0f, 32.0f,
+
+            // Batch 1, Channel 1
+            33.0f, 34.0f,
+
+            // Batch 1, Channel 2
+            35.0f, 36.0f
+        },
+        qScale, qOffset));
+
+    LayerTestResult<T, 3> result(outputTensorInfo);
+
+    std::vector<T> output;
+    output.resize(outputTensorInfo.GetNumElements());
+    Concatenate<T>(workloadFactory, memoryManager,
+                   { inputTensorInfo, inputTensorInfo, inputTensorInfo },
+                   { input0.data(), input1.data(), input2.data() },
+                   outputTensorInfo,
+                   output.data(),
+                   dimension,
+                   useSubtensor);
+
+    result.output = MakeTensor<T, 3>(outputTensorInfo, output);
+    return result;
+}
+
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
+LayerTestResult<T, 3> Concat3dDim0TestImpl(
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    TensorInfo outputTensorInfo({ 6, 3, 2 }, ArmnnType, qScale, qOffset);
+
+    LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
+        workloadFactory, memoryManager, outputTensorInfo, 0, true, qScale, qOffset);
+
+    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f,
+
+            // Batch 0, Channel 1
+            3.0f, 4.0f,
+
+            // Batch 0, Channel 2
+            5.0f, 6.0f,
+
+            // Batch 1, Channel 0
+            19.0f, 20.0f,
+
+            // Batch 1, Channel 1
+            21.0f, 22.0f,
+
+            // Batch 1, Channel 2
+            23.0f, 24.0f,
+
+            // Batch 2, Channel 0
+            7.0f, 8.0f,
+
+            // Batch 2, Channel 1
+            9.0f, 10.0f,
+
+            // Batch 2, Channel 2
+            11.0f, 12.0f,
+
+            // Batch 3, Channel 0
+            25.0f, 26.0f,
+
+            // Batch 3, Channel 1
+            27.0f, 28.0f,
+
+            // Batch 3, Channel 2
+            29.0f, 30.0f,
+
+            // Batch 4, Channel 0
+            13.0f, 14.0f,
+
+            // Batch 4, Channel 1
+            15.0f, 16.0f,
+
+            // Batch 4, Channel 2
+            17.0f, 18.0f,
+
+            // Batch 5, Channel 0
+            31.0f, 32.0f,
+
+            // Batch 5, Channel 1
+            33.0f, 34.0f,
+
+            // Batch 5, Channel 2
+            35.0f, 36.0f
+        },
+        qScale, qOffset));
+
+    return result;
+}
+
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
+LayerTestResult<T, 3> Concat3dDim1TestImpl(
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    TensorInfo outputTensorInfo({ 2, 9, 2 }, ArmnnType, qScale, qOffset);
+
+    LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
+        workloadFactory, memoryManager, outputTensorInfo, 1, true, qScale, qOffset);
+
+    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f,
+
+            // Batch 0, Channel 1
+            3.0f, 4.0f,
+
+            // Batch 0, Channel 2
+            5.0f, 6.0f,
+
+            // Batch 0, Channel 3
+            7.0f, 8.0f,
+
+            // Batch 0, Channel 4
+            9.0f, 10.0f,
+
+            // Batch 0, Channel 5
+            11.0f, 12.0f,
+
+            // Batch 0, Channel 6
+            13.0f, 14.0f,
+
+            // Batch 0, Channel 7
+            15.0f, 16.0f,
+
+            // Batch 0, Channel 8
+            17.0f, 18.0f,
+
+            // Batch 1, Channel 0
+            19.0f, 20.0f,
+
+            // Batch 1, Channel 1
+            21.0f, 22.0f,
+
+            // Batch 1, Channel 2
+            23.0f, 24.0f,
+
+            // Batch 1, Channel 3
+            25.0f, 26.0f,
+
+            // Batch 1, Channel 4
+            27.0f, 28.0f,
+
+            // Batch 1, Channel 5
+            29.0f, 30.0f,
+
+            // Batch 1, Channel 6
+            31.0f, 32.0f,
+
+            // Batch 1, Channel 7
+            33.0f, 34.0f,
+
+            // Batch 1, Channel 8
+            35.0f, 36.0f
+        },
+        qScale, qOffset));
+
+    return result;
+}
+
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
+LayerTestResult<T, 3> Concat3dDim2TestImpl(
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    bool useSubtensor,
+    float qScale,
+    int32_t qOffset)
+{
+    TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType, qScale, qOffset);
+
+    LayerTestResult<T, 3> result = Concat3dTestImpl<ArmnnType>(
+        workloadFactory, memoryManager, outputTensorInfo, 2, useSubtensor, qScale, qOffset);
+
+    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f, 7.0f, 8.0f, 13.0f, 14.0f,
+
+            // Batch 0, Channel 1
+            3.0f, 4.0f, 9.0f, 10.0f, 15.0f, 16.0f,
+
+            // Batch 0, Channel 2
+            5.0f, 6.0f, 11.0f, 12.0f, 17.0f, 18.0f,
+
+            // Batch 1, Channel 0
+            19.0f, 20.0f, 25.0f, 26.0f, 31.0f, 32.0f,
+
+            // Batch 1, Channel 1
+            21.0f, 22.0f, 27.0f, 28.0f, 33.0f, 34.0f,
+
+            // Batch 1, Channel 2
+            23.0f, 24.0f, 29.0f, 30.0f, 35.0f, 36.0f,
+        },
+        qScale, qOffset));
+
+    return result;
+}
+
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
+LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    float qScale,
+    int32_t qOffset)
+{
+    TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType);
+    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f,
+
+            // Batch 0, Channel 1
+            3.0f, 4.0f,
+
+            // Batch 0, Channel 2
+            5.0f, 6.0f,
+
+            // Batch 1, Channel 0
+            19.0f, 20.0f,
+
+            // Batch 1, Channel 1
+            21.0f, 22.0f,
+
+            // Batch 1, Channel 2
+            23.0f, 24.0f
+        },
+        qScale, qOffset));
+
+    TensorInfo input1TensorInfo({ 1, 3, 2 }, ArmnnType);
+    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            7.0f, 8.0f,
+
+            // Batch 0, Channel 1
+            9.0f, 10.0f,
+
+            // Batch 0, Channel 2
+            11.0f, 12.0f,
+        },
+        qScale, qOffset));
+
+    TensorInfo input2TensorInfo({ 3, 3, 2 }, ArmnnType);
+    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(
+        {
             // Batch 0, Channel 0
             25.0f, 26.0f,
 
@@ -1011,9 +1060,10 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
 
             // Batch 2, Channel 2
             35.0f, 36.0f
-    }));
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo outputTensorInfo({ 6, 3, 2 }, ArmnnType);
+    TensorInfo outputTensorInfo({ 6, 3, 2 }, ArmnnType);
     LayerTestResult<T, 3> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -1027,130 +1077,138 @@ LayerTestResult<T, 3> Concat3dDim0DiffInputDimsTestImpl(
                    true);
 
     result.output = MakeTensor<T, 3>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f,
+    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f,
 
-        // Batch 0, Channel 1
-        3.0f, 4.0f,
+            // Batch 0, Channel 1
+            3.0f, 4.0f,
 
-        // Batch 0, Channel 2
-        5.0f, 6.0f,
+            // Batch 0, Channel 2
+            5.0f, 6.0f,
 
-        // Batch 1, Channel 0
-        19.0f, 20.0f,
+            // Batch 1, Channel 0
+            19.0f, 20.0f,
 
-        // Batch 1, Channel 1
-        21.0f, 22.0f,
+            // Batch 1, Channel 1
+            21.0f, 22.0f,
 
-        // Batch 1, Channel 2
-        23.0f, 24.0f,
+            // Batch 1, Channel 2
+            23.0f, 24.0f,
 
-        // Batch 2, Channel 0
-        7.0f, 8.0f,
+            // Batch 2, Channel 0
+            7.0f, 8.0f,
 
-        // Batch 2, Channel 1
-        9.0f, 10.0f,
+            // Batch 2, Channel 1
+            9.0f, 10.0f,
 
-        // Batch 2, Channel 2
-        11.0f, 12.0f,
+            // Batch 2, Channel 2
+            11.0f, 12.0f,
 
-        // Batch 3, Channel 0
-        25.0f, 26.0f,
+            // Batch 3, Channel 0
+            25.0f, 26.0f,
 
-        // Batch 3, Channel 1
-        27.0f, 28.0f,
+            // Batch 3, Channel 1
+            27.0f, 28.0f,
 
-        // Batch 3, Channel 2
-        29.0f, 30.0f,
+            // Batch 3, Channel 2
+            29.0f, 30.0f,
 
-        // Batch 4, Channel 0
-        13.0f, 14.0f,
+            // Batch 4, Channel 0
+            13.0f, 14.0f,
 
-        // Batch 4, Channel 1
-        15.0f, 16.0f,
+            // Batch 4, Channel 1
+            15.0f, 16.0f,
 
-        // Batch 4, Channel 2
-        17.0f, 18.0f,
+            // Batch 4, Channel 2
+            17.0f, 18.0f,
 
-        // Batch 5, Channel 0
-        31.0f, 32.0f,
+            // Batch 5, Channel 0
+            31.0f, 32.0f,
 
-        // Batch 5, Channel 1
-        33.0f, 34.0f,
+            // Batch 5, Channel 1
+            33.0f, 34.0f,
 
-        // Batch 5, Channel 2
-        35.0f, 36.0f
-    }));
+            // Batch 5, Channel 2
+            35.0f, 36.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 3> Concat3dDim1DiffInputDimsTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f,
+    TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
+    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f,
 
-        // Batch 0, Channel 1
-        3.0f, 4.0f,
+            // Batch 0, Channel 1
+            3.0f, 4.0f,
 
-        // Batch 0, Channel 2
-        5.0f, 6.0f,
+            // Batch 0, Channel 2
+            5.0f, 6.0f,
 
-        // Batch 1, Channel 0
-        19.0f, 20.0f,
+            // Batch 1, Channel 0
+            19.0f, 20.0f,
 
-        // Batch 1, Channel 1
-        21.0f, 22.0f,
+            // Batch 1, Channel 1
+            21.0f, 22.0f,
 
-        // Batch 1, Channel 2
-        23.0f, 24.0f
-    }));
+            // Batch 1, Channel 2
+            23.0f, 24.0f
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input1TensorInfo({ 2, 4, 2 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        7.0f, 8.0f,
+    TensorInfo input1TensorInfo({ 2, 4, 2 }, ArmnnType, qScale, qOffset);
+    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            7.0f, 8.0f,
 
-        // Batch 0, Channel 1
-        9.0f, 10.0f,
+            // Batch 0, Channel 1
+            9.0f, 10.0f,
 
-        // Batch 0, Channel 2
-        11.0f, 12.0f,
+            // Batch 0, Channel 2
+            11.0f, 12.0f,
 
-        // Batch 0, Channel 3
-        25.0f, 26.0f,
+            // Batch 0, Channel 3
+            25.0f, 26.0f,
 
-        // Batch 1, Channel 0
-        27.0f, 28.0f,
+            // Batch 1, Channel 0
+            27.0f, 28.0f,
 
-        // Batch 1, Channel 1
-        29.0f, 30.0f,
+            // Batch 1, Channel 1
+            29.0f, 30.0f,
 
-        // Batch 1, Channel 2
-        13.0f, 14.0f,
+            // Batch 1, Channel 2
+            13.0f, 14.0f,
 
-        // Batch 1, Channel 3
-        15.0f, 16.0f,
-    }));
+            // Batch 1, Channel 3
+            15.0f, 16.0f,
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input2TensorInfo({ 2, 1, 2 }, ArmnnType, qScale, qOffset);
-    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        17.0f, 18.0f,
+    TensorInfo input2TensorInfo({ 2, 1, 2 }, ArmnnType, qScale, qOffset);
+    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            17.0f, 18.0f,
 
-        // Batch 1, Channel 0
-        31.0f, 32.0f,
-    }));
+            // Batch 1, Channel 0
+            31.0f, 32.0f,
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo outputTensorInfo({ 2, 8, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 2, 8, 2 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 3> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -1164,131 +1222,139 @@ LayerTestResult<T, 3> Concat3dDim1DiffInputDimsTestImpl(
                    true);
 
     result.output = MakeTensor<T, 3>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f,
+    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f,
 
-        // Batch 0, Channel 1
-        3.0f, 4.0f,
+            // Batch 0, Channel 1
+            3.0f, 4.0f,
 
-        // Batch 0, Channel 2
-        5.0f, 6.0f,
+            // Batch 0, Channel 2
+            5.0f, 6.0f,
 
-        // Batch 0, Channel 3
-        7.0f, 8.0f,
+            // Batch 0, Channel 3
+            7.0f, 8.0f,
 
-        // Batch 0, Channel 4
-        9.0f, 10.0f,
+            // Batch 0, Channel 4
+            9.0f, 10.0f,
 
-        // Batch 0, Channel 5
-        11.0f, 12.0f,
+            // Batch 0, Channel 5
+            11.0f, 12.0f,
 
-        // Batch 0, Channel 6
-        25.0f, 26.0f,
+            // Batch 0, Channel 6
+            25.0f, 26.0f,
 
-        // Batch 0, Channel 7
-        17.0f, 18.0f,
+            // Batch 0, Channel 7
+            17.0f, 18.0f,
 
-        // Batch 1, Channel 0
-        19.0f, 20.0f,
+            // Batch 1, Channel 0
+            19.0f, 20.0f,
 
-        // Batch 1, Channel 1
-        21.0f, 22.0f,
+            // Batch 1, Channel 1
+            21.0f, 22.0f,
 
-        // Batch 1, Channel 2
-        23.0f, 24.0f,
+            // Batch 1, Channel 2
+            23.0f, 24.0f,
 
-        // Batch 1, Channel 3
-        27.0f, 28.0f,
+            // Batch 1, Channel 3
+            27.0f, 28.0f,
 
-        // Batch 1, Channel 4
-        29.0f, 30.0f,
+            // Batch 1, Channel 4
+            29.0f, 30.0f,
 
-        // Batch 1, Channel 5
-        13.0f, 14.0f,
+            // Batch 1, Channel 5
+            13.0f, 14.0f,
 
-        // Batch 1, Channel 6
-        15.0f, 16.0f,
+            // Batch 1, Channel 6
+            15.0f, 16.0f,
 
-        // Batch 1, Channel 7
-        31.0f, 32.0f,
-    }));
+            // Batch 1, Channel 7
+            31.0f, 32.0f,
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 3> Concat3dDim2DiffInputDimsTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
-    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f,
+    TensorInfo input0TensorInfo({ 2, 3, 2 }, ArmnnType, qScale, qOffset);
+    auto input0 = MakeTensor<T, 3>(input0TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f,
 
-        // Batch 0, Channel 1
-        3.0f, 4.0f,
+            // Batch 0, Channel 1
+            3.0f, 4.0f,
 
-        // Batch 0, Channel 2
-        5.0f, 6.0f,
+            // Batch 0, Channel 2
+            5.0f, 6.0f,
 
-        // Batch 1, Channel 0
-        19.0f, 20.0f,
+            // Batch 1, Channel 0
+            19.0f, 20.0f,
 
-        // Batch 1, Channel 1
-        21.0f, 22.0f,
+            // Batch 1, Channel 1
+            21.0f, 22.0f,
 
-        // Batch 1, Channel 2
-        23.0f, 24.0f
-    }));
+            // Batch 1, Channel 2
+            23.0f, 24.0f
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input1TensorInfo({ 2, 3, 1 }, ArmnnType, qScale, qOffset);
-    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        7.0f,
+    TensorInfo input1TensorInfo({ 2, 3, 1 }, ArmnnType, qScale, qOffset);
+    auto input1 = MakeTensor<T, 3>(input1TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            7.0f,
 
-        // Batch 0, Channel 1
-        9.0f,
+            // Batch 0, Channel 1
+            9.0f,
 
-        // Batch 0, Channel 2
-        11.0f,
+            // Batch 0, Channel 2
+            11.0f,
 
-        // Batch 1, Channel 0
-        25.0f,
+            // Batch 1, Channel 0
+            25.0f,
 
-        // Batch 1, Channel 1
-        27.0f,
+            // Batch 1, Channel 1
+            27.0f,
 
-        // Batch 1, Channel 2
-        29.0f
-    }));
+            // Batch 1, Channel 2
+            29.0f
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo input2TensorInfo({ 2, 3, 3 }, ArmnnType, qScale, qOffset);
-    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        13.0f, 14.0f, 50.0f,
+    TensorInfo input2TensorInfo({ 2, 3, 3 }, ArmnnType, qScale, qOffset);
+    auto input2 = MakeTensor<T, 3>(input2TensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            13.0f, 14.0f, 50.0f,
 
-        // Batch 0, Channel 1
-        15.0f, 16.0f, 51.0f,
+            // Batch 0, Channel 1
+            15.0f, 16.0f, 51.0f,
 
-        // Batch 0, Channel 2
-        17.0f, 18.0f, 52.0f,
+            // Batch 0, Channel 2
+            17.0f, 18.0f, 52.0f,
 
-        // Batch 1, Channel 0
-        31.0f, 32.0f, 53.0f,
+            // Batch 1, Channel 0
+            31.0f, 32.0f, 53.0f,
 
-        // Batch 1, Channel 1
-        33.0f, 34.0f, 54.0f,
+            // Batch 1, Channel 1
+            33.0f, 34.0f, 54.0f,
 
-        // Batch 1, Channel 2
-        35.0f, 36.0f, 55.0f,
-    }));
+            // Batch 1, Channel 2
+            35.0f, 36.0f, 55.0f,
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 2, 3, 6 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 3> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -1302,67 +1368,75 @@ LayerTestResult<T, 3> Concat3dDim2DiffInputDimsTestImpl(
                    useSubtensor);
 
     result.output = MakeTensor<T, 3>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        // Batch 0, Channel 0
-        1.0f, 2.0f, 7.0f, 13.0f, 14.0f, 50.0f,
+    result.outputExpected = MakeTensor<T, 3>(outputTensorInfo, QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0
+            1.0f, 2.0f, 7.0f, 13.0f, 14.0f, 50.0f,
 
-        // Batch 0, Channel 1
-        3.0f, 4.0f, 9.0f, 15.0f, 16.0f, 51.0f,
+            // Batch 0, Channel 1
+            3.0f, 4.0f, 9.0f, 15.0f, 16.0f, 51.0f,
 
-        // Batch 0, Channel 2
-        5.0f, 6.0f, 11.0f, 17.0f, 18.0f, 52.0f,
+            // Batch 0, Channel 2
+            5.0f, 6.0f, 11.0f, 17.0f, 18.0f, 52.0f,
 
-        // Batch 1, Channel 0
-        19.0f, 20.0f, 25.0f, 31.0f, 32.0f, 53.0f,
+            // Batch 1, Channel 0
+            19.0f, 20.0f, 25.0f, 31.0f, 32.0f, 53.0f,
 
-        // Batch 1, Channel 1
-        21.0f, 22.0f, 27.0f, 33.0f, 34.0f, 54.0f,
+            // Batch 1, Channel 1
+            21.0f, 22.0f, 27.0f, 33.0f, 34.0f, 54.0f,
 
-        // Batch 1, Channel 2
-        23.0f, 24.0f, 29.0f, 35.0f, 36.0f, 55.0f,
-    }));
+            // Batch 1, Channel 2
+            23.0f, 24.0f, 29.0f, 35.0f, 36.0f, 55.0f,
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::TensorInfo& outputTensorInfo,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const TensorInfo& outputTensorInfo,
     unsigned int dimension,
     bool useSubtensor,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo inputTensorInfo({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputTensorInfo({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f
-    }));
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+             9.0f, 10.0f,
+            11.0f, 12.0f
+        },
+        qScale, qOffset));
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f,
-        19.0f, 20.0f,
-        21.0f, 22.0f
-    }));
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(
+        {
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f,
+            19.0f, 20.0f,
+            21.0f, 22.0f
+        },
+        qScale, qOffset));
 
-    auto input2 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        21.0f, 22.0f,
-        23.0f, 24.0f,
-        25.0f, 26.0f,
-        27.0f, 28.0f,
-        29.0f, 30.0f,
-        31.0f, 32.0f
-    }));
+    auto input2 = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(
+        {
+            21.0f, 22.0f,
+            23.0f, 24.0f,
+            25.0f, 26.0f,
+            27.0f, 28.0f,
+            29.0f, 30.0f,
+            31.0f, 32.0f
+        },
+        qScale, qOffset));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -1382,197 +1456,209 @@ LayerTestResult<T, 4> Concat4dTestImpl(
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dDim0TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result = Concat4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 0, true, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f,
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+             9.0f, 10.0f,
+            11.0f, 12.0f,
 
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f,
-        19.0f, 20.0f,
-        21.0f, 22.0f,
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f,
+            19.0f, 20.0f,
+            21.0f, 22.0f,
 
-        21.0f, 22.0f,
-        23.0f, 24.0f,
-        25.0f, 26.0f,
-        27.0f, 28.0f,
-        29.0f, 30.0f,
-        31.0f, 32.0f
-    }));
+            21.0f, 22.0f,
+            23.0f, 24.0f,
+            25.0f, 26.0f,
+            27.0f, 28.0f,
+            29.0f, 30.0f,
+            31.0f, 32.0f
+        },
+        qScale, qOffset));
+
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dDim1TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 1, 9, 2, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 1, 9, 2, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result = Concat4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 1, true, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f,
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+             9.0f, 10.0f,
+            11.0f, 12.0f,
 
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f,
-        19.0f, 20.0f,
-        21.0f, 22.0f,
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f,
+            19.0f, 20.0f,
+            21.0f, 22.0f,
 
-        21.0f, 22.0f,
-        23.0f, 24.0f,
-        25.0f, 26.0f,
-        27.0f, 28.0f,
-        29.0f, 30.0f,
-        31.0f, 32.0f
-    }));
+            21.0f, 22.0f,
+            23.0f, 24.0f,
+            25.0f, 26.0f,
+            27.0f, 28.0f,
+            29.0f, 30.0f,
+            31.0f, 32.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dDim2TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 6, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 1, 3, 6, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result = Concat4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 2, true, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        21.0f, 22.0f,
-        23.0f, 24.0f,
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            21.0f, 22.0f,
+            23.0f, 24.0f,
 
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f,
-        25.0f, 26.0f,
-        27.0f, 28.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f,
+            25.0f, 26.0f,
+            27.0f, 28.0f,
 
-        9.0f, 10.0f,
-        11.0f, 12.0f,
-        19.0f, 20.0f,
-        21.0f, 22.0f,
-        29.0f, 30.0f,
-        31.0f, 32.0f
-    }));
+             9.0f, 10.0f,
+            11.0f, 12.0f,
+            19.0f, 20.0f,
+            21.0f, 22.0f,
+            29.0f, 30.0f,
+            31.0f, 32.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dDim3TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset,
     bool useSubtensor)
 {
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 2, 6 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 1, 3, 2, 6 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result = Concat4dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, outputTensorInfo, 3, useSubtensor, qScale, qOffset);
 
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        11.0f, 12.0f,
-        21.0f, 22.0f,
-        3.0f, 4.0f,
-        13.0f, 14.0f,
-        23.0f, 24.0f,
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+            11.0f, 12.0f,
+            21.0f, 22.0f,
+             3.0f,  4.0f,
+            13.0f, 14.0f,
+            23.0f, 24.0f,
 
-        5.0f, 6.0f,
-        15.0f, 16.0f,
-        25.0f, 26.0f,
-        7.0f, 8.0f,
-        17.0f, 18.0f,
-        27.0f, 28.0f,
+             5.0f,  6.0f,
+            15.0f, 16.0f,
+            25.0f, 26.0f,
+             7.0f,  8.0f,
+            17.0f, 18.0f,
+            27.0f, 28.0f,
 
-        9.0f, 10.0f,
-        19.0f, 20.0f,
-        29.0f, 30.0f,
-        11.0f, 12.0f,
-        21.0f, 22.0f,
-        31.0f, 32.0f
-    }));
+             9.0f, 10.0f,
+            19.0f, 20.0f,
+            29.0f, 30.0f,
+            11.0f, 12.0f,
+            21.0f, 22.0f,
+            31.0f, 32.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dDiffShapeDim0TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    unsigned int dimension = 0;
-    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    constexpr unsigned int dimension = 0u;
 
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f
-    }));
+    TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+             9.0f, 10.0f,
+            11.0f, 12.0f
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo inputTensorInfo1({ 2, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputTensorInfo1({ 2, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f,
-        19.0f, 20.0f,
-        21.0f, 22.0f,
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(
+        {
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f,
+            19.0f, 20.0f,
+            21.0f, 22.0f,
 
-        21.0f, 22.0f,
-        23.0f, 24.0f,
-        25.0f, 26.0f,
-        27.0f, 28.0f,
-        29.0f, 30.0f,
-        31.0f, 32.0f
+            21.0f, 22.0f,
+            23.0f, 24.0f,
+            25.0f, 26.0f,
+            27.0f, 28.0f,
+            29.0f, 30.0f,
+            31.0f, 32.0f
+        },
+        qScale, qOffset));
 
-    }));
-
-    armnn::TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 3, 3, 2, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -1588,62 +1674,67 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim0TestImpl(
                    true);
 
     result.output = MakeTensor<T, 4>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f,
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+        {
+             1.0f, 2.0f,
+             3.0f, 4.0f,
+             5.0f, 6.0f,
+             7.0f, 8.0f,
+             9.0f, 10.0f,
+            11.0f, 12.0f,
 
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f,
-        19.0f, 20.0f,
-        21.0f, 22.0f,
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f,
+            19.0f, 20.0f,
+            21.0f, 22.0f,
 
-        21.0f, 22.0f,
-        23.0f, 24.0f,
-        25.0f, 26.0f,
-        27.0f, 28.0f,
-        29.0f, 30.0f,
-        31.0f, 32.0f
-    }));
+            21.0f, 22.0f,
+            23.0f, 24.0f,
+            25.0f, 26.0f,
+            27.0f, 28.0f,
+            29.0f, 30.0f,
+            31.0f, 32.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dDiffShapeDim1TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    unsigned int dimension = 1;
-    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    constexpr unsigned int dimension = 1u;
 
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f
-    }));
+    TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+             9.0f, 10.0f,
+            11.0f, 12.0f
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputTensorInfo1({ 1, 2, 2, 2 }, ArmnnType, qScale, qOffset);
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f,
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(
+        {
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f,
+        },
+        qScale, qOffset));
 
-    }));
-
-    armnn::TensorInfo outputTensorInfo({ 1, 5, 2, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 1, 5, 2, 2 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -1659,57 +1750,61 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim1TestImpl(
                    true);
 
     result.output = MakeTensor<T, 4>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f,
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f
-    }));
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+             9.0f, 10.0f,
+            11.0f, 12.0f,
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dDiffShapeDim2TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset)
 {
-    unsigned int dimension = 2;
-    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    constexpr unsigned int dimension = 2u;
 
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f
-    }));
+    TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(
+        {
+             1.0f, 2.0f,
+             3.0f, 4.0f,
+             5.0f, 6.0f,
+             7.0f, 8.0f,
+            9.0f, 10.0f,
+            11.0f, 12.0f
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo inputTensorInfo1({ 1, 3, 3, 2 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputTensorInfo1({ 1, 3, 3, 2 }, ArmnnType, qScale, qOffset);
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(
+        {
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
+            17.0f, 18.0f,
+            19.0f, 20.0f,
+            21.0f, 22.0f,
+            23.0f, 24.0f,
+            25.0f, 26.0f,
+            27.0f, 28.0f
+        },
+        qScale, qOffset));
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
-        17.0f, 18.0f,
-        19.0f, 20.0f,
-        21.0f, 22.0f,
-        23.0f, 24.0f,
-        25.0f, 26.0f,
-        27.0f, 28.0f
-    }));
-
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 5, 2 }, ArmnnType, qScale, qOffset);
-
+    TensorInfo outputTensorInfo({ 1, 3, 5, 2 }, ArmnnType, qScale, qOffset);
     LayerTestResult<T, 4> result(outputTensorInfo);
 
     std::vector<T> output;
@@ -1723,64 +1818,69 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim2TestImpl(
                    dimension,
                    true);
 
-    result.output = MakeTensor<T, 4>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        11.0f, 12.0f,
-        13.0f, 14.0f,
-        15.0f, 16.0f,
+    result.output         = MakeTensor<T, 4>(outputTensorInfo, output);
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+            11.0f, 12.0f,
+            13.0f, 14.0f,
+            15.0f, 16.0f,
 
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        17.0f, 18.0f,
-        19.0f, 20.0f,
-        21.0f, 22.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+            17.0f, 18.0f,
+            19.0f, 20.0f,
+            21.0f, 22.0f,
 
-        9.0f, 10.0f,
-        11.0f, 12.0f,
-        23.0f, 24.0f,
-        25.0f, 26.0f,
-        27.0f, 28.0f
-    }));
+             9.0f, 10.0f,
+            11.0f, 12.0f,
+            23.0f, 24.0f,
+            25.0f, 26.0f,
+            27.0f, 28.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 4> Concat4dDiffShapeDim3TestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     float qScale,
     int32_t qOffset,
     bool useSubtensor)
 {
-    unsigned int dimension = 3;
-    armnn::TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    constexpr unsigned int dimension = 3u;
 
-    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f,
-        3.0f, 4.0f,
-        5.0f, 6.0f,
-        7.0f, 8.0f,
-        9.0f, 10.0f,
-        11.0f, 12.0f
-    }));
+    TensorInfo inputTensorInfo0({ 1, 3, 2, 2 }, ArmnnType, qScale, qOffset);
+    auto input0 = MakeTensor<T, 4>(inputTensorInfo0, QuantizedVector<T>(
+        {
+             1.0f,  2.0f,
+             3.0f,  4.0f,
+             5.0f,  6.0f,
+             7.0f,  8.0f,
+             9.0f, 10.0f,
+            11.0f, 12.0f
+        },
+        qScale, qOffset));
 
-    armnn::TensorInfo inputTensorInfo1({ 1, 3, 2, 3 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputTensorInfo1({ 1, 3, 2, 3 }, ArmnnType, qScale, qOffset);
+    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(
+        {
+            11.0f, 12.0f, 13.0f,
+            14.0f, 15.0f, 16.0f,
 
-    auto input1 = MakeTensor<T, 4>(inputTensorInfo1, QuantizedVector<T>(qScale, qOffset, {
-        11.0f, 12.0f, 13.0f,
-        14.0f, 15.0f, 16.0f,
+            17.0f, 18.0f, 19.0f,
+            20.0f, 21.0f, 22.0f,
 
-        17.0f, 18.0f, 19.0f,
-        20.0f, 21.0f, 22.0f,
+            23.0f, 24.0f, 25.0f,
+            26.0f, 27.0f, 28.0f
+        },
+        qScale, qOffset));
 
-        23.0f, 24.0f, 25.0f,
-        26.0f, 27.0f, 28.0f
-    }));
-
-    armnn::TensorInfo outputTensorInfo({ 1, 3, 2, 5 }, ArmnnType, qScale, qOffset);
+    TensorInfo outputTensorInfo({ 1, 3, 2, 5 }, ArmnnType, qScale, qOffset);
 
     LayerTestResult<T, 4> result(outputTensorInfo);
 
@@ -1796,30 +1896,32 @@ LayerTestResult<T, 4> Concat4dDiffShapeDim3TestImpl(
                    useSubtensor);
 
     result.output = MakeTensor<T, 4>(outputTensorInfo, output);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, {
-        1.0f, 2.0f, 11.0f, 12.0f, 13.0f,
-        3.0f, 4.0f, 14.0f, 15.0f, 16.0f,
-        5.0f, 6.0f, 17.0f, 18.0f, 19.0f,
-        7.0f, 8.0f, 20.0f, 21.0f, 22.0f,
-        9.0f, 10.0f, 23.0f, 24.0f, 25.0f,
-        11.0f, 12.0f, 26.0f, 27.0f, 28.0f
-    }));
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
+        {
+            1.0f, 2.0f, 11.0f, 12.0f, 13.0f,
+            3.0f, 4.0f, 14.0f, 15.0f, 16.0f,
+            5.0f, 6.0f, 17.0f, 18.0f, 19.0f,
+            7.0f, 8.0f, 20.0f, 21.0f, 22.0f,
+            9.0f, 10.0f, 23.0f, 24.0f, 25.0f,
+            11.0f, 12.0f, 26.0f, 27.0f, 28.0f
+        },
+        qScale, qOffset));
 
     return result;
 }
 
-template<armnn::DataType ArmnnType, typename T>
+template<DataType ArmnnType, typename T>
 LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
     // Defines the tensor descriptors.
-    armnn::TensorInfo outputTensorInfo({ 3, 6, 3 }, ArmnnType);
-    armnn::TensorInfo inputTensorInfo1({ 3, 6, 2 }, ArmnnType);
-    armnn::TensorInfo inputTensorInfo2({ 3, 6, 1 }, ArmnnType);
+    TensorInfo outputTensorInfo({ 3, 6, 3 }, ArmnnType);
+    TensorInfo inputTensorInfo1({ 3, 6, 2 }, ArmnnType);
+    TensorInfo inputTensorInfo2({ 3, 6, 1 }, ArmnnType);
 
-    std::vector<armnn::TensorShape> inputTensorShapes({inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()});
+    std::vector<TensorShape> inputTensorShapes({inputTensorInfo1.GetShape(), inputTensorInfo2.GetShape()});
 
     // Quantized input1 tensor.
     const float inputScale1 = 0.5f;
@@ -1894,31 +1996,31 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
     inputTensorInfo2.SetQuantizationOffset(inputOffset2);
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
-    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
+    ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = { 0, 0, 2 }; //Extent of the window is defined by size of input[1].
-    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
+    ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = useSubtensor && workloadFactory.SupportsSubTensors();
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 =
+    std::unique_ptr<ITensorHandle> inputHandle1 =
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo1);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 =
+    std::unique_ptr<ITensorHandle> inputHandle2 =
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
-    armnn::ConcatQueueDescriptor data;
-    armnn::OriginsDescriptor desc = armnn::CreateDescriptorForConcatenation(
+    ConcatQueueDescriptor data;
+    OriginsDescriptor desc = CreateDescriptorForConcatenation(
             inputTensorShapes.begin(),inputTensorShapes.end(), 2);
     data.m_Parameters = desc;
 
-    armnn::WorkloadInfo info;
+    WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
@@ -1926,7 +2028,7 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -1947,16 +2049,16 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
 // Explicit template specializations
 //
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedAsymm8>, 3>
-ConcatDifferentInputOutputQParamTest<armnn::DataType::QuantisedAsymm8>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+template LayerTestResult<ResolveType<DataType::QuantisedAsymm8>, 3>
+ConcatDifferentInputOutputQParamTest<DataType::QuantisedAsymm8>(
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::QuantisedSymm16>, 3>
-ConcatDifferentInputOutputQParamTest<armnn::DataType::QuantisedSymm16>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+template LayerTestResult<ResolveType<DataType::QuantisedSymm16>, 3>
+ConcatDifferentInputOutputQParamTest<DataType::QuantisedSymm16>(
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor);
 
 //
@@ -1964,8 +2066,8 @@ ConcatDifferentInputOutputQParamTest<armnn::DataType::QuantisedSymm16>(
 //
 
 LayerTestResult<float,3> ConcatTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -1980,9 +2082,9 @@ LayerTestResult<float,3> ConcatTest(
     unsigned int inputChannels2 = 1;
 
     // Define the tensor descriptors.
-    armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::Float32);
-    armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::Float32);
-    armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::Float32);
+    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::Float32);
+    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::Float32);
+    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::Float32);
 
     LayerTestResult<float,3> ret(outputTensorInfo);
 
@@ -2041,27 +2143,27 @@ LayerTestResult<float,3> ConcatTest(
     );
 
     std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //Extent of the window is defined by size of input[0].
-    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
+    ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = {2, 0, 0}; //Extent of the window is defined by size of input[1].
-    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
+    ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 =
+    std::unique_ptr<ITensorHandle> inputHandle1 =
         subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo1);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2  =
+    std::unique_ptr<ITensorHandle> inputHandle2  =
         subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
-    armnn::ConcatQueueDescriptor data;
-    armnn::WorkloadInfo info;
+    ConcatQueueDescriptor data;
+    WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
@@ -2069,7 +2171,7 @@ LayerTestResult<float,3> ConcatTest(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -2087,156 +2189,156 @@ LayerTestResult<float,3> ConcatTest(
 }
 
 LayerTestResult<float, 1> Concat1dTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat1dTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat1dTestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 2> Concat2dDim0Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim0TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat2dDim0TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 2> Concat2dDim1Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim1TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat2dDim1TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 2> Concat2dDim0DiffInputDimsTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim0DiffInputDimsTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat2dDim0DiffInputDimsTestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 2> Concat2dDim1DiffInputDimsTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim1DiffInputDimsTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat2dDim1DiffInputDimsTestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 3> Concat3dDim0Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim0TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat3dDim0TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 3> Concat3dDim1Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim1TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat3dDim1TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 3> Concat3dDim2Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat3dDim2TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, useSubtensor, 0.0f, 0);
+    return Concat3dDim2TestImpl<DataType::Float32>(workloadFactory, memoryManager, useSubtensor, 0.0f, 0);
 }
 
 LayerTestResult<float, 3> Concat3dDim0DiffInputDimsTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim0DiffInputDimsTestImpl<armnn::DataType::Float32>(
+    return Concat3dDim0DiffInputDimsTestImpl<DataType::Float32>(
         workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 3> Concat3dDim1DiffInputDimsTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim1DiffInputDimsTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat3dDim1DiffInputDimsTestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 3> Concat3dDim2DiffInputDimsTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat3dDim2DiffInputDimsTestImpl<armnn::DataType::Float32>(
+    return Concat3dDim2DiffInputDimsTestImpl<DataType::Float32>(
         workloadFactory, memoryManager, useSubtensor, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> Concat4dDim0Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim0TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat4dDim0TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> Concat4dDim1Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim1TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat4dDim1TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> Concat4dDim2Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim2TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat4dDim2TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> Concat4dDim3Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat4dDim3TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0, useSubtensor);
+    return Concat4dDim3TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0, useSubtensor);
 }
 
 LayerTestResult<float, 4> Concat4dDiffShapeDim0Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim0TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat4dDiffShapeDim0TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> Concat4dDiffShapeDim1Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim1TestImpl<armnn::DataType::Float32>(
+    return Concat4dDiffShapeDim1TestImpl<DataType::Float32>(
         workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> Concat4dDiffShapeDim2Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim2TestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat4dDiffShapeDim2TestImpl<DataType::Float32>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<float, 4> Concat4dDiffShapeDim3Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat4dDiffShapeDim3TestImpl<armnn::DataType::Float32>(
+    return Concat4dDiffShapeDim3TestImpl<DataType::Float32>(
         workloadFactory, memoryManager, 0.0f, 0, useSubtensor);
 }
 
-LayerTestResult<armnn::Half, 3> ConcatFloat16Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+LayerTestResult<Half, 3> ConcatFloat16Test(
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim1TestImpl<armnn::DataType::Float16>(workloadFactory, memoryManager, 0.0f, 0);
+    return Concat3dDim1TestImpl<DataType::Float16>(workloadFactory, memoryManager, 0.0f, 0);
 }
 
 LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -2251,9 +2353,9 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     unsigned int inputChannels2 = 1;
 
     // Defines the tensor descriptors.
-    armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedAsymm8);
+    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QuantisedAsymm8);
+    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QuantisedAsymm8);
+    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QuantisedAsymm8);
 
     // Quantized input1 tensor. Range [-3, 1]
     const float inputScale1 = 0.015686f;
@@ -2332,27 +2434,27 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     inputTensorInfo2.SetQuantizationOffset(inputOffset2);
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
-    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
+    ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
-    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
+    ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 =
+    std::unique_ptr<ITensorHandle> inputHandle1 =
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo1);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 =
+    std::unique_ptr<ITensorHandle> inputHandle2 =
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
-    armnn::ConcatQueueDescriptor data;
-    armnn::WorkloadInfo info;
+    ConcatQueueDescriptor data;
+    WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
@@ -2360,7 +2462,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -2378,8 +2480,8 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
 }
 
 LayerTestResult<uint8_t, 3> ConcatUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -2394,9 +2496,9 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     unsigned int inputChannels2 = 1;
 
     // Defines the tensor descriptors.
-    armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedAsymm8);
+    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QuantisedAsymm8);
+    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QuantisedAsymm8);
+    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QuantisedAsymm8);
 
     // Arbitrary scale and offsets. They don't really matter as the Concat operator doesn't dequantize/quantize them.
     const float scale = 0.13497836f;
@@ -2466,29 +2568,29 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     );
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
-    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
+    ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
-    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
+    ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
 
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 =
+    std::unique_ptr<ITensorHandle> inputHandle1 =
         subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo1);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 =
+    std::unique_ptr<ITensorHandle> inputHandle2 =
         subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
 
-    armnn::ConcatQueueDescriptor data;
-    armnn::WorkloadInfo info;
+    ConcatQueueDescriptor data;
+    WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
@@ -2496,7 +2598,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -2514,8 +2616,8 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
 }
 
 LayerTestResult<uint16_t, 3> ConcatUint16Test(
-        armnn::IWorkloadFactory& workloadFactory,
-        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+        IWorkloadFactory& workloadFactory,
+        const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     unsigned int outputWidth = 3;
     unsigned int outputHeight = 6;
@@ -2530,9 +2632,9 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     unsigned int inputChannels2 = 1;
 
     // Defines the tensor descriptors.
-    armnn::TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, armnn::DataType::QuantisedSymm16);
-    armnn::TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, armnn::DataType::QuantisedSymm16);
-    armnn::TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, armnn::DataType::QuantisedSymm16);
+    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::QuantisedSymm16);
+    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::QuantisedSymm16);
+    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::QuantisedSymm16);
 
     // Arbitrary scale and offsets. They don't really matter as the Concat operator doesn't dequantize/quantize them.
     const float scale = 0.13497836f;
@@ -2599,29 +2701,29 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     }));
 
     std::vector<unsigned int> wOrigin1 = { 0, 0, 0 }; //Extent of the window is defined by size of input[0].
-    armnn::ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
+    ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
 
     std::vector<unsigned int> wOrigin2 = { 2, 0, 0 }; //Extent of the window is defined by size of input[1].
-    armnn::ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
+    ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
 
 
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
 
     bool subTensorsSupported = workloadFactory.SupportsSubTensors();
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle1 =
+    std::unique_ptr<ITensorHandle> inputHandle1 =
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo1);
 
-    std::unique_ptr<armnn::ITensorHandle> inputHandle2 =
+    std::unique_ptr<ITensorHandle> inputHandle2 =
             subTensorsSupported ?
             workloadFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
             workloadFactory.CreateTensorHandle(inputTensorInfo2);
 
 
-    armnn::ConcatQueueDescriptor data;
-    armnn::WorkloadInfo info;
+    ConcatQueueDescriptor data;
+    WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
@@ -2629,7 +2731,7 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -2647,147 +2749,147 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
 }
 
 LayerTestResult<uint8_t, 1> Concat1dUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat1dTestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat1dTestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 2> Concat2dDim0Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim0TestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat2dDim0TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 2> Concat2dDim1Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim1TestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat2dDim1TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 2> Concat2dDim0DiffInputDimsUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim0DiffInputDimsTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat2dDim0DiffInputDimsTestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 2> Concat2dDim1DiffInputDimsUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat2dDim1DiffInputDimsTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat2dDim1DiffInputDimsTestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim0Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim0TestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat3dDim0TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim1Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim1TestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat3dDim1TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim2Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat3dDim2TestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat3dDim2TestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, useSubtensor, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim0DiffInputDimsUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim0TestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat3dDim0TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim1DiffInputDimsUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat3dDim1DiffInputDimsTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat3dDim1DiffInputDimsTestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 3> Concat3dDim2DiffInputDimsUint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat3dDim2DiffInputDimsTestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat3dDim2DiffInputDimsTestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, useSubtensor, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDim0Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim0TestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat4dDim0TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDim1Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim1TestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat4dDim1TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDim2Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDim2TestImpl<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
+    return Concat4dDim2TestImpl<DataType::QuantisedAsymm8>(workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDim3Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager, bool useSubtensor)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager, bool useSubtensor)
 {
-    return Concat4dDim3TestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat4dDim3TestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.5f, -1, useSubtensor);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDiffShapeDim0Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim0TestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat4dDiffShapeDim0TestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDiffShapeDim1Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim1TestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat4dDiffShapeDim1TestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDiffShapeDim2Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
-    return Concat4dDiffShapeDim2TestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat4dDiffShapeDim2TestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.5f, -1);
 }
 
 LayerTestResult<uint8_t, 4> Concat4dDiffShapeDim3Uint8Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    IWorkloadFactory& workloadFactory,
+    const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     bool useSubtensor)
 {
-    return Concat4dDiffShapeDim3TestImpl<armnn::DataType::QuantisedAsymm8>(
+    return Concat4dDiffShapeDim3TestImpl<DataType::QuantisedAsymm8>(
         workloadFactory, memoryManager, 0.5f, -1, useSubtensor);
 }

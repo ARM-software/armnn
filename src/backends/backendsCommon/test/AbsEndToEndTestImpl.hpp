@@ -7,6 +7,7 @@
 
 #include "CommonTestUtils.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -53,8 +54,8 @@ void AbsEndToEnd(const std::vector<armnn::BackendId>& backends)
     };
 
     // quantize data
-    std::vector<T> qInputData          = QuantizedVector<T>(qScale, qOffset, inputData);
-    std::vector<T> qExpectedOutputData = QuantizedVector<T>(qScale, qOffset, expectedOutputData);
+    std::vector<T> qInputData          = armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset);
+    std::vector<T> qExpectedOutputData = armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset);
 
     INetworkPtr network = CreateAbsNetwork(tensorInfo);
 

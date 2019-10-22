@@ -6,6 +6,7 @@
 #include "L2NormalizationTestImpl.hpp"
 
 #include <Permute.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 #include <TensorUtils.hpp>
 
@@ -44,10 +45,10 @@ LayerTestResult<T, 4> L2NormalizationTestImpl(
         inputData = tmp;
     }
 
-    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(
-                                                         inputTensorInfo.GetQuantizationScale(),
-                                                         inputTensorInfo.GetQuantizationOffset(),
-                                                         inputData));
+    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo,
+                                        armnnUtils::QuantizedVector<T>(inputData,
+                                                                       inputTensorInfo.GetQuantizationScale(),
+                                                                       inputTensorInfo.GetQuantizationOffset()));
 
     std::vector<float> expectedOutputData = expectedOutputValues;
     if (layout == armnn::DataLayout::NHWC)
@@ -59,10 +60,11 @@ LayerTestResult<T, 4> L2NormalizationTestImpl(
     }
 
     LayerTestResult<T, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(
-                                                               outputTensorInfo.GetQuantizationScale(),
-                                                               outputTensorInfo.GetQuantizationOffset(),
-                                                               expectedOutputData));
+    result.outputExpected =
+        MakeTensor<T, 4>(outputTensorInfo,
+                         armnnUtils::QuantizedVector<T>(expectedOutputData,
+                                                        outputTensorInfo.GetQuantizationScale(),
+                                                        outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -693,16 +695,10 @@ LayerTestResult<float, 2> L2Normalization2dShapeTest(
     const armnn::TensorInfo inputTensorInfo(inputOutputTensorShape, armnn::DataType::Float32, 0.f, 0);
     const armnn::TensorInfo outputTensorInfo(inputOutputTensorShape, armnn::DataType::Float32, 0.f, 0);
 
-    auto inputTensor = MakeTensor<float, 2>(inputTensorInfo, QuantizedVector<float>(
-                                                             inputTensorInfo.GetQuantizationScale(),
-                                                             inputTensorInfo.GetQuantizationOffset(),
-                                                             inputData));
+    auto inputTensor = MakeTensor<float, 2>(inputTensorInfo, inputData);
 
     LayerTestResult<float, 2> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<float, 2>(outputTensorInfo, QuantizedVector<float>(
-                                                                   outputTensorInfo.GetQuantizationScale(),
-                                                                   outputTensorInfo.GetQuantizationOffset(),
-                                                                   expectedOutputData));
+    result.outputExpected = MakeTensor<float, 2>(outputTensorInfo, expectedOutputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);

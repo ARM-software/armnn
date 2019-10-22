@@ -8,6 +8,7 @@
 #include "LayerTestResult.hpp"
 
 #include <Permute.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 #include <TensorUtils.hpp>
 
@@ -76,9 +77,10 @@ LayerTestResult<T, 4> ResizeBilinearNopTest(
         inputData = tmp;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = input;
@@ -174,15 +176,16 @@ LayerTestResult<T, 4> SimpleResizeBilinearTest(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputData));
+                                             armnnUtils::QuantizedVector<T>(outputData,
+                                                                            outputTensorInfo.GetQuantizationScale(),
+                                                                            outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr <armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -278,15 +281,16 @@ LayerTestResult<T, 4> ResizeBilinearSqMinTest(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputData));
+                                             armnnUtils::QuantizedVector<T>(outputData,
+                                                                            outputTensorInfo.GetQuantizationScale(),
+                                                                            outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr <armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -377,15 +381,16 @@ LayerTestResult<T, 4> ResizeBilinearMinTest(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputData));
+                                             armnnUtils::QuantizedVector<T>(outputData,
+                                                                            outputTensorInfo.GetQuantizationScale(),
+                                                                            outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -484,15 +489,16 @@ LayerTestResult<T, 4> ResizeBilinearMagTest(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputData));
+                                             armnnUtils::QuantizedVector<T>(outputData,
+                                                                            outputTensorInfo.GetQuantizationScale(),
+                                                                            outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr <armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -573,9 +579,10 @@ LayerTestResult<T, 4> ResizeNearestNeighborNopTest(
         inputData = tmp;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = input;
@@ -670,15 +677,16 @@ LayerTestResult<T, 4> SimpleResizeNearestNeighborTest(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputData));
+                                             armnnUtils::QuantizedVector<T>(outputData,
+                                                                            outputTensorInfo.GetQuantizationScale(),
+                                                                            outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr <armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -773,15 +781,16 @@ LayerTestResult<T, 4> ResizeNearestNeighborSqMinTest(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputData));
+                                             armnnUtils::QuantizedVector<T>(outputData,
+                                                                            outputTensorInfo.GetQuantizationScale(),
+                                                                            outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr <armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -871,15 +880,16 @@ LayerTestResult<T, 4> ResizeNearestNeighborMinTest(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputData));
+                                             armnnUtils::QuantizedVector<T>(outputData,
+                                                                            outputTensorInfo.GetQuantizationScale(),
+                                                                            outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -978,15 +988,16 @@ LayerTestResult<T, 4> ResizeNearestNeighborMagTest(
         outputData = tmp1;
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
     result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputData));
+                                             armnnUtils::QuantizedVector<T>(outputData,
+                                                                            outputTensorInfo.GetQuantizationScale(),
+                                                                            outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr <armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);

@@ -12,6 +12,8 @@
 #include "ParserPrototxtFixture.hpp"
 #include "ParserHelper.hpp"
 
+#include <QuantizeHelper.hpp>
+
 BOOST_AUTO_TEST_SUITE(TensorflowLiteParser)
 
 struct DetectionPostProcessFixture : ParserFlatbuffersFixture
@@ -200,8 +202,9 @@ BOOST_FIXTURE_TEST_CASE( ParseDetectionPostProcess, ParseDetectionPostProcessCus
 
     // Quantize inputs and outputs
     using QuantizedContainer = std::vector<uint8_t>;
-    QuantizedContainer quantBoxEncodings = QuantizedVector<uint8_t>(1.0f, 1, boxEncodings);
-    QuantizedContainer quantScores = QuantizedVector<uint8_t>(0.01f, 0, scores);
+
+    QuantizedContainer quantBoxEncodings = armnnUtils::QuantizedVector<uint8_t>(boxEncodings, 1.00f, 1);
+    QuantizedContainer quantScores       = armnnUtils::QuantizedVector<uint8_t>(scores,       0.01f, 0);
 
     std::map<std::string, QuantizedContainer> input =
     {

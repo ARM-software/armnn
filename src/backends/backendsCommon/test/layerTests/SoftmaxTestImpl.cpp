@@ -5,13 +5,13 @@
 
 #include "SoftmaxTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -85,8 +85,7 @@ LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     LayerTestResult<T, n> ret(outputTensorInfo);
 
     // Each row is independently softmax'd.
-    auto input = MakeTensor<T, n>(inputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(qScale, qOffset, inputData)));
+    auto input = MakeTensor<T, n>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -111,8 +110,7 @@ LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
 
     CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
 
-    std::vector<T> expectedOutput = std::vector<T>(
-            QuantizedVector<T>(qScale, qOffset, outputData));
+    std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(outputData, qScale, qOffset);
     ret.outputExpected = MakeTensor<T, n>(outputTensorInfo, expectedOutput);
 
     return ret;

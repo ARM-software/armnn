@@ -7,45 +7,12 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
-
 #include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <set>
 
 BOOST_AUTO_TEST_SUITE(EndToEnd)
-
-namespace
-{
-
-template<typename T>
-bool IsFloatIterFunc(T iter)
-{
-    boost::ignore_unused(iter);
-    return IsFloatingPointIterator<T>::value;
-}
-
-} //namespace
-
-BOOST_AUTO_TEST_CASE(QuantizedHelper)
-{
-    std::vector<float> fArray;
-    BOOST_TEST(IsFloatIterFunc(fArray.begin()) == true);
-    BOOST_TEST(IsFloatIterFunc(fArray.cbegin()) == true);
-
-    std::vector<double> dArray;
-    BOOST_TEST(IsFloatIterFunc(dArray.begin()) == true);
-
-    std::vector<int> iArray;
-    BOOST_TEST(IsFloatIterFunc(iArray.begin()) == false);
-
-    float floats[5];
-    BOOST_TEST(IsFloatIterFunc(&floats[0]) == true);
-
-    int ints[5];
-    BOOST_TEST(IsFloatIterFunc(&ints[0]) == false);
-}
 
 BOOST_AUTO_TEST_CASE(ErrorOnLoadNetwork)
 {

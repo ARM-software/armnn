@@ -2,24 +2,23 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
+#include "InferenceTestImage.hpp"
 #include "ObjectDetectionCommon.hpp"
 
-#include <memory>
-#include <string>
-#include <vector>
+#include <QuantizeHelper.hpp>
 
 #include <armnn/TypesUtils.hpp>
-#include <backendsCommon/test/QuantizeHelper.hpp>
 
 #include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <array>
+#include <memory>
 #include <string>
-
-#include "InferenceTestImage.hpp"
+#include <vector>
 
 namespace
 {
@@ -97,7 +96,7 @@ std::unique_ptr<MobileNetSsdTestCaseData> MobileNetSsdDatabase::GetTestCaseData(
 
         // Get image data as a vector of floats
         std::vector<float> floatImageData = GetImageDataAsNormalizedFloats(ImageChannelLayout::Rgb, image);
-        imageData = QuantizedVector<uint8_t>(m_Scale, m_Offset, floatImageData);
+        imageData = armnnUtils::QuantizedVector<uint8_t>(floatImageData, m_Scale, m_Offset);
     }
     catch (const InferenceTestImageException& e)
     {

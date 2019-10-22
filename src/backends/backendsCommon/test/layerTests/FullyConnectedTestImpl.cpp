@@ -7,6 +7,8 @@
 
 #include <armnn/ArmNN.hpp>
 
+#include <QuantizeHelper.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <backendsCommon/test/DataTypeUtils.hpp>
@@ -191,15 +193,17 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
     LayerTestResult<T, 2> result(outputTensorInfo);
 
     boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        armnnUtils::QuantizedVector<T>({
             1.0f, 10.0f, 100.0f, 1000.0f, 10000.0f,
-        })
+        },
+        qScale, qOffset)
     );
 
     boost::multi_array<T, 2> weights = MakeTensor<T, 2>(weightsDesc,
-        QuantizedVector<T>(qScale, qOffset, {
+        armnnUtils::QuantizedVector<T>({
             2.0f, 3.0f, 4.0f, 5.0f, 6.0f
-        })
+        },
+        qScale, qOffset)
     );
 
     std::vector<T> biasValues({900000.f});
@@ -215,10 +219,7 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
     );
 
     result.outputExpected = MakeTensor<T, 2>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
-            965432.0f,
-        })
-    );
+                                             armnnUtils::QuantizedVector<T>({ 965432.0f }, qScale, qOffset));
 
     return result;
 }

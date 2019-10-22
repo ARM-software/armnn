@@ -5,6 +5,7 @@
 
 #include "DebugTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -40,11 +41,11 @@ LayerTestResult<T, Dim> DebugTestImpl(
     }
 
     boost::multi_array<T, Dim> input =
-        MakeTensor<T, Dim>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+        MakeTensor<T, Dim>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
 
     LayerTestResult<T, Dim> ret(outputTensorInfo);
     ret.outputExpected =
-        MakeTensor<T, Dim>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, outputExpectedData));
+        MakeTensor<T, Dim>(outputTensorInfo, armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle =
         workloadFactory.CreateTensorHandle(inputTensorInfo);

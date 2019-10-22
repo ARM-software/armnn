@@ -9,12 +9,12 @@
 
 #include <DataLayoutIndexed.hpp>
 #include <Permute.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 #include <TensorUtils.hpp>
 
 #include <backendsCommon/WorkloadInfo.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -24,6 +24,8 @@
 
 namespace
 {
+
+using namespace armnnUtils;
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimplePooling2dTestImpl(
@@ -187,7 +189,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
     inputData.insert(inputData.end(), singleChannelData.begin(), singleChannelData.end());
     std::transform(singleChannelData.begin(), singleChannelData.end(), std::back_inserter(inputData), negator);
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputData, qScale, qOffset));
 
     // These were calculated manually.
     auto shape(GetTensorShapeAsArray<4>(outputTensorInfo));
@@ -195,7 +197,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
     if (forceNoPadding)
     {
         outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-            QuantizedVector<T>(qScale, qOffset, {
+            QuantizedVector<T>({
                  8.0f,  8.0f,  8.0f,
                  9.0f,  7.0f,  9.0f,
                  9.0f,  9.0f,  9.0f,
@@ -211,12 +213,13 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
                  0.0f,  0.0f, -3.0f,
                 -1.0f,  0.0f,  0.0f,
                 -1.0f, -1.0f, -1.0f
-        }));
+            },
+            qScale, qOffset));
     }
     else
     {
         outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-            QuantizedVector<T>(qScale, qOffset, {
+            QuantizedVector<T>({
                 0.0f, 8.0f, 8.0f, 8.0f, 8.0f, 8.0f,
                 0.0f, 9.0f, 7.0f, 9.0f, 9.0f, 3.0f,
                 0.0f, 8.0f, 9.0f, 9.0f, 9.0f, 9.0f,
@@ -232,7 +235,8 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize3x3Stride2x4TestCommon(
                 0.0f, 0.0f, 0.0f, 0.0f,-3.0f, 0.0f,
                 0.0f,-1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
                 0.0f,-1.0f,-1.0f,-1.0f,-1.0f, 0.0f
-        }));
+            },
+            qScale, qOffset));
     }
 
     return SimplePooling2dTestImpl<ArmnnType>(
@@ -267,7 +271,7 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
     }
 
     std::vector<T> inputData(
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
              1.0f,  2.0f,  5.0f,  6.0f,
              3.0f,  4.0f,  7.0f,  8.0f,
              9.0f, 10.0f, 13.0f, 14.0f,
@@ -277,16 +281,18 @@ LayerTestResult<T, 4> SimpleMaxPooling2dTestCommon(
             19.0f, 20.0f, 23.0f, 24.0f,
             25.0f, 26.0f, 29.0f, 30.0f,
             27.0f, 28.0f, 31.0f, 32.0f,
-        }));
+        },
+        qScale, qOffset));
 
     std::vector<T> outputData(
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
              4.0f,  8.0f,
             12.0f, 16.0f,
 
             20.0f, 24.0f,
             28.0f, 32.0f,
-        }));
+        },
+        qScale, qOffset));
 
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
     if (dataLayout == armnn::DataLayout::NHWC)
@@ -336,7 +342,7 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
     }
 
     std::vector<T> inputData(
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
              2.0f,  2.0f,  6.0f,  6.0f,
              4.0f,  4.0f,  8.0f,  8.0f,
             10.0f, 12.0f, 14.0f, 16.0f,
@@ -346,16 +352,18 @@ LayerTestResult<T, 4> SimpleAveragePooling2dTestCommon(
             20.0f, 18.0f, 22.0f, 24.0f,
             26.0f, 28.0f,  0.0f,  0.0f,
             26.0f, 28.0f,  0.0f,  0.0f,
-        }));
+        },
+        qScale, qOffset));
 
     std::vector<T> outputData(
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
              3.0f,  7.0f,
             11.0f, 15.0f,
 
             19.0f, 23.0f,
             27.0f,  0.0f,
-        }));
+        },
+        qScale, qOffset));
 
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
     if (dataLayout == armnn::DataLayout::NHWC)
@@ -447,7 +455,7 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
     armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(1, 2, 2, 2, dataLayout, ArmnnType);
 
     std::vector<T> inputData(
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             1.0f, 7.0f, 5.0f, 5.0f,
             1.0f, 7.0f, 5.0f, 5.0f,
             3.0f, 3.0f, 1.0f, 1.0f,
@@ -457,16 +465,18 @@ LayerTestResult<T, 4> SimpleL2Pooling2dTestCommon(
             1.0f, 7.0f, 2.0f, 0.0f,
             0.0f, 2.0f, 1.0f, 1.0f,
             0.0f, 0.0f, 1.0f, 1.0f,
-        }));
+        },
+        qScale, qOffset));
 
     std::vector<T> outputData(
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             5.0f, 5.0f,
             3.0f, 1.0f,
 
             5.0f, 1.0f,
             1.0f, 1.0f,
-        }));
+        },
+        qScale, qOffset));
 
     const armnn::PermutationVector NCHWToNHWC = { 0, 3, 1, 2 };
     if (dataLayout == armnn::DataLayout::NHWC)
@@ -503,19 +513,21 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride1TestCommon(
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             2.0f, 1.0f, 5.0f, 2.0f,
             1.0f, 2.0f, 2.0f, 1.0f,
             5.0f, 4.0f, 1.0f, 5.0f,
             2.0f, 1.0f, 5.0f, 2.0f,
-        }));
+        },
+        qScale, qOffset));
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             3.0f, 3.0f,
             3.0f, 3.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -536,7 +548,7 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
@@ -546,15 +558,17 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride3TestCommon(
             2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
-        }));
+        },
+        qScale, qOffset));
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             3.0f, 3.0f, 3.0f,
             3.0f, 3.0f, 3.0f,
             3.0f, 3.0f, 3.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -575,7 +589,7 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 7, 7 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             2.0f, 1.0f, 5.0f, 0.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 0.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 0.0f, 5.0f, 4.0f, 1.0f,
@@ -583,14 +597,16 @@ LayerTestResult<T, 4> L2Pooling2dSize3Stride4TestCommon(
             2.0f, 1.0f, 5.0f, 0.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 0.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 0.0f, 5.0f, 4.0f, 1.0f,
-        }));
+        },
+        qScale, qOffset));
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             3.0f, 3.0f,
             3.0f, 3.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -611,7 +627,7 @@ LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 7, 7 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             1.0f, 0.0f, 2.0f, 0.0f,  3.0f, 0.0f, 4.0f,
             0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
             0.0f, 5.0f, 0.0f, 6.0f,  0.0f, 7.0f, 0.0f,
@@ -619,13 +635,15 @@ LayerTestResult<T, 4> L2Pooling2dSize7TestCommon(
             0.0f, 5.0f, 0.0f, 2.0f,  0.0f, 1.0f, 1.0f,
             0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
-        }));
+        },
+        qScale, qOffset));
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 1 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             3.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -646,7 +664,7 @@ LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
 
     armnn::TensorInfo inputTensorInfo({ 1, 1, 9, 9 }, ArmnnType);
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
@@ -656,13 +674,15 @@ LayerTestResult<T, 4> L2Pooling2dSize9TestCommon(
             2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f, 2.0f, 1.0f, 5.0f,
             1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f, 1.0f, 2.0f, 2.0f,
             5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f, 5.0f, 4.0f, 1.0f,
-        }));
+        },
+        qScale, qOffset));
 
     armnn::TensorInfo outputTensorInfo({ 1, 1, 1, 1 }, ArmnnType);
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             3.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -693,15 +713,17 @@ LayerTestResult<T, 4> AsymmetricNonSquarePooling2dTestCommon(
 
     // Construct input data.
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             1.0f, 3.0f, 4.0f,
-        }));
+        },
+        qScale, qOffset));
 
     // These were calculated manually.
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             0.0f, 3.0f, 0.0f, 3.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -883,11 +905,11 @@ LayerTestResult<T, 4> SimpleMaxPooling2dSize2x2Stride2x2TestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputData, qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        forceNoPadding ? QuantizedVector<T>(qScale, qOffset, expectedOutputDataNoPadding) :
-                         QuantizedVector<T>(qScale, qOffset, expectedOutputDataWithPadding));
+        forceNoPadding ? QuantizedVector<T>(expectedOutputDataNoPadding, qScale, qOffset) :
+                         QuantizedVector<T>(expectedOutputDataWithPadding, qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -961,11 +983,11 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3x2Stride2x2TestCommon(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputData, qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        forceNoPadding ? QuantizedVector<T>(qScale, qOffset, expectedOutputDataNoPadding) :
-                         QuantizedVector<T>(qScale, qOffset, expectedOutputDataWithPadding));
+        forceNoPadding ? QuantizedVector<T>(expectedOutputDataNoPadding, qScale, qOffset) :
+                         QuantizedVector<T>(expectedOutputDataWithPadding, qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -1002,19 +1024,21 @@ LayerTestResult<T, 4> IgnorePaddingSimpleMaxPooling2dTestCommon(
     }
 
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             -1.0f, -2.0f,  3.0f,  4.0f,
             -1.0f, -2.0f,  3.0f,  4.0f,
              1.0f,  2.0f, -3.0f, -4.0f,
              1.0f,  2.0f, -3.0f, -4.0f,
-        }));
+        },
+        qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             -1.0f,  3.0f,  4.0f,
              1.0f,  3.0f,  4.0f,
              1.0f,  2.0f, -4.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -1050,20 +1074,22 @@ LayerTestResult<T, 4> IgnorePaddingMaxPooling2dSize3TestCommon(
     }
 
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             -1.0f, -2.0f,  3.0f,  4.0f,
             -1.0f, -2.0f,  3.0f,  4.0f,
              1.0f,  2.0f, -3.0f, -4.0f,
              1.0f,  2.0f, -3.0f, -4.0f,
-        }));
+        },
+        qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             -1.0f,  3.0f,  4.0f,  4.0f,
              2.0f,  3.0f,  4.0f,  4.0f,
              2.0f,  3.0f,  4.0f,  4.0f,
              2.0f,  2.0f,  2.0f, -3.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -1099,19 +1125,21 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dTestCommon(
     }
 
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             12.0f, 20.0f, 32.0f, 40.0f,
             12.0f, 20.0f, 32.0f, 40.0f,
             12.0f, 20.0f, 32.0f, 40.0f,
             12.0f, 20.0f, 32.0f, 40.0f,
-        }));
+        },
+        qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             3.0f,  13.0f,  10.0f,
             6.0f,  26.0f,  20.0f,
             3.0f,  13.0f,  10.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -1148,18 +1176,20 @@ LayerTestResult<T, 4> IgnorePaddingSimpleAveragePooling2dNoPaddingTestCommon(
     }
 
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
-        }));
+        },
+        qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             2.0f, 3.5f,
             2.0f, 3.5f
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -1195,20 +1225,22 @@ LayerTestResult<T, 4> IgnorePaddingAveragePooling2dSize3TestCommon(
     }
 
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             9.0f,   27.0f,  18.0f,  36.0f,
             18.0f,   9.0f,  18.0f,   9.0f,
             27.0f,  18.0f,   9.0f,  27.0f,
             9.0f,   27.0f,   9.0f,  18.0f,
-        }));
+        },
+        qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
              7.0f,  11.0f,  13.0f, 9.0f,
             12.0f,  17.0f,  19.0f, 13.0f,
             12.0f,  16.0f,  16.0f, 10.0f,
              9.0f,  11.0f,  12.0f, 7.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -1244,19 +1276,21 @@ LayerTestResult<T, 4> IgnorePaddingSimpleL2Pooling2dTestCommon(
     }
 
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             2.0f,  4.0f, 8.0f, 16.0f,
             4.0f,  2.0f, 2.0f, 4.0f,
             8.0f,  2.0f, 4.0f, 2.0f,
             16.0f, 2.0f, 2.0f, 8.0f,
-        }));
+        },
+        qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
                1.0f,     4.4721f,   8.0f,
             4.4721f,     2.6457f,   2.236f,
                8.0f,     1.4142f,   4.0f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);
@@ -1292,20 +1326,22 @@ LayerTestResult<T, 4> IgnorePaddingL2Pooling2dSize3TestCommon(
     }
 
     auto input = MakeTensor<T, 4>(inputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
             1.0f, 2.0f, 3.0f, 4.0f,
-        }));
+        },
+        qScale, qOffset));
 
     auto outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-        QuantizedVector<T>(qScale, qOffset, {
+        QuantizedVector<T>({
             1.0540f, 1.7638f, 2.5385f, 2.3570f,
             1.2909f, 2.1602f, 3.1091f, 2.8867f,
             1.2909f, 2.1602f, 3.1091f, 2.8867f,
             1.0540f, 1.7638f, 2.5385f, 2.3570f,
-        }));
+        },
+        qScale, qOffset));
 
     return SimplePooling2dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, descriptor, qScale, qOffset, input, outputExpected);

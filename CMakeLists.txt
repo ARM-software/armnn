@@ -63,6 +63,7 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/ParserPrototxtFixture.hpp
     src/armnnUtils/PrototxtConversions.hpp
     src/armnnUtils/PrototxtConversions.cpp
+    src/armnnUtils/QuantizeHelper.hpp
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.hpp
     src/armnnUtils/TensorUtils.cpp
@@ -612,6 +613,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/UnitTests.cpp
         src/armnn/test/UnitTests.hpp
         src/armnn/test/UtilsTests.cpp
+        src/armnnUtils/test/QuantizeHelperTest.cpp
         src/armnnUtils/test/PrototxtConversionsTest.cpp
         src/armnnUtils/test/ParserHelperTest.cpp
         src/armnnUtils/test/TensorUtilsTest.cpp

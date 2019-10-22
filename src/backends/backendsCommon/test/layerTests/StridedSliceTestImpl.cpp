@@ -5,6 +5,7 @@
 
 #include "StridedSliceTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -39,11 +40,11 @@ LayerTestResult<T, OutDim> StridedSliceTestImpl(
     }
 
     boost::multi_array<T, InDim> input =
-        MakeTensor<T, InDim>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+        MakeTensor<T, InDim>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
 
     LayerTestResult<T, OutDim> ret(outputTensorInfo);
     ret.outputExpected =
-        MakeTensor<T, OutDim>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, outputExpectedData));
+        MakeTensor<T, OutDim>(outputTensorInfo, armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle =
         workloadFactory.CreateTensorHandle(inputTensorInfo);

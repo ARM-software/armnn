@@ -5,11 +5,11 @@
 
 #include "SplitterTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -80,7 +80,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
     LayerTestResult<T,3> ret4(outputTensorInfo4);
 
     auto input = MakeTensor<T, 3>(inputTensorInfo, std::vector<T>(
-        QuantizedVector<T>(qScale, qOffset, {
+        armnnUtils::QuantizedVector<T>({
             1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
             6.0f, 7.0f, 8.0f, 9.0f, 10.0f,
             11.0f, 12.0f, 13.0f, 14.0f, 15.0f,
@@ -101,24 +101,26 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
             76.0f, 77.0f, 78.0f, 79.0f, 80.0f,
             81.0f, 82.0f, 83.0f, 84.0f, 85.0f,
             86.0f, 87.0f, 88.0f, 89.0f, 90.0f,
-        })
+        },
+        qScale, qOffset)
     ));
 
     // Channel 0 of the original input.
     ret1.outputExpected = MakeTensor<T, 3>(outputTensorInfo1, std::vector<T>(
-        QuantizedVector<T>(qScale, qOffset, {
+        armnnUtils::QuantizedVector<T>({
             1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
             6.0f, 7.0f, 8.0f, 9.0f, 10.0f,
             11.0f, 12.0f, 13.0f, 14.0f, 15.0f,
             16.0f, 17.0f, 18.0f, 19.0f, 20.0f,
             21.0f, 22.0f, 23.0f, 24.0f, 25.0f,
             26.0f, 27.0f, 28.0f, 29.0f, 30.0f,
-        })
+        },
+        qScale, qOffset)
     ));
 
     // Channel 1 & 2 of the original input.
     ret2.outputExpected = MakeTensor<T, 3>(outputTensorInfo2, std::vector<T>(
-        QuantizedVector<T>(qScale, qOffset, {
+        armnnUtils::QuantizedVector<T>({
             31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
             36.0f, 37.0f, 38.0f, 39.0f, 40.0f,
             41.0f, 42.0f, 43.0f, 44.0f, 45.0f,
@@ -132,31 +134,34 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
             76.0f, 77.0f, 78.0f, 79.0f, 80.0f,
             81.0f, 82.0f, 83.0f, 84.0f, 85.0f,
             86.0f, 87.0f, 88.0f, 89.0f, 90.0f,
-        })
+        },
+        qScale, qOffset)
     ));
 
     // Channel 0 of return 2 (i.e. channels 1 and 2 of the original input).
     ret3.outputExpected = MakeTensor<T, 3>(outputTensorInfo3, std::vector<T>(
-        QuantizedVector<T>(qScale, qOffset, {
+        armnnUtils::QuantizedVector<T>({
             31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
             36.0f, 37.0f, 38.0f, 39.0f, 40.0f,
             41.0f, 42.0f, 43.0f, 44.0f, 45.0f,
             46.0f, 47.0f, 48.0f, 49.0f, 50.0f,
             51.0f, 52.0f, 53.0f, 54.0f, 55.0f,
             56.0f, 57.0f, 58.0f, 59.0f, 60.0f,
-        })
+        },
+        qScale, qOffset)
     ));
 
     // Channel 1 of return 2.
     ret4.outputExpected = MakeTensor<T, 3>(outputTensorInfo4, std::vector<T>(
-        QuantizedVector<T>(qScale, qOffset, {
+        armnnUtils::QuantizedVector<T>({
             61.0f, 62.0f, 63.0f, 64.0f, 65.0f,
             66.0f, 67.0f, 68.0f, 69.0f, 70.0f,
             71.0f, 72.0f, 73.0f, 74.0f, 75.0f,
             76.0f, 77.0f, 78.0f, 79.0f, 80.0f,
             81.0f, 82.0f, 83.0f, 84.0f, 85.0f,
             86.0f, 87.0f, 88.0f, 89.0f, 90.0f,
-        })
+        },
+        qScale, qOffset)
     ));
 
     // NOTE: as a corollary of the splitting of x and y restriction the x and y values of the view origins
@@ -253,29 +258,31 @@ LayerTestResult<T, 3> CopyViaSplitterTestImpl(
     float qScale, int32_t qOffset)
 {
     const armnn::TensorInfo tensorInfo({ 3, 6, 5 }, ArmnnType, qScale, qOffset);
-    auto input = MakeTensor<T, 3>(tensorInfo, QuantizedVector<T>(qScale, qOffset,
-                                                                 {
-                                                                     1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
-                                                                     6.0f, 7.0f, 8.0f, 9.0f, 10.0f,
-                                                                     11.0f, 12.0f, 13.0f, 14.0f, 15.0f,
-                                                                     16.0f, 17.0f, 18.0f, 19.0f, 20.0f,
-                                                                     21.0f, 22.0f, 23.0f, 24.0f, 25.0f,
-                                                                     26.0f, 27.0f, 28.0f, 29.0f, 30.0f,
+    auto input = MakeTensor<T, 3>(
+        tensorInfo,
+        armnnUtils::QuantizedVector<T>({
+             1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
+             6.0f, 7.0f, 8.0f, 9.0f, 10.0f,
+            11.0f, 12.0f, 13.0f, 14.0f, 15.0f,
+            16.0f, 17.0f, 18.0f, 19.0f, 20.0f,
+            21.0f, 22.0f, 23.0f, 24.0f, 25.0f,
+            26.0f, 27.0f, 28.0f, 29.0f, 30.0f,
 
-                                                                     31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
-                                                                     36.0f, 37.0f, 38.0f, 39.0f, 40.0f,
-                                                                     41.0f, 42.0f, 43.0f, 44.0f, 45.0f,
-                                                                     46.0f, 47.0f, 48.0f, 49.0f, 50.0f,
-                                                                     51.0f, 52.0f, 53.0f, 54.0f, 55.0f,
-                                                                     56.0f, 57.0f, 58.0f, 59.0f, 60.0f,
+            31.0f, 32.0f, 33.0f, 34.0f, 35.0f,
+            36.0f, 37.0f, 38.0f, 39.0f, 40.0f,
+            41.0f, 42.0f, 43.0f, 44.0f, 45.0f,
+            46.0f, 47.0f, 48.0f, 49.0f, 50.0f,
+            51.0f, 52.0f, 53.0f, 54.0f, 55.0f,
+            56.0f, 57.0f, 58.0f, 59.0f, 60.0f,
 
-                                                                     61.0f, 62.0f, 63.0f, 64.0f, 65.0f,
-                                                                     66.0f, 67.0f, 68.0f, 69.0f, 70.0f,
-                                                                     71.0f, 72.0f, 73.0f, 74.0f, 75.0f,
-                                                                     76.0f, 77.0f, 78.0f, 79.0f, 80.0f,
-                                                                     81.0f, 82.0f, 83.0f, 84.0f, 85.0f,
-                                                                     86.0f, 87.0f, 88.0f, 89.0f, 90.0f,
-                                                                 }));
+            61.0f, 62.0f, 63.0f, 64.0f, 65.0f,
+            66.0f, 67.0f, 68.0f, 69.0f, 70.0f,
+            71.0f, 72.0f, 73.0f, 74.0f, 75.0f,
+            76.0f, 77.0f, 78.0f, 79.0f, 80.0f,
+            81.0f, 82.0f, 83.0f, 84.0f, 85.0f,
+            86.0f, 87.0f, 88.0f, 89.0f, 90.0f,
+        },
+        qScale, qOffset));
 
     std::vector<unsigned int> origin = { 0, 0, 0 };
     armnn::SplitterQueueDescriptor::ViewOrigin window(origin);

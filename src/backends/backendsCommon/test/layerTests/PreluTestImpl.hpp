@@ -7,6 +7,7 @@
 
 #include "LayerTestResult.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -57,18 +58,22 @@ LayerTestResult<T, 4> PreluTest(
        0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, -2.0f, 0.0f, -2.0f, -4.0f
     };
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(inputTensorInfo.GetQuantizationScale(),
-                                                                      inputTensorInfo.GetQuantizationOffset(),
-                                                                      inputData));
-    auto alpha = MakeTensor<T, 4>(alphaTensorInfo, QuantizedVector<T>(alphaTensorInfo.GetQuantizationScale(),
-                                                                      alphaTensorInfo.GetQuantizationOffset(),
-                                                                      alphaData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(inputData,
+                                                                 inputTensorInfo.GetQuantizationScale(),
+                                                                 inputTensorInfo.GetQuantizationOffset()));
+
+    auto alpha = MakeTensor<T, 4>(alphaTensorInfo,
+                                  armnnUtils::QuantizedVector<T>(alphaData,
+                                                                 alphaTensorInfo.GetQuantizationScale(),
+                                                                 alphaTensorInfo.GetQuantizationOffset()));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
-                                             QuantizedVector<T>(outputTensorInfo.GetQuantizationScale(),
-                                                                outputTensorInfo.GetQuantizationOffset(),
-                                                                outputExpectedData));
+    result.outputExpected =
+        MakeTensor<T, 4>(outputTensorInfo,
+                         armnnUtils::QuantizedVector<T>(outputExpectedData,
+                                                        outputTensorInfo.GetQuantizationScale(),
+                                                        outputTensorInfo.GetQuantizationOffset()));
 
     std::unique_ptr <armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr <armnn::ITensorHandle> alphaHandle  = workloadFactory.CreateTensorHandle(alphaTensorInfo);

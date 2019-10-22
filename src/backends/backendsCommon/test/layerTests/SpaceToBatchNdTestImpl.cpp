@@ -6,6 +6,7 @@
 #include "SpaceToBatchNdTestImpl.hpp"
 
 #include <Permute.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -55,10 +56,12 @@ LayerTestResult<T, 4> SpaceToBatchNdTestImpl(
         outputTensorInfo.SetQuantizationOffset(qOffset);
     }
 
-    boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+    boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputTensorInfo,
+                                                      armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
 
     LayerTestResult<T, 4> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, outputExpectedData));
+    ret.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
+                                          armnnUtils::QuantizedVector<T>(outputExpectedData, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);

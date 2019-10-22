@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <armnn/TypesUtils.hpp>
-#include <backendsCommon/test/QuantizeHelper.hpp>
 
 #include <boost/log/trivial.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -202,4 +201,3 @@ std::unique_ptr<DeepSpeechV1TestCaseData> DeepSpeechV1Database::GetTestCaseData(
 }
 
 } // anonymous namespace
-

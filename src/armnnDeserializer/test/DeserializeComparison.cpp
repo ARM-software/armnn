@@ -6,9 +6,8 @@
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include "../Deserializer.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
-
-#include <backendsCommon/test/QuantizeHelper.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -32,8 +31,8 @@ BOOST_FIXTURE_TEST_CASE(operation##dataType, Simple##operation##dataType##Fixtur
     constexpr int32_t qOffset = 0; \
     RunTest<4, armnn::DataType::dataType, armnn::DataType::Boolean>( \
         0, \
-        {{ "InputLayer0", QuantizedVector<T>(qScale, qOffset, s_TestData.m_InputData0)  }, \
-         { "InputLayer1", QuantizedVector<T>(qScale, qOffset, s_TestData.m_InputData1)  }}, \
+        {{ "InputLayer0", armnnUtils::QuantizedVector<T>(s_TestData.m_InputData0, qScale, qOffset)  }, \
+         { "InputLayer1", armnnUtils::QuantizedVector<T>(s_TestData.m_InputData1, qScale, qOffset)  }}, \
         {{ "OutputLayer", s_TestData.m_Output##operation }}); \
 }
 

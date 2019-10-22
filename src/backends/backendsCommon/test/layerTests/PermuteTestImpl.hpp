@@ -12,7 +12,6 @@
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
 #include <test/TensorHelpers.hpp>

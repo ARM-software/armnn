@@ -8,12 +8,12 @@
 #include <armnn/ArmNN.hpp>
 
 #include <Half.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -155,8 +155,8 @@ LayerTestResult<uint8_t, 4> ComparisonTestImpl(armnn::IWorkloadFactory& workload
 {
     using T = armnn::ResolveType<ArmnnInType>;
 
-    std::vector<T> inputData0 = QuantizedVector<T>(quantScale, quantOffset, testData.m_InputData0);
-    std::vector<T> inputData1 = QuantizedVector<T>(quantScale, quantOffset, testData.m_InputData1);
+    std::vector<T> inputData0 = armnnUtils::QuantizedVector<T>(testData.m_InputData0, quantScale, quantOffset);
+    std::vector<T> inputData1 = armnnUtils::QuantizedVector<T>(testData.m_InputData1, quantScale, quantOffset);
 
     return ComparisonTestImpl<4, ArmnnInType>(
         workloadFactory,

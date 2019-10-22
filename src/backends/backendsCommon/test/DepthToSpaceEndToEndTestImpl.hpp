@@ -9,8 +9,9 @@
 
 #include <armnn/ArmNN.hpp>
 
+#include <QuantizeHelper.hpp>
+
 #include <backendsCommon/test/DataLayoutUtils.hpp>
-#include <backendsCommon/test/QuantizeHelper.hpp>
 
 namespace
 {
@@ -58,8 +59,8 @@ void DepthToSpaceEndToEndImpl(const std::vector<armnn::BackendId>& backends,
         outputInfo.SetQuantizationOffset(qOffset);
     }
 
-    std::vector<T> inputData          = QuantizedVector<T>(qScale, qOffset, floatInputData);
-    std::vector<T> expectedOutputData = QuantizedVector<T>(qScale, qOffset, floatExpectedOutputData);
+    std::vector<T> inputData          = armnnUtils::QuantizedVector<T>(floatInputData, qScale, qOffset);
+    std::vector<T> expectedOutputData = armnnUtils::QuantizedVector<T>(floatExpectedOutputData, qScale, qOffset);
 
     // Permute tensors from NHWC to NCHW (if needed)
     if (descriptor.m_DataLayout == DataLayout::NCHW)

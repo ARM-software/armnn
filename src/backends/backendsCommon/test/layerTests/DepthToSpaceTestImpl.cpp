@@ -5,7 +5,7 @@
 
 #include "DepthToSpaceTestImpl.hpp"
 
-#include <Permute.hpp>
+#include <QuantizeHelper.hpp>
 
 #include <armnn/ArmNN.hpp>
 
@@ -44,10 +44,12 @@ LayerTestResult<T, 4> DepthToSpaceTestImpl(
         outputInfo.SetQuantizationOffset(qOffset);
     }
 
-    boost::multi_array<T, 4> input = MakeTensor<T, 4>(inputInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+    boost::multi_array<T, 4> input =
+        MakeTensor<T, 4>(inputInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
 
     LayerTestResult<T, 4> result(outputInfo);
-    result.outputExpected = MakeTensor<T, 4>(outputInfo, QuantizedVector<T>(qScale, qOffset, expectedOutputData));
+    result.outputExpected =
+        MakeTensor<T, 4>(outputInfo, armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);

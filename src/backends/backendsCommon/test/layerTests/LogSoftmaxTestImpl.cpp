@@ -6,6 +6,7 @@
 #include "LogSoftmaxTestImpl.hpp"
 
 #include <Half.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -14,7 +15,6 @@
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -39,7 +39,7 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
 {
     LayerTestResult<T, NumDims> result(outputInfo);
     result.outputExpected =
-        MakeTensor<T, NumDims>(outputInfo, QuantizedVector<T>(qScale, qOffset, expectedOutputValues));
+        MakeTensor<T, NumDims>(outputInfo, armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
@@ -54,7 +54,7 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
     inputHandle->Allocate();
     outputHandle->Allocate();
 
-    auto inputTensor = MakeTensor<T, NumDims>(inputInfo, QuantizedVector<T>(qScale, qOffset, inputValues));
+    auto inputTensor = MakeTensor<T, NumDims>(inputInfo, armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset));
     CopyDataToITensorHandle(inputHandle.get(), inputTensor.origin());
 
     workload->Execute();

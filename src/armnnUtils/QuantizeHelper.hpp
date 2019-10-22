@@ -17,6 +17,9 @@
 #include <boost/core/ignore_unused.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+namespace armnnUtils
+{
+
 template<typename T, bool DoQuantize=true>
 struct SelectiveQuantizer
 {
@@ -84,7 +87,7 @@ struct IsFloatingPointIterator
 template <typename T, typename FloatIt,
 typename std::enable_if<IsFloatingPointIterator<FloatIt>::value, int>::type=0 // Makes sure fp iterator is valid.
 >
-std::vector<T> QuantizedVector(float qScale, int32_t qOffset, FloatIt first, FloatIt last)
+std::vector<T> QuantizedVector(FloatIt first, FloatIt last, float qScale, int32_t qOffset)
 {
     std::vector<T> quantized;
     quantized.reserve(boost::numeric_cast<size_t>(std::distance(first, last)));
@@ -92,7 +95,7 @@ std::vector<T> QuantizedVector(float qScale, int32_t qOffset, FloatIt first, Flo
     for (auto it = first; it != last; ++it)
     {
         auto f = *it;
-        T q =SelectiveQuantize<T>(f, qScale, qOffset);
+        T q = SelectiveQuantize<T>(f, qScale, qOffset);
         quantized.push_back(q);
     }
 
@@ -100,13 +103,15 @@ std::vector<T> QuantizedVector(float qScale, int32_t qOffset, FloatIt first, Flo
 }
 
 template<typename T>
-std::vector<T> QuantizedVector(float qScale, int32_t qOffset, const std::vector<float>& array)
+std::vector<T> QuantizedVector(const std::vector<float>& array, float qScale = 1.f, int32_t qOffset = 0)
 {
-    return QuantizedVector<T>(qScale, qOffset, array.begin(), array.end());
+    return QuantizedVector<T>(array.begin(), array.end(), qScale, qOffset);
 }
 
 template<typename T>
-std::vector<T> QuantizedVector(float qScale, int32_t qOffset, std::initializer_list<float> array)
+std::vector<T> QuantizedVector(std::initializer_list<float> array, float qScale = 1.f, int32_t qOffset = 0)
 {
-    return QuantizedVector<T>(qScale, qOffset, array.begin(), array.end());
+    return QuantizedVector<T>(array.begin(), array.end(), qScale, qOffset);
 }
+
+} // namespace armnnUtils

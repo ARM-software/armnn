@@ -12,7 +12,6 @@
 #include <Graph.hpp>
 #include <Optimizer.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/test/QuantizeHelper.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>

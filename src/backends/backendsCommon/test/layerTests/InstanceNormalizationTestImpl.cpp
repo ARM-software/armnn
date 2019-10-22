@@ -5,6 +5,7 @@
 
 #include "InstanceNormalizationTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -14,7 +15,6 @@
 #include <backendsCommon/WorkloadFactory.hpp>
 
 #include <backendsCommon/test/DataLayoutUtils.hpp>
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -35,12 +35,12 @@ LayerTestResult<T, 4> InstanceNormTestImpl(
     float qScale = 0.0f,
     int32_t qOffset = 0)
 {
-    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(qScale, qOffset, inputValues));
+    auto inputTensor = MakeTensor<T, 4>(inputTensorInfo,
+                                        armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset));
 
     LayerTestResult<T, 4> result(outputTensorInfo);
-
-    result.outputExpected =
-        MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(qScale, qOffset, expectedOutputValues));
+    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo,
+                                             armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);

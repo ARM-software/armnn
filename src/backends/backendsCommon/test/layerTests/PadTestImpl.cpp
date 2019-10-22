@@ -5,6 +5,8 @@
 
 #include "PadTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
+
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -28,28 +30,27 @@ LayerTestResult<T, 2> Pad2dTestCommon(
     const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType, qScale, qOffset);
     const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType, qScale, qOffset);
 
-    std::vector<T> inputValues(
-    QuantizedVector<T>(qScale, qOffset,
-    {
-      // Height (3) x Width (3)
-      4, 8, 6,
-      7, 4, 4,
-      3, 2, 4
-    }));
+    std::vector<T> inputValues = armnnUtils::QuantizedVector<T>(
+        {
+            // Height (3) x Width (3)
+            4, 8, 6,
+            7, 4, 4,
+            3, 2, 4
+        },
+        qScale, qOffset);
 
     auto p = customPaddingValue;
-    std::vector<T> expectedOutputValues;
-    expectedOutputValues = (
-    QuantizedVector<T>(qScale, qOffset,
-    {
-      p, p, p, p, p, p, p,
-      p, p, p, p, p, p, p,
-      p, p, 4, 8, 6, p, p,
-      p, p, 7, 4, 4, p, p,
-      p, p, 3, 2, 4, p, p,
-      p, p, p, p, p, p, p,
-      p, p, p, p, p, p, p
-    }));
+    std::vector<T> expectedOutputValues = armnnUtils::QuantizedVector<T>(
+        {
+            p, p, p, p, p, p, p,
+            p, p, p, p, p, p, p,
+            p, p, 4, 8, 6, p, p,
+            p, p, 7, 4, 4, p, p,
+            p, p, 3, 2, 4, p, p,
+            p, p, p, p, p, p, p,
+            p, p, p, p, p, p, p
+        },
+        qScale, qOffset);
 
     auto inputTensor = MakeTensor<T, 2>(inputTensorInfo, std::vector<T>(inputValues));
 
@@ -100,41 +101,39 @@ LayerTestResult<T, 3> Pad3dTestCommon(
     const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType, qScale, qOffset);
     const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType, qScale, qOffset);
 
-    std::vector<T> inputValues(
-      QuantizedVector<T>(qScale,qOffset,
-    {
-        // Channel 0, Height (2) x Width (2)
-        0, 4,
-        2, 5,
+    std::vector<T> inputValues = armnnUtils::QuantizedVector<T>(
+        {
+            // Channel 0, Height (2) x Width (2)
+            0, 4,
+            2, 5,
 
-        // Channel 1, Height (2) x Width (2)
-        6, 1,
-        5, 2
-    }));
+            // Channel 1, Height (2) x Width (2)
+            6, 1,
+            5, 2
+        },
+        qScale, qOffset);
 
-    std::vector<T> expectedOutputValues(
-      QuantizedVector<T>(qScale,qOffset,
-    {
+    std::vector<T> expectedOutputValues = armnnUtils::QuantizedVector<T>(
+        {
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 4, 0, 0,
+            0, 0, 2, 5, 0, 0,
+            0, 0, 0, 0, 0, 0,
 
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 4, 0, 0,
-        0, 0, 2, 5, 0, 0,
-        0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 6, 1, 0, 0,
+            0, 0, 5, 2, 0, 0,
+            0, 0, 0, 0, 0, 0,
 
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 6, 1, 0, 0,
-        0, 0, 5, 2, 0, 0,
-        0, 0, 0, 0, 0, 0,
-
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0
-
-    }));
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0
+       },
+       qScale, qOffset);
 
     auto inputTensor = MakeTensor<T, 3>(inputTensorInfo, std::vector<T>(inputValues));
 
@@ -185,193 +184,193 @@ LayerTestResult<T, 4> Pad4dTestCommon(
     const armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType, qScale, qOffset);
     const armnn::TensorInfo outputTensorInfo(outputShape, ArmnnType, qScale, qOffset);
 
-    std::vector<T> inputValues(
-      QuantizedVector<T>(qScale,qOffset,
-    {
-        // Batch 0, Channel 0, Height (3) x Width (2)
-        0, 1,
-        2, 3,
-        4, 5,
+    std::vector<T> inputValues = armnnUtils::QuantizedVector<T>(
+        {
+            // Batch 0, Channel 0, Height (3) x Width (2)
+             0,  1,
+             2,  3,
+             4,  5,
 
-        // Batch 0, Channel 1, Height (3) x Width (2)
-        6, 7,
-        8, 9,
-        10, 11,
+            // Batch 0, Channel 1, Height (3) x Width (2)
+             6,  7,
+             8,  9,
+            10, 11,
 
-        // Batch 1, Channel 0, Height (3) x Width (2)
-        12, 13,
-        14, 15,
-        16, 17,
+            // Batch 1, Channel 0, Height (3) x Width (2)
+            12, 13,
+            14, 15,
+            16, 17,
 
-        // Batch 1, Channel 1, Height (3) x Width (2)
-        18, 19,
-        20, 21,
-        22, 23
-    }));
+            // Batch 1, Channel 1, Height (3) x Width (2)
+            18, 19,
+            20, 21,
+            22, 23
+        },
+        qScale, qOffset);
 
-    std::vector<T> expectedOutputValues(
-      QuantizedVector<T>(qScale,qOffset,
-    {
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+    std::vector<T> expectedOutputValues = armnnUtils::QuantizedVector<T>(
+        {
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 1, 0,
-        0, 2, 3, 0,
-        0, 4, 5, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 1, 0,
+            0, 2, 3, 0,
+            0, 4, 5, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 6, 7, 0,
-        0, 8, 9, 0,
-        0, 10, 11, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 6, 7, 0,
+            0, 8, 9, 0,
+            0, 10, 11, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 12, 13, 0,
-        0, 14, 15, 0,
-        0, 16, 17, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 12, 13, 0,
+            0, 14, 15, 0,
+            0, 16, 17, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 18, 19, 0,
-        0, 20, 21, 0,
-        0, 22, 23, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 18, 19, 0,
+            0, 20, 21, 0,
+            0, 22, 23, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
 
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0
-    }));
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0
+        },
+        qScale, qOffset);
 
     auto inputTensor = MakeTensor<T, 4>(inputTensorInfo, std::vector<T>(inputValues));
 

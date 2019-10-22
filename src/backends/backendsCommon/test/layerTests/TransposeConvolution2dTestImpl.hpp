@@ -8,12 +8,12 @@
 #include <armnn/ArmNN.hpp>
 
 #include <Permute.hpp>
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <backendsCommon/test/DataLayoutUtils.hpp>
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -146,14 +146,16 @@ LayerTestResult<T, 4> TransposeConvolution2dTest(
     TensorData<T> input =
     {
         inputInfo,
-        QuantizedVector<T>(inputInfo.GetQuantizationScale(), inputInfo.GetQuantizationOffset(), inputData)
+        armnnUtils::QuantizedVector<T>(inputData, inputInfo.GetQuantizationScale(), inputInfo.GetQuantizationOffset())
     };
 
     // set up weights
     TensorData<T> weights =
     {
         weightsInfo,
-        QuantizedVector<T>(weightsInfo.GetQuantizationScale(), weightsInfo.GetQuantizationOffset(), weightsData)
+        armnnUtils::QuantizedVector<T>(weightsData,
+                                       weightsInfo.GetQuantizationScale(),
+                                       weightsInfo.GetQuantizationOffset())
     };
 
     // set up biases
@@ -164,7 +166,9 @@ LayerTestResult<T, 4> TransposeConvolution2dTest(
         TensorData<BT> biases =
         {
             biasesInfo,
-            QuantizedVector<BT>(biasesInfo.GetQuantizationScale(), biasesInfo.GetQuantizationOffset(), biasesData)
+            armnnUtils::QuantizedVector<BT>(biasesData,
+                                            biasesInfo.GetQuantizationScale(),
+                                            biasesInfo.GetQuantizationOffset())
         };
 
         optionalBiases = Optional<TensorData<BT>>(biases);
@@ -186,9 +190,9 @@ LayerTestResult<T, 4> TransposeConvolution2dTest(
     LayerTestResult<T, 4> testResult(outputInfo);
     testResult.output         = MakeTensor<T, 4>(outputInfo, output.second);
     testResult.outputExpected = MakeTensor<T, 4>(outputInfo,
-                                                 QuantizedVector<T>(outputInfo.GetQuantizationScale(),
-                                                                    outputInfo.GetQuantizationOffset(),
-                                                                    expectedOutputData));
+                                                 armnnUtils::QuantizedVector<T>(expectedOutputData,
+                                                                                outputInfo.GetQuantizationScale(),
+                                                                                outputInfo.GetQuantizationOffset()));
 
     return testResult;
 }

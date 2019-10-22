@@ -5,12 +5,12 @@
 
 #include "ActivationTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
 
 #include <backendsCommon/test/ActivationFixture.hpp>
-#include <backendsCommon/test/QuantizeHelper.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -424,7 +424,7 @@ LayerTestResult<T, 4> SimpleActivationTest(
 
     LayerTestResult<T, 4> result(inputTensorInfo);
 
-    auto input = MakeTensor<T, 4>(inputTensorInfo, QuantizedVector<T>(scale, offset, inputData));
+    auto input = MakeTensor<T, 4>(inputTensorInfo, armnnUtils::QuantizedVector<T>(inputData, scale, offset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -451,8 +451,8 @@ LayerTestResult<T, 4> SimpleActivationTest(
     CopyDataFromITensorHandle(&result.output[0][0][0][0], outputHandle.get());
 
     // Calculated manually.
-    result.outputExpected = MakeTensor<T, 4>(outputTensorInfo, QuantizedVector<T>(outScale, outOffset,
-                                                                                  outputExpectedData));
+    result.outputExpected =
+        MakeTensor<T, 4>(outputTensorInfo, armnnUtils::QuantizedVector<T>(outputExpectedData, outScale, outOffset));
 
     return result;
 }
@@ -812,7 +812,7 @@ LayerTestResult<float, 5> SqrtNNTest(
 
     LayerTestResult<float, 5> result(inputTensorInfo);
 
-    auto input = MakeTensor<float, 5>(inputTensorInfo, QuantizedVector<float>(0.f, 0.f, inputData));
+    auto input = MakeTensor<float, 5>(inputTensorInfo, inputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -836,8 +836,7 @@ LayerTestResult<float, 5> SqrtNNTest(
     CopyDataFromITensorHandle(&result.output[0][0][0][0][0], outputHandle.get());
 
     // Calculated manually.
-    result.outputExpected = MakeTensor<float, 5>(outputTensorInfo, QuantizedVector<float>(0.f, 0.f,
-                                                                                  outputExpectedData));
+    result.outputExpected = MakeTensor<float, 5>(outputTensorInfo, outputExpectedData);
 
     return result;
 };

@@ -51,40 +51,27 @@ BOOST_AUTO_TEST_CASE(OpenClTimerBatchNorm)
     const unsigned int height   = 3;
     const unsigned int channels = 2;
     const unsigned int num      = 1;
-    int32_t qOffset = 0;
-    float qScale = 0.f;
 
-    TensorInfo inputTensorInfo({num, channels, height, width}, DataType::Float32);
+    TensorInfo inputTensorInfo( {num, channels, height, width}, DataType::Float32);
     TensorInfo outputTensorInfo({num, channels, height, width}, DataType::Float32);
     TensorInfo tensorInfo({channels}, DataType::Float32);
 
-    // Set quantization parameters if the requested type is a quantized type.
-    if(IsQuantizedType<float>())
-    {
-         inputTensorInfo.SetQuantizationScale(qScale);
-         inputTensorInfo.SetQuantizationOffset(qOffset);
-         outputTensorInfo.SetQuantizationScale(qScale);
-         outputTensorInfo.SetQuantizationOffset(qOffset);
-         tensorInfo.SetQuantizationScale(qScale);
-         tensorInfo.SetQuantizationOffset(qOffset);
-    }
-
     auto input = MakeTensor<float, 4>(inputTensorInfo,
-    QuantizedVector<float>(qScale, qOffset,
-    {
-        1.f, 4.f,
-        4.f, 2.f,
-        1.f, 6.f,
+        {
+             1.f, 4.f,
+             4.f, 2.f,
+             1.f, 6.f,
 
-        1.f, 1.f,
-        4.f, 1.f,
-        -2.f, 4.f
-    }));
+             1.f, 1.f,
+             4.f, 1.f,
+            -2.f, 4.f
+        });
+
     // these values are per-channel of the input
-    auto mean     = MakeTensor<float, 1>(tensorInfo, QuantizedVector<float>(qScale, qOffset, {3, -2}));
-    auto variance = MakeTensor<float, 1>(tensorInfo, QuantizedVector<float>(qScale, qOffset, {4, 9}));
-    auto beta     = MakeTensor<float, 1>(tensorInfo, QuantizedVector<float>(qScale, qOffset, {3, 2}));
-    auto gamma    = MakeTensor<float, 1>(tensorInfo, QuantizedVector<float>(qScale, qOffset, {2, 1}));
+    auto mean     = MakeTensor<float, 1>(tensorInfo, { 3.f, -2.f });
+    auto variance = MakeTensor<float, 1>(tensorInfo, { 4.f,  9.f });
+    auto beta     = MakeTensor<float, 1>(tensorInfo, { 3.f,  2.f });
+    auto gamma    = MakeTensor<float, 1>(tensorInfo, { 2.f,  1.f });
 
     std::unique_ptr<ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);

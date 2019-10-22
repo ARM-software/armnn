@@ -5,6 +5,7 @@
 
 #include "SliceTestImpl.hpp"
 
+#include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/ArmNN.hpp>
@@ -39,11 +40,11 @@ LayerTestResult<T, NumDims> SliceTestImpl(
     }
 
     boost::multi_array<T, NumDims> input =
-        MakeTensor<T, NumDims>(inputInfo, QuantizedVector<T>(qScale, qOffset, inputData));
+        MakeTensor<T, NumDims>(inputInfo, armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset));
 
     LayerTestResult<T, NumDims> result(outputInfo);
     result.outputExpected =
-        MakeTensor<T, NumDims>(outputInfo, QuantizedVector<T>(qScale, qOffset, expectedOutputData));
+        MakeTensor<T, NumDims>(outputInfo, armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset));
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);

@@ -56,6 +56,10 @@ public:
                                   const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                   const char* name = nullptr) override;
 
+    void VisitComparisonLayer(const IConnectableLayer* layer,
+                              const ComparisonDescriptor& comparisonDescriptor,
+                              const char* name = nullptr) override;
+
     void VisitConcatLayer(const IConnectableLayer* layer,
                           const OriginsDescriptor& originsDescriptor,
                           const char* name = nullptr) override;

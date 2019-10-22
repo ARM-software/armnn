@@ -1586,6 +1586,63 @@ BOOST_AUTO_TEST_CASE(QuantizeArgMinMax)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeComparison)
+{
+    class TestComparisonQuantization : public TestQuantization
+    {
+    public:
+        TestComparisonQuantization(const TensorShape& inputShape, const TensorShape& outputShape)
+            : TestQuantization(inputShape, outputShape) {}
+
+        TestComparisonQuantization(const QuantizerOptions& options,
+                                   const TensorShape& inputShape,
+                                   const TensorShape& outputShape)
+            : TestQuantization(options, inputShape, outputShape) {}
+
+        void VisitComparisonLayer(const IConnectableLayer* layer,
+                                  const ComparisonDescriptor& descriptor,
+                                  const char* name = nullptr) override
+        {
+            TensorInfo info = layer->GetOutputSlot(0).GetTensorInfo();
+
+            const OffsetScalePair qAsymm8Params{ 30.0f / g_Asymm8QuantizationBase, 128 };
+            const OffsetScalePair qSymm16Params{ 15.0f / g_Symm16QuantizationBase, 0 };
+
+            TestQuantizationParams(info, qAsymm8Params, qSymm16Params);
+        }
+    };
+
+    const TensorShape tensorShape{ 1u };
+    const TensorInfo tensorInfo(tensorShape, DataType::Float32);
+
+    INetworkPtr network = INetwork::Create();
+    ComparisonDescriptor descriptor(ComparisonOperation::LessOrEqual);
+
+    IConnectableLayer* inputLayer0     = network->AddInputLayer(0);
+    IConnectableLayer* inputLayer1     = network->AddInputLayer(1);
+    IConnectableLayer* comparisonLayer = network->AddComparisonLayer(descriptor);
+    IConnectableLayer* outputLayer     = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(comparisonLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(comparisonLayer->GetInputSlot(1));
+    comparisonLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    comparisonLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    // test QAsymm8 quantization
+    INetworkPtr quantizedNetworkQAsymm8 = INetworkQuantizer::Create(network.get())->ExportNetwork();
+    TestComparisonQuantization validatorQAsymm8(tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQAsymm8.get(), validatorQAsymm8);
+
+    // test QuantisedSymm16 quantization
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    INetworkPtr quantizedNetworkQSymm16 = INetworkQuantizer::Create(network.get(), options)->ExportNetwork();
+    TestComparisonQuantization validatorQSymm16(options, tensorShape, tensorShape);
+    VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
+}
+
 BOOST_AUTO_TEST_CASE(QuantizeConcat)
 {
     class TestConcatQuantization : public TestQuantization

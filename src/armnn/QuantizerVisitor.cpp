@@ -185,6 +185,15 @@ void QuantizerVisitor::VisitBatchToSpaceNdLayer(const IConnectableLayer* layer,
     SetQuantizedInputConnections(layer, newLayer);
 }
 
+void QuantizerVisitor::VisitComparisonLayer(const IConnectableLayer* layer,
+                                            const ComparisonDescriptor& comparisonDescriptor,
+                                            const char* name)
+{
+    IConnectableLayer* newLayer = m_QuantizedNetwork->AddComparisonLayer(comparisonDescriptor, name);
+    RecordLayer(layer, newLayer);
+    SetQuantizedInputConnections(layer, newLayer);
+}
+
 void QuantizerVisitor::VisitConcatLayer(const IConnectableLayer* layer,
                                         const OriginsDescriptor& originsDescriptor,
                                         const char* name)

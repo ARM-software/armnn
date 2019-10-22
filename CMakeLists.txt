@@ -474,6 +474,8 @@ list(APPEND armnn_sources
     src/profiling/ProfilingConnectionDumpToFileDecorator.hpp
     src/profiling/ProfilingConnectionFactory.cpp
     src/profiling/ProfilingConnectionFactory.hpp
+    src/profiling/ProfilingGuid.hpp
+    src/profiling/ProfilingGuidGenerator.hpp
     src/profiling/ProfilingService.cpp
     src/profiling/ProfilingService.hpp
     src/profiling/ProfilingStateMachine.cpp
@@ -609,6 +611,7 @@ if(BUILD_UNIT_TESTS)
         src/armnnUtils/test/TensorUtilsTest.cpp
         src/profiling/test/BufferTests.cpp
         src/profiling/test/ProfilingConnectionDumpToFileDecoratorTests.cpp
+        src/profiling/test/ProfilingGuidTest.cpp
         src/profiling/test/ProfilingTests.cpp
         src/profiling/test/ProfilingTests.hpp
         src/profiling/test/SendCounterPacketTests.cpp

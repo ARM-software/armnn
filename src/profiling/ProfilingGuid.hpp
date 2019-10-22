@@ -18,7 +18,7 @@ class ProfilingGuid
 public:
     ProfilingGuid(uint64_t guid) : m_Guid(guid) {}
 
-    operator uint64_t () const { return m_Guid; }
+    operator uint64_t() const { return m_Guid; }
 
     bool operator==(const ProfilingGuid& other) const
     {
@@ -27,7 +27,7 @@ public:
 
     bool operator!=(const ProfilingGuid& other) const
     {
-        return !(*this == other);
+        return m_Guid != other.m_Guid;
     }
 
     bool operator<(const ProfilingGuid& other) const

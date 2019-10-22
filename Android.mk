@@ -190,7 +190,8 @@ LOCAL_SRC_FILES := \
         src/profiling/ProfilingUtils.cpp \
         src/profiling/RequestCounterDirectoryCommandHandler.cpp \
         src/profiling/SendCounterPacket.cpp \
-        src/profiling/SocketProfilingConnection.cpp
+        src/profiling/SocketProfilingConnection.cpp \
+        src/profiling/TimelineUtilityMethods.cpp
 
 LOCAL_STATIC_LIBRARIES := \
         armnn-arm_compute \

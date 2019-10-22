@@ -495,6 +495,8 @@ list(APPEND armnn_sources
     src/profiling/SocketProfilingConnection.hpp
     src/profiling/TimelinePacketWriterFactory.cpp
     src/profiling/TimelinePacketWriterFactory.hpp
+    src/profiling/TimelineUtilityMethods.cpp
+    src/profiling/TimelineUtilityMethods.hpp
     third-party/half/half.hpp
     )
 
@@ -626,6 +628,7 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/SendCounterPacketTests.hpp
         src/profiling/test/SendTimelinePacketTests.cpp
         src/profiling/test/TimelinePacketTests.cpp
+        src/profiling/test/TimelineUtilityMethodsTests.cpp
         )
 
     if(ARMNNREF)

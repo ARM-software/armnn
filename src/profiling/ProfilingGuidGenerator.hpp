@@ -26,8 +26,6 @@ public:
     /// Create a ProfilingStaticGuid based on a hash of the string
     // NOTE: dummy implementation for the moment
     inline ProfilingStaticGuid GenerateStaticId(const std::string& str) override { return ProfilingStaticGuid(0); }
-
-private:
 };
 
 } // namespace profiling

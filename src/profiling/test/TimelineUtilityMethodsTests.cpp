@@ -258,7 +258,7 @@ void VerifyTimelineEntityBinaryPacket(Optional<ProfilingGuid> guid,
     uint32_t entityBinaryPacketSequenceNumbered = (entityBinaryPacketHeaderWord1 >> 24) & 0x00000001;
     uint32_t entityBinaryPacketDataLength       = (entityBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(entityBinaryPacketSequenceNumbered == 0);
-    BOOST_CHECK(entityBinaryPacketDataLength       == 8);
+    BOOST_CHECK(entityBinaryPacketDataLength       == 12);
 
     // Check the decl_id
     offset += uint32_t_size;

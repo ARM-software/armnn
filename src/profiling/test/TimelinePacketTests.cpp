@@ -543,6 +543,11 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTest3)
     BOOST_CHECK(sequenceNumbered ==  0);
     BOOST_CHECK(dataLength       == 416);
 
+    // Check the number of declarations
+    offset += uint32_t_size;
+    uint32_t declCount = ReadUint32(buffer.data(), offset);
+    BOOST_CHECK(declCount == 5);
+
     // Check the decl_id
     offset += uint32_t_size;
     uint32_t readDeclId = ReadUint32(buffer.data(), offset);
@@ -689,7 +694,7 @@ BOOST_AUTO_TEST_CASE(TimelineEntityPacketTest4)
     uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
     uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(sequenceNumbered ==  0);
-    BOOST_CHECK(dataLength       == 8);
+    BOOST_CHECK(dataLength       == 12);
 
     // Check decl_Id
     offset += uint32_t_size;

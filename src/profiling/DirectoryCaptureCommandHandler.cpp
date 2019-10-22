@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <atomic>
 #include "DirectoryCaptureCommandHandler.hpp"
 #include "SendCounterPacket.hpp"
 

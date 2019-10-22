@@ -53,7 +53,11 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(dataLength       == 416);
 
     offset += uint32_t_size;
-    SwTraceMessage swTraceMessage = ReadSwTraceMessage(packetBuffer, offset);
+    uint32_t DeclCount = ReadUint32(packetBuffer, offset);
+    BOOST_CHECK(DeclCount == 5);
+
+    offset += uint32_t_size;
+    SwTraceMessage swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
     BOOST_CHECK(swTraceMessage.id == 0);
     BOOST_CHECK(swTraceMessage.name == "declareLabel");
@@ -65,7 +69,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.argNames[0] == "guid");
     BOOST_CHECK(swTraceMessage.argNames[1] == "value");
 
-    swTraceMessage = ReadSwTraceMessage(packetBuffer, offset);
+    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
     BOOST_CHECK(swTraceMessage.id == 1);
     BOOST_CHECK(swTraceMessage.name == "declareEntity");
@@ -75,7 +79,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.argNames.size() == 1);
     BOOST_CHECK(swTraceMessage.argNames[0] == "guid");
 
-    swTraceMessage = ReadSwTraceMessage(packetBuffer, offset);
+    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
     BOOST_CHECK(swTraceMessage.id == 2);
     BOOST_CHECK(swTraceMessage.name == "declareEventClass");
@@ -85,7 +89,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.argNames.size() == 1);
     BOOST_CHECK(swTraceMessage.argNames[0] == "guid");
 
-    swTraceMessage = ReadSwTraceMessage(packetBuffer, offset);
+    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
     BOOST_CHECK(swTraceMessage.id == 3);
     BOOST_CHECK(swTraceMessage.name == "declareRelationship");
@@ -101,7 +105,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     BOOST_CHECK(swTraceMessage.argNames[2] == "headGuid");
     BOOST_CHECK(swTraceMessage.argNames[3] == "tailGuid");
 
-    swTraceMessage = ReadSwTraceMessage(packetBuffer, offset);
+    swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
     BOOST_CHECK(swTraceMessage.id == 4);
     BOOST_CHECK(swTraceMessage.name == "declareEvent");
@@ -157,7 +161,7 @@ BOOST_AUTO_TEST_CASE(SendTimelineEntityPlusEventClassBinaryPacketTest)
     uint32_t entityBinaryPacketSequenceNumbered = (entityBinaryPacketHeaderWord1 >> 24) & 0x00000001;
     uint32_t entityBinaryPacketDataLength       = (entityBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(entityBinaryPacketSequenceNumbered == 0);
-    BOOST_CHECK(entityBinaryPacketDataLength       == 8);
+    BOOST_CHECK(entityBinaryPacketDataLength       == 12);
 
     // Check the decl_id
     offset += uint32_t_size;
@@ -243,7 +247,7 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests1)
     uint32_t entityBinaryPacketSequenceNumbered = (entityBinaryPacketHeaderWord1 >> 24) & 0x00000001;
     uint32_t entityBinaryPacketDataLength       = (entityBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(entityBinaryPacketSequenceNumbered == 0);
-    BOOST_CHECK(entityBinaryPacketDataLength       == 8);
+    BOOST_CHECK(entityBinaryPacketDataLength       == 12);
 
     // Check the decl_id
     offset += uint32_t_size;

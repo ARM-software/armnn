@@ -822,6 +822,7 @@ if(BUILD_UNIT_TESTS)
     if(BUILD_GATORD_MOCK)
         list(APPEND unittest_sources
             tests/profiling/gatordmock/tests/GatordMockTests.cpp
+            tests/profiling/timelineDecoder/tests/TimelineTests.cpp
             )
     endif()
 
@@ -936,6 +937,13 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.hpp
         tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.cpp
         tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.hpp
+        tests/profiling/timelineDecoder/ITimelineDecoder.h
+        tests/profiling/timelineDecoder/TimelineCaptureCommandHandler.cpp
+        tests/profiling/timelineDecoder/TimelineCaptureCommandHandler.hpp
+        tests/profiling/timelineDecoder/TimelineDecoder.cpp
+        tests/profiling/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp
+        tests/profiling/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp
+        tests/profiling/timelineDecoder/tests/TimelineTestFunctions.hpp
         )
 
     include_directories(${Boost_INCLUDE_DIRS} src/profiling)

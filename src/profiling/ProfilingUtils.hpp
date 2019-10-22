@@ -156,7 +156,7 @@ enum class ProfilingRelationshipType
 
 uint32_t CalculateSizeOfPaddedSwString(const std::string& str);
 
-SwTraceMessage ReadSwTraceMessage(const IPacketBufferPtr& packetBuffer, unsigned int& offset);
+SwTraceMessage ReadSwTraceMessage(const unsigned char*, unsigned int& offset);
 
 TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
                                                     const std::string& label,

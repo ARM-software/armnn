@@ -347,7 +347,7 @@ uint32_t CalculateSizeOfPaddedSwString(const std::string& str)
 }
 
 // Read TimelineMessageDirectoryPacket from given IPacketBuffer and offset
-SwTraceMessage ReadSwTraceMessage(const IPacketBufferPtr& packetBuffer, unsigned int& offset)
+SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer, unsigned int& offset)
 {
     BOOST_ASSERT(packetBuffer);
 
@@ -369,7 +369,7 @@ SwTraceMessage ReadSwTraceMessage(const IPacketBufferPtr& packetBuffer, unsigned
     offset += uint32_t_size;
     std::vector<unsigned char> swTraceStringBuffer(swTraceDeclNameLength - 1);
     std::memcpy(swTraceStringBuffer.data(),
-                packetBuffer->GetReadableData()  + offset, swTraceStringBuffer.size());
+                packetBuffer + offset, swTraceStringBuffer.size());
 
     swTraceMessage.name.assign(swTraceStringBuffer.begin(), swTraceStringBuffer.end()); // name
 
@@ -380,7 +380,7 @@ SwTraceMessage ReadSwTraceMessage(const IPacketBufferPtr& packetBuffer, unsigned
     offset += uint32_t_size;
     swTraceStringBuffer.resize(swTraceUINameLength - 1);
     std::memcpy(swTraceStringBuffer.data(),
-                packetBuffer->GetReadableData()  + offset, swTraceStringBuffer.size());
+                packetBuffer  + offset, swTraceStringBuffer.size());
 
     swTraceMessage.uiName.assign(swTraceStringBuffer.begin(), swTraceStringBuffer.end()); // ui_name
 
@@ -391,7 +391,7 @@ SwTraceMessage ReadSwTraceMessage(const IPacketBufferPtr& packetBuffer, unsigned
     offset += uint32_t_size;
     swTraceStringBuffer.resize(swTraceArgTypesLength - 1);
     std::memcpy(swTraceStringBuffer.data(),
-                packetBuffer->GetReadableData()  + offset, swTraceStringBuffer.size());
+                packetBuffer  + offset, swTraceStringBuffer.size());
 
     swTraceMessage.argTypes.assign(swTraceStringBuffer.begin(), swTraceStringBuffer.end()); // arg_types
 
@@ -404,7 +404,7 @@ SwTraceMessage ReadSwTraceMessage(const IPacketBufferPtr& packetBuffer, unsigned
     offset += uint32_t_size;
     swTraceStringBuffer.resize(swTraceArgNamesLength - 1);
     std::memcpy(swTraceStringBuffer.data(),
-                packetBuffer->GetReadableData()  + offset, swTraceStringBuffer.size());
+                packetBuffer  + offset, swTraceStringBuffer.size());
 
     swTraceString.assign(swTraceStringBuffer.begin(), swTraceStringBuffer.end());
     std::stringstream stringStream(swTraceString);
@@ -536,12 +536,11 @@ TimelinePacketStatus WriteTimelineEntityBinaryPacket(uint64_t profilingGuid,
     unsigned int uint64_t_size = sizeof(uint64_t);
 
     // Calculate the length of the data (in bytes)
-    unsigned int timelineEntityPacketDataLength = uint64_t_size;   // Profiling GUID
+    unsigned int timelineEntityPacketDataLength = uint32_t_size + uint64_t_size;  // decl_id + Profiling GUID
 
 
     // Calculate the timeline binary packet size (in bytes)
     unsigned int timelineEntityPacketSize = 2 * uint32_t_size +             // Header (2 words)
-                                            uint32_t_size +                 // decl_Id
                                             timelineEntityPacketDataLength; // Profiling GUID
 
     // Check whether the timeline binary packet fits in the given buffer
@@ -742,6 +741,9 @@ TimelinePacketStatus WriteTimelineMessageDirectoryPackage(unsigned char* buffer,
     WriteUint32(buffer, offset, packetHeader.first);
     offset += uint32_t_size;
     WriteUint32(buffer, offset, packetHeader.second);
+    offset += uint32_t_size;
+
+    WriteUint32(buffer, offset, static_cast<uint32_t >(swTraceTimelineDirectoryMessages.size()));
     offset += uint32_t_size;
 
     for (unsigned int i = 0u; i < swTraceTimelineDirectoryMessages.size(); ++i)

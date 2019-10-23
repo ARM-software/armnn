@@ -10,7 +10,7 @@ namespace armnn
 {
 
 StandInLayer::StandInLayer(const StandInDescriptor& param, const char* name)
-    : LayerWithParameters(param.m_NumInputs, 1, LayerType::StandIn, param, name)
+    : LayerWithParameters(param.m_NumInputs, param.m_NumOutputs, LayerType::StandIn, param, name)
 {
 }
 
@@ -42,6 +42,4 @@ void StandInLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitStandInLayer(this, GetParameters(), GetName());
 }
-} //namespace armnn
-
-
+} // namespace armnn

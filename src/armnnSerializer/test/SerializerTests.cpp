@@ -2289,6 +2289,41 @@ BOOST_AUTO_TEST_CASE(SerializeStack)
     deserializedNetwork->Accept(verifier);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeStandIn)
+{
+    DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(StandIn)
+
+    const std::string layerName("standIn");
+
+    armnn::TensorInfo tensorInfo({ 1u }, armnn::DataType::Float32);
+    armnn::StandInDescriptor descriptor(2u, 2u);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0  = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1  = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const standInLayer = network->AddStandInLayer(descriptor, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer0 = network->AddOutputLayer(0);
+    armnn::IConnectableLayer* const outputLayer1 = network->AddOutputLayer(1);
+
+    inputLayer0->GetOutputSlot(0).Connect(standInLayer->GetInputSlot(0));
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    inputLayer1->GetOutputSlot(0).Connect(standInLayer->GetInputSlot(1));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    standInLayer->GetOutputSlot(0).Connect(outputLayer0->GetInputSlot(0));
+    standInLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    standInLayer->GetOutputSlot(1).Connect(outputLayer1->GetInputSlot(0));
+    standInLayer->GetOutputSlot(1).SetTensorInfo(tensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    BOOST_CHECK(deserializedNetwork);
+
+    StandInLayerVerifier verifier(layerName, { tensorInfo, tensorInfo }, { tensorInfo, tensorInfo }, descriptor);
+    deserializedNetwork->Accept(verifier);
+}
+
 BOOST_AUTO_TEST_CASE(SerializeStridedSlice)
 {
     DECLARE_LAYER_VERIFIER_CLASS_WITH_DESCRIPTOR(StridedSlice)

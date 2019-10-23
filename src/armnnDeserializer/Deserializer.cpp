@@ -232,6 +232,7 @@ m_ParserFunctions(Layer_MAX+1, &Deserializer::ParseUnsupportedLayer)
     m_ParserFunctions[Layer_SpaceToDepthLayer]           = &Deserializer::ParseSpaceToDepth;
     m_ParserFunctions[Layer_SplitterLayer]               = &Deserializer::ParseSplitter;
     m_ParserFunctions[Layer_StackLayer]                  = &Deserializer::ParseStack;
+    m_ParserFunctions[Layer_StandInLayer]                = &Deserializer::ParseStandIn;
     m_ParserFunctions[Layer_StridedSliceLayer]           = &Deserializer::ParseStridedSlice;
     m_ParserFunctions[Layer_SubtractionLayer]            = &Deserializer::ParseSubtraction;
     m_ParserFunctions[Layer_SwitchLayer]                 = &Deserializer::ParseSwitch;
@@ -342,6 +343,8 @@ Deserializer::LayerBaseRawPtr Deserializer::GetBaseLayer(const GraphPtr& graphPt
             return graphPtr->layers()->Get(layerIndex)->layer_as_SplitterLayer()->base();
         case Layer::Layer_StackLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_StackLayer()->base();
+        case Layer::Layer_StandInLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_StandInLayer()->base();
         case Layer::Layer_StridedSliceLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_StridedSliceLayer()->base();
         case Layer::Layer_SubtractionLayer:
@@ -2680,6 +2683,36 @@ void Deserializer::ParseStack(GraphPtr graph, unsigned int layerIndex)
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void Deserializer::ParseStandIn(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs  = GetInputs(graph, layerIndex);
+    auto outputs = GetOutputs(graph, layerIndex);
+
+    auto fbLayer      = graph->layers()->Get(layerIndex)->layer_as_StandInLayer();
+    auto fbDescriptor = fbLayer->descriptor();
+
+    armnn::StandInDescriptor descriptor;
+    descriptor.m_NumInputs  = fbDescriptor->numInputs();
+    descriptor.m_NumOutputs = fbDescriptor->numOutputs();
+
+    CHECK_VALID_SIZE(inputs.size(),  descriptor.m_NumInputs);
+    CHECK_VALID_SIZE(outputs.size(), descriptor.m_NumOutputs);
+
+    const std::string layerName     = GetLayerName(graph, layerIndex);
+    armnn::IConnectableLayer* layer = m_Network->AddStandInLayer(descriptor, layerName.c_str());
+
+    for (unsigned int i = 0u; i < descriptor.m_NumOutputs; ++i)
+    {
+        armnn::TensorInfo outputInfo = ToTensorInfo(outputs[i]);
+        layer->GetOutputSlot(i).SetTensorInfo(outputInfo);
+    }
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

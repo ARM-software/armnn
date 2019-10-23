@@ -144,7 +144,8 @@ enum LayerType : uint {
     DepthToSpace = 49,
     InstanceNormalization = 50,
     LogSoftmax = 51,
-    Comparison = 52
+    Comparison = 52,
+    StandIn = 53
 }
 
 // Base layer table to be used as part of other layers
@@ -731,6 +732,16 @@ table StackDescriptor {
     inputShape:[uint];
 }
 
+table StandInDescriptor {
+    numInputs:uint;
+    numOutputs:uint;
+}
+
+table StandInLayer {
+    base:LayerBase;
+    descriptor:StandInDescriptor;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -784,7 +795,8 @@ union Layer {
     DepthToSpaceLayer,
     InstanceNormalizationLayer,
     LogSoftmaxLayer,
-    ComparisonLayer
+    ComparisonLayer,
+    StandInLayer
 }
 
 table AnyLayer {

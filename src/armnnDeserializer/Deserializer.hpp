@@ -123,6 +123,7 @@ private:
     void ParseSpaceToDepth(GraphPtr graph, unsigned int layerIndex);
     void ParseSplitter(GraphPtr graph, unsigned int layerIndex);
     void ParseStack(GraphPtr graph, unsigned int layerIndex);
+    void ParseStandIn(GraphPtr graph, unsigned int layerIndex);
     void ParseStridedSlice(GraphPtr graph, unsigned int layerIndex);
     void ParseSubtraction(GraphPtr graph, unsigned int layerIndex);
     void ParseSwitch(GraphPtr graph, unsigned int layerIndex);

@@ -962,6 +962,12 @@ struct StandInDescriptor
         , m_NumOutputs(numOutputs)
     {}
 
+    bool operator ==(const StandInDescriptor& rhs) const
+    {
+        return m_NumInputs  == rhs.m_NumInputs &&
+               m_NumOutputs == rhs.m_NumOutputs;
+    }
+
     /// Number of input tensors
     uint32_t m_NumInputs = 0;
     /// Number of output tensors

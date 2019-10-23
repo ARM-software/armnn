@@ -50,6 +50,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 * SpaceToDepth
 * Splitter
 * Stack
+* StandIn
 * StridedSlice
 * Subtraction
 * Switch

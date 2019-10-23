@@ -1094,7 +1094,14 @@ void SerializerVisitor::VisitStandInLayer(const armnn::IConnectableLayer *layer,
                                           const armnn::StandInDescriptor& standInDescriptor,
                                           const char *name)
 {
-    // TODO: IVGCVSW-4010 Implement serialization
+    auto fbDescriptor = serializer::CreateStandInDescriptor(m_flatBufferBuilder,
+                                                            standInDescriptor.m_NumInputs,
+                                                            standInDescriptor.m_NumOutputs);
+
+    auto fbBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_StandIn);
+    auto fbLayer     = serializer::CreateStandInLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_StandInLayer);
 }
 
 void SerializerVisitor::VisitStridedSliceLayer(const armnn::IConnectableLayer* layer,

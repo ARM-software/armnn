@@ -1179,6 +1179,37 @@ BOOST_AUTO_TEST_CASE(QuantizeSoftmax)
     VisitLayersTopologically(quantizedNetworkQSymm16.get(), validatorQSymm16);
 }
 
+BOOST_AUTO_TEST_CASE(QuantizeStandIn)
+{
+    const TensorShape tensorShape{ 1U };
+    const TensorInfo tensorInfo(tensorShape, DataType::Float32);
+
+    INetworkPtr network = INetwork::Create();
+
+    StandInDescriptor descriptor;
+    descriptor.m_NumInputs = 1;
+    descriptor.m_NumOutputs = 1;
+
+    IConnectableLayer* inputLayer     = network->AddInputLayer(0);
+    IConnectableLayer* standInLayer   = network->AddStandInLayer(descriptor);
+    IConnectableLayer* outputLayer    = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(standInLayer->GetInputSlot(0));
+    standInLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    standInLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    // test QAsymm8 quantization
+    BOOST_CHECK_THROW(INetworkQuantizer::Create(network.get())->ExportNetwork(),
+                      armnn::UnimplementedException);
+
+    // test QuantisedSymm16 quantization
+    const QuantizerOptions options(DataType::QuantisedSymm16);
+    BOOST_CHECK_THROW(INetworkQuantizer::Create(network.get(), options)->ExportNetwork(),
+                      armnn::UnimplementedException);
+}
+
 IConnectableLayer* CreateStartOfLeakyReluNetwork(INetwork* network, const TensorInfo& info)
 {
     ActivationDescriptor activationDescriptor;

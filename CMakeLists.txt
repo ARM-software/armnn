@@ -711,6 +711,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/TransposeConv.cpp
              src/armnnTfLiteParser/test/Transpose.cpp
              src/armnnTfLiteParser/test/Unpack.cpp
+             src/armnnTfLiteParser/test/Unsupported.cpp
              src/armnnTfLiteParser/test/LoadModel.cpp
              src/armnnTfLiteParser/test/GetBuffer.cpp
              src/armnnTfLiteParser/test/OutputShapeOfSqueeze.cpp

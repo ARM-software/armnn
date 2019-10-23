@@ -8,6 +8,7 @@
 #include "armnn/NetworkFwd.hpp"
 #include "armnn/Tensor.hpp"
 #include "armnn/INetwork.hpp"
+#include "armnn/Optional.hpp"
 
 #include <memory>
 #include <map>
@@ -24,8 +25,16 @@ using ITfLiteParserPtr = std::unique_ptr<ITfLiteParser, void(*)(ITfLiteParser* p
 class ITfLiteParser
 {
 public:
-    static ITfLiteParser* CreateRaw();
-    static ITfLiteParserPtr Create();
+    struct TfLiteParserOptions
+    {
+        TfLiteParserOptions()
+            : m_StandInLayerForUnsupported(false) {}
+
+        bool m_StandInLayerForUnsupported;
+    };
+
+    static ITfLiteParser* CreateRaw(const armnn::Optional<TfLiteParserOptions>& options = armnn::EmptyOptional());
+    static ITfLiteParserPtr Create(const armnn::Optional<TfLiteParserOptions>& options = armnn::EmptyOptional());
     static void Destroy(ITfLiteParser* parser);
 
     /// Create the network from a flatbuffers binary file on disk

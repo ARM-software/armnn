@@ -29,22 +29,27 @@
 #include <iostream>
 
 using armnnTfLiteParser::ITfLiteParser;
-using TensorRawPtr = const tflite::TensorT *;
+using armnnTfLiteParser::ITfLiteParserPtr;
 
+using TensorRawPtr = const tflite::TensorT *;
 struct ParserFlatbuffersFixture
 {
     ParserFlatbuffersFixture() :
-        m_Parser(ITfLiteParser::Create()),
+        m_Parser(nullptr, &ITfLiteParser::Destroy),
         m_Runtime(armnn::IRuntime::Create(armnn::IRuntime::CreationOptions())),
         m_NetworkIdentifier(-1)
     {
+        ITfLiteParser::TfLiteParserOptions options;
+        options.m_StandInLayerForUnsupported = true;
+
+        m_Parser.reset(ITfLiteParser::CreateRaw(armnn::Optional<ITfLiteParser::TfLiteParserOptions>(options)));
     }
 
     std::vector<uint8_t> m_GraphBinary;
-    std::string m_JsonString;
-    std::unique_ptr<ITfLiteParser, void (*)(ITfLiteParser *parser)> m_Parser;
-    armnn::IRuntimePtr m_Runtime;
-    armnn::NetworkId m_NetworkIdentifier;
+    std::string          m_JsonString;
+    ITfLiteParserPtr     m_Parser;
+    armnn::IRuntimePtr   m_Runtime;
+    armnn::NetworkId     m_NetworkIdentifier;
 
     /// If the single-input-single-output overload of Setup() is called, these will store the input and output name
     /// so they don't need to be passed to the single-input-single-output overload of RunTest().

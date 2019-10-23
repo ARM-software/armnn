@@ -18,6 +18,7 @@ armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType da
         case armnn::DataType::Signed32:
             return armnnSerializer::ConstTensorData::ConstTensorData_IntData;
         case armnn::DataType::Float16:
+        case armnn::DataType::QuantisedSymm16:
             return armnnSerializer::ConstTensorData::ConstTensorData_ShortData;
         case armnn::DataType::QuantisedAsymm8:
         case armnn::DataType::Boolean:
@@ -37,6 +38,8 @@ armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType)
             return armnnSerializer::DataType::DataType_Float16;
         case armnn::DataType::Signed32:
             return armnnSerializer::DataType::DataType_Signed32;
+        case armnn::DataType::QuantisedSymm16:
+            return armnnSerializer::DataType::DataType_QuantisedSymm16;
         case armnn::DataType::QuantisedAsymm8:
             return armnnSerializer::DataType::DataType_QuantisedAsymm8;
         case armnn::DataType::Boolean:

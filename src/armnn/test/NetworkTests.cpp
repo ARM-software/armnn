@@ -473,4 +473,70 @@ BOOST_AUTO_TEST_CASE(Network_AddMerge)
     BOOST_TEST(testMerge.m_Visited == true);
 }
 
+BOOST_AUTO_TEST_CASE(StandInLayerNetworkTest)
+{
+    // Create a simple network with a StandIn some place in it.
+    armnn::Network net;
+    auto input = net.AddInputLayer(0);
+
+    // Add some valid layer.
+    auto floor = net.AddFloorLayer("Floor");
+
+    // Add a standin layer
+    armnn::StandInDescriptor standInDescriptor;
+    standInDescriptor.m_NumInputs  = 1;
+    standInDescriptor.m_NumOutputs = 1;
+    auto standIn = net.AddStandInLayer(standInDescriptor, "StandIn");
+
+    // Finally the output.
+    auto output = net.AddOutputLayer(0);
+
+    // Connect up the layers
+    input->GetOutputSlot(0).Connect(floor->GetInputSlot(0));
+
+    floor->GetOutputSlot(0).Connect(standIn->GetInputSlot(0));
+
+    standIn->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    // Check that the layer is there.
+    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "StandIn"));
+    // Check that it is connected as expected.
+    BOOST_TEST(input->GetOutputSlot(0).GetConnection(0) == &floor->GetInputSlot(0));
+    BOOST_TEST(floor->GetOutputSlot(0).GetConnection(0) == &standIn->GetInputSlot(0));
+    BOOST_TEST(standIn->GetOutputSlot(0).GetConnection(0) == &output->GetInputSlot(0));
+}
+
+BOOST_AUTO_TEST_CASE(StandInLayerSingleInputMultipleOutputsNetworkTest)
+{
+    // Another test with one input and two outputs on the StandIn layer.
+    armnn::Network net;
+
+    // Create the input.
+    auto input = net.AddInputLayer(0);
+
+    // Add a standin layer
+    armnn::StandInDescriptor standInDescriptor;
+    standInDescriptor.m_NumInputs  = 1;
+    standInDescriptor.m_NumOutputs = 2;
+    auto standIn = net.AddStandInLayer(standInDescriptor, "StandIn");
+
+    // Add two outputs.
+    auto output0 = net.AddOutputLayer(0);
+    auto output1 = net.AddOutputLayer(1);
+
+    // Connect up the layers
+    input->GetOutputSlot(0).Connect(standIn->GetInputSlot(0));
+
+    // Connect the two outputs of the Standin to the two outputs.
+    standIn->GetOutputSlot(0).Connect(output0->GetInputSlot(0));
+    standIn->GetOutputSlot(1).Connect(output1->GetInputSlot(0));
+
+    // Check that the layer is there.
+    BOOST_TEST(GraphHasNamedLayer(net.GetGraph(), "StandIn"));
+    // Check that it is connected as expected.
+    BOOST_TEST(input->GetOutputSlot(0).GetConnection(0) == &standIn->GetInputSlot(0));
+    BOOST_TEST(standIn->GetOutputSlot(0).GetConnection(0) == &output0->GetInputSlot(0));
+    BOOST_TEST(standIn->GetOutputSlot(1).GetConnection(0) == &output1->GetInputSlot(0));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

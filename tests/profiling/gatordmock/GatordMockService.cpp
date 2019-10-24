@@ -6,8 +6,8 @@
 #include "GatordMockService.hpp"
 
 #include <CommandHandlerRegistry.hpp>
-#include "../../src/profiling/PacketVersionResolver.hpp"
-#include "../../src/profiling/ProfilingUtils.hpp"
+#include <PacketVersionResolver.hpp>
+#include <ProfilingUtils.hpp>
 
 #include <cerrno>
 #include <fcntl.h>
@@ -231,12 +231,12 @@ void GatordMockService::ReceiveLoop(GatordMockService& mockService)
         {
             // In this case we ignore timeouts and and keep trying to receive.
         }
-        catch (const armnn::InvalidArgumentException &e)
+        catch (const armnn::InvalidArgumentException& e)
         {
             // We couldn't find a functor to handle the packet?
             std::cerr << "Packet received that could not be processed: " << e.what() << std::endl;
         }
-        catch (const armnn::RuntimeException &e)
+        catch (const armnn::RuntimeException& e)
         {
             // A runtime exception occurred which means we must exit the loop.
             std::cerr << "Receive thread closing: " << e.what() << std::endl;
@@ -331,15 +331,14 @@ armnn::profiling::Packet GatordMockService::ReceivePacket()
         std::cout << "Processing packet ID= " << packetRx.GetPacketId() << " Length=" << packetRx.GetLength()
                   << std::endl;
     }
-    // Pass packet into the handler registry
-    m_PacketsReceivedCount.operator++(std::memory_order::memory_order_release);
-    m_HandlerRegistry
-        .GetFunctor(packetRx.GetPacketFamily(),
-                    packetRx.GetPacketId(),
-                    packetVersionResolver.ResolvePacketVersion(packetRx.GetPacketFamily(),
-                                                               packetRx.GetPacketId()).GetEncodedValue())
-        ->operator()(packetRx);
 
+    profiling::Version version =
+        packetVersionResolver.ResolvePacketVersion(packetRx.GetPacketFamily(), packetRx.GetPacketId());
+
+    profiling::CommandHandlerFunctor* commandHandlerFunctor =
+        m_HandlerRegistry.GetFunctor(packetRx.GetPacketFamily(), packetRx.GetPacketId(), version.GetEncodedValue());
+    BOOST_ASSERT(commandHandlerFunctor);
+    commandHandlerFunctor->operator()(packetRx);
     return packetRx;
 }
 

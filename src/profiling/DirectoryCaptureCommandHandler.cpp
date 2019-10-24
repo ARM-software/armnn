@@ -3,13 +3,15 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <atomic>
 #include "DirectoryCaptureCommandHandler.hpp"
+#include "SendCounterPacket.hpp"
+
+#include <iostream>
 
 namespace armnn
 {
 
-namespace gatordmock
+namespace profiling
 {
 
 // Utils
@@ -30,7 +32,7 @@ void DirectoryCaptureCommandHandler::ParseData(const armnn::profiling::Packet& p
         return;
     }
 
-    const unsigned char* data = reinterpret_cast<const unsigned char*>(packet.GetData());
+    const unsigned char* data = packet.GetData();
     // Body header word 0:
     // 0:15  [16] reserved: all zeros
     offset += uint16_t_size;
@@ -89,29 +91,15 @@ void DirectoryCaptureCommandHandler::ParseData(const armnn::profiling::Packet& p
         offset += uint32_t_size;
     }
 
-    m_CounterDirectory.m_DeviceRecords = ReadDeviceRecords(data, offset, deviceRecordOffsets);
-    m_CounterDirectory.m_CounterSets   = ReadCounterSetRecords(data, offset, counterSetOffsets);
-    m_CounterDirectory.m_Categories    = ReadCategoryRecords(data, offset, categoryOffsets);
-
-    m_CounterDirectoryCount.operator++(std::memory_order_release);
-}
-
-std::vector<DeviceRecord> DirectoryCaptureCommandHandler::ReadDeviceRecords(const unsigned char* const data,
-                                                                            uint32_t offset,
-                                                                            std::vector<uint32_t> deviceRecordOffsets)
-{
-    uint32_t deviceRecordCount = static_cast<uint32_t >(deviceRecordOffsets.size());
-    std::vector<DeviceRecord> deviceRecords(deviceRecordCount);
-
-    for(uint32_t deviceIndex = 0; deviceIndex < deviceRecordCount; ++deviceIndex)
+    for (uint32_t deviceIndex = 0; deviceIndex < deviceRecordCount; ++deviceIndex)
     {
         uint32_t deviceRecordOffset = offset + deviceRecordOffsets[deviceIndex];
         // Device record word 0:
         // 0:15  [16] cores: the number of individual streams of counters for one or more cores of some device
-        deviceRecords[deviceIndex].m_DeviceCores = profiling::ReadUint16(data, deviceRecordOffset);
+        uint16_t deviceCores = profiling::ReadUint16(data, deviceRecordOffset);
         // 16:31 [16] deviceUid: the unique identifier for the device
         deviceRecordOffset += uint16_t_size;
-        deviceRecords[deviceIndex].m_DeviceUid = profiling::ReadUint16(data, deviceRecordOffset);
+        uint16_t deviceUid = profiling::ReadUint16(data, deviceRecordOffset);
         deviceRecordOffset += uint16_t_size;
 
         // Device record word 1:
@@ -122,20 +110,10 @@ std::vector<DeviceRecord> DirectoryCaptureCommandHandler::ReadDeviceRecords(cons
         deviceRecordOffset += uint32_t_size;
         deviceRecordOffset += nameOffset;
 
-        deviceRecords[deviceIndex].m_DeviceName = GetStringNameFromBuffer(data, deviceRecordOffset);
+        const std::string& deviceName             = GetStringNameFromBuffer(data, deviceRecordOffset);
+        const Device* registeredDevice            = m_CounterDirectory.RegisterDevice(deviceName, deviceCores);
+        m_UidTranslation[registeredDevice->m_Uid] = deviceUid;
     }
-
-    return  deviceRecords;
-}
-
-
-std::vector<CounterSetRecord>
-        DirectoryCaptureCommandHandler::ReadCounterSetRecords(const unsigned char* const data,
-                                                              uint32_t offset,
-                                                              std::vector<uint32_t> counterSetOffsets)
-{
-    uint32_t counterSetRecordCount = static_cast<uint32_t >(counterSetOffsets.size());
-    std::vector<CounterSetRecord> counterSets(counterSetRecordCount);
 
     for (uint32_t counterSetIndex = 0; counterSetIndex < counterSetRecordCount; ++counterSetIndex)
     {
@@ -143,11 +121,11 @@ std::vector<CounterSetRecord>
 
         // Counter set record word 0:
         // 0:15  [16] count: the number of counters which can be active in this set at any one time
-        counterSets[counterSetIndex].m_CounterSetCount = profiling::ReadUint16(data, counterSetOffset);
+        uint16_t counterSetCount = profiling::ReadUint16(data, counterSetOffset);
         counterSetOffset += uint16_t_size;
 
         // 16:31 [16] deviceUid: the unique identifier for the counter_set
-        counterSets[counterSetIndex].m_CounterSetUid = profiling::ReadUint16(data, counterSetOffset);
+        uint16_t counterSetUid = profiling::ReadUint16(data, counterSetOffset);
         counterSetOffset += uint16_t_size;
 
         // Counter set record word 1:
@@ -156,18 +134,18 @@ std::vector<CounterSetRecord>
         counterSetOffset += uint32_t_size;
         counterSetOffset += uint32_t_size;
 
-        counterSets[counterSetIndex].m_CounterSetName = GetStringNameFromBuffer(data, counterSetOffset);
+        auto counterSet =
+            m_CounterDirectory.RegisterCounterSet(GetStringNameFromBuffer(data, counterSetOffset), counterSetCount);
+        m_UidTranslation[counterSet->m_Uid] = counterSetUid;
     }
-
-    return counterSets;
+    ReadCategoryRecords(data, offset, categoryOffsets);
 }
 
-std::vector<CategoryRecord> DirectoryCaptureCommandHandler::ReadCategoryRecords(const unsigned char* const data,
-                                                                                uint32_t offset,
-                                                                                std::vector<uint32_t> categoryOffsets)
+void DirectoryCaptureCommandHandler::ReadCategoryRecords(const unsigned char* const data,
+                                                         uint32_t offset,
+                                                         std::vector<uint32_t> categoryOffsets)
 {
-    uint32_t categoryRecordCount = static_cast<uint32_t >(categoryOffsets.size());
-    std::vector<CategoryRecord> categories(categoryRecordCount);
+    uint32_t categoryRecordCount = static_cast<uint32_t>(categoryOffsets.size());
 
     for (uint32_t categoryIndex = 0; categoryIndex < categoryRecordCount; ++categoryIndex)
     {
@@ -176,19 +154,20 @@ std::vector<CategoryRecord> DirectoryCaptureCommandHandler::ReadCategoryRecords(
         // Category record word 0:
         // 0:15  The deviceUid of a counter_set the category is associated with.
         // Set to zero if the category is NOT associated with a counter set.
-        categories[categoryIndex].m_CounterSet = profiling::ReadUint16(data, categoryRecordOffset);
+        uint16_t counterSetUid = profiling::ReadUint16(data, categoryRecordOffset);
         categoryRecordOffset += uint16_t_size;
 
         // 16:31 The deviceUid of a device element which identifies some hardware device that the category belongs to.
         // Set to zero if the category is NOT associated with a device
-        categories[categoryIndex].m_DeviceUid = profiling::ReadUint16(data, categoryRecordOffset);
+        uint16_t deviceUid = profiling::ReadUint16(data, categoryRecordOffset);
+
         categoryRecordOffset += uint16_t_size;
 
         // Category record word 1:
         // 0:15 Reserved, value 0x0000.
         categoryRecordOffset += uint16_t_size;
         // 16:31 Number of events belonging to this category.
-        categories[categoryIndex].m_EventCount = profiling::ReadUint16(data, categoryRecordOffset);
+        uint32_t eventCount = profiling::ReadUint16(data, categoryRecordOffset);
         categoryRecordOffset += uint16_t_size;
 
         // Category record word 2
@@ -201,9 +180,6 @@ std::vector<CategoryRecord> DirectoryCaptureCommandHandler::ReadCategoryRecords(
         uint32_t nameOffset = profiling::ReadUint32(data, categoryRecordOffset);
         categoryRecordOffset += uint32_t_size;
 
-        //Get the events for the category
-        uint32_t eventCount = categories[categoryIndex].m_EventCount;
-
         std::vector<uint32_t> eventRecordsOffsets(eventCount);
 
         eventPointerTableOffset += categoryRecordOffset;
@@ -211,27 +187,31 @@ std::vector<CategoryRecord> DirectoryCaptureCommandHandler::ReadCategoryRecords(
         for (uint32_t eventIndex = 0; eventIndex < eventCount; ++eventIndex)
         {
             eventRecordsOffsets[eventIndex] =
-                    profiling::ReadUint32(data, eventPointerTableOffset + uint32_t_size * eventIndex);
+                profiling::ReadUint32(data, eventPointerTableOffset + uint32_t_size * eventIndex);
         }
 
-        categories[categoryIndex].m_EventRecords = ReadEventRecords(data, categoryRecordOffset, eventRecordsOffsets);
-
+        const std::vector<CounterDirectoryEventRecord>& eventRecords =
+            ReadEventRecords(data, categoryRecordOffset, eventRecordsOffsets);
         categoryRecordOffset += uint32_t_size;
 
-        categories[categoryIndex].m_CategoryName = GetStringNameFromBuffer(data, categoryRecordOffset + nameOffset);
+        const Category* category = m_CounterDirectory.RegisterCategory(
+            GetStringNameFromBuffer(data, categoryRecordOffset + nameOffset), deviceUid, counterSetUid);
+        for (auto& counter : eventRecords)
+        {
+            const Counter* registeredCounter = m_CounterDirectory.RegisterCounter(
+                category->m_Name, counter.m_CounterClass, counter.m_CounterInterpolation, counter.m_CounterMultiplier,
+                counter.m_CounterName, counter.m_CounterDescription, counter.m_CounterUnits);
+            m_UidTranslation[registeredCounter->m_Uid] = counter.m_CounterUid;
+        }
     }
-
-    return categories;
 }
 
-
-std::vector<EventRecord> DirectoryCaptureCommandHandler::ReadEventRecords(const unsigned char* const data,
-                                                                          uint32_t offset,
-                                                                          std::vector<uint32_t> eventRecordsOffsets)
+std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEventRecords(
+    const unsigned char* data, uint32_t offset, std::vector<uint32_t> eventRecordsOffsets)
 {
     uint32_t eventCount = static_cast<uint32_t>(eventRecordsOffsets.size());
 
-    std::vector<EventRecord> eventRecords(eventCount);
+    std::vector<CounterDirectoryEventRecord> eventRecords(eventCount);
     for (unsigned long i = 0; i < eventCount; ++i)
     {
         uint32_t eventRecordOffset = eventRecordsOffsets[i] + offset;
@@ -261,7 +241,7 @@ std::vector<EventRecord> DirectoryCaptureCommandHandler::ReadEventRecords(const 
 
         // Event record word 2:
         // 0:15  [16] interpolation: type describing how to interpolate each data point in a stream of data points
-        eventRecords[i].m_CounterClass =profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_CounterClass = profiling::ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // 16:31 [16] class: type describing how to treat each data point in a stream of data points
@@ -313,29 +293,44 @@ std::vector<EventRecord> DirectoryCaptureCommandHandler::ReadEventRecords(const 
 
 void DirectoryCaptureCommandHandler::operator()(const profiling::Packet& packet)
 {
-    if (!m_QuietOperation)// Are we supposed to print to stdout?
+    if (!m_QuietOperation)    // Are we supposed to print to stdout?
     {
         std::cout << "Counter directory packet received." << std::endl;
     }
 
-    ParseData(packet);
+    // The ArmNN counter directory is static per ArmNN instance. Ensure we don't parse it a second time.
+    if (!ParsedCounterDirectory())
+    {
+        ParseData(packet);
+        m_AlreadyParsed = true;
+    }
 
     if (!m_QuietOperation)
     {
-        m_CounterDirectory.print();
+        armnn::profiling::PrintCounterDirectory(m_CounterDirectory);
     }
 }
 
-CounterDirectory DirectoryCaptureCommandHandler::GetCounterDirectory() const
+const ICounterDirectory& DirectoryCaptureCommandHandler::GetCounterDirectory() const
 {
     return m_CounterDirectory;
 }
 
-uint32_t DirectoryCaptureCommandHandler::GetCounterDirectoryCount() const
+std::string DirectoryCaptureCommandHandler::GetStringNameFromBuffer(const unsigned char* const data, uint32_t offset)
 {
-    return m_CounterDirectoryCount.load(std::memory_order_acquire);
+    std::string deviceName;
+    u_char nextChar = profiling::ReadUint8(data, offset);
+
+    while (isprint(nextChar))
+    {
+        deviceName += static_cast<char>(nextChar);
+        offset++;
+        nextChar = profiling::ReadUint8(data, offset);
+    }
+
+    return deviceName;
 }
 
-} // namespace gatordmock
+}    // namespace profiling
 
-} // namespace armnn
+}    // namespace armnn

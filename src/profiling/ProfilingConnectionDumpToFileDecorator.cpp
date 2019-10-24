@@ -43,7 +43,9 @@ bool ProfilingConnectionDumpToFileDecorator::IsOpen() const
 
 void ProfilingConnectionDumpToFileDecorator::Close()
 {
+    m_IncomingDumpFileStream.flush();
     m_IncomingDumpFileStream.close();
+    m_OutgoingDumpFileStream.flush();
     m_OutgoingDumpFileStream.close();
     m_Connection->Close();
 }

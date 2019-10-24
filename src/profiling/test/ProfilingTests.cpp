@@ -32,10 +32,10 @@
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <random>
-#include <iostream>
 
 using namespace armnn::profiling;
 
@@ -58,53 +58,49 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerKeyComparisons)
     BOOST_CHECK(testKey1_0 == testKey1_1);
     BOOST_CHECK(testKey1_0 < testKey1_2);
 
-    BOOST_CHECK(testKey1<testKey4);
-    BOOST_CHECK(testKey1>testKey3);
-    BOOST_CHECK(testKey1<=testKey4);
-    BOOST_CHECK(testKey1>=testKey3);
-    BOOST_CHECK(testKey1<=testKey2);
-    BOOST_CHECK(testKey1>=testKey2);
-    BOOST_CHECK(testKey1==testKey2);
-    BOOST_CHECK(testKey1==testKey1);
+    BOOST_CHECK(testKey1 < testKey4);
+    BOOST_CHECK(testKey1 > testKey3);
+    BOOST_CHECK(testKey1 <= testKey4);
+    BOOST_CHECK(testKey1 >= testKey3);
+    BOOST_CHECK(testKey1 <= testKey2);
+    BOOST_CHECK(testKey1 >= testKey2);
+    BOOST_CHECK(testKey1 == testKey2);
+    BOOST_CHECK(testKey1 == testKey1);
 
-    BOOST_CHECK(!(testKey1==testKey5));
-    BOOST_CHECK(!(testKey1!=testKey1));
-    BOOST_CHECK(testKey1!=testKey5);
+    BOOST_CHECK(!(testKey1 == testKey5));
+    BOOST_CHECK(!(testKey1 != testKey1));
+    BOOST_CHECK(testKey1 != testKey5);
 
-    BOOST_CHECK(testKey1==testKey2 && testKey2==testKey1);
-    BOOST_CHECK(testKey0==testKey1 && testKey1==testKey2 && testKey0==testKey2);
+    BOOST_CHECK(testKey1 == testKey2 && testKey2 == testKey1);
+    BOOST_CHECK(testKey0 == testKey1 && testKey1 == testKey2 && testKey0 == testKey2);
 
-    BOOST_CHECK(testKey1.GetPacketId()==1);
-    BOOST_CHECK(testKey1.GetVersion()==1);
+    BOOST_CHECK(testKey1.GetPacketId() == 1);
+    BOOST_CHECK(testKey1.GetVersion() == 1);
 
-    std::vector<CommandHandlerKey> vect =
-    {
-        CommandHandlerKey(0,0,1), CommandHandlerKey(0,2,0), CommandHandlerKey(0,1,0),
-        CommandHandlerKey(0,2,1), CommandHandlerKey(0,1,1), CommandHandlerKey(0,0,1),
-        CommandHandlerKey(0,2,0), CommandHandlerKey(0,0,0)
-    };
+    std::vector<CommandHandlerKey> vect = { CommandHandlerKey(0, 0, 1), CommandHandlerKey(0, 2, 0),
+                                            CommandHandlerKey(0, 1, 0), CommandHandlerKey(0, 2, 1),
+                                            CommandHandlerKey(0, 1, 1), CommandHandlerKey(0, 0, 1),
+                                            CommandHandlerKey(0, 2, 0), CommandHandlerKey(0, 0, 0) };
 
     std::sort(vect.begin(), vect.end());
 
-    std::vector<CommandHandlerKey> expectedVect =
-    {
-        CommandHandlerKey(0,0,0), CommandHandlerKey(0,0,1), CommandHandlerKey(0,0,1),
-        CommandHandlerKey(0,1,0), CommandHandlerKey(0,1,1), CommandHandlerKey(0,2,0),
-        CommandHandlerKey(0,2,0), CommandHandlerKey(0,2,1)
-    };
+    std::vector<CommandHandlerKey> expectedVect = { CommandHandlerKey(0, 0, 0), CommandHandlerKey(0, 0, 1),
+                                                    CommandHandlerKey(0, 0, 1), CommandHandlerKey(0, 1, 0),
+                                                    CommandHandlerKey(0, 1, 1), CommandHandlerKey(0, 2, 0),
+                                                    CommandHandlerKey(0, 2, 0), CommandHandlerKey(0, 2, 1) };
 
     BOOST_CHECK(vect == expectedVect);
 }
 
 BOOST_AUTO_TEST_CASE(CheckPacketKeyComparisons)
 {
-    PacketKey key0(0,0);
-    PacketKey key1(0,0);
-    PacketKey key2(0,1);
-    PacketKey key3(0,2);
-    PacketKey key4(1,0);
-    PacketKey key5(1,0);
-    PacketKey key6(1,1);
+    PacketKey key0(0, 0);
+    PacketKey key1(0, 0);
+    PacketKey key2(0, 1);
+    PacketKey key3(0, 2);
+    PacketKey key4(1, 0);
+    PacketKey key5(1, 0);
+    PacketKey key6(1, 1);
 
     BOOST_CHECK(!(key0 < key1));
     BOOST_CHECK(!(key0 > key1));
@@ -129,8 +125,11 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     TestProfilingConnectionBase testProfilingConnectionBase;
     TestProfilingConnectionTimeoutError testProfilingConnectionTimeOutError;
     TestProfilingConnectionArmnnError testProfilingConnectionArmnnError;
-
-    ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(0, 1, 4194304, profilingStateMachine);
+    CounterDirectory counterDirectory;
+    MockBufferManager mockBuffer(1024);
+    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(0, 1, 4194304, counterDirectory,
+                                                                              sendCounterPacket, profilingStateMachine);
     CommandHandlerRegistry commandHandlerRegistry;
 
     commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler);
@@ -138,10 +137,7 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
 
-    CommandHandler commandHandler0(1,
-                                   true,
-                                   commandHandlerRegistry,
-                                   packetVersionResolver);
+    CommandHandler commandHandler0(1, true, commandHandlerRegistry, packetVersionResolver);
 
     commandHandler0.Start(testProfilingConnectionBase);
     commandHandler0.Start(testProfilingConnectionBase);
@@ -154,10 +150,7 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
     // commandHandler1 should give up after one timeout
-    CommandHandler commandHandler1(10,
-                                   true,
-                                   commandHandlerRegistry,
-                                   packetVersionResolver);
+    CommandHandler commandHandler1(10, true, commandHandlerRegistry, packetVersionResolver);
 
     commandHandler1.Start(testProfilingConnectionTimeOutError);
 
@@ -185,10 +178,7 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
 
     BOOST_CHECK(profilingStateMachine.GetCurrentState() == ProfilingState::Active);
 
-    CommandHandler commandHandler2(100,
-                                   false,
-                                   commandHandlerRegistry,
-                                   packetVersionResolver);
+    CommandHandler commandHandler2(100, false, commandHandlerRegistry, packetVersionResolver);
 
     commandHandler2.Start(testProfilingConnectionArmnnError);
 
@@ -231,7 +221,7 @@ BOOST_AUTO_TEST_CASE(CheckEncodeVersion)
 
 BOOST_AUTO_TEST_CASE(CheckPacketClass)
 {
-    uint32_t length = 4;
+    uint32_t length                              = 4;
     std::unique_ptr<unsigned char[]> packetData0 = std::make_unique<unsigned char[]>(length);
     std::unique_ptr<unsigned char[]> packetData1 = std::make_unique<unsigned char[]>(0);
     std::unique_ptr<unsigned char[]> nullPacketData;
@@ -288,11 +278,11 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandlerFunctor)
 
     // Check the order of the map is correct
     auto it = registry.begin();
-    BOOST_CHECK(it->first==keyC); // familyId == 5
+    BOOST_CHECK(it->first == keyC);    // familyId == 5
     it++;
-    BOOST_CHECK(it->first==keyA); // familyId == 7
+    BOOST_CHECK(it->first == keyA);    // familyId == 7
     it++;
-    BOOST_CHECK(it->first==keyB); // familyId == 8
+    BOOST_CHECK(it->first == keyB);    // familyId == 8
 
     std::unique_ptr<unsigned char[]> packetDataA;
     std::unique_ptr<unsigned char[]> packetDataB;
@@ -407,7 +397,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingStateMachine)
 {
     ProfilingStateMachine profilingState1(ProfilingState::Uninitialised);
     profilingState1.TransitionToState(ProfilingState::Uninitialised);
-    BOOST_CHECK(profilingState1.GetCurrentState() ==  ProfilingState::Uninitialised);
+    BOOST_CHECK(profilingState1.GetCurrentState() == ProfilingState::Uninitialised);
 
     ProfilingStateMachine profilingState2(ProfilingState::Uninitialised);
     profilingState2.TransitionToState(ProfilingState::NotConnected);
@@ -438,44 +428,37 @@ BOOST_AUTO_TEST_CASE(CheckProfilingStateMachine)
     BOOST_CHECK(profilingState8.GetCurrentState() == ProfilingState::Active);
 
     ProfilingStateMachine profilingState9(ProfilingState::Uninitialised);
-    BOOST_CHECK_THROW(profilingState9.TransitionToState(ProfilingState::WaitingForAck),
-                      armnn::Exception);
+    BOOST_CHECK_THROW(profilingState9.TransitionToState(ProfilingState::WaitingForAck), armnn::Exception);
 
     ProfilingStateMachine profilingState10(ProfilingState::Uninitialised);
-    BOOST_CHECK_THROW(profilingState10.TransitionToState(ProfilingState::Active),
-                      armnn::Exception);
+    BOOST_CHECK_THROW(profilingState10.TransitionToState(ProfilingState::Active), armnn::Exception);
 
     ProfilingStateMachine profilingState11(ProfilingState::NotConnected);
-    BOOST_CHECK_THROW(profilingState11.TransitionToState(ProfilingState::Uninitialised),
-                      armnn::Exception);
+    BOOST_CHECK_THROW(profilingState11.TransitionToState(ProfilingState::Uninitialised), armnn::Exception);
 
     ProfilingStateMachine profilingState12(ProfilingState::NotConnected);
-    BOOST_CHECK_THROW(profilingState12.TransitionToState(ProfilingState::Active),
-                      armnn::Exception);
+    BOOST_CHECK_THROW(profilingState12.TransitionToState(ProfilingState::Active), armnn::Exception);
 
     ProfilingStateMachine profilingState13(ProfilingState::WaitingForAck);
-    BOOST_CHECK_THROW(profilingState13.TransitionToState(ProfilingState::Uninitialised),
-                      armnn::Exception);
+    BOOST_CHECK_THROW(profilingState13.TransitionToState(ProfilingState::Uninitialised), armnn::Exception);
 
     ProfilingStateMachine profilingState14(ProfilingState::WaitingForAck);
     profilingState14.TransitionToState(ProfilingState::NotConnected);
     BOOST_CHECK(profilingState14.GetCurrentState() == ProfilingState::NotConnected);
 
     ProfilingStateMachine profilingState15(ProfilingState::Active);
-    BOOST_CHECK_THROW(profilingState15.TransitionToState(ProfilingState::Uninitialised),
-                      armnn::Exception);
+    BOOST_CHECK_THROW(profilingState15.TransitionToState(ProfilingState::Uninitialised), armnn::Exception);
 
     ProfilingStateMachine profilingState16(armnn::profiling::ProfilingState::Active);
-    BOOST_CHECK_THROW(profilingState16.TransitionToState(ProfilingState::WaitingForAck),
-                      armnn::Exception);
+    BOOST_CHECK_THROW(profilingState16.TransitionToState(ProfilingState::WaitingForAck), armnn::Exception);
 
     ProfilingStateMachine profilingState17(ProfilingState::Uninitialised);
 
-    std::thread thread1 (ProfilingCurrentStateThreadImpl,std::ref(profilingState17));
-    std::thread thread2 (ProfilingCurrentStateThreadImpl,std::ref(profilingState17));
-    std::thread thread3 (ProfilingCurrentStateThreadImpl,std::ref(profilingState17));
-    std::thread thread4 (ProfilingCurrentStateThreadImpl,std::ref(profilingState17));
-    std::thread thread5 (ProfilingCurrentStateThreadImpl,std::ref(profilingState17));
+    std::thread thread1(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
+    std::thread thread2(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
+    std::thread thread3(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
+    std::thread thread4(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
+    std::thread thread5(ProfilingCurrentStateThreadImpl, std::ref(profilingState17));
 
     thread1.join();
     thread2.join();
@@ -541,17 +524,14 @@ BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
     std::vector<std::thread> readThreadsVect;
     for (uint32_t i = 0; i < numThreads; ++i)
     {
-        threadsVect.emplace_back(std::thread(CaptureDataWriteThreadImpl,
-                                 std::ref(holder),
-                                 i,
-                                 std::ref(periodIdMap[i])));
+        threadsVect.emplace_back(
+            std::thread(CaptureDataWriteThreadImpl, std::ref(holder), i, std::ref(periodIdMap[i])));
 
         // Verify that the CaptureData goes into the thread in a virgin state
         BOOST_CHECK(captureDataIdMap.at(i).GetCapturePeriod() == 0);
         BOOST_CHECK(captureDataIdMap.at(i).GetCounterIds().empty());
-        readThreadsVect.emplace_back(std::thread(CaptureDataReadThreadImpl,
-                                     std::ref(holder),
-                                     std::ref(captureDataIdMap.at(i))));
+        readThreadsVect.emplace_back(
+            std::thread(CaptureDataReadThreadImpl, std::ref(holder), std::ref(captureDataIdMap.at(i))));
     }
 
     for (uint32_t i = 0; i < numThreads; ++i)
@@ -572,7 +552,7 @@ BOOST_AUTO_TEST_CASE(CheckCaptureDataHolder)
 BOOST_AUTO_TEST_CASE(CaptureDataMethods)
 {
     // Check CaptureData setter and getter functions
-    std::vector<uint16_t> counterIds = {42, 29, 13};
+    std::vector<uint16_t> counterIds = { 42, 29, 13 };
     CaptureData captureData;
     BOOST_CHECK(captureData.GetCapturePeriod() == 0);
     BOOST_CHECK((captureData.GetCounterIds()).empty());
@@ -611,7 +591,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceEnabled)
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
 
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -672,13 +652,13 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterDirectory)
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     profilingService.Update();
     const ICounterDirectory& counterDirectory = profilingService.GetCounterDirectory();
-    const Counters& counters = counterDirectory.GetCounters();
+    const Counters& counters                  = counterDirectory.GetCounters();
     BOOST_CHECK(!counters.empty());
 
     // Get the UID of the first counter for testing
@@ -687,13 +667,13 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceCounterValues)
     ProfilingService* profilingServicePtr = &profilingService;
     std::vector<std::thread> writers;
 
-    for (int i = 0; i < 100 ; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         // Increment and decrement the first counter
         writers.push_back(std::thread(&ProfilingService::IncrementCounterValue, profilingServicePtr, counterUid));
         writers.push_back(std::thread(&ProfilingService::DecrementCounterValue, profilingServicePtr, counterUid));
         // Add 10 and subtract 5 from the first counter
-        writers.push_back(std::thread(&ProfilingService::AddCounterValue,      profilingServicePtr, counterUid, 10));
+        writers.push_back(std::thread(&ProfilingService::AddCounterValue, profilingServicePtr, counterUid, 10));
         writers.push_back(std::thread(&ProfilingService::SubtractCounterValue, profilingServicePtr, counterUid, 5));
     }
 
@@ -733,7 +713,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)
     BOOST_CHECK_NO_THROW(counterUidsMultiCore = GetNextCounterUids(numberOfCores));
     BOOST_CHECK(counterUidsMultiCore.size() == numberOfCores);
     BOOST_CHECK(counterUidsMultiCore.front() >= nextCounterUids[0]);
-    for (size_t i = 1; i < numberOfCores; i ++)
+    for (size_t i = 1; i < numberOfCores; i++)
     {
         BOOST_CHECK(counterUidsMultiCore[i] == counterUidsMultiCore[i - 1] + 1);
     }
@@ -743,10 +723,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingObjectUids)
 BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 {
     CounterDirectory counterDirectory;
-    BOOST_CHECK(counterDirectory.GetCategoryCount()   == 0);
-    BOOST_CHECK(counterDirectory.GetDeviceCount()     == 0);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 0);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 0);
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
-    BOOST_CHECK(counterDirectory.GetCounterCount()    == 0);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
 
     // Register a category with an invalid name
     const Category* noCategory = nullptr;
@@ -762,7 +742,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 
     // Register a new category
     const std::string categoryName = "some_category";
-    const Category* category = nullptr;
+    const Category* category       = nullptr;
     BOOST_CHECK_NO_THROW(category = counterDirectory.RegisterCategory(categoryName));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
     BOOST_CHECK(category);
@@ -791,7 +771,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 
     // Register a device for testing
     const std::string deviceName = "some_device";
-    const Device* device = nullptr;
+    const Device* device         = nullptr;
     BOOST_CHECK_NO_THROW(device = counterDirectory.RegisterDevice(deviceName));
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 1);
     BOOST_CHECK(device);
@@ -801,7 +781,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 
     // Register a new category not associated to any device
     const std::string categoryWoDeviceName = "some_category_without_device";
-    const Category* categoryWoDevice = nullptr;
+    const Category* categoryWoDevice       = nullptr;
     BOOST_CHECK_NO_THROW(categoryWoDevice = counterDirectory.RegisterCategory(categoryWoDeviceName, 0));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 2);
     BOOST_CHECK(categoryWoDevice);
@@ -818,19 +798,17 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
     ARMNN_NO_CONVERSION_WARN_END
 
     const Category* categoryWInvalidDevice = nullptr;
-    BOOST_CHECK_THROW(categoryWInvalidDevice
-                      = counterDirectory.RegisterCategory(categoryWInvalidDeviceName,
-                                                          invalidDeviceUid),
+    BOOST_CHECK_THROW(categoryWInvalidDevice =
+                          counterDirectory.RegisterCategory(categoryWInvalidDeviceName, invalidDeviceUid),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 2);
     BOOST_CHECK(!categoryWInvalidDevice);
 
     // Register a new category associated to a valid device
     const std::string categoryWValidDeviceName = "some_category_with_valid_device";
-    const Category* categoryWValidDevice = nullptr;
-    BOOST_CHECK_NO_THROW(categoryWValidDevice
-                         = counterDirectory.RegisterCategory(categoryWValidDeviceName,
-                                                             device->m_Uid));
+    const Category* categoryWValidDevice       = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWValidDevice =
+                             counterDirectory.RegisterCategory(categoryWValidDeviceName, device->m_Uid));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 3);
     BOOST_CHECK(categoryWValidDevice);
     BOOST_CHECK(categoryWValidDevice != category);
@@ -840,7 +818,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 
     // Register a counter set for testing
     const std::string counterSetName = "some_counter_set";
-    const CounterSet* counterSet = nullptr;
+    const CounterSet* counterSet     = nullptr;
     BOOST_CHECK_NO_THROW(counterSet = counterDirectory.RegisterCounterSet(counterSetName));
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 1);
     BOOST_CHECK(counterSet);
@@ -850,11 +828,9 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 
     // Register a new category not associated to any counter set
     const std::string categoryWoCounterSetName = "some_category_without_counter_set";
-    const Category* categoryWoCounterSet = nullptr;
-    BOOST_CHECK_NO_THROW(categoryWoCounterSet
-                         = counterDirectory.RegisterCategory(categoryWoCounterSetName,
-                                                             armnn::EmptyOptional(),
-                                                             0));
+    const Category* categoryWoCounterSet       = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWoCounterSet =
+                             counterDirectory.RegisterCategory(categoryWoCounterSetName, armnn::EmptyOptional(), 0));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 4);
     BOOST_CHECK(categoryWoCounterSet);
     BOOST_CHECK(categoryWoCounterSet->m_Name == categoryWoCounterSetName);
@@ -869,21 +845,17 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
     ARMNN_NO_CONVERSION_WARN_END
 
     const Category* categoryWInvalidCounterSet = nullptr;
-    BOOST_CHECK_THROW(categoryWInvalidCounterSet
-                      = counterDirectory.RegisterCategory(categoryWInvalidCounterSetName,
-                                                          armnn::EmptyOptional(),
-                                                          invalidCunterSetUid),
+    BOOST_CHECK_THROW(categoryWInvalidCounterSet = counterDirectory.RegisterCategory(
+                          categoryWInvalidCounterSetName, armnn::EmptyOptional(), invalidCunterSetUid),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 4);
     BOOST_CHECK(!categoryWInvalidCounterSet);
 
     // Register a new category associated to a valid counter set
     const std::string categoryWValidCounterSetName = "some_category_with_valid_counter_set";
-    const Category* categoryWValidCounterSet = nullptr;
-    BOOST_CHECK_NO_THROW(categoryWValidCounterSet
-                         = counterDirectory.RegisterCategory(categoryWValidCounterSetName,
-                                                             armnn::EmptyOptional(),
-                                                             counterSet->m_Uid));
+    const Category* categoryWValidCounterSet       = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWValidCounterSet = counterDirectory.RegisterCategory(
+                             categoryWValidCounterSetName, armnn::EmptyOptional(), counterSet->m_Uid));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 5);
     BOOST_CHECK(categoryWValidCounterSet);
     BOOST_CHECK(categoryWValidCounterSet != category);
@@ -893,11 +865,9 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 
     // Register a new category associated to a valid device and counter set
     const std::string categoryWValidDeviceAndValidCounterSetName = "some_category_with_valid_device_and_counter_set";
-    const Category* categoryWValidDeviceAndValidCounterSet = nullptr;
-    BOOST_CHECK_NO_THROW(categoryWValidDeviceAndValidCounterSet
-                         = counterDirectory.RegisterCategory(categoryWValidDeviceAndValidCounterSetName,
-                                                             device->m_Uid,
-                                                             counterSet->m_Uid));
+    const Category* categoryWValidDeviceAndValidCounterSet       = nullptr;
+    BOOST_CHECK_NO_THROW(categoryWValidDeviceAndValidCounterSet = counterDirectory.RegisterCategory(
+                             categoryWValidDeviceAndValidCounterSetName, device->m_Uid, counterSet->m_Uid));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 6);
     BOOST_CHECK(categoryWValidDeviceAndValidCounterSet);
     BOOST_CHECK(categoryWValidDeviceAndValidCounterSet != category);
@@ -909,10 +879,10 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCategory)
 BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterDevice)
 {
     CounterDirectory counterDirectory;
-    BOOST_CHECK(counterDirectory.GetCategoryCount()   == 0);
-    BOOST_CHECK(counterDirectory.GetDeviceCount()     == 0);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 0);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 0);
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
-    BOOST_CHECK(counterDirectory.GetCounterCount()    == 0);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
 
     // Register a device with an invalid name
     const Device* noDevice = nullptr;
@@ -927,7 +897,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterDevice)
 
     // Register a new device with no cores or parent category
     const std::string deviceName = "some_device";
-    const Device* device = nullptr;
+    const Device* device         = nullptr;
     BOOST_CHECK_NO_THROW(device = counterDirectory.RegisterDevice(deviceName));
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 1);
     BOOST_CHECK(device);
@@ -953,7 +923,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterDevice)
 
     // Register a new device with cores and no parent category
     const std::string deviceWCoresName = "some_device_with_cores";
-    const Device* deviceWCores = nullptr;
+    const Device* deviceWCores         = nullptr;
     BOOST_CHECK_NO_THROW(deviceWCores = counterDirectory.RegisterDevice(deviceWCoresName, 2));
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
     BOOST_CHECK(deviceWCores);
@@ -971,29 +941,25 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterDevice)
 
     // Register a new device with cores and invalid parent category
     const std::string deviceWCoresWInvalidParentCategoryName = "some_device_with_cores_with_invalid_parent_category";
-    const Device* deviceWCoresWInvalidParentCategory = nullptr;
-    BOOST_CHECK_THROW(deviceWCoresWInvalidParentCategory
-                      = counterDirectory.RegisterDevice(deviceWCoresWInvalidParentCategoryName,
-                                                        3,
-                                                        std::string("")),
+    const Device* deviceWCoresWInvalidParentCategory         = nullptr;
+    BOOST_CHECK_THROW(deviceWCoresWInvalidParentCategory =
+                          counterDirectory.RegisterDevice(deviceWCoresWInvalidParentCategoryName, 3, std::string("")),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
     BOOST_CHECK(!deviceWCoresWInvalidParentCategory);
 
     // Register a new device with cores and invalid parent category
     const std::string deviceWCoresWInvalidParentCategoryName2 = "some_device_with_cores_with_invalid_parent_category2";
-    const Device* deviceWCoresWInvalidParentCategory2 = nullptr;
-    BOOST_CHECK_THROW(deviceWCoresWInvalidParentCategory2
-                      = counterDirectory.RegisterDevice(deviceWCoresWInvalidParentCategoryName2,
-                                                        3,
-                                                        std::string("invalid_parent_category")),
+    const Device* deviceWCoresWInvalidParentCategory2         = nullptr;
+    BOOST_CHECK_THROW(deviceWCoresWInvalidParentCategory2 = counterDirectory.RegisterDevice(
+                          deviceWCoresWInvalidParentCategoryName2, 3, std::string("invalid_parent_category")),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
     BOOST_CHECK(!deviceWCoresWInvalidParentCategory2);
 
     // Register a category for testing
     const std::string categoryName = "some_category";
-    const Category* category = nullptr;
+    const Category* category       = nullptr;
     BOOST_CHECK_NO_THROW(category = counterDirectory.RegisterCategory(categoryName));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
     BOOST_CHECK(category);
@@ -1004,11 +970,9 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterDevice)
 
     // Register a new device with cores and valid parent category
     const std::string deviceWCoresWValidParentCategoryName = "some_device_with_cores_with_valid_parent_category";
-    const Device* deviceWCoresWValidParentCategory = nullptr;
-    BOOST_CHECK_NO_THROW(deviceWCoresWValidParentCategory
-                         = counterDirectory.RegisterDevice(deviceWCoresWValidParentCategoryName,
-                                                           4,
-                                                           categoryName));
+    const Device* deviceWCoresWValidParentCategory         = nullptr;
+    BOOST_CHECK_NO_THROW(deviceWCoresWValidParentCategory =
+                             counterDirectory.RegisterDevice(deviceWCoresWValidParentCategoryName, 4, categoryName));
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 3);
     BOOST_CHECK(deviceWCoresWValidParentCategory);
     BOOST_CHECK(deviceWCoresWValidParentCategory->m_Name == deviceWCoresWValidParentCategoryName);
@@ -1020,7 +984,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterDevice)
 
     // Register a device associated to a category already associated to a different device
     const std::string deviceSameCategoryName = "some_device_with_invalid_parent_category";
-    const Device* deviceSameCategory = nullptr;
+    const Device* deviceSameCategory         = nullptr;
     BOOST_CHECK_THROW(deviceSameCategory = counterDirectory.RegisterDevice(deviceSameCategoryName, 0, categoryName),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 3);
@@ -1030,10 +994,10 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterDevice)
 BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
 {
     CounterDirectory counterDirectory;
-    BOOST_CHECK(counterDirectory.GetCategoryCount()   == 0);
-    BOOST_CHECK(counterDirectory.GetDeviceCount()     == 0);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 0);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 0);
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
-    BOOST_CHECK(counterDirectory.GetCounterCount()    == 0);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
 
     // Register a counter set with an invalid name
     const CounterSet* noCounterSet = nullptr;
@@ -1049,7 +1013,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
 
     // Register a new counter set with no count or parent category
     const std::string counterSetName = "some_counter_set";
-    const CounterSet* counterSet = nullptr;
+    const CounterSet* counterSet     = nullptr;
     BOOST_CHECK_NO_THROW(counterSet = counterDirectory.RegisterCounterSet(counterSetName));
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 1);
     BOOST_CHECK(counterSet);
@@ -1076,7 +1040,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
 
     // Register a new counter set with count and no parent category
     const std::string counterSetWCountName = "some_counter_set_with_count";
-    const CounterSet* counterSetWCount = nullptr;
+    const CounterSet* counterSetWCount     = nullptr;
     BOOST_CHECK_NO_THROW(counterSetWCount = counterDirectory.RegisterCounterSet(counterSetWCountName, 37));
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 2);
     BOOST_CHECK(counterSetWCount);
@@ -1096,10 +1060,8 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
     const std::string counterSetWCountWInvalidParentCategoryName = "some_counter_set_with_count_"
                                                                    "with_invalid_parent_category";
     const CounterSet* counterSetWCountWInvalidParentCategory = nullptr;
-    BOOST_CHECK_THROW(counterSetWCountWInvalidParentCategory
-                      = counterDirectory.RegisterCounterSet(counterSetWCountWInvalidParentCategoryName,
-                                                            42,
-                                                            std::string("")),
+    BOOST_CHECK_THROW(counterSetWCountWInvalidParentCategory = counterDirectory.RegisterCounterSet(
+                          counterSetWCountWInvalidParentCategoryName, 42, std::string("")),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 2);
     BOOST_CHECK(!counterSetWCountWInvalidParentCategory);
@@ -1108,17 +1070,15 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
     const std::string counterSetWCountWInvalidParentCategoryName2 = "some_counter_set_with_count_"
                                                                     "with_invalid_parent_category2";
     const CounterSet* counterSetWCountWInvalidParentCategory2 = nullptr;
-    BOOST_CHECK_THROW(counterSetWCountWInvalidParentCategory2
-                      = counterDirectory.RegisterCounterSet(counterSetWCountWInvalidParentCategoryName2,
-                                                            42,
-                                                            std::string("invalid_parent_category")),
+    BOOST_CHECK_THROW(counterSetWCountWInvalidParentCategory2 = counterDirectory.RegisterCounterSet(
+                          counterSetWCountWInvalidParentCategoryName2, 42, std::string("invalid_parent_category")),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 2);
     BOOST_CHECK(!counterSetWCountWInvalidParentCategory2);
 
     // Register a category for testing
     const std::string categoryName = "some_category";
-    const Category* category = nullptr;
+    const Category* category       = nullptr;
     BOOST_CHECK_NO_THROW(category = counterDirectory.RegisterCategory(categoryName));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
     BOOST_CHECK(category);
@@ -1131,10 +1091,8 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
     const std::string counterSetWCountWValidParentCategoryName = "some_counter_set_with_count_"
                                                                  "with_valid_parent_category";
     const CounterSet* counterSetWCountWValidParentCategory = nullptr;
-    BOOST_CHECK_NO_THROW(counterSetWCountWValidParentCategory
-                         = counterDirectory.RegisterCounterSet(counterSetWCountWValidParentCategoryName,
-                                                               42,
-                                                               categoryName));
+    BOOST_CHECK_NO_THROW(counterSetWCountWValidParentCategory = counterDirectory.RegisterCounterSet(
+                             counterSetWCountWValidParentCategoryName, 42, categoryName));
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 3);
     BOOST_CHECK(counterSetWCountWValidParentCategory);
     BOOST_CHECK(counterSetWCountWValidParentCategory->m_Name == counterSetWCountWValidParentCategoryName);
@@ -1146,10 +1104,9 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
 
     // Register a counter set associated to a category already associated to a different counter set
     const std::string counterSetSameCategoryName = "some_counter_set_with_invalid_parent_category";
-    const CounterSet* counterSetSameCategory = nullptr;
-    BOOST_CHECK_THROW(counterSetSameCategory = counterDirectory.RegisterCounterSet(counterSetSameCategoryName,
-                                                                                   0,
-                                                                                   categoryName),
+    const CounterSet* counterSetSameCategory     = nullptr;
+    BOOST_CHECK_THROW(counterSetSameCategory =
+                          counterDirectory.RegisterCounterSet(counterSetSameCategoryName, 0, categoryName),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 3);
     BOOST_CHECK(!counterSetSameCategory);
@@ -1158,130 +1115,85 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounterSet)
 BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 {
     CounterDirectory counterDirectory;
-    BOOST_CHECK(counterDirectory.GetCategoryCount()   == 0);
-    BOOST_CHECK(counterDirectory.GetDeviceCount()     == 0);
+    BOOST_CHECK(counterDirectory.GetCategoryCount() == 0);
+    BOOST_CHECK(counterDirectory.GetDeviceCount() == 0);
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 0);
-    BOOST_CHECK(counterDirectory.GetCounterCount()    == 0);
+    BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
 
     // Register a counter with an invalid parent category name
     const Counter* noCounter = nullptr;
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
-                                                                   "valid description"),
+    BOOST_CHECK_THROW(noCounter =
+                          counterDirectory.RegisterCounter("", 0, 1, 123.45f, "valid name", "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid parent category name
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("invalid parent category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
-                                                                   "valid description"),
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("invalid parent category", 0, 1, 123.45f,
+                                                                   "valid name", "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid class
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
-                                                                   2,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 2, 1, 123.45f, "valid name",
                                                                    "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid interpolation
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
-                                                                   0,
-                                                                   3,
-                                                                   123.45f,
-                                                                   "valid name",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 3, 123.45f, "valid name",
                                                                    "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid multiplier
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   .0f,
-                                                                   "valid name",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, .0f, "valid name",
                                                                    "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid name
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "",
-                                                                   "valid description"),
-                      armnn::InvalidArgumentException);
+    BOOST_CHECK_THROW(
+        noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f, "", "valid description"),
+        armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid name
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "invalid nam€",
-                                                                   "valid description"),
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f,
+                                                                   "invalid nam€", "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid description
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
-                                                                   ""),
+    BOOST_CHECK_THROW(noCounter =
+                          counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f, "valid name", ""),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid description
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f, "valid name",
                                                                    "inv@lid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with an invalid unit2
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
-                                                                   "valid description",
-                                                                   std::string("Mb/s2")),
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("valid_parent_category", 0, 1, 123.45f, "valid name",
+                                                                   "valid description", std::string("Mb/s2")),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with a non-existing parent category name
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("invalid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
-                                                                   "valid description"),
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter("invalid_parent_category", 0, 1, 123.45f,
+                                                                   "valid name", "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 0);
     BOOST_CHECK(!noCounter);
@@ -1292,7 +1204,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a category for testing
     const std::string categoryName = "some_category";
-    const Category* category = nullptr;
+    const Category* category       = nullptr;
     BOOST_CHECK_NO_THROW(category = counterDirectory.RegisterCategory(categoryName));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 1);
     BOOST_CHECK(category);
@@ -1303,12 +1215,8 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name
     const Counter* counter = nullptr;
-    BOOST_CHECK_NO_THROW(counter = counterDirectory.RegisterCounter(categoryName,
-                                                                    0,
-                                                                    1,
-                                                                    123.45f,
-                                                                    "valid name",
-                                                                    "valid description"));
+    BOOST_CHECK_NO_THROW(
+        counter = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name", "valid description"));
     BOOST_CHECK(counterDirectory.GetCounterCount() == 1);
     BOOST_CHECK(counter);
     BOOST_CHECK(counter->m_Uid >= 0);
@@ -1326,25 +1234,17 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a name of a counter already registered for the given parent category name
     const Counter* counterSameName = nullptr;
-    BOOST_CHECK_THROW(counterSameName = counterDirectory.RegisterCounter(categoryName,
-                                                                         0,
-                                                                         0,
-                                                                         1.0f,
-                                                                         "valid name",
-                                                                         "valid description"),
+    BOOST_CHECK_THROW(counterSameName =
+                          counterDirectory.RegisterCounter(categoryName, 0, 0, 1.0f, "valid name", "valid description"),
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 1);
     BOOST_CHECK(!counterSameName);
 
     // Register a counter with a valid parent category name and units
     const Counter* counterWUnits = nullptr;
-    BOOST_CHECK_NO_THROW(counterWUnits = counterDirectory.RegisterCounter(categoryName,
-                                                                          0,
-                                                                          1,
-                                                                          123.45f,
-                                                                          "valid name 2",
+    BOOST_CHECK_NO_THROW(counterWUnits = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name 2",
                                                                           "valid description",
-                                                                          std::string("Mnnsq2"))); // Units
+                                                                          std::string("Mnnsq2")));    // Units
     BOOST_CHECK(counterDirectory.GetCounterCount() == 2);
     BOOST_CHECK(counterWUnits);
     BOOST_CHECK(counterWUnits->m_Uid >= 0);
@@ -1363,15 +1263,11 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and not associated with a device
     const Counter* counterWoDevice = nullptr;
-    BOOST_CHECK_NO_THROW(counterWoDevice = counterDirectory.RegisterCounter(categoryName,
-                                                                            0,
-                                                                            1,
-                                                                            123.45f,
-                                                                            "valid name 3",
-                                                                            "valid description",
-                                                                            armnn::EmptyOptional(), // Units
-                                                                            armnn::EmptyOptional(), // Number of cores
-                                                                            0));                    // Device UID
+    BOOST_CHECK_NO_THROW(counterWoDevice = counterDirectory.RegisterCounter(
+                             categoryName, 0, 1, 123.45f, "valid name 3", "valid description",
+                             armnn::EmptyOptional(),    // Units
+                             armnn::EmptyOptional(),    // Number of cores
+                             0));                       // Device UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 3);
     BOOST_CHECK(counterWoDevice);
     BOOST_CHECK(counterWoDevice->m_Uid >= 0);
@@ -1389,22 +1285,18 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     BOOST_CHECK(category->m_Counters.back() == counterWoDevice->m_Uid);
 
     // Register a counter with a valid parent category name and associated to an invalid device
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(categoryName,
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name 4",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name 4",
                                                                    "valid description",
-                                                                   armnn::EmptyOptional(), // Units
-                                                                   armnn::EmptyOptional(), // Number of cores
-                                                                   100),                   // Device UID
+                                                                   armnn::EmptyOptional(),    // Units
+                                                                   armnn::EmptyOptional(),    // Number of cores
+                                                                   100),                      // Device UID
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 3);
     BOOST_CHECK(!noCounter);
 
     // Register a device for testing
     const std::string deviceName = "some_device";
-    const Device* device = nullptr;
+    const Device* device         = nullptr;
     BOOST_CHECK_NO_THROW(device = counterDirectory.RegisterDevice(deviceName));
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 1);
     BOOST_CHECK(device);
@@ -1414,15 +1306,11 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and associated to a device
     const Counter* counterWDevice = nullptr;
-    BOOST_CHECK_NO_THROW(counterWDevice = counterDirectory.RegisterCounter(categoryName,
-                                                                           0,
-                                                                           1,
-                                                                           123.45f,
-                                                                           "valid name 5",
+    BOOST_CHECK_NO_THROW(counterWDevice = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name 5",
                                                                            "valid description",
-                                                                           armnn::EmptyOptional(), // Units
-                                                                           armnn::EmptyOptional(), // Number of cores
-                                                                           device->m_Uid));        // Device UID
+                                                                           armnn::EmptyOptional(),    // Units
+                                                                           armnn::EmptyOptional(),    // Number of cores
+                                                                           device->m_Uid));           // Device UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 4);
     BOOST_CHECK(counterWDevice);
     BOOST_CHECK(counterWDevice->m_Uid >= 0);
@@ -1441,17 +1329,12 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and not associated with a counter set
     const Counter* counterWoCounterSet = nullptr;
-    BOOST_CHECK_NO_THROW(counterWoCounterSet
-                         = counterDirectory.RegisterCounter(categoryName,
-                                                            0,
-                                                            1,
-                                                            123.45f,
-                                                            "valid name 6",
-                                                            "valid description",
-                                                            armnn::EmptyOptional(), // Units
-                                                            armnn::EmptyOptional(), // Number of cores
-                                                            armnn::EmptyOptional(), // Device UID
-                                                            0));                    // Counter set UID
+    BOOST_CHECK_NO_THROW(counterWoCounterSet = counterDirectory.RegisterCounter(
+                             categoryName, 0, 1, 123.45f, "valid name 6", "valid description",
+                             armnn::EmptyOptional(),    // Units
+                             armnn::EmptyOptional(),    // Number of cores
+                             armnn::EmptyOptional(),    // Device UID
+                             0));                       // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 5);
     BOOST_CHECK(counterWoCounterSet);
     BOOST_CHECK(counterWoCounterSet->m_Uid >= 0);
@@ -1469,34 +1352,25 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     BOOST_CHECK(category->m_Counters.back() == counterWoCounterSet->m_Uid);
 
     // Register a counter with a valid parent category name and associated to an invalid counter set
-    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(categoryName,
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name 7",
+    BOOST_CHECK_THROW(noCounter = counterDirectory.RegisterCounter(categoryName, 0, 1, 123.45f, "valid name 7",
                                                                    "valid description",
-                                                                   armnn::EmptyOptional(), // Units
-                                                                   armnn::EmptyOptional(), // Number of cores
-                                                                   armnn::EmptyOptional(), // Device UID
-                                                                   100),                   // Counter set UID
+                                                                   armnn::EmptyOptional(),    // Units
+                                                                   armnn::EmptyOptional(),    // Number of cores
+                                                                   armnn::EmptyOptional(),    // Device UID
+                                                                   100),                      // Counter set UID
                       armnn::InvalidArgumentException);
     BOOST_CHECK(counterDirectory.GetCounterCount() == 5);
     BOOST_CHECK(!noCounter);
 
     // Register a counter with a valid parent category name and with a given number of cores
     const Counter* counterWNumberOfCores = nullptr;
-    uint16_t numberOfCores = 15;
-    BOOST_CHECK_NO_THROW(counterWNumberOfCores
-                         = counterDirectory.RegisterCounter(categoryName,
-                                                            0,
-                                                            1,
-                                                            123.45f,
-                                                            "valid name 8",
-                                                            "valid description",
-                                                            armnn::EmptyOptional(),   // Units
-                                                            numberOfCores,            // Number of cores
-                                                            armnn::EmptyOptional(),   // Device UID
-                                                            armnn::EmptyOptional())); // Counter set UID
+    uint16_t numberOfCores               = 15;
+    BOOST_CHECK_NO_THROW(counterWNumberOfCores = counterDirectory.RegisterCounter(
+                             categoryName, 0, 1, 123.45f, "valid name 8", "valid description",
+                             armnn::EmptyOptional(),      // Units
+                             numberOfCores,               // Number of cores
+                             armnn::EmptyOptional(),      // Device UID
+                             armnn::EmptyOptional()));    // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 20);
     BOOST_CHECK(counterWNumberOfCores);
     BOOST_CHECK(counterWNumberOfCores->m_Uid >= 0);
@@ -1511,7 +1385,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     BOOST_CHECK(counterWNumberOfCores->m_DeviceUid == 0);
     BOOST_CHECK(counterWNumberOfCores->m_CounterSetUid == 0);
     BOOST_CHECK(category->m_Counters.size() == 20);
-    for (size_t i = 0; i < numberOfCores; i ++)
+    for (size_t i = 0; i < numberOfCores; i++)
     {
         BOOST_CHECK(category->m_Counters[category->m_Counters.size() - numberOfCores + i] ==
                     counterWNumberOfCores->m_Uid + i);
@@ -1519,7 +1393,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a multi-core device for testing
     const std::string multiCoreDeviceName = "some_multi_core_device";
-    const Device* multiCoreDevice = nullptr;
+    const Device* multiCoreDevice         = nullptr;
     BOOST_CHECK_NO_THROW(multiCoreDevice = counterDirectory.RegisterDevice(multiCoreDeviceName, 4));
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 2);
     BOOST_CHECK(multiCoreDevice);
@@ -1529,17 +1403,12 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and associated to the multi-core device
     const Counter* counterWMultiCoreDevice = nullptr;
-    BOOST_CHECK_NO_THROW(counterWMultiCoreDevice
-                         = counterDirectory.RegisterCounter(categoryName,
-                                                            0,
-                                                            1,
-                                                            123.45f,
-                                                            "valid name 9",
-                                                            "valid description",
-                                                            armnn::EmptyOptional(),   // Units
-                                                            armnn::EmptyOptional(),   // Number of cores
-                                                            multiCoreDevice->m_Uid,   // Device UID
-                                                            armnn::EmptyOptional())); // Counter set UID
+    BOOST_CHECK_NO_THROW(counterWMultiCoreDevice = counterDirectory.RegisterCounter(
+                             categoryName, 0, 1, 123.45f, "valid name 9", "valid description",
+                             armnn::EmptyOptional(),      // Units
+                             armnn::EmptyOptional(),      // Number of cores
+                             multiCoreDevice->m_Uid,      // Device UID
+                             armnn::EmptyOptional()));    // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 24);
     BOOST_CHECK(counterWMultiCoreDevice);
     BOOST_CHECK(counterWMultiCoreDevice->m_Uid >= 0);
@@ -1555,16 +1424,16 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     BOOST_CHECK(counterWMultiCoreDevice->m_DeviceUid == multiCoreDevice->m_Uid);
     BOOST_CHECK(counterWMultiCoreDevice->m_CounterSetUid == 0);
     BOOST_CHECK(category->m_Counters.size() == 24);
-    for (size_t i = 0; i < 4; i ++)
+    for (size_t i = 0; i < 4; i++)
     {
         BOOST_CHECK(category->m_Counters[category->m_Counters.size() - 4 + i] == counterWMultiCoreDevice->m_Uid + i);
     }
 
     // Register a multi-core device associate to a parent category for testing
     const std::string multiCoreDeviceNameWParentCategory = "some_multi_core_device_with_parent_category";
-    const Device* multiCoreDeviceWParentCategory = nullptr;
+    const Device* multiCoreDeviceWParentCategory         = nullptr;
     BOOST_CHECK_NO_THROW(multiCoreDeviceWParentCategory =
-            counterDirectory.RegisterDevice(multiCoreDeviceNameWParentCategory, 2, categoryName));
+                             counterDirectory.RegisterDevice(multiCoreDeviceNameWParentCategory, 2, categoryName));
     BOOST_CHECK(counterDirectory.GetDeviceCount() == 3);
     BOOST_CHECK(multiCoreDeviceWParentCategory);
     BOOST_CHECK(multiCoreDeviceWParentCategory->m_Name == multiCoreDeviceNameWParentCategory);
@@ -1574,17 +1443,12 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     // Register a counter with a valid parent category name and getting the number of cores of the multi-core device
     // associated to that category
     const Counter* counterWMultiCoreDeviceWParentCategory = nullptr;
-    BOOST_CHECK_NO_THROW(counterWMultiCoreDeviceWParentCategory
-                         = counterDirectory.RegisterCounter(categoryName,
-                                                            0,
-                                                            1,
-                                                            123.45f,
-                                                            "valid name 10",
-                                                            "valid description",
-                                                            armnn::EmptyOptional(),   // Units
-                                                            armnn::EmptyOptional(),   // Number of cores
-                                                            armnn::EmptyOptional(),   // Device UID
-                                                            armnn::EmptyOptional())); // Counter set UID
+    BOOST_CHECK_NO_THROW(counterWMultiCoreDeviceWParentCategory = counterDirectory.RegisterCounter(
+                             categoryName, 0, 1, 123.45f, "valid name 10", "valid description",
+                             armnn::EmptyOptional(),      // Units
+                             armnn::EmptyOptional(),      // Number of cores
+                             armnn::EmptyOptional(),      // Device UID
+                             armnn::EmptyOptional()));    // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 26);
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory);
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory->m_Uid >= 0);
@@ -1600,7 +1464,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory->m_DeviceUid == 0);
     BOOST_CHECK(counterWMultiCoreDeviceWParentCategory->m_CounterSetUid == 0);
     BOOST_CHECK(category->m_Counters.size() == 26);
-    for (size_t i = 0; i < 2; i ++)
+    for (size_t i = 0; i < 2; i++)
     {
         BOOST_CHECK(category->m_Counters[category->m_Counters.size() - 2 + i] ==
                     counterWMultiCoreDeviceWParentCategory->m_Uid + i);
@@ -1608,7 +1472,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter set for testing
     const std::string counterSetName = "some_counter_set";
-    const CounterSet* counterSet = nullptr;
+    const CounterSet* counterSet     = nullptr;
     BOOST_CHECK_NO_THROW(counterSet = counterDirectory.RegisterCounterSet(counterSetName));
     BOOST_CHECK(counterDirectory.GetCounterSetCount() == 1);
     BOOST_CHECK(counterSet);
@@ -1618,17 +1482,12 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and associated to a counter set
     const Counter* counterWCounterSet = nullptr;
-    BOOST_CHECK_NO_THROW(counterWCounterSet
-                         = counterDirectory.RegisterCounter(categoryName,
-                                                            0,
-                                                            1,
-                                                            123.45f,
-                                                            "valid name 11",
-                                                            "valid description",
-                                                            armnn::EmptyOptional(), // Units
-                                                            0,                      // Number of cores
-                                                            armnn::EmptyOptional(), // Device UID
-                                                            counterSet->m_Uid));    // Counter set UID
+    BOOST_CHECK_NO_THROW(counterWCounterSet = counterDirectory.RegisterCounter(
+                             categoryName, 0, 1, 123.45f, "valid name 11", "valid description",
+                             armnn::EmptyOptional(),    // Units
+                             0,                         // Number of cores
+                             armnn::EmptyOptional(),    // Device UID
+                             counterSet->m_Uid));       // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 27);
     BOOST_CHECK(counterWCounterSet);
     BOOST_CHECK(counterWCounterSet->m_Uid >= 0);
@@ -1647,17 +1506,12 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter with a valid parent category name and associated to a device and a counter set
     const Counter* counterWDeviceWCounterSet = nullptr;
-    BOOST_CHECK_NO_THROW(counterWDeviceWCounterSet
-                         = counterDirectory.RegisterCounter(categoryName,
-                                                            0,
-                                                            1,
-                                                            123.45f,
-                                                            "valid name 12",
-                                                            "valid description",
-                                                            armnn::EmptyOptional(), // Units
-                                                            1,                      // Number of cores
-                                                            device->m_Uid,          // Device UID
-                                                            counterSet->m_Uid));    // Counter set UID
+    BOOST_CHECK_NO_THROW(counterWDeviceWCounterSet = counterDirectory.RegisterCounter(
+                             categoryName, 0, 1, 123.45f, "valid name 12", "valid description",
+                             armnn::EmptyOptional(),    // Units
+                             1,                         // Number of cores
+                             device->m_Uid,             // Device UID
+                             counterSet->m_Uid));       // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 28);
     BOOST_CHECK(counterWDeviceWCounterSet);
     BOOST_CHECK(counterWDeviceWCounterSet->m_Uid >= 0);
@@ -1676,7 +1530,7 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register another category for testing
     const std::string anotherCategoryName = "some_other_category";
-    const Category* anotherCategory = nullptr;
+    const Category* anotherCategory       = nullptr;
     BOOST_CHECK_NO_THROW(anotherCategory = counterDirectory.RegisterCategory(anotherCategoryName));
     BOOST_CHECK(counterDirectory.GetCategoryCount() == 2);
     BOOST_CHECK(anotherCategory);
@@ -1688,16 +1542,12 @@ BOOST_AUTO_TEST_CASE(CheckCounterDirectoryRegisterCounter)
 
     // Register a counter to the other category
     const Counter* anotherCounter = nullptr;
-    BOOST_CHECK_NO_THROW(anotherCounter = counterDirectory.RegisterCounter(anotherCategoryName,
-                                                                           1,
-                                                                           0,
-                                                                           .00043f,
-                                                                           "valid name",
-                                                                           "valid description",
-                                                                           armnn::EmptyOptional(), // Units
-                                                                           armnn::EmptyOptional(), // Number of cores
-                                                                           device->m_Uid,          // Device UID
-                                                                           counterSet->m_Uid));    // Counter set UID
+    BOOST_CHECK_NO_THROW(anotherCounter = counterDirectory.RegisterCounter(anotherCategoryName, 1, 0, .00043f,
+                                                                           "valid name", "valid description",
+                                                                           armnn::EmptyOptional(),    // Units
+                                                                           armnn::EmptyOptional(),    // Number of cores
+                                                                           device->m_Uid,             // Device UID
+                                                                           counterSet->m_Uid));       // Counter set UID
     BOOST_CHECK(counterDirectory.GetCounterCount() == 29);
     BOOST_CHECK(anotherCounter);
     BOOST_CHECK(anotherCounter->m_Uid >= 0);
@@ -1722,15 +1572,26 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
 
     class TestCaptureThread : public IPeriodicCounterCapture
     {
-        void Start() override {}
-        void Stop() override {}
+        void Start() override
+        {}
+        void Stop() override
+        {}
     };
 
     class TestReadCounterValues : public IReadCounterValues
     {
-        bool IsCounterRegistered(uint16_t counterUid) const override { return true; }
-        uint16_t GetCounterCount() const override { return 0; }
-        uint32_t GetCounterValue(uint16_t counterUid) const override { return 0; }
+        bool IsCounterRegistered(uint16_t counterUid) const override
+        {
+            return true;
+        }
+        uint16_t GetCounterCount() const override
+        {
+            return 0;
+        }
+        uint32_t GetCounterValue(uint16_t counterUid) const override
+        {
+            return 0;
+        }
     };
     const uint32_t familyId = 0;
     const uint32_t packetId = 0x40000;
@@ -1746,12 +1607,12 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
 
     // Data with period and counters
-    uint32_t period1 = 10;
+    uint32_t period1     = 10;
     uint32_t dataLength1 = 8;
-    uint32_t offset = 0;
+    uint32_t offset      = 0;
 
     std::unique_ptr<unsigned char[]> uniqueData1 = std::make_unique<unsigned char[]>(dataLength1);
-    unsigned char* data1 = reinterpret_cast<unsigned char*>(uniqueData1.get());
+    unsigned char* data1                         = reinterpret_cast<unsigned char*>(uniqueData1.get());
 
     WriteUint32(data1, offset, period1);
     offset += sizeOfUint32;
@@ -1761,14 +1622,8 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
 
     Packet packetA(packetId, dataLength1, uniqueData1);
 
-    PeriodicCounterSelectionCommandHandler commandHandler(familyId,
-                                                          packetId,
-                                                          version,
-                                                          holder,
-                                                          captureThread,
-                                                          readCounterValues,
-                                                          sendCounterPacket,
-                                                          profilingStateMachine);
+    PeriodicCounterSelectionCommandHandler commandHandler(familyId, packetId, version, holder, captureThread,
+                                                          readCounterValues, sendCounterPacket, profilingStateMachine);
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
     BOOST_CHECK_THROW(commandHandler(packetA), armnn::RuntimeException);
@@ -1796,10 +1651,10 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     offset += sizeOfUint32;
     uint32_t period = ReadUint32(readBuffer, offset);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
-    BOOST_TEST(headerWord1 == 8);                   // data lenght
-    BOOST_TEST(period == 10);                       // capture period
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);     // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4);    // packet id
+    BOOST_TEST(headerWord1 == 8);                      // data lenght
+    BOOST_TEST(period == 10);                          // capture period
 
     uint16_t counterId = 0;
     offset += sizeOfUint32;
@@ -1812,7 +1667,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     mockBuffer.MarkRead(readBuffer);
 
     // Data with period only
-    uint32_t period2 = 11;
+    uint32_t period2     = 11;
     uint32_t dataLength2 = 4;
 
     std::unique_ptr<unsigned char[]> uniqueData2 = std::make_unique<unsigned char[]>(dataLength2);
@@ -1838,30 +1693,30 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     offset += sizeOfUint32;
     period = ReadUint32(readBuffer, offset);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);  // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4); // packet id
-    BOOST_TEST(headerWord1 == 4);                   // data length
-    BOOST_TEST(period == 11);                       // capture period
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);     // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4);    // packet id
+    BOOST_TEST(headerWord1 == 4);                      // data length
+    BOOST_TEST(period == 11);                          // capture period
 }
 
 BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
 {
     using boost::numeric_cast;
 
-    const uint32_t packetFamilyId = 0;
+    const uint32_t packetFamilyId     = 0;
     const uint32_t connectionPacketId = 0x10000;
-    const uint32_t version = 1;
+    const uint32_t version            = 1;
 
     uint32_t sizeOfUint32 = numeric_cast<uint32_t>(sizeof(uint32_t));
     uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
 
     // Data with period and counters
-    uint32_t period1 = 10;
+    uint32_t period1     = 10;
     uint32_t dataLength1 = 8;
-    uint32_t offset = 0;
+    uint32_t offset      = 0;
 
     std::unique_ptr<unsigned char[]> uniqueData1 = std::make_unique<unsigned char[]>(dataLength1);
-    unsigned char* data1 = reinterpret_cast<unsigned char*>(uniqueData1.get());
+    unsigned char* data1                         = reinterpret_cast<unsigned char*>(uniqueData1.get());
 
     WriteUint32(data1, offset, period1);
     offset += sizeOfUint32;
@@ -1873,8 +1728,12 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
 
     ProfilingStateMachine profilingState(ProfilingState::Uninitialised);
     BOOST_CHECK(profilingState.GetCurrentState() == ProfilingState::Uninitialised);
+    CounterDirectory counterDirectory;
+    MockBufferManager mockBuffer(1024);
+    SendCounterPacket sendCounterPacket(profilingState, mockBuffer);
 
-    ConnectionAcknowledgedCommandHandler commandHandler(packetFamilyId, connectionPacketId, version, profilingState);
+    ConnectionAcknowledgedCommandHandler commandHandler(packetFamilyId, connectionPacketId, version, counterDirectory,
+                                                        sendCounterPacket, profilingState);
 
     // command handler received packet on ProfilingState::Uninitialised
     BOOST_CHECK_THROW(commandHandler(packetA), armnn::Exception);
@@ -1899,8 +1758,8 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     Packet packetB(differentPacketId, dataLength1, uniqueData1);
     profilingState.TransitionToState(ProfilingState::NotConnected);
     profilingState.TransitionToState(ProfilingState::WaitingForAck);
-    ConnectionAcknowledgedCommandHandler differentCommandHandler(
-        packetFamilyId, differentPacketId, version, profilingState);
+    ConnectionAcknowledgedCommandHandler differentCommandHandler(packetFamilyId, differentPacketId, version,
+                                                                 counterDirectory, sendCounterPacket, profilingState);
     BOOST_CHECK_THROW(differentCommandHandler(packetB), armnn::Exception);
 }
 
@@ -2021,7 +1880,7 @@ void StringToSwTraceStringTestHelper(const std::string& testString, std::vector<
 
     // The buffer must include the null-terminator at the end of the string
     size_t nullTerminatorIndex = sizeof(uint32_t) + testString.size();
-    BOOST_CHECK(reinterpret_cast<unsigned char*>(buffer.data())[nullTerminatorIndex]  == '\0');
+    BOOST_CHECK(reinterpret_cast<unsigned char*>(buffer.data())[nullTerminatorIndex] == '\0');
 }
 
 BOOST_AUTO_TEST_CASE(StringToSwTraceStringTest)
@@ -2083,7 +1942,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     public:
         CaptureReader(uint16_t counterSize)
         {
-            for(uint16_t i = 0; i < counterSize; ++i)
+            for (uint16_t i = 0; i < counterSize; ++i)
             {
                 m_Data[i] = 0;
             }
@@ -2102,7 +1961,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
 
         uint32_t GetCounterValue(uint16_t counterUid) const override
         {
-            if(counterUid > m_CounterSize)
+            if (counterUid > m_CounterSize)
             {
                 BOOST_FAIL("Invalid counter Uid");
             }
@@ -2111,7 +1970,7 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
 
         void SetCounterValue(uint16_t counterUid, uint32_t value)
         {
-            if(counterUid > m_CounterSize)
+            if (counterUid > m_CounterSize)
             {
                 BOOST_FAIL("Invalid counter Uid");
             }
@@ -2135,8 +1994,8 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     std::vector<uint16_t> counterIds;
     CaptureReader captureReader(2);
 
-    unsigned int valueA = 10;
-    unsigned int valueB = 15;
+    unsigned int valueA   = 10;
+    unsigned int valueB   = 15;
     unsigned int numSteps = 5;
 
     PeriodicCounterCapture periodicCounterCapture(std::ref(data), std::ref(sendCounterPacket), captureReader);
@@ -2156,12 +2015,12 @@ BOOST_AUTO_TEST_CASE(CheckPeriodicCounterCaptureThread)
     uint32_t headerWord0 = ReadUint32(buffer, 0);
     uint32_t headerWord1 = ReadUint32(buffer, 4);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 1); // packet family
-    BOOST_TEST(((headerWord0 >> 19) & 0x0000007F) == 0); // packet class
-    BOOST_TEST(((headerWord0 >> 16) & 0x00000007) == 0); // packet type
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 1);    // packet family
+    BOOST_TEST(((headerWord0 >> 19) & 0x0000007F) == 0);    // packet class
+    BOOST_TEST(((headerWord0 >> 16) & 0x00000007) == 0);    // packet type
     BOOST_TEST(headerWord1 == 20);
 
-    uint32_t offset = 16;
+    uint32_t offset    = 16;
     uint16_t readIndex = ReadUint16(buffer, offset);
     BOOST_TEST(0 == readIndex);
 
@@ -2184,50 +2043,46 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
 
     const uint32_t familyId = 0;
     const uint32_t packetId = 3;
-    const uint32_t version = 1;
+    const uint32_t version  = 1;
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
-    RequestCounterDirectoryCommandHandler commandHandler(familyId,
-                                                         packetId,
-                                                         version,
-                                                         counterDirectory,
-                                                         sendCounterPacket,
-                                                         profilingStateMachine);
+    RequestCounterDirectoryCommandHandler commandHandler(familyId, packetId, version, counterDirectory,
+                                                         sendCounterPacket, profilingStateMachine);
 
     const uint32_t wrongPacketId = 47;
-    const uint32_t wrongHeader = (wrongPacketId & 0x000003FF) << 16;
+    const uint32_t wrongHeader   = (wrongPacketId & 0x000003FF) << 16;
 
     Packet wrongPacket(wrongHeader);
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
-    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
-    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
-    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::Active);
-    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::InvalidArgumentException); // Wrong packet
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::InvalidArgumentException);    // Wrong packet
 
     const uint32_t rightHeader = (packetId & 0x000003FF) << 16;
 
     Packet rightPacket(rightHeader);
 
-    BOOST_CHECK_NO_THROW(commandHandler(rightPacket)); // Right packet
+    BOOST_CHECK_NO_THROW(commandHandler(rightPacket));    // Right packet
 
     auto readBuffer = mockBuffer.GetReadableBuffer();
 
     uint32_t headerWord0 = ReadUint32(readBuffer, 0);
     uint32_t headerWord1 = ReadUint32(readBuffer, 4);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 0);  // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x000003FF) == 2);  // packet id
-    BOOST_TEST(headerWord1 == 24);                        // data length
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 0);    // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x000003FF) == 2);    // packet id
+    BOOST_TEST(headerWord1 == 24);                          // data length
 
-    uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
+    uint32_t bodyHeaderWord0   = ReadUint32(readBuffer, 8);
     uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
-    BOOST_TEST(deviceRecordCount == 0); // device_records_count
+    BOOST_TEST(deviceRecordCount == 0);    // device_records_count
 }
 
 BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
@@ -2236,32 +2091,28 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
 
     const uint32_t familyId = 0;
     const uint32_t packetId = 3;
-    const uint32_t version = 1;
+    const uint32_t version  = 1;
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
-    RequestCounterDirectoryCommandHandler commandHandler(familyId,
-                                                         packetId,
-                                                         version,
-                                                         counterDirectory,
-                                                         sendCounterPacket,
-                                                         profilingStateMachine);
+    RequestCounterDirectoryCommandHandler commandHandler(familyId, packetId, version, counterDirectory,
+                                                         sendCounterPacket, profilingStateMachine);
     const uint32_t header = (packetId & 0x000003FF) << 16;
     Packet packet(header);
 
-    const Device* device = counterDirectory.RegisterDevice("deviceA", 1);
+    const Device* device         = counterDirectory.RegisterDevice("deviceA", 1);
     const CounterSet* counterSet = counterDirectory.RegisterCounterSet("countersetA");
     counterDirectory.RegisterCategory("categoryA", device->m_Uid, counterSet->m_Uid);
     counterDirectory.RegisterCounter("categoryA", 0, 1, 2.0f, "counterA", "descA");
     counterDirectory.RegisterCounter("categoryA", 1, 1, 3.0f, "counterB", "descB");
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
-    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException); // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
-    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException); // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
-    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException); // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(packet), armnn::RuntimeException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::Active);
     BOOST_CHECK_NO_THROW(commandHandler(packet));
 
@@ -2270,34 +2121,34 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     uint32_t headerWord0 = ReadUint32(readBuffer, 0);
     uint32_t headerWord1 = ReadUint32(readBuffer, 4);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 0);  // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x000003FF) == 2);  // packet id
-    BOOST_TEST(headerWord1 == 240);                       // data length
+    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 0);    // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x000003FF) == 2);    // packet id
+    BOOST_TEST(headerWord1 == 240);                         // data length
 
-    uint32_t bodyHeaderWord0 = ReadUint32(readBuffer,  8);
-    uint32_t bodyHeaderWord1 = ReadUint32(readBuffer, 12);
-    uint32_t bodyHeaderWord2 = ReadUint32(readBuffer, 16);
-    uint32_t bodyHeaderWord3 = ReadUint32(readBuffer, 20);
-    uint32_t bodyHeaderWord4 = ReadUint32(readBuffer, 24);
-    uint32_t bodyHeaderWord5 = ReadUint32(readBuffer, 28);
-    uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
+    uint32_t bodyHeaderWord0       = ReadUint32(readBuffer, 8);
+    uint32_t bodyHeaderWord1       = ReadUint32(readBuffer, 12);
+    uint32_t bodyHeaderWord2       = ReadUint32(readBuffer, 16);
+    uint32_t bodyHeaderWord3       = ReadUint32(readBuffer, 20);
+    uint32_t bodyHeaderWord4       = ReadUint32(readBuffer, 24);
+    uint32_t bodyHeaderWord5       = ReadUint32(readBuffer, 28);
+    uint16_t deviceRecordCount     = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
     uint16_t counterSetRecordCount = numeric_cast<uint16_t>(bodyHeaderWord2 >> 16);
-    uint16_t categoryRecordCount = numeric_cast<uint16_t>(bodyHeaderWord4 >> 16);
-    BOOST_TEST(deviceRecordCount == 1);     // device_records_count
-    BOOST_TEST(bodyHeaderWord1 == 0);       // device_records_pointer_table_offset
-    BOOST_TEST(counterSetRecordCount == 1); // counter_set_count
-    BOOST_TEST(bodyHeaderWord3 == 4);       // counter_set_pointer_table_offset
-    BOOST_TEST(categoryRecordCount == 1);   // categories_count
-    BOOST_TEST(bodyHeaderWord5 == 8);       // categories_pointer_table_offset
+    uint16_t categoryRecordCount   = numeric_cast<uint16_t>(bodyHeaderWord4 >> 16);
+    BOOST_TEST(deviceRecordCount == 1);        // device_records_count
+    BOOST_TEST(bodyHeaderWord1 == 0);          // device_records_pointer_table_offset
+    BOOST_TEST(counterSetRecordCount == 1);    // counter_set_count
+    BOOST_TEST(bodyHeaderWord3 == 4);          // counter_set_pointer_table_offset
+    BOOST_TEST(categoryRecordCount == 1);      // categories_count
+    BOOST_TEST(bodyHeaderWord5 == 8);          // categories_pointer_table_offset
 
     uint32_t deviceRecordOffset = ReadUint32(readBuffer, 32);
-    BOOST_TEST(deviceRecordOffset ==  0);
+    BOOST_TEST(deviceRecordOffset == 0);
 
     uint32_t counterSetRecordOffset = ReadUint32(readBuffer, 36);
     BOOST_TEST(counterSetRecordOffset == 20);
 
     uint32_t categoryRecordOffset = ReadUint32(readBuffer, 40);
-    BOOST_TEST(categoryRecordOffset ==  44);
+    BOOST_TEST(categoryRecordOffset == 44);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
@@ -2313,21 +2164,21 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Calculate the size of a Stream Metadata packet
-    std::string processName = GetProcessName().substr(0, 60);
+    std::string processName      = GetProcessName().substr(0, 60);
     unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
     unsigned int streamMetadataPacketsize = 118 + processNameSize;
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "WaitingForAck" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update();// Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
 
     // Get the mock profiling connection
     MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
@@ -2356,9 +2207,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
     // 8:15  [8]  reserved: Reserved, value 0b00000000
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
-    uint32_t packetId     = 37; // Wrong packet id!!!
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t packetId     = 37;    // Wrong packet id!!!
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
     // Create the Connection Acknowledged Packet
     Packet connectionAcknowledgedPacket(header);
@@ -2387,21 +2237,21 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     SwapProfilingConnectionFactoryHelper helper;
 
     // Calculate the size of a Stream Metadata packet
-    std::string processName = GetProcessName().substr(0, 60);
+    std::string processName      = GetProcessName().substr(0, 60);
     unsigned int processNameSize = processName.empty() ? 0 : boost::numeric_cast<unsigned int>(processName.size()) + 1;
     unsigned int streamMetadataPacketsize = 118 + processNameSize;
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "WaitingForAck" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
 
     // Get the mock profiling connection
     MockProfilingConnection* mockProfilingConnection = helper.GetMockProfilingConnection();
@@ -2411,7 +2261,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     mockProfilingConnection->Clear();
 
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet to be sent
     helper.WaitForProfilingPacketsSent();
@@ -2431,8 +2281,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
     uint32_t packetId     = 1;
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
     // Create the Connection Acknowledged Packet
     Packet connectionAcknowledgedPacket(header);
@@ -2466,7 +2315,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
@@ -2474,9 +2323,9 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     helper.ForceTransitionToState(ProfilingState::NotConnected);
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -2502,9 +2351,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadRequestCounterDirectoryPacket)
     // 8:15  [8]  reserved: Reserved, value 0b00000000
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
-    uint32_t packetId     = 123; // Wrong packet id!!!
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t packetId     = 123;    // Wrong packet id!!!
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
     // Create the Request Counter Directory packet
     Packet requestCounterDirectoryPacket(header);
@@ -2534,17 +2382,17 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "Active" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -2571,8 +2419,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
     uint32_t packetId     = 3;
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
     // Create the Request Counter Directory packet
     Packet requestCounterDirectoryPacket(header);
@@ -2586,7 +2433,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
     // Check that the mock profiling connection contains one Counter Directory packet
     const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
     BOOST_TEST(writtenData.size() == 1);
-    BOOST_TEST(writtenData[0] == 416); // The size of the expected Counter Directory packet
+    BOOST_TEST(writtenData[0] == 416);    // The size of the expected Counter Directory packet
 
     // The Request Counter Directory Command Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
@@ -2610,17 +2457,17 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "Active" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -2646,12 +2493,11 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacket)
     // 8:15  [8]  reserved: Reserved, value 0b00000000
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
-    uint32_t packetId     = 999; // Wrong packet id!!!
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t packetId     = 999;    // Wrong packet id!!!
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
     // Create the Periodic Counter Selection packet
-    Packet periodicCounterSelectionPacket(header); // Length == 0, this will disable the collection of counters
+    Packet periodicCounterSelectionPacket(header);    // Length == 0, this will disable the collection of counters
 
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
@@ -2681,17 +2527,17 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacketInval
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "Active" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -2718,17 +2564,16 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacketInval
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
     uint32_t packetId     = 4;
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
-    uint32_t capturePeriod = 123456; // Some capture period (microseconds)
+    uint32_t capturePeriod = 123456;    // Some capture period (microseconds)
 
     // Get the first valid counter UID
     const ICounterDirectory& counterDirectory = profilingService.GetCounterDirectory();
-    const Counters& counters = counterDirectory.GetCounters();
+    const Counters& counters                  = counterDirectory.GetCounters();
     BOOST_CHECK(counters.size() > 1);
-    uint16_t counterUidA = counters.begin()->first; // First valid counter UID
-    uint16_t counterUidB = 9999;                    // Second invalid counter UID
+    uint16_t counterUidA = counters.begin()->first;    // First valid counter UID
+    uint16_t counterUidB = 9999;                       // Second invalid counter UID
 
     uint32_t length = 8;
 
@@ -2738,8 +2583,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacketInval
     WriteUint16(data.get(), 6, counterUidB);
 
     // Create the Periodic Counter Selection packet
-    Packet periodicCounterSelectionPacket(header, length, data); // Length > 0, this will start the Period Counter
-                                                                 // Capture thread
+    Packet periodicCounterSelectionPacket(header, length, data);    // Length > 0, this will start the Period Counter
+                                                                    // Capture thread
 
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
@@ -2760,8 +2605,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadPeriodicCounterSelectionPacketInval
         }
         receivedPackets.insert(receivedPackets.end(), writtenData.begin(), writtenData.end());
         expectedPackets -= boost::numeric_cast<int>(writtenData.size());
-    }
-    while (expectedPackets > 0);
+    } while (expectedPackets > 0);
     BOOST_TEST(!receivedPackets.empty());
 
     // The size of the expected Periodic Counter Selection packet
@@ -2784,17 +2628,17 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCo
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "Active" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -2821,11 +2665,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCo
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
     uint32_t packetId     = 4;
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
     // Create the Periodic Counter Selection packet
-    Packet periodicCounterSelectionPacket(header); // Length == 0, this will disable the collection of counters
+    Packet periodicCounterSelectionPacket(header);    // Length == 0, this will disable the collection of counters
 
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
@@ -2838,8 +2681,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCo
 
     // Check that the mock profiling connection contains one Periodic Counter Selection
     const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-    BOOST_TEST(writtenData.size() == 1); // Only one packet is expected (no Periodic Counter packets)
-    BOOST_TEST(writtenData[0] == 12); // The size of the expected Periodic Counter Selection (echos the sent one)
+    BOOST_TEST(writtenData.size() == 1);    // Only one packet is expected (no Periodic Counter packets)
+    BOOST_TEST(writtenData[0] == 12);       // The size of the expected Periodic Counter Selection (echos the sent one)
 
     // Reset the profiling service to stop any running thread
     options.m_EnableProfiling = false;
@@ -2853,17 +2696,17 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketSing
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "Active" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -2890,16 +2733,15 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketSing
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
     uint32_t packetId     = 4;
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
-    uint32_t capturePeriod = 123456; // Some capture period (microseconds)
+    uint32_t capturePeriod = 123456;    // Some capture period (microseconds)
 
     // Get the first valid counter UID
     const ICounterDirectory& counterDirectory = profilingService.GetCounterDirectory();
-    const Counters& counters = counterDirectory.GetCounters();
+    const Counters& counters                  = counterDirectory.GetCounters();
     BOOST_CHECK(!counters.empty());
-    uint16_t counterUid = counters.begin()->first; // Valid counter UID
+    uint16_t counterUid = counters.begin()->first;    // Valid counter UID
 
     uint32_t length = 6;
 
@@ -2908,8 +2750,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketSing
     WriteUint16(data.get(), 4, counterUid);
 
     // Create the Periodic Counter Selection packet
-    Packet periodicCounterSelectionPacket(header, length, data); // Length > 0, this will start the Period Counter
-                                                                 // Capture thread
+    Packet periodicCounterSelectionPacket(header, length, data);    // Length > 0, this will start the Period Counter
+                                                                    // Capture thread
 
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
@@ -2930,8 +2772,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketSing
         }
         receivedPackets.insert(receivedPackets.end(), writtenData.begin(), writtenData.end());
         expectedPackets -= boost::numeric_cast<int>(writtenData.size());
-    }
-    while (expectedPackets > 0);
+    } while (expectedPackets > 0);
     BOOST_TEST(!receivedPackets.empty());
 
     // The size of the expected Periodic Counter Selection packet (echos the sent one)
@@ -2954,17 +2795,17 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMult
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "Active" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -2991,17 +2832,16 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMult
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
     uint32_t packetId     = 4;
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
-    uint32_t capturePeriod = 123456; // Some capture period (microseconds)
+    uint32_t capturePeriod = 123456;    // Some capture period (microseconds)
 
     // Get the first valid counter UID
     const ICounterDirectory& counterDirectory = profilingService.GetCounterDirectory();
-    const Counters& counters = counterDirectory.GetCounters();
+    const Counters& counters                  = counterDirectory.GetCounters();
     BOOST_CHECK(counters.size() > 1);
-    uint16_t counterUidA = counters.begin()->first;     // First valid counter UID
-    uint16_t counterUidB = (counters.begin()++)->first; // Second valid counter UID
+    uint16_t counterUidA = counters.begin()->first;        // First valid counter UID
+    uint16_t counterUidB = (counters.begin()++)->first;    // Second valid counter UID
 
     uint32_t length = 8;
 
@@ -3011,8 +2851,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMult
     WriteUint16(data.get(), 6, counterUidB);
 
     // Create the Periodic Counter Selection packet
-    Packet periodicCounterSelectionPacket(header, length, data); // Length > 0, this will start the Period Counter
-                                                                 // Capture thread
+    Packet periodicCounterSelectionPacket(header, length, data);    // Length > 0, this will start the Period Counter
+                                                                    // Capture thread
 
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
@@ -3033,8 +2873,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPeriodicCounterSelectionPacketMult
         }
         receivedPackets.insert(receivedPackets.end(), writtenData.begin(), writtenData.end());
         expectedPackets -= boost::numeric_cast<int>(writtenData.size());
-    }
-    while (expectedPackets > 0);
+    } while (expectedPackets > 0);
     BOOST_TEST(!receivedPackets.empty());
 
     // The size of the expected Periodic Counter Selection packet (echos the sent one)
@@ -3057,29 +2896,29 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisconnect)
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Try to disconnect the profiling service while in the "Uninitialised" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Disconnect();
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised); // The state should not change
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);    // The state should not change
 
     // Try to disconnect the profiling service while in the "NotConnected" state
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
     profilingService.Disconnect();
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected); // The state should not change
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);    // The state should not change
 
     // Try to disconnect the profiling service while in the "WaitingForAck" state
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
     profilingService.Disconnect();
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck); // The state should not change
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);    // The state should not change
 
     // Try to disconnect the profiling service while in the "Active" state
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -3097,7 +2936,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceDisconnect)
     BOOST_CHECK(mockProfilingConnection->IsOpen());
 
     profilingService.Disconnect();
-    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected); // The state should have changed
+    BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);    // The state should have changed
 
     // Check that the profiling connection has been reset
     mockProfilingConnection = helper.GetMockProfilingConnection();
@@ -3115,17 +2954,17 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
 
     // Reset the profiling service to the uninitialized state
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "Active" state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
-    profilingService.Update(); // Initialize the counter directory
+    profilingService.Update();    // Initialize the counter directory
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
-    profilingService.Update(); // Create the profiling connection
+    profilingService.Update();    // Create the profiling connection
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::WaitingForAck);
-    profilingService.Update(); // Start the command handler and the send thread
+    profilingService.Update();    // Start the command handler and the send thread
 
     // Wait for the Stream Metadata packet the be sent
     // (we are not testing the connection acknowledgement here so it will be ignored by this test)
@@ -3152,11 +2991,10 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
     // 0:7   [8]  reserved: Reserved, value 0b00000000
     uint32_t packetFamily = 0;
     uint32_t packetId     = 5;
-    uint32_t header = ((packetFamily & 0x0000003F) << 26) |
-                      ((packetId     & 0x000003FF) << 16);
+    uint32_t header       = ((packetFamily & 0x0000003F) << 26) | ((packetId & 0x000003FF) << 16);
 
     // Create the Per-Job Counter Selection packet
-    Packet periodicCounterSelectionPacket(header); // Length == 0, this will disable the collection of counters
+    Packet periodicCounterSelectionPacket(header);    // Length == 0, this will disable the collection of counters
 
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(periodicCounterSelectionPacket));
@@ -3181,7 +3019,7 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodPerJobCounterSelectionPacket)
 BOOST_AUTO_TEST_CASE(CheckConfigureProfilingServiceOn)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_EnableProfiling = true;
+    options.m_EnableProfiling          = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);

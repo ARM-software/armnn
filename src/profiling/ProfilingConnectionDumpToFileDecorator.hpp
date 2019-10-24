@@ -28,7 +28,7 @@ public:
 
     ProfilingConnectionDumpToFileDecorator(std::unique_ptr<IProfilingConnection> connection,
                                            const Runtime::CreationOptions::ExternalProfilingOptions& options,
-                                           bool ignoreFailures);
+                                           bool ignoreFailures = false);
 
     ~ProfilingConnectionDumpToFileDecorator();
 

@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
     armnn::gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
         1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue());
 
-    armnn::gatordmock::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
-        0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue());
+    armnn::profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
+        0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), false);
 
     // Register different derived functors
     registry.RegisterFunctor(&periodicCounterSelectionResponseHandler);

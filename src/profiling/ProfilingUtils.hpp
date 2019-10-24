@@ -7,6 +7,7 @@
 
 #include <armnn/Exceptions.hpp>
 
+#include "ICounterDirectory.hpp"
 #include "IPacketBuffer.hpp"
 
 #include <boost/numeric/conversion/cast.hpp>
@@ -55,10 +56,7 @@ template <typename SwTracePolicy>
 bool IsValidSwTraceString(const std::string& s)
 {
     // Check that all the characters in the given string conform to the given policy
-    return std::all_of(s.begin(), s.end(), [](unsigned char c)
-    {
-        return SwTracePolicy::IsValidChar(c);
-    });
+    return std::all_of(s.begin(), s.end(), [](unsigned char c) { return SwTracePolicy::IsValidChar(c); });
 }
 
 template <typename SwTracePolicy>
@@ -77,7 +75,7 @@ bool StringToSwTraceString(const std::string& s, std::vector<uint32_t>& outputBu
     }
 
     // Prepare the output buffer
-    size_t s_size = s.size() + 1; // The size of the string (in chars) plus the null-terminator
+    size_t s_size        = s.size() + 1;    // The size of the string (in chars) plus the null-terminator
     size_t uint32_t_size = sizeof(uint32_t);
     size_t outBufferSize = 1 + s_size / uint32_t_size + (s_size % uint32_t_size != 0 ? 1 : 0);
     outputBuffer.resize(outBufferSize, '\0');
@@ -94,6 +92,10 @@ uint16_t GetNextUid(bool peekOnly = false);
 std::vector<uint16_t> GetNextCounterUids(uint16_t cores);
 
 void WriteBytes(const IPacketBuffer& packetBuffer, unsigned int offset, const void* value, unsigned int valueSize);
+
+uint32_t ConstructHeader(uint32_t packetFamily, uint32_t packetId);
+
+uint32_t ConstructHeader(uint32_t packetFamily, uint32_t packetClass, uint32_t packetType);
 
 void WriteUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint64_t value);
 
@@ -146,10 +148,10 @@ enum class TimelinePacketStatus
 
 enum class ProfilingRelationshipType
 {
-    RetentionLink, /// Head retains(parents) Tail
-    ExecutionLink, /// Head execution start depends on Tail execution completion
-    DataLink,      /// Head uses data of Tail
-    LabelLink      /// Head uses label Tail (Tail MUST be a guid of a label).
+    RetentionLink,    /// Head retains(parents) Tail
+    ExecutionLink,    /// Head execution start depends on Tail execution completion
+    DataLink,         /// Head uses data of Tail
+    LabelLink         /// Head uses label Tail (Tail MUST be a guid of a label).
 };
 
 uint32_t CalculateSizeOfPaddedSwString(const std::string& str);
@@ -191,14 +193,18 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
                                                     unsigned int bufferSize,
                                                     unsigned int& numberOfBytesWritten);
 
+std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth);
+
+void PrintCounterDirectory(ICounterDirectory& counterDirectory);
+
 class BufferExhaustion : public armnn::Exception
 {
     using Exception::Exception;
 };
 
-} // namespace profiling
+}    // namespace profiling
 
-} // namespace armnn
+}    // namespace armnn
 
 namespace std
 {

@@ -5,9 +5,9 @@
 
 #include "../GatordMockService.hpp"
 #include "../PeriodicCounterCaptureCommandHandler.hpp"
-#include "../DirectoryCaptureCommandHandler.hpp"
 
 #include <CommandHandlerRegistry.hpp>
+#include <DirectoryCaptureCommandHandler.hpp>
 #include <ProfilingService.hpp>
 
 #include <test/SendCounterPacketTests.hpp>
@@ -87,8 +87,7 @@ BOOST_AUTO_TEST_CASE(CounterCaptureHandlingTest)
     profiling::Packet packet1(headerWord1, dataLength, uniqueData1);
     profiling::Packet packet2(headerWord1, dataLength, uniqueData2);
 
-    gatordmock::PeriodicCounterCaptureCommandHandler commandHandler
-        (0, 4, headerWord1, true);
+    gatordmock::PeriodicCounterCaptureCommandHandler commandHandler(0, 4, headerWord1, true);
 
     // Simulate two separate packets coming in to calculate period
     commandHandler(packet1);
@@ -108,7 +107,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // performance data.
 
     //These variables are used to wait for the profiling service
-    u_int32_t timeout = 2000;
+    u_int32_t timeout   = 2000;
     u_int32_t sleepTime = 50;
     u_int32_t timeSlept = 0;
 
@@ -118,11 +117,11 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     profiling::CommandHandlerRegistry registry;
 
     // Update with derived functors
-    gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler
-        (0, 4, packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(), true);
+    gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
+        0, 4, packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(), true);
 
-    gatordmock::DirectoryCaptureCommandHandler directoryCaptureCommandHandler
-        (0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), true);
+    profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
+        0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), true);
 
     // Register different derived functors
     registry.RegisterFunctor(&counterCaptureCommandHandler);
@@ -183,10 +182,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     }
 
     mockService.LaunchReceivingThread();
-    mockService.SendRequestCounterDir();
-
+    // As part of the default startup of the profiling service a counter directory packet will be sent.
     timeSlept = 0;
-    while (directoryCaptureCommandHandler.GetCounterDirectoryCount() == 0)
+    while (!directoryCaptureCommandHandler.ParsedCounterDirectory())
     {
         if (timeSlept >= timeout)
         {
@@ -196,81 +194,85 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
         timeSlept += sleepTime;
     }
 
-    const profiling::ICounterDirectory& serviceCounterDirectory = profilingService.GetCounterDirectory();
-    gatordmock::CounterDirectory mockCounterDirectory = directoryCaptureCommandHandler.GetCounterDirectory();
+    const profiling::ICounterDirectory& serviceCounterDirectory  = profilingService.GetCounterDirectory();
+    const profiling::ICounterDirectory& receivedCounterDirectory = directoryCaptureCommandHandler.GetCounterDirectory();
 
-    BOOST_ASSERT(serviceCounterDirectory.GetDeviceCount() ==  mockCounterDirectory.m_DeviceRecords.size());
-    BOOST_ASSERT(serviceCounterDirectory.GetCounterSetCount() ==  mockCounterDirectory.m_CounterSets.size());
-    BOOST_ASSERT(serviceCounterDirectory.GetCategoryCount() ==  mockCounterDirectory.m_Categories.size());
+    // Compare thre basics of the counter directory from the service and the one we received over the wire.
+    BOOST_ASSERT(serviceCounterDirectory.GetDeviceCount() == receivedCounterDirectory.GetDeviceCount());
+    BOOST_ASSERT(serviceCounterDirectory.GetCounterSetCount() == receivedCounterDirectory.GetCounterSetCount());
+    BOOST_ASSERT(serviceCounterDirectory.GetCategoryCount() == receivedCounterDirectory.GetCategoryCount());
+    BOOST_ASSERT(serviceCounterDirectory.GetCounterCount() == receivedCounterDirectory.GetCounterCount());
+
+    receivedCounterDirectory.GetDeviceCount();
+    serviceCounterDirectory.GetDeviceCount();
 
     const profiling::Devices& serviceDevices = serviceCounterDirectory.GetDevices();
-
-    uint32_t deviceIndex = 0;
     for (auto& device : serviceDevices)
     {
-        BOOST_ASSERT(device.second->m_Name.size() ==
-                     mockCounterDirectory.m_DeviceRecords[deviceIndex].m_DeviceName.size());
-
-        BOOST_CHECK(device.second->m_Name == mockCounterDirectory.m_DeviceRecords[deviceIndex].m_DeviceName);
-        BOOST_CHECK(device.second->m_Uid == mockCounterDirectory.m_DeviceRecords[deviceIndex].m_DeviceUid);
-        BOOST_CHECK(device.second->m_Cores == mockCounterDirectory.m_DeviceRecords[deviceIndex].m_DeviceCores);
-        deviceIndex++;
+        // Find the same device in the received counter directory.
+        auto foundDevice = receivedCounterDirectory.GetDevices().find(device.second->m_Uid);
+        BOOST_CHECK(foundDevice != receivedCounterDirectory.GetDevices().end());
+        BOOST_CHECK(device.second->m_Name.compare((*foundDevice).second->m_Name) == 0);
+        BOOST_CHECK(device.second->m_Cores == (*foundDevice).second->m_Cores);
     }
 
-    const profiling::CounterSets & serviceCounterSets = serviceCounterDirectory.GetCounterSets();
-    uint32_t counterSetIndex = 0;
+    const profiling::CounterSets& serviceCounterSets = serviceCounterDirectory.GetCounterSets();
     for (auto& counterSet : serviceCounterSets)
     {
-        BOOST_ASSERT(counterSet.second->m_Name.size() ==
-                     mockCounterDirectory.m_CounterSets[counterSetIndex].m_CounterSetName.size());
-
-        BOOST_CHECK(counterSet.second->m_Name == mockCounterDirectory.m_CounterSets[counterSetIndex].m_CounterSetName);
-        BOOST_CHECK(counterSet.second->m_Uid == mockCounterDirectory.m_CounterSets[counterSetIndex].m_CounterSetUid);
-        BOOST_CHECK(counterSet.second->m_Count ==
-                    mockCounterDirectory.m_CounterSets[counterSetIndex].m_CounterSetCount);
-        counterSetIndex++;
+        // Find the same counter set in the received counter directory.
+        auto foundCounterSet = receivedCounterDirectory.GetCounterSets().find(counterSet.second->m_Uid);
+        BOOST_CHECK(foundCounterSet != receivedCounterDirectory.GetCounterSets().end());
+        BOOST_CHECK(counterSet.second->m_Name.compare((*foundCounterSet).second->m_Name) == 0);
+        BOOST_CHECK(counterSet.second->m_Count == (*foundCounterSet).second->m_Count);
     }
 
     const profiling::Categories& serviceCategories = serviceCounterDirectory.GetCategories();
-    const std::vector<gatordmock::CategoryRecord> mockCategories = mockCounterDirectory.m_Categories;
-
-    uint32_t categoryIndex = 0;
     for (auto& category : serviceCategories)
     {
-        BOOST_ASSERT(category->m_Name.size() == mockCategories[categoryIndex].m_CategoryName.size());
-
-        BOOST_CHECK(category->m_Name == mockCategories[categoryIndex].m_CategoryName);
-        BOOST_CHECK(category->m_CounterSetUid == mockCategories[categoryIndex].m_CounterSet);
-        BOOST_CHECK(category->m_DeviceUid == mockCategories[categoryIndex].m_DeviceUid);
-
-        const std::vector<gatordmock::EventRecord> events = mockCategories[categoryIndex].m_EventRecords;
-        uint32_t eventIndex = 0;
-        for (uint16_t counterUid : category->m_Counters)
+        for (auto& receivedCategory : receivedCounterDirectory.GetCategories())
         {
-            const profiling::Counter* counter = serviceCounterDirectory.GetCounter(counterUid);
-
-            BOOST_CHECK(counterUid == events[eventIndex].m_CounterUid);
-
-            BOOST_ASSERT(counter->m_Name.size() == events[eventIndex].m_CounterName.size());
-            BOOST_ASSERT(counter->m_Units.size() == events[eventIndex].m_CounterUnits.size());
-            BOOST_ASSERT(counter->m_Description.size() == events[eventIndex].m_CounterDescription.size());
-
-            BOOST_CHECK(counter->m_Name == events[eventIndex].m_CounterName);
-            BOOST_CHECK(counter->m_Units == events[eventIndex].m_CounterUnits);
-            BOOST_CHECK(counter->m_Description == events[eventIndex].m_CounterDescription);
-
-            BOOST_CHECK(counter->m_CounterSetUid == events[eventIndex].m_CounterSetUid);
-            BOOST_CHECK(counter->m_DeviceUid == events[eventIndex].m_DeviceUid);
-            BOOST_CHECK(counter->m_Uid == events[eventIndex].m_CounterUid);
-
-            BOOST_CHECK(counter->m_Multiplier == events[eventIndex].m_CounterMultiplier);
-            BOOST_CHECK(counter->m_MaxCounterUid == events[eventIndex].m_MaxCounterUid);
-            BOOST_CHECK(counter->m_Interpolation == events[eventIndex].m_CounterInterpolation);
-            BOOST_CHECK(counter->m_Class == events[eventIndex].m_CounterClass);
-
-            eventIndex++;
+            if (receivedCategory->m_Name.compare(category->m_Name) == 0)
+            {
+                // We've found the matching category.
+                BOOST_CHECK(category->m_DeviceUid == receivedCategory->m_DeviceUid);
+                BOOST_CHECK(category->m_CounterSetUid == receivedCategory->m_CounterSetUid);
+                // Now look at the interiors of the counters. Start by sorting them.
+                std::sort(category->m_Counters.begin(), category->m_Counters.end());
+                std::sort(receivedCategory->m_Counters.begin(), receivedCategory->m_Counters.end());
+                // When comparing uid's here we need to translate them.
+                std::function<bool(const uint16_t&, const uint16_t&)> comparator =
+                    [&directoryCaptureCommandHandler](const uint16_t& first, const uint16_t& second) {
+                        uint16_t translated = directoryCaptureCommandHandler.TranslateUIDCopyToOriginal(second);
+                        if (translated == first)
+                        {
+                            return true;
+                        }
+                        return false;
+                    };
+                // Then let vector == do the work.
+                BOOST_CHECK(std::equal(category->m_Counters.begin(), category->m_Counters.end(),
+                                       receivedCategory->m_Counters.begin(), comparator));
+                break;
+            }
         }
-        categoryIndex++;
+    }
+
+    // Finally check the content of the counters.
+    const profiling::Counters& receivedCounters = receivedCounterDirectory.GetCounters();
+    for (auto& receivedCounter : receivedCounters)
+    {
+        // Translate the Uid and find the corresponding counter in the original counter directory.
+        // Note we can't check m_MaxCounterUid here as it will likely differ between the two counter directories.
+        uint16_t translated = directoryCaptureCommandHandler.TranslateUIDCopyToOriginal(receivedCounter.first);
+        const profiling::Counter* serviceCounter = serviceCounterDirectory.GetCounter(translated);
+        BOOST_CHECK(serviceCounter->m_DeviceUid == receivedCounter.second->m_DeviceUid);
+        BOOST_CHECK(serviceCounter->m_Name.compare(receivedCounter.second->m_Name) == 0);
+        BOOST_CHECK(serviceCounter->m_CounterSetUid == receivedCounter.second->m_CounterSetUid);
+        BOOST_CHECK(serviceCounter->m_Multiplier == receivedCounter.second->m_Multiplier);
+        BOOST_CHECK(serviceCounter->m_Interpolation == receivedCounter.second->m_Interpolation);
+        BOOST_CHECK(serviceCounter->m_Class == receivedCounter.second->m_Class);
+        BOOST_CHECK(serviceCounter->m_Units.compare(receivedCounter.second->m_Units) == 0);
+        BOOST_CHECK(serviceCounter->m_Description.compare(receivedCounter.second->m_Description) == 0);
     }
 
     mockService.WaitForReceivingThread();

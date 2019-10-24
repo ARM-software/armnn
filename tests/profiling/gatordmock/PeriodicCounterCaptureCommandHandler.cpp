@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "MockUtils.hpp"
 #include "PeriodicCounterCaptureCommandHandler.hpp"
 
 #include <ProfilingUtils.hpp>
@@ -94,24 +93,24 @@ void PeriodicCounterCaptureCommandHandler::operator()(const profiling::Packet& p
             valueString.append(", ");
         }
 
-        body.append(gatordmock::CentreAlignFormatting(std::to_string(m_CounterCaptureValues.m_Timestamp), 10));
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_CounterCaptureValues.m_Timestamp), 10));
         body.append(" | ");
-        body.append(gatordmock::CentreAlignFormatting(std::to_string(m_CurrentPeriodValue), 13));
+        body.append(profiling::CentreAlignFormatting(std::to_string(m_CurrentPeriodValue), 13));
         body.append(" | ");
-        body.append(gatordmock::CentreAlignFormatting(uidString, 10));
+        body.append(profiling::CentreAlignFormatting(uidString, 10));
         body.append(" | ");
-        body.append(gatordmock::CentreAlignFormatting(valueString, 10));
+        body.append(profiling::CentreAlignFormatting(valueString, 10));
         body.append("\n");
 
         if (!m_HeaderPrinted)
         {
-            header.append(gatordmock::CentreAlignFormatting(" Timestamp", 11));
+            header.append(profiling::CentreAlignFormatting(" Timestamp", 11));
             header.append(" | ");
-            header.append(gatordmock::CentreAlignFormatting("Period (us)", 13));
+            header.append(profiling::CentreAlignFormatting("Period (us)", 13));
             header.append(" | ");
-            header.append(gatordmock::CentreAlignFormatting("UID's", static_cast<int>(uidString.size())));
+            header.append(profiling::CentreAlignFormatting("UID's", static_cast<int>(uidString.size())));
             header.append(" | ");
-            header.append(gatordmock::CentreAlignFormatting("Values", 10));
+            header.append(profiling::CentreAlignFormatting("Values", 10));
             header.append("\n");
 
             std::cout << header;

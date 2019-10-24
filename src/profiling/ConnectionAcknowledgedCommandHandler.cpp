@@ -38,6 +38,11 @@ void ConnectionAcknowledgedCommandHandler::operator()(const Packet& packet)
         // Once a Connection Acknowledged packet has been received, move to the Active state immediately
         m_StateMachine.TransitionToState(ProfilingState::Active);
 
+        m_SendCounterPacket.SendCounterDirectoryPacket(m_CounterDirectory);
+
+        // Notify the Send Thread that new data is available in the Counter Stream Buffer
+        m_SendCounterPacket.SetReadyToRead();
+
         break;
     case ProfilingState::Active:
         return; // NOP

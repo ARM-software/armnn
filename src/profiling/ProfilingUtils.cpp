@@ -11,6 +11,7 @@
 #include <boost/assert.hpp>
 
 #include <fstream>
+#include <iostream>
 #include <limits>
 
 namespace armnn
@@ -94,7 +95,23 @@ void WriteBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset,  cons
     WriteBytes(packetBuffer->GetWritableData(), offset, value, valueSize);
 }
 
-void WriteUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint64_t value)
+uint32_t ConstructHeader(uint32_t packetFamily,
+                         uint32_t packetId)
+{
+    return ((packetFamily & 0x3F) << 26)|
+           ((packetId & 0x3FF) << 16);
+}
+
+uint32_t ConstructHeader(uint32_t packetFamily,
+                         uint32_t packetClass,
+                         uint32_t packetType)
+{
+    return ((packetFamily & 0x3F) << 26)|
+           ((packetClass & 0x3FF) << 19)|
+           ((packetType & 0x3FFF) << 16);
+}
+
+void WriteUint64(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint64_t value)
 {
     BOOST_ASSERT(packetBuffer);
 
@@ -871,6 +888,208 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
 
     return TimelinePacketStatus::Ok;
 }
+
+
+std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth)
+{
+    std::stringstream outputStream, centrePadding;
+    int padding = spacingWidth - static_cast<int>(stringToPass.size());
+
+    for (int i = 0; i < padding / 2; ++i)
+    {
+        centrePadding << " ";
+    }
+
+    outputStream << centrePadding.str() << stringToPass << centrePadding.str();
+
+    if (padding > 0 && padding %2 != 0)
+    {
+        outputStream << " ";
+    }
+
+    return outputStream.str();
+}
+
+void PrintDeviceDetails(const std::pair<const unsigned short, std::unique_ptr<Device>>& devicePair)
+{
+    std::string body;
+
+    body.append(CentreAlignFormatting(devicePair.second->m_Name, 20));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(devicePair.first), 13));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(devicePair.second->m_Cores), 10));
+    body.append("\n");
+
+    std::cout << std::string(body.size(), '-') << "\n";
+    std::cout<< body;
+}
+
+void PrintCounterSetDetails(const std::pair<const unsigned short, std::unique_ptr<CounterSet>>& counterSetPair)
+{
+    std::string body;
+
+    body.append(CentreAlignFormatting(counterSetPair.second->m_Name, 20));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counterSetPair.first), 13));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counterSetPair.second->m_Count), 10));
+    body.append("\n");
+
+    std::cout << std::string(body.size(), '-') << "\n";
+
+    std::cout<< body;
+}
+
+void PrintCounterDetails(std::shared_ptr<Counter>& counter)
+{
+    std::string body;
+
+    body.append(CentreAlignFormatting(counter->m_Name, 20));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(counter->m_Description, 50));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(counter->m_Units, 14));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counter->m_Uid), 6));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counter->m_MaxCounterUid), 10));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counter->m_Class), 8));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counter->m_Interpolation), 14));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counter->m_Multiplier), 20));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counter->m_CounterSetUid), 16));
+    body.append(" | ");
+    body.append(CentreAlignFormatting(std::to_string(counter->m_DeviceUid), 14));
+
+    body.append("\n");
+
+    std::cout << std::string(body.size(), '-') << "\n";
+
+    std::cout << body;
+}
+
+void PrintCategoryDetails(const std::unique_ptr<Category>& category,
+                          std::unordered_map<unsigned short, std::shared_ptr<Counter>> counterMap)
+{
+    std::string categoryBody;
+    std::string categoryHeader;
+
+    categoryHeader.append(CentreAlignFormatting("Name", 20));
+    categoryHeader.append(" | ");
+    categoryHeader.append(CentreAlignFormatting("Device", 12));
+    categoryHeader.append(" | ");
+    categoryHeader.append(CentreAlignFormatting("Counter set UID:", 16));
+    categoryHeader.append(" | ");
+    categoryHeader.append(CentreAlignFormatting("Event Count", 14));
+    categoryHeader.append("\n");
+
+    categoryBody.append(CentreAlignFormatting(category->m_Name, 20));
+    categoryBody.append(" | ");
+    categoryBody.append(CentreAlignFormatting(std::to_string(category->m_DeviceUid), 12));
+    categoryBody.append(" | ");
+    categoryBody.append(CentreAlignFormatting(std::to_string(category->m_CounterSetUid), 16));
+    categoryBody.append(" | ");
+    categoryBody.append(CentreAlignFormatting(std::to_string(category->m_Counters.size()), 14));
+
+    std::cout << "\n" << "\n";
+    std::cout << CentreAlignFormatting("CATEGORY", static_cast<int>(categoryHeader.size()));
+    std::cout << "\n";
+    std::cout << std::string(categoryHeader.size(), '=') << "\n";
+
+    std::cout << categoryHeader;
+
+    std::cout << std::string(categoryBody.size(), '-') << "\n";
+
+    std::cout << categoryBody;
+
+    std::string counterHeader;
+
+    counterHeader.append(CentreAlignFormatting("Counter Name", 20));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("Description", 50));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("Units", 14));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("UID", 6));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("Max UID", 10));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("Class", 8));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("Interpolation", 14));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("Multiplier", 20));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("Counter set UID", 16));
+    counterHeader.append(" | ");
+    counterHeader.append(CentreAlignFormatting("Device UID", 14));
+    counterHeader.append("\n");
+
+    std::cout << "\n" << "\n";
+    std::cout << CentreAlignFormatting("EVENTS IN CATEGORY: " + category->m_Name,
+                                       static_cast<int>(counterHeader.size()));
+    std::cout << "\n";
+    std::cout << std::string(counterHeader.size(), '=') << "\n";
+    std::cout << counterHeader;
+    for (auto& it: category->m_Counters) {
+        auto search = counterMap.find(it);
+        if(search != counterMap.end()) {
+            PrintCounterDetails(search->second);
+        }
+    }
+}
+
+void PrintCounterDirectory(ICounterDirectory& counterDirectory)
+{
+    std::string devicesHeader;
+
+    devicesHeader.append(CentreAlignFormatting("Device name", 20));
+    devicesHeader.append(" | ");
+    devicesHeader.append(CentreAlignFormatting("UID", 13));
+    devicesHeader.append(" | ");
+    devicesHeader.append(CentreAlignFormatting("Cores", 10));
+    devicesHeader.append("\n");
+
+    std::cout << "\n" << "\n";
+    std::cout << CentreAlignFormatting("DEVICES", static_cast<int>(devicesHeader.size()));
+    std::cout << "\n";
+    std::cout << std::string(devicesHeader.size(), '=') << "\n";
+    std::cout << devicesHeader;
+    for (auto& it: counterDirectory.GetDevices()) {
+        PrintDeviceDetails(it);
+    }
+
+    std::string counterSetHeader;
+
+    counterSetHeader.append(CentreAlignFormatting("Counter set name", 20));
+    counterSetHeader.append(" | ");
+    counterSetHeader.append(CentreAlignFormatting("UID", 13));
+    counterSetHeader.append(" | ");
+    counterSetHeader.append(CentreAlignFormatting("Count", 10));
+    counterSetHeader.append("\n");
+
+    std::cout << "\n" << "\n";
+    std::cout << CentreAlignFormatting("COUNTER SETS", static_cast<int>(counterSetHeader.size()));
+    std::cout << "\n";
+    std::cout << std::string(counterSetHeader.size(), '=') << "\n";
+
+    std::cout << counterSetHeader;
+
+    for (auto& it: counterDirectory.GetCounterSets()) {
+        PrintCounterSetDetails(it);
+    }
+
+    auto counters = counterDirectory.GetCounters();
+    for (auto& it: counterDirectory.GetCategories()) {
+        PrintCategoryDetails(it, counters);
+    }
+    std::cout << "\n";
+}
+
 
 } // namespace profiling
 

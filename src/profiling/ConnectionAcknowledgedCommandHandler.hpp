@@ -6,6 +6,7 @@
 #pragma once
 
 #include "CommandHandlerFunctor.hpp"
+#include "ISendCounterPacket.hpp"
 #include "Packet.hpp"
 #include "ProfilingStateMachine.hpp"
 
@@ -22,15 +23,22 @@ public:
     ConnectionAcknowledgedCommandHandler(uint32_t familyId,
                                          uint32_t packetId,
                                          uint32_t version,
+                                         ICounterDirectory& counterDirectory,
+                                         ISendCounterPacket& sendCounterPacket,
                                          ProfilingStateMachine& profilingStateMachine)
         : CommandHandlerFunctor(familyId, packetId, version)
+        , m_CounterDirectory(counterDirectory)
+        , m_SendCounterPacket(sendCounterPacket)
         , m_StateMachine(profilingStateMachine)
     {}
 
     void operator()(const Packet& packet) override;
 
 private:
-    ProfilingStateMachine& m_StateMachine;
+    const ICounterDirectory& m_CounterDirectory;
+    ISendCounterPacket&      m_SendCounterPacket;
+    ProfilingStateMachine&   m_StateMachine;
+
 };
 
 } // namespace profiling

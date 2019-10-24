@@ -81,7 +81,6 @@ std::vector<char> ReadDumpFile(const std::string& dumpFileName)
 
 BOOST_AUTO_TEST_SUITE(ProfilingConnectionDumpToFileDecoratorTests)
 
-
 BOOST_AUTO_TEST_CASE(DumpIncomingInvalidFile)
 {
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;

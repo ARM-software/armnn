@@ -136,6 +136,8 @@ protected:
         , m_ConnectionAcknowledgedCommandHandler(0,
                                                  1,
                                                  m_PacketVersionResolver.ResolvePacketVersion(0, 1).GetEncodedValue(),
+                                                 m_CounterDirectory,
+                                                 m_SendCounterPacket,
                                                  m_StateMachine)
         , m_RequestCounterDirectoryCommandHandler(0,
                                                   3,

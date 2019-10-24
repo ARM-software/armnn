@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -26,6 +26,6 @@ public:
     IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const override;
 };
 
-} // namespace profiling
+}    // namespace profiling
 
-} // namespace armnn
+}    // namespace armnn

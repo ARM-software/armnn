@@ -17,6 +17,7 @@
 #include "RequestCounterDirectoryCommandHandler.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
 #include "PerJobCounterSelectionCommandHandler.hpp"
+#include "ProfilingGuidGenerator.hpp"
 
 namespace armnn
 {
@@ -24,7 +25,7 @@ namespace armnn
 namespace profiling
 {
 
-class ProfilingService : public IReadWriteCounterValues
+class ProfilingService : public IReadWriteCounterValues, public IProfilingGuidGenerator
 {
 public:
     using ExternalProfilingOptions = Runtime::CreationOptions::ExternalProfilingOptions;
@@ -66,6 +67,12 @@ public:
     uint32_t IncrementCounterValue(uint16_t counterUid) override;
     uint32_t DecrementCounterValue(uint16_t counterUid) override;
 
+    // IProfilingGuidGenerator functions
+    /// Return the next random Guid in the sequence
+    ProfilingDynamicGuid NextGuid() override;
+    /// Create a ProfilingStaticGuid based on a hash of the string
+    ProfilingStaticGuid GenerateStaticId(const std::string& str) override;
+
 private:
     // Copy/move constructors/destructors and copy/move assignment operators are deleted
     ProfilingService(const ProfilingService&) = delete;
@@ -101,6 +108,7 @@ private:
     RequestCounterDirectoryCommandHandler m_RequestCounterDirectoryCommandHandler;
     PeriodicCounterSelectionCommandHandler m_PeriodicCounterSelectionCommandHandler;
     PerJobCounterSelectionCommandHandler m_PerJobCounterSelectionCommandHandler;
+    ProfilingGuidGenerator m_GuidGenerator;
 
 protected:
     // Default constructor/destructor kept protected for testing

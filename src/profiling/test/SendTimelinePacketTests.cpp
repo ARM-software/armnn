@@ -6,6 +6,7 @@
 #include "SendCounterPacketTests.hpp"
 
 #include <BufferManager.hpp>
+#include <ProfilingService.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendTimelinePacket.hpp>
 #include <TimelinePacketWriterFactory.hpp>
@@ -382,6 +383,24 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests3)
     const uint64_t eventClassBinaryPacketProfilingGuid = 789123u;
     BOOST_CHECK_THROW(sendTimelinePacket->SendTimelineEventClassBinaryPacket(eventClassBinaryPacketProfilingGuid),
                       armnn::RuntimeException);
+}
+
+BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+    ProfilingStaticGuid staticGuid = profilingService.GenerateStaticId("dummy");
+    // TODO when actual value gets generated verify its correctness
+    ProfilingStaticGuid expectedStaticValue(0);
+    BOOST_CHECK(staticGuid == expectedStaticValue);
+    ProfilingDynamicGuid dynamicGuid = profilingService.NextGuid();
+    // TODO when actual value gets generated verify its correctness by verifying
+    //      it is in the correct range i.e. > x and that if NextGuid is invoked
+    //      again it is equal to the previous + 1
+    ProfilingDynamicGuid expectedDynamicValue(0);
+    BOOST_CHECK(dynamicGuid == expectedDynamicValue);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

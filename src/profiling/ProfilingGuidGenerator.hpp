@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ProfilingGuid.hpp"
+#include "IProfilingGuidGenerator.hpp"
 
 namespace armnn
 {
@@ -13,20 +13,21 @@ namespace armnn
 namespace profiling
 {
 
-class ProfilingGuidGenerator
+class ProfilingGuidGenerator : public IProfilingGuidGenerator
 {
 public:
     /// Construct a generator with the default address space static/dynamic partitioning
-    ProfilingGuidGenerator() : m_Sequence(0) {}
+    ProfilingGuidGenerator() {}
 
     /// Return the next random Guid in the sequence
-    ProfilingDynamicGuid NextGuid();
+    // NOTE: dummy implementation for the moment
+    inline ProfilingDynamicGuid NextGuid() override { return ProfilingDynamicGuid(0); }
 
-    /// Create a ProfilingStaticGuid based on a hash of the name
-    ProfilingStaticGuid GenerateStaticId(const char* name);
+    /// Create a ProfilingStaticGuid based on a hash of the string
+    // NOTE: dummy implementation for the moment
+    inline ProfilingStaticGuid GenerateStaticId(const std::string& str) override { return ProfilingStaticGuid(0); }
 
 private:
-    uint64_t m_Sequence;
 };
 
 } // namespace profiling

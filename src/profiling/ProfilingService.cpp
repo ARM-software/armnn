@@ -241,6 +241,16 @@ uint32_t ProfilingService::DecrementCounterValue(uint16_t counterUid)
     return counterValuePtr->operator--(std::memory_order::memory_order_relaxed);
 }
 
+ProfilingDynamicGuid ProfilingService::NextGuid()
+{
+    return m_GuidGenerator.NextGuid();
+}
+
+ProfilingStaticGuid ProfilingService::GenerateStaticId(const std::string& str)
+{
+    return m_GuidGenerator.GenerateStaticId(str);
+}
+
 void ProfilingService::Initialize()
 {
     // Register a category for the basic runtime counters

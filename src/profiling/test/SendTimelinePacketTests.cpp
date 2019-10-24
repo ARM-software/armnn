@@ -403,4 +403,15 @@ BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
     BOOST_CHECK(dynamicGuid == expectedDynamicValue);
 }
 
+BOOST_AUTO_TEST_CASE(GetTimelinePackerWriterFromProfilingService)
+{
+    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    options.m_EnableProfiling = true;
+    ProfilingService& profilingService = ProfilingService::Instance();
+    profilingService.ResetExternalProfilingOptions(options, true);
+
+    std::unique_ptr<ISendTimelinePacket> writer = profilingService.GetSendTimelinePacket();
+    BOOST_CHECK(writer != nullptr);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

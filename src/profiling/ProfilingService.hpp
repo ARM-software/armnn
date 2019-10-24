@@ -5,19 +5,20 @@
 
 #pragma once
 
-#include "ProfilingStateMachine.hpp"
-#include "ProfilingConnectionFactory.hpp"
+#include "BufferManager.hpp"
+#include "CommandHandler.hpp"
+#include "ConnectionAcknowledgedCommandHandler.hpp"
 #include "CounterDirectory.hpp"
 #include "ICounterValues.hpp"
-#include "CommandHandler.hpp"
-#include "BufferManager.hpp"
-#include "SendCounterPacket.hpp"
 #include "PeriodicCounterCapture.hpp"
-#include "ConnectionAcknowledgedCommandHandler.hpp"
-#include "RequestCounterDirectoryCommandHandler.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
 #include "PerJobCounterSelectionCommandHandler.hpp"
+#include "ProfilingConnectionFactory.hpp"
 #include "ProfilingGuidGenerator.hpp"
+#include "ProfilingStateMachine.hpp"
+#include "RequestCounterDirectoryCommandHandler.hpp"
+#include "SendCounterPacket.hpp"
+#include "TimelinePacketWriterFactory.hpp"
 
 namespace armnn
 {
@@ -73,6 +74,8 @@ public:
     /// Create a ProfilingStaticGuid based on a hash of the string
     ProfilingStaticGuid GenerateStaticId(const std::string& str) override;
 
+    std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const;
+
 private:
     // Copy/move constructors/destructors and copy/move assignment operators are deleted
     ProfilingService(const ProfilingService&) = delete;
@@ -109,6 +112,7 @@ private:
     PeriodicCounterSelectionCommandHandler m_PeriodicCounterSelectionCommandHandler;
     PerJobCounterSelectionCommandHandler m_PerJobCounterSelectionCommandHandler;
     ProfilingGuidGenerator m_GuidGenerator;
+    TimelinePacketWriterFactory m_TimelinePacketWriterFactory;
 
 protected:
     // Default constructor/destructor kept protected for testing
@@ -151,6 +155,7 @@ protected:
                                                  5,
                                                  m_PacketVersionResolver.ResolvePacketVersion(0, 5).GetEncodedValue(),
                                                  m_StateMachine)
+        , m_TimelinePacketWriterFactory(m_BufferManager)
     {
         // Register the "Connection Acknowledged" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_ConnectionAcknowledgedCommandHandler);

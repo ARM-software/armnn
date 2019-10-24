@@ -251,6 +251,11 @@ ProfilingStaticGuid ProfilingService::GenerateStaticId(const std::string& str)
     return m_GuidGenerator.GenerateStaticId(str);
 }
 
+std::unique_ptr<ISendTimelinePacket> ProfilingService::GetSendTimelinePacket() const
+{
+    return m_TimelinePacketWriterFactory.GetSendTimelinePacket();
+}
+
 void ProfilingService::Initialize()
 {
     // Register a category for the basic runtime counters

@@ -9,6 +9,8 @@
 
 #include <memory>
 
+#define MAX_METADATA_PACKET_LENGTH 4096
+
 namespace armnn
 {
 

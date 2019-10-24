@@ -5,8 +5,8 @@
 
 #include "SendCounterPacketTests.hpp"
 
-#include <CounterDirectory.hpp>
 #include <BufferManager.hpp>
+#include <CounterDirectory.hpp>
 #include <EncodeVersion.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(SendStreamMetaDataPacketTest)
     offset += sizeUint32;
     BOOST_TEST(ReadUint32(readBuffer2, offset) == EncodeVersion(1, 0, 0)); // stream_metadata_version
     offset += sizeUint32;
-    BOOST_TEST(ReadUint32(readBuffer2, offset) == SendCounterPacket::MAX_METADATA_PACKET_LENGTH); // max_data_len
+    BOOST_TEST(ReadUint32(readBuffer2, offset) == MAX_METADATA_PACKET_LENGTH); // max_data_len
     offset += sizeUint32;
     BOOST_TEST(ReadUint32(readBuffer2, offset) == numeric_cast<uint32_t>(getpid())); // pid
     offset += sizeUint32;

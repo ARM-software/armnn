@@ -23,6 +23,15 @@ namespace armnn
 namespace profiling
 {
 
+struct SwTraceMessage
+{
+    uint32_t id;
+    std::string name;
+    std::string uiName;
+    std::vector<char> argTypes;
+    std::vector<std::string> argNames;
+};
+
 struct SwTraceCharPolicy
 {
     static bool IsValidChar(unsigned char c)
@@ -133,6 +142,10 @@ enum class ProfilingRelationshipType
     DataLink,      /// Head uses data of Tail
     LabelLink      /// Head uses label Tail (Tail MUST be a guid of a label).
 };
+
+uint32_t CalculateSizeOfPaddedSwString(const std::string& str);
+
+SwTraceMessage ReadSwTraceMessage(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int& offset);
 
 TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
                                                     const std::string& label,

@@ -25,7 +25,6 @@ namespace profiling
 using boost::numeric_cast;
 
 const unsigned int SendCounterPacket::PIPE_MAGIC;
-const unsigned int SendCounterPacket::MAX_METADATA_PACKET_LENGTH;
 
 void SendCounterPacket::SendStreamMetaDataPacket()
 {

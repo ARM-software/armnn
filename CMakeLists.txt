@@ -455,6 +455,7 @@ list(APPEND armnn_sources
     src/profiling/ICounterDirectory.hpp
     src/profiling/ICounterValues.hpp
     src/profiling/ISendCounterPacket.hpp
+    src/profiling/ISendTimelinePacket.hpp
     src/profiling/IPacketBuffer.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
@@ -486,8 +487,12 @@ list(APPEND armnn_sources
     src/profiling/RequestCounterDirectoryCommandHandler.hpp
     src/profiling/SendCounterPacket.cpp
     src/profiling/SendCounterPacket.hpp
+    src/profiling/SendTimelinePacket.cpp
+    src/profiling/SendTimelinePacket.hpp
     src/profiling/SocketProfilingConnection.cpp
     src/profiling/SocketProfilingConnection.hpp
+    src/profiling/TimelinePacketWriterFactory.cpp
+    src/profiling/TimelinePacketWriterFactory.hpp
     third-party/half/half.hpp
     )
 
@@ -616,6 +621,7 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/ProfilingTests.hpp
         src/profiling/test/SendCounterPacketTests.cpp
         src/profiling/test/SendCounterPacketTests.hpp
+        src/profiling/test/SendTimelinePacketTests.cpp
         src/profiling/test/TimelinePacketTests.cpp
         )
 

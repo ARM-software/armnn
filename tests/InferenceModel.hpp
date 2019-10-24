@@ -442,6 +442,12 @@ public:
         }
     }
 
+    unsigned int GetInputSize(unsigned int inputIndex = 0u) const
+    {
+        CheckInputIndexIsValid(inputIndex);
+        return m_InputBindings[inputIndex].second.GetNumElements();
+    }
+
     unsigned int GetOutputSize(unsigned int outputIndex = 0u) const
     {
         CheckOutputIndexIsValid(outputIndex);

@@ -25,6 +25,7 @@
 
 #include <Logging.hpp>
 #include <Profiling.hpp>
+#include <ResolveType.hpp>
 
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -120,7 +121,6 @@ void CheckOptionDependencies(const po::variables_map& vm)
 {
     CheckOptionDependency(vm, "model-path", "model-format");
     CheckOptionDependency(vm, "model-path", "input-name");
-    CheckOptionDependency(vm, "model-path", "input-tensor-data");
     CheckOptionDependency(vm, "model-path", "output-name");
     CheckOptionDependency(vm, "input-tensor-shape", "model-path");
 }
@@ -277,27 +277,104 @@ private:
 };
 
 
-} // namespace
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+std::vector<T> GenerateDummyTensorData(unsigned int numElements)
+{
+    return std::vector<T>(numElements, static_cast<T>(0));
+}
+
+using TContainer         = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
+using QuantizationParams = std::pair<float, int32_t>;
+
+void PopulateTensorWithData(TContainer& tensorData,
+                            unsigned int numElements,
+                            const std::string& dataTypeStr,
+                            const armnn::Optional<QuantizationParams>& qParams,
+                            const armnn::Optional<std::string>& dataFile)
+{
+    const bool readFromFile = dataFile.has_value() && !dataFile.value().empty();
+    const bool quantizeData = qParams.has_value();
+
+    std::ifstream inputTensorFile;
+    if (readFromFile)
+    {
+        inputTensorFile = std::ifstream(dataFile.value());
+    }
+
+    if (dataTypeStr.compare("float") == 0)
+    {
+        if (quantizeData)
+        {
+            const float qScale  = qParams.value().first;
+            const int   qOffset = qParams.value().second;
+
+            tensorData = readFromFile ?
+                ParseDataArray<armnn::DataType::QuantisedAsymm8>(inputTensorFile, qScale, qOffset) :
+                GenerateDummyTensorData<armnn::DataType::QuantisedAsymm8>(numElements);
+        }
+        else
+        {
+            tensorData = readFromFile ?
+                ParseDataArray<armnn::DataType::Float32>(inputTensorFile) :
+                GenerateDummyTensorData<armnn::DataType::Float32>(numElements);
+        }
+    }
+    else if (dataTypeStr.compare("int") == 0)
+    {
+        tensorData = readFromFile ?
+            ParseDataArray<armnn::DataType::Signed32>(inputTensorFile) :
+            GenerateDummyTensorData<armnn::DataType::Signed32>(numElements);
+    }
+    else if (dataTypeStr.compare("qasymm8") == 0)
+    {
+         tensorData = readFromFile ?
+            ParseDataArray<armnn::DataType::QuantisedAsymm8>(inputTensorFile) :
+            GenerateDummyTensorData<armnn::DataType::QuantisedAsymm8>(numElements);
+    }
+    else
+    {
+        std::string errorMessage = "Unsupported tensor data type " + dataTypeStr;
+        BOOST_LOG_TRIVIAL(fatal) << errorMessage;
+
+        inputTensorFile.close();
+        throw armnn::Exception(errorMessage);
+    }
+
+    inputTensorFile.close();
+}
+
+} // anonymous namespace
+
+bool generateTensorData = true;
+
+struct ExecuteNetworkParams
+{
+    using TensorShapePtr = std::unique_ptr<armnn::TensorShape>;
+
+    const char*                   m_ModelPath;
+    bool                          m_IsModelBinary;
+    std::vector<armnn::BackendId> m_ComputeDevices;
+    std::string                   m_DynamicBackendsPath;
+    std::vector<string>           m_InputNames;
+    std::vector<TensorShapePtr>   m_InputTensorShapes;
+    std::vector<string>           m_InputTensorDataFilePaths;
+    std::vector<string>           m_InputTypes;
+    bool                          m_QuantizeInput;
+    std::vector<string>           m_OutputTypes;
+    std::vector<string>           m_OutputNames;
+    std::vector<string>           m_OutputTensorFiles;
+    bool                          m_EnableProfiling;
+    bool                          m_EnableFp16TurboMode;
+    double                        m_ThresholdTime;
+    bool                          m_PrintIntermediate;
+    size_t                        m_SubgraphId;
+    bool                          m_EnableLayerDetails = false;
+    bool                          m_GenerateTensorData;
+};
 
 template<typename TParser, typename TDataType>
-int MainImpl(const char* modelPath,
-             bool isModelBinary,
-             const std::vector<armnn::BackendId>& computeDevices,
-             const std::string& dynamicBackendsPath,
-             const std::vector<string>& inputNames,
-             const std::vector<std::unique_ptr<armnn::TensorShape>>& inputTensorShapes,
-             const std::vector<string>& inputTensorDataFilePaths,
-             const std::vector<string>& inputTypes,
-             bool quantizeInput,
-             const std::vector<string>& outputTypes,
-             const std::vector<string>& outputNames,
-             const std::vector<string>& outputTensorFiles,
-             bool enableProfiling,
-             bool enableFp16TurboMode,
-             const double& thresholdTime,
-             bool printIntermediate,
-             const size_t subgraphId,
-             bool enableLayerDetails = false,
+int MainImpl(const ExecuteNetworkParams& params,
              const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
     using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
@@ -307,92 +384,86 @@ int MainImpl(const char* modelPath,
     try
     {
         // Creates an InferenceModel, which will parse the model and load it into an IRuntime.
-        typename InferenceModel<TParser, TDataType>::Params params;
-        params.m_ModelPath = modelPath;
-        params.m_IsModelBinary = isModelBinary;
-        params.m_ComputeDevices = computeDevices;
-        params.m_DynamicBackendsPath = dynamicBackendsPath;
-        params.m_PrintIntermediateLayers = printIntermediate;
-        params.m_VisualizePostOptimizationModel = enableLayerDetails;
+        typename InferenceModel<TParser, TDataType>::Params inferenceModelParams;
+        inferenceModelParams.m_ModelPath                      = params.m_ModelPath;
+        inferenceModelParams.m_IsModelBinary                  = params.m_IsModelBinary;
+        inferenceModelParams.m_ComputeDevices                 = params.m_ComputeDevices;
+        inferenceModelParams.m_DynamicBackendsPath            = params.m_DynamicBackendsPath;
+        inferenceModelParams.m_PrintIntermediateLayers        = params.m_PrintIntermediate;
+        inferenceModelParams.m_VisualizePostOptimizationModel = params.m_EnableLayerDetails;
 
-        for(const std::string& inputName: inputNames)
+        for(const std::string& inputName: params.m_InputNames)
         {
-            params.m_InputBindings.push_back(inputName);
+            inferenceModelParams.m_InputBindings.push_back(inputName);
         }
 
-        for(unsigned int i = 0; i < inputTensorShapes.size(); ++i)
+        for(unsigned int i = 0; i < params.m_InputTensorShapes.size(); ++i)
         {
-            params.m_InputShapes.push_back(*inputTensorShapes[i]);
+            inferenceModelParams.m_InputShapes.push_back(*params.m_InputTensorShapes[i]);
         }
 
-        for(const std::string& outputName: outputNames)
+        for(const std::string& outputName: params.m_OutputNames)
         {
-            params.m_OutputBindings.push_back(outputName);
+            inferenceModelParams.m_OutputBindings.push_back(outputName);
         }
 
-        params.m_SubgraphId = subgraphId;
-        params.m_EnableFp16TurboMode = enableFp16TurboMode;
-        InferenceModel<TParser, TDataType> model(params, enableProfiling, dynamicBackendsPath, runtime);
+        inferenceModelParams.m_SubgraphId          = params.m_SubgraphId;
+        inferenceModelParams.m_EnableFp16TurboMode = params.m_EnableFp16TurboMode;
 
-        for(unsigned int i = 0; i < inputTensorDataFilePaths.size(); ++i)
+        InferenceModel<TParser, TDataType> model(inferenceModelParams,
+                                                 params.m_EnableProfiling,
+                                                 params.m_DynamicBackendsPath,
+                                                 runtime);
+
+        const size_t numInputs = inferenceModelParams.m_InputBindings.size();
+        for(unsigned int i = 0; i < numInputs; ++i)
         {
-            std::ifstream inputTensorFile(inputTensorDataFilePaths[i]);
+            armnn::Optional<QuantizationParams> qParams = params.m_QuantizeInput ?
+                armnn::MakeOptional<QuantizationParams>(model.GetInputQuantizationParams()) :
+                armnn::EmptyOptional();
 
-            if (inputTypes[i].compare("float") == 0)
+            armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ?
+                armnn::EmptyOptional() :
+                armnn::MakeOptional<std::string>(params.m_InputTensorDataFilePaths[i]);
+
+            unsigned int numElements = model.GetInputSize(i);
+            if (params.m_InputTensorShapes.size() > i && params.m_InputTensorShapes[i])
             {
-                if (quantizeInput)
-                {
-                    auto inputBinding = model.GetInputBindingInfo();
-                    inputDataContainers.push_back(
-                            ParseDataArray<armnn::DataType::QuantisedAsymm8>(inputTensorFile,
-                                                         inputBinding.second.GetQuantizationScale(),
-                                                         inputBinding.second.GetQuantizationOffset()));
-                }
-                else
-                {
-                    inputDataContainers.push_back(
-                            ParseDataArray<armnn::DataType::Float32>(inputTensorFile));
-                }
-            }
-            else if (inputTypes[i].compare("int") == 0)
-            {
-                inputDataContainers.push_back(
-                    ParseDataArray<armnn::DataType::Signed32>(inputTensorFile));
-            }
-            else if (inputTypes[i].compare("qasymm8") == 0)
-            {
-                inputDataContainers.push_back(
-                    ParseDataArray<armnn::DataType::QuantisedAsymm8>(inputTensorFile));
-            }
-            else
-            {
-                BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << inputTypes[i] << "\". ";
-                return EXIT_FAILURE;
+                // If the user has provided a tensor shape for the current input,
+                // override numElements
+                numElements = params.m_InputTensorShapes[i]->GetNumElements();
             }
 
-            inputTensorFile.close();
+            TContainer tensorData;
+            PopulateTensorWithData(tensorData,
+                                   numElements,
+                                   params.m_InputTypes[i],
+                                   qParams,
+                                   dataFile);
+
+            inputDataContainers.push_back(tensorData);
         }
 
-        const size_t numOutputs = params.m_OutputBindings.size();
+        const size_t numOutputs = inferenceModelParams.m_OutputBindings.size();
         std::vector<TContainer> outputDataContainers;
 
         for (unsigned int i = 0; i < numOutputs; ++i)
         {
-            if (outputTypes[i].compare("float") == 0)
+            if (params.m_OutputTypes[i].compare("float") == 0)
             {
                 outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
             }
-            else if (outputTypes[i].compare("int") == 0)
+            else if (params.m_OutputTypes[i].compare("int") == 0)
             {
                 outputDataContainers.push_back(std::vector<int>(model.GetOutputSize(i)));
             }
-            else if (outputTypes[i].compare("qasymm8") == 0)
+            else if (params.m_OutputTypes[i].compare("qasymm8") == 0)
             {
                 outputDataContainers.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
             }
             else
             {
-                BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << outputTypes[i] << "\". ";
+                BOOST_LOG_TRIVIAL(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
                 return EXIT_FAILURE;
             }
         }
@@ -400,25 +471,35 @@ int MainImpl(const char* modelPath,
         // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
         auto inference_duration = model.Run(inputDataContainers, outputDataContainers);
 
-        // Print output tensors
-        const auto& infosOut = model.GetOutputBindingInfos();
-        for (size_t i = 0; i < numOutputs; i++)
+        // Print output tensors (if requested)
+        if (!params.m_OutputTensorFiles.empty())
         {
-            const armnn::TensorInfo& infoOut = infosOut[i].second;
-            auto outputTensorFile = outputTensorFiles.empty() ? "" : outputTensorFiles[i];
-            TensorPrinter printer(params.m_OutputBindings[i], infoOut, outputTensorFile);
-            boost::apply_visitor(printer, outputDataContainers[i]);
+            if (params.m_GenerateTensorData)
+            {
+                BOOST_LOG_TRIVIAL(warning) << "Requested to write output to file, although the input was generated. "
+                                           << "Note that the output will not be useful.";
+            }
+
+            const auto& infosOut = model.GetOutputBindingInfos();
+            for (size_t i = 0; i < numOutputs; i++)
+            {
+                const armnn::TensorInfo& infoOut = infosOut[i].second;
+                auto outputTensorFile = params.m_OutputTensorFiles[i];
+
+                TensorPrinter printer(inferenceModelParams.m_OutputBindings[i], infoOut, outputTensorFile);
+                boost::apply_visitor(printer, outputDataContainers[i]);
+            }
         }
 
         BOOST_LOG_TRIVIAL(info) << "\nInference time: " << std::setprecision(2)
                                 << std::fixed << inference_duration.count() << " ms";
 
         // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
-        if (thresholdTime != 0.0)
+        if (params.m_ThresholdTime != 0.0)
         {
             BOOST_LOG_TRIVIAL(info) << "Threshold time: " << std::setprecision(2)
-                                    << std::fixed << thresholdTime << " ms";
-            auto thresholdMinusInference = thresholdTime - inference_duration.count();
+                                    << std::fixed << params.m_ThresholdTime << " ms";
+            auto thresholdMinusInference = params.m_ThresholdTime - inference_duration.count();
             BOOST_LOG_TRIVIAL(info) << "Threshold time - Inference time: " << std::setprecision(2)
                                     << std::fixed << thresholdMinusInference << " ms" << "\n";
 
@@ -428,8 +509,6 @@ int MainImpl(const char* modelPath,
                 return EXIT_FAILURE;
             }
         }
-
-
     }
     catch (armnn::Exception const& e)
     {
@@ -443,7 +522,7 @@ int MainImpl(const char* modelPath,
 // This will run a test
 int RunTest(const std::string& format,
             const std::string& inputTensorShapesStr,
-            const vector<armnn::BackendId>& computeDevice,
+            const vector<armnn::BackendId>& computeDevices,
             const std::string& dynamicBackendsPath,
             const std::string& path,
             const std::string& inputNames,
@@ -558,20 +637,42 @@ int RunTest(const std::string& format,
     // Check that threshold time is not less than zero
     if (thresholdTime < 0)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "Threshold time supplied as a commoand line argument is less than zero.";
+        BOOST_LOG_TRIVIAL(fatal) << "Threshold time supplied as a command line argument is less than zero.";
         return EXIT_FAILURE;
+    }
+
+    ExecuteNetworkParams params;
+    params.m_ModelPath                = modelPath.c_str();
+    params.m_IsModelBinary            = isModelBinary;
+    params.m_ComputeDevices           = computeDevices;
+    params.m_DynamicBackendsPath      = dynamicBackendsPath;
+    params.m_InputNames               = inputNamesVector;
+    params.m_InputTensorShapes        = std::move(inputTensorShapes);
+    params.m_InputTensorDataFilePaths = inputTensorDataFilePathsVector;
+    params.m_InputTypes               = inputTypesVector;
+    params.m_QuantizeInput            = quantizeInput;
+    params.m_OutputTypes              = outputTypesVector;
+    params.m_OutputNames              = outputNamesVector;
+    params.m_OutputTensorFiles        = outputTensorFilesVector;
+    params.m_EnableProfiling          = enableProfiling;
+    params.m_EnableFp16TurboMode      = enableFp16TurboMode;
+    params.m_ThresholdTime            = thresholdTime;
+    params.m_PrintIntermediate        = printIntermediate;
+    params.m_SubgraphId               = subgraphId;
+    params.m_EnableLayerDetails       = enableLayerDetails;
+    params.m_GenerateTensorData       = inputTensorDataFilePathsVector.empty();
+
+    // Warn if ExecuteNetwork will generate dummy input data
+    if (params.m_GenerateTensorData)
+    {
+        BOOST_LOG_TRIVIAL(warning) << "No input files provided, input tensors will be filled with 0s.";
     }
 
     // Forward to implementation based on the parser type
     if (modelFormat.find("armnn") != std::string::npos)
     {
 #if defined(ARMNN_SERIALIZER)
-    return MainImpl<armnnDeserializer::IDeserializer, float>(
-        modelPath.c_str(), isModelBinary, computeDevice,
-        dynamicBackendsPath, inputNamesVector, inputTensorShapes,
-        inputTensorDataFilePathsVector, inputTypesVector, quantizeInput,
-        outputTypesVector, outputNamesVector, outputTensorFilesVector, enableProfiling,
-        enableFp16TurboMode, thresholdTime, printIntermediate, subgraphId, enableLayerDetails, runtime);
+    return MainImpl<armnnDeserializer::IDeserializer, float>(params, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with serialization support.";
     return EXIT_FAILURE;
@@ -580,15 +681,7 @@ int RunTest(const std::string& format,
     else if (modelFormat.find("caffe") != std::string::npos)
     {
 #if defined(ARMNN_CAFFE_PARSER)
-        return MainImpl<armnnCaffeParser::ICaffeParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
-                                                               dynamicBackendsPath,
-                                                               inputNamesVector, inputTensorShapes,
-                                                               inputTensorDataFilePathsVector, inputTypesVector,
-                                                               quantizeInput, outputTypesVector, outputNamesVector,
-                                                               outputTensorFilesVector, enableProfiling,
-                                                               enableFp16TurboMode, thresholdTime,
-                                                               printIntermediate, subgraphId, enableLayerDetails,
-                                                               runtime);
+        return MainImpl<armnnCaffeParser::ICaffeParser, float>(params, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Caffe parser support.";
         return EXIT_FAILURE;
@@ -597,14 +690,7 @@ int RunTest(const std::string& format,
     else if (modelFormat.find("onnx") != std::string::npos)
 {
 #if defined(ARMNN_ONNX_PARSER)
-    return MainImpl<armnnOnnxParser::IOnnxParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
-                                                         dynamicBackendsPath,
-                                                         inputNamesVector, inputTensorShapes,
-                                                         inputTensorDataFilePathsVector, inputTypesVector,
-                                                         quantizeInput, outputTypesVector, outputNamesVector,
-                                                         outputTensorFilesVector, enableProfiling, enableFp16TurboMode,
-                                                         thresholdTime,printIntermediate, subgraphId,
-                                                         enableLayerDetails, runtime);
+    return MainImpl<armnnOnnxParser::IOnnxParser, float>(params, runtime);
 #else
     BOOST_LOG_TRIVIAL(fatal) << "Not built with Onnx parser support.";
     return EXIT_FAILURE;
@@ -613,14 +699,7 @@ int RunTest(const std::string& format,
     else if (modelFormat.find("tensorflow") != std::string::npos)
     {
 #if defined(ARMNN_TF_PARSER)
-        return MainImpl<armnnTfParser::ITfParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
-                                                         dynamicBackendsPath,
-                                                         inputNamesVector, inputTensorShapes,
-                                                         inputTensorDataFilePathsVector, inputTypesVector,
-                                                         quantizeInput, outputTypesVector, outputNamesVector,
-                                                         outputTensorFilesVector, enableProfiling, enableFp16TurboMode,
-                                                         thresholdTime,printIntermediate, subgraphId,
-                                                         enableLayerDetails, runtime);
+        return MainImpl<armnnTfParser::ITfParser, float>(params, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Not built with Tensorflow parser support.";
         return EXIT_FAILURE;
@@ -635,14 +714,7 @@ int RunTest(const std::string& format,
               for tflite files";
             return EXIT_FAILURE;
         }
-        return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(modelPath.c_str(), isModelBinary, computeDevice,
-                                                                 dynamicBackendsPath,
-                                                                 inputNamesVector, inputTensorShapes,
-                                                                 inputTensorDataFilePathsVector, inputTypesVector,
-                                                                 quantizeInput, outputTypesVector, outputNamesVector,
-                                                                 outputTensorFilesVector, enableProfiling,
-                                                                 enableFp16TurboMode, thresholdTime, printIntermediate,
-                                                                 subgraphId, enableLayerDetails, runtime);
+        return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(params, runtime);
 #else
         BOOST_LOG_TRIVIAL(fatal) << "Unknown model format: '" << modelFormat <<
             "'. Please include 'caffe', 'tensorflow', 'tflite' or 'onnx'";
@@ -699,9 +771,10 @@ int RunCsvTest(const armnnUtils::CsvRow &csvRow, const std::shared_ptr<armnn::IR
          "The shape of the input tensors in the network as a flat array of integers separated by comma. "
          "Several shapes can be passed separating them by semicolon. "
          "This parameter is optional, depending on the network.")
-        ("input-tensor-data,d", po::value(&inputTensorDataFilePaths),
+        ("input-tensor-data,d", po::value(&inputTensorDataFilePaths)->default_value(""),
          "Path to files containing the input data as a flat array separated by whitespace. "
-         "Several paths can be passed separating them by comma.")
+         "Several paths can be passed separating them by comma. If not specified, the network will be run with dummy "
+         "data (useful for profiling).")
         ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
          "If unset, defaults to \"float\" for all defined inputs. "
          "Accepted values (float, int or qasymm8).")

@@ -69,9 +69,10 @@ int main(int argc, const char* argv[])
              "The shape of the input tensors in the network as a flat array of integers separated by comma."
              "Several shapes can be passed by separating them with a colon (:)."
              "This parameter is optional, depending on the network.")
-            ("input-tensor-data,d", po::value(&inputTensorDataFilePaths),
+            ("input-tensor-data,d", po::value(&inputTensorDataFilePaths)->default_value(""),
              "Path to files containing the input data as a flat array separated by whitespace. "
-             "Several paths can be passed by separating them with a comma.")
+             "Several paths can be passed by separating them with a comma. If not specified, the network will be run "
+             "with dummy data (useful for profiling).")
             ("input-type,y",po::value(&inputTypes), "The type of the input tensors in the network separated by comma. "
              "If unset, defaults to \"float\" for all defined inputs. "
              "Accepted values (float, int or qasymm8)")
@@ -255,14 +256,15 @@ int main(int argc, const char* argv[])
         }
         // Create runtime
         armnn::IRuntime::CreationOptions options;
-        options.m_EnableGpuProfiling = enableProfiling;
-        options.m_DynamicBackendsPath = dynamicBackendsPath;
-        options.m_ProfilingOptions.m_EnableProfiling = enableExternalProfiling;
+        options.m_EnableGpuProfiling                     = enableProfiling;
+        options.m_DynamicBackendsPath                    = dynamicBackendsPath;
+        options.m_ProfilingOptions.m_EnableProfiling     = enableExternalProfiling;
         options.m_ProfilingOptions.m_IncomingCaptureFile = incomingCaptureFile;
         options.m_ProfilingOptions.m_OutgoingCaptureFile = outgoingCaptureFile;
-        options.m_ProfilingOptions.m_FileOnly = fileOnlyExternalProfiling;
-        options.m_ProfilingOptions.m_CapturePeriod = counterCapturePeriod;
+        options.m_ProfilingOptions.m_FileOnly            = fileOnlyExternalProfiling;
+        options.m_ProfilingOptions.m_CapturePeriod       = counterCapturePeriod;
         std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(options));
+
         return RunTest(modelFormat, inputTensorShapes, computeDevices, dynamicBackendsPath, modelPath, inputNames,
                        inputTensorDataFilePaths, inputTypes, quantizeInput, outputTypes, outputNames,
                        outputTensorFiles, enableProfiling, enableFp16TurboMode, thresholdTime, printIntermediate,

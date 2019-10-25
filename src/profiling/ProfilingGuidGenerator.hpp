@@ -7,6 +7,8 @@
 
 #include "IProfilingGuidGenerator.hpp"
 
+#include <functional>
+
 namespace armnn
 {
 
@@ -17,15 +19,28 @@ class ProfilingGuidGenerator : public IProfilingGuidGenerator
 {
 public:
     /// Construct a generator with the default address space static/dynamic partitioning
-    ProfilingGuidGenerator() {}
+    ProfilingGuidGenerator() : m_Sequence(0) {}
 
     /// Return the next random Guid in the sequence
     // NOTE: dummy implementation for the moment
-    inline ProfilingDynamicGuid NextGuid() override { return ProfilingDynamicGuid(0); }
+    inline ProfilingDynamicGuid NextGuid() override
+    {
+        ProfilingDynamicGuid guid(m_Sequence);
+        m_Sequence++;
+        return guid;
+    }
 
     /// Create a ProfilingStaticGuid based on a hash of the string
     // NOTE: dummy implementation for the moment
-    inline ProfilingStaticGuid GenerateStaticId(const std::string& str) override { return ProfilingStaticGuid(0); }
+    inline ProfilingStaticGuid GenerateStaticId(const std::string& str) override
+    {
+        uint64_t guid = static_cast<uint64_t>(m_StringHasher(str));
+        return guid;
+    }
+
+private:
+    std::hash<std::string> m_StringHasher;
+    uint64_t m_Sequence;
 };
 
 } // namespace profiling

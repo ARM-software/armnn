@@ -178,6 +178,7 @@ LOCAL_SRC_FILES := \
         src/profiling/ConnectionAcknowledgedCommandHandler.cpp \
         src/profiling/CounterDirectory.cpp \
         src/profiling/Holder.cpp \
+        src/profiling/LabelsAndEventClasses.cpp \
         src/profiling/PacketBuffer.cpp \
         src/profiling/PacketVersionResolver.cpp \
         src/profiling/PeriodicCounterCapture.cpp \

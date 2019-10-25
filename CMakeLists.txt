@@ -462,6 +462,8 @@ list(APPEND armnn_sources
     src/profiling/IProfilingConnection.hpp
     src/profiling/IProfilingConnectionFactory.hpp
     src/profiling/IProfilingGuidGenerator.hpp
+    src/profiling/LabelsAndEventClasses.cpp
+    src/profiling/LabelsAndEventClasses.hpp
     src/profiling/Packet.hpp
     src/profiling/PacketBuffer.cpp
     src/profiling/PacketBuffer.hpp

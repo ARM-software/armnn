@@ -7,6 +7,8 @@
 
 #include "ProfilingGuid.hpp"
 
+#include <string>
+
 namespace armnn
 {
 

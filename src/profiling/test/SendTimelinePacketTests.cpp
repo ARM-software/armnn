@@ -12,6 +12,9 @@
 #include <TimelinePacketWriterFactory.hpp>
 
 #include <boost/test/unit_test.hpp>
+#include <LabelsAndEventClasses.hpp>
+
+#include <functional>
 
 using namespace armnn::profiling;
 
@@ -392,14 +395,16 @@ BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
     ProfilingStaticGuid staticGuid = profilingService.GenerateStaticId("dummy");
-    // TODO when actual value gets generated verify its correctness
-    ProfilingStaticGuid expectedStaticValue(0);
+    // TODO this will change again...
+    std::hash<std::string> hasher;
+    uint64_t hash = static_cast<uint64_t>(hasher("dummy"));
+    ProfilingStaticGuid expectedStaticValue(hash);
     BOOST_CHECK(staticGuid == expectedStaticValue);
     ProfilingDynamicGuid dynamicGuid = profilingService.NextGuid();
-    // TODO when actual value gets generated verify its correctness by verifying
-    //      it is in the correct range i.e. > x and that if NextGuid is invoked
-    //      again it is equal to the previous + 1
-    ProfilingDynamicGuid expectedDynamicValue(0);
+    uint64_t dynamicGuidValue = static_cast<uint64_t>(dynamicGuid);
+    ++dynamicGuidValue;
+    ProfilingDynamicGuid expectedDynamicValue(dynamicGuidValue);
+    dynamicGuid = profilingService.NextGuid();
     BOOST_CHECK(dynamicGuid == expectedDynamicValue);
 }
 
@@ -412,6 +417,35 @@ BOOST_AUTO_TEST_CASE(GetTimelinePackerWriterFromProfilingService)
 
     std::unique_ptr<ISendTimelinePacket> writer = profilingService.GetSendTimelinePacket();
     BOOST_CHECK(writer != nullptr);
+}
+
+BOOST_AUTO_TEST_CASE(CheckStaticGuidsAndEvents)
+{
+    BOOST_CHECK("name" == LabelsAndEventClasses::NAME_LABEL);
+    BOOST_CHECK("type" == LabelsAndEventClasses::TYPE_LABEL);
+    BOOST_CHECK("index" == LabelsAndEventClasses::INDEX_LABEL);
+
+    std::hash<std::string> hasher;
+
+    uint64_t hash = static_cast<uint64_t>(hasher(LabelsAndEventClasses::NAME_LABEL));
+    ProfilingStaticGuid expectedNameGuid(hash);
+    BOOST_CHECK(LabelsAndEventClasses::NAME_GUID == expectedNameGuid);
+
+    hash = static_cast<uint64_t>(hasher(LabelsAndEventClasses::TYPE_LABEL));
+    ProfilingStaticGuid expectedTypeGuid(hash);
+    BOOST_CHECK(LabelsAndEventClasses::TYPE_GUID == expectedTypeGuid);
+
+    hash = static_cast<uint64_t>(hasher(LabelsAndEventClasses::INDEX_LABEL));
+    ProfilingStaticGuid expectedIndexGuid(hash);
+    BOOST_CHECK(LabelsAndEventClasses::INDEX_GUID == expectedIndexGuid);
+
+    hash = static_cast<uint64_t>(hasher("ARMNN_PROFILING_SOL"));
+    ProfilingStaticGuid expectedSol(hash);
+    BOOST_CHECK(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS == expectedSol);
+
+    hash = static_cast<uint64_t>(hasher("ARMNN_PROFILING_EOL"));
+    ProfilingStaticGuid expectedEol(hash);
+    BOOST_CHECK(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS == expectedEol);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

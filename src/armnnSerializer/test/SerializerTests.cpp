@@ -3823,29 +3823,29 @@ protected:
     void VerifyInputParameters(const armnn::QuantizedLstmInputParams& params)
     {
         VerifyConstTensors("m_InputToInputWeights",
-                m_InputParams.m_InputToInputWeights, params.m_InputToInputWeights);
+                           m_InputParams.m_InputToInputWeights, params.m_InputToInputWeights);
         VerifyConstTensors("m_InputToForgetWeights",
-                m_InputParams.m_InputToForgetWeights, params.m_InputToForgetWeights);
+                           m_InputParams.m_InputToForgetWeights, params.m_InputToForgetWeights);
         VerifyConstTensors("m_InputToCellWeights",
-                m_InputParams.m_InputToCellWeights, params.m_InputToCellWeights);
+                           m_InputParams.m_InputToCellWeights, params.m_InputToCellWeights);
         VerifyConstTensors("m_InputToOutputWeights",
-                m_InputParams.m_InputToOutputWeights, params.m_InputToOutputWeights);
+                           m_InputParams.m_InputToOutputWeights, params.m_InputToOutputWeights);
         VerifyConstTensors("m_RecurrentToInputWeights",
-                m_InputParams.m_RecurrentToInputWeights, params.m_RecurrentToInputWeights);
+                           m_InputParams.m_RecurrentToInputWeights, params.m_RecurrentToInputWeights);
         VerifyConstTensors("m_RecurrentToForgetWeights",
-                m_InputParams.m_RecurrentToForgetWeights, params.m_RecurrentToForgetWeights);
+                           m_InputParams.m_RecurrentToForgetWeights, params.m_RecurrentToForgetWeights);
         VerifyConstTensors("m_RecurrentToCellWeights",
-                m_InputParams.m_RecurrentToCellWeights, params.m_RecurrentToCellWeights);
+                           m_InputParams.m_RecurrentToCellWeights, params.m_RecurrentToCellWeights);
         VerifyConstTensors("m_RecurrentToOutputWeights",
-                m_InputParams.m_RecurrentToOutputWeights, params.m_RecurrentToOutputWeights);
+                           m_InputParams.m_RecurrentToOutputWeights, params.m_RecurrentToOutputWeights);
         VerifyConstTensors("m_InputGateBias",
-                m_InputParams.m_InputGateBias, params.m_InputGateBias);
+                           m_InputParams.m_InputGateBias, params.m_InputGateBias);
         VerifyConstTensors("m_ForgetGateBias",
-                m_InputParams.m_ForgetGateBias, params.m_ForgetGateBias);
+                           m_InputParams.m_ForgetGateBias, params.m_ForgetGateBias);
         VerifyConstTensors("m_CellBias",
-                m_InputParams.m_CellBias, params.m_CellBias);
+                           m_InputParams.m_CellBias, params.m_CellBias);
         VerifyConstTensors("m_OutputGateBias",
-                m_InputParams.m_OutputGateBias, params.m_OutputGateBias);
+                           m_InputParams.m_OutputGateBias, params.m_OutputGateBias);
     }
 
 private:
@@ -3859,78 +3859,117 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     const uint32_t numUnits = 4;
     const uint32_t outputSize = numUnits;
 
-    std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> inputToInputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToInputWeights(armnn::TensorInfo(
-            4, inputToInputWeightsDimensions.data(),
-            armnn::DataType::QuantisedAsymm8), inputToInputWeightsData);
+    // Scale/Offset for input/output, cellState In/Out, weights, bias
+    float inputOutputScale = 0.0078125f;
+    int32_t inputOutputOffset = 128;
 
-    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> inputToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToForgetWeights(armnn::TensorInfo(
-            4, inputToForgetWeightsDimensions.data(),
-            armnn::DataType::QuantisedAsymm8), inputToForgetWeightsData);
+    float cellStateScale = 0.00048828125f;
+    int32_t cellStateOffset = 0;
 
-    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> inputToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToCellWeights(armnn::TensorInfo(
-            4, inputToCellWeightsDimensions.data(),
-            armnn::DataType::QuantisedAsymm8), inputToCellWeightsData);
+    float weightsScale = 0.00408021f;
+    int32_t weightsOffset = 100;
 
-    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> inputToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputToOutputWeights(armnn::TensorInfo(
-            4, inputToOutputWeightsDimensions.data(),
-            armnn::DataType::QuantisedAsymm8), inputToOutputWeightsData);
+    float biasScale = 3.1876640625e-05f;
+    int32_t biasOffset = 0;
 
-    std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> recurrentToInputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToInputWeights(armnn::TensorInfo(
-            4, recurrentToInputWeightsDimensions.data(),
-            armnn::DataType::QuantisedAsymm8), recurrentToInputWeightsData);
+    // The shape of weight data is {outputSize, inputSize} = {4, 2}
+    armnn::TensorShape inputToInputWeightsShape = {4, 2};
+    std::vector<uint8_t> inputToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8};
+    armnn::TensorInfo inputToInputWeightsInfo(inputToInputWeightsShape,
+                                              armnn::DataType::QuantisedAsymm8,
+                                              weightsScale,
+                                              weightsOffset);
+    armnn::ConstTensor inputToInputWeights(inputToInputWeightsInfo, inputToInputWeightsData);
 
-    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> recurrentToForgetWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToForgetWeights(armnn::TensorInfo(
-            4, recurrentToForgetWeightsDimensions.data(),
-            armnn::DataType::QuantisedAsymm8), recurrentToForgetWeightsData);
+    armnn::TensorShape inputToForgetWeightsShape = {4, 2};
+    std::vector<uint8_t> inputToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8};
+    armnn::TensorInfo inputToForgetWeightsInfo(inputToForgetWeightsShape,
+                                               armnn::DataType::QuantisedAsymm8,
+                                               weightsScale,
+                                               weightsOffset);
+    armnn::ConstTensor inputToForgetWeights(inputToForgetWeightsInfo, inputToForgetWeightsData);
 
-    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> recurrentToCellWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToCellWeights(armnn::TensorInfo(
-            4, recurrentToCellWeightsDimensions.data(),
-            armnn::DataType::QuantisedAsymm8), recurrentToCellWeightsData);
+    armnn::TensorShape inputToCellWeightsShape = {4, 2};
+    std::vector<uint8_t> inputToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8};
+    armnn::TensorInfo inputToCellWeightsInfo(inputToCellWeightsShape,
+                                             armnn::DataType::QuantisedAsymm8,
+                                             weightsScale,
+                                             weightsOffset);
+    armnn::ConstTensor inputToCellWeights(inputToCellWeightsInfo, inputToCellWeightsData);
 
-    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> recurrentToOutputWeightsDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor recurrentToOutputWeights(armnn::TensorInfo(
-            4, recurrentToOutputWeightsDimensions.data(),
-            armnn::DataType::QuantisedAsymm8), recurrentToOutputWeightsData);
+    armnn::TensorShape inputToOutputWeightsShape = {4, 2};
+    std::vector<uint8_t> inputToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8};
+    armnn::TensorInfo inputToOutputWeightsInfo(inputToOutputWeightsShape,
+                                               armnn::DataType::QuantisedAsymm8,
+                                               weightsScale,
+                                               weightsOffset);
+    armnn::ConstTensor inputToOutputWeights(inputToOutputWeightsInfo, inputToOutputWeightsData);
 
+    // The shape of recurrent weight data is {outputSize, outputSize} = {4, 4}
+    armnn::TensorShape recurrentToInputWeightsShape = {4, 4};
+    std::vector<uint8_t> recurrentToInputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+    armnn::TensorInfo recurrentToInputWeightsInfo(recurrentToInputWeightsShape,
+                                                  armnn::DataType::QuantisedAsymm8,
+                                                  weightsScale,
+                                                  weightsOffset);
+    armnn::ConstTensor recurrentToInputWeights(recurrentToInputWeightsInfo, recurrentToInputWeightsData);
 
-    std::vector<int32_t> inputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> inputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor inputGateBias(armnn::TensorInfo(
-            4, inputGateBiasDimensions.data(),
-            armnn::DataType::Signed32), inputGateBiasData);
+    armnn::TensorShape recurrentToForgetWeightsShape = {4, 4};
+    std::vector<uint8_t> recurrentToForgetWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+    armnn::TensorInfo recurrentToForgetWeightsInfo(recurrentToForgetWeightsShape,
+                                                   armnn::DataType::QuantisedAsymm8,
+                                                   weightsScale,
+                                                   weightsOffset);
+    armnn::ConstTensor recurrentToForgetWeights(recurrentToForgetWeightsInfo, recurrentToForgetWeightsData);
 
-    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> forgetGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor forgetGateBias(armnn::TensorInfo(
-            4, forgetGateBiasDimensions.data(),
-            armnn::DataType::Signed32), forgetGateBiasData);
+    armnn::TensorShape recurrentToCellWeightsShape = {4, 4};
+    std::vector<uint8_t> recurrentToCellWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+    armnn::TensorInfo recurrentToCellWeightsInfo(recurrentToCellWeightsShape,
+                                                 armnn::DataType::QuantisedAsymm8,
+                                                 weightsScale,
+                                                 weightsOffset);
+    armnn::ConstTensor recurrentToCellWeights(recurrentToCellWeightsInfo, recurrentToCellWeightsData);
 
-    std::vector<int32_t> cellBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> cellBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor cellBias(armnn::TensorInfo(
-            4, cellBiasDimensions.data(),
-            armnn::DataType::Signed32), cellBiasData);
+    armnn::TensorShape recurrentToOutputWeightsShape = {4, 4};
+    std::vector<uint8_t> recurrentToOutputWeightsData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+    armnn::TensorInfo recurrentToOutputWeightsInfo(recurrentToOutputWeightsShape,
+                                                   armnn::DataType::QuantisedAsymm8,
+                                                   weightsScale,
+                                                   weightsOffset);
+    armnn::ConstTensor recurrentToOutputWeights(recurrentToOutputWeightsInfo, recurrentToOutputWeightsData);
 
-    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<unsigned int> outputGateBiasDimensions = {1, 1, 3, 3};
-    armnn::ConstTensor outputGateBias(armnn::TensorInfo(
-            4, outputGateBiasDimensions.data(),
-            armnn::DataType::Signed32), outputGateBiasData);
+    // The shape of bias data is {outputSize} = {4}
+    armnn::TensorShape inputGateBiasShape = {4};
+    std::vector<int32_t> inputGateBiasData = {1, 2, 3, 4};
+    armnn::TensorInfo inputGateBiasInfo(inputGateBiasShape,
+                                        armnn::DataType::Signed32,
+                                        biasScale,
+                                        biasOffset);
+    armnn::ConstTensor inputGateBias(inputGateBiasInfo, inputGateBiasData);
+
+    armnn::TensorShape forgetGateBiasShape = {4};
+    std::vector<int32_t> forgetGateBiasData = {1, 2, 3, 4};
+    armnn::TensorInfo forgetGateBiasInfo(forgetGateBiasShape,
+                                         armnn::DataType::Signed32,
+                                         biasScale,
+                                         biasOffset);
+    armnn::ConstTensor forgetGateBias(forgetGateBiasInfo, forgetGateBiasData);
+
+    armnn::TensorShape cellBiasShape = {4};
+    std::vector<int32_t> cellBiasData = {1, 2, 3, 4};
+    armnn::TensorInfo cellBiasInfo(cellBiasShape,
+                                   armnn::DataType::Signed32,
+                                   biasScale,
+                                   biasOffset);
+    armnn::ConstTensor cellBias(cellBiasInfo, cellBiasData);
+
+    armnn::TensorShape outputGateBiasShape = {4};
+    std::vector<int32_t> outputGateBiasData = {1, 2, 3, 4};
+    armnn::TensorInfo outputGateBiasInfo(outputGateBiasShape,
+                                         armnn::DataType::Signed32,
+                                         biasScale,
+                                         biasOffset);
+    armnn::ConstTensor outputGateBias(outputGateBiasInfo, outputGateBiasData);
 
     armnn::QuantizedLstmInputParams params;
     params.m_InputToInputWeights = &inputToInputWeights;
@@ -3947,18 +3986,27 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     params.m_OutputGateBias = &outputGateBias;
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayer   = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
     armnn::IConnectableLayer* const cellStateIn = network->AddInputLayer(1);
     armnn::IConnectableLayer* const outputStateIn = network->AddInputLayer(2);
     const std::string layerName("QuantizedLstm");
     armnn::IConnectableLayer* const quantizedLstmLayer = network->AddQuantizedLstmLayer(params, layerName.c_str());
-    armnn::IConnectableLayer* const cellStateOut  = network->AddOutputLayer(0);
-    armnn::IConnectableLayer* const outputLayer  = network->AddOutputLayer(1);
+    armnn::IConnectableLayer* const cellStateOut = network->AddOutputLayer(0);
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(1);
 
-    // connect up
-    armnn::TensorInfo inputTensorInfo({ batchSize, inputSize }, armnn::DataType::QuantisedAsymm8);
-    armnn::TensorInfo cellStateTensorInfo({ batchSize, numUnits}, armnn::DataType::Signed32);
-    armnn::TensorInfo outputStateTensorInfo({ batchSize, outputSize }, armnn::DataType::QuantisedAsymm8);
+    // Connect up
+    armnn::TensorInfo inputTensorInfo({ batchSize, inputSize },
+                                      armnn::DataType::QuantisedAsymm8,
+                                      inputOutputScale,
+                                      inputOutputOffset);
+    armnn::TensorInfo cellStateTensorInfo({ batchSize, numUnits },
+                                          armnn::DataType::QuantisedSymm16,
+                                          cellStateScale,
+                                          cellStateOffset);
+    armnn::TensorInfo outputStateTensorInfo({ batchSize, outputSize },
+                                            armnn::DataType::QuantisedAsymm8,
+                                            inputOutputScale,
+                                            inputOutputOffset);
 
     inputLayer->GetOutputSlot(0).Connect(quantizedLstmLayer->GetInputSlot(0));
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
@@ -3978,11 +4026,10 @@ BOOST_AUTO_TEST_CASE(SerializeDeserializeQuantizedLstm)
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     BOOST_CHECK(deserializedNetwork);
 
-    VerifyQuantizedLstmLayer checker(
-            layerName,
-            {inputTensorInfo, cellStateTensorInfo, outputStateTensorInfo},
-            {cellStateTensorInfo, outputStateTensorInfo},
-            params);
+    VerifyQuantizedLstmLayer checker(layerName,
+                                     {inputTensorInfo, cellStateTensorInfo, outputStateTensorInfo},
+                                     {cellStateTensorInfo, outputStateTensorInfo},
+                                     params);
 
     deserializedNetwork->Accept(checker);
 }

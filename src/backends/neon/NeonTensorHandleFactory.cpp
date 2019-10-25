@@ -60,7 +60,7 @@ std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const
     }
     // If we are not Managing the Memory then we must be importing
     tensorHandle->SetImportEnabledFlag(!IsMemoryManaged);
-    tensorHandle->SetImportFlags(m_ImportFlags);
+    tensorHandle->SetImportFlags(GetImportFlags());
 
     return tensorHandle;
 }
@@ -76,7 +76,7 @@ std::unique_ptr<ITensorHandle> NeonTensorHandleFactory::CreateTensorHandle(const
     }
     // If we are not Managing the Memory then we must be importing
     tensorHandle->SetImportEnabledFlag(!IsMemoryManaged);
-    tensorHandle->SetImportFlags(m_ImportFlags);
+    tensorHandle->SetImportFlags(GetImportFlags());
 
     return tensorHandle;
 }
@@ -99,12 +99,12 @@ bool NeonTensorHandleFactory::SupportsSubTensors() const
 
 MemorySourceFlags NeonTensorHandleFactory::GetExportFlags() const
 {
-    return m_ExportFlags;
+    return 0;
 }
 
 MemorySourceFlags NeonTensorHandleFactory::GetImportFlags() const
 {
-    return m_ImportFlags;
+    return static_cast<MemorySourceFlags>(MemorySource::Malloc);
 }
 
 } // namespace armnn

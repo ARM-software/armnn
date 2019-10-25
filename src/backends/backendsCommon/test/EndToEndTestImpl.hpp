@@ -369,6 +369,11 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
 
     std::vector<float> outputData(4);
 
+    std::vector<float> expectedOutput
+    {
+        1.0f, 4.0f, 9.0f, 16.0f
+    };
+
     InputTensors inputTensors
     {
         {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
@@ -378,8 +383,6 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
         {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
     };
 
-    // The result of the inference is not important, just the fact that there
-    // should not be CopyMemGeneric workloads.
     runtime->GetProfiler(netId)->EnableProfiling(true);
 
     // Do the inference
@@ -394,12 +397,17 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
     // Contains ActivationWorkload
     std::size_t found = dump.find("ActivationWorkload");
     BOOST_TEST(found != std::string::npos);
+
     // Contains SyncMemGeneric
     found = dump.find("SyncMemGeneric");
     BOOST_TEST(found != std::string::npos);
+
     // Does not contain CopyMemGeneric
     found = dump.find("CopyMemGeneric");
     BOOST_TEST(found == std::string::npos);
+
+    // Check output is as expected
+    BOOST_TEST(outputData == expectedOutput);
 }
 
 inline void ImportOnlyWorkload(std::vector<BackendId> backends)

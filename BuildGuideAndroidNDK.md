@@ -134,7 +134,11 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	```bash
 	cd ~/armnn-devenv/google/
 	git clone https://github.com/tensorflow/tensorflow.git
+        cd tensorflow/
+        git checkout a0043f9262dc1b0e7dc4bdf3a7f0ef0bebc4891e
 	```
+
+	You need tensorflow/contrib/makefile/tf_proto_files.txt from TensorFlow to generate TensorFlow protobuf definitions. This file is not available in TensorFlow master branch.
 
 #### <a name="buildArmNN">Build ArmNN</a>
 
@@ -236,4 +240,3 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 	```
 
 	If libarmnnUtils.a is present in `~/armnn-devenv/armnn/build/` and the unit tests run without failure then the build was successful.
-

@@ -52,6 +52,39 @@ ProfilingStaticGuid TimelineUtilityMethods::DeclareLabel(const std::string& labe
     return labelGuid;
 }
 
+void TimelineUtilityMethods::CreateTypedLabel(ProfilingGuid entityGuid,
+                                              const std::string& entityName,
+                                              ProfilingStaticGuid labelTypeGuid)
+{
+    // Check that the entity name is valid
+    if (entityName.empty())
+    {
+        // The entity name is invalid
+        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+    }
+
+    // Declare a label with the entity's name, this call throws in case of error
+    ProfilingGuid labelGuid = DeclareLabel(entityName);
+
+    // Generate a GUID for the label relationship
+    ProfilingGuid relationshipGuid = ProfilingService::Instance().NextGuid();
+
+    // Send the new label link to the external profiling service, this call throws in case of error
+    m_SendTimelinePacket.SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                                              relationshipGuid,
+                                                              entityGuid,
+                                                              labelGuid);
+
+    // Generate a GUID for the label relationship
+    ProfilingGuid relationshipLabelGuid = ProfilingService::Instance().NextGuid();
+
+    // Send the new label link to the external profiling service, this call throws in case of error
+    m_SendTimelinePacket.SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                                              relationshipLabelGuid,
+                                                              relationshipGuid,
+                                                              labelTypeGuid);
+}
+
 } // namespace profiling
 
 } // namespace armnn

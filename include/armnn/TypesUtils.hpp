@@ -141,8 +141,8 @@ constexpr const char* GetDataTypeName(DataType dataType)
     {
         case DataType::Float16:         return "Float16";
         case DataType::Float32:         return "Float32";
-        case DataType::QuantisedAsymm8: return "Unsigned8";
-        case DataType::QuantisedSymm16: return "Signed16";
+        case DataType::QuantisedAsymm8: return "QAsymm8";
+        case DataType::QuantisedSymm16: return "QSymm16";
         case DataType::Signed32:        return "Signed32";
         case DataType::Boolean:         return "Boolean";
 

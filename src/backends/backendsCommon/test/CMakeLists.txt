@@ -116,6 +116,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/QuantizeTestImpl.hpp
     layerTests/ReshapeTestImpl.cpp
     layerTests/ReshapeTestImpl.hpp
+    layerTests/ResizeTestImpl.cpp
     layerTests/ResizeTestImpl.hpp
     layerTests/RsqrtTestImpl.cpp
     layerTests/RsqrtTestImpl.hpp

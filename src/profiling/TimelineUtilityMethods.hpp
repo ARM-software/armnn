@@ -22,6 +22,8 @@ public:
     {}
     ~TimelineUtilityMethods() = default;
 
+    void SendWellKnownLabelsAndEventClasses();
+
     ProfilingStaticGuid DeclareLabel(const std::string& labelName);
 
 private:

@@ -35,7 +35,7 @@ void SendTimelinePacket::ReserveBuffer()
         // Check if there is enough space in the buffer
         if (m_WriteBuffer == nullptr || reserved < m_Offset)
         {
-            throw RuntimeException("No space left on buffer", CHECK_LOCATION());
+            throw BufferExhaustion("No space left on buffer", CHECK_LOCATION());
         }
         m_BufferSize = reserved;
     }

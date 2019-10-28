@@ -471,24 +471,20 @@ int MainImpl(const ExecuteNetworkParams& params,
         // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
         auto inference_duration = model.Run(inputDataContainers, outputDataContainers);
 
-        // Print output tensors (if requested)
-        if (!params.m_OutputTensorFiles.empty())
+        if (params.m_GenerateTensorData)
         {
-            if (params.m_GenerateTensorData)
-            {
-                BOOST_LOG_TRIVIAL(warning) << "Requested to write output to file, although the input was generated. "
-                                           << "Note that the output will not be useful.";
-            }
+            BOOST_LOG_TRIVIAL(warning) << "The input data was generated, note that the output will not be useful";
+        }
 
-            const auto& infosOut = model.GetOutputBindingInfos();
-            for (size_t i = 0; i < numOutputs; i++)
-            {
-                const armnn::TensorInfo& infoOut = infosOut[i].second;
-                auto outputTensorFile = params.m_OutputTensorFiles[i];
+        // Print output tensors
+        const auto& infosOut = model.GetOutputBindingInfos();
+        for (size_t i = 0; i < numOutputs; i++)
+        {
+            const armnn::TensorInfo& infoOut = infosOut[i].second;
+            auto outputTensorFile = params.m_OutputTensorFiles.empty() ? "" : params.m_OutputTensorFiles[i];
 
-                TensorPrinter printer(inferenceModelParams.m_OutputBindings[i], infoOut, outputTensorFile);
-                boost::apply_visitor(printer, outputDataContainers[i]);
-            }
+            TensorPrinter printer(inferenceModelParams.m_OutputBindings[i], infoOut, outputTensorFile);
+            boost::apply_visitor(printer, outputDataContainers[i]);
         }
 
         BOOST_LOG_TRIVIAL(info) << "\nInference time: " << std::setprecision(2)

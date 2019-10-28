@@ -37,11 +37,10 @@ inline armnn::InputTensors MakeInputTensors(
                              {
                                  if (value.size() != inputBinding.second.GetNumElements())
                                  {
-                                    std::ostringstream msg;
-                                    msg << "Input tensor has incorrect size (expected "
-                                        << inputBinding.second.GetNumElements() << " got "
-                                        << value.size();
-                                    throw armnn::Exception(msg.str());
+                                    throw armnn::Exception(boost::str(boost::format("Input tensor has incorrect size "
+                                                                                    "(expected %1% got %2%)")
+                                                                      % inputBinding.second.GetNumElements()
+                                                                      % value.size()));
                                  }
 
                                  armnn::ConstTensor inputTensor(inputBinding.second, value.data());

@@ -7,6 +7,7 @@
 #include "TensorFwd.hpp"
 
 #include "Exceptions.hpp"
+#include "Optional.hpp"
 #include "Types.hpp"
 
 #include <array>
@@ -55,10 +56,27 @@ public:
     /// Empty (invalid) constructor.
     TensorInfo();
 
-    TensorInfo(const TensorShape& shape, DataType dataType,
-        float quantizationScale = 0.0f, int32_t quantizationOffset = 0);
-    TensorInfo(unsigned int numDimensions, const unsigned int* dimensionSizes, DataType dataType,
-        float quantizationScale = 0.0f, int32_t quantizationOffset = 0);
+    TensorInfo(const TensorShape& shape,
+               DataType dataType,
+               float quantizationScale = 0.0f,
+               int32_t quantizationOffset = 0);
+
+    TensorInfo(unsigned int numDimensions,
+               const unsigned int* dimensionSizes,
+               DataType dataType,
+               float quantizationScale = 0.0f,
+               int32_t quantizationOffset = 0);
+
+    TensorInfo(const TensorShape& shape,
+               DataType dataType,
+               const std::vector<float>& quantizationScales,
+               unsigned int quantizationDim);
+
+    TensorInfo(unsigned int numDimensions,
+               const unsigned int* dimensionSizes,
+               DataType dataType,
+               const std::vector<float>& quantizationScales,
+               unsigned int quantizationDim);
 
     TensorInfo(const TensorInfo& other);
 
@@ -67,22 +85,31 @@ public:
     bool operator==(const TensorInfo& other) const;
     bool operator!=(const TensorInfo& other) const;
 
-    const TensorShape& GetShape() const             { return m_Shape; }
-    TensorShape& GetShape()                         { return m_Shape; }
-    void SetShape(const TensorShape& newShape)      { m_Shape = newShape; }
+    const TensorShape& GetShape() const              { return m_Shape; }
+    TensorShape& GetShape()                          { return m_Shape; }
+    void SetShape(const TensorShape& newShape)       { m_Shape = newShape; }
 
-    unsigned int GetNumDimensions() const { return m_Shape.GetNumDimensions(); }
-    unsigned int GetNumElements() const { return m_Shape.GetNumElements(); }
+    unsigned int GetNumDimensions() const            { return m_Shape.GetNumDimensions(); }
+    unsigned int GetNumElements() const              { return m_Shape.GetNumElements(); }
 
-    DataType GetDataType() const                    { return m_DataType; }
-    void SetDataType(DataType type)                 { m_DataType = type; }
+    DataType GetDataType() const                     { return m_DataType; }
+    void SetDataType(DataType type)                  { m_DataType = type; }
 
-    float GetQuantizationScale() const              { return m_Quantization.m_Scale; }
-    int32_t GetQuantizationOffset() const           { return m_Quantization.m_Offset; }
-    void SetQuantizationScale(float scale)          { m_Quantization.m_Scale = scale; }
-    void SetQuantizationOffset(int32_t offset)      { m_Quantization.m_Offset = offset; }
-    bool IsQuantized() const                        { return m_DataType == DataType::QuantisedAsymm8 ||
-                                                             m_DataType == DataType::QuantisedSymm16; }
+    bool HasMultipleQuantizationScales() const       { return m_Quantization.m_Scales.size() > 1; }
+
+    std::vector<float> GetQuantizationScales() const;
+    void SetQuantizationScales(const std::vector<float>& scales);
+
+    float GetQuantizationScale() const;
+    void SetQuantizationScale(float scale);
+
+    int32_t GetQuantizationOffset() const;
+    void SetQuantizationOffset(int32_t offset);
+
+    Optional<unsigned int> GetQuantizationDim() const;
+    void SetQuantizationDim(const Optional<unsigned int>& quantizationDim);
+
+    bool IsQuantized() const;
 
     /// Check that the types are the same and, if quantize, that the quantization parameters are the same.
     bool IsTypeSpaceMatch(const TensorInfo& other) const;
@@ -91,14 +118,26 @@ public:
 
 private:
     TensorShape m_Shape;
-    DataType m_DataType;
-    /// Scale and offset values are used for quantization.
+    DataType    m_DataType;
+
+    /// Vectors of scale and offset are used for per-axis quantization.
     struct Quantization
     {
-        Quantization() : m_Scale(0.f), m_Offset(0) {}
-        bool operator==(const Quantization& o) const {return ((m_Scale == o.m_Scale) && (m_Offset == o.m_Offset));}
-        float m_Scale;
-        int32_t m_Offset;
+        Quantization()
+            : m_Scales{}
+            , m_Offset(EmptyOptional())
+            , m_QuantizationDim(EmptyOptional()) {}
+
+        bool operator==(const Quantization& other) const
+        {
+            return ((m_Scales == other.m_Scales) && (m_Offset == other.m_Offset) &&
+                (m_QuantizationDim == other.m_QuantizationDim));
+        }
+
+        std::vector<float>     m_Scales;
+        Optional<int32_t>      m_Offset;
+        Optional<unsigned int> m_QuantizationDim;
+
     } m_Quantization;
 };
 
@@ -151,7 +190,7 @@ class Tensor : public BaseTensor<void*>
 {
 public:
     /// Brings in the constructors and assignment operator.
-    using BaseTensor<void*>::BaseTensor; 
+    using BaseTensor<void*>::BaseTensor;
 };
 
 /// A tensor defined by a TensorInfo (shape and data type) and an immutable backing store.
@@ -159,7 +198,7 @@ class ConstTensor : public BaseTensor<const void*>
 {
 public:
     /// Brings in the constructors and assignment operator.
-    using BaseTensor<const void*>::BaseTensor; 
+    using BaseTensor<const void*>::BaseTensor;
     ConstTensor() : BaseTensor<const void*>() {} // This needs to be redefined explicitly??
 
     /// Can be implicitly constructed from non-const Tensor.

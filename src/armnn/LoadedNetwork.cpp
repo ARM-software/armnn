@@ -11,8 +11,9 @@
 #include "Profiling.hpp"
 #include "HeapProfiling.hpp"
 
+#include <armnn/BackendRegistry.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IMemoryManager.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/MemSyncWorkload.hpp>

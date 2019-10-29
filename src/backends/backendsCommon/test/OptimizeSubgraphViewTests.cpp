@@ -10,7 +10,7 @@
 #include <Graph.hpp>
 #include <Network.hpp>
 
-#include <backendsCommon/BackendRegistry.hpp>
+#include <armnn/BackendRegistry.hpp>
 
 #include <boost/test/unit_test.hpp>
 

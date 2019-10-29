@@ -5,7 +5,7 @@
 
 #include "RefBackend.hpp"
 
-#include <backendsCommon/BackendRegistry.hpp>
+#include <armnn/BackendRegistry.hpp>
 
 namespace
 {

@@ -8,8 +8,7 @@
 #include "SubgraphViewSelector.hpp"
 
 #include <armnn/Exceptions.hpp>
-
-#include <backendsCommon/BackendRegistry.hpp>
+#include <armnn/BackendRegistry.hpp>
 
 namespace armnn
 {

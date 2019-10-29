@@ -9,9 +9,10 @@
 #include "NeonLayerSupport.hpp"
 #include "NeonTensorHandleFactory.hpp"
 
+#include <armnn/BackendRegistry.hpp>
+
 #include <aclCommon/BaseMemoryManager.hpp>
 
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/IMemoryManager.hpp>
 

@@ -214,6 +214,7 @@ list(APPEND armnn_sources
     include/armnn/ArmNN.hpp
     include/armnn/BackendHelper.hpp
     include/armnn/BackendId.hpp
+    include/armnn/BackendRegistry.hpp
     include/armnn/Conversion.hpp
     include/armnn/Deprecated.hpp
     include/armnn/Descriptors.hpp
@@ -355,6 +356,7 @@ list(APPEND armnn_sources
     src/armnn/layers/SwitchLayer.hpp
     src/armnn/layers/TransposeConvolution2dLayer.cpp
     src/armnn/layers/TransposeConvolution2dLayer.hpp
+    src/armnn/BackendRegistry.cpp
     src/armnn/BackendSettings.hpp
     src/armnn/BackendHelper.cpp
     src/armnn/CompatibleTypes.hpp

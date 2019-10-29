@@ -78,6 +78,7 @@ LOCAL_C_INCLUDES := \
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_SOURCES) \
         src/armnn/BackendHelper.cpp \
+        src/armnn/BackendRegistry.cpp \
         src/armnn/Descriptors.cpp \
         src/armnn/Exceptions.cpp \
         src/armnn/Graph.cpp \

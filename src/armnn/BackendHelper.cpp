@@ -4,8 +4,9 @@
 //
 
 #include <armnn/BackendHelper.hpp>
-#include "backendsCommon/BackendRegistry.hpp"
-#include "backendsCommon/IBackendInternal.hpp"
+#include <armnn/BackendRegistry.hpp>
+
+#include <backendsCommon/IBackendInternal.hpp>
 
 namespace armnn
 {

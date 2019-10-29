@@ -9,8 +9,9 @@
 #include <SubgraphView.hpp>
 #include <SubgraphViewSelector.hpp>
 
+#include <armnn/BackendRegistry.hpp>
+
 #include <backendsCommon/CpuTensorHandle.hpp>
-#include <backendsCommon/BackendRegistry.hpp>
 
 #include <test/TestUtils.hpp>
 

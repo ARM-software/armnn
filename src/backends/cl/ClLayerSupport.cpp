@@ -7,10 +7,10 @@
 #include "ClBackendId.hpp"
 
 #include <armnn/Descriptors.hpp>
+#include <armnn/BackendRegistry.hpp>
+
 #include <InternalTypes.hpp>
 #include <LayerSupportCommon.hpp>
-
-#include <backendsCommon/BackendRegistry.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "BackendRegistry.hpp"
+#include <armnn/BackendRegistry.hpp>
 #include <armnn/Exceptions.hpp>
 
 namespace armnn

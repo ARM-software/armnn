@@ -4,8 +4,8 @@
 //
 
 #include <armnn/Types.hpp>
+#include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 
 #include <boost/test/unit_test.hpp>

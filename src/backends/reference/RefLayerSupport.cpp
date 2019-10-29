@@ -12,8 +12,8 @@
 
 #include <armnn/Types.hpp>
 #include <armnn/Descriptors.hpp>
+#include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/LayerSupportRules.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 

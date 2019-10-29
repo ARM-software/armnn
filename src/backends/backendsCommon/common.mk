@@ -8,7 +8,6 @@
 # file in the root of ArmNN
 
 COMMON_SOURCES := \
-    BackendRegistry.cpp \
     CpuTensorHandle.cpp \
     DynamicBackend.cpp \
     DynamicBackendUtils.cpp \

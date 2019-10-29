@@ -4,8 +4,6 @@
 #
 
 list(APPEND armnnBackendsCommon_sources
-    BackendRegistry.cpp
-    BackendRegistry.hpp
     CpuTensorHandle.cpp
     CpuTensorHandleFwd.hpp
     CpuTensorHandle.hpp

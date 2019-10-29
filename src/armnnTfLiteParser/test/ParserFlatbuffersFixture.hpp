@@ -5,27 +5,29 @@
 
 #pragma once
 
+#include "Schema.hpp"
+
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnn/BackendRegistry.hpp>
 
-#include "Schema.hpp"
+#include <armnnTfLiteParser/ITfLiteParser.hpp>
+
+#include <ResolveType.hpp>
+
+#include <test/TensorHelpers.hpp>
+
 #include <boost/filesystem.hpp>
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
-
-#include "test/TensorHelpers.hpp"
-
-#include <ResolveType.hpp>
-#include "armnnTfLiteParser/ITfLiteParser.hpp"
-
-#include <backendsCommon/BackendRegistry.hpp>
 
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"
 #include "flatbuffers/flexbuffers.h"
 
 #include <schema_generated.h>
+
 #include <iostream>
 
 using armnnTfLiteParser::ITfLiteParser;

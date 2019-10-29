@@ -7,10 +7,10 @@
 
 #include <backendsCommon/DynamicBackend.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
 #include <armnn/ILayerSupport.hpp>
+#include <armnn/BackendRegistry.hpp>
 
 #include <reference/workloads/RefConvolution2dWorkload.hpp>
 

@@ -125,7 +125,7 @@ The method ```OptimizationViews OptimizeSubgraph(const SubgraphView& subgraph)``
 apply specific optimizations to a given sub-graph.
 
 The Arm NN framework then creates instances of the IBackendInternal interface with the help of the
-[BackendRegistry](backendsCommon/BackendRegistry.hpp) singleton.
+[BackendRegistry](../../include/armnn/BackendRegistry.hpp) singleton.
 
 **Important:** the ```IBackendInternal``` object is not guaranteed to have a longer lifetime than
 the objects it creates. It is only intended to be a single entry point for the factory functions it has.

@@ -2,11 +2,12 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include <armnn/LayerSupport.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/ILayerSupport.hpp>
+#include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 
 #include <boost/assert.hpp>

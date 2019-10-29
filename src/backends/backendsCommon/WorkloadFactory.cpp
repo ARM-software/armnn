@@ -6,15 +6,14 @@
 #include "CpuTensorHandle.hpp"
 #include "WorkloadFactory.hpp"
 
-
 #include <Layer.hpp>
 #include <LayersFwd.hpp>
 
 #include <armnn/Types.hpp>
 #include <armnn/LayerSupport.hpp>
 #include <armnn/ILayerSupport.hpp>
+#include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>

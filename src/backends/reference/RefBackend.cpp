@@ -9,9 +9,10 @@
 #include "RefLayerSupport.hpp"
 #include "RefTensorHandleFactory.hpp"
 
+#include <armnn/BackendRegistry.hpp>
+
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/IMemoryManager.hpp>
-#include <backendsCommon/BackendRegistry.hpp>
 
 #include <Optimizer.hpp>
 

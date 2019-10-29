@@ -6,7 +6,8 @@
 #pragma once
 
 #include "IBackendInternal.hpp"
-#include "BackendRegistry.hpp"
+
+#include <armnn/BackendRegistry.hpp>
 
 #include <functional>
 #include <memory>

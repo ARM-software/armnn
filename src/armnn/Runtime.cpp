@@ -5,8 +5,8 @@
 #include "Runtime.hpp"
 
 #include <armnn/Version.hpp>
+#include <armnn/BackendRegistry.hpp>
 
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 

@@ -2,8 +2,11 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
+
 #include <armnn/ArmNN.hpp>
+#include <armnn/BackendRegistry.hpp>
 
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"
@@ -17,8 +20,6 @@
 
 #include <HeapProfiling.hpp>
 #include <TensorIOUtils.hpp>
-
-#include <backendsCommon/BackendRegistry.hpp>
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/exception/exception.hpp>

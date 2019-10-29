@@ -14,13 +14,13 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/BackendRegistry.hpp>
 #include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/TypesUtils.hpp>
+#include <armnn/BackendRegistry.hpp>
 
 #include <fcntl.h>
 #include <algorithm>

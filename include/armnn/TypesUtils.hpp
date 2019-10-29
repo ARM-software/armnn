@@ -67,6 +67,16 @@ constexpr char const* GetPoolingAlgorithmAsCString(PoolingAlgorithm pooling)
     }
 }
 
+constexpr char const* GetResizeMethodAsCString(ResizeMethod resizeMethod)
+{
+    switch (resizeMethod)
+    {
+        case ResizeMethod::Bilinear:        return "Bilinear";
+        case ResizeMethod::NearestNeighbor: return "NearestNeighbor";
+        default:                            return "Unknown";
+    }
+}
+
 constexpr char const* GetOutputShapeRoundingAsCString(OutputShapeRounding rounding)
 {
     switch (rounding)

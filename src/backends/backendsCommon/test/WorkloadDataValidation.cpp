@@ -588,4 +588,69 @@ BOOST_AUTO_TEST_CASE(LstmQueueDescriptor_Validate)
     BOOST_CHECK_NO_THROW(data.Validate(info));
 }
 
+BOOST_AUTO_TEST_CASE(BiasPerAxisQuantization_Validate)
+{
+    constexpr unsigned int nInput  = 1u;
+    constexpr unsigned int cInput  = 3u;
+    constexpr unsigned int hInput  = 3u;
+    constexpr unsigned int wInput  = 3u;
+
+    constexpr unsigned int nOutput = nInput;
+    constexpr unsigned int cOutput = cInput;
+    constexpr unsigned int hOutput = 1u;
+    constexpr unsigned int wOutput = 1u;
+
+    const TensorShape inputShape { nInput,  cInput,  hInput,  wInput  };
+    const TensorShape outputShape{ nOutput, cOutput, hOutput, wOutput };
+    const TensorShape weightShape{ cOutput, cInput,  hInput,  wInput  };
+    const TensorShape biasShape  { cOutput                            };
+
+    constexpr DataType dataType = DataType::QuantisedAsymm8;
+    constexpr DataType biasType = DataType::Signed32;
+
+    constexpr float perTensorScale = 1.5f;
+    const TensorInfo inputInfo (inputShape,  dataType, perTensorScale);
+    const TensorInfo outputInfo(outputShape, dataType, perTensorScale);
+
+    const std::vector<float> weightPerAxisScales = { 2.50f, 3.50f };
+    const TensorInfo weightInfo(weightShape, dataType, weightPerAxisScales, 0);
+
+    Convolution2dQueueDescriptor queueDescriptor;
+    queueDescriptor.m_Parameters.m_BiasEnabled = true;
+
+    WorkloadInfo workloadInfo;
+    AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, nullptr);
+    AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, nullptr);
+
+    ScopedCpuTensorHandle weightTensor(weightInfo);
+    queueDescriptor.m_Weight = &weightTensor;
+
+    // Test 1: correct per-axis quantization values
+    const std::vector<float> biasPerAxisScales1  = { 3.75f, 5.25f };
+    const TensorInfo biasInfo1(biasShape, biasType, biasPerAxisScales1, 0);
+
+    ScopedCpuTensorHandle biasHandle1(biasInfo1);
+    queueDescriptor.m_Bias = &biasHandle1;
+
+    BOOST_CHECK_NO_THROW(queueDescriptor.Validate(workloadInfo));
+
+    // Test 2: wrong per-axis quantization values
+    const std::vector<float> biasPerAxisScales2 = { 4.00f, 5.00f };
+    const TensorInfo biasInfo2(biasShape, biasType, biasPerAxisScales2, 0);
+
+    ScopedCpuTensorHandle biasHandle2(biasInfo2);
+    queueDescriptor.m_Bias = &biasHandle2;
+
+    BOOST_CHECK_THROW(queueDescriptor.Validate(workloadInfo), InvalidArgumentException);
+
+    // Test 3: mismatched number of quantization scales
+    const std::vector<float> biasPerAxisScales3 = { 3.75f, 5.25f, 5.25f };
+    const TensorInfo biasInfo3(biasShape, biasType, biasPerAxisScales3, 0);
+
+    ScopedCpuTensorHandle biasHandle3(biasInfo3);
+    queueDescriptor.m_Bias = &biasHandle3;
+
+    BOOST_CHECK_THROW(queueDescriptor.Validate(workloadInfo), InvalidArgumentException);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

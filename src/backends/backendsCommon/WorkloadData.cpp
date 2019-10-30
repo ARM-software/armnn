@@ -192,20 +192,52 @@ void ValidateBiasTensorQuantization(const TensorInfo& biasTensor,
                                     const TensorInfo& weightsTensorInfo,
                                     const std::string& descName)
 {
+    // Helper lambda function to validate a single bias quantization scale value
+    auto VerifyBiasQuantizationScale = [&descName](float biasScale, float expectedScale) -> void
+    {
+        constexpr float tolerance = 0.00000001f;
+        if (std::abs(biasScale - expectedScale) > tolerance)
+        {
+            // Print the float values with extra precision to see very small differences
+            std::stringstream msg;
+            msg << std::setprecision(10) << descName << ": Expected " << expectedScale <<
+                " quantization scale for bias tensor (the product of the input and weight scales), but got " <<
+                biasScale;
+            throw InvalidArgumentException(msg.str(), CHECK_LOCATION());
+        }
+    };
+
     if (biasTensor.GetQuantizationOffset() != 0)
     {
         throw InvalidArgumentException(descName + ": Expected zero quantization offset for bias tensor but got " +
             to_string(biasTensor.GetQuantizationOffset()));
     }
-    const float expectedScale = inputTensorInfo.GetQuantizationScale() * weightsTensorInfo.GetQuantizationScale();
-    if (std::abs(biasTensor.GetQuantizationScale() - expectedScale) > 0.00000001f)
+
+    if (biasTensor.HasMultipleQuantizationScales())
     {
-        // Print the float values with extra precision to see very small differences
-        std::stringstream msg;
-        msg << std::setprecision(10) << descName << ": Expected " << expectedScale <<
-            " quantization scale for bias tensor (the product of the input and weight scales), but got " <<
-            biasTensor.GetQuantizationScale();
-        throw InvalidArgumentException(msg.str());
+        // Validate per-axis quantization scales
+        const std::vector<float>& weightScales = weightsTensorInfo.GetQuantizationScales();
+        const std::vector<float>& biasScales   = biasTensor.GetQuantizationScales();
+
+        if (weightScales.size() != biasScales.size())
+        {
+            std::stringstream msg;
+            msg << descName << ": Expected matchhing number of per-axis quantization scales, but got different "
+                << "values: weights=" << weightScales.size()  << ", biases=" << biasScales.size();
+            throw InvalidArgumentException(msg.str(), CHECK_LOCATION());
+        }
+
+        for (size_t i = 0ul; i < biasScales.size(); ++i)
+        {
+            const float expectedScale = inputTensorInfo.GetQuantizationScale() * weightScales[i];
+            VerifyBiasQuantizationScale(biasScales[i], expectedScale);
+        }
+    }
+    else
+    {
+        // Validate per-tensor quantization scale
+        const float expectedScale = inputTensorInfo.GetQuantizationScale() * weightsTensorInfo.GetQuantizationScale();
+        VerifyBiasQuantizationScale(biasTensor.GetQuantizationScale(), expectedScale);
     }
 }
 

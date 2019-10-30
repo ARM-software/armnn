@@ -34,6 +34,10 @@ public:
 
     void TypeEntity(ProfilingGuid entityGuid, const std::string& type);
 
+    ProfilingDynamicGuid CreateNamedTypedChildEntity(ProfilingGuid parentEntityGuid,
+                                                     const std::string& entityName,
+                                                     const std::string& entityType);
+
 private:
     ISendTimelinePacket& m_SendTimelinePacket;
 };

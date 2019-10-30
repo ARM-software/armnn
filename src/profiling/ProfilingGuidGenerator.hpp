@@ -25,8 +25,8 @@ public:
     // NOTE: dummy implementation for the moment
     inline ProfilingDynamicGuid NextGuid() override
     {
-        ProfilingDynamicGuid guid(m_Sequence);
-        m_Sequence++;
+        // NOTE: skipping the zero for testing purposes
+        ProfilingDynamicGuid guid(++m_Sequence);
         return guid;
     }
 

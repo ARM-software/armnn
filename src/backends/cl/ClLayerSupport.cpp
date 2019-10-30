@@ -28,6 +28,7 @@
 #include "workloads/ClDepthwiseConvolutionWorkload.hpp"
 #include "workloads/ClDequantizeWorkload.hpp"
 #include "workloads/ClDivisionFloatWorkload.hpp"
+#include "workloads/ClFloorFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClGreaterWorkload.hpp"
 #include "workloads/ClInstanceNormalizationWorkload.hpp"
@@ -384,15 +385,10 @@ bool ClLayerSupport::IsFloorSupported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    ignore_unused(output);
-    return IsClBackendSupported(reasonIfUnsupported) &&
-           IsSupportedForDataTypeGeneric(reasonIfUnsupported,
-                                         input.GetDataType(),
-                                         &FalseFuncF16<>,
-                                         &TrueFunc<>,
-                                         &FalseFuncU8<>,
-                                         &FalseFuncI32<>,
-                                         &FalseFuncU8<>);
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClFloorWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool ClLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,

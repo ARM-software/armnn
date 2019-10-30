@@ -12,6 +12,9 @@
 namespace armnn
 {
 
+arm_compute::Status ClFloorWorkloadValidate(const TensorInfo& input,
+                                            const TensorInfo& output);
+
 class ClFloorFloatWorkload : public FloatWorkload<FloorQueueDescriptor>
 {
 public:

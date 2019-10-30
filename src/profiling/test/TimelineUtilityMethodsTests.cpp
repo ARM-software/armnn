@@ -231,6 +231,57 @@ void VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType relationsh
     offset += uint64_t_size;
 }
 
+void VerifyTimelineEntityPacket(Optional<ProfilingGuid> guid,
+                                const unsigned char* readableData,
+                                unsigned int& offset)
+{
+    BOOST_ASSERT(readableData);
+
+    // Utils
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+
+    // Reading TimelineEntityClassBinaryPacket
+    uint32_t entityBinaryPacketHeaderWord0 = ReadUint32(readableData, offset);
+    uint32_t entityBinaryPacketFamily = (entityBinaryPacketHeaderWord0 >> 26) & 0x0000003F;
+    uint32_t entityBinaryPacketClass = (entityBinaryPacketHeaderWord0 >> 19) & 0x0000007F;
+    uint32_t entityBinaryPacketType = (entityBinaryPacketHeaderWord0 >> 16) & 0x00000007;
+    uint32_t entityBinaryPacketStreamId = (entityBinaryPacketHeaderWord0 >>  0) & 0x00000007;
+
+    BOOST_CHECK(entityBinaryPacketFamily == 1);
+    BOOST_CHECK(entityBinaryPacketClass  == 0);
+    BOOST_CHECK(entityBinaryPacketType   == 1);
+    BOOST_CHECK(entityBinaryPacketStreamId     == 0);
+
+    offset += uint32_t_size;
+    uint32_t entityBinaryPacketHeaderWord1 = ReadUint32(readableData, offset);
+    uint32_t entityBinaryPacketSequenceNumbered = (entityBinaryPacketHeaderWord1 >> 24) & 0x00000001;
+    uint32_t entityBinaryPacketDataLength       = (entityBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
+    BOOST_CHECK(entityBinaryPacketSequenceNumbered == 0);
+    BOOST_CHECK(entityBinaryPacketDataLength       == 8);
+
+    // Check the decl_id
+    offset += uint32_t_size;
+    uint32_t entitytDecId = ReadUint32(readableData, offset);
+
+    BOOST_CHECK(entitytDecId == uint32_t(1));
+
+    // Check the profiling GUID
+    offset += uint32_t_size;
+    uint64_t readProfilingGuid = ReadUint64(readableData, offset);
+
+    if (guid.has_value())
+    {
+        BOOST_CHECK(readProfilingGuid == guid.value());
+    }
+    else
+    {
+        BOOST_CHECK(readProfilingGuid != ProfilingGuid(0));
+    }
+
+    offset += uint64_t_size;
+}
+
 } // Anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(TimelineUtilityMethodsTests)
@@ -363,6 +414,96 @@ BOOST_AUTO_TEST_CASE(DeclareLabelTest)
     //BOOST_CHECK_NO_THROW(labelGuid = timelineUtilityMethods.DeclareLabel(labelName));
     //BOOST_CHECK(newLabelGuid != ProfilingGuid(0));
     //BOOST_CHECK(newLabelGuid == labelGuid);
+}
+
+BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
+{
+    MockBufferManager mockBufferManager(1024);
+    SendTimelinePacket sendTimelinePacket(mockBufferManager);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+
+    // Invalid name
+    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity("", "Type"), InvalidArgumentException);
+
+    // Invalid type
+    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity("Name", ""), InvalidArgumentException);
+
+}
+
+BOOST_AUTO_TEST_CASE(CreateNameTypeEntitylTest)
+{
+    MockBufferManager mockBufferManager(1024);
+    SendTimelinePacket sendTimelinePacket(mockBufferManager);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+
+    const std::string entityName = "Entity0";
+    const std::string entityType = "Type0";
+
+    // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
+    ProfilingService::Instance().NextGuid();
+
+    ProfilingDynamicGuid guid = timelineUtilityMethods.CreateNamedTypedEntity(entityName, entityType);
+    BOOST_CHECK(guid != ProfilingGuid(0));
+
+    // Commit all packets at once
+    sendTimelinePacket.Commit();
+
+    // Get the readable buffer
+    auto readableBuffer = mockBufferManager.GetReadableBuffer();
+    BOOST_CHECK(readableBuffer != nullptr);
+    unsigned int size = readableBuffer->GetSize();
+    BOOST_CHECK(size == 244);
+    const unsigned char* readableData = readableBuffer->GetReadableData();
+    BOOST_CHECK(readableData != nullptr);
+
+    // Utils
+    unsigned int offset = 0;
+
+    // First packet sent: TimelineEntityBinaryPacket
+    VerifyTimelineEntityPacket(guid, readableData, offset);
+
+    // Packets for Name Entity
+    // First packet sent: TimelineLabelBinaryPacket
+    VerifyTimelineLabelBinaryPacket(EmptyOptional(), entityName, readableData, offset);
+
+    // Second packet sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Third packet sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::NAME_GUID,
+                                           readableData,
+                                           offset);
+
+    // Packets for Type Entity
+    // First packet sent: TimelineLabelBinaryPacket
+    VerifyTimelineLabelBinaryPacket(EmptyOptional(), entityType, readableData, offset);
+
+    // Second packet sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Third packet sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Mark the buffer as read
+    mockBufferManager.MarkRead(readableBuffer);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

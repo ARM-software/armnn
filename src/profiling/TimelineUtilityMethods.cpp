@@ -34,6 +34,35 @@ void TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses()
     m_SendTimelinePacket.SendTimelineEventClassBinaryPacket(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
 }
 
+ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedEntity(const std::string& name, const std::string& type)
+{
+    // Check that the entity name is valid
+    if (name.empty())
+    {
+        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+    }
+
+    // Check that the entity type is valid
+    if (type.empty())
+    {
+        throw InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
+    }
+
+    // Generate dynamic GUID of the entity
+    ProfilingDynamicGuid entityGuid = ProfilingService::Instance().NextGuid();
+
+    // Send Entity Binary Packet of the entity to the external profiling service
+    m_SendTimelinePacket.SendTimelineEntityBinaryPacket(entityGuid);
+
+    // Create name entity and send the relationship of the entity with the given name
+    NameEntity(entityGuid, name);
+
+    // Create type entity and send the relationship of the entity with the given type
+    TypeEntity(entityGuid, type);
+
+    return entityGuid;
+}
+
 ProfilingStaticGuid TimelineUtilityMethods::DeclareLabel(const std::string& labelName)
 {
     // Check that the label name is valid
@@ -83,6 +112,16 @@ void TimelineUtilityMethods::CreateTypedLabel(ProfilingGuid entityGuid,
                                                               relationshipLabelGuid,
                                                               relationshipGuid,
                                                               labelTypeGuid);
+}
+
+void TimelineUtilityMethods::NameEntity(ProfilingGuid entityGuid, const std::string& name)
+{
+    CreateTypedLabel(entityGuid, name, LabelsAndEventClasses::NAME_GUID);
+}
+
+void TimelineUtilityMethods::TypeEntity(ProfilingGuid entityGuid, const std::string& type)
+{
+    CreateTypedLabel(entityGuid, type, LabelsAndEventClasses::TYPE_GUID);
 }
 
 } // namespace profiling

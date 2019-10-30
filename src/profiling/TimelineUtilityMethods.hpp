@@ -24,8 +24,15 @@ public:
 
     void SendWellKnownLabelsAndEventClasses();
 
-    ProfilingStaticGuid DeclareLabel(const std::string& labelName);
+    ProfilingDynamicGuid CreateNamedTypedEntity(const std::string& name, const std::string& type);
+
     void CreateTypedLabel(ProfilingGuid entityGuid, const std::string& entityName, ProfilingStaticGuid labelTypeGuid);
+
+    ProfilingStaticGuid DeclareLabel(const std::string& labelName);
+
+    void NameEntity(ProfilingGuid entityGuid, const std::string& name);
+
+    void TypeEntity(ProfilingGuid entityGuid, const std::string& type);
 
 private:
     ISendTimelinePacket& m_SendTimelinePacket;

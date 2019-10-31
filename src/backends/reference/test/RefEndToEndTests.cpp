@@ -6,6 +6,7 @@
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
 #include <backendsCommon/test/AbsEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
@@ -1039,6 +1040,111 @@ BOOST_AUTO_TEST_CASE(RefInstanceNormalizationNhwcEndToEndTest2)
 BOOST_AUTO_TEST_CASE(RefInstanceNormalizationNchwEndToEndTest2)
 {
     InstanceNormalizationNchwEndToEndTest2(defaultBackends);
+}
+
+// ArgMinMax
+BOOST_AUTO_TEST_CASE(RefArgMaxSimpleTest)
+{
+    ArgMaxEndToEndSimple<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxSimpleUint8Test)
+{
+    ArgMaxEndToEndSimple<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinSimpleTest)
+{
+    ArgMinEndToEndSimple<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinSimpleUint8Test)
+{
+    ArgMinEndToEndSimple<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxAxis0Test)
+{
+    ArgMaxAxis0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxAxis0Uint8Test)
+{
+    ArgMaxAxis0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinAxis0Test)
+{
+    ArgMinAxis0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinAxis0Uint8Test)
+{
+
+    ArgMinAxis0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxAxis1Test)
+{
+    ArgMaxAxis1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxAxis1Uint8Test)
+{
+    ArgMaxAxis1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinAxis1Test)
+{
+    ArgMinAxis1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinAxis1Uint8Test)
+{
+
+    ArgMinAxis1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxAxis2Test)
+{
+    ArgMaxAxis2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxAxis2Uint8Test)
+{
+    ArgMaxAxis2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinAxis2Test)
+{
+    ArgMinAxis2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinAxis2Uint8Test)
+{
+
+    ArgMinAxis2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxAxis3Test)
+{
+    ArgMaxAxis3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMaxAxis3Uint8Test)
+{
+    ArgMaxAxis3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinAxis3Test)
+{
+    ArgMinAxis3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(RefArgMinAxis3Uint8Test)
+{
+
+    ArgMinAxis3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
 }
 
 #if !defined(__ANDROID__)

@@ -110,7 +110,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject->IsArgMinMaxSupported(
                     OverrideDataType(input, dataType),
-                    OverrideDataType(output, dataType),
+                    OverrideDataType(output, DataType::Signed32),
                     descriptor,
                     reason);
             break;

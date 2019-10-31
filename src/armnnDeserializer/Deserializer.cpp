@@ -461,7 +461,7 @@ armnn::ResizeMethod ToResizeMethod(armnnSerializer::ResizeMethod method)
         case armnnSerializer::ResizeMethod_NearestNeighbor:
             return armnn::ResizeMethod::NearestNeighbor;
         case armnnSerializer::ResizeMethod_Bilinear:
-            return armnn::ResizeMethod::NearestNeighbor;
+            return armnn::ResizeMethod::Bilinear;
         default:
             return armnn::ResizeMethod::NearestNeighbor;
     }

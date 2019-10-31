@@ -3,35 +3,33 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/ILayerVisitor.hpp>
-#include <armnn/INetwork.hpp>
-#include <armnn/Tensor.hpp>
-#include <armnn/Types.hpp>
-#include <TensorUtils.hpp>
-#include <TensorIOUtils.hpp>
-
+#include "NetworkQuantizer.hpp"
+#include "NetworkQuantizerUtils.hpp"
 #include "Graph.hpp"
 #include "Layer.hpp"
 #include "Network.hpp"
-#include "NetworkQuantizer.hpp"
-#include "NetworkQuantizerUtils.hpp"
-
 #include "DynamicQuantizationVisitor.hpp"
 #include "StaticRangeVisitor.hpp"
 #include "QuantizerVisitor.hpp"
 #include "OverrideInputRangeVisitor.hpp"
 
-#include <vector>
-#include <cmath>
+#include <armnn/ILayerVisitor.hpp>
+#include <armnn/INetwork.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+
+#include <TensorUtils.hpp>
+#include <TensorIOUtils.hpp>
 
 #include <boost/variant.hpp>
 
+#include <vector>
+#include <cmath>
 
 namespace armnn
 {
 
 using TContainer = boost::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>>;
-
 
 INetworkQuantizer* INetworkQuantizer::CreateRaw(INetwork* inputNetwork, const QuantizerOptions& options)
 {

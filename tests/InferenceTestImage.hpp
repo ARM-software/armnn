@@ -128,15 +128,15 @@ enum class ImageChannelLayout
 // and now lie in the range [0,1]. Channel data is stored according to the ArmNN layout (CHW). The order in which
 // channels appear in the resulting vector is defined by the provided layout.
 std::vector<float> GetImageDataInArmNnLayoutAsNormalizedFloats(ImageChannelLayout layout,
-    const InferenceTestImage& image);
+                                                               const InferenceTestImage& image);
 
 // Reads the contents of an inference test image as 3-channel pixels, whose value is the result of subtracting the mean
 // from the values in the original image. Channel data is stored according to the ArmNN layout (CHW). The order in
 // which channels appear in the resulting vector is defined by the provided layout. The order of the channels of the
 // provided mean should also match the given layout.
 std::vector<float> GetImageDataInArmNnLayoutAsFloatsSubtractingMean(ImageChannelLayout layout,
-    const InferenceTestImage& image,
-    const std::array<float, 3>& mean);
+                                                                    const InferenceTestImage& image,
+                                                                    const std::array<float, 3>& mean);
 
 // Reads the contents of an inference test image as 3-channel pixels and returns the image data as normalized float
 // values. The returned image stay in the original order (HWC) order. The C order may be changed according to the

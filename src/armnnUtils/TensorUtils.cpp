@@ -4,55 +4,58 @@
 //
 
 #include "TensorUtils.hpp"
+
 #include <backendsCommon/ITensorHandle.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+using namespace armnn;
+
 namespace armnnUtils
 {
 
-armnn::TensorShape GetTensorShape(unsigned int numberOfBatches,
+TensorShape GetTensorShape(unsigned int numberOfBatches,
                                   unsigned int numberOfChannels,
                                   unsigned int height,
                                   unsigned int width,
-                                  const armnn::DataLayout dataLayout)
+                                  const DataLayout dataLayout)
 {
     switch (dataLayout)
     {
-        case armnn::DataLayout::NCHW:
-            return armnn::TensorShape({numberOfBatches, numberOfChannels, height, width});
-        case armnn::DataLayout::NHWC:
-            return armnn::TensorShape({numberOfBatches, height, width, numberOfChannels});
+        case DataLayout::NCHW:
+            return TensorShape({numberOfBatches, numberOfChannels, height, width});
+        case DataLayout::NHWC:
+            return TensorShape({numberOfBatches, height, width, numberOfChannels});
         default:
-            throw armnn::InvalidArgumentException("Unknown data layout ["
+            throw InvalidArgumentException("Unknown data layout ["
                                                   + std::to_string(static_cast<int>(dataLayout)) +
                                                   "]", CHECK_LOCATION());
     }
 }
 
-armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
+TensorInfo GetTensorInfo(unsigned int numberOfBatches,
                                 unsigned int numberOfChannels,
                                 unsigned int height,
                                 unsigned int width,
-                                const armnn::DataLayout dataLayout,
-                                const armnn::DataType dataType)
+                                const DataLayout dataLayout,
+                                const DataType dataType)
 {
     switch (dataLayout)
     {
-        case armnn::DataLayout::NCHW:
-            return armnn::TensorInfo({numberOfBatches, numberOfChannels, height, width}, dataType);
-        case armnn::DataLayout::NHWC:
-            return armnn::TensorInfo({numberOfBatches, height, width, numberOfChannels}, dataType);
+        case DataLayout::NCHW:
+            return TensorInfo({numberOfBatches, numberOfChannels, height, width}, dataType);
+        case DataLayout::NHWC:
+            return TensorInfo({numberOfBatches, height, width, numberOfChannels}, dataType);
         default:
-            throw armnn::InvalidArgumentException("Unknown data layout ["
+            throw InvalidArgumentException("Unknown data layout ["
                                                   + std::to_string(static_cast<int>(dataLayout)) +
                                                   "]", CHECK_LOCATION());
     }
 }
 
-std::pair<float, float> FindMinMax(armnn::ITensorHandle* tensorHandle)
+std::pair<float, float> FindMinMax(ITensorHandle* tensorHandle)
 {
     auto tensor_data = static_cast<const float *>(tensorHandle->Map(true));
     auto tensor_size = tensorHandle->GetShape().GetNumElements();
@@ -79,13 +82,13 @@ std::pair<float, float> FindMinMax(armnn::ITensorHandle* tensorHandle)
     return std::make_pair(min, max);
 }
 
-armnn::TensorShape ExpandDims(const armnn::TensorShape& tensorShape, int axis)
+TensorShape ExpandDims(const TensorShape& tensorShape, int axis)
 {
     unsigned int outputDim = tensorShape.GetNumDimensions() + 1;
 
     if (axis < -boost::numeric_cast<int>(outputDim) || axis > boost::numeric_cast<int>(tensorShape.GetNumDimensions()))
     {
-        throw armnn::InvalidArgumentException(
+        throw InvalidArgumentException(
             boost::str(boost::format("Invalid expansion axis %1% for %2%D input tensor. %3%") %
                        axis %
                        tensorShape.GetNumDimensions() %
@@ -104,10 +107,10 @@ armnn::TensorShape ExpandDims(const armnn::TensorShape& tensorShape, int axis)
     }
     outputShape.insert(outputShape.begin() + axis, 1);
 
-    return armnn::TensorShape(outputDim, outputShape.data());
+    return TensorShape(outputDim, outputShape.data());
 }
 
-unsigned int GetNumElementsBetween(const armnn::TensorShape& shape,
+unsigned int GetNumElementsBetween(const TensorShape& shape,
                                    const unsigned int firstAxisInclusive,
                                    const unsigned int lastAxisExclusive)
 {
@@ -135,4 +138,4 @@ unsigned int GetUnsignedAxis(const unsigned int inputDimension, const int axis)
     return uAxis;
 }
 
-}
+} // namespace armnnUtils

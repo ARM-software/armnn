@@ -6,8 +6,6 @@
 
 #include "armnn/TypesUtils.hpp"
 
-#include <vector>
-
 namespace armnn
 {
 

@@ -195,7 +195,7 @@ void ValidateBiasTensorQuantization(const TensorInfo& biasTensor,
     // Helper lambda function to validate a single bias quantization scale value
     auto VerifyBiasQuantizationScale = [&descName](float biasScale, float expectedScale) -> void
     {
-        constexpr float tolerance = 0.00000001f;
+        constexpr float tolerance = 0.000001f;
         if (std::abs(biasScale - expectedScale) > tolerance)
         {
             // Print the float values with extra precision to see very small differences

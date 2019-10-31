@@ -916,6 +916,11 @@ void SendCounterPacket::Start(IProfilingConnection& profilingConnection)
         return;
     }
 
+    if (m_SendThread.joinable())
+    {
+        m_SendThread.join();
+    }
+
     // Mark the send thread as running
     m_IsRunning.store(true);
 

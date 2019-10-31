@@ -22,6 +22,7 @@ option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OF
 option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
 option(DYNAMIC_BACKEND_PATHS "Colon seperated list of paths where to load the dynamic backends from" "")
 option(BUILD_GATORD_MOCK "Build the Gatord simulator for external profiling testing." ON)
+option(SHARED_BOOST "Use dynamic linking for boost libraries" OFF)
 
 include(SelectLibraryConfigurations)
 
@@ -108,8 +109,13 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
 # Boost
+if(SHARED_BOOST)
+    add_definitions(-DBOOST_ALL_DYN_LINK)
+    set(Boost_USE_STATIC_LIBS OFF)
+else()
+    set(Boost_USE_STATIC_LIBS ON)
+endif()
 add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
-set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework system filesystem log program_options)
 include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
 link_directories(${Boost_LIBRARY_DIRS})

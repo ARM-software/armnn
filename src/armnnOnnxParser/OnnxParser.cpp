@@ -187,16 +187,10 @@ std::string ReadOptionalNodeStringAttribute(const onnx::NodeProto& node, const s
     return attribValue;
 }
 
-armnn::TensorInfo ToTensorInfo(const onnx::ValueInfoProto& info)
+armnn::TensorInfo ToTensorInfo(const std::string& name, std::vector<unsigned int>& shape, int data_type)
 {
-  const onnx::TensorShapeProto onnxShape = info.type().tensor_type().shape();
-  std::vector<unsigned int> shapeDims;
-  for (int i = 0; i < onnxShape.dim_size(); ++i)
-  {
-      shapeDims.push_back(CHECKED_NON_NEGATIVE(CHECKED_INT32(onnxShape.dim(i).dim_value())));
-  }
   DataType type;
-  switch(info.type().tensor_type().elem_type())
+  switch(data_type)
   {
       case onnx::TensorProto::FLOAT:
       {
@@ -216,13 +210,35 @@ armnn::TensorInfo ToTensorInfo(const onnx::ValueInfoProto& info)
                   boost::format("'%1%' is not a currently supported datatype for tensor %2%."
                                 " Supported dataTypes are FLOAT, INT32 and INT64.  %3%") %
                                 onnx::TensorProto::DataType_Name(
-                                    static_cast<onnx::TensorProto::DataType>(info.type().tensor_type().elem_type())) %
-                                info.name() %
+                                    static_cast<onnx::TensorProto::DataType>(data_type)) %
+                                name %
                                 CHECK_LOCATION().AsString() ));
       }
-
   }
-  return TensorInfo(TensorShape(static_cast<unsigned int>(shapeDims.size()), shapeDims.data()), type);
+  return TensorInfo(TensorShape(static_cast<unsigned int>(shape.size()), shape.data()), type);
+}
+
+armnn::TensorInfo ToTensorInfo(const onnx::ValueInfoProto& info)
+{
+  const onnx::TensorShapeProto onnxShape = info.type().tensor_type().shape();
+  std::vector<unsigned int> shapeDims;
+  for (int i = 0; i < onnxShape.dim_size(); ++i)
+  {
+      shapeDims.push_back(CHECKED_NON_NEGATIVE(CHECKED_INT32(onnxShape.dim(i).dim_value())));
+  }
+
+  return ToTensorInfo(info.name(), shapeDims, info.type().tensor_type().elem_type());
+}
+
+armnn::TensorInfo ToTensorInfo(const onnx::TensorProto& tensor)
+{
+  std::vector<unsigned int> shapeDims;
+  for (auto dim: tensor.dims())
+  {
+      shapeDims.push_back(CHECKED_NON_NEGATIVE(CHECKED_INT32(dim)));
+  }
+
+  return ToTensorInfo(tensor.name(), shapeDims, tensor.data_type());
 }
 
 std::string TensorInfoAsString(const TensorInfo& info,
@@ -580,6 +596,9 @@ void OnnxParser::LoadGraph()
     for (auto tensor : m_Graph->initializer())
     {
         m_TensorsInfo[tensor.name()].m_tensor = std::make_unique<const onnx::TensorProto>(tensor);
+        m_TensorsInfo[tensor.name()].m_info = std::make_unique<TensorInfo>(ToTensorInfo(tensor));
+        m_TensorsInfo[tensor.name()].m_dtype =
+            static_cast<onnx::TensorProto::DataType>(tensor.data_type());
     }
 
     SetupInputLayers();

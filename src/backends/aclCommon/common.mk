@@ -16,4 +16,5 @@ COMMON_SOURCES := \
 # up by the Android.mk file in the root of ArmNN
 
 COMMON_TEST_SOURCES := \
+    test/ArmComputeTensorUtilsTests.cpp \
     test/MemCopyTests.cpp

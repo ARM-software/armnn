@@ -4,6 +4,7 @@
 #
 
 list(APPEND armnnAclCommonUnitTests_sources
+    ArmComputeTensorUtilsTests.cpp
     CreateWorkloadClNeon.hpp
     MemCopyTests.cpp
     MemCopyTestImpl.hpp

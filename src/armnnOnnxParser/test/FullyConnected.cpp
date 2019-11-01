@@ -56,6 +56,7 @@ struct MatMulFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser:
                         }
                         initializer {
                           dims: 1
+                          dims: 1
                           data_type: 1
                           float_data: 17.0
                           name: "Const"
@@ -144,6 +145,7 @@ struct FullyConnectedFixture : public armnnUtils::ParserPrototxtFixture<armnnOnn
                           }
                         }
                         initializer {
+                          dims: 1
                           dims: 1
                           data_type: 1
                           float_data: 2
@@ -283,6 +285,7 @@ struct MatMulUsedInTwoFcFixture : public armnnUtils::ParserPrototxtFixture<armnn
                           }
                         }
                         initializer {
+                          dims: 1
                           dims: 1
                           data_type: 1
                           float_data: 2
@@ -487,6 +490,7 @@ struct MatMulUsedInTwoFcStaggeredFixture : public armnnUtils::ParserPrototxtFixt
                           }
                         }
                         initializer {
+                          dims: 1
                           dims: 1
                           data_type: 1
                           float_data: 2

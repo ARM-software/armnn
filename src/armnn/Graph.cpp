@@ -490,9 +490,22 @@ void Graph::InferTensorInfos()
     {
         for (auto&& input : layer->GetInputSlots())
         {
-            boost::ignore_unused(input);
-            BOOST_ASSERT_MSG(input.GetConnectedOutputSlot()->IsTensorInfoSet(),
-                             "All inputs must have the TensorInfo set at this point.");
+            const IOutputSlot* source = input.GetConnectedOutputSlot();
+            if (source == NULL)
+            {
+                std::ostringstream message;
+                message << "Input not connected on "
+                        << GetLayerTypeAsCString(layer->GetType())
+                        << " layer \""
+                        << layer->GetName()
+                        << "\"";
+                throw LayerValidationException(message.str());
+            }
+
+            if (!source->IsTensorInfoSet())
+            {
+                throw LayerValidationException("All inputs must have the TensorInfo set at this point.");
+            }
         }
         layer->ValidateTensorShapesFromInputs();
     }

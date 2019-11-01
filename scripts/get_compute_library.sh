@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_19_08" # Release 19.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="79f88e6d825402388bb79fc123ee2dfe01985bda" #COMPMID-2313: Implement CL INSTANCE_NORMALIZATION function
+DEFAULT_CLFRAMEWORKREVISION="94e0cf960ea6116eb57fa88d9b951f859b52c602" #COMPMID-2690 Extend Doxygen documents to include GEMM Tuner
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

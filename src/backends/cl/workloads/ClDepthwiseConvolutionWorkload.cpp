@@ -118,8 +118,8 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     bool use3x3Optimisation = (weightInfo.GetShape()[2] == 3) && (weightInfo.GetShape()[3] == 3);
     if (use3x3Optimisation)
     {
-        m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer3x3>();
-        static_cast<arm_compute::CLDepthwiseConvolutionLayer3x3*>(m_DepthwiseConvolutionLayer.get())->configure(
+        m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer>();
+        static_cast<arm_compute::CLDepthwiseConvolutionLayer*>(m_DepthwiseConvolutionLayer.get())->configure(
             &input,
             m_KernelTensor.get(),
             m_BiasTensor.get(),

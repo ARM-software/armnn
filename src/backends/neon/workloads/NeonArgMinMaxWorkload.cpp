@@ -59,20 +59,24 @@ NeonArgMinMaxWorkload::NeonArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& des
     auto unsignedAxis = armnnUtils::GetUnsignedAxis(numDims, m_Data.m_Parameters.m_Axis);
     int aclAxis = boost::numeric_cast<int>(CalcAclAxis(numDims, unsignedAxis));
 
+    auto layer = std::make_unique<arm_compute::NEArgMinMaxLayer>();
+
     if (m_Data.m_Parameters.m_Function == ArgMinMaxFunction::Max)
     {
-        m_ArgMinMaxLayer.configure(&input, aclAxis, &output, arm_compute::ReductionOperation::ARG_IDX_MAX);
+        layer->configure(&input, aclAxis, &output, arm_compute::ReductionOperation::ARG_IDX_MAX);
     }
     else
     {
-        m_ArgMinMaxLayer.configure(&input, aclAxis, &output, arm_compute::ReductionOperation::ARG_IDX_MIN);
+        layer->configure(&input, aclAxis, &output, arm_compute::ReductionOperation::ARG_IDX_MIN);
     }
+
+    m_ArgMinMaxLayer.reset(layer.release());
 }
 
 void NeonArgMinMaxWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON("NeonArgMinMaxWorkload_Execute");
-    m_ArgMinMaxLayer.run();
+    m_ArgMinMaxLayer->run();
 }
 
 } //namespace armnn

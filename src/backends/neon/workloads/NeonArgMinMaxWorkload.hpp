@@ -8,7 +8,8 @@
 #include <backendsCommon/Workload.hpp>
 
 #include <arm_compute/core/Error.h>
-#include <arm_compute/runtime/NEON/functions/NEArgMinMaxLayer.h>
+#include <arm_compute/runtime/IFunction.h>
+
 namespace armnn
 {
 
@@ -23,7 +24,7 @@ public:
     virtual void Execute() const override;
 
 private:
-    mutable arm_compute::NEArgMinMaxLayer m_ArgMinMaxLayer;
+    std::unique_ptr<arm_compute::IFunction> m_ArgMinMaxLayer;
 };
 
 } //namespace armnn

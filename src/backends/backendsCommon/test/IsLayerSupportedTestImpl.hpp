@@ -203,6 +203,8 @@ struct DummyConvolutionLayer
     DummyConvolutionLayer()
     {
         typename ConvolutionLayerType::DescriptorType desc;
+        desc.m_StrideX = 1;
+        desc.m_StrideY = 1;
         m_Layer = dummyGraph.AddLayer<ConvolutionLayerType>(desc, "");
         m_Layer->m_Weight = std::make_unique<armnn::ScopedCpuTensorHandle>(
             armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));

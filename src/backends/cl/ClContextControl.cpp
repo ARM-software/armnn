@@ -104,7 +104,7 @@ void ClContextControl::DoLoadOpenClRuntime(bool useTunedParameters)
     cl::Context context;
     cl::CommandQueue commandQueue;
 
-    if (arm_compute::CLScheduler::get().context()() != NULL)
+    if (arm_compute::CLScheduler::get().is_initialised() && arm_compute::CLScheduler::get().context()() != NULL)
     {
         // Wait for all queued CL requests to finish before reinitialising it.
         arm_compute::CLScheduler::get().sync();

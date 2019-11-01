@@ -14,6 +14,7 @@
 namespace armnn
 {
 class TensorInfo;
+enum class ActivationFunction;
 }
 
 namespace armnnOnnxParser
@@ -103,7 +104,12 @@ private:
     void AddPoolingLayer(const onnx::NodeProto& nodeProto, armnn::Pooling2dDescriptor& desc);
 
     void ParseReshape(const onnx::NodeProto& nodeProto);
+
+    void ParseActivation(const onnx::NodeProto& nodeProto, const armnn::ActivationFunction func);
+    void ParseSigmoid(const onnx::NodeProto& nodeProto);
+    void ParseTanh(const onnx::NodeProto& nodeProto);
     void ParseRelu(const onnx::NodeProto& nodeProto);
+    void ParseLeakyRelu(const onnx::NodeProto& nodeProto);
 
     void AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, const armnn::Convolution2dDescriptor& convDesc);
     void ParseConv(const onnx::NodeProto& nodeProto);

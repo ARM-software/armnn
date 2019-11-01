@@ -337,7 +337,10 @@ const std::map<std::string, OnnxParser::OperationParsingFunction> OnnxParser::m_
     { "Constant",              &OnnxParser::ParseConstant },
     { "MaxPool",               &OnnxParser::ParseMaxPool },
     { "Reshape",               &OnnxParser::ParseReshape },
+    { "Sigmoid",               &OnnxParser::ParseSigmoid },
+    { "Tanh",                  &OnnxParser::ParseTanh },
     { "Relu",                  &OnnxParser::ParseRelu },
+    { "LeakyRelu",             &OnnxParser::ParseLeakyRelu },
     { "Conv",                  &OnnxParser::ParseConv },
     { "Add",                   &OnnxParser::ParseAdd },
 };
@@ -1083,7 +1086,7 @@ void OnnxParser::ParseReshape(const onnx::NodeProto& node)
     }
 }
 
-void OnnxParser::ParseRelu(const onnx::NodeProto& node)
+void OnnxParser::ParseActivation(const onnx::NodeProto& node, const armnn::ActivationFunction func)
 {
     CHECK_VALID_SIZE(static_cast<size_t>(node.input_size()), 1);
     CHECK_VALID_SIZE(static_cast<size_t>(node.output_size()), 1);
@@ -1091,7 +1094,7 @@ void OnnxParser::ParseRelu(const onnx::NodeProto& node)
     VALID_INPUTS(node, STR_LIST(onnx::TensorProto::FLOAT));
 
     ActivationDescriptor desc;
-    desc.m_Function = ActivationFunction::ReLu;
+    desc.m_Function = func;
 
     IConnectableLayer* const layer = m_Network->AddActivationLayer(desc, node.name().c_str());
     BOOST_ASSERT(layer != nullptr);
@@ -1107,6 +1110,25 @@ void OnnxParser::ParseRelu(const onnx::NodeProto& node)
     RegisterOutputSlots(layer, {node.output(0)});
 }
 
+void OnnxParser::ParseSigmoid(const onnx::NodeProto& node)
+{
+    ParseActivation(node, ActivationFunction::Sigmoid);
+}
+
+void OnnxParser::ParseTanh(const onnx::NodeProto& node)
+{
+    ParseActivation(node, ActivationFunction::TanH);
+}
+
+void OnnxParser::ParseRelu(const onnx::NodeProto& node)
+{
+    ParseActivation(node, ActivationFunction::ReLu);
+}
+
+void OnnxParser::ParseLeakyRelu(const onnx::NodeProto& node)
+{
+    ParseActivation(node, ActivationFunction::LeakyReLu);
+}
 
 void OnnxParser::AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, const Convolution2dDescriptor& convDesc)
 {

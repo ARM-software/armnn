@@ -17,20 +17,20 @@
 namespace
 {
 
-template<typename T, std::size_t Dim>
-LayerTestResult<float, Dim> DequantizeTestImpl(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::TensorInfo& inputTensorInfo,
-    const armnn::TensorInfo& outputTensorInfo,
-    const std::vector<T>& inputData,
-    const std::vector<float>& expectedOutputData,
-    armnn::DequantizeQueueDescriptor descriptor)
+template<typename T, std::size_t Dim, typename T1=float>
+LayerTestResult<T1, Dim> DequantizeTestImpl(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::TensorInfo& inputTensorInfo,
+        const armnn::TensorInfo& outputTensorInfo,
+        const std::vector<T>& inputData,
+        const std::vector<T1>& expectedOutputData,
+        armnn::DequantizeQueueDescriptor descriptor)
 {
     boost::multi_array<T, Dim> input = MakeTensor<T, Dim>(inputTensorInfo, inputData);
 
-    LayerTestResult<float, Dim> ret(outputTensorInfo);
-    ret.outputExpected = MakeTensor<float, Dim>(outputTensorInfo, expectedOutputData);
+    LayerTestResult<T1, Dim> ret(outputTensorInfo);
+    ret.outputExpected = MakeTensor<T1, Dim>(outputTensorInfo, expectedOutputData);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = workloadFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputTensorInfo);
@@ -53,8 +53,10 @@ LayerTestResult<float, Dim> DequantizeTestImpl(
     return ret;
 }
 
-template <armnn::DataType ArmnnInputType>
-LayerTestResult<float, 4> DequantizeSimpleTest(
+template <armnn::DataType ArmnnInputType,
+          armnn::DataType ArmnnOutputType=armnn::DataType::Float32,
+          typename OutType=armnn::ResolveType<ArmnnOutputType>>
+LayerTestResult<OutType, 4> DequantizeSimpleTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
@@ -63,7 +65,7 @@ LayerTestResult<float, 4> DequantizeSimpleTest(
     armnn::DequantizeQueueDescriptor desc;
 
     const armnn::TensorInfo inputTensorInfo({1, 2, 2, 3}, ArmnnInputType, 0.5f, 0);
-    const armnn::TensorInfo outputTensorInfo({1, 2, 2, 3}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo({1, 2, 2, 3}, ArmnnOutputType);
 
     std::vector<T> inputData = std::vector<T>(
     {
@@ -73,21 +75,19 @@ LayerTestResult<float, 4> DequantizeSimpleTest(
         20, 22, 24,
     });
 
-    std::vector<float> expectedOutputData = std::vector<float>(
+    std::vector<OutType> expectedOutputData;
+    for (OutType i = OutType(1); i <= OutType(12); ++i)
     {
-        1.0f,   2.0f,  3.0f,
-        4.0f,   5.0f,  6.0f,
-        7.0f,   8.0f,  9.0f,
-        10.0f, 11.0f, 12.0f,
-    });
+        expectedOutputData.push_back(i);
+    }
 
-    return DequantizeTestImpl<T, 4>(workloadFactory,
-                                    memoryManager,
-                                    inputTensorInfo,
-                                    outputTensorInfo,
-                                    inputData,
-                                    expectedOutputData,
-                                    desc);
+    return DequantizeTestImpl<T, 4, OutType>(workloadFactory,
+                                             memoryManager,
+                                             inputTensorInfo,
+                                             outputTensorInfo,
+                                             inputData,
+                                             expectedOutputData,
+                                             desc);
 }
 
 template <armnn::DataType ArmnnInputType>
@@ -148,4 +148,20 @@ LayerTestResult<float, 4> DequantizeSimpleInt16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return DequantizeSimpleTest<armnn::DataType::QuantisedSymm16>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> DequantizeSimpleUint8ToFp16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return DequantizeSimpleTest<armnn::DataType::QuantisedAsymm8, armnn::DataType::Float16>(workloadFactory,
+                                                                                            memoryManager);
+}
+
+LayerTestResult<armnn::Half, 4> DequantizeSimpleInt16ToFp16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return DequantizeSimpleTest<armnn::DataType::QuantisedSymm16, armnn::DataType::Float16>(workloadFactory,
+                                                                                            memoryManager);
 }

@@ -266,7 +266,7 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
 
             result = layerSupportObject->IsDequantizeSupported(OverrideDataType(input, dataType),
-                                                               OverrideDataType(output, DataType::Float32),
+                                                               output,
                                                                reason);
             break;
         }

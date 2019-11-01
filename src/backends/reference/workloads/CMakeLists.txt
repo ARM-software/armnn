@@ -28,6 +28,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     DepthToSpace.hpp
     DetectionPostProcess.cpp
     DetectionPostProcess.hpp
+    Dequantize.cpp
+    Dequantize.hpp
     ElementwiseFunction.cpp
     ElementwiseFunction.hpp
     Encoders.hpp

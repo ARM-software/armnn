@@ -325,8 +325,10 @@ BOOST_AUTO_TEST_CASE(DepthwiseConv2dUtils)
 }
 
 // Dequantize
+// Fp16 is only supported if __ARM_FEATURE_FP16_VECTOR_ARITHMETIC is enabled
 ARMNN_AUTO_TEST_CASE(DequantizeSimpleUint8, DequantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_CASE(DequantizeOffsetUint8, DequantizeOffsetUint8Test)
+ARMNN_AUTO_TEST_CASE(DequantizeSimpleInt16, DequantizeSimpleInt16Test)
 
 // Pooling
 ARMNN_AUTO_TEST_CASE(SimpleMaxPooling2dSize3x3Stride2x4, SimpleMaxPooling2dSize3x3Stride2x4Test, true)

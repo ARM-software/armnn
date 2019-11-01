@@ -31,6 +31,7 @@ BACKEND_SOURCES := \
         workloads/Debug.cpp \
         workloads/DepthToSpace.cpp \
         workloads/DetectionPostProcess.cpp \
+        workloads/Dequantize.cpp \
         workloads/ElementwiseFunction.cpp \
         workloads/FullyConnected.cpp \
         workloads/Gather.cpp \

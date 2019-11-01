@@ -5,6 +5,9 @@
 
 #include "RefDequantizeWorkload.hpp"
 #include "RefWorkloadUtils.hpp"
+#include "Encoders.hpp"
+#include "Decoders.hpp"
+#include "Dequantize.hpp"
 
 namespace armnn
 {
@@ -14,21 +17,12 @@ void RefDequantizeWorkload::Execute() const
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefDequantizeWorkload_Execute");
 
     const TensorInfo& inputInfo = GetTensorInfo(m_Data.m_Inputs[0]);
-    const DataType& inputDataType = inputInfo.GetDataType();
+    const TensorInfo& outputInfo = GetTensorInfo(m_Data.m_Outputs[0]);
 
-    float* outputData = GetOutputTensorData<float>(0, m_Data);
+    auto inputDecoder  = MakeDecoder<float>(inputInfo,  m_Data.m_Inputs[0]->Map());
+    auto outputEncoder = MakeEncoder<float>(outputInfo, m_Data.m_Outputs[0]->Map());
 
-    switch (inputDataType)
-    {
-        case DataType::QuantisedAsymm8:
-            Dequantize<uint8_t>(GetInputTensorData<uint8_t>(0, m_Data), outputData, inputInfo);
-            break;
-        case DataType::QuantisedSymm16:
-            Dequantize<int16_t>(GetInputTensorData<int16_t>(0, m_Data), outputData, inputInfo);
-            break;
-        default:
-            throw InvalidArgumentException("RefDequantizeWorkload: Unsupported input data type");
-    }
+    Dequantize(*inputDecoder, *outputEncoder, inputInfo, outputInfo);
 }
 
 } // namespace armnn

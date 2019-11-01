@@ -587,8 +587,9 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,
                                   "Reference dequantize: input type not supported.");
 
-    std::array<DataType,1> supportedOutputTypes = {
-        DataType::Float32
+    std::array<DataType,2> supportedOutputTypes = {
+        DataType::Float32,
+        DataType::Float16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,

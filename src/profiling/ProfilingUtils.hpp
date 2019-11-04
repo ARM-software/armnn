@@ -202,9 +202,11 @@ class BufferExhaustion : public armnn::Exception
     using Exception::Exception;
 };
 
-}    // namespace profiling
+uint64_t GetTimestamp();
 
-}    // namespace armnn
+} // namespace profiling
+
+} // namespace armnn
 
 namespace std
 {

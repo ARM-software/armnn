@@ -38,6 +38,8 @@ public:
                                                      const std::string& entityName,
                                                      const std::string& entityType);
 
+    ProfilingDynamicGuid RecordEvent(ProfilingGuid entityGuid, ProfilingStaticGuid eventClassGuid);
+
 private:
     ISendTimelinePacket& m_SendTimelinePacket;
 };

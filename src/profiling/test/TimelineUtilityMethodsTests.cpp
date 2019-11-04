@@ -262,9 +262,8 @@ void VerifyTimelineEntityBinaryPacket(Optional<ProfilingGuid> guid,
 
     // Check the decl_id
     offset += uint32_t_size;
-    uint32_t entitytDecId = ReadUint32(readableData, offset);
-
-    BOOST_CHECK(entitytDecId == uint32_t(1));
+    uint32_t entityDeclId = ReadUint32(readableData, offset);
+    BOOST_CHECK(entityDeclId == 1);
 
     // Check the profiling GUID
     offset += uint32_t_size;
@@ -277,6 +276,83 @@ void VerifyTimelineEntityBinaryPacket(Optional<ProfilingGuid> guid,
     else
     {
         BOOST_CHECK(readProfilingGuid != ProfilingGuid(0));
+    }
+
+    offset += uint64_t_size;
+}
+
+void VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
+                                     Optional<std::thread::id> threadId,
+                                     Optional<ProfilingGuid> eventGuid,
+                                     const unsigned char* readableData,
+                                     unsigned int& offset)
+{
+    BOOST_ASSERT(readableData);
+
+    // Utils
+    unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+    unsigned int threadId_size = sizeof(std::thread::id);
+
+    // Reading TimelineEventBinaryPacket
+    uint32_t entityBinaryPacketHeaderWord0 = ReadUint32(readableData, offset);
+    uint32_t entityBinaryPacketFamily   = (entityBinaryPacketHeaderWord0 >> 26) & 0x0000003F;
+    uint32_t entityBinaryPacketClass    = (entityBinaryPacketHeaderWord0 >> 19) & 0x0000007F;
+    uint32_t entityBinaryPacketType     = (entityBinaryPacketHeaderWord0 >> 16) & 0x00000007;
+    uint32_t entityBinaryPacketStreamId = (entityBinaryPacketHeaderWord0 >>  0) & 0x00000007;
+
+    BOOST_CHECK(entityBinaryPacketFamily   == 1);
+    BOOST_CHECK(entityBinaryPacketClass    == 0);
+    BOOST_CHECK(entityBinaryPacketType     == 1);
+    BOOST_CHECK(entityBinaryPacketStreamId == 0);
+
+    offset += uint32_t_size;
+    uint32_t entityBinaryPacketHeaderWord1 = ReadUint32(readableData, offset);
+    uint32_t entityBinaryPacketSequenceNumbered = (entityBinaryPacketHeaderWord1 >> 24) & 0x00000001;
+    uint32_t entityBinaryPacketDataLength       = (entityBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
+    BOOST_CHECK(entityBinaryPacketSequenceNumbered == 0);
+    BOOST_CHECK(entityBinaryPacketDataLength       == 20 + threadId_size);
+
+    // Check the decl_id
+    offset += uint32_t_size;
+    uint32_t entityDeclId = ReadUint32(readableData, offset);
+    BOOST_CHECK(entityDeclId == 4);
+
+    // Check the timestamp
+    offset += uint32_t_size;
+    uint64_t readTimestamp = ReadUint64(readableData, offset);
+    if (timestamp.has_value())
+    {
+        BOOST_CHECK(readTimestamp == timestamp.value());
+    }
+    else
+    {
+        BOOST_CHECK(readTimestamp != 0);
+    }
+
+    // Check the thread id
+    offset += uint64_t_size;
+    std::vector<uint8_t> readThreadId(threadId_size, 0);
+    ReadBytes(readableData, offset, threadId_size, readThreadId.data());
+    if (threadId.has_value())
+    {
+        BOOST_CHECK(readThreadId == threadId.value());
+    }
+    else
+    {
+        BOOST_CHECK(readThreadId == std::this_thread::get_id());
+    }
+
+    // Check the event GUID
+    offset += threadId_size;
+    uint64_t readEventGuid = ReadUint64(readableData, offset);
+    if (eventGuid.has_value())
+    {
+        BOOST_CHECK(readEventGuid == eventGuid.value());
+    }
+    else
+    {
+        BOOST_CHECK(readEventGuid != ProfilingGuid(0));
     }
 
     offset += uint64_t_size;
@@ -518,7 +594,7 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
 
 }
 
-BOOST_AUTO_TEST_CASE(CreateNameTypeEntitylTest)
+BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
 {
     MockBufferManager mockBufferManager(1024);
     SendTimelinePacket sendTimelinePacket(mockBufferManager);
@@ -584,6 +660,55 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntitylTest)
                                            EmptyOptional(),
                                            EmptyOptional(),
                                            LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Mark the buffer as read
+    mockBufferManager.MarkRead(readableBuffer);
+}
+
+BOOST_AUTO_TEST_CASE(RecordEventTest)
+{
+    MockBufferManager mockBufferManager(1024);
+    SendTimelinePacket sendTimelinePacket(mockBufferManager);
+    TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+
+    ProfilingGuid entityGuid(123);
+    ProfilingStaticGuid eventClassGuid(456);
+    ProfilingDynamicGuid eventGuid(0);
+    BOOST_CHECK_NO_THROW(eventGuid = timelineUtilityMethods.RecordEvent(entityGuid, eventClassGuid));
+    BOOST_CHECK(eventGuid != ProfilingGuid(0));
+
+    // Commit all packets at once
+    sendTimelinePacket.Commit();
+
+    // Get the readable buffer
+    auto readableBuffer = mockBufferManager.GetReadableBuffer();
+    BOOST_CHECK(readableBuffer != nullptr);
+    unsigned int size = readableBuffer->GetSize();
+    BOOST_CHECK(size == 116);
+    const unsigned char* readableData = readableBuffer->GetReadableData();
+    BOOST_CHECK(readableData != nullptr);
+
+    // Utils
+    unsigned int offset = 0;
+
+    // First packet sent: TimelineEntityBinaryPacket
+    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+
+    // Second packet sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                           EmptyOptional(),
+                                           entityGuid,
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Third packet sent: TimelineRelationshipBinaryPacket
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                           EmptyOptional(),
+                                           entityGuid,
+                                           eventClassGuid,
                                            readableData,
                                            offset);
 

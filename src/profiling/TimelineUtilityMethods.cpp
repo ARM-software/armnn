@@ -157,6 +157,41 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedChildEntity(Profili
     return childEntityGuid;
 }
 
+ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGuid, ProfilingStaticGuid eventClassGuid)
+{
+    // Take a timestamp
+    uint64_t timestamp = GetTimestamp();
+
+    // Get the thread id
+    std::thread::id threadId = std::this_thread::get_id();
+
+    // Generate a GUID for the event
+    ProfilingDynamicGuid eventGuid = ProfilingService::Instance().NextGuid();
+
+    // Send the new timeline event to the external profiling service, this call throws in case of error
+    m_SendTimelinePacket.SendTimelineEventBinaryPacket(timestamp, threadId, eventGuid);
+
+    // Generate a GUID for the execution link
+    ProfilingDynamicGuid executionLinkId = ProfilingService::Instance().NextGuid();
+
+    // Send the new execution link to the external profiling service, this call throws in case of error
+    m_SendTimelinePacket.SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::ExecutionLink,
+                                                              executionLinkId,
+                                                              entityGuid,
+                                                              eventGuid);
+
+    // Generate a GUID for the data relationship link
+    ProfilingDynamicGuid eventClassLinkId = ProfilingService::Instance().NextGuid();
+
+    // Send the new data relationship link to the external profiling service, this call throws in case of error
+    m_SendTimelinePacket.SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::DataLink,
+                                                              eventClassLinkId,
+                                                              entityGuid,
+                                                              eventClassGuid);
+
+    return eventGuid;
+}
+
 } // namespace profiling
 
 } // namespace armnn

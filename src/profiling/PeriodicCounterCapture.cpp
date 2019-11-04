@@ -92,18 +92,11 @@ void PeriodicCounterCapture::Capture(const IReadCounterValues& readCounterValues
             values.emplace_back(std::make_pair(requestedId, counterValue));
         }
 
-        #if USE_CLOCK_MONOTONIC_RAW
-            using clock = MonotonicClockRaw;
-        #else
-            using clock = std::chrono::steady_clock;
-        #endif
-
         // Take a timestamp
-        auto timestamp = clock::now();
+        uint64_t timestamp = GetTimestamp();
 
         // Write a Periodic Counter Capture packet to the Counter Stream Buffer
-        m_SendCounterPacket.SendPeriodicCounterCapturePacket(
-                    static_cast<uint64_t>(timestamp.time_since_epoch().count()), values);
+        m_SendCounterPacket.SendPeriodicCounterCapturePacket(timestamp, values);
 
         // Notify the Send Thread that new data is available in the Counter Stream Buffer
         m_SendCounterPacket.SetReadyToRead();

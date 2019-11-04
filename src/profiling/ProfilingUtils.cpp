@@ -8,6 +8,8 @@
 #include <armnn/Version.hpp>
 #include <armnn/Conversion.hpp>
 
+#include <WallClockTimer.hpp>
+
 #include <boost/assert.hpp>
 
 #include <fstream>
@@ -889,7 +891,6 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
     return TimelinePacketStatus::Ok;
 }
 
-
 std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth)
 {
     std::stringstream outputStream, centrePadding;
@@ -1090,6 +1091,19 @@ void PrintCounterDirectory(ICounterDirectory& counterDirectory)
     std::cout << "\n";
 }
 
+uint64_t GetTimestamp()
+{
+#if USE_CLOCK_MONOTONIC_RAW
+    using clock = MonotonicClockRaw;
+#else
+    using clock = std::chrono::steady_clock;
+#endif
+
+    // Take a timestamp
+    auto timestamp = clock::now();
+
+    return static_cast<uint64_t>(timestamp.time_since_epoch().count());
+}
 
 } // namespace profiling
 

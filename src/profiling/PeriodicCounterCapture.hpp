@@ -11,10 +11,7 @@
 #include "SendCounterPacket.hpp"
 #include "ICounterValues.hpp"
 
-#include <WallClockTimer.hpp>
-
 #include <atomic>
-#include <chrono>
 #include <mutex>
 #include <thread>
 

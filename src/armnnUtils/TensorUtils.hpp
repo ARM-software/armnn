@@ -34,32 +34,8 @@ unsigned int GetNumElementsBetween(const armnn::TensorShape& shape,
 
 unsigned int GetUnsignedAxis(const unsigned int inputDimension, const int axis);
 
-inline unsigned int GetNumElementsAfter(const armnn::TensorShape& shape,
-                                        unsigned int axis)
-{
-    unsigned int numDim = shape.GetNumDimensions();
-    BOOST_ASSERT(0 >= axis);
-    BOOST_ASSERT(axis < numDim - 1);
-    unsigned int count = 1;
-    for (unsigned int i = axis; i < numDim; i++)
-    {
-        count *= shape[i];
-    }
-    return count;
-}
+unsigned int GetNumElementsAfter(const armnn::TensorShape& shape, unsigned int axis);
 
-inline std::pair<unsigned int, std::vector<float>> GetPerAxisParams(const armnn::TensorInfo& info)
-{
-    const std::vector<float>& scales = info.GetQuantizationScales();
-    armnn::Optional<unsigned int> quantizationDim = info.GetQuantizationDim();
-    if (scales.size() < 1 || !quantizationDim.has_value())
-    {
-        throw armnn::InvalidArgumentException(
-        "We currently support only per-axis symmetric quantization for QuantizedSymm8.");
-    }
-    unsigned int axisFactor = GetNumElementsAfter(info.GetShape(), quantizationDim.value());
-
-    return {axisFactor, scales};
-}
+std::pair<unsigned int, std::vector<float>> GetPerAxisParams(const armnn::TensorInfo& info);
 
 } // namespace armnnUtils

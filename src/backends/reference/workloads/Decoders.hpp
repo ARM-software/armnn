@@ -14,6 +14,54 @@
 namespace armnn
 {
 
+namespace
+{
+
+inline std::unique_ptr<Decoder<float>> MakeSigned32PerAxisDecoder(const TensorInfo& info, const void* data)
+{
+    auto params = armnnUtils::GetPerAxisParams(info);
+    return std::make_unique<ScaledInt32PerAxisDecoder>(
+        static_cast<const int32_t*>(data),
+        params.second,
+        params.first);
+}
+
+inline std::unique_ptr<Decoder<float>> MakeSigned32Decoder(const TensorInfo& info, const void* data)
+{
+    if(info.HasMultipleQuantizationScales())
+    {
+        // NOTE: If we have multiple quantization scales, we create a ScaledInt32PerAxisDecoder.
+        // This will be used to decode per-axis quantized convolution biases.
+        return MakeSigned32PerAxisDecoder(info, data);
+    }
+    else
+    {
+        if (info.GetQuantizationDim().has_value())
+        {
+            // NOTE: Even though we only have a single quantization scale, if the quantization
+            // dimension is set, the tensor has per-axis quantization and we need to create a
+            // ScaledInt32PerAxisDecoder
+            return MakeSigned32PerAxisDecoder(info, data);
+        }
+
+        const float scale = info.GetQuantizationScale();
+        if (scale == 0.f)
+        {
+            // NOTE:: If no quantization scale is set, we create an Int32Decoder, which simply
+            // casts the int value to float. This will be used for any INT32 data other than
+            // convolution biases.
+            return std::make_unique<Int32Decoder>(static_cast<const int32_t*>(data));
+        }
+
+        // NOTE: If we only have a single (non-zero) quantization scale and no quantization
+        // dimension is specified, we need to create a ScaledInt32Decoder. This will be used
+        // to decode per-tensor quantized convolution biases.
+        return std::make_unique<ScaledInt32Decoder>(static_cast<const int32_t*>(data), scale);
+    }
+}
+
+} // anonymous namespace
+
 template<typename T>
 inline std::unique_ptr<Decoder<T>> MakeDecoder(const TensorInfo& info, const void* data = nullptr);
 
@@ -54,13 +102,7 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         }
         case DataType::Signed32:
         {
-            const float scale = info.GetQuantizationScale();
-            if (scale == 0.f)
-            {
-                return std::make_unique<Int32Decoder>(static_cast<const int32_t*>(data));
-            }
-            // NOTE: ScaledInt32Decoder is used for quantized convolution biases
-            return std::make_unique<ScaledInt32Decoder>(static_cast<const int32_t*>(data), scale);
+            return MakeSigned32Decoder(info, data);
         }
         default:
         {

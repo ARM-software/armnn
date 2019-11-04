@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <thread>
 
 namespace armnn
 {
@@ -29,7 +30,9 @@ public:
     virtual void SendTimelineEntityBinaryPacket(uint64_t profilingGuid) = 0;
 
     /// Create and write a TimelineEventBinaryPacket from the parameters to the buffer.
-    virtual void SendTimelineEventBinaryPacket(uint64_t timestamp, uint32_t threadId, uint64_t profilingGuid) = 0;
+    virtual void SendTimelineEventBinaryPacket(uint64_t timestamp,
+                                               std::thread::id threadId,
+                                               uint64_t profilingGuid) = 0;
 
     /// Create and write a TimelineEventClassBinaryPacket from the parameters to the buffer.
     virtual void SendTimelineEventClassBinaryPacket(uint64_t profilingGuid) = 0;

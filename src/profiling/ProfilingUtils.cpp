@@ -87,6 +87,13 @@ std::vector<uint16_t> GetNextCounterUids(uint16_t cores)
     return counterUids;
 }
 
+void WriteBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset,  const void* value, unsigned int valueSize)
+{
+    BOOST_ASSERT(packetBuffer);
+
+    WriteBytes(packetBuffer->GetWritableData(), offset, value, valueSize);
+}
+
 void WriteUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint64_t value)
 {
     BOOST_ASSERT(packetBuffer);
@@ -106,6 +113,17 @@ void WriteUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint
     BOOST_ASSERT(packetBuffer);
 
     WriteUint16(packetBuffer->GetWritableData(), offset, value);
+}
+
+void WriteBytes(unsigned char* buffer, unsigned int offset, const void* value, unsigned int valueSize)
+{
+    BOOST_ASSERT(buffer);
+    BOOST_ASSERT(value);
+
+    for (unsigned int i = 0; i < valueSize; i++, offset++)
+    {
+        buffer[offset] = *(reinterpret_cast<const unsigned char*>(value) + i);
+    }
 }
 
 void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value)
@@ -140,6 +158,13 @@ void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value)
     buffer[offset + 1] = static_cast<unsigned char>((value >> 8) & 0xFF);
 }
 
+void ReadBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
+{
+    BOOST_ASSERT(packetBuffer);
+
+    ReadBytes(packetBuffer->GetReadableData(), offset, valueSize, outValue);
+}
+
 uint64_t ReadUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
     BOOST_ASSERT(packetBuffer);
@@ -166,6 +191,17 @@ uint8_t ReadUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset)
     BOOST_ASSERT(packetBuffer);
 
     return ReadUint8(packetBuffer->GetReadableData(), offset);
+}
+
+void ReadBytes(const unsigned char* buffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
+{
+    BOOST_ASSERT(buffer);
+    BOOST_ASSERT(outValue);
+
+    for (unsigned int i = 0; i < valueSize; i++, offset++)
+    {
+        outValue[i] = static_cast<uint8_t>(buffer[offset]);
+    }
 }
 
 uint64_t ReadUint64(const unsigned char* buffer, unsigned int offset)
@@ -769,7 +805,7 @@ TimelinePacketStatus WriteTimelineEventClassBinaryPacket(uint64_t profilingGuid,
 }
 
 TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
-                                                    uint32_t threadId,
+                                                    std::thread::id threadId,
                                                     uint64_t profilingGuid,
                                                     unsigned char* buffer,
                                                     unsigned int bufferSize,
@@ -787,6 +823,7 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
+    unsigned int threadId_size = sizeof(std::thread::id);
 
     // decl_id of the timeline message
     uint32_t declId = 4;
@@ -794,7 +831,7 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
     // Calculate the length of the data (in bytes)
     unsigned int timelineEventPacketDataLength = uint32_t_size + // decl_id
                                                  uint64_t_size + // Timestamp
-                                                 uint32_t_size + // Thread id
+                                                 threadId_size + // Thread id
                                                  uint64_t_size;  // Profiling GUID
 
     // Calculate the timeline binary packet size (in bytes)
@@ -824,8 +861,8 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
     offset += uint32_t_size;
     WriteUint64(buffer, offset, timestamp); // Timestamp
     offset += uint64_t_size;
-    WriteUint32(buffer, offset, threadId); // Thread id
-    offset += uint32_t_size;
+    WriteBytes(buffer, offset, &threadId, threadId_size); // Thread id
+    offset += threadId_size;
     WriteUint64(buffer, offset, profilingGuid); // Profiling GUID
     offset += uint64_t_size;
 
@@ -838,3 +875,13 @@ TimelinePacketStatus WriteTimelineEventBinaryPacket(uint64_t timestamp,
 } // namespace profiling
 
 } // namespace armnn
+
+namespace std
+{
+
+bool operator==(const std::vector<uint8_t>& left, std::thread::id right)
+{
+    return std::memcmp(left.data(), &right, left.size()) == 0;
+}
+
+} // namespace std

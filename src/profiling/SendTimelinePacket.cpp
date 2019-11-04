@@ -79,7 +79,9 @@ void SendTimelinePacket::SendTimelineEntityBinaryPacket(uint64_t profilingGuid)
                               m_BufferSize);
 }
 
-void SendTimelinePacket::SendTimelineEventBinaryPacket(uint64_t timestamp, uint32_t threadId, uint64_t profilingGuid)
+void SendTimelinePacket::SendTimelineEventBinaryPacket(uint64_t timestamp,
+                                                       std::thread::id threadId,
+                                                       uint64_t profilingGuid)
 {
     FORWARD_WRITE_BINARY_FUNC(WriteTimelineEventBinaryPacket,
                               timestamp,

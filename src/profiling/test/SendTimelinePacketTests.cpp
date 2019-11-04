@@ -207,6 +207,7 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests1)
 {
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
+    unsigned int threadId_size = sizeof(std::thread::id);
 
     MockBufferManager bufferManager(512);
     TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
@@ -303,7 +304,7 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests1)
 
     // Send TimelineEventBinaryPacket
     const uint64_t timestamp = 456789u;
-    const uint32_t threadId = 654321u;
+    const std::thread::id threadId = std::this_thread::get_id();
     const uint64_t eventProfilingGuid = 123456u;
     sendTimelinePacket->SendTimelineEventBinaryPacket(timestamp, threadId, eventProfilingGuid);
 
@@ -333,7 +334,7 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests1)
     uint32_t eventBinaryPacketSequenceNumbered = (eventBinaryPacketHeaderWord1 >> 24) & 0x00000001;
     uint32_t eventBinaryPacketDataLength       = (eventBinaryPacketHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(eventBinaryPacketSequenceNumbered == 0);
-    BOOST_CHECK(eventBinaryPacketDataLength       == 24);
+    BOOST_CHECK(eventBinaryPacketDataLength       == 28);
 
     // Check the decl_id
     offset += uint32_t_size;
@@ -347,11 +348,12 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests1)
 
     // Check the thread id
     offset += uint64_t_size;
-    uint32_t readThreadId = ReadUint32(packetBuffer, offset);
+    std::vector<uint8_t> readThreadId(threadId_size, 0);
+    ReadBytes(packetBuffer, offset, threadId_size, readThreadId.data());
     BOOST_CHECK(readThreadId == threadId);
 
     // Check the profiling GUID
-    offset += uint32_t_size;
+    offset += threadId_size;
     readProfilingGuid = ReadUint64(packetBuffer, offset);
     BOOST_CHECK(readProfilingGuid == eventProfilingGuid);
 }

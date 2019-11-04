@@ -6,6 +6,7 @@
 #pragma once
 
 #include "BaseIterator.hpp"
+#include "TensorUtils.hpp"
 
 #include <boost/assert.hpp>
 
@@ -20,6 +21,14 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
 {
     switch(info.GetDataType())
     {
+        case armnn::DataType::QuantizedSymm8PerAxis:
+        {
+            std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
+            return std::make_unique<QSymm8PerAxisEncoder>(
+                static_cast<int8_t*>(data),
+                params.second,
+                params.first);
+        }
         case armnn::DataType::QuantisedAsymm8:
         {
             return std::make_unique<QASymm8Encoder>(
@@ -48,7 +57,7 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Cannot encode from float. Not supported target Data Type!");
+            BOOST_ASSERT_MSG(false, "Unsupported target Data Type!");
             break;
         }
     }

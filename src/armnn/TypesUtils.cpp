@@ -33,6 +33,10 @@ float armnn::Dequantize(QuantizedType value, float scale, int32_t offset)
     return dequantized;
 }
 
+/// Explicit specialization of Quantize for int8_t
+template
+int8_t armnn::Quantize<int8_t>(float value, float scale, int32_t offset);
+
 /// Explicit specialization of Quantize for uint8_t
 template
 uint8_t armnn::Quantize<uint8_t>(float value, float scale, int32_t offset);
@@ -44,6 +48,10 @@ int16_t armnn::Quantize<int16_t>(float value, float scale, int32_t offset);
 /// Explicit specialization of Quantize for int32_t
 template
 int32_t armnn::Quantize<int32_t>(float value, float scale, int32_t offset);
+
+/// Explicit specialization of Dequantize for int8_t
+template
+float armnn::Dequantize<int8_t>(int8_t value, float scale, int32_t offset);
 
 /// Explicit specialization of Dequantize for uint8_t
 template

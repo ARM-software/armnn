@@ -7,6 +7,7 @@
 
 #include "BaseIterator.hpp"
 #include "FloatingPointConverter.hpp"
+#include "TensorUtils.hpp"
 
 #include <boost/assert.hpp>
 
@@ -21,6 +22,14 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
 {
     switch(info.GetDataType())
     {
+        case armnn::DataType::QuantizedSymm8PerAxis:
+        {
+            std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
+            return std::make_unique<QSymm8PerAxisDecoder>(
+                static_cast<const int8_t*>(data),
+                params.second,
+                params.first);
+        }
         case DataType::QuantisedAsymm8:
         {
             return std::make_unique<QASymm8Decoder>(
@@ -55,7 +64,7 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         }
         default:
         {
-            BOOST_ASSERT_MSG(false, "Not supported Data Type!");
+            BOOST_ASSERT_MSG(false, "Unsupported Data Type!");
             break;
         }
     }

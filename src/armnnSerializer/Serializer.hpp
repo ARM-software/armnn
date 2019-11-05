@@ -29,12 +29,12 @@ public:
         return m_flatBufferBuilder;
     }
 
-    std::vector<uint32_t>& GetInputIds()
+    std::vector<int>& GetInputIds()
     {
         return m_inputIds;
     }
 
-    std::vector<uint32_t>& GetOutputIds()
+    std::vector<int>& GetOutputIds()
     {
         return m_outputIds;
     }
@@ -43,6 +43,9 @@ public:
     {
         return m_serializedLayers;
     }
+
+    flatbuffers::Offset<armnnSerializer::FeatureCompatibilityVersions> GetVersionTable();
+
 
     ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
     void VisitAbsLayer(const armnn::IConnectableLayer* layer,
@@ -301,11 +304,11 @@ private:
     /// AnyLayers required by the SerializedGraph.
     std::vector<flatbuffers::Offset<armnnSerializer::AnyLayer>> m_serializedLayers;
 
-    /// Vector of indexes of all Input Layers required by the SerializedGraph.
-    std::vector<uint32_t> m_inputIds;
+    /// Vector of the binding ids of all Input Layers required by the SerializedGraph.
+    std::vector<int> m_inputIds;
 
-    /// Vector of indexes of all Output Layers required by the SerializedGraph.
-    std::vector<uint32_t> m_outputIds;
+    /// Vector of the binding ids of all Output Layers required by the SerializedGraph.
+    std::vector<int> m_outputIds;
 
     /// Mapped Guids of all Layers to match our index.
     std::unordered_map<armnn::LayerGuid, uint32_t > m_guidMap;

@@ -826,11 +826,16 @@ table AnyLayer {
     layer:Layer;
 }
 
+table FeatureCompatibilityVersions {
+  bindingIdsScheme:uint = 0;
+}
+
 // Root type for serialized data is the graph of the network
 table SerializedGraph {
     layers:[AnyLayer];
-    inputIds:[uint];
-    outputIds:[uint];
+    inputIds:[int];
+    outputIds:[int];
+    featureVersions:FeatureCompatibilityVersions;
 }
 
 root_type SerializedGraph;

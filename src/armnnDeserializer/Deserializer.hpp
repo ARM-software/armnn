@@ -144,8 +144,20 @@ private:
     void SetupInputLayers(GraphPtr graphPtr);
     void SetupOutputLayers(GraphPtr graphPtr);
 
+    /// Helper to get the index of the layer in the flatbuffer vector from its bindingId property
+    unsigned int GetInputLayerInVector(GraphPtr graph, int targetId);
+    unsigned int GetOutputLayerInVector(GraphPtr graph, int targetId);
+
     /// Helper to get the index of the layer in the flatbuffer vector from its index property
     unsigned int GetLayerIndexInVector(GraphPtr graph, unsigned int index);
+
+    struct FeatureVersions
+    {
+        // Default values to zero for backward compatibility
+        unsigned int m_BindingIdScheme = 0;
+    };
+
+    FeatureVersions GetFeatureVersions(GraphPtr graph);
 
     /// The network we're building. Gets cleared after it is passed to the user
     armnn::INetworkPtr                    m_Network;

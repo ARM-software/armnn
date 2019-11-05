@@ -91,8 +91,8 @@ void SerializerVisitor::VisitInputLayer(const armnn::IConnectableLayer* layer, L
     auto flatBufferInputBindableBaseLayer = serializer::CreateBindableLayerBase(m_flatBufferBuilder,
                                                                                 flatBufferInputBaseLayer,
                                                                                 id);
-    // Push layer index to outputIds.
-    m_inputIds.push_back(GetSerializedId(layer->GetGuid()));
+    // Push layer binding id to outputIds.
+    m_inputIds.push_back(id);
 
     // Create the FlatBuffer InputLayer
     auto flatBufferInputLayer = serializer::CreateInputLayer(m_flatBufferBuilder, flatBufferInputBindableBaseLayer);
@@ -113,8 +113,8 @@ void SerializerVisitor::VisitOutputLayer(const armnn::IConnectableLayer* layer, 
     auto flatBufferOutputBindableBaseLayer = serializer::CreateBindableLayerBase(m_flatBufferBuilder,
                                                                                  flatBufferOutputBaseLayer,
                                                                                  id);
-    // Push layer index to outputIds.
-    m_outputIds.push_back(GetSerializedId(layer->GetGuid()));
+    // Push layer binding id to outputIds.
+    m_outputIds.push_back(id);
 
     // Create the FlatBuffer OutputLayer
     auto flatBufferOutputLayer = serializer::CreateOutputLayer(m_flatBufferBuilder, flatBufferOutputBindableBaseLayer);
@@ -1449,6 +1449,16 @@ flatbuffers::Offset<serializer::ConstTensor>
     return flatBufferConstTensor;
 }
 
+flatbuffers::Offset<armnnSerializer::FeatureCompatibilityVersions> SerializerVisitor::GetVersionTable()
+{
+    flatbuffers::Offset<armnnSerializer::FeatureCompatibilityVersions> versionsTable =
+        serializer::CreateFeatureCompatibilityVersions(
+                m_flatBufferBuilder,
+                1 // Binding ids scheme version
+            );
+    return versionsTable;
+}
+
 std::vector<fb::Offset<serializer::InputSlot>>
     SerializerVisitor::CreateInputSlots(const armnn::IConnectableLayer* layer)
 {
@@ -1531,7 +1541,8 @@ void Serializer::Serialize(const INetwork& inNetwork)
         fbBuilder,
         fbBuilder.CreateVector(m_SerializerVisitor.GetSerializedLayers()),
         fbBuilder.CreateVector(m_SerializerVisitor.GetInputIds()),
-        fbBuilder.CreateVector(m_SerializerVisitor.GetOutputIds()));
+        fbBuilder.CreateVector(m_SerializerVisitor.GetOutputIds()),
+        m_SerializerVisitor.GetVersionTable());
 
     // Serialize the graph
     fbBuilder.Finish(serializedGraph);

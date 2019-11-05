@@ -793,7 +793,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                               const std::vector<BackendId>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
                               const OptimizerOptions& options,
-                              Optional<std::vector<std::string>&> errMessages)
+                              Optional<std::vector<std::string>&> messages)
 {
     if (backendPreferences.empty())
     {
@@ -837,7 +837,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         std::stringstream failureMsg;
         failureMsg << "None of the preferred backends " << backendPreferences
                    << " are supported. Current platform provides " << backendSettings.m_SupportedBackends;
-        ReportError(failureMsg.str(), errMessages);
+        ReportError(failureMsg.str(), messages);
         return IOptimizedNetworkPtr(nullptr, &IOptimizedNetwork::Destroy);
     }
 
@@ -852,7 +852,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                                                              backendSettings,
                                                              firstLayer,
                                                              lastLayer,
-                                                             errMessages);
+                                                             messages);
     if (assignBackendsResult.m_Error)
     {
         // Failed to assign a backend to each layer
@@ -866,7 +866,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     OptimizationResult backendOptimizationResult = ApplyBackendOptimizations(optNetObjPtr,
                                                                              backendSettings,
                                                                              backends,
-                                                                             errMessages);
+                                                                             messages);
     if (backendOptimizationResult.m_Error)
     {
         // Failed to apply the backend-specific optimizations
@@ -884,7 +884,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     OptimizationResult strategyResult = SelectTensorHandleStrategy(optGraph,
                                                                    backends,
                                                                    tensorHandleFactoryRegistry,
-                                                                   errMessages);
+                                                                   messages);
     if (strategyResult.m_Error)
     {
         // Failed to apply the backend-specific optimizations

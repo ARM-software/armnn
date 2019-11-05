@@ -102,13 +102,14 @@ constexpr unsigned int GetDataTypeSize(DataType dataType)
 {
     switch (dataType)
     {
-        case DataType::Float16:          return 2U;
+        case DataType::Float16:               return 2U;
         case DataType::Float32:
-        case DataType::Signed32:         return 4U;
-        case DataType::QuantisedAsymm8:  return 1U;
-        case DataType::QuantisedSymm16:  return 2U;
-        case DataType::Boolean:          return 1U;
-        default:                         return 0U;
+        case DataType::Signed32:              return 4U;
+        case DataType::QuantisedAsymm8:       return 1U;
+        case DataType::QuantizedSymm8PerAxis: return 1U;
+        case DataType::QuantisedSymm16:       return 2U;
+        case DataType::Boolean:               return 1U;
+        default:                              return 0U;
     }
 }
 

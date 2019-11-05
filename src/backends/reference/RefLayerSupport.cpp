@@ -433,11 +433,12 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType,4> supportedTypes = {
-            DataType::Float32,
-            DataType::Float16,
-            DataType::QuantisedAsymm8,
-            DataType::QuantisedSymm16
+    std::array<DataType,4> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
@@ -446,22 +447,39 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
                                   "Reference convolution2d: output is not a supported type.");
 
-    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
-                                  "Reference convolution2d: weights is not a supported type.");
-
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                   "Reference convolution2d: input and output types mismatched.");
 
-    supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
-                                  "Reference convolution2d: input and weights types mismatched.");
+    const DataType inputType = input.GetDataType();
+    if (inputType == DataType::QuantisedAsymm8)
+    {
+        std::array<DataType, 2> supportedWeightTypes =
+        {
+            DataType::QuantisedAsymm8,
+            DataType::QuantizedSymm8PerAxis
+        };
+
+        supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
+                                      "Reference convolution2d: weights type not supported for quantized input.");
+    }
+    else
+    {
+        supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+                                      "Reference convolution2d: weights is not a supported type.");
+
+        supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
+                                      "Reference convolution2d: input and weights types mismatched.");
+    }
 
     if (biases.has_value())
     {
-        std::array<DataType,3> biasesSupportedTypes = {
-                DataType::Float32,
-                DataType::Float16,
-                DataType::Signed32
+        std::array<DataType,3> biasesSupportedTypes =
+        {
+            DataType::Float32,
+            DataType::Float16,
+            DataType::Signed32
         };
+
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
                                       "Reference convolution2d: biases is not a supported type.");
     }

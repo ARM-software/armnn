@@ -97,6 +97,8 @@ public:
 
     bool HasMultipleQuantizationScales() const       { return m_Quantization.m_Scales.size() > 1; }
 
+    bool HasPerAxisQuantization() const;
+
     std::vector<float> GetQuantizationScales() const;
     void SetQuantizationScales(const std::vector<float>& scales);
 

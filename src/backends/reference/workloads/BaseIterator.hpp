@@ -11,6 +11,7 @@
 #include <ResolveType.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/core/ignore_unused.hpp>
 
 namespace armnn
 {
@@ -21,6 +22,8 @@ public:
     BaseIterator() {}
 
     virtual ~BaseIterator() {}
+
+    virtual BaseIterator& SetIndex(unsigned int index, unsigned int axisIndex = 0) = 0;
 
     virtual BaseIterator& operator++() = 0;
 
@@ -96,6 +99,14 @@ public:
 
     TypedIterator& operator[](const unsigned int index) override
     {
+        BOOST_ASSERT(m_Iterator);
+        m_Iterator = m_Start + index;
+        return *this;
+    }
+
+    TypedIterator& SetIndex(unsigned int index, unsigned int axisIndex = 0) override
+    {
+        boost::ignore_unused(axisIndex);
         BOOST_ASSERT(m_Iterator);
         m_Iterator = m_Start + index;
         return *this;
@@ -350,7 +361,7 @@ public:
     {}
 
     // This should be called to set index for per-axis Encoder/Decoder
-    PerAxisIterator& SetIndex(unsigned int index, unsigned int axisIndex)
+    PerAxisIterator& SetIndex(unsigned int index, unsigned int axisIndex) override
     {
          BOOST_ASSERT(m_Iterator);
          m_Iterator = m_Start + index;

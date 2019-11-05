@@ -165,7 +165,7 @@ void Convolve(const TensorShape& rInputShape,
                                     }
                                 }
 
-                                rFilterDecoder[filterIndex];
+                                rFilterDecoder.SetIndex(filterIndex, cOutput);
                                 float filterValue = rFilterDecoder.Get();
 
                                 unsigned int yInput = yOutput * yStride + yFilter * yDilation;
@@ -211,7 +211,7 @@ void Convolve(const TensorShape& rInputShape,
 
                     if (biasEnabled)
                     {
-                        (*pBiasDecoder)[cOutput];
+                        (*pBiasDecoder).SetIndex(cOutput, cOutput);
                         sum += pBiasDecoder->Get();
                     }
 
@@ -225,4 +225,4 @@ void Convolve(const TensorShape& rInputShape,
     }
 }
 
-} //namespace armnn
+} // namespace armnn

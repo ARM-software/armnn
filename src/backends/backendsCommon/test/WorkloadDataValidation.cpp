@@ -605,15 +605,16 @@ BOOST_AUTO_TEST_CASE(BiasPerAxisQuantization_Validate)
     const TensorShape weightShape{ cOutput, cInput,  hInput,  wInput  };
     const TensorShape biasShape  { cOutput                            };
 
-    constexpr DataType dataType = DataType::QuantisedAsymm8;
-    constexpr DataType biasType = DataType::Signed32;
+    constexpr DataType inputType  = DataType::QuantisedAsymm8;
+    constexpr DataType weightType = DataType::QuantizedSymm8PerAxis;
+    constexpr DataType biasType   = DataType::Signed32;
 
     constexpr float perTensorScale = 1.5f;
-    const TensorInfo inputInfo (inputShape,  dataType, perTensorScale);
-    const TensorInfo outputInfo(outputShape, dataType, perTensorScale);
+    const TensorInfo inputInfo (inputShape,  inputType, perTensorScale);
+    const TensorInfo outputInfo(outputShape, inputType, perTensorScale);
 
     const std::vector<float> weightPerAxisScales = { 2.50f, 3.50f };
-    const TensorInfo weightInfo(weightShape, dataType, weightPerAxisScales, 0);
+    const TensorInfo weightInfo(weightShape, weightType, weightPerAxisScales, 0);
 
     Convolution2dQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters.m_BiasEnabled = true;

@@ -14,6 +14,7 @@
 
 #include <backendsCommon/CpuTensorHandle.hpp>
 
+#include <backendsCommon/test/DataLayoutUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -3033,6 +3034,98 @@ LayerTestResult<uint8_t, 4> Convolution1dUint8Test(
 {
     return Convolution1dTestImpl<armnn::DataType::QuantisedAsymm8, armnn::DataType::Signed32>(
             workloadFactory, memoryManager, 0.1f, 128, biasEnabled);
+}
+
+LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout)
+{
+    using namespace armnn;
+
+    const DataType inputType  = DataType::QuantisedAsymm8;
+    const DataType kernelType = DataType::QuantizedSymm8PerAxis;
+    const DataType biasType   = DataType::Signed32;
+
+    TensorInfo inputInfo ({ 1, 3, 1, 2 }, inputType, 0.5f, 128);
+    TensorInfo outputInfo({ 1, 3, 1, 3 }, inputType, 1.0f, 128);
+
+    const std::vector<float> quantScales{ 0.5f, 0.75f, 1.0f };
+    constexpr unsigned int quantDimension = 0;
+
+    TensorInfo kernelInfo({ 3, 1, 1, 2 }, kernelType, quantScales, quantDimension);
+
+    const std::vector<float> biasQuantScales{ 0.25f, 0.375f, 0.5f };
+    TensorInfo biasInfo({ 3 }, biasType, biasQuantScales, quantDimension);
+
+    std::vector<uint8_t> inputData =
+    {
+        138, 108, 138, 108, 138, 108
+    };
+
+    std::vector<int8_t> kernelData =
+    {
+        1, 2, 1, 2, 1, 2
+    };
+
+    std::vector<int32_t> biasData =
+    {
+        4, 4, 4
+    };
+
+    std::vector<uint8_t> expectedOutputData =
+    {
+        121, 118, 115, 121, 118, 115, 121, 118, 115
+    };
+
+    if (layout == DataLayout::NCHW)
+    {
+        PermuteTensorNhwcToNchw(inputInfo, inputData);
+        PermuteTensorNhwcToNchw(kernelInfo, kernelData);
+        PermuteTensorNhwcToNchw(outputInfo, expectedOutputData);
+    }
+
+    Convolution2dDescriptor descriptor;
+    descriptor.m_StrideX     = 1;
+    descriptor.m_StrideY     = 1;
+    descriptor.m_PadLeft     = 0;
+    descriptor.m_PadRight    = 0;
+    descriptor.m_PadTop      = 0;
+    descriptor.m_PadBottom   = 0;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = layout;
+
+    std::unique_ptr<ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
+
+    WorkloadInfo workloadInfo;
+    ScopedCpuTensorHandle weightTensor(kernelInfo);
+    ScopedCpuTensorHandle biasTensor(biasInfo);
+
+    AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
+    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
+
+    Convolution2dQueueDescriptor queueDescriptor;
+    queueDescriptor.m_Parameters = descriptor;
+    queueDescriptor.m_Weight     = &weightTensor;
+    queueDescriptor.m_Bias       = &biasTensor;
+
+    AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
+    AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
+
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConvolution2d(queueDescriptor, workloadInfo);
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), inputData.data());
+
+    ExecuteWorkload(*workload, memoryManager);
+
+    LayerTestResult<uint8_t, 4> ret(outputInfo);
+    CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
+    ret.outputExpected = MakeTensor<uint8_t, 4>(outputInfo, expectedOutputData);
+
+    return ret;
 }
 
 LayerTestResult<float,4> CompareConvolution2dTest(

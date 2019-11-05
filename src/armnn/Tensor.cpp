@@ -230,6 +230,11 @@ bool TensorInfo::IsTypeSpaceMatch(const TensorInfo& other) const
     return match;
 }
 
+bool TensorInfo::HasPerAxisQuantization() const
+{
+    return HasMultipleQuantizationScales() || m_Quantization.m_QuantizationDim.has_value();
+}
+
 std::vector<float> TensorInfo::GetQuantizationScales() const
 {
     return m_Quantization.m_Scales;

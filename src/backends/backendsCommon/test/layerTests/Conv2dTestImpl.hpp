@@ -111,6 +111,11 @@ LayerTestResult<float, 4> CompareConvolution2dTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     armnn::IWorkloadFactory& refWorkloadFactory);
 
+LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout);
+
 //
 // DepthwiseConvolution2d
 //

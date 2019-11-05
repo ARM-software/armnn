@@ -196,6 +196,8 @@ void GatherTensorHandlePairs(const DescriptorType& descriptor,
     }
 }
 
+int32_t ConvertMaskToACLFormat(int32_t mask, int32_t numDim);
+
 armnn::ConstTensor PermuteTensor(const ConstCpuTensorHandle* tensor,
                                  const PermutationVector& permutationVector,
                                  void* permuteBuffer);

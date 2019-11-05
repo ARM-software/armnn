@@ -30,6 +30,46 @@ LayerTestResult<float, 2> StridedSliceShrinkAxisMaskFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskBitPosition0Dim3Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 4> StridedSliceShrinkAxisMaskCTSFloat32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 3> StridedSliceShrinkAxisMaskBitPosition0Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 3> StridedSliceShrinkAxisMaskBitPosition1Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 3> StridedSliceShrinkAxisMaskBitPosition2Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 3> StridedSliceShrinkAxisMaskBitPosition3Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskBitPosition0And1Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskBitPosition0And2Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskBitPosition0And3Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<float, 1> StridedSliceShrinkAxisMaskBitPosition0And1And3Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
 LayerTestResult<float, 3> StridedSlice3dFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
@@ -63,6 +103,42 @@ LayerTestResult<uint8_t, 4> StridedSliceSimpleRangeMaskUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskUint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0Dim3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition0Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And3Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+LayerTestResult<uint8_t, 1> StridedSliceShrinkAxisMaskBitPosition0And1And3Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 

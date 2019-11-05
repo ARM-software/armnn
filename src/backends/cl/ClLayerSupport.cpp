@@ -275,7 +275,7 @@ bool ClLayerSupport::IsConstantSupported(const TensorInfo& output,
     return IsSupportedForDataTypeCl(reasonIfUnsupported,
                                     output.GetDataType(),
                                     &TrueFunc<>,
-                                    &FalseFuncU8<>);
+                                    &TrueFunc<>);
 }
 
 bool ClLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,

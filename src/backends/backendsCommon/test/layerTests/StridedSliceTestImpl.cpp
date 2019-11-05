@@ -266,6 +266,400 @@ LayerTestResult<T, 2> StridedSliceShrinkAxisMaskTest(
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSliceShrinkAxisMaskBitPosition0Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {3, 2, 3, 1};
+    unsigned int outputShape[] = {2, 3, 1};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0, 0};
+    desc.m_Parameters.m_End            = {1, 1, 1, 1};
+    desc.m_Parameters.m_Stride         = {1, 1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 0);
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f
+            });
+
+    return StridedSliceTestImpl<T, 4, 3>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSliceShrinkAxisMaskBitPosition1Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {3, 2, 3, 1};
+    unsigned int outputShape[] = {3, 3, 1};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0, 0};
+    desc.m_Parameters.m_End            = {1, 1, 1, 1};
+    desc.m_Parameters.m_Stride         = {1, 1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 1);
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 7.0f, 8.0f, 9.0f, 13.0f, 14.0f, 15.0f
+            });
+
+    return StridedSliceTestImpl<T, 4, 3>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSliceShrinkAxisMaskBitPosition2Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {3, 2, 3, 1};
+    unsigned int outputShape[] = {3, 2, 1};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0, 0};
+    desc.m_Parameters.m_End            = {1, 1, 1, 1};
+    desc.m_Parameters.m_Stride         = {1, 1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 2);
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 4.0f, 7.0f, 10.0f, 13.0f, 16.0f
+            });
+
+    return StridedSliceTestImpl<T, 4, 3>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSliceShrinkAxisMaskBitPosition3Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {3, 2, 3, 1};
+    unsigned int outputShape[] = {3, 2, 3};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0, 0};
+    desc.m_Parameters.m_End            = {1, 1, 1, 1};
+    desc.m_Parameters.m_Stride         = {1, 1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 3);
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    return StridedSliceTestImpl<T, 4, 3>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> StridedSliceShrinkAxisMaskBitPosition0And1Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {3, 2, 3, 1};
+    unsigned int outputShape[] = {3, 1};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0, 0};
+    desc.m_Parameters.m_End            = {1, 1, 1, 1};
+    desc.m_Parameters.m_Stride         = {1, 1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 0) | (1 << 1);
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(2, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f
+            });
+
+    return StridedSliceTestImpl<T, 4, 2>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> StridedSliceShrinkAxisMaskBitPosition0Dim3Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 1};
+    unsigned int outputShape[] = {3, 1};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0};
+    desc.m_Parameters.m_End            = {0, 0, 0};
+    desc.m_Parameters.m_Stride         = {1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 0);
+
+    inputTensorInfo = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(2, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f
+            });
+
+    return StridedSliceTestImpl<T, 3, 2>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+void FillVector(std::vector<float>& inputArray, float start, float step)
+{
+    for (uint32_t i = 0; i < inputArray.size(); ++i)
+    {
+        inputArray[i] = start;
+        start += step;
+    }
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSliceShrinkAxisMaskCTSTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {1, 1, 8, 942};
+    unsigned int outputShape[] = {1, 1, 1, 279};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 1, 229};
+    desc.m_Parameters.m_End            = {1, 1, 2, 787};
+    desc.m_Parameters.m_Stride         = {2, 3, 3, 2};
+    desc.m_Parameters.m_BeginMask      = 2;
+    desc.m_Parameters.m_EndMask        = 0;
+    desc.m_Parameters.m_ShrinkAxisMask = 0;
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    // Array from 1 to 7535
+    std::vector<float> input(7536);
+    FillVector(input, 1.0f, 1.0f);
+
+    // Array from 1171 to 1727 in steps of 2
+    std::vector<float> outputExpected(279);
+    FillVector(outputExpected, 1171.0, 2.0f);
+
+    return StridedSliceTestImpl<T, 4, 4>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> StridedSliceShrinkAxisMaskBitPosition0And2Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {3, 2, 3, 1};
+    unsigned int outputShape[] = {2, 1};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0, 0};
+    desc.m_Parameters.m_End            = {1, 1, 1, 1};
+    desc.m_Parameters.m_Stride         = {1, 1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 0) | (1 << 2);
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(2, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 4.0f
+            });
+
+    return StridedSliceTestImpl<T, 4, 2>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 2> StridedSliceShrinkAxisMaskBitPosition0And3Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {3, 2, 3, 1};
+    unsigned int outputShape[] = {2, 3};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0, 0};
+    desc.m_Parameters.m_End            = {1, 1, 1, 1};
+    desc.m_Parameters.m_Stride         = {1, 1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 0) | (1 << 3);
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(2, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f
+            });
+
+    return StridedSliceTestImpl<T, 4, 2>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 1> StridedSliceShrinkAxisMaskBitPosition0And1And3Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {3, 2, 3, 1};
+    unsigned int outputShape[] = {3};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin          = {0, 0, 0, 0};
+    desc.m_Parameters.m_End            = {1, 1, 1, 1};
+    desc.m_Parameters.m_Stride         = {1, 1, 1, 1};
+    desc.m_Parameters.m_EndMask        = (1 << 4) - 1;
+    desc.m_Parameters.m_ShrinkAxisMask = (1 << 0) | (1 << 1) | (1 << 3);
+
+    inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
+    outputTensorInfo = armnn::TensorInfo(1, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+
+                    7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+                    13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f
+            });
+
+    std::vector<float> outputExpected = std::vector<float>(
+            {
+                    1.0f, 2.0f, 3.0f
+            });
+
+    return StridedSliceTestImpl<T, 4, 1>(
+            workloadFactory, memoryManager, inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 3> StridedSlice3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -462,6 +856,76 @@ LayerTestResult<float, 2> StridedSliceShrinkAxisMaskFloat32Test(
     return StridedSliceShrinkAxisMaskTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
 }
 
+LayerTestResult<float, 4> StridedSliceShrinkAxisMaskCTSFloat32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskCTSTest<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskBitPosition0Dim3Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0Dim3Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 3> StridedSliceShrinkAxisMaskBitPosition0Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 3> StridedSliceShrinkAxisMaskBitPosition1Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition1Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 3> StridedSliceShrinkAxisMaskBitPosition2Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition2Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 3> StridedSliceShrinkAxisMaskBitPosition3Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition3Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskBitPosition0And1Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0And1Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskBitPosition0And2Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0And2Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 2> StridedSliceShrinkAxisMaskBitPosition0And3Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0And3Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<float, 1> StridedSliceShrinkAxisMaskBitPosition0And1And3Float32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0And1And3Test<armnn::DataType::Float32>(workloadFactory, memoryManager);
+}
+
 LayerTestResult<float, 3> StridedSlice3dFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
@@ -523,6 +987,78 @@ LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskUint8Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
 {
     return StridedSliceShrinkAxisMaskTest<armnn::DataType::QuantisedAsymm8>(workloadFactory, memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0Dim3Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0Dim3Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                            memoryManager);
+}
+
+LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition0Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                        memoryManager);
+}
+
+LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition1Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition1Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                        memoryManager);
+}
+
+LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition2Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition2Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                        memoryManager);
+}
+
+LayerTestResult<uint8_t, 3> StridedSliceShrinkAxisMaskBitPosition3Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition3Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                        memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And1Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0And1Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                            memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And2Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0And2Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                            memoryManager);
+}
+
+LayerTestResult<uint8_t, 2> StridedSliceShrinkAxisMaskBitPosition0And3Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0And3Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                            memoryManager);
+}
+
+LayerTestResult<uint8_t, 1> StridedSliceShrinkAxisMaskBitPosition0And1And3Uint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager)
+{
+    return StridedSliceShrinkAxisMaskBitPosition0And1And3Test<armnn::DataType::QuantisedAsymm8>(workloadFactory,
+                                                                                                memoryManager);
 }
 
 LayerTestResult<uint8_t, 3> StridedSlice3dUint8Test(

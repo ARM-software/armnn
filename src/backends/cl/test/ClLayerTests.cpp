@@ -568,6 +568,21 @@ ARMNN_AUTO_TEST_CASE(StridedSlice4dReverseFloat32, StridedSlice4dReverseFloat32T
 ARMNN_AUTO_TEST_CASE(StridedSliceSimpleStrideFloat32, StridedSliceSimpleStrideFloat32Test)
 ARMNN_AUTO_TEST_CASE(StridedSliceSimpleRangeMaskFloat32, StridedSliceSimpleRangeMaskFloat32Test)
 ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskFloat32, StridedSliceShrinkAxisMaskFloat32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskCTSFloat32, StridedSliceShrinkAxisMaskCTSFloat32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0Dim3Float32,
+                     StridedSliceShrinkAxisMaskBitPosition0Dim3Float32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0Float32, StridedSliceShrinkAxisMaskBitPosition0Float32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition1Float32, StridedSliceShrinkAxisMaskBitPosition1Float32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition2Float32, StridedSliceShrinkAxisMaskBitPosition2Float32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition3Float32, StridedSliceShrinkAxisMaskBitPosition3Float32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0And1Float32,
+                     StridedSliceShrinkAxisMaskBitPosition0And1Float32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0And2Float32,
+                     StridedSliceShrinkAxisMaskBitPosition0And2Float32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0And3Float32,
+                     StridedSliceShrinkAxisMaskBitPosition0And3Float32Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0And1And3Float32,
+                     StridedSliceShrinkAxisMaskBitPosition0And1And3Float32Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice3dFloat32, StridedSlice3dFloat32Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice3dReverseFloat32, StridedSlice3dReverseFloat32Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice2dFloat32, StridedSlice2dFloat32Test)
@@ -578,6 +593,20 @@ ARMNN_AUTO_TEST_CASE(StridedSlice4dReverseUint8, StridedSlice4dReverseUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSliceSimpleStrideUint8, StridedSliceSimpleStrideUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSliceSimpleRangeMaskUint8, StridedSliceSimpleRangeMaskUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskUint8, StridedSliceShrinkAxisMaskUint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0Dim3Uint8,
+                     StridedSliceShrinkAxisMaskBitPosition0Dim3Uint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0Uint8, StridedSliceShrinkAxisMaskBitPosition0Uint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition1Uint8, StridedSliceShrinkAxisMaskBitPosition1Uint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition2Uint8, StridedSliceShrinkAxisMaskBitPosition2Uint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition3Uint8, StridedSliceShrinkAxisMaskBitPosition3Uint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0And1Uint8,
+                     StridedSliceShrinkAxisMaskBitPosition0And1Uint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0And2Uint8,
+                     StridedSliceShrinkAxisMaskBitPosition0And2Uint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0And3Uint8,
+                     StridedSliceShrinkAxisMaskBitPosition0And3Uint8Test)
+ARMNN_AUTO_TEST_CASE(StridedSliceShrinkAxisMaskBitPosition0And1And3Uint8,
+                     StridedSliceShrinkAxisMaskBitPosition0And1And3Uint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice3dUint8, StridedSlice3dUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice3dReverseUint8, StridedSlice3dReverseUint8Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice2dUint8, StridedSlice2dUint8Test)

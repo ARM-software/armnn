@@ -9,7 +9,7 @@
 #include <neon/NeonTensorHandle.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-
+#include <backendsCommon/WorkloadUtils.hpp>
 
 namespace armnn
 {
@@ -29,9 +29,10 @@ arm_compute::Status NeonStridedSliceWorkloadValidate(const TensorInfo& input,
                                                               descriptor.m_End,
                                                               descriptor.m_Stride);
 
-    int32_t begin_mask = descriptor.m_BeginMask;
-    int32_t end_mask = descriptor.m_EndMask;
-    int32_t shrink_axis_mask = descriptor.m_ShrinkAxisMask;
+    auto numDimensions       = boost::numeric_cast<int>(input.GetNumDimensions());
+    int32_t begin_mask       = ConvertMaskToACLFormat(descriptor.m_BeginMask, numDimensions);
+    int32_t end_mask         = ConvertMaskToACLFormat(descriptor.m_EndMask, numDimensions);
+    int32_t shrink_axis_mask = ConvertMaskToACLFormat(descriptor.m_ShrinkAxisMask, numDimensions);
 
     return arm_compute::NEStridedSlice::validate(&aclInput,
                                                  &aclOutput,
@@ -60,9 +61,10 @@ NeonStridedSliceWorkload::NeonStridedSliceWorkload(const StridedSliceQueueDescri
                                                               m_Data.m_Parameters.m_End,
                                                               m_Data.m_Parameters.m_Stride);
 
-    int32_t begin_mask = m_Data.m_Parameters.m_BeginMask;
-    int32_t end_mask = m_Data.m_Parameters.m_EndMask;
-    int32_t shrink_axis_mask = m_Data.m_Parameters.m_ShrinkAxisMask;
+    auto numDimensions       = boost::numeric_cast<int>(info.m_InputTensorInfos[0].GetNumDimensions());
+    int32_t begin_mask       = ConvertMaskToACLFormat(m_Data.m_Parameters.m_BeginMask, numDimensions);
+    int32_t end_mask         = ConvertMaskToACLFormat(m_Data.m_Parameters.m_EndMask, numDimensions);
+    int32_t shrink_axis_mask = ConvertMaskToACLFormat(m_Data.m_Parameters.m_ShrinkAxisMask, numDimensions);
 
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);

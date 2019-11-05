@@ -83,7 +83,7 @@ private:
     }
 
     template <typename ExceptionType>
-    void CancelOperationAndThrow(std::unique_ptr<IPacketBuffer>& writerBuffer, const std::string& errorMessage)
+    void CancelOperationAndThrow(IPacketBufferPtr& writerBuffer, const std::string& errorMessage)
     {
         if (std::is_same<ExceptionType, armnn::profiling::BufferExhaustion>::value)
         {

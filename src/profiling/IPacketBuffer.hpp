@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <memory>
+
 namespace armnn
 {
 
@@ -34,6 +36,8 @@ public:
 
     virtual unsigned char* GetWritableData() = 0;
 };
+
+using IPacketBufferPtr = std::unique_ptr<IPacketBuffer>;
 
 } // namespace profiling
 

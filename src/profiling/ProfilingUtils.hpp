@@ -92,11 +92,11 @@ uint16_t GetNextUid(bool peekOnly = false);
 
 std::vector<uint16_t> GetNextCounterUids(uint16_t cores);
 
-void WriteUint64(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint64_t value);
+void WriteUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint64_t value);
 
-void WriteUint32(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint32_t value);
+void WriteUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint32_t value);
 
-void WriteUint16(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint16_t value);
+void WriteUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint16_t value);
 
 void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value);
 
@@ -104,13 +104,13 @@ void WriteUint32(unsigned char* buffer, unsigned int offset, uint32_t value);
 
 void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value);
 
-uint64_t ReadUint64(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset);
+uint64_t ReadUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset);
 
-uint32_t ReadUint32(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset);
+uint32_t ReadUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset);
 
-uint16_t ReadUint16(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset);
+uint16_t ReadUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset);
 
-uint8_t ReadUint8(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset);
+uint8_t ReadUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset);
 
 uint64_t ReadUint64(unsigned const char* buffer, unsigned int offset);
 
@@ -145,7 +145,7 @@ enum class ProfilingRelationshipType
 
 uint32_t CalculateSizeOfPaddedSwString(const std::string& str);
 
-SwTraceMessage ReadSwTraceMessage(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int& offset);
+SwTraceMessage ReadSwTraceMessage(const IPacketBufferPtr& packetBuffer, unsigned int& offset);
 
 TimelinePacketStatus WriteTimelineLabelBinaryPacket(uint64_t profilingGuid,
                                                     const std::string& label,

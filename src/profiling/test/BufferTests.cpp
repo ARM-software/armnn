@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_SUITE(BufferTests)
 
 BOOST_AUTO_TEST_CASE(PacketBufferTest0)
 {
-    std::unique_ptr<IPacketBuffer> packetBuffer = std::make_unique<PacketBuffer>(512);
+    IPacketBufferPtr packetBuffer = std::make_unique<PacketBuffer>(512);
 
     BOOST_TEST(packetBuffer->GetSize() == 0);
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(PacketBufferTest0)
 
 BOOST_AUTO_TEST_CASE(PacketBufferTest1)
 {
-    std::unique_ptr<IPacketBuffer> packetBuffer = std::make_unique<PacketBuffer>(512);
+    IPacketBufferPtr packetBuffer = std::make_unique<PacketBuffer>(512);
 
     BOOST_TEST(packetBuffer->GetSize() == 0);
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(PacketBufferTest1)
 }
 
 BOOST_AUTO_TEST_CASE(PacketBufferReleaseTest) {
-    std::unique_ptr<IPacketBuffer> packetBuffer = std::make_unique<PacketBuffer>(512);
+    IPacketBufferPtr packetBuffer = std::make_unique<PacketBuffer>(512);
 
     BOOST_TEST(packetBuffer->GetSize() == 0);
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(PacketBufferReleaseTest) {
 
 BOOST_AUTO_TEST_CASE(PacketBufferCommitErrorTest)
 {
-    std::unique_ptr<IPacketBuffer> packetBuffer = std::make_unique<PacketBuffer>(8);
+    IPacketBufferPtr packetBuffer = std::make_unique<PacketBuffer>(8);
 
     // Cannot commit data bigger than the max size of the buffer
     BOOST_CHECK_THROW(packetBuffer->Commit(16);, armnn::RuntimeException);

@@ -64,7 +64,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     uint32_t offset = 0;
     uint32_t reserved = 0;
 
-    std::unique_ptr<IPacketBuffer> writeBuffer = m_BufferManager.Reserve(totalSize, reserved);
+    IPacketBufferPtr writeBuffer = m_BufferManager.Reserve(totalSize, reserved);
 
     if (writeBuffer == nullptr || reserved < totalSize)
     {
@@ -786,7 +786,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
     // Reserve space in the buffer for the packet
     uint32_t reserved = 0;
-    std::unique_ptr<IPacketBuffer> writeBuffer = m_BufferManager.Reserve(totalSize, reserved);
+    IPacketBufferPtr writeBuffer = m_BufferManager.Reserve(totalSize, reserved);
 
     if (writeBuffer == nullptr || reserved < totalSize)
     {
@@ -823,7 +823,7 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
     uint32_t offset = 0;
     uint32_t reserved = 0;
 
-    std::unique_ptr<IPacketBuffer> writeBuffer = m_BufferManager.Reserve(totalSize, reserved);
+    IPacketBufferPtr writeBuffer = m_BufferManager.Reserve(totalSize, reserved);
 
     if (writeBuffer == nullptr || reserved < totalSize)
     {
@@ -872,7 +872,7 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
     uint32_t offset = 0;
     uint32_t reserved = 0;
 
-    std::unique_ptr<IPacketBuffer> writeBuffer = m_BufferManager.Reserve(totalSize, reserved);
+    IPacketBufferPtr writeBuffer = m_BufferManager.Reserve(totalSize, reserved);
 
     if (writeBuffer == nullptr || reserved < totalSize)
     {
@@ -1056,7 +1056,7 @@ void SendCounterPacket::Send(IProfilingConnection& profilingConnection)
 void SendCounterPacket::FlushBuffer(IProfilingConnection& profilingConnection, bool notifyWatchers)
 {
     // Get the first available readable buffer
-    std::unique_ptr<IPacketBuffer> packetBuffer = m_BufferManager.GetReadableBuffer();
+    IPacketBufferPtr packetBuffer = m_BufferManager.GetReadableBuffer();
 
     // Initialize the flag that indicates whether at least a packet has been sent
     bool packetsSent = false;

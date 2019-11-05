@@ -55,7 +55,7 @@ private:
     void ReserveBuffer();
 
     IBufferManager& m_BufferManager;
-    std::unique_ptr<IPacketBuffer> m_WriteBuffer;
+    IPacketBufferPtr m_WriteBuffer;
     unsigned int m_Offset;
     unsigned int m_BufferSize;
 };

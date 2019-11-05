@@ -24,25 +24,25 @@ public:
 
     ~BufferManager() {}
 
-    std::unique_ptr<IPacketBuffer> Reserve(unsigned int requestedSize, unsigned int& reservedSize) override;
+    IPacketBufferPtr Reserve(unsigned int requestedSize, unsigned int& reservedSize) override;
 
-    void Commit(std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int size) override;
+    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) override;
 
-    void Release(std::unique_ptr<IPacketBuffer>& packetBuffer) override;
+    void Release(IPacketBufferPtr& packetBuffer) override;
 
-    std::unique_ptr<IPacketBuffer> GetReadableBuffer() override;
+    IPacketBufferPtr GetReadableBuffer() override;
 
-    void MarkRead(std::unique_ptr<IPacketBuffer>& packetBuffer) override;
+    void MarkRead(IPacketBufferPtr& packetBuffer) override;
 
 private:
     // Maximum buffer size
     unsigned int m_MaxBufferSize;
 
     // List of available packet buffers
-    std::vector<std::unique_ptr<IPacketBuffer>> m_AvailableList;
+    std::vector<IPacketBufferPtr> m_AvailableList;
 
     // List of readable packet buffers
-    std::vector<std::unique_ptr<IPacketBuffer>> m_ReadableList;
+    std::vector<IPacketBufferPtr> m_ReadableList;
 
     // Mutex for available packet buffer list
     std::mutex m_AvailableMutex;

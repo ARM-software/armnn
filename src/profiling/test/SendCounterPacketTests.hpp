@@ -145,7 +145,7 @@ public:
 
     ~MockBufferManager() {}
 
-    std::unique_ptr<IPacketBuffer> Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
+    IPacketBufferPtr Reserve(unsigned int requestedSize, unsigned int& reservedSize) override
     {
         if (requestedSize > m_BufferSize)
         {
@@ -159,24 +159,24 @@ public:
         return std::move(m_Buffer);
     }
 
-    void Commit(std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int size) override
+    void Commit(IPacketBufferPtr& packetBuffer, unsigned int size) override
     {
         packetBuffer->Commit(size);
         m_Buffer = std::move(packetBuffer);
     }
 
-    std::unique_ptr<IPacketBuffer> GetReadableBuffer() override
+    IPacketBufferPtr GetReadableBuffer() override
     {
         return std::move(m_Buffer);
     }
 
-    void Release(std::unique_ptr<IPacketBuffer>& packetBuffer) override
+    void Release(IPacketBufferPtr& packetBuffer) override
     {
         packetBuffer->Release();
         m_Buffer = std::move(packetBuffer);
     }
 
-    void MarkRead(std::unique_ptr<IPacketBuffer>& packetBuffer) override
+    void MarkRead(IPacketBufferPtr& packetBuffer) override
     {
         packetBuffer->MarkRead();
         m_Buffer = std::move(packetBuffer);
@@ -184,14 +184,12 @@ public:
 
 private:
     unsigned int m_BufferSize;
-    std::unique_ptr<IPacketBuffer> m_Buffer;
+    IPacketBufferPtr m_Buffer;
 };
 
 class MockStreamCounterBuffer : public IBufferManager
 {
 public:
-    using IPacketBufferPtr = std::unique_ptr<IPacketBuffer>;
-
     MockStreamCounterBuffer(unsigned int maxBufferSize = 4096)
         : m_MaxBufferSize(maxBufferSize)
         , m_BufferList()
@@ -286,7 +284,7 @@ public:
     {
         std::string message("SendStreamMetaDataPacket");
         unsigned int reserved = 0;
-        std::unique_ptr<IPacketBuffer> buffer = m_BufferManager.Reserve(1024, reserved);
+        IPacketBufferPtr buffer = m_BufferManager.Reserve(1024, reserved);
         memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
         m_BufferManager.Commit(buffer, reserved);
     }
@@ -295,7 +293,7 @@ public:
     {
         std::string message("SendCounterDirectoryPacket");
         unsigned int reserved = 0;
-        std::unique_ptr<IPacketBuffer> buffer = m_BufferManager.Reserve(1024, reserved);
+        IPacketBufferPtr buffer = m_BufferManager.Reserve(1024, reserved);
         memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
         m_BufferManager.Commit(buffer, reserved);
     }
@@ -305,7 +303,7 @@ public:
     {
         std::string message("SendPeriodicCounterCapturePacket");
         unsigned int reserved = 0;
-        std::unique_ptr<IPacketBuffer> buffer = m_BufferManager.Reserve(1024, reserved);
+        IPacketBufferPtr buffer = m_BufferManager.Reserve(1024, reserved);
         memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
         m_BufferManager.Commit(buffer, reserved);
     }
@@ -315,7 +313,7 @@ public:
     {
         std::string message("SendPeriodicCounterSelectionPacket");
         unsigned int reserved = 0;
-        std::unique_ptr<IPacketBuffer> buffer = m_BufferManager.Reserve(1024, reserved);
+        IPacketBufferPtr buffer = m_BufferManager.Reserve(1024, reserved);
         memcpy(buffer->GetWritableData(), message.c_str(), static_cast<unsigned int>(message.size()) + 1);
         m_BufferManager.Commit(buffer, reserved);
     }

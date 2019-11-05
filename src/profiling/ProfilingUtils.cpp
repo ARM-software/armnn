@@ -87,21 +87,21 @@ std::vector<uint16_t> GetNextCounterUids(uint16_t cores)
     return counterUids;
 }
 
-void WriteUint64(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint64_t value)
+void WriteUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint64_t value)
 {
     BOOST_ASSERT(packetBuffer);
 
     WriteUint64(packetBuffer->GetWritableData(), offset, value);
 }
 
-void WriteUint32(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint32_t value)
+void WriteUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint32_t value)
 {
     BOOST_ASSERT(packetBuffer);
 
     WriteUint32(packetBuffer->GetWritableData(), offset, value);
 }
 
-void WriteUint16(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint16_t value)
+void WriteUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint16_t value)
 {
     BOOST_ASSERT(packetBuffer);
 
@@ -140,28 +140,28 @@ void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value)
     buffer[offset + 1] = static_cast<unsigned char>((value >> 8) & 0xFF);
 }
 
-uint64_t ReadUint64(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset)
+uint64_t ReadUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
     BOOST_ASSERT(packetBuffer);
 
     return ReadUint64(packetBuffer->GetReadableData(), offset);
 }
 
-uint32_t ReadUint32(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset)
+uint32_t ReadUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
     BOOST_ASSERT(packetBuffer);
 
     return ReadUint32(packetBuffer->GetReadableData(), offset);
 }
 
-uint16_t ReadUint16(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset)
+uint16_t ReadUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
     BOOST_ASSERT(packetBuffer);
 
     return ReadUint16(packetBuffer->GetReadableData(), offset);
 }
 
-uint8_t ReadUint8(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset)
+uint8_t ReadUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
     BOOST_ASSERT(packetBuffer);
 
@@ -292,7 +292,7 @@ uint32_t CalculateSizeOfPaddedSwString(const std::string& str)
 }
 
 // Read TimelineMessageDirectoryPacket from given IPacketBuffer and offset
-SwTraceMessage ReadSwTraceMessage(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int& offset)
+SwTraceMessage ReadSwTraceMessage(const IPacketBufferPtr& packetBuffer, unsigned int& offset)
 {
     BOOST_ASSERT(packetBuffer);
 

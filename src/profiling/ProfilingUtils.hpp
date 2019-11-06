@@ -25,13 +25,20 @@ namespace armnn
 namespace profiling
 {
 
+struct SwTraceHeader
+{
+    uint8_t m_StreamVersion;
+    uint8_t m_PointerBytes;
+    uint8_t m_ThreadIdBytes;
+};
+
 struct SwTraceMessage
 {
-    uint32_t id;
-    std::string name;
-    std::string uiName;
-    std::vector<char> argTypes;
-    std::vector<std::string> argNames;
+    uint32_t m_Id;
+    std::string m_Name;
+    std::string m_UiName;
+    std::vector<char> m_ArgTypes;
+    std::vector<std::string> m_ArgNames;
 };
 
 struct SwTraceCharPolicy
@@ -49,6 +56,29 @@ struct SwTraceNameCharPolicy
     {
         // Check that the given character has ASCII 7-bit encoding, alpha-numeric and underscore only
         return c < 128 && (std::isalnum(c) || c == '_');
+    }
+};
+
+struct SwTraceTypeCharPolicy
+{
+    static bool IsValidChar(unsigned char c)
+    {
+        // Check that the given character is among the allowed ones
+        switch (c)
+        {
+        case '@':
+        case 't':
+        case 'i':
+        case 'I':
+        case 'l':
+        case 'L':
+        case 'F':
+        case 'p':
+        case 's':
+            return true; // Valid char
+        default:
+            return false; // Invalid char
+        }
     }
 };
 
@@ -87,6 +117,23 @@ bool StringToSwTraceString(const std::string& s, std::vector<uint32_t>& outputBu
     return true;
 }
 
+template <typename SwTracePolicy,
+          typename SwTraceBuffer = std::vector<uint32_t>>
+bool ConvertDirectoryComponent(const std::string& directoryComponent, SwTraceBuffer& swTraceBuffer)
+{
+    // Convert the directory component using the given policy
+    SwTraceBuffer tempSwTraceBuffer;
+    bool result = StringToSwTraceString<SwTracePolicy>(directoryComponent, tempSwTraceBuffer);
+    if (!result)
+    {
+        return false;
+    }
+
+    swTraceBuffer.insert(swTraceBuffer.end(), tempSwTraceBuffer.begin(), tempSwTraceBuffer.end());
+
+    return true;
+}
+
 uint16_t GetNextUid(bool peekOnly = false);
 
 std::vector<uint16_t> GetNextCounterUids(uint16_t cores);
@@ -103,6 +150,8 @@ void WriteUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint
 
 void WriteUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint16_t value);
 
+void WriteUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint8_t value);
+
 void WriteBytes(unsigned char* buffer, unsigned int offset, const void* value, unsigned int valueSize);
 
 void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value);
@@ -110,6 +159,8 @@ void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value);
 void WriteUint32(unsigned char* buffer, unsigned int offset, uint32_t value);
 
 void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value);
+
+void WriteUint8(unsigned char* buffer, unsigned int offset, uint8_t value);
 
 void ReadBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[]);
 

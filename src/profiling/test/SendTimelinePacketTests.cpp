@@ -31,7 +31,11 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     // Get the readable buffer
     auto packetBuffer = mockBuffer.GetReadableBuffer();
 
+    unsigned int uint8_t_size  = sizeof(uint8_t);
     unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+    unsigned int threadId_size = sizeof(std::thread::id);
+
     // Check the packet header
     unsigned int offset = 0;
     uint32_t packetHeaderWord0 = ReadUint32(packetBuffer, offset);
@@ -50,74 +54,84 @@ BOOST_AUTO_TEST_CASE(SendTimelineMessageDirectoryPackageTest)
     uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
     uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(sequenceNumbered ==  0);
-    BOOST_CHECK(dataLength       == 416);
+    BOOST_CHECK(dataLength       == 419);
 
     offset += uint32_t_size;
+    uint8_t readStreamVersion = ReadUint8(packetBuffer, offset);
+    BOOST_CHECK(readStreamVersion == 4);
+    offset += uint8_t_size;
+    uint8_t readPointerBytes = ReadUint8(packetBuffer, offset);
+    BOOST_CHECK(readPointerBytes == uint64_t_size);
+    offset += uint8_t_size;
+    uint8_t readThreadIdBytes = ReadUint8(packetBuffer, offset);
+    BOOST_CHECK(readThreadIdBytes == threadId_size);
+
+    offset += uint8_t_size;
     uint32_t DeclCount = ReadUint32(packetBuffer, offset);
     BOOST_CHECK(DeclCount == 5);
 
     offset += uint32_t_size;
     SwTraceMessage swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
-    BOOST_CHECK(swTraceMessage.id == 0);
-    BOOST_CHECK(swTraceMessage.name == "declareLabel");
-    BOOST_CHECK(swTraceMessage.uiName == "declare label");
-    BOOST_CHECK(swTraceMessage.argTypes.size() == 2);
-    BOOST_CHECK(swTraceMessage.argTypes[0] == 'p');
-    BOOST_CHECK(swTraceMessage.argTypes[1] == 's');
-    BOOST_CHECK(swTraceMessage.argNames.size() == 2);
-    BOOST_CHECK(swTraceMessage.argNames[0] == "guid");
-    BOOST_CHECK(swTraceMessage.argNames[1] == "value");
+    BOOST_CHECK(swTraceMessage.m_Id == 0);
+    BOOST_CHECK(swTraceMessage.m_Name == "declareLabel");
+    BOOST_CHECK(swTraceMessage.m_UiName == "declare label");
+    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 2);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[0] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[1] == 's');
+    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 2);
+    BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "guid");
+    BOOST_CHECK(swTraceMessage.m_ArgNames[1] == "value");
 
     swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
-    BOOST_CHECK(swTraceMessage.id == 1);
-    BOOST_CHECK(swTraceMessage.name == "declareEntity");
-    BOOST_CHECK(swTraceMessage.uiName == "declare entity");
-    BOOST_CHECK(swTraceMessage.argTypes.size() == 1);
-    BOOST_CHECK(swTraceMessage.argTypes[0] == 'p');
-    BOOST_CHECK(swTraceMessage.argNames.size() == 1);
-    BOOST_CHECK(swTraceMessage.argNames[0] == "guid");
+    BOOST_CHECK(swTraceMessage.m_Id == 1);
+    BOOST_CHECK(swTraceMessage.m_Name == "declareEntity");
+    BOOST_CHECK(swTraceMessage.m_UiName == "declare entity");
+    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 1);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[0] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 1);
+    BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "guid");
 
     swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
-    BOOST_CHECK(swTraceMessage.id == 2);
-    BOOST_CHECK(swTraceMessage.name == "declareEventClass");
-    BOOST_CHECK(swTraceMessage.uiName == "declare event class");
-    BOOST_CHECK(swTraceMessage.argTypes.size() == 1);
-    BOOST_CHECK(swTraceMessage.argTypes[0] == 'p');
-    BOOST_CHECK(swTraceMessage.argNames.size() == 1);
-    BOOST_CHECK(swTraceMessage.argNames[0] == "guid");
+    BOOST_CHECK(swTraceMessage.m_Id == 2);
+    BOOST_CHECK(swTraceMessage.m_Name == "declareEventClass");
+    BOOST_CHECK(swTraceMessage.m_UiName == "declare event class");
+    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 1);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[0] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 1);
+    BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "guid");
 
     swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
-    BOOST_CHECK(swTraceMessage.id == 3);
-    BOOST_CHECK(swTraceMessage.name == "declareRelationship");
-    BOOST_CHECK(swTraceMessage.uiName == "declare relationship");
-    BOOST_CHECK(swTraceMessage.argTypes.size() == 4);
-    BOOST_CHECK(swTraceMessage.argTypes[0] == 'I');
-    BOOST_CHECK(swTraceMessage.argTypes[1] == 'p');
-    BOOST_CHECK(swTraceMessage.argTypes[2] == 'p');
-    BOOST_CHECK(swTraceMessage.argTypes[3] == 'p');
-    BOOST_CHECK(swTraceMessage.argNames.size() == 4);
-    BOOST_CHECK(swTraceMessage.argNames[0] == "relationshipType");
-    BOOST_CHECK(swTraceMessage.argNames[1] == "relationshipGuid");
-    BOOST_CHECK(swTraceMessage.argNames[2] == "headGuid");
-    BOOST_CHECK(swTraceMessage.argNames[3] == "tailGuid");
+    BOOST_CHECK(swTraceMessage.m_Id == 3);
+    BOOST_CHECK(swTraceMessage.m_Name == "declareRelationship");
+    BOOST_CHECK(swTraceMessage.m_UiName == "declare relationship");
+    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 4);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[0] == 'I');
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[1] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[2] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[3] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 4);
+    BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "relationshipType");
+    BOOST_CHECK(swTraceMessage.m_ArgNames[1] == "relationshipGuid");
+    BOOST_CHECK(swTraceMessage.m_ArgNames[2] == "headGuid");
+    BOOST_CHECK(swTraceMessage.m_ArgNames[3] == "tailGuid");
 
     swTraceMessage = ReadSwTraceMessage(packetBuffer->GetReadableData(), offset);
 
-    BOOST_CHECK(swTraceMessage.id == 4);
-    BOOST_CHECK(swTraceMessage.name == "declareEvent");
-    BOOST_CHECK(swTraceMessage.uiName == "declare event");
-    BOOST_CHECK(swTraceMessage.argTypes.size() == 3);
-    BOOST_CHECK(swTraceMessage.argTypes[0] == '@');
-    BOOST_CHECK(swTraceMessage.argTypes[1] == 't');
-    BOOST_CHECK(swTraceMessage.argTypes[2] == 'p');
-    BOOST_CHECK(swTraceMessage.argNames.size() == 3);
-    BOOST_CHECK(swTraceMessage.argNames[0] == "timestamp");
-    BOOST_CHECK(swTraceMessage.argNames[1] == "threadId");
-    BOOST_CHECK(swTraceMessage.argNames[2] == "eventGuid");
+    BOOST_CHECK(swTraceMessage.m_Id == 4);
+    BOOST_CHECK(swTraceMessage.m_Name == "declareEvent");
+    BOOST_CHECK(swTraceMessage.m_UiName == "declare event");
+    BOOST_CHECK(swTraceMessage.m_ArgTypes.size() == 3);
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[0] == '@');
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[1] == 't');
+    BOOST_CHECK(swTraceMessage.m_ArgTypes[2] == 'p');
+    BOOST_CHECK(swTraceMessage.m_ArgNames.size() == 3);
+    BOOST_CHECK(swTraceMessage.m_ArgNames[0] == "timestamp");
+    BOOST_CHECK(swTraceMessage.m_ArgNames[1] == "threadId");
+    BOOST_CHECK(swTraceMessage.m_ArgNames[2] == "eventGuid");
 }
 
 BOOST_AUTO_TEST_CASE(SendTimelineEntityPlusEventClassBinaryPacketTest)

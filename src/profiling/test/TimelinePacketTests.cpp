@@ -520,9 +520,12 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTest3)
                                                                        numberOfBytesWritten);
     BOOST_CHECK(result == TimelinePacketStatus::Ok);
 
-    BOOST_CHECK(numberOfBytesWritten == 424);
+    BOOST_CHECK(numberOfBytesWritten == 427);
 
+    unsigned int uint8_t_size  = sizeof(uint8_t);
     unsigned int uint32_t_size = sizeof(uint32_t);
+    unsigned int uint64_t_size = sizeof(uint64_t);
+    unsigned int threadId_size = sizeof(std::thread::id);
 
     // Check the packet header
     unsigned int offset = 0;
@@ -541,10 +544,21 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTest3)
     uint32_t sequenceNumbered = (packetHeaderWord1 >> 24) & 0x00000001;
     uint32_t dataLength       = (packetHeaderWord1 >>  0) & 0x00FFFFFF;
     BOOST_CHECK(sequenceNumbered ==  0);
-    BOOST_CHECK(dataLength       == 416);
+    BOOST_CHECK(dataLength       == 419);
+
+    // Check the stream header
+    offset += uint32_t_size;
+    uint8_t readStreamVersion = ReadUint8(buffer.data(), offset);
+    BOOST_CHECK(readStreamVersion == 4);
+    offset += uint8_t_size;
+    uint8_t readPointerBytes = ReadUint8(buffer.data(), offset);
+    BOOST_CHECK(readPointerBytes == uint64_t_size);
+    offset += uint8_t_size;
+    uint8_t readThreadIdBytes = ReadUint8(buffer.data(), offset);
+    BOOST_CHECK(readThreadIdBytes == threadId_size);
 
     // Check the number of declarations
-    offset += uint32_t_size;
+    offset += uint8_t_size;
     uint32_t declCount = ReadUint32(buffer.data(), offset);
     BOOST_CHECK(declCount == 5);
 
@@ -564,7 +578,7 @@ BOOST_AUTO_TEST_CASE(TimelineMessageDirectoryPacketTest3)
     std::string label = "declareLabel";
     offset += uint32_t_size;
     BOOST_CHECK(std::memcmp(buffer.data() + offset,           // Offset to the label in the buffer
-                            label.data(),                      // The original label
+                            label.data(),                     // The original label
                             swTraceDeclNameLength - 1) == 0); // The length of the label
 
     // Check the ui_name

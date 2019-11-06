@@ -35,18 +35,22 @@ void SendTimelinePacketToCommandHandler(const unsigned char* packetBuffer,
 
     uint32_t PacketDataLength  = header[1] & 0x00FFFFFF;
 
-    std::unique_ptr<unsigned char[]> uniquePacketData = std::make_unique<unsigned char[]>(PacketDataLength);
-
+    auto uniquePacketData = std::make_unique<unsigned char[]>(PacketDataLength);
     std::memcpy(uniquePacketData.get(), packetBuffer + offset, PacketDataLength);
 
-    armnn::profiling::Packet packet = armnn::profiling::Packet(header[0], PacketDataLength, uniquePacketData);
+    armnn::profiling::Packet packet(header[0], PacketDataLength, uniquePacketData);
+
+    BOOST_CHECK(std::memcmp(packetBuffer + offset, packet.GetData(), packet.GetLength()) == 0);
 
     CommandHandler(packet);
 }
 
-BOOST_AUTO_TEST_CASE(TimelineDirecotryTest)
+BOOST_AUTO_TEST_CASE(TimelineDirectoryTest)
 {
+    uint32_t uint8_t_size  = sizeof(uint8_t);
     uint32_t uint32_t_size = sizeof(uint32_t);
+    uint32_t uint64_t_size = sizeof(uint64_t);
+    uint32_t threadId_size = sizeof(std::thread::id);
 
     profiling::BufferManager bufferManager(5);
     profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
@@ -68,6 +72,16 @@ BOOST_AUTO_TEST_CASE(TimelineDirecotryTest)
 
     std::unique_ptr<profiling::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
 
+    uint8_t readStreamVersion = ReadUint8(packetBuffer, offset);
+    BOOST_CHECK(readStreamVersion == 4);
+    offset += uint8_t_size;
+    uint8_t readPointerBytes = ReadUint8(packetBuffer, offset);
+    BOOST_CHECK(readPointerBytes == uint64_t_size);
+    offset += uint8_t_size;
+    uint8_t readThreadIdBytes = ReadUint8(packetBuffer, offset);
+    BOOST_CHECK(readThreadIdBytes == threadId_size);
+    offset += uint8_t_size;
+
     uint32_t declarationSize = profiling::ReadUint32(packetBuffer, offset);
     offset += uint32_t_size;
     for(uint32_t i = 0; i < declarationSize; ++i)
@@ -82,20 +96,20 @@ BOOST_AUTO_TEST_CASE(TimelineDirecotryTest)
         profiling::SwTraceMessage& bufferMessage = swTraceBufferMessages[index];
         profiling::SwTraceMessage& handlerMessage = timelineDirectoryCaptureCommandHandler.m_SwTraceMessages[index];
 
-        BOOST_CHECK(bufferMessage.name == handlerMessage.name);
-        BOOST_CHECK(bufferMessage.uiName == handlerMessage.uiName);
-        BOOST_CHECK(bufferMessage.id == handlerMessage.id);
+        BOOST_CHECK(bufferMessage.m_Name == handlerMessage.m_Name);
+        BOOST_CHECK(bufferMessage.m_UiName == handlerMessage.m_UiName);
+        BOOST_CHECK(bufferMessage.m_Id == handlerMessage.m_Id);
 
-        BOOST_CHECK(bufferMessage.argTypes.size() == handlerMessage.argTypes.size());
-        for(uint32_t i = 0; i < bufferMessage.argTypes.size(); ++i)
+        BOOST_CHECK(bufferMessage.m_ArgTypes.size() == handlerMessage.m_ArgTypes.size());
+        for(uint32_t i = 0; i < bufferMessage.m_ArgTypes.size(); ++i)
         {
-            BOOST_CHECK(bufferMessage.argTypes[i] == handlerMessage.argTypes[i]);
+            BOOST_CHECK(bufferMessage.m_ArgTypes[i] == handlerMessage.m_ArgTypes[i]);
         }
 
-        BOOST_CHECK(bufferMessage.argNames.size() == handlerMessage.argNames.size());
-        for(uint32_t i = 0; i < bufferMessage.argNames.size(); ++i)
+        BOOST_CHECK(bufferMessage.m_ArgNames.size() == handlerMessage.m_ArgNames.size());
+        for(uint32_t i = 0; i < bufferMessage.m_ArgNames.size(); ++i)
         {
-            BOOST_CHECK(bufferMessage.argNames[i] == handlerMessage.argNames[i]);
+            BOOST_CHECK(bufferMessage.m_ArgNames[i] == handlerMessage.m_ArgNames[i]);
         }
     }
 }

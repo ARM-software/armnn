@@ -5,8 +5,12 @@
 
 #include "TimelineDirectoryCaptureCommandHandler.hpp"
 
+#include <ProfilingUtils.hpp>
+
 #include <iostream>
 #include <string>
+
+using namespace armnn::profiling;
 
 namespace armnn
 {
@@ -25,10 +29,17 @@ void TimelineDirectoryCaptureCommandHandler::ParseData(const armnn::profiling::P
 
     const unsigned char* data = packet.GetData();
 
+    m_SwTraceHeader.m_StreamVersion = ReadUint8(data, offset);
+    offset += uint8_t_size;
+    m_SwTraceHeader.m_PointerBytes = ReadUint8(data, offset);
+    offset += uint8_t_size;
+    m_SwTraceHeader.m_ThreadIdBytes = ReadUint8(data, offset);
+    offset += uint8_t_size;
+
     uint32_t numberOfDeclarations = profiling::ReadUint32(data, offset);
     offset += uint32_t_size;
 
-    for (uint32_t declaration = 0; declaration <  numberOfDeclarations; ++declaration)
+    for (uint32_t declaration = 0; declaration < numberOfDeclarations; ++declaration)
     {
         m_SwTraceMessages.push_back(profiling::ReadSwTraceMessage(data, offset));
     }
@@ -54,21 +65,21 @@ void TimelineDirectoryCaptureCommandHandler::Print()
     std::cout << "\n";
     std::cout << std::string(header.size(), '=') << "\n";
 
-    std::cout<< header;
+    std::cout << header;
 
-    for (auto swTraceMessage : m_SwTraceMessages)
+    for (const auto& swTraceMessage : m_SwTraceMessages)
     {
         std::string body;
 
-        body.append(profiling::CentreAlignFormatting(std::to_string(swTraceMessage.id), 12));
+        body.append(profiling::CentreAlignFormatting(std::to_string(swTraceMessage.m_Id), 12));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(swTraceMessage.name, 20));
+        body.append(profiling::CentreAlignFormatting(swTraceMessage.m_Name, 20));
         body.append(" | ");
-        body.append(profiling::CentreAlignFormatting(swTraceMessage.uiName, 20));
+        body.append(profiling::CentreAlignFormatting(swTraceMessage.m_UiName, 20));
         body.append(" | ");
 
         std::string argTypes;
-        for(auto argType: swTraceMessage.argTypes)
+        for (auto argType: swTraceMessage.m_ArgTypes)
         {
             argTypes += argType;
             argTypes += " ";
@@ -77,7 +88,7 @@ void TimelineDirectoryCaptureCommandHandler::Print()
         body.append(" | ");
 
         std::string argNames;
-        for(auto argName: swTraceMessage.argNames)
+        for (auto argName: swTraceMessage.m_ArgNames)
         {
             argNames += argName + " ";
         }
@@ -87,7 +98,7 @@ void TimelineDirectoryCaptureCommandHandler::Print()
 
         std::cout << std::string(body.size(), '-') << "\n";
 
-        std::cout<< body;
+        std::cout << body;
     }
 }
 
@@ -95,7 +106,7 @@ void TimelineDirectoryCaptureCommandHandler::operator()(const profiling::Packet&
 {
     ParseData(packet);
 
-    if(!m_QuietOperation)
+    if (!m_QuietOperation)
     {
         Print();
     }

@@ -20,6 +20,7 @@ namespace gatordmock
 class TimelineDirectoryCaptureCommandHandler : public profiling::CommandHandlerFunctor
 {
     // Utils
+    uint32_t uint8_t_size  = sizeof(uint8_t);
     uint32_t uint32_t_size = sizeof(uint32_t);
 
 public:
@@ -27,12 +28,13 @@ public:
                                            uint32_t packetId,
                                            uint32_t version,
                                            bool quietOperation = false)
-            : CommandHandlerFunctor(familyId, packetId, version)
-            , m_QuietOperation(quietOperation)
+        : CommandHandlerFunctor(familyId, packetId, version)
+        , m_QuietOperation(quietOperation)
     {}
 
     void operator()(const armnn::profiling::Packet& packet) override;
 
+    profiling::SwTraceHeader m_SwTraceHeader;
     std::vector<profiling::SwTraceMessage> m_SwTraceMessages;
 
 private:

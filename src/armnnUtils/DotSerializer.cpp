@@ -6,6 +6,7 @@
 #include "DotSerializer.hpp"
 
 #include <boost/assert.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <sstream>
 #include <cstring>
 
@@ -23,6 +24,14 @@ std::string Indent(int numSpaces)
     }
     return ss.str();
 }
+
+std::string Escape(std::string s)
+{
+    boost::replace_all(s, "<", "\\<");
+    boost::replace_all(s, ">", "\\>");
+    return s;
+}
+
 } //namespace
 
 
@@ -151,7 +160,7 @@ NodeContent::~NodeContent()
     }
     for (auto & content : m_Contents)
     {
-        ss << content;
+        ss << Escape(content);
         ss << "\\l";
     }
     ss << "}\"";

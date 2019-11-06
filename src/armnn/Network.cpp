@@ -22,6 +22,8 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/BackendRegistry.hpp>
 
+#include <ProfilingService.hpp>
+
 #include <fcntl.h>
 #include <algorithm>
 #include <fstream>
@@ -51,12 +53,6 @@ armnn::INetworkPtr INetwork::Create()
 void INetwork::Destroy(INetwork* network)
 {
     delete boost::polymorphic_downcast<Network*>(network);
-}
-
-Status Network::PrintGraph()
-{
-    m_Graph->Print();
-    return Status::Success;
 }
 
 void IOptimizedNetwork::Destroy(IOptimizedNetwork* network)
@@ -925,12 +921,19 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
 }
 
 Network::Network()
-: m_Graph(std::make_unique<Graph>())
+: m_Graph(std::make_unique<Graph>()),
+  m_Guid(profiling::ProfilingService::Instance().NextGuid())
 {
 }
 
 Network::~Network()
 {
+}
+
+Status Network::PrintGraph()
+{
+    m_Graph->Print();
+    return Status::Success;
 }
 
 IConnectableLayer* Network::AddInputLayer(LayerBindingId id, const char* name)
@@ -1563,7 +1566,8 @@ void Network::Accept(ILayerVisitor& visitor) const
 }
 
 OptimizedNetwork::OptimizedNetwork(std::unique_ptr<Graph> graph)
-    : m_Graph(std::move(graph))
+    : m_Graph(std::move(graph)),
+      m_Guid(profiling::ProfilingService::Instance().NextGuid())
 {
 }
 

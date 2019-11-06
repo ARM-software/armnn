@@ -95,6 +95,8 @@ public:
 
     virtual Status PrintGraph() = 0;
 
+    virtual profiling::ProfilingGuid GetGuid() const = 0;
+
     /// Adds an input layer to the network.
     /// @param id - User generated id to uniquely identify a particular input. The same id needs to be specified.
     /// when passing the inputs to the IRuntime::EnqueueWorkload() function.
@@ -540,6 +542,7 @@ public:
     virtual Status PrintGraph() = 0;
     virtual Status SerializeToDot(std::ostream& stream) const = 0;
 
+    virtual profiling::ProfilingGuid GetGuid() const = 0;
 
 protected:
     ~IOptimizedNetwork() {}

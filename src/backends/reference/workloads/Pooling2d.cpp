@@ -107,9 +107,9 @@ namespace
         }
     }
 
-    bool OnPaddingOnly(int start, int end, int maxRange, int padding)
+    bool OnPaddingOnly(int start, int end, int maxRange)
     {
-        if (end <= 0 || start > (maxRange - padding))
+        if (end <= 0 || start > maxRange)
         {
             return true;
         }
@@ -187,34 +187,49 @@ void Pooling2d(Decoder<float>& rInputDecoder,
         {
             for (int yOutput = 0; yOutput < heightOutput; yOutput++)
             {
+                //  Calculate values independent of the x axis
+                int hstart = (yOutput * strideY) - padTop;
+                int hend = hstart + poolHeight;
+                // Clamp the pooling region inside the valid input area (which includes the padding).
+                // This is necessary because the final pooling in a row may overlap beyond the padding.
+                hend = std::min(hend, heightInput + padBottom);
+
+                int height = hend - hstart;
+                bool hclamped = ClampRange(hstart, hend, heightInput);
+
                 for (int xOutput = 0; xOutput < widthOutput; xOutput++)
                 {
-                    int hstart = (yOutput * strideY) - padTop;
                     int wstart = (xOutput * strideX) - padLeft;
-                    int hend = hstart + poolHeight;
                     int wend = wstart + poolWidth;
 
                     // Clamp the pooling region inside the valid input area (which includes the padding).
                     // This is necessary because the final pooling in a row may overlap beyond the padding.
-                    hend = std::min(hend, heightInput + padBottom);
                     wend = std::min(wend, widthInput + padRight);
 
                     float result = defaultInitializer;
-                    float poolAreaSize = boost::numeric_cast<float>((hend - hstart) * (wend - wstart));
+                    float poolAreaSize = boost::numeric_cast<float>(height * (wend - wstart));
 
                     // Special case: when the pooling kernel is over a padding region and the padding
                     //               size is larger or equal to the kernel and the kernel only covers
                     //               padding and no real values, then we initialize the result as zero
                     //               by convention. This is because we need to choose a value here and
                     //               all values we have are padding, which we ignore.
-                    if (OnPaddingOnly(hstart, hend, heightInput, padBottom) ||
-                        OnPaddingOnly(wstart, wend, widthInput, padRight))
+                    if (OnPaddingOnly(hstart, hend, heightInput) ||
+                        OnPaddingOnly(wstart, wend, widthInput))
                     {
                         result = 0.0f;
+
+                        unsigned int outputIndex = dataLayout.GetIndex(outputShape,
+                                                                       boost::numeric_cast<unsigned int>(n),
+                                                                       boost::numeric_cast<unsigned int>(c),
+                                                                       boost::numeric_cast<unsigned int>(yOutput),
+                                                                       boost::numeric_cast<unsigned int>(xOutput));
+                        rOutputEncoder[outputIndex];
+                        rOutputEncoder.Set(result);
+                        continue;
                     }
 
-                    bool clamped = ClampRange(wstart, wend, widthInput);
-                    clamped |= ClampRange(hstart, hend, heightInput);
+                    bool clamped = hclamped |= ClampRange(wstart, wend, widthInput);
 
                     if (clamped && params.m_PaddingMethod == PaddingMethod::Exclude)
                     {

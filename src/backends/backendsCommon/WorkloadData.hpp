@@ -439,6 +439,8 @@ struct GreaterQueueDescriptor : QueueDescriptor
 
 struct DebugQueueDescriptor : QueueDescriptor
 {
+    DebugQueueDescriptor() : m_Guid(0) {}
+
     void Validate(const WorkloadInfo& workloadInfo) const;
 
     LayerGuid m_Guid;

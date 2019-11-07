@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn/Types.hpp>
+
 #include <ostream>
 #include <vector>
 #include <memory>
@@ -75,7 +77,7 @@ private:
 class DotEdge : public DotBase
 {
 public:
-    explicit DotEdge(std::ostream& stream, unsigned int fromNodeId, unsigned int toNodeId);
+    explicit DotEdge(std::ostream& stream, LayerGuid fromNodeId, LayerGuid toNodeId);
     ~DotEdge();
 
     DotAttributeSet& GetAttributeSet() { return *m_Attributes.get(); }
@@ -99,7 +101,7 @@ private:
 class DotNode : public DotBase
 {
 public:
-    explicit DotNode(std::ostream& stream, unsigned int nodeId, const char* label);
+    explicit DotNode(std::ostream& stream, LayerGuid nodeId, const char* label);
     ~DotNode();
 
     NodeContent& GetContents()         { return *m_Contents.get(); }

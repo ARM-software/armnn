@@ -25,11 +25,11 @@ void CheckLayers(Graph& graph)
         {
             case LayerType::Input:
                 ++m_inputLayerCount;
-                if (layer->GetGuid() == 0)
+                if (layer->GetGuid() == profiling::ProfilingGuid(0))
                 {
                     BOOST_TEST(layer->GetName() == "inLayer0");
                 }
-                else if (layer->GetGuid() == 1)
+                else if (layer->GetGuid() == profiling::ProfilingGuid(1))
                 {
                     BOOST_TEST(layer->GetName() == "inLayer1");
                 }

@@ -209,8 +209,10 @@ private:
     SizeType m_NumDimMappings;
 };
 
+namespace profiling { class ProfilingGuid; }
+
 /// Define LayerGuid type.
-using LayerGuid = unsigned int;
+using LayerGuid = profiling::ProfilingGuid;
 
 class ITensorHandle;
 
@@ -312,4 +314,4 @@ struct hash<armnn::profiling::ProfilingStaticGuid>
         return hash<uint64_t>()(uint64_t(guid));
     }
 };
-}
+} // namespace std

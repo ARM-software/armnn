@@ -116,7 +116,7 @@ DotAttributeSet & DotAttributeSet::AddAttribute(const std::string& name, const s
     return *this;
 }
 
-DotEdge::DotEdge(std::ostream& stream, unsigned int fromNodeId, unsigned int toNodeId)
+DotEdge::DotEdge(std::ostream& stream, LayerGuid fromNodeId, LayerGuid toNodeId)
     : DotBase(stream)
 {
     std::stringstream ss;
@@ -176,7 +176,7 @@ NodeContent::~NodeContent()
     GetStream() << s;
 }
 
-DotNode::DotNode(std::ostream& stream, unsigned int nodeId, const char* label)
+DotNode::DotNode(std::ostream& stream, LayerGuid nodeId, const char* label)
     : DotBase(stream)
 {
     std::stringstream ss;

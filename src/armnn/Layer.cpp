@@ -5,6 +5,7 @@
 #include "Layer.hpp"
 
 #include "Graph.hpp"
+#include <ProfilingService.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 
@@ -184,15 +185,6 @@ EdgeStrategy OutputSlot::GetEdgeStrategyForConnection(unsigned int connectionIdx
     return m_EdgeStrategies[connectionIdx];
 }
 
-namespace {
-LayerGuid GenerateLayerGuid()
-{
-    // Note: Not thread safe.
-    static LayerGuid newGuid=0;
-    return newGuid++;
-}
-} // namespace
-
 Layer::Layer(unsigned int numInputSlots,
              unsigned int numOutputSlots,
              LayerType type,
@@ -202,7 +194,7 @@ Layer::Layer(unsigned int numInputSlots,
 , m_LayerName(name ? name : "")
 , m_Type(type)
 , m_BackendId()
-, m_Guid(GenerateLayerGuid())
+, m_Guid(profiling::ProfilingService::Instance().NextGuid())
 {
     m_InputSlots.reserve(numInputSlots);
     for (unsigned int i = 0; i < numInputSlots; ++i)

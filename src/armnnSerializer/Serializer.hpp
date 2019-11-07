@@ -13,6 +13,8 @@
 
 #include <ArmnnSchema_generated.h>
 
+#include <armnn/Types.hpp>
+
 namespace armnnSerializer
 {
 
@@ -27,12 +29,12 @@ public:
         return m_flatBufferBuilder;
     }
 
-    std::vector<unsigned int>& GetInputIds()
+    std::vector<uint32_t>& GetInputIds()
     {
         return m_inputIds;
     }
 
-    std::vector<unsigned int>& GetOutputIds()
+    std::vector<uint32_t>& GetOutputIds()
     {
         return m_outputIds;
     }
@@ -277,7 +279,7 @@ private:
     flatbuffers::Offset<flatbuffers::Vector<T>> CreateDataVector(const void* memory, unsigned int size);
 
     ///Function which maps Guid to an index
-    uint32_t GetSerializedId(unsigned int guid);
+    uint32_t GetSerializedId(armnn::LayerGuid guid);
 
     /// Creates the serializer InputSlots for the layer.
     std::vector<flatbuffers::Offset<armnnSerializer::InputSlot>> CreateInputSlots(
@@ -293,14 +295,14 @@ private:
     /// AnyLayers required by the SerializedGraph.
     std::vector<flatbuffers::Offset<armnnSerializer::AnyLayer>> m_serializedLayers;
 
-    /// Guids of all Input Layers required by the SerializedGraph.
-    std::vector<unsigned int> m_inputIds;
+    /// Vector of indexes of all Input Layers required by the SerializedGraph.
+    std::vector<uint32_t> m_inputIds;
 
-    /// Guids of all Output Layers required by the SerializedGraph.
-    std::vector<unsigned int> m_outputIds;
+    /// Vector of indexes of all Output Layers required by the SerializedGraph.
+    std::vector<uint32_t> m_outputIds;
 
     /// Mapped Guids of all Layers to match our index.
-    std::unordered_map<unsigned int, uint32_t > m_guidMap;
+    std::unordered_map<armnn::LayerGuid, uint32_t > m_guidMap;
 
     /// layer within our FlatBuffer index.
     uint32_t m_layerId;

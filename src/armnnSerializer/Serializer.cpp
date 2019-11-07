@@ -61,18 +61,17 @@ serializer::ArgMinMaxFunction GetFlatBufferArgMinMaxFunction(armnn::ArgMinMaxFun
     }
 }
 
-uint32_t SerializerVisitor::GetSerializedId(unsigned int guid)
+uint32_t SerializerVisitor::GetSerializedId(armnn::LayerGuid guid)
 {
-    std::pair<unsigned int, uint32_t> guidPair(guid, m_layerId);
-
     if (m_guidMap.empty())
     {
-        m_guidMap.insert(guidPair);
+        m_guidMap.insert(std::make_pair(guid, m_layerId));
     }
     else if (m_guidMap.find(guid) == m_guidMap.end())
     {
-        guidPair.second = ++m_layerId;
-        m_guidMap.insert(guidPair);
+        ++m_layerId;
+        m_guidMap.insert(std::make_pair(guid, m_layerId));
+
         return m_layerId;
     }
     return m_guidMap[guid];
@@ -88,7 +87,7 @@ void SerializerVisitor::VisitInputLayer(const armnn::IConnectableLayer* layer, L
     auto flatBufferInputBindableBaseLayer = serializer::CreateBindableLayerBase(m_flatBufferBuilder,
                                                                                 flatBufferInputBaseLayer,
                                                                                 id);
-    // Push layer Guid to outputIds.
+    // Push layer index to outputIds.
     m_inputIds.push_back(GetSerializedId(layer->GetGuid()));
 
     // Create the FlatBuffer InputLayer
@@ -108,7 +107,7 @@ void SerializerVisitor::VisitOutputLayer(const armnn::IConnectableLayer* layer, 
     auto flatBufferOutputBindableBaseLayer = serializer::CreateBindableLayerBase(m_flatBufferBuilder,
                                                                                  flatBufferOutputBaseLayer,
                                                                                  id);
-    // Push layer Guid to outputIds.
+    // Push layer index to outputIds.
     m_outputIds.push_back(GetSerializedId(layer->GetGuid()));
 
     // Create the FlatBuffer OutputLayer

@@ -109,8 +109,8 @@ ConstTensor QuantizerVisitor::CreateQuantizedBias(const IConnectableLayer* srcLa
 
 void QuantizerVisitor::RecordLayer(const IConnectableLayer* srcLayer, IConnectableLayer* quantizedLayer)
 {
-    m_OriginalToQuantizedGuidMap[srcLayer->GetGuid()] = quantizedLayer->GetGuid();
-    m_QuantizedGuidToLayerMap[quantizedLayer->GetGuid()] = quantizedLayer;
+    m_OriginalToQuantizedGuidMap.insert(std::make_pair(srcLayer->GetGuid(), quantizedLayer->GetGuid()));
+    m_QuantizedGuidToLayerMap.insert(std::make_pair(quantizedLayer->GetGuid(), quantizedLayer));
 }
 
 void QuantizerVisitor::VisitAbsLayer(const IConnectableLayer* layer, const char* name)

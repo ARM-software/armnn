@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include "ProfilingGuid.hpp"
 #include "ProfilingGuidGenerator.hpp"
+
+#include <armnn/Types.hpp>
 
 namespace armnn
 {

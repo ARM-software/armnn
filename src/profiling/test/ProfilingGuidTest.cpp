@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ProfilingGuid.hpp"
+#include <armnn/Types.hpp>
 
 #include <boost/test/unit_test.hpp>
 

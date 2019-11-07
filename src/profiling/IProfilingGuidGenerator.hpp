@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ProfilingGuid.hpp"
+#include <armnn/Types.hpp>
 
 #include <string>
 

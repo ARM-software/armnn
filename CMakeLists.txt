@@ -485,7 +485,6 @@ list(APPEND armnn_sources
     src/profiling/ProfilingConnectionDumpToFileDecorator.hpp
     src/profiling/ProfilingConnectionFactory.cpp
     src/profiling/ProfilingConnectionFactory.hpp
-    src/profiling/ProfilingGuid.hpp
     src/profiling/ProfilingGuidGenerator.hpp
     src/profiling/ProfilingService.cpp
     src/profiling/ProfilingService.hpp

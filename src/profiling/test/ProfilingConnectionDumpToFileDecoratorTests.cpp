@@ -10,14 +10,9 @@
 #include <sstream>
 
 #include <boost/core/ignore_unused.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
-
-#if defined(__ANDROID__)
-#define ARMNN_PROFILING_CONNECTION_TEST_DUMP_DIR "/data/local/tmp"
-#else
-#define ARMNN_PROFILING_CONNECTION_TEST_DUMP_DIR "/tmp"
-#endif
 
 using namespace armnn::profiling;
 
@@ -101,10 +96,11 @@ BOOST_AUTO_TEST_CASE(DumpIncomingInvalidFileIgnoreErrors)
 
 BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
 {
-    std::stringstream fileName;
-    fileName << ARMNN_PROFILING_CONNECTION_TEST_DUMP_DIR << "/test_dump_file_incoming.dat";
+    boost::filesystem::path fileName =
+        boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
+
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_IncomingCaptureFile = fileName.str();
+    options.m_IncomingCaptureFile = fileName.c_str();
     options.m_OutgoingCaptureFile =  "";
 
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
@@ -148,12 +144,12 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingInvalidFileIgnoreErrors)
 
 BOOST_AUTO_TEST_CASE(DumpOutgoingValidFile)
 {
-    std::stringstream fileName;
-    fileName << ARMNN_PROFILING_CONNECTION_TEST_DUMP_DIR << "/test_dump_file.dat";
+    boost::filesystem::path fileName =
+        boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
 
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = "";
-    options.m_OutgoingCaptureFile = fileName.str();
+    options.m_OutgoingCaptureFile = fileName.c_str();
 
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
 

@@ -4,6 +4,8 @@
 //
 
 #include "../FileOnlyProfilingConnection.hpp"
+
+#include <ProfilingService.hpp>
 #include <Runtime.hpp>
 
 #include <boost/core/ignore_unused.hpp>
@@ -11,17 +13,10 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <ProfilingService.hpp>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
-
-#if defined(__ANDROID__)
-#define ARMNN_PROFILING_CONNECTION_TEST_DUMP_DIR "/data/local/tmp"
-#else
-#define ARMNN_PROFILING_CONNECTION_TEST_DUMP_DIR "/tmp"
-#endif
 
 using namespace armnn::profiling;
 using namespace armnn;

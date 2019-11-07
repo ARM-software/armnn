@@ -699,6 +699,12 @@ EdgeStrategy CalculateEdgeStrategy(BackendsMap& backends,
         for (auto&& pref : dstPrefs)
         {
             ITensorHandleFactory* dstFactory = registry.GetFactory(pref);
+
+            // Handles some cases where dstFactory is null when Neon memory import is disabled
+            if (!dstFactory) {
+                return EdgeStrategy::CopyToTarget;
+            }
+
             if ((dstFactory->GetImportFlags() & srcFactory->GetExportFlags()) != 0)
             {
                 return EdgeStrategy::ExportToTarget;

@@ -104,7 +104,7 @@ MemorySourceFlags NeonTensorHandleFactory::GetExportFlags() const
 
 MemorySourceFlags NeonTensorHandleFactory::GetImportFlags() const
 {
-    return static_cast<MemorySourceFlags>(MemorySource::Malloc);
+    return 0;
 }
 
 } // namespace armnn

@@ -366,27 +366,27 @@ BOOST_AUTO_TEST_CASE(NeonExportNonAlignedOutputPointerTest)
     ExportNonAlignedOutputPointerTest(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportAlignedPointerTest)
+BOOST_AUTO_TEST_CASE(NeonImportAlignedPointerTest, * boost::unit_test::disabled())
 {
     ImportAlignedPointerTest(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportOnlyWorkload)
+BOOST_AUTO_TEST_CASE(NeonImportOnlyWorkload, * boost::unit_test::disabled())
 {
     ImportOnlyWorkload(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonExportOnlyWorkload)
+BOOST_AUTO_TEST_CASE(NeonExportOnlyWorkload, * boost::unit_test::disabled())
 {
     ExportOnlyWorkload(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonImportAndExportWorkload)
+BOOST_AUTO_TEST_CASE(NeonImportAndExportWorkload, * boost::unit_test::disabled())
 {
     ImportAndExportWorkload(defaultBackends);
 }
 
-BOOST_AUTO_TEST_CASE(NeonExportOutputWithSeveralOutputSlotConnectionsTest)
+BOOST_AUTO_TEST_CASE(NeonExportOutputWithSeveralOutputSlotConnectionsTest, * boost::unit_test::disabled())
 {
     ExportOutputWithSeveralOutputSlotConnectionsTest(defaultBackends);
 }

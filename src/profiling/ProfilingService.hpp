@@ -18,6 +18,7 @@
 #include "ProfilingStateMachine.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 #include "SendCounterPacket.hpp"
+#include "SendTimelinePacket.hpp"
 #include "TimelinePacketWriterFactory.hpp"
 
 namespace armnn
@@ -105,6 +106,7 @@ private:
     CommandHandler m_CommandHandler;
     BufferManager m_BufferManager;
     SendCounterPacket m_SendCounterPacket;
+    SendTimelinePacket m_SendTimelinePacket;
     Holder m_Holder;
     PeriodicCounterCapture m_PeriodicCounterCapture;
     ConnectionAcknowledgedCommandHandler m_ConnectionAcknowledgedCommandHandler;
@@ -132,12 +134,14 @@ protected:
                            m_PacketVersionResolver)
         , m_BufferManager()
         , m_SendCounterPacket(m_StateMachine, m_BufferManager)
+        , m_SendTimelinePacket(m_BufferManager)
         , m_PeriodicCounterCapture(m_Holder, m_SendCounterPacket, *this)
         , m_ConnectionAcknowledgedCommandHandler(0,
                                                  1,
                                                  m_PacketVersionResolver.ResolvePacketVersion(0, 1).GetEncodedValue(),
                                                  m_CounterDirectory,
                                                  m_SendCounterPacket,
+                                                 m_SendTimelinePacket,
                                                  m_StateMachine)
         , m_RequestCounterDirectoryCommandHandler(0,
                                                   3,

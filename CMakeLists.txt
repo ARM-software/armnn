@@ -936,6 +936,8 @@ if(BUILD_GATORD_MOCK)
         tests/profiling/gatordmock/PeriodicCounterCaptureCommandHandler.hpp
         tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.cpp
         tests/profiling/gatordmock/PeriodicCounterSelectionResponseHandler.hpp
+        tests/profiling/gatordmock/StreamMetadataCommandHandler.cpp
+        tests/profiling/gatordmock/StreamMetadataCommandHandler.hpp
         tests/profiling/timelineDecoder/ITimelineDecoder.h
         tests/profiling/timelineDecoder/TimelineCaptureCommandHandler.cpp
         tests/profiling/timelineDecoder/TimelineCaptureCommandHandler.hpp
@@ -946,6 +948,9 @@ if(BUILD_GATORD_MOCK)
         )
 
     include_directories(${Boost_INCLUDE_DIRS} src/profiling)
+    include_directories(${Boost_INCLUDE_DIRS} tests/profiling)
+    include_directories(${Boost_INCLUDE_DIRS} tests/profiling/gatordmock)
+    include_directories(${Boost_INCLUDE_DIRS} tests/profiling/timelineDecoder)
 
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
 

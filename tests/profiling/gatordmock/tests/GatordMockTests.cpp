@@ -3,12 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../GatordMockService.hpp"
-#include "../PeriodicCounterCaptureCommandHandler.hpp"
-
 #include <CommandHandlerRegistry.hpp>
 #include <DirectoryCaptureCommandHandler.hpp>
 #include <ProfilingService.hpp>
+#include <GatordMockService.hpp>
+#include <PeriodicCounterCaptureCommandHandler.hpp>
+#include <StreamMetadataCommandHandler.hpp>
+#include <TimelineDirectoryCaptureCommandHandler.hpp>
 
 #include <test/SendCounterPacketTests.hpp>
 
@@ -117,15 +118,23 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     profiling::CommandHandlerRegistry registry;
 
     // Update with derived functors
+    gatordmock::StreamMetadataCommandHandler streamMetadataCommandHandler(
+        0, 0, packetVersionResolver.ResolvePacketVersion(0, 0).GetEncodedValue(), true);
+
     gatordmock::PeriodicCounterCaptureCommandHandler counterCaptureCommandHandler(
         0, 4, packetVersionResolver.ResolvePacketVersion(0, 4).GetEncodedValue(), true);
 
     profiling::DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
         0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), true);
 
+    gatordmock::TimelineDirectoryCaptureCommandHandler timelineDirectoryCaptureCommandHandler(
+        1, 0, packetVersionResolver.ResolvePacketVersion(1, 0).GetEncodedValue(), true);
+
     // Register different derived functors
+    registry.RegisterFunctor(&streamMetadataCommandHandler);
     registry.RegisterFunctor(&counterCaptureCommandHandler);
     registry.RegisterFunctor(&directoryCaptureCommandHandler);
+    registry.RegisterFunctor(&timelineDirectoryCaptureCommandHandler);
     // Setup the mock service to bind to the UDS.
     std::string udsNamespace = "gatord_namespace";
     gatordmock::GatordMockService mockService(registry, false);

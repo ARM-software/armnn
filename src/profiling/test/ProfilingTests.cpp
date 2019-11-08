@@ -22,6 +22,8 @@
 #include <RequestCounterDirectoryCommandHandler.hpp>
 #include <Runtime.hpp>
 #include <SocketProfilingConnection.hpp>
+#include <SendCounterPacket.hpp>
+#include <SendTimelinePacket.hpp>
 
 #include <armnn/Conversion.hpp>
 
@@ -128,8 +130,11 @@ BOOST_AUTO_TEST_CASE(CheckCommandHandler)
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    SendTimelinePacket sendTimelinePacket(mockBuffer);
+
     ConnectionAcknowledgedCommandHandler connectionAcknowledgedCommandHandler(0, 1, 4194304, counterDirectory,
-                                                                              sendCounterPacket, profilingStateMachine);
+                                                                              sendCounterPacket, sendTimelinePacket,
+                                                                              profilingStateMachine);
     CommandHandlerRegistry commandHandlerRegistry;
 
     commandHandlerRegistry.RegisterFunctor(&connectionAcknowledgedCommandHandler);
@@ -1731,9 +1736,10 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(profilingState, mockBuffer);
+    SendTimelinePacket sendTimelinePacket(mockBuffer);
 
     ConnectionAcknowledgedCommandHandler commandHandler(packetFamilyId, connectionPacketId, version, counterDirectory,
-                                                        sendCounterPacket, profilingState);
+                                                        sendCounterPacket, sendTimelinePacket, profilingState);
 
     // command handler received packet on ProfilingState::Uninitialised
     BOOST_CHECK_THROW(commandHandler(packetA), armnn::Exception);
@@ -1759,7 +1765,8 @@ BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)
     profilingState.TransitionToState(ProfilingState::NotConnected);
     profilingState.TransitionToState(ProfilingState::WaitingForAck);
     ConnectionAcknowledgedCommandHandler differentCommandHandler(packetFamilyId, differentPacketId, version,
-                                                                 counterDirectory, sendCounterPacket, profilingState);
+                                                                 counterDirectory, sendCounterPacket,
+                                                                 sendTimelinePacket, profilingState);
     BOOST_CHECK_THROW(differentCommandHandler(packetB), armnn::Exception);
 }
 

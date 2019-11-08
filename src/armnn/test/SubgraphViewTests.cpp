@@ -11,7 +11,11 @@
 #include <SubgraphViewSelector.hpp>
 
 #include <backendsCommon/CpuTensorHandle.hpp>
-
+#include <fstream>
+#include <map>
+#include <queue>
+#include <random>
+#include <chrono>
 using namespace armnn;
 
 namespace
@@ -513,16 +517,60 @@ BOOST_AUTO_TEST_CASE(MultipleLayersSelectedInTheMiddle)
     }
 }
 
+BOOST_AUTO_TEST_CASE(DisjointGraphs)
+{
+    // The input graph has two disjoint sections and all layers are selected.
+    // This should result in two subgraphs being produced.
+    Graph graph;
+
+    // the graph is constructed in reverse order
+    auto o0 = graph.AddLayer<OutputLayer>(0, "output0");
+    auto n0 = graph.InsertNewLayer<ActivationLayer>(o0->GetInputSlot(0), ActivationDescriptor{}, "intermediate0");
+    auto i0 = graph.InsertNewLayer<InputLayer>(n0->GetInputSlot(0), 0, "input0");
+
+    auto o1 = graph.AddLayer<OutputLayer>(1, "output1");
+    auto n1 = graph.InsertNewLayer<ActivationLayer>(o1->GetInputSlot(0), ActivationDescriptor{}, "intermediate1");
+    auto i1 = graph.InsertNewLayer<InputLayer>(n1->GetInputSlot(0), 1, "input1");
+
+    SubgraphViewSelector::Subgraphs subgraphs =
+        SubgraphViewSelector::SelectSubgraphs(graph,
+                                              // select the middle layers only
+                                              [](const Layer& l) {
+                                                  return true;
+                                              });
+
+    // expected results to test against
+    auto expected1 = CreateSubgraphViewFrom({}, {}, { o0, n0, i0 });
+    auto expected2 = CreateSubgraphViewFrom({}, {}, { o1, n1, i1 });
+    BOOST_TEST(subgraphs.size() == 2);
+    if (subgraphs.size() == 2)
+    {
+        BOOST_TEST((subgraphs[0] != nullptr));
+        BOOST_TEST((subgraphs[1] != nullptr));
+        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
+        {
+            if (std::find(subgraphs[0]->GetLayers().begin(), subgraphs[0]->GetLayers().end(), i0) !=
+                    subgraphs[0]->GetLayers().end())
+            {
+                CompareSubgraphViews(subgraphs[0], expected1);
+                CompareSubgraphViews(subgraphs[1], expected2);
+            }
+            else
+            {
+                CompareSubgraphViews(subgraphs[0], expected2);
+                CompareSubgraphViews(subgraphs[1], expected1);
+            }
+        }
+    }
+}
+
 BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
 {
     // This case represent the scenario when a non-selected X1 node placed in the middle
-    // of the selected M* nodes:
-    //
-    // X0 -> M1 -> M2 -> M3 -> X2
-    // X0 -> M4 -> X1 -> M5 -> X2
-    //
+    // of the selected M* nodes.
+    // This checks that we don't merge M6 and M3 and create a dependency loop.
     /*
-          X0
+          M0
           / \
         M1   M4
          |   |
@@ -530,59 +578,56 @@ BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
          |   |
         M3   M5
           \ /
-          X2
+          M6
     */
-    // The expected result for this is that M1,M2,M3,M4 will be part of one subgraph and
-    // M5 will be part of another subgraph and the input and output slots in the subgraphs
-    // will be set accordingly.
-    //
     Graph graph;
 
     OriginsDescriptor concatDescriptor(2);
-    auto x2 = graph.AddLayer<ConcatLayer>(concatDescriptor, "x2");
-    auto m3 = graph.InsertNewLayer<ActivationLayer>(x2->GetInputSlot(0),
-                                                    ActivationDescriptor{},
-                                                    "m3");
+    auto m6 = graph.AddLayer<ConcatLayer>(concatDescriptor, "m6");
+    auto m3 = graph.InsertNewLayer<ActivationLayer>(m6->GetInputSlot(0),
+        ActivationDescriptor{},
+        "m3");
     auto m2 = graph.InsertNewLayer<ActivationLayer>(m3->GetInputSlot(0),
-                                                    ActivationDescriptor{},
-                                                    "m2");
+        ActivationDescriptor{},
+        "m2");
     auto m1 = graph.InsertNewLayer<ActivationLayer>(m2->GetInputSlot(0),
-                                                    ActivationDescriptor{},
-                                                    "m1");
-    auto x0 = graph.InsertNewLayer<InputLayer>(m1->GetInputSlot(0), 0, "x0");
+        ActivationDescriptor{},
+        "m1");
+    auto m0 = graph.InsertNewLayer<InputLayer>(m1->GetInputSlot(0), 0, "m0");
 
-    auto m5 = graph.InsertNewLayer<ActivationLayer>(x2->GetInputSlot(1),
-                                                    ActivationDescriptor{},
-                                                    "m5");
-    auto x1 = graph.InsertNewLayer<Convolution2dLayer>(m5->GetInputSlot(0),
-                                                       Convolution2dDescriptor{},
-                                                       "x1");
+    auto m5 = graph.InsertNewLayer<ActivationLayer>(m6->GetInputSlot(1),
+        ActivationDescriptor{},
+        "m5");
+    auto x1 = graph.InsertNewLayer<ActivationLayer>(m5->GetInputSlot(0),
+        ActivationDescriptor{},
+        "x1");
     auto m4 = graph.InsertNewLayer<ActivationLayer>(x1->GetInputSlot(0),
-                                                    ActivationDescriptor{},
-                                                    "m4");
+        ActivationDescriptor{},
+        "m4");
 
     // Connect the other branch to the input layer
-    x0->GetOutputSlot(0).Connect(m4->GetInputSlot(0));
+    m0->GetOutputSlot(0).Connect(m4->GetInputSlot(0));
 
     // All selected 'M*' layers will be of Activation type
     SubgraphViewSelector::Subgraphs subgraphs =
         SubgraphViewSelector::SelectSubgraphs(
             graph,
             // select the middle layers only
-            [](const Layer & l)
-            {
-                bool toSelect = (l.GetType() == LayerType::Activation);
-                return toSelect;
-            });
+            [](const Layer& l)
+    {
+        bool toSelect = std::string(l.GetName())[0] == 'm';
+        return toSelect;
+    });
 
     // expected results to test against
-    auto largerSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({m1, m4}),
-                                                 CreateOutputsFrom({m3, m4}),
-                                                 {m1, m4, m2, m3});
+    auto largerSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({ m0 }),
+        CreateOutputsFrom({ m3, m4 }),
+        { m0, m1, m2, m3, m4 });
 
-    auto smallerSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({m5}),
-                                                  CreateOutputsFrom({m5}),
-                                                  {m5});
+    auto smallerSubgraph =
+        CreateSubgraphViewFrom(std::vector<InputSlot*>{ &m5->GetInputSlot(0), & m6->GetInputSlot(0) },
+            std::vector<OutputSlot*>{},
+            { m5, m6 });
 
     BOOST_TEST(subgraphs.size() == 2);
     if (subgraphs.size() == 2)
@@ -595,15 +640,14 @@ BOOST_AUTO_TEST_CASE(IslandInTheMiddle)
         {
             // sort the subgraphs by layer size, so it is simpler to test
             std::sort(subgraphs.begin(), subgraphs.end(),
-                [](SubgraphViewSelector::SubgraphViewPtr & lhs, SubgraphViewSelector::SubgraphViewPtr & rhs)
-                {
-                    return (lhs->GetLayers().size() < rhs->GetLayers().size());
-                }
+                [](SubgraphViewSelector::SubgraphViewPtr& lhs, SubgraphViewSelector::SubgraphViewPtr& rhs)
+            {
+                return (lhs->GetLayers().size() < rhs->GetLayers().size());
+            }
             );
 
-            // one subgraph needs to be size=1 and the other one is 4
-            BOOST_TEST(subgraphs[0]->GetLayers().size() == 1);
-            BOOST_TEST(subgraphs[1]->GetLayers().size() == 4);
+            BOOST_TEST(subgraphs[0]->GetLayers().size() == 2);
+            BOOST_TEST(subgraphs[1]->GetLayers().size() == 5);
 
             CompareSubgraphViews(subgraphs[0], smallerSubgraph);
             CompareSubgraphViews(subgraphs[1], largerSubgraph);
@@ -804,7 +848,7 @@ BOOST_AUTO_TEST_CASE(SingleInputMultiOutput)
     Layer* layerX2 = graph.AddLayer<OutputLayer>(0, "layerX2");
     Layer* layerX3 = graph.AddLayer<OutputLayer>(1, "layerX3");
 
-    //      X2
+    //      X1
     //      |
     //      M1
     //     /|
@@ -904,6 +948,386 @@ BOOST_AUTO_TEST_CASE(MultiInputMultiOutput)
                                                {m1, m2, m3, m4, m5});
 
         CompareSubgraphViews(subgraphs[0], expected);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(ValidMerge)
+{
+    // Checks that a node that has multiple choices for merge candidates (M3 in this case) correctly merges with the
+    // one that it can (M0), and doesn't merge with the ones it can't (X2 and M2).
+    //
+    //      X1
+    //      |
+    //      M1
+    //     / \'
+    //    X2  M2   M0
+    //     \  |  /
+    //        M3
+    //
+    Graph graph;
+
+    ActivationDescriptor activationDefaults;
+    OriginsDescriptor concatDescriptor(3);
+
+    auto x1 = graph.AddLayer<InputLayer>(0, "x1");
+    auto x2 = graph.AddLayer<ActivationLayer>(activationDefaults, "x2");
+    auto m0 = graph.AddLayer<InputLayer>(1, "m0");
+    auto m1 = graph.AddLayer<ActivationLayer>(activationDefaults, "m1");
+    auto m2 = graph.AddLayer<ActivationLayer>(activationDefaults, "m2");
+    auto m3 = graph.AddLayer<ConcatLayer>(concatDescriptor, "m3");
+
+    x1->GetOutputSlot(0).Connect(m1->GetInputSlot(0));
+    m1->GetOutputSlot(0).Connect(x2->GetInputSlot(0));
+    m1->GetOutputSlot(0).Connect(m2->GetInputSlot(0));
+    x2->GetOutputSlot(0).Connect(m3->GetInputSlot(0));
+    m2->GetOutputSlot(0).Connect(m3->GetInputSlot(1));
+    m0->GetOutputSlot(0).Connect(m3->GetInputSlot(2));
+
+    SubgraphViewSelector::Subgraphs subgraphs = SubgraphViewSelector::SelectSubgraphs(
+        graph,
+        [](const Layer& l) {
+            return std::string(l.GetName())[0] == 'm';
+        });
+
+    // expected results to test against
+    auto expectedSubgraph0 =
+        CreateSubgraphViewFrom(
+            CreateInputsFrom({ m1 }),
+            std::vector<OutputSlot*>{ &m1->GetOutputSlot(0), &m2->GetOutputSlot(0) },
+            { m1, m2 });
+
+    auto expectedSubgraph1 = CreateSubgraphViewFrom(
+        std::vector<InputSlot*>{ &m3->GetInputSlot(0), & m3->GetInputSlot(1) },
+        CreateOutputsFrom({ }),
+        { m0, m3 });
+
+    BOOST_TEST(subgraphs.size() == 2);
+    if (subgraphs.size() == 2)
+    {
+        // we need to have valid subgraph pointers here
+        BOOST_TEST((subgraphs[0] != nullptr));
+        BOOST_TEST((subgraphs[1] != nullptr));
+
+        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
+        {
+            if (subgraphs[0]->GetInputSlots().size() == 1)
+            {
+                CompareSubgraphViews(subgraphs[0], expectedSubgraph0);
+                CompareSubgraphViews(subgraphs[1], expectedSubgraph1);
+            }
+            else
+            {
+                CompareSubgraphViews(subgraphs[0], expectedSubgraph1);
+                CompareSubgraphViews(subgraphs[1], expectedSubgraph0);
+            }
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(PropagatedDependencies)
+{
+    // Version of IslandInTheMiddle with longer chain
+    // to make sure antecedents are propagated.
+    /*
+          M0
+          / \
+        M1   M4
+         |   |
+        M2   X1 < the island in the middle !
+         |   |
+         |   M10
+         |   |
+         |   X2 < another island in the middle !
+         |   |
+         M3  M5
+          \ /
+          M6
+    */
+    Graph graph;
+
+    OriginsDescriptor concatDescriptor(2);
+    auto m6 = graph.AddLayer<ConcatLayer>(concatDescriptor, "m6");
+    auto m3 = graph.InsertNewLayer<ActivationLayer>(m6->GetInputSlot(0),
+        ActivationDescriptor{},
+        "m3");
+    auto m2 = graph.InsertNewLayer<ActivationLayer>(m3->GetInputSlot(0),
+        ActivationDescriptor{},
+        "m2");
+    auto m1 = graph.InsertNewLayer<ActivationLayer>(m2->GetInputSlot(0),
+        ActivationDescriptor{},
+        "m1");
+    auto m0 = graph.InsertNewLayer<InputLayer>(m1->GetInputSlot(0), 0, "m0");
+
+    auto m5 = graph.InsertNewLayer<ActivationLayer>(m6->GetInputSlot(1),
+        ActivationDescriptor{},
+        "m5");
+    auto x2 = graph.InsertNewLayer<ActivationLayer>(m5->GetInputSlot(0), ActivationDescriptor{}, "x2");
+    auto m10 = graph.InsertNewLayer<ActivationLayer>(x2->GetInputSlot(0), ActivationDescriptor{}, "m10");
+    auto x1 = graph.InsertNewLayer<ActivationLayer>(m10->GetInputSlot(0),
+        ActivationDescriptor{},
+        "x1");
+    auto m4 = graph.InsertNewLayer<ActivationLayer>(x1->GetInputSlot(0),
+        ActivationDescriptor{},
+        "m4");
+
+    // Connect the other branch to the input layer
+    m0->GetOutputSlot(0).Connect(m4->GetInputSlot(0));
+
+    // All selected 'M*' layers will be of Activation type
+    SubgraphViewSelector::Subgraphs subgraphs =
+        SubgraphViewSelector::SelectSubgraphs(
+            graph,
+            // select the middle layers only
+            [](const Layer& l)
+    {
+        bool toSelect = std::string(l.GetName())[0] == 'm';
+        return toSelect;
+    });
+
+    // expected results to test against
+    auto largerSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({ m0 }),
+        CreateOutputsFrom({ m3, m4 }),
+        { m0, m1, m2, m3, m4 });
+
+    auto mediumSubgraph = CreateSubgraphViewFrom(std::vector<InputSlot*>{ &m5->GetInputSlot(0), &m6->GetInputSlot(0) },
+                                                 std::vector<OutputSlot*>{}, { m5, m6 });
+
+    auto smallerSubgraph =
+        CreateSubgraphViewFrom(CreateInputsFrom({ m10 }), CreateOutputsFrom({ m10 }), { m10 });
+
+    BOOST_TEST(subgraphs.size() == 3);
+    if (subgraphs.size() == 3)
+    {
+        // we need to have valid subgraph pointers here
+        BOOST_TEST((subgraphs[0] != nullptr));
+        BOOST_TEST((subgraphs[1] != nullptr));
+        BOOST_TEST((subgraphs[2] != nullptr));
+
+        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr && subgraphs[2].get() != nullptr)
+        {
+            // sort the subgraphs by layer size, so it is simpler to test
+            std::sort(subgraphs.begin(), subgraphs.end(),
+                [](SubgraphViewSelector::SubgraphViewPtr& lhs, SubgraphViewSelector::SubgraphViewPtr& rhs)
+            {
+                return (lhs->GetLayers().size() < rhs->GetLayers().size());
+            }
+            );
+
+            CompareSubgraphViews(subgraphs[0], smallerSubgraph);
+            CompareSubgraphViews(subgraphs[1], mediumSubgraph);
+            CompareSubgraphViews(subgraphs[2], largerSubgraph);
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(Random)
+{
+    // Creates random networks, splits them into subgraphs and checks the resulting subgraphs obey the required
+    // dependency rules. We can easily generate very large networks which helps cover corner cases the other
+    // small, manually crafted tests have missed. We can also use this to measure performance on large networks.
+    constexpr bool debug = false; // Enable this to dump dot files and performance timings.
+
+    std::mt19937 randomGenerator;
+
+    // Helper function to get a random number in [0, maxExclusive)
+    auto GetRandom = [&randomGenerator](auto maxExclusive) {
+        // Note we could use uniform_int_distribution here, but that gives inconsistent results across platforms
+        // which makes it harder to reproduce results.
+        // It appears that uniform_real_distribution is consistent across MSVC and gcc so we use that and round it.
+        std::uniform_real_distribution<float> uniform(0.0f, 1.0f);
+        return static_cast<decltype(maxExclusive)>(uniform(randomGenerator) * static_cast<float>(maxExclusive));
+    };
+    // Helper function to get a bool that has probability 'trueProb' of being true.
+    auto GetRandomFlag = [&randomGenerator](float trueProb) {
+        std::uniform_real_distribution<float> uniform(0.0f, 1.0f);
+        return uniform(randomGenerator) < trueProb;
+    };
+
+    constexpr uint32_t numTests = 100;
+    for (uint32_t testIdx = 0; testIdx < numTests; ++testIdx)
+    {
+        randomGenerator.seed(testIdx); // Set a deterministic seed for reproducibility.
+
+        // Create random graph
+        Graph graph;
+        {
+            // First add the layers, without any connections. The following random constants determine the number of
+            // each layer to add, along with the chance that each layer will be 'supported' (i.e. selected for
+            // inclusion in the resulting subgraphs).
+            uint32_t numInputs = 1 + GetRandom(4u);
+            uint32_t numConstants = 1 + GetRandom(4u);
+            uint32_t numOutputs = 1 + GetRandom(4u);
+            uint32_t numConcats = 0 + GetRandom(500u);
+            uint32_t numSplits = 0 + GetRandom(500u);
+            float supportedProb = 0.7f;
+
+            for (uint32_t i = 0; i < numInputs; ++i)
+            {
+                std::string name = "input" + std::to_string(i) + (GetRandomFlag(supportedProb) ? "S" : "N");
+                graph.AddLayer<InputLayer>(static_cast<LayerBindingId>(i), name.c_str());
+            }
+            for (uint32_t i = 0; i < numConstants; ++i)
+            {
+                std::string name = "constant" + std::to_string(i) + (GetRandomFlag(supportedProb) ? "S" : "N");
+                graph.AddLayer<ConstantLayer>(name.c_str());
+            }
+            for (uint32_t i = 0; i < numOutputs; ++i)
+            {
+                std::string name = "output" + std::to_string(i) + (GetRandomFlag(supportedProb) ? "S" : "N");
+                graph.AddLayer<OutputLayer>(static_cast<LayerBindingId>(i), name.c_str());
+            }
+            for (uint32_t i = 0; i < numConcats; ++i)
+            {
+                std::string name = "concat" + std::to_string(i) + (GetRandomFlag(supportedProb) ? "S" : "N");
+                uint32_t numInputs = 1 + GetRandom(3u);
+                OriginsDescriptor concatDesc(numInputs);
+                graph.AddLayer<ConcatLayer>(concatDesc, name.c_str());
+            }
+            for (uint32_t i = 0; i < numSplits; ++i)
+            {
+                std::string name = "split" + std::to_string(i) + (GetRandomFlag(supportedProb) ? "S" : "N");
+                uint32_t numOutputs = 1 + GetRandom(3u);
+                ViewsDescriptor splitDesc(numOutputs);
+                graph.AddLayer<SplitterLayer>(splitDesc, name.c_str());
+            }
+
+            // Associate each layer with a "depth" parameter. This is used when creating connections to ensure
+            // that we don't have any loops, by only connecting to layers with a lower "depth".
+            // This can be thought of as distance from the "top" of the graph (assuming the graph flows top-to-bottom).
+            // Unfortunately this approach ends up producing very "wide" graphs,
+            // which probably isn't very representative of 'real' networks.
+            uint32_t maxLayerDepth = 5 + GetRandom(2000u);
+            std::map<Layer*, uint32_t> layerDepths;
+            std::map<uint32_t, std::vector<Layer*>> layersAtDepth;
+            for (Layer* layer : graph)
+            {
+                uint32_t depth;
+                if (layer->GetType() == LayerType::Input || layer->GetType() == LayerType::Constant)
+                {
+                    // There needs to be at least one input-like layer above everything else, otherwise would be
+                    // nothing for them to connect to!
+                    depth = 0;
+                }
+                else
+                {
+                    // Other layers are randomly assigned to later depths.
+                    depth = 1 + GetRandom(maxLayerDepth);
+                }
+                layerDepths[layer] = depth;
+                layersAtDepth[depth].push_back(layer);
+            }
+
+            // Connect layers to each other. Every input slot of every layer must be connected, but it doesn't
+            // matter if an output slot goes unused.
+            for (Layer* layer : graph)
+            {
+                for (uint32_t inputSlotIdx = 0; inputSlotIdx < layer->GetNumInputSlots(); ++inputSlotIdx)
+                {
+                    InputSlot& inputSlot = layer->GetInputSlot(inputSlotIdx);
+                    uint32_t maxLayerDepthToConnectTo = layerDepths[layer]; // This prevents a connection causing a loop
+                    // Finding a layer to connect to may take multiple attempts, so keep trying until it works.
+                    while (inputSlot.GetConnectedOutputSlot() == nullptr)
+                    {
+                        uint32_t layerDepth = GetRandom(maxLayerDepthToConnectTo);
+                        const std::vector<Layer*>& layersToChooseFrom = layersAtDepth[layerDepth];
+                        if (layersToChooseFrom.size() == 0)
+                        {
+                            continue;
+                        }
+                        Layer* layerToConnectWith = layersToChooseFrom[GetRandom(layersToChooseFrom.size())];
+                        if (layerToConnectWith->GetNumOutputSlots() == 0)
+                        {
+                            continue;
+                        }
+                        uint32_t outputSlotIdx = GetRandom(layerToConnectWith->GetNumOutputSlots());
+                        layerToConnectWith->GetOutputSlot(outputSlotIdx).Connect(inputSlot);
+                    }
+                }
+            }
+        }
+
+        if (debug)
+        {
+            std::ofstream f("INPUT_" + std::to_string(testIdx) + ".dot");
+            graph.SerializeToDot(f);
+        }
+
+        // Run the splitting algorithm, selecting all nodes ending in an 'S' (as randomly assigned above).
+        auto startTime = std::chrono::high_resolution_clock::now();
+
+        SubgraphViewSelector::Subgraphs subgraphs =
+            SubgraphViewSelector::SelectSubgraphs(graph,
+                [](const Layer& l) { return std::string(l.GetName()).back() == 'S'; });
+
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        if (debug)
+        {
+            std::cout << "Test " << testIdx << ": " << duration.count() << " microseconds" << std::endl;
+        }
+
+        // Build a map of which subgraph is assigned to each layer.
+        // This helps some of the following code.
+        std::map<Layer*, SubgraphView*> layerToSubgraph;
+        for (Layer* layer : graph)
+        {
+            size_t i = 0;
+            for (std::unique_ptr<SubgraphView>& subgraph : subgraphs)
+            {
+                std::string name = std::to_string(i++);
+                if (std::find(subgraph->begin(), subgraph->end(), layer) != subgraph->end())
+                {
+                    layerToSubgraph[layer] = subgraph.get();
+                    break;
+                }
+            }
+        }
+
+        if (debug)
+        {
+            // Before dumping the dot file, set each Layer's BackendId property so that the dot file
+            // shows the resulting subgraph assignments.
+            for (Layer* layer : graph)
+            {
+                std::string name = "NotAssigned";
+                auto subgraphIt = layerToSubgraph.find(layer);
+                if (subgraphIt != layerToSubgraph.end())
+                {
+                    auto subgraphIdx = std::distance(subgraphs.begin(),
+                            std::find_if(subgraphs.begin(), subgraphs.end(),
+                                [&](auto& s) { return s.get() == subgraphIt->second; }));
+                    name = std::to_string(subgraphIdx);
+                }
+                layer->SetBackendId(armnn::BackendId(name));
+            }
+
+            std::ofstream f("GRAPH_" + std::to_string(testIdx) + ".dot");
+            graph.SerializeToDot(f);
+        }
+
+        // Check the dependencies between subgraphs to make sure that the algorithm has produced a valid result.
+        // Starting from each of the input slots of each subgraph, recurse up the graph and ensure that we never
+        // encounter a layer that belongs to the subgraph that we started from.
+        for (std::unique_ptr<SubgraphView>& subgraph : subgraphs)
+        {
+            for (InputSlot* inputSlot : subgraph->GetInputSlots())
+            {
+                std::queue<Layer*> toProcess;
+                toProcess.push(&inputSlot->GetConnectedOutputSlot()->GetOwningLayer());
+                while (toProcess.size() > 0)
+                {
+                    Layer* l = toProcess.front();
+                    toProcess.pop();
+
+                    BOOST_CHECK(layerToSubgraph[l] != subgraph.get());
+
+                    for (const InputSlot& is : l->GetInputSlots())
+                    {
+                        toProcess.push(&is.GetConnectedOutputSlot()->GetOwningLayer());
+                    }
+                }
+            }
+        }
     }
 }
 

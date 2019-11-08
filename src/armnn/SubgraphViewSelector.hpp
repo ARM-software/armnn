@@ -14,6 +14,10 @@ namespace armnn
 class Layer;
 class Graph;
 
+/// Algorithm that splits a Graph into Subgraphs based on a filtering of layers (e.g. which layers are appropriate for
+/// a certain backend). The resulting subgraphs are guaranteed to be form a DAG (i.e. there are no dependency loops).
+///
+/// The algorithm aims to produce as few subgraphs as possible.
 class SubgraphViewSelector final
 {
 public:

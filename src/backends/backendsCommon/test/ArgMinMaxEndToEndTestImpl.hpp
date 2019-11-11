@@ -71,7 +71,7 @@ void ArgMaxEndToEndSimple(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape inputShape{ 1, 1, 1, 5 };
     const armnn::TensorShape outputShape{ 1, 1, 1 };
 
-    std::vector<float> inputData({ 5.0f, 2.0f, 8.0f, 10.0f, 9.0f });
+    std::vector<float> inputData({ 6.0f, 2.0f, 8.0f, 10.0f, 9.0f });
     std::vector<int32_t> expectedOutputData({ 3 });
 
     ArgMinMaxEndToEndImpl<ArmnnType>(inputShape,
@@ -89,7 +89,7 @@ void ArgMinEndToEndSimple(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape inputShape{ 1, 1, 1, 5 };
     const armnn::TensorShape outputShape{ 1, 1, 1 };
 
-    std::vector<float> inputData({ 5.0f, 2.0f, 8.0f, 10.0f, 9.0f });
+    std::vector<float> inputData({ 6.0f, 2.0f, 8.0f, 10.0f, 9.0f });
     std::vector<int32_t> expectedOutputData({ 1 });
 
     ArgMinMaxEndToEndImpl<ArmnnType>(inputShape,
@@ -108,9 +108,9 @@ void ArgMaxAxis0EndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape outputShape{ 2, 1, 4 };
 
     std::vector<float> inputData({    1.0f,   2.0f,   3.0f,   4.0f,
-                                      8.0f,   7.0f,   6.0f,   5.0f,
+                                      8.0f,   7.0f,   6.0f,   6.0f,
                                     100.0f,  20.0f, 300.0f,  40.0f,
-                                    500.0f, 475.0f, 450.0f, 425.0f,
+                                    500.0f, 476.0f, 450.0f, 426.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f,
                                      10.0f, 200.0f,  30.0f, 400.0f });
 
@@ -133,9 +133,9 @@ void ArgMinAxis0EndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape outputShape{ 2, 1, 4 };
 
     std::vector<float> inputData({    1.0f,   2.0f,   3.0f,   4.0f,
-                                      8.0f,   7.0f,   6.0f,   5.0f,
+                                      8.0f,   7.0f,   6.0f,   6.0f,
                                     100.0f,  20.0f, 300.0f,  40.0f,
-                                    500.0f, 475.0f, 450.0f, 425.0f,
+                                    500.0f, 476.0f, 450.0f, 426.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f,
                                      10.0f, 200.0f,  30.0f, 400.0f });
 
@@ -158,9 +158,9 @@ void ArgMaxAxis1EndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape outputShape{ 1, 2, 4 };
 
     std::vector<float> inputData({    1.0f,   2.0f,   3.0f,   4.0f,
-                                      8.0f,   7.0f,   6.0f,   5.0f,
+                                      8.0f,   7.0f,   6.0f,   6.0f,
                                     100.0f,  20.0f, 300.0f,  40.0f,
-                                    500.0f, 475.0f, 450.0f, 425.0f,
+                                    500.0f, 476.0f, 450.0f, 426.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f,
                                      10.0f, 200.0f,  30.0f, 400.0f });
 
@@ -183,9 +183,9 @@ void ArgMinAxis1EndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape outputShape{ 1, 2, 4 };
 
     std::vector<float> inputData({    1.0f,   2.0f,   3.0f,   4.0f,
-                                      8.0f,   7.0f,   6.0f,   5.0f,
+                                      8.0f,   7.0f,   6.0f,   6.0f,
                                     100.0f,  20.0f, 300.0f,  40.0f,
-                                    500.0f, 475.0f, 450.0f, 425.0f,
+                                    500.0f, 476.0f, 450.0f, 426.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f,
                                      10.0f, 200.0f,  30.0f, 400.0f });
 
@@ -208,9 +208,9 @@ void ArgMaxAxis2EndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape outputShape{ 1, 3, 4 };
 
     std::vector<float> inputData({    1.0f,   2.0f,   3.0f,   4.0f,
-                                      8.0f,   7.0f,   6.0f,   5.0f,
+                                      8.0f,   7.0f,   6.0f,   6.0f,
                                     100.0f,  20.0f, 300.0f,  40.0f,
-                                    500.0f, 475.0f, 450.0f, 425.0f,
+                                    500.0f, 476.0f, 450.0f, 426.0f,
                                      10.0f, 200.0f,  30.0f, 400.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f });
 
@@ -234,9 +234,9 @@ void ArgMinAxis2EndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape outputShape{ 1, 3, 4 };
 
     std::vector<float> inputData({    1.0f,   2.0f,   3.0f,   4.0f,
-                                      8.0f,   7.0f,   6.0f,   5.0f,
+                                      8.0f,   7.0f,   6.0f,   6.0f,
                                     100.0f,  20.0f, 300.0f,  40.0f,
-                                    500.0f, 475.0f, 450.0f, 425.0f,
+                                    500.0f, 476.0f, 450.0f, 426.0f,
                                      10.0f, 200.0f,  30.0f, 400.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f });
 
@@ -259,10 +259,10 @@ void ArgMaxAxis3EndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape inputShape{ 1, 3, 2, 4 };
     const armnn::TensorShape outputShape{ 1, 3, 2 };
 
-    std::vector<float> inputData({    1.0f,   3.0f,   5.0f,   7.0f,
-                                      8.0f,   7.0f,   6.0f,   5.0f,
+    std::vector<float> inputData({    1.0f,   3.0f,   6.0f,   7.0f,
+                                      8.0f,   7.0f,   6.0f,   6.0f,
                                     100.0f,  20.0f, 300.0f,  40.0f,
-                                    500.0f, 475.0f, 450.0f, 425.0f,
+                                    500.0f, 476.0f, 450.0f, 426.0f,
                                      10.0f, 200.0f,  30.0f, 400.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f });
 
@@ -285,10 +285,10 @@ void ArgMinAxis3EndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorShape inputShape{ 1, 3, 2, 4 };
     const armnn::TensorShape outputShape{ 1, 3, 2 };
 
-    std::vector<float> inputData({    1.0f,   3.0f,   5.0f,   7.0f,
+    std::vector<float> inputData({    1.0f,   3.0f,   6.0f,   7.0f,
                                      18.0f,  16.0f,  14.0f,  12.0f,
                                     100.0f,  20.0f, 300.0f,  40.0f,
-                                    500.0f, 475.0f, 450.0f, 425.0f,
+                                    500.0f, 476.0f, 450.0f, 426.0f,
                                      10.0f, 200.0f,  30.0f, 400.0f,
                                      50.0f,  60.0f,  70.0f,  80.0f });
 

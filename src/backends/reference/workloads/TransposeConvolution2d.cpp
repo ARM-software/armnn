@@ -79,7 +79,7 @@ void TransposeConvolution2dImpl(const TransposeConvolution2dDescriptor& descript
 
                                     const unsigned int weightsIndex =
                                         dataLayoutIndexed.GetIndex(weightsShape, dOutput, dInput, yWeights, xWeights);
-                                    weightsDecoder[weightsIndex];
+                                    weightsDecoder.SetIndex(weightsIndex, dOutput);
 
                                     const unsigned int outputIndex =
                                         dataLayoutIndexed.GetIndex(outputShape, batch, dOutput, yOutput, xOutput);
@@ -107,7 +107,7 @@ void TransposeConvolution2dImpl(const TransposeConvolution2dDescriptor& descript
         {
             for (unsigned int dOutput = 0u; dOutput < outputDepth; ++dOutput)
             {
-                rBiasesDecoder[dOutput];
+                rBiasesDecoder.SetIndex(dOutput, dOutput);
                 for (unsigned int yOutput = 0u; yOutput < outputHeight; ++yOutput)
                 {
                     for (unsigned int xOutput = 0u; xOutput < outputWidth; ++xOutput)

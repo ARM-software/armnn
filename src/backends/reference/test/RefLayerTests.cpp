@@ -1609,6 +1609,13 @@ ARMNN_AUTO_TEST_CASE(MultiChannelTransposeConvolution2dInt16Nhwc,
                      MultiChannelTransposeConvolution2dTest<DataType::QuantisedSymm16, DataType::Signed32>,
                      DataLayout::NCHW)
 
+ARMNN_AUTO_TEST_CASE(TransposeConvolution2dPerAxisQuantTestNchw,
+                     TransposeConvolution2dPerAxisQuantTest,
+                     DataLayout::NCHW);
+ARMNN_AUTO_TEST_CASE(TransposeConvolution2dPerAxisQuantTestNhwc,
+                     TransposeConvolution2dPerAxisQuantTest,
+                     DataLayout::NHWC);
+
 // Stack
 ARMNN_AUTO_TEST_CASE(Stack0Axis,           StackAxis0Float32Test)
 ARMNN_AUTO_TEST_CASE(StackOutput4DAxis1,   StackOutput4DAxis1Float32Test)

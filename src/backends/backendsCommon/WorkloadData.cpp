@@ -2595,22 +2595,37 @@ void TransposeConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
 
     const TensorInfo& weightTensorInfo = m_Weight->GetTensorInfo();
     ValidateTensorNumDimensions(weightTensorInfo, descriptorName, 4, "weight");
-    ValidateTensorDataType(weightTensorInfo, inputTensorInfo.GetDataType(), descriptorName, "weight");
 
+    ValidateWeightDataType(inputTensorInfo, weightTensorInfo, descriptorName);
+
+    Optional<TensorInfo> optionalBiasTensorInfo;
     if (m_Parameters.m_BiasEnabled)
     {
         ValidatePointer(m_Bias, descriptorName, "bias");
 
-        const TensorInfo& biasTensorInfo = m_Bias->GetTensorInfo();
-        ValidateTensorNumDimensions(biasTensorInfo, descriptorName, 1, "bias");
+        optionalBiasTensorInfo = MakeOptional<TensorInfo>(m_Bias->GetTensorInfo());
+        const TensorInfo& biasTensorInfo = optionalBiasTensorInfo.value();
 
-        ValidateTensorDataType(biasTensorInfo,
-                               GetBiasDataType(inputTensorInfo.GetDataType()),
-                               descriptorName,
-                               "bias");
-
+        ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
         ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
     }
+
+    ValidatePerAxisQuantization(inputTensorInfo,
+                                outputTensorInfo,
+                                weightTensorInfo,
+                                optionalBiasTensorInfo,
+                                descriptorName);
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QuantisedAsymm8,
+        DataType::QuantisedSymm16
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void QuantizedLstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

@@ -137,6 +137,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/StridedSliceTestImpl.hpp
     layerTests/SubtractionTestImpl.cpp
     layerTests/SubtractionTestImpl.hpp
+    layerTests/TransposeConvolution2dTestImpl.cpp
     layerTests/TransposeConvolution2dTestImpl.hpp
 )
 

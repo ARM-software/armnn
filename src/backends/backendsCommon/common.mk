@@ -76,7 +76,8 @@ COMMON_TEST_SOURCES := \
     test/layerTests/SplitterTestImpl.cpp \
     test/layerTests/StackTestImpl.cpp \
     test/layerTests/StridedSliceTestImpl.cpp \
-    test/layerTests/SubtractionTestImpl.cpp
+    test/layerTests/SubtractionTestImpl.cpp \
+    test/layerTests/TransposeConvolution2dTestImpl.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 COMMON_TEST_SOURCES += \

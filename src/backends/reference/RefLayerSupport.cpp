@@ -1802,14 +1802,31 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
                                   "Reference TransposeConvolution2d: output is not a supported type.");
 
-    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
-                                  "Reference TransposeConvolution2d: weights is not a supported type.");
-
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                   "Reference TransposeConvolution2d: input and output types mismatched.");
 
-    supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
-                                  "Reference TransposeConvolution2d: input and weights types mismatched.");
+
+    const DataType inputType = input.GetDataType();
+    if (inputType == DataType::QuantisedAsymm8)
+    {
+        std::array<DataType, 2> supportedWeightTypes =
+        {
+            DataType::QuantisedAsymm8,
+            DataType::QuantizedSymm8PerAxis
+        };
+
+        supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
+                                      "Reference TransposeConvolution2d: weights type not supported for "
+                                      "quantized input.");
+    }
+    else
+    {
+        supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+                                    "Reference TransposeConvolution2d: weights is not a supported type.");
+
+        supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
+                                    "Reference TransposeConvolution2d: input and weights types mismatched.");
+    }
 
     if (biases.has_value())
     {

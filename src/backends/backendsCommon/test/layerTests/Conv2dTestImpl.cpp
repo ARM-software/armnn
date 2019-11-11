@@ -3260,6 +3260,114 @@ LayerTestResult<int16_t, 4> DepthwiseConvolution2dDepthMul1Int16Test(
         workloadFactory, memoryManager, 0.5f, 50, biasEnabled, layout);
 }
 
+LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::DataLayout layout)
+{
+    using namespace armnn;
+
+    const DataType inputType  = DataType::QuantisedAsymm8;
+    const DataType kernelType = DataType::QuantizedSymm8PerAxis;
+    const DataType biasType   = DataType::Signed32;
+
+    TensorInfo inputInfo ({ 1, 3, 3, 2 }, inputType, 0.5f, 128); // N H W C
+    TensorInfo outputInfo({ 1, 2, 2, 4 }, inputType, 1.0f, 128); // N H W C
+
+    const std::vector<float> quantScales{ 1.0f, 0.5f, 1.0f, 0.5f };
+    const unsigned int quantDimension = 0;
+    TensorInfo kernelInfo({ 2, 2, 2, 2 }, kernelType, quantScales, quantDimension); // M I H W
+
+    const std::vector<float> biasQuantScales{ 0.5f, 0.25f, 0.5f, 0.25f };
+    constexpr unsigned int biasQuantDimension = 0;
+    TensorInfo biasInfo({ 4 }, biasType, biasQuantScales, biasQuantDimension);
+
+    std::vector<uint8_t> inputData =
+    {
+        129, 130,
+        129, 130,
+        129, 130,
+        129, 130,
+        129, 130,
+        129, 130,
+        129, 130,
+        129, 130,
+        129, 130
+    };
+
+    std::vector<int8_t> kernelData =
+    {
+        1, 1, 1, 1,
+        1, 1, 1, 1,
+        1, 1, 1, 1,
+        1, 1, 1, 1
+    };
+
+    std::vector<int32_t> biasData =
+    {
+        4, 4, 4, 4
+    };
+
+    std::vector<uint8_t> expectedOutputData =
+    {
+        132, 130, 134, 131,
+        132, 130, 134, 131,
+        132, 130, 134, 131,
+        132, 130, 134, 131
+    };
+
+    if (layout == DataLayout::NCHW)
+    {
+        PermuteTensorNhwcToNchw(inputInfo, inputData);
+        PermuteTensorNhwcToNchw(outputInfo, expectedOutputData);
+    }
+
+    DepthwiseConvolution2dDescriptor descriptor;
+    descriptor.m_StrideX     = 1;
+    descriptor.m_StrideY     = 1;
+    descriptor.m_PadLeft     = 0;
+    descriptor.m_PadRight    = 0;
+    descriptor.m_PadTop      = 0;
+    descriptor.m_PadBottom   = 0;
+    descriptor.m_DilationX   = 1;
+    descriptor.m_DilationY   = 1;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = layout;
+
+    std::unique_ptr<ITensorHandle> inputHandle  = workloadFactory.CreateTensorHandle(inputInfo);
+    std::unique_ptr<ITensorHandle> outputHandle = workloadFactory.CreateTensorHandle(outputInfo);
+
+    WorkloadInfo workloadInfo;
+    ScopedCpuTensorHandle weightTensor(kernelInfo);
+    ScopedCpuTensorHandle biasTensor(biasInfo);
+
+    AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
+    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
+
+    DepthwiseConvolution2dQueueDescriptor queueDescriptor;
+    queueDescriptor.m_Parameters = descriptor;
+    queueDescriptor.m_Weight     = &weightTensor;
+    queueDescriptor.m_Bias       = &biasTensor;
+
+    AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
+    AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
+
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(queueDescriptor, workloadInfo);
+    inputHandle->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), inputData.data());
+
+    ExecuteWorkload(*workload, memoryManager);
+
+    LayerTestResult<uint8_t, 4> ret(outputInfo);
+
+    CopyDataFromITensorHandle(ret.output.origin(), outputHandle.get());
+    ret.outputExpected = MakeTensor<uint8_t, 4>(outputInfo, expectedOutputData);
+
+    return ret;
+}
+
 LayerTestResult<float, 4> CompareDepthwiseConvolution2dFloatTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

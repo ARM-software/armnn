@@ -565,14 +565,29 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
                                   "Reference DepthwiseConvolution2d: output is not a supported type.");
 
-    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
-                                  "Reference DepthwiseConvolution2d: weights is not a supported type.");
-
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
                                   "Reference DepthwiseConvolution2d: input and output types mismatched.");
 
-    supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
-                                  "Reference DepthwiseConvolution2d: input and weights types mismatched.");
+    const DataType inputType = input.GetDataType();
+    if (inputType == DataType::QuantisedAsymm8)
+    {
+        std::array<DataType, 2> supportedWeightTypes =
+        {
+            DataType::QuantisedAsymm8,
+            DataType::QuantizedSymm8PerAxis
+        };
+
+        supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
+                                      "Reference convolution2d: weights type not supported for quantized input.");
+    }
+    else
+    {
+        supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+                                      "Reference DepthwiseConvolution2d: weights is not a supported type.");
+
+        supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
+                                      "Reference DepthwiseConvolution2d: input and weights types mismatched.");
+    }
 
     if (biases.has_value())
     {

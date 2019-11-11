@@ -210,6 +210,11 @@ LayerTestResult<int16_t, 4> DepthwiseConvolution2dDepthMul1Int16Test(
     bool biasEnabled,
     const armnn::DataLayout layout);
 
+LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::DataLayout layout);
+
 LayerTestResult<float, 4> CompareDepthwiseConvolution2dFloatTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

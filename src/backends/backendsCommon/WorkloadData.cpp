@@ -1210,18 +1210,24 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
                                      numWeightInputChannels % numWeightChannelMultiplier));
     }
 
-    ValidateTensorDataTypesMatch(inputTensorInfo, weightTensorInfo, descriptorName, "input", "weight");
+    ValidateWeightDataType(inputTensorInfo, weightTensorInfo, descriptorName);
 
+    Optional<TensorInfo> optionalBiasTensorInfo;
     if (m_Parameters.m_BiasEnabled)
     {
         ValidatePointer(m_Bias, descriptorName, "bias");
 
-        const TensorInfo& biasTensorInfo = m_Bias->GetTensorInfo();
-        ValidateTensorNumDimensions(biasTensorInfo, descriptorName, 1, "bias");
+        optionalBiasTensorInfo = MakeOptional<TensorInfo>(m_Bias->GetTensorInfo());
+        const TensorInfo& biasTensorInfo = optionalBiasTensorInfo.value();
 
         ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
         ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
     }
+    ValidatePerAxisQuantization(inputTensorInfo,
+                                outputTensorInfo,
+                                weightTensorInfo,
+                                optionalBiasTensorInfo,
+                                descriptorName);
 
     std::vector<DataType> supportedTypes =
     {

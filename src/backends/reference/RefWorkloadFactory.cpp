@@ -172,10 +172,15 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateConvolution2d(const Convolu
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
+    if (IsFloat16(info))
+    {
+        return std::make_unique<RefDebugFloat16Workload>(descriptor, info);
+    }
     if (IsQSymm16(info))
     {
         return std::make_unique<RefDebugQSymm16Workload>(descriptor, info);
     }
+
     return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymm8Workload>(descriptor, info);
 }
 

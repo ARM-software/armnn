@@ -2,7 +2,10 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "Debug.hpp"
+
+#include <Half.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -85,6 +88,12 @@ void Debug(const TensorInfo& inputInfo,
     std::cout << " }" << std::endl;
 }
 
+template void Debug<Half>(const TensorInfo& inputInfo,
+                          const Half* inputData,
+                          LayerGuid guid,
+                          const std::string& layerName,
+                          unsigned int slotIndex);
+
 template void Debug<float>(const TensorInfo& inputInfo,
                            const float* inputData,
                            LayerGuid guid,
@@ -102,4 +111,5 @@ template void Debug<int16_t>(const TensorInfo& inputInfo,
                              LayerGuid guid,
                              const std::string& layerName,
                              unsigned int slotIndex);
+
 } // namespace armnn

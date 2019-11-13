@@ -6,6 +6,7 @@
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
 #include <backendsCommon/test/AbsEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
@@ -336,6 +337,57 @@ BOOST_AUTO_TEST_CASE(ClTransposeConvolution2dEndToEndUint8NhwcTest)
 BOOST_AUTO_TEST_CASE(ClQuantizedLstmEndToEndTest)
 {
     QuantizedLstmEndToEnd(defaultBackends);
+}
+
+// ArgMinMax
+BOOST_AUTO_TEST_CASE(ClArgMaxSimpleTest)
+{
+    ArgMaxEndToEndSimple<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinSimpleTest)
+{
+    ArgMinEndToEndSimple<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMaxAxis0Test)
+{
+    ArgMaxAxis0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinAxis0Test)
+{
+    ArgMinAxis0EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMaxAxis1Test)
+{
+    ArgMaxAxis1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinAxis1Test)
+{
+    ArgMinAxis1EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMaxAxis2Test)
+{
+    ArgMaxAxis2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinAxis2Test)
+{
+    ArgMinAxis2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMaxAxis3Test)
+{
+    ArgMaxAxis3EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(ClArgMinAxis3Test)
+{
+    ArgMinAxis3EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

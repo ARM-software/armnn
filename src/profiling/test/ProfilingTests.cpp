@@ -2053,10 +2053,12 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
     const uint32_t version  = 1;
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
-    MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    MockBufferManager mockBuffer1(1024);
+    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer1);
+    MockBufferManager mockBuffer2(1024);
+    SendTimelinePacket sendTimelinePacket(mockBuffer2);
     RequestCounterDirectoryCommandHandler commandHandler(familyId, packetId, version, counterDirectory,
-                                                         sendCounterPacket, profilingStateMachine);
+                                                         sendCounterPacket, sendTimelinePacket, profilingStateMachine);
 
     const uint32_t wrongPacketId = 47;
     const uint32_t wrongHeader   = (wrongPacketId & 0x000003FF) << 16;
@@ -2064,32 +2066,43 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest1)
     Packet wrongPacket(wrongHeader);
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
-    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException);    // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
-    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException);    // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
-    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException);    // Wrong profiling state
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::Active);
-    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::InvalidArgumentException);    // Wrong packet
+    BOOST_CHECK_THROW(commandHandler(wrongPacket), armnn::InvalidArgumentException); // Wrong packet
 
     const uint32_t rightHeader = (packetId & 0x000003FF) << 16;
 
     Packet rightPacket(rightHeader);
 
-    BOOST_CHECK_NO_THROW(commandHandler(rightPacket));    // Right packet
+    BOOST_CHECK_NO_THROW(commandHandler(rightPacket)); // Right packet
 
-    auto readBuffer = mockBuffer.GetReadableBuffer();
+    auto readBuffer1 = mockBuffer1.GetReadableBuffer();
 
-    uint32_t headerWord0 = ReadUint32(readBuffer, 0);
-    uint32_t headerWord1 = ReadUint32(readBuffer, 4);
+    uint32_t header1Word0 = ReadUint32(readBuffer1, 0);
+    uint32_t header1Word1 = ReadUint32(readBuffer1, 4);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 0);    // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x000003FF) == 2);    // packet id
-    BOOST_TEST(headerWord1 == 24);                          // data length
+    // Counter directory packet
+    BOOST_TEST(((header1Word0 >> 26) & 0x0000003F) == 0); // packet family
+    BOOST_TEST(((header1Word0 >> 16) & 0x000003FF) == 2); // packet id
+    BOOST_TEST(header1Word1 == 24);                       // data length
 
-    uint32_t bodyHeaderWord0   = ReadUint32(readBuffer, 8);
-    uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
-    BOOST_TEST(deviceRecordCount == 0);    // device_records_count
+    uint32_t bodyHeader1Word0   = ReadUint32(readBuffer1, 8);
+    uint16_t deviceRecordCount = numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
+    BOOST_TEST(deviceRecordCount == 0); // device_records_count
+
+    auto readBuffer2 = mockBuffer2.GetReadableBuffer();
+
+    uint32_t header2Word0 = ReadUint32(readBuffer2, 0);
+    uint32_t header2Word1 = ReadUint32(readBuffer2, 4);
+
+    // Timeline message directory packet
+    BOOST_TEST(((header2Word0 >> 26) & 0x0000003F) == 1); // packet family
+    BOOST_TEST(((header2Word0 >> 16) & 0x000003FF) == 0); // packet id
+    BOOST_TEST(header2Word1 == 419);                      // data length
 }
 
 BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
@@ -2101,15 +2114,19 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     const uint32_t version  = 1;
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
-    MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer);
+    MockBufferManager mockBuffer1(1024);
+    SendCounterPacket sendCounterPacket(profilingStateMachine, mockBuffer1);
+    MockBufferManager mockBuffer2(1024);
+    SendTimelinePacket sendTimelinePacket(mockBuffer2);
     RequestCounterDirectoryCommandHandler commandHandler(familyId, packetId, version, counterDirectory,
-                                                         sendCounterPacket, profilingStateMachine);
+                                                         sendCounterPacket, sendTimelinePacket, profilingStateMachine);
     const uint32_t header = (packetId & 0x000003FF) << 16;
     Packet packet(header);
 
-    const Device* device         = counterDirectory.RegisterDevice("deviceA", 1);
+    const Device* device = counterDirectory.RegisterDevice("deviceA", 1);
+    BOOST_CHECK(device != nullptr);
     const CounterSet* counterSet = counterDirectory.RegisterCounterSet("countersetA");
+    BOOST_CHECK(counterSet != nullptr);
     counterDirectory.RegisterCategory("categoryA", device->m_Uid, counterSet->m_Uid);
     counterDirectory.RegisterCounter("categoryA", 0, 1, 2.0f, "counterA", "descA");
     counterDirectory.RegisterCounter("categoryA", 1, 1, 3.0f, "counterB", "descB");
@@ -2123,39 +2140,49 @@ BOOST_AUTO_TEST_CASE(RequestCounterDirectoryCommandHandlerTest2)
     profilingStateMachine.TransitionToState(ProfilingState::Active);
     BOOST_CHECK_NO_THROW(commandHandler(packet));
 
-    auto readBuffer = mockBuffer.GetReadableBuffer();
+    auto readBuffer1 = mockBuffer1.GetReadableBuffer();
 
-    uint32_t headerWord0 = ReadUint32(readBuffer, 0);
-    uint32_t headerWord1 = ReadUint32(readBuffer, 4);
+    uint32_t header1Word0 = ReadUint32(readBuffer1, 0);
+    uint32_t header1Word1 = ReadUint32(readBuffer1, 4);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x0000003F) == 0);    // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x000003FF) == 2);    // packet id
-    BOOST_TEST(headerWord1 == 240);                         // data length
+    BOOST_TEST(((header1Word0 >> 26) & 0x0000003F) == 0); // packet family
+    BOOST_TEST(((header1Word0 >> 16) & 0x000003FF) == 2); // packet id
+    BOOST_TEST(header1Word1 == 240);                      // data length
 
-    uint32_t bodyHeaderWord0       = ReadUint32(readBuffer, 8);
-    uint32_t bodyHeaderWord1       = ReadUint32(readBuffer, 12);
-    uint32_t bodyHeaderWord2       = ReadUint32(readBuffer, 16);
-    uint32_t bodyHeaderWord3       = ReadUint32(readBuffer, 20);
-    uint32_t bodyHeaderWord4       = ReadUint32(readBuffer, 24);
-    uint32_t bodyHeaderWord5       = ReadUint32(readBuffer, 28);
-    uint16_t deviceRecordCount     = numeric_cast<uint16_t>(bodyHeaderWord0 >> 16);
-    uint16_t counterSetRecordCount = numeric_cast<uint16_t>(bodyHeaderWord2 >> 16);
-    uint16_t categoryRecordCount   = numeric_cast<uint16_t>(bodyHeaderWord4 >> 16);
-    BOOST_TEST(deviceRecordCount == 1);        // device_records_count
-    BOOST_TEST(bodyHeaderWord1 == 0);          // device_records_pointer_table_offset
-    BOOST_TEST(counterSetRecordCount == 1);    // counter_set_count
-    BOOST_TEST(bodyHeaderWord3 == 4);          // counter_set_pointer_table_offset
-    BOOST_TEST(categoryRecordCount == 1);      // categories_count
-    BOOST_TEST(bodyHeaderWord5 == 8);          // categories_pointer_table_offset
+    uint32_t bodyHeader1Word0      = ReadUint32(readBuffer1, 8);
+    uint32_t bodyHeader1Word1      = ReadUint32(readBuffer1, 12);
+    uint32_t bodyHeader1Word2      = ReadUint32(readBuffer1, 16);
+    uint32_t bodyHeader1Word3      = ReadUint32(readBuffer1, 20);
+    uint32_t bodyHeader1Word4      = ReadUint32(readBuffer1, 24);
+    uint32_t bodyHeader1Word5      = ReadUint32(readBuffer1, 28);
+    uint16_t deviceRecordCount     = numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
+    uint16_t counterSetRecordCount = numeric_cast<uint16_t>(bodyHeader1Word2 >> 16);
+    uint16_t categoryRecordCount   = numeric_cast<uint16_t>(bodyHeader1Word4 >> 16);
+    BOOST_TEST(deviceRecordCount == 1);     // device_records_count
+    BOOST_TEST(bodyHeader1Word1 == 0);      // device_records_pointer_table_offset
+    BOOST_TEST(counterSetRecordCount == 1); // counter_set_count
+    BOOST_TEST(bodyHeader1Word3 == 4);      // counter_set_pointer_table_offset
+    BOOST_TEST(categoryRecordCount == 1);   // categories_count
+    BOOST_TEST(bodyHeader1Word5 == 8);      // categories_pointer_table_offset
 
-    uint32_t deviceRecordOffset = ReadUint32(readBuffer, 32);
+    uint32_t deviceRecordOffset = ReadUint32(readBuffer1, 32);
     BOOST_TEST(deviceRecordOffset == 0);
 
-    uint32_t counterSetRecordOffset = ReadUint32(readBuffer, 36);
+    uint32_t counterSetRecordOffset = ReadUint32(readBuffer1, 36);
     BOOST_TEST(counterSetRecordOffset == 20);
 
-    uint32_t categoryRecordOffset = ReadUint32(readBuffer, 40);
+    uint32_t categoryRecordOffset = ReadUint32(readBuffer1, 40);
     BOOST_TEST(categoryRecordOffset == 44);
+
+    auto readBuffer2 = mockBuffer2.GetReadableBuffer();
+
+    uint32_t header2Word0 = ReadUint32(readBuffer2, 0);
+    uint32_t header2Word1 = ReadUint32(readBuffer2, 4);
+
+    // Timeline message directory packet
+    BOOST_TEST(((header2Word0 >> 26) & 0x0000003F) == 1); // packet family
+    BOOST_TEST(((header2Word0 >> 16) & 0x000003FF) == 0); // packet id
+    BOOST_TEST(header2Word1 == 419);                      // data length
 }
 
 BOOST_AUTO_TEST_CASE(CheckProfilingServiceBadConnectionAcknowledgedPacket)
@@ -2296,9 +2323,8 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodConnectionAcknowledgedPacket)
     // Write the packet to the mock profiling connection
     mockProfilingConnection->WritePacket(std::move(connectionAcknowledgedPacket));
 
-    // Wait for a bit (must at least be the delay value of the mock profiling connection) to make sure that
-    // the Connection Acknowledged packet gets processed by the profiling service
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // Wait for the Counter Directory packet to be sent
+    helper.WaitForProfilingPacketsSent();
 
     // The Connection Acknowledged Command Handler should have updated the profiling state accordingly
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);
@@ -2439,8 +2465,9 @@ BOOST_AUTO_TEST_CASE(CheckProfilingServiceGoodRequestCounterDirectoryPacket)
 
     // Check that the mock profiling connection contains one Counter Directory packet
     const std::vector<uint32_t> writtenData = mockProfilingConnection->GetWrittenData();
-    BOOST_TEST(writtenData.size() == 1);
-    BOOST_TEST(writtenData[0] == 416);    // The size of the expected Counter Directory packet
+    BOOST_TEST(writtenData.size() == 2);
+    BOOST_TEST(writtenData[0] == 427); // The size of the expected Timeline Directory packet
+    BOOST_TEST(writtenData[1] == 416); // The size of the expected Counter Directory packet
 
     // The Request Counter Directory Command Handler should not have updated the profiling state
     BOOST_CHECK(profilingService.GetCurrentState() == ProfilingState::Active);

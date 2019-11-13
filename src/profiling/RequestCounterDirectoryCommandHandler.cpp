@@ -34,8 +34,9 @@ void RequestCounterDirectoryCommandHandler::operator()(const Packet& packet)
                                                   % packet.GetPacketId()));
         }
 
-        // Write a Counter Directory packet to the Counter Stream Buffer
+        // Send all the packet required for the handshake with the external profiling service
         m_SendCounterPacket.SendCounterDirectoryPacket(m_CounterDirectory);
+        m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
 
         // Notify the Send Thread that new data is available in the Counter Stream Buffer
         m_SendCounterPacket.SetReadyToRead();

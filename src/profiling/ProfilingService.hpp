@@ -148,6 +148,7 @@ protected:
                                                   m_PacketVersionResolver.ResolvePacketVersion(0, 3).GetEncodedValue(),
                                                   m_CounterDirectory,
                                                   m_SendCounterPacket,
+                                                  m_SendTimelinePacket,
                                                   m_StateMachine)
         , m_PeriodicCounterSelectionCommandHandler(0,
                                                    4,

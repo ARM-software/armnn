@@ -9,6 +9,8 @@
 #include "ISendTimelinePacket.hpp"
 #include "ProfilingUtils.hpp"
 
+#include <boost/assert.hpp>
+
 #include <memory>
 
 namespace armnn
@@ -54,11 +56,51 @@ private:
     /// Reserves maximum packet size from buffer
     void ReserveBuffer();
 
+    template <typename Func, typename ... Params>
+    void ForwardWriteBinaryFunction(Func& func, Params&& ... params);
+
     IBufferManager& m_BufferManager;
     IPacketBufferPtr m_WriteBuffer;
     unsigned int m_Offset;
     unsigned int m_BufferSize;
 };
+
+template <typename Func, typename ... Params>
+void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... params)
+{
+    try
+    {
+        ReserveBuffer();
+        BOOST_ASSERT(m_WriteBuffer);
+        unsigned int numberOfBytesWritten = 0;
+        while (true)
+        {
+            TimelinePacketStatus result = func(std::forward<Params>(params)...,
+                                               &m_WriteBuffer->GetWritableData()[m_Offset],
+                                               m_BufferSize,
+                                               numberOfBytesWritten);
+            switch (result)
+            {
+            case TimelinePacketStatus::BufferExhaustion:
+                Commit();
+                ReserveBuffer();
+                continue;
+
+            case TimelinePacketStatus::Error:
+                throw RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION());
+
+            default:
+                m_Offset     += numberOfBytesWritten;
+                m_BufferSize -= numberOfBytesWritten;
+                return;
+            }
+        }
+    }
+    catch (...)
+    {
+        throw RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION());
+    }
+}
 
 } // namespace profiling
 

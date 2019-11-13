@@ -7,6 +7,7 @@
 
 #include "CommandHandlerFunctor.hpp"
 #include "ISendCounterPacket.hpp"
+#include "ISendTimelinePacket.hpp"
 #include "Packet.hpp"
 #include "ProfilingStateMachine.hpp"
 
@@ -25,10 +26,12 @@ public:
                                           uint32_t version,
                                           ICounterDirectory& counterDirectory,
                                           ISendCounterPacket& sendCounterPacket,
+                                          ISendTimelinePacket& sendTimelinePacket,
                                           ProfilingStateMachine& profilingStateMachine)
         : CommandHandlerFunctor(familyId, packetId, version)
         , m_CounterDirectory(counterDirectory)
         , m_SendCounterPacket(sendCounterPacket)
+        , m_SendTimelinePacket(sendTimelinePacket)
         , m_StateMachine(profilingStateMachine)
     {}
 
@@ -37,6 +40,7 @@ public:
 private:
     const ICounterDirectory& m_CounterDirectory;
     ISendCounterPacket& m_SendCounterPacket;
+    ISendTimelinePacket& m_SendTimelinePacket;
     const ProfilingStateMachine& m_StateMachine;
 };
 

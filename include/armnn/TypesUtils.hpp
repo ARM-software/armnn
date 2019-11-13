@@ -42,6 +42,16 @@ constexpr char const* GetActivationFunctionAsCString(ActivationFunction activati
     }
 }
 
+constexpr char const* GetArgMinMaxFunctionAsCString(ArgMinMaxFunction function)
+{
+    switch (function)
+    {
+        case ArgMinMaxFunction::Max:    return "Max";
+        case ArgMinMaxFunction::Min:    return "Min";
+        default:                        return "Unknown";
+    }
+}
+
 constexpr char const* GetComparisonOperationAsCString(ComparisonOperation operation)
 {
     switch (operation)

@@ -564,7 +564,7 @@ if(ARMCOMPUTECL)
     target_link_libraries(armnn ${OPENCL_LIBRARIES})
 endif()
 
-if(PROFILING_BACKEND_STREAMLINE)
+if(PROFILING_BACKEND_STREAMLINE AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
     target_link_libraries(armnn pthread)
 endif()
 
@@ -951,14 +951,14 @@ if(BUILD_GATORD_MOCK)
 
     add_executable_ex(GartordMock tests/profiling/gatordmock/GatordMockMain.cpp)
 
-    if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-        target_link_libraries(GartordMock pthread)
-    endif()
-
     target_link_libraries(GartordMock
         armnn
         gatordMockService
         ${Boost_PROGRAM_OPTIONS_LIBRARY}
         ${Boost_SYSTEM_LIBRARY})
+
+    if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
+        target_link_libraries(GartordMock pthread)
+    endif()
 
 endif()

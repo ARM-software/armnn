@@ -215,6 +215,13 @@ armnn::TensorInfo ToTensorInfo(const std::string& name, std::vector<unsigned int
                                 CHECK_LOCATION().AsString() ));
       }
   }
+
+  // To avoid crashes by trivial tensors
+  if (shape.empty())
+  {
+      return TensorInfo(TensorShape(), type);
+  }
+
   return TensorInfo(TensorShape(static_cast<unsigned int>(shape.size()), shape.data()), type);
 }
 

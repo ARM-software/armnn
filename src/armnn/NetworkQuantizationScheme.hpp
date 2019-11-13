@@ -40,6 +40,12 @@ struct QAsymm8QuantizationScheme : IQuantizationScheme
         min = std::min(0.0, min); // min <= 0.0
         max = std::max(0.0, max); // max >= 0.0
 
+        // To avoid dividing by zero when quantizing a zero filled tensor
+        if (min == 0.0 && max == 0.0)
+        {
+            max = 1.0;
+        }
+
         // Assumes quantization range [0-highest]
         double scale = (max-min) / highest;
         double offset = -min / scale;
@@ -62,6 +68,12 @@ struct QSymm16QuantizationScheme : IQuantizationScheme
         if (min > max)
         {
             throw InvalidArgumentException("min > max will result in invalid quantization.");
+        }
+
+        // To avoid dividing by zero when quantizing a zero filled tensor
+        if (min == 0.0 && max == 0.0)
+        {
+            max = 1.0;
         }
 
         double highest = (1 << (NumBits()-1)) - 1; // (numbits-1) accounts for the sign bit

@@ -74,7 +74,7 @@ bool GatordMockService::WaitForStreamMetaData()
         std::cout << "Waiting for stream meta data..." << std::endl;
     }
     // The start of the stream metadata is 2x32bit words, 0 and packet length.
-    u_char header[8];
+    uint8_t header[8];
     if (!ReadFromSocket(header, 8))
     {
         return false;
@@ -87,7 +87,7 @@ bool GatordMockService::WaitForStreamMetaData()
         return false;
     }
 
-    u_char pipeMagic[4];
+    uint8_t pipeMagic[4];
     if (!ReadFromSocket(pipeMagic, 4))
     {
         return false;
@@ -112,7 +112,7 @@ bool GatordMockService::WaitForStreamMetaData()
     // Remember we already read the pipe magic 4 bytes.
     uint32_t metaDataLength = ToUint32(&header[4], m_Endianness) - 4;
     // Read the entire packet.
-    u_char packetData[metaDataLength];
+    uint8_t packetData[metaDataLength];
     if (metaDataLength != boost::numeric_cast<uint32_t>(read(m_ClientConnection, &packetData, metaDataLength)))
     {
         std::cerr << ": Protocol read error. Data length mismatch." << std::endl;
@@ -342,7 +342,7 @@ armnn::profiling::Packet GatordMockService::ReceivePacket()
     return packetRx;
 }
 
-bool GatordMockService::SendPacket(uint32_t packetFamily, uint32_t packetId, const u_char* data, uint32_t dataLength)
+bool GatordMockService::SendPacket(uint32_t packetFamily, uint32_t packetId, const uint8_t* data, uint32_t dataLength)
 {
     // Construct a packet from the id and data given and send it to the client.
     // Encode the header.
@@ -350,7 +350,7 @@ bool GatordMockService::SendPacket(uint32_t packetFamily, uint32_t packetId, con
     header[0] = packetFamily << 26 | packetId << 16;
     header[1] = dataLength;
     // Add the header to the packet.
-    u_char packet[8 + dataLength];
+    uint8_t packet[8 + dataLength];
     InsertU32(header[0], packet, m_Endianness);
     InsertU32(header[1], packet + 4, m_Endianness);
     // And the rest of the data if there is any.
@@ -370,7 +370,7 @@ bool GatordMockService::SendPacket(uint32_t packetFamily, uint32_t packetId, con
 bool GatordMockService::ReadHeader(uint32_t headerAsWords[2])
 {
     // The header will always be 2x32bit words.
-    u_char header[8];
+    uint8_t header[8];
     if (!ReadFromSocket(header, 8))
     {
         return false;
@@ -381,7 +381,7 @@ bool GatordMockService::ReadHeader(uint32_t headerAsWords[2])
     return true;
 }
 
-bool GatordMockService::ReadFromSocket(u_char* packetData, uint32_t expectedLength)
+bool GatordMockService::ReadFromSocket(uint8_t* packetData, uint32_t expectedLength)
 {
     // This is a blocking read until either expectedLength has been received or an error is detected.
     ssize_t totalBytesRead = 0;
@@ -403,7 +403,7 @@ bool GatordMockService::ReadFromSocket(u_char* packetData, uint32_t expectedLeng
     return true;
 };
 
-void GatordMockService::EchoPacket(PacketDirection direction, u_char* packet, size_t lengthInBytes)
+void GatordMockService::EchoPacket(PacketDirection direction, uint8_t* packet, size_t lengthInBytes)
 {
     // If enabled print the contents of the data packet to the console.
     if (m_EchoPackets)
@@ -433,7 +433,7 @@ void GatordMockService::EchoPacket(PacketDirection direction, u_char* packet, si
     }
 }
 
-uint32_t GatordMockService::ToUint32(u_char* data, TargetEndianness endianness)
+uint32_t GatordMockService::ToUint32(uint8_t* data, TargetEndianness endianness)
 {
     // Extract the first 4 bytes starting at data and push them into a 32bit integer based on the
     // specified endianness.
@@ -449,23 +449,23 @@ uint32_t GatordMockService::ToUint32(u_char* data, TargetEndianness endianness)
     }
 }
 
-void GatordMockService::InsertU32(uint32_t value, u_char* data, TargetEndianness endianness)
+void GatordMockService::InsertU32(uint32_t value, uint8_t* data, TargetEndianness endianness)
 {
     // Take the bytes of a 32bit integer and copy them into char array starting at data considering
     // the endianness value.
     if (endianness == TargetEndianness::BeWire)
     {
-        *data       = static_cast<u_char>((value >> 24) & 0xFF);
-        *(data + 1) = static_cast<u_char>((value >> 16) & 0xFF);
-        *(data + 2) = static_cast<u_char>((value >> 8) & 0xFF);
-        *(data + 3) = static_cast<u_char>(value & 0xFF);
+        *data       = static_cast<uint8_t>((value >> 24) & 0xFF);
+        *(data + 1) = static_cast<uint8_t>((value >> 16) & 0xFF);
+        *(data + 2) = static_cast<uint8_t>((value >> 8) & 0xFF);
+        *(data + 3) = static_cast<uint8_t>(value & 0xFF);
     }
     else
     {
-        *(data + 3) = static_cast<u_char>((value >> 24) & 0xFF);
-        *(data + 2) = static_cast<u_char>((value >> 16) & 0xFF);
-        *(data + 1) = static_cast<u_char>((value >> 8) & 0xFF);
-        *data       = static_cast<u_char>(value & 0xFF);
+        *(data + 3) = static_cast<uint8_t>((value >> 24) & 0xFF);
+        *(data + 2) = static_cast<uint8_t>((value >> 16) & 0xFF);
+        *(data + 1) = static_cast<uint8_t>((value >> 8) & 0xFF);
+        *data       = static_cast<uint8_t>(value & 0xFF);
     }
 }
 

@@ -90,7 +90,7 @@ public:
     void SendPeriodicCounterSelectionList(uint32_t period, std::vector<uint16_t> counters);
 
     /// Execute the WAIT command from the comamnd file.
-    void WaitCommand(uint timeout);
+    void WaitCommand(uint32_t timeout);
 
     uint32_t GetStreamMetadataVersion()
     {
@@ -117,17 +117,17 @@ private:
 
     armnn::profiling::Packet ReceivePacket();
 
-    bool SendPacket(uint32_t packetFamily, uint32_t packetId, const u_char* data, uint32_t dataLength);
+    bool SendPacket(uint32_t packetFamily, uint32_t packetId, const uint8_t* data, uint32_t dataLength);
 
-    void EchoPacket(PacketDirection direction, u_char* packet, size_t lengthInBytes);
+    void EchoPacket(PacketDirection direction, uint8_t* packet, size_t lengthInBytes);
 
     bool ReadHeader(uint32_t headerAsWords[2]);
 
-    bool ReadFromSocket(u_char* packetData, uint32_t expectedLength);
+    bool ReadFromSocket(uint8_t* packetData, uint32_t expectedLength);
 
-    uint32_t ToUint32(u_char* data, TargetEndianness endianness);
+    uint32_t ToUint32(uint8_t* data, TargetEndianness endianness);
 
-    void InsertU32(uint32_t value, u_char* data, TargetEndianness endianness);
+    void InsertU32(uint32_t value, uint8_t* data, TargetEndianness endianness);
 
     static const uint32_t PIPE_MAGIC = 0x45495434;
 

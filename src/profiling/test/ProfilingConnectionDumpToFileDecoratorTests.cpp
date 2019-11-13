@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(DumpIncomingValidFile)
         boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
 
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
-    options.m_IncomingCaptureFile = fileName.c_str();
+    options.m_IncomingCaptureFile = fileName.string();
     options.m_OutgoingCaptureFile =  "";
 
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFile)
 
     armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
     options.m_IncomingCaptureFile = "";
-    options.m_OutgoingCaptureFile = fileName.c_str();
+    options.m_OutgoingCaptureFile = fileName.string();
 
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
 

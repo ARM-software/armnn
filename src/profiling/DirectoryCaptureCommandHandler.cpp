@@ -320,7 +320,7 @@ const ICounterDirectory& DirectoryCaptureCommandHandler::GetCounterDirectory() c
 std::string DirectoryCaptureCommandHandler::GetStringNameFromBuffer(const unsigned char* const data, uint32_t offset)
 {
     std::string deviceName;
-    u_char nextChar = profiling::ReadUint8(data, offset);
+    uint8_t nextChar = profiling::ReadUint8(data, offset);
 
     while (isprint(nextChar))
     {

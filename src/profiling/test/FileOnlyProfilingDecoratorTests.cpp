@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     options.m_EnableProfiling     = true;
     options.m_FileOnly            = true;
     options.m_IncomingCaptureFile = "";
-    options.m_OutgoingCaptureFile = tempPath.c_str();
+    options.m_OutgoingCaptureFile = tempPath.string();
     options.m_CapturePeriod       = 100;
 
     // Enable the profiling service
@@ -45,9 +45,9 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     profilingService.Update();
     profilingService.Update();
 
-    u_int32_t timeout   = 2000;
-    u_int32_t sleepTime = 50;
-    u_int32_t timeSlept = 0;
+    uint32_t timeout   = 2000;
+    uint32_t sleepTime = 50;
+    uint32_t timeSlept = 0;
 
     // Give the profiling service sending thread time start executing and send the stream metadata.
     while (profilingService.GetCurrentState() != ProfilingState::WaitingForAck)

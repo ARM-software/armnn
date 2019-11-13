@@ -107,9 +107,9 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     // performance data.
 
     //These variables are used to wait for the profiling service
-    u_int32_t timeout   = 2000;
-    u_int32_t sleepTime = 50;
-    u_int32_t timeSlept = 0;
+    uint32_t timeout   = 2000;
+    uint32_t sleepTime = 50;
+    uint32_t timeSlept = 0;
 
     profiling::PacketVersionResolver packetVersionResolver;
 

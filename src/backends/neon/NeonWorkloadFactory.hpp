@@ -6,6 +6,7 @@
 
 #include <armnn/Optional.hpp>
 
+#include <backendsCommon/WorkloadFactoryBase.hpp>
 #include <backendsCommon/OutputHandler.hpp>
 #include <aclCommon/BaseMemoryManager.hpp>
 
@@ -15,7 +16,7 @@ namespace armnn
 {
 
 // Neon workload factory.
-class NeonWorkloadFactory : public IWorkloadFactory
+class NeonWorkloadFactory : public WorkloadFactoryBase
 {
 public:
     NeonWorkloadFactory(const std::shared_ptr<NeonMemoryManager>& memoryManager);

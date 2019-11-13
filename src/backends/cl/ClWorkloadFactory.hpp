@@ -7,6 +7,7 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/Optional.hpp>
 
+#include <backendsCommon/WorkloadFactoryBase.hpp>
 #include <backendsCommon/OutputHandler.hpp>
 #include <aclCommon/BaseMemoryManager.hpp>
 
@@ -14,7 +15,7 @@ namespace armnn
 {
 
 // ARM Compute OpenCL workload factory.
-class ClWorkloadFactory : public IWorkloadFactory
+class ClWorkloadFactory : public WorkloadFactoryBase
 {
 public:
     ClWorkloadFactory(const std::shared_ptr<ClMemoryManager>& memoryManager);

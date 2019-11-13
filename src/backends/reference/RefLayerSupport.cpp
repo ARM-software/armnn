@@ -198,11 +198,12 @@ bool RefLayerSupport::IsArgMinMaxSupported(const armnn::TensorInfo &input, const
 {
     ignore_unused(descriptor);
 
-    std::array<DataType, 3> supportedTypes =
+    std::array<DataType, 4> supportedTypes =
     {
         DataType::Float32,
         DataType::QuantisedAsymm8,
-        DataType::QuantisedSymm16
+        DataType::QuantisedSymm16,
+        DataType::Signed32
     };
 
     bool supported = true;

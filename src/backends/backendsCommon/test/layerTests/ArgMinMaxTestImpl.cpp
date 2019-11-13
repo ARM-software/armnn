@@ -261,6 +261,11 @@ ArgMaxSimpleTest<armnn::DataType::QuantisedSymm16>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
+ArgMaxSimpleTest<armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
 ArgMinSimpleTest<armnn::DataType::Float32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
@@ -272,6 +277,11 @@ ArgMinSimpleTest<armnn::DataType::QuantisedAsymm8>(
 
 template LayerTestResult<int32_t, 3>
 ArgMinSimpleTest<armnn::DataType::QuantisedSymm16>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
+ArgMinSimpleTest<armnn::DataType::Signed32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
@@ -291,6 +301,11 @@ ArgMinChannelTest<armnn::DataType::QuantisedSymm16>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
+ArgMinChannelTest<armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
 ArgMaxChannelTest<armnn::DataType::Float32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
@@ -306,11 +321,26 @@ ArgMaxChannelTest<armnn::DataType::QuantisedSymm16>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
+ArgMaxChannelTest<armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
 ArgMaxHeightTest<armnn::DataType::Float32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
+ArgMaxHeightTest<armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
 ArgMinWidthTest<armnn::DataType::Float32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
+ArgMinWidthTest<armnn::DataType::Signed32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

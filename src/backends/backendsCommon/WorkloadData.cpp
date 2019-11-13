@@ -610,7 +610,8 @@ void ArgMinMaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float16,
         DataType::Float32,
         DataType::QuantisedAsymm8,
-        DataType::QuantisedSymm16
+        DataType::QuantisedSymm16,
+        DataType::Signed32
     };
 
     ValidateDataTypes(inputTensorInfo, supportedInputTypes, descriptorName);

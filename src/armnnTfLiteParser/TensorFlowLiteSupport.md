@@ -46,6 +46,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 
 * RESIZE_BILINEAR
 
+* SLICE
+
 * SOFTMAX
 
 * SPACE_TO_BATCH

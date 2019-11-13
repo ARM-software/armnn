@@ -116,6 +116,7 @@ private:
     void ParseRelu6(size_t subgraphIndex, size_t operatorIndex);
     void ParseReshape(size_t subgraphIndex, size_t operatorIndex);
     void ParseResizeBilinear(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorIndex);
     void ParseSplit(size_t subgraphIndex, size_t operatorIndex);

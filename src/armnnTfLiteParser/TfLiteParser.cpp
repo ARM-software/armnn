@@ -459,6 +459,7 @@ TfLiteParser::TfLiteParser(const Optional<ITfLiteParser::TfLiteParserOptions>& o
     m_ParserFunctions[tflite::BuiltinOperator_MEAN]              = &TfLiteParser::ParseMean;
     m_ParserFunctions[tflite::BuiltinOperator_PACK]              = &TfLiteParser::ParsePack;
     m_ParserFunctions[tflite::BuiltinOperator_PAD]               = &TfLiteParser::ParsePad;
+    m_ParserFunctions[tflite::BuiltinOperator_SLICE]             = &TfLiteParser::ParseSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]             = &TfLiteParser::ParseSplit;
     m_ParserFunctions[tflite::BuiltinOperator_TANH]              = &TfLiteParser::ParseTanH;
     m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE]         = &TfLiteParser::ParseTranspose;
@@ -934,17 +935,27 @@ void TfLiteParser::ParseTranspose(size_t subgraphIndex, size_t operatorIndex)
 
     PermuteDescriptor desc;
 
-    if(inputs.size() == 2)
+    if (inputs.size() == 2)
     {
         armnn::TensorInfo permuteTensorInfo = ToTensorInfo(inputs[1]);
         BufferRawPtr permuteBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
-
-        std::vector<unsigned int> permuteShape(permuteTensorInfo.GetNumElements());
+        auto numPermVecElements = permuteTensorInfo.GetNumElements();
+        std::vector<unsigned int> permuteShape(numPermVecElements);
         ::memcpy(permuteShape.data(), permuteBufferPtr->data.data(), permuteTensorInfo.GetNumBytes());
 
-        PermutationVector permutationVector(permuteShape.data(), permuteTensorInfo.GetNumElements());
+        // permuteShape assumes Tf/Np permute vectors, we must translate to armnn expected form
+        // to do so we find the perm vector which would invert what a tf perm vector would do (ex 3,0,1,2 -> 1,2,3,0)
+        std::vector<unsigned int> armnnPermuteShape(numPermVecElements);
+        std::vector<unsigned int>::iterator it;
+        for (unsigned int i = 0u; i < numPermVecElements; ++i)
+        {
+            it = std::find(permuteShape.begin(), permuteShape.end(), i);
+            armnnPermuteShape[i] = static_cast<unsigned int>(std::distance(permuteShape.begin(), it));
+        }
 
-        desc =  PermuteDescriptor(permutationVector);
+        PermutationVector permutationVector(armnnPermuteShape.data(), permuteTensorInfo.GetNumElements());
+
+        desc = PermuteDescriptor(permutationVector);
     }
 
     layer = m_Network->AddPermuteLayer(desc, layerName.c_str());
@@ -1249,6 +1260,48 @@ void TfLiteParser::ParsePool(size_t subgraphIndex,
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParser::ParseSlice(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 3);
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    SliceDescriptor desc;
+
+    // set begin tensor info for slice descriptor
+    armnn::TensorInfo beginTensorInfo = ToTensorInfo(inputs[1]);
+    BufferRawPtr beginBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+
+    std::vector<unsigned int> begin(beginTensorInfo.GetNumElements());
+    ::memcpy(begin.data(), beginBufferPtr->data.data(), beginTensorInfo.GetNumBytes());
+
+    // set size tensor info for slice descriptor
+    armnn::TensorInfo sizeTensorInfo = ToTensorInfo(inputs[2]);
+    BufferRawPtr sizeBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+
+    std::vector<unsigned int> size(sizeTensorInfo.GetNumElements());
+    ::memcpy(size.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
+    desc = SliceDescriptor(begin, size);
+
+    auto layerName = boost::str(boost::format("Slice:%1%:%2%") % subgraphIndex % operatorIndex);
+    IConnectableLayer* const layer = m_Network->AddSliceLayer(desc, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    // register the input connection slots for the layer, connections are made after all layers have been created
+    // only the tensors for the inputs are relevant, exclude the const tensors
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});

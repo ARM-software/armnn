@@ -11,7 +11,9 @@
 namespace armnn
 {
 
-std::vector<ConvertFp16ToFp32Layer*> InsertConvertFp16ToFp32LayersBefore(Graph& graph, Layer& layer);
+std::vector<ConvertFp16ToFp32Layer*> InsertConvertFp16ToFp32LayersBefore(Graph& graph,
+                                                                         Layer& layer,
+                                                                         bool expectCorrectInputType = true);
 
 std::vector<ConvertFp32ToFp16Layer*> InsertConvertFp32ToFp16LayersAfter(Graph& graph, Layer& layer);
 

@@ -13,67 +13,97 @@
 namespace armnn
 {
 
-std::vector<ConvertFp16ToFp32Layer*> InsertConvertFp16ToFp32LayersBefore(Graph& graph, Layer& layer)
+namespace
+{
+
+void UpdateOutputSlotFp16ToFp32(OutputSlot& outputSlot)
+{
+    const TensorInfo& origTensorInfo = outputSlot.GetTensorInfo();
+    TensorInfo newTensorInfo(origTensorInfo);
+    newTensorInfo.SetDataType(DataType::Float32);
+    outputSlot.SetTensorInfo(newTensorInfo);
+}
+
+void ChangeOutputFp16ToFp32(Layer& layer)
+{
+    for (auto&& outputSlot = layer.BeginOutputSlots(); outputSlot != layer.EndOutputSlots(); ++outputSlot)
+    {
+        if (outputSlot->GetTensorInfo().GetDataType() == DataType::Float16)
+        {
+            UpdateOutputSlotFp16ToFp32(*outputSlot);
+        }
+    }
+}
+
+} // anonymous namespace
+
+std::vector<ConvertFp16ToFp32Layer*> InsertConvertFp16ToFp32LayersBefore(Graph& graph,
+                                                                         Layer& layer,
+                                                                         bool expectCorrectInputType)
 {
     std::vector<ConvertFp16ToFp32Layer*> convertLayers;
     convertLayers.reserve(layer.GetNumInputSlots());
 
+    // Insert a ConvertFp16ToFp32Layer before each input slot
     for (auto&& inputSlot = layer.BeginInputSlots(); inputSlot != layer.EndInputSlots(); ++inputSlot)
     {
-        // Insert FP16 to FP32 converter layer before the layer
-        const std::string name =
-            std::string("convert_fp16_to_fp32-" + std::to_string(inputSlot->GetSlotIndex()) + "-") + layer.GetName();
-        ConvertFp16ToFp32Layer* convertLayer =
-            graph.InsertNewLayer<ConvertFp16ToFp32Layer>(*inputSlot, name.c_str());
+        bool allowInsert = true;
+        if (expectCorrectInputType)
+        {
+            // Only insert ConvertFp16ToFp32Layer before FP16 input slots
+            OutputSlot* connectedOutputSlot = inputSlot->GetConnectedOutputSlot();
+            allowInsert =
+                connectedOutputSlot && connectedOutputSlot->GetTensorInfo().GetDataType() == DataType::Float16;
+        }
 
-        // Sets output tensor info for the convert layer
-        TensorInfo convertInfo = convertLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
-        convertInfo.SetDataType(DataType::Float32);
+        if (allowInsert)
+        {
+            const std::string name =
+                std::string("convert_fp16_to_fp32-" + std::to_string(inputSlot->GetSlotIndex()) + "-") +
+                layer.GetName();
+            ConvertFp16ToFp32Layer* convertLayer =
+                graph.InsertNewLayer<ConvertFp16ToFp32Layer>(*inputSlot, name.c_str());
 
-        convertLayer->GetOutputSlot().SetTensorInfo(convertInfo);
+            TensorInfo convertInfo = convertLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+            convertInfo.SetDataType(DataType::Float32);
 
-        convertLayers.emplace_back(convertLayer);
+            convertLayer->GetOutputSlot().SetTensorInfo(convertInfo);
+
+            convertLayers.emplace_back(convertLayer);
+        }
     }
-
-    // Sets the output tensor info for the unsupported layer
-    auto UpdateTensorInfo = [](auto& outputSlot)
-    {
-        // Copy original tensor info and change data type to FP32
-        TensorInfo newTensorInfo = outputSlot.GetTensorInfo();
-        newTensorInfo.SetDataType(DataType::Float32);
-
-        outputSlot.SetTensorInfo(newTensorInfo);
-    };
-
-    std::for_each(layer.BeginOutputSlots(), layer.EndOutputSlots(), UpdateTensorInfo);
 
     return convertLayers;
 }
 
 std::vector<ConvertFp32ToFp16Layer*> InsertConvertFp32ToFp16LayersAfter(Graph& graph, Layer& layer)
 {
+    const unsigned int numOutputSlots = layer.GetNumOutputSlots();
+
     std::vector<ConvertFp32ToFp16Layer*> convertLayers;
-    convertLayers.reserve(layer.GetNumOutputSlots());
+    convertLayers.reserve(numOutputSlots);
 
-    int index = 0;
-    // Change outputs to DataType::Float16
-    for (auto&& outputSlot = layer.BeginOutputSlots(); outputSlot != layer.EndOutputSlots(); ++outputSlot)
+    // Update FP16 output slots to FP32 on current layer
+    ChangeOutputFp16ToFp32(layer);
+
+    // Insert a ConvertFp32ToFp16Layer after each FP32 output slot
+    for (unsigned int slotIndex = 0u; slotIndex < numOutputSlots; ++slotIndex)
     {
-        BOOST_ASSERT(outputSlot->GetTensorInfo().GetDataType() == DataType::Float32);
+        OutputSlot& outputSlot = layer.GetOutputSlot(slotIndex);
+        if(outputSlot.GetTensorInfo().GetDataType() == DataType::Float32)
+        {
+            const std::string name =
+                std::string("convert_fp32_to_fp16-" + std::to_string(slotIndex) + "-") + layer.GetName();
+            ConvertFp32ToFp16Layer* convertLayer =
+                graph.InsertNewLayer<ConvertFp32ToFp16Layer>(outputSlot, name.c_str());
 
-        // Insert FP32 to FP16 converter layer after the layer
-        const std::string name =
-            std::string("convert_fp32_to_fp16-" + std::to_string(index++) + "-") + layer.GetName();
-        ConvertFp32ToFp16Layer* convertLayer =
-            graph.InsertNewLayer<ConvertFp32ToFp16Layer>(*outputSlot, name.c_str());
+            TensorInfo convertInfo = convertLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+            convertInfo.SetDataType(DataType::Float16);
 
-        // Sets output tensor info for the convert layer.
-        TensorInfo convertInfo = convertLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
-        convertInfo.SetDataType(DataType::Float16);
+            convertLayer->GetOutputSlot().SetTensorInfo(convertInfo);
 
-        convertLayer->GetOutputSlot().SetTensorInfo(convertInfo);
-
-        convertLayers.emplace_back(convertLayer);
+            convertLayers.emplace_back(convertLayer);
+        }
     }
 
     return convertLayers;

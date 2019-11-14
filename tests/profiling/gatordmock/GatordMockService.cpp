@@ -166,7 +166,11 @@ bool GatordMockService::LaunchReceivingThread()
 
 void GatordMockService::WaitForReceivingThread()
 {
-    m_CloseReceivingThread.store(true);
+    // The receiving thread may already have died.
+    if (m_CloseReceivingThread != true)
+    {
+        m_CloseReceivingThread.store(true);
+    }
     // Check that the receiving thread is running
     if (m_ListeningThread.joinable())
     {
@@ -210,8 +214,16 @@ void GatordMockService::SendPeriodicCounterSelectionList(uint32_t period, std::v
 
 void GatordMockService::WaitCommand(uint timeout)
 {
-    std::this_thread::sleep_for(std::chrono::microseconds(timeout));
-
+    // Wait for a maximum of timeout microseconds or if the receive thread has closed.
+    // There is a certain level of rounding involved in this timing.
+    uint iterations = timeout / 1000;
+    std::cout << std::dec << "Wait command with timeout of " << timeout << " iterations =  " << iterations << std::endl;
+    uint count = 0;
+    while ((this->ReceiveThreadRunning() && (count < iterations)))
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds(1000));
+        ++count;
+    }
     if (m_EchoPackets)
     {
         std::cout << std::dec << "Wait command with timeout of " << timeout << " microseconds completed. " << std::endl;

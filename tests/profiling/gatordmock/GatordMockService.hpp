@@ -41,6 +41,7 @@ public:
     GatordMockService(armnn::profiling::CommandHandlerRegistry& registry, bool echoPackets)
         : m_HandlerRegistry(registry)
         , m_EchoPackets(echoPackets)
+        , m_CloseReceivingThread(false)
     {
         m_PacketsReceivedCount.store(0, std::memory_order_relaxed);
     }
@@ -85,6 +86,12 @@ public:
     /// This is a placeholder method to prevent main exiting. It can be removed once the
     /// command handling code is added.
     void WaitForReceivingThread();
+
+    // @return true only if the receive thread is closed or closing.
+    bool ReceiveThreadRunning()
+    {
+        return !m_CloseReceivingThread.load();
+    }
 
     /// Send the counter list to ArmNN.
     void SendPeriodicCounterSelectionList(uint32_t period, std::vector<uint16_t> counters);

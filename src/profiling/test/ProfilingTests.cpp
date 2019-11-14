@@ -26,6 +26,7 @@
 #include <SendTimelinePacket.hpp>
 
 #include <armnn/Conversion.hpp>
+#include <armnn/Types.hpp>
 
 #include <armnn/Utils.hpp>
 
@@ -1612,7 +1613,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     uint32_t sizeOfUint16 = numeric_cast<uint32_t>(sizeof(uint16_t));
 
     // Data with period and counters
-    uint32_t period1     = 10;
+    uint32_t period1     = armnn::LOWEST_CAPTURE_PERIOD;
     uint32_t dataLength1 = 8;
     uint32_t offset      = 0;
 
@@ -1656,10 +1657,10 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     offset += sizeOfUint32;
     uint32_t period = ReadUint32(readBuffer, offset);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);     // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4);    // packet id
-    BOOST_TEST(headerWord1 == 8);                      // data lenght
-    BOOST_TEST(period == 10);                          // capture period
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);             // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4);            // packet id
+    BOOST_TEST(headerWord1 == 8);                              // data length
+    BOOST_TEST(period ==  armnn::LOWEST_CAPTURE_PERIOD);       // capture period
 
     uint16_t counterId = 0;
     offset += sizeOfUint32;
@@ -1672,7 +1673,7 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     mockBuffer.MarkRead(readBuffer);
 
     // Data with period only
-    uint32_t period2     = 11;
+    uint32_t period2     = 9000; // We'll specify a value below LOWEST_CAPTURE_PERIOD. It should be pulled upwards.
     uint32_t dataLength2 = 4;
 
     std::unique_ptr<unsigned char[]> uniqueData2 = std::make_unique<unsigned char[]>(dataLength2);
@@ -1685,7 +1686,8 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
 
     const std::vector<uint16_t> counterIdsB = holder.GetCaptureData().GetCounterIds();
 
-    BOOST_TEST(holder.GetCaptureData().GetCapturePeriod() == period2);
+    // Value should have been pulled up from 9000 to LOWEST_CAPTURE_PERIOD.
+    BOOST_TEST(holder.GetCaptureData().GetCapturePeriod() ==  armnn::LOWEST_CAPTURE_PERIOD);
     BOOST_TEST(counterIdsB.size() == 0);
 
     readBuffer = mockBuffer.GetReadableBuffer();
@@ -1698,10 +1700,10 @@ BOOST_AUTO_TEST_CASE(CounterSelectionCommandHandlerParseData)
     offset += sizeOfUint32;
     period = ReadUint32(readBuffer, offset);
 
-    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);     // packet family
-    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4);    // packet id
-    BOOST_TEST(headerWord1 == 4);                      // data length
-    BOOST_TEST(period == 11);                          // capture period
+    BOOST_TEST(((headerWord0 >> 26) & 0x3F) == 0);         // packet family
+    BOOST_TEST(((headerWord0 >> 16) & 0x3FF) == 4);        // packet id
+    BOOST_TEST(headerWord1 == 4);                          // data length
+    BOOST_TEST(period == armnn::LOWEST_CAPTURE_PERIOD);    // capture period
 }
 
 BOOST_AUTO_TEST_CASE(CheckConnectionAcknowledged)

@@ -6,6 +6,7 @@
 #include "PeriodicCounterSelectionCommandHandler.hpp"
 #include "ProfilingUtils.hpp"
 
+#include <armnn/Types.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/format.hpp>
 
@@ -82,7 +83,12 @@ void PeriodicCounterSelectionCommandHandler::operator()(const Packet& packet)
         ParseData(packet, captureData);
 
         // Get the capture data
-        const uint32_t capturePeriod = captureData.GetCapturePeriod();
+        uint32_t capturePeriod = captureData.GetCapturePeriod();
+        // Validate that the capture period is within the acceptable range.
+        if (capturePeriod > 0  && capturePeriod < LOWEST_CAPTURE_PERIOD)
+        {
+            capturePeriod = LOWEST_CAPTURE_PERIOD;
+        }
         const std::vector<uint16_t>& counterIds = captureData.GetCounterIds();
 
         // Check whether the selected counter UIDs are valid

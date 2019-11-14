@@ -23,7 +23,7 @@ void CommandFileParser::ParseFile(std::string CommandFile, GatordMockService& mo
 
     std::cout << "Parsing command file: " << CommandFile << std::endl;
 
-    while (std::getline(infile, line))
+    while (mockService.ReceiveThreadRunning() && std::getline(infile, line))
     {
         std::istringstream iss(line);
 

@@ -64,7 +64,7 @@ public:
                 , m_OutgoingCaptureFile("")
                 , m_IncomingCaptureFile("")
                 , m_FileOnly(false)
-                , m_CapturePeriod(150u)
+                , m_CapturePeriod(LOWEST_CAPTURE_PERIOD)
             {}
 
             bool        m_EnableProfiling;

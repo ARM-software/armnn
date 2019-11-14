@@ -61,6 +61,7 @@ char const* GetLayerTypeAsCString(LayerType type)
         case LayerType::Slice: return "Slice";
         case LayerType::Softmax: return "Softmax";
         case LayerType::SpaceToBatchNd: return "SpaceToBatchNd";
+        case LayerType::SpaceToDepth: return "SpaceToDepth";
         case LayerType::Splitter: return "Splitter";
         case LayerType::Stack: return "Stack";
         case LayerType::StandIn: return "StandIn";

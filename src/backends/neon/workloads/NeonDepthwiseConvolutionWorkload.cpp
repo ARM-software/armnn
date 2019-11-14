@@ -113,48 +113,16 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
-    const arm_compute::ITensorInfo* inputInfo  = input.info();
-    const arm_compute::ITensorInfo* kernelInfo = m_KernelTensor->info();
-    const arm_compute::ITensorInfo* biasInfo   = m_BiasTensor ? m_BiasTensor->info() : nullptr;
-    const arm_compute::ITensorInfo* outputInfo = output.info();
-
-    // Check for optimisation opportunities
-    arm_compute::Status optimizationStatus =
-        arm_compute::NEDepthwiseConvolutionLayer::validate(inputInfo,
-                                                           kernelInfo,
-                                                           biasInfo,
-                                                           outputInfo,
-                                                           padStrideInfo,
-                                                           depthMultiplier,
-                                                           arm_compute::ActivationLayerInfo(),
-                                                           aclDilationInfo);
-
-    if (optimizationStatus.error_code() == arm_compute::ErrorCode::OK)
-    {
-        m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer>();
-        static_cast<arm_compute::NEDepthwiseConvolutionLayer*>(
-            m_pDepthwiseConvolutionLayer.get())->configure(&input,
-                                                           m_KernelTensor.get(),
-                                                           m_BiasTensor.get(),
-                                                           &output,
-                                                           padStrideInfo,
-                                                           depthMultiplier,
-                                                           arm_compute::ActivationLayerInfo(),
-                                                           aclDilationInfo);
-    }
-    else
-    {
-        m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer>();
-        static_cast<arm_compute::NEDepthwiseConvolutionLayer*>(
-            m_pDepthwiseConvolutionLayer.get())->configure(&input,
-                                                           m_KernelTensor.get(),
-                                                           m_BiasTensor.get(),
-                                                           &output,
-                                                           padStrideInfo,
-                                                           depthMultiplier,
-                                                           arm_compute::ActivationLayerInfo(),
-                                                           aclDilationInfo);
-    }
+    m_pDepthwiseConvolutionLayer = std::make_unique<arm_compute::NEDepthwiseConvolutionLayer>();
+    static_cast<arm_compute::NEDepthwiseConvolutionLayer*>(
+        m_pDepthwiseConvolutionLayer.get())->configure(&input,
+                                                        m_KernelTensor.get(),
+                                                        m_BiasTensor.get(),
+                                                        &output,
+                                                        padStrideInfo,
+                                                        depthMultiplier,
+                                                        arm_compute::ActivationLayerInfo(),
+                                                        aclDilationInfo);
 
     BOOST_ASSERT(m_pDepthwiseConvolutionLayer);
 

@@ -114,35 +114,16 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
-    // Check for optimisation opportunities.
-    bool use3x3Optimisation = (weightInfo.GetShape()[2] == 3) && (weightInfo.GetShape()[3] == 3);
-    if (use3x3Optimisation)
-    {
-        m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer>();
-        static_cast<arm_compute::CLDepthwiseConvolutionLayer*>(m_DepthwiseConvolutionLayer.get())->configure(
-            &input,
-            m_KernelTensor.get(),
-            m_BiasTensor.get(),
-            &output,
-            padStrideInfo,
-            depthMultiplier,
-            arm_compute::ActivationLayerInfo(),
-            aclDilationInfo);
-    }
-    else
-    {
-        m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer>();
-        static_cast<arm_compute::CLDepthwiseConvolutionLayer*>(m_DepthwiseConvolutionLayer.get())->configure(
-            &input,
-            m_KernelTensor.get(),
-            m_BiasTensor.get(),
-            &output,
-            padStrideInfo,
-            depthMultiplier,
-            arm_compute::ActivationLayerInfo(),
-            aclDilationInfo);
-
-    }
+    m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer>();
+    static_cast<arm_compute::CLDepthwiseConvolutionLayer*>(m_DepthwiseConvolutionLayer.get())->configure(
+        &input,
+        m_KernelTensor.get(),
+        m_BiasTensor.get(),
+        &output,
+        padStrideInfo,
+        depthMultiplier,
+        arm_compute::ActivationLayerInfo(),
+        aclDilationInfo);
 
     BOOST_ASSERT(m_DepthwiseConvolutionLayer);
 

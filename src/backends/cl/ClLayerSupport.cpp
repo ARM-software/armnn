@@ -361,6 +361,11 @@ bool ClLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                                      const Optional<TensorInfo>& biases,
                                                      Optional<std::string&> reasonIfUnsupported) const
 {
+    if (weights.HasPerAxisQuantization())
+    {
+        return false;
+    }
+
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClDepthwiseConvolutionWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,

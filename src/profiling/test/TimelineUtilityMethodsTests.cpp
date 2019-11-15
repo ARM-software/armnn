@@ -368,6 +368,9 @@ BOOST_AUTO_TEST_CASE(CreateTypedLabelTest)
     SendTimelinePacket sendTimelinePacket(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
+    // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
+    ProfilingService::Instance().NextGuid();
+
     ProfilingGuid entityGuid(123);
     const std::string entityName = "some entity";
     ProfilingStaticGuid labelTypeGuid(456);
@@ -475,6 +478,9 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     const std::string entityName = "some entity";
     const std::string entityType = "some type";
 
+    // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
+    ProfilingService::Instance().NextGuid();
+
     BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, "", entityType),
                       InvalidArgumentException);
     BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, entityName, ""),
@@ -559,6 +565,9 @@ BOOST_AUTO_TEST_CASE(DeclareLabelTest)
     SendTimelinePacket sendTimelinePacket(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
+    // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
+    ProfilingService::Instance().NextGuid();
+
     // Try declaring an invalid (empty) label
     BOOST_CHECK_THROW(timelineUtilityMethods.DeclareLabel(""), InvalidArgumentException);
 
@@ -569,15 +578,13 @@ BOOST_AUTO_TEST_CASE(DeclareLabelTest)
     const std::string labelName = "valid label";
     ProfilingGuid labelGuid = 0;
     BOOST_CHECK_NO_THROW(labelGuid = timelineUtilityMethods.DeclareLabel(labelName));
-    // TODO when the implementation of the profiling GUID generator is done, enable the following test
-    //BOOST_CHECK(labelGuid != ProfilingGuid(0));
+    BOOST_CHECK(labelGuid != ProfilingGuid(0));
 
-    // TODO when the implementation of the profiling GUID generator is done, enable the following tests
     // Try adding the same label as before
-    //ProfilingGuid newLabelGuid = 0;
-    //BOOST_CHECK_NO_THROW(labelGuid = timelineUtilityMethods.DeclareLabel(labelName));
-    //BOOST_CHECK(newLabelGuid != ProfilingGuid(0));
-    //BOOST_CHECK(newLabelGuid == labelGuid);
+    ProfilingGuid newLabelGuid = 0;
+    BOOST_CHECK_NO_THROW(newLabelGuid = timelineUtilityMethods.DeclareLabel(labelName));
+    BOOST_CHECK(newLabelGuid != ProfilingGuid(0));
+    BOOST_CHECK(newLabelGuid == labelGuid);
 }
 
 BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
@@ -602,6 +609,9 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityTest)
 
     const std::string entityName = "Entity0";
     const std::string entityType = "Type0";
+
+    // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
+    ProfilingService::Instance().NextGuid();
 
     ProfilingDynamicGuid guid = timelineUtilityMethods.CreateNamedTypedEntity(entityName, entityType);
     BOOST_CHECK(guid != ProfilingGuid(0));
@@ -672,6 +682,9 @@ BOOST_AUTO_TEST_CASE(RecordEventTest)
     MockBufferManager mockBufferManager(1024);
     SendTimelinePacket sendTimelinePacket(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
+
+    // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.
+    ProfilingService::Instance().NextGuid();
 
     ProfilingGuid entityGuid(123);
     ProfilingStaticGuid eventClassGuid(456);

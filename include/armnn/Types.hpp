@@ -229,6 +229,8 @@ using DebugCallbackFunction = std::function<void(LayerGuid guid, unsigned int sl
 namespace profiling
 {
 
+static constexpr uint64_t MIN_STATIC_GUID = 1llu << 63;
+
 class ProfilingGuid
 {
 public:

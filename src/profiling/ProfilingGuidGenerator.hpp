@@ -22,25 +22,28 @@ public:
     ProfilingGuidGenerator() : m_Sequence(0) {}
 
     /// Return the next random Guid in the sequence
-    // NOTE: dummy implementation for the moment
     inline ProfilingDynamicGuid NextGuid() override
     {
-        // NOTE: skipping the zero for testing purposes
-        ProfilingDynamicGuid guid(++m_Sequence);
+        ProfilingDynamicGuid guid(m_Sequence);
+        m_Sequence++;
+        if (m_Sequence >= MIN_STATIC_GUID)
+        {
+            // Reset the sequence to 0 when it reaches the upper bound of dynamic guid
+            m_Sequence = 0;
+        }
         return guid;
     }
 
     /// Create a ProfilingStaticGuid based on a hash of the string
-    // NOTE: dummy implementation for the moment
     inline ProfilingStaticGuid GenerateStaticId(const std::string& str) override
     {
-        uint64_t guid = static_cast<uint64_t>(m_StringHasher(str));
-        return guid;
+        uint64_t staticHash = m_Hash(str) | MIN_STATIC_GUID;
+        return ProfilingStaticGuid(staticHash);
     }
 
 private:
-    std::hash<std::string> m_StringHasher;
     uint64_t m_Sequence;
+    std::hash<std::string> m_Hash;
 };
 
 } // namespace profiling

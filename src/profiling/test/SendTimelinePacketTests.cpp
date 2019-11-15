@@ -415,10 +415,9 @@ BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
     ProfilingStaticGuid staticGuid = profilingService.GenerateStaticId("dummy");
-    // TODO this will change again...
     std::hash<std::string> hasher;
     uint64_t hash = static_cast<uint64_t>(hasher("dummy"));
-    ProfilingStaticGuid expectedStaticValue(hash);
+    ProfilingStaticGuid expectedStaticValue(hash | MIN_STATIC_GUID);
     BOOST_CHECK(staticGuid == expectedStaticValue);
     ProfilingDynamicGuid dynamicGuid = profilingService.NextGuid();
     uint64_t dynamicGuidValue = static_cast<uint64_t>(dynamicGuid);
@@ -448,23 +447,23 @@ BOOST_AUTO_TEST_CASE(CheckStaticGuidsAndEvents)
     std::hash<std::string> hasher;
 
     uint64_t hash = static_cast<uint64_t>(hasher(LabelsAndEventClasses::NAME_LABEL));
-    ProfilingStaticGuid expectedNameGuid(hash);
+    ProfilingStaticGuid expectedNameGuid(hash | MIN_STATIC_GUID);
     BOOST_CHECK(LabelsAndEventClasses::NAME_GUID == expectedNameGuid);
 
     hash = static_cast<uint64_t>(hasher(LabelsAndEventClasses::TYPE_LABEL));
-    ProfilingStaticGuid expectedTypeGuid(hash);
+    ProfilingStaticGuid expectedTypeGuid(hash | MIN_STATIC_GUID);
     BOOST_CHECK(LabelsAndEventClasses::TYPE_GUID == expectedTypeGuid);
 
     hash = static_cast<uint64_t>(hasher(LabelsAndEventClasses::INDEX_LABEL));
-    ProfilingStaticGuid expectedIndexGuid(hash);
+    ProfilingStaticGuid expectedIndexGuid(hash | MIN_STATIC_GUID);
     BOOST_CHECK(LabelsAndEventClasses::INDEX_GUID == expectedIndexGuid);
 
     hash = static_cast<uint64_t>(hasher("ARMNN_PROFILING_SOL"));
-    ProfilingStaticGuid expectedSol(hash);
+    ProfilingStaticGuid expectedSol(hash | MIN_STATIC_GUID);
     BOOST_CHECK(LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS == expectedSol);
 
     hash = static_cast<uint64_t>(hasher("ARMNN_PROFILING_EOL"));
-    ProfilingStaticGuid expectedEol(hash);
+    ProfilingStaticGuid expectedEol(hash | MIN_STATIC_GUID);
     BOOST_CHECK(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS == expectedEol);
 }
 

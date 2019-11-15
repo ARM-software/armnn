@@ -518,7 +518,7 @@ endif()
 # object libs armnn to include in the build
 include(src/backends/backends.cmake)
 foreach(lib ${armnnLibraries})
-    message("Adding object library dependency to armnn: ${lib}")
+    message(STATUS "Adding object library dependency to armnn: ${lib}")
     list(APPEND armnn_sources $<TARGET_OBJECTS:${lib}>)
 endforeach()
 
@@ -826,7 +826,7 @@ if(BUILD_UNIT_TESTS)
     endif()
 
     foreach(lib ${armnnUnitTestLibraries})
-        message("Adding object library dependency to UnitTests: ${lib}")
+        message(STATUS "Adding object library dependency to UnitTests: ${lib}")
         list(APPEND unittest_sources $<TARGET_OBJECTS:${lib}>)
     endforeach()
 
@@ -838,7 +838,7 @@ if(BUILD_UNIT_TESTS)
 
     if(VALGRIND_FOUND)
         if(HEAP_PROFILING OR LEAK_CHECKING)
-            message("Valgrind is disabled for heap profiling and leak checking builds.")
+            message(STATUS "Valgrind is disabled for heap profiling and leak checking builds.")
         else()
             # Valgrind works with gperftools version number <= 2.4
             target_compile_definitions(UnitTests PRIVATE "WITH_VALGRIND=1")

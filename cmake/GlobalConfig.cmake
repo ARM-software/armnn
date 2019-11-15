@@ -328,7 +328,7 @@ if(HEAP_PROFILING OR LEAK_CHECKING)
             add_definitions("-DARMNN_LEAK_CHECKING_ENABLED=1")
         endif()
     else()
-        message("Heap profiling and leak checking are disabled for referencetests")
+        message(STATUS "Heap profiling and leak checking are disabled for referencetests")
     endif()
 else()
     # Valgrind only works with gperftools version number <= 2.4

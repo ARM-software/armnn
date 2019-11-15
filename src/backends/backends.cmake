@@ -10,13 +10,13 @@ file(GLOB backendIncludes ${PROJECT_SOURCE_DIR}/src/backends/*/backend.cmake)
 
 # prefer to include common code first
 foreach(includeFile ${commonIncludes})
-    message("Including backend common library into the build: ${includeFile}")
+    message(STATUS "Including backend common library into the build: ${includeFile}")
     include(${includeFile})
 endforeach()
 
 # now backends can depend on common code included first
 foreach(includeFile ${backendIncludes})
-    message("Including backend into the build: ${includeFile}")
+    message(STATUS "Including backend into the build: ${includeFile}")
     include(${includeFile})
 endforeach()
 

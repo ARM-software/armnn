@@ -1731,10 +1731,20 @@ void LstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                                      "output_" + std::to_string(i));
     }
 
-    // TODO: check clipping parameter is valid
+    // Making sure clipping parameters have valid values.
+    // == 0 means no clipping
+    //  > 0 means clipping
+    if (m_Parameters.m_ClippingThresCell < 0.0f)
+    {
+        throw InvalidArgumentException(descriptorName + ": negative cell clipping threshold is invalid");
+    }
+    if (m_Parameters.m_ClippingThresProj < 0.0f)
+    {
+        throw InvalidArgumentException(descriptorName + ": negative projection clipping threshold is invalid");
+    }
+
 
     // Inferring batch size, number of outputs and number of cells from the inputs.
-    // TODO: figure out if there is a way to make sure the specific inputs are at that index of workloadInfo
     const uint32_t n_input = workloadInfo.m_InputTensorInfos[0].GetShape()[1];
     const uint32_t n_batch = workloadInfo.m_InputTensorInfos[0].GetShape()[0];
     ValidatePointer(m_InputToOutputWeights, "Null pointer check", "InputToOutputWeights");

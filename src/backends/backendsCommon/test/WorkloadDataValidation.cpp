@@ -584,6 +584,16 @@ BOOST_AUTO_TEST_CASE(LstmQueueDescriptor_Validate)
     BOOST_CHECK_THROW(data.Validate(info), armnn::InvalidArgumentException);
     SetWorkloadOutput(data, info, 3, outputTensorInfo, nullptr);
 
+    // check invalid cell clipping parameters
+    data.m_Parameters.m_ClippingThresCell = -1.0f;
+    BOOST_CHECK_THROW(data.Validate(info), armnn::InvalidArgumentException);
+    data.m_Parameters.m_ClippingThresCell = 0.0f;
+
+    // check invalid projection clipping parameters
+    data.m_Parameters.m_ClippingThresProj = -1.0f;
+    BOOST_CHECK_THROW(data.Validate(info), armnn::InvalidArgumentException);
+    data.m_Parameters.m_ClippingThresProj = 0.0f;
+
     // check correct configuration
     BOOST_CHECK_NO_THROW(data.Validate(info));
 }

@@ -37,6 +37,7 @@
 #include "NeonReshapeWorkload.hpp"
 #include "NeonResizeWorkload.hpp"
 #include "NeonRsqrtWorkload.hpp"
+#include "NeonSliceWorkload.hpp"
 #include "NeonSoftmaxFloatWorkload.hpp"
 #include "NeonSoftmaxUint8Workload.hpp"
 #include "NeonSpaceToDepthWorkload.hpp"

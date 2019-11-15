@@ -428,6 +428,12 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateRsqrt(const RsqrtQueueDesc
     return std::make_unique<NeonRsqrtWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    return std::make_unique<NeonSliceWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const
 {

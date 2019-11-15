@@ -70,6 +70,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonResizeWorkload.hpp
     NeonRsqrtWorkload.cpp
     NeonRsqrtWorkload.hpp
+    NeonSliceWorkload.cpp
+    NeonSliceWorkload.hpp
     NeonSoftmaxBaseWorkload.cpp
     NeonSoftmaxBaseWorkload.hpp
     NeonSoftmaxFloatWorkload.cpp

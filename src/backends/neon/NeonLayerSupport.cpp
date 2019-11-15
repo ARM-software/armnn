@@ -46,6 +46,7 @@
 #include "workloads/NeonQuantizedLstmWorkload.hpp"
 #include "workloads/NeonResizeWorkload.hpp"
 #include "workloads/NeonRsqrtWorkload.hpp"
+#include "workloads/NeonSliceWorkload.hpp"
 #include "workloads/NeonSoftmaxBaseWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
 #include "workloads/NeonSplitterWorkload.hpp"
@@ -617,6 +618,18 @@ bool NeonLayerSupport::IsRsqrtSupported(const TensorInfo& input,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonRsqrtWorkloadValidate, reasonIfUnsupported, input, output);
+}
+
+bool NeonLayerSupport::IsSliceSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        const SliceDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSliceWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

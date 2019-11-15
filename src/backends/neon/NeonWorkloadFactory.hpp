@@ -188,6 +188,9 @@ public:
     std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateSlice(const SliceQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
 

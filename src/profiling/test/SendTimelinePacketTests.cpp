@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_CASE(SendTimelinePacketTests3)
 
 BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -429,7 +429,7 @@ BOOST_AUTO_TEST_CASE(GetGuidsFromProfilingService)
 
 BOOST_AUTO_TEST_CASE(GetTimelinePackerWriterFromProfilingService)
 {
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling = true;
     ProfilingService& profilingService = ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);

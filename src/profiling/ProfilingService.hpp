@@ -30,7 +30,7 @@ namespace profiling
 class ProfilingService : public IReadWriteCounterValues, public IProfilingGuidGenerator
 {
 public:
-    using ExternalProfilingOptions = Runtime::CreationOptions::ExternalProfilingOptions;
+    using ExternalProfilingOptions = IRuntime::CreationOptions::ExternalProfilingOptions;
     using IProfilingConnectionFactoryPtr = std::unique_ptr<IProfilingConnectionFactory>;
     using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
     using CounterIndices = std::vector<std::atomic<uint32_t>*>;

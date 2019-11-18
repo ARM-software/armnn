@@ -12,6 +12,7 @@
 #include <Logging.hpp>
 #include <ProfilingService.hpp>
 
+#include <boost/polymorphic_cast.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <chrono>

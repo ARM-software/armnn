@@ -25,5 +25,6 @@ add_library(Arm_CpuRef_backend MODULE ${armnnRefDynamicBackend_sources} ${RefBac
 target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
 set_target_properties(Arm_CpuRef_backend PROPERTIES PREFIX "")
 target_link_libraries(Arm_CpuRef_backend armnn)

@@ -10,7 +10,7 @@
 #include <backendsCommon/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
 
-#include "../profiling/ProfilingService.hpp"
+#include <ProfilingService.hpp>
 
 #include <iostream>
 

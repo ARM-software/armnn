@@ -7,7 +7,9 @@
 #include "WorkloadData.hpp"
 #include "WorkloadInfo.hpp"
 
+#include <armnn/Types.hpp>
 #include <Profiling.hpp>
+#include <ProfilingService.hpp>
 
 #include <algorithm>
 
@@ -22,6 +24,8 @@ public:
 
     virtual void PostAllocationConfigure() = 0;
     virtual void Execute() const = 0;
+
+    virtual profiling::ProfilingGuid GetGuid() const = 0;
 
     virtual void RegisterDebugCallback(const DebugCallbackFunction& func) {}
 };
@@ -40,7 +44,8 @@ class BaseWorkload : public IWorkload
 public:
 
     BaseWorkload(const QueueDescriptor& descriptor, const WorkloadInfo& info)
-        : m_Data(descriptor)
+        : m_Data(descriptor),
+          m_Guid(profiling::ProfilingService::Instance().NextGuid())
     {
         m_Data.Validate(info);
     }
@@ -49,8 +54,11 @@ public:
 
     const QueueDescriptor& GetData() const { return m_Data; }
 
+    profiling::ProfilingGuid GetGuid() const final { return m_Guid; }
+
 protected:
     const QueueDescriptor m_Data;
+    const profiling::ProfilingGuid m_Guid;
 };
 
 // TypedWorkload used

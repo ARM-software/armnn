@@ -7,10 +7,6 @@
 
 #include "IProfilingConnectionFactory.hpp"
 
-#include <Runtime.hpp>
-
-#include <memory>
-
 namespace armnn
 {
 

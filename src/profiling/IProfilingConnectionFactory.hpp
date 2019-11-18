@@ -7,7 +7,7 @@
 
 #include "IProfilingConnection.hpp"
 
-#include <Runtime.hpp>
+#include <armnn/IRuntime.hpp>
 
 #include <memory>
 
@@ -20,7 +20,7 @@ namespace profiling
 class IProfilingConnectionFactory
 {
 public:
-    using ExternalProfilingOptions = Runtime::CreationOptions::ExternalProfilingOptions;
+    using ExternalProfilingOptions = IRuntime::CreationOptions::ExternalProfilingOptions;
     using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
 
     virtual ~IProfilingConnectionFactory() {}

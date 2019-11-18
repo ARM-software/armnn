@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(GatorDMockEndToEnd)
     mockService.OpenListeningSocket(udsNamespace);
 
     // Enable the profiling service.
-    armnn::Runtime::CreationOptions::ExternalProfilingOptions options;
+    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
     options.m_EnableProfiling                     = true;
     profiling::ProfilingService& profilingService = profiling::ProfilingService::Instance();
     profilingService.ResetExternalProfilingOptions(options, true);

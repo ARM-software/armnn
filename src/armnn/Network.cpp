@@ -708,9 +708,9 @@ EdgeStrategy CalculateEdgeStrategy(BackendsMap& backends,
         {
             ITensorHandleFactory* dstFactory = registry.GetFactory(pref);
 
-            // Handles some cases where dstFactory is null when Neon memory import is disabled
+            // Handles cases when a destPref is not listed in TensorHandleFactoryRegistry
             if (!dstFactory) {
-                return EdgeStrategy::CopyToTarget;
+                continue;
             }
 
             if ((dstFactory->GetImportFlags() & srcFactory->GetExportFlags()) != 0)
@@ -726,7 +726,7 @@ EdgeStrategy CalculateEdgeStrategy(BackendsMap& backends,
         for (auto&& pref : dstPrefs)
         {
             ITensorHandleFactory* dstFactory = registry.GetFactory(pref);
-            if (dstFactory->SupportsMapUnmap())
+            if (dstFactory && dstFactory->SupportsMapUnmap())
             {
                 return EdgeStrategy::CopyToTarget;
             }

@@ -93,7 +93,7 @@ The instructions show how to build the ArmNN core library and the Boost, Protobu
 #### <a name="installBaarch">Build Boost library for arm64</a>
 * Build Boost library for arm64
     Download Boost version 1.64 from http://www.boost.org/doc/libs/1_64_0/more/getting_started/unix-variants.html
-    Version 1.66 is not supported.
+    Using any version of Boost greater than 1.64 will fail to build ArmNN, due to different dependency issues.
     ```bash
     tar -zxvf boost_1_64_0.tar.gz
     cd boost_1_64_0

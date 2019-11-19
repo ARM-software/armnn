@@ -51,6 +51,27 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedEntity(const std::s
     // Generate dynamic GUID of the entity
     ProfilingDynamicGuid entityGuid = ProfilingService::Instance().NextGuid();
 
+    CreateNamedTypedEntity(entityGuid, name, type);
+
+    return entityGuid;
+}
+
+void TimelineUtilityMethods::CreateNamedTypedEntity(ProfilingDynamicGuid entityGuid,
+                                                    const std::string& name,
+                                                    const std::string& type)
+{
+    // Check that the entity name is valid
+    if (name.empty())
+    {
+        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+    }
+
+    // Check that the entity type is valid
+    if (type.empty())
+    {
+        throw InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
+    }
+
     // Send Entity Binary Packet of the entity to the external profiling service
     m_SendTimelinePacket.SendTimelineEntityBinaryPacket(entityGuid);
 
@@ -59,8 +80,6 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedEntity(const std::s
 
     // Create type entity and send the relationship of the entity with the given type
     TypeEntity(entityGuid, type);
-
-    return entityGuid;
 }
 
 ProfilingStaticGuid TimelineUtilityMethods::DeclareLabel(const std::string& labelName)
@@ -155,6 +174,38 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedChildEntity(Profili
                                                               childEntityGuid);
 
     return childEntityGuid;
+}
+
+void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingDynamicGuid childEntityGuid,
+                                                         ProfilingGuid parentEntityGuid,
+                                                         const std::string& entityName,
+                                                         const std::string& entityType)
+{
+    // Check that the entity name is valid
+    if (entityName.empty())
+    {
+        // The entity name is invalid
+        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+    }
+
+    // Check that the entity type is valid
+    if (entityType.empty())
+    {
+        // The entity type is invalid
+        throw InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
+    }
+
+    // Create a named type entity from the given guid, name and type, this call throws in case of error
+    CreateNamedTypedEntity(childEntityGuid, entityName, entityType);
+
+    // Generate a GUID for the retention link relationship
+    ProfilingDynamicGuid retentionLinkGuid = ProfilingService::Instance().NextGuid();
+
+    // Send the new retention link to the external profiling service, this call throws in case of error
+    m_SendTimelinePacket.SendTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                                              retentionLinkGuid,
+                                                              parentEntityGuid,
+                                                              childEntityGuid);
 }
 
 ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGuid, ProfilingStaticGuid eventClassGuid)

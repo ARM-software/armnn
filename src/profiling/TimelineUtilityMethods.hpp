@@ -26,6 +26,8 @@ public:
 
     ProfilingDynamicGuid CreateNamedTypedEntity(const std::string& name, const std::string& type);
 
+    void CreateNamedTypedEntity(ProfilingDynamicGuid entityGuid, const std::string& name, const std::string& type);
+
     void CreateTypedLabel(ProfilingGuid entityGuid, const std::string& entityName, ProfilingStaticGuid labelTypeGuid);
 
     ProfilingStaticGuid DeclareLabel(const std::string& labelName);
@@ -37,6 +39,11 @@ public:
     ProfilingDynamicGuid CreateNamedTypedChildEntity(ProfilingGuid parentEntityGuid,
                                                      const std::string& entityName,
                                                      const std::string& entityType);
+
+    void CreateNamedTypedChildEntity(ProfilingDynamicGuid entityGuid,
+                                     ProfilingGuid parentEntityGuid,
+                                     const std::string& entityName,
+                                     const std::string& entityType);
 
     ProfilingDynamicGuid RecordEvent(ProfilingGuid entityGuid, ProfilingStaticGuid eventClassGuid);
 

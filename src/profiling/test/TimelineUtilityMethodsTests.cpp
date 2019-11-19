@@ -474,6 +474,7 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
     SendTimelinePacket sendTimelinePacket(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
+    ProfilingDynamicGuid childEntityGuid(0);
     ProfilingGuid parentEntityGuid(123);
     const std::string entityName = "some entity";
     const std::string entityType = "some type";
@@ -485,8 +486,11 @@ BOOST_AUTO_TEST_CASE(CreateNamedTypedChildEntityTest)
                       InvalidArgumentException);
     BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, entityName, ""),
                       InvalidArgumentException);
+    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(
+        childEntityGuid, parentEntityGuid, "", entityType), InvalidArgumentException);
+    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedChildEntity(
+        childEntityGuid, parentEntityGuid, entityName, ""), InvalidArgumentException);
 
-    ProfilingGuid childEntityGuid(0);
     BOOST_CHECK_NO_THROW(childEntityGuid = timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid,
                                                                                               entityName,
                                                                                               entityType));
@@ -598,6 +602,16 @@ BOOST_AUTO_TEST_CASE(CreateNameTypeEntityInvalidTest)
 
     // Invalid type
     BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity("Name", ""), InvalidArgumentException);
+
+    ProfilingDynamicGuid guid = ProfilingService::Instance().NextGuid();
+
+    // CreatedNamedTypedEntity with Guid - Invalid name
+    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity(guid, "", "Type"),
+                      InvalidArgumentException);
+
+    // CreatedNamedTypedEntity with Guid - Invalid type
+    BOOST_CHECK_THROW(timelineUtilityMethods.CreateNamedTypedEntity(guid, "Name", ""),
+                      InvalidArgumentException);
 
 }
 

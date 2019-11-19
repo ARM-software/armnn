@@ -328,6 +328,12 @@ bool ClLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
         return false;
     }
 
+    // Multiplier > 1.0f currently not supported in ACL
+    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    {
+        return false;
+    }
+
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClConvolution2dWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -371,6 +377,12 @@ bool ClLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
         return false;
     }
 
+    // Multiplier > 1.0f currently not supported in ACL
+    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    {
+        return false;
+    }
+
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClDepthwiseConvolutionWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -387,6 +399,12 @@ bool ClLayerSupport::IsDilatedDepthwiseConvolutionSupported(const TensorInfo& in
                                                             const Optional<TensorInfo>& biases,
                                                             Optional<std::string&> reasonIfUnsupported) const
 {
+    // Multiplier > 1.0f currently not supported in ACL
+    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    {
+        return false;
+    }
+
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClDepthwiseConvolutionWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
@@ -792,6 +810,12 @@ bool ClLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
                                                        const Optional<TensorInfo>& biases,
                                                        Optional<std::string&> reasonIfUnsupported) const
 {
+    // Multiplier > 1.0f currently not supported in ACL
+    if ((input.GetQuantizationScale() * weights.GetQuantizationScale()) / output.GetQuantizationScale() > 1.0f)
+    {
+        return false;
+    }
+
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClTransposeConvolution2dWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,

@@ -44,13 +44,14 @@ ClPooling2dWorkload::ClPooling2dWorkload(
     // enable fp_mixed_precision for the the FP16 cases that
     // accumulation reaches a limit beyond which there is no more increment of the value
     bool fpMixedPrecision = false;
-#ifdef ARMNN_MIXED_PRECISION_FP16_POOLING
     if (input.info()->data_type() == arm_compute::DataType::F16
-        && m_Data.m_Parameters.m_PoolType == PoolingAlgorithm::Average)
+        && m_Data.m_Parameters.m_PoolType == PoolingAlgorithm::Average
+        && m_Data.m_Parameters.m_PoolWidth >= 100
+        && input.info()->dimension(3) >= 5
+        && input.info()->dimension(2) * input.info()->dimension(1) >= 3000)
     {
         fpMixedPrecision = true;
     }
-#endif
 
     arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(m_Data.m_Parameters, fpMixedPrecision);
 

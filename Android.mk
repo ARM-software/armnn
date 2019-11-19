@@ -308,14 +308,6 @@ LOCAL_CFLAGS += \
         -DARMNNREF_ENABLED
 endif # ARMNN_REF_ENABLED == 1
 
-# Only enable on Android P
-ifeq (($(P_OR_LATER),1))
-  ifeq (($(Q_OR_LATER),0))
-LOCAL_CFLAGS += \
-        -DARMNN_MIXED_PRECISION_FP16_POOLING
-  endif # Q_OR_LATER=0
-endif # P_OR_LATER=1
-
 ifeq ($(Q_OR_LATER),1)
 LOCAL_CFLAGS += \
         -DBOOST_NO_AUTO_PTR

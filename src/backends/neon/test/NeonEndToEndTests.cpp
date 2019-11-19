@@ -454,4 +454,54 @@ BOOST_AUTO_TEST_CASE(NeonArgMinAxis3Test)
     ArgMinAxis3EndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
+BOOST_AUTO_TEST_CASE(NeonArgMaxSimpleTestQuantisedAsymm8)
+{
+    ArgMaxEndToEndSimple<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMinSimpleTestQuantisedAsymm8)
+{
+    ArgMinEndToEndSimple<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMaxAxis0TestQuantisedAsymm8)
+{
+    ArgMaxAxis0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMinAxis0TestQuantisedAsymm8)
+{
+    ArgMinAxis0EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMaxAxis1TestQuantisedAsymm8)
+{
+    ArgMaxAxis1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMinAxis1TestQuantisedAsymm8)
+{
+    ArgMinAxis1EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMaxAxis2TestQuantisedAsymm8)
+{
+    ArgMaxAxis2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMinAxis2TestQuantisedAsymm8)
+{
+    ArgMinAxis2EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMaxAxis3TestQuantisedAsymm8)
+{
+    ArgMaxAxis3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
+BOOST_AUTO_TEST_CASE(NeonArgMinAxis3TestQuantisedAsymm8)
+{
+    ArgMinAxis3EndToEnd<armnn::DataType::QuantisedAsymm8>(defaultBackends);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -70,7 +70,7 @@ LayerTestResult<int32_t, 3> ArgMaxSimpleTest(
 
     armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
 
-    if(armnn::IsQuantizedType<T>())
+    if (armnn::IsQuantizedType<T>())
     {
         inputTensorInfo.SetQuantizationScale(1.0f);
         inputTensorInfo.SetQuantizationOffset(0);
@@ -97,7 +97,7 @@ LayerTestResult<int32_t, 3> ArgMinSimpleTest(
 
     armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
 
-    if(armnn::IsQuantizedType<T>())
+    if (armnn::IsQuantizedType<T>())
     {
         inputTensorInfo.SetQuantizationScale(1.0f);
         inputTensorInfo.SetQuantizationOffset(0);
@@ -124,7 +124,7 @@ LayerTestResult<int32_t, 3> ArgMinChannelTest(
 
     armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
 
-    if(armnn::IsQuantizedType<T>())
+    if (armnn::IsQuantizedType<T>())
     {
         inputTensorInfo.SetQuantizationScale(1.0f);
         inputTensorInfo.SetQuantizationOffset(0);
@@ -159,7 +159,7 @@ LayerTestResult<int32_t, 3> ArgMaxChannelTest(
 
     armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
 
-    if(armnn::IsQuantizedType<T>())
+    if (armnn::IsQuantizedType<T>())
     {
         inputTensorInfo.SetQuantizationScale(1.0f);
         inputTensorInfo.SetQuantizationOffset(0);
@@ -195,6 +195,12 @@ LayerTestResult<int32_t, 3> ArgMaxHeightTest(
     armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
     armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
 
+    if (armnn::IsQuantizedType<T>())
+    {
+        inputTensorInfo.SetQuantizationScale(1.0f);
+        inputTensorInfo.SetQuantizationOffset(0);
+    }
+
     std::vector<float> inputValues({  1.0f,   2.0f,   3.0f,   4.0f,
                                       5.0f,   6.0f,   7.0f,   8.0f,
 
@@ -223,6 +229,12 @@ LayerTestResult<int32_t, 3> ArgMinWidthTest(
 
     armnn::TensorInfo inputTensorInfo(inputShape, ArmnnType);
     armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Signed32);
+
+    if (armnn::IsQuantizedType<T>())
+    {
+        inputTensorInfo.SetQuantizationScale(1.0f);
+        inputTensorInfo.SetQuantizationOffset(0);
+    }
 
     std::vector<float> inputValues({  1.0f,   2.0f,   3.0f,   4.0f,
                                       5.0f,   6.0f,   7.0f,   8.0f,
@@ -336,11 +348,21 @@ ArgMaxHeightTest<armnn::DataType::Signed32>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
+ArgMaxHeightTest<armnn::DataType::QuantisedAsymm8>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
 ArgMinWidthTest<armnn::DataType::Float32>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
 
 template LayerTestResult<int32_t, 3>
 ArgMinWidthTest<armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);
+
+template LayerTestResult<int32_t, 3>
+ArgMinWidthTest<armnn::DataType::QuantisedAsymm8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager);

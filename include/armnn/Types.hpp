@@ -36,7 +36,8 @@ enum class DataType
     Signed32 = 3,
     Boolean = 4,
     QuantisedSymm16 = 5,
-    QuantizedSymm8PerAxis = 6
+    QuantizedSymm8PerAxis = 6,
+    QuantisedSymm8 = 7
 };
 
 enum class DataLayout

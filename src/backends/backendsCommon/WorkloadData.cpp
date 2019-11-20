@@ -2484,6 +2484,8 @@ void DequantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
     if (inputTensorInfo.GetDataType() != DataType::QuantisedAsymm8 &&
+        inputTensorInfo.GetDataType() != DataType::QuantisedSymm8 &&
+        inputTensorInfo.GetDataType() != DataType::QuantizedSymm8PerAxis &&
         inputTensorInfo.GetDataType() != DataType::QuantisedSymm16)
     {
         throw InvalidArgumentException(descriptorName + ": Input to dequantize layer must be quantized type.");

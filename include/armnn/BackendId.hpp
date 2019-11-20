@@ -79,12 +79,18 @@ public:
     BackendId(const std::string& id) : m_Id{id} {}
     BackendId(const char* id) : m_Id{id} {}
 
+
+    BackendId(const BackendId& other) = default;
+    BackendId(BackendId&& other) = default;
+    BackendId& operator=(const BackendId& other) = default;
+    BackendId& operator=(BackendId&& other) = default;
+    ~BackendId(){}
+
     /// Deprecated function that will be removed together with
     /// the Compute enum
     BackendId(Compute compute) : m_Id{GetComputeDeviceAsCString(compute)} {}
 
     operator std::string() const { return m_Id; }
-
     BackendId& operator=(const std::string& other)
     {
         m_Id = other;

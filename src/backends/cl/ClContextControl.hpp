@@ -11,15 +11,12 @@
 namespace armnn
 {
 
-class IGpuAccTunedParameters;
-class ClTunedParameters;
-
 // ARM Compute OpenCL context control.
 class ClContextControl
 {
 public:
 
-    ClContextControl(IGpuAccTunedParameters* clTunedParameters = nullptr,
+    ClContextControl(arm_compute::CLTuner* = nullptr,
                      bool profilingEnabled = false);
 
     virtual ~ClContextControl();
@@ -35,9 +32,9 @@ public:
 
 private:
 
-    void DoLoadOpenClRuntime(bool useTunedParameters);
+    void DoLoadOpenClRuntime(bool updateTunedParameters);
 
-    ClTunedParameters* m_clTunedParameters;
+    arm_compute::CLTuner* m_Tuner;
 
     bool m_ProfilingEnabled;
 };

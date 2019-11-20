@@ -4,7 +4,7 @@
 //
 #pragma once
 
-
+#include "BackendOptions.hpp"
 #include "INetwork.hpp"
 #include "IProfiler.hpp"
 #include "Tensor.hpp"
@@ -73,8 +73,35 @@ public:
             bool        m_FileOnly;
             uint32_t    m_CapturePeriod;
         };
-
         ExternalProfilingOptions m_ProfilingOptions;
+
+        /// Pass backend specific options.
+        ///
+        /// For example, to enable GpuAcc tuning add the following
+        /// m_BackendOption.emplace_back(
+        ///     BackendOptions{"GpuAcc",
+        ///       {
+        ///         {"TuningLevel", 2},
+        ///         {"TuningFile", filename}
+        ///       }
+        ///     });
+        /// Execute representative workloads through the runtime to generate tuning data.
+        /// The tuning file is written once the runtime is destroyed
+
+        /// To execute with the tuning data, start up with just the tuning file specified.
+        /// m_BackendOption.emplace_back(
+        ///     BackendOptions{"GpuAcc",
+        ///       {
+        ///         {"TuningFile", filename}
+        ///       }
+        ///     });
+
+        /// The following backend options are available:
+        /// GpuAcc:
+        ///   "TuningLevel" : int [0..3] (0=UseOnly(default) | 1=RapidTuning | 2=NormalTuning | 3=ExhaustiveTuning)
+        ///   "TuningFile" : string [filenameString]
+        ///   "KernelProfilingEnabled" : bool [true | false]
+        std::vector<BackendOptions> m_BackendOptions;
     };
 
     static IRuntime* CreateRaw(const CreationOptions& options);
@@ -134,6 +161,8 @@ protected:
     ~IRuntime() {}
 };
 
+
+/// The following API is replaced by the backend options API.
 using IGpuAccTunedParametersPtr = std::shared_ptr<IGpuAccTunedParameters>;
 
 /// Manages a set of GpuAcc parameters which have been tuned for maximum performance.

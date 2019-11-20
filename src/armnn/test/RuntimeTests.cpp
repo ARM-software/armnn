@@ -288,6 +288,55 @@ BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
     BOOST_TEST(!optNet);
 }
 
+BOOST_AUTO_TEST_CASE(RuntimeBackendOptions)
+{
+    using namespace armnn;
+
+    IRuntime::CreationOptions creationOptions;
+    auto& backendOptions = creationOptions.m_BackendOptions;
+
+
+    // Define Options on explicit construction
+    BackendOptions options1("FakeBackend1",
+                           {
+                               {"Option1", 1.3f},
+                               {"Option2", true}
+                           });
+
+    // Add an option after construction
+    options1.AddOption({"Option3", "some_value"});
+
+    // Add the options to CreationOptions struct
+    backendOptions.push_back(options1);
+
+    // Add more Options via inplace explicit construction
+    backendOptions.emplace_back(
+        BackendOptions{"FakeBackend1",
+                       {{"Option4", 42}}
+                        });
+
+
+    // First group
+    BOOST_TEST(backendOptions[0].GetBackendId().Get() == "FakeBackend1");
+    BOOST_TEST(backendOptions[0].GetOption(0).GetName() == "Option1");
+    BOOST_TEST(backendOptions[0].GetOption(0).GetValue().IsFloat() == true);
+    BOOST_TEST(backendOptions[0].GetOption(0).GetValue().AsFloat() == 1.3f);
+
+    BOOST_TEST(backendOptions[0].GetOption(1).GetName() == "Option2");
+    BOOST_TEST(backendOptions[0].GetOption(1).GetValue().IsBool() == true);
+    BOOST_TEST(backendOptions[0].GetOption(1).GetValue().AsBool() == true);
+
+    BOOST_TEST(backendOptions[0].GetOption(2).GetName() == "Option3");
+    BOOST_TEST(backendOptions[0].GetOption(2).GetValue().IsString() == true);
+    BOOST_TEST(backendOptions[0].GetOption(2).GetValue().AsString() == "some_value");
+
+    // Second group
+    BOOST_TEST(backendOptions[1].GetBackendId().Get() == "FakeBackend1");
+    BOOST_TEST(backendOptions[1].GetOption(0).GetName() == "Option4");
+    BOOST_TEST(backendOptions[1].GetOption(0).GetValue().IsInt() == true);
+    BOOST_TEST(backendOptions[1].GetOption(0).GetValue().AsInt() == 42);
+}
+
 BOOST_AUTO_TEST_CASE(ProfilingDisable)
 {
     using namespace armnn;
@@ -635,7 +684,7 @@ BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
                                            LabelsAndEventClasses::TYPE_GUID,
                                            readableData,
                                            offset);
-    
+
     bufferManager.MarkRead(readableBuffer);
 
     // Creates structures for input & output.

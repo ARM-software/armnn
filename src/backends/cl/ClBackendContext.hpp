@@ -8,6 +8,8 @@
 #include <unordered_set>
 #include <mutex>
 
+#include <arm_compute/runtime/CL/CLTuner.h>
+
 namespace armnn
 {
 
@@ -31,6 +33,8 @@ private:
 
     std::unordered_set<NetworkId> m_NetworkIds;
 
+    std::unique_ptr<arm_compute::CLTuner> m_Tuner;
+    std::string m_TuningFile;
 };
 
 } // namespace armnn

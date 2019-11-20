@@ -27,9 +27,9 @@ class Device;
 namespace armnn
 {
 
-ClContextControl::ClContextControl(IGpuAccTunedParameters* clTunedParameters,
+ClContextControl::ClContextControl(arm_compute::CLTuner *tuner,
                                    bool profilingEnabled)
-    : m_clTunedParameters(boost::polymorphic_downcast<ClTunedParameters*>(clTunedParameters))
+    : m_Tuner(tuner)
     , m_ProfilingEnabled(profilingEnabled)
 {
     // Ignore m_ProfilingEnabled if unused to avoid compiling problems when ArmCompute is disabled.
@@ -97,7 +97,7 @@ void ClContextControl::UnloadOpenClRuntime()
     DoLoadOpenClRuntime(false);
 }
 
-void ClContextControl::DoLoadOpenClRuntime(bool useTunedParameters)
+void ClContextControl::DoLoadOpenClRuntime(bool updateTunedParameters)
 {
     cl::Device device = cl::Device::getDefault();
     cl::Context context;
@@ -133,8 +133,8 @@ void ClContextControl::DoLoadOpenClRuntime(bool useTunedParameters)
 
         // NOTE: In this specific case profiling has to be enabled on the command queue
         // in order for the CLTuner to work.
-        bool profilingNeededForClTuner = useTunedParameters && m_clTunedParameters &&
-            m_clTunedParameters->m_Mode == IGpuAccTunedParameters::Mode::UpdateTunedParameters;
+        bool profilingNeededForClTuner = updateTunedParameters && m_Tuner &&
+            m_Tuner->tune_new_kernels();
 
         if (m_ProfilingEnabled || profilingNeededForClTuner)
         {
@@ -156,34 +156,7 @@ void ClContextControl::DoLoadOpenClRuntime(bool useTunedParameters)
 
     // Note the first argument (path to cl source code) will be ignored as they should be embedded in the armcompute.
     arm_compute::CLKernelLibrary::get().init(".", context, device);
-
-    arm_compute::ICLTuner* tuner = nullptr;
-    if (useTunedParameters && m_clTunedParameters)
-    {
-        tuner = &m_clTunedParameters->m_Tuner;
-        auto clTuner = boost::polymorphic_downcast<arm_compute::CLTuner*>(tuner);
-
-        auto ConvertTuningLevel = [](IGpuAccTunedParameters::TuningLevel level)
-        {
-            switch(level)
-            {
-                case IGpuAccTunedParameters::TuningLevel::Rapid:
-                    return arm_compute::CLTunerMode::RAPID;
-                case IGpuAccTunedParameters::TuningLevel::Normal:
-                    return arm_compute::CLTunerMode::NORMAL;
-                case IGpuAccTunedParameters::TuningLevel::Exhaustive:
-                    return arm_compute::CLTunerMode::EXHAUSTIVE;
-                default:
-                {
-                    BOOST_ASSERT_MSG(false, "Tuning level not recognised.");
-                    return arm_compute::CLTunerMode::NORMAL;
-                }
-            }
-        };
-
-        clTuner->set_tuner_mode(ConvertTuningLevel(m_clTunedParameters->m_TuningLevel));
-    }
-    arm_compute::CLScheduler::get().init(context, commandQueue, device, tuner);
+    arm_compute::CLScheduler::get().init(context, commandQueue, device, m_Tuner);
 }
 
 void ClContextControl::ClearClCache()
@@ -225,7 +198,7 @@ void ClTunedParameters::Load(const char* filename)
     catch (const std::exception& e)
     {
         throw armnn::Exception(std::string("Failed to load tuned parameters file '") + filename + "': " +
-            e.what());
+                               e.what());
     }
 }
 
@@ -238,7 +211,7 @@ void ClTunedParameters::Save(const char* filename) const
     catch (const std::exception& e)
     {
         throw armnn::Exception(std::string("Failed to save tuned parameters file to '") + filename + "': " +
-            e.what());
+                               e.what());
     }
 }
 

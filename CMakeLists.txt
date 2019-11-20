@@ -210,6 +210,7 @@ list(APPEND armnn_sources
     include/armnn/ArmNN.hpp
     include/armnn/BackendHelper.hpp
     include/armnn/BackendId.hpp
+    include/armnn/BackendOptions.hpp
     include/armnn/BackendRegistry.hpp
     include/armnn/Conversion.hpp
     include/armnn/Deprecated.hpp

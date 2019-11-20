@@ -45,8 +45,8 @@ BOOST_AUTO_TEST_CASE(DumpOutgoingValidFileEndToEnd)
     profilingService.Update();
     profilingService.Update();
 
-    uint32_t timeout   = 2000;
-    uint32_t sleepTime = 50;
+    uint32_t timeout   = 25; // Wait for a maximum of 25mSec
+    uint32_t sleepTime = 1;  // in 1mSec intervals.
     uint32_t timeSlept = 0;
 
     // Give the profiling service sending thread time start executing and send the stream metadata.

@@ -11,6 +11,7 @@
 #include "ProfilingUtils.hpp"
 #include "Runtime.hpp"
 
+#include <condition_variable>
 #include <fstream>
 #include <queue>
 
@@ -75,6 +76,9 @@ private:
     std::vector<uint16_t> m_IdList;
     std::queue<Packet> m_PacketQueue;
     TargetEndianness m_Endianness;
+
+    std::mutex m_PacketAvailableMutex;
+    std::condition_variable m_ConditionPacketAvailable;
 };
 
 }    // namespace profiling

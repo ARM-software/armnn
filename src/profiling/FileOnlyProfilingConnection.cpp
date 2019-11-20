@@ -69,7 +69,11 @@ void FileOnlyProfilingConnection::SendConnectionAck()
         std::cout << "Sending connection acknowledgement." << std::endl;
     }
     std::unique_ptr<unsigned char[]> uniqueNullPtr = nullptr;
-    m_PacketQueue.push(Packet(0x10000, 0, uniqueNullPtr));
+    {
+        std::lock_guard<std::mutex> lck(m_PacketAvailableMutex);
+        m_PacketQueue.push(Packet(0x10000, 0, uniqueNullPtr));
+    }
+    m_ConditionPacketAvailable.notify_one();
 }
 
 bool FileOnlyProfilingConnection::SendCounterSelectionPacket()
@@ -94,7 +98,11 @@ bool FileOnlyProfilingConnection::SendCounterSelectionPacket()
         offset += uint16_t_size;
     }
 
-    m_PacketQueue.push(Packet(0x40000, bodySize, uniqueData));
+    {
+        std::lock_guard<std::mutex> lck(m_PacketAvailableMutex);
+        m_PacketQueue.push(Packet(0x40000, bodySize, uniqueData));
+    }
+    m_ConditionPacketAvailable.notify_one();
 
     return true;
 }
@@ -155,13 +163,10 @@ bool FileOnlyProfilingConnection::WritePacket(const unsigned char* buffer, uint3
 
 Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
 {
-    uint16_t loopCount       = 10;
-    uint32_t timeoutFraction = timeout / loopCount;
-    while (m_PacketQueue.empty())
+    std::unique_lock<std::mutex> lck(m_PacketAvailableMutex);
+    if (m_PacketQueue.empty())
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeoutFraction));
-        --loopCount;
-        if ((loopCount) == 0)
+        if(m_ConditionPacketAvailable.wait_for(lck, std::chrono::milliseconds(timeout)) == std::cv_status::timeout)
         {
             throw armnn::TimeoutException("Thread has timed out as per requested time limit");
         }

@@ -118,7 +118,7 @@ public:
 
     ~MockPacketBuffer() {}
 
-    const unsigned char* const GetReadableData() const override { return m_Data.get(); }
+    const unsigned char* GetReadableData() const override { return m_Data.get(); }
 
     unsigned int GetSize() const override { return m_Size; }
 

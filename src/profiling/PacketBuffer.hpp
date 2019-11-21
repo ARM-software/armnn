@@ -22,7 +22,7 @@ public:
 
     ~PacketBuffer() {}
 
-    const unsigned char* const GetReadableData() const  override;
+    const unsigned char* GetReadableData() const  override;
 
     unsigned int GetSize() const  override;
 

@@ -20,7 +20,7 @@ PacketBuffer::PacketBuffer(unsigned int maxSize)
     m_Data = std::make_unique<unsigned char[]>(m_MaxSize);
 }
 
-const unsigned char* const PacketBuffer::GetReadableData() const
+const unsigned char* PacketBuffer::GetReadableData() const
 {
     return m_Data.get();
 }

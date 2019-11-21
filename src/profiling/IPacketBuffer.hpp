@@ -18,7 +18,7 @@ class IReadOnlyPacketBuffer // interface used by the read thread
 public:
     virtual ~IReadOnlyPacketBuffer() {}
 
-    virtual const unsigned char* const GetReadableData() const = 0;
+    virtual const unsigned char* GetReadableData() const = 0;
 
     virtual unsigned int GetSize() const = 0;
 

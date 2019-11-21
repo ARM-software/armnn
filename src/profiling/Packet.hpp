@@ -66,13 +66,13 @@ public:
     Packet& operator=(const Packet&) = delete;
     Packet& operator=(Packet&&) = default;
 
-    uint32_t GetHeader() const                 { return m_Header;        }
-    uint32_t GetPacketFamily() const           { return m_PacketFamily;  }
-    uint32_t GetPacketId() const               { return m_PacketId;      }
-    uint32_t GetPacketClass() const            { return m_PacketId >> 3; }
-    uint32_t GetPacketType() const             { return m_PacketId & 7;  }
-    uint32_t GetLength() const                 { return m_Length;        }
-    const unsigned char* const GetData() const { return m_Data.get();    }
+    uint32_t GetHeader() const           { return m_Header;        }
+    uint32_t GetPacketFamily() const     { return m_PacketFamily;  }
+    uint32_t GetPacketId() const         { return m_PacketId;      }
+    uint32_t GetPacketClass() const      { return m_PacketId >> 3; }
+    uint32_t GetPacketType() const       { return m_PacketId & 7;  }
+    uint32_t GetLength() const           { return m_Length;        }
+    const unsigned char* GetData() const { return m_Data.get();    }
 
     bool IsEmpty() { return m_Header == 0 && m_Length == 0; }
 

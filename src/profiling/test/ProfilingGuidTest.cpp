@@ -11,6 +11,7 @@
 #include <set>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/format.hpp>
 
 using namespace armnn::profiling;
 
@@ -64,27 +65,6 @@ BOOST_AUTO_TEST_CASE(DynamicGuidTest)
     BOOST_TEST(guid1 >= guid2);
 }
 
-std::string GenerateRandomString()
-{
-    // Random a string lengh from 3 - 100
-    int minLength = 3;
-    int maxLength = 100;
-
-    // Random a character from lower case alphabets, upper case alphabets, numbers and special characters
-    int minAscii = 32; // space 32
-    int maxAscii = 126; // ~
-
-    int stringLen = rand() % (maxLength - minLength + 1) + minLength;
-    char str[stringLen + 1];
-    for (int i = 0; i < stringLen; ++i)
-    {
-        int randAscii = rand() % (maxAscii - minAscii + 1) + minAscii;
-        str[i] = char(randAscii);
-    }
-    str[stringLen] = '\0';
-    return std::string(str);
-}
-
 void CheckStaticGuid(uint64_t guid, uint64_t expectedGuid)
 {
     BOOST_TEST(guid == expectedGuid);
@@ -101,25 +81,19 @@ BOOST_AUTO_TEST_CASE(StaticGuidGeneratorCollisionTest)
 {
     ProfilingGuidGenerator generator;
     std::set<uint64_t> guids;
-    std::set<std::string> strs;
-    std::map<uint64_t,std::string> guidMap;
-    int collision = 0;
     for (int i = 0; i < 1000000; ++i)
     {
-        std::string str = GenerateRandomString();
-        if(strs.find(str) != strs.end())
-        {
-            continue;
-        }
-        strs.insert(str);
+        std::stringstream ss;
+        ss << i;
+        std::string str = ss.str();
         ProfilingStaticGuid guid = generator.GenerateStaticId(str.c_str());
         if (guids.find(guid) != guids.end())
         {
-            collision++;
+            BOOST_ERROR(boost::str(boost::format("GUID collision occurred: %1% -> %2%") % str % guid));
+            break;
         }
         guids.insert(guid);
     }
-    BOOST_TEST(collision == 0);
 }
 
 BOOST_AUTO_TEST_CASE(StaticGuidGeneratorTest)

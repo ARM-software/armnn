@@ -16,6 +16,7 @@
 
 using namespace armnnUtils;
 
+namespace {
 struct TestHelper
 {
     const std::map<std::string, std::string> GetValidationLabelSet()
@@ -52,6 +53,7 @@ struct TestHelper
         return modelOutputLabels;
     }
 };
+}
 
 BOOST_AUTO_TEST_SUITE(ModelAccuracyCheckerTest)
 

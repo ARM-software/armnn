@@ -14,6 +14,7 @@
 
 using namespace armnnUtils;
 
+namespace {
 struct TestHelper {
 
     TestHelper()
@@ -75,6 +76,7 @@ struct TestHelper {
 
     boost::optional<boost::filesystem::path> m_CsvFile;
 };
+}
 
 BOOST_AUTO_TEST_SUITE(CsvReaderTest)
 

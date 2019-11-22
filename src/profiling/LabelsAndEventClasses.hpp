@@ -22,9 +22,21 @@ public:
     static std::string NAME_LABEL;
     static std::string TYPE_LABEL;
     static std::string INDEX_LABEL;
+    static std::string BACKENDID_LABEL;
     static ProfilingStaticGuid NAME_GUID;
     static ProfilingStaticGuid TYPE_GUID;
     static ProfilingStaticGuid INDEX_GUID;
+    static ProfilingStaticGuid BACKENDID_GUID;
+
+    // Common types
+    static std::string LAYER;
+    static std::string WORKLOAD;
+    static std::string NETWORK;
+    static std::string CONNECTION;
+    static ProfilingStaticGuid LAYER_GUID;
+    static ProfilingStaticGuid WORKLOAD_GUID;
+    static ProfilingStaticGuid NETWORK_GUID;
+    static ProfilingStaticGuid CONNECTION_GUID;
 
     // Event Class GUIDs
     static ProfilingStaticGuid ARMNN_PROFILING_SOL_EVENT_CLASS;

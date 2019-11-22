@@ -17,18 +17,34 @@ namespace profiling
 class TimelineUtilityMethods
 {
 public:
-    TimelineUtilityMethods(ISendTimelinePacket& sendTimelinePacket)
-        : m_SendTimelinePacket(sendTimelinePacket)
-    {}
+
+    // static factory method which will return a pointer to a timelie utility methods
+    // object if profiling is enabled. Otherwise will return a null unique_ptr
+    static std::unique_ptr<TimelineUtilityMethods> GetTimelineUtils();
+
+    TimelineUtilityMethods(std::unique_ptr<ISendTimelinePacket>& sendTimelinePacket)
+        : m_SendTimelinePacket(std::move(sendTimelinePacket)) {}
+
+    TimelineUtilityMethods(TimelineUtilityMethods&& other)
+        : m_SendTimelinePacket(std::move(other.m_SendTimelinePacket)) {}
+
+    TimelineUtilityMethods(const TimelineUtilityMethods& other) = delete;
+
+    TimelineUtilityMethods& operator=(const TimelineUtilityMethods& other) = delete;
+
+    TimelineUtilityMethods& operator=(TimelineUtilityMethods&& other) = default;
+
     ~TimelineUtilityMethods() = default;
 
     void SendWellKnownLabelsAndEventClasses();
 
     ProfilingDynamicGuid CreateNamedTypedEntity(const std::string& name, const std::string& type);
 
-    void CreateNamedTypedEntity(ProfilingDynamicGuid entityGuid, const std::string& name, const std::string& type);
+    void CreateNamedTypedEntity(ProfilingGuid entityGuid, const std::string& name, const std::string& type);
 
-    void CreateTypedLabel(ProfilingGuid entityGuid, const std::string& entityName, ProfilingStaticGuid labelTypeGuid);
+    void CreateNamedTypedEntity(ProfilingGuid entityGuid, const std::string& name, ProfilingStaticGuid typeGuid);
+
+    void MarkEntityWithLabel(ProfilingGuid entityGuid, const std::string &labelName, ProfilingStaticGuid labelLinkGuid);
 
     ProfilingStaticGuid DeclareLabel(const std::string& labelName);
 
@@ -40,15 +56,34 @@ public:
                                                      const std::string& entityName,
                                                      const std::string& entityType);
 
-    void CreateNamedTypedChildEntity(ProfilingDynamicGuid entityGuid,
+    void CreateNamedTypedChildEntity(ProfilingGuid entityGuid,
                                      ProfilingGuid parentEntityGuid,
                                      const std::string& entityName,
                                      const std::string& entityType);
 
+    void CreateNamedTypedChildEntity(ProfilingGuid entityGuid,
+                                     ProfilingGuid parentEntityGuid,
+                                     const std::string& entityName,
+                                     ProfilingStaticGuid typeGuid);
+
+    ProfilingDynamicGuid CreateRelationship(ProfilingRelationshipType relationshipType,
+                                            ProfilingGuid headGuid,
+                                            ProfilingGuid tailGuid);
+
+    ProfilingDynamicGuid CreateConnectionRelationship(ProfilingRelationshipType relationshipType,
+                                                      ProfilingGuid headGuid,
+                                                      ProfilingGuid tailGuid);
+
+    void CreateTypedEntity(ProfilingGuid entityGuid, ProfilingStaticGuid typeGuid);
+
+    void MarkEntityWithType(ProfilingGuid entityGuid, ProfilingStaticGuid typeNameGuid);
+
     ProfilingDynamicGuid RecordEvent(ProfilingGuid entityGuid, ProfilingStaticGuid eventClassGuid);
 
+    void Commit() { m_SendTimelinePacket->Commit(); }
+
 private:
-    ISendTimelinePacket& m_SendTimelinePacket;
+    std::unique_ptr<ISendTimelinePacket> m_SendTimelinePacket;
 };
 
 } // namespace profiling

@@ -199,6 +199,7 @@ LOCAL_SRC_FILES := \
         src/profiling/SendCounterPacket.cpp \
         src/profiling/SendTimelinePacket.cpp \
         src/profiling/SocketProfilingConnection.cpp \
+        src/profiling/TimelinePacketWriterFactory.cpp \
         src/profiling/TimelineUtilityMethods.cpp
 
 LOCAL_STATIC_LIBRARIES := \
@@ -330,7 +331,8 @@ LOCAL_SRC_FILES := \
         src/armnn/test/TensorTest.cpp \
         src/armnn/test/TestUtils.cpp \
         src/armnn/test/UnitTests.cpp \
-        src/armnn/test/UtilsTests.cpp
+        src/armnn/test/UtilsTests.cpp \
+        src/profiling/test/ProfilingTestUtils.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 LOCAL_SRC_FILES += \

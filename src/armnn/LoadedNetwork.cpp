@@ -17,6 +17,9 @@
 #include <backendsCommon/IMemoryManager.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <backendsCommon/MemSyncWorkload.hpp>
+#include <LabelsAndEventClasses.hpp>
+#include <ProfilingService.hpp>
+#include <TimelineUtilityMethods.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 #include <boost/assert.hpp>
@@ -27,6 +30,7 @@ namespace armnn
 {
 
 using namespace std;
+using namespace armnn::profiling;
 
 namespace
 {
@@ -37,6 +41,43 @@ std::string ToErrorMessage(const char * prefix, const ExceptionType & error)
     std::stringstream ss;
     ss << prefix << " " << error.what();
     return ss.str();
+}
+
+void AddLayerStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils,
+                       const Layer& layer,
+                       ProfilingGuid networkGuid)
+{
+    // Add layer to the post-optimisation network structure
+    std::string layerName = layer.GetNameStr().empty() ? "<Unnamed>" : layer.GetNameStr();
+    timelineUtils->CreateNamedTypedChildEntity(layer.GetGuid(),
+                                               networkGuid,
+                                               layerName,
+                                               LabelsAndEventClasses::LAYER_GUID);
+    for (auto&& input : layer.GetInputSlots())
+    {
+        const IOutputSlot* source = input.GetConnectedOutputSlot();
+        BOOST_ASSERT(source != NULL);
+        timelineUtils->CreateConnectionRelationship(ProfilingRelationshipType::RetentionLink,
+                                                    source->GetOwningLayerGuid(),
+                                                    layer.GetGuid());
+    }
+}
+
+void AddWorkloadStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils,
+                          std::unique_ptr<IWorkload>& workload,
+                          const Layer& layer)
+{
+    // Add workload to the post-optimisation network structure
+    timelineUtils->CreateTypedEntity(workload->GetGuid(), LabelsAndEventClasses::WORKLOAD_GUID);
+    timelineUtils->MarkEntityWithLabel(workload->GetGuid(),
+                                       layer.GetBackendId().Get(),
+                                       LabelsAndEventClasses::BACKENDID_GUID);
+
+    // Link the workload to the layer
+    timelineUtils->CreateRelationship(ProfilingRelationshipType::RetentionLink,
+                                      layer.GetGuid(),
+                                      workload->GetGuid());
+
 }
 
 } // anonymous
@@ -149,9 +190,22 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
         }
     }
 
+    ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
+    std::unique_ptr<TimelineUtilityMethods> timelineUtils = TimelineUtilityMethods::GetTimelineUtils();
+    if (timelineUtils)
+    {
+        timelineUtils->CreateTypedEntity(networkGuid, LabelsAndEventClasses::NETWORK_GUID);
+    }
+
     //Then create workloads.
     for (auto&& layer : order)
     {
+        if (timelineUtils)
+        {
+            // Add layer to the post-optimisation network structure
+            AddLayerStructure(timelineUtils, *layer, networkGuid);
+        }
+
         const IWorkloadFactory& workloadFactory = GetWorkloadFactory(*layer);
 
         switch (layer->GetType())
@@ -168,11 +222,18 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
 
                 if (!workload)
                 {
-                    const char* const layerName = layer->GetNameStr().length() != 0 ? layer->GetName() : "<Unnamed>";
+                    const char* const layerName =
+                        layer->GetNameStr().length() != 0 ? layer->GetName() : "<Unnamed>";
                     throw InvalidArgumentException(boost::str(
                         boost::format("No workload created for layer (name: '%1%' type: '%2%') (compute '%3%')")
                         % layerName % static_cast<int>(layer->GetType()) % layer->GetBackendId().Get()
                     ));
+                }
+
+                if (timelineUtils)
+                {
+                    // Add workload to the post-optimisation network structure
+                    AddWorkloadStructure(timelineUtils, workload, *layer);
                 }
 
                 m_WorkloadQueue.push_back(move(workload));
@@ -181,6 +242,12 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<OptimizedNetwork> net,
                 break;
             }
         }
+    }
+
+    if (timelineUtils)
+    {
+        // Commit to send the post-optimisation network structure
+        timelineUtils->Commit();
     }
 
     // Set up memory.

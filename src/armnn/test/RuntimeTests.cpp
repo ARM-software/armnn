@@ -9,6 +9,9 @@
 #include <Runtime.hpp>
 #include <armnn/TypesUtils.hpp>
 
+#include <LabelsAndEventClasses.hpp>
+#include <test/ProfilingTestUtils.hpp>
+
 #include <HeapProfiling.hpp>
 #include <LeakChecking.hpp>
 
@@ -17,6 +20,7 @@
 #endif
 
 #include <boost/test/unit_test.hpp>
+#include "RuntimeTests.hpp"
 
 namespace armnn
 {
@@ -282,6 +286,362 @@ BOOST_AUTO_TEST_CASE(IVGCVSW_1929_QuantizedSoftmaxIssue)
         "ERROR: output 0 of layer Softmax (softmax) is of type "
         "Quantized 8 bit but its scale parameter has not been set");
     BOOST_TEST(!optNet);
+}
+
+BOOST_AUTO_TEST_CASE(ProfilingDisable)
+{
+    using namespace armnn;
+
+    // Create runtime in which the test will run
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0);
+
+    // This layer configuration isn't supported by CpuAcc, should fall back to CpuRef.
+    NormalizationDescriptor descriptor;
+    IConnectableLayer* normalize = net->AddNormalizationLayer(descriptor);
+
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(normalize->GetInputSlot(0));
+    normalize->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+    normalize->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+
+    // optimize the network
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+
+    // Load it into the runtime. It should succeed.
+    armnn::NetworkId netId;
+    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+
+    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper;
+    profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
+    auto readableBuffer = bufferManager.GetReadableBuffer();
+
+    // Profiling is not enabled, the post-optimisation structure should not be created
+    BOOST_TEST(!readableBuffer);
+}
+
+BOOST_AUTO_TEST_CASE(ProfilingEnableCpuRef)
+{
+    using namespace armnn;
+    using namespace armnn::profiling;
+
+    // Create runtime in which the test will run
+    armnn::IRuntime::CreationOptions options;
+    options.m_ProfilingOptions.m_EnableProfiling = true;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0, "input");
+
+    NormalizationDescriptor descriptor;
+    IConnectableLayer* normalize = net->AddNormalizationLayer(descriptor, "normalization");
+
+    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+
+    input->GetOutputSlot(0).Connect(normalize->GetInputSlot(0));
+    normalize->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+    normalize->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 4 }, DataType::Float32));
+
+    // optimize the network
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+
+    ProfilingGuid optNetGuid = optNet->GetGuid();
+
+    // Load it into the runtime. It should succeed.
+    armnn::NetworkId netId;
+    BOOST_TEST(runtime->LoadNetwork(netId, std::move(optNet)) == Status::Success);
+
+    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper;
+    profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
+    auto readableBuffer = bufferManager.GetReadableBuffer();
+
+    // Profiling is enabled, the post-optimisation structure should be created
+    BOOST_CHECK(readableBuffer != nullptr);
+
+    unsigned int size = readableBuffer->GetSize();
+    BOOST_CHECK(size == 1356);
+
+    const unsigned char* readableData = readableBuffer->GetReadableData();
+    BOOST_CHECK(readableData != nullptr);
+
+    unsigned int offset = 0;
+
+    // Post-optimisation network
+    // Network entity
+    VerifyTimelineEntityBinaryPacket(optNetGuid, readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           optNetGuid,
+                                           LabelsAndEventClasses::NETWORK_GUID,
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Input layer
+    // Input layer entity
+    VerifyTimelineEntityBinaryPacket(input->GetGuid(), readableData, offset);
+
+    // Name Entity
+    VerifyTimelineLabelBinaryPacket(EmptyOptional(), "input", readableData, offset);
+
+    // Entity - Name relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           input->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Name label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::NAME_GUID,
+                                           readableData,
+                                           offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           input->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Network - Input layer relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           optNetGuid,
+                                           input->GetGuid(),
+                                           readableData,
+                                           offset);
+
+    // Normalization layer
+    // Normalization layer entity
+    VerifyTimelineEntityBinaryPacket(normalize->GetGuid(), readableData, offset);
+
+    // Name entity
+    VerifyTimelineLabelBinaryPacket(EmptyOptional(), "normalization", readableData, offset);
+
+    // Entity - Name relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           normalize->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Name label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::NAME_GUID,
+                                           readableData,
+                                           offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           normalize->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Network - Normalize layer relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           optNetGuid,
+                                           normalize->GetGuid(),
+                                           readableData,
+                                           offset);
+
+    // Input layer - Normalize layer relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           input->GetGuid(),
+                                           normalize->GetGuid(),
+                                           readableData,
+                                           offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::CONNECTION_GUID,
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Normalization workload
+    // Normalization workload entity
+    VerifyTimelineEntityBinaryPacket(EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // BackendId entity
+    VerifyTimelineLabelBinaryPacket(EmptyOptional(), "CpuRef", readableData, offset);
+
+    // Entity - BackendId relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // BackendId label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::BACKENDID_GUID,
+                                           readableData,
+                                           offset);
+
+    // Normalize layer - Normalize workload relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           normalize->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Output layer
+    // Output layer entity
+    VerifyTimelineEntityBinaryPacket(output->GetGuid(), readableData, offset);
+
+    // Name entity
+    VerifyTimelineLabelBinaryPacket(EmptyOptional(), "output", readableData, offset);
+
+    // Entity - Name relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           output->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Name label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::NAME_GUID,
+                                           readableData,
+                                           offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           output->GetGuid(),
+                                           EmptyOptional(),
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+
+    // Network - Output layer relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           optNetGuid,
+                                           output->GetGuid(),
+                                           readableData,
+                                           offset);
+
+    // Normalize layer - Output layer relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::RetentionLink,
+                                           EmptyOptional(),
+                                           normalize->GetGuid(),
+                                           output->GetGuid(),
+                                           readableData,
+                                           offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::CONNECTION_GUID,
+                                           readableData,
+                                           offset);
+
+    // Type label relationship
+    VerifyTimelineRelationshipBinaryPacket(ProfilingRelationshipType::LabelLink,
+                                           EmptyOptional(),
+                                           EmptyOptional(),
+                                           LabelsAndEventClasses::TYPE_GUID,
+                                           readableData,
+                                           offset);
+    
+    bufferManager.MarkRead(readableBuffer);
+}
+
+BOOST_AUTO_TEST_CASE(ProfilingPostOptimisationStructureCpuRef)
+{
+    VerifyPostOptimisationStructureTestImpl(armnn::Compute::CpuRef);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

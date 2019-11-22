@@ -77,6 +77,9 @@ public:
 
     std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const;
 
+    /// Check if the profiling is enabled
+    bool IsEnabled() { return m_Options.m_EnableProfiling; }
+
 private:
     // Copy/move constructors/destructors and copy/move assignment operators are deleted
     ProfilingService(const ProfilingService&) = delete;
@@ -200,6 +203,11 @@ protected:
     void WaitForPacketSent(ProfilingService& instance, uint32_t timeout = 1000)
     {
         return instance.m_SendCounterPacket.WaitForPacketSent(timeout);
+    }
+
+    BufferManager& GetBufferManager(ProfilingService& instance)
+    {
+        return instance.m_BufferManager;
     }
 };
 

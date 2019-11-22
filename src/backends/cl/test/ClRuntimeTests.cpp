@@ -8,6 +8,7 @@
 #include <LeakChecking.hpp>
 
 #include <backendsCommon/test/RuntimeTestImpl.hpp>
+#include <test/ProfilingTestUtils.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
@@ -147,5 +148,10 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryUsage)
     boost::ignore_unused(suppressed);
 }
 #endif
+
+BOOST_AUTO_TEST_CASE(ProfilingPostOptimisationStructureGpuAcc)
+{
+    VerifyPostOptimisationStructureTestImpl(armnn::Compute::GpuAcc);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

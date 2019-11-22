@@ -8,6 +8,7 @@
 #include <LeakChecking.hpp>
 
 #include <backendsCommon/test/RuntimeTestImpl.hpp>
+#include <test/ProfilingTestUtils.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -64,5 +65,10 @@ BOOST_AUTO_TEST_CASE(RuntimeMemoryLeaksCpuAcc)
     }
 }
 #endif
+
+BOOST_AUTO_TEST_CASE(ProfilingPostOptimisationStructureCpuAcc)
+{
+    VerifyPostOptimisationStructureTestImpl(armnn::Compute::CpuAcc);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

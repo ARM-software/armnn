@@ -632,6 +632,8 @@ if(BUILD_UNIT_TESTS)
         src/profiling/test/ProfilingGuidTest.cpp
         src/profiling/test/ProfilingTests.cpp
         src/profiling/test/ProfilingTests.hpp
+        src/profiling/test/ProfilingTestUtils.cpp
+        src/profiling/test/ProfilingTestUtils.hpp
         src/profiling/test/SendCounterPacketTests.cpp
         src/profiling/test/SendCounterPacketTests.hpp
         src/profiling/test/SendTimelinePacketTests.cpp

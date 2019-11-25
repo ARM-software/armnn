@@ -185,6 +185,7 @@ All downloaded or generated files will be saved inside the `~/armnn-devenv` dire
 
 
 * Push the build results to an Android device and make symbolic links for shared libraries:
+  Currently adb version we have used for testing is 1.0.41.
 
 	```bash
 	adb push libarmnnTfParser.so /data/local/tmp/

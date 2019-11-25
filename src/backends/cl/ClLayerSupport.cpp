@@ -49,6 +49,7 @@
 #include "workloads/ClRsqrtWorkload.hpp"
 #include "workloads/ClQuantizedLstmWorkload.hpp"
 #include "workloads/ClQuantizeWorkload.hpp"
+#include "workloads/ClSliceWorkload.hpp"
 #include "workloads/ClSoftmaxBaseWorkload.hpp"
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
 #include "workloads/ClSpaceToDepthWorkload.hpp"
@@ -690,6 +691,14 @@ bool ClLayerSupport::IsRsqrtSupported(const TensorInfo& input,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClRsqrtWorkloadValidate, reasonIfUnsupported, input, output);
+}
+
+bool ClLayerSupport::IsSliceSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const SliceDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClSliceWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 bool ClLayerSupport::IsSoftmaxSupported(const TensorInfo& input,

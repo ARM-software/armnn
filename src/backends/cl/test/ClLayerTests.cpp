@@ -562,6 +562,20 @@ ARMNN_AUTO_TEST_CASE(StackOutput3DInputs3, StackOutput3DInputs3Float32Test)
 ARMNN_AUTO_TEST_CASE(StackOutput5D,        StackOutput5DFloat32Test)
 ARMNN_AUTO_TEST_CASE(StackFloat16,         StackFloat16Test)
 
+// Slice
+ARMNN_AUTO_TEST_CASE(Slice4dFloat32, Slice4dFloat32Test)
+ARMNN_AUTO_TEST_CASE(Slice3dFloat32, Slice3dFloat32Test)
+ARMNN_AUTO_TEST_CASE(Slice2dFloat32, Slice2dFloat32Test)
+ARMNN_AUTO_TEST_CASE(Slice1dFloat32, Slice1dFloat32Test)
+ARMNN_AUTO_TEST_CASE(Slice4dUint8, Slice4dUint8Test)
+ARMNN_AUTO_TEST_CASE(Slice3dUint8, Slice3dUint8Test)
+ARMNN_AUTO_TEST_CASE(Slice2dUint8, Slice2dUint8Test)
+ARMNN_AUTO_TEST_CASE(Slice1dUint8, Slice1dUint8Test)
+ARMNN_AUTO_TEST_CASE(Slice4dInt16, Slice4dInt16Test)
+ARMNN_AUTO_TEST_CASE(Slice3dInt16, Slice3dInt16Test)
+ARMNN_AUTO_TEST_CASE(Slice2dInt16, Slice2dInt16Test)
+ARMNN_AUTO_TEST_CASE(Slice1dInt16, Slice1dInt16Test)
+
 // Strided Slice
 ARMNN_AUTO_TEST_CASE(StridedSlice4dFloat32, StridedSlice4dFloat32Test)
 ARMNN_AUTO_TEST_CASE(StridedSlice4dReverseFloat32, StridedSlice4dReverseFloat32Test)

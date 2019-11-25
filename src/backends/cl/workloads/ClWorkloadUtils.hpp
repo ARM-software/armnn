@@ -60,6 +60,30 @@ inline auto SetClStridedSliceData(const std::vector<int>& m_begin,
     return std::make_tuple(starts, ends, strides);
 }
 
+inline auto SetClSliceData(const std::vector<unsigned int>& m_begin,
+                           const std::vector<unsigned int>& m_size)
+{
+    // This function must translate the size vector given to an end vector
+    // expected by the ACL NESlice workload
+    arm_compute::Coordinates starts;
+    arm_compute::Coordinates ends;
+
+    unsigned int num_dims = static_cast<unsigned int>(m_begin.size());
+
+    // For strided slices, we have the relationship size = (end - begin) / stride
+    // For slice, we assume stride to be a vector of all ones, yielding the formula
+    // size = (end - begin) therefore we know end = size + begin
+    for (unsigned int i = 0; i < num_dims; i++)
+    {
+        unsigned int revertedIndex = num_dims - i - 1;
+
+        starts.set(i, static_cast<int>(m_begin[revertedIndex]));
+        ends.set(i, static_cast<int>(m_begin[revertedIndex] + m_size[revertedIndex]));
+    }
+
+    return std::make_tuple(starts, ends);
+}
+
 inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
                                              const ConstCpuTensorHandle* handle)
 {
